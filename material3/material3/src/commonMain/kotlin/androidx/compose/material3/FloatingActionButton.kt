@@ -32,7 +32,6 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.tokens.ExtendedFabPrimaryTokens
 import androidx.compose.material3.tokens.FabPrimaryTokens
 import androidx.compose.material3.tokens.FabPrimaryLargeTokens
@@ -51,14 +50,17 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import kotlinx.coroutines.flow.collect
 
 /**
  * ![FAB image](https://developer.android.com/images/reference/androidx/compose/material3/fab.png)
  *
- * A floating action button (FAB) represents the primary action of a screen.
+ * A floating action button (FAB) represents the primary action of a screen. To learn more about the
+ * FAB visit the [Material website](https://m3.material.io/components/floating-action-button).
+ *
+ * FAB typically contains an icon, for a FAB with text and an icon, see
+ * [ExtendedFloatingActionButton].
  *
  * @sample androidx.compose.material3.samples.FloatingActionButtonSample
  *
@@ -88,38 +90,35 @@ fun FloatingActionButton(
     elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
     content: @Composable () -> Unit,
 ) {
-    val shadowElevation = elevation.shadowElevation(interactionSource = interactionSource).value
-    val tonalElevation = elevation.tonalElevation(interactionSource = interactionSource).value
-    val clickAndSemanticsModifier = Modifier.clickable(
-        interactionSource = interactionSource,
-        indication = rememberRipple(),
-        enabled = true,
-        onClickLabel = null,
-        role = Role.Button,
-        onClick = onClick
-    )
     Surface(
-        modifier = modifier
-            .minimumTouchTargetSize()
-            .shadow(
-                elevation = shadowElevation,
-                shape = shape,
-            ),
+        modifier = modifier.clickable(
+            interactionSource = interactionSource,
+            indication = null,
+            role = Role.Button,
+            onClick = onClick
+        ),
+        interactionSource = interactionSource,
         shape = shape,
         color = containerColor,
         contentColor = contentColor,
-        tonalElevation = tonalElevation,
+        tonalElevation = elevation.tonalElevation(interactionSource = interactionSource).value,
+        shadowElevation = elevation.shadowElevation(interactionSource = interactionSource).value,
     ) {
         CompositionLocalProvider(LocalContentColor provides contentColor) {
-            ProvideTextStyle(MaterialTheme.typography.labelLarge) {
+            // Adding the text style from [ExtendedFloatingActionButton] to all FAB variations. In
+            // the majority of cases this will have no impact, because icons are expected, but if a
+            // developer decides to put some short text to emulate an icon, (like "?") then it will
+            // have the correct styling.
+            ProvideTextStyle(
+                MaterialTheme.typography.fromToken(ExtendedFabPrimaryTokens.LabelTextFont),
+            ) {
                 Box(
                     modifier = Modifier
                         .defaultMinSize(
                             minWidth = FabPrimaryTokens.ContainerWidth,
                             minHeight = FabPrimaryTokens.ContainerHeight,
-                        )
-                        .then(clickAndSemanticsModifier),
-                    contentAlignment = Alignment.Center
+                        ),
+                    contentAlignment = Alignment.Center,
                 ) { content() }
             }
         }
@@ -225,7 +224,8 @@ fun LargeFloatingActionButton(
 /**
  * ![Extended FAB image](https://developer.android.com/images/reference/androidx/compose/material3/extended-fab.png)
  *
- * The extended FAB is wider than a regular FAB, and it includes a text label.
+ * The extended FAB is wider than a regular FAB, and it includes a text label. To learn more about
+ * the extended FAB visit the [Material website](https://m3.material.io/components/extended-fab).
  *
  * @sample androidx.compose.material3.samples.ExtendedFloatingActionButtonSample
  *
@@ -286,10 +286,7 @@ fun ExtendedFloatingActionButton(
                 icon()
                 Spacer(Modifier.width(ExtendedFabIconPadding))
             }
-            ProvideTextStyle(
-                value = MaterialTheme.typography.fromToken(ExtendedFabPrimaryTokens.LabelTextFont),
-                content = text,
-            )
+            text()
         }
     }
 }

@@ -23,6 +23,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.tokens.ExtendedFabPrimaryTokens
+import androidx.compose.material3.tokens.FabPrimaryLargeTokens
+import androidx.compose.material3.tokens.FabPrimarySmallTokens
+import androidx.compose.material3.tokens.FabPrimaryTokens
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -38,6 +42,10 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -96,7 +104,7 @@ class FloatingActionButtonTest {
                     Icon(Icons.Filled.Favorite, null)
                 }
             }
-            .assertIsSquareWithSize(56.dp)
+            .assertIsSquareWithSize(FabPrimaryTokens.ContainerHeight)
     }
 
     @Test
@@ -107,7 +115,7 @@ class FloatingActionButtonTest {
                     Icon(Icons.Filled.Favorite, null)
                 }
             }
-            .assertIsSquareWithSize(48.dp)
+            .assertIsSquareWithSize(FabPrimarySmallTokens.ContainerHeight)
     }
 
     @Test
@@ -118,7 +126,7 @@ class FloatingActionButtonTest {
                     Icon(Icons.Filled.Favorite, null)
                 }
             }
-            .assertIsSquareWithSize(96.dp)
+            .assertIsSquareWithSize(FabPrimaryLargeTokens.ContainerHeight)
     }
 
     @Test
@@ -133,7 +141,7 @@ class FloatingActionButtonTest {
         }
 
         rule.onNodeWithTag("FAB")
-            .assertHeightIsEqualTo(56.dp)
+            .assertHeightIsEqualTo(ExtendedFabPrimaryTokens.ContainerHeight)
             .assertWidthIsAtLeast(48.dp)
     }
 
@@ -148,8 +156,82 @@ class FloatingActionButtonTest {
         }
 
         rule.onNodeWithTag("FAB")
+            .assertHeightIsEqualTo(ExtendedFabPrimaryTokens.ContainerHeight)
             .assertWidthIsEqualTo(80.dp)
-            .assertHeightIsEqualTo(56.dp)
+    }
+
+    @Test
+    fun fabHasCorrectTextStyle() {
+        var fontFamily: FontFamily? = null
+        var fontWeight: FontWeight? = null
+        var fontSize: TextUnit? = null
+        var lineHeight: TextUnit? = null
+        var letterSpacing: TextUnit? = null
+        var expectedTextStyle: TextStyle? = null
+
+        rule.setMaterialContent(lightColorScheme()) {
+            FloatingActionButton(onClick = {}) {
+                Icon(Icons.Filled.Favorite, null)
+                Text(
+                    "Normal FAB with Text",
+                    onTextLayout = {
+                        fontFamily = it.layoutInput.style.fontFamily
+                        fontWeight = it.layoutInput.style.fontWeight
+                        fontSize = it.layoutInput.style.fontSize
+                        lineHeight = it.layoutInput.style.lineHeight
+                        letterSpacing = it.layoutInput.style.letterSpacing
+                    }
+                )
+            }
+            expectedTextStyle = MaterialTheme.typography.fromToken(
+                ExtendedFabPrimaryTokens.LabelTextFont
+            )
+        }
+        rule.runOnIdle {
+            assertThat(fontFamily).isEqualTo(expectedTextStyle!!.fontFamily)
+            assertThat(fontWeight).isEqualTo(expectedTextStyle!!.fontWeight)
+            assertThat(fontSize).isEqualTo(expectedTextStyle!!.fontSize)
+            assertThat(lineHeight).isEqualTo(expectedTextStyle!!.lineHeight)
+            assertThat(letterSpacing).isEqualTo(expectedTextStyle!!.letterSpacing)
+        }
+    }
+
+    @Test
+    fun extendedFabHasCorrectTextStyle() {
+        var fontFamily: FontFamily? = null
+        var fontWeight: FontWeight? = null
+        var fontSize: TextUnit? = null
+        var lineHeight: TextUnit? = null
+        var letterSpacing: TextUnit? = null
+        var expectedTextStyle: TextStyle? = null
+
+        rule.setMaterialContent(lightColorScheme()) {
+            ExtendedFloatingActionButton(
+                onClick = {},
+                text = {
+                    Text(
+                        "Extended FAB",
+                        onTextLayout = {
+                            fontFamily = it.layoutInput.style.fontFamily
+                            fontWeight = it.layoutInput.style.fontWeight
+                            fontSize = it.layoutInput.style.fontSize
+                            lineHeight = it.layoutInput.style.lineHeight
+                            letterSpacing = it.layoutInput.style.letterSpacing
+                        }
+                    )
+                }
+            )
+            expectedTextStyle = MaterialTheme.typography.fromToken(
+                ExtendedFabPrimaryTokens.LabelTextFont
+            )
+        }
+        rule.runOnIdle {
+            assertThat(fontFamily).isEqualTo(expectedTextStyle!!.fontFamily)
+            assertThat(fontWeight).isEqualTo(expectedTextStyle!!.fontWeight)
+            assertThat(fontSize).isEqualTo(expectedTextStyle!!.fontSize)
+            assertThat(lineHeight).isEqualTo(expectedTextStyle!!.lineHeight)
+            assertThat(letterSpacing).isEqualTo(expectedTextStyle!!.letterSpacing)
+        }
     }
 
     @Test
