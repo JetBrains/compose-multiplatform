@@ -250,6 +250,7 @@ private fun Scrollbar(
                     .scrollbarDrag(
                         interactionSource = interactionSource,
                         draggedInteraction = dragInteraction,
+                        onStarted = { sliderAdapter.rawPosition = sliderAdapter.position },
                         onDelta = { offset ->
                             sliderAdapter.rawPosition += if (isVertical) offset.y else offset.x
                         },
@@ -267,11 +268,13 @@ private fun Scrollbar(
 private fun Modifier.scrollbarDrag(
     interactionSource: MutableInteractionSource,
     draggedInteraction: MutableState<DragInteraction.Start?>,
+    onStarted: () -> Unit,
     onDelta: (Offset) -> Unit,
     onFinished: () -> Unit
 ): Modifier = composed {
     val currentInteractionSource by rememberUpdatedState(interactionSource)
     val currentDraggedInteraction by rememberUpdatedState(draggedInteraction)
+    val currentOnStarted by rememberUpdatedState(onStarted)
     val currentOnDelta by rememberUpdatedState(onDelta)
     val currentOnFinished by rememberUpdatedState(onFinished)
     pointerInput(Unit) {
@@ -281,6 +284,7 @@ private fun Modifier.scrollbarDrag(
                 val interaction = DragInteraction.Start()
                 currentInteractionSource.tryEmit(interaction)
                 currentDraggedInteraction.value = interaction
+                currentOnStarted.invoke()
                 val isSuccess = drag(down.id) { change ->
                     currentOnDelta.invoke(change.positionChange())
                     change.consume()
