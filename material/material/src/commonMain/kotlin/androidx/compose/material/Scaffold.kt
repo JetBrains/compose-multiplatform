@@ -25,6 +25,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.UiComposable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.SubcomposeLayout
@@ -223,14 +224,15 @@ fun Scaffold(
  * [content], typically a [BottomAppBar].
  */
 @Composable
+@UiComposable
 private fun ScaffoldLayout(
     isFabDocked: Boolean,
     fabPosition: FabPosition,
-    topBar: @Composable () -> Unit,
-    content: @Composable (PaddingValues) -> Unit,
-    snackbar: @Composable () -> Unit,
-    fab: @Composable () -> Unit,
-    bottomBar: @Composable () -> Unit
+    topBar: @Composable @UiComposable () -> Unit,
+    content: @Composable @UiComposable (PaddingValues) -> Unit,
+    snackbar: @Composable @UiComposable () -> Unit,
+    fab: @Composable @UiComposable () -> Unit,
+    bottomBar: @Composable @UiComposable () -> Unit
 ) {
     SubcomposeLayout { constraints ->
         val layoutWidth = constraints.maxWidth

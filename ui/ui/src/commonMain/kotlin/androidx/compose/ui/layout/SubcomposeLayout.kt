@@ -29,6 +29,7 @@ import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.SubcomposeLayoutState.PrecomposedSlotHandle
+import androidx.compose.ui.UiComposable
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.ComposeUiNode
 import androidx.compose.ui.node.LayoutNode
@@ -94,6 +95,7 @@ fun SubcomposeLayout(
  * @param measurePolicy Measure policy which provides ability to subcompose during the measuring.
  */
 @Composable
+@UiComposable
 fun SubcomposeLayout(
     state: SubcomposeLayoutState,
     modifier: Modifier = Modifier,

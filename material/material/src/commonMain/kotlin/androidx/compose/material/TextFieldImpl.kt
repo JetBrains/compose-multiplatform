@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.material.Strings.Companion.DefaultErrorMessage
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ComposableOpenTarget
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -227,11 +228,12 @@ internal fun CommonDecorationBox(
  * Set content color, typography and emphasis for [content] composable
  */
 @Composable
+@ComposableOpenTarget(index = 0)
 internal fun Decoration(
     contentColor: Color,
     typography: TextStyle? = null,
     contentAlpha: Float? = null,
-    content: @Composable () -> Unit
+    content: @Composable @ComposableOpenTarget(index = 0) () -> Unit
 ) {
     val colorAndEmphasis: @Composable () -> Unit = @Composable {
         CompositionLocalProvider(LocalContentColor provides contentColor) {
