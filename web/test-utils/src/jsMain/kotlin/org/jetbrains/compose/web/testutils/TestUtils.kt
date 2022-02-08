@@ -68,7 +68,7 @@ class TestScope : CoroutineScope by MainScope() {
      * @return a reference to the next child element of the root.
      * Subsequent calls will return next child reference every time.
      */
-    fun nextChild() = childrenIterator.next() as HTMLElement
+    fun nextChild() = nextChild<HTMLElement>()
 
     @Suppress("UNCHECKED_CAST")
     fun <T> nextChild() = childrenIterator.next() as T
