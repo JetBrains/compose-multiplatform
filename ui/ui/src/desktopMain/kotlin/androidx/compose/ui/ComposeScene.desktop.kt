@@ -92,3 +92,5 @@ internal actual fun makeAccessibilityController(
     skiaBasedOwner: SkiaBasedOwner,
     component: PlatformComponent
 ): AccessibilityController = AccessibilityControllerImpl(skiaBasedOwner, component)
+
+internal actual fun currentMillis(): Long = System.currentTimeMillis()
