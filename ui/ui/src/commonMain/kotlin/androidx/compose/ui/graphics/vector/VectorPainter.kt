@@ -17,6 +17,7 @@
 package androidx.compose.ui.graphics.vector
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ComposableOpenTarget
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.DisposableEffect
@@ -25,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.UiComposable
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
@@ -58,6 +60,7 @@ const val RootGroupName = "VectorRootGroup"
  * @param [content] Composable used to define the structure and contents of the vector graphic
  */
 @Composable
+@ComposableOpenTarget(-1)
 fun rememberVectorPainter(
     defaultWidth: Dp,
     defaultHeight: Dp,
@@ -66,7 +69,7 @@ fun rememberVectorPainter(
     name: String = RootGroupName,
     tintColor: Color = Color.Unspecified,
     tintBlendMode: BlendMode = BlendMode.SrcIn,
-    content: @Composable (viewportWidth: Float, viewportHeight: Float) -> Unit
+    content: @Composable @UiComposable (viewportWidth: Float, viewportHeight: Float) -> Unit
 ): VectorPainter {
     val density = LocalDensity.current
     val widthPx = with(density) { defaultWidth.toPx() }

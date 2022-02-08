@@ -152,6 +152,9 @@ package androidx.compose.ui {
   public final class TempListUtilsKt {
   }
 
+  @androidx.compose.runtime.ComposableTargetMarker(description="UI Composable") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY_GETTER, kotlin.annotation.AnnotationTarget.TYPE, kotlin.annotation.AnnotationTarget.TYPE_PARAMETER}) public @interface UiComposable {
+  }
+
   public final class ZIndexModifierKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier zIndex(androidx.compose.ui.Modifier, float zIndex);
   }
@@ -618,9 +621,12 @@ package androidx.compose.ui.graphics.vector {
     method public void remove(int index, int count);
   }
 
+  @androidx.compose.runtime.ComposableTargetMarker(description="Vector Composable") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY_GETTER, kotlin.annotation.AnnotationTarget.TYPE, kotlin.annotation.AnnotationTarget.TYPE_PARAMETER}) public @interface VectorComposable {
+  }
+
   public final class VectorComposeKt {
-    method @androidx.compose.runtime.Composable public static void Group(optional String name, optional float rotation, optional float pivotX, optional float pivotY, optional float scaleX, optional float scaleY, optional float translationX, optional float translationY, optional java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> clipPathData, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static void Path(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> pathData, optional int pathFillType, optional String name, optional androidx.compose.ui.graphics.Brush? fill, optional float fillAlpha, optional androidx.compose.ui.graphics.Brush? stroke, optional float strokeAlpha, optional float strokeLineWidth, optional int strokeLineCap, optional int strokeLineJoin, optional float strokeLineMiter, optional float trimPathStart, optional float trimPathEnd, optional float trimPathOffset);
+    method @androidx.compose.runtime.Composable @androidx.compose.ui.graphics.vector.VectorComposable public static void Group(optional String name, optional float rotation, optional float pivotX, optional float pivotY, optional float scaleX, optional float scaleY, optional float translationX, optional float translationY, optional java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> clipPathData, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable @androidx.compose.ui.graphics.vector.VectorComposable public static void Path(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> pathData, optional int pathFillType, optional String name, optional androidx.compose.ui.graphics.Brush? fill, optional float fillAlpha, optional androidx.compose.ui.graphics.Brush? stroke, optional float strokeAlpha, optional float strokeLineWidth, optional int strokeLineCap, optional int strokeLineJoin, optional float strokeLineMiter, optional float trimPathStart, optional float trimPathEnd, optional float trimPathOffset);
   }
 
   public interface VectorConfig {
@@ -694,7 +700,7 @@ package androidx.compose.ui.graphics.vector {
 
   public final class VectorPainterKt {
     method @androidx.compose.runtime.Composable public static void RenderVectorGroup(androidx.compose.ui.graphics.vector.VectorGroup group, optional java.util.Map<java.lang.String,? extends androidx.compose.ui.graphics.vector.VectorConfig> configs);
-    method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, optional long tintColor, optional int tintBlendMode, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableOpenTarget(index=0xffffffff) public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, optional long tintColor, optional int tintBlendMode, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> content);
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(androidx.compose.ui.graphics.vector.ImageVector image);
     field public static final String RootGroupName = "VectorRootGroup";
   }
@@ -1951,9 +1957,9 @@ package androidx.compose.ui.layout {
   }
 
   public final class LayoutKt {
-    method @androidx.compose.runtime.Composable public static inline void Layout(kotlin.jvm.functions.Function0<kotlin.Unit> content, optional androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.MeasurePolicy measurePolicy);
-    method @androidx.compose.runtime.Composable public static inline void Layout(optional androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.MeasurePolicy measurePolicy);
-    method @Deprecated @androidx.compose.runtime.Composable public static void MultiMeasureLayout(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function0<kotlin.Unit> content, androidx.compose.ui.layout.MeasurePolicy measurePolicy);
+    method @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public static inline void Layout(kotlin.jvm.functions.Function0<kotlin.Unit> content, optional androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.MeasurePolicy measurePolicy);
+    method @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public static inline void Layout(optional androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.MeasurePolicy measurePolicy);
+    method @Deprecated @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public static void MultiMeasureLayout(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function0<kotlin.Unit> content, androidx.compose.ui.layout.MeasurePolicy measurePolicy);
   }
 
   public interface LayoutModifier extends androidx.compose.ui.Modifier.Element {
@@ -2135,7 +2141,7 @@ package androidx.compose.ui.layout {
 
   public final class SubcomposeLayoutKt {
     method @androidx.compose.runtime.Composable public static void SubcomposeLayout(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function2<? super androidx.compose.ui.layout.SubcomposeMeasureScope,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measurePolicy);
-    method @androidx.compose.runtime.Composable public static void SubcomposeLayout(androidx.compose.ui.layout.SubcomposeLayoutState state, optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function2<? super androidx.compose.ui.layout.SubcomposeMeasureScope,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measurePolicy);
+    method @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public static void SubcomposeLayout(androidx.compose.ui.layout.SubcomposeLayoutState state, optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function2<? super androidx.compose.ui.layout.SubcomposeMeasureScope,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measurePolicy);
     method public static androidx.compose.ui.layout.SubcomposeSlotReusePolicy SubcomposeSlotReusePolicy(int maxSlotsToRetainForReuse);
   }
 
@@ -3048,7 +3054,7 @@ package androidx.compose.ui.viewinterop {
   }
 
   public final class AndroidView_androidKt {
-    method @androidx.compose.runtime.Composable public static <T extends android.view.View> void AndroidView(kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> factory, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit> update);
+    method @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public static <T extends android.view.View> void AndroidView(kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> factory, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit> update);
     method public static kotlin.jvm.functions.Function1<android.view.View,kotlin.Unit> getNoOpUpdate();
     property public static final kotlin.jvm.functions.Function1<android.view.View,kotlin.Unit> NoOpUpdate;
   }
