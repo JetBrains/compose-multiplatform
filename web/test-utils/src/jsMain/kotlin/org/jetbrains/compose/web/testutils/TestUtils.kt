@@ -14,7 +14,6 @@ import org.w3c.dom.MutationObserver
 import org.w3c.dom.MutationObserverInit
 import org.w3c.dom.asList
 import org.w3c.dom.css.CSSStyleDeclaration
-import org.w3c.dom.get
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
