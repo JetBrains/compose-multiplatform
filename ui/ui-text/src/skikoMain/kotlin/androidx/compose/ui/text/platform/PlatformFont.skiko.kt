@@ -32,11 +32,9 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.Typeface
 import androidx.compose.ui.text.font.createFontFamilyResolver
 
-sealed class PlatformFont : Font {
+expect sealed class PlatformFont : Font {
     abstract val identity: String
-
     internal val cacheKey: String
-        get() = "${this::class.qualifiedName}|$identity"
 }
 
 /**

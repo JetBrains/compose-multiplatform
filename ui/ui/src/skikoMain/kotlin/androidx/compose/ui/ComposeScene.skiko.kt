@@ -370,7 +370,7 @@ class ComposeScene internal constructor(
         eventType: PointerEventType,
         position: Offset,
         scrollDelta: Offset = Offset(0f, 0f),
-        timeMillis: Long = System.nanoTime() / 1_000_000L,
+        timeMillis: Long = currentMillis(),
         type: PointerType = PointerType.Mouse,
         buttons: PointerButtons? = null,
         keyboardModifiers: PointerKeyboardModifiers? = null,
@@ -482,3 +482,5 @@ internal expect fun makeAccessibilityController(
     skiaBasedOwner: SkiaBasedOwner,
     component: PlatformComponent
 ): AccessibilityController
+
+internal expect fun currentMillis(): Long

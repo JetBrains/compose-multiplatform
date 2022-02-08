@@ -31,6 +31,12 @@ import org.jetbrains.skia.Data
 import org.jetbrains.skia.makeFromFile
 import org.jetbrains.skia.Typeface as SkTypeface
 
+actual sealed class PlatformFont : Font {
+    actual abstract val identity: String
+    internal actual val cacheKey: String
+        get() = "${this::class.qualifiedName}|$identity"
+}
+
 internal val GenericFontFamiliesMapping by lazy {
     when (Platform.Current) {
         Platform.Windows ->
