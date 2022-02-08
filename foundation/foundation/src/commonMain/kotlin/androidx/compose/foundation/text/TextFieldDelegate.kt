@@ -189,7 +189,7 @@ internal class TextFieldDelegate {
             onImeActionPerformed: (ImeAction) -> Unit
         ): TextInputSession {
             return textInputService.startInput(
-                value = value.copy(),
+                value = value,
                 imeOptions = imeOptions,
                 onEditCommand = { onEditCommand(it, editProcessor, onValueChange) },
                 onImeActionPerformed = onImeActionPerformed
