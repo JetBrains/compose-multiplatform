@@ -321,7 +321,7 @@ class LazyListState constructor(
      * @param index the index to which to scroll. Must be non-negative.
      * @param scrollOffset the offset that the item should end up after the scroll. Note that
      * positive offset refers to forward scroll, so in a top-to-bottom list, positive offset will
-     * scroll the item further upward (taking it partly offscreen)
+     * scroll the item further upward (taking it partly offscreen).
      */
     suspend fun animateScrollToItem(
         /*@IntRange(from = 0)*/

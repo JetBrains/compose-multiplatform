@@ -32,7 +32,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
@@ -142,11 +141,10 @@ class LazyScrollTest(private val orientation: Orientation) {
 
     @Test
     fun animateScrollBy() = runBlocking {
-        fun Int.dpToPx(): Int = with(rule.density) { dp.toPx().roundToInt() }
-        val scrollDistance = 320.dpToPx()
+        val scrollDistance = 320
 
         val expectedIndex = scrollDistance / itemSizePx // resolves to 3
-        val expectedOffset = scrollDistance % itemSizePx // resolves to ~17.dp.toIntPx()
+        val expectedOffset = scrollDistance % itemSizePx // resolves to 20px
 
         withContext(Dispatchers.Main + AutoTestFrameClock()) {
             state.animateScrollBy(scrollDistance.toFloat())
