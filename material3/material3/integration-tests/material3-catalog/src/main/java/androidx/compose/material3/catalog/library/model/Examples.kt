@@ -65,7 +65,9 @@ import androidx.compose.material3.samples.ScrollingFancyIndicatorContainerTabs
 import androidx.compose.material3.samples.ScrollingTextTabs
 import androidx.compose.material3.samples.SimpleCenterAlignedTopAppBar
 import androidx.compose.material3.samples.SimpleSmallTopAppBar
+import androidx.compose.material3.samples.SliderSample
 import androidx.compose.material3.samples.SmallFloatingActionButtonSample
+import androidx.compose.material3.samples.StepsSliderSample
 import androidx.compose.material3.samples.TextAndIconTabs
 import androidx.compose.material3.samples.TextButtonSample
 import androidx.compose.material3.samples.TextTabs
@@ -374,6 +376,25 @@ val RadioButtonsExamples = listOf(
         sourceUrl = RadioButtonsExampleSourceUrl
     ) {
         RadioGroupSample()
+    },
+)
+
+private const val SlidersExampleDescription = "Sliders examples"
+private const val SlidersExampleSourceUrl = "$SampleSourceUrl/SliderSample.kt"
+val SlidersExamples = listOf(
+    Example(
+        name = ::SliderSample.name,
+        description = SlidersExampleDescription,
+        sourceUrl = SlidersExampleSourceUrl
+    ) {
+        SliderSample()
+    },
+    Example(
+        name = ::StepsSliderSample.name,
+        description = SlidersExampleDescription,
+        sourceUrl = SlidersExampleSourceUrl
+    ) {
+        StepsSliderSample()
     },
 )
 
