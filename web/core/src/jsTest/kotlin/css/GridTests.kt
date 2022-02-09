@@ -42,8 +42,11 @@ class GridColumnTests {
         }
 
         assertEquals("main-start", nextChild().style.asDynamic().gridColumnStart)
-        assertEquals("main-start", nextChild().style.asDynamic().gridColumnStart)
-        assertEquals("main-end", currentChild().style.asDynamic().gridColumnEnd)
+
+        nextChild().style.apply {
+            assertEquals("main-start", asDynamic().gridColumnStart)
+            assertEquals("main-end", asDynamic().gridColumnEnd)
+        }
     }
 
 
