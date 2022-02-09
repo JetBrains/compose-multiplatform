@@ -19,6 +19,10 @@ package androidx.build.studio
 import androidx.build.StudioType
 import androidx.build.getSupportRootFolder
 import com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
+import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -29,8 +33,6 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.service.ServiceRegistry
 import org.gradle.process.ExecOperations
-import java.io.File
-import javax.inject.Inject
 
 /**
  * Base task with common logic for updating and launching studio in both the frameworks/support
@@ -127,12 +129,6 @@ abstract class StudioTask : DefaultTask() {
     open val vmOptions = File(project.getSupportRootFolder(), "development/studio/studio.vmoptions")
 
     /**
-     * [StudioArchiveCreator] that will ensure that an archive is present at [studioArchivePath]
-     */
-    @get:Internal
-    protected abstract val studioArchiveCreator: StudioArchiveCreator
-
-    /**
      * List of additional environment variables to pass into the Studio application.
      */
     @get:Internal
@@ -152,7 +148,7 @@ abstract class StudioTask : DefaultTask() {
             studioInstallationDir.parentFile.deleteRecursively()
             // Create installation directory and any needed parent directories
             studioInstallationDir.mkdirs()
-            studioArchiveCreator(
+            downloadStudioArchive(
                 execOperations,
                 studioVersion,
                 studioArchiveName,
@@ -230,6 +226,26 @@ abstract class StudioTask : DefaultTask() {
         return true
     }
 
+    private fun downloadStudioArchive(
+        execOperations: ExecOperations,
+        studioVersion: String,
+        filename: String,
+        destinationPath: String
+    ) {
+        val url = "https://dl.google.com/dl/android/studio/ide-zips/$studioVersion/$filename"
+        val tmpDownloadPath = File("$destinationPath.tmp").absolutePath
+        println("Downloading $url to $tmpDownloadPath")
+        execOperations.exec { execSpec ->
+            with(execSpec) {
+                executable("curl")
+                args(url, "--output", tmpDownloadPath)
+            }
+        }
+
+        // Renames temp archive to the final archive name
+        Files.move(Paths.get(tmpDownloadPath), Paths.get(destinationPath))
+    }
+
     private fun extractStudioArchive() {
         val fromPath = studioArchivePath
         val toPath = studioInstallationDir.absolutePath
@@ -258,7 +274,6 @@ abstract class StudioTask : DefaultTask() {
  * Task for launching studio in the frameworks/support project
  */
 abstract class RootStudioTask : StudioTask() {
-    override val studioArchiveCreator = UrlArchiveCreator
     override val ideaProperties get() = projectRoot.resolve("development/studio/idea.properties")
 }
 
