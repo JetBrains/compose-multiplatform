@@ -28,10 +28,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Chip
 import androidx.compose.material.ChipDefaults
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FilterChip
 import androidx.compose.material.Icon
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +53,9 @@ fun ChipDemo() {
         ) {
             item {
                 Chips(chipEnabledState.value)
+            }
+            item {
+                FilterChips(chipEnabledState.value)
             }
         }
         Row(horizontalArrangement = Arrangement.Center) {
@@ -89,6 +95,52 @@ private fun Chips(enabled: Boolean) {
             }
         ) {
             Text("Action chip")
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun FilterChips(enabled: Boolean) {
+    Text("Filter Chips")
+    Spacer(Modifier.height(DefaultSpace))
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        val state1 = remember { mutableStateOf(false) }
+        FilterChip(
+            selected = state1.value, onClick = { state1.value = !state1.value }, enabled = enabled,
+            selectedIcon = {
+                Icon(
+                    imageVector = Icons.Filled.Done,
+                    contentDescription = "Localized Description",
+                    modifier = Modifier.size(ChipDefaults.SelectedIconSize)
+                )
+            }
+        ) {
+            Text("Filter chip")
+        }
+        val state2 = remember { mutableStateOf(false) }
+        FilterChip(
+            selected = state2.value,
+            onClick = { state2.value = !state2.value },
+            border = ChipDefaults.outlinedBorder,
+            colors = ChipDefaults.outlinedFilterChipColors(),
+            enabled = enabled,
+            leadingIcon = {
+                Icon(
+                    Icons.Filled.Home,
+                    contentDescription = "Localized Description",
+                    modifier = Modifier.size(ChipDefaults.LeadingIconSize)
+                )
+            },
+            selectedIcon = {
+                Icon(
+                    imageVector = Icons.Filled.Done,
+                    contentDescription = "Localized Description",
+                    modifier = Modifier.size(ChipDefaults.SelectedIconSize)
+                )
+            }
+        ) {
+            Text("Filter chip")
         }
     }
 }

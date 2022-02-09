@@ -225,12 +225,18 @@ package androidx.compose.material {
 
   @androidx.compose.material.ExperimentalMaterialApi public final class ChipDefaults {
     method @androidx.compose.runtime.Composable public androidx.compose.material.ChipColors chipColors(optional long backgroundColor, optional long contentColor, optional long leadingIconContentColor, optional long disabledBackgroundColor, optional long disabledContentColor, optional long disabledLeadingIconContentColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material.SelectableChipColors filterChipColors(optional long backgroundColor, optional long contentColor, optional long leadingIconColor, optional long disabledBackgroundColor, optional long disabledContentColor, optional long disabledLeadingIconColor, optional long selectedBackgroundColor, optional long selectedContentColor, optional long selectedLeadingIconColor);
+    method public float getLeadingIconSize();
     method public float getMinHeight();
     method @androidx.compose.runtime.Composable public androidx.compose.foundation.BorderStroke getOutlinedBorder();
     method public float getOutlinedBorderSize();
+    method public float getSelectedIconSize();
     method @androidx.compose.runtime.Composable public androidx.compose.material.ChipColors outlinedChipColors(optional long backgroundColor, optional long contentColor, optional long leadingIconContentColor, optional long disabledBackgroundColor, optional long disabledContentColor, optional long disabledLeadingIconContentColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material.SelectableChipColors outlinedFilterChipColors(optional long backgroundColor, optional long contentColor, optional long leadingIconColor, optional long disabledBackgroundColor, optional long disabledContentColor, optional long disabledLeadingIconColor, optional long selectedBackgroundColor, optional long selectedContentColor, optional long selectedLeadingIconColor);
+    property public final float LeadingIconSize;
     property public final float MinHeight;
     property public final float OutlinedBorderSize;
+    property public final float SelectedIconSize;
     property @androidx.compose.runtime.Composable public final androidx.compose.foundation.BorderStroke outlinedBorder;
     field public static final float ContentOpacity = 0.87f;
     field public static final androidx.compose.material.ChipDefaults INSTANCE;
@@ -240,6 +246,7 @@ package androidx.compose.material {
 
   public final class ChipKt {
     method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void Chip(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.material.ChipColors colors, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void FilterChip(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.material.SelectableChipColors colors, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? selectedIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
   }
 
   @androidx.compose.runtime.Stable public final class Colors {
@@ -596,6 +603,12 @@ package androidx.compose.material {
     method public androidx.compose.material.SnackbarHostState getSnackbarHostState();
     property public final androidx.compose.material.DrawerState drawerState;
     property public final androidx.compose.material.SnackbarHostState snackbarHostState;
+  }
+
+  @androidx.compose.material.ExperimentalMaterialApi public interface SelectableChipColors {
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> backgroundColor(boolean enabled, boolean selected);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> contentColor(boolean enabled, boolean selected);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> leadingIconColor(boolean enabled, boolean selected);
   }
 
   @androidx.compose.runtime.Immutable public final class Shapes {
