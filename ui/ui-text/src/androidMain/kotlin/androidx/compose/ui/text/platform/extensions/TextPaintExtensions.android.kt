@@ -37,8 +37,8 @@ import androidx.compose.ui.unit.TextUnitType
 @OptIn(ExperimentalTextApi::class)
 internal fun AndroidTextPaint.applySpanStyle(
     style: SpanStyle,
-    fontFamilyResolver: FontFamily.Resolver,
-    density: Density
+    resolveTypeface: (FontFamily?, FontWeight, FontStyle, FontSynthesis) -> Typeface,
+    density: Density,
 ): SpanStyle {
     when (style.fontSize.type) {
         TextUnitType.Sp -> with(density) {
@@ -51,13 +51,12 @@ internal fun AndroidTextPaint.applySpanStyle(
     }
 
     if (style.hasFontAttributes()) {
-        // TODO (b/214587005): Check if it's async here and uncache
-        typeface = fontFamilyResolver.resolve(
-            fontFamily = style.fontFamily,
-            fontWeight = style.fontWeight ?: FontWeight.Normal,
-            fontStyle = style.fontStyle ?: FontStyle.Normal,
-            fontSynthesis = style.fontSynthesis ?: FontSynthesis.All
-        ).value as Typeface
+        typeface = resolveTypeface(
+            style.fontFamily,
+            style.fontWeight ?: FontWeight.Normal,
+            style.fontStyle ?: FontStyle.Normal,
+            style.fontSynthesis ?: FontSynthesis.All
+        )
     }
 
     if (style.localeList != null && style.localeList != LocaleList.current) {

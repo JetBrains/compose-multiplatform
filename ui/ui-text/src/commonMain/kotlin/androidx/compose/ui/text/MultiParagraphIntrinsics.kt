@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMaxBy
 
@@ -114,6 +115,9 @@ class MultiParagraphIntrinsics(
                 )
             }
     }
+
+    override val hasStaleResolvedFonts: Boolean
+        get() = infoList.fastAny { it.intrinsics.hasStaleResolvedFonts }
 
     /**
      * if the [style] does `not` have [TextDirection] set, it will return a new

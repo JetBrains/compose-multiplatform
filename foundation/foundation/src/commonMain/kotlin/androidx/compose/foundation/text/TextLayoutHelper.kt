@@ -57,6 +57,11 @@ internal fun TextLayoutResult.canReuse(
 
     // Check if this is created from the same parameter.
     val layoutInput = this.layoutInput
+    if (multiParagraph.intrinsics.hasStaleResolvedFonts) {
+        // one of the resolved fonts has updated, and this MultiParagraph is no longer valid for
+        // measure or display
+        return false
+    }
     if (!(
         layoutInput.text == text &&
             layoutInput.style.canReuseLayout(style) &&

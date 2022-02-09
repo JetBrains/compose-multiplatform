@@ -17,6 +17,8 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.MultiParagraph
+import androidx.compose.ui.text.MultiParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.TextLayoutInput
@@ -32,6 +34,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,6 +51,10 @@ class TextLayoutHelperTest {
     fun setUp() {
         fontFamilyResolver = mock()
 
+        val intrinsics = mock<MultiParagraphIntrinsics>()
+        val multiParagraph = mock<MultiParagraph>()
+        whenever(multiParagraph.intrinsics).thenReturn(intrinsics)
+        whenever(intrinsics.hasStaleResolvedFonts).thenReturn(false)
         referenceResult = TextLayoutResult(
             TextLayoutInput(
                 text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
@@ -61,7 +68,7 @@ class TextLayoutHelperTest {
                 fontFamilyResolver = fontFamilyResolver,
                 constraints = Constraints.fixedWidth(100)
             ),
-            multiParagraph = mock(),
+            multiParagraph = multiParagraph,
             size = IntSize(50, 50)
         )
     }
@@ -277,5 +284,24 @@ class TextLayoutHelperTest {
                 constraints = Constraints.fixedWidth(200)
             )
         ).isFalse()
+    }
+
+    @Test
+    fun testCanResuse_notLatestTypefaces_isFalse() {
+        val constraints = Constraints.fixedWidth(100)
+        whenever(referenceResult.multiParagraph.intrinsics.hasStaleResolvedFonts)
+            .thenReturn(true)
+        assertThat(referenceResult.canReuse(
+            text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
+            style = TextStyle(),
+            placeholders = emptyList(),
+            maxLines = 1,
+            softWrap = true,
+            overflow = TextOverflow.Ellipsis,
+            density = Density(1.0f),
+            layoutDirection = LayoutDirection.Ltr,
+            fontFamilyResolver = fontFamilyResolver,
+            constraints = constraints
+        )).isFalse()
     }
 }
