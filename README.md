@@ -43,6 +43,7 @@ Preview functionality (check your application UI without building/running it) fo
        * [Signing and notarization](tutorials/Signing_and_notarization_on_macOS)
        * [Swing interoperability](tutorials/Swing_Integration)
        * [Development for Android](tutorials/Development_for_Android)
+       * [Navigation](tutorials/Navigation)
    * [tutorials: compose for web](tutorials/Web) - tutorials on using Compose for Web
        * [Getting started with Compose for Web](tutorials/Web/Getting_Started) 
        * [Building web UI](tutorials/Web/Building_UI)
