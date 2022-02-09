@@ -857,6 +857,26 @@ class LazyGridTest {
     }
 
     @Test
+    fun passingNegativeItemsCountIsNotAllowed() {
+        var exception: Exception? = null
+        rule.setContentWithTestViewConfiguration {
+            LazyVerticalGrid(GridCells.Fixed(1)) {
+                try {
+                    items(-1) {
+                        Box(Modifier)
+                    }
+                } catch (e: Exception) {
+                    exception = e
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            Truth.assertThat(exception).isInstanceOf(IllegalArgumentException::class.java)
+        }
+    }
+
+    @Test
     fun recomposingWithNewComposedModifierObjectIsNotCausingRemeasure() {
         var remeasureCount = 0
         val layoutModifier = Modifier.layout { measurable, constraints ->
