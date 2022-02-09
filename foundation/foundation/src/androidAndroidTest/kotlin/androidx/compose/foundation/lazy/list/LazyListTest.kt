@@ -42,11 +42,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.WithTouchSlop
+import androidx.compose.testutils.assertPixels
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.layout
@@ -75,6 +77,7 @@ import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.collect.Range
@@ -1714,6 +1717,35 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
         rule.runOnIdle {
             assertThat(recomposeCount).isEqualTo(1)
         }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun zIndexOnItemAffectsDrawingOrder() {
+        rule.setContentWithTestViewConfiguration {
+            LazyColumnOrRow(
+                Modifier.size(6.dp).testTag(LazyListTag)
+            ) {
+                items(listOf(Color.Blue, Color.Green, Color.Red)) { color ->
+                    Box(
+                        Modifier
+                            .mainAxisSize(2.dp)
+                            .crossAxisSize(6.dp)
+                            .zIndex(if (color == Color.Green) 1f else 0f)
+                            .drawBehind {
+                                drawRect(
+                                    color,
+                                    topLeft = Offset(-10.dp.toPx(), -10.dp.toPx()),
+                                    size = Size(20.dp.toPx(), 20.dp.toPx())
+                                )
+                            })
+                }
+            }
+        }
+
+        rule.onNodeWithTag(LazyListTag)
+            .captureToImage()
+            .assertPixels { Color.Green }
     }
 
     // ********************* END OF TESTS *********************
