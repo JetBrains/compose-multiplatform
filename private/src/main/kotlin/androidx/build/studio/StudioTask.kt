@@ -66,7 +66,6 @@ abstract class StudioTask : DefaultTask() {
     @get:Internal
     protected open val installParentDir: File = project.rootDir
 
-    @Suppress("UnstableApiUsage") // For use of VersionCatalog
     private val studioVersion by lazy {
         val libs = project.extensions.getByType(
             VersionCatalogsExtension::class.java

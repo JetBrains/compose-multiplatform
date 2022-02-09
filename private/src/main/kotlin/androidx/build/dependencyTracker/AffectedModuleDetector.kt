@@ -118,7 +118,7 @@ abstract class AffectedModuleDetector(
             // AffectedModuleDetector is ready. Callers won't be able to use it until the wrapped
             // detector has been assigned, but configureTaskGuard can still reference it in
             // closures that will execute during task execution.
-            var instance = AffectedModuleDetectorWrapper()
+            val instance = AffectedModuleDetectorWrapper()
             rootProject.extensions.add(ROOT_PROP_NAME, instance)
 
             val enabled = rootProject.hasProperty(ENABLE_ARG) &&
@@ -146,12 +146,8 @@ abstract class AffectedModuleDetector(
             if (baseCommitOverride != null) {
                 logger.info("using base commit override $baseCommitOverride")
             }
-            @Suppress("DEPRECATION") // TODO: remove when studio upgrades to Gradle 7.4-rc-1
             val changeInfoPath = GitClient.getChangeInfoPath(rootProject)
-                .forUseAtConfigurationTime()
-            @Suppress("DEPRECATION") // TODO: remove when studio upgrades to Gradle 7.4-rc-1
             val manifestPath = GitClient.getManifestPath(rootProject)
-                .forUseAtConfigurationTime()
             gradle.taskGraph.whenReady {
                 logger.lifecycle("projects evaluated")
                 val projectGraph = ProjectGraph(rootProject)
@@ -181,13 +177,12 @@ abstract class AffectedModuleDetector(
             if (!rootProject.isRoot) {
                 throw IllegalArgumentException("this should've been the root project")
             }
-            val serviceProvider = rootProject.getGradle().getSharedServices()
+            return rootProject.gradle.sharedServices
                 .registerIfAbsent(
                     SERVICE_NAME,
                     AffectedModuleDetectorLoader::class.java,
                     configureAction
                 )
-            return serviceProvider
         }
 
         fun getInstance(project: Project): AffectedModuleDetector {

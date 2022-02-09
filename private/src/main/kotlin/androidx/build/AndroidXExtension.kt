@@ -41,14 +41,13 @@ open class AndroidXExtension(val project: Project) {
         val composeCustomVersion = project.providers.environmentVariable("COMPOSE_CUSTOM_VERSION")
         val composeCustomGroup = project.providers.environmentVariable("COMPOSE_CUSTOM_GROUP")
 
-        @Suppress("DEPRECATION")
         val serviceProvider = project.gradle.sharedServices.registerIfAbsent(
             "libraryVersionsService",
             LibraryVersionsService::class.java
         ) { spec ->
-            spec.parameters.tomlFile = content.asText.forUseAtConfigurationTime()
-            spec.parameters.composeCustomVersion = composeCustomVersion.forUseAtConfigurationTime()
-            spec.parameters.composeCustomGroup = composeCustomGroup.forUseAtConfigurationTime()
+            spec.parameters.tomlFile = content.asText
+            spec.parameters.composeCustomVersion = composeCustomVersion
+            spec.parameters.composeCustomGroup = composeCustomGroup
         }
         LibraryGroups = serviceProvider.get().libraryGroups
         LibraryVersions = serviceProvider.get().libraryVersions
