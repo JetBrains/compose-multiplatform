@@ -1,3 +1,0 @@
-// Baseline format: 1.0
-ChangedSuperclass: androidx.compose.ui.test.junit4.android.ComposeNotIdleException:
-    Class androidx.compose.ui.test.junit4.android.ComposeNotIdleException superclass changed from java.lang.Throwable to java.lang.Exception
