@@ -238,8 +238,10 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
                     java.includes.add("**/*.kt")
                 }
                 sourceSets.findByName("test")?.apply {
-                    java.srcDirs("src/test/kotlin")
-                    res.srcDirs("src/test/res")
+                    java.srcDirs(
+                        "src/commonTest/kotlin", "src/jvmTest/kotlin"
+                    )
+                    res.srcDirs("src/commonTest/res", "src/jvmTest/res")
 
                     // Keep Kotlin files in java source sets so the source set is not empty when
                     // running unit tests which would prevent the tests from running in CI.
