@@ -16,20 +16,16 @@
 
 package androidx.compose.ui.graphics
 
-import androidx.compose.ui.graphics.colorspace.RenderIntent
-import org.junit.Assert.assertEquals
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
-@RunWith(JUnit4::class)
-class RenderIntentTest {
+class TileModeTest {
 
     @Test
     fun testToString() {
-        assertEquals("Absolute", RenderIntent.Absolute.toString())
-        assertEquals("Perceptual", RenderIntent.Perceptual.toString())
-        assertEquals("Relative", RenderIntent.Relative.toString())
-        assertEquals("Saturation", RenderIntent.Saturation.toString())
+        assertEquals("Clamp", TileMode.Clamp.toString())
+        assertEquals("Mirror", TileMode.Mirror.toString())
+        assertEquals("Repeated", TileMode.Repeated.toString())
+        assertEquals("Decal", TileMode.Decal.toString())
     }
 }

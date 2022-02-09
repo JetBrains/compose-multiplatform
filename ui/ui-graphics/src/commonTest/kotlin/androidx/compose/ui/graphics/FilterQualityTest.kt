@@ -16,20 +16,16 @@
 
 package androidx.compose.ui.graphics
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
-@RunWith(JUnit4::class)
-class ImageBitmapConfigTest {
+class FilterQualityTest {
 
     @Test
     fun testToString() {
-        assertEquals("Argb8888", ImageBitmapConfig.Argb8888.toString())
-        assertEquals("Alpha8", ImageBitmapConfig.Alpha8.toString())
-        assertEquals("Rgb565", ImageBitmapConfig.Rgb565.toString())
-        assertEquals("F16", ImageBitmapConfig.F16.toString())
-        assertEquals("Gpu", ImageBitmapConfig.Gpu.toString())
+        assertEquals("None", FilterQuality.None.toString())
+        assertEquals("Low", FilterQuality.Low.toString())
+        assertEquals("Medium", FilterQuality.Medium.toString())
+        assertEquals("High", FilterQuality.High.toString())
     }
 }

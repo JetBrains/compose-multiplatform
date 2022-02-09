@@ -18,15 +18,13 @@ package androidx.compose.ui.graphics
 
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import androidx.compose.ui.util.lerp
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertTrue
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
 
-@RunWith(JUnit4::class)
 class ColorTest {
     private val adobeColorSpace = ColorSpaces.AdobeRgb
     private val srgbColor = Color(0xFFFF8000)
@@ -130,9 +128,9 @@ class ColorTest {
             val colorARGB = Color(color.toArgb())
             val expectedARGB = Color(expected.toArgb())
             assertEquals(
+                expectedARGB, colorARGB,
                 "at t = $t[$i] was ${colorARGB.toArgb().toHexString()}, " +
-                    "expecting ${expectedARGB.toArgb().toHexString()}",
-                expectedARGB, colorARGB
+                    "expecting ${expectedARGB.toArgb().toHexString()}"
             )
         }
 
@@ -150,9 +148,9 @@ class ColorTest {
             val colorARGB = Color(color.toArgb())
             val expectedARGB = Color(expected.toArgb())
             assertEquals(
+                expectedARGB, colorARGB,
                 "at t = $t[$i] was ${colorARGB.toArgb().toHexString()}, " +
                     "expecting ${expectedARGB.toArgb().toHexString()}",
-                expectedARGB, colorARGB
             )
         }
     }
@@ -203,44 +201,60 @@ class ColorTest {
         assertEquals(Color(0f, 0f, 0f, 0f), result)
     }
 
-    @Test(expected = java.lang.IllegalArgumentException::class)
+    @Test
     fun srgbOutOfBounds_highRed() {
-        Color(2f, 0f, 0f)
+        assertFailsWith<IllegalArgumentException> {
+            Color(2f, 0f, 0f)
+        }
     }
 
-    @Test(expected = java.lang.IllegalArgumentException::class)
+    @Test
     fun srgbOutOfBounds_lowRed() {
-        Color(-1f, 0f, 0f)
+        assertFailsWith<IllegalArgumentException> {
+            Color(-1f, 0f, 0f)
+        }
     }
 
-    @Test(expected = java.lang.IllegalArgumentException::class)
+    @Test
     fun srgbOutOfBounds_highGreen() {
-        Color(0f, 2f, 0f)
+        assertFailsWith<IllegalArgumentException> {
+            Color(0f, 2f, 0f)
+        }
     }
 
-    @Test(expected = java.lang.IllegalArgumentException::class)
+    @Test
     fun srgbOutOfBounds_lowGreen() {
-        Color(0f, -1f, 0f)
+        assertFailsWith<IllegalArgumentException> {
+            Color(0f, -1f, 0f)
+        }
     }
 
-    @Test(expected = java.lang.IllegalArgumentException::class)
+    @Test
     fun srgbOutOfBounds_highBlue() {
-        Color(0f, 0f, 2f)
+        assertFailsWith<IllegalArgumentException> {
+            Color(0f, 0f, 2f)
+        }
     }
 
-    @Test(expected = java.lang.IllegalArgumentException::class)
+    @Test
     fun srgbOutOfBounds_lowBlue() {
-        Color(0f, 0f, -1f)
+        assertFailsWith<IllegalArgumentException> {
+            Color(0f, 0f, -1f)
+        }
     }
 
-    @Test(expected = java.lang.IllegalArgumentException::class)
+    @Test
     fun srgbOutOfBounds_highAlpha() {
-        Color(0f, 0f, 0f, 2f)
+        assertFailsWith<IllegalArgumentException> {
+            Color(0f, 0f, 0f, 2f)
+        }
     }
 
-    @Test(expected = java.lang.IllegalArgumentException::class)
+    @Test
     fun srgbOutOfBounds_lowAlpha() {
-        Color(0f, 0f, 0f, -1f)
+        assertFailsWith<IllegalArgumentException> {
+            Color(0f, 0f, 0f, -1f)
+        }
     }
 
     @Test

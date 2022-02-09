@@ -16,18 +16,17 @@
 
 package androidx.compose.ui.graphics
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import androidx.compose.ui.graphics.colorspace.RenderIntent
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
-@RunWith(JUnit4::class)
-class StrokeCapTest {
+class RenderIntentTest {
 
     @Test
     fun testToString() {
-        assertEquals("Butt", StrokeCap.Butt.toString())
-        assertEquals("Round", StrokeCap.Round.toString())
-        assertEquals("Square", StrokeCap.Square.toString())
+        assertEquals("Absolute", RenderIntent.Absolute.toString())
+        assertEquals("Perceptual", RenderIntent.Perceptual.toString())
+        assertEquals("Relative", RenderIntent.Relative.toString())
+        assertEquals("Saturation", RenderIntent.Saturation.toString())
     }
 }

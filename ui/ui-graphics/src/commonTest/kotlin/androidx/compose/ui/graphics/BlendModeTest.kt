@@ -16,12 +16,9 @@
 
 package androidx.compose.ui.graphics
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import kotlin.test.assertEquals
+import kotlin.test.Test
 
-@RunWith(JUnit4::class)
 class BlendModeTest {
 
     @Test

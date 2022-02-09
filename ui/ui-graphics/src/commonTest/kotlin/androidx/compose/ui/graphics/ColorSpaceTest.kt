@@ -30,20 +30,18 @@ import androidx.compose.ui.graphics.colorspace.TransferParameters
 import androidx.compose.ui.graphics.colorspace.WhitePoint
 import androidx.compose.ui.graphics.colorspace.adapt
 import androidx.compose.ui.graphics.colorspace.connect
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertSame
-import org.junit.Assert.assertTrue
-import org.junit.Assert.fail
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
+import kotlin.test.fail
 
-@RunWith(JUnit4::class)
 class ColorSpaceTest {
 
     @Test
@@ -57,17 +55,19 @@ class ColorSpaceTest {
         }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun testEmptyName() {
-        Rgb(
-            "",
-            FloatArray(6),
-            WhitePoint(0f, 0f),
-            sIdentity,
-            sIdentity,
-            0.0f,
-            1.0f
-        )
+        assertFailsWith<IllegalArgumentException> {
+            Rgb(
+                "",
+                FloatArray(6),
+                WhitePoint(0f, 0f),
+                sIdentity,
+                sIdentity,
+                0.0f,
+                1.0f
+            )
+        }
     }
 
     @Test
@@ -79,17 +79,19 @@ class ColorSpaceTest {
         assertEquals("Test", cs.name)
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun testPrimariesLength() {
-        Rgb(
-            "Test",
-            FloatArray(7),
-            WhitePoint(0f, 0f),
-            sIdentity,
-            sIdentity,
-            0.0f,
-            1.0f
-        )
+        assertFailsWith<IllegalArgumentException> {
+            Rgb(
+                "Test",
+                FloatArray(7),
+                WhitePoint(0f, 0f),
+                sIdentity,
+                sIdentity,
+                0.0f,
+                1.0f
+            )
+        }
     }
 
     @Test
@@ -112,17 +114,19 @@ class ColorSpaceTest {
         assertEquals(0.0625, cs.eotf(0.25), 1e-5)
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun testInvalidRange() {
-        Rgb(
-            "Test",
-            FloatArray(6),
-            WhitePoint(0f, 0f),
-            sIdentity,
-            sIdentity,
-            2.0f,
-            1.0f
-        )
+        assertFailsWith<IllegalArgumentException> {
+            Rgb(
+                "Test",
+                FloatArray(6),
+                WhitePoint(0f, 0f),
+                sIdentity,
+                sIdentity,
+                2.0f,
+                1.0f
+            )
+        }
     }
 
     @Test
@@ -309,8 +313,8 @@ class ColorSpaceTest {
                 assertTrue(colorSpace.isSrgb)
             } else {
                 assertFalse(
-                    "Incorrectly treating $colorSpace as SRGB!",
-                    colorSpace.isSrgb
+                    colorSpace.isSrgb,
+                    "Incorrectly treating $colorSpace as SRGB!"
                 )
             }
         }
