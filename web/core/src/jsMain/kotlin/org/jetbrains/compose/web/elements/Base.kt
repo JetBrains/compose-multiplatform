@@ -148,7 +148,7 @@ fun <TElement : Element> TagElement(
 @ExperimentalComposeWebApi
 fun <TElement : Element> TagElement(
     tagName: String,
-    applyAttrs: AttrsScope<TElement>.() -> Unit,
+    applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
     content: (@Composable ElementScope<TElement>.() -> Unit)?
 ) = TagElement(
     elementBuilder = ElementBuilder.createBuilder(tagName),
