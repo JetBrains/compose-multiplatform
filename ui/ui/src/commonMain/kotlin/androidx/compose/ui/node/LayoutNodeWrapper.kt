@@ -143,7 +143,21 @@ internal abstract class LayoutNodeWrapper(
     private var oldAlignmentLines: MutableMap<AlignmentLine, Int>? = null
 
     override val providedAlignmentLines: Set<AlignmentLine>
-        get() = _measureResult?.alignmentLines?.keys ?: emptySet()
+        get() {
+            var set: MutableSet<AlignmentLine>? = null
+            var wrapper: LayoutNodeWrapper? = this
+            while (wrapper != null) {
+                val alignmentLines = wrapper._measureResult?.alignmentLines
+                if (alignmentLines?.isNotEmpty() == true) {
+                    if (set == null) {
+                        set = mutableSetOf()
+                    }
+                    set.addAll(alignmentLines.keys)
+                }
+                wrapper = wrapper.wrapped
+            }
+            return set ?: emptySet()
+        }
 
     /**
      * Called when the width or height of [measureResult] change. The object instance pointed to
