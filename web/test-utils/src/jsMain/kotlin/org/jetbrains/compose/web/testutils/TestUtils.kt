@@ -13,7 +13,7 @@ import org.w3c.dom.HTMLElement
 import org.w3c.dom.MutationObserver
 import org.w3c.dom.MutationObserverInit
 import org.w3c.dom.asList
-import org.w3c.dom.get
+import org.w3c.dom.css.CSSStyleDeclaration
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -68,23 +68,10 @@ class TestScope : CoroutineScope by MainScope() {
      * @return a reference to the next child element of the root.
      * Subsequent calls will return next child reference every time.
      */
-    fun nextChild() = childrenIterator.next() as HTMLElement
+    fun nextChild() = nextChild<HTMLElement>()
 
     @Suppress("UNCHECKED_CAST")
     fun <T> nextChild() = childrenIterator.next() as T
-
-    /**
-     * @return a reference to current child.
-     * Calling this subsequently returns the same reference every time.
-     */
-    fun currentChild() = root.children[childrenIterator.previousIndex()] as HTMLElement
-
-    /**
-     * Suspends until [root] observes any change to its html.
-     */
-    suspend fun waitForChanges() {
-        waitForChanges(root)
-    }
 
     /**
      * Suspends until element with [elementId] observes any change to its html.
@@ -96,7 +83,7 @@ class TestScope : CoroutineScope by MainScope() {
     /**
      * Suspends until [element] observes any change to its html.
      */
-    suspend fun waitForChanges(element: HTMLElement) {
+    suspend fun waitForChanges(element: HTMLElement = root) {
         suspendCoroutine<Unit> { continuation ->
             val observer = MutationObserver { _, observer ->
                 continuation.resume(Unit)
@@ -178,3 +165,6 @@ private class TestMonotonicClockImpl(
         }
     }
 }
+
+val HTMLElement.computedStyle: CSSStyleDeclaration
+    get() = window.getComputedStyle(this)

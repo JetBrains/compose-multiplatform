@@ -5,10 +5,17 @@
 
 package org.jetbrains.compose.web.core.tests.css
 
-import kotlinx.browser.window
-import org.jetbrains.compose.web.testutils.*
-import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.padding
+import org.jetbrains.compose.web.css.paddingBottom
+import org.jetbrains.compose.web.css.paddingLeft
+import org.jetbrains.compose.web.css.paddingRight
+import org.jetbrains.compose.web.css.paddingTop
+import org.jetbrains.compose.web.css.percent
+import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.vw
 import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.testutils.computedStyle
+import org.jetbrains.compose.web.testutils.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -75,7 +82,7 @@ class CSSPaddingTests {
             })
         }
 
-        val el = window.getComputedStyle(nextChild())
+        val el = nextChild().computedStyle
 
         assertEquals("4px", el.paddingTop, "paddingTop")
         assertEquals("4px", el.paddingRight, "paddingRight")
@@ -93,7 +100,7 @@ class CSSPaddingTests {
             })
         }
 
-        val el = window.getComputedStyle(nextChild())
+        val el = nextChild().computedStyle
 
         assertEquals("4px", el.paddingTop, "paddingTop")
         assertEquals("6px", el.paddingRight, "paddingRight")
@@ -111,7 +118,7 @@ class CSSPaddingTests {
             })
         }
 
-        val el = window.getComputedStyle(nextChild())
+        val el = nextChild().computedStyle
 
         assertEquals("4px", el.paddingTop, "paddingTop")
         assertEquals("6px", el.paddingRight, "paddingRight")
@@ -129,7 +136,7 @@ class CSSPaddingTests {
             })
         }
 
-        val el = window.getComputedStyle(nextChild())
+        val el = nextChild().computedStyle
 
         assertEquals("4px", el.paddingTop, "paddingTop")
         assertEquals("6px", el.paddingRight, "paddingRight")

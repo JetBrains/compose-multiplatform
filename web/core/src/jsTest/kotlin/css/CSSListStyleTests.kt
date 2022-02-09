@@ -101,8 +101,10 @@ class CSSListStyleTests {
             })
         }
 
-        assertEquals("inside", (nextChild()).style.listStylePosition)
-        assertEquals("georgian", (currentChild()).style.listStyleType)
+        nextChild().style.apply {
+            assertEquals("inside", listStylePosition)
+            assertEquals("georgian", listStyleType)
+        }
     }
 
 }
