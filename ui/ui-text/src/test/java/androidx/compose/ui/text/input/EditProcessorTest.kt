@@ -187,4 +187,115 @@ class EditProcessorTest {
         assertThat(updatedSelection.min).isEqualTo(initialBuffer.selectionStart)
         assertThat(updatedSelection.max).isEqualTo(initialBuffer.selectionEnd)
     }
+
+    @Test
+    fun compositionIsCleared_when_textChanged() {
+        val processor = EditProcessor()
+        val textInputSession = mock<TextInputSession>()
+
+        // set the initial value
+        processor.apply(
+            listOf(
+                CommitTextCommand("ab", 0),
+                SetComposingRegionCommand(0, 2)
+            )
+        )
+
+        // change the text
+        val newValue = processor.mBufferState.copy(text = "cd")
+        processor.reset(newValue, textInputSession)
+
+        assertThat(processor.mBufferState.text).isEqualTo(newValue.text)
+        assertThat(processor.mBufferState.composition).isNull()
+    }
+
+    @Test
+    fun compositionIsNotCleared_when_textIsSame() {
+        val processor = EditProcessor()
+        val textInputSession = mock<TextInputSession>()
+        val composition = TextRange(0, 2)
+
+        // set the initial value
+        processor.apply(
+            listOf(
+                CommitTextCommand("ab", 0),
+                SetComposingRegionCommand(composition.start, composition.end)
+            )
+        )
+
+        // use the same TextFieldValue
+        val newValue = processor.mBufferState.copy()
+        processor.reset(newValue, textInputSession)
+
+        assertThat(processor.mBufferState.text).isEqualTo(newValue.text)
+        assertThat(processor.mBufferState.composition).isEqualTo(composition)
+    }
+
+    @Test
+    fun compositionIsCleared_when_compositionReset() {
+        val processor = EditProcessor()
+        val textInputSession = mock<TextInputSession>()
+
+        // set the initial value
+        processor.apply(
+            listOf(
+                CommitTextCommand("ab", 0),
+                SetComposingRegionCommand(-1, -1)
+            )
+        )
+
+        // change the composition
+        val newValue = processor.mBufferState.copy(composition = TextRange(0, 2))
+        processor.reset(newValue, textInputSession)
+
+        assertThat(processor.mBufferState.text).isEqualTo(newValue.text)
+        assertThat(processor.mBufferState.composition).isNull()
+    }
+
+    @Test
+    fun compositionIsCleared_when_compositionChanged() {
+        val processor = EditProcessor()
+        val textInputSession = mock<TextInputSession>()
+
+        // set the initial value
+        processor.apply(
+            listOf(
+                CommitTextCommand("ab", 0),
+                SetComposingRegionCommand(0, 2)
+            )
+        )
+
+        // change the composition
+        val newValue = processor.mBufferState.copy(composition = TextRange(0, 1))
+        processor.reset(newValue, textInputSession)
+
+        assertThat(processor.mBufferState.text).isEqualTo(newValue.text)
+        assertThat(processor.mBufferState.composition).isNull()
+    }
+
+    @Test
+    fun compositionIsNotCleared_when_onlySelectionChanged() {
+        val processor = EditProcessor()
+        val textInputSession = mock<TextInputSession>()
+        val composition = TextRange(0, 2)
+        val selection = TextRange(0, 2)
+
+        // set the initial value
+        processor.apply(
+            listOf(
+                CommitTextCommand("ab", 0),
+                SetComposingRegionCommand(composition.start, composition.end),
+                SetSelectionCommand(selection.start, selection.end)
+            )
+        )
+
+        // change selection
+        val newSelection = TextRange(1)
+        val newValue = processor.mBufferState.copy(selection = newSelection)
+        processor.reset(newValue, textInputSession)
+
+        assertThat(processor.mBufferState.text).isEqualTo(newValue.text)
+        assertThat(processor.mBufferState.composition).isEqualTo(composition)
+        assertThat(processor.mBufferState.selection).isEqualTo(newSelection)
+    }
 }
