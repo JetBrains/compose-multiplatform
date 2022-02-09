@@ -34,6 +34,8 @@ abstract class AbstractRunDistributableTask @Inject constructor(
     fun run() {
         val appDir = appImageRootDir.ioFile.let { appImageRoot ->
             val files = appImageRoot.listFiles()
+                // Sometimes ".DS_Store" files are created on macOS, so ignore them.
+                ?.filterNot { it.name == ".DS_Store" }
             if (files == null || files.isEmpty()) {
                 error("Could not find application image: $appImageRoot is empty!")
             } else if (files.size > 1) {
