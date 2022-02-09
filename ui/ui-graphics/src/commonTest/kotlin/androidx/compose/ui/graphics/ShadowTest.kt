@@ -19,36 +19,32 @@ package androidx.compose.ui.graphics
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.lerp
 import androidx.compose.ui.util.lerp
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
-@RunWith(JUnit4::class)
 class ShadowTest {
     @Test
-    fun `default value`() {
+    fun defaultValue() {
         val shadow = Shadow()
-        assertThat(shadow.color, equalTo(Color(0xFF000000)))
-        assertThat(shadow.blurRadius, equalTo(0.0f))
-        assertThat(shadow.offset, equalTo(Offset.Zero))
+        assertEquals(Color(0xFF000000), shadow.color)
+        assertEquals(0.0f, shadow.blurRadius)
+        assertEquals(Offset.Zero, shadow.offset)
     }
 
     @Test
-    fun `constructor`() {
+    fun testConstructor() {
         val color = Color(0xFF00FF00)
         val offset = Offset(2f, 3f)
         val blurRadius = 1.0f
 
         val shadow = Shadow(color, offset, blurRadius)
-        assertThat(shadow.color, equalTo(color))
-        assertThat(shadow.offset, equalTo(offset))
-        assertThat(shadow.blurRadius, equalTo(blurRadius))
+        assertEquals(color, shadow.color)
+        assertEquals(offset, shadow.offset)
+        assertEquals(blurRadius, shadow.blurRadius)
     }
 
     @Test
-    fun `lerp`() {
+    fun testLerp() {
         val colorA = Color(0xFF00FF00)
         val colorB = Color(0xFF0000FF)
         val offsetA = Offset(5f, 10f)
@@ -60,8 +56,8 @@ class ShadowTest {
         val t = 0.4f
 
         val shadow = lerp(shadowA, shadowB, t)
-        assertThat(shadow.color, equalTo(lerp(colorA, colorB, t)))
-        assertThat(shadow.offset, equalTo(lerp(offsetA, offsetB, t)))
-        assertThat(shadow.blurRadius, equalTo(lerp(radiusA, radiusB, t)))
+        assertEquals(lerp(colorA, colorB, t), shadow.color)
+        assertEquals(lerp(offsetA, offsetB, t), shadow.offset)
+        assertEquals(lerp(radiusA, radiusB, t), shadow.blurRadius)
     }
 }
