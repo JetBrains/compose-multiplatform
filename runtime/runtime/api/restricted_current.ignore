@@ -11,7 +11,3 @@ AddedAbstractMethod: androidx.compose.runtime.ControlledComposition#changesAppli
     Added method androidx.compose.runtime.ControlledComposition.changesApplied()
 AddedAbstractMethod: androidx.compose.runtime.ControlledComposition#delegateInvalidations(androidx.compose.runtime.ControlledComposition, int, kotlin.jvm.functions.Function0<? extends R>):
     Added method androidx.compose.runtime.ControlledComposition.delegateInvalidations(androidx.compose.runtime.ControlledComposition,int,kotlin.jvm.functions.Function0<? extends R>)
-AddedAbstractMethod: androidx.compose.runtime.ControlledComposition#disposeUnusedMovableContent(androidx.compose.runtime.MovableContentState):
-    Added method androidx.compose.runtime.ControlledComposition.disposeUnusedMovableContent(androidx.compose.runtime.MovableContentState)
-AddedAbstractMethod: androidx.compose.runtime.ControlledComposition#insertMovableContent(java.util.List<kotlin.Pair<androidx.compose.runtime.MovableContentStateReference,androidx.compose.runtime.MovableContentStateReference>>):
-    Added method androidx.compose.runtime.ControlledComposition.insertMovableContent(java.util.List<kotlin.Pair<androidx.compose.runtime.MovableContentStateReference,androidx.compose.runtime.MovableContentStateReference>>)
