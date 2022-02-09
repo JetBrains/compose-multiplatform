@@ -47,20 +47,16 @@ fun GridItemSpan(currentLineSpan: Int) = GridItemSpan(currentLineSpan.toLong())
 @ExperimentalFoundationApi
 interface LazyGridItemSpanScope {
     /**
-     * The row of the item the span is calculated for.
-     */
-    @ExperimentalFoundationApi
-    val itemRow: Int
-
-    /**
-     * The column of the item the span is calculated for.
-     */
-    @ExperimentalFoundationApi
-    val itemColumn: Int
-
-    /**
-     * The max current line (horizontal for vertical grids) the item can occupy.
+     * The max current line (horizontal for vertical grids) the item can occupy, such that
+     * it will be positioned on the current line.
      */
     @ExperimentalFoundationApi
     val maxCurrentLineSpan: Int
+
+    /**
+     * The max line span (horizontal for vertical grids) an item can occupy. This will be the
+     * number of columns in vertical grids or the number of rows in horizontal grids.
+     */
+    @ExperimentalFoundationApi
+    val maxLineSpan: Int
 }

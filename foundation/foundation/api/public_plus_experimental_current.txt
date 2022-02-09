@@ -473,12 +473,10 @@ package androidx.compose.foundation.lazy {
   }
 
   @androidx.compose.foundation.ExperimentalFoundationApi public interface LazyGridItemSpanScope {
-    method public int getItemColumn();
-    method public int getItemRow();
     method public int getMaxCurrentLineSpan();
-    property public abstract int itemColumn;
-    property public abstract int itemRow;
+    method public int getMaxLineSpan();
     property public abstract int maxCurrentLineSpan;
+    property public abstract int maxLineSpan;
   }
 
   public final class LazyGridKt {

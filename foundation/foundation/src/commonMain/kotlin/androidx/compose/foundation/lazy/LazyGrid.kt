@@ -37,6 +37,12 @@ import androidx.compose.ui.unit.dp
  * This API is not stable, please consider using stable components like [LazyColumn] and [Row]
  * to achieve the same result.
  *
+ * Sample:
+ * @sample androidx.compose.foundation.samples.LazyVerticalGridSample
+ *
+ * Sample with custom item spans:
+ * @sample androidx.compose.foundation.samples.LazyVerticalGridSpanSample
+ *
  * @param cells a class describing how cells form columns, see [GridCells] doc for more information
  * @param modifier the modifier to apply to this layout
  * @param state the state object to be used to control or observe the list's state

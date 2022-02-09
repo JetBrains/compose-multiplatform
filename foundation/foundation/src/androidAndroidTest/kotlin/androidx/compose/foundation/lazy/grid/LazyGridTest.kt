@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.GridItemSpan
 import androidx.compose.foundation.lazy.LazyGridState
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
@@ -59,7 +58,6 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsAtLeast
-import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.LayoutDirection
@@ -710,181 +708,6 @@ class LazyGridTest {
     }
 
     @Test
-    fun spans() {
-        val columns = 4
-        val columnWidth = with(rule.density) { 5.toDp() }
-        val itemHeight = with(rule.density) { 10.toDp() }
-        rule.setContent {
-            LazyVerticalGrid(
-                cells = GridCells.Fixed(columns),
-                modifier = Modifier.requiredSize(columnWidth * columns, itemHeight * 3)
-            ) {
-                items(
-                    count = 6,
-                    span = { index ->
-                        when (index) {
-                            0 -> {
-                                Truth.assertThat(itemRow).isEqualTo(0)
-                                Truth.assertThat(itemColumn).isEqualTo(0)
-                                Truth.assertThat(maxCurrentLineSpan).isEqualTo(4)
-                                GridItemSpan(3)
-                            }
-                            1 -> {
-                                Truth.assertThat(itemRow).isEqualTo(0)
-                                Truth.assertThat(itemColumn).isEqualTo(3)
-                                Truth.assertThat(maxCurrentLineSpan).isEqualTo(1)
-                                GridItemSpan(1)
-                            }
-                            2 -> {
-                                Truth.assertThat(itemRow).isEqualTo(1)
-                                Truth.assertThat(itemColumn).isEqualTo(0)
-                                Truth.assertThat(maxCurrentLineSpan).isEqualTo(4)
-                                GridItemSpan(1)
-                            }
-                            3 -> {
-                                Truth.assertThat(itemRow).isEqualTo(1)
-                                Truth.assertThat(itemColumn).isEqualTo(1)
-                                Truth.assertThat(maxCurrentLineSpan).isEqualTo(3)
-                                GridItemSpan(3)
-                            }
-                            4 -> {
-                                Truth.assertThat(itemRow).isEqualTo(2)
-                                Truth.assertThat(itemColumn).isEqualTo(0)
-                                Truth.assertThat(maxCurrentLineSpan).isEqualTo(4)
-                                GridItemSpan(1)
-                            }
-                            5 -> {
-                                Truth.assertThat(itemRow).isEqualTo(2)
-                                Truth.assertThat(itemColumn).isEqualTo(1)
-                                Truth.assertThat(maxCurrentLineSpan).isEqualTo(3)
-                                GridItemSpan(1)
-                            }
-                            else -> error("Out of index span queried")
-                        }
-                    },
-                ) {
-                    Box(Modifier.fillMaxWidth().height(itemHeight).testTag("$it"))
-                }
-            }
-        }
-
-        rule.onNodeWithTag("0")
-            .assertTopPositionInRootIsEqualTo(0.dp)
-            .assertLeftPositionInRootIsEqualTo(0.dp)
-        rule.onNodeWithTag("1")
-            .assertTopPositionInRootIsEqualTo(0.dp)
-            .assertLeftPositionInRootIsEqualTo(columnWidth * 3)
-        rule.onNodeWithTag("2")
-            .assertTopPositionInRootIsEqualTo(itemHeight)
-            .assertLeftPositionInRootIsEqualTo(0.dp)
-        rule.onNodeWithTag("3")
-            .assertTopPositionInRootIsEqualTo(itemHeight)
-            .assertLeftPositionInRootIsEqualTo(columnWidth)
-        rule.onNodeWithTag("4")
-            .assertTopPositionInRootIsEqualTo(itemHeight * 2)
-            .assertLeftPositionInRootIsEqualTo(0.dp)
-        rule.onNodeWithTag("5")
-            .assertTopPositionInRootIsEqualTo(itemHeight * 2)
-            .assertLeftPositionInRootIsEqualTo(columnWidth)
-    }
-
-    @Test
-    fun spansWithHorizontalSpacing() {
-        val columns = 4
-        val columnWidth = with(rule.density) { 5.toDp() }
-        val itemHeight = with(rule.density) { 10.toDp() }
-        val spacing = with(rule.density) { 4.toDp() }
-        rule.setContent {
-            LazyVerticalGrid(
-                cells = GridCells.Fixed(columns),
-                modifier = Modifier.requiredSize(
-                    columnWidth * columns + spacing * (columns - 1),
-                    itemHeight
-                ),
-                horizontalArrangement = Arrangement.spacedBy(spacing)
-            ) {
-                items(
-                    count = 2,
-                    span = { index ->
-                        when (index) {
-                            0 -> GridItemSpan(1)
-                            1 -> GridItemSpan(3)
-                            else -> error("Out of index span queried")
-                        }
-                    }
-                ) {
-                    Box(Modifier.fillMaxWidth().height(itemHeight).testTag("$it"))
-                }
-            }
-        }
-
-        rule.onNodeWithTag("0")
-            .assertTopPositionInRootIsEqualTo(0.dp)
-            .assertLeftPositionInRootIsEqualTo(0.dp)
-            .assertWidthIsEqualTo(columnWidth)
-        rule.onNodeWithTag("1")
-            .assertTopPositionInRootIsEqualTo(0.dp)
-            .assertLeftPositionInRootIsEqualTo(columnWidth + spacing)
-            .assertWidthIsEqualTo(columnWidth * 3 + spacing * 2)
-    }
-
-    @Test
-    fun spansMultipleBlocks() {
-        val columns = 4
-        val columnWidth = with(rule.density) { 5.toDp() }
-        val itemHeight = with(rule.density) { 10.toDp() }
-        rule.setContent {
-            LazyVerticalGrid(
-                cells = GridCells.Fixed(columns),
-                modifier = Modifier.requiredSize(columnWidth * columns, itemHeight)
-            ) {
-                items(
-                    count = 1,
-                    span = { index ->
-                        when (index) {
-                            0 -> GridItemSpan(1)
-                            else -> error("Out of index span queried")
-                        }
-                    }
-                ) {
-                    Box(Modifier.fillMaxWidth().height(itemHeight).testTag("0"))
-                }
-                item(span = {
-                    if (maxCurrentLineSpan != 3) error("Wrong maxSpan")
-                    GridItemSpan(2)
-                }) {
-                    Box(Modifier.fillMaxWidth().height(itemHeight).testTag("1"))
-                }
-                items(
-                    count = 1,
-                    span = { index ->
-                        if (maxCurrentLineSpan != 1 || index != 0) {
-                            error("Wrong span calculation parameters")
-                        }
-                        GridItemSpan(1)
-                    }
-                ) {
-                    if (it != 0) error("Wrong index")
-                    Box(Modifier.fillMaxWidth().height(itemHeight).testTag("2"))
-                }
-            }
-        }
-
-        rule.onNodeWithTag("0")
-            .assertTopPositionInRootIsEqualTo(0.dp)
-            .assertLeftPositionInRootIsEqualTo(0.dp)
-            .assertWidthIsEqualTo(columnWidth)
-        rule.onNodeWithTag("1")
-            .assertTopPositionInRootIsEqualTo(0.dp)
-            .assertLeftPositionInRootIsEqualTo(columnWidth)
-            .assertWidthIsEqualTo(columnWidth * 2)
-        rule.onNodeWithTag("2")
-            .assertTopPositionInRootIsEqualTo(0.dp)
-            .assertLeftPositionInRootIsEqualTo(columnWidth * 3)
-            .assertWidthIsEqualTo(columnWidth)
-    }
-
-    @Test
     fun pointerInputScrollingIsAllowedWhenUserScrollingIsEnabled() {
         val itemSize = with(rule.density) { 30.toDp() }
         rule.setContentWithTestViewConfiguration {
@@ -1102,6 +925,4 @@ class LazyGridTest {
             Truth.assertThat(recomposeCount).isEqualTo(1)
         }
     }
-
-    // TODO: add tests for the cache logic
 }
