@@ -17,6 +17,10 @@
 package androidx.compose.material
 
 import android.os.Build
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -102,6 +106,130 @@ class ChipScreenshotTest {
             }
         }
         assertChipAgainstGolden("actionChip_outlined_disabled")
+    }
+
+    @Test
+    fun filterChip_selected() {
+        rule.setMaterialContent {
+            FilterChip(
+                selected = true,
+                onClick = {},
+                modifier = Modifier.testTag(TestTag),
+                selectedIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Done,
+                        contentDescription = "Localized Description",
+                        modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
+                    )
+                }
+            ) {
+                Text("Filter Chip")
+            }
+        }
+        assertChipAgainstGolden("filterChip_selected")
+    }
+
+    @Test
+    fun filterChip_withLeadingIcon_selected() {
+        rule.setMaterialContent {
+            FilterChip(
+                selected = true,
+                onClick = {},
+                modifier = Modifier.testTag(TestTag),
+                leadingIcon = {
+                    Icon(
+                        Icons.Filled.Home,
+                        contentDescription = "Localized Description"
+                    )
+                },
+                selectedIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Done,
+                        contentDescription = "Localized Description",
+                        modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
+                    )
+                }
+            ) {
+                Text("Filter Chip")
+            }
+        }
+        assertChipAgainstGolden("filterChip_with_leading_icon_selected")
+    }
+
+    @Test
+    fun filterChip_notSelected() {
+        rule.setMaterialContent {
+            FilterChip(selected = false, onClick = {}, modifier = Modifier.testTag(TestTag)) {
+                Text("Filter Chip")
+            }
+        }
+        assertChipAgainstGolden("filterChip_notSelected")
+    }
+
+    @Test
+    fun filterChip_disabled_selected() {
+        rule.setMaterialContent {
+            FilterChip(
+                selected = true,
+                onClick = {},
+                enabled = false,
+                modifier = Modifier.testTag(TestTag),
+                selectedIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Done,
+                        tint = LocalContentColor.current,
+                        contentDescription = "Localized Description",
+                        modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
+                    )
+                }
+            ) {
+                Text("Filter Chip")
+            }
+        }
+        assertChipAgainstGolden("filterChip_disabled_selected")
+    }
+
+    @Test
+    fun filterChip_withLeadingIcon_disabled_selected() {
+        rule.setMaterialContent {
+            FilterChip(
+                selected = true,
+                onClick = {},
+                enabled = false,
+                modifier = Modifier.testTag(TestTag),
+                leadingIcon = {
+                    Icon(
+                        Icons.Filled.Home,
+                        contentDescription = "Localized Description"
+                    )
+                },
+                selectedIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Done,
+                        contentDescription = "Localized Description",
+                        modifier = Modifier.requiredSize(ChipDefaults.SelectedIconSize)
+                    )
+                }
+            ) {
+                Text("Filter Chip")
+            }
+        }
+        assertChipAgainstGolden("filterChip_with_leading_icon_disabled_selected")
+    }
+
+    @Test
+    fun filterChip_disabled_notSelected() {
+        rule.setMaterialContent {
+            FilterChip(
+                selected = false,
+                onClick = {},
+                enabled = false,
+                modifier = Modifier.testTag(TestTag)
+            ) {
+                Text("filter Chip")
+            }
+        }
+        assertChipAgainstGolden("filterChip_disabled_notSelected")
     }
 
     private fun assertChipAgainstGolden(goldenIdentifier: String) {
