@@ -18,6 +18,7 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusOrder
 import androidx.compose.ui.focus.FocusState
@@ -319,7 +320,12 @@ internal abstract class LayoutNodeWrapper(
         wrapped?.draw(canvas)
     }
 
-    open fun onPlaced() {}
+    fun onPlaced() {
+        @OptIn(ExperimentalComposeUiApi::class)
+        entities.forEach(EntityList.OnPlacedEntityType) {
+            it.modifier.onPlaced(this)
+        }
+    }
 
     // implementation of draw block passed to the OwnedLayer
     @Suppress("LiftReturnOrAssignment")
