@@ -145,6 +145,7 @@ package androidx.compose.ui.text {
     method public float getMinIntrinsicWidth();
     method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> getPlaceholders();
     property public final androidx.compose.ui.text.AnnotatedString annotatedString;
+    property public boolean hasStaleResolvedFonts;
     property public float maxIntrinsicWidth;
     property public float minIntrinsicWidth;
     property public final java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders;
@@ -198,8 +199,10 @@ package androidx.compose.ui.text {
   }
 
   public interface ParagraphIntrinsics {
+    method public default boolean getHasStaleResolvedFonts();
     method public float getMaxIntrinsicWidth();
     method public float getMinIntrinsicWidth();
+    property public default boolean hasStaleResolvedFonts;
     property public abstract float maxIntrinsicWidth;
     property public abstract float minIntrinsicWidth;
   }

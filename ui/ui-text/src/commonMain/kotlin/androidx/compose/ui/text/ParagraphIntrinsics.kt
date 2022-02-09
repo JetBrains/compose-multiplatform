@@ -36,6 +36,26 @@ interface ParagraphIntrinsics {
      * decreases the height.
      */
     val maxIntrinsicWidth: Float
+
+    /**
+     * Any [Paragraph] rendered using this [ParagraphIntrinsics] will be measured and drawn using
+     * stale resolved fonts.
+     *
+     * If this is false, this [ParagraphIntrinsics] is using the most current font resolution from
+     * [FontFamily.Resolver].
+     *
+     * If this is true, recreating this [ParagraphIntrinsics] will use new fonts from
+     * [FontFamily.Resolver] for both display and measurement. Recreating this [ParagraphIntrinsics]
+     * and displaying the resulting [Paragraph] causes user-visible reflow of the displayed text.
+     *
+     * Once true, this will never become false without recreating this [ParagraphIntrinsics].
+     *
+     * It is discouraged, but safe, to continue to use this object after this becomes true. The
+     * only impact of using this object after [hasStaleResolvedFonts] becomes true is stale
+     * resolutions of async fonts for measurement and display.
+     */
+    val hasStaleResolvedFonts: Boolean
+        get() = false
 }
 
 /**
