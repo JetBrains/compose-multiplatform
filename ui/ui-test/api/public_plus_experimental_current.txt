@@ -84,6 +84,9 @@ package androidx.compose.ui.test {
   public final class ErrorMessagesKt {
   }
 
+  public final class Expect_jvmKt {
+  }
+
   @kotlin.RequiresOptIn(message="This testing API is experimental and is likely to be changed or removed entirely") public @interface ExperimentalTestApi {
   }
 
