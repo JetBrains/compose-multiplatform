@@ -283,6 +283,21 @@ internal class TextController(val state: TextState) : RememberObserver {
         }
     }
 
+    /**
+     * Sets the [TextDelegate] in the [state]. If the text of the new delegate is different from
+     * the text of the current delegate, the [semanticsModifier] will be recreated. Note that
+     * changing the semantics modifier does not invalidate the composition, so callers of
+     * [setTextDelegate] are required to call [modifiers] again if they wish to use the updated
+     * semantics modifier.
+     */
+    fun setTextDelegate(textDelegate: TextDelegate) {
+        if (state.textDelegate === textDelegate) {
+            return
+        }
+        state.textDelegate = textDelegate
+        semanticsModifier = createSemanticsModifierFor(state.textDelegate.text)
+    }
+
     val measurePolicy = object : MeasurePolicy {
         override fun MeasureScope.measure(
             measurables: List<Measurable>,
@@ -442,21 +457,33 @@ internal class TextController(val state: TextState) : RememberObserver {
             }
             state.previousGlobalPosition = newGlobalPosition
         }
-    }.semantics {
-        text = state.textDelegate.text
-        getTextLayoutResult {
-            if (state.layoutResult != null) {
-                it.add(state.layoutResult!!)
-                true
-            } else {
-                false
+    }
+
+    /*@VisibleForTesting*/
+    internal var semanticsModifier = createSemanticsModifierFor(state.textDelegate.text)
+        private set
+
+    @Suppress("ModifierFactoryExtensionFunction") // not intended for chaining
+    private fun createSemanticsModifierFor(text: AnnotatedString): Modifier {
+        return Modifier.semantics {
+            this.text = text
+            getTextLayoutResult {
+                if (state.layoutResult != null) {
+                    it.add(state.layoutResult!!)
+                    true
+                } else {
+                    false
+                }
             }
         }
     }
 
     private var selectionModifiers: Modifier = Modifier
 
-    val modifiers: Modifier get() = coreModifiers.then(selectionModifiers)
+    val modifiers: Modifier
+        get() = coreModifiers
+            .then(semanticsModifier)
+            .then(selectionModifiers)
 
     override fun onRemembered() {
         selectionRegistrar?.let { selectionRegistrar ->
@@ -483,6 +510,7 @@ internal class TextController(val state: TextState) : RememberObserver {
 @OptIn(InternalFoundationTextApi::class)
 /*@VisibleForTesting*/
 internal class TextState(
+    /** Should *NEVER* be set directly, only through [TextController.setTextDelegate] */
     var textDelegate: TextDelegate,
     /** The selectable Id assigned to the [selectable] */
     val selectableId: Long

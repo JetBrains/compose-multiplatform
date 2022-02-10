@@ -108,15 +108,17 @@ fun BasicText(
     }
     val state = controller.state
     if (!currentComposer.inserting) {
-        state.textDelegate = updateTextDelegate(
-            current = state.textDelegate,
-            text = text,
-            style = style,
-            density = density,
-            softWrap = softWrap,
-            fontFamilyResolver = fontFamilyResolver,
-            overflow = overflow,
-            maxLines = maxLines,
+        controller.setTextDelegate(
+            updateTextDelegate(
+                current = state.textDelegate,
+                text = text,
+                style = style,
+                density = density,
+                softWrap = softWrap,
+                fontFamilyResolver = fontFamilyResolver,
+                overflow = overflow,
+                maxLines = maxLines,
+            )
         )
     }
     state.onTextLayout = onTextLayout
@@ -206,16 +208,18 @@ fun BasicText(
     }
     val state = controller.state
     if (!currentComposer.inserting) {
-        state.textDelegate = updateTextDelegate(
-            current = state.textDelegate,
-            text = text,
-            style = style,
-            density = density,
-            softWrap = softWrap,
-            fontFamilyResolver = fontFamilyResolver,
-            overflow = overflow,
-            maxLines = maxLines,
-            placeholders = placeholders,
+        controller.setTextDelegate(
+            updateTextDelegate(
+                current = state.textDelegate,
+                text = text,
+                style = style,
+                density = density,
+                softWrap = softWrap,
+                fontFamilyResolver = fontFamilyResolver,
+                overflow = overflow,
+                maxLines = maxLines,
+                placeholders = placeholders,
+            )
         )
     }
     state.onTextLayout = onTextLayout
