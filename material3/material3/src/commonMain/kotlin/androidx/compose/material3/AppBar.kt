@@ -53,9 +53,9 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -64,6 +64,7 @@ import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
@@ -774,14 +775,19 @@ private fun SingleRowTopAppBar(
             TopAppBarSmallTokens.ContainerHeight.toPx() + (scrollBehavior?.offset ?: 0f)
         }
         TopAppBarLayout(
+            modifier = Modifier,
             heightPx = height,
             navigationIconContentColor = colors.navigationIconContentColor(scrollFraction).value,
             titleContentColor = colors.titleContentColor(scrollFraction).value,
             actionIconContentColor = colors.actionIconContentColor(scrollFraction).value,
             title = title,
             titleTextStyle = titleTextStyle,
+            titleAlpha = 1f,
+            titleVerticalArrangement = Arrangement.Center,
             titleHorizontalArrangement =
-            if (centeredTitle) Arrangement.Center else Arrangement.Start,
+                if (centeredTitle) Arrangement.Center else Arrangement.Start,
+            titleBottomPadding = 0,
+            hideTitleSemantics = false,
             navigationIcon = navigationIcon,
             actions = actionsRow,
         )
@@ -832,12 +838,13 @@ private fun TwoRowsTopAppBar(
         }
     }
 
-    val titleAlpha =
+    val scrollPercentage =
         if (scrollBehavior == null || scrollBehavior.offsetLimit == 0f) {
-            1f
+            0f
         } else {
-            1f - (scrollBehavior.offset / scrollBehavior.offsetLimit)
+            scrollBehavior.offset / scrollBehavior.offsetLimit
         }
+
     // Obtain the container Color from the TopAppBarColors.
     // This will potentially animate or interpolate a transition between the container color and the
     // container's scrolled color according to the app bar's scroll state.
@@ -852,9 +859,15 @@ private fun TwoRowsTopAppBar(
             content = actions
         )
     }
+    val titleAlpha = 1f - scrollPercentage
+    // Hide the top row title semantics when its alpha value goes below 0.5 threshold.
+    // Hide the bottom row title semantics when the top title semantics are active.
+    val hideTopRowSemantics = scrollPercentage < 0.5f
+    val hideBottomRowSemantics = !hideTopRowSemantics
     Surface(modifier = modifier, color = appBarContainerColor) {
         Column {
             TopAppBarLayout(
+                modifier = Modifier,
                 heightPx = pinnedHeightPx,
                 navigationIconContentColor =
                     colors.navigationIconContentColor(scrollFraction).value,
@@ -863,10 +876,15 @@ private fun TwoRowsTopAppBar(
                 title = smallTitle,
                 titleTextStyle = smallTitleTextStyle,
                 titleAlpha = 1f - titleAlpha,
+                titleVerticalArrangement = Arrangement.Center,
+                titleHorizontalArrangement = Arrangement.Start,
+                titleBottomPadding = 0,
+                hideTitleSemantics = hideTopRowSemantics,
                 navigationIcon = navigationIcon,
                 actions = actionsRow,
             )
             TopAppBarLayout(
+                modifier = Modifier.clipToBounds(),
                 heightPx = maxHeightPx - pinnedHeightPx + (scrollBehavior?.offset ?: 0f),
                 navigationIconContentColor =
                     colors.navigationIconContentColor(scrollFraction).value,
@@ -876,8 +894,11 @@ private fun TwoRowsTopAppBar(
                 titleTextStyle = titleTextStyle,
                 titleAlpha = titleAlpha,
                 titleVerticalArrangement = Arrangement.Bottom,
+                titleHorizontalArrangement = Arrangement.Start,
                 titleBottomPadding = titleBottomPaddingPx,
-                modifier = Modifier.graphicsLayer { clip = true }
+                hideTitleSemantics = hideBottomRowSemantics,
+                navigationIcon = {},
+                actions = {}
             )
         }
     }
@@ -902,24 +923,29 @@ private fun TwoRowsTopAppBar(
  * @param titleVerticalArrangement the title's vertical arrangement
  * @param titleHorizontalArrangement the title's horizontal arrangement
  * @param titleBottomPadding the title's bottom padding
+ * @param hideTitleSemantics hides the title node from the semantic tree. Apply this
+ * boolean when this layout is part of a [TwoRowsTopAppBar] to hide the title's semantics
+ * from accessibility services. This is needed to avoid having multiple titles visible to
+ * accessibility services at the same time, when animating between collapsed / expanded states.
  * @param navigationIcon a navigation icon [Composable]
  * @param actions actions [Composable]
  */
 @Composable
 private fun TopAppBarLayout(
+    modifier: Modifier,
     heightPx: Float,
     navigationIconContentColor: Color,
     titleContentColor: Color,
     actionIconContentColor: Color,
     title: @Composable () -> Unit,
     titleTextStyle: TextStyle,
-    modifier: Modifier = Modifier,
-    titleAlpha: Float = 1f,
-    titleVerticalArrangement: Arrangement.Vertical = Arrangement.Center,
-    titleHorizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
-    titleBottomPadding: Int = 0,
-    navigationIcon: @Composable () -> Unit = {},
-    actions: @Composable () -> Unit = {},
+    titleAlpha: Float,
+    titleVerticalArrangement: Arrangement.Vertical,
+    titleHorizontalArrangement: Arrangement.Horizontal,
+    titleBottomPadding: Int,
+    hideTitleSemantics: Boolean,
+    navigationIcon: @Composable () -> Unit,
+    actions: @Composable () -> Unit,
 ) {
     Layout(
         {
@@ -929,7 +955,10 @@ private fun TopAppBarLayout(
                     content = navigationIcon
                 )
             }
-            Box(Modifier.layoutId("title").padding(horizontal = TopAppBarHorizontalPadding)) {
+            Box(
+                Modifier.layoutId("title").padding(horizontal = TopAppBarHorizontalPadding)
+                    .then(if (hideTitleSemantics) Modifier.clearAndSetSemantics { } else Modifier)
+            ) {
                 ProvideTextStyle(value = titleTextStyle) {
                     CompositionLocalProvider(
                         LocalContentColor provides titleContentColor.copy(alpha = titleAlpha),

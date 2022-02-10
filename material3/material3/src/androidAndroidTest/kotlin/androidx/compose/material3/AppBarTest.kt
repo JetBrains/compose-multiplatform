@@ -41,6 +41,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEqualTo
@@ -503,6 +504,45 @@ class AppBarTest {
         )
     }
 
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun mediumTopAppBar_semantics() {
+        val content = @Composable { scrollBehavior: TopAppBarScrollBehavior? ->
+            MediumTopAppBar(
+                modifier = Modifier.testTag(TopAppBarTestTag),
+                title = {
+                    Text("Title", Modifier.testTag(TitleTestTag))
+                },
+                scrollBehavior = scrollBehavior
+            )
+        }
+
+        assertMediumOrLargeScrolledSemantics(
+            TopAppBarMediumTokens.ContainerHeight,
+            TopAppBarSmallTokens.ContainerHeight,
+            content
+        )
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun largeTopAppBar_semantics() {
+        val content = @Composable { scrollBehavior: TopAppBarScrollBehavior? ->
+            LargeTopAppBar(
+                modifier = Modifier.testTag(TopAppBarTestTag),
+                title = {
+                    Text("Title", Modifier.testTag(TitleTestTag))
+                },
+                scrollBehavior = scrollBehavior
+            )
+        }
+        assertMediumOrLargeScrolledSemantics(
+            TopAppBarLargeTokens.ContainerHeight,
+            TopAppBarSmallTokens.ContainerHeight,
+            content
+        )
+    }
+
     @Test
     fun largeTopAppBar_expandsToScreen() {
         rule.setMaterialContentForSizeAssertions {
@@ -833,7 +873,8 @@ class AppBarTest {
 
         // Expecting the title composable to be reused for the top and bottom rows of the top app
         // bar, so obtaining the node with the title tag should return two nodes, one for each row.
-        val allTitleNodes = rule.onAllNodesWithTag(TitleTestTag)
+        val allTitleNodes = rule.onAllNodesWithTag(TitleTestTag, true)
+        allTitleNodes.assertCountEquals(2)
         val topTitleNode = allTitleNodes.onFirst()
         val bottomTitleNode = allTitleNodes.onLast()
 
@@ -984,7 +1025,8 @@ class AppBarTest {
 
         // Expecting the title composable to be reused for the top and bottom rows of the top app
         // bar, so obtaining the node with the title tag should return two nodes, one for each row.
-        val allTitleNodes = rule.onAllNodesWithTag(TitleTestTag)
+        val allTitleNodes = rule.onAllNodesWithTag(TitleTestTag, true)
+        allTitleNodes.assertCountEquals(2)
         val topTitleNode = allTitleNodes.onFirst()
         val bottomTitleNode = allTitleNodes.onLast()
 
@@ -1021,6 +1063,75 @@ class AppBarTest {
         // Only the top title should be visible in the collapsed form.
         topTitleNode.captureToImage().assertContainsColor(titleContentColor)
         bottomTitleNode.assertIsNotDisplayed()
+    }
+
+    /**
+     * Checks that changing values at a [MediumTopAppBar] or a [LargeTopAppBar] scroll behavior
+     * affects the title's semantics.
+     *
+     * This check partially and fully collapses the app bar to test the semantics.
+     *
+     * @param appBarMaxHeight the max height of the app bar [content]
+     * @param appBarMinHeight the min height of the app bar [content]
+     * @param content a Composable that adds a MediumTopAppBar or a LargeTopAppBar
+     */
+    @OptIn(ExperimentalMaterial3Api::class)
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    private fun assertMediumOrLargeScrolledSemantics(
+        appBarMaxHeight: Dp,
+        appBarMinHeight: Dp,
+        content: @Composable (TopAppBarScrollBehavior?) -> Unit
+    ) {
+        val fullyCollapsedOffsetDp = appBarMaxHeight - appBarMinHeight
+        val oneThirdCollapsedOffsetDp = fullyCollapsedOffsetDp / 3
+        var fullyCollapsedOffsetPx = 0f
+        var oneThirdCollapsedOffsetPx = 0f
+        var scrollBehavior: TopAppBarScrollBehavior? = null
+        rule.setMaterialContent(lightColorScheme()) {
+            scrollBehavior =
+                TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberSplineBasedDecay())
+            with(LocalDensity.current) {
+                oneThirdCollapsedOffsetPx = oneThirdCollapsedOffsetDp.toPx()
+                fullyCollapsedOffsetPx = fullyCollapsedOffsetDp.toPx()
+            }
+
+            content(scrollBehavior)
+        }
+
+        // Asserting that only one semantic title node is returned after the clearAndSetSemantics is
+        // applied to the merged tree according to the alpha values of the titles.
+        assertSingleTitleSemanticNode()
+
+        // Simulate 1/3 collapsed content.
+        rule.runOnIdle {
+            scrollBehavior!!.offset = -oneThirdCollapsedOffsetPx
+            scrollBehavior!!.contentOffset = -oneThirdCollapsedOffsetPx
+        }
+        rule.waitForIdle()
+
+        // Assert that only one semantic title node is available while scrolling the app bar.
+        assertSingleTitleSemanticNode()
+
+        // Simulate fully collapsed content.
+        rule.runOnIdle {
+            scrollBehavior!!.offset = -fullyCollapsedOffsetPx
+            scrollBehavior!!.contentOffset = -fullyCollapsedOffsetPx
+        }
+        rule.waitForIdle()
+
+        // Assert that only one semantic title node is available.
+        assertSingleTitleSemanticNode()
+    }
+
+    /**
+     * Asserts that only one semantic node exists at app bar title when the tree is merged.
+     */
+    private fun assertSingleTitleSemanticNode() {
+        val unmergedTitleNodes = rule.onAllNodesWithTag(TitleTestTag, useUnmergedTree = true)
+        unmergedTitleNodes.assertCountEquals(2)
+
+        val mergedTitleNodes = rule.onAllNodesWithTag(TitleTestTag, useUnmergedTree = false)
+        mergedTitleNodes.assertCountEquals(1)
     }
 
     /**
