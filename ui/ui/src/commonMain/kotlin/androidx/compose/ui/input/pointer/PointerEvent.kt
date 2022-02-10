@@ -77,8 +77,8 @@ abstract class PointerInputFilter {
      */
     val size: IntSize
         get() = layoutCoordinates?.size ?: IntSize.Zero
-    internal val isAttached: Boolean
-        get() = layoutCoordinates?.isAttached == true
+
+    internal var isAttached: Boolean = false
 
     /**
      * Intercept pointer input that children receive even if the pointer is out of bounds.

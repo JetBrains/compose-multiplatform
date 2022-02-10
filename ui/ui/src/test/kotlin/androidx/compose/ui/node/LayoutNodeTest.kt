@@ -54,7 +54,7 @@ import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.WindowInfo
 import androidx.compose.ui.semantics.SemanticsConfiguration
 import androidx.compose.ui.semantics.SemanticsModifier
-import androidx.compose.ui.semantics.SemanticsWrapper
+import androidx.compose.ui.semantics.SemanticsEntity
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextInputService
@@ -1130,7 +1130,7 @@ class LayoutNodeTest {
             ).apply {
                 attach(MockOwner())
             }
-        val hit = HitTestResult<SemanticsWrapper>()
+        val hit = HitTestResult<SemanticsEntity>()
 
         layoutNode.hitTestSemantics(Offset(-3f, 3f), hit)
 
@@ -1149,7 +1149,7 @@ class LayoutNodeTest {
         val layoutNode = LayoutNode(0, 0, 1, 1, semanticsModifier, DpSize(48.dp, 48.dp))
         outerNode.add(layoutNode)
         layoutNode.onNodePlaced()
-        val hit = HitTestResult<SemanticsWrapper>()
+        val hit = HitTestResult<SemanticsEntity>()
 
         layoutNode.hitTestSemantics(Offset(-3f, 3f), hit)
 
@@ -1177,42 +1177,42 @@ class LayoutNodeTest {
         layoutNode2.onNodePlaced()
 
         // Hit closer to layoutNode1
-        val hit1 = HitTestResult<SemanticsWrapper>()
+        val hit1 = HitTestResult<SemanticsEntity>()
         outerNode.hitTestSemantics(Offset(5.1f, 5.5f), hit1, true)
 
         assertThat(hit1).hasSize(1)
         assertThat(hit1[0].modifier).isEqualTo(semanticsModifier1)
 
         // Hit closer to layoutNode2
-        val hit2 = HitTestResult<SemanticsWrapper>()
+        val hit2 = HitTestResult<SemanticsEntity>()
         outerNode.hitTestSemantics(Offset(5.9f, 5.5f), hit2, true)
 
         assertThat(hit2).hasSize(1)
         assertThat(hit2[0].modifier).isEqualTo(semanticsModifier2)
 
         // Hit closer to layoutNode1
-        val hit3 = HitTestResult<SemanticsWrapper>()
+        val hit3 = HitTestResult<SemanticsEntity>()
         outerNode.hitTestSemantics(Offset(5.5f, 5.1f), hit3, true)
 
         assertThat(hit3).hasSize(1)
         assertThat(hit3[0].modifier).isEqualTo(semanticsModifier1)
 
         // Hit closer to layoutNode2
-        val hit4 = HitTestResult<SemanticsWrapper>()
+        val hit4 = HitTestResult<SemanticsEntity>()
         outerNode.hitTestSemantics(Offset(5.5f, 5.9f), hit4, true)
 
         assertThat(hit4).hasSize(1)
         assertThat(hit4[0].modifier).isEqualTo(semanticsModifier2)
 
         // Hit inside layoutNode1
-        val hit5 = HitTestResult<SemanticsWrapper>()
+        val hit5 = HitTestResult<SemanticsEntity>()
         outerNode.hitTestSemantics(Offset(4.9f, 4.9f), hit5, true)
 
         assertThat(hit5).hasSize(1)
         assertThat(hit5[0].modifier).isEqualTo(semanticsModifier1)
 
         // Hit inside layoutNode2
-        val hit6 = HitTestResult<SemanticsWrapper>()
+        val hit6 = HitTestResult<SemanticsEntity>()
         outerNode.hitTestSemantics(Offset(6.1f, 6.1f), hit6, true)
 
         assertThat(hit6).hasSize(1)
@@ -1239,14 +1239,14 @@ class LayoutNodeTest {
         layoutNode2.onNodePlaced()
 
         // Hit layoutNode1
-        val hit1 = HitTestResult<SemanticsWrapper>()
+        val hit1 = HitTestResult<SemanticsEntity>()
         outerNode.hitTestSemantics(Offset(3.95f, 3.95f), hit1, true)
 
         assertThat(hit1).hasSize(1)
         assertThat(hit1[0].modifier).isEqualTo(semanticsModifier1)
 
         // Hit layoutNode2
-        val hit2 = HitTestResult<SemanticsWrapper>()
+        val hit2 = HitTestResult<SemanticsEntity>()
         outerNode.hitTestSemantics(Offset(4.05f, 4.05f), hit2, true)
 
         assertThat(hit2).hasSize(1)

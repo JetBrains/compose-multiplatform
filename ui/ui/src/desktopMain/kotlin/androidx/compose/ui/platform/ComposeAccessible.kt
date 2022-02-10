@@ -318,7 +318,7 @@ internal class ComposeAccessible(
         @OptIn(ExperimentalComposeUiApi::class)
         override fun isVisible(): Boolean = with(semanticsNode) {
             !config.contains(SemanticsProperties.InvisibleToUser) &&
-            !outerSemanticsNodeWrapper.isTransparent()
+            !outerSemanticsEntity.layoutNodeWrapper.isTransparent()
         }
 
         override fun isEnabled(): Boolean =

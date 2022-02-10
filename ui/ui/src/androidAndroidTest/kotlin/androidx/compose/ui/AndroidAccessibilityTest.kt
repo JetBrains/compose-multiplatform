@@ -2604,7 +2604,7 @@ class AndroidAccessibilityTest {
 
         rule.runOnIdle {
             child.layoutNode.innerLayoutNodeWrapper.detach()
-            child.outerSemanticsNodeWrapper.detach()
+            child.outerSemanticsEntity.onDetach()
         }
 
         rule.runOnIdle {
@@ -2633,9 +2633,9 @@ class AndroidAccessibilityTest {
         val grandChild2 = rule.onNodeWithTag("grandChild2").fetchSemanticsNode()
         rule.runOnIdle {
             grandChild1.layoutNode.innerLayoutNodeWrapper.detach()
-            grandChild1.outerSemanticsNodeWrapper.detach()
+            grandChild1.outerSemanticsEntity.onDetach()
             grandChild2.layoutNode.innerLayoutNodeWrapper.detach()
-            grandChild2.outerSemanticsNodeWrapper.detach()
+            grandChild2.outerSemanticsEntity.onDetach()
         }
 
         rule.runOnIdle {
