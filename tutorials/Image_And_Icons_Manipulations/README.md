@@ -260,6 +260,23 @@ fun main() = application {
 
 <img alt="Window icon" src="window_icon.png" height="371" />
 
+In case of `singleWindowApplication` usage, you can use the following approach:
+
+```kotlin
+import androidx.compose.material.Text
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.res.loadImageBitmap
+import androidx.compose.ui.res.useResource
+import androidx.compose.ui.window.singleWindowApplication
+
+fun main() {
+    val icon = BitmapPainter(useResource("sample.png", ::loadImageBitmap))
+    singleWindowApplication(icon = icon) {
+        Text("Hello World!")
+    }
+}
+```
+
 ## Setting the application tray icon
 
 You can create a tray icon for your application:
