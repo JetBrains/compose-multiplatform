@@ -5,8 +5,6 @@
 
 package org.jetbrains.compose.desktop.ide.preview
 
-import com.intellij.notification.NotificationGroupManager
-import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.Logger
@@ -17,6 +15,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.components.JBLoadingPanel
 import com.intellij.util.concurrency.annotations.RequiresReadLock
+import org.jetbrains.compose.desktop.ide.preview.ui.PreviewPanel
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.*
 import org.jetbrains.plugins.gradle.util.GradleConstants
 import javax.swing.JComponent
@@ -27,14 +26,11 @@ import javax.swing.event.AncestorListener
 class PreviewStateService(private val myProject: Project) : Disposable {
     private val idePreviewLogger = Logger.getInstance("org.jetbrains.compose.desktop.ide.preview")
     private val previewListener = CompositePreviewListener()
-    private val errorReporter = IdePreviewErrorReporter(idePreviewLogger, this)
-    private val previewManager: PreviewManager = PreviewManagerImpl(previewListener, errorReporter)
+    private val previewManager: PreviewManager = PreviewManagerImpl(previewListener)
     val gradleCallbackPort: Int
         get() = previewManager.gradleCallbackPort
     private val configurePreviewTaskNameCache =
         ConfigurePreviewTaskNameCache(ConfigurePreviewTaskNameProviderImpl())
-    private var previewPanel: PreviewPanel? = null
-    private var loadingPanel: JBLoadingPanel? = null
 
     init {
         val projectRefreshListener = ConfigurePreviewTaskNameCacheInvalidator(configurePreviewTaskNameCache)
@@ -49,43 +45,18 @@ class PreviewStateService(private val myProject: Project) : Disposable {
     override fun dispose() {
         previewManager.close()
         configurePreviewTaskNameCache.invalidate()
-        previewPanel = null
-        loadingPanel = null
     }
 
     internal fun registerPreviewPanels(
         previewPanel: PreviewPanel,
         loadingPanel: JBLoadingPanel
     ) {
-        this.previewPanel = previewPanel
-        this.loadingPanel = loadingPanel
-
         val previewResizeListener = PreviewResizeListener(previewManager)
         previewPanel.addAncestorListener(previewResizeListener)
         Disposer.register(this) { previewPanel.removeAncestorListener(previewResizeListener) }
 
         previewListener.addListener(PreviewPanelUpdater(previewPanel))
         previewListener.addListener(LoadingPanelUpdater(loadingPanel))
-        previewListener.addListener(object : PreviewListenerBase() {
-            private val reported = hashSetOf<Pair<Int, Int>>()
-
-            override fun onIncompatibleProtocolVersions(versionServer: Int, versionClient: Int) {
-                if (reported.add(versionServer to versionClient)) {
-                    NotificationGroupManager.getInstance()
-                        .getNotificationGroup("Compose MPP Notifications")
-                        .createNotification("Compose Desktop Preview may be incompatible " +
-                                "with provided Compose Gradle plugin. " +
-                                "Please use matching versions.",
-                            NotificationType.ERROR)
-                        .notify(myProject)
-                }
-            }
-        })
-    }
-
-    internal fun clearPreviewOnError() {
-        loadingPanel?.stopLoading()
-        previewPanel?.previewImage(null, null)
     }
 
     internal fun buildStarted() {
@@ -123,6 +94,10 @@ private class PreviewResizeListener(private val previewManager: PreviewManager) 
 private class PreviewPanelUpdater(private val panel: PreviewPanel) : PreviewListenerBase() {
     override fun onRenderedFrame(frame: RenderedFrame) {
         panel.previewImage(frame.image, frame.dimension)
+    }
+
+    override fun onError(error: String) {
+        panel.error(error)
     }
 }
 
