@@ -54,6 +54,7 @@ internal class InnerPlaceable(
             layoutNode.measureScope.measure(layoutNode.children, constraints)
         }
         layoutNode.handleMeasureResult(measureResult)
+        onMeasured()
         return this
     }
 

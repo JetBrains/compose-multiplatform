@@ -242,6 +242,19 @@ internal abstract class LayoutNodeWrapper(
         return result
     }
 
+    fun onMeasured() {
+        if (entities.has(EntityList.RemeasureEntityType)) {
+            val invokeRemeasureCallbacks = {
+                entities.forEach(EntityList.RemeasureEntityType) {
+                    it.modifier.onRemeasured(measuredSize)
+                }
+            }
+            layoutNode.owner?.snapshotObserver?.withNoSnapshotReadObservation(
+                invokeRemeasureCallbacks
+            ) ?: invokeRemeasureCallbacks()
+        }
+    }
+
     abstract fun calculateAlignmentLine(alignmentLine: AlignmentLine): Int
 
     final override fun get(alignmentLine: AlignmentLine): Int {
