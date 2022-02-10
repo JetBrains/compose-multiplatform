@@ -48,7 +48,7 @@ import android.graphics.Rect as AndroidRect
  */
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class ExcludeFromSystemGestureTest {
+class SystemGestureExclusionTest {
     @get:Rule
     val rule = createAndroidComposeRule<TestActivity>()
 
@@ -60,7 +60,7 @@ class ExcludeFromSystemGestureTest {
     @Test
     fun excludeBounds() {
         val composeView = setComposeContent {
-            Box(Modifier.size(50.dp).excludeFromSystemGesture())
+            Box(Modifier.size(50.dp).systemGestureExclusion())
         }
         rule.runOnIdle {
             assertThat(composeView.systemGestureExclusionRects).isNotNull()
@@ -79,7 +79,7 @@ class ExcludeFromSystemGestureTest {
     @Test
     fun excludeRect() {
         val composeView = setComposeContent {
-            Box(Modifier.size(50.dp).excludeFromSystemGesture {
+            Box(Modifier.size(50.dp).systemGestureExclusion {
                 Rect(0f, 0f, 10f, 20f)
             })
         }
@@ -97,7 +97,7 @@ class ExcludeFromSystemGestureTest {
     fun removeWhenModifierRemovedBounds() {
         var setExclusion by mutableStateOf(true)
         val composeView = setComposeContent {
-            val modifier = if (setExclusion) Modifier.excludeFromSystemGesture() else Modifier
+            val modifier = if (setExclusion) Modifier.systemGestureExclusion() else Modifier
             Box(Modifier.size(50.dp).then(modifier))
         }
         rule.runOnUiThread {
@@ -118,7 +118,7 @@ class ExcludeFromSystemGestureTest {
     fun removeWhenModifierRemovedRect() {
         var setExclusion by mutableStateOf(true)
         val composeView = setComposeContent {
-            val modifier = if (setExclusion) Modifier.excludeFromSystemGesture {
+            val modifier = if (setExclusion) Modifier.systemGestureExclusion {
                 Rect(0f, 0f, 10f, 20f)
             } else Modifier
             Box(Modifier.size(50.dp).then(modifier))
@@ -141,8 +141,8 @@ class ExcludeFromSystemGestureTest {
     fun excludeMultipleBounds() {
         val composeView = setComposeContent {
             Column(Modifier.wrapContentSize()) {
-                Box(Modifier.size(50.dp).excludeFromSystemGesture())
-                Box(Modifier.size(50.dp).excludeFromSystemGesture())
+                Box(Modifier.size(50.dp).systemGestureExclusion())
+                Box(Modifier.size(50.dp).systemGestureExclusion())
             }
         }
         rule.runOnIdle {
@@ -176,9 +176,9 @@ class ExcludeFromSystemGestureTest {
         var setExclusion by mutableStateOf(true)
         val composeView = setComposeContent {
             Column(Modifier.wrapContentSize()) {
-                val modifier = if (setExclusion) Modifier.excludeFromSystemGesture() else Modifier
+                val modifier = if (setExclusion) Modifier.systemGestureExclusion() else Modifier
                 Box(Modifier.size(50.dp).then(modifier))
-                Box(Modifier.size(50.dp).excludeFromSystemGesture())
+                Box(Modifier.size(50.dp).systemGestureExclusion())
             }
         }
         rule.runOnIdle {
@@ -202,8 +202,8 @@ class ExcludeFromSystemGestureTest {
                 } else { _ ->
                     Rect(0f, 0f, 10f, 10f)
                 }
-                Box(Modifier.size(50.dp).excludeFromSystemGesture(lambda))
-                Box(Modifier.size(50.dp).excludeFromSystemGesture())
+                Box(Modifier.size(50.dp).systemGestureExclusion(lambda))
+                Box(Modifier.size(50.dp).systemGestureExclusion())
             }
         }
         rule.runOnIdle {

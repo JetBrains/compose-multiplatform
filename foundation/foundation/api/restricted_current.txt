@@ -48,8 +48,8 @@ package androidx.compose.foundation {
   }
 
   public final class ExcludeFromSystemGesture_androidKt {
-    method public static androidx.compose.ui.Modifier excludeFromSystemGesture(androidx.compose.ui.Modifier);
-    method public static androidx.compose.ui.Modifier excludeFromSystemGesture(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LayoutCoordinates,androidx.compose.ui.geometry.Rect> exclusion);
+    method @Deprecated public static androidx.compose.ui.Modifier excludeFromSystemGesture(androidx.compose.ui.Modifier);
+    method @Deprecated public static androidx.compose.ui.Modifier excludeFromSystemGesture(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LayoutCoordinates,androidx.compose.ui.geometry.Rect> exclusion);
   }
 
   public final class FocusableKt {
@@ -127,6 +127,11 @@ package androidx.compose.foundation {
   public static final class ScrollState.Companion {
     method public androidx.compose.runtime.saveable.Saver<androidx.compose.foundation.ScrollState,?> getSaver();
     property public final androidx.compose.runtime.saveable.Saver<androidx.compose.foundation.ScrollState,?> Saver;
+  }
+
+  public final class SystemGestureExclusionKt {
+    method public static androidx.compose.ui.Modifier systemGestureExclusion(androidx.compose.ui.Modifier);
+    method public static androidx.compose.ui.Modifier systemGestureExclusion(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LayoutCoordinates,androidx.compose.ui.geometry.Rect> exclusion);
   }
 
   public final class TempListUtilsKt {
