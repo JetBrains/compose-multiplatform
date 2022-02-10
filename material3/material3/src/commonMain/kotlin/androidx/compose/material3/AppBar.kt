@@ -27,13 +27,20 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.tokens.BottomAppBarTokens
 import androidx.compose.material3.tokens.TopAppBarLargeTokens
 import androidx.compose.material3.tokens.TopAppBarMediumTokens
-import androidx.compose.material3.tokens.TopAppBarSmallTokens
 import androidx.compose.material3.tokens.TopAppBarSmallCenteredTokens
+import androidx.compose.material3.tokens.TopAppBarSmallTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
@@ -269,6 +276,118 @@ fun LargeTopAppBar(
         pinnedHeight = TopAppBarSmallTokens.ContainerHeight,
         scrollBehavior = scrollBehavior
     )
+}
+
+// TODO(b/209583788): Add link to Material 3 bottom app bar spec article.
+/**
+ * A bottom app bar displays navigation and key actions at the bottom of screens.
+ *
+ * @sample androidx.compose.material3.samples.SimpleBottomAppBar
+ *
+ * It can optionally display a [FloatingActionButton] embedded at the end of the BottomAppBar.
+ *
+ * @sample androidx.compose.material3.samples.BottomAppBarWithFAB
+ *
+ * Also see [NavigationBar].
+ *
+ * @param icons the icon content of this BottomAppBar. The default layout here is a [Row],
+ * so content inside will be placed horizontally.
+ * @param modifier The [Modifier] to be applied to this BottomAppBar
+ * @param containerColor The container color for the BottomAppBar. Use [Color.Transparent] to
+ * have no color.
+ * @param contentColor The preferred content color provided by this BottomAppBar to its children.
+ * Defaults to either the matching content color for [containerColor], or if [containerColor] is
+ * not a color from the theme, this will keep the same value set above this BottomAppBar.
+ * @param tonalElevation When [containerColor] is [ColorScheme.surface], a higher tonal elevation
+ * value will result in a darker color in light theme and lighter color in dark theme. See also:
+ * [Surface].
+ * @param contentPadding the padding applied to the content of this BottomAppBar
+ * @param floatingActionButton optional floating action button at the end of this BottomAppBar
+ */
+@Composable
+fun BottomAppBar(
+    icons: @Composable RowScope.() -> Unit,
+    modifier: Modifier = Modifier,
+    containerColor: Color = BottomAppBarTokens.ContainerColor.toColor(),
+    contentColor: Color = contentColorFor(containerColor),
+    tonalElevation: Dp = BottomAppBarTokens.ContainerElevation,
+    contentPadding: PaddingValues = BottomAppBarDefaults.ContentPadding,
+    floatingActionButton: @Composable (() -> Unit)? = null,
+) {
+    Surface(
+        color = containerColor,
+        contentColor = contentColor,
+        tonalElevation = tonalElevation,
+        // TODO(b/209583788): Consider adding a shape parameter if updated design guidance allows
+        shape = BottomAppBarTokens.ContainerShape,
+        modifier = modifier
+    ) {
+        Row(
+            Modifier.fillMaxWidth()
+                .heightIn(BottomAppBarTokens.ContainerHeight, BottomAppBarTokens.FabContainerHeight)
+                .padding(contentPadding),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            icons()
+            if (floatingActionButton != null) {
+                Spacer(Modifier.weight(1f, true))
+                Box(
+                    Modifier.fillMaxHeight().padding(top = FABPadding, end = FABPadding),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+                    floatingActionButton()
+                }
+            }
+        }
+    }
+}
+
+// TODO(b/209583788): Add link to Material 3 bottom app bar spec article.
+/**
+ * A bottom app bar displays navigation and key actions at the bottom of screens.
+ *
+ * If you are interested in displaying a [FloatingActionButton], consider using another overload.
+ *
+ * Also see [NavigationBar].
+ *
+ * @param modifier The [Modifier] to be applied to this BottomAppBar
+ * @param containerColor The background color for the BottomAppBar. Use [Color.Transparent] to
+ * have no color.
+ * @param contentColor The preferred content color provided by this BottomAppBar to its children.
+ * Defaults to either the matching content color for [containerColor], or if [containerColor] is
+ * not a color from the theme, this will keep the same value set above this BottomAppBar.
+ * @param tonalElevation the elevation of this BottomAppBar.
+ * @param contentPadding the padding applied to the content of this BottomAppBar
+ * @param content the content of this BottomAppBar. The default layout here is a [Row],
+ * so content inside will be placed horizontally.
+ */
+@Composable
+fun BottomAppBar(
+    modifier: Modifier = Modifier,
+    containerColor: Color = BottomAppBarTokens.ContainerColor.toColor(),
+    contentColor: Color = contentColorFor(containerColor),
+    tonalElevation: Dp = BottomAppBarTokens.ContainerElevation,
+    contentPadding: PaddingValues = BottomAppBarDefaults.ContentPadding,
+    content: @Composable RowScope.() -> Unit
+) {
+    Surface(
+        color = containerColor,
+        contentColor = contentColor,
+        tonalElevation = tonalElevation,
+        // TODO(b/209583788): Consider adding a shape parameter if updated design guidance allows
+        shape = BottomAppBarTokens.ContainerShape,
+        modifier = modifier
+    ) {
+        Row(
+            Modifier.fillMaxWidth()
+                .height(BottomAppBarTokens.ContainerHeight)
+                .padding(contentPadding),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically,
+            content = content
+        )
+    }
 }
 
 /**
@@ -583,6 +702,27 @@ object TopAppBarDefaults {
     ): TopAppBarScrollBehavior =
         ExitUntilCollapsedScrollBehavior(decayAnimationSpec, canScroll)
 }
+
+/** Contains default values used for the bottom app bar implementations. */
+object BottomAppBarDefaults {
+    /**
+     * Default padding used for [BottomAppBar] when content are default size (24dp) icons in
+     * [IconButton] that meet the minimum touch target (48.dp).
+     */
+    val ContentPadding = PaddingValues(
+        start = BottomAppBarHorizontalPadding,
+        top = BottomAppBarVerticalPadding,
+        end = BottomAppBarHorizontalPadding
+    )
+}
+
+// Padding minus IconButton's min touch target expansion
+private val BottomAppBarHorizontalPadding = 16.dp - 12.dp
+// Padding minus IconButton's min touch target expansion
+private val BottomAppBarVerticalPadding = 16.dp - 12.dp
+
+// Padding minus content padding
+private val FABPadding = 16.dp - BottomAppBarHorizontalPadding
 
 /**
  * A single-row top app bar that is designed to be called by the small and center aligned top app
@@ -1215,6 +1355,9 @@ private suspend fun onTopBarFling(
 private val MediumTitleBottomPadding = 24.dp
 private val LargeTitleBottomPadding = 28.dp
 private val TopAppBarHorizontalPadding = 4.dp
+
+// TODO: this should probably be part of the touch target of the start and end icons, clarify this
+private val AppBarHorizontalPadding = 4.dp
 
 // A title inset when the App-Bar is a Medium or Large one. Also used to size a spacer when the
 // navigation icon is missing.

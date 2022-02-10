@@ -24,10 +24,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.tokens.BottomAppBarTokens
 import androidx.compose.material3.tokens.TopAppBarLargeTokens
 import androidx.compose.material3.tokens.TopAppBarMediumTokens
-import androidx.compose.material3.tokens.TopAppBarSmallTokens
 import androidx.compose.material3.tokens.TopAppBarSmallCenteredTokens
+import androidx.compose.material3.tokens.TopAppBarSmallTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.testutils.assertContainsColor
 import androidx.compose.ui.Modifier
@@ -642,6 +645,82 @@ class AppBarTest {
         }
     }
 
+    @Test
+    fun bottomAppBarWithFAB_heightIsFromSpec() {
+        rule
+            .setMaterialContentForSizeAssertions {
+                BottomAppBar(
+                    icons = {},
+                    floatingActionButton = {
+                    FloatingActionButton(
+                        onClick = { /* do something */ },
+                    ) {
+                        Icon(Icons.Filled.Add, "Localized description")
+                    }
+                })
+            }
+            .assertHeightIsEqualTo(BottomAppBarTokens.FabContainerHeight)
+            .assertWidthIsEqualTo(rule.rootWidth())
+    }
+
+    @Test
+    fun bottomAppBar_widthExpandsToScreen() {
+        rule
+            .setMaterialContentForSizeAssertions {
+                BottomAppBar {}
+            }
+            .assertHeightIsEqualTo(BottomAppBarTokens.ContainerHeight)
+            .assertWidthIsEqualTo(rule.rootWidth())
+    }
+
+    @Test
+    fun bottomAppBar_default_positioning() {
+        rule.setMaterialContent(lightColorScheme()) {
+            BottomAppBar(Modifier.testTag("bar")) {
+                FakeIcon(Modifier.testTag("icon"))
+            }
+        }
+
+        val appBarBounds = rule.onNodeWithTag("bar").getUnclippedBoundsInRoot()
+        val appBarBottomEdgeY = appBarBounds.top + appBarBounds.height
+
+        rule.onNodeWithTag("icon")
+            // Child icon should be 4.dp from the start
+            .assertLeftPositionInRootIsEqualTo(AppBarStartAndEndPadding)
+            // Child icon should be 10.dp from the top
+            .assertTopPositionInRootIsEqualTo(
+                BottomAppBarTopPadding +
+                    (appBarBottomEdgeY - BottomAppBarTopPadding - FakeIconSize) / 2
+            )
+    }
+
+    @Test
+    fun bottomAppBarWithFAB_default_positioning() {
+        rule.setMaterialContent(lightColorScheme()) {
+            BottomAppBar(
+                icons = {},
+                Modifier.testTag("bar"),
+                floatingActionButton = {
+                    FloatingActionButton(
+                        modifier = Modifier.testTag("FAB"),
+                        onClick = { /* do something */ },
+                    ) {
+                        Icon(Icons.Filled.Add, "Localized description")
+                    }
+                })
+        }
+
+        val appBarBounds = rule.onNodeWithTag("bar").getUnclippedBoundsInRoot()
+
+        val fabBounds = rule.onNodeWithTag("FAB").getUnclippedBoundsInRoot()
+
+        rule.onNodeWithTag("FAB")
+            // FAB should be 16.dp from the end
+            .assertLeftPositionInRootIsEqualTo(appBarBounds.width - 16.dp - fabBounds.width)
+            // FAB should be 16.dp from the top
+            .assertTopPositionInRootIsEqualTo(16.dp)
+    }
+
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun MultiPageContent(scrollBehavior: TopAppBarScrollBehavior, state: LazyListState) {
@@ -965,6 +1044,7 @@ class AppBarTest {
     private val AppBarStartAndEndPadding = 4.dp
     private val AppBarTopAndBottomPadding =
         (TopAppBarSmallTokens.ContainerHeight - FakeIconSize) / 2
+    private val BottomAppBarTopPadding = 16.dp - 12.dp
 
     private val LazyListTag = "lazyList"
     private val TopAppBarTestTag = "bar"
