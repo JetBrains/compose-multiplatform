@@ -642,6 +642,36 @@ class AppBarTest {
         }
     }
 
+    @Test
+    fun bottomAppBar_expandsToScreen() {
+        rule
+            .setMaterialContentForSizeAssertions {
+                BottomAppBar {}
+            }
+            .assertHeightIsEqualTo(appBarHeight)
+            .assertWidthIsEqualTo(rule.rootWidth())
+    }
+
+    @Test
+    fun bottomAppBar_default_positioning() {
+        rule.setMaterialContent {
+            BottomAppBar(Modifier.testTag("bar")) {
+                FakeIcon(Modifier.testTag("icon"))
+            }
+        }
+
+        val appBarBounds = rule.onNodeWithTag("bar").getUnclippedBoundsInRoot()
+        val appBarBottomEdgeY = appBarBounds.top + appBarBounds.height
+
+        rule.onNodeWithTag("icon")
+            // Child icon should be 4.dp from the start
+            .assertLeftPositionInRootIsEqualTo(AppBarStartAndEndPadding)
+            // Child icon should be 4.dp from the bottom
+            .assertTopPositionInRootIsEqualTo(
+                appBarBottomEdgeY - AppBarStartAndEndPadding - FakeIconSize
+            )
+    }
+
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun MultiPageContent(scrollBehavior: TopAppBarScrollBehavior, state: LazyListState) {

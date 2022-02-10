@@ -27,6 +27,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -48,6 +49,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -268,6 +271,73 @@ fun LargeTopAppBar(
         maxHeight = TopAppBarLargeTokens.ContainerHeight,
         pinnedHeight = TopAppBarSmallTokens.ContainerHeight,
         scrollBehavior = scrollBehavior
+    )
+}
+
+/**
+ * <a href="https://material.io/components/app-bars-bottom" class="external" target="_blank">Material Design bottom app bar</a>.
+ *
+ * A bottom app bar displays navigation and key actions at the bottom of screens.
+ *
+ * ![App bars: bottom image](https://developer.android.com/images/reference/androidx/compose/material/app-bars-bottom.png)
+ *
+ * It can also optionally display a [FloatingActionButton], which is either overlaid
+ * on top of the BottomAppBar, or inset, carving a cutout in the BottomAppBar.
+ *
+ * See [BottomAppBar anatomy](https://material.io/components/app-bars-bottom/#anatomy) for the
+ * recommended content depending on the [FloatingActionButton] position.
+ *
+ * Note that when you pass a non-null [cutoutShape] this makes the AppBar shape concave. The shadows
+ * for such shapes will not be drawn on Android versions less than 10.
+ *
+ * The [LocalContentAlpha] inside a BottomAppBar is [ContentAlpha.medium] - this is the default
+ * for trailing and overflow icons. It is recommended that any leading icons at the start of the
+ * BottomAppBar, such as a menu icon, use [ContentAlpha.high] instead. This is demonstrated in the
+ * sample below.
+ *
+ * Also see [BottomNavigation].
+ *
+ * @sample androidx.compose.material.samples.SimpleBottomAppBar
+ *
+ * @param modifier The [Modifier] to be applied to this BottomAppBar
+ * @param backgroundColor The background color for the BottomAppBar. Use [Color.Transparent] to
+ * have no color.
+ * @param contentColor The preferred content color provided by this BottomAppBar to its children.
+ * Defaults to either the matching content color for [backgroundColor], or if [backgroundColor] is
+ * not a color from the theme, this will keep the same value set above this BottomAppBar.
+ * @param cutoutShape the shape of the cutout that will be added to the BottomAppBar - this
+ * should typically be the same shape used inside the [FloatingActionButton], when [BottomAppBar]
+ * and [FloatingActionButton] are being used together in [Scaffold]. This shape will be drawn with
+ * an offset around all sides. If null, where will be no cutout.
+ * @param elevation the elevation of this BottomAppBar.
+ * @param contentPadding the padding applied to the content of this BottomAppBar
+ * @param content the content of this BottomAppBar. The default layout here is a [Row],
+ * so content inside will be placed horizontally.
+ */
+@Composable
+fun BottomAppBar(
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = MaterialTheme.colors.primarySurface,
+    contentColor: Color = contentColorFor(backgroundColor),
+    cutoutShape: Shape? = null,
+    elevation: Dp = AppBarDefaults.BottomAppBarElevation,
+    contentPadding: PaddingValues = AppBarDefaults.ContentPadding,
+    content: @Composable RowScope.() -> Unit
+) {
+    val fabPlacement = LocalFabPlacement.current
+    val shape = if (cutoutShape != null && fabPlacement?.isDocked == true) {
+        BottomAppBarCutoutShape(cutoutShape, fabPlacement)
+    } else {
+        RectangleShape
+    }
+    AppBar(
+        backgroundColor,
+        contentColor,
+        elevation,
+        contentPadding,
+        shape,
+        modifier,
+        content
     )
 }
 
@@ -582,6 +652,31 @@ object TopAppBarDefaults {
         canScroll: () -> Boolean = { true }
     ): TopAppBarScrollBehavior =
         ExitUntilCollapsedScrollBehavior(decayAnimationSpec, canScroll)
+}
+
+/**
+ * Contains default values used for [TopAppBar] and [BottomAppBar].
+ */
+object AppBarDefaults {
+    // TODO: clarify elevation in surface mapping - spec says 0.dp but it appears to have an
+    //  elevation overlay applied in dark theme examples.
+    /**
+     * Default elevation used for [TopAppBar].
+     */
+    val TopAppBarElevation = 4.dp
+
+    /**
+     * Default elevation used for [BottomAppBar].
+     */
+    val BottomAppBarElevation = 8.dp
+
+    /**
+     * Default padding used for [TopAppBar] and [BottomAppBar].
+     */
+    val ContentPadding = PaddingValues(
+        start = AppBarHorizontalPadding,
+        end = AppBarHorizontalPadding
+    )
 }
 
 /**
@@ -1215,6 +1310,9 @@ private suspend fun onTopBarFling(
 private val MediumTitleBottomPadding = 24.dp
 private val LargeTitleBottomPadding = 28.dp
 private val TopAppBarHorizontalPadding = 4.dp
+
+// TODO: this should probably be part of the touch target of the start and end icons, clarify this
+private val AppBarHorizontalPadding = 4.dp
 
 // A title inset when the App-Bar is a Medium or Large one. Also used to size a spacer when the
 // navigation icon is missing.
