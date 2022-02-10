@@ -436,7 +436,7 @@ The following platform-specific options are available
     * `packageName` — a name of the application;
     * `dockName` — a name of the application displayed in the menu bar, the "About <App>" menu item, in the dock, etc. 
       Equals to `packageName` by default.
-    * `signing`, `notarization`, and `provisioningProfile` — see
+    * `signing`, `notarization`, `provisioningProfile`, and `runtimeProvisioningProfile` — see
       [the corresponding tutorial](/tutorials/Signing_and_notarization_on_macOS/README.md) 
       for details;
     * `appStore = true` — build and sign for the Apple App Store. Requires at least JDK 17;
@@ -446,6 +446,13 @@ The following platform-specific options are available
     * `entitlementsFile.set(File("PATH_TO_ENTITLEMENTS"))` — a path to file containing entitlements to use when signing.
       When a custom file is provided, make sure to add the entitlements that are required for Java apps.
       See [sandbox.plist](https://github.com/openjdk/jdk/blob/master/src/jdk.jpackage/macosx/classes/jdk/jpackage/internal/resources/sandbox.plist) for the default file that is used when building for the App Store. It can be different depending on your JDK version.
+      If no file is provided the default entitlements provided by jpackage are used.
+      See [the corresponding tutorial](/tutorials/Signing_and_notarization_on_macOS/README.md#configuring-entitlements)
+    * `runtimeEntitlementsFile.set(File("PATH_TO_RUNTIME_ENTITLEMENTS"))` — a path to file containing entitlements to use when signing the JVM runtime.
+      When a custom file is provided, make sure to add the entitlements that are required for Java apps.
+      See [sandbox.plist](https://github.com/openjdk/jdk/blob/master/src/jdk.jpackage/macosx/classes/jdk/jpackage/internal/resources/sandbox.plist) for the default file that is used when building for the App Store. It can be different depending on your JDK version.
+      If no file is provided then `entitlementsFile` is used. If that was also not provided, the default entitlements provided by jpackage are used.
+      See [the corresponding tutorial](/tutorials/Signing_and_notarization_on_macOS/README.md#configuring-entitlements)
     * `dmgPackageVersion = "DMG_VERSION"` — a dmg-specific package version
       (see the section `Specifying package version` for details);
     * `pkgPackageVersion = "PKG_VERSION"` — a pkg-specific package version
