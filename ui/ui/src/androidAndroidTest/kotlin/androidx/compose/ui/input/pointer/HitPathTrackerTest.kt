@@ -2948,16 +2948,19 @@ class HitPathTrackerTest {
         removalPass: PointerEventPass
     ) {
         val layoutCoordinates = LayoutCoordinatesStub(true)
+        lateinit var pifRef: PointerInputFilter
         val pif = PointerInputFilterMock(
             pointerEventHandler =
                 { pointerEvent, pass, _ ->
                     if (pass == removalPass) {
                         layoutCoordinates.isAttached = false
+                        pifRef.isAttached = false
                     }
                     pointerEvent.changes
                 },
             layoutCoordinates = layoutCoordinates
         )
+        pifRef = pif
         hitPathTracker.addHitPath(PointerId(13), listOf(pif))
 
         hitPathTracker.dispatchChanges(internalPointerEventOf(down(13)))
@@ -2999,19 +3002,20 @@ class HitPathTrackerTest {
     ) {
         val log = mutableListOf<LogEntry>()
         val childLayoutCoordinates = LayoutCoordinatesStub(true)
+        val childPif = PointerInputFilterMock(
+            log,
+            layoutCoordinates = childLayoutCoordinates
+        )
         val parentPif = PointerInputFilterMock(
             log,
             pointerEventHandler =
                 { pointerEvent, pass, _ ->
                     if (pass == removalPass) {
                         childLayoutCoordinates.isAttached = false
+                        childPif.isAttached = false
                     }
                     pointerEvent.changes
                 }
-        )
-        val childPif = PointerInputFilterMock(
-            log,
-            layoutCoordinates = childLayoutCoordinates
         )
         hitPathTracker.addHitPath(PointerId(13), listOf(parentPif, childPif))
 
@@ -3068,6 +3072,7 @@ class HitPathTrackerTest {
                 { pointerEvent, pass, _ ->
                     if (pass == removalPass) {
                         parentLayoutCoordinates.isAttached = false
+                        parentPif.isAttached = false
                     }
                     pointerEvent.changes
                 }

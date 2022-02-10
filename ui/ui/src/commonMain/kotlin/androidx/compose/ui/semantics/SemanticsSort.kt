@@ -26,8 +26,8 @@ import androidx.compose.ui.util.fastMap
 
 // This part is a copy from ViewGroup#addChildrenForAccessibility.
 internal fun LayoutNode.findOneLayerOfSemanticsWrappersSortedByBounds(
-    list: MutableList<SemanticsWrapper> = mutableListOf()
-): List<SemanticsWrapper> {
+    list: MutableList<SemanticsEntity> = mutableListOf()
+): List<SemanticsEntity> {
     fun sortWithStrategy(holders: List<NodeLocationHolder>): List<NodeLocationHolder> {
         // This is gross but the least risky solution. The current comparison
         // strategy breaks transitivity but produces very good results. Coming
@@ -190,5 +190,5 @@ internal fun LayoutNode.findNodeByPredicateTraversal(
  * innerLayoutNodeWrapper because it seems the bounds after padding is the effective content.
  */
 internal fun LayoutNode.findWrapperToGetBounds(): LayoutNodeWrapper {
-    return outerMergingSemantics ?: outerSemantics ?: innerLayoutNodeWrapper
+    return (outerMergingSemantics ?: outerSemantics)?.layoutNodeWrapper ?: innerLayoutNodeWrapper
 }
