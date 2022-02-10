@@ -50,8 +50,7 @@ private data class RunningPreview(
 }
 
 class PreviewManagerImpl(
-    private val previewListener: PreviewListener = PreviewListenerBase(),
-    private val errorReporter: PreviewErrorReporter = StderrPreviewErrorReporter
+    private val previewListener: PreviewListener
 ) : PreviewManager {
     // todo: add quiet mode
     private val log = PrintStreamLogger("SERVER")
@@ -125,7 +124,7 @@ class PreviewManagerImpl(
                         appendLine(exception)
                     }
                 }
-                errorReporter.report(PreviewException(errorMessage), details = processLogLines.joinToString("\n"))
+                onError(errorMessage)
             }
         }
     }
@@ -160,10 +159,10 @@ class PreviewManagerImpl(
                     previewListener.onRenderedFrame(renderedFrame)
                 },
                 onError = { error ->
-                    errorReporter.report(PreviewException(error))
                     previewHostConfig.set(null)
                     previewClasspath.set(null)
                     inProcessRequest.set(null)
+                    onError(error)
                 }
             )
         }
@@ -292,9 +291,18 @@ class PreviewManagerImpl(
         }
     }.also {
         it.uncaughtExceptionHandler = Thread.UncaughtExceptionHandler { thread, e ->
-            errorReporter.report(e)
+            onError(e)
         }
         threads.add(it)
         it.start()
+    }
+
+    private fun onError(e: Throwable) {
+        onError(e.stackTraceString)
+    }
+
+    private fun onError(error: String) {
+        log.error { error }
+        previewListener.onError(error)
     }
 }

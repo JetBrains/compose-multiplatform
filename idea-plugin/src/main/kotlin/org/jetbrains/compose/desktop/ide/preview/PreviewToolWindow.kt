@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.components.JBLoadingPanel
+import org.jetbrains.compose.desktop.ide.preview.ui.PreviewPanel
 import java.awt.BorderLayout
 
 class PreviewToolWindow : ToolWindowFactory, DumbAware {
@@ -24,7 +25,7 @@ class PreviewToolWindow : ToolWindowFactory, DumbAware {
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         toolWindow.contentManager.let { content ->
-            val panel = PreviewPanel()
+            val panel = PreviewPanel(project)
             val loadingPanel = JBLoadingPanel(BorderLayout(), project)
             loadingPanel.add(panel, BorderLayout.CENTER)
             content.addContent(content.factory.createContent(loadingPanel, null, false))
