@@ -23,15 +23,11 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
-                implementation(kotlin("stdlib-common"))
             }
         }
 
         val jsMain by getting {
             dependencies {
-                implementation(kotlin("stdlib-js"))
-                implementation(npm("css-typed-om", "0.4.0"))
-
                 implementation(project(":web-core"))
             }
         }
