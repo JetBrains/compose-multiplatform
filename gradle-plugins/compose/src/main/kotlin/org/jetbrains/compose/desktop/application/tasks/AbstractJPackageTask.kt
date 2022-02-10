@@ -140,6 +140,11 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:PathSensitive(PathSensitivity.ABSOLUTE)
     val macEntitlementsFile: RegularFileProperty = objects.fileProperty()
 
+    @get:InputFile
+    @get:Optional
+    @get:PathSensitive(PathSensitivity.ABSOLUTE)
+    val macRuntimeEntitlementsFile: RegularFileProperty = objects.fileProperty()
+
     @get:Input
     @get:Optional
     val packageBuildVersion: Property<String?> = objects.nullableProperty()
@@ -148,6 +153,11 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Optional
     @get:PathSensitive(PathSensitivity.ABSOLUTE)
     val macProvisioningProfile: RegularFileProperty = objects.fileProperty()
+
+    @get:InputFile
+    @get:Optional
+    @get:PathSensitive(PathSensitivity.ABSOLUTE)
+    val macRuntimeProvisioningProfile: RegularFileProperty = objects.fileProperty()
 
     @get:Input
     @get:Optional
@@ -490,8 +500,24 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     override fun checkResult(result: ExecResult) {
         super.checkResult(result)
+        modifyRuntimeOnMacOsIfNeeded()
         val outputFile = findOutputFileOrDir(destinationDir.ioFile, targetFormat)
         logger.lifecycle("The distribution is written to ${outputFile.canonicalPath}")
+    }
+
+    private fun modifyRuntimeOnMacOsIfNeeded() {
+        if (currentOS != OS.MacOS || targetFormat != TargetFormat.AppImage) return
+        macSigner?.let { macSigner ->
+            val macSigningHelper = MacSigningHelper(
+                macSigner = macSigner,
+                runtimeProvisioningProfile = macRuntimeProvisioningProfile.ioFileOrNull,
+                entitlementsFile = macEntitlementsFile.ioFileOrNull,
+                runtimeEntitlementsFile = macRuntimeEntitlementsFile.ioFileOrNull,
+                destinationDir = destinationDir.ioFile,
+                packageName = packageName.get()
+            )
+            macSigningHelper.modifyRuntimeIfNeeded()
+        }
     }
 
     override fun initState() {

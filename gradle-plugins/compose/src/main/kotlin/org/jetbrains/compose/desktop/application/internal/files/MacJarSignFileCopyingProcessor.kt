@@ -86,5 +86,5 @@ internal class MacJarSignFileCopyingProcessor(
     }
 }
 
-private val String.isDylibPath
+internal val String.isDylibPath
     get() = endsWith(".dylib") || endsWith(".jnilib")
