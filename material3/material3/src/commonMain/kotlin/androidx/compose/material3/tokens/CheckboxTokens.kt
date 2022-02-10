@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_76
+// VERSION: v0_77
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -22,25 +22,64 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 
 internal object CheckboxTokens {
+    val ContainerHeight = 18.0.dp
     val ContainerShape = RoundedCornerShape(2.0.dp)
-    val DisabledSelectedIconColor = ColorSchemeKeyTokens.Primary
-    const val DisabledSelectedIconOpacity = 0.38f
-    val DisabledUnselectedIconColor = ColorSchemeKeyTokens.Primary
-    const val DisabledUnselectedIconOpacity = 0.38f
-    val IconSize = 24.0.dp
-    val SelectedFocusIconColor = ColorSchemeKeyTokens.Primary
+    val ContainerWidth = 18.0.dp
+    val ErrorFocusStateLayerColor = ColorSchemeKeyTokens.Error
+    val ErrorHoverStateLayerColor = ColorSchemeKeyTokens.Error
+    val ErrorPressedStateLayerColor = ColorSchemeKeyTokens.Error
+    val IconSize = 18.0.dp
+    val SelectedContainerColor = ColorSchemeKeyTokens.Primary
+    val SelectedDisabledContainerColor = ColorSchemeKeyTokens.OnSurface
+    const val SelectedDisabledContainerOpacity = 0.38f
+    val SelectedDisabledContainerOutlineWidth = 0.0.dp
+    val SelectedDisabledIconColor = ColorSchemeKeyTokens.Surface
+    val SelectedErrorContainerColor = ColorSchemeKeyTokens.Error
+    val SelectedErrorFocusContainerColor = ColorSchemeKeyTokens.Error
+    val SelectedErrorFocusIconColor = ColorSchemeKeyTokens.OnError
+    val SelectedErrorFocusOutlineWidth = 0.0.dp
+    val SelectedErrorHoverContainerColor = ColorSchemeKeyTokens.Error
+    val SelectedErrorHoverIconColor = ColorSchemeKeyTokens.OnError
+    val SelectedErrorHoverOutlineWidth = 0.0.dp
+    val SelectedErrorIconColor = ColorSchemeKeyTokens.OnError
+    val SelectedErrorPressedContainerColor = ColorSchemeKeyTokens.Error
+    val SelectedErrorPressedIconColor = ColorSchemeKeyTokens.OnError
+    val SelectedErrorPressedOutlineWidth = 0.0.dp
+    val SelectedFocusContainerColor = ColorSchemeKeyTokens.Primary
+    val SelectedFocusIconColor = ColorSchemeKeyTokens.OnPrimary
+    val SelectedFocusOutlineWidth = 0.0.dp
     val SelectedFocusStateLayerColor = ColorSchemeKeyTokens.Primary
-    val SelectedHoverIconColor = ColorSchemeKeyTokens.Primary
+    val SelectedHoverContainerColor = ColorSchemeKeyTokens.Primary
+    val SelectedHoverIconColor = ColorSchemeKeyTokens.OnPrimary
+    val SelectedHoverOutlineWidth = 0.0.dp
     val SelectedHoverStateLayerColor = ColorSchemeKeyTokens.Primary
-    val SelectedIconColor = ColorSchemeKeyTokens.Primary
-    val SelectedPressedIconColor = ColorSchemeKeyTokens.Primary
+    val SelectedIconColor = ColorSchemeKeyTokens.OnPrimary
+    val SelectedOutlineWidth = 0.0.dp
+    val SelectedPressedContainerColor = ColorSchemeKeyTokens.Primary
+    val SelectedPressedIconColor = ColorSchemeKeyTokens.OnPrimary
+    val SelectedPressedOutlineWidth = 0.0.dp
     val SelectedPressedStateLayerColor = ColorSchemeKeyTokens.OnSurface
-    val StateLayerSize = 48.0.dp
-    val UnselectedFocusIconColor = ColorSchemeKeyTokens.OnSurface
+    val StateLayerShape = ShapeTokens.CornerFull
+    val StateLayerSize = 40.0.dp
+    const val UnselectedDisabledContainerOpacity = 0.38f
+    val UnselectedDisabledOutlineColor = ColorSchemeKeyTokens.OnSurface
+    val UnselectedDisabledOutlineWidth = 2.0.dp
+    val UnselectedErrorFocusOutlineColor = ColorSchemeKeyTokens.Error
+    val UnselectedErrorFocusOutlineWidth = 2.0.dp
+    val UnselectedErrorHoverOutlineColor = ColorSchemeKeyTokens.Error
+    val UnselectedErrorHoverOutlineWidth = 2.0.dp
+    val UnselectedErrorOutlineColor = ColorSchemeKeyTokens.Error
+    val UnselectedErrorPressedOutlineColor = ColorSchemeKeyTokens.Error
+    val UnselectedErrorPressedOutlineWidth = 2.0.dp
+    val UnselectedFocusOutlineColor = ColorSchemeKeyTokens.OnSurface
+    val UnselectedFocusOutlineWidth = 2.0.dp
     val UnselectedFocusStateLayerColor = ColorSchemeKeyTokens.OnSurface
-    val UnselectedHoverIconColor = ColorSchemeKeyTokens.OnSurface
+    val UnselectedHoverOutlineColor = ColorSchemeKeyTokens.OnSurface
+    val UnselectedHoverOutlineWidth = 2.0.dp
     val UnselectedHoverStateLayerColor = ColorSchemeKeyTokens.OnSurface
-    val UnselectedIconColor = ColorSchemeKeyTokens.OnSurface
-    val UnselectedPressedIconColor = ColorSchemeKeyTokens.OnSurface
+    val UnselectedOutlineColor = ColorSchemeKeyTokens.OnSurface
+    val UnselectedOutlineWidth = 2.0.dp
+    val UnselectedPressedOutlineColor = ColorSchemeKeyTokens.OnSurface
+    val UnselectedPressedOutlineWidth = 2.0.dp
     val UnselectedPressedStateLayerColor = ColorSchemeKeyTokens.Primary
 }
