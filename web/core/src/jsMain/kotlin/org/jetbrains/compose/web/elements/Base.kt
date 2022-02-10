@@ -15,15 +15,17 @@ import org.w3c.dom.svg.SVGElement
 
 @Composable
 @ExplicitGroupsComposable
-private fun <TScope, T> ComposeDomNode(
-    factory: () -> T,
+private inline fun <TScope, T> ComposeDomNode(
+    crossinline factory: () -> T,
     elementScope: TScope,
     attrsSkippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
-    content: (@Composable TScope.() -> Unit)?
+    content: (@Composable TScope.() -> Unit)
 ) {
     currentComposer.startNode()
     if (currentComposer.inserting) {
-        currentComposer.createNode(factory)
+        currentComposer.createNode {
+            factory()
+        }
     } else {
         currentComposer.useNode()
     }
@@ -31,7 +33,7 @@ private fun <TScope, T> ComposeDomNode(
     attrsSkippableUpdate.invoke(SkippableUpdater(currentComposer))
 
     currentComposer.startReplaceableGroup(0x7ab4aae9)
-    content?.invoke(elementScope)
+    content.invoke(elementScope)
     currentComposer.endReplaceableGroup()
     currentComposer.endNode()
 }
@@ -134,7 +136,9 @@ fun <TElement : Element> TagElement(
             }
         },
         elementScope = scope,
-        content = content
+        content = {
+            content?.invoke(this)
+        }
     )
 
     refEffect?.let { effect ->
