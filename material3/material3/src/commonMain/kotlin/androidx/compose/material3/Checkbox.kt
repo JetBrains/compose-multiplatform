@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.triStateToggleable
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.tokens.CheckboxTokens
-import androidx.compose.material3.tokens.ColorSchemeKeyTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
@@ -231,16 +230,20 @@ object CheckboxDefaults {
      */
     @Composable
     fun colors(
-        checkedColor: Color = CheckboxTokens.SelectedIconColor.toColor(),
-        uncheckedColor: Color = CheckboxTokens.UnselectedIconColor.toColor(),
-        // TODO(b/188529841): Update the token when this issue is resolved.
-        checkmarkColor: Color = ColorSchemeKeyTokens.Surface.toColor(),
-        disabledCheckedColor: Color = CheckboxTokens.DisabledSelectedIconColor
-            .toColor()
-            .copy(alpha = CheckboxTokens.DisabledSelectedIconOpacity),
-        disabledUncheckedColor: Color = CheckboxTokens.DisabledUnselectedIconColor
-            .toColor()
-            .copy(alpha = CheckboxTokens.DisabledUnselectedIconOpacity),
+        checkedColor: Color =
+            MaterialTheme.colorScheme.fromToken(CheckboxTokens.SelectedContainerColor),
+        uncheckedColor: Color =
+            MaterialTheme.colorScheme.fromToken(CheckboxTokens.UnselectedOutlineColor),
+        checkmarkColor: Color =
+            MaterialTheme.colorScheme.fromToken(CheckboxTokens.SelectedIconColor),
+        disabledCheckedColor: Color =
+            MaterialTheme.colorScheme
+                .fromToken(CheckboxTokens.SelectedDisabledContainerColor)
+                .copy(alpha = CheckboxTokens.SelectedDisabledContainerOpacity),
+        disabledUncheckedColor: Color =
+            MaterialTheme.colorScheme
+                .fromToken(CheckboxTokens.UnselectedDisabledOutlineColor)
+                .copy(alpha = CheckboxTokens.UnselectedDisabledContainerOpacity),
         disabledIndeterminateColor: Color = disabledCheckedColor
     ): CheckboxColors {
         return remember(
