@@ -1,6 +1,7 @@
 import org.gradle.api.*
 import org.jetbrains.compose.internal.publishing.*
 
+
 plugins {
     signing
 }
@@ -18,6 +19,15 @@ open class ComposePublishingTask : AbstractComposePublishingTask() {
 val composeProperties = ComposeProperties(project)
 val isWebExist =
     project.composeBuild?.run { projectDir.resolve(".jbWebExistsMarker").exists() } ?: false
+
+OELPublishingPrototype(project)
+
+//if (project.experimentalOELPublication() && (project.oelAndroidxVersion() == null)) {
+//    error("androidx version should be specified for OEL publications")
+//}
+//if (project.experimentalOELPublication())
+//    OELPublishingPrototype(project)
+//}
 
 val mainComponents =
     listOf(
@@ -224,3 +234,84 @@ fun readComposeModules(
                 localDir = repoRoot.get().asFile.resolve("$group/$artifact/$version")
             )
         }
+
+fun Project.experimentalOELPublication() : Boolean = findProperty("oel.publication") == "true"
+fun Project.oelAndroidxVersion() : String? = findProperty("oel.androidx.version") as String?
+
+// FIXME: reflection access! Some API in Kotlin is needed
+@Suppress("unchecked_cast")
+private val KotlinTarget.kotlinComponents: Iterable<KotlinTargetComponent>
+    get() = javaClass.kotlin.memberProperties
+        .single { it.name == "kotlinComponents" }
+            .get(this) as Iterable<KotlinTargetComponent>
+
+
+fun OELPublishingPrototype(project: Project) {
+    val ext = project.multiplatformExtension ?: error("expected a multiplatform project")
+
+    ext.targets.all { target ->
+        if (target is KotlinAndroidTarget) {
+            project.publishAndroidxReference(target)
+        }
+    }
+}
+
+@Suppress("unchecked_cast")
+private fun Project.publishAndroidxReference(target: KotlinTarget) {
+    afterEvaluate {
+        target.kotlinComponents.forEach { component ->
+            val componentName = component.name
+
+            val multiplatformExtension =
+                extensions.findByType(KotlinMultiplatformExtension::class.java)
+                    ?: error("Expected a multiplatform project")
+
+            if (component is KotlinVariant)
+                component.publishable = false
+
+            val usages = when (component) {
+                is KotlinVariant -> component.usages
+                is JointAndroidKotlinTargetComponent -> component.usages
+                else -> emptyList()
+            }
+
+            extensions.getByType(PublishingExtension::class.java)
+                .publications.withType(DefaultMavenPublication::class.java)
+                // isAlias is needed for Gradle to ignore the fact that there's a
+                // publication that is not referenced as an available-at variant of the root module
+                // and has the Maven coordinates that are different from those of the root module
+                // FIXME: internal Gradle API! We would rather not create the publications,
+                //        but some API for that is needed in the Kotlin Gradle plugin
+                .all { publication ->
+                    if (publication.name == componentName) {
+                        publication.isAlias = true
+                    }
+                }
+
+            usages.forEach {    usage ->
+                val configurationName = usage.name + "-published"
+
+                configurations.matching{it.name == configurationName}.all() { conf ->
+                    conf.artifacts.clear()
+                    conf.dependencies.clear()
+                    conf.setExtendsFrom(emptyList())
+                    var version = if (target.project.group.toString().contains("org.jetbrains.compose.material3")) "1.0.0-alpha01" else target.project.oelAndroidxVersion()!!
+                    val newDependency = target.project.group.toString().replace("org.jetbrains.compose", "androidx.compose") + ":" + name + ":" + version
+                    conf.dependencies.add(target.project.dependencies.create(newDependency))
+                }
+
+                val rootComponent : KotlinSoftwareComponent = target.project.components.withType(KotlinSoftwareComponent::class.java)
+                    .getByName("kotlin")
+
+                (rootComponent.usages as MutableSet).add(
+                    DefaultKotlinUsageContext(
+                        multiplatformExtension.metadata().compilations.getByName("main"),
+                        objects.named(Usage::class.java, "kotlin-api"),
+                        configurationName
+                    )
+                )
+
+            }
+        }
+    }
+}
