@@ -21,6 +21,7 @@ package androidx.compose.material3.catalog.library.model
 import androidx.compose.material3.catalog.library.util.SampleSourceUrl
 import androidx.compose.material3.samples.AlertDialogSample
 import androidx.compose.material3.samples.AlertDialogWithIconSample
+import androidx.compose.material3.samples.BottomAppBarWithFAB
 import androidx.compose.material3.samples.ButtonSample
 import androidx.compose.material3.samples.ButtonWithIconSample
 import androidx.compose.material3.samples.CardSample
@@ -63,6 +64,7 @@ import androidx.compose.material3.samples.ScaffoldWithIndefiniteSnackbar
 import androidx.compose.material3.samples.ScaffoldWithSimpleSnackbar
 import androidx.compose.material3.samples.ScrollingFancyIndicatorContainerTabs
 import androidx.compose.material3.samples.ScrollingTextTabs
+import androidx.compose.material3.samples.SimpleBottomAppBar
 import androidx.compose.material3.samples.SimpleCenterAlignedTopAppBar
 import androidx.compose.material3.samples.SimpleSmallTopAppBar
 import androidx.compose.material3.samples.SliderSample
@@ -209,6 +211,21 @@ val DialogExamples =
             sourceUrl = DialogExampleSourceUrl,
         ) { AlertDialogWithIconSample() },
     )
+
+private const val BottomAppBarsExampleDescription = "Bottom app bar examples"
+private const val BottomAppBarsExampleSourceUrl = "$SampleSourceUrl/AppBarSamples.kt"
+val BottomAppBarsExamples = listOf(
+    Example(
+        name = ::SimpleBottomAppBar.name,
+        description = BottomAppBarsExampleDescription,
+        sourceUrl = BottomAppBarsExampleSourceUrl,
+    ) { SimpleBottomAppBar() },
+    Example(
+        name = ::BottomAppBarWithFAB.name,
+        description = BottomAppBarsExampleDescription,
+        sourceUrl = BottomAppBarsExampleSourceUrl,
+    ) { BottomAppBarWithFAB() }
+)
 
 private const val TopAppBarExampleDescription = "Top app bar examples"
 private const val TopAppBarExampleSourceUrl = "$SampleSourceUrl/AppBarSamples.kt"
