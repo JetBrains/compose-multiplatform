@@ -1,9 +1,11 @@
 package org.jetbrains.compose.web.attributes
 
 import org.jetbrains.compose.web.attributes.builders.saveControlledInputState
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.events.SyntheticSubmitEvent
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLButtonElement
+import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLFormElement
 import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLInputElement
@@ -329,3 +331,9 @@ fun AttrsScope<HTMLTableCellElement>.colspan(value: Int): AttrsScope<HTMLTableCe
 fun AttrsScope<HTMLTableCellElement>.rowspan(value: Int): AttrsScope<HTMLTableCellElement> =
     attr("rowspan", value.toString())
 
+/* Canvas attributes */
+fun AttrsScope<HTMLCanvasElement>.width(value: CSSSizeValue<out CSSUnitLengthOrPercentage>) =
+    attr("width", value.toString())
+
+fun AttrsScope<HTMLCanvasElement>.height(value: CSSSizeValue<out CSSUnitLengthOrPercentage>) =
+    attr("height", value.toString())
