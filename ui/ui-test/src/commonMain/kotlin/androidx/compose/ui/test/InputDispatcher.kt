@@ -97,7 +97,8 @@ internal abstract class InputDispatcher(
         get() = partialGesture != null
 
     init {
-        val state = testContext.states.remove(root)
+        val rootHash = identityHashCode(root)
+        val state = testContext.states.remove(rootHash)
         if (state != null) {
             partialGesture = state.partialGesture
             mouseInputState = state.mouseInputState
@@ -106,7 +107,8 @@ internal abstract class InputDispatcher(
 
     protected open fun saveState(root: RootForTest?) {
         if (root != null) {
-            testContext.states[root] =
+            val rootHash = identityHashCode(root)
+            testContext.states[rootHash] =
                 InputDispatcherState(
                     partialGesture,
                     mouseInputState

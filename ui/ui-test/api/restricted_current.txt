@@ -82,6 +82,9 @@ package androidx.compose.ui.test {
   public final class ErrorMessagesKt {
   }
 
+  public final class Expect_jvmKt {
+  }
+
   public final class FiltersKt {
     method public static androidx.compose.ui.test.SemanticsMatcher hasAnyAncestor(androidx.compose.ui.test.SemanticsMatcher matcher);
     method public static androidx.compose.ui.test.SemanticsMatcher hasAnyChild(androidx.compose.ui.test.SemanticsMatcher matcher);

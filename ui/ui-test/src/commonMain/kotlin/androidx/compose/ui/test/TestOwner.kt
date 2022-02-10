@@ -76,9 +76,11 @@ class TestContext internal constructor(internal val testOwner: TestOwner) {
 
     /**
      * Stores the [InputDispatcherState] of each [RootForTest]. The state will be restored in an
-     * [InputDispatcher] when it is created for an owner that has a state stored.
+     * [InputDispatcher] when it is created for an owner that has a state stored. To avoid leaking
+     * the [RootForTest], the [identityHashCode] of the root is used as the key instead of the
+     * actual object.
      */
-    internal val states = mutableMapOf<RootForTest, InputDispatcherState>()
+    internal val states = mutableMapOf<Int, InputDispatcherState>()
 
     /**
      * Collects all [SemanticsNode]s from all compose hierarchies.
