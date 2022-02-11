@@ -1,7 +1,14 @@
 import org.gradle.api.*
 import org.jetbrains.compose.internal.publishing.*
-import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
-import org.jetbrains.kotlin.gradle.plugin.KotlinTargetComponent
+import kotlin.reflect.full.memberProperties
+import org.jetbrains.kotlin.gradle.plugin.*
+import org.jetbrains.kotlin.gradle.plugin.mpp.*
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
+import org.gradle.api.publish.maven.internal.dependencies.DefaultMavenDependency
+import org.gradle.api.publish.maven.internal.dependencies.MavenDependencyInternal
+import org.gradle.api.publish.maven.internal.publication.DefaultMavenPublication
+
 
 
 repositories {
@@ -255,17 +262,24 @@ private val KotlinTarget.kotlinComponents: Iterable<KotlinTargetComponent>
             .get(this) as Iterable<KotlinTargetComponent>
 
 fun OELPublishingPrototype(project: Project) {
-    val ext = project.multiplatformExtension ?: error("expected a multiplatform project")
-
-    ext.targets.all { target ->
-        if (target is KotlinAndroidTarget) {
-            project.publishAndroidxReference(target)
+    println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    subprojects.forEach {
+        println(">>>>>>>>>>>>>> trying  " + it.name)
+        val ext = it.extensions.getByType(KotlinMultiplatformExtension::class.java)
+        if (ext != null) {
+            println(">>>>>>>>>>>>>> accepted " + it.name)
+            ext.targets.all { target ->
+                if (target is KotlinAndroidTarget) {
+                    project.publishAndroidxReference(target)
+                }
+                true
+            }
         }
     }
 }
 
 @Suppress("unchecked_cast")
-private fun Project.publishAndroidxReference(target: KotlinTarget) {
+fun Project.publishAndroidxReference(target: KotlinTarget) {
     afterEvaluate {
         target.kotlinComponents.forEach { component ->
             val componentName = component.name
@@ -294,6 +308,7 @@ private fun Project.publishAndroidxReference(target: KotlinTarget) {
                     if (publication.name == componentName) {
                         publication.isAlias = true
                     }
+                    true
                 }
 
             usages.forEach {    usage ->
