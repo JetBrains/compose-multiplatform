@@ -82,8 +82,8 @@ profile. You can skip this step otherwise.
 
 First make sure you have created two app IDs, one for your app, and another one for the JVM runtime.
 They should look like this:
-App ID for app: `com.yoursitename.yourappname` (format: `YOURBUNDLEID`)
-App ID for runtime: `com.oracle.java.com.yoursitename.yourappname` (format: `com.oracle.java.YOURBUNDLEID`)
+* App ID for app: `com.yoursitename.yourappname` (format: `YOURBUNDLEID`)
+* App ID for runtime: `com.oracle.java.com.yoursitename.yourappname` (format: `com.oracle.java.YOURBUNDLEID`)
 
 #### Checking existing provisioning profiles
 
