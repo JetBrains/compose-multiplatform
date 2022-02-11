@@ -5,19 +5,17 @@
 
 package org.jetbrains.compose.web.core.tests.elements
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import kotlinx.browser.document
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.attributes.AttrsScope
-import org.jetbrains.compose.web.testutils.*
 import org.jetbrains.compose.web.dom.*
+import org.jetbrains.compose.web.testutils.runTest
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertSame
 
 class ElementsTests {
     @Test
@@ -160,5 +158,42 @@ class ElementsTests {
 
         assertEquals(1, counter)
         assertEquals("<div><div>ON</div></div>", nextChild().outerHTML)
+    }
+
+    @Test @NoLiveLiterals
+    fun keyChangesTheOrderButKeepsSameInstances() = runTest {
+        val items = mutableStateListOf(1, 2, 3)
+
+        composition {
+            items.forEach {
+                key(it) {
+                    Div { Text("I = $it") }
+                }
+            }
+        }
+
+        val refs = listOf(
+            root.children[0],
+            root.children[1],
+            root.children[2],
+        )
+
+        root.children[0]!!.asDynamic().fakeid = "0"
+        root.children[1]!!.asDynamic().fakeid = "1"
+        root.children[2]!!.asDynamic().fakeid = "2"
+
+        items[0] = 3
+        items[1] = 2
+        items[2] = 1
+
+        waitForRecompositionComplete()
+
+        assertSame(refs[0], root.children[2])
+        assertSame(refs[1], root.children[1])
+        assertSame(refs[2], root.children[0])
+
+        assertEquals("0", root.children[2].asDynamic().fakeid)
+        assertEquals("1", root.children[1].asDynamic().fakeid)
+        assertEquals("2", root.children[0].asDynamic().fakeid)
     }
 }
