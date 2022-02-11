@@ -64,8 +64,12 @@ private class DerivedSnapshotState<T>(
     private var first: ResultRecord<T> = ResultRecord()
 
     private class ResultRecord<T> : StateRecord() {
+        companion object {
+            val Unset = Any()
+        }
+
         var dependencies: HashSet<StateObject>? = null
-        var result: T? = null
+        var result: Any? = Unset
         var resultHash: Int = 0
 
         override fun assign(value: StateRecord) {
@@ -79,7 +83,7 @@ private class DerivedSnapshotState<T>(
         override fun create(): StateRecord = ResultRecord<T>()
 
         fun isValid(derivedState: DerivedState<*>, snapshot: Snapshot): Boolean =
-            result != null && resultHash == readableHash(derivedState, snapshot)
+            result !== Unset && resultHash == readableHash(derivedState, snapshot)
 
         fun readableHash(derivedState: DerivedState<*>, snapshot: Snapshot): Int {
             var hash = 7
@@ -184,8 +188,9 @@ private class DerivedSnapshotState<T>(
     val debuggerDisplayValue: T?
         @JvmName("getDebuggerDisplayValue")
         get() = first.withCurrent {
+            @Suppress("UNCHECKED_CAST")
             if (it.isValid(this, Snapshot.current))
-                it.result
+                it.result as T
             else null
         }
 
