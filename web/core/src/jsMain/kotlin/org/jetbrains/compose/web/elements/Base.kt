@@ -154,8 +154,12 @@ fun <TElement : Element> TagElement(
     tagName: String,
     applyAttrs: AttrsScope<TElement>.() -> Unit,
     content: (@Composable ElementScope<TElement>.() -> Unit)?
-) = TagElement(
-    elementBuilder = ElementBuilder.createBuilder(tagName),
-    applyAttrs = applyAttrs,
-    content = content
-)
+) {
+    key(tagName) {
+        TagElement(
+            elementBuilder = ElementBuilder.createBuilder(tagName),
+            applyAttrs = applyAttrs,
+            content = content
+        )
+    }
+}
