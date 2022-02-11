@@ -648,7 +648,7 @@ package androidx.compose.ui.text.font {
   public final class FontListFontFamilyTypefaceAdapterKt {
   }
 
-  @androidx.compose.ui.text.ExperimentalTextApi @kotlin.jvm.JvmInline public final value class FontLoadingStrategy {
+  @kotlin.jvm.JvmInline public final value class FontLoadingStrategy {
     method public int getValue();
     property public final int value;
     field public static final androidx.compose.ui.text.font.FontLoadingStrategy.Companion Companion;

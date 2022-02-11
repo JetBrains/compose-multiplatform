@@ -628,6 +628,21 @@ package androidx.compose.ui.text.font {
   public final class FontListFontFamilyTypefaceAdapterKt {
   }
 
+  @kotlin.jvm.JvmInline public final value class FontLoadingStrategy {
+    method public int getValue();
+    property public final int value;
+    field public static final androidx.compose.ui.text.font.FontLoadingStrategy.Companion Companion;
+  }
+
+  public static final class FontLoadingStrategy.Companion {
+    method public int getAsync();
+    method public int getBlocking();
+    method public int getOptionalLocal();
+    property public final int Async;
+    property public final int Blocking;
+    property public final int OptionalLocal;
+  }
+
   public final inline class FontStyle {
     ctor public FontStyle();
     method public int getValue();
