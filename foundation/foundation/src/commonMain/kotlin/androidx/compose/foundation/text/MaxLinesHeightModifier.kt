@@ -17,6 +17,7 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -25,6 +26,9 @@ import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontSynthesis
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.resolveDefaults
 
 /**
@@ -53,21 +57,44 @@ internal fun Modifier.maxLinesHeight(
 
     // Difference between the height of two lines paragraph and one line paragraph gives us
     // an approximation of height of one line
-    // TODO(b/214587005): Uncache this
-    val firstLineHeight = remember(density, fontFamilyResolver, textStyle, layoutDirection) {
+    val resolvedStyle = remember(textStyle, layoutDirection) {
+        resolveDefaults(textStyle, layoutDirection)
+    }
+    val typeface by remember(fontFamilyResolver, resolvedStyle) {
+         fontFamilyResolver.resolve(
+            resolvedStyle.fontFamily,
+            resolvedStyle.fontWeight ?: FontWeight.Normal,
+            resolvedStyle.fontStyle ?: FontStyle.Normal,
+            resolvedStyle.fontSynthesis ?: FontSynthesis.All
+        )
+    }
+
+    val firstLineHeight = remember(
+        density,
+        fontFamilyResolver,
+        textStyle,
+        layoutDirection,
+        typeface
+    ) {
         computeSizeForDefaultText(
-            style = resolveDefaults(textStyle, layoutDirection),
+            style = resolvedStyle,
             density = density,
             fontFamilyResolver = fontFamilyResolver,
             text = EmptyTextReplacement,
             maxLines = 1
         ).height
     }
-    // TODO(b/214587005): Uncache this
-    val firstTwoLinesHeight = remember(density, fontFamilyResolver, textStyle, layoutDirection) {
+
+    val firstTwoLinesHeight = remember(
+        density,
+        fontFamilyResolver,
+        textStyle,
+        layoutDirection,
+        typeface
+    ) {
         val twoLines = EmptyTextReplacement + "\n" + EmptyTextReplacement
         computeSizeForDefaultText(
-            style = resolveDefaults(textStyle, layoutDirection),
+            style = resolvedStyle,
             density = density,
             fontFamilyResolver = fontFamilyResolver,
             text = twoLines,
