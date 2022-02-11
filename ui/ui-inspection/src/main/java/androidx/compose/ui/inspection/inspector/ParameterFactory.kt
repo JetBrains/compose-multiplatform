@@ -16,9 +16,9 @@
 
 package androidx.compose.ui.inspection.inspector
 
+import java.lang.reflect.Modifier as JavaModifier
 import android.util.Log
 import android.view.View
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.internal.ComposableLambda
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Modifier
@@ -57,7 +57,6 @@ import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.javaGetter
-import java.lang.reflect.Modifier as JavaModifier
 
 private val reflectionScope: ReflectionScope = ReflectionScope()
 
@@ -66,7 +65,6 @@ private val reflectionScope: ReflectionScope = ReflectionScope()
  *
  * Each parameter value is converted to a user readable value.
  */
-@RequiresApi(29)
 internal class ParameterFactory(private val inlineClassConverter: InlineClassConverter) {
     /**
      * A map from known values to a user readable string representation.
