@@ -156,6 +156,7 @@ fun interface ElementBuilder<TElement : Element> {
     fun create(): TElement
 
     companion object {
+        // it's internal only for testing purposes
         internal val buildersCache = mutableMapOf<String, ElementBuilder<*>>()
 
         fun <TElement : Element> createBuilder(tagName: String): ElementBuilder<TElement> {
