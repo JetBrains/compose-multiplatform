@@ -23,6 +23,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import androidx.compose.runtime.collection.IdentityScopeMap
 import androidx.compose.runtime.snapshots.fastAll
+import androidx.compose.runtime.snapshots.fastAny
 import androidx.compose.runtime.snapshots.fastForEach
 
 /**
@@ -502,8 +503,20 @@ internal class CompositionImpl(
         parent.composeInitial(this, composable)
     }
 
-    fun invalidateGroupsWithKey(key: Int): Boolean {
-        return slotTable.invalidateGroupsWithKey(key)
+    fun invalidateGroupsWithKey(key: Int) {
+        val scopesToInvalidate = synchronized(lock) {
+            slotTable.invalidateGroupsWithKey(key)
+        }
+        // Calls to invalidate must be performed without the lock as the they may cause the
+        // recomposer to take its lock to respond to the invalidation and that takes the locks
+        // in the opposite order of composition so if composition begins in another thread taking
+        // trying to take the recomposer lock with the composer lock held will deadlock.
+        val forceComposition = scopesToInvalidate == null || scopesToInvalidate.fastAny {
+            it.invalidateForResult(null) == InvalidationResult.IGNORED
+        }
+        if (forceComposition && composer.forceRecomposeScopes()) {
+            parent.invalidate(this)
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -1037,7 +1050,7 @@ private class HotReloader {
         }
 
         @TestOnly
-        internal fun invalidateGroupsWithKey(key: Int): Boolean {
+        internal fun invalidateGroupsWithKey(key: Int) {
             return Recomposer.invalidateGroupsWithKey(key)
         }
     }
