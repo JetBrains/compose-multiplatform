@@ -42,6 +42,10 @@ private val RelocationDemos = listOf(
     ComposableDemo("Nested scrollables") { BringNestedIntoViewDemo() },
 )
 
+private val FocusDemos = listOf(
+    ComposableDemo("Focus Group") { FocusGroupDemo() },
+)
+
 val FoundationDemos = DemoCategory(
     "Foundation",
     listOf(
@@ -55,6 +59,7 @@ val FoundationDemos = DemoCategory(
         DemoCategory("Suspending Gesture Detectors", CoroutineGestureDemos),
         ComposableDemo("NestedScroll") { NestedScrollDemo() },
         DemoCategory("Relocation Demos", RelocationDemos),
+        DemoCategory("Focus Demos", FocusDemos),
         DemoCategory("Magnifier Demos", MagnifierDemos),
     )
 )

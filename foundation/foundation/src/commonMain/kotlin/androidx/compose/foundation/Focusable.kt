@@ -34,6 +34,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.InputMode
 import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.platform.inspectable
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.semantics
 import kotlinx.coroutines.launch
@@ -132,6 +133,35 @@ fun Modifier.focusable(
     } else {
         Modifier
     }
+}
+
+/**
+ * Creates a focus group or marks this component as a focus group. This means that when we move
+ * focus using the keyboard or programmatically using
+ * [FocusManager.moveFocus()][androidx.compose.ui.focus.FocusManager.moveFocus], the items within
+ * the focus group will be given a higher priority before focus moves to items outside the focus
+ * group.
+ *
+ * In the sample below, each column is a focus group, so pressing the tab key will move focus
+ * to all the buttons in column 1 before visiting column 2.
+ *
+ * @sample androidx.compose.foundation.samples.FocusGroupSample
+ *
+ * Note: The focusable children of a focusable parent automatically form a focus group. This
+ * modifier is to be used when you want to create a focus group where the parent is not focusable.
+ * If you encounter a component that uses a [focusGroup] internally, you can make it focusable by
+ * using a [focusable] modifier. In the second sample here, the
+ * [LazyRow][androidx.compose.foundation.lazy.LazyRow] is a focus group that is not itself
+ * focusable. But you can make it focusable by adding a [focusable] modifier.
+ *
+ * @sample androidx.compose.foundation.samples.FocusableFocusGroupSample
+ */
+@ExperimentalFoundationApi
+fun Modifier.focusGroup(): Modifier {
+   return inspectable(inspectorInfo = debugInspectorInfo { name = "focusGroup" }) {
+       focusProperties { canFocus = false }
+           .focusTarget()
+   }
 }
 
 // TODO: b/202856230 - consider either making this / a similar API public, or add a parameter to
