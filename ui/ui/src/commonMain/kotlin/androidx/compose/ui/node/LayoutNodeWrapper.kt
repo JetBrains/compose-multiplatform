@@ -45,6 +45,7 @@ import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.layout.findRoot
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.modifier.ModifierLocal
+import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.semantics.SemanticsEntity
 import androidx.compose.ui.semantics.SemanticsModifier
 import androidx.compose.ui.unit.Constraints
@@ -1197,6 +1198,12 @@ internal abstract class LayoutNodeWrapper(
         fun interceptOutOfBoundsChildEvents(entity: T): Boolean
 
         /**
+         * Returns false if the parent layout node has a state that suppresses
+         * hit testing of its children.
+         */
+        fun shouldHitTestChildren(parentLayoutNode: LayoutNode): Boolean
+
+        /**
          * Calls a hit test on [layoutNode].
          */
         fun childHitTest(
@@ -1236,6 +1243,8 @@ internal abstract class LayoutNodeWrapper(
                 override fun interceptOutOfBoundsChildEvents(entity: PointerInputEntity) =
                     entity.modifier.pointerInputFilter.interceptOutOfBoundsChildEvents
 
+                override fun shouldHitTestChildren(parentLayoutNode: LayoutNode) = true
+
                 override fun childHitTest(
                     layoutNode: LayoutNode,
                     pointerPosition: Offset,
@@ -1255,6 +1264,10 @@ internal abstract class LayoutNodeWrapper(
                 override fun contentFrom(entity: SemanticsEntity) = entity
 
                 override fun interceptOutOfBoundsChildEvents(entity: SemanticsEntity) = false
+
+                override fun shouldHitTestChildren(parentLayoutNode: LayoutNode) =
+                    parentLayoutNode.outerSemantics?.collapsedSemanticsConfiguration()
+                         ?.isClearingSemantics != true
 
                 override fun childHitTest(
                     layoutNode: LayoutNode,

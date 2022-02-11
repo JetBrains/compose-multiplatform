@@ -1708,6 +1708,29 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    fun testSemanticsHitTest_clearAndSet() {
+        val outertag = "outerbox"
+        val innertag = "innerbox"
+        container.setContent {
+            Box(Modifier.size(100.dp).clickable {}.testTag(outertag).clearAndSetSemantics {}) {
+                Box(Modifier.size(100.dp).clickable {}.testTag(innertag)) {
+                    BasicText("")
+                }
+            }
+        }
+
+        val outerNode = rule.onNodeWithTag(outertag).fetchSemanticsNode("")
+        val innerNode = rule.onNodeWithTag(innertag, true).fetchSemanticsNode("")
+        val bounds = innerNode.boundsInRoot
+
+        val hitNodeId = delegate.hitTestSemanticsAt(
+            bounds.left + bounds.width / 2,
+            bounds.top + bounds.height / 2
+        )
+        assertEquals(outerNode.id, hitNodeId)
+    }
+
+    @Test
     @SdkSuppress(maxSdkVersion = Build.VERSION_CODES.P)
     fun testViewInterop_findViewByAccessibilityId() {
         val androidViewTag = "androidView"

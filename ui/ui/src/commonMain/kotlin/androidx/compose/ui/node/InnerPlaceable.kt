@@ -154,13 +154,15 @@ internal class InnerPlaceable(
         var inLayer = isInLayer
         var hitTestChildren = false
 
-        if (withinLayerBounds(pointerPosition)) {
-            hitTestChildren = true
-        } else if (isTouchEvent &&
-            distanceInMinimumTouchTarget(pointerPosition, minimumTouchTargetSize).isFinite()
-        ) {
-            inLayer = false
-            hitTestChildren = true
+        if (hitTestSource.shouldHitTestChildren(layoutNode)) {
+            if (withinLayerBounds(pointerPosition)) {
+                hitTestChildren = true
+            } else if (isTouchEvent &&
+                distanceInMinimumTouchTarget(pointerPosition, minimumTouchTargetSize).isFinite()
+            ) {
+                inLayer = false
+                hitTestChildren = true
+            }
         }
 
         if (hitTestChildren) {
