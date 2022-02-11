@@ -33,7 +33,6 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.ReusableGraphicsLayerScope
-import androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapper
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.layout.AlignmentLine
@@ -945,29 +944,10 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
-     * Returns the first [NestedScrollDelegatingWrapper] in the wrapper list that wraps this
-     * [LayoutNodeWrapper].
-     *
-     * Note: This method tried to find [NestedScrollDelegatingWrapper] in the
-     * modifiers before the one wrapped with this [LayoutNodeWrapper] and goes up the hierarchy of
-     * [LayoutNode]s if needed.
-     */
-    abstract fun findPreviousNestedScrollWrapper(): NestedScrollDelegatingWrapper?
-
-    /**
-     * Returns the first [NestedScrollDelegatingWrapper] in the wrapper list that is wrapped by this
-     * [LayoutNodeWrapper].
-     *
-     * Note: This method only goes to the modifiers that follow the one wrapped by
-     * this [LayoutNodeWrapper], it doesn't to the children [LayoutNode]s.
-     */
-    abstract fun findNextNestedScrollWrapper(): NestedScrollDelegatingWrapper?
-
-    /**
      * Returns the first [focus node][ModifiedFocusNode] in the wrapper list that wraps this
      * [LayoutNodeWrapper].
      *
-     * Note: This method tried to find [NestedScrollDelegatingWrapper] in the
+     * Note: This method tried to find [ModifiedFocusNode] in the
      * modifiers before the one wrapped with this [LayoutNodeWrapper] and goes up the hierarchy of
      * [LayoutNode]s if needed.
      */
@@ -1088,7 +1068,7 @@ internal abstract class LayoutNodeWrapper(
      * Returns the first [ModifiedKeyInputNode] in the wrapper list that wraps this
      * [LayoutNodeWrapper].
      *
-     * Note: This method tried to find [NestedScrollDelegatingWrapper] in the
+     * Note: This method tried to find [ModifiedKeyInputNode] in the
      * modifiers before the one wrapped with this [LayoutNodeWrapper] and goes up the hierarchy of
      * [LayoutNode]s if needed.
      */
