@@ -29,6 +29,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class DerivedSnapshotStateTests {
 
@@ -232,6 +233,16 @@ class DerivedSnapshotStateTests {
         } finally {
             snapshot.dispose()
         }
+    }
+
+    @Test
+    fun nullResultIsCached() {
+        var runs = 0
+        val a = derivedStateOf { runs++; null }
+        assertNull(a.value)
+        assertEquals(1, runs)
+        assertNull(a.value)
+        assertEquals(1, runs)
     }
 
     private var count = 0
