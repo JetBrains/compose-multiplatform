@@ -179,8 +179,8 @@ internal fun ProvideCommonCompositionLocals(
         LocalDensity provides owner.density,
         LocalFocusManager provides owner.focusManager,
         @Suppress("DEPRECATION") LocalFontLoader
-            provides @Suppress("DEPRECATION") owner.fontLoader,
-        LocalFontFamilyResolver provides owner.fontFamilyResolver,
+            providesDefault @Suppress("DEPRECATION") owner.fontLoader,
+        LocalFontFamilyResolver providesDefault owner.fontFamilyResolver,
         LocalHapticFeedback provides owner.hapticFeedBack,
         LocalInputModeManager provides owner.inputModeManager,
         LocalLayoutDirection provides owner.layoutDirection,
