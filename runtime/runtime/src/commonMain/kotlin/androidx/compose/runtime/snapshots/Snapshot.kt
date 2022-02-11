@@ -75,7 +75,9 @@ sealed class Snapshot(
      */
     open fun dispose() {
         disposed = true
-        releasePinnedSnapshot()
+        sync {
+            releasePinnedSnapshotLocked()
+        }
     }
 
     /**
@@ -134,11 +136,12 @@ sealed class Snapshot(
     internal var disposed = false
 
     /*
-     *
+     * Handle to use when unpinning this snapshot. -1 if this snapshot has been unpinned.
      */
-    @Suppress("LeakingThis")
     private var pinningTrackingHandle =
         if (id != INVALID_SNAPSHOT) trackPinning(id, invalid) else -1
+
+    internal inline val isPinned get() = pinningTrackingHandle >= 0
 
     /*
      * The read observer for the snapshot if there is one.
@@ -184,22 +187,44 @@ sealed class Snapshot(
 
     /**
      * Closes the snapshot by removing the snapshot id (an any previous id's) from the list of
-     * open snapshots.
+     * open snapshots and unpinning snapshots that no longer are referenced by this snapshot.
      */
-    internal open fun close() {
+    internal fun closeAndReleasePinning() {
         sync {
-            openSnapshots = openSnapshots.clear(id)
-            releasePinnedSnapshot()
+            closeLocked()
+            releasePinnedSnapshotsForCloseLocked()
         }
+    }
+
+    /**
+     * Closes the snapshot by removing the snapshot id (and any previous ids) from the list of
+     * open snapshots. Does not release pinned snapshots. See [releasePinnedSnapshotsForCloseLocked]
+     * for the second half of [closeAndReleasePinning].
+     *
+     * Call while holding a `sync {}` lock.
+     */
+    internal open fun closeLocked() {
+        openSnapshots = openSnapshots.clear(id)
+    }
+
+    /**
+     * Releases all pinned snapshots required to perform a clean [closeAndReleasePinning].
+     *
+     * Call while holding a `sync {}` lock.
+     *
+     * See [closeAndReleasePinning], [closeLocked].
+     */
+    internal open fun releasePinnedSnapshotsForCloseLocked() {
+        releasePinnedSnapshotLocked()
     }
 
     internal fun validateNotDisposed() {
         require(!disposed) { "Cannot use a disposed snapshot" }
     }
 
-    internal fun releasePinnedSnapshot() {
+    internal fun releasePinnedSnapshotLocked() {
         if (pinningTrackingHandle >= 0) {
-            releasePinning(pinningTrackingHandle)
+            releasePinningLocked(pinningTrackingHandle)
             pinningTrackingHandle = -1
         }
     }
@@ -500,7 +525,7 @@ sealed class Snapshot(
 /**
  * Pin the snapshot and invalid set.
  *
- * @return returns a handle that should be passed to [releasePinning] when the snapshot closes or
+ * @return returns a handle that should be passed to [releasePinningLocked] when the snapshot closes or
  * is disposed.
  */
 internal fun trackPinning(id: Int, invalid: SnapshotIdSet): Int {
@@ -513,10 +538,8 @@ internal fun trackPinning(id: Int, invalid: SnapshotIdSet): Int {
 /**
  * Release the [handle] returned by [trackPinning]
  */
-internal fun releasePinning(handle: Int) {
-    sync {
-        pinningTable.remove(handle)
-    }
+internal fun releasePinningLocked(handle: Int) {
+    pinningTable.remove(handle)
 }
 
 /**
@@ -571,7 +594,7 @@ open class MutableSnapshot internal constructor(
         writeObserver: ((Any) -> Unit)? = null
     ): MutableSnapshot {
         validateNotDisposed()
-        validateNotApplied()
+        validateNotAppliedOrPinned()
         return advance {
             sync {
                 val newId = nextSnapshotId++
@@ -624,7 +647,7 @@ open class MutableSnapshot internal constructor(
         val (observers, globalModified) = sync {
             validateOpen(this)
             if (modified == null || modified.size == 0) {
-                close()
+                closeLocked()
                 val previousGlobalSnapshot = currentGlobalSnapshot.get()
                 takeNewGlobalSnapshot(previousGlobalSnapshot, emptyLambda)
                 val globalModified = previousGlobalSnapshot.modified
@@ -634,15 +657,14 @@ open class MutableSnapshot internal constructor(
                     emptyList<(Set<Any>, Snapshot) -> Unit>() to null
             } else {
                 val previousGlobalSnapshot = currentGlobalSnapshot.get()
-                val result = innerApply(
+                val result = innerApplyLocked(
                     nextSnapshotId,
                     optimisticMerges,
                     openSnapshots.clear(previousGlobalSnapshot.id)
                 )
                 if (result != SnapshotApplyResult.Success) return result
 
-                // Close this snapshot
-                close()
+                closeLocked()
 
                 // Take a new global snapshot that includes this one.
                 takeNewGlobalSnapshot(previousGlobalSnapshot, emptyLambda)
@@ -670,6 +692,13 @@ open class MutableSnapshot internal constructor(
             }
         }
 
+        // Wait to release pinned snapshots until after running observers.
+        // This permits observers to safely take a nested snapshot of the one that was just applied
+        // before unpinning records that need to be retained in this case.
+        sync {
+            releasePinnedSnapshotsForCloseLocked()
+        }
+
         return SnapshotApplyResult.Success
     }
 
@@ -686,7 +715,7 @@ open class MutableSnapshot internal constructor(
 
     override fun takeNestedSnapshot(readObserver: ((Any) -> Unit)?): Snapshot {
         validateNotDisposed()
-        validateNotApplied()
+        validateNotAppliedOrPinned()
         val previousId = id
         return advance {
             sync {
@@ -718,23 +747,31 @@ open class MutableSnapshot internal constructor(
         advance()
     }
 
-    override fun close() {
-        sync {
-            // Remove itself and previous ids from the open set.
-            openSnapshots = openSnapshots.clear(id).andNot(previousIds)
-            releasePinnedSnapshot()
-            releasePreviouslyPinnedSnapshots()
-        }
+    override fun closeLocked() {
+        // Remove itself and previous ids from the open set.
+        openSnapshots = openSnapshots.clear(id).andNot(previousIds)
+    }
+
+    override fun releasePinnedSnapshotsForCloseLocked() {
+        releasePreviouslyPinnedSnapshotsLocked()
+        super.releasePinnedSnapshotsForCloseLocked()
     }
 
     internal fun validateNotApplied() {
-        require(!applied) {
+        check(!applied) {
             "Unsupported operation on a snapshot that has been applied"
         }
     }
 
+    internal fun validateNotAppliedOrPinned() {
+        check(!applied || isPinned) {
+            "Unsupported operation on a disposed or applied snapshot"
+        }
+    }
+
     /**
-     * Abandon the snapshot.
+     * Abandon the snapshot. This does NOT [closeAndReleasePinning], which must be done
+     * as an additional step by callers.
      */
     private fun abandon() {
         val modified = modified
@@ -757,10 +794,10 @@ open class MutableSnapshot internal constructor(
         }
 
         // The snapshot can now be closed.
-        close()
+        closeAndReleasePinning()
     }
 
-    internal fun innerApply(
+    internal fun innerApplyLocked(
         snapshotId: Int,
         optimisticMerges: Map<StateRecord, StateRecord>?,
         invalidSnapshots: SnapshotIdSet
@@ -851,12 +888,18 @@ open class MutableSnapshot internal constructor(
     internal inline fun <T> advance(block: () -> T): T {
         recordPrevious(id)
         return block().also {
-            val previousId = id
-            sync {
-                id = nextSnapshotId++
-                openSnapshots = openSnapshots.set(id)
+            // Only advance this snapshot if it's possible for it to be applied later,
+            // otherwise we don't need to bother.
+            // This simplifies tracking of open snapshots when an apply observer takes
+            // a nested snapshot of the snapshot that was just applied.
+            if (!applied && !disposed) {
+                val previousId = id
+                sync {
+                    id = nextSnapshotId++
+                    openSnapshots = openSnapshots.set(id)
+                }
+                invalid = invalid.addRange(previousId + 1, id)
             }
-            invalid = invalid.addRange(previousId + 1, id)
         }
     }
 
@@ -881,9 +924,9 @@ open class MutableSnapshot internal constructor(
         else previousPinnedSnapshots = pinned + handles
     }
 
-    internal fun releasePreviouslyPinnedSnapshots() {
+    internal fun releasePreviouslyPinnedSnapshotsLocked() {
         for (index in previousPinnedSnapshots.indices) {
-            releasePinning(previousPinnedSnapshots[index])
+            releasePinningLocked(previousPinnedSnapshots[index])
         }
     }
 
@@ -1117,7 +1160,7 @@ internal class ReadonlySnapshot internal constructor(
     override fun nestedDeactivated(snapshot: Snapshot) {
         if (--snapshots == 0) {
             // A read-only snapshot can be just be closed as it has no modifications.
-            close()
+            closeAndReleasePinning()
         }
     }
 
@@ -1155,7 +1198,7 @@ internal class NestedReadonlySnapshot(
     override fun dispose() {
         if (!disposed) {
             if (id != parent.id) {
-                close()
+                closeAndReleasePinning()
             }
             parent.nestedDeactivated(this)
             super.dispose()
@@ -1232,7 +1275,9 @@ internal class GlobalSnapshot(id: Int, invalid: SnapshotIdSet) :
         error("Cannot apply the global snapshot directly. Call Snapshot.advanceGlobalSnapshot")
 
     override fun dispose() {
-        releasePinnedSnapshot()
+        sync {
+            releasePinnedSnapshotLocked()
+        }
     }
 }
 
@@ -1277,9 +1322,9 @@ internal class NestedMutableSnapshot(
         sync {
             validateOpen(this)
             if (modified == null || modified.size == 0) {
-                close()
+                closeAndReleasePinning()
             } else {
-                val result = innerApply(parent.id, optimisticMerges, parent.invalid)
+                val result = innerApplyLocked(parent.id, optimisticMerges, parent.invalid)
                 if (result != SnapshotApplyResult.Success) return result
 
                 // Add all modified objects in this set to the parent

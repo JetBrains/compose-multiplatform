@@ -38,6 +38,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlin.test.fail
 
 class SnapshotTests {
     @Test
@@ -802,6 +803,84 @@ class SnapshotTests {
         } finally {
             snapshot1.dispose()
             snapshot2.dispose()
+        }
+    }
+
+    @Test
+    fun canTakeNestedSnapshotsFromApplyObserver() {
+        var takenSnapshot: Snapshot? = null
+        val observer = Snapshot.registerApplyObserver { _, snapshot ->
+            if (takenSnapshot != null) error("already took a nested snapshot")
+            takenSnapshot = snapshot.takeNestedSnapshot()
+        }
+
+        try {
+            var state by mutableStateOf("initial")
+            Snapshot.withMutableSnapshot {
+                state = "before observer snapshot"
+            }
+
+            state = "after observer snapshot"
+
+            val observerSnapshot = takenSnapshot ?: fail("snapshot was not taken by observer")
+
+            observerSnapshot.enter {
+                assertEquals("before observer snapshot", state)
+            }
+        } finally {
+            observer.dispose()
+            takenSnapshot?.dispose()
+        }
+    }
+
+    @Test
+    fun canTakeNestedMutableSnapshotsFromApplyObserver() {
+        var takenSnapshot: MutableSnapshot? = null
+        val observer = Snapshot.registerApplyObserver { _, snapshot ->
+            if (takenSnapshot != null) error("already took a nested snapshot")
+            takenSnapshot = (snapshot as? MutableSnapshot)
+                ?.takeNestedMutableSnapshot()
+                ?: error("Applied snapshot was not mutable")
+        }
+
+        try {
+            var state by mutableStateOf("initial")
+            Snapshot.withMutableSnapshot {
+                state = "before observer snapshot"
+            }
+
+            state = "after observer snapshot"
+
+            val observerSnapshot = takenSnapshot ?: fail("snapshot was not taken by observer")
+
+            observerSnapshot.enter {
+                assertEquals("before observer snapshot", state)
+                state = "change made by observer snapshot"
+            }
+
+            assertFalse(observerSnapshot.apply().succeeded,
+                "applying observer snapshot with conflicting change")
+        } finally {
+            observer.dispose()
+            takenSnapshot?.dispose()
+        }
+    }
+
+    @Test
+    fun cannotTakeSnapshotOfClosedSnapshotAfterApplyReturns() {
+        val snapshot = takeMutableSnapshot()
+        @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
+        var state by mutableStateOf("initial")
+
+        try {
+            snapshot.enter { state = "mutated" }
+            snapshot.apply().check()
+            snapshot.takeNestedSnapshot().dispose()
+            fail("taking a nested snapshot of an applied snapshot did not throw")
+        } catch (ise: IllegalStateException) {
+            // expected
+        } finally {
+            snapshot.dispose()
         }
     }
 
