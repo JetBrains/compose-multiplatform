@@ -1,9 +1,18 @@
 import org.gradle.api.*
 import org.jetbrains.compose.internal.publishing.*
+import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
+import org.jetbrains.kotlin.gradle.plugin.KotlinTargetComponent
 
+
+repositories {
+    google()
+    mavenCentral()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+}
 
 plugins {
     signing
+    kotlin("multiplatform") apply false version "1.6.10"
 }
 
 fun Task.dependsOnComposeTask(name: String) {
@@ -244,7 +253,6 @@ private val KotlinTarget.kotlinComponents: Iterable<KotlinTargetComponent>
     get() = javaClass.kotlin.memberProperties
         .single { it.name == "kotlinComponents" }
             .get(this) as Iterable<KotlinTargetComponent>
-
 
 fun OELPublishingPrototype(project: Project) {
     val ext = project.multiplatformExtension ?: error("expected a multiplatform project")

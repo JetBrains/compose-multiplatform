@@ -1,6 +1,7 @@
 pluginManagement {
     buildscript {
         repositories {
+            gradlePluginPortal()
             mavenCentral()
             maven("https://maven.pkg.jetbrains.space/public/p/compose/internal")
             maven("https://maven.pkg.jetbrains.space/public/p/space/maven")
