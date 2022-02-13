@@ -125,7 +125,9 @@ internal class AndroidParagraph constructor(
             lineSpacingMultiplier = DEFAULT_LINESPACING_MULTIPLIER,
             maxLines = maxLines,
             justificationMode = justificationMode,
-            layoutIntrinsics = paragraphIntrinsics.layoutIntrinsics
+            layoutIntrinsics = paragraphIntrinsics.layoutIntrinsics,
+            includePadding = false,
+            fallbackLineSpacing = true
         )
     }
 

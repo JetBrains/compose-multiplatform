@@ -507,6 +507,9 @@ package androidx.compose.ui.text.android {
   public final class LayoutIntrinsicsKt {
   }
 
+  public final class PaintExtensionsKt {
+  }
+
   public final class SpannedExtensionsKt {
   }
 

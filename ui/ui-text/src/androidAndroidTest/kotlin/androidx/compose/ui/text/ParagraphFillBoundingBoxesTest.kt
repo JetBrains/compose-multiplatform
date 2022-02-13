@@ -167,10 +167,43 @@ class ParagraphFillBoundingBoxesTest {
         val text = "a"
         val paragraph = Paragraph(text, style = TextStyle(lineHeight = lineHeight))
 
-        // character bound is still based on character but not the line
+        // first line line height is ignored, therefore the result is the same as without line
+        // height
         assertThat(
             paragraph.getBoundingBoxes(TextRange(0, text.length))
         ).isEqualToWithTolerance(ltrCharacterBoundariesForTestFont(text))
+    }
+
+    @Test
+    fun multiLineCharacterLineHeight() {
+        val lineHeight = fontSize * 2
+        val text = "a\na\na"
+        val paragraph = Paragraph(text, style = TextStyle(lineHeight = lineHeight))
+
+        // first line no line height
+        val firstLineEnd = text.indexOf("\n") + 1
+        assertThat(
+            paragraph.getBoundingBoxes(TextRange(0, firstLineEnd))
+        ).isEqualToWithTolerance(
+            ltrCharacterBoundariesForTestFont(
+                text = text.substring(IntRange(0, firstLineEnd - 1)),
+                fontSizeInPx = fontSizeInPx,
+                lineHeightInPx = fontSizeInPx
+            )
+        )
+
+        // second and third lines have line height applied
+        val lineHeightInPx = with(defaultDensity) { lineHeight.toPx() }
+        val expectedBounds = ltrCharacterBoundariesForTestFont(
+            text = text.substring(startIndex = firstLineEnd),
+            fontSizeInPx = fontSizeInPx,
+            lineHeightInPx = lineHeightInPx,
+            initialTop = fontSizeInPx
+        )
+
+        assertThat(
+            paragraph.getBoundingBoxes(TextRange(firstLineEnd, text.length))
+        ).isEqualToWithTolerance(expectedBounds)
     }
 
     @Test
@@ -539,11 +572,17 @@ class ParagraphFillBoundingBoxesTest {
         return array.asRectArray()
     }
 
-    private fun ltrCharacterBoundariesForTestFont(text: String): Array<Rect> =
-        ltrCharacterBoundariesForTestFont(text, fontSizeInPx)
+    private fun ltrCharacterBoundariesForTestFont(
+        text: String,
+        fontSizeInPx: Float = this.fontSizeInPx,
+        // assumes that the test font is used and fontSize is equal to default line height
+        lineHeightInPx: Float = fontSizeInPx,
+        initialTop: Float = 0f
+    ): Array<Rect> =
+        getLtrCharacterBoundariesForTestFont(text, fontSizeInPx, lineHeightInPx, initialTop)
 
     private fun rtlCharacterBoundariesForTestFont(text: String, width: Float): Array<Rect> =
-        rtlCharacterBoundariesForTestFont(text, width, fontSizeInPx)
+        getRtlCharacterBoundariesForTestFont(text, width, fontSizeInPx)
 
     private fun Paragraph(
         text: String,
