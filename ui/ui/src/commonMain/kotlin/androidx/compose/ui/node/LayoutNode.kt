@@ -43,7 +43,6 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.ModifierInfo
 import androidx.compose.ui.layout.OnGloballyPositionedModifier
-import androidx.compose.ui.layout.OnPlacedModifier
 import androidx.compose.ui.layout.OnRemeasuredModifier
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.Remeasurement
@@ -732,11 +731,6 @@ internal class LayoutNode(
                 }
                 if (mod is OnRemeasuredModifier) {
                     wrapper = RemeasureModifierWrapper(wrapper, mod)
-                        .initialize()
-                        .assignChained(toWrap)
-                }
-                if (mod is OnPlacedModifier) {
-                    wrapper = OnPlacedModifierWrapper(wrapper, mod)
                         .initialize()
                         .assignChained(toWrap)
                 }
