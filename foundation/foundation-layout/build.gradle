@@ -46,6 +46,7 @@ dependencies {
         testImplementation(libs.testRules)
         testImplementation(libs.testRunner)
         testImplementation(libs.junit)
+        testImplementation(libs.truth)
 
         androidTestImplementation(project(":compose:foundation:foundation"))
         androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.0")
@@ -103,6 +104,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.testRules)
                 implementation(libs.testRunner)
                 implementation(libs.junit)
+                implementation(libs.truth)
             }
 
             androidAndroidTest.dependencies {

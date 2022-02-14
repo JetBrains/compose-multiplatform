@@ -66,6 +66,97 @@ interface WindowInsets {
 }
 
 /**
+ * [WindowInsetsSides] is used in [WindowInsets.only] to define which sides of the
+ * [WindowInsets] should apply.
+ */
+@kotlin.jvm.JvmInline
+value class WindowInsetsSides private constructor(private val value: Int) {
+    /**
+     * Returns a [WindowInsetsSides] containing sides defied in [sides] and the
+     * sides in `this`.
+     */
+    operator fun plus(sides: WindowInsetsSides): WindowInsetsSides =
+        WindowInsetsSides(value or sides.value)
+
+    internal fun hasAny(sides: WindowInsetsSides): Boolean =
+        (value and sides.value) != 0
+
+    companion object {
+        //    _---- allowLeft  in ltr
+        //    /
+        //    | _--- allowRight in ltr
+        //    |/
+        //    || _-- allowLeft  in rtl
+        //    ||/
+        //    ||| _- allowRight in rtl
+        //    |||/
+        //    VVVV
+        //    Mask   = ----
+        //
+        //    Left   = 1010
+        //    Right  = 0101
+        //    Start  = 1001
+        //    End    = 0110
+
+        internal val AllowLeftInLtr = WindowInsetsSides(1 shl 3)
+        internal val AllowRightInLtr = WindowInsetsSides(1 shl 2)
+        internal val AllowLeftInRtl = WindowInsetsSides(1 shl 1)
+        internal val AllowRightInRtl = WindowInsetsSides(1 shl 0)
+
+        /**
+         * Indicates a [WindowInsets] start side, which is left or right
+         * depending on [LayoutDirection]. If [LayoutDirection.Ltr], [Start]
+         * is the left side. If [LayoutDirection.Rtl], [Start] is the right side.
+         *
+         * Use [Left] or [Right] if the physical direction is required.
+         */
+        val Start = AllowLeftInLtr + AllowRightInRtl
+
+        /**
+         * Indicates a [WindowInsets] end side, which is left or right
+         * depending on [LayoutDirection]. If [LayoutDirection.Ltr], [End]
+         * is the right side. If [LayoutDirection.Rtl], [End] is the left side.
+         *
+         * Use [Left] or [Right] if the physical direction is required.
+         */
+        val End = AllowRightInLtr + AllowLeftInRtl
+
+        /**
+         * Indicates a [WindowInsets] top side.
+         */
+        val Top = WindowInsetsSides(1 shl 4)
+
+        /**
+         * Indicates a [WindowInsets] bottom side.
+         */
+        val Bottom = WindowInsetsSides(1 shl 5)
+
+        /**
+         * Indicates a [WindowInsets] left side. Most layouts will prefer using
+         * [Start] or [End] to account for [LayoutDirection].
+         */
+        val Left = AllowLeftInLtr + AllowLeftInRtl
+
+        /**
+         * Indicates a [WindowInsets] right side. Most layouts will prefer using
+         * [Start] or [End] to account for [LayoutDirection].
+         */
+        val Right = AllowRightInLtr + AllowRightInRtl
+
+        /**
+         * Indicates a [WindowInsets] horizontal sides. This is a combination of
+         * [Left] and [Right] sides, or [Start] and [End] sides.
+         */
+        val Horizontal = Left + Right
+
+        /**
+         * Indicates a [WindowInsets] [Top] and [Bottom] sides.
+         */
+        val Vertical = Top + Bottom
+    }
+}
+
+/**
  * Returns an [WindowInsets] that has the maximum values of this [WindowInsets] and [insets].
  */
 fun WindowInsets.union(insets: WindowInsets): WindowInsets = UnionInsets(this, insets)
@@ -83,11 +174,18 @@ fun WindowInsets.union(insets: WindowInsets): WindowInsets = UnionInsets(this, i
 fun WindowInsets.exclude(insets: WindowInsets): WindowInsets = ExcludeInsets(this, insets)
 
 /**
- * Returns the an [WindowInsets] that has values of this, added to the values of [insets].
+ * Returns a [WindowInsets] that has values of this, added to the values of [insets].
  * For example, if this has a top of 10 and insets has a top of 5, the returned [WindowInsets]
  * will have a top of 15.
  */
 fun WindowInsets.add(insets: WindowInsets): WindowInsets = AddedInsets(this, insets)
+
+/**
+ * Returns a [WindowInsets] that eliminates all dimensions except the ones that are enabled.
+ * For example, to have a [WindowInsets] at the bottom of the screen, pass
+ * [WindowInsetsSides.Bottom].
+ */
+fun WindowInsets.only(sides: WindowInsetsSides): WindowInsets = LimitInsets(this, sides)
 
 /**
  * Convert an [WindowInsets] to a [PaddingValues] and uses [LocalDensity] for DP to pixel conversion.
@@ -412,6 +510,63 @@ private class PaddingValuesInsets(private val paddingValues: PaddingValues) : Wi
     }
 
     override fun hashCode(): Int = paddingValues.hashCode()
+}
+
+@Stable
+private class LimitInsets(
+    val insets: WindowInsets,
+    val sides: WindowInsetsSides
+) : WindowInsets {
+    override fun getLeft(density: Density, layoutDirection: LayoutDirection): Int {
+        val layoutDirectionSide = if (layoutDirection == LayoutDirection.Ltr) {
+            WindowInsetsSides.AllowLeftInLtr
+        } else {
+            WindowInsetsSides.AllowLeftInRtl
+        }
+        val allowLeft = sides.hasAny(layoutDirectionSide)
+        return if (allowLeft) {
+            insets.getLeft(density, layoutDirection)
+        } else {
+            0
+        }
+    }
+
+    override fun getTop(density: Density): Int =
+        if (sides.hasAny(WindowInsetsSides.Top)) insets.getTop(density) else 0
+
+    override fun getRight(density: Density, layoutDirection: LayoutDirection): Int {
+        val layoutDirectionSide = if (layoutDirection == LayoutDirection.Ltr) {
+            WindowInsetsSides.AllowRightInLtr
+        } else {
+            WindowInsetsSides.AllowRightInRtl
+        }
+        val allowRight = sides.hasAny(layoutDirectionSide)
+        return if (allowRight) {
+            insets.getRight(density, layoutDirection)
+        } else {
+            0
+        }
+    }
+
+    override fun getBottom(density: Density): Int =
+        if (sides.hasAny(WindowInsetsSides.Bottom)) insets.getBottom(density) else 0
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) {
+            return true
+        }
+        if (other !is LimitInsets) {
+            return false
+        }
+        return insets == other.insets &&
+            sides == other.sides
+    }
+
+    override fun hashCode(): Int {
+        var result = insets.hashCode()
+        result = 31 * result + sides.hashCode()
+        return result
+    }
 }
 
 @Stable
