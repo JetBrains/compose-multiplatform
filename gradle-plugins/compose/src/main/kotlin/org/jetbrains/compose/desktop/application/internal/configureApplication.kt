@@ -94,6 +94,20 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
             into(destDir)
         }
 
+        val preparePackagingResources = tasks.composeTask<Sync>(
+            taskName("preparePackagingResources", app)
+        ) {
+            val packagingResourcesRootDir = app.nativeDistributions.packagingResourcesRootDir
+            if (packagingResourcesRootDir.isPresent) {
+                from(packagingResourcesRootDir.dir("common"))
+                from(packagingResourcesRootDir.dir(currentOS.id))
+                from(packagingResourcesRootDir.dir(currentTarget.id))
+            }
+
+            val destDir = project.layout.buildDirectory.dir("compose/tmp/resources")
+            into(destDir)
+        }
+
         val createRuntimeImage = tasks.composeTask<AbstractJLinkTask>(
             taskName("createRuntimeImage", app)
         ) {
@@ -113,6 +127,7 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
                 app,
                 createRuntimeImage = createRuntimeImage,
                 prepareAppResources = prepareAppResources,
+                preparePackagingResources = preparePackagingResources,
                 checkRuntime = checkRuntime
             )
         }
@@ -133,6 +148,7 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
                         app,
                         createRuntimeImage = createRuntimeImage,
                         prepareAppResources = prepareAppResources,
+                        preparePackagingResources = preparePackagingResources,
                         checkRuntime = checkRuntime
                     )
                 } else {
@@ -191,6 +207,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(
     createAppImage: TaskProvider<AbstractJPackageTask>? = null,
     createRuntimeImage: TaskProvider<AbstractJLinkTask>? = null,
     prepareAppResources: TaskProvider<Sync>? = null,
+    preparePackagingResources: TaskProvider<Sync>? = null,
     checkRuntime: TaskProvider<AbstractCheckNativeDistributionRuntime>? = null
 ) {
     enabled = targetFormat.isCompatibleWithCurrentOS
@@ -209,6 +226,12 @@ internal fun AbstractJPackageTask.configurePackagingTask(
         dependsOn(prepareResources)
         val resourcesDir = project.layout.dir(prepareResources.map { it.destinationDir })
         appResourcesDir.set(resourcesDir)
+    }
+
+    preparePackagingResources?.let { prepareResources ->
+        dependsOn(prepareResources)
+        val resourcesDir = project.layout.dir(prepareResources.map { it.destinationDir })
+        jpackageResources.set(resourcesDir)
     }
 
     checkRuntime?.let { checkRuntime ->

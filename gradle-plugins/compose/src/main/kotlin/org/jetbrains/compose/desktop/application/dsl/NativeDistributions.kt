@@ -27,6 +27,7 @@ open class NativeDistributions @Inject constructor(
     var vendor: String? = null
     var packageVersion: String? = null
     val appResourcesRootDir: DirectoryProperty = objects.directoryProperty()
+    val packagingResourcesRootDir: DirectoryProperty = objects.directoryProperty()
     val licenseFile: RegularFileProperty = objects.fileProperty()
 
     val outputBaseDir: DirectoryProperty = objects.directoryProperty().apply {
