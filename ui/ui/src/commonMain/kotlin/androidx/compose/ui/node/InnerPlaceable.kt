@@ -34,6 +34,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapper
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.modifier.ModifierLocal
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
@@ -140,6 +141,10 @@ internal class InnerPlaceable(
         if (owner.showLayoutBounds) {
             drawBorder(canvas, innerBoundsPaint)
         }
+    }
+
+    override fun invalidateConsumersOf(local: ModifierLocal<*>) {
+        layoutNode._children.forEach { it.outerLayoutNodeWrapper.invalidateConsumersOf(local) }
     }
 
     override fun <T : LayoutNodeEntity<T, M>, C, M : Modifier> hitTestChild(

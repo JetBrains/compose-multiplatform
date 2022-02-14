@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.modifier.ModifierLocal
 import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalReadScope
@@ -23,7 +24,9 @@ import androidx.compose.ui.modifier.ModifierLocalReadScope
 internal class ModifierLocalConsumerNode(
     wrapped: LayoutNodeWrapper,
     modifier: ModifierLocalConsumer
-) : DelegatingLayoutNodeWrapper<ModifierLocalConsumer>(wrapped, modifier), ModifierLocalReadScope {
+) : DelegatingLayoutNodeWrapper<ModifierLocalConsumer>(wrapped, modifier), () -> Unit,
+    ModifierLocalReadScope {
+    private val modifierLocalsRead = mutableVectorOf<ModifierLocal<*>>()
 
     override fun onModifierChanged() {
         super.onModifierChanged()
@@ -36,16 +39,44 @@ internal class ModifierLocalConsumerNode(
     }
 
     override val <T> ModifierLocal<T>.current: T
-        get() = onModifierLocalRead(this)
+        get() {
+            // Track that we read this ModifierLocal so that it can be invalidated later
+            modifierLocalsRead += this
+            val provider = wrappedBy?.findModifierLocalProvider(this)
+            return if (provider == null) {
+                defaultFactory()
+            } else {
+                // We need a cast because type information is erased.
+                // When we check for equality of the key it implies that the types are equal too.
+                @Suppress("UNCHECKED_CAST")
+                provider.modifier.value as T
+            }
+        }
 
-    private fun notifyConsumerOfChanges() {
+    override fun invalidateConsumersOf(local: ModifierLocal<*>) {
+        if (local in modifierLocalsRead) {
+            // Trigger the value to be read again
+            layoutNode.owner?.registerOnEndApplyChangesListener(this)
+        }
+        super.invalidateConsumersOf(local)
+    }
+
+    fun notifyConsumerOfChanges() {
         // If the node is not attached, we don't notify the consumers.
         // Ultimately when the node is attached, this function will be called again.
         if (!isAttached) return
 
+        modifierLocalsRead.clear()
         layoutNode.requireOwner().snapshotObserver.observeReads(this, onReadValuesChanged) {
             modifier.onModifierLocalsUpdated(this)
         }
+    }
+
+    /**
+     * The listener for [UiApplier.onEndChanges].
+     */
+    override fun invoke() {
+        notifyConsumerOfChanges()
     }
 
     companion object {

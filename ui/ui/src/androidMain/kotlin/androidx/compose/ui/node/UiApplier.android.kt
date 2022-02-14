@@ -17,7 +17,6 @@
 package androidx.compose.ui.node
 
 import androidx.compose.runtime.AbstractApplier
-import androidx.compose.ui.platform.AndroidComposeView
 
 internal class UiApplier(
     root: LayoutNode
@@ -46,6 +45,6 @@ internal class UiApplier(
 
     override fun onEndChanges() {
         super.onEndChanges()
-        (root.owner as? AndroidComposeView)?.clearInvalidObservations()
+        root.owner?.onEndApplyChanges()
     }
 }

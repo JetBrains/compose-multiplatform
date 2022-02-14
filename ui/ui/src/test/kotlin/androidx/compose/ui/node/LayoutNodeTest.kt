@@ -2329,6 +2329,13 @@ private class MockOwner(
     override fun forceMeasureTheSubtree(layoutNode: LayoutNode) {
     }
 
+    override fun registerOnEndApplyChangesListener(listener: () -> Unit) {
+        listener()
+    }
+
+    override fun onEndApplyChanges() {
+    }
+
     override fun createLayer(
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit
