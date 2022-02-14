@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.lazy.grid
 
+import android.os.Build
 import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.scrollBy
@@ -42,8 +43,13 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
@@ -58,12 +64,15 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsAtLeast
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
@@ -924,5 +933,35 @@ class LazyGridTest {
         rule.runOnIdle {
             Truth.assertThat(recomposeCount).isEqualTo(1)
         }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun zIndexOnItemAffectsDrawingOrder() {
+        rule.setContentWithTestViewConfiguration {
+            LazyVerticalGrid(
+                GridCells.Fixed(1),
+                Modifier.size(6.dp).testTag(LazyGridTag)
+            ) {
+                items(listOf(Color.Blue, Color.Green, Color.Red)) { color ->
+                    Box(
+                        Modifier
+                            .height(2.dp)
+                            .width(6.dp)
+                            .zIndex(if (color == Color.Green) 1f else 0f)
+                            .drawBehind {
+                                drawRect(
+                                    color,
+                                    topLeft = Offset(-10.dp.toPx(), -10.dp.toPx()),
+                                    size = Size(20.dp.toPx(), 20.dp.toPx())
+                                )
+                            })
+                }
+            }
+        }
+
+        rule.onNodeWithTag(LazyGridTag)
+            .captureToImage()
+            .assertPixels { Color.Green }
     }
 }
