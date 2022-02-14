@@ -9,13 +9,11 @@ import kotlinx.dom.clear
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.*
-import org.w3c.dom.HTMLButtonElement
-import org.w3c.dom.HTMLDivElement
-import org.w3c.dom.HTMLElement
+import org.jetbrains.compose.web.dom.Text
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import org.jetbrains.compose.web.testutils.*
-import org.w3c.dom.HTMLInputElement
+import org.w3c.dom.*
 import kotlin.test.assertContains
 import kotlin.test.assertTrue
 
@@ -556,9 +554,14 @@ class AttributesTests {
         composition {
             Canvas({
                 height(400.px)
-                width(400.px)
+                width(450.px)
             })
         }
-        assertEquals("""<canvas height="400px" width="400px"></canvas>""",root.innerHTML)
+        with(nextChild() as HTMLCanvasElement) {
+            val attrsMap = getAttributeNames().associateWith { getAttribute(it) }
+            assertEquals(2, attrsMap.size)
+            assertEquals("450px", attrsMap["width"])
+            assertEquals("400px", attrsMap["height"])
+        }
     }
 }
