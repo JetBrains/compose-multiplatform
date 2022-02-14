@@ -550,4 +550,15 @@ class AttributesTests {
         check(InputMode.Search, "search")
         check(InputMode.Url, "url")
     }
+
+    @Test
+    fun canvasAttributeTest() = runTest {
+        composition {
+            Canvas({
+                height(400.px)
+                width(400.px)
+            })
+        }
+        assertEquals("""<canvas height="400px" width="400px"></canvas>""",root.innerHTML)
+    }
 }

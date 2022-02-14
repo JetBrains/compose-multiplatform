@@ -17,6 +17,7 @@ import org.w3c.dom.HTMLAreaElement
 import org.w3c.dom.HTMLAudioElement
 import org.w3c.dom.HTMLBRElement
 import org.w3c.dom.HTMLButtonElement
+import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLDataListElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
@@ -93,6 +94,7 @@ private val Object: ElementBuilder<HTMLObjectElement> = ElementBuilderImplementa
 private val Param: ElementBuilder<HTMLParamElement> = ElementBuilderImplementation("param")
 private val Picture: ElementBuilder<HTMLPictureElement> = ElementBuilderImplementation("picture")
 private val Source: ElementBuilder<HTMLSourceElement> = ElementBuilderImplementation("source")
+private val Canvas: ElementBuilder<HTMLCanvasElement> = ElementBuilderImplementation("canvas")
 
 private val Div: ElementBuilder<HTMLDivElement> = ElementBuilderImplementation("div")
 private val A: ElementBuilder<HTMLAnchorElement> = ElementBuilderImplementation("a")
@@ -409,6 +411,18 @@ fun Source(
 ) {
     TagElement(
         elementBuilder = Source,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun Canvas(
+    attrs: AttrBuilderContext<HTMLCanvasElement>? = null,
+    content: ContentBuilder<HTMLCanvasElement>? = null
+) {
+    TagElement(
+        elementBuilder = Canvas,
         applyAttrs = attrs,
         content = content
     )
