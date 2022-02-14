@@ -41,7 +41,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalMaterial3Api::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-class NavigationDrawerScreenshotTest {
+class ModalNavigationDrawerScreenshotTest {
 
     @Suppress("DEPRECATION")
     @get:Rule
@@ -53,7 +53,7 @@ class NavigationDrawerScreenshotTest {
     private fun ComposeContentTestRule.setnavigationDrawer(drawerValue: DrawerValue) {
         setMaterialContent(lightColorScheme()) {
             Box(Modifier.requiredSize(400.dp, 32.dp).testTag(ContainerTestTag)) {
-                NavigationDrawer(
+                ModalNavigationDrawer(
                     drawerState = rememberDrawerState(drawerValue),
                     drawerContent = {},
                     content = {
@@ -70,7 +70,7 @@ class NavigationDrawerScreenshotTest {
         setMaterialContent(darkColorScheme()) {
             Surface {
                 Box(Modifier.requiredSize(400.dp, 32.dp).testTag(ContainerTestTag)) {
-                    NavigationDrawer(
+                    ModalNavigationDrawer(
                         drawerState = rememberDrawerState(drawerValue),
                         drawerContent = {},
                         content = {

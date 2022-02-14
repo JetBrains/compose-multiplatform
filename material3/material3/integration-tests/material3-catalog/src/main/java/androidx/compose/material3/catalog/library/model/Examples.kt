@@ -31,6 +31,7 @@ import androidx.compose.material3.samples.ClickableCardSample
 import androidx.compose.material3.samples.ClickableElevatedCardSample
 import androidx.compose.material3.samples.ClickableOutlinedCardSample
 import androidx.compose.material3.samples.ColorSchemeSample
+import androidx.compose.material3.samples.DismissibleNavigationDrawerSample
 import androidx.compose.material3.samples.ElevatedButtonSample
 import androidx.compose.material3.samples.ElevatedCardSample
 import androidx.compose.material3.samples.EnterAlwaysSmallTopAppBar
@@ -49,12 +50,13 @@ import androidx.compose.material3.samples.LeadingIconTabs
 import androidx.compose.material3.samples.MenuSample
 import androidx.compose.material3.samples.NavigationBarSample
 import androidx.compose.material3.samples.NavigationBarWithOnlySelectedLabelsSample
-import androidx.compose.material3.samples.NavigationDrawerSample
+import androidx.compose.material3.samples.ModalNavigationDrawerSample
 import androidx.compose.material3.samples.NavigationRailBottomAlignSample
 import androidx.compose.material3.samples.NavigationRailSample
 import androidx.compose.material3.samples.NavigationRailWithOnlySelectedLabelsSample
 import androidx.compose.material3.samples.OutlinedButtonSample
 import androidx.compose.material3.samples.OutlinedCardSample
+import androidx.compose.material3.samples.PermanentNavigationDrawerSample
 import androidx.compose.material3.samples.PinnedSmallTopAppBar
 import androidx.compose.material3.samples.RadioButtonSample
 import androidx.compose.material3.samples.RadioGroupSample
@@ -349,11 +351,25 @@ private const val NavigationDrawerExampleDescription = "Navigation drawer exampl
 private const val NavigationDrawerExampleSourceUrl = "$SampleSourceUrl/DrawerSamples.kt"
 val NavigationDrawerExamples = listOf(
     Example(
-        name = ::NavigationDrawerSample.name,
+        name = ::ModalNavigationDrawerSample.name,
         description = NavigationDrawerExampleDescription,
         sourceUrl = NavigationDrawerExampleSourceUrl
     ) {
-        NavigationDrawerSample()
+        ModalNavigationDrawerSample()
+    },
+    Example(
+        name = ::PermanentNavigationDrawerSample.name,
+        description = NavigationDrawerExampleDescription,
+        sourceUrl = NavigationDrawerExampleSourceUrl
+    ) {
+        PermanentNavigationDrawerSample()
+    },
+    Example(
+        name = ::DismissibleNavigationDrawerSample.name,
+        description = NavigationDrawerExampleDescription,
+        sourceUrl = NavigationDrawerExampleSourceUrl
+    ) {
+        DismissibleNavigationDrawerSample()
     }
 )
 
