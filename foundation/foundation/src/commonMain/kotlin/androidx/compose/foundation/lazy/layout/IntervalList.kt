@@ -20,7 +20,12 @@ internal class IntervalHolder<T>(
     val startIndex: Int,
     val size: Int,
     val content: T
-)
+) {
+    init {
+        require(startIndex >= 0) { "startIndex should be non-negative but was $startIndex" }
+        require(size > 0) { "size should be positive but was $size" }
+    }
+}
 
 internal interface IntervalList<T> {
     val intervals: List<IntervalHolder<T>>
