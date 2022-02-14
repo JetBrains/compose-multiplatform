@@ -16,9 +16,11 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.input.pointer.PointerInputModifier
+import androidx.compose.ui.layout.OnPlacedModifier
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.semantics.SemanticsEntity
 import androidx.compose.ui.semantics.SemanticsModifier
@@ -49,6 +51,10 @@ internal value class EntityList(
         }
         if (modifier is ParentDataModifier) {
             add(SimpleEntity(layoutNodeWrapper, modifier), ParentDataEntityType.index)
+        }
+        @OptIn(ExperimentalComposeUiApi::class)
+        if (modifier is OnPlacedModifier) {
+            add(SimpleEntity(layoutNodeWrapper, modifier), OnPlacedEntityType.index)
         }
     }
 
@@ -128,7 +134,10 @@ internal value class EntityList(
         val SemanticsEntityType = EntityType<SemanticsEntity, SemanticsModifier>(2)
         val ParentDataEntityType =
             EntityType<SimpleEntity<ParentDataModifier>, ParentDataModifier>(3)
+        @OptIn(ExperimentalComposeUiApi::class)
+        val OnPlacedEntityType =
+            EntityType<SimpleEntity<OnPlacedModifier>, OnPlacedModifier>(4)
 
-        private const val TypeCount = 4
+        private const val TypeCount = 5
     }
 }
