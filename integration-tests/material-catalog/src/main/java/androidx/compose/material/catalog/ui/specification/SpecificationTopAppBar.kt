@@ -16,6 +16,11 @@
 
 package androidx.compose.material.catalog.ui.specification
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -25,8 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
-import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.insets.statusBarsPadding
 
 @Composable
 fun SpecificationTopAppBar(
@@ -54,9 +57,9 @@ fun SpecificationTopAppBar(
             },
             scrollBehavior = scrollBehavior,
             colors = foregroundColors,
-            modifier = Modifier
-                .statusBarsPadding()
-                .navigationBarsPadding(bottom = false)
+            modifier = Modifier.windowInsetsPadding(
+                WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
+            )
         )
     }
 }
