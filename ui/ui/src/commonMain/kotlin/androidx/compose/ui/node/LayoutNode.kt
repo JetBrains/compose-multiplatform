@@ -665,6 +665,10 @@ internal class LayoutNode(
 
                 toWrap.entities.add(toWrap, mod)
 
+                if (mod is OnGloballyPositionedModifier) {
+                    getOrCreateOnPositionedCallbacks() += toWrap to mod
+                }
+
                 // Re-use the layoutNodeWrapper if possible.
                 reuseLayoutNodeWrapper(mod, toWrap)?.let {
                     return@foldOut it
@@ -733,11 +737,6 @@ internal class LayoutNode(
                 }
                 if (mod is OnPlacedModifier) {
                     wrapper = OnPlacedModifierWrapper(wrapper, mod)
-                        .initialize()
-                        .assignChained(toWrap)
-                }
-                if (mod is OnGloballyPositionedModifier) {
-                    wrapper = OnGloballyPositionedModifierWrapper(wrapper, mod)
                         .initialize()
                         .assignChained(toWrap)
                 }
@@ -810,10 +809,11 @@ internal class LayoutNode(
     /**
      * List of all OnPositioned callbacks in the modifier chain.
      */
-    private var onPositionedCallbacks: MutableVector<OnGloballyPositionedModifierWrapper>? = null
+    private var onPositionedCallbacks:
+        MutableVector<Pair<LayoutNodeWrapper, OnGloballyPositionedModifier>>? = null
 
     internal fun getOrCreateOnPositionedCallbacks() = onPositionedCallbacks
-        ?: mutableVectorOf<OnGloballyPositionedModifierWrapper>().also {
+        ?: mutableVectorOf<Pair<LayoutNodeWrapper, OnGloballyPositionedModifier>>().also {
             onPositionedCallbacks = it
         }
 
@@ -907,7 +907,7 @@ internal class LayoutNode(
         val onPositionedCallbacks = onPositionedCallbacks
         return modifier.foldOut(false) { mod, hasNewCallback ->
             hasNewCallback || mod is OnGloballyPositionedModifier &&
-                (onPositionedCallbacks?.firstOrNull { mod == it.modifier } == null)
+                (onPositionedCallbacks?.firstOrNull { mod == it.second } == null)
         }
     }
 
@@ -1173,7 +1173,7 @@ internal class LayoutNode(
             return // it hasn't been placed, so don't make a call
         }
         onPositionedCallbacks?.forEach {
-            it.modifier.onGloballyPositioned(it)
+            it.second.onGloballyPositioned(it.first)
         }
     }
 
