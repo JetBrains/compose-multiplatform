@@ -79,7 +79,7 @@ class ComposePlugin : Plugin<Project> {
                     // Note that we don't provide a configuration parameter to disable dependency replacement,
                     // because without replacement, gradle will fail anyway because classpath contains two incompatible artifacts.
                     //
-                    // We should define all replacements, even for transient dependencies.
+                    // We should define all replacements, even for transitive dependencies.
                     // For example, a library can depend on androidx.compose.foundation:foundation-layout
                     //
                     // List of all org.jetbrains.compose libraries is here:
