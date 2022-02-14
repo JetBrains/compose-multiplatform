@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.OnGloballyPositionedModifier
 
 /**
@@ -31,17 +30,4 @@ internal class OnGloballyPositionedModifierWrapper(
         super.onInitialize()
         layoutNode.getOrCreateOnPositionedCallbacks() += this
     }
-
-    override val providedAlignmentLines: Set<AlignmentLine>
-        get() {
-            val result = mutableSetOf<AlignmentLine>()
-            layoutNode
-            var wrapper = wrapped as LayoutNodeWrapper?
-            while (wrapper != null) {
-                result += wrapper.providedAlignmentLines
-                if (wrapper == layoutNode.innerLayoutNodeWrapper) break
-                wrapper = wrapper.wrapped
-            }
-            return result
-        }
 }
