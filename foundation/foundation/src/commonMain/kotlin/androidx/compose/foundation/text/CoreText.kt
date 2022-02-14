@@ -360,8 +360,8 @@ internal class TextController(val state: TextState) : RememberObserver {
                     LastBaseline to layoutResult.lastBaseline.roundToInt()
                 )
             ) {
-                placeables.fastForEach { placeable ->
-                    placeable.first.placeRelative(placeable.second)
+                placeables.fastForEach { (placeable, position) ->
+                    placeable.place(position)
                 }
             }
         }
