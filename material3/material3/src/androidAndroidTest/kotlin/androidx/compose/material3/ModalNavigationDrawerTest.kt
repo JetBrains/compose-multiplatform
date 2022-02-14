@@ -60,7 +60,7 @@ import org.junit.runner.RunWith
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalMaterial3Api::class)
-class NavigationDrawerTest {
+class ModalNavigationDrawerTest {
 
     @get:Rule
     val rule = createComposeRule()
@@ -75,7 +75,7 @@ class NavigationDrawerTest {
     fun navigationDrawer_testOffset_whenOpen() {
         rule.setMaterialContent(lightColorScheme()) {
             val drawerState = rememberDrawerState(DrawerValue.Open)
-            NavigationDrawer(
+            ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("content"))
@@ -92,7 +92,7 @@ class NavigationDrawerTest {
     fun navigationDrawer_testOffset_whenClosed() {
         rule.setMaterialContent(lightColorScheme()) {
             val drawerState = rememberDrawerState(DrawerValue.Closed)
-            NavigationDrawer(
+            ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("content"))
@@ -109,7 +109,7 @@ class NavigationDrawerTest {
     fun navigationDrawer_testWidth_whenOpen() {
         rule.setMaterialContent(lightColorScheme()) {
             val drawerState = rememberDrawerState(DrawerValue.Open)
-            NavigationDrawer(
+            ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("content"))
@@ -127,7 +127,7 @@ class NavigationDrawerTest {
     fun navigationDrawer_hasPaneTitle() {
         lateinit var navigationMenu: String
         rule.setMaterialContent(lightColorScheme()) {
-            NavigationDrawer(
+            ModalNavigationDrawer(
                 drawerState = rememberDrawerState(DrawerValue.Open),
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("navigationDrawerTag"))
@@ -148,7 +148,7 @@ class NavigationDrawerTest {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent(lightColorScheme()) {
             drawerState = rememberDrawerState(DrawerValue.Closed)
-            NavigationDrawer(
+            ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
@@ -177,7 +177,7 @@ class NavigationDrawerTest {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent(lightColorScheme()) {
             drawerState = rememberDrawerState(DrawerValue.Closed)
-            NavigationDrawer(
+            ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
@@ -206,7 +206,7 @@ class NavigationDrawerTest {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent(lightColorScheme()) {
             drawerState = rememberDrawerState(DrawerValue.Closed)
-            NavigationDrawer(
+            ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
@@ -235,7 +235,7 @@ class NavigationDrawerTest {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent(lightColorScheme()) {
             drawerState = rememberDrawerState(DrawerValue.Closed)
-            NavigationDrawer(
+            ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
@@ -267,7 +267,7 @@ class NavigationDrawerTest {
         rule.setMaterialContent(lightColorScheme()) {
             drawerState = rememberDrawerState(DrawerValue.Closed)
             // emulate click on the screen
-            NavigationDrawer(
+            ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().clickable { drawerClicks += 1 })
@@ -307,7 +307,7 @@ class NavigationDrawerTest {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent(lightColorScheme()) {
             drawerState = rememberDrawerState(DrawerValue.Closed)
-            NavigationDrawer(
+            ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
@@ -343,7 +343,7 @@ class NavigationDrawerTest {
         rule.setMaterialContent(lightColorScheme()) {
             drawerState = rememberDrawerState(DrawerValue.Closed)
             Box(Modifier.testTag(DrawerTestTag)) {
-                NavigationDrawer(
+                ModalNavigationDrawer(
                     drawerState = drawerState,
                     drawerContent = {
                         Box(Modifier.fillMaxSize().background(color = Color.Magenta))
@@ -382,7 +382,7 @@ class NavigationDrawerTest {
                 }
             )
             Box(Modifier.testTag(DrawerTestTag)) {
-                NavigationDrawer(
+                ModalNavigationDrawer(
                     drawerState = drawerState,
                     drawerContent = {
                         Box(
@@ -424,7 +424,7 @@ class NavigationDrawerTest {
             // emulate click on the screen
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Box(Modifier.testTag(DrawerTestTag)) {
-                    NavigationDrawer(
+                    ModalNavigationDrawer(
                         drawerState = drawerState,
                         drawerContent = {
                             Box(Modifier.fillMaxSize().background(color = Color.Magenta))
@@ -460,7 +460,7 @@ class NavigationDrawerTest {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent(lightColorScheme()) {
             drawerState = rememberDrawerState(DrawerValue.Closed)
-            NavigationDrawer(
+            ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
@@ -496,7 +496,7 @@ class NavigationDrawerTest {
         val topTag = "navigationDrawer"
         lateinit var closeDrawer: String
         rule.setMaterialContent(lightColorScheme()) {
-            NavigationDrawer(
+            ModalNavigationDrawer(
                 modifier = Modifier.testTag(topTag),
                 drawerState = rememberDrawerState(DrawerValue.Open),
                 drawerContent = {
