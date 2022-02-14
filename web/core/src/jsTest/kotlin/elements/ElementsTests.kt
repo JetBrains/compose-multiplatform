@@ -45,6 +45,7 @@ class ElementsTests {
             Pair({ Param() }, "PARAM"),
             Pair({ Picture() }, "PICTURE"),
             Pair({ Source() }, "SOURCE"),
+            Pair({ Canvas() }, "CANVAS"),
 
             Pair({ Div() }, "DIV"),
             Pair({ A() }, "A"),
