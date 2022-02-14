@@ -17,8 +17,13 @@
 package androidx.compose.material3.catalog.library.ui.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.add
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
@@ -31,8 +36,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.rememberInsetsPaddingValues
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
@@ -47,27 +50,29 @@ fun Home(
         theme = theme,
         onThemeChange = onThemeChange
     ) { paddingValues ->
-        BoxWithConstraints(modifier = Modifier.padding(paddingValues)) {
-            LazyVerticalGrid(
-                modifier = Modifier.padding(paddingValues),
-                cells = GridCells.Adaptive(HomeCellMinSize),
-                content = {
-                    items(components) { component ->
-                        ComponentItem(
-                            component = component,
-                            onClick = onComponentClick
-                        )
-                    }
-                },
-                contentPadding = rememberInsetsPaddingValues(
-                    insets = LocalWindowInsets.current.navigationBars,
-                    additionalStart = HomePadding,
-                    additionalTop = HomePadding,
-                    additionalEnd = HomePadding,
-                    additionalBottom = HomePadding
+        LazyVerticalGrid(
+            modifier = Modifier.padding(paddingValues),
+            cells = GridCells.Adaptive(HomeCellMinSize),
+            content = {
+                items(components) { component ->
+                    ComponentItem(
+                        component = component,
+                        onClick = onComponentClick
+                    )
+                }
+            },
+            contentPadding = WindowInsets.safeDrawing
+                .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+                .add(
+                    WindowInsets(
+                        left = HomePadding,
+                        top = HomePadding,
+                        right = HomePadding,
+                        bottom = HomePadding
+                    )
                 )
-            )
-        }
+                .asPaddingValues()
+        )
     }
 }
 

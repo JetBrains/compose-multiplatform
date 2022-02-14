@@ -18,13 +18,10 @@ package androidx.compose.material.catalog
 
 import androidx.compose.material.catalog.ui.theme.CatalogTheme
 import androidx.compose.runtime.Composable
-import com.google.accompanist.insets.ProvideWindowInsets
 
 @Composable
 fun CatalogApp() {
-    ProvideWindowInsets {
-        CatalogTheme {
-            NavGraph()
-        }
+    CatalogTheme {
+        NavGraph()
     }
 }
