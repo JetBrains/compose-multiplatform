@@ -40,6 +40,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.layout.findRoot
@@ -166,6 +167,22 @@ internal abstract class LayoutNodeWrapper(
 
     var zIndex: Float = 0f
         protected set
+
+    override val parentData: Any?
+        get() = entities.head(EntityList.ParentDataEntityType).parentData
+
+    private val SimpleEntity<ParentDataModifier>?.parentData: Any?
+        get() = if (this == null) {
+            wrapped?.parentData
+        } else {
+            with(modifier) {
+                /**
+                 * ParentData provided through the parentData node will override the data provided
+                 * through a modifier.
+                 */
+                measureScope.modifyParentData(next.parentData)
+            }
+        }
 
     final override val parentLayoutCoordinates: LayoutCoordinates?
         get() {
