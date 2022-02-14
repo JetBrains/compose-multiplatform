@@ -1687,6 +1687,26 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
     }
 
     @Test
+    fun passingNegativeItemsCountIsNotAllowed() {
+        var exception: Exception? = null
+        rule.setContentWithTestViewConfiguration {
+            LazyColumnOrRow {
+                try {
+                    items(-1) {
+                        Box(Modifier)
+                    }
+                } catch (e: Exception) {
+                    exception = e
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(exception).isInstanceOf(IllegalArgumentException::class.java)
+        }
+    }
+
+    @Test
     fun scrollingALotDoesntCauseLazyLayoutRecomposition() {
         var recomposeCount = 0
         lateinit var state: LazyListState
