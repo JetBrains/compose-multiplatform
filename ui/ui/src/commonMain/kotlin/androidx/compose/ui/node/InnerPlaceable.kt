@@ -57,9 +57,6 @@ internal class InnerPlaceable(
         return this
     }
 
-    override val parentData: Any?
-        get() = null
-
     override fun findPreviousFocusWrapper() = wrappedBy?.findPreviousFocusWrapper()
 
     override fun findNextFocusWrapper(excludeDeactivated: Boolean): ModifiedFocusNode? = null

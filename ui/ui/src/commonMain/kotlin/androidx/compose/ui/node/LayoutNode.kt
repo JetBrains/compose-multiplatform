@@ -45,7 +45,6 @@ import androidx.compose.ui.layout.ModifierInfo
 import androidx.compose.ui.layout.OnGloballyPositionedModifier
 import androidx.compose.ui.layout.OnPlacedModifier
 import androidx.compose.ui.layout.OnRemeasuredModifier
-import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
@@ -724,11 +723,6 @@ internal class LayoutNode(
                 }
                 if (mod is LayoutModifier) {
                     wrapper = ModifiedLayoutNode(wrapper, mod)
-                        .initialize()
-                        .assignChained(toWrap)
-                }
-                if (mod is ParentDataModifier) {
-                    wrapper = ModifiedParentDataNode(wrapper, mod)
                         .initialize()
                         .assignChained(toWrap)
                 }

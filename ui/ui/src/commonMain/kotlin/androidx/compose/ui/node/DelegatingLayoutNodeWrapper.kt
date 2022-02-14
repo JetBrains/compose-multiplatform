@@ -145,6 +145,4 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
     override fun minIntrinsicHeight(width: Int) = wrapped.minIntrinsicHeight(width)
 
     override fun maxIntrinsicHeight(width: Int) = wrapped.maxIntrinsicHeight(width)
-
-    override val parentData: Any? get() = wrapped.parentData
 }
