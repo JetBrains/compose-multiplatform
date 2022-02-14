@@ -104,6 +104,7 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
                 }
             }
         }
+        onMeasured()
         return this
     }
 
