@@ -1797,6 +1797,26 @@ class SubcomposeLayoutTest {
         }
     }
 
+    @Test
+    fun disposeSecondPrecomposedItem() {
+        // it is a regression from b/218668336. the assertion was incorrectly checking
+        // for the ranges so disposing the second active precomposed node was crashing.
+        val state = SubcomposeLayoutState(SubcomposeSlotReusePolicy(0))
+
+        composeItems(state, mutableStateOf(emptyList()))
+
+        rule.runOnIdle {
+            state.precompose(0) { ItemContent(0) }
+            val handle = state.precompose(1) { ItemContent(1) }
+            handle.dispose()
+        }
+
+        assertNodes(
+            exists = /*prefetch*/ listOf(0),
+            doesNotExist = /*disposed*/ listOf(1)
+        )
+    }
+
     private fun composeItems(
         state: SubcomposeLayoutState,
         items: MutableState<List<Int>>
