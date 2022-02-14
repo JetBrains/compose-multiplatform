@@ -565,7 +565,8 @@ internal class LayoutNodeSubcompositionsState(
                 if (node != null) {
                     check(precomposedCount > 0)
                     val itemIndex = root.foldedChildren.indexOf(node)
-                    check(itemIndex <= root.foldedChildren.size - precomposedCount)
+                    // make sure this item is in the precomposed items range
+                    check(itemIndex >= root.foldedChildren.size - precomposedCount)
                     // move this item into the reusable section
                     reusableCount++
                     precomposedCount--
