@@ -226,6 +226,7 @@ package androidx.compose.foundation.layout {
     method public static androidx.compose.foundation.layout.WindowInsets add(androidx.compose.foundation.layout.WindowInsets, androidx.compose.foundation.layout.WindowInsets insets);
     method @androidx.compose.runtime.Composable public static androidx.compose.foundation.layout.PaddingValues asPaddingValues(androidx.compose.foundation.layout.WindowInsets);
     method public static androidx.compose.foundation.layout.WindowInsets exclude(androidx.compose.foundation.layout.WindowInsets, androidx.compose.foundation.layout.WindowInsets insets);
+    method public static androidx.compose.foundation.layout.WindowInsets only(androidx.compose.foundation.layout.WindowInsets, int sides);
     method public static androidx.compose.foundation.layout.WindowInsets union(androidx.compose.foundation.layout.WindowInsets, androidx.compose.foundation.layout.WindowInsets insets);
   }
 
@@ -248,6 +249,30 @@ package androidx.compose.foundation.layout {
     method public static androidx.compose.ui.Modifier systemBarsPadding(androidx.compose.ui.Modifier);
     method public static androidx.compose.ui.Modifier systemGesturesPadding(androidx.compose.ui.Modifier);
     method public static androidx.compose.ui.Modifier waterfallPadding(androidx.compose.ui.Modifier);
+  }
+
+  @kotlin.jvm.JvmInline public final value class WindowInsetsSides {
+    method public operator int plus(int sides);
+    field public static final androidx.compose.foundation.layout.WindowInsetsSides.Companion Companion;
+  }
+
+  public static final class WindowInsetsSides.Companion {
+    method public int getBottom();
+    method public int getEnd();
+    method public int getHorizontal();
+    method public int getLeft();
+    method public int getRight();
+    method public int getStart();
+    method public int getTop();
+    method public int getVertical();
+    property public final int Bottom;
+    property public final int End;
+    property public final int Horizontal;
+    property public final int Left;
+    property public final int Right;
+    property public final int Start;
+    property public final int Top;
+    property public final int Vertical;
   }
 
   public final class WindowInsetsSizeKt {
