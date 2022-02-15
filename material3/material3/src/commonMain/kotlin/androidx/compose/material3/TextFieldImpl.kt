@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.material
+package androidx.compose.material3
 
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.LinearEasing
@@ -27,9 +27,8 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.material.Strings.Companion.DefaultErrorMessage
+import androidx.compose.material3.Strings.Companion.DefaultErrorMessage
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposableOpenTarget
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,7 +58,7 @@ internal enum class TextFieldType {
 /**
  * Implementation of the [TextField] and [OutlinedTextField]
  */
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CommonDecorationBox(
     type: TextFieldType,
@@ -100,18 +99,18 @@ internal fun CommonDecorationBox(
     }
 
     val typography = MaterialTheme.typography
-    val subtitle1 = typography.subtitle1
-    val caption = typography.caption
+    val bodyLarge = typography.bodyLarge
+    val bodySmall = typography.bodySmall
     val shouldOverrideTextStyleColor =
-        (subtitle1.color == Color.Unspecified && caption.color != Color.Unspecified) ||
-            (subtitle1.color != Color.Unspecified && caption.color == Color.Unspecified)
+        (bodyLarge.color == Color.Unspecified && bodySmall.color != Color.Unspecified) ||
+            (bodyLarge.color != Color.Unspecified && bodySmall.color == Color.Unspecified)
 
     TextFieldTransitionScope.Transition(
         inputState = inputState,
-        focusedTextStyleColor = with(MaterialTheme.typography.caption.color) {
+        focusedTextStyleColor = with(MaterialTheme.typography.bodySmall.color) {
             if (shouldOverrideTextStyleColor) this.takeOrElse { labelColor(inputState) } else this
         },
-        unfocusedTextStyleColor = with(MaterialTheme.typography.subtitle1.color) {
+        unfocusedTextStyleColor = with(MaterialTheme.typography.bodyLarge.color) {
             if (shouldOverrideTextStyleColor) this.takeOrElse { labelColor(inputState) } else this
         },
         contentColor = labelColor,
@@ -121,13 +120,13 @@ internal fun CommonDecorationBox(
         val decoratedLabel: @Composable (() -> Unit)? = label?.let {
             @Composable {
                 val labelTextStyle = lerp(
-                    MaterialTheme.typography.subtitle1,
-                    MaterialTheme.typography.caption,
+                    MaterialTheme.typography.bodyLarge,
+                    MaterialTheme.typography.bodySmall,
                     labelProgress
                 ).let {
                     if (shouldOverrideTextStyleColor) it.copy(color = labelTextStyleColor) else it
                 }
-                Decoration(labelContentColor, labelTextStyle, null, it)
+                Decoration(labelContentColor, labelTextStyle, it)
             }
         }
 
@@ -137,7 +136,7 @@ internal fun CommonDecorationBox(
                     Box(modifier.alpha(placeholderAlphaProgress)) {
                         Decoration(
                             contentColor = colors.placeholderColor(enabled).value,
-                            typography = MaterialTheme.typography.subtitle1,
+                            typography = MaterialTheme.typography.bodyLarge,
                             content = placeholder
                         )
                     }
@@ -228,29 +227,18 @@ internal fun CommonDecorationBox(
  * Set content color, typography and emphasis for [content] composable
  */
 @Composable
-@ComposableOpenTarget(index = 0)
 internal fun Decoration(
     contentColor: Color,
     typography: TextStyle? = null,
-    contentAlpha: Float? = null,
-    content: @Composable @ComposableOpenTarget(index = 0) () -> Unit
+    content: @Composable () -> Unit
 ) {
-    val colorAndEmphasis: @Composable () -> Unit = @Composable {
-        CompositionLocalProvider(LocalContentColor provides contentColor) {
-            if (contentAlpha != null) {
-                CompositionLocalProvider(
-                    LocalContentAlpha provides contentAlpha,
-                    content = content
-                )
-            } else {
-                CompositionLocalProvider(
-                    LocalContentAlpha provides contentColor.alpha,
-                    content = content
-                )
-            }
-        }
+    val contentWithColor: @Composable () -> Unit = @Composable {
+        CompositionLocalProvider(
+            LocalContentColor provides contentColor,
+            content = content
+        )
     }
-    if (typography != null) ProvideTextStyle(typography, colorAndEmphasis) else colorAndEmphasis()
+    if (typography != null) ProvideTextStyle(typography, contentWithColor) else contentWithColor()
 }
 
 internal fun widthOrZero(placeable: Placeable?) = placeable?.width ?: 0

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.material
+package androidx.compose.material3
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.Interaction
@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.tokens.OutlinedTextFieldTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,17 +67,13 @@ import androidx.compose.ui.unit.offset
 import kotlin.math.max
 import kotlin.math.roundToInt
 
+// TODO(221954765): Add links to docs and images.
 /**
- * <a href="https://material.io/components/text-fields#outlined-text-field" class="external" target="_blank">Material Design outlined text field</a>.
+ * Material Design outlined text field.
  *
  * Outlined text fields have less visual emphasis than filled text fields. When they appear in
  * places like forms, where many text fields are placed together, their reduced emphasis helps
  * simplify the layout.
- *
- * ![Outlined text field image](https://developer.android.com/images/reference/androidx/compose/material/outlined-text-field.png)
- *
- * See example usage:
- * @sample androidx.compose.material.samples.SimpleOutlinedTextFieldSample
  *
  * If apart from input text change you also want to observe the cursor location, selection range,
  * or IME composition use the OutlinedTextField overload with the [TextFieldValue] parameter
@@ -86,19 +83,18 @@ import kotlin.math.roundToInt
  * @param onValueChange the callback that is triggered when the input service updates the text. An
  * updated text comes as a parameter of the callback
  * @param modifier a [Modifier] for this text field
- * @param enabled controls the enabled state of the [OutlinedTextField]. When `false`, the text field will
- * be neither editable nor focusable, the input of the text field will not be selectable,
+ * @param enabled controls the enabled state of the [OutlinedTextField]. When `false`, the text
+ * field will be neither editable nor focusable, the input of the text field will not be selectable,
  * visually text field will appear in the disabled UI state
  * @param readOnly controls the editable state of the [OutlinedTextField]. When `true`, the text
  * field can not be modified, however, a user can focus it and copy text from it. Read-only text
  * fields are usually used to display pre-filled forms that user can not edit
- * @param textStyle the style to be applied to the input text. The default [textStyle] uses the
- * [LocalTextStyle] defined by the theme
+ * @param textStyle the style to be applied to the input text. Defaults to [LocalTextStyle]
  * @param label the optional label to be displayed inside the text field container. The default
- * text style for internal [Text] is [Typography.caption] when the text field is in focus and
- * [Typography.subtitle1] when the text field is not in focus
+ * text style for internal [Text] is [Typography.bodySmall] when the text field is in focus and
+ * [Typography.bodyLarge] when the text field is not in focus
  * @param placeholder the optional placeholder to be displayed when the text field is in focus and
- * the input text is empty. The default text style for internal [Text] is [Typography.subtitle1]
+ * the input text is empty. The default text style for internal [Text] is [Typography.bodyLarge]
  * @param leadingIcon the optional leading icon to be displayed at the beginning of the text field
  * container
  * @param trailingIcon the optional trailing icon to be displayed at the end of the text field
@@ -150,7 +146,7 @@ fun OutlinedTextField(
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = MaterialTheme.shapes.small,
+    shape: Shape = OutlinedTextFieldTokens.ContainerShape,
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
 ) {
     var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
@@ -184,17 +180,13 @@ fun OutlinedTextField(
     )
 }
 
+// TODO(221954765): Add links to docs and images.
 /**
- * <a href="https://material.io/components/text-fields#outlined-text-field" class="external" target="_blank">Material Design outlined text field</a>.
+ * Material Design outlined text field.
  *
  * Outlined text fields have less visual emphasis than filled text fields. When they appear in
  * places like forms, where many text fields are placed together, their reduced emphasis helps
  * simplify the layout.
- *
- * ![Outlined text field image](https://developer.android.com/images/reference/androidx/compose/material/outlined-text-field.png)
- *
- * See example usage:
- * @sample androidx.compose.material.samples.OutlinedTextFieldSample
  *
  * This overload provides access to the input text, cursor position and selection range and
  * IME composition. If you only want to observe an input text change, use the OutlinedTextField
@@ -204,19 +196,18 @@ fun OutlinedTextField(
  * @param onValueChange the callback that is triggered when the input service updates values in
  * [TextFieldValue]. An updated [TextFieldValue] comes as a parameter of the callback
  * @param modifier a [Modifier] for this text field
- * @param enabled controls the enabled state of the [OutlinedTextField]. When `false`, the text field will
- * be neither editable nor focusable, the input of the text field will not be selectable,
+ * @param enabled controls the enabled state of the [OutlinedTextField]. When `false`, the text
+ * field will be neither editable nor focusable, the input of the text field will not be selectable,
  * visually text field will appear in the disabled UI state
  * @param readOnly controls the editable state of the [OutlinedTextField]. When `true`, the text
  * field can not be modified, however, a user can focus it and copy text from it. Read-only text
  * fields are usually used to display pre-filled forms that user can not edit
- * @param textStyle the style to be applied to the input text. The default [textStyle] uses the
- * [LocalTextStyle] defined by the theme
+ * @param textStyle the style to be applied to the input text. Defaults to [LocalTextStyle]
  * @param label the optional label to be displayed inside the text field container. The default
- * text style for internal [Text] is [Typography.caption] when the text field is in focus and
- * [Typography.subtitle1] when the text field is not in focus
+ * text style for internal [Text] is [Typography.bodySmall] when the text field is in focus and
+ * [Typography.bodyLarge] when the text field is not in focus
  * @param placeholder the optional placeholder to be displayed when the text field is in focus and
- * the input text is empty. The default text style for internal [Text] is [Typography.subtitle1]
+ * the input text is empty. The default text style for internal [Text] is [Typography.bodyLarge]
  * @param leadingIcon the optional leading icon to be displayed at the beginning of the text field
  * container
  * @param trailingIcon the optional trailing icon to be displayed at the end of the text field
@@ -263,11 +254,11 @@ fun OutlinedTextField(
     isError: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions(),
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = TextFieldDefaults.OutlinedTextFieldShape,
+    shape: Shape = OutlinedTextFieldTokens.ContainerShape,
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
 ) {
     // If color is not provided via the text style, use content color as a default
@@ -276,7 +267,7 @@ fun OutlinedTextField(
     }
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
 
-    @OptIn(ExperimentalMaterialApi::class)
+    @OptIn(ExperimentalMaterial3Api::class)
     BasicTextField(
         value = value,
         modifier = if (label != null) {
