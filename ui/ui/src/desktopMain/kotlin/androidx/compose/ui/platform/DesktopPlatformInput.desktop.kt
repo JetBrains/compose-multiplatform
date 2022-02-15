@@ -197,17 +197,22 @@ internal actual class PlatformInput actual constructor(val component: PlatformCo
                 endIndex: Int,
                 attributes: Array<AttributedCharacterIterator.Attribute>?
             ): AttributedCharacterIterator {
-
                 val comp = input.value.composition
                 val text = input.value.text
-                val range = TextRange(beginIndex, endIndex.coerceAtMost(text.length))
+                // When input is performed with Pinyin and backspace pressed,
+                // comp is null and beginIndex > endIndex.
+                // TODO Check is this an expected behavior?
+                val range = TextRange(
+                    start = beginIndex.coerceAtMost(text.length),
+                    end = endIndex.coerceAtMost(text.length)
+                )
                 if (comp == null) {
                     val res = text.substring(range)
                     return AttributedString(res).iterator
                 }
                 val committed = text.substring(
                     TextRange(
-                        min(range.min, comp.min),
+                        min(range.min, comp.min).coerceAtMost(text.length),
                         max(range.max, comp.max).coerceAtMost(text.length)
                     )
                 )
