@@ -65,11 +65,35 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     androidXComposeMultiplatform {
         android()
         desktop()
-        darwin()
         js()
+        darwin()
     }
 
     kotlin {
+        targets {
+            def darwinFlags = [
+                "-linker-option", "-framework", "-linker-option", "Metal",
+                "-linker-option", "-framework", "-linker-option", "CoreText",
+                "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+                "-linker-option", "-framework", "-linker-option", "CoreServices"
+            ]
+            configure([macosX64, macosArm64]) {
+                binaries.all {
+                    freeCompilerArgs += darwinFlags
+                    // TODO: the current release binary surprises LLVM, so disable checks for now.
+                    freeCompilerArgs += "-Xdisable-phases=VerifyBitcode"
+                }
+            }
+            configure([uikitX64, uikitArm64]) {
+                binaries.all {
+                    freeCompilerArgs += darwinFlags
+                    freeCompilerArgs +=
+                        ["-linker-option", "-framework", "-linker-option", "UIKit"]
+                    // TODO: the current release binary surprises LLVM, so disable checks for now.
+                    freeCompilerArgs += "-Xdisable-phases=VerifyBitcode"
+                }
+            }
+        }
 
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
