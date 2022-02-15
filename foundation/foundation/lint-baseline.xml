@@ -36,6 +36,17 @@
 
     <issue
         id="NewApi"
+        message="Call requires API level 30 (current min is 21): `android.view.View#setWindowInsetsAnimationCallback`"
+        errorLine1="    rootView.setWindowInsetsAnimationCallback("
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/foundation/text/CoreTextFieldSoftKeyboardTest.kt"
+            line="193"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NewApi"
         message="Call requires API level 30 (current min is 21): `InsetAnimationCallback`"
         errorLine1="        InsetAnimationCallback {"
         errorLine2="        ^">
