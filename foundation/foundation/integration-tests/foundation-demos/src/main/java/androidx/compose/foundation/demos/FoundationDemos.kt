@@ -21,6 +21,7 @@ import androidx.compose.foundation.demos.relocation.BringIntoViewDemo
 import androidx.compose.foundation.demos.relocation.BringRectangleIntoViewDemo
 import androidx.compose.foundation.demos.relocation.RequestRectangleOnScreenDemo
 import androidx.compose.foundation.samples.ControlledScrollableRowSample
+import androidx.compose.foundation.samples.CustomTouchSlopSample
 import androidx.compose.foundation.samples.InteractionSourceFlowSample
 import androidx.compose.foundation.samples.SimpleInteractionSourceSample
 import androidx.compose.foundation.samples.VerticalScrollExample
@@ -48,5 +49,6 @@ val FoundationDemos = DemoCategory(
         ComposableDemo("NestedScroll") { NestedScrollDemo() },
         DemoCategory("Relocation Demos", RelocationDemos),
         DemoCategory("Magnifier Demos", MagnifierDemos),
+        ComposableDemo("Custom Touch Slop Demo - Composition Locals") { CustomTouchSlopSample() },
     )
 )
