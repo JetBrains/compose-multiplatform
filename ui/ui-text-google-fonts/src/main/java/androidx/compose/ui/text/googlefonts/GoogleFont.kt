@@ -163,7 +163,7 @@ internal object GoogleFontTypefaceLoader : AndroidFont.TypefaceLoader {
         font: AndroidFont,
         loader: FontsContractCompatLoader
     ): Typeface? {
-        require(font is GoogleFontImpl) { "Only GoogleFontImpl supported" }
+        require(font is GoogleFontImpl) { "Only GoogleFontImpl supported (actual $font)" }
         val fontRequest = font.toFontRequest()
         val typefaceStyle = font.toTypefaceStyle()
 

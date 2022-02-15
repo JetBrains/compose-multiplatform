@@ -23,7 +23,6 @@ package androidx.compose.ui.text.font
  *
  * For more information about font family resolution see [FontFamily].
  */
-// TODO: When making stable, resolve Font(resId) != Font(resId, fontLoad) in Font.kt
 @kotlin.jvm.JvmInline
 value class FontLoadingStrategy private constructor(val value: Int) {
     override fun toString(): String {
