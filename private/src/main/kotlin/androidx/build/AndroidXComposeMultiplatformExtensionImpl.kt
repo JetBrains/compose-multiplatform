@@ -21,6 +21,16 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.gradle.api.Project
 import javax.inject.Inject
+import org.jetbrains.kotlin.gradle.plugin.*
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
+import kotlin.reflect.full.memberProperties
+import org.jetbrains.kotlin.gradle.plugin.mpp.*
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.internal.dependencies.DefaultMavenDependency
+import org.gradle.api.publish.maven.internal.dependencies.MavenDependencyInternal
+import org.gradle.api.publish.maven.internal.publication.DefaultMavenPublication
+import org.gradle.api.attributes.Usage
+
 
 open class AndroidXComposeMultiplatformExtensionImpl @Inject constructor(
     project: Project
@@ -121,3 +131,101 @@ open class AndroidXComposeMultiplatformExtensionImpl @Inject constructor(
             }
     }
 }
+
+fun Project.experimentalOELPublication() : Boolean = findProperty("oel.publication") == "true"
+fun Project.oelAndroidxVersion() : String? = findProperty("oel.androidx.version") as String?
+fun Project.oelAndroidxMaterial3Version() : String? = findProperty("oel.androidx.material3.version") as String?
+
+
+fun enableOELPublishing(project: Project) {
+    if (!project.experimentalOELPublication()) return
+
+    if (project.experimentalOELPublication() && (project.oelAndroidxVersion() == null)) {
+        error("androidx version should be specified for OEL publications")
+    }
+
+
+    val ext = project.multiplatformExtension ?: error("expected a multiplatform project")
+
+    ext.targets.all { target ->
+        if (target is KotlinAndroidTarget) {
+            project.publishAndroidxReference(target)
+        }
+    }
+}
+
+// FIXME: reflection access! Some API in Kotlin is needed
+@Suppress("unchecked_cast")
+private val KotlinTarget.kotlinComponents: Iterable<KotlinTargetComponent>
+    get() = javaClass.kotlin.memberProperties
+        .single { it.name == "kotlinComponents" }
+        .get(this) as Iterable<KotlinTargetComponent>
+
+
+@Suppress("unchecked_cast")
+private fun Project.publishAndroidxReference(target: KotlinTarget) {
+    afterEvaluate {
+        target.kotlinComponents.forEach { component ->
+            val componentName = component.name
+
+            val multiplatformExtension =
+                extensions.findByType(KotlinMultiplatformExtension::class.java)
+                    ?: error("Expected a multiplatform project")
+
+            if (component is KotlinVariant)
+                component.publishable = false
+
+            val usages = when (component) {
+                is KotlinVariant -> component.usages
+                is JointAndroidKotlinTargetComponent -> component.usages
+                else -> emptyList()
+            }
+
+            extensions.getByType(PublishingExtension::class.java)
+                .publications.withType(DefaultMavenPublication::class.java)
+                // isAlias is needed for Gradle to ignore the fact that there's a
+                // publication that is not referenced as an available-at variant of the root module
+                // and has the Maven coordinates that are different from those of the root module
+                // FIXME: internal Gradle API! We would rather not create the publications,
+                //        but some API for that is needed in the Kotlin Gradle plugin
+                .all { publication ->
+                    if (publication.name == componentName) {
+                        publication.isAlias = true
+                    }
+                }
+
+            usages.forEach {    usage ->
+                val configurationName = usage.name + "-published"
+
+                configurations.matching{it.name == configurationName}.all() { conf ->
+                    conf.artifacts.clear()
+                    conf.dependencies.clear()
+                    conf.setExtendsFrom(emptyList())
+                    val composeVersion = requireNotNull(target.project.oelAndroidxVersion()) {
+                        "Please specify oel.androidx.version property"
+                    }
+                    val material3Version = requireNotNull(target.project.oelAndroidxMaterial3Version()) {
+                        "Please specify oel.androidx.material3.version property"
+                    }
+
+                    val version = if (target.project.group.toString().contains("org.jetbrains.compose.material3")) material3Version else composeVersion
+                    val newDependency = target.project.group.toString().replace("org.jetbrains.compose", "androidx.compose") + ":" + name + ":" + version
+                    conf.dependencies.add(target.project.dependencies.create(newDependency))
+                }
+
+                val rootComponent : KotlinSoftwareComponent = target.project.components.withType(KotlinSoftwareComponent::class.java)
+                    .getByName("kotlin")
+
+                (rootComponent.usages as MutableSet).add(
+                    DefaultKotlinUsageContext(
+                        multiplatformExtension.metadata().compilations.getByName("main"),
+                        objects.named(Usage::class.java, "kotlin-api"),
+                        configurationName
+                    )
+                )
+
+            }
+        }
+    }
+}
+
