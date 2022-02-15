@@ -132,27 +132,27 @@ inline class FocusDirection internal constructor(@Suppress("unused") private val
  * Moves focus based on the requested focus direction.
  *
  * @param focusDirection The requested direction to move focus.
- * @return whether a focus node was found. If a focus node was found and the focus request was
- * not granted, this function still returns true.
+ * @param layoutDirection Whether the layout is RTL or LTR.
+ * @param onFound This lambda is invoked if focus search finds the next focus node.
+ * @return if no focus node is found, we return false. otherwise we return the result of [onFound].
  */
 internal fun ModifiedFocusNode.focusSearch(
     focusDirection: FocusDirection,
-    layoutDirection: LayoutDirection
-): ModifiedFocusNode? {
+    layoutDirection: LayoutDirection,
+    onFound: (ModifiedFocusNode) -> Boolean
+): Boolean {
     return when (focusDirection) {
-        Next, Previous -> oneDimensionalFocusSearch(focusDirection)
-        Left, Right, Up, Down -> twoDimensionalFocusSearch(focusDirection)
+        Next, Previous -> oneDimensionalFocusSearch(focusDirection, onFound)
+        Left, Right, Up, Down -> twoDimensionalFocusSearch(focusDirection, onFound)
         @OptIn(ExperimentalComposeUiApi::class)
         In -> {
             // we search among the children of the active item.
             val direction = when (layoutDirection) { Rtl -> Left; Ltr -> Right }
-            findActiveFocusNode()?.twoDimensionalFocusSearch(direction)
+            findActiveFocusNode()?.twoDimensionalFocusSearch(direction, onFound) ?: false
         }
         @OptIn(ExperimentalComposeUiApi::class)
-        Out -> {
-            findActiveFocusNode()?.findActiveParent().let {
-                if (it == this) null else it
-            }
+        Out -> findActiveFocusNode()?.findActiveParent().let {
+            if (it == this || it == null) false else onFound.invoke(it)
         }
         else -> error(invalidFocusDirection)
     }

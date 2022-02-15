@@ -141,41 +141,13 @@ internal class FocusManagerImpl(
             return true
         }
 
-        val destination = focusModifier.focusNode.focusSearch(focusDirection, layoutDirection)
-        if (destination == source) {
-            return false
-        }
-
-        // TODO(b/144116848): This is a hack to make Next/Previous wrap around. This must be
-        //  replaced by code that sends the move request back to the view system. The view system
-        //  will then pass focus to other views, and ultimately return back to this compose view.
-        if (destination == null) {
-            // Check if we need to wrap around (no destination and a non-root item is focused)
-            if (focusModifier.focusState.hasFocus && !focusModifier.focusState.isFocused) {
-                // Next and Previous wraps around.
-                return when (focusDirection) {
-                    Next, Previous -> {
-                        // Clear Focus to send focus the root node.
-                        // Wrap around by requesting focus for the root and then calling moveFocus.
-                        clearFocus(force = false)
-
-                        if (focusModifier.focusState.isFocused) {
-                            moveFocus(focusDirection)
-                        } else {
-                            false
-                        }
-                    }
-                    else -> false
-                }
-            }
-            return false
-        }
-
-        checkNotNull(destination.findParentFocusNode()) { "Move focus landed at the root." }
-
-        // If we found a potential next item, move focus to it.
-        destination.requestFocus()
-        return true
+        return focusModifier.focusNode.focusSearch(focusDirection, layoutDirection) { destination ->
+            if (destination == source) return@focusSearch false
+            checkNotNull(destination.findParentFocusNode()) { "Move focus landed at the root." }
+            // If we found a potential next item, move focus to it.
+            destination.requestFocus()
+            true
+        }.let { foundNextItem -> foundNextItem || wrapAroundFocus(focusDirection) }
     }
 
     /**
@@ -198,6 +170,28 @@ internal class FocusManagerImpl(
     @Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
     internal fun getActiveFocusModifier(): FocusModifier? {
         return focusModifier.findActiveItem()
+    }
+
+    // TODO(b/144116848): This is a hack to make Next/Previous wrap around. This must be
+    //  replaced by code that sends the move request back to the view system. The view system
+    //  will then pass focus to other views, and ultimately return back to this compose view.
+    private fun wrapAroundFocus(focusDirection: FocusDirection): Boolean {
+        // Wrap is not supported when this sub-hierarchy doesn't have focus.
+        if (!focusModifier.focusState.hasFocus || focusModifier.focusState.isFocused) return false
+
+        // Next and Previous wraps around.
+        when (focusDirection) {
+            Next, Previous -> {
+                // Clear Focus to send focus the root node.
+                clearFocus(force = false)
+                if (!focusModifier.focusState.isFocused) return false
+
+                // Wrap around by calling moveFocus after the root gains focus.
+                return moveFocus(focusDirection)
+            }
+            // We only wrap-around for 1D Focus search.
+            else -> return false
+        }
     }
 }
 
