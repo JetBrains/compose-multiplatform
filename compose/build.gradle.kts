@@ -16,8 +16,6 @@ open class ComposePublishingTask : AbstractComposePublishingTask() {
 }
 
 val composeProperties = ComposeProperties(project)
-val isWebExist =
-    project.composeBuild?.run { projectDir.resolve(".jbWebExistsMarker").exists() } ?: false
 
 val mainComponents =
     listOf(
@@ -118,11 +116,9 @@ tasks.register("testComposeJbDesktop") {
     dependsOnComposeTask(":compose:runtime:runtime-saveable:desktopTest")
 }
 
-if (isWebExist) {
-    tasks.register("testComposeJbWeb") {
-        dependsOnComposeTask(":compose:runtime:runtime:jsTest")
-        dependsOnComposeTask(":compose:runtime:runtime:test")
-    }
+tasks.register("testComposeJbWeb") {
+    dependsOnComposeTask(":compose:runtime:runtime:jsTest")
+    dependsOnComposeTask(":compose:runtime:runtime:test")
 }
 
 tasks.register("buildNativeDemo") {
