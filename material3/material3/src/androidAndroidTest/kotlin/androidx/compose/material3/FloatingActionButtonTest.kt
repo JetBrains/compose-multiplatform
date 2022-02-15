@@ -28,6 +28,9 @@ import androidx.compose.material3.tokens.FabPrimaryLargeTokens
 import androidx.compose.material3.tokens.FabPrimarySmallTokens
 import androidx.compose.material3.tokens.FabPrimaryTokens
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -36,6 +39,7 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertTouchHeightIsEqualTo
 import androidx.compose.ui.test.assertTouchWidthIsEqualTo
@@ -87,7 +91,7 @@ class FloatingActionButtonTest {
 
         rule.setMaterialContent(lightColorScheme()) {
             Box {
-                ExtendedFloatingActionButton(text = { Text(text) }, onClick = onClick)
+                ExtendedFloatingActionButton(onClick = onClick, content = { Text(text) })
             }
         }
 
@@ -167,7 +171,7 @@ class FloatingActionButtonTest {
 
         rule.onNodeWithTag("FAB")
             .assertHeightIsEqualTo(ExtendedFabPrimaryTokens.ContainerHeight)
-            .assertWidthIsAtLeast(48.dp)
+            .assertWidthIsAtLeast(FabPrimaryTokens.ContainerHeight)
     }
 
     @Test
@@ -175,8 +179,8 @@ class FloatingActionButtonTest {
         rule.setMaterialContent(lightColorScheme()) {
             ExtendedFloatingActionButton(
                 modifier = Modifier.testTag("FAB"),
-                text = { Text(".") },
-                onClick = {}
+                onClick = {},
+                content = { Text(".") },
             )
         }
 
@@ -231,21 +235,18 @@ class FloatingActionButtonTest {
         var expectedTextStyle: TextStyle? = null
 
         rule.setMaterialContent(lightColorScheme()) {
-            ExtendedFloatingActionButton(
-                onClick = {},
-                text = {
-                    Text(
-                        "Extended FAB",
-                        onTextLayout = {
-                            fontFamily = it.layoutInput.style.fontFamily
-                            fontWeight = it.layoutInput.style.fontWeight
-                            fontSize = it.layoutInput.style.fontSize
-                            lineHeight = it.layoutInput.style.lineHeight
-                            letterSpacing = it.layoutInput.style.letterSpacing
-                        }
-                    )
-                }
-            )
+            ExtendedFloatingActionButton(onClick = {}) {
+                Text(
+                    "Extended FAB",
+                    onTextLayout = {
+                        fontFamily = it.layoutInput.style.fontFamily
+                        fontWeight = it.layoutInput.style.fontWeight
+                        fontSize = it.layoutInput.style.fontSize
+                        lineHeight = it.layoutInput.style.lineHeight
+                        letterSpacing = it.layoutInput.style.letterSpacing
+                    }
+                )
+            }
             expectedTextStyle = MaterialTheme.typography.fromToken(
                 ExtendedFabPrimaryTokens.LabelTextFont
             )
@@ -329,15 +330,14 @@ class FloatingActionButtonTest {
         rule.setMaterialContent(lightColorScheme()) {
             Box {
                 ExtendedFloatingActionButton(
-                    text = {
-                        Box(
-                            Modifier.size(2.dp)
-                                .onGloballyPositioned { contentCoordinates = it }
-                        )
-                    },
                     onClick = {},
-                    modifier = Modifier.onGloballyPositioned { buttonCoordinates = it }
-                )
+                    modifier = Modifier.onGloballyPositioned { buttonCoordinates = it },
+                ) {
+                    Box(
+                        Modifier.size(2.dp)
+                            .onGloballyPositioned { contentCoordinates = it }
+                    )
+                }
             }
         }
 
@@ -399,6 +399,90 @@ class FloatingActionButtonTest {
                 )
             }
         }
+    }
+
+    @Test
+    fun expandedExtendedFabTextHasSizeFromSpecAndTextVisible() {
+        rule.setMaterialContent(lightColorScheme()) {
+            ExtendedFloatingActionButton(
+                expanded = true,
+                onClick = { },
+                icon = {
+                    Icon(
+                        Icons.Filled.Favorite,
+                        "Add",
+                        modifier = Modifier.testTag("icon"),
+                    )
+                },
+                text = { Text(text = "FAB", modifier = Modifier.testTag("text")) },
+                modifier = Modifier.testTag("FAB"),
+            )
+        }
+
+        rule.onNodeWithTag("FAB")
+            .assertHeightIsEqualTo(ExtendedFabPrimaryTokens.ContainerHeight)
+            .assertWidthIsAtLeast(80.dp)
+
+        rule.onNodeWithTag("text", useUnmergedTree = true).assertIsDisplayed()
+        rule.onNodeWithTag("icon", useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun collapsedExtendedFabTextHasSizeFromSpecAndTextNotVisible() {
+        rule.setMaterialContent(lightColorScheme()) {
+            ExtendedFloatingActionButton(
+                expanded = false,
+                onClick = { },
+                icon = {
+                    Icon(
+                        Icons.Filled.Favorite,
+                        "Add",
+                        modifier = Modifier.testTag("icon")
+                    )
+                },
+                text = { Text(text = "FAB", modifier = Modifier.testTag("text")) },
+                modifier = Modifier.testTag("FAB"),
+            )
+        }
+
+        rule.onNodeWithTag("FAB")
+            .assertIsSquareWithSize(FabPrimaryTokens.ContainerHeight)
+        rule.onNodeWithTag("text", useUnmergedTree = true).assertDoesNotExist()
+        rule.onNodeWithTag("icon", useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun extendedFabAnimates() {
+        rule.mainClock.autoAdvance = false
+
+        var expanded by mutableStateOf(true)
+        rule.setMaterialContent(lightColorScheme()) {
+            ExtendedFloatingActionButton(
+                expanded = expanded,
+                onClick = {},
+                icon = {
+                    Icon(
+                        Icons.Filled.Favorite,
+                        "Add",
+                        modifier = Modifier.testTag("icon")
+                    )
+                },
+                text = { Text(text = "FAB", modifier = Modifier.testTag("text")) },
+                modifier = Modifier.testTag("FAB"),
+            )
+        }
+
+        rule.onNodeWithTag("FAB")
+            .assertHeightIsEqualTo(ExtendedFabPrimaryTokens.ContainerHeight)
+            .assertWidthIsAtLeast(80.dp)
+
+        rule.runOnIdle { expanded = false }
+        rule.mainClock.advanceTimeBy(200)
+
+        rule.onNodeWithTag("FAB")
+            .assertIsSquareWithSize(FabPrimaryTokens.ContainerHeight)
+            .assertHeightIsEqualTo(FabPrimaryTokens.ContainerHeight)
+            .assertWidthIsEqualTo(FabPrimaryTokens.ContainerWidth)
     }
 }
 
