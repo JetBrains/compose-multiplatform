@@ -145,6 +145,11 @@ class LazyGridState constructor(
     /**
      * Needed for [animateScrollToItem]. Updated on every measure.
      */
+    internal var slotsPerLine: Int = 0
+
+    /**
+     * Needed for [animateScrollToItem]. Updated on every measure.
+     */
     internal var density: Density = Density(1f, 1f)
 
     /**
@@ -336,7 +341,7 @@ class LazyGridState constructor(
         index: Int,
         scrollOffset: Int = 0
     ) {
-        doSmoothScrollToItem(index, scrollOffset)
+        doSmoothScrollToItem(index, scrollOffset, slotsPerLine)
     }
 
     /**

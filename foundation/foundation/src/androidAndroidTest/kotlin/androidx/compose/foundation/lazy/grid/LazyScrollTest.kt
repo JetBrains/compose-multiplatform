@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.lazy.grid
 
+import androidx.compose.animation.core.FloatSpringSpec
 import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.animateScrollBy
@@ -28,11 +29,17 @@ import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyGridState
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.rememberLazyGridState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Dp
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.assertWithMessage
+import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.junit.Before
@@ -49,12 +56,14 @@ class LazyScrollTest { // (private val orientation: Orientation)
     private val vertical: Boolean
         get() = true // orientation == Orientation.Vertical
 
-    private val itemsCount = 20
+    private val itemsCount = 40
     private lateinit var state: LazyGridState
 
     private val itemSizePx = 100
     private var itemSizeDp = Dp.Unspecified
     private var containerSizeDp = Dp.Unspecified
+
+    lateinit var scope: CoroutineScope
 
     @Before
     fun setup() {
@@ -64,6 +73,7 @@ class LazyScrollTest { // (private val orientation: Orientation)
         }
         rule.setContent {
             state = rememberLazyGridState()
+            scope = rememberCoroutineScope()
             TestContent()
         }
     }
@@ -204,6 +214,97 @@ class LazyScrollTest { // (private val orientation: Orientation)
         assertThat(state.firstVisibleItemIndex).isEqualTo(itemsCount - 6)
     }
 
+    @Test
+    fun animatePerFrameForwardToVisibleItem() {
+        assertSpringAnimation(toIndex = 4)
+    }
+
+    @Test
+    fun animatePerFrameForwardToVisibleItemWithOffset() {
+        assertSpringAnimation(toIndex = 4, toOffset = 35)
+    }
+
+    @Test
+    fun animatePerFrameForwardToNotVisibleItem() {
+        assertSpringAnimation(toIndex = 16)
+    }
+
+    @Test
+    fun animatePerFrameForwardToNotVisibleItemWithOffset() {
+        assertSpringAnimation(toIndex = 20, toOffset = 35)
+    }
+
+    @Test
+    fun animatePerFrameBackward() {
+        assertSpringAnimation(toIndex = 2, fromIndex = 12)
+    }
+
+    @Test
+    fun animatePerFrameBackwardWithOffset() {
+        assertSpringAnimation(toIndex = 2, fromIndex = 10, fromOffset = 58)
+    }
+
+    @Test
+    fun animatePerFrameBackwardWithInitialOffset() {
+        assertSpringAnimation(toIndex = 0, toOffset = 40, fromIndex = 8)
+    }
+
+    private fun assertSpringAnimation(
+        toIndex: Int,
+        toOffset: Int = 0,
+        fromIndex: Int = 0,
+        fromOffset: Int = 0
+    ) {
+        if (fromIndex != 0 || fromOffset != 0) {
+            rule.runOnIdle {
+                runBlocking {
+                    state.scrollToItem(fromIndex, fromOffset)
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        assertThat(state.firstVisibleItemIndex).isEqualTo(fromIndex)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(fromOffset)
+
+        rule.mainClock.autoAdvance = false
+
+        scope.launch {
+            state.animateScrollToItem(toIndex, toOffset)
+        }
+
+        while (!state.isScrollInProgress) {
+            Thread.sleep(5)
+        }
+
+        val startOffset = (fromIndex / 2 * itemSizePx + fromOffset).toFloat()
+        val endOffset = (toIndex / 2 * itemSizePx + toOffset).toFloat()
+        val spec = FloatSpringSpec()
+
+        val duration =
+            TimeUnit.NANOSECONDS.toMillis(spec.getDurationNanos(startOffset, endOffset, 0f))
+        rule.mainClock.advanceTimeByFrame()
+        var expectedTime = rule.mainClock.currentTime
+        for (i in 0..duration step FrameDuration) {
+            val nanosTime = TimeUnit.MILLISECONDS.toNanos(i)
+            val expectedValue =
+                spec.getValueFromNanos(nanosTime, startOffset, endOffset, 0f)
+            val actualValue =
+                (state.firstVisibleItemIndex / 2 * itemSizePx + state.firstVisibleItemScrollOffset)
+            assertWithMessage(
+                "On animation frame at $i index=${state.firstVisibleItemIndex} " +
+                    "offset=${state.firstVisibleItemScrollOffset} expectedValue=$expectedValue"
+            ).that(actualValue).isEqualTo(expectedValue.roundToInt(), tolerance = 1)
+
+            rule.mainClock.advanceTimeBy(FrameDuration)
+            expectedTime += FrameDuration
+            assertThat(expectedTime).isEqualTo(rule.mainClock.currentTime)
+            rule.waitForIdle()
+        }
+        assertThat(state.firstVisibleItemIndex).isEqualTo(toIndex)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(toOffset)
+    }
+
     @Composable
     private fun TestContent() {
         if (vertical) {
@@ -237,3 +338,5 @@ class LazyScrollTest { // (private val orientation: Orientation)
     //     fun params() = arrayOf(Orientation.Vertical, Orientation.Horizontal)
     // }
 }
+
+private val FrameDuration = 16L

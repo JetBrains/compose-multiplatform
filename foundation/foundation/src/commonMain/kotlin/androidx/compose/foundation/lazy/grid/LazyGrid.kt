@@ -221,13 +221,14 @@ private fun rememberLazyGridMeasurePolicy(
         val itemsProvider = stateOfItemsProvider.value
         state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
 
-        // Update the state's cached Density
-        state.density = this
-
         val spanLayoutProvider = stateOfSpanLayoutProvider.value
         // Resolve slotsPerLine.
         val resolvedSlotsPerLine = slotsPerLine(constraints)
         spanLayoutProvider.slotsPerLine = resolvedSlotsPerLine
+
+        // Update the state's cached Density and slotsPerLine
+        state.density = this
+        state.slotsPerLine = resolvedSlotsPerLine
 
         val spaceBetweenLinesDp = if (isVertical) {
             requireNotNull(verticalArrangement).spacing
