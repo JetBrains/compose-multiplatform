@@ -12,6 +12,7 @@ import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.util.GradleVersion
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.compose.web.WebExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 internal val Project.composeExt: ComposeExtension?
@@ -25,6 +26,9 @@ internal val Project.mppExt: KotlinMultiplatformExtension
 
 internal val Project.mppExtOrNull: KotlinMultiplatformExtension?
     get() = extensions.findByType(KotlinMultiplatformExtension::class.java)
+
+internal val Project.kotlinJsExtOrNull: KotlinJsProjectExtension?
+    get() = extensions.findByType(KotlinJsProjectExtension::class.java)
 
 internal val Project.javaSourceSets: SourceSetContainer
     get() = if (GradleVersion.current() < GradleVersion.version("7.1")) {

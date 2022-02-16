@@ -137,17 +137,6 @@ class ComposePlugin : Plugin<Project> {
                 }
             }
         }
-
-        checkAndWarnAboutUsingJsPlugin(project)
-    }
-
-    private fun checkAndWarnAboutUsingJsPlugin(project: Project) {
-        val msg = "'$COMPOSE_PLUGIN_ID' plugin is not compatible with '$KOTLIN_JS_PLUGIN_ID' plugin. " +
-                "Use '$KOTLIN_MPP_PLUGIN_ID' instead"
-
-        project.plugins.withId(KOTLIN_JS_PLUGIN_ID) {
-            project.logger.error(msg)
-        }
     }
 
     class RedirectAndroidVariants : ComponentMetadataRule {
