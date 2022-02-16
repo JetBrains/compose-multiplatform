@@ -105,8 +105,12 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
             }
+
             skikoMain {
                 dependsOn(commonMain)
+                dependencies {
+                    api(libs.skikoCommon)
+                }
             }
 
             desktopMain {
@@ -117,6 +121,12 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
             jsMain.dependsOn(skikoMain)
             nativeMain.dependsOn(skikoMain)
+
+            commonTest {
+                dependencies {
+                    implementation(kotlin("test"))
+                }
+            }
 
             // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
             //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
@@ -155,15 +165,25 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.mockitoKotlin)
             }
 
-            desktopTest.dependencies {
-                implementation(project(":compose:ui:ui-test-junit4"))
-                implementation(libs.truth)
-                implementation(libs.junit)
-                implementation(libs.skikoCurrentOs)
-                implementation(libs.kotlinCoroutinesSwing)
-                implementation(libs.mockitoCore)
-                implementation(libs.mockitoKotlin)
+            skikoTest {
+                dependsOn(commonTest)
             }
+
+            desktopTest {
+                dependsOn(skikoTest)
+                dependencies {
+                    implementation(project(":compose:ui:ui-test-junit4"))
+                    implementation(libs.truth)
+                    implementation(libs.junit)
+                    implementation(libs.skikoCurrentOs)
+                    implementation(libs.kotlinCoroutinesSwing)
+                    implementation(libs.mockitoCore)
+                    implementation(libs.mockitoKotlin)
+                }
+            }
+
+            nativeTest.dependsOn(skikoTest)
+            jsTest.dependsOn(skikoTest)
         }
     }
     dependencies {

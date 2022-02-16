@@ -18,25 +18,22 @@ package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.text.findFollowingBreak
 import androidx.compose.foundation.text.findPrecedingBreak
-import com.google.common.truth.Truth.assertThat
 
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
-@RunWith(JUnit4::class)
 class StringHelpersTest {
     val complexString = "\uD83E\uDDD1\uD83C\uDFFF\u200D\uD83E\uDDB0"
 
     @Test
     fun StringHelpersTest_findFollowingBreak() {
         val result = complexString.findFollowingBreak(0)
-        assertThat(result).isEqualTo(7)
+        assertEquals(result, 7)
     }
 
     @Test
     fun StringHelpersTest_findPrecedingBreak() {
         val result = complexString.findPrecedingBreak(7)
-        assertThat(result).isEqualTo(0)
+        assertEquals(result, 0)
     }
 }
