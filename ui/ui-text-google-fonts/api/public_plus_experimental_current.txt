@@ -1,0 +1,13 @@
+// Signature format: 4.0
+package androidx.compose.ui.text.googlefonts {
+
+  public final class GoogleFontKt {
+    method @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font GoogleFont(String name, androidx.compose.ui.text.googlefonts.GoogleFontProvider fontProvider, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional boolean bestEffort);
+  }
+
+  @androidx.compose.ui.text.ExperimentalTextApi public final class GoogleFontProvider {
+    ctor public GoogleFontProvider(String providerAuthority, String providerPackage, java.util.List<? extends java.util.List<byte[]>> certificates);
+  }
+
+}
+
