@@ -24,19 +24,12 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.relocation.BringIntoViewResponder.Companion.ModifierLocalBringIntoViewResponder
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.modifier.modifierLocalProvider
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.IntOffset
@@ -103,9 +96,9 @@ class BringIntoViewRequesterViewIntegrationTest {
     @Test
     fun bringIntoView_callsViewRequestRectangleOnScreen_whenResponderPresent() {
         val requesterOffset = IntOffset(1, 2)
-        val scrollOffset = 3
+        val scrollOffset = Offset(3f, 4f)
         val rectangleToRequest = Rect(Offset(10f, 20f), Size(30f, 40f))
-        val expectedRectangle = AndroidRect(11, 38, 41, 78)
+        val expectedRectangle = AndroidRect(14, 26, 44, 66)
         lateinit var scope: CoroutineScope
         lateinit var parent: FakeScrollable
         val bringIntoViewRequester = BringIntoViewRequester()
@@ -119,7 +112,7 @@ class BringIntoViewRequesterViewIntegrationTest {
                     Box(
                         Modifier
                             .size(10.dp)
-                            .verticalScroll(rememberScrollState(scrollOffset))
+                            .fakeScrollable(scrollOffset) {}
                     ) {
                         Box(
                             Modifier
@@ -148,7 +141,7 @@ class BringIntoViewRequesterViewIntegrationTest {
         }
     }
 
-    @Ignore("b/216652644")
+    @Ignore("This use case can't be supported until BringIntoView is in ui: b/216652644")
     @Test
     fun bringIntoView_propagatesThroughIntermediateView() {
         val requesterOffset = IntOffset(1, 2)
@@ -160,7 +153,9 @@ class BringIntoViewRequesterViewIntegrationTest {
         rule.setContent {
             scope = rememberCoroutineScope()
             AndroidView(
-                modifier = Modifier.testBringIntoViewResponder { requests += it },
+                modifier = Modifier
+                    // This offset needs to be non-zero or it won't see the request at all.
+                    .fakeScrollable { requests += it },
                 factory = { context ->
                     val parent = FakeScrollable(context)
                     val child = ComposeView(context)
@@ -188,26 +183,6 @@ class BringIntoViewRequesterViewIntegrationTest {
             assertThat(requests.single()).isEqualTo(expectedRectangle)
         }
     }
-
-    private fun Modifier.testBringIntoViewResponder(onBringIntoView: (Rect) -> Unit): Modifier =
-        composed {
-            val screenRequester = remember { BringRectangleOnScreenRequester() }
-            val responder = remember {
-                object : BringIntoViewResponder {
-                    override suspend fun bringIntoView(rect: Rect) {
-                        onBringIntoView(rect)
-                    }
-
-                    override fun toLocalRect(
-                        rect: Rect,
-                        layoutCoordinates: LayoutCoordinates
-                    ): Rect = rect
-                }
-            }
-
-            bringRectangleOnScreenRequester(screenRequester)
-                .modifierLocalProvider(ModifierLocalBringIntoViewResponder) { responder }
-        }
 
     /** A view that records calls to [requestChildRectangleOnScreen] for testing. */
     private class FakeScrollable(context: Context) : FrameLayout(context) {

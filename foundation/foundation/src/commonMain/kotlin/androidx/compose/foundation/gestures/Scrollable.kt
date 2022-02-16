@@ -26,10 +26,7 @@ import androidx.compose.foundation.gestures.Orientation.Horizontal
 import androidx.compose.foundation.gestures.Orientation.Vertical
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.relocation.BringIntoViewResponder
-import androidx.compose.foundation.relocation.BringIntoViewResponder.Companion.ModifierLocalBringIntoViewResponder
-import androidx.compose.foundation.relocation.BringRectangleOnScreenRequester
-import androidx.compose.foundation.relocation.bringIntoView
-import androidx.compose.foundation.relocation.bringRectangleOnScreenRequester
+import androidx.compose.foundation.relocation.bringIntoViewResponder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -51,11 +48,8 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.OnGloballyPositionedModifier
-import androidx.compose.ui.modifier.ModifierLocalConsumer
+import androidx.compose.ui.layout.OnRemeasuredModifier
 import androidx.compose.ui.modifier.ModifierLocalProvider
-import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
@@ -65,7 +59,6 @@ import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.abs
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 /**
@@ -108,6 +101,7 @@ fun Modifier.scrollable(
     overScrollController = null
 )
 
+@OptIn(ExperimentalFoundationApi::class)
 internal fun Modifier.scrollable(
     state: ScrollableState,
     orientation: Orientation,
@@ -129,7 +123,7 @@ internal fun Modifier.scrollable(
     },
     factory = {
         val overscrollModifier = overScrollController?.let { Modifier.overScroll(it) } ?: Modifier
-        val bringIntoViewModifier = remember(orientation, state, reverseDirection) {
+        val bringIntoViewResponder = remember(orientation, state, reverseDirection) {
             BringIntoViewResponder(orientation, state, reverseDirection)
         }
 
@@ -140,8 +134,7 @@ internal fun Modifier.scrollable(
         }
 
         Modifier
-            .then(bringIntoViewModifier)
-            .bringRectangleOnScreenRequester(bringIntoViewModifier.bringRectangleOnScreenRequester)
+            .then(bringIntoViewResponder.modifier)
             .then(overscrollModifier)
             .pointerScrollable(
                 interactionSource,
@@ -468,89 +461,40 @@ private class BringIntoViewResponder(
     private val orientation: Orientation,
     private val scrollableState: ScrollableState,
     private val reverseDirection: Boolean,
-) : ModifierLocalConsumer,
-    ModifierLocalProvider<BringIntoViewResponder>,
-    BringIntoViewResponder,
-    OnGloballyPositionedModifier {
+) : BringIntoViewResponder, OnRemeasuredModifier {
+    private var size: IntSize = IntSize.Zero
 
-    private fun Float.reverseIfNeeded(): Float = if (reverseDirection) this * -1 else this
+    val modifier = Modifier.bringIntoViewResponder(this)
+        .then(this)
 
-    // Read the modifier local and save a reference to the parent.
-    private lateinit var parent: BringIntoViewResponder
-    override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) {
-        parent = scope.run { ModifierLocalBringIntoViewResponder.current }
+    override fun onRemeasured(size: IntSize) {
+        this.size = size
     }
 
-    val bringRectangleOnScreenRequester = BringRectangleOnScreenRequester()
-
-    // Populate the modifier local with this object.
-    override val key = ModifierLocalBringIntoViewResponder
-    override val value = this
-
-    // LayoutCoordinates of this item.
-    private lateinit var layoutCoordinates: LayoutCoordinates
-    override fun onGloballyPositioned(coordinates: LayoutCoordinates) {
-        layoutCoordinates = coordinates
-    }
-
-    override suspend fun bringIntoView(rect: Rect) {
-
-        val destRect = computeDestination(rect)
-
-        // For the item to be visible, if needs to be in the viewport of all its ancestors.
-        // Note: For now we run both of these in parallel, but in the future we could make this
-        // configurable. (The child relocation could be executed before the parent, or parent
-        // before the child).
-        coroutineScope {
-            // Bring the requested Child into this parent's view.
-            launch {
-                performBringIntoView(rect, destRect)
-            }
-
-            // If the parent is another BringIntoViewResponder, call bringIntoView.
-            launch {
-                parent.bringIntoView(
-                    parent.toLocalRect(destRect, this@BringIntoViewResponder.layoutCoordinates),
-                    bringRectangleOnScreenRequester
-                )
-            }
-        }
-    }
-
-    override fun toLocalRect(rect: Rect, layoutCoordinates: LayoutCoordinates): Rect {
-        // Translate the supplied layout coordinates into the coordinate system of this parent.
-        val parentBoundingBox = this.layoutCoordinates.localBoundingBoxOf(layoutCoordinates, false)
-
-        // Translate the rect to this parent's local coordinates.
-        return rect.translate(parentBoundingBox.topLeft)
-    }
-
-    /**
-     * Compute the destination given the source rectangle and current bounds.
-     *
-     * @param source The bounding box of the item that sent the request to be brought into view.
-     * @return the destination rectangle.
-     */
-    fun computeDestination(source: Rect): Rect {
-        val size = layoutCoordinates.size.toSize()
+    override fun calculateRectForParent(localRect: Rect): Rect {
+        val size = size.toSize()
         return when (orientation) {
-            Vertical ->
-                source.translate(0f, relocationDistance(source.top, source.bottom, size.height))
-            Horizontal ->
-                source.translate(relocationDistance(source.left, source.right, size.width), 0f)
+            Vertical -> localRect.translate(
+                translateX = 0f,
+                translateY = relocationDistance(localRect.top, localRect.bottom, size.height)
+            )
+            Horizontal -> localRect.translate(
+                translateX = relocationDistance(localRect.left, localRect.right, size.width),
+                translateY = 0f
+            )
         }
     }
 
-    /**
-     * Using the source and destination bounds, perform an animated scroll.
-     */
-    suspend fun performBringIntoView(source: Rect, destination: Rect) {
+    override suspend fun bringChildIntoView(localRect: Rect) {
+        val destRect = calculateRectForParent(localRect)
         val offset = when (orientation) {
-            Vertical -> source.top - destination.top
-            Horizontal -> source.left - destination.left
+            Vertical -> localRect.top - destRect.top
+            Horizontal -> localRect.left - destRect.left
         }
         scrollableState.animateScrollBy(offset.reverseIfNeeded())
     }
+
+    private fun Float.reverseIfNeeded(): Float = if (reverseDirection) this * -1 else this
 }
 
 // Calculate the offset needed to bring one of the edges into view. The leadingEdge is the side

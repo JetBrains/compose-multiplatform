@@ -16,24 +16,17 @@
 
 package androidx.compose.foundation.relocation
 
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Rect as ComposeRect
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.runtime.Composable
 
 /**
  * Platform specific internal API to bring a rectangle into view.
  */
-internal actual class BringRectangleOnScreenRequester {
-    @Suppress("UNUSED_PARAMETER")
-    actual fun bringRectangleOnScreen(rect: ComposeRect) {
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+internal actual fun rememberDefaultBringIntoViewParent(): BringIntoViewParent {
+    return BringIntoViewParent { _, _ ->
         // TODO(b/203204124): Implement this if desktop has a
         //  concept similar to Android's View.requestRectangleOnScreen.
     }
 }
-
-/**
- * Companion Modifier to [BringRectangleOnScreenRequester].
- */
-@Suppress("UNUSED_PARAMETER")
-internal actual fun Modifier.bringRectangleOnScreenRequester(
-    bringRectangleOnScreenRequester: BringRectangleOnScreenRequester
-): Modifier = this
