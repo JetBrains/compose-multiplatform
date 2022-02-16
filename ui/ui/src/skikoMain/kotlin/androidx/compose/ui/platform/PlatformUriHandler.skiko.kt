@@ -16,4 +16,6 @@
 
 package androidx.compose.ui.platform
 
-internal expect class PlatformUriHandler : UriHandler
+import org.jetbrains.skiko.URIManager
+
+internal class PlatformUriHandler : UriHandler, URIManager()

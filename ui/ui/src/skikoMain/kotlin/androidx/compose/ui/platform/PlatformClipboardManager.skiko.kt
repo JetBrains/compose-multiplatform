@@ -16,4 +16,16 @@
 
 package androidx.compose.ui.platform
 
-internal expect class PlatformClipboardManager : ClipboardManager
+import androidx.compose.ui.text.AnnotatedString
+import org.jetbrains.skiko.ClipboardManager as SkikoCLipboardManager
+
+internal class PlatformClipboardManager : ClipboardManager {
+    val skikoClipboardManager = SkikoCLipboardManager()
+
+    override fun getText(): AnnotatedString? =
+        skikoClipboardManager.getText()?.let { AnnotatedString(it) }
+
+    override fun setText(annotatedString: AnnotatedString) {
+        skikoClipboardManager.setText(annotatedString.text)
+    }
+}
