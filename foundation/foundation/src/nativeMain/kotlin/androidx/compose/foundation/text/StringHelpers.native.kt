@@ -20,21 +20,3 @@ internal actual fun StringBuilder.appendCodePointX(codePoint: Int): StringBuilde
     TODO("Implement native StringBuilder.appendCodePointX")
     // TODO: there is an appendCodePoint in K/N stdlib, but it is internal.
     // this.appendCodePoint(codePoint)
-
-internal actual fun String.findPrecedingBreak(index: Int): Int {
-    TODO("Implement native String.findPrecedingBreak")
-/*
-    val it = BreakIterator.getCharacterInstance()
-    it.setText(this)
-    return it.preceding(index)
-*/
-}
-
-internal actual fun String.findFollowingBreak(index: Int): Int {
-    TODO("Implement native String.findFollowingBreak")
-/*
-    val it = BreakIterator.getCharacterInstance()
-    it.setText(this)
-    return it.following(index)
-*/
-}
