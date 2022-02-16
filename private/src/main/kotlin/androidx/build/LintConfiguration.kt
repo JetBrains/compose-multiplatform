@@ -341,6 +341,7 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension) {
             textReport = false
         }
 
+        val lintBaselineFile = lintBaseline.get().asFile
         // If we give lint the filepath of a baseline file, then:
         //   If the file does not exist, lint will write new violations to it
         //   If the file does exist, lint will read extemptions from it
@@ -352,13 +353,14 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension) {
         // This requires us only pass a baseline to lint if one already exists.
         if (updateLintBaseline) {
             baseline = generatedLintBaseline
-        } else if (lintBaseline.exists()) {
-            baseline = lintBaseline
+        } else if (lintBaselineFile.exists()) {
+            baseline = lintBaselineFile
         }
     }
 }
 
-val Project.lintBaseline get() = File(projectDir, "/lint-baseline.xml")
+val Project.lintBaseline get() =
+    project.objects.fileProperty().fileValue(File(projectDir, "/lint-baseline.xml"))
 val Project.generatedLintBaseline get() = File(project.buildDir, "/generated-lint-baseline.xml")
 
 /**
