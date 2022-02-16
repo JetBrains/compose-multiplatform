@@ -59,9 +59,11 @@ internal class LazyGridScrollPosition(
         // state would be lost and overridden with zeros.
         if (hadFirstNotEmptyLayout || measureResult.totalItemsCount > 0) {
             hadFirstNotEmptyLayout = true
+            val scrollOffset = measureResult.firstVisibleLineScrollOffset
+            check(scrollOffset >= 0f) { "scrollOffset should be non-negative ($scrollOffset)" }
             update(
                 ItemIndex(measureResult.firstVisibleLine?.items?.firstOrNull()?.index?.value ?: 0),
-                measureResult.firstVisibleLineScrollOffset
+                scrollOffset
             )
         }
     }
@@ -71,7 +73,7 @@ internal class LazyGridScrollPosition(
      * composing the items during the next measure pass and will be updated by the real
      * position calculated during the measurement. This means that there is guarantee that
      * exactly this index and offset will be applied as it is possible that:
-     * a) there will no item at this index in reality
+     * a) there will be no item at this index in reality
      * b) item at this index will be smaller than the asked scrollOffset, which means we would
      * switch to the next item
      * c) there will be not enough items to fill the viewport after the requested index, so we
@@ -96,7 +98,6 @@ internal class LazyGridScrollPosition(
 
     private fun update(index: ItemIndex, scrollOffset: Int) {
         require(index.value >= 0f) { "Index should be non-negative (${index.value})" }
-        require(scrollOffset >= 0f) { "scrollOffset should be non-negative ($scrollOffset)" }
         if (index != this.index) {
             this.index = index
             indexState.value = index.value

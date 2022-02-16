@@ -73,6 +73,8 @@ import androidx.compose.ui.zIndex
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
+import com.google.common.collect.Range
+import com.google.common.truth.IntegerSubject
 import com.google.common.truth.Truth
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
@@ -984,4 +986,8 @@ class LazyGridTest {
             .captureToImage()
             .assertPixels { Color.Green }
     }
+}
+
+internal fun IntegerSubject.isEqualTo(expected: Int, tolerance: Int) {
+    isIn(Range.closed(expected - tolerance, expected + tolerance))
 }
