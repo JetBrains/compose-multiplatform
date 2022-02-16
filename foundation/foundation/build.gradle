@@ -105,10 +105,18 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
             }
-
-            desktopMain.dependencies {
-                implementation(libs.kotlinStdlib)
+            skikoMain {
+                dependsOn(commonMain)
             }
+
+            desktopMain {
+                dependsOn(skikoMain)
+                dependencies {
+                    implementation(libs.kotlinStdlib)
+                }
+            }
+            jsMain.dependsOn(skikoMain)
+            nativeMain.dependsOn(skikoMain)
 
             // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
             //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
