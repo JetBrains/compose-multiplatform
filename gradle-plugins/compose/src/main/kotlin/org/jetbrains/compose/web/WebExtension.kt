@@ -7,8 +7,10 @@ package org.jetbrains.compose.web
 
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
+import org.jetbrains.compose.internal.kotlinJsExtOrNull
 import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.compose.internal.mppExtOrNull
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 
@@ -46,16 +48,36 @@ abstract class WebExtension : ExtensionAware {
     }
 
     private fun defaultJsTargetsToConfigure(project: Project): Set<KotlinJsIrTarget> {
-        val mppTargets = project.mppExtOrNull?.targets?.asMap?.values ?: emptySet()
-        val jsIRTargets = mppTargets.filterIsInstanceTo(LinkedHashSet<KotlinJsIrTarget>())
+        val mppExt = project.mppExtOrNull
 
-        return if (jsIRTargets.size > 1) {
-            project.logger.error(
-                "w: Default configuration for Compose Web is disabled: " +
-                        "multiple Kotlin JS IR targets are defined. " +
-                        "Specify Compose Web Kotlin targets by using `compose.web.targets()`"
-            )
-            emptySet()
-        } else jsIRTargets
+        if (mppExt != null) {
+            val mppTargets = mppExt.targets.asMap.values
+            val jsIRTargets = mppTargets.filterIsInstanceTo(LinkedHashSet<KotlinJsIrTarget>())
+
+            return if (jsIRTargets.size > 1) {
+                project.logger.error(
+                    "w: Default configuration for Compose for Web is disabled: " +
+                            "multiple Kotlin JS IR targets are defined. " +
+                            "Specify Compose for Web Kotlin targets by using `compose.web.targets()`"
+                )
+                emptySet()
+            } else jsIRTargets
+        }
+
+        val jsExt = project.kotlinJsExtOrNull
+        if (jsExt != null) {
+            val target = jsExt.target
+            return if (target is KotlinJsIrTarget) {
+                setOf(target)
+            } else {
+                project.logger.error(
+                    "w: Default configuration for Compose for Web is disabled: " +
+                            "Compose for Web does not support legacy (non-IR) JS targets"
+                )
+                emptySet()
+            }
+        }
+
+        return emptySet()
     }
 }
