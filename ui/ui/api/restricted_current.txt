@@ -139,17 +139,6 @@ package androidx.compose.ui {
     method public default <R> R! foldOut(R? initial, kotlin.jvm.functions.Function2<? super androidx.compose.ui.Modifier.Element,? super R,? extends R> operation);
   }
 
-  @androidx.compose.runtime.Stable public interface MotionDurationScale extends kotlin.coroutines.CoroutineContext.Element {
-    method public default kotlin.coroutines.CoroutineContext.Key<?> getKey();
-    method public float getScaleFactor();
-    property public default kotlin.coroutines.CoroutineContext.Key<?> key;
-    property public abstract float scaleFactor;
-    field public static final androidx.compose.ui.MotionDurationScale.Key Key;
-  }
-
-  public static final class MotionDurationScale.Key implements kotlin.coroutines.CoroutineContext.Key<androidx.compose.ui.MotionDurationScale> {
-  }
-
   public final class TempListUtilsKt {
   }
 

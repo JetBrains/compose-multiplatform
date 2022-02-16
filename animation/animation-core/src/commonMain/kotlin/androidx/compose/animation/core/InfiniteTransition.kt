@@ -26,10 +26,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.Dp
-import kotlinx.coroutines.flow.first
 
 /**
  * Creates a [InfiniteTransition] that runs infinite child animations. Child animations can be
@@ -111,15 +109,6 @@ class InfiniteTransition internal constructor() {
             value = animation.getValueFromNanos(playTime)
             isFinished = animation.isFinishedFromNanos(playTime)
         }
-
-        fun skipToEnd() {
-            value = animation.targetValue
-            startOnTheNextFrame = true
-        }
-
-        fun reset() {
-            startOnTheNextFrame = true
-        }
     }
 
     internal val animations = mutableVectorOf<TransitionAnimationState<*, *>>()
@@ -141,41 +130,18 @@ class InfiniteTransition internal constructor() {
     internal fun run() {
         if (isRunning || refreshChildNeeded) {
             LaunchedEffect(this) {
-                var durationScale = 1f
-                // Restart every time duration scale changes
                 while (true) {
-                    withInfiniteAnimationFrameNanos {
-                        if (startTimeNanos == AnimationConstants.UnspecifiedTime ||
-                            durationScale != coroutineContext.durationScale
-                        ) {
-                            startTimeNanos = it
-                            animations.forEach {
-                                it.reset()
-                            }
-                            durationScale = coroutineContext.durationScale
-                        }
-                        if (durationScale == 0f) {
-                            // Finish right away
-                            animations.forEach {
-                                it.skipToEnd()
-                            }
-                        } else {
-                            val playTimeNanos = ((it - startTimeNanos) / durationScale).toLong()
-                            onFrame(playTimeNanos)
-                        }
-                    }
-                    // Suspend until duration scale is non-zero
-                    if (durationScale == 0f) {
-                        snapshotFlow { coroutineContext.durationScale }.first {
-                            it > 0f
-                        }
-                    }
+                    withInfiniteAnimationFrameNanos(::onFrame)
                 }
             }
         }
     }
 
-    private fun onFrame(playTimeNanos: Long) {
+    private fun onFrame(frameTimeNanos: Long) {
+        if (startTimeNanos == AnimationConstants.UnspecifiedTime) {
+            startTimeNanos = frameTimeNanos
+        }
+        val playTimeNanos = frameTimeNanos - startTimeNanos
         var allFinished = true
         // Pulse new playtime
         animations.forEach {
