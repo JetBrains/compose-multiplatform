@@ -160,8 +160,9 @@ fun interface ElementBuilder<TElement : Element> {
         internal val buildersCache = mutableMapOf<String, ElementBuilder<*>>()
 
         fun <TElement : Element> createBuilder(tagName: String): ElementBuilder<TElement> {
-            return buildersCache.getOrPut(tagName) {
-                ElementBuilderImplementation<TElement>(tagName)
+            val tagLowercase = tagName.lowercase()
+            return buildersCache.getOrPut(tagLowercase) {
+                ElementBuilderImplementation<TElement>(tagLowercase)
             }.unsafeCast<ElementBuilder<TElement>>()
         }
     }

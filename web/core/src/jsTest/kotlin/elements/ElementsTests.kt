@@ -146,10 +146,10 @@ class ElementsTests {
         val expectedKeys = setOf("custom", "div", "b", "abc")
         assertEquals(expectedKeys, ElementBuilder.buildersCache.keys.intersect(expectedKeys))
 
-        assertEquals("custom", custom.create().nodeName.lowercase())
-        assertEquals("div", div.create().nodeName.lowercase())
-        assertEquals("b", b.create().nodeName.lowercase())
-        assertEquals("abc", abc.create().nodeName.lowercase())
+        assertEquals("CUSTOM", custom.create().nodeName)
+        assertEquals("DIV", div.create().nodeName)
+        assertEquals("B", b.create().nodeName)
+        assertEquals("ABC", abc.create().nodeName)
     }
 
     @Test

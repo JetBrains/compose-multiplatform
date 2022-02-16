@@ -148,8 +148,16 @@ fun <TElement : Element> TagElement(
     }
 }
 
+/**
+ * @param tagName - the name of the tag that needs to be created.
+ * It's best to use constant values for [tagName].
+ * If variable [tagName] needed, consider wrapping TagElement calls into an if...else:
+ *
+ * ```
+ *      if (useDiv) TagElement("div",...) else TagElement("span", ...)
+ * ```
+ */
 @Composable
-@ExperimentalComposeWebApi
 fun <TElement : Element> TagElement(
     tagName: String,
     applyAttrs: AttrsScope<TElement>.() -> Unit,
