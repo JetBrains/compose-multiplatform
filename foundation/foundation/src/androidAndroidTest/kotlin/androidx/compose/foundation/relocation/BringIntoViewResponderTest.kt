@@ -17,37 +17,30 @@
 package androidx.compose.foundation.relocation
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.TestActivity
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.relocation.BringIntoViewResponder.Companion.ModifierLocalBringIntoViewResponder
-import androidx.compose.foundation.relocation.LayoutCoordinateSubject.Companion.assertThat
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.boundsInParent
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.modifier.modifierLocalProvider
-import androidx.compose.foundation.TestActivity
-import androidx.compose.foundation.relocation.ScrollableResponder.Companion.LocalRect
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
-import com.google.common.truth.Fact.simpleFact
-import com.google.common.truth.FailureMetadata
-import com.google.common.truth.Subject
-import com.google.common.truth.Subject.Factory
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.junit.Before
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @SmallTest
 @RunWith(AndroidJUnit4::class)
 class BringIntoViewResponderTest {
@@ -55,28 +48,18 @@ class BringIntoViewResponderTest {
     @get:Rule
     val rule = createAndroidComposeRule<TestActivity>()
 
-    lateinit var density: Density
+    fun Float.toDp(): Dp = with(rule.density) { this@toDp.toDp() }
 
-    @Before
-    fun setup() {
-        density = Density(rule.activity)
-    }
-
-    fun Float.toDp(): Dp = with(density) { this@toDp.toDp() }
-
-    @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
     @Test
     fun zeroSizedItem_zeroSizedParent_bringIntoView() {
         // Arrange.
-        lateinit var layoutCoordinates: LayoutCoordinates
         val bringIntoViewRequester = BringIntoViewRequester()
-        val scrollableParent = ScrollableResponder()
+        lateinit var requestedRect: Rect
         rule.setContent {
             Box(
                 Modifier
-                    .modifierLocalProvider(ModifierLocalBringIntoViewResponder) { scrollableParent }
+                    .fakeScrollable { requestedRect = it }
                     .bringIntoViewRequester(bringIntoViewRequester)
-                    .onGloballyPositioned { layoutCoordinates = it }
             )
         }
 
@@ -84,27 +67,71 @@ class BringIntoViewResponderTest {
         runBlocking { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
-        assertThat(scrollableParent.callersLayoutCoordinates).isEqualTo(layoutCoordinates)
-        assertThat(scrollableParent.nonLocalRect).isEqualTo(Rect.Zero)
-        assertThat(scrollableParent.requestedRect).isEqualTo(LocalRect)
+        rule.runOnIdle {
+            assertThat(requestedRect).isEqualTo(Rect.Zero)
+        }
     }
 
-    @OptIn(ExperimentalComposeUiApi::class,
-        androidx.compose.foundation.ExperimentalFoundationApi::class
-    )
     @Test
-    fun bringIntoView_itemWithSize() {
+    fun bringIntoView_rectInChild() {
         // Arrange.
-        lateinit var layoutCoordinates: LayoutCoordinates
         val bringIntoViewRequester = BringIntoViewRequester()
-        val scrollableParent = ScrollableResponder()
+        lateinit var requestedRect: Rect
         rule.setContent {
             Box(
                 Modifier
-                    .size(20f.toDp(), 10f.toDp())
-                    .modifierLocalProvider(ModifierLocalBringIntoViewResponder) { scrollableParent }
+                    .fakeScrollable { requestedRect = it }
                     .bringIntoViewRequester(bringIntoViewRequester)
-                    .onGloballyPositioned { layoutCoordinates = it }
+            )
+        }
+
+        // Act.
+        runBlocking { bringIntoViewRequester.bringIntoView(Rect(1f, 2f, 3f, 4f)) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(requestedRect).isEqualTo(Rect(1f, 2f, 3f, 4f))
+        }
+    }
+
+    @Test
+    fun bringIntoView_childWithSize() {
+        // Arrange.
+        val bringIntoViewRequester = BringIntoViewRequester()
+        lateinit var requestedRect: Rect
+        rule.setContent {
+            Box(Modifier) {
+                Box(
+                    Modifier
+                        .fakeScrollable { requestedRect = it }
+                        .size(20f.toDp(), 10f.toDp())
+                        .offset { IntOffset(40, 30) }
+                        .bringIntoViewRequester(bringIntoViewRequester)
+                )
+            }
+        }
+
+        // Act.
+        runBlocking { bringIntoViewRequester.bringIntoView() }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(requestedRect).isEqualTo(Rect(40f, 30f, 60f, 40f))
+        }
+    }
+
+    @Test
+    fun bringIntoView_childBiggerThanParent() {
+        // Arrange.
+        val bringIntoViewRequester = BringIntoViewRequester()
+        lateinit var requestedRect: Rect
+        rule.setContent {
+            Box(
+                Modifier
+                    .size(1f.toDp())
+                    .fakeScrollable { requestedRect = it }
+                    .size(20f.toDp(), 10f.toDp())
+                    .bringIntoViewRequester(bringIntoViewRequester)
             )
         }
 
@@ -112,68 +139,192 @@ class BringIntoViewResponderTest {
         runBlocking { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
+        rule.runOnIdle {
+            assertThat(requestedRect).isEqualTo(Rect(0f, 0f, 20f, 10f))
+        }
+    }
+
+    @Test
+    fun bringIntoView_propagatesToMultipleResponders() {
+        // Arrange.
+        lateinit var outerRequest: Rect
+        lateinit var innerRequest: Rect
+        val bringIntoViewRequester = BringIntoViewRequester()
+        rule.setContent {
+            Box(
+                Modifier
+                    .fakeScrollable { outerRequest = it }
+                    .offset(2f.toDp(), 1f.toDp())
+                    .fakeScrollable { innerRequest = it }
+                    .size(20f.toDp(), 10f.toDp())
+                    .bringIntoViewRequester(bringIntoViewRequester)
+            )
+        }
+
+        // Act.
+        runBlocking { bringIntoViewRequester.bringIntoView() }
+
         // Assert.
-        assertThat(scrollableParent.callersLayoutCoordinates).isEqualTo(layoutCoordinates)
-        assertThat(scrollableParent.nonLocalRect).isEqualTo(Rect(0f, 0f, 20f, 10f))
-        assertThat(scrollableParent.requestedRect).isEqualTo(LocalRect)
+        rule.runOnIdle {
+            assertThat(innerRequest).isEqualTo(Rect(0f, 0f, 20f, 10f))
+            assertThat(outerRequest).isEqualTo(Rect(2f, 1f, 22f, 11f))
+        }
     }
-}
 
-private class LayoutCoordinateSubject(metadata: FailureMetadata?, val actual: LayoutCoordinates?) :
-    Subject(metadata, actual) {
-
-    fun isEqualTo(expected: LayoutCoordinates?) {
-        if (expected == null) {
-            assertThat(actual).isNull()
-            return
-        }
-        if (actual == null) {
-            failWithActual(simpleFact("Expected non-null layout coordinates."))
-            return
-        }
-        if (expected.size != actual.size) {
-            failWithoutActual(
-                simpleFact("Expected size be ${expected.size}"),
-                simpleFact("But was ${actual.size}")
+    @Test
+    fun bringIntoView_onlyPropagatesUp() {
+        // Arrange.
+        lateinit var parentRequest: Rect
+        var childRequest: Rect? = null
+        val bringIntoViewRequester = BringIntoViewRequester()
+        rule.setContent {
+            Box(
+                Modifier
+                    .fakeScrollable { parentRequest = it }
+                    .bringIntoViewRequester(bringIntoViewRequester)
+                    .fakeScrollable { childRequest = it }
             )
         }
-        if (expected.positionInParent() != actual.positionInParent()) {
-            failWithoutActual(
-                simpleFact("Expected bounds in parent to be ${expected.boundsInParent()}"),
-                simpleFact("But was ${actual.boundsInParent()}")
+
+        // Act.
+        runBlocking { bringIntoViewRequester.bringIntoView() }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(parentRequest).isEqualTo(Rect.Zero)
+            assertThat(childRequest).isNull()
+        }
+    }
+
+    @Test
+    fun bringIntoView_propagatesUp_whenRectForParentReturnsInput() {
+        // Arrange.
+        lateinit var parentRequest: Rect
+        var childRequest: Rect? = null
+        val bringIntoViewRequester = BringIntoViewRequester()
+        rule.setContent {
+            Box(
+                Modifier
+                    .fakeScrollable { parentRequest = it }
+                    .fakeScrollable { childRequest = it }
+                    .bringIntoViewRequester(bringIntoViewRequester)
             )
         }
+
+        // Act.
+        runBlocking { bringIntoViewRequester.bringIntoView() }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(parentRequest).isEqualTo(Rect.Zero)
+            assertThat(childRequest).isEqualTo(Rect.Zero)
+        }
     }
 
-    companion object {
-        fun assertThat(layoutCoordinates: LayoutCoordinates?): LayoutCoordinateSubject {
-            return Truth.assertAbout(subjectFactory).that(layoutCoordinates)
+    @Test
+    fun bringIntoView_translatesByCalculateRectForParent() {
+        // Arrange.
+        lateinit var requestedRect: Rect
+        val bringIntoViewRequester = BringIntoViewRequester()
+        rule.setContent {
+            Box(
+                Modifier
+                    .fakeScrollable { requestedRect = it }
+                    .fakeScrollable(Offset(2f, 3f)) {}
+                    .bringIntoViewRequester(bringIntoViewRequester)
+            )
         }
 
-        private val subjectFactory =
-            Factory<LayoutCoordinateSubject, LayoutCoordinates?> { metadata, actual ->
-                LayoutCoordinateSubject(metadata, actual)
-            }
-    }
-}
+        // Act.
+        runBlocking { bringIntoViewRequester.bringIntoView() }
 
-@OptIn(ExperimentalFoundationApi::class)
-private class ScrollableResponder : BringIntoViewResponder {
-    lateinit var requestedRect: Rect
-    lateinit var nonLocalRect: Rect
-    lateinit var callersLayoutCoordinates: LayoutCoordinates
-
-    override suspend fun bringIntoView(rect: Rect) {
-        requestedRect = rect
+        // Assert.
+        rule.runOnIdle {
+            assertThat(requestedRect).isEqualTo(Rect(2f, 3f, 2f, 3f))
+        }
     }
 
-    override fun toLocalRect(rect: Rect, layoutCoordinates: LayoutCoordinates): Rect {
-        nonLocalRect = rect
-        callersLayoutCoordinates = layoutCoordinates
-        return LocalRect
+    @Test
+    fun bringChildIntoView_isCalled_whenRectForParentDoesNotReturnInput() {
+        // Arrange.
+        var requestedRect: Rect? = null
+        val bringIntoViewRequester = BringIntoViewRequester()
+        rule.setContent {
+            Box(
+                Modifier
+                    .fakeScrollable(Offset.Zero) { requestedRect = it }
+                    .bringIntoViewRequester(bringIntoViewRequester)
+            )
+        }
+
+        // Act.
+        runBlocking { bringIntoViewRequester.bringIntoView() }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(requestedRect).isEqualTo(Rect.Zero)
+        }
     }
 
-    companion object {
-        val LocalRect = Rect(10f, 10f, 10f, 10f)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun bringChildIntoView_calledConcurrentlyOnAllResponders() {
+        // Arrange.
+        var childStarted = false
+        var parentStarted = false
+        var childFinished = false
+        var parentFinished = false
+        val bringIntoViewRequester = BringIntoViewRequester()
+        rule.setContent {
+            Box(
+                Modifier
+                    .fakeScrollable {
+                        parentStarted = true
+                        try {
+                            awaitCancellation()
+                        } finally {
+                            parentFinished = true
+                        }
+                    }
+                    .fakeScrollable {
+                        childStarted = true
+                        try {
+                            awaitCancellation()
+                        } finally {
+                            childFinished = true
+                        }
+                    }
+                    .bringIntoViewRequester(bringIntoViewRequester)
+            )
+        }
+        val testScope = TestCoroutineScope().apply {
+            pauseDispatcher()
+        }
+        val requestJob = testScope.launch {
+            bringIntoViewRequester.bringIntoView()
+        }
+        rule.waitForIdle()
+
+        assertThat(childStarted).isFalse()
+        assertThat(parentStarted).isFalse()
+        assertThat(childFinished).isFalse()
+        assertThat(parentFinished).isFalse()
+
+        // Act.
+        testScope.advanceUntilIdle()
+
+        // Assert.
+        assertThat(childStarted).isTrue()
+        assertThat(parentStarted).isTrue()
+        assertThat(childFinished).isFalse()
+        assertThat(parentFinished).isFalse()
+
+        // Act.
+        requestJob.cancel()
+        testScope.advanceUntilIdle()
+
+        // Assert.
+        assertThat(childFinished).isTrue()
+        assertThat(parentFinished).isTrue()
     }
 }

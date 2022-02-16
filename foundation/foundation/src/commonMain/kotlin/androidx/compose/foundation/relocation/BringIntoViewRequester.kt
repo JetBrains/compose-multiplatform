@@ -17,20 +17,13 @@
 package androidx.compose.foundation.relocation
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.relocation.BringIntoViewResponder.Companion.ModifierLocalBringIntoViewResponder
-import androidx.compose.foundation.relocation.BringIntoViewResponder.Companion.RootBringIntoViewResponder
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.toRect
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.modifier.ModifierLocalConsumer
-import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.toSize
 
@@ -98,59 +91,55 @@ fun BringIntoViewRequester(): BringIntoViewRequester {
 @ExperimentalFoundationApi
 fun Modifier.bringIntoViewRequester(
     bringIntoViewRequester: BringIntoViewRequester
-): Modifier = composed(
-    inspectorInfo = debugInspectorInfo {
-        name = "bringIntoViewRequester"
-        properties["bringIntoViewRequester"] = bringIntoViewRequester
+): Modifier = composed(debugInspectorInfo {
+    name = "bringIntoViewRequester"
+    properties["bringIntoViewRequester"] = bringIntoViewRequester
+}) {
+    val defaultResponder = rememberDefaultBringIntoViewParent()
+    val modifier = remember(defaultResponder) {
+        BringIntoViewRequesterModifier(defaultResponder)
     }
-) {
-    val bringIntoViewData = remember { BringIntoViewData(BringRectangleOnScreenRequester()) }
     if (bringIntoViewRequester is BringIntoViewRequesterImpl) {
         DisposableEffect(bringIntoViewRequester) {
-            bringIntoViewRequester.bringIntoViewUsages += bringIntoViewData
-            onDispose { bringIntoViewRequester.bringIntoViewUsages -= bringIntoViewData }
+            bringIntoViewRequester.modifiers += modifier
+            onDispose { bringIntoViewRequester.modifiers -= modifier }
         }
     }
-
-    Modifier
-        .bringRectangleOnScreenRequester(bringIntoViewData.bringRectangleOnScreenRequester)
-        .onGloballyPositioned { bringIntoViewData.layoutCoordinates = it }
-        .then(
-            remember {
-                object : ModifierLocalConsumer {
-                    override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) {
-                        bringIntoViewData.parent = scope.run {
-                            ModifierLocalBringIntoViewResponder.current
-                        }
-                    }
-                }
-            }
-        )
+    return@composed modifier
 }
 
 @ExperimentalFoundationApi
 private class BringIntoViewRequesterImpl : BringIntoViewRequester {
-    val bringIntoViewUsages: MutableVector<BringIntoViewData> = mutableVectorOf()
+    val modifiers = mutableVectorOf<BringIntoViewRequesterModifier>()
 
     override suspend fun bringIntoView(rect: Rect?) {
-        bringIntoViewUsages.forEach {
-            val layoutCoordinates = it.layoutCoordinates
-            if (layoutCoordinates == null || !layoutCoordinates.isAttached) return@forEach
-
-            // If the rect is not specified, use a rectangle representing the entire composable.
-            val sourceRect = rect ?: layoutCoordinates.size.toSize().toRect()
-
-            // Convert the rect into parent coordinates.
-            val rectInParentCoordinates = it.parent.toLocalRect(sourceRect, layoutCoordinates)
-
-            it.parent.bringIntoView(rectInParentCoordinates, it.bringRectangleOnScreenRequester)
+        modifiers.forEach {
+            it.bringIntoView(rect)
         }
     }
 }
 
+/**
+ * A modifier that holds state and modifier implementations for [bringIntoViewRequester]. It has
+ * access to the next [BringIntoViewParent] via [BringIntoViewChildModifier], and uses that parent
+ * to respond to requests to [bringIntoView].
+ */
 @ExperimentalFoundationApi
-private data class BringIntoViewData(
-    val bringRectangleOnScreenRequester: BringRectangleOnScreenRequester,
-    var parent: BringIntoViewResponder = RootBringIntoViewResponder,
-    var layoutCoordinates: LayoutCoordinates? = null
-)
+private class BringIntoViewRequesterModifier(
+    defaultParent: BringIntoViewParent
+) : BringIntoViewChildModifier(defaultParent) {
+
+    /**
+     * Requests that [rect] (if non-null) or the entire bounds of this modifier's node (if [rect]
+     * is null) be brought into view by the [parent]&nbsp;[BringIntoViewParent].
+     */
+    suspend fun bringIntoView(rect: Rect?) {
+        val layoutCoordinates = layoutCoordinates ?: return
+
+        // If the rect is not specified, use a rectangle representing the entire composable.
+        val sourceRect = rect ?: layoutCoordinates.size.toSize().toRect()
+
+        // Convert the rect into parent coordinates.
+        parent.bringChildIntoView(sourceRect, layoutCoordinates)
+    }
+}
