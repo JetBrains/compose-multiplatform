@@ -161,7 +161,9 @@ internal fun measureLazyGrid(
             val toScrollBack = maxOffset - currentMainAxisOffset
             currentFirstLineScrollOffset -= toScrollBack
             currentMainAxisOffset += toScrollBack
-            while (currentFirstLineScrollOffset < 0 && currentFirstLineIndex > LineIndex(0)) {
+            while (currentFirstLineScrollOffset < beforeContentPadding &&
+                currentFirstLineIndex > LineIndex(0)
+            ) {
                 val previousIndex = LineIndex(currentFirstLineIndex.value - 1)
                 val measuredLine = measuredLineProvider.getAndMeasure(previousIndex)
                 visibleLines.add(0, measuredLine)
