@@ -152,14 +152,20 @@ private val Td: ElementBuilder<HTMLTableCellElement> = ElementBuilderImplementat
 private val Tbody: ElementBuilder<HTMLTableSectionElement> = ElementBuilderImplementation("tbody")
 private val Tfoot: ElementBuilder<HTMLTableSectionElement> = ElementBuilderImplementation("tfoot")
 
-val Style: ElementBuilder<HTMLStyleElement> = ElementBuilderImplementation("style")
+internal val Style: ElementBuilder<HTMLStyleElement> = ElementBuilderImplementation("style")
 
 fun interface ElementBuilder<TElement : Element> {
     fun create(): TElement
 
     companion object {
+        // it's internal only for testing purposes
+        internal val buildersCache = mutableMapOf<String, ElementBuilder<*>>()
+
         fun <TElement : Element> createBuilder(tagName: String): ElementBuilder<TElement> {
-            return object  : ElementBuilderImplementation<TElement>(tagName) {}
+            val tagLowercase = tagName.lowercase()
+            return buildersCache.getOrPut(tagLowercase) {
+                ElementBuilderImplementation<TElement>(tagLowercase)
+            }.unsafeCast<ElementBuilder<TElement>>()
         }
     }
 }

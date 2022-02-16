@@ -136,6 +136,56 @@ class ElementsTests {
     }
 
     @Test
+    fun testElementBuilderCreate() {
+        val custom = ElementBuilder.createBuilder<HTMLElement>("custom")
+        val div = ElementBuilder.createBuilder<HTMLElement>("div")
+        val b = ElementBuilder.createBuilder<HTMLElement>("b")
+        val abc = ElementBuilder.createBuilder<HTMLElement>("abc")
+
+        val expectedKeys = setOf("custom", "div", "b", "abc")
+        assertEquals(expectedKeys, ElementBuilder.buildersCache.keys.intersect(expectedKeys))
+
+        assertEquals("CUSTOM", custom.create().nodeName)
+        assertEquals("DIV", div.create().nodeName)
+        assertEquals("B", b.create().nodeName)
+        assertEquals("ABC", abc.create().nodeName)
+    }
+
+    @Test
+    @OptIn(ExperimentalComposeWebApi::class)
+    fun rawCreationAndTagChanges() = runTest {
+        @Composable
+        fun CustomElement(
+            tagName: String,
+            attrs: AttrsScope<HTMLElement>.() -> Unit,
+            content: ContentBuilder<HTMLElement>? = null
+        ) {
+            TagElement(
+                tagName = tagName,
+                applyAttrs = attrs,
+                content
+            )
+        }
+
+        var tagName by mutableStateOf("custom")
+
+        composition {
+            CustomElement(tagName, {
+                id("container")
+            }) {
+                Text("CUSTOM")
+            }
+        }
+
+        assertEquals("<div><custom id=\"container\">CUSTOM</custom></div>", root.outerHTML)
+
+        tagName = "anothercustom"
+        waitForRecompositionComplete()
+
+        assertEquals("<div><anothercustom id=\"container\">CUSTOM</anothercustom></div>", root.outerHTML)
+    }
+
+    @Test
     fun elementBuilderShouldBeCalledOnce() = runTest {
         var counter = 0
         var flag by mutableStateOf(false)
