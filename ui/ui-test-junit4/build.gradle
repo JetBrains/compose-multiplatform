@@ -62,6 +62,7 @@ dependencies {
 
         androidTestImplementation(project(":compose:test-utils"))
         androidTestImplementation(project(":compose:material:material"))
+        androidTestImplementation("androidx.fragment:fragment-testing:1.4.1")
         androidTestImplementation(libs.testRules)
         androidTestImplementation(libs.testRunner)
         androidTestImplementation(libs.truth)
@@ -124,6 +125,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             androidAndroidTest.dependencies {
                 implementation(project(":compose:test-utils"))
                 implementation(project(":compose:material:material"))
+                implementation("androidx.fragment:fragment-testing:1.4.1")
                 implementation(libs.testRules)
                 implementation(libs.testRunner)
                 implementation(libs.truth)
