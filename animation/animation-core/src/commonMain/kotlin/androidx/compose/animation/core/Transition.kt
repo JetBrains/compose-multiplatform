@@ -280,7 +280,7 @@ class Transition<S> @PublishedApi internal constructor(
         maxDurationNanos
     }
 
-    internal fun onFrame(frameTimeNanos: Long, durationScale: Float) {
+    internal fun onFrame(frameTimeNanos: Long) {
         if (startTimeNanos == AnimationConstants.UnspecifiedTime) {
             onTransitionStart(frameTimeNanos)
         }
@@ -292,7 +292,7 @@ class Transition<S> @PublishedApi internal constructor(
         // Pulse new playtime
         _animations.forEach {
             if (!it.isFinished) {
-                it.onPlayTimeChanged(playTimeNanos, durationScale)
+                it.onPlayTimeChanged(playTimeNanos)
             }
             // Check isFinished flag again after the animation pulse
             if (!it.isFinished) {
@@ -301,7 +301,7 @@ class Transition<S> @PublishedApi internal constructor(
         }
         _transitions.forEach {
             if (it.targetState != it.currentState) {
-                it.onFrame(playTimeNanos, durationScale)
+                it.onFrame(playTimeNanos)
             }
             if (it.targetState != it.currentState) {
                 allFinished = false
@@ -429,13 +429,12 @@ class Transition<S> @PublishedApi internal constructor(
             if (targetState != currentState || isRunning || updateChildrenNeeded) {
                 LaunchedEffect(this) {
                     while (true) {
-                        val durationScale = coroutineContext.durationScale
                         withFrameNanos {
                             // This check is very important, as isSeeking may be changed off-band
                             // between the last check in composition and this callback which
                             // happens in the animation callback the next frame.
                             if (!isSeeking) {
-                                onFrame(it / AnimationDebugDurationScale, durationScale)
+                                onFrame(it / AnimationDebugDurationScale)
                             }
                         }
                     }
@@ -504,13 +503,8 @@ class Transition<S> @PublishedApi internal constructor(
         internal val durationNanos
             get() = animation.durationNanos
 
-        internal fun onPlayTimeChanged(playTimeNanos: Long, durationScale: Float) {
-            val playTime =
-                if (durationScale == 0f) {
-                    animation.durationNanos
-                } else {
-                    ((playTimeNanos - offsetTimeNanos) / durationScale).toLong()
-                }
+        internal fun onPlayTimeChanged(playTimeNanos: Long) {
+            val playTime = playTimeNanos - offsetTimeNanos
             value = animation.getValueFromNanos(playTime)
             velocityVector = animation.getVelocityVectorFromNanos(playTime)
             if (animation.isFinishedFromNanos(playTime)) {
