@@ -88,13 +88,28 @@ class LazyListState constructor(
         LazyListScrollPosition(firstVisibleItemIndex, firstVisibleItemScrollOffset)
 
     /**
-     * The index of the first item that is visible
+     * The index of the first item that is visible.
+     *
+     * Note that this property is observable and if you use it in the composable function it will
+     * be recomposed on every change causing potential performance issues.
+     *
+     * If you want to run some side effects like sending an analytics event or updating a state
+     * based on this value consider using "snapshotFlow":
+     * @sample androidx.compose.foundation.samples.UsingListScrollPositionForSideEffectSample
+     *
+     * If you need to use it in the composition then consider wrapping the calculation into a
+     * derived state in order to only have recompositions when the derived value changes:
+     * @sample androidx.compose.foundation.samples.UsingListScrollPositionInCompositionSample
      */
     val firstVisibleItemIndex: Int get() = scrollPosition.observableIndex
 
     /**
      * The scroll offset of the first visible item. Scrolling forward is positive - i.e., the
-     * amount that the item is offset backwards
+     * amount that the item is offset backwards.
+     *
+     * Note that this property is observable and if you use it in the composable function it will
+     * be recomposed on every scroll causing potential performance issues.
+     * @see firstVisibleItemIndex for samples with the recommended usage patterns.
      */
     val firstVisibleItemScrollOffset: Int get() = scrollPosition.observableScrollOffset
 
@@ -104,6 +119,15 @@ class LazyListState constructor(
     /**
      * The object of [LazyListLayoutInfo] calculated during the last layout pass. For example,
      * you can use it to calculate what items are currently visible.
+     *
+     * Note that this property is observable and is updated after every scroll or remeasure.
+     * If you use it in the composable function it will be recomposed on every change causing
+     * potential performance issues including infinity recomposition loop.
+     * Therefore, avoid using it in the composition.
+     *
+     * If you want to run some side effects like sending an analytics event or updating a state
+     * based on this value consider using "snapshotFlow":
+     * @sample androidx.compose.foundation.samples.UsingListLayoutInfoForSideEffectSample
      */
     val layoutInfo: LazyListLayoutInfo get() = layoutInfoState.value
 
