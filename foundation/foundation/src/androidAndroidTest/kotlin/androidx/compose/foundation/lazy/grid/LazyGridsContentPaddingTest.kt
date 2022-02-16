@@ -20,6 +20,7 @@ import androidx.compose.animation.core.snap
 import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -67,12 +68,14 @@ class LazyGridsContentPaddingTest {
 
     private var itemSize: Dp = Dp.Infinity
     private var smallPaddingSize: Dp = Dp.Infinity
+    private var itemSizePx = 50f
+    private var smallPaddingSizePx = 12f
 
     @Before
     fun before() {
         with(rule.density) {
-            itemSize = 50.toDp()
-            smallPaddingSize = 12.toDp()
+            itemSize = itemSizePx.toDp()
+            smallPaddingSize = smallPaddingSizePx.toDp()
         }
     }
 
@@ -413,6 +416,52 @@ class LazyGridsContentPaddingTest {
         // Shouldn't be visible
         rule.onNodeWithTag("1").assertIsNotDisplayed()
         rule.onNodeWithTag("0").assertIsNotDisplayed()
+    }
+
+    @Test
+    fun column_overscrollWithContentPadding() {
+        lateinit var state: LazyGridState
+        rule.setContent {
+            state = rememberLazyGridState()
+            Box(modifier = Modifier.testTag(ContainerTag).size(itemSize + smallPaddingSize * 2)) {
+                LazyVerticalGrid(
+                    GridCells.Fixed(1),
+                    state = state,
+                    contentPadding = PaddingValues(
+                        vertical = smallPaddingSize
+                    )
+                ) {
+                    items(2) {
+                        Box(Modifier.testTag("$it").height(itemSize))
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertTopPositionInRootIsEqualTo(smallPaddingSize)
+            .assertHeightIsEqualTo(itemSize)
+
+        rule.onNodeWithTag("1")
+            .assertTopPositionInRootIsEqualTo(smallPaddingSize + itemSize)
+            .assertHeightIsEqualTo(itemSize)
+
+        rule.runOnIdle {
+            runBlocking {
+                // itemSizePx is the maximum offset, plus if we overscroll the content padding
+                // the layout mechanism will decide the item 0 is not needed until we start
+                // filling the over scrolled gap.
+                state.scrollBy(value = itemSizePx + smallPaddingSizePx * 1.5f)
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertTopPositionInRootIsEqualTo(smallPaddingSize)
+            .assertHeightIsEqualTo(itemSize)
+
+        rule.onNodeWithTag("0")
+            .assertTopPositionInRootIsEqualTo(smallPaddingSize - itemSize)
+            .assertHeightIsEqualTo(itemSize)
     }
 
     @Test
@@ -1087,6 +1136,51 @@ class LazyGridsContentPaddingTest {
     //     // Shouldn't be visible
     //     rule.onNodeWithTag("1").assertIsNotDisplayed()
     //     rule.onNodeWithTag("0").assertIsNotDisplayed()
+    // }
+
+    // @Test
+    // fun row_overscrollWithContentPadding() {
+    //     lateinit var state: LazyListState
+    //     rule.setContent {
+    //         state = rememberLazyListState()
+    //         Box(modifier = Modifier.testTag(ContainerTag).size(itemSize + smallPaddingSize * 2)) {
+    //             LazyRow(
+    //                 state = state,
+    //                 contentPadding = PaddingValues(
+    //                     horizontal = smallPaddingSize
+    //                 )
+    //             ) {
+    //                 items(2) {
+    //                     Box(Modifier.testTag("$it").fillParentMaxSize())
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     rule.onNodeWithTag("0")
+    //         .assertLeftPositionInRootIsEqualTo(smallPaddingSize)
+    //         .assertWidthIsEqualTo(itemSize)
+
+    //     rule.onNodeWithTag("1")
+    //         .assertLeftPositionInRootIsEqualTo(smallPaddingSize + itemSize)
+    //         .assertWidthIsEqualTo(itemSize)
+
+    //     rule.runOnIdle {
+    //         runBlocking {
+    //             // itemSizePx is the maximum offset, plus if we overscroll the content padding
+    //             // the layout mechanism will decide the item 0 is not needed until we start
+    //             // filling the over scrolled gap.
+    //             state.scrollBy(value = itemSizePx + smallPaddingSizePx * 1.5f)
+    //         }
+    //     }
+
+    //     rule.onNodeWithTag("1")
+    //         .assertLeftPositionInRootIsEqualTo(smallPaddingSize)
+    //         .assertWidthIsEqualTo(itemSize)
+
+    //     rule.onNodeWithTag("0")
+    //         .assertLeftPositionInRootIsEqualTo(smallPaddingSize - itemSize)
+    //         .assertWidthIsEqualTo(itemSize)
     // }
 
     private fun LazyGridState.scrollBy(offset: Dp) {
