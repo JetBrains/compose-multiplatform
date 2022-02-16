@@ -232,10 +232,6 @@ class ResourceFont internal constructor(
  * frame they are used until the font is loaded. This is the correct behavior for small fonts
  * available locally.
  *
- * To load fonts from a remote resource, it is recommended to call
- * [Font](Int, FontLoadingStrategy, ...) and provide [FontLoadingStrategy.Async] as the second
- * parameter.
- *
  * @param resId The resource ID of the font file in font resources. i.e. "R.font.myfont".
  * @param weight The weight of the font. The system uses this to match a font to a font request
  * that is given in a [androidx.compose.ui.text.SpanStyle].
@@ -247,10 +243,14 @@ class ResourceFont internal constructor(
  *
  * @see FontFamily
  */
-// TODO: When FontLoadingStrategy is stable, deprecate HIDDEN this for binary compatible overload
-//  and add a default parameter to other overload for source compatible (deferred because adding an
-//  optional experimental parameters makes call sites experimental).
-@OptIn(ExperimentalTextApi::class)
+// TODO(b/219783755): Remove this when safe after Compose 1.3
+@Deprecated(
+    "Maintained for binary compatibility until Compose 1.3.",
+    replaceWith = ReplaceWith(
+        "Font(resId, weight, style)"
+    ),
+    DeprecationLevel.HIDDEN
+)
 @Stable
 fun Font(
     resId: Int,
@@ -270,25 +270,20 @@ fun Font(
  * [FontLoadingStrategy.Async].
  *
  * @param resId The resource ID of the font file in font resources. i.e. "R.font.myfont".
- * @param loadingStrategy Load strategy for this font, may be async for async resource fonts
  * @param weight The weight of the font. The system uses this to match a font to a font request
  * that is given in a [androidx.compose.ui.text.SpanStyle].
  * @param style The style of the font, normal or italic. The system uses this to match a font to a
  * font request that is given in a [androidx.compose.ui.text.SpanStyle].
+ * @param loadingStrategy Load strategy for this font, may be async for async resource fonts
  *
  * @see FontFamily
  */
-// TODO: When FontLoadingStrategy is stable, move fontLoad parameter to last position, add default,
-//  and promote  to stable API in the same release. This maintains source compatibility with the
-//  original  overload's positional ordering as well as adding a default param (deferred because new
-//  default parameters of experimental type mark call site as experimental)
-@ExperimentalTextApi
 @Stable
 fun Font(
     resId: Int,
-    loadingStrategy: FontLoadingStrategy,
     weight: FontWeight = FontWeight.Normal,
-    style: FontStyle = FontStyle.Normal
+    style: FontStyle = FontStyle.Normal,
+    loadingStrategy: FontLoadingStrategy = FontLoadingStrategy.Blocking
 ): Font = ResourceFont(resId, weight, style, loadingStrategy)
 
 /**

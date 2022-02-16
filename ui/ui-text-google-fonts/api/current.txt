@@ -1,0 +1,8 @@
+// Signature format: 4.0
+package androidx.compose.ui.text.googlefonts {
+
+  public final class GoogleFontKt {
+  }
+
+}
+

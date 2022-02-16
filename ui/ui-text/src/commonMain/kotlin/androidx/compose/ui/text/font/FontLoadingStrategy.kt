@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.text.font
 
-import androidx.compose.ui.text.ExperimentalTextApi
-
 /**
  * Font loading strategy for a [Font] in a [FontListFontFamily].
  *
@@ -25,8 +23,6 @@ import androidx.compose.ui.text.ExperimentalTextApi
  *
  * For more information about font family resolution see [FontFamily].
  */
-// TODO: When making stable, resolve Font(resId) != Font(resId, fontLoad) in Font.kt
-@ExperimentalTextApi
 @kotlin.jvm.JvmInline
 value class FontLoadingStrategy private constructor(val value: Int) {
     override fun toString(): String {

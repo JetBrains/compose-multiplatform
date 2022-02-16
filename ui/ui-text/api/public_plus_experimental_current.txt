@@ -635,8 +635,8 @@ package androidx.compose.ui.text.font {
   }
 
   public final class FontKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.Font Font(int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
-    method @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(int resId, int loadingStrategy, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.Font Font(int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional int loadingStrategy);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.Font! Font(int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily toFontFamily(androidx.compose.ui.text.font.Font);
   }
 
@@ -648,7 +648,7 @@ package androidx.compose.ui.text.font {
   public final class FontListFontFamilyTypefaceAdapterKt {
   }
 
-  @androidx.compose.ui.text.ExperimentalTextApi @kotlin.jvm.JvmInline public final value class FontLoadingStrategy {
+  @kotlin.jvm.JvmInline public final value class FontLoadingStrategy {
     method public int getValue();
     property public final int value;
     field public static final androidx.compose.ui.text.font.FontLoadingStrategy.Companion Companion;
