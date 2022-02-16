@@ -24,14 +24,22 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.GridItemSpan
+import androidx.compose.foundation.lazy.LazyGridState
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyGridState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.collect
 
 @OptIn(ExperimentalFoundationApi::class)
 @Sampled
@@ -90,4 +98,50 @@ fun LazyVerticalGridSpanSample() {
             }
         }
     }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Sampled
+@Composable
+fun UsingGridScrollPositionForSideEffectSample() {
+    val gridState = rememberLazyGridState()
+    LaunchedEffect(gridState) {
+        snapshotFlow { gridState.firstVisibleItemIndex }
+            .collect {
+                // use the new index
+            }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Sampled
+@Composable
+fun UsingGridScrollPositionInCompositionSample() {
+    val gridState = rememberLazyGridState()
+    val isAtTop by remember {
+        derivedStateOf {
+            gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0
+        }
+    }
+    if (!isAtTop) {
+        ScrollToTopButton(gridState)
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Sampled
+@Composable
+fun UsingGridLayoutInfoForSideEffectSample() {
+    val gridState = rememberLazyGridState()
+    LaunchedEffect(gridState) {
+        snapshotFlow { gridState.layoutInfo.totalItemsCount }
+            .collect {
+                // use the new items count
+            }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun ScrollToTopButton(@Suppress("UNUSED_PARAMETER") gridState: LazyGridState) {
 }
