@@ -17,8 +17,8 @@
 package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.lazy.layout.LazyLayoutPlaceable
 import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 
 /**
@@ -65,13 +65,12 @@ internal class LazyMeasuredItemProvider @ExperimentalFoundationApi constructor(
 }
 
 // This interface allows to avoid autoboxing on index param
-@ExperimentalFoundationApi
 internal fun interface MeasuredItemFactory {
     fun createItem(
         index: ItemIndex,
         key: Any,
         crossAxisSize: Int,
         mainAxisSpacing: Int,
-        placeables: Array<LazyLayoutPlaceable>
+        placeables: Array<Placeable>
     ): LazyMeasuredItem
 }

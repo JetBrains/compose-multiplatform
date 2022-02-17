@@ -2046,8 +2046,10 @@ package androidx.compose.ui.layout {
     method public operator int get(androidx.compose.ui.layout.AlignmentLine alignmentLine);
     method public int getMeasuredHeight();
     method public int getMeasuredWidth();
+    method public default Object? getParentData();
     property public abstract int measuredHeight;
     property public abstract int measuredWidth;
+    property public default Object? parentData;
   }
 
   public final class ModifierInfo {

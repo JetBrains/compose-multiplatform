@@ -31,6 +31,11 @@ interface Measured {
     val measuredHeight: Int
 
     /**
+     * Data provided by the [ParentDataModifier] applied to the layout.
+     */
+    val parentData: Any? get() = null
+
+    /**
      * Returns the position of an [alignment line][AlignmentLine],
      * or [AlignmentLine.Unspecified] if the line is not provided.
      */
