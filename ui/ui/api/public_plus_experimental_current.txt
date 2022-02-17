@@ -1834,6 +1834,34 @@ package androidx.compose.ui.layout {
     property public static final androidx.compose.ui.layout.HorizontalAlignmentLine LastBaseline;
   }
 
+  public interface BeyondBoundsLayout {
+    method public void requestBeyondBoundsLayout(int direction, kotlin.jvm.functions.Function0<java.lang.Boolean> until, kotlin.jvm.functions.Function0<kotlin.Unit> onBeyondBoundsLayoutCompleted);
+  }
+
+  public final inline class BeyondBoundsLayoutDirection {
+    ctor public BeyondBoundsLayoutDirection();
+  }
+
+  public static final class BeyondBoundsLayoutDirection.Companion {
+    method public int getAbove();
+    method public int getAfter();
+    method public int getBefore();
+    method public int getBelow();
+    method public int getLeft();
+    method public int getRight();
+    property public final int Above;
+    property public final int After;
+    property public final int Before;
+    property public final int Below;
+    property public final int Left;
+    property public final int Right;
+  }
+
+  public final class BeyondBoundsLayoutKt {
+    method public static androidx.compose.ui.modifier.ProvidableModifierLocal<androidx.compose.ui.layout.BeyondBoundsLayout> getModifierLocalBeyondBoundsLayout();
+    property public static final androidx.compose.ui.modifier.ProvidableModifierLocal<androidx.compose.ui.layout.BeyondBoundsLayout> ModifierLocalBeyondBoundsLayout;
+  }
+
   @androidx.compose.runtime.Stable public interface ContentScale {
     method public long computeScaleFactor(long srcSize, long dstSize);
     field public static final androidx.compose.ui.layout.ContentScale.Companion Companion;
