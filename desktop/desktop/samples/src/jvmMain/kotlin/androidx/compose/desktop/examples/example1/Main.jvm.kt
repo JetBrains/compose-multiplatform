@@ -102,7 +102,6 @@ import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
@@ -111,7 +110,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.platform.Font
-import androidx.compose.ui.text.platform.FontLoader
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
@@ -132,33 +130,14 @@ import kotlin.random.Random
 
 private const val title = "Desktop Compose Elements"
 
-val italicFont = try {
-    FontFamily(
-        Font("NotoSans-Italic.ttf").also {
-            // Check that font is loadable.
-            @OptIn(ExperimentalTextApi::class)
-            FontLoader().load(it)!!
-        }
-    )
-} catch (e: Exception) {
-    FontFamily.SansSerif
-}
+val italicFont = FontFamily(
+    Font("NotoSans-Italic.ttf")
+)
 
-val dispatchedFonts = try {
-    FontFamily(
-        Font("NotoSans-Italic.ttf", style = FontStyle.Italic).also {
-            @OptIn(ExperimentalTextApi::class)
-            FontLoader().load(it)!!
-        },
-        Font("NotoSans-Regular.ttf", style = FontStyle.Normal).also {
-            @OptIn(ExperimentalTextApi::class)
-            FontLoader().load(it)!!
-        }
-    )
-} catch (e: Exception) {
-    println("Failed to load font $e")
-    null
-}
+val dispatchedFonts = FontFamily(
+    Font("NotoSans-Italic.ttf", style = FontStyle.Italic),
+    Font("NotoSans-Regular.ttf", style = FontStyle.Normal)
+)
 
 fun main() = singleWindowApplication(
     title = title,
