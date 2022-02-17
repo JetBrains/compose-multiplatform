@@ -115,6 +115,10 @@ internal class AndroidComposeTest<A : ComponentActivity>(
         if (Build.FINGERPRINT.lowercase() == "robolectric") {
             idlingStrategy = RobolectricIdlingStrategy(composeRootRegistry, composeIdlingResource)
         }
+        // Need to await quiescence before registering our ComposeIdlingResource because the host
+        // activity might still be launching. If it is going to set compose content, we want that
+        // to happen before we install our hooks to avoid a race.
+        idlingStrategy.runUntilIdle()
         return composeRootRegistry.withRegistry {
             idlingResourceRegistry.withRegistry {
                 idlingStrategy.withStrategy {
