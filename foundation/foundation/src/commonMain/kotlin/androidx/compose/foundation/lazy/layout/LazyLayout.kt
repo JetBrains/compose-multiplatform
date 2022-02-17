@@ -16,8 +16,8 @@
 
 package androidx.compose.foundation.lazy.layout
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
@@ -30,6 +30,7 @@ import androidx.compose.ui.layout.SubcomposeSlotReusePolicy
  * A layout that only composes and lays out currently visible items. Can be used to build
  * efficient scrollable layouts.
  */
+@ExperimentalFoundationApi
 @Composable
 internal fun LazyLayout(
     itemsProvider: () -> LazyLayoutItemsProvider,
@@ -71,6 +72,7 @@ internal fun LazyLayout(
     )
 }
 
+@ExperimentalFoundationApi
 private class LazyLayoutItemReusePolicy(
     private val factory: LazyLayoutItemContentFactory
 ) : SubcomposeSlotReusePolicy {
@@ -102,6 +104,7 @@ private const val MaxItemsToRetainForReuse = 2
  * Platform specific implementation of lazy layout items prefetching - precomposing next items in
  * advance during the scrolling.
  */
+@ExperimentalFoundationApi
 @Composable
 internal expect fun LazyLayoutPrefetcher(
     prefetchPolicy: LazyLayoutPrefetchPolicy,

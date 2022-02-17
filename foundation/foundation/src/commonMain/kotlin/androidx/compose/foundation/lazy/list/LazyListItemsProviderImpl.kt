@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.lazy.list
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.getDefaultLazyKeyFor
@@ -34,6 +35,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.node.Ref
 import kotlinx.coroutines.flow.collect
 
+@ExperimentalFoundationApi
 @Composable
 internal fun rememberStateOfItemsProvider(
     state: LazyListState,
@@ -65,6 +67,7 @@ internal fun rememberStateOfItemsProvider(
     }
 }
 
+@ExperimentalFoundationApi
 internal class LazyListItemsProviderImpl(
     private val itemScope: Ref<LazyItemScopeImpl>,
     private val list: IntervalList<LazyListIntervalContent>,

@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.LayoutDirection
  * Represents one measured item of the lazy grid. It can in fact consist of multiple placeables
  * if the user emit multiple layout nodes in the item callback.
  */
+@OptIn(ExperimentalFoundationApi::class)
 internal class LazyMeasuredItem(
     val index: ItemIndex,
     val key: Any,

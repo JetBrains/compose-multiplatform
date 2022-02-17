@@ -17,6 +17,7 @@
 package androidx.compose.foundation.lazy.list
 
 import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.layout.LazyLayoutPlaceable
 import androidx.compose.ui.Alignment
@@ -28,7 +29,8 @@ import androidx.compose.ui.unit.LayoutDirection
  * Represents one measured item of the lazy list. It can in fact consist of multiple placeables
  * if the user emit multiple layout nodes in the item callback.
  */
-internal class LazyMeasuredItem(
+@OptIn(ExperimentalFoundationApi::class)
+internal class LazyMeasuredItem @ExperimentalFoundationApi constructor(
     val index: Int,
     private val placeables: Array<LazyLayoutPlaceable>,
     private val isVertical: Boolean,

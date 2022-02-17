@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.lazy.layout
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.Constraints
 /**
  * Defines the measure and layout behaviour of a [LazyLayout].
  */
+@ExperimentalFoundationApi
 @Stable
 internal fun interface LazyMeasurePolicy {
     fun MeasureScope.measure(
@@ -33,6 +35,7 @@ internal fun interface LazyMeasurePolicy {
     ): MeasureResult
 }
 
+@ExperimentalFoundationApi
 @Stable
 internal class LazyLayoutPlaceablesProvider internal constructor(
     private val itemContentFactory: LazyLayoutItemContentFactory,

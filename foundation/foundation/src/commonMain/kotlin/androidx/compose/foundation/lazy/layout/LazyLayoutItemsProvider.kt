@@ -16,8 +16,10 @@
 
 package androidx.compose.foundation.lazy.layout
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 
+@ExperimentalFoundationApi
 internal interface LazyLayoutItemsProvider {
     /** Returns the content lambda for the given index and scope object */
     fun getContent(index: Int): @Composable () -> Unit

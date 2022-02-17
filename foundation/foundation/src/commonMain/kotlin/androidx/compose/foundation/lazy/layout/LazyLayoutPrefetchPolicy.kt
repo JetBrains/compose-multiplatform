@@ -16,12 +16,14 @@
 
 package androidx.compose.foundation.lazy.layout
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.Constraints
 
 /** Creates a [LazyLayoutPrefetchPolicy]. */
+@ExperimentalFoundationApi
 @Composable
 internal fun rememberLazyLayoutPrefetchPolicy(): LazyLayoutPrefetchPolicy = remember {
     LazyLayoutPrefetchPolicy()
@@ -30,6 +32,7 @@ internal fun rememberLazyLayoutPrefetchPolicy(): LazyLayoutPrefetchPolicy = reme
 /**
  * Controller for lazy items prefetching, used by lazy layouts to instruct the prefetcher.
  */
+@ExperimentalFoundationApi
 @Stable
 internal class LazyLayoutPrefetchPolicy {
     internal var prefetcher: Subscriber? = null

@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.lazy.list
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.assertNotNestingScrollableContainers
 import androidx.compose.foundation.clipScrollableContainer
 import androidx.compose.foundation.gestures.FlingBehavior
@@ -49,6 +50,7 @@ import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.offset
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun LazyList(
     /** Modifier to be applied for the inner layout */
@@ -145,6 +147,7 @@ internal fun LazyList(
 }
 
 /** Extracted to minimize the recomposition scope */
+@ExperimentalFoundationApi
 @Composable
 private fun ScrollPositionUpdater(
     stateOfItemsProvider: State<LazyListItemsProvider>,
@@ -156,6 +159,7 @@ private fun ScrollPositionUpdater(
     }
 }
 
+@ExperimentalFoundationApi
 @Composable
 private fun rememberLazyListMeasurePolicy(
     /** State containing the items provider of the list. */

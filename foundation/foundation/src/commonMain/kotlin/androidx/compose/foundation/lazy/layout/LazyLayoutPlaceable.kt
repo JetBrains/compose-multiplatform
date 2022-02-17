@@ -16,8 +16,10 @@
 
 package androidx.compose.foundation.lazy.layout
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.ui.layout.Placeable
 
+@ExperimentalFoundationApi
 internal class LazyLayoutPlaceable(
     val placeable: Placeable,
     val parentData: Any?

@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.lazy.list
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.mutableStateOf
 
 /**
@@ -92,6 +93,7 @@ internal class LazyListScrollPosition(
      * there were items added or removed before our current first visible item and keep this item
      * as the first visible one even given that its index has been changed.
      */
+    @ExperimentalFoundationApi
     fun updateScrollPositionIfTheFirstItemWasMoved(itemsProvider: LazyListItemsProvider) {
         update(findLazyListIndexByKey(lastKnownFirstItemKey, index, itemsProvider), scrollOffset)
     }
@@ -113,6 +115,7 @@ internal class LazyListScrollPosition(
          * Finds a position of the item with the given key in the lists. This logic allows us to
          * detect when there were items added or removed before our current first item.
          */
+        @ExperimentalFoundationApi
         private fun findLazyListIndexByKey(
             key: Any?,
             lastKnownIndex: DataIndex,
