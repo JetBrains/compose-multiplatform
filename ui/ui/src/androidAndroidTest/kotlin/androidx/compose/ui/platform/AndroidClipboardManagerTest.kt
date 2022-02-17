@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.platform
 
+import android.content.ClipboardManager
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -34,7 +35,10 @@ import androidx.compose.ui.unit.sp
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -42,6 +46,9 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalTextApi::class)
 class AndroidClipboardManagerTest {
+
+    private val context = InstrumentationRegistry.getInstrumentation().context
+
     @Test
     fun annotatedString_singleSpanStyle_convertToCharSequenceAndRecover() {
         val annotatedString = buildAnnotatedString {
@@ -196,6 +203,17 @@ class AndroidClipboardManagerTest {
             )
         )
         assertEncodeAndDecode(spanStyle)
+    }
+
+    @Test
+    fun getText_whenHasPrimary_butNoPrimary_returnsNull() {
+        val clipboardManager = mock<ClipboardManager>()
+        whenever(clipboardManager.hasPrimaryClip()).thenReturn(true)
+        whenever(clipboardManager.primaryClip).thenReturn(null)
+        val subject = AndroidClipboardManager(clipboardManager)
+
+        val actual = subject.getText()
+        assertThat(actual).isNull()
     }
 
     private fun assertEncodeAndDecode(spanStyle: SpanStyle) {
