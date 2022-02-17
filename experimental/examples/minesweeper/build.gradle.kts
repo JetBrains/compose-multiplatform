@@ -3,6 +3,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
+import org.jetbrains.compose.experimental.dsl.IOSDevices
 
 buildscript {
     repositories {
@@ -151,7 +152,23 @@ compose.desktop {
 
 compose.experimental {
     web.application {}
-    uikit.application {}
+    uikit.application {
+        bundleIdPrefix = "org.jetbrains"
+        projectName = "ComposeMinesweeper"
+        developmentTeam = "N462MKSJ7M"
+        deployConfigurations {
+            simulator("IPhone8_en") {
+                //Usage: ./gradlew iosDeployIPhone8_en
+                device = IOSDevices.IPHONE_8
+                buildConfiguration = "Debug" // or "Release"
+            }
+            simulator("IPad_ru") {
+                //Usage: ./gradlew iosDeployIPad_ru
+                device = IOSDevices.IPAD_MINI_6
+                buildConfiguration = "Debug"
+            }
+        }
+    }
 }
 
 tasks.withType<KotlinCompile> {

@@ -47,4 +47,6 @@ internal fun Project.configureExperimentalUikitApplication(
         packTask.destinationDir.set(targetBuildDir)
         packTask.executablePath.set(executablePath)
     }
+
+    configureIosDeployTasks(application)
 }

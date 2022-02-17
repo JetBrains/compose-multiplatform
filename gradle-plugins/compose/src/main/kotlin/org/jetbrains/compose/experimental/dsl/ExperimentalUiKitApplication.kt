@@ -5,7 +5,22 @@
 
 package org.jetbrains.compose.experimental.dsl
 
+import org.gradle.api.Action
+import org.gradle.api.model.ObjectFactory
+import org.jetbrains.compose.internal.requiredDslProperty
 import javax.inject.Inject
 
-abstract class ExperimentalUiKitApplication @Inject constructor(val name: String) {
+@Suppress("unused")
+abstract class ExperimentalUiKitApplication @Inject constructor(
+    val name: String,
+    val objects: ObjectFactory
+) {
+    var bundleIdPrefix: String by requiredDslProperty("require property [bundleIdPrefix] in uikit.application { ...")
+    var projectName: String by requiredDslProperty("require property [projectName] in uikit.application { ...")
+    var developmentTeam: String by requiredDslProperty("require property [developmentTeam] in uikit.application { ...")
+
+    val deployConfigurations: IosDeployConfigurations = objects.newInstance(IosDeployConfigurations::class.java)
+    fun deployConfigurations(fn: Action<IosDeployConfigurations>) {
+        fn.execute(deployConfigurations)
+    }
 }
