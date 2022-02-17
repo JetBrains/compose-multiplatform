@@ -255,6 +255,17 @@ private val Tabs = Component(
     examples = TabsExamples
 )
 
+private val TextFields = Component(
+    id = nextId(),
+    name = "Text fields",
+    description = "Text fields let users enter and edit text.",
+    // No text fields icon
+    guidelinesUrl = "$ComponentGuidelinesUrl/text-fields",
+    docsUrl = "$DocsUrl#textfield",
+    sourceUrl = "$Material3SourceUrl/TextField.kt",
+    examples = TextFieldsExamples
+)
+
 private val TopAppBar = Component(
     id = nextId(),
     name = "Top app bar",
@@ -286,5 +297,6 @@ val Components = listOf(
     Sliders,
     Snackbars,
     Tabs,
+    TextFields,
     TopAppBar
 )

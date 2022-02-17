@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.material.textfield
+package androidx.compose.material3
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
@@ -23,15 +23,9 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CutCornerShape
-import androidx.compose.material.GOLDEN_MATERIAL
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.setMaterialContent
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
@@ -77,11 +71,11 @@ class OutlinedTextFieldScreenshotTest {
     val rule = createComposeRule()
 
     @get:Rule
-    val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
+    val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL3)
 
     @Test
     fun outlinedTextField_withInput() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 val text = "Text"
                 OutlinedTextField(
@@ -98,7 +92,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_notFocused() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 OutlinedTextField(
                     value = "",
@@ -114,7 +108,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_focused() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 OutlinedTextField(
                     value = "",
@@ -132,7 +126,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_focused_rtl() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                     OutlinedTextField(
@@ -152,7 +146,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_error_focused() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 val text = "Input"
                 OutlinedTextField(
@@ -172,7 +166,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_error_notFocused() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 OutlinedTextField(
                     value = "",
@@ -188,24 +182,23 @@ class OutlinedTextFieldScreenshotTest {
     }
 
     @Test
-    fun outlinedTextField_textColor_fallbackToContentColor() {
-        rule.setMaterialContent {
-            CompositionLocalProvider(LocalContentColor provides Color.Magenta) {
-                val text = "Hello, world!"
-                OutlinedTextField(
-                    value = TextFieldValue(text = text, selection = TextRange(text.length)),
-                    onValueChange = {},
-                    modifier = Modifier.testTag(TextFieldTag).requiredWidth(280.dp)
-                )
-            }
+    fun outlinedTextField_textColor_customTextColor() {
+        rule.setMaterialContent(lightColorScheme()) {
+            val text = "Hello, world!"
+            OutlinedTextField(
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
+                onValueChange = {},
+                modifier = Modifier.testTag(TextFieldTag).requiredWidth(280.dp),
+                colors = TextFieldDefaults.outlinedTextFieldColors(textColor = Color.Magenta)
+            )
         }
 
-        assertAgainstGolden("outlined_textField_textColor_defaultContentColor")
+        assertAgainstGolden("outlined_textField_textColor_customTextColor")
     }
 
     @Test
     fun outlinedTextField_multiLine_withLabel_textAlignedToTop() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val text = "Text"
             OutlinedTextField(
                 value = TextFieldValue(text = text, selection = TextRange(text.length)),
@@ -222,7 +215,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_multiLine_withoutLabel_textAlignedToTop() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val text = "Text"
             OutlinedTextField(
                 value = TextFieldValue(text = text, selection = TextRange(text.length)),
@@ -238,7 +231,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_multiLine_withLabel_placeholderAlignedToTop() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
@@ -257,7 +250,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_multiLine_withoutLabel_placeholderAlignedToTop() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
@@ -275,7 +268,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_multiLine_labelAlignedToTop() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
@@ -291,7 +284,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_singleLine_withLabel_textAlignedToTop() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val text = "Text"
             OutlinedTextField(
                 value = TextFieldValue(text = text, selection = TextRange(text.length)),
@@ -307,7 +300,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_singleLine_withoutLabel_textCenteredVertically() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val text = "Text"
             OutlinedTextField(
                 value = TextFieldValue(text = text, selection = TextRange(text.length)),
@@ -322,7 +315,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_singleLine_withLabel_placeholderAlignedToTop() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
@@ -340,7 +333,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_singleLine_withoutLabel_placeholderCenteredVertically() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
@@ -358,8 +351,8 @@ class OutlinedTextFieldScreenshotTest {
     }
 
     @Test
-    fun outlinedTextField_singleLine_labelCenteredVetically() {
-        rule.setMaterialContent {
+    fun outlinedTextField_singleLine_labelCenteredVertically() {
+        rule.setMaterialContent(lightColorScheme()) {
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
@@ -373,7 +366,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_disabled() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 OutlinedTextField(
                     value = TextFieldValue("Text"),
@@ -390,7 +383,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_disabled_notFocusable() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 OutlinedTextField(
                     value = TextFieldValue("Text"),
@@ -409,7 +402,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_disabled_notScrolled() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 OutlinedTextField(
                     value = longText,
@@ -434,7 +427,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_readOnly() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             OutlinedTextField(
                 value = TextFieldValue("Text"),
                 onValueChange = {},
@@ -449,7 +442,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_readOnly_focused() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             OutlinedTextField(
                 value = TextFieldValue("Text"),
                 onValueChange = {},
@@ -466,7 +459,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_readOnly_scrolled() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             OutlinedTextField(
                 value = longText,
                 onValueChange = { },
@@ -490,7 +483,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_textCenterAligned() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val text = "Hello world"
             OutlinedTextField(
                 value = TextFieldValue(text = text, selection = TextRange(text.length)),
@@ -506,7 +499,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_textAlignedToEnd() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val text = "Hello world"
             OutlinedTextField(
                 value = TextFieldValue(text = text, selection = TextRange(text.length)),
@@ -520,14 +513,9 @@ class OutlinedTextFieldScreenshotTest {
         assertAgainstGolden("outlinedTextField_textAlignedToEnd")
     }
 
-    private fun SemanticsNodeInteraction.focus() {
-        // split click into (down) and (move, up) to enforce a composition in between
-        this.performTouchInput { down(center) }.performTouchInput { move(); up() }
-    }
-
     @Test
     fun outlinedTextField_customShape() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
@@ -543,7 +531,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_leadingTrailingIcons() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
@@ -559,7 +547,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_leadingTrailingIcons_error() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
@@ -572,6 +560,99 @@ class OutlinedTextFieldScreenshotTest {
         }
 
         assertAgainstGolden("outlinedTextField_leadingTrailingIcons_error")
+    }
+
+    @Test
+    fun outlinedTextField_withInput_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
+                val text = "Text"
+                OutlinedTextField(
+                    value = TextFieldValue(text = text, selection = TextRange(text.length)),
+                    onValueChange = {},
+                    label = { Text("Label") },
+                    modifier = Modifier.requiredWidth(280.dp)
+                )
+            }
+        }
+
+        assertAgainstGolden("outlined_textField_withInput_dark")
+    }
+
+    @Test
+    fun outlinedTextField_focused_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
+                OutlinedTextField(
+                    value = "",
+                    onValueChange = {},
+                    label = { Text("Label") },
+                    modifier = Modifier.requiredWidth(280.dp)
+                )
+            }
+        }
+
+        rule.onNodeWithTag(TextFieldTag).focus()
+
+        assertAgainstGolden("outlined_textField_focused_dark")
+    }
+
+    @Test
+    fun outlinedTextField_error_focused_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
+                val text = "Input"
+                OutlinedTextField(
+                    value = TextFieldValue(text = text, selection = TextRange(text.length)),
+                    onValueChange = {},
+                    label = { Text("Label") },
+                    isError = true,
+                    modifier = Modifier.requiredWidth(280.dp)
+                )
+            }
+        }
+
+        rule.onNodeWithTag(TextFieldTag).focus()
+
+        assertAgainstGolden("outlined_textField_focused_errorState_dark")
+    }
+
+    @Test
+    fun outlinedTextField_disabled_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
+                OutlinedTextField(
+                    value = TextFieldValue("Text"),
+                    onValueChange = {},
+                    singleLine = true,
+                    enabled = false,
+                    modifier = Modifier.requiredWidth(280.dp)
+                )
+            }
+        }
+
+        assertAgainstGolden("outlinedTextField_disabled_dark")
+    }
+
+    @Test
+    fun outlinedTextField_leadingTrailingIcons_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.width(300.dp).testTag(TextFieldTag),
+                leadingIcon = { Icon(Icons.Default.Call, null) },
+                trailingIcon = { Icon(Icons.Default.Clear, null) }
+            )
+        }
+
+        assertAgainstGolden("outlinedTextField_leadingTrailingIcons_dark")
+    }
+
+    private fun SemanticsNodeInteraction.focus() {
+        // split click into (down) and (move, up) to enforce a composition in between
+        this.performTouchInput { down(center) }.performTouchInput { move(); up() }
     }
 
     private fun assertAgainstGolden(goldenIdentifier: String) {

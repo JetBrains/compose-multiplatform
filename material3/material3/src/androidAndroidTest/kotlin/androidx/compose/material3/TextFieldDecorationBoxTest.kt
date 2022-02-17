@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.material.textfield
+package androidx.compose.material3
 
 import android.os.Build
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -22,17 +22,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.FirstBaselineOffset
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldBottomPadding
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.TextFieldDefaults.OutlinedTextFieldDecorationBox
-import androidx.compose.material.TextFieldDefaults.TextFieldDecorationBox
-import androidx.compose.material.TextFieldDefaults.indicatorLine
-import androidx.compose.material.TextFieldPadding
-import androidx.compose.material.TextFieldTopPadding
-import androidx.compose.material.setMaterialContent
+import androidx.compose.material3.TextFieldDefaults.OutlinedTextFieldDecorationBox
+import androidx.compose.material3.TextFieldDefaults.TextFieldDecorationBox
+import androidx.compose.material3.TextFieldDefaults.indicatorLine
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -66,7 +58,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 class TextFieldDecorationBoxTest {
     @get:Rule
     val rule = createComposeRule()
@@ -339,7 +331,7 @@ class TextFieldDecorationBoxTest {
         val borderWidth = 40
         val value = "Text"
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             CompositionLocalProvider(LocalDensity provides Density) {
                 val interactionSource = remember { MutableInteractionSource() }
                 val singleLine = true
@@ -398,7 +390,7 @@ class TextFieldDecorationBoxTest {
         val borderWidth = 40
         val value = "Text"
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             CompositionLocalProvider(LocalDensity provides Density) {
                 val interactionSource = remember { MutableInteractionSource() }
                 val singleLine = true
@@ -467,13 +459,13 @@ class TextFieldDecorationBoxTest {
     private fun assertHorizontalSizeAndPosition_outlinedTextField(
         padding: PaddingValues,
         rtl: Boolean,
-        expectedHeight: Dp,
+        expectedWidth: Dp,
         expectedPosition: Dp
     ) {
         assertSizeAndPosition_outlinedTextField(
             padding,
             true,
-            expectedHeight,
+            expectedWidth,
             expectedPosition,
             false,
             if (rtl) LayoutDirection.Rtl else LayoutDirection.Ltr
@@ -490,7 +482,7 @@ class TextFieldDecorationBoxTest {
     ) {
         var size: IntSize? = null
         var position: Offset? = null
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             CompositionLocalProvider(
                 LocalLayoutDirection provides layoutDirection,
                 LocalDensity provides Density
@@ -565,13 +557,13 @@ class TextFieldDecorationBoxTest {
         padding: PaddingValues,
         rtl: Boolean,
         hasLabel: Boolean,
-        expectedHeight: Dp,
+        expectedWidth: Dp,
         expectedPosition: Dp
     ) {
         assertSizeAndPosition_textField(
             padding,
             true,
-            expectedHeight,
+            expectedWidth,
             expectedPosition,
             false,
             hasLabel,
@@ -590,7 +582,7 @@ class TextFieldDecorationBoxTest {
     ) {
         var size: IntSize? = null
         var position: Offset? = null
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             CompositionLocalProvider(
                 LocalLayoutDirection provides layoutDirection,
                 LocalDensity provides Density

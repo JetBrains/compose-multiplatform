@@ -89,13 +89,7 @@ internal fun CommonDecorationBox(
     }
 
     val labelColor: @Composable (InputPhase) -> Color = {
-        colors.labelColor(
-            enabled,
-            // if label is used as a placeholder (aka not as a small header
-            // at the top), we don't use an error color
-            if (it == InputPhase.UnfocusedEmpty) false else isError,
-            interactionSource
-        ).value
+        colors.labelColor(enabled, isError, interactionSource).value
     }
 
     val typography = MaterialTheme.typography

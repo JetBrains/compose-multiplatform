@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.material.samples
+package androidx.compose.material3.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.background
@@ -22,24 +22,24 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.TextFieldDefaults.indicatorLine
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.materialIcon
 import androidx.compose.material.icons.materialPath
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TextFieldDefaults.indicatorLine
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -154,8 +154,8 @@ fun TextFieldWithHelperMessage() {
         )
         Text(
             text = "Helper message",
-            color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium),
-            style = MaterialTheme.typography.caption,
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(start = 16.dp)
         )
     }
@@ -339,7 +339,7 @@ fun TextArea() {
 @Sampled
 @Composable
 fun CustomTextFieldBasedOnDecorationBox() {
-    @OptIn(ExperimentalMaterialApi::class)
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun CustomTextField(
         value: String,
@@ -360,7 +360,12 @@ fun CustomTextFieldBasedOnDecorationBox() {
             modifier = modifier
                 .background(
                     color = colors.backgroundColor(enabled).value,
-                    shape = TextFieldDefaults.TextFieldShape
+                    shape = RoundedCornerShape(
+                        topStart = 4.0.dp,
+                        topEnd = 4.0.dp,
+                        bottomEnd = 0.0.dp,
+                        bottomStart = 0.0.dp
+                    )
                 )
                 .indicatorLine(
                     enabled = enabled,
@@ -395,7 +400,7 @@ fun CustomTextFieldBasedOnDecorationBox() {
 @Sampled
 @Composable
 fun CustomOutlinedTextFieldBasedOnDecorationBox() {
-    @OptIn(ExperimentalMaterialApi::class)
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun CustomTextField(
         value: String,

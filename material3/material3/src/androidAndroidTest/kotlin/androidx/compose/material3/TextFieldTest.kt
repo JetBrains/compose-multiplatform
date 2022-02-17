@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,48 +14,31 @@
  * limitations under the License.
  */
 
-package androidx.compose.material.textfield
+package androidx.compose.material3
 
 import android.content.Context
 import android.os.Build
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.LocalTextStyle
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Strings.Companion.DefaultErrorMessage
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.TextFieldPadding
-import androidx.compose.material.Typography
-import androidx.compose.material.getString
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.runOnIdleWithDensity
-import androidx.compose.material.setMaterialContent
-import androidx.compose.material.setMaterialContentForSizeAssertions
+import androidx.compose.material3.Strings.Companion.DefaultErrorMessage
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -120,27 +103,25 @@ import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.math.roundToInt
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalTestApi::class)
 class TextFieldTest {
-
-    private val ExpectedDefaultTextFieldHeight = 56.dp
-    private val ExpectedDefaultTextFieldWidth = 280.dp
-    private val ExpectedPadding = 16.dp
-    private val IconPadding = 12.dp
+    private val ExpectedDefaultTextFieldHeight = TextFieldDefaults.MinHeight
+    private val ExpectedDefaultTextFieldWidth = TextFieldDefaults.MinWidth
+    private val ExpectedPadding = TextFieldPadding
+    private val IconPadding = HorizontalIconPadding
     private val ExpectedBaselineOffset = 20.dp
-    private val TopPaddingFilledTextfield = 4.dp
-    private val IconColorAlpha = 0.54f
-    private val TextfieldTag = "textField"
+    private val TopPaddingFilledTextField = 4.dp
+    private val TextFieldTag = "textField"
 
     @get:Rule
     val rule = createComposeRule()
@@ -189,7 +170,7 @@ class TextFieldTest {
 
         var scope: CoroutineScope? = null
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             scope = rememberCoroutineScope()
             Column {
                 TextField(
@@ -246,10 +227,10 @@ class TextFieldTest {
         val interactionSource = MutableInteractionSource()
         var scope: CoroutineScope? = null
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             scope = rememberCoroutineScope()
             TextField(
-                modifier = Modifier.testTag(TextfieldTag),
+                modifier = Modifier.testTag(TextFieldTag),
                 value = "input",
                 onValueChange = {},
                 interactionSource = interactionSource
@@ -267,7 +248,7 @@ class TextFieldTest {
         }
 
         // Click on (2, 2) which is Surface area and outside input area
-        rule.onNodeWithTag(TextfieldTag).performTouchInput {
+        rule.onNodeWithTag(TextFieldTag).performTouchInput {
             click(Offset(2f, 2f))
         }
 
@@ -282,7 +263,7 @@ class TextFieldTest {
     fun testTextField_showHideKeyboardBasedOnFocus() {
         val (focusRequester, parentFocusRequester) = FocusRequester.createRefs()
         lateinit var hostView: View
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             hostView = LocalView.current
             Box {
                 TextField(
@@ -290,7 +271,7 @@ class TextFieldTest {
                         .focusRequester(parentFocusRequester)
                         .focusTarget()
                         .focusRequester(focusRequester)
-                        .testTag(TextfieldTag),
+                        .testTag(TextFieldTag),
                     value = "input",
                     onValueChange = {}
                 )
@@ -312,7 +293,7 @@ class TextFieldTest {
         val (focusRequester, parentFocusRequester) = FocusRequester.createRefs()
         var softwareKeyboardController: SoftwareKeyboardController? = null
         lateinit var hostView: View
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             hostView = LocalView.current
             softwareKeyboardController = LocalSoftwareKeyboardController.current
             Box {
@@ -321,7 +302,7 @@ class TextFieldTest {
                         .focusRequester(parentFocusRequester)
                         .focusTarget()
                         .focusRequester(focusRequester)
-                        .testTag(TextfieldTag),
+                        .testTag(TextFieldTag),
                     value = "input",
                     onValueChange = {}
                 )
@@ -336,7 +317,7 @@ class TextFieldTest {
         rule.runOnIdle { softwareKeyboardController?.hide() }
 
         // Clicking on the text field shows the keyboard.
-        rule.onNodeWithTag(TextfieldTag).performClick()
+        rule.onNodeWithTag(TextFieldTag).performClick()
         rule.runOnIdle { assertThat(hostView.isSoftwareKeyboardShown).isTrue() }
     }
 
@@ -344,7 +325,7 @@ class TextFieldTest {
     fun testTextField_labelPosition_initial_singleLine() {
         val labelSize = Ref<IntSize>()
         val labelPosition = Ref<Offset>()
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 TextField(
                     value = "",
@@ -386,7 +367,7 @@ class TextFieldTest {
     fun testTextField_labelPosition_initial_withDefaultHeight() {
         val labelSize = Ref<IntSize>()
         val labelPosition = Ref<Offset>()
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 TextField(
                     value = "",
@@ -427,7 +408,7 @@ class TextFieldTest {
         val height = 80.dp
         val labelSize = Ref<IntSize>()
         val labelPosition = Ref<Offset>()
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 TextField(
                     value = "",
@@ -465,10 +446,10 @@ class TextFieldTest {
         val labelSize = Ref<IntSize>()
         val labelPosition = Ref<Offset>()
         val baseline = Ref<Float>()
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 TextField(
-                    modifier = Modifier.testTag(TextfieldTag),
+                    modifier = Modifier.testTag(TextFieldTag),
                     value = "",
                     onValueChange = {},
                     label = {
@@ -487,7 +468,7 @@ class TextFieldTest {
         }
 
         // click to focus
-        rule.onNodeWithTag(TextfieldTag).performClick()
+        rule.onNodeWithTag(TextFieldTag).performClick()
 
         rule.runOnIdleWithDensity {
             // size
@@ -509,7 +490,7 @@ class TextFieldTest {
         val labelSize = Ref<IntSize>()
         val labelPosition = Ref<Offset>()
         val baseline = Ref<Float>()
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 TextField(
                     value = "input",
@@ -548,12 +529,12 @@ class TextFieldTest {
     fun testTextField_placeholderPosition_withLabel() {
         val placeholderSize = Ref<IntSize>()
         val placeholderPosition = Ref<Offset>()
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 TextField(
                     modifier = Modifier
                         .height(60.dp)
-                        .testTag(TextfieldTag),
+                        .testTag(TextFieldTag),
                     value = "",
                     onValueChange = {},
                     label = { Text("label") },
@@ -570,7 +551,7 @@ class TextFieldTest {
             }
         }
         // click to focus
-        rule.onNodeWithTag(TextfieldTag).performClick()
+        rule.onNodeWithTag(TextFieldTag).performClick()
 
         rule.runOnIdleWithDensity {
             // size
@@ -583,7 +564,7 @@ class TextFieldTest {
             )
             assertThat(placeholderPosition.value?.y)
                 .isEqualTo(
-                    (ExpectedBaselineOffset.roundToPx() + TopPaddingFilledTextfield.roundToPx())
+                    (ExpectedBaselineOffset.roundToPx() + TopPaddingFilledTextField.roundToPx())
                         .toFloat()
                 )
         }
@@ -594,10 +575,10 @@ class TextFieldTest {
         val placeholderSize = Ref<IntSize>()
         val placeholderPosition = Ref<Offset>()
         val height = 60.dp
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 TextField(
-                    modifier = Modifier.height(height).testTag(TextfieldTag),
+                    modifier = Modifier.height(height).testTag(TextFieldTag),
                     value = "",
                     onValueChange = {},
                     placeholder = {
@@ -614,7 +595,7 @@ class TextFieldTest {
             }
         }
         // click to focus
-        rule.onNodeWithTag(TextfieldTag).performClick()
+        rule.onNodeWithTag(TextFieldTag).performClick()
 
         rule.runOnIdleWithDensity {
             // size
@@ -635,10 +616,10 @@ class TextFieldTest {
     fun testTextField_noPlaceholder_whenInputNotEmpty() {
         val placeholderSize = Ref<IntSize>()
         val placeholderPosition = Ref<Offset>()
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Column {
                 TextField(
-                    modifier = Modifier.testTag(TextfieldTag),
+                    modifier = Modifier.testTag(TextFieldTag),
                     value = "input",
                     onValueChange = {},
 
@@ -656,7 +637,7 @@ class TextFieldTest {
         }
 
         // click to focus
-        rule.onNodeWithTag(TextfieldTag).performClick()
+        rule.onNodeWithTag(TextFieldTag).performClick()
 
         rule.runOnIdleWithDensity {
             assertThat(placeholderSize.value).isNull()
@@ -666,31 +647,21 @@ class TextFieldTest {
 
     @Test
     fun testTextField_placeholderColorAndTextStyle() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
-                modifier = Modifier.testTag(TextfieldTag),
+                modifier = Modifier.testTag(TextFieldTag),
                 value = "",
                 onValueChange = {},
                 placeholder = {
                     Text("placeholder")
-                    assertThat(
-                        LocalContentColor.current.copy(
-                            alpha = LocalContentAlpha.current
-                        )
-                    )
-                        .isEqualTo(
-                            MaterialTheme.colors.onSurface.copy(
-                                alpha = 0.6f
-                            )
-                        )
                     assertThat(LocalTextStyle.current)
-                        .isEqualTo(MaterialTheme.typography.subtitle1)
+                        .isEqualTo(MaterialTheme.typography.bodyLarge)
                 }
             )
         }
 
         // click to focus
-        rule.onNodeWithTag(TextfieldTag).performClick()
+        rule.onNodeWithTag(TextFieldTag).performClick()
     }
 
     @Test
@@ -703,7 +674,7 @@ class TextFieldTest {
         val trailingSize = Ref<IntSize>()
         val density = Density(2f)
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             CompositionLocalProvider(LocalDensity provides density) {
                 TextField(
                     value = "text",
@@ -776,7 +747,7 @@ class TextFieldTest {
         var trailingPosition: Offset? = null
         var trailingSize: IntSize? = null
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             CompositionLocalProvider(LocalDensity provides density) {
                 TextField(
                     value = "text",
@@ -847,7 +818,7 @@ class TextFieldTest {
         var trailingPosition: Offset? = null
         var trailingSize: IntSize? = null
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             CompositionLocalProvider(LocalDensity provides density) {
                 TextField(
                     value = "text",
@@ -902,7 +873,7 @@ class TextFieldTest {
     fun testTextField_labelPositionX_initial_withTrailingAndLeading() {
         val height = 60.dp
         val labelPosition = Ref<Offset>()
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 TextField(
                     value = "",
@@ -935,7 +906,7 @@ class TextFieldTest {
     fun testTextField_labelPositionX_initial_withNullTrailingAndLeading() {
         val height = 60.dp
         val labelPosition = Ref<Offset>()
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 TextField(
                     value = "",
@@ -964,26 +935,18 @@ class TextFieldTest {
 
     @Test
     fun testTextField_colorInLeadingTrailing_whenValidInput() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = "",
                 onValueChange = {},
                 isError = false,
                 leadingIcon = {
                     assertThat(LocalContentColor.current)
-                        .isEqualTo(
-                            MaterialTheme.colors.onSurface.copy(
-                                IconColorAlpha
-                            )
-                        )
+                        .isEqualTo(MaterialTheme.colorScheme.onSurfaceVariant)
                 },
                 trailingIcon = {
                     assertThat(LocalContentColor.current)
-                        .isEqualTo(
-                            MaterialTheme.colors.onSurface.copy(
-                                IconColorAlpha
-                            )
-                        )
+                        .isEqualTo(MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             )
         }
@@ -991,21 +954,17 @@ class TextFieldTest {
 
     @Test
     fun testTextField_colorInLeadingTrailing_whenInvalidInput() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = "",
                 onValueChange = {},
                 isError = true,
                 leadingIcon = {
                     assertThat(LocalContentColor.current)
-                        .isEqualTo(
-                            MaterialTheme.colors.onSurface.copy(
-                                IconColorAlpha
-                            )
-                        )
+                        .isEqualTo(MaterialTheme.colorScheme.onSurfaceVariant)
                 },
                 trailingIcon = {
-                    assertThat(LocalContentColor.current).isEqualTo(MaterialTheme.colors.error)
+                    assertThat(LocalContentColor.current).isEqualTo(MaterialTheme.colorScheme.error)
                 }
             )
         }
@@ -1021,7 +980,7 @@ class TextFieldTest {
             ) {
                 val text = remember { mutableStateOf("") }
                 TextField(
-                    modifier = Modifier.testTag(TextfieldTag),
+                    modifier = Modifier.testTag(TextFieldTag),
                     value = text.value,
                     onValueChange = { text.value = it },
                     keyboardOptions = KeyboardOptions(
@@ -1032,7 +991,7 @@ class TextFieldTest {
             }
         }
 
-        rule.onNodeWithTag(TextfieldTag).performClick()
+        rule.onNodeWithTag(TextFieldTag).performClick()
 
         rule.runOnIdle {
             verify(platformTextInputService, atLeastOnce()).startInput(
@@ -1053,9 +1012,9 @@ class TextFieldTest {
     @LargeTest
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testTextField_visualTransformationPropagated() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
-                modifier = Modifier.testTag(TextfieldTag),
+                modifier = Modifier.testTag(TextFieldTag),
                 value = "qwerty",
                 onValueChange = {},
                 visualTransformation = PasswordVisualTransformation('\u0020'),
@@ -1064,7 +1023,7 @@ class TextFieldTest {
             )
         }
 
-        rule.onNodeWithTag(TextfieldTag)
+        rule.onNodeWithTag(TextFieldTag)
             .captureToImage()
             .assertShape(
                 density = rule.density,
@@ -1081,10 +1040,10 @@ class TextFieldTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testTextField_alphaNotApplied_toCustomBackgroundColorAndTransparentColors() {
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.background(color = Color.White)) {
                 TextField(
-                    modifier = Modifier.testTag(TextfieldTag),
+                    modifier = Modifier.testTag(TextFieldTag),
                     value = "test",
                     onValueChange = {},
                     label = { Text("label") },
@@ -1108,7 +1067,7 @@ class TextFieldTest {
             }
         }
 
-        rule.onNodeWithTag(TextfieldTag)
+        rule.onNodeWithTag(TextFieldTag)
             .captureToImage()
             .assertShape(
                 density = rule.density,
@@ -1119,9 +1078,9 @@ class TextFieldTest {
                 shapeOverlapPixelCount = with(rule.density) { 1.dp.toPx() }
             )
 
-        rule.onNodeWithTag(TextfieldTag).performClick()
+        rule.onNodeWithTag(TextFieldTag).performClick()
 
-        rule.onNodeWithTag(TextfieldTag)
+        rule.onNodeWithTag(TextFieldTag)
             .captureToImage()
             .assertShape(
                 density = rule.density,
@@ -1152,7 +1111,7 @@ class TextFieldTest {
             }
             TransformedText(transformed, mapping)
         }
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = "",
                 onValueChange = {},
@@ -1188,9 +1147,9 @@ class TextFieldTest {
             }
             TransformedText(transformed, mapping)
         }
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
-                modifier = Modifier.testTag(TextfieldTag),
+                modifier = Modifier.testTag(TextFieldTag),
                 value = "",
                 onValueChange = {},
                 visualTransformation = prefixTransformation,
@@ -1208,7 +1167,7 @@ class TextFieldTest {
                 )
             )
         }
-        rule.onNodeWithTag(TextfieldTag)
+        rule.onNodeWithTag(TextFieldTag)
             .captureToImage()
             .assertPixels {
                 Color.White
@@ -1218,7 +1177,7 @@ class TextFieldTest {
     @Test
     fun testErrorSemantics_defaultMessage() {
         lateinit var errorMessage: String
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = "test",
                 onValueChange = {},
@@ -1235,7 +1194,7 @@ class TextFieldTest {
     @Test
     fun testErrorSemantics_messageOverridable() {
         val errorMessage = "Special symbols not allowed"
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             var isError = remember { mutableStateOf(true) }
             TextField(
                 value = "test",
@@ -1254,7 +1213,7 @@ class TextFieldTest {
     fun testTextField_withLabel_doesNotCrash_rowHeightWithMinIntrinsics() {
         var size: IntSize? = null
         var dividerSize: IntSize? = null
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.onGloballyPositioned { size = it.size }) {
                 Row(Modifier.height(IntrinsicSize.Min)) {
                     Divider(
@@ -1283,7 +1242,7 @@ class TextFieldTest {
     fun testTextField_withLabel_doesNotCrash_columnWidthWithMinIntrinsics() {
         var textFieldSize: IntSize? = null
         var dividerSize: IntSize? = null
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val text = remember { mutableStateOf("") }
             Box {
                 Column(Modifier.width(IntrinsicSize.Min)) {
@@ -1311,32 +1270,6 @@ class TextFieldTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-    fun testTextField_label_notUsingErrorColor_notFocused_withoutInput() {
-        rule.setMaterialContent {
-            Box(Modifier.background(Color.White).padding(10.dp)) {
-                TextField(
-                    value = "",
-                    onValueChange = {},
-                    modifier = Modifier.testTag(TextfieldTag),
-                    label = { Text("Label") },
-                    isError = true,
-                    colors = TextFieldDefaults.textFieldColors(
-                        unfocusedLabelColor = Color.White,
-                        errorLabelColor = Color.Red,
-                        backgroundColor = Color.White,
-                        errorIndicatorColor = Color.White
-                    )
-                )
-            }
-        }
-
-        rule.onNodeWithTag(TextfieldTag).captureToImage().assertPixels {
-            Color.White
-        }
-    }
-
-    @Test
     fun testTextField_labelStyle() {
         val unfocusedLabelColor = Color.Blue
         val focusedLabelColor = Color.Red
@@ -1345,7 +1278,7 @@ class TextFieldTest {
 
         val focusRequester = FocusRequester()
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = "",
                 onValueChange = {},
@@ -1376,18 +1309,18 @@ class TextFieldTest {
     }
 
     @Test
-    fun testTextField_labelStyle_whenCaptionStyleColorProvided() {
+    fun testTextField_labelStyle_whenBodySmallStyleColorProvided() {
         val unfocusedLabelColor = Color.Blue
         val focusedLabelColor = Color.Red
-        val captionColor = Color.Green
+        val bodySmallColor = Color.Green
         var textStyle = TextStyle()
         var contentColor = Color.Unspecified
 
         val focusRequester = FocusRequester()
 
-        rule.setMaterialContent {
-            val caption = MaterialTheme.typography.caption.copy(color = captionColor)
-            MaterialTheme(typography = Typography(caption = caption)) {
+        rule.setMaterialContent(lightColorScheme()) {
+            val bodySmall = MaterialTheme.typography.bodySmall.copy(color = bodySmallColor)
+            MaterialTheme(typography = Typography(bodySmall = bodySmall)) {
                 TextField(
                     value = "",
                     onValueChange = {},
@@ -1414,13 +1347,13 @@ class TextFieldTest {
         }
 
         rule.runOnIdle {
-            assertThat(textStyle.color).isEqualTo(captionColor)
+            assertThat(textStyle.color).isEqualTo(bodySmallColor)
             assertThat(contentColor).isEqualTo(focusedLabelColor)
         }
     }
 
     @Test
-    fun testTextField_labelStyle_middle_whenCaptionStyleColorProvided() {
+    fun testTextField_labelStyle_middle_whenBodySmallStyleColorProvided() {
         val expectedLabelColor = Color.Blue
         val focusedLabelColor = Color.Red
         var textStyle = TextStyle()
@@ -1428,9 +1361,9 @@ class TextFieldTest {
         val focusRequester = FocusRequester()
 
         rule.mainClock.autoAdvance = false
-        rule.setMaterialContent {
-            val caption = MaterialTheme.typography.caption.copy(color = expectedLabelColor)
-            MaterialTheme(typography = Typography(caption = caption)) {
+        rule.setMaterialContent(lightColorScheme()) {
+            val bodySmall = MaterialTheme.typography.bodySmall.copy(color = expectedLabelColor)
+            MaterialTheme(typography = Typography(bodySmall = bodySmall)) {
                 TextField(
                     value = "",
                     onValueChange = {},
@@ -1467,16 +1400,16 @@ class TextFieldTest {
     fun testTextField_labelStyle_whenBothTypographiesColorProvided() {
         val unfocusedLabelColor = Color.Blue
         val focusedLabelColor = Color.Red
-        val captionColor = Color.Green
-        val subtitleColor = Color.Black
+        val bodySmallColor = Color.Green
+        val bodyLargeColor = Color.Black
         var textStyle = TextStyle()
         var contentColor = Color.Unspecified
         val focusRequester = FocusRequester()
 
-        rule.setMaterialContent {
-            val caption = MaterialTheme.typography.caption.copy(color = captionColor)
-            val subtitle1 = MaterialTheme.typography.subtitle1.copy(color = subtitleColor)
-            MaterialTheme(typography = Typography(caption = caption, subtitle1 = subtitle1)) {
+        rule.setMaterialContent(lightColorScheme()) {
+            val bodySmall = MaterialTheme.typography.bodySmall.copy(color = bodySmallColor)
+            val bodyLarge = MaterialTheme.typography.bodyLarge.copy(color = bodyLargeColor)
+            MaterialTheme(typography = Typography(bodySmall = bodySmall, bodyLarge = bodyLarge)) {
                 TextField(
                     value = "",
                     onValueChange = {},
@@ -1494,7 +1427,7 @@ class TextFieldTest {
         }
 
         rule.runOnIdle {
-            assertThat(textStyle.color).isEqualTo(subtitleColor)
+            assertThat(textStyle.color).isEqualTo(bodyLargeColor)
             assertThat(contentColor).isEqualTo(unfocusedLabelColor)
         }
 
@@ -1503,7 +1436,7 @@ class TextFieldTest {
         }
 
         rule.runOnIdle {
-            assertThat(textStyle.color).isEqualTo(captionColor)
+            assertThat(textStyle.color).isEqualTo(bodySmallColor)
             assertThat(contentColor).isEqualTo(focusedLabelColor)
         }
     }
@@ -1511,7 +1444,7 @@ class TextFieldTest {
     @Test
     fun testTextField_intrinsicsMeasurement_correctHeight() {
         var height = 0
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val text = remember { mutableStateOf("") }
             Box(Modifier.onGloballyPositioned {
                 height = it.size.height
@@ -1535,7 +1468,7 @@ class TextFieldTest {
     @Test
     fun testTextField_intrinsicsMeasurement_withLeadingIcon_correctHeight() {
         var height = 0
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val text = remember { mutableStateOf("") }
             Box(Modifier.onGloballyPositioned {
                 height = it.size.height
@@ -1560,7 +1493,7 @@ class TextFieldTest {
     @Test
     fun testTextField_intrinsicsMeasurement_withTrailingIcon_correctHeight() {
         var height = 0
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val text = remember { mutableStateOf("") }
             Box(Modifier.onGloballyPositioned {
                 height = it.size.height
