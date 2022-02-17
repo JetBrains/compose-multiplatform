@@ -43,11 +43,12 @@ private const val NoActiveChild = "ActiveParent must have a focusedChild"
  *  top-left or bottom right based on the specified [direction][FocusDirection].
  */
 internal fun ModifiedFocusNode.twoDimensionalFocusSearch(
-    direction: FocusDirection
-): ModifiedFocusNode? {
+    direction: FocusDirection,
+    onFound: (ModifiedFocusNode) -> Boolean
+): Boolean {
     when (focusState) {
-        Inactive -> return this
-        Deactivated -> return null
+        Inactive -> return onFound.invoke(this)
+        Deactivated -> return false
         ActiveParent, DeactivatedParent -> {
             val focusedChild = focusedChild ?: error(NoActiveChild)
             // For 2D focus search we only search among siblings. You have to use DPad Center or
@@ -55,13 +56,14 @@ internal fun ModifiedFocusNode.twoDimensionalFocusSearch(
             // search to a child only if it "has focus". If this node "is focused", we just skip the
             // children and search among the siblings of the focused item by calling
             // "searchChildren" on this node.
-            return when (focusedChild.focusState) {
+            when (focusedChild.focusState) {
                 // If the focusedChild is an intermediate parent, we continue searching among its
                 // children. If we don't find a match, we search among the siblings of the parent.
-                ActiveParent, DeactivatedParent -> focusedChild.twoDimensionalFocusSearch(direction)
-                        ?: searchChildren(focusedChild.activeNode(), direction)
+                ActiveParent, DeactivatedParent ->
+                  return focusedChild.twoDimensionalFocusSearch(direction, onFound) ||
+                        searchChildren(focusedChild.activeNode(), direction, onFound)
                 // Search for the next eligible sibling.
-                Active, Captured -> searchChildren(focusedChild, direction)
+                Active, Captured -> return searchChildren(focusedChild, direction, onFound)
                 Deactivated, Inactive -> error(NoActiveChild)
             }
         }
@@ -73,7 +75,7 @@ internal fun ModifiedFocusNode.twoDimensionalFocusSearch(
 
             // If there are aren't multiple children to choose from, return the first child.
             if (focusableChildren.size <= 1) {
-                return focusableChildren.firstOrNull()
+                return focusableChildren.firstOrNull()?.let { onFound.invoke(it) } ?: false
             }
 
             // To start the search, we pick one of the four corners of this node as the initially
@@ -83,31 +85,33 @@ internal fun ModifiedFocusNode.twoDimensionalFocusSearch(
                 Left, Up -> focusRect().bottomRight()
                 else -> error(InvalidFocusDirection)
             }
-            return focusableChildren.findBestCandidate(initialFocusRect, direction)
+            val nextCandidate = focusableChildren.findBestCandidate(initialFocusRect, direction)
+            return nextCandidate?.let { onFound.invoke(it) } ?: false
         }
     }
 }
 
 private fun ModifiedFocusNode.searchChildren(
     focusedItem: ModifiedFocusNode,
-    direction: FocusDirection
-): ModifiedFocusNode? {
+    direction: FocusDirection,
+    onFound: (ModifiedFocusNode) -> Boolean
+): Boolean {
     val children = focusableChildren(excludeDeactivated = false).toMutableList()
     while (children.isNotEmpty()) {
         val nextItem = children.findBestCandidate(focusedItem.focusRect(), direction)
+            ?: return false
+
+        // If the result is not deactivated, this is a valid next item.
+        if (!nextItem.focusState.isDeactivated) return onFound.invoke(nextItem)
 
         // If the result is deactivated, we search among its children.
+        if (nextItem.searchChildren(focusedItem, direction, onFound)) return true
+
         // If there are no results among the children of the deactivated node,
         // repeat the search by excluding this deactivated node.
-        if (nextItem?.modifier?.focusState?.isDeactivated == true) {
-            nextItem.searchChildren(focusedItem, direction)?.let { return it }
-            children.remove(nextItem)
-        } else {
-            // If the result is not deactivated, this is a valid next item.
-            return nextItem
-        }
+        children.remove(nextItem)
     }
-    return null
+    return false
 }
 
 // Iterate through this list of focus nodes and find best candidate in the specified direction.
