@@ -31,7 +31,7 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.layout.LazyLayout
-import androidx.compose.foundation.lazy.layout.LazyMeasurePolicy
+import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
 import androidx.compose.foundation.lazy.layout.rememberLazyLayoutPrefetchPolicy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -40,6 +40,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Constraints
@@ -186,7 +187,7 @@ private fun rememberLazyListMeasurePolicy(
     verticalArrangement: Arrangement.Vertical? = null,
     /** Item placement animator. Should be notified with the measuring result */
     placementAnimator: LazyListItemPlacementAnimator
-) = remember(
+) = remember<LazyLayoutMeasureScope.(Constraints) -> MeasureResult>(
     state,
     overScrollController,
     contentPadding,
@@ -198,7 +199,7 @@ private fun rememberLazyListMeasurePolicy(
     verticalArrangement,
     placementAnimator
 ) {
-    LazyMeasurePolicy { placeablesProvider, containerConstraints ->
+    { containerConstraints ->
         containerConstraints.assertNotNestingScrollableContainers(isVertical)
 
         // resolve content paddings
@@ -241,7 +242,7 @@ private fun rememberLazyListMeasurePolicy(
             contentConstraints,
             isVertical,
             itemsProvider,
-            placeablesProvider
+            this
         ) { index, key, placeables ->
             // we add spaceBetweenItems as an extra spacing for all items apart from the last one so
             // the lazy list measuring logic will take it into account.

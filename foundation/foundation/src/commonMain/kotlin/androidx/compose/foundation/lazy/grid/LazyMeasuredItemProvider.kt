@@ -18,7 +18,7 @@ package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.layout.LazyLayoutPlaceable
-import androidx.compose.foundation.lazy.layout.LazyLayoutPlaceablesProvider
+import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
 import androidx.compose.ui.unit.Constraints
 
 /**
@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.Constraints
 @OptIn(ExperimentalFoundationApi::class)
 internal class LazyMeasuredItemProvider @ExperimentalFoundationApi constructor(
     private val itemsProvider: LazyGridItemsProvider,
-    private val placeablesProvider: LazyLayoutPlaceablesProvider,
+    private val measureScope: LazyLayoutMeasureScope,
     private val defaultMainAxisSpacing: Int,
     private val measuredItemFactory: MeasuredItemFactory
 ) {
@@ -41,7 +41,7 @@ internal class LazyMeasuredItemProvider @ExperimentalFoundationApi constructor(
         constraints: Constraints
     ): LazyMeasuredItem {
         val key = itemsProvider.getKey(index.value)
-        val placeables = placeablesProvider.getAndMeasure(index.value, constraints)
+        val placeables = measureScope.measure(index.value, constraints)
         val crossAxisSize = if (constraints.hasFixedWidth) {
             constraints.minWidth
         } else {

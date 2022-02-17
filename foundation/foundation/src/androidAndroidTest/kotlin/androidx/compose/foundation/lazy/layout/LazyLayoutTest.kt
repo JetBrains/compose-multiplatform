@@ -24,6 +24,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.unit.Constraints
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
@@ -43,7 +44,7 @@ class LazyLayoutTest {
     fun lazyListShowsCombinedItems() {
         val counter = mutableStateOf(0)
         var remeasureCount = 0
-        val policy = LazyMeasurePolicy { _, _ ->
+        val policy: LazyLayoutMeasureScope.(Constraints) -> MeasureResult = {
             remeasureCount++
             object : MeasureResult {
                 override val alignmentLines: Map<AlignmentLine, Int> = emptyMap()

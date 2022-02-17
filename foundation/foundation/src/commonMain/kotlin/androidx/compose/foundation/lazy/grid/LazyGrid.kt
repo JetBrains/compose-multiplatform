@@ -32,7 +32,7 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.lazy.LazyGridScope
 import androidx.compose.foundation.lazy.LazyGridState
 import androidx.compose.foundation.lazy.layout.LazyLayout
-import androidx.compose.foundation.lazy.layout.LazyMeasurePolicy
+import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
 import androidx.compose.foundation.lazy.layout.rememberLazyLayoutPrefetchPolicy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -41,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -187,7 +188,7 @@ private fun rememberLazyGridMeasurePolicy(
     verticalArrangement: Arrangement.Vertical? = null,
     /** Item placement animator. Should be notified with the measuring result */
     placementAnimator: LazyGridItemPlacementAnimator
-) = remember(
+) = remember<LazyLayoutMeasureScope.(Constraints) -> MeasureResult>(
     state,
     overScrollController,
     slotSizesSums,
@@ -198,7 +199,7 @@ private fun rememberLazyGridMeasurePolicy(
     verticalArrangement,
     placementAnimator
 ) {
-    LazyMeasurePolicy { placeablesProvider, constraints ->
+    { constraints ->
         constraints.assertNotNestingScrollableContainers(isVertical)
 
         // resolve content paddings
@@ -246,7 +247,7 @@ private fun rememberLazyGridMeasurePolicy(
 
         val measuredItemProvider = LazyMeasuredItemProvider(
             itemsProvider,
-            placeablesProvider,
+            this,
             spaceBetweenLines
         ) { index, key, crossAxisSize, mainAxisSpacing, placeables ->
             LazyMeasuredItem(

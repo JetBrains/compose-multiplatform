@@ -18,29 +18,24 @@ package androidx.compose.foundation.lazy.layout
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.SubcomposeMeasureScope
 import androidx.compose.ui.unit.Constraints
 
-/**
- * Defines the measure and layout behaviour of a [LazyLayout].
- */
 @ExperimentalFoundationApi
-@Stable
-internal fun interface LazyMeasurePolicy {
-    fun MeasureScope.measure(
-        placeablesProvider: LazyLayoutPlaceablesProvider,
-        constraints: Constraints
-    ): MeasureResult
+internal interface LazyLayoutMeasureScope : MeasureScope {
+    /**
+     * Subcompose and measure the item of lazy layout.
+     */
+    fun measure(index: Int, constraints: Constraints): Array<LazyLayoutPlaceable>
 }
 
 @ExperimentalFoundationApi
 @Stable
-internal class LazyLayoutPlaceablesProvider internal constructor(
+internal class LazyLayoutMeasureScopeImpl internal constructor(
     private val itemContentFactory: LazyLayoutItemContentFactory,
     private val subcomposeMeasureScope: SubcomposeMeasureScope
-) {
+) : LazyLayoutMeasureScope, MeasureScope by subcomposeMeasureScope {
 
     /**
      * A cache of the previously composed items. It allows us to support [get]
@@ -48,10 +43,7 @@ internal class LazyLayoutPlaceablesProvider internal constructor(
      */
     private val placeablesCache = hashMapOf<Int, Array<LazyLayoutPlaceable>>()
 
-    /**
-     * Used to subcompose and measure the items of lazy layout.
-     */
-    fun getAndMeasure(index: Int, constraints: Constraints): Array<LazyLayoutPlaceable> {
+    override fun measure(index: Int, constraints: Constraints): Array<LazyLayoutPlaceable> {
         val cachedPlaceable = placeablesCache[index]
         return if (cachedPlaceable != null) {
             cachedPlaceable

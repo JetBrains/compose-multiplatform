@@ -18,7 +18,7 @@ package androidx.compose.foundation.lazy.list
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.layout.LazyLayoutPlaceable
-import androidx.compose.foundation.lazy.layout.LazyLayoutPlaceablesProvider
+import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
 import androidx.compose.ui.unit.Constraints
 
 /**
@@ -29,7 +29,7 @@ internal class LazyMeasuredItemProvider @ExperimentalFoundationApi constructor(
     constraints: Constraints,
     isVertical: Boolean,
     private val itemsProvider: LazyListItemsProvider,
-    private val placeablesProvider: LazyLayoutPlaceablesProvider,
+    private val measureScope: LazyLayoutMeasureScope,
     private val measuredItemFactory: MeasuredItemFactory
 ) {
     // the constraints we will measure child with. the main axis is not restricted
@@ -44,7 +44,7 @@ internal class LazyMeasuredItemProvider @ExperimentalFoundationApi constructor(
      */
     fun getAndMeasure(index: DataIndex): LazyMeasuredItem {
         val key = itemsProvider.getKey(index.value)
-        val placeables = placeablesProvider.getAndMeasure(index.value, childConstraints)
+        val placeables = measureScope.measure(index.value, childConstraints)
         return measuredItemFactory.createItem(index, key, placeables)
     }
 

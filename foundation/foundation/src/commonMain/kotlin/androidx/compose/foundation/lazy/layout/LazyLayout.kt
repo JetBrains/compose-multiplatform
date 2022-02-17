@@ -22,9 +22,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.SubcomposeLayoutState
 import androidx.compose.ui.layout.SubcomposeSlotReusePolicy
+import androidx.compose.ui.unit.Constraints
 
 /**
  * A layout that only composes and lays out currently visible items. Can be used to build
@@ -36,7 +38,7 @@ internal fun LazyLayout(
     itemsProvider: () -> LazyLayoutItemsProvider,
     modifier: Modifier = Modifier,
     prefetchPolicy: LazyLayoutPrefetchPolicy? = null,
-    measurePolicy: LazyMeasurePolicy
+    measurePolicy: LazyLayoutMeasureScope.(Constraints) -> MeasureResult
 ) {
     val currentItemsProvider = rememberUpdatedState(itemsProvider)
 
@@ -62,11 +64,9 @@ internal fun LazyLayout(
             { constraints ->
                 itemContentFactory.onBeforeMeasure(this, constraints)
 
-                val placeablesProvider = LazyLayoutPlaceablesProvider(
-                    itemContentFactory,
-                    this
-                )
-                with(measurePolicy) { measure(placeablesProvider, constraints) }
+                with(LazyLayoutMeasureScopeImpl(itemContentFactory, this)) {
+                    measurePolicy(constraints)
+                }
             }
         }
     )
