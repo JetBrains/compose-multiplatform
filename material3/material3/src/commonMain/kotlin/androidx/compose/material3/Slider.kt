@@ -22,11 +22,11 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.MutatorMutex
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.DragScope
 import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.indication
@@ -62,6 +62,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.lerp
@@ -69,9 +70,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
@@ -79,7 +80,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
-import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.abs
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
@@ -570,36 +570,41 @@ private fun Modifier.sliderPressModifier(
     rawOffset: State<Float>,
     gestureEndAction: State<(Float) -> Unit>,
     enabled: Boolean
-): Modifier =
-    if (enabled) {
-        pointerInput(draggableState, interactionSource, maxPx, isRtl) {
-            detectTapGestures(
-                onPress = { pos ->
-                    draggableState.drag(MutatePriority.UserInput) {
-                        val to = if (isRtl) maxPx - pos.x else pos.x
-                        dragBy(to - rawOffset.value)
-                    }
-                    val interaction = PressInteraction.Press(pos)
-                    interactionSource.emit(interaction)
-                    val finishInteraction =
-                        try {
-                            val success = tryAwaitRelease()
-                            gestureEndAction.value.invoke(0f)
-                            if (success) {
-                                PressInteraction.Release(interaction)
-                            } else {
-                                PressInteraction.Cancel(interaction)
+) = composed(
+    factory = {
+        if (enabled) {
+            LaunchedEffect(draggableState, interactionSource, maxPx, isRtl) {
+                // TODO (b/219761251): Use ModifierLocalScrollableContainer once it's public,
+                //  interaction sources should not be used for business logic
+                interactionSource.interactions.collect { interaction ->
+                    when (interaction) {
+                        is PressInteraction.Press -> {
+                            draggableState.drag(MutatePriority.UserInput) {
+                                val x = interaction.pressPosition.x
+                                val to = if (isRtl) maxPx - x else x
+                                dragBy(to - rawOffset.value)
                             }
-                        } catch (c: CancellationException) {
-                            PressInteraction.Cancel(interaction)
                         }
-                    interactionSource.emit(finishInteraction)
+                    }
                 }
-            )
+            }
+            Modifier.clickable(interactionSource = interactionSource, null) {
+                gestureEndAction.value.invoke(0f)
+            }
+        } else {
+            this
         }
-    } else {
-        this
-    }
+    },
+    inspectorInfo = debugInspectorInfo {
+        name = "sliderPressModifier"
+        properties["draggableState"] = draggableState
+        properties["interactionSource"] = interactionSource
+        properties["maxPx"] = maxPx
+        properties["isRtl"] = isRtl
+        properties["rawOffset"] = rawOffset
+        properties["gestureEndAction"] = gestureEndAction
+        properties["enabled"] = enabled
+    })
 
 private suspend fun animateToTarget(
     draggableState: DraggableState,

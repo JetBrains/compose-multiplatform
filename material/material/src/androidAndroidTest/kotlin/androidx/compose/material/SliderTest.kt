@@ -16,6 +16,7 @@
 
 package androidx.compose.material
 
+import android.view.ViewConfiguration
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -24,6 +25,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -268,6 +271,41 @@ class SliderTest {
                 up()
                 expected = calculateFraction(left, right, centerX + 50)
             }
+        rule.runOnIdle {
+            Truth.assertThat(state.value).isWithin(0.001f).of(expected)
+        }
+    }
+
+    /**
+     * Guarantee slider doesn't move while we wait to see if the gesture is scrolling.
+     */
+    @Test
+    fun slider_tap_scrollableContainer() {
+        rule.mainClock.autoAdvance = false
+        val state = mutableStateOf(0f)
+        rule.setContent {
+            Box(Modifier.verticalScroll(rememberScrollState())) {
+                Slider(
+                    modifier = Modifier.testTag(tag),
+                    value = state.value,
+                    onValueChange = { state.value = it }
+                )
+            }
+        }
+
+        var expected = 0f
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                down(Offset(centerX + 50, centerY))
+                expected = calculateFraction(left, right, centerX + 50)
+            }
+
+        rule.runOnIdle {
+            Truth.assertThat(state.value).isEqualTo(0f)
+        }
+
+        rule.mainClock.advanceTimeBy(ViewConfiguration.getTapTimeout().toLong())
+
         rule.runOnIdle {
             Truth.assertThat(state.value).isWithin(0.001f).of(expected)
         }
