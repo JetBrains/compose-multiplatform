@@ -120,6 +120,10 @@ class DialogProperties @ExperimentalComposeUiApi constructor(
 /**
  * Opens a dialog with the given content.
  *
+ * A dialog is a small window that prompts the user to make a decision or enter
+ * additional information. A dialog does not fill the screen and is normally used
+ * for modal events that require users to take an action before they can proceed.
+ *
  * The dialog is visible as long as it is part of the composition hierarchy.
  * In order to let the user dismiss the Dialog, the implementation of [onDismissRequest] should
  * contain a way to remove to remove the dialog from the composition hierarchy.
