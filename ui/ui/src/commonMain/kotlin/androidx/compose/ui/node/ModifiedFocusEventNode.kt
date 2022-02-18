@@ -31,7 +31,13 @@ internal class ModifiedFocusEventNode(
         modifier.onFocusEvent(focusState)
 
         // Propagate the event up the hierarchy only if parents have focus event listeners.
-        if (onModifierLocalRead(ModifierLocalHasFocusEventListener)) {
+        val provider = findModifierLocalProvider(ModifierLocalHasFocusEventListener)
+        val hasFocusEventListener = if (provider != null) {
+            provider.modifier.value as Boolean
+        } else {
+            ModifierLocalHasFocusEventListener.defaultFactory()
+        }
+        if (hasFocusEventListener) {
             super.propagateFocusEvent(focusState)
         }
     }

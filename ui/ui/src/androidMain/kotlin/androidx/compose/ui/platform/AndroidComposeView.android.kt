@@ -51,6 +51,7 @@ import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
+import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -439,6 +440,11 @@ internal class AndroidComposeView(context: Context) :
     private val layerCache = WeakCache<OwnedLayer>()
 
     /**
+     * List of lambdas to be called when [onEndApplyChanges] is called.
+     */
+    private val endApplyChangesListeners = mutableVectorOf<() -> Unit>()
+
+    /**
      * Runnable used to update the pointer position after layout. If
      * another pointer event comes in before this runs, this Runnable will be removed and
      * not executed.
@@ -586,7 +592,7 @@ internal class AndroidComposeView(context: Context) :
         observationClearRequested = true
     }
 
-    internal fun clearInvalidObservations() {
+    override fun onEndApplyChanges() {
         if (observationClearRequested) {
             snapshotObserver.clearInvalidObservations()
             observationClearRequested = false
@@ -595,13 +601,25 @@ internal class AndroidComposeView(context: Context) :
         if (childAndroidViews != null) {
             clearChildInvalidObservations(childAndroidViews)
         }
+        // Iterate through the whole list, even if listeners are added.
+        var i = 0
+        while (i < endApplyChangesListeners.size) {
+            val listener = endApplyChangesListeners[i]
+            listener()
+            i++
+        }
+        endApplyChangesListeners.clear()
+    }
+
+    override fun registerOnEndApplyChangesListener(listener: () -> Unit) {
+        endApplyChangesListeners += listener
     }
 
     private fun clearChildInvalidObservations(viewGroup: ViewGroup) {
         for (i in 0 until viewGroup.childCount) {
             val child = viewGroup.getChildAt(i)
             if (child is AndroidComposeView) {
-                child.clearInvalidObservations()
+                child.onEndApplyChanges()
             } else if (child is ViewGroup) {
                 clearChildInvalidObservations(child)
             }

@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -265,11 +266,15 @@ class ModifierLocalConsumerNodeTest {
     }
 
     private fun attach() {
+        // Apply changes after attaching
         layoutNode.attach(owner)
+        owner.onEndApplyChanges()
     }
 
     private fun detach() {
+        // Apply changes after detaching
         layoutNode.detach()
+        owner.onEndApplyChanges()
     }
 
     private fun changeModifier(modifier: Modifier) {
@@ -282,9 +287,20 @@ class ModifierLocalConsumerNodeTest {
 
     @OptIn(ExperimentalComposeUiApi::class)
     private class FakeOwner : Owner {
+        val listeners = mutableVectorOf<() -> Unit>()
         @OptIn(InternalCoreApi::class)
         override var showLayoutBounds: Boolean = false
         override val snapshotObserver: OwnerSnapshotObserver = OwnerSnapshotObserver { it.invoke() }
+        override fun registerOnEndApplyChangesListener(listener: () -> Unit) {
+            listeners += listener
+        }
+
+        override fun onEndApplyChanges() {
+            while (listeners.isNotEmpty()) {
+                listeners.removeAt(0).invoke()
+            }
+        }
+
         override fun onRequestMeasure(layoutNode: LayoutNode) {}
         override fun onAttach(node: LayoutNode) = node.forEachLayoutNodeWrapper { it.attach() }
         override fun onDetach(node: LayoutNode) = node.forEachLayoutNodeWrapper { it.detach() }
