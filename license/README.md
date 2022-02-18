@@ -5,8 +5,11 @@ to which different licenses may apply:
 ## Compose IDEA plugin
 
 * Path: idea-plugin/src/main/kotlin/org/jetbrains/compose/desktop/idea/preview
-  * License: Apache 2 (license/third_party/aosp_license.txt)
-  * Origin: Copyright 2021 The Android Open Source Project
+    * License: Apache 2 (license/third_party/aosp_license.txt)
+    * Origin: Copyright 2021 The Android Open Source Project
 * Path: idea-plugin/src/main/resources/icons/compose/compose.svg
     * License: Apache 2 (license/third_party/aosp_license.txt)
     * Origin: Copyright 2021 The Android Open Source Project
+* Path: compose/external/noto-fonts
+    * License: SIL Open Font License, Version 1.1 (license/third_party/notosans_license.txt)
+    * Origin: Copyright 2012 Google Inc.
