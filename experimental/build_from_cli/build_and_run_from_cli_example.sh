@@ -19,6 +19,7 @@ function mavenDep {
 }
 
 PLATFORM=macos-x64
+# to know which Skiko version corresponds to Compose version, search "skiko" in https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/compose/ui/ui-graphics-desktop/1.1.0-alpha04/ui-graphics-desktop-1.1.0-alpha04.pom (replace 1.0.0-alpha04 by needed version)
 SKIKO_VERSION=0.2.33
 KOTLIN_VERSION=1.5.0
 COMPOSE_VERSION=0.4.0-build209
