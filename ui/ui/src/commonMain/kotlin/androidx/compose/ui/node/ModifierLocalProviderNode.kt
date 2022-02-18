@@ -22,16 +22,45 @@ import androidx.compose.ui.modifier.ModifierLocalProvider
 internal class ModifierLocalProviderNode <T> (
     wrapped: LayoutNodeWrapper,
     modifier: ModifierLocalProvider<T>
-) : DelegatingLayoutNodeWrapper<ModifierLocalProvider<T>>(wrapped, modifier) {
+) : DelegatingLayoutNodeWrapper<ModifierLocalProvider<T>>(wrapped, modifier), () -> Unit {
+    override fun attach() {
+        super.attach()
 
-    override fun <V> onModifierLocalRead(modifierLocal: ModifierLocal<V>): V {
-        return if (modifier.key == modifierLocal) {
-            // We need a cast because type information is erased.
-            // When we check for equality of the key it implies that the types are equal too.
-            @Suppress("UNCHECKED_CAST")
-            modifier.value as V
-        } else {
-            super.onModifierLocalRead(modifierLocal)
+        // Invalidate children that read this ModifierLocal
+        layoutNode.owner?.registerOnEndApplyChangesListener(this)
+    }
+
+    override fun detach() {
+        // Notify anyone who has read from me that the value has changed
+        wrapped.invalidateConsumersOf(modifier.key)
+        super.detach()
+    }
+
+    override fun onModifierChanged() {
+        super.onModifierChanged()
+        layoutNode.owner?.registerOnEndApplyChangesListener(this)
+    }
+
+    override fun invalidateConsumersOf(local: ModifierLocal<*>) {
+        // If this provides a value for local, we don't have to notify the sub-tree
+        if (modifier.key != local) {
+            super.invalidateConsumersOf(local)
+        }
+    }
+
+    override fun findModifierLocalProvider(local: ModifierLocal<*>): ModifierLocalProviderNode<*>? {
+        if (modifier.key == local) {
+            return this
+        }
+        return super.findModifierLocalProvider(local)
+    }
+
+    /**
+     * The listener for [UiApplier.onEndChanges].
+     */
+    override fun invoke() {
+        if (isAttached) {
+            wrapped.invalidateConsumersOf(modifier.key)
         }
     }
 }

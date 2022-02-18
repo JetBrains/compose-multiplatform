@@ -15,6 +15,7 @@
  */
 package androidx.compose.ui.node
 
+import androidx.compose.runtime.Applier
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
@@ -235,6 +236,19 @@ internal interface Owner {
      * automatically when the snapshot value has been changed.
      */
     val snapshotObserver: OwnerSnapshotObserver
+
+    /**
+     * Registers a call to be made when the [Applier.onEndChanges] is called. [listener]
+     * should be called in [onEndApplyChanges] and then removed after being called.
+     */
+    fun registerOnEndApplyChangesListener(listener: () -> Unit)
+
+    /**
+     * Called when [Applier.onEndChanges] executes. This must call all listeners registered
+     * in [registerOnEndApplyChangesListener] and then remove them so that they are not
+     * called again.
+     */
+    fun onEndApplyChanges()
 
     companion object {
         /**

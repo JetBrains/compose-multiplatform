@@ -41,4 +41,9 @@ internal class DefaultUiApplier(
     override fun onClear() {
         root.removeAll()
     }
+
+    override fun onEndChanges() {
+        super.onEndChanges()
+        root.owner?.onEndApplyChanges()
+    }
 }

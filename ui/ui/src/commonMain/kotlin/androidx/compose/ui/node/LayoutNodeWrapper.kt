@@ -998,6 +998,20 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
+     * Returns the ModifierLocalProviderNode that has the value for [local].
+     */
+    open fun findModifierLocalProvider(local: ModifierLocal<*>): ModifierLocalProviderNode<*>? =
+        wrappedBy?.findModifierLocalProvider(local)
+
+    /**
+     * Invalidates any [ModifierLocalConsumerNode] in the subtree that has read a
+     * default value for [local].
+     */
+    open fun invalidateConsumersOf(local: ModifierLocal<*>) {
+        wrapped?.invalidateConsumersOf(local)
+    }
+
+    /**
      * Search up the component tree for any parent/parents that have specified a custom focus order.
      * Allowing parents higher up the hierarchy to overwrite the focus order specified by their
      * children.
@@ -1101,16 +1115,6 @@ internal abstract class LayoutNodeWrapper(
      */
     open fun onModifierChanged() {
         layer?.invalidate()
-    }
-
-    /**
-     * Called when a [ModifierLocalConsumer][androidx.compose.ui.modifier.ModifierLocalConsumer]
-     * reads a value. Ths function walks up the tree and reads any value provided by a parent. If
-     * no value is available it returns the default value associated with the specified
-     * [ModifierLocal].
-     */
-    open fun <T> onModifierLocalRead(modifierLocal: ModifierLocal<T>): T {
-        return wrappedBy?.onModifierLocalRead(modifierLocal) ?: modifierLocal.defaultFactory()
     }
 
     internal fun findCommonAncestor(other: LayoutNodeWrapper): LayoutNodeWrapper {

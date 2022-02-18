@@ -3629,6 +3629,13 @@ private class MockOwner(
         get() = LayoutDirection.Ltr
     override var showLayoutBounds: Boolean = false
     override val snapshotObserver = OwnerSnapshotObserver { it.invoke() }
+    override fun registerOnEndApplyChangesListener(listener: () -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onEndApplyChanges() {
+        TODO("Not yet implemented")
+    }
 
     override fun onRequestMeasure(layoutNode: LayoutNode) {
         onRequestMeasureParams += layoutNode

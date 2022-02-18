@@ -88,6 +88,13 @@ private class FakeOwner(
     }
 
     override val snapshotObserver: OwnerSnapshotObserver = OwnerSnapshotObserver { it.invoke() }
+    override fun registerOnEndApplyChangesListener(listener: () -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onEndApplyChanges() {
+        TODO("Not yet implemented")
+    }
 
     override fun onLayoutChange(layoutNode: LayoutNode) { }
 

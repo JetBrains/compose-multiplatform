@@ -18,6 +18,7 @@
 
 package androidx.compose.ui.platform
 
+import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -188,6 +189,8 @@ internal class SkiaBasedOwner(
     }
     private val pointerInputEventProcessor = PointerInputEventProcessor(root)
     private val measureAndLayoutDelegate = MeasureAndLayoutDelegate(root)
+
+    private val endApplyChangesListeners = mutableVectorOf<() -> Unit>()
 
     init {
         snapshotObserver.startObserving()
@@ -421,6 +424,21 @@ internal class SkiaBasedOwner(
                 if (isPressed) PrimaryPressedPointerButtons else DefaultPointerButtons
             )
         )
+    }
+
+    override fun onEndApplyChanges() {
+        // Iterate through the whole list, even if listeners are added.
+        var i = 0
+        while (i < endApplyChangesListeners.size) {
+            val listener = endApplyChangesListeners[i]
+            listener()
+            i++
+        }
+        endApplyChangesListeners.clear()
+    }
+
+    override fun registerOnEndApplyChangesListener(listener: () -> Unit) {
+        endApplyChangesListeners += listener
     }
 
     override val pointerIconService: PointerIconService =
