@@ -90,7 +90,7 @@ class LiveEditTests {
 
     @Test
     fun testNonRestartableFunctionPreservesParentAndSiblingState() = liveEditTest {
-        EnsureStatePreservedAndNotRecomposed("a")
+        EnsureStatePreservedButRecomposed("a")
         RestartGroup {
             Text("Hello World")
             EnsureStatePreservedButRecomposed("b")
@@ -280,7 +280,7 @@ class LiveEditTestScope {
         addLogCheck(ref) { logs ->
             val actual = logs.filter { m -> m == msg }.count()
             Assert.assertEquals(
-                "Ref $ref had an unexpected # of '$msg' logs",
+                "Ref '$ref' had an unexpected # of '$msg' logs",
                 expected,
                 actual
             )

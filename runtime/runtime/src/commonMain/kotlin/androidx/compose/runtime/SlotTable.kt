@@ -290,21 +290,37 @@ internal class SlotTable : CompositionData, Iterable<CompositionGroup> {
     }
 
     /**
-     * Modifies the current slot table such that every group with the target key will be invalidated, and
-     * when recomposed, the content of those groups will be disposed and re-inserted.
+     * Modifies the current slot table such that every group with the target key will be
+     * invalidated, and when recomposed, the content of those groups will be disposed and
+     * re-inserted.
      *
-     * This is currently only used for developer tooling such as Live Edit to invalidate groups which
-     * we know will no longer have the same structure so we want to remove them before recomposing.
+     * This is currently only used for developer tooling such as Live Edit to invalidate groups
+     * which we know will no longer have the same structure so we want to remove them before
+     * recomposing.
+     *
+     * Returns true if all the groups were successfully invalidated. If this returns fals then
+     * the a full composition must be foreced.
      */
-    internal fun invalidateGroupsWithKey(target: Int): Boolean {
+    internal fun invalidateGroupsWithKey(target: Int): List<RecomposeScopeImpl>? {
         val anchors = mutableListOf<Anchor>()
-        // invalidate groups
+        val scopes = mutableListOf<RecomposeScopeImpl>()
+        var allScopesFound = true
+
+        // Invalidate groups with the target key
         read { reader ->
             fun scanGroup() {
                 val key = reader.groupKey
                 if (key == target) {
                     anchors.add(reader.anchor())
-                    invalidateGroup(reader.currentGroup)
+                    if (allScopesFound) {
+                        val nearestScope = findEffectiveRecomposeScope(reader.currentGroup)
+                        if (nearestScope != null) {
+                            scopes.add(nearestScope)
+                        } else {
+                            allScopesFound = false
+                            scopes.clear()
+                        }
+                    }
                     reader.skipGroup()
                     return
                 }
@@ -316,7 +332,9 @@ internal class SlotTable : CompositionData, Iterable<CompositionGroup> {
             }
             scanGroup()
         }
-        // bash keys
+
+        // Bash groups even if we could not invalidate it. The call is responsible for ensuring
+        // the group is recomposed when this happens.
         write { writer ->
             writer.startGroup()
             anchors.fastForEach { anchor ->
@@ -329,30 +347,44 @@ internal class SlotTable : CompositionData, Iterable<CompositionGroup> {
             writer.endGroup()
         }
 
-        return true
+        return if (allScopesFound) scopes else null
     }
 
     /**
-     * Finds the nearest recompose scope to the provided group and invalidates it
+     * Find the nearest recompose scope for [group] that, when invalidated, will cause [group]
+     * group to be recomposed.
      */
-    private fun invalidateGroup(group: Int): Anchor? {
+    private fun findEffectiveRecomposeScope(group: Int): RecomposeScopeImpl? {
+        var current = group
+        while (current > 0) {
+            for (data in DataIterator(this, current)) {
+                if (data is RecomposeScopeImpl) {
+                    return data
+                }
+            }
+            current = groups.parentAnchor(current)
+        }
+        return null
+    }
+
+    /**
+     * Finds the nearest recompose scope to the provided group and invalidates it. Return
+     * true if the invalidation will cause the scope to reccompose, otherwise false which will
+     * require forcing recomposition some other way.
+     */
+    private fun invalidateGroup(group: Int): Boolean {
         var current = group
         // for each parent up the spine
         while (current >= 0) {
             for (data in DataIterator(this, current)) {
                 if (data is RecomposeScopeImpl) {
                     data.requiresRecompose = true
-                    val result = data.invalidateForResult(null)
-                    if (result != InvalidationResult.IGNORED) {
-                        // even though this is nullable, the anchor will not be null if
-                        // the invalidation wasn't ignored
-                        return data.anchor
-                    }
+                    return data.invalidateForResult(null) != InvalidationResult.IGNORED
                 }
             }
             current = groups.parentAnchor(current)
         }
-        return null
+        return false
     }
 
     /**

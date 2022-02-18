@@ -318,13 +318,13 @@ class Recomposer(
             get() = this@Recomposer.hasPendingWork
         override val changeCount: Long
             get() = this@Recomposer.changeCount
-        fun invalidateGroupsWithKey(key: Int): Boolean {
+        fun invalidateGroupsWithKey(key: Int) {
             val compositions: List<ControlledComposition> = synchronized(stateLock) {
                 knownCompositions.toMutableList()
             }
-            return compositions
+            compositions
                 .fastMapNotNull { it as? CompositionImpl }
-                .fastAny { it.invalidateGroupsWithKey(key) }
+                .fastForEach { it.invalidateGroupsWithKey(key) }
         }
         fun saveStateAndDisposeForHotReload(): List<HotReloadable> {
             val compositions: List<ControlledComposition> = synchronized(stateLock) {
@@ -1114,12 +1114,10 @@ class Recomposer(
             holders.fastForEach { it.recompose() }
         }
 
-        internal fun invalidateGroupsWithKey(key: Int): Boolean {
-            var result = false
+        internal fun invalidateGroupsWithKey(key: Int) {
             _runningRecomposers.value.forEach {
-                result = it.invalidateGroupsWithKey(key) || result
+                it.invalidateGroupsWithKey(key)
             }
-            return result
         }
     }
 }
