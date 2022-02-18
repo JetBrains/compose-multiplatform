@@ -1145,7 +1145,8 @@ internal class ComposerImpl(
     private var groupNodeCountStack = IntStack()
     private var nodeCountOverrides: IntArray? = null
     private var nodeCountVirtualOverrides: HashMap<Int, Int>? = null
-    private var collectParameterInformation = false
+    private var forceRecomposeScopes = false
+    private var forciblyRecompose = false
     private var nodeExpected = false
     private val invalidations: MutableList<Invalidation> = mutableListOf()
     private val entersStack = IntStack()
@@ -1314,8 +1315,8 @@ internal class ComposerImpl(
         parentProvider = parentContext.getCompositionLocalScope()
         providersInvalidStack.push(providersInvalid.asInt())
         providersInvalid = changed(parentProvider)
-        if (!collectParameterInformation) {
-            collectParameterInformation = parentContext.collectingParameterInformation
+        if (!forceRecomposeScopes) {
+            forceRecomposeScopes = parentContext.collectingParameterInformation
         }
         resolveCompositionLocal(LocalInspectionTables, parentProvider)?.let {
             it.add(slotTable)
@@ -1336,6 +1337,7 @@ internal class ComposerImpl(
         recordEndRoot()
         finalizeCompose()
         reader.close()
+        forciblyRecompose = false
     }
 
     /**
@@ -1355,6 +1357,7 @@ internal class ComposerImpl(
         childrenComposing = 0
         nodeExpected = false
         isComposing = false
+        forciblyRecompose = false
     }
 
     internal fun changesApplied() {
@@ -1377,7 +1380,8 @@ internal class ComposerImpl(
     override val skipping: Boolean get() {
         return !inserting && !reusing &&
             !providersInvalid &&
-            currentRecomposeScope?.requiresRecompose == false
+            currentRecomposeScope?.requiresRecompose == false &&
+            !forciblyRecompose
     }
 
     /**
@@ -1393,7 +1397,7 @@ internal class ComposerImpl(
      * determine the parameter values of composable calls.
      */
     override fun collectParameterInformation() {
-        collectParameterInformation = true
+        forceRecomposeScopes = true
     }
 
     @OptIn(InternalComposeApi::class)
@@ -1406,6 +1410,16 @@ internal class ComposerImpl(
             providerUpdates.clear()
             applier.clear()
             isDisposed = true
+        }
+    }
+
+    internal fun forceRecomposeScopes(): Boolean {
+        return if (!forceRecomposeScopes) {
+            forceRecomposeScopes = true
+            forciblyRecompose = true
+             true
+        } else {
+            false
         }
     }
 
@@ -1862,7 +1876,7 @@ internal class ComposerImpl(
             ref = CompositionContextHolder(
                 CompositionContextImpl(
                     compoundKeyHash,
-                    collectParameterInformation
+                    forceRecomposeScopes
                 )
             )
             updateValue(ref)
@@ -2601,7 +2615,7 @@ internal class ComposerImpl(
         }
         val result = if (scope != null &&
             !scope.skipped &&
-            (scope.used || collectParameterInformation)
+            (scope.used || forceRecomposeScopes)
         ) {
             if (scope.anchor == null) {
                 scope.anchor = if (inserting) {
@@ -2995,7 +3009,11 @@ internal class ComposerImpl(
         // some invalidations scheduled already. it can happen when during some parent composition
         // there were a change for a state which was used by the child composition. such changes
         // will be tracked and added into `invalidations` list.
-        if (invalidationsRequested.isNotEmpty() || invalidations.isNotEmpty()) {
+        if (
+            invalidationsRequested.isNotEmpty() ||
+            invalidations.isNotEmpty() ||
+            forciblyRecompose
+        ) {
             doCompose(invalidationsRequested, null)
             return changes.isNotEmpty()
         }
@@ -3020,6 +3038,15 @@ internal class ComposerImpl(
             isComposing = true
             try {
                 startRoot()
+
+                // vv Experimental for forced
+                @Suppress("UNCHECKED_CAST")
+                val savedContent = nextSlot()
+                if (savedContent !== content && content != null) {
+                    updateValue(content as Any?)
+                }
+                // ^^ Experimental for forced
+
                 // Ignore reads of derivedStateOf recalculations
                 observeDerivedStateRecalculations(
                     start = {
@@ -3031,8 +3058,16 @@ internal class ComposerImpl(
                 ) {
                     if (content != null) {
                         startGroup(invocationKey, invocation)
-
                         invokeComposable(this, content)
+                        endGroup()
+                    } else if (
+                        forciblyRecompose &&
+                        savedContent != null &&
+                        savedContent != Composer.Empty
+                    ) {
+                        startGroup(invocationKey, invocation)
+                        @Suppress("UNCHECKED_CAST")
+                        invokeComposable(this, savedContent as @Composable () -> Unit)
                         endGroup()
                     } else {
                         skipCurrentGroup()
