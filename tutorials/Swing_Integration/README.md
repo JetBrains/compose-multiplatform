@@ -1,10 +1,10 @@
-# Integration of Compose for Desktop and Swing
+# Integration of Compose Multiplatform and Swing
 
 ## What is covered
 
 In this tutorial, we'll show you how to make the `Swing/Compose` interop work in your application, what its limitations are, what you can achieve with it, in which cases you may use it and when you shouldn't do that.
 
-The main goals of the interoperability between Compose for Desktop and Swing are 
+The main goals of the interoperability between Compose Multiplatform and Swing are 
 - make it easier and smoother to migrate Swing applications to to Compose 
 - allow to enhance Compose application with Swing components that don't have 'Compose' analogues
  
@@ -12,7 +12,7 @@ In many cases it is more efficient to implement a missing Component in Compose (
 
 ## Swing/CfD interop use cases and limitations
 
-Before combining Compose for Desktop and Swing, it's important to keep in mind that these two technologies have different approaches to the content rendering. Compose for Desktop uses one heavyweight Swing component to render all its content and has logical rendering layers, while Swing operates on both heavyweight and lightweight components (`Component/JComponent`). For Swing logic Compose for Desktop is just one more heavyweight component and it interacts with it the same way as with all other Swing components.
+Before combining Compose Multiplatform and Swing, it's important to keep in mind that these two technologies have different approaches to the content rendering. Compose Multiplatform uses one heavyweight Swing component to render all its content and has logical rendering layers, while Swing operates on both heavyweight and lightweight components (`Component/JComponent`). For Swing logic Compose Multiplatform is just one more heavyweight component and it interacts with it the same way as with all other Swing components.
 
 The first use-case is addition of a Compose part into a Swing application. It could be done use `ComposePanel` Swing component to render the "Compose" part of the application. From swing perspective it will be just another Swing component, that should be treated accordingly. Important point, that all Compose components will be rendered inside the `ComposePanel`, including popups, tooltips, context menus, etc. They will be positioned and resized inside the `ComposePanel`. So probably it would be better to replace them with a Swing based implementation.
 
@@ -24,7 +24,7 @@ Below you can find several cases where the use of `ComposePanel` is justified:
 
 If your case is somewhat similar to one of the above, then you should try to implement it using `ComposePanel`.
 
-The second use case is situation when you want to use some component, that exists in Swing and there is no analogue in Compose. And creating it from scratch is too expensive. In this case, you can use `SwingPanel`. A `SwingPanel` is a wrapper that controls the size, position and rendering of a Swing component that is placed on top of a Compose for Desktop component, meaning the component inside a `SwingPanel` will always be on top of the Compose in depth. Anything that is misplaced and rests on the `SwingPanel` will be clipped by the Swing component placed there, so try to think about these situations, and if there is such a risk, then it is better to either redesign the UI accordingly, or stop using the `SwingPanel` and still try to implement the missing component, thereby contributing to the development of technology and making life easier for other developers.
+The second use case is situation when you want to use some component, that exists in Swing and there is no analogue in Compose. And creating it from scratch is too expensive. In this case, you can use `SwingPanel`. A `SwingPanel` is a wrapper that controls the size, position and rendering of a Swing component that is placed on top of a Compose Multiplatform component, meaning the component inside a `SwingPanel` will always be on top of the Compose in depth. Anything that is misplaced and rests on the `SwingPanel` will be clipped by the Swing component placed there, so try to think about these situations, and if there is such a risk, then it is better to either redesign the UI accordingly, or stop using the `SwingPanel` and still try to implement the missing component, thereby contributing to the development of technology and making life easier for other developers.
 
 Below you can find several cases where the use of `SwingPanel` is justified:
 - there are no popups, tooltips, context menus, etc. in your application. or they are not used inside your `SwingPanel`
@@ -32,11 +32,11 @@ Below you can find several cases where the use of `SwingPanel` is justified:
 
 If your case is  somewhat similar to one of the above, then you should try to implement it using `SwingPanel`.
 
-Since Compose for Desktop and Swing can be combined in both directions, it is quite possible to place a `SwingPanel` into a `ComposePanel`, which in turn could be placed into another `SwingPanel`. In this case, you should be careful to minimize rendering glitches. At the end of this tutorial, you can find an example covering this case.
+Since Compose Multiplatform and Swing can be combined in both directions, it is quite possible to place a `SwingPanel` into a `ComposePanel`, which in turn could be placed into another `SwingPanel`. In this case, you should be careful to minimize rendering glitches. At the end of this tutorial, you can find an example covering this case.
 
 ## Using ComposePanel
 
-`ComposePanel` lets you create a UI using Compose for Desktop in a Swing-based UI. To achieve this you need to create an instance of `ComposePanel`, add it to your Swing layout, and describe the composition inside `setContent`.
+`ComposePanel` lets you create a UI using Compose Multiplatform in a Swing-based UI. To achieve this you need to create an instance of `ComposePanel`, add it to your Swing layout, and describe the composition inside `setContent`.
 
 ```kotlin
 import androidx.compose.foundation.layout.Box
