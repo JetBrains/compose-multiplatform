@@ -167,6 +167,10 @@ class PopupProperties @ExperimentalComposeUiApi constructor(
 /**
  * Opens a popup with the given content.
  *
+ * A popup is a floating container that appears on top of the current activity.
+ * It is especially useful for non-modal UI surfaces that remain hidden until they
+ * are needed, for example floating menus like Cut/Copy/Paste.
+ *
  * The popup is positioned relative to its parent, using the [alignment] and [offset].
  * The popup is visible as long as it is part of the composition hierarchy.
  *
