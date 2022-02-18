@@ -44,6 +44,8 @@ internal class AccessibilityControllerImpl(
             return _currentNodes
         }
 
+    var onFocusRequested: ((ComposeAccessible) -> Unit)? = null
+
     @Suppress("UNUSED_PARAMETER")
     fun fireNewNodeEvent(accessible: ComposeAccessible) {}
 
@@ -83,6 +85,7 @@ internal class AccessibilityControllerImpl(
                                 ACCESSIBLE_STATE_PROPERTY,
                                 null, AccessibleState.FOCUSED
                             )
+                            onFocusRequested?.invoke(component)
                         } else {
                             component.accessibleContext.firePropertyChange(
                                 ACCESSIBLE_STATE_PROPERTY,

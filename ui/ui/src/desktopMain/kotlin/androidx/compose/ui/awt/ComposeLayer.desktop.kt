@@ -125,6 +125,9 @@ internal class ComposeLayer {
             if (a11yDisabled) return null
             val controller =
                 scene.mainOwner?.accessibilityController as? AccessibilityControllerImpl
+            controller?.onFocusRequested = {
+                _component.requestNativeFocusOnAccessible(it)
+            }
             val accessible = controller?.rootAccessible
             accessible?.getAccessibleContext()?.accessibleParent = component.parent as Accessible
             return accessible?.getAccessibleContext()
