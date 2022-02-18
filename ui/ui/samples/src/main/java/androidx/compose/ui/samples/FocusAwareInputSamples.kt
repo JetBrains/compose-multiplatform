@@ -18,12 +18,13 @@ package androidx.compose.ui.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -58,6 +59,9 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.rotary.onPreRotaryScrollEvent
 import androidx.compose.ui.input.rotary.onRotaryScrollEvent
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
 @Suppress("UNUSED_ANONYMOUS_PARAMETER")
@@ -183,7 +187,10 @@ fun RotaryEventSample() {
             .fillMaxWidth()
             .verticalScroll(scrollState)
             .onRotaryScrollEvent {
-                coroutineScope.launch { scrollState.animateScrollBy(it.verticalScrollPixels) }
+                coroutineScope.launch {
+                    scrollState.scrollTo((scrollState.value +
+                        it.verticalScrollPixels).roundToInt())
+                }
                 true
             }
             .focusRequester(focusRequester)
@@ -219,7 +226,7 @@ fun PreRotaryEventSample() {
                     // You can intercept an event before it is sent to the child.
                     if (interceptScroll) {
                         coroutineScope.launch {
-                            rowScrollState.animateScrollBy(it.horizontalScrollPixels)
+                            rowScrollState.scrollBy(it.horizontalScrollPixels)
                         }
                         // return true to consume this event.
                         true
@@ -231,16 +238,25 @@ fun PreRotaryEventSample() {
                 .onRotaryScrollEvent {
                     // If the child does not use the scroll, we get notified here.
                     coroutineScope.launch {
-                        rowScrollState.animateScrollBy(it.horizontalScrollPixels)
+                        rowScrollState.scrollBy(it.horizontalScrollPixels)
                     }
                     true
                 }
         ) {
-            Switch(
-                checked = interceptScroll,
-                onCheckedChange = { interceptScroll = it },
-                modifier = Modifier.align(CenterHorizontally)
-            )
+            Row(
+                modifier = Modifier.align(CenterHorizontally),
+                verticalAlignment = CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier.width(70.dp),
+                    text = if (interceptScroll) "Row" else "Column",
+                    style = TextStyle(color = White)
+                )
+                Switch(
+                    checked = interceptScroll,
+                    onCheckedChange = { interceptScroll = it },
+                )
+            }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -260,7 +276,7 @@ fun PreRotaryEventSample() {
                     .verticalScroll(columnScrollState)
                     .onRotaryScrollEvent {
                         coroutineScope.launch {
-                            columnScrollState.animateScrollBy(it.verticalScrollPixels)
+                            columnScrollState.scrollBy(it.verticalScrollPixels)
                         }
                         true
                     }
