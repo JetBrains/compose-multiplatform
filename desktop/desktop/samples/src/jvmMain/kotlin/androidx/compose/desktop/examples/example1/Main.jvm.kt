@@ -184,8 +184,8 @@ private fun FrameWindowScope.App() {
                     }
                 }
             },
-            content = {
-                Row(Modifier.padding(bottom = 56.dp)) {
+            content = { innerPadding ->
+                Row(Modifier.padding(innerPadding)) {
                     LeftColumn(Modifier.weight(1f))
                     RightColumn(Modifier.width(200.dp))
                 }
