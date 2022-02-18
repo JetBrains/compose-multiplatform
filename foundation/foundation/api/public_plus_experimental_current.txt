@@ -59,6 +59,7 @@ package androidx.compose.foundation {
   }
 
   public final class FocusableKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.ui.Modifier focusGroup(androidx.compose.ui.Modifier);
     method public static androidx.compose.ui.Modifier focusable(androidx.compose.ui.Modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource? interactionSource);
   }
 
