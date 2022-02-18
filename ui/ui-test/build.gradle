@@ -72,6 +72,8 @@ dependencies {
         androidTestImplementation(libs.mockitoCore)
         androidTestImplementation(libs.dexmakerMockito)
         androidTestImplementation(libs.mockitoKotlin)
+
+        samples(project(":compose:ui:ui-test:ui-test-samples"))
     }
 }
 
@@ -147,6 +149,8 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         // Can't declare this in kotlin { sourceSets { androidTest.dependencies { .. } } } as that
         // leaks into instrumented tests (b/214407011)
         testImplementation(libs.robolectric)
+
+        samples(project(":compose:ui:ui-test:ui-test-samples"))
     }
 }
 

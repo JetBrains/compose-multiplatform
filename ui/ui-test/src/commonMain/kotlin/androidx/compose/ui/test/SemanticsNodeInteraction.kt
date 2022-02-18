@@ -23,33 +23,16 @@ import androidx.compose.ui.semantics.SemanticsNode
  * with this node by performing actions such as [performClick], assertions such as
  * [assertHasClickAction], or navigate to other nodes such as [onChildren].
  *
- * This is usually obtained from methods like [onNode][SemanticsNodeInteractionsProvider.onNode].
+ * An instance of [SemanticsNodeInteraction] can be obtained from
+ * [onNode][SemanticsNodeInteractionsProvider.onNode] and convenience
+ * methods that use a specific filter, such as [onNodeWithText].
  *
- * Example usage:
- * ```
- * composeTestRule.onNodeWithTag("myCheckbox")
- *    .performClick()
- *    .assertIsOn()
- * ````
+ * Here you can see how you can locate a checkbox, click it and verify that it's checked:
+ * @sample androidx.compose.ui.test.samples.clickAndVerifyCheckbox
  *
- * useUnmergedTree is for tests with a special need to inspect "implementation
- * detail" children.  For example:
- * ```
- * composeTestRule.setMaterialContent {
- *     // IconButton is a semantically merging composable.  All testTags of its children
- *     // are merged up into it in the default, "merged" semantics tree.
- *     IconButton(onClick = {}) {
- *         MyIcon(Modifier.testTag("icon"))
- *     }
- * }
- *
- * // Assert that MyIcon is at the expected position inside the IconButton.
- * // Without useUnmergedTree, then the test would check the position of the IconButton (0, 0)
- * // instead of the position of the Icon (30, 30).
- * composeTestRule.onNodeWithTag("icon", useUnmergedTree = true)
- *     .assertLeftPosition(30.dp)
- *     .assertTopPosition(30.dp)
- * ````
+ * [useUnmergedTree] is for tests with a special need to inspect implementation detail within
+ * children. For example:
+ * @sample androidx.compose.ui.test.samples.useUnmergedTree
  */
 class SemanticsNodeInteraction constructor(
     internal val testContext: TestContext,
@@ -198,15 +181,12 @@ class SemanticsNodeInteraction constructor(
  * One can interact with these nodes by performing assertions such as [assertCountEquals], or
  * navigate to other nodes such as [get].
  *
- * This is usually obtained from methods like
- * [onAllNodes][SemanticsNodeInteractionsProvider.onAllNodes] or chains of
- * [onNode][SemanticsNodeInteractionsProvider.onNode].[onChildren].
+ * An instance of [SemanticsNodeInteractionCollection] can be obtained from
+ * [onAllNodes][SemanticsNodeInteractionsProvider.onAllNodes] and convenience
+ * methods that use a specific filter, such as [onAllNodesWithText].
  *
- * Example usage:
- * ```
- * composeTestRule.onAllNodes(isClickable())
- *    .assertCountEquals(2)
- * ````
+ * For example, here is how you verify that there are exactly two clickable items:
+ * @sample androidx.compose.ui.test.samples.verifyTwoClickableNodes
  */
 class SemanticsNodeInteractionCollection constructor(
     internal val testContext: TestContext,

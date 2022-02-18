@@ -23,18 +23,8 @@ package androidx.compose.ui.test
  * All events sent by these methods are batched together and sent as a whole after
  * [performRotaryScrollInput] has executed its code block.
  *
- * Example usage:
- * ```
- * onRoot().performRotaryScrollInput {
- *     rotateToScrollVertically(3.0f)
- * }
- *
- * onRoot().performRotaryScrollInput {
- *     rotateToScrollVertically(3.0f)
- *     rotateToScrollVertically(10.0f)
- *     rotateToScrollVertically(2.0f)
- * }
- * ```
+ * Example of performing a scroll with three events:
+ * @sample androidx.compose.ui.test.samples.rotaryInputScroll
  */
 @ExperimentalTestApi
 interface RotaryInjectionScope : InjectionScope {

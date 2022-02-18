@@ -44,7 +44,7 @@ private const val LongPressTimeoutMillis: Long = 500L
  * corresponding [SemanticsNodeInteraction]. Gestures can be injected by calling methods defined
  * on [GestureScope], such as [click] or [swipe]. The [SemanticsNodeInteraction] can be found by
  * one of the finder methods such as
- * [ComposeTestRule.onNode][androidx.compose.ui.test.junit4.ComposeTestRule.onNode].
+ * [onNode][androidx.compose.ui.test.SemanticsNodeInteractionsProvider.onNode].
  *
  * The functions in [GestureScope] can roughly be divided into two groups: full gestures and
  * individual touch events. The individual touch events are: [down], [move] and friends, [up],
@@ -62,30 +62,14 @@ private const val LongPressTimeoutMillis: Long = 500L
  * [coordinates][Offset] within a node, like the [top left corner][topLeft], its [center], or
  * some percentage of the size ([percentOffset]).
  *
- * Example usage:
- * ```
- * onNodeWithTag("myWidget")
- *    .performGesture {
- *        click(center)
- *    }
+ * Example of performing a click:
+ * @sample androidx.compose.ui.test.samples.gestureClick
  *
- * onNodeWithTag("myWidget")
- *    // Perform an L-shaped gesture
- *    .performGesture {
- *        down(topLeft)
- *        move(topLeft + percentOffset(0f, .1f))
- *        move(topLeft + percentOffset(0f, .2f))
- *        move(topLeft + percentOffset(0f, .3f))
- *        move(topLeft + percentOffset(0f, .4f))
- *        move(centerLeft)
- *        move(centerLeft + percentOffset(.1f, 0f))
- *        move(centerLeft + percentOffset(.2f, 0f))
- *        move(centerLeft + percentOffset(.3f, 0f))
- *        move(centerLeft + percentOffset(.4f, 0f))
- *        move(center)
- *        up()
- *    }
- * ```
+ * Example of performing a swipe up:
+ * @sample androidx.compose.ui.test.samples.gestureSwipeUp
+ *
+ * Example of performing an L-shaped gesture:
+ * @sample androidx.compose.ui.test.samples.gestureLShape
  */
 @Deprecated(
     message = "Replaced by TouchInjectionScope"

@@ -275,25 +275,8 @@ fun SemanticsNodeInteraction.performScrollToNode(
  * execution of [block] or injection of the events, all (subsequent) events are dropped and the
  * error is thrown here.
  *
- * Example usage:
- * ```
- * testRule.onNodeWithTag("myWidget")
- *     .performGesture { swipeUp() }
- *
- * testRule.onNodeWithTag("myWidget")
- *     .performGesture { click(center) }
- *
- * testRule.onNodeWithTag("myWidget")
- *     .performGesture { down(topLeft) }
- *     .assertHasClickAction()
- *     .performGesture { up(topLeft) }
- *
- * testRule.onNodeWithTag("myWidget")
- *     .performGesture { click() }
- * testRule.mainClock.advanceTimeBy(100)
- * testRule.onNodeWithTag("myWidget")
- *     .performGesture(true) { swipeUp() }
- * ```
+ * Example of performing a click:
+ * @sample androidx.compose.ui.test.samples.gestureClick
  *
  * @param block A lambda with [GestureScope] as receiver that describes the gesture by
  * sending all touch events.
@@ -335,29 +318,17 @@ fun SemanticsNodeInteraction.performGesture(
  * execution of [block] or injection of the events, all (subsequent) events are dropped and the
  * error is thrown here.
  *
- * Example usage:
- * ```
- * // Perform a swipe up
- * testRule.onNodeWithTag("myWidget")
- *     .performTouchInput { swipeUp() }
+ * Example of performing a swipe up:
+ * @sample androidx.compose.ui.test.samples.touchInputSwipeUp
  *
- * // Perform a click off-center
- * testRule.onNodeWithTag("myWidget")
- *     .performTouchInput { click(percentOffset(.2f, .5f) }
+ * Example of performing an off-center click:
+ * @sample androidx.compose.ui.test.samples.touchInputClickOffCenter
  *
- * // Do an assertion while performing a click
- * testRule.onNodeWithTag("myWidget")
- *     .performTouchInput { down(topLeft) }
- *     .assertHasClickAction()
- *     .performTouchInput { up(topLeft) }
+ * Example of doing an assertion during a click:
+ * @sample androidx.compose.ui.test.samples.touchInputAssertDuringClick
  *
- * // Perform a click-and-drag
- * testRule.onNodeWithTag("myWidget").performTouchInput {
- *     click()
- *     advanceEventTime(100)
- *     swipeUp()
- * }
- * ```
+ * Example of performing a click-and-drag:
+ * @sample androidx.compose.ui.test.samples.touchInputClickAndDrag
  *
  * @param block A lambda with [TouchInjectionScope] as receiver that describes the gesture by
  * sending all touch events.
@@ -393,25 +364,11 @@ fun SemanticsNodeInteraction.performTouchInput(
  * execution of [block] or injection of the events, all (subsequent) events are dropped and the
  * error is thrown here.
  *
- * Example usage:
- * ```
- * onNodeWithTag("myWidget")
- *    .performMouseInput {
- *        click(center)
- *    }
+ * Example of performing a mouse click:
+ * @sample androidx.compose.ui.test.samples.mouseInputClick
  *
- * onNodeWithTag("myWidget")
- *    // Scroll down while the primary mouse button is down:
- *    .performMouseInput {
- *        down()
- *        repeat(6) {
- *            advanceEventTime()
- *            scroll(-1f)
- *        }
- *        advanceEventTime()
- *        up()
- *    }
- * ```
+ * Example of scrolling the mouse wheel while the mouse button is pressed:
+ * @sample androidx.compose.ui.test.samples.mouseInputScrollWhileDown
  *
  * @param block A lambda with [MouseInjectionScope] as receiver that describes the gesture by
  * sending all mouse events.
