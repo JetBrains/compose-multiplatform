@@ -57,7 +57,7 @@ class AnimationTests {
             Style(AnimationsStyleSheet)
         }
 
-        val el = root.children[0] as HTMLStyleElement
+        val el = nextChild() as HTMLStyleElement
         val cssRules = (el.sheet as? CSSStyleSheet)?.cssRules
         val rules = (0 until (cssRules?.length ?: 0)).map {
             cssRules?.item(it)?.cssText?.replace("\n", "") ?: ""

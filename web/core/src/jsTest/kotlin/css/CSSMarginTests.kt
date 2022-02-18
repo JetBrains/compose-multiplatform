@@ -22,7 +22,7 @@ class CSSMarginTests {
             })
         }
 
-        assertEquals("5px", (nextChild()).style.marginLeft)
+        assertEquals("5px", nextChild().style.marginLeft)
     }
 
     @Test
@@ -35,7 +35,7 @@ class CSSMarginTests {
             })
         }
 
-        assertEquals("15px", (nextChild()).style.marginTop)
+        assertEquals("15px", nextChild().style.marginTop)
     }
 
     @Test
@@ -48,7 +48,7 @@ class CSSMarginTests {
             })
         }
 
-        assertEquals("12vw", (nextChild()).style.marginRight)
+        assertEquals("12vw", nextChild().style.marginRight)
     }
 
     @Test
@@ -61,7 +61,7 @@ class CSSMarginTests {
             })
         }
 
-        assertEquals("12%", (nextChild()).style.marginBottom)
+        assertEquals("12%", nextChild().style.marginBottom)
     }
 
     @Test

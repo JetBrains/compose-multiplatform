@@ -35,9 +35,9 @@ class CSSListStyleTests {
 
         }
 
-        assertEquals("none", (nextChild()).style.listStyleImage)
-        assertEquals("url(\"starsolid.gif\")", (nextChild()).style.listStyleImage)
-        assertEquals("linear-gradient(to left bottom, red, blue)", (nextChild()).style.listStyleImage)
+        assertEquals("none", nextChild().style.listStyleImage)
+        assertEquals("url(\"starsolid.gif\")", nextChild().style.listStyleImage)
+        assertEquals("linear-gradient(to left bottom, red, blue)", nextChild().style.listStyleImage)
     }
 
     @Test
@@ -55,8 +55,8 @@ class CSSListStyleTests {
             })
         }
 
-        assertEquals("inside", (nextChild()).style.listStylePosition)
-        assertEquals("outside", (nextChild()).style.listStylePosition)
+        assertEquals("inside", nextChild().style.listStylePosition)
+        assertEquals("outside", nextChild().style.listStylePosition)
     }
 
 
@@ -85,10 +85,10 @@ class CSSListStyleTests {
             })
         }
 
-        assertEquals("armenian", (nextChild()).style.listStyleType)
-        assertEquals("disc", (nextChild()).style.listStyleType)
-        assertEquals("circle", (nextChild()).style.listStyleType)
-        assertEquals("square", (nextChild()).style.listStyleType)
+        assertEquals("armenian", nextChild().style.listStyleType)
+        assertEquals("disc", nextChild().style.listStyleType)
+        assertEquals("circle", nextChild().style.listStyleType)
+        assertEquals("square", nextChild().style.listStyleType)
     }
 
     @Test

@@ -23,7 +23,7 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("20em", (nextChild()).style.fontSize)
+        assertEquals("20em", nextChild().style.fontSize)
     }
 
     @Test
@@ -41,8 +41,8 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("italic", (nextChild()).style.fontStyle)
-        assertEquals("oblique", (nextChild()).style.fontStyle)
+        assertEquals("italic", nextChild().style.fontStyle)
+        assertEquals("oblique", nextChild().style.fontStyle)
     }
 
     @Test
@@ -75,11 +75,11 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("bold", (nextChild()).style.fontWeight)
-        assertEquals("bolder", (nextChild()).style.fontWeight)
-        assertEquals("lighter", (nextChild()).style.fontWeight)
-        assertEquals("100", (nextChild()).style.fontWeight)
-        assertEquals("800", (nextChild()).style.fontWeight)
+        assertEquals("bold", nextChild().style.fontWeight)
+        assertEquals("bolder", nextChild().style.fontWeight)
+        assertEquals("lighter", nextChild().style.fontWeight)
+        assertEquals("100", nextChild().style.fontWeight)
+        assertEquals("800", nextChild().style.fontWeight)
     }
 
     @Test
@@ -97,8 +97,8 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("normal", (nextChild()).style.lineHeight)
-        assertEquals("2em", (nextChild()).style.lineHeight)
+        assertEquals("normal", nextChild().style.lineHeight)
+        assertEquals("2em", nextChild().style.lineHeight)
     }
 
     @Test
@@ -116,8 +116,8 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("normal", (nextChild()).style.letterSpacing)
-        assertEquals("2em", (nextChild()).style.letterSpacing)
+        assertEquals("normal", nextChild().style.letterSpacing)
+        assertEquals("2em", nextChild().style.letterSpacing)
     }
 
     @Test
@@ -135,8 +135,8 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("\"Gill Sans Extrabold\", sans-serif", (nextChild()).style.fontFamily)
-        assertEquals("sans-serif", (nextChild()).style.fontFamily)
+        assertEquals("\"Gill Sans Extrabold\", sans-serif", nextChild().style.fontFamily)
+        assertEquals("sans-serif", nextChild().style.fontFamily)
     }
 
     @Test
@@ -149,7 +149,7 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("italic bold 0.8em / 1.2 Arial, sans-serif", (nextChild()).style.font)
+        assertEquals("italic bold 0.8em / 1.2 Arial, sans-serif", nextChild().style.font)
     }
 
     @Test
@@ -187,12 +187,12 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("left", (nextChild()).style.textAlign)
-        assertEquals("right", (nextChild()).style.textAlign)
-        assertEquals("center", (nextChild()).style.textAlign)
-        assertEquals("justify", (nextChild()).style.textAlign)
-        assertEquals("start", (nextChild()).style.textAlign)
-        assertEquals("end", (nextChild()).style.textAlign)
+        assertEquals("left", nextChild().style.textAlign)
+        assertEquals("right", nextChild().style.textAlign)
+        assertEquals("center", nextChild().style.textAlign)
+        assertEquals("justify", nextChild().style.textAlign)
+        assertEquals("start", nextChild().style.textAlign)
+        assertEquals("end", nextChild().style.textAlign)
     }
 
 
@@ -211,8 +211,8 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("red", (nextChild()).style.textDecorationColor)
-        assertEquals("rgba(0, 200, 20, 0.85)", (nextChild()).style.textDecorationColor)
+        assertEquals("red", nextChild().style.textDecorationColor)
+        assertEquals("rgba(0, 200, 20, 0.85)", nextChild().style.textDecorationColor)
     }
 
     @Test
@@ -245,11 +245,11 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("solid", (nextChild()).style.textDecorationStyle)
-        assertEquals("double", (nextChild()).style.textDecorationStyle)
-        assertEquals("dotted", (nextChild()).style.textDecorationStyle)
-        assertEquals("dashed", (nextChild()).style.textDecorationStyle)
-        assertEquals("wavy", (nextChild()).style.textDecorationStyle)
+        assertEquals("solid", nextChild().style.textDecorationStyle)
+        assertEquals("double", nextChild().style.textDecorationStyle)
+        assertEquals("dotted", nextChild().style.textDecorationStyle)
+        assertEquals("dashed", nextChild().style.textDecorationStyle)
+        assertEquals("wavy", nextChild().style.textDecorationStyle)
     }
 
     @Test
@@ -277,10 +277,10 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("text-decoration-thickness: auto;", (nextChild()).style.cssText)
-        assertEquals("text-decoration-thickness: from-font;", (nextChild()).style.cssText)
-        assertEquals("text-decoration-thickness: 10px;", (nextChild()).style.cssText)
-        assertEquals("text-decoration-thickness: 2%;", (nextChild()).style.cssText)
+        assertEquals("text-decoration-thickness: auto;", nextChild().style.cssText)
+        assertEquals("text-decoration-thickness: from-font;", nextChild().style.cssText)
+        assertEquals("text-decoration-thickness: 10px;", nextChild().style.cssText)
+        assertEquals("text-decoration-thickness: 2%;", nextChild().style.cssText)
     }
 
     @Test
@@ -313,11 +313,11 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("none", (nextChild()).style.textDecorationLine)
-        assertEquals("underline", (nextChild()).style.textDecorationLine)
-        assertEquals("overline", (nextChild()).style.textDecorationLine)
-        assertEquals("line-through", (nextChild()).style.textDecorationLine)
-        assertEquals("blink", (nextChild()).style.textDecorationLine)
+        assertEquals("none", nextChild().style.textDecorationLine)
+        assertEquals("underline", nextChild().style.textDecorationLine)
+        assertEquals("overline", nextChild().style.textDecorationLine)
+        assertEquals("line-through", nextChild().style.textDecorationLine)
+        assertEquals("blink", nextChild().style.textDecorationLine)
     }
 
     @Test
@@ -345,10 +345,10 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("underline red", (nextChild()).style.textDecoration)
-        assertEquals("overline wavy lime", (nextChild()).style.textDecoration)
-        assertEquals("line-through", (nextChild()).style.textDecoration)
-        assertEquals("underline overline dashed", (nextChild()).style.textDecoration)
+        assertEquals("underline red", nextChild().style.textDecoration)
+        assertEquals("overline wavy lime", nextChild().style.textDecoration)
+        assertEquals("line-through", nextChild().style.textDecoration)
+        assertEquals("underline overline dashed", nextChild().style.textDecoration)
     }
 
     @Test
@@ -386,12 +386,12 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("normal", (nextChild()).style.whiteSpace)
-        assertEquals("nowrap", (nextChild()).style.whiteSpace)
-        assertEquals("pre", (nextChild()).style.whiteSpace)
-        assertEquals("pre-wrap", (nextChild()).style.whiteSpace)
-        assertEquals("pre-line", (nextChild()).style.whiteSpace)
-        assertEquals("break-spaces", (nextChild()).style.whiteSpace)
+        assertEquals("normal", nextChild().style.whiteSpace)
+        assertEquals("nowrap", nextChild().style.whiteSpace)
+        assertEquals("pre", nextChild().style.whiteSpace)
+        assertEquals("pre-wrap", nextChild().style.whiteSpace)
+        assertEquals("pre-line", nextChild().style.whiteSpace)
+        assertEquals("break-spaces", nextChild().style.whiteSpace)
     }
 
 }

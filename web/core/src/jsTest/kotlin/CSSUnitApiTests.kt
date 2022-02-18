@@ -522,8 +522,9 @@ class CSSUnitApiTests {
             })
         }
 
+        val el = nextChild()
 
-        assertEquals("5px", (root.children[0] as HTMLElement).style.left)
-        assertEquals("8px", (root.children[0] as HTMLElement).style.top)
+        assertEquals("5px", el.style.left)
+        assertEquals("8px", el.style.top)
     }
 }

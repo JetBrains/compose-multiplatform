@@ -20,8 +20,8 @@ class CSSBorderTests {
             Div({ style { border(3.px, color = Color("green")) } })
         }
 
-        assertEquals("1px solid red", (nextChild()).style.border)
-        (nextChild()).let { el ->
+        assertEquals("1px solid red", nextChild().style.border)
+        nextChild().let { el ->
             assertEquals("green", el.style.getPropertyValue("border-color"))
             assertEquals("3px", el.style.getPropertyValue("border-width"))
         }
@@ -33,7 +33,7 @@ class CSSBorderTests {
             Div({ style { border(3.px, LineStyle.Dotted, Color("green")) } })
         }
 
-        assertEquals("3px dotted green", (nextChild()).style.border)
+        assertEquals("3px dotted green", nextChild().style.border)
     }
 
     @Test
@@ -45,10 +45,10 @@ class CSSBorderTests {
             Div({ style { borderRadius(3.px, 5.px, 4.px, 1.px) } })
         }
 
-        assertEquals("3px", (nextChild()).style.borderRadius)
-        assertEquals("3px 5px", (nextChild()).style.borderRadius)
-        assertEquals("3px 5px 4px", (nextChild()).style.borderRadius)
-        assertEquals("3px 5px 4px 1px", (nextChild()).style.borderRadius)
+        assertEquals("3px", nextChild().style.borderRadius)
+        assertEquals("3px 5px", nextChild().style.borderRadius)
+        assertEquals("3px 5px 4px", nextChild().style.borderRadius)
+        assertEquals("3px 5px 4px 1px", nextChild().style.borderRadius)
     }
 
 
@@ -61,9 +61,9 @@ class CSSBorderTests {
             Div({ style { borderWidth(3.px, 5.px, 4.px, 2.px) } })
         }
 
-        assertEquals("2px", (nextChild()).style.borderWidth)
-        assertEquals("3px 7px", (nextChild()).style.borderWidth)
-        assertEquals("3px 5px 4px", (nextChild()).style.borderWidth)
-        assertEquals("3px 5px 4px 2px", (nextChild()).style.borderWidth)
+        assertEquals("2px", nextChild().style.borderWidth)
+        assertEquals("3px 7px", nextChild().style.borderWidth)
+        assertEquals("3px 5px 4px", nextChild().style.borderWidth)
+        assertEquals("3px 5px 4px 2px", nextChild().style.borderWidth)
     }
 }

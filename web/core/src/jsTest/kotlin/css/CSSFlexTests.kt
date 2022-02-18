@@ -36,8 +36,8 @@ class CSSFlexTests {
             )
         }
 
-        assertEquals("-4", (nextChild()).style.order)
-        assertEquals("3", (nextChild()).style.order)
+        assertEquals("-4", nextChild().style.order)
+        assertEquals("3", nextChild().style.order)
     }
 
     @Test
@@ -73,10 +73,10 @@ class CSSFlexTests {
             )
         }
 
-        assertEquals("3", (nextChild()).style.flexGrow)
-        assertEquals("2.5", (nextChild()).style.flexGrow)
-        assertEquals("100", (nextChild()).style.flexGrow)
-        assertEquals("0.6", (nextChild()).style.flexGrow)
+        assertEquals("3", nextChild().style.flexGrow)
+        assertEquals("2.5", nextChild().style.flexGrow)
+        assertEquals("100", nextChild().style.flexGrow)
+        assertEquals("0.6", nextChild().style.flexGrow)
     }
 
     @Test
@@ -112,10 +112,10 @@ class CSSFlexTests {
             )
         }
 
-        assertEquals("3", (nextChild()).style.flexShrink)
-        assertEquals("2.5", (nextChild()).style.flexShrink)
-        assertEquals("100", (nextChild()).style.flexShrink)
-        assertEquals("0.6", (nextChild()).style.flexShrink)
+        assertEquals("3", nextChild().style.flexShrink)
+        assertEquals("2.5", nextChild().style.flexShrink)
+        assertEquals("100", nextChild().style.flexShrink)
+        assertEquals("0.6", nextChild().style.flexShrink)
     }
 
     @Test
@@ -140,7 +140,7 @@ class CSSFlexTests {
             flexWraps.forEach { flexWrap ->
                 assertEquals(
                     "${flexDirection.value} ${flexWrap.value}",
-                    (nextChild()).style.flexFlow
+                    nextChild().style.flexFlow
                 )
             }
         }
@@ -164,7 +164,7 @@ class CSSFlexTests {
         enumValues.forEach { justifyContent ->
             assertEquals(
                 justifyContent.value,
-                (nextChild()).style.justifyContent
+                nextChild().style.justifyContent
             )
         }
     }
@@ -233,7 +233,7 @@ class CSSFlexTests {
         enumValues.forEach { alignContent ->
             assertEquals(
                 alignContent.value,
-                (nextChild()).style.alignContent
+                nextChild().style.alignContent
             )
         }
     }
@@ -256,7 +256,7 @@ class CSSFlexTests {
         enumValues.forEach { displayStyle ->
             assertEquals(
                 displayStyle.value,
-                (nextChild()).style.flexDirection
+                nextChild().style.flexDirection
             )
         }
     }
@@ -300,8 +300,8 @@ class CSSFlexTests {
             })
         }
 
-        assertEquals("10em", (nextChild()).style.flexBasis)
-        assertEquals("auto", (nextChild()).style.flexBasis)
+        assertEquals("10em", nextChild().style.flexBasis)
+        assertEquals("auto", nextChild().style.flexBasis)
     }
 
     @Test
@@ -329,10 +329,10 @@ class CSSFlexTests {
             })
         }
 
-        assertEquals("auto", (nextChild()).style.flexBasis)
-        assertEquals("initial", (nextChild()).style.flexBasis)
-        assertEquals("2", (nextChild()).style.flexGrow)
-        assertEquals("10em", (nextChild()).style.flexBasis)
+        assertEquals("auto", nextChild().style.flexBasis)
+        assertEquals("initial", nextChild().style.flexBasis)
+        assertEquals("2", nextChild().style.flexGrow)
+        assertEquals("10em", nextChild().style.flexBasis)
     }
 
     @Test

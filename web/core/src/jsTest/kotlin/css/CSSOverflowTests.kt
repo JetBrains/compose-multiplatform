@@ -42,11 +42,11 @@ class CSSOverflowTests {
             })
         }
 
-        assertEquals("visible", (nextChild()).style.overflowX)
-        assertEquals("hidden", (nextChild()).style.overflowX)
-        assertEquals("clip", (nextChild()).style.overflowX)
-        assertEquals("scroll", (nextChild()).style.overflowX)
-        assertEquals("auto", (nextChild()).style.overflowX)
+        assertEquals("visible", nextChild().style.overflowX)
+        assertEquals("hidden", nextChild().style.overflowX)
+        assertEquals("clip", nextChild().style.overflowX)
+        assertEquals("scroll", nextChild().style.overflowX)
+        assertEquals("auto", nextChild().style.overflowX)
     }
 
     @Test
@@ -79,11 +79,11 @@ class CSSOverflowTests {
             })
         }
 
-        assertEquals("visible", (nextChild()).style.overflowY)
-        assertEquals("hidden", (nextChild()).style.overflowY)
-        assertEquals("clip", (nextChild()).style.overflowY)
-        assertEquals("scroll", (nextChild()).style.overflowY)
-        assertEquals("auto", (nextChild()).style.overflowY)
+        assertEquals("visible", nextChild().style.overflowY)
+        assertEquals("hidden", nextChild().style.overflowY)
+        assertEquals("clip", nextChild().style.overflowY)
+        assertEquals("scroll", nextChild().style.overflowY)
+        assertEquals("auto", nextChild().style.overflowY)
     }
 
     @Test
@@ -96,7 +96,7 @@ class CSSOverflowTests {
             })
         }
 
-        val style = (nextChild()).style
+        val style = nextChild().style
         assertEquals("clip", style.overflowX)
         assertEquals("clip", style.overflowY)
     }

@@ -30,7 +30,7 @@ class CSSPaddingTests {
             })
         }
 
-        assertEquals("5px", (nextChild()).style.paddingLeft)
+        assertEquals("5px", nextChild().style.paddingLeft)
     }
 
     @Test
@@ -43,7 +43,7 @@ class CSSPaddingTests {
             })
         }
 
-        assertEquals("15px", (nextChild()).style.paddingTop)
+        assertEquals("15px", nextChild().style.paddingTop)
     }
 
     @Test
@@ -56,7 +56,7 @@ class CSSPaddingTests {
             })
         }
 
-        assertEquals("12vw", (nextChild()).style.paddingRight)
+        assertEquals("12vw", nextChild().style.paddingRight)
     }
 
     @Test
@@ -69,7 +69,7 @@ class CSSPaddingTests {
             })
         }
 
-        assertEquals("12%", (nextChild()).style.paddingBottom)
+        assertEquals("12%", nextChild().style.paddingBottom)
     }
 
     @Test
