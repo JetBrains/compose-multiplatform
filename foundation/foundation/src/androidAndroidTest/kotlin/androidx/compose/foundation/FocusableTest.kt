@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -176,7 +176,7 @@ class FocusableTest {
         }
 
         rule.runOnIdle {
-            Truth.assertThat(interactions).isEmpty()
+            assertThat(interactions).isEmpty()
         }
 
         rule.runOnIdle {
@@ -184,8 +184,8 @@ class FocusableTest {
         }
 
         rule.runOnIdle {
-            Truth.assertThat(interactions).hasSize(1)
-            Truth.assertThat(interactions.first()).isInstanceOf(FocusInteraction.Focus::class.java)
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(FocusInteraction.Focus::class.java)
         }
 
         rule.runOnIdle {
@@ -193,11 +193,11 @@ class FocusableTest {
         }
 
         rule.runOnIdle {
-            Truth.assertThat(interactions).hasSize(2)
-            Truth.assertThat(interactions.first()).isInstanceOf(FocusInteraction.Focus::class.java)
-            Truth.assertThat(interactions[1])
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(FocusInteraction.Focus::class.java)
+            assertThat(interactions[1])
                 .isInstanceOf(FocusInteraction.Unfocus::class.java)
-            Truth.assertThat((interactions[1] as FocusInteraction.Unfocus).focus)
+            assertThat((interactions[1] as FocusInteraction.Unfocus).focus)
                 .isEqualTo(interactions[0])
         }
     }
@@ -232,7 +232,7 @@ class FocusableTest {
         }
 
         rule.runOnIdle {
-            Truth.assertThat(interactions).isEmpty()
+            assertThat(interactions).isEmpty()
         }
 
         rule.runOnIdle {
@@ -240,8 +240,8 @@ class FocusableTest {
         }
 
         rule.runOnIdle {
-            Truth.assertThat(interactions).hasSize(1)
-            Truth.assertThat(interactions.first()).isInstanceOf(FocusInteraction.Focus::class.java)
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(FocusInteraction.Focus::class.java)
         }
 
         // Dispose focusable, Interaction should be gone
@@ -250,11 +250,10 @@ class FocusableTest {
         }
 
         rule.runOnIdle {
-            Truth.assertThat(interactions).hasSize(2)
-            Truth.assertThat(interactions.first()).isInstanceOf(FocusInteraction.Focus::class.java)
-            Truth.assertThat(interactions[1])
-                .isInstanceOf(FocusInteraction.Unfocus::class.java)
-            Truth.assertThat((interactions[1] as FocusInteraction.Unfocus).focus)
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(FocusInteraction.Focus::class.java)
+            assertThat(interactions[1]).isInstanceOf(FocusInteraction.Unfocus::class.java)
+            assertThat((interactions[1] as FocusInteraction.Unfocus).focus)
                 .isEqualTo(interactions[0])
         }
     }
@@ -263,9 +262,9 @@ class FocusableTest {
     fun focusableText_testInspectorValue() {
         rule.setContent {
             val modifier = Modifier.focusable() as InspectableValue
-            Truth.assertThat(modifier.nameFallback).isEqualTo("focusable")
-            Truth.assertThat(modifier.valueOverride).isNull()
-            Truth.assertThat(modifier.inspectableElements.map { it.name }.asIterable())
+            assertThat(modifier.nameFallback).isEqualTo("focusable")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable())
                 .containsExactly(
                     "enabled",
                     "interactionSource"
