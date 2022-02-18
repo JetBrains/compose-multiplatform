@@ -1,7 +1,6 @@
 def useRemoteBuildCache = System.getenv("USE_ANDROIDX_REMOTE_BUILD_CACHE") == "true"
 
 if (useRemoteBuildCache) {
-    logger.warn("Using AndroidX remote build cache")
     gradle.settingsEvaluated { settings ->
         settings.buildCache {
             remote(HttpBuildCache) {
@@ -20,5 +19,13 @@ if (useRemoteBuildCache) {
                 push = true
             }
         }
+    }
+} else {
+    def uplinkLinux = new File("/usr/bin/uplink-helper")
+    def uplinkMac = new File("/usr/local/bin/uplink-helper")
+    if (uplinkLinux.exists() || uplinkMac.exists()) {
+        logger.warn("\u001B[31m\nIt looks like you are a Googler running without remote build "
+                + "cache. Enable it for faster builds, see " +
+                "http://go/androidx-dev#remote-build-cache\u001B[0m\n")
     }
 }
