@@ -70,6 +70,10 @@ internal val LocalComposeScene = staticCompositionLocalOf<ComposeScene> {
  *
  * After [ComposeScene] will no longer needed, you should call [close] method, so all resources
  * and subscriptions will be properly closed. Otherwise there can be a memory leak.
+ *
+ * [ComposeScene] doesn't support concurrent read/write access from different threads. Except:
+ * - [hasInvalidations] can be called from any thread
+ * - [invalidate] callback can be called from any thread
  */
 class ComposeScene internal constructor(
     coroutineContext: CoroutineContext = Dispatchers.Unconfined,
@@ -114,10 +118,24 @@ class ComposeScene internal constructor(
     }
 
     private fun invalidateIfNeeded() {
-        hasPendingDraws = frameClock.hasAwaiters || list.any(SkiaBasedOwner::needRender)
+        hasPendingDraws = frameClock.hasAwaiters || needLayout || needDraw ||
+            list.any(SkiaBasedOwner::needRender)
         if (hasPendingDraws && !isInvalidationDisabled && !isClosed) {
             invalidate()
         }
+    }
+
+    private var needLayout = true
+    private var needDraw = true
+
+    private fun requestLayout() {
+        needLayout = true
+        invalidateIfNeeded()
+    }
+
+    private fun requestDraw() {
+        needDraw = true
+        invalidateIfNeeded()
     }
 
     private val list = LinkedHashSet<SkiaBasedOwner>()
@@ -214,6 +232,8 @@ class ComposeScene internal constructor(
         check(!isClosed) { "ComposeScene is closed" }
         list.add(owner)
         owner.onNeedRender = ::invalidateIfNeeded
+        owner.requestLayout = ::requestLayout
+        owner.requestDraw = ::requestDraw
         owner.onDispatchCommand = ::dispatchCommand
         owner.constraints = constraints
         owner.accessibilityController = makeAccessibilityController(
@@ -230,6 +250,8 @@ class ComposeScene internal constructor(
         check(!isClosed) { "ComposeScene is closed" }
         list.remove(owner)
         owner.onDispatchCommand = null
+        owner.requestDraw = null
+        owner.requestLayout = null
         owner.onNeedRender = null
         invalidateIfNeeded()
         if (owner == focusedOwner) {
@@ -321,18 +343,20 @@ class ComposeScene internal constructor(
      * Render the current content on [canvas]. Passed [nanoTime] will be used to drive all
      * animations in the content (or any other code, which uses [withFrameNanos]
      */
-    fun render(canvas: Canvas, nanoTime: Long) {
+    fun render(canvas: Canvas, nanoTime: Long): Unit = postponeInvalidation {
         check(!isClosed) { "ComposeScene is closed" }
-        postponeInvalidation {
-            // We must see the actual state before we will render the frame
-            Snapshot.sendApplyNotifications()
-            recomposeDispatcher.flush()
-            frameClock.sendFrame(nanoTime)
-
-            forEachOwner {
-                it.render(canvas)
-            }
+        // We must see the actual state before we will render the frame
+        Snapshot.sendApplyNotifications()
+        recomposeDispatcher.flush()
+        frameClock.sendFrame(nanoTime)
+        needLayout = false
+        forEachOwner {
+            it.measureAndLayout()
+            it.sendSyntheticEvents()
         }
+        needDraw = false
+        forEachOwner { it.draw(canvas) }
+        forEachOwner { it.clearInvalidObservations() }
     }
 
     // for TestComposeWindow backward compatibility
@@ -399,11 +423,18 @@ class ComposeScene internal constructor(
             actualButtons,
             actualKeyboardModifiers
         )
-        when (eventType) {
+        needLayout = false
+        forEachOwner { it.measureAndLayout() }
+        processPointerInput(event)
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    private fun processPointerInput(event: PointerInputEvent) {
+        when (event.eventType) {
             PointerEventType.Press -> onMousePressed(event)
             PointerEventType.Release -> onMouseReleased(event)
             PointerEventType.Move -> {
-                pointLocation = position
+                pointLocation = event.pointers.first().position
                 hoveredOwner?.processPointerInput(event)
             }
             PointerEventType.Enter -> hoveredOwner?.processPointerInput(event)
