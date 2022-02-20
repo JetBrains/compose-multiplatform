@@ -193,7 +193,7 @@ internal class SkiaBasedOwner(
     override val rootForTest = this
 
     override val snapshotObserver = OwnerSnapshotObserver { command ->
-        onDispatchCommand?.invoke(command)
+        dispatchSnapshotChanges?.invoke(command)
     }
     private val pointerInputEventProcessor = PointerInputEventProcessor(root)
     private val measureAndLayoutDelegate = MeasureAndLayoutDelegate(root)
@@ -258,7 +258,7 @@ internal class SkiaBasedOwner(
     var onNeedRender: (() -> Unit)? = null
     var requestLayout: (() -> Unit)? = null
     var requestDraw: (() -> Unit)? = null
-    var onDispatchCommand: ((Command) -> Unit)? = null
+    var dispatchSnapshotChanges: ((Command) -> Unit)? = null
 
     private var needClearObservations = false
 

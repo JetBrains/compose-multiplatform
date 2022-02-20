@@ -43,6 +43,7 @@ import androidx.compose.ui.platform.FlushCoroutineDispatcher
 import androidx.compose.ui.platform.GlobalSnapshotManager
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.node.RootForTest
+import androidx.compose.ui.platform.synchronized
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -107,8 +108,15 @@ class ComposeScene internal constructor(
     @Volatile
     private var hasPendingDraws = true
     private inline fun <T> postponeInvalidation(block: () -> T): T {
+        check(!isClosed) { "ComposeScene is closed" }
         isInvalidationDisabled = true
         val result = try {
+            // We must see the actual state before we will do [block]
+            // TODO(https://github.com/JetBrains/compose-jb/issues/1854) get rid of synchronized.
+            synchronized(GlobalSnapshotManager) {
+                Snapshot.sendApplyNotifications()
+            }
+            snapshotChanges.perform()
             block()
         } finally {
             isInvalidationDisabled = false
@@ -119,7 +127,7 @@ class ComposeScene internal constructor(
 
     private fun invalidateIfNeeded() {
         hasPendingDraws = frameClock.hasAwaiters || needLayout || needDraw ||
-            list.any(SkiaBasedOwner::needRender)
+            list.any(SkiaBasedOwner::needRender) || snapshotChanges.hasCommands
         if (hasPendingDraws && !isInvalidationDisabled && !isClosed) {
             invalidate()
         }
@@ -213,11 +221,7 @@ class ComposeScene internal constructor(
         isClosed = true
     }
 
-    private fun dispatchCommand(command: () -> Unit) {
-        coroutineScope.launch {
-            command()
-        }
-    }
+    private val snapshotChanges = CommandList(::invalidateIfNeeded)
 
     /**
      * Returns true if there are pending recompositions, renders or dispatched tasks.
@@ -234,7 +238,7 @@ class ComposeScene internal constructor(
         owner.onNeedRender = ::invalidateIfNeeded
         owner.requestLayout = ::requestLayout
         owner.requestDraw = ::requestDraw
-        owner.onDispatchCommand = ::dispatchCommand
+        owner.dispatchSnapshotChanges = snapshotChanges::add
         owner.constraints = constraints
         owner.accessibilityController = makeAccessibilityController(
             owner,
@@ -249,7 +253,7 @@ class ComposeScene internal constructor(
     internal fun detach(owner: SkiaBasedOwner) {
         check(!isClosed) { "ComposeScene is closed" }
         list.remove(owner)
-        owner.onDispatchCommand = null
+        owner.dispatchSnapshotChanges = null
         owner.requestDraw = null
         owner.requestLayout = null
         owner.onNeedRender = null
@@ -313,7 +317,7 @@ class ComposeScene internal constructor(
         }
         this.mainOwner = mainOwner
 
-        // to perform all pending work synchronously. to start LaunchedEffect for example
+        // to perform all pending work synchronously
         recomposeDispatcher.flush()
     }
 
@@ -344,9 +348,6 @@ class ComposeScene internal constructor(
      * animations in the content (or any other code, which uses [withFrameNanos]
      */
     fun render(canvas: Canvas, nanoTime: Long): Unit = postponeInvalidation {
-        check(!isClosed) { "ComposeScene is closed" }
-        // We must see the actual state before we will render the frame
-        Snapshot.sendApplyNotifications()
         recomposeDispatcher.flush()
         frameClock.sendFrame(nanoTime)
         needLayout = false
@@ -372,8 +373,7 @@ class ComposeScene internal constructor(
         targetOwner: SkiaBasedOwner?
     ) = list.indexOf(this) > list.indexOf(targetOwner)
 
-    // TODO(demin): return Boolean (when it is consumed).
-    //  see ComposeLayer todo about AWTDebounceEventQueue
+    // TODO(demin): return Boolean (when it is consumed)
     /**
      * Send pointer event to the content.
      *
@@ -400,7 +400,6 @@ class ComposeScene internal constructor(
         keyboardModifiers: PointerKeyboardModifiers? = null,
         nativeEvent: Any? = null,
     ): Unit = postponeInvalidation {
-        check(!isClosed) { "ComposeScene is closed" }
         defaultPointerStateTracker.onPointerEvent(eventType)
 
         val actualButtons = buttons ?: defaultPointerStateTracker.buttons

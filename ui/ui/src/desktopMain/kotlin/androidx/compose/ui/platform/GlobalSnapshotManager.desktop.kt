@@ -45,7 +45,10 @@ internal actual object GlobalSnapshotManager {
             val channel = Channel<Unit>(Channel.CONFLATED)
             CoroutineScope(Dispatchers.Swing).launch {
                 channel.consumeEach {
-                    Snapshot.sendApplyNotifications()
+                    // TODO(https://github.com/JetBrains/compose-jb/issues/1854) get rid of synchronized
+                    synchronized(GlobalSnapshotManager) {
+                        Snapshot.sendApplyNotifications()
+                    }
                 }
             }
             Snapshot.registerGlobalWriteObserver {
