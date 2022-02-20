@@ -22,10 +22,8 @@ import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.DefaultPointerButtons
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.InternalComposeUiApi
-import androidx.compose.ui.PrimaryPressedPointerButtons
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.FocusDirection
@@ -50,6 +48,7 @@ import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.PointerButtons
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.PointerIconDefaults
@@ -405,7 +404,7 @@ internal class SkiaBasedOwner(
                         lastPointerEvent.pointers,
                         lastPointerEvent.buttons,
                         lastPointerEvent.keyboardModifiers,
-                        lastPointerEvent.mouseEvent
+                        lastPointerEvent.nativeEvent
                     )
                 )
             }
@@ -444,7 +443,7 @@ internal class SkiaBasedOwner(
                 PointerEventType.Unknown,
                 timeMillis,
                 pointers.map { it.toPointerInputEventData() },
-                if (isPressed) PrimaryPressedPointerButtons else DefaultPointerButtons
+                if (isPressed) PointerButtons(isPrimaryPressed = true) else PointerButtons()
             )
         )
     }

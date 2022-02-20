@@ -35,7 +35,7 @@ import java.awt.event.MouseWheelEvent
  */
 @Deprecated(
     "Use Modifier.pointerInput + PointerEventType.Scroll." +
-        "See the comment to mouseScrollFilter"
+        "See the comment to mouseScrollFilter. Will be removed in 1.3"
 )
 sealed class MouseScrollUnit {
     /**
@@ -49,7 +49,7 @@ sealed class MouseScrollUnit {
      */
     @Deprecated(
         "Use Modifier.pointerInput + PointerEventType.Scroll." +
-            "See the comment to mouseScrollFilter"
+            "See the comment to mouseScrollFilter. Will be removed in 1.3"
     )
     data class Line(val value: Float) : MouseScrollUnit()
 
@@ -63,7 +63,7 @@ sealed class MouseScrollUnit {
      */
     @Deprecated(
         "Use Modifier.pointerInput + PointerEventType.Scroll." +
-            "See the comment to mouseScrollFilter"
+            "See the comment to mouseScrollFilter. Will be removed in 1.3"
     )
     data class Page(val value: Float) : MouseScrollUnit()
 }
@@ -73,7 +73,7 @@ sealed class MouseScrollUnit {
  */
 @Deprecated(
     "Use Modifier.pointerInput + PointerEventType.Scroll." +
-    "See the comment to mouseScrollFilter"
+    "See the comment to mouseScrollFilter. Will be removed in 1.3"
 )
 class MouseScrollEvent(
     /**
@@ -106,7 +106,7 @@ class MouseScrollEvent(
  * false, the scroll event will be sent to this [mouseScrollFilter]'s parent.
  */
 @Deprecated(
-    "Use Modifier.pointerInput + PointerEventType.Scroll",
+    "Use Modifier.pointerInput + PointerEventType.Scroll. Will be removed in 1.3",
     replaceWith = ReplaceWith(
         "pointerInput(Unit) { \n" +
         "     awaitPointerEventScope {\n" +
@@ -146,7 +146,7 @@ fun Modifier.mouseScrollFilter(
     //  the more proper behaviour would be to batch multiple scroll events into the single one
     while (true) {
         val event = awaitScrollEvent()
-        val mouseEvent = event.mouseEvent as? MouseWheelEvent
+        val mouseEvent = event.nativeEvent as? MouseWheelEvent
         val mouseChange = event.changes.find { it.type == PointerType.Mouse }
         if (mouseChange != null && !mouseChange.isConsumed) {
             val legacyEvent = mouseEvent.toLegacyEvent(mouseChange.scrollDelta)
@@ -185,7 +185,7 @@ private fun MouseWheelEvent?.toLegacyEvent(scrollDelta: Offset): MouseScrollEven
 
 @Deprecated(
     "Use Modifier.pointerInput + PointerEventType.Scroll." +
-        "See the comment to mouseScrollFilter"
+        "See the comment to mouseScrollFilter. Will be removed in 1.3"
 )
 enum class MouseScrollOrientation {
     Vertical, Horizontal

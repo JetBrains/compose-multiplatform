@@ -16,14 +16,16 @@
 
 package androidx.compose.foundation.gestures
 
-import androidx.compose.runtime.Composable
-import androidx.compose.foundation.fastFold
 import androidx.compose.foundation.DesktopPlatform
+import androidx.compose.foundation.fastFold
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.awt.awtEventOrNull
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import java.awt.event.MouseWheelEvent
 import kotlin.math.sqrt
@@ -96,11 +98,11 @@ private fun calculateOffsetByPage(event: PointerEvent, bounds: IntSize): Offset 
 
 private val PointerEvent.scrollAmount
     get() =
-        (mouseEvent as? MouseWheelEvent)?.scrollAmount?.toFloat() ?: 1f
+        (awtEventOrNull as? MouseWheelEvent)?.scrollAmount?.toFloat() ?: 1f
 
 private val PointerEvent.shouldScrollByPage
     get() =
-        (mouseEvent as? MouseWheelEvent)?.scrollType == MouseWheelEvent.WHEEL_BLOCK_SCROLL
+        (awtEventOrNull as? MouseWheelEvent)?.scrollType == MouseWheelEvent.WHEEL_BLOCK_SCROLL
 
 private val PointerEvent.totalScrollDelta
     get() = this.changes.fastFold(Offset.Zero) { acc, c -> acc + c.scrollDelta }

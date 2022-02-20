@@ -15,20 +15,11 @@
  */
 package androidx.compose.ui
 
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.PointerButtons
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.PointerId
-import androidx.compose.ui.input.pointer.PointerInputEvent
-import androidx.compose.ui.input.pointer.PointerInputEventData
-import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
-import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.platform.AccessibilityController
 import androidx.compose.ui.platform.AccessibilityControllerImpl
 import androidx.compose.ui.platform.PlatformComponent
 import androidx.compose.ui.platform.SkiaBasedOwner
 import java.awt.event.InputMethodEvent
-import java.awt.event.MouseEvent
 
 internal actual fun ComposeScene.onPlatformInputMethodEvent(event: Any) {
     require(event is InputMethodEvent)
@@ -46,49 +37,6 @@ internal actual fun ComposeScene.onPlatformInputMethodEvent(event: Any) {
     }
 }
 
-internal actual fun pointerInputEvent(
-    eventType: PointerEventType,
-    position: Offset,
-    timeMillis: Long,
-    nativeEvent: Any?,
-    type: PointerType,
-    isMousePressed: Boolean,
-    pointerId: Long,
-    scrollDelta: Offset,
-    buttons: PointerButtons,
-    keyboardModifiers: PointerKeyboardModifiers,
-): PointerInputEvent {
-    return PointerInputEvent(
-        eventType,
-        timeMillis,
-        listOf(
-            PointerInputEventData(
-                PointerId(pointerId),
-                timeMillis,
-                position,
-                position,
-                isMousePressed,
-                pressure = 1.0f,
-                type,
-                scrollDelta = scrollDelta
-            )
-        ),
-        buttons,
-        keyboardModifiers,
-        nativeEvent as MouseEvent?
-    )
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-internal actual val DefaultPointerButtons: PointerButtons = PointerButtons()
-
-@OptIn(ExperimentalComposeUiApi::class)
-internal actual val DefaultPointerKeyboardModifiers: PointerKeyboardModifiers =
-    PointerKeyboardModifiers()
-
-@OptIn(ExperimentalComposeUiApi::class)
-internal actual val PrimaryPressedPointerButtons: PointerButtons =
-    PointerButtons(isPrimaryPressed = true)
 internal actual fun makeAccessibilityController(
     skiaBasedOwner: SkiaBasedOwner,
     component: PlatformComponent

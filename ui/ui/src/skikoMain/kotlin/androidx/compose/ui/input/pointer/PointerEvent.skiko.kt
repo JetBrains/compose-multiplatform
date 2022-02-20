@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.input.pointer
 
-import java.awt.event.MouseEvent
-
 internal actual typealias NativePointerButtons = Int
 internal actual typealias NativePointerKeyboardModifiers = Int
 
@@ -90,14 +88,17 @@ actual data class PointerEvent internal constructor(
      */
     actual val keyboardModifiers: PointerKeyboardModifiers,
 
+    internal val _type: PointerEventType,
+
     /**
-     * Original raw native event from AWT.
+     * The original raw native event which is sent by the platform.
      *
-     * Note, that its type can be different from [type], which is sent by Compose.
-     * For example, Compose can send synthetic Move event on relayout,
-     * but [mouseEvent] will tell that it is Up event
+     * Null if:
+     * - there no native event (in tests, for example)
+     * - there was a synthetic move event sent by compose on relayout
+     * - there was a synthetic move event sent by compose when move is missing between two non-move events
      */
-    val mouseEvent: MouseEvent?
+    val nativeEvent: Any?
 ) {
     internal actual constructor(
         changes: List<PointerInputChange>,
@@ -106,10 +107,9 @@ actual data class PointerEvent internal constructor(
         changes,
         internalPointerEvent?.buttons ?: PointerButtons(0),
         internalPointerEvent?.keyboardModifiers ?: PointerKeyboardModifiers(0),
-        internalPointerEvent?.mouseEvent
-    ) {
-        this.type = internalPointerEvent?.type ?: PointerEventType.Unknown
-    }
+        internalPointerEvent?.type ?: PointerEventType.Unknown,
+        internalPointerEvent?.nativeEvent
+    )
 
     /**
      * @param changes The changes.
@@ -118,10 +118,11 @@ actual data class PointerEvent internal constructor(
         changes,
         buttons = PointerButtons(0),
         keyboardModifiers = PointerKeyboardModifiers(0),
-        mouseEvent = null
+        _type = PointerEventType.Unknown,
+        nativeEvent = null
     )
 
-    actual var type: PointerEventType = PointerEventType.Unknown
+    actual var type: PointerEventType = _type
         internal set
 }
 

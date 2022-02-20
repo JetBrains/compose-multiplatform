@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.ui.awt.awtEventOrNull
 import androidx.compose.ui.input.key.KeyEvent
 
 private fun Char.isPrintable(): Boolean {
@@ -27,5 +28,5 @@ private fun Char.isPrintable(): Boolean {
 }
 
 actual val KeyEvent.isTypedEvent: Boolean
-    get() = nativeKeyEvent.id == java.awt.event.KeyEvent.KEY_TYPED &&
-        nativeKeyEvent.keyChar.isPrintable()
+    get() = awtEventOrNull?.id == java.awt.event.KeyEvent.KEY_TYPED &&
+        awtEventOrNull?.keyChar?.isPrintable() == true

@@ -30,7 +30,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerButtons
 import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputEvent
+import androidx.compose.ui.input.pointer.PointerInputEventData
 import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.node.LayoutNode
@@ -476,21 +478,21 @@ class ComposeScene internal constructor(
 private class DefaultPointerStateTracker {
     fun onPointerEvent(eventType: PointerEventType) {
         when (eventType) {
-            PointerEventType.Press -> buttons = PrimaryPressedPointerButtons
-            PointerEventType.Release -> buttons = DefaultPointerButtons
+            PointerEventType.Press -> buttons = PointerButtons(isPrimaryPressed = true)
+            PointerEventType.Release -> buttons = PointerButtons()
         }
     }
 
-    var buttons = DefaultPointerButtons
+    var buttons = PointerButtons()
         private set
 
-    var keyboardModifiers = DefaultPointerKeyboardModifiers
+    var keyboardModifiers = PointerKeyboardModifiers()
         private set
 }
 
 internal expect fun ComposeScene.onPlatformInputMethodEvent(event: Any)
 
-internal expect fun pointerInputEvent(
+private fun pointerInputEvent(
     eventType: PointerEventType,
     position: Offset,
     timeMillis: Long,
@@ -500,12 +502,27 @@ internal expect fun pointerInputEvent(
     pointerId: Long,
     scrollDelta: Offset,
     buttons: PointerButtons,
-    keyboardModifiers: PointerKeyboardModifiers,
-): PointerInputEvent
-
-internal expect val DefaultPointerButtons: PointerButtons
-internal expect val DefaultPointerKeyboardModifiers: PointerKeyboardModifiers
-internal expect val PrimaryPressedPointerButtons: PointerButtons
+    keyboardModifiers: PointerKeyboardModifiers
+): PointerInputEvent {
+    return PointerInputEvent(
+        eventType,
+        timeMillis,
+        listOf(
+            PointerInputEventData(
+                PointerId(pointerId),
+                timeMillis,
+                position,
+                position,
+                isMousePressed,
+                type,
+                scrollDelta = scrollDelta
+            )
+        ),
+        buttons,
+        keyboardModifiers,
+        nativeEvent
+    )
+}
 
 internal expect fun makeAccessibilityController(
     skiaBasedOwner: SkiaBasedOwner,

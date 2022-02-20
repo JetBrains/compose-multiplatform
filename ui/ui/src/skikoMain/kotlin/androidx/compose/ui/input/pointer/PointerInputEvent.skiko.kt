@@ -16,13 +16,11 @@
 
 package androidx.compose.ui.input.pointer
 
-import java.awt.event.MouseEvent
-
 internal actual data class PointerInputEvent(
     val eventType: PointerEventType,
     actual val uptime: Long,
     actual val pointers: List<PointerInputEventData>,
     val buttons: PointerButtons = PointerButtons(0),
     val keyboardModifiers: PointerKeyboardModifiers = PointerKeyboardModifiers(0),
-    val mouseEvent: MouseEvent? = null
+    val nativeEvent: Any? = null
 )
