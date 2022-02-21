@@ -16,9 +16,4 @@ abstract class ExperimentalExtension @Inject constructor(
     fun web(action: Action<ExperimentalWebExtension>) {
         action.execute(web)
     }
-
-    val uikit: ExperimentalUiKitExtension = objects.newInstance(ExperimentalUiKitExtension::class.java)
-    fun uikit(action: Action<ExperimentalUiKitExtension>) {
-        action.execute(uikit)
-    }
 }
