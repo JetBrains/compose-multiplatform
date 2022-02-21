@@ -16,6 +16,7 @@ import org.jetbrains.compose.desktop.application.dsl.Application
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.validation.validatePackageVersions
 import org.jetbrains.compose.desktop.application.tasks.*
+import org.jetbrains.compose.desktop.tasks.AbstractUnpackDefaultComposeApplicationResourcesTask
 import org.jetbrains.compose.internal.*
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import java.io.File
@@ -58,6 +59,10 @@ internal fun Project.configureFromMppPlugin(mainApplication: Application) {
 }
 
 internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
+    val unpackDefaultResources = tasks.composeTask<AbstractUnpackDefaultComposeApplicationResourcesTask>(
+        "unpackDefaultComposeApplicationResources"
+    ) {}
+
     for (app in apps) {
         val checkRuntime = tasks.composeTask<AbstractCheckNativeDistributionRuntime>(
             taskName("checkRuntime", app)
@@ -113,7 +118,8 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
                 app,
                 createRuntimeImage = createRuntimeImage,
                 prepareAppResources = prepareAppResources,
-                checkRuntime = checkRuntime
+                checkRuntime = checkRuntime,
+                unpackDefaultResources = unpackDefaultResources
             )
         }
 
@@ -133,13 +139,15 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
                         app,
                         createRuntimeImage = createRuntimeImage,
                         prepareAppResources = prepareAppResources,
-                        checkRuntime = checkRuntime
+                        checkRuntime = checkRuntime,
+                        unpackDefaultResources = unpackDefaultResources
                     )
                 } else {
                     configurePackagingTask(
                         app,
                         createAppImage = createDistributable,
-                        checkRuntime = checkRuntime
+                        checkRuntime = checkRuntime,
+                        unpackDefaultResources = unpackDefaultResources
                     )
                 }
             }
@@ -191,7 +199,8 @@ internal fun AbstractJPackageTask.configurePackagingTask(
     createAppImage: TaskProvider<AbstractJPackageTask>? = null,
     createRuntimeImage: TaskProvider<AbstractJLinkTask>? = null,
     prepareAppResources: TaskProvider<Sync>? = null,
-    checkRuntime: TaskProvider<AbstractCheckNativeDistributionRuntime>? = null
+    checkRuntime: TaskProvider<AbstractCheckNativeDistributionRuntime>? = null,
+    unpackDefaultResources: TaskProvider<AbstractUnpackDefaultComposeApplicationResourcesTask>
 ) {
     enabled = targetFormat.isCompatibleWithCurrentOS
 
@@ -216,7 +225,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(
         javaRuntimePropertiesFile.set(checkRuntime.flatMap { it.javaRuntimePropertiesFile })
     }
 
-    configurePlatformSettings(app)
+    configurePlatformSettings(app, unpackDefaultResources)
 
     app.nativeDistributions.let { executables ->
         packageName.set(app._packageNameProvider(project))
@@ -271,7 +280,11 @@ internal fun AbstractNotarizationTask.configureCommonNotarizationSettings(
     nonValidatedNotarizationSettings = app.nativeDistributions.macOS.notarization
 }
 
-internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
+internal fun AbstractJPackageTask.configurePlatformSettings(
+    app: Application,
+    unpackDefaultResources: TaskProvider<AbstractUnpackDefaultComposeApplicationResourcesTask>
+) {
+    dependsOn(unpackDefaultResources)
     when (currentOS) {
         OS.Linux -> {
             app.nativeDistributions.linux.also { linux ->
@@ -282,7 +295,7 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
                 linuxMenuGroup.set(provider { linux.menuGroup })
                 linuxPackageName.set(provider { linux.packageName })
                 linuxRpmLicenseType.set(provider { linux.rpmLicenseType })
-                iconFile.set(linux.iconFile.orElse(DefaultIcons.forLinux(project)))
+                iconFile.set(linux.iconFile.orElse(unpackDefaultResources.flatMap { it.resources.linuxIcon }))
                 installationPath.set(linux.installationPath)
             }
         }
@@ -295,7 +308,7 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
                 winMenu.set(provider { win.menu })
                 winMenuGroup.set(provider { win.menuGroup })
                 winUpgradeUuid.set(provider { win.upgradeUuid })
-                iconFile.set(win.iconFile.orElse(DefaultIcons.forWindows(project)))
+                iconFile.set(win.iconFile.orElse(unpackDefaultResources.flatMap { it.resources.windowsIcon }))
                 installationPath.set(win.installationPath)
             }
         }
@@ -318,7 +331,7 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
                 macRuntimeProvisioningProfile.set(mac.runtimeProvisioningProfile)
                 macExtraPlistKeysRawXml.set(provider { mac.infoPlistSettings.extraKeysRawXml })
                 nonValidatedMacSigningSettings = app.nativeDistributions.macOS.signing
-                iconFile.set(mac.iconFile.orElse(DefaultIcons.forMac(project)))
+                iconFile.set(mac.iconFile.orElse(unpackDefaultResources.flatMap { it.resources.macIcon }))
                 installationPath.set(mac.installationPath)
             }
         }
