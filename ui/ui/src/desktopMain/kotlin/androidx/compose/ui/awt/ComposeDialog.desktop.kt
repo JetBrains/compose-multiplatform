@@ -31,10 +31,19 @@ import javax.swing.JDialog
  * ComposeDialog is a dialog for building UI using Compose for Desktop.
  * ComposeDialog inherits javax.swing.JDialog.
  */
-class ComposeDialog(
-    owner: Window? = null,
-    modalityType: ModalityType = ModalityType.MODELESS
-) : JDialog(owner, modalityType) {
+class ComposeDialog : JDialog {
+    constructor(
+        owner: Window?,
+        modalityType: ModalityType = ModalityType.MODELESS
+    ) : super(owner, modalityType)
+
+    @Deprecated("Use the constructor with setting owner explicitly")
+    constructor(
+        modalityType: ModalityType = ModalityType.MODELESS
+    ) : super(null, modalityType)
+
+    constructor() : super()
+
     private val delegate = ComposeWindowDelegate(this, ::isUndecorated)
 
     init {

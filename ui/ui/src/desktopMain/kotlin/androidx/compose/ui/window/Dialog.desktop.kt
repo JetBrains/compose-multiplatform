@@ -143,7 +143,12 @@ fun Dialog(
         onPreviewKeyEvent = onPreviewKeyEvent,
         onKeyEvent = onKeyEvent,
         create = {
-            ComposeDialog(owner, ModalityType.DOCUMENT_MODAL).apply {
+            val dialog = if (owner != null) {
+                ComposeDialog(owner, ModalityType.DOCUMENT_MODAL)
+            } else {
+                ComposeDialog()
+            }
+            dialog.apply {
                 // close state is controlled by DialogState.isOpen
                 defaultCloseOperation = JDialog.DO_NOTHING_ON_CLOSE
                 addWindowListener(object : WindowAdapter() {
