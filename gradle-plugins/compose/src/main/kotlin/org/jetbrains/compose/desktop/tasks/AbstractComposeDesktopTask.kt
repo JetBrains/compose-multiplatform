@@ -7,6 +7,7 @@ package org.jetbrains.compose.desktop.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.Directory
+import org.gradle.api.file.FileSystemLocation
 import org.gradle.api.internal.file.FileOperations
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -53,4 +54,11 @@ abstract class AbstractComposeDesktopTask : DefaultTask() {
     @get:Internal
     internal val runExternalTool: ExternalToolRunner
         get() = ExternalToolRunner(verbose, logsDir, execOperations)
+
+    protected fun cleanDirs(vararg dirs: Provider<out FileSystemLocation>) {
+        for (dir in dirs) {
+            fileOperations.delete(dir)
+            fileOperations.mkdir(dir)
+        }
+    }
 }

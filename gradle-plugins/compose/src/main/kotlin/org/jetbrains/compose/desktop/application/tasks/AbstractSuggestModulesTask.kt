@@ -44,8 +44,7 @@ abstract class AbstractSuggestModulesTask : AbstractComposeDesktopTask() {
     fun run() {
         val jtool = jvmToolFile("jdeps", javaHome = javaHome)
 
-        fileOperations.delete(workingDir)
-        fileOperations.mkdir(workingDir)
+        cleanDirs(workingDir)
         val args = arrayListOf<String>().apply {
             add("--print-module-deps")
             add("--ignore-missing-deps")

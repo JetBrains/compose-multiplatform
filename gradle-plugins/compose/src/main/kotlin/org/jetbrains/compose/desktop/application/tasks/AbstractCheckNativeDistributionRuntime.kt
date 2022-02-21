@@ -81,9 +81,8 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
     }
 
     private fun getJavaRuntimeVersionUnsafe(): String? {
+        cleanDirs(workingDir)
         val workingDir = workingDir.ioFile
-        fileOperations.delete(workingDir)
-        fileOperations.mkdir(workingDir)
 
         val printJavaRuntimeClassName = "PrintJavaRuntimeVersion"
         val javaVersionPrefix = "Java runtime version = '"
