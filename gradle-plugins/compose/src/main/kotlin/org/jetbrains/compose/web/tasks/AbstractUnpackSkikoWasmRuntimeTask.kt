@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose.experimental.web.tasks
+package org.jetbrains.compose.web.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
@@ -14,7 +14,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.compose.internal.debug
 
-abstract class ExperimentalUnpackSkikoWasmRuntimeTask : DefaultTask() {
+abstract class AbstractUnpackSkikoWasmRuntimeTask : DefaultTask() {
     @get:InputFiles
     lateinit var runtimeClasspath: Configuration
 

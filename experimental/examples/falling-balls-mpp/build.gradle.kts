@@ -148,7 +148,7 @@ compose.desktop {
     }
 }
 
-compose.experimental {
+compose {
     web.application {}
 }
 
