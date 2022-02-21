@@ -131,7 +131,7 @@ class ComposePlugin : Plugin<Project> {
             project.tasks.withType(KotlinCompile::class.java) {
                 it.kotlinOptions.apply {
                     if (overrideDefaultJvmTarget) {
-                        jvmTarget = "11".takeIf { jvmTarget.toDouble() < 11 } ?: jvmTarget
+                        jvmTarget = "1.8".takeIf { jvmTarget.toDouble() < 1.8 } ?: jvmTarget
                     }
                     useIR = true
                 }
