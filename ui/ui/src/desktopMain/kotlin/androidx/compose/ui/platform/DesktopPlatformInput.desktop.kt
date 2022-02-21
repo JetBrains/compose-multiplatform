@@ -120,7 +120,7 @@ internal actual class PlatformInput actual constructor(val component: PlatformCo
             val composing = event.text.toStringFrom(event.committedCharacterCount)
             val ops = mutableListOf<EditCommand>()
 
-            if (needToDeletePreviousChar && isMac && input.value.selection.min > 0) {
+            if (needToDeletePreviousChar && isMac && input.value.selection.min > 0 && composing.isEmpty()) {
                 needToDeletePreviousChar = false
                 ops.add(DeleteSurroundingTextInCodePointsCommand(1, 0))
             }
