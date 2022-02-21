@@ -35,9 +35,6 @@ sealed interface Nth {
 }
 
 abstract class CSSSelector internal constructor() {
-    override fun equals(other: Any?): Boolean {
-        return this === other || asString() == (other as? CSSSelector)?.asString()
-    }
 
     internal open fun contains(other: CSSSelector, strict: Boolean = false): Boolean {
         return if (strict) this === other else this == other
