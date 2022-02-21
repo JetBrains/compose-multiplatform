@@ -158,9 +158,9 @@ internal fun buildCSS(
 ): Pair<StyleHolder, CSSRuleDeclarationList> {
     val styleSheet = StyleSheetBuilderImpl()
     // workaround because of problems with plus operator overloading
-    val root = if (thisClass is StyleSheet.CSSSelfSelector) thisClass else StyleSheet.CSSSelfSelector(thisClass)
+    val root =  (thisClass as? StyleSheet.CSSSelfSelector) ?: StyleSheet.CSSSelfSelector(thisClass)
     // workaround because of problems with plus operator overloading
-    val self = if (thisContext is StyleSheet.CSSSelfSelector) thisContext else StyleSheet.CSSSelfSelector(thisContext)
+    val self =  (thisContext as? StyleSheet.CSSSelfSelector) ?: StyleSheet.CSSSelfSelector(thisContext)
 
     val builder = CSSBuilderImpl(root, self, styleSheet)
     builder.cssRule()
