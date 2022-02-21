@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import org.jetbrains.compose.web.ExperimentalComposeWebStyleApi
 import org.jetbrains.compose.web.css.selectors.CSSSelector
 import org.jetbrains.compose.web.dom.Style
 import kotlin.properties.ReadOnlyProperty
@@ -83,28 +82,6 @@ open class StyleSheet(
         override fun asString(): String = selector?.asString() ?: throw IllegalStateException("You can't instantiate self")
         override fun equals(other: Any?): Boolean {
             return other is CSSSelfSelector
-        }
-    }
-
-    // TODO: just proof of concept, do not use it
-    @ExperimentalComposeWebStyleApi
-    fun css(cssBuild: CSSBuilder.() -> Unit): String {
-        val selfSelector = CSSSelfSelector()
-        val (style, newCssRules) = buildCSS(selfSelector, selfSelector, cssBuild)
-        val cssRule = cssRules.find {
-            it is CSSStyleRuleDeclaration &&
-                    it.selector is CSSSelector.CSSClass && it.style == style &&
-                    (boundClasses[it.selector.className] ?: emptyList()) == newCssRules
-        }.unsafeCast<CSSStyleRuleDeclaration?>()
-        return if (cssRule != null) {
-            cssRule.selector.unsafeCast<CSSSelector.CSSClass>().className
-        } else {
-            val classNameSelector = CSSSelector.CSSClass("auto-${counter++}")
-            selfSelector.selector = classNameSelector
-            add(classNameSelector, style)
-            newCssRules.forEach { add(it) }
-            boundClasses[classNameSelector.className] = newCssRules
-            classNameSelector.className
         }
     }
 
