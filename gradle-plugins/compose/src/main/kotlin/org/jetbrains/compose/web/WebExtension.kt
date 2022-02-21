@@ -5,16 +5,33 @@
 
 package org.jetbrains.compose.web
 
+import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.jetbrains.compose.internal.kotlinJsExtOrNull
-import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.compose.internal.mppExtOrNull
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.compose.web.dsl.WebApplication
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
+import javax.inject.Inject
 
 abstract class WebExtension : ExtensionAware {
+    @get:Inject
+    internal abstract val objects: ObjectFactory
+
+    internal var _isApplicationInitialized = false
+        private set
+
+    val application: WebApplication by lazy {
+        _isApplicationInitialized = true
+        objects.newInstance(WebApplication::class.java, "main")
+    }
+
+    fun application(fn: Action<WebApplication>) {
+        fn.execute(application)
+    }
+
     private var requestedTargets: Set<KotlinJsIrTarget>? = null
     private var targetsToConfigure: Set<KotlinJsIrTarget>? = null
 

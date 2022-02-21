@@ -3,13 +3,12 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose.experimental.dsl
+package org.jetbrains.compose.web.dsl
 
 import javax.inject.Inject
 
-abstract class ExperimentalWebApplication  @Inject constructor(
+abstract class WebApplication  @Inject constructor(
     @Suppress("unused")
     val name: String,
 ) {
-
 }
