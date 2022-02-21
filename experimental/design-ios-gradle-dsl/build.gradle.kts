@@ -59,27 +59,6 @@ compose.ios {
                 buildConfiguration = "Debug"
                 signingConfiguration = developmentSigning
             }
-            appleTestFlight("Prod") {
-                //Usage: ./gradlew iosDeployProd
-                appStoreConnectApiKey = "***" // or "@keychain:APPSTORE_API_KEY"
-                description = "description in test flight"
-                buildConfiguration = "Release"
-                signingConfiguration = distributionSigning
-            }
-            appleTestFlight("Beta") {
-                //Usage: ./gradlew iosDeployBeta
-                appStoreConnectApiKey = "***" // or "@keychain:APPSTORE_API_KEY"
-                description = "description in test flight"
-                buildConfiguration = "Debug"
-                signingConfiguration = developmentSigning
-            }
-            firebaseAppDistribution("Firebase") {
-                //Usage: ./gradlew iosDeployFirebase
-                googleCloudApiKey = "***" // or "@keychain:GCLOUD_API_KEY"
-                firebaseProjectId = "some_firebase_project"
-                buildConfiguration = "Debug"
-                signingConfiguration = developmentSigning
-            }
         }
 
     }
