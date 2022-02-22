@@ -26,16 +26,18 @@ interface GenericStyleSheetBuilder<TBuilder> : CSSRulesHolder, SelectorsScope {
     }
 
     operator fun String.invoke(cssRule: TBuilder.() -> Unit) {
-        style(Raw(this), cssRule)
+        style(RawSelector(this), cssRule)
     }
 
     infix fun String.style(cssRule: TBuilder.() -> Unit) {
-        style(Raw(this), cssRule)
+        style(RawSelector(this), cssRule)
     }
 }
 
+private val Universal = RawSelector("*")
+
 interface SelectorsScope {
-    fun selector(selector: String): CSSSelector = Raw(selector)
+    fun selector(selector: String): CSSSelector = RawSelector(selector)
     fun combine(vararg selectors: CSSSelector): CSSSelector = Combine(selectors.toMutableList())
 
     operator fun CSSSelector.plus(selector: CSSSelector): CSSSelector {
@@ -67,9 +69,9 @@ interface SelectorsScope {
     val universal: CSSSelector
         get() = Universal
 
-    fun type(type: String): CSSSelector = Type(type)
+    fun type(type: String): CSSSelector = RawSelector(type)
     fun className(className: String): CSSSelector = CSSSelector.CSSClass(className)
-    fun id(id: String): CSSSelector = Id(id)
+    fun id(id: String): CSSSelector = RawSelector("#$id")
 
     fun attr(
         name: String,
@@ -241,19 +243,7 @@ interface SelectorsScope {
     fun slotted(selector: CSSSelector): CSSSelector = PseudoElementInternal.Slotted(selector)
 }
 
-private data class Id(val id: String) : CSSSelector() {
-    override fun toString(): String = "#$id"
-}
-
-private data class Type(val type: String) : CSSSelector() {
-    override fun toString(): String = type
-}
-
-private object Universal : CSSSelector() {
-    override fun toString(): String = "*"
-}
-
-private data class Raw(val selector: String) : CSSSelector() {
+private data class RawSelector(val selector: String): CSSSelector() {
     override fun toString(): String = selector
 }
 
