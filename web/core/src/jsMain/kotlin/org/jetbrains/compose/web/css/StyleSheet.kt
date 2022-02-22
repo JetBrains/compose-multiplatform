@@ -2,7 +2,6 @@ package org.jetbrains.compose.web.css
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
-import org.jetbrains.compose.web.ExperimentalComposeWebStyleApi
 import org.jetbrains.compose.web.css.selectors.CSSSelector
 import org.jetbrains.compose.web.dom.Style
 import kotlin.properties.ReadOnlyProperty
@@ -77,32 +76,14 @@ open class StyleSheet(
 
     @Suppress("EqualsOrHashCode")
     internal class CSSSelfSelector(var selector: CSSSelector? = null) : CSSSelector() {
-        override fun toString(): String = throw IllegalStateException("You can't concatenate `String + CSSSelector` which contains `self` or `root`. Use `selector(<your string>)` to convert `String` to `CSSSelector` for proper work. https://github.com/JetBrains/compose-jb/issues/1440")
-        override fun asString(): String = selector?.asString() ?: throw IllegalStateException("You can't instantiate self")
+        override fun toString(): String =
+            throw IllegalStateException("You can't concatenate `String + CSSSelector` which contains `self` or `root`. Use `selector(<your string>)` to convert `String` to `CSSSelector` for proper work. https://github.com/JetBrains/compose-jb/issues/1440")
+
+        override fun asString(): String =
+            selector?.asString() ?: throw IllegalStateException("You can't instantiate self")
+
         override fun equals(other: Any?): Boolean {
             return other is CSSSelfSelector
-        }
-    }
-
-    // TODO: just proof of concept, do not use it
-    @ExperimentalComposeWebStyleApi
-    fun css(cssBuild: CSSBuilder.() -> Unit): String {
-        val selfSelector = CSSSelfSelector()
-        val (style, newCssRules) = buildCSS(selfSelector, selfSelector, cssBuild)
-        val cssRule = cssRules.find {
-            it is CSSStyleRuleDeclaration &&
-                    it.selector is CSSSelector.CSSClass && it.style == style &&
-                    (boundClasses[it.selector.className] ?: emptyList()) == newCssRules
-        }.unsafeCast<CSSStyleRuleDeclaration?>()
-        return if (cssRule != null) {
-            cssRule.selector.unsafeCast<CSSSelector.CSSClass>().className
-        } else {
-            val classNameSelector = CSSSelector.CSSClass("auto-${counter++}")
-            selfSelector.selector = classNameSelector
-            add(classNameSelector, style)
-            newCssRules.forEach { add(it) }
-            boundClasses[classNameSelector.className] = newCssRules
-            classNameSelector.className
         }
     }
 
@@ -112,14 +93,15 @@ open class StyleSheet(
             property: KProperty<*>
         ): ReadOnlyProperty<Any?, String> {
             val sheetName = if (usePrefix) "${sheet::class.simpleName}-" else ""
-            val selector = CSSSelector.CSSClass("$sheetName${property.name}")
+            val className = "$sheetName${property.name}"
+            val selector = object : CSSSelector() {
+                override fun asString() = ".${className}"
+            }
             val (properties, rules) = buildCSS(selector, selector, cssBuilder)
             sheet.add(selector, properties)
             rules.forEach { sheet.add(it) }
 
-            return ReadOnlyProperty { _, _ ->
-                selector.className
-            }
+            return ReadOnlyProperty { _, _ -> className }
         }
     }
 
@@ -156,9 +138,9 @@ internal fun buildCSS(
 ): Pair<StyleHolder, CSSRuleDeclarationList> {
     val styleSheet = StyleSheetBuilderImpl()
     // workaround because of problems with plus operator overloading
-    val root = if (thisClass is StyleSheet.CSSSelfSelector) thisClass else StyleSheet.CSSSelfSelector(thisClass)
+    val root = (thisClass as? StyleSheet.CSSSelfSelector) ?: StyleSheet.CSSSelfSelector(thisClass)
     // workaround because of problems with plus operator overloading
-    val self = if (thisContext is StyleSheet.CSSSelfSelector) thisContext else StyleSheet.CSSSelfSelector(thisContext)
+    val self = (thisContext as? StyleSheet.CSSSelfSelector) ?: StyleSheet.CSSSelfSelector(thisContext)
 
     val builder = CSSBuilderImpl(root, self, styleSheet)
     builder.cssRule()

@@ -553,15 +553,15 @@ class AttributesTests {
     fun canvasAttributeTest() = runTest {
         composition {
             Canvas({
-                height(400.px)
-                width(450.px)
+                height(400)
+                width(450)
             })
         }
         with(nextChild() as HTMLCanvasElement) {
             val attrsMap = getAttributeNames().associateWith { getAttribute(it) }
             assertEquals(2, attrsMap.size)
-            assertEquals("450px", attrsMap["width"])
-            assertEquals("400px", attrsMap["height"])
+            assertEquals("450", attrsMap["width"])
+            assertEquals("400", attrsMap["height"])
         }
     }
 }

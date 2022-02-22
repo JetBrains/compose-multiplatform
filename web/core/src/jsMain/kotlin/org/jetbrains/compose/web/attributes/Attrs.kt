@@ -158,6 +158,12 @@ fun AttrsScope<HTMLInputElement>.height(value: Int) =
 fun AttrsScope<HTMLInputElement>.width(value: Int) =
     attr("width", value.toString()) // image only
 
+fun AttrsScope<HTMLCanvasElement>.width(value: Int) =
+    attr("width", value.toString())
+
+fun AttrsScope<HTMLCanvasElement>.height(value: Int) =
+    attr("height", value.toString())
+
 fun AttrsScope<HTMLInputElement>.list(dataListId: String) =
     attr("list", dataListId)
 
@@ -330,10 +336,3 @@ fun AttrsScope<HTMLTableCellElement>.colspan(value: Int): AttrsScope<HTMLTableCe
 
 fun AttrsScope<HTMLTableCellElement>.rowspan(value: Int): AttrsScope<HTMLTableCellElement> =
     attr("rowspan", value.toString())
-
-/* Canvas attributes */
-fun AttrsScope<HTMLCanvasElement>.width(value: CSSSizeValue<out CSSUnitLengthOrPercentage>) =
-    attr("width", value.toString())
-
-fun AttrsScope<HTMLCanvasElement>.height(value: CSSSizeValue<out CSSUnitLengthOrPercentage>) =
-    attr("height", value.toString())
