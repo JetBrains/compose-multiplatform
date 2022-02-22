@@ -21,10 +21,12 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.GridItemSpan
 import androidx.compose.foundation.lazy.LazyGridState
+import androidx.compose.foundation.lazy.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -94,6 +96,65 @@ fun LazyVerticalGridSpanSample() {
                 Text(
                     "Item $it",
                     Modifier.border(1.dp, Color.Blue).height(80.dp).wrapContentSize()
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Sampled
+@Composable
+fun LazyHorizontalGridSample() {
+    val itemsList = (0..5).toList()
+    val itemsIndexedList = listOf("A", "B", "C")
+
+    val itemModifier = Modifier.border(1.dp, Color.Blue).width(80.dp).wrapContentSize()
+
+    LazyHorizontalGrid(
+        rows = GridCells.Fixed(3),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(itemsList) {
+            Text("Item is $it", itemModifier)
+        }
+
+        item {
+            Text("Single item", itemModifier)
+        }
+
+        itemsIndexed(itemsIndexedList) { index, item ->
+            Text("Item at index $index is $item", itemModifier)
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Sampled
+@Composable
+fun LazyHorizontalGridSpanSample() {
+    val sections = (0 until 25).toList().chunked(5)
+    LazyHorizontalGrid(
+        rows = GridCells.Fixed(3),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        sections.forEachIndexed { index, items ->
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Text(
+                    "This is section $index",
+                    Modifier.border(1.dp, Color.Gray).width(80.dp).wrapContentSize()
+                )
+            }
+            items(
+                items,
+                // not required as it is the default
+                span = { GridItemSpan(1) }
+            ) {
+                Text(
+                    "Item $it",
+                    Modifier.border(1.dp, Color.Blue).width(80.dp).wrapContentSize()
                 )
             }
         }

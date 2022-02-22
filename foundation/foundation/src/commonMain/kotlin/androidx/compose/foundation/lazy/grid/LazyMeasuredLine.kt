@@ -30,7 +30,6 @@ internal class LazyMeasuredLine constructor(
     val items: Array<LazyMeasuredItem>,
     private val spans: List<GridItemSpan>,
     private val isVertical: Boolean,
-    private val reverseLayout: Boolean,
     private val slotsPerLine: Int,
     private val layoutDirection: LayoutDirection,
     /**
@@ -85,11 +84,11 @@ internal class LazyMeasuredLine constructor(
             item.position(
                 rawMainAxisOffset = offset,
                 rawCrossAxisOffset = usedCrossAxis,
-                layoutWidth,
-                layoutHeight,
+                layoutWidth = layoutWidth,
+                layoutHeight = layoutHeight,
                 row = if (isVertical) index.value else startSlot,
                 column = if (isVertical) startSlot else index.value,
-                mainAxisSizeWithSpacings
+                lineMainAxisSize = mainAxisSize
             ).also {
                 usedCrossAxis += item.crossAxisSize + crossAxisSpacing
                 usedSpan += span
