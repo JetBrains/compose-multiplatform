@@ -26,24 +26,25 @@ interface GenericStyleSheetBuilder<TBuilder> : CSSRulesHolder, SelectorsScope {
     }
 
     operator fun String.invoke(cssRule: TBuilder.() -> Unit) {
-        style(Raw(this), cssRule)
+        style(RawSelector(this), cssRule)
     }
 
     infix fun String.style(cssRule: TBuilder.() -> Unit) {
-        style(Raw(this), cssRule)
+        style(RawSelector(this), cssRule)
     }
 }
 
+private val Universal = RawSelector("*")
+
 interface SelectorsScope {
-    fun selector(selector: String): CSSSelector = Raw(selector)
+    fun selector(selector: String): CSSSelector = RawSelector(selector)
     fun combine(vararg selectors: CSSSelector): CSSSelector = Combine(selectors.toMutableList())
 
     operator fun CSSSelector.plus(selector: CSSSelector): CSSSelector {
-        if (this is Combine) {
+        return if (this is Combine) {
             this.selectors.add(selector)
-            return this
-        }
-        return if (selector is Combine) {
+            this
+        } else if (selector is Combine) {
             selector.selectors.add(0, this)
             selector
         } else {
@@ -52,12 +53,12 @@ interface SelectorsScope {
     }
 
     operator fun CSSSelector.plus(selector: String): CSSSelector {
-        if (this is Combine) {
+        return if (this is Combine) {
             this.selectors.add(selector(selector))
-            return this
+            this
+        } else {
+            combine(this, selector(selector))
         }
-
-        return combine(this, selector(selector))
     }
 
     @JsName("returnUniversalSelector")
@@ -67,9 +68,9 @@ interface SelectorsScope {
     val universal: CSSSelector
         get() = Universal
 
-    fun type(type: String): CSSSelector = Type(type)
-    fun className(className: String): CSSSelector = CSSSelector.CSSClass(className)
-    fun id(id: String): CSSSelector = Id(id)
+    fun type(type: String): CSSSelector = RawSelector(type)
+    fun className(className: String): CSSSelector = RawSelector(".$className")
+    fun id(id: String): CSSSelector = RawSelector("#$id")
 
     fun attr(
         name: String,
@@ -241,33 +242,21 @@ interface SelectorsScope {
     fun slotted(selector: CSSSelector): CSSSelector = PseudoElementInternal.Slotted(selector)
 }
 
-private data class Id(val id: String) : CSSSelector() {
-    override fun toString(): String = "#$id"
-}
-
-private data class Type(val type: String) : CSSSelector() {
-    override fun toString(): String = type
-}
-
-private object Universal : CSSSelector() {
-    override fun toString(): String = "*"
-}
-
-private data class Raw(val selector: String) : CSSSelector() {
+private data class RawSelector(val selector: String) : CSSSelector() {
     override fun toString(): String = selector
 }
 
 private data class Combine(val selectors: MutableList<CSSSelector>) : CSSSelector() {
-    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-        contains(this, other, selectors, strict)
+    override fun contains(other: CSSSelector): Boolean =
+        contains(this, other, selectors)
 
     override fun toString(): String = selectors.joinToString("")
     override fun asString(): String = selectors.joinToString("") { it.asString() }
 }
 
 private data class Group(val selectors: List<CSSSelector>) : CSSSelector() {
-    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-        contains(this, other, selectors, strict)
+    override fun contains(other: CSSSelector): Boolean =
+        contains(this, other, selectors)
 
     override fun toString(): String = selectors.joinToString(", ")
     override fun asString(): String = selectors.joinToString(", ") { it.asString() }
@@ -275,32 +264,32 @@ private data class Group(val selectors: List<CSSSelector>) : CSSSelector() {
 
 private data class Descendant(val parent: CSSSelector, val selected: CSSSelector) :
     CSSSelector() {
-    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-        contains(this, other, listOf(parent, selected), strict)
+    override fun contains(other: CSSSelector): Boolean =
+        contains(this, other, listOf(parent, selected))
 
     override fun toString(): String = "$parent $selected"
     override fun asString(): String = "${parent.asString()} ${selected.asString()}"
 }
 
 private data class Child(val parent: CSSSelector, val selected: CSSSelector) : CSSSelector() {
-    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-        contains(this, other, listOf(parent, selected), strict)
+    override fun contains(other: CSSSelector): Boolean =
+        contains(this, other, listOf(parent, selected))
 
     override fun toString(): String = "$parent > $selected"
     override fun asString(): String = "${parent.asString()} > ${selected.asString()}"
 }
 
 private data class Sibling(val prev: CSSSelector, val selected: CSSSelector) : CSSSelector() {
-    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-        contains(this, other, listOf(prev, selected), strict)
+    override fun contains(other: CSSSelector): Boolean =
+        contains(this, other, listOf(prev, selected))
 
     override fun toString(): String = "$prev ~ $selected"
     override fun asString(): String = "${prev.asString()} ~ ${selected.asString()}"
 }
 
 private data class Adjacent(val prev: CSSSelector, val selected: CSSSelector) : CSSSelector() {
-    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-        contains(this, other, listOf(prev, selected), strict)
+    override fun contains(other: CSSSelector): Boolean =
+        contains(this, other, listOf(prev, selected))
 
     override fun toString(): String = "$prev + $selected"
     override fun asString(): String = "${prev.asString()} + ${selected.asString()}"
@@ -327,6 +316,7 @@ private open class PseudoClassInternal(val name: String) : CSSSelector() {
             name == other.name && argsStr() == other.argsStr()
         } else false
     }
+
     open fun argsStr(): String? = null
     override fun toString(): String = ":$name${argsStr()?.let { "($it)" } ?: ""}"
 
@@ -353,16 +343,16 @@ private open class PseudoClassInternal(val name: String) : CSSSelector() {
     }
 
     class Host internal constructor(val selector: CSSSelector) : PseudoClassInternal("host") {
-        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-            contains(this, other, listOf(selector), strict)
+        override fun contains(other: CSSSelector): Boolean =
+            contains(this, other, listOf(selector))
 
         override fun argsStr() = selector.asString()
     }
 
     // Etc
     class Not internal constructor(val selector: CSSSelector) : PseudoClassInternal("not") {
-        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-            contains(this, other, listOf(selector), strict)
+        override fun contains(other: CSSSelector): Boolean =
+            contains(this, other, listOf(selector))
 
         override fun argsStr() = "$selector"
     }
@@ -379,8 +369,8 @@ private open class PseudoElementInternal(val name: String) : CSSSelector() {
     override fun toString(): String = "::$name${argsStr()?.let { "($it)" } ?: ""}"
 
     class Slotted internal constructor(val selector: CSSSelector) : PseudoElementInternal("slotted") {
-        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-            contains(this, other, listOf(selector), strict)
+        override fun contains(other: CSSSelector): Boolean =
+            contains(this, other, listOf(selector))
 
         override fun argsStr() = selector.asString()
     }

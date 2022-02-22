@@ -35,30 +35,20 @@ sealed interface Nth {
 }
 
 abstract class CSSSelector internal constructor() {
-    override fun equals(other: Any?): Boolean {
-        return this === other || asString() == (other as? CSSSelector)?.asString()
-    }
 
-    internal open fun contains(other: CSSSelector, strict: Boolean = false): Boolean {
-        return if (strict) this === other else this == other
+    internal open fun contains(other: CSSSelector): Boolean {
+        return this === other
     }
 
     @Suppress("SuspiciousEqualsCombination")
-    protected fun contains(that: CSSSelector, other: CSSSelector, children: List<CSSSelector>, strict: Boolean): Boolean {
-        return that === other || // exactly same selector
-                children.any { it.contains(other, strict) } || // contains it in children
-                (!strict && that == other) // equals structurally
+    protected fun contains(that: CSSSelector, other: CSSSelector, children: List<CSSSelector>): Boolean {
+        return (that === other) || children.any { it.contains(other) }
     }
-
 
     // This method made for workaround because of possible concatenation of `String + CSSSelector`,
     // so `toString` is called for such operator, but we are calling `asString` for instantiation.
     // `toString` is reloaded for CSSSelfSelector
     internal open fun asString(): String = toString()
-
-    internal data class CSSClass internal constructor(val className: String) : CSSSelector() {
-        override fun toString(): String = ".$className"
-    }
 
     object Attribute {
         enum class Operator(val value: String) {

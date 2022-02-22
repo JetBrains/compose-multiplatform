@@ -249,16 +249,8 @@ fun main() {
 
         Div(
             attrs = {
-                classes(
-                    Auto.css {
-                        color(Color.pink)
-                        hover(self) style {
-                            color(Color.blue)
-                        }
-                    }
-                )
-
                 style {
+                    color(Color.pink)
                     opacity(30.percent)
                 }
             }
