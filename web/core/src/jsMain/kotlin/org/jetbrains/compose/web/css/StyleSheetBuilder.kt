@@ -69,7 +69,7 @@ interface SelectorsScope {
         get() = Universal
 
     fun type(type: String): CSSSelector = RawSelector(type)
-    fun className(className: String): CSSSelector = CSSSelector.CSSClass(className)
+    fun className(className: String): CSSSelector = RawSelector(".$className")
     fun id(id: String): CSSSelector = RawSelector("#$id")
 
     fun attr(

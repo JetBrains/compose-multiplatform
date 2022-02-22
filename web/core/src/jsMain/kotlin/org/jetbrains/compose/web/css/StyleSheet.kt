@@ -78,8 +78,12 @@ open class StyleSheet(
 
     @Suppress("EqualsOrHashCode")
     internal class CSSSelfSelector(var selector: CSSSelector? = null) : CSSSelector() {
-        override fun toString(): String = throw IllegalStateException("You can't concatenate `String + CSSSelector` which contains `self` or `root`. Use `selector(<your string>)` to convert `String` to `CSSSelector` for proper work. https://github.com/JetBrains/compose-jb/issues/1440")
-        override fun asString(): String = selector?.asString() ?: throw IllegalStateException("You can't instantiate self")
+        override fun toString(): String =
+            throw IllegalStateException("You can't concatenate `String + CSSSelector` which contains `self` or `root`. Use `selector(<your string>)` to convert `String` to `CSSSelector` for proper work. https://github.com/JetBrains/compose-jb/issues/1440")
+
+        override fun asString(): String =
+            selector?.asString() ?: throw IllegalStateException("You can't instantiate self")
+
         override fun equals(other: Any?): Boolean {
             return other is CSSSelfSelector
         }
@@ -92,7 +96,9 @@ open class StyleSheet(
         ): ReadOnlyProperty<Any?, String> {
             val sheetName = if (usePrefix) "${sheet::class.simpleName}-" else ""
             val className = "$sheetName${property.name}"
-            val selector = CSSSelector.CSSClass(className)
+            val selector = object : CSSSelector() {
+                override fun asString() = ".${className}"
+            }
             val (properties, rules) = buildCSS(selector, selector, cssBuilder)
             sheet.add(selector, properties)
             rules.forEach { sheet.add(it) }
@@ -134,9 +140,9 @@ internal fun buildCSS(
 ): Pair<StyleHolder, CSSRuleDeclarationList> {
     val styleSheet = StyleSheetBuilderImpl()
     // workaround because of problems with plus operator overloading
-    val root =  (thisClass as? StyleSheet.CSSSelfSelector) ?: StyleSheet.CSSSelfSelector(thisClass)
+    val root = (thisClass as? StyleSheet.CSSSelfSelector) ?: StyleSheet.CSSSelfSelector(thisClass)
     // workaround because of problems with plus operator overloading
-    val self =  (thisContext as? StyleSheet.CSSSelfSelector) ?: StyleSheet.CSSSelfSelector(thisContext)
+    val self = (thisContext as? StyleSheet.CSSSelfSelector) ?: StyleSheet.CSSSelfSelector(thisContext)
 
     val builder = CSSBuilderImpl(root, self, styleSheet)
     builder.cssRule()

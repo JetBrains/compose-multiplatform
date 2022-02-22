@@ -50,10 +50,6 @@ abstract class CSSSelector internal constructor() {
     // `toString` is reloaded for CSSSelfSelector
     internal open fun asString(): String = toString()
 
-    internal data class CSSClass internal constructor(val className: String) : CSSSelector() {
-        override fun toString(): String = ".$className"
-    }
-
     object Attribute {
         enum class Operator(val value: String) {
             Equals("="),
