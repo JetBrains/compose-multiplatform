@@ -41,11 +41,10 @@ interface SelectorsScope {
     fun combine(vararg selectors: CSSSelector): CSSSelector = Combine(selectors.toMutableList())
 
     operator fun CSSSelector.plus(selector: CSSSelector): CSSSelector {
-        if (this is Combine) {
+        return if (this is Combine) {
             this.selectors.add(selector)
-            return this
-        }
-        return if (selector is Combine) {
+            this
+        } else if (selector is Combine) {
             selector.selectors.add(0, this)
             selector
         } else {
@@ -54,12 +53,12 @@ interface SelectorsScope {
     }
 
     operator fun CSSSelector.plus(selector: String): CSSSelector {
-        if (this is Combine) {
+        return if (this is Combine) {
             this.selectors.add(selector(selector))
-            return this
+            this
+        } else {
+            combine(this, selector(selector))
         }
-
-        return combine(this, selector(selector))
     }
 
     @JsName("returnUniversalSelector")
@@ -243,7 +242,7 @@ interface SelectorsScope {
     fun slotted(selector: CSSSelector): CSSSelector = PseudoElementInternal.Slotted(selector)
 }
 
-private data class RawSelector(val selector: String): CSSSelector() {
+private data class RawSelector(val selector: String) : CSSSelector() {
     override fun toString(): String = selector
 }
 
@@ -317,6 +316,7 @@ private open class PseudoClassInternal(val name: String) : CSSSelector() {
             name == other.name && argsStr() == other.argsStr()
         } else false
     }
+
     open fun argsStr(): String? = null
     override fun toString(): String = ":$name${argsStr()?.let { "($it)" } ?: ""}"
 
