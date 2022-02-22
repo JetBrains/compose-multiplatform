@@ -80,6 +80,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -638,7 +639,7 @@ private fun LazyGridDemo() {
 @Composable
 private fun LazyGridForMode(mode: GridCells) {
     LazyVerticalGrid(
-        cells = mode
+        columns = mode
     ) {
         items(100) {
             Text(
@@ -657,7 +658,18 @@ private fun LazyGridForMode(mode: GridCells) {
 private fun LazyGridWithSpacingDemo() {
     val columnModes = listOf(
         GridCells.Fixed(3),
-        GridCells.Adaptive(minSize = 60.dp)
+        GridCells.Adaptive(minSize = 60.dp),
+        object : GridCells {
+            // columns widths have ratio 1:1:2:3
+            override fun Density.calculateCrossAxisCellSizes(
+                availableSize: Int,
+                spacing: Int,
+            ): List<Int> {
+                val totalSlots = 1 + 1 + 2 + 3
+                val slotWidth = (availableSize - spacing * 3) / totalSlots
+                return listOf(slotWidth, slotWidth, slotWidth * 2, slotWidth * 3)
+            }
+        }
     )
     var currentMode by remember { mutableStateOf(0) }
     var horizontalSpacing by remember { mutableStateOf(8) }
@@ -785,7 +797,7 @@ private fun LazyGridWithSpacingForMode(
     verticalSpacing: Dp
 ) {
     LazyVerticalGrid(
-        cells = mode,
+        columns = mode,
         horizontalArrangement = Arrangement.spacedBy(horizontalSpacing),
         verticalArrangement = Arrangement.spacedBy(verticalSpacing)
     ) {

@@ -52,7 +52,7 @@ fun Home(
     ) { paddingValues ->
         LazyVerticalGrid(
             modifier = Modifier.padding(paddingValues),
-            cells = GridCells.Adaptive(HomeCellMinSize),
+            columns = GridCells.Adaptive(HomeCellMinSize),
             content = {
                 items(components) { component ->
                     ComponentItem(

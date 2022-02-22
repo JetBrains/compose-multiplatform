@@ -51,7 +51,7 @@ fun LazyVerticalGridSample() {
     val itemModifier = Modifier.border(1.dp, Color.Blue).height(80.dp).wrapContentSize()
 
     LazyVerticalGrid(
-        cells = GridCells.Fixed(3),
+        columns = GridCells.Fixed(3),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -75,7 +75,7 @@ fun LazyVerticalGridSample() {
 fun LazyVerticalGridSpanSample() {
     val sections = (0 until 25).toList().chunked(5)
     LazyVerticalGrid(
-        cells = GridCells.Fixed(3),
+        columns = GridCells.Fixed(3),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {

@@ -22,6 +22,8 @@ import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.lazy.grid.LazyGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -30,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
 /**
@@ -43,7 +46,8 @@ import androidx.compose.ui.unit.dp
  * Sample with custom item spans:
  * @sample androidx.compose.foundation.samples.LazyVerticalGridSpanSample
  *
- * @param cells a class describing how cells form columns, see [GridCells] doc for more information
+ * @param columns describes the count and the size of the grid's columns,
+ * see [GridCells] doc for more information
  * @param modifier the modifier to apply to this layout
  * @param state the state object to be used to control or observe the list's state
  * @param contentPadding specify a padding around the whole content
@@ -60,7 +64,7 @@ import androidx.compose.ui.unit.dp
 @ExperimentalFoundationApi
 @Composable
 fun LazyVerticalGrid(
-    cells: GridCells,
+    columns: GridCells,
     modifier: Modifier = Modifier,
     state: LazyGridState = rememberLazyGridState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
@@ -72,18 +76,9 @@ fun LazyVerticalGrid(
     userScrollEnabled: Boolean = true,
     content: LazyGridScope.() -> Unit
 ) {
-    val slotsPerLine = remember<Density.(Constraints) -> Int>(cells) {
-        { constraints ->
-            if (cells is GridCells.Fixed) {
-                cells.count
-            } else {
-                require(cells is GridCells.Adaptive)
-                maxOf((constraints.maxWidth.toDp() / cells.minSize).toInt(), 1)
-            }
-        }
-    }
+    val slotSizesSums = rememberSlotSizesSums(columns, horizontalArrangement, contentPadding)
     LazyGrid(
-        slotsPerLine = slotsPerLine,
+        slotSizesSums = slotSizesSums,
         modifier = modifier,
         state = state,
         contentPadding = contentPadding,
@@ -96,45 +91,133 @@ fun LazyVerticalGrid(
     )
 }
 
+/** Returns prefix sums of slot sizes. */
+@ExperimentalFoundationApi
+@Composable
+private fun rememberSlotSizesSums(
+    columns: GridCells,
+    horizontalArrangement: Arrangement.Horizontal,
+    contentPadding: PaddingValues
+) = remember<Density.(Constraints) -> List<Int>>(
+    columns,
+    horizontalArrangement,
+    contentPadding,
+) {
+    { constraints ->
+        require(constraints.maxWidth != Constraints.Infinity) {
+            "LazyVerticalGrid's width should be bound by parent."
+        }
+        val horizontalPadding = contentPadding.calculateStartPadding(LayoutDirection.Ltr) +
+            contentPadding.calculateEndPadding(LayoutDirection.Ltr)
+        val gridWidth = constraints.maxWidth - horizontalPadding.roundToPx()
+        with(columns) {
+            calculateCrossAxisCellSizes(
+                gridWidth,
+                horizontalArrangement.spacing.roundToPx()
+            ).toMutableList().apply {
+                for (i in 1 until size) {
+                    this[i] += this[i - 1]
+                }
+            }
+        }
+    }
+}
+
 /**
- * This class describes how cells form columns in vertical grids or rows in horizontal grids.
+ * This class describes the count and the sizes of columns in vertical grids,
+ * or rows in horizontal grids.
  */
 @ExperimentalFoundationApi
 @Stable
-sealed class GridCells {
+interface GridCells {
     /**
-     * Combines cells with fixed number rows or columns.
+     * Calculates the number of cells and their cross axis size based on
+     * [availableSize] and [spacing].
      *
-     * For example, for the vertical [LazyVerticalGrid] Fixed(3) would mean that there are 3 columns 1/3
-     * of the parent wide.
+     * For example, in vertical grids, [spacing] is passed from the grid's [Arrangement.Horizontal].
+     * The [Arrangement.Horizontal] will also be used to arrange items in a row if the grid is wider
+     * than the calculated sum of columns.
+     *
+     * Note that the calculated cross axis sizes will be considered in an RTL-aware manner --
+     * if the grid is vertical and the layout direction is RTL, the first width in the returned
+     * list will correspond to the rightmost column.
+     *
+     * @param availableSize available size on cross axis, e.g. width of [LazyVerticalGrid].
+     * @param spacing cross axis spacing, e.g. horizontal spacing for [LazyVerticalGrid].
+     * The spacing is passed from the corresponding [Arrangement] param of the lazy grid.
      */
-    @ExperimentalFoundationApi
-    @Stable
-    class Fixed(val count: Int) : GridCells()
+    fun Density.calculateCrossAxisCellSizes(availableSize: Int, spacing: Int): List<Int>
 
     /**
-     * Combines cells with adaptive number of rows or columns. It will try to position as many rows
-     * or columns as possible on the condition that every cell has at least [minSize] space and
-     * all extra space distributed evenly.
+     * Defines a grid with fixed number of rows or columns.
      *
-     * For example, for the vertical [LazyVerticalGrid] Adaptive(20.dp) would mean that there will be as
-     * many columns as possible and every column will be at least 20.dp and all the columns will
-     * have equal width. If the screen is 88.dp wide then there will be 4 columns 22.dp each.
+     * For example, for the vertical [LazyVerticalGrid] Fixed(3) would mean that
+     * there are 3 columns 1/3 of the parent width.
      */
-    @ExperimentalFoundationApi
-    @Stable
-    class Adaptive(val minSize: Dp) : GridCells()
+    class Fixed(private val count: Int) : GridCells {
+        init {
+            require(count > 0)
+        }
 
-    override fun hashCode() = if (this is Fixed) {
-        31 + count
-    } else {
-        require(this is Adaptive)
-        62 + minSize.hashCode()
+        override fun Density.calculateCrossAxisCellSizes(
+            availableSize: Int,
+            spacing: Int
+        ): List<Int> {
+            return calculateCellsCrossAxisSizeImpl(availableSize, count, spacing)
+        }
+
+        override fun hashCode(): Int {
+            return -count // Different sign from Adaptive.
+        }
+
+        override fun equals(other: Any?): Boolean {
+            return other is Fixed && count == other.count
+        }
     }
 
-    override fun equals(other: Any?) =
-        (this is Fixed && other is Fixed && this.count == other.count) ||
-            (this is Adaptive && other is Adaptive && this.minSize == other.minSize)
+    /**
+     * Defines a grid with as many rows or columns as possible on the condition that
+     * every cell has at least [minSize] space and all extra space distributed evenly.
+     *
+     * For example, for the vertical [LazyVerticalGrid] Adaptive(20.dp) would mean that
+     * there will be as many columns as possible and every column will be at least 20.dp
+     * and all the columns will have equal width. If the screen is 88.dp wide then
+     * there will be 4 columns 22.dp each.
+     */
+    class Adaptive(private val minSize: Dp) : GridCells {
+        init {
+            require(minSize > 0.dp)
+        }
+
+        override fun Density.calculateCrossAxisCellSizes(
+            availableSize: Int,
+            spacing: Int
+        ): List<Int> {
+            val count = maxOf((availableSize + spacing) / (minSize.roundToPx() + spacing), 1)
+            return calculateCellsCrossAxisSizeImpl(availableSize, count, spacing)
+        }
+
+        override fun hashCode(): Int {
+            return minSize.hashCode()
+        }
+
+        override fun equals(other: Any?): Boolean {
+            return other is Adaptive && minSize == other.minSize
+        }
+    }
+}
+
+private fun calculateCellsCrossAxisSizeImpl(
+    gridSize: Int,
+    slotCount: Int,
+    spacing: Int
+): List<Int> {
+    val gridSizeWithoutSpacing = gridSize - spacing * (slotCount - 1)
+    val slotSize = gridSizeWithoutSpacing / slotCount
+    val remainingPixels = gridSizeWithoutSpacing % slotCount
+    return List(slotCount) {
+        slotSize + if (it < remainingPixels) 1 else 0
+    }
 }
 
 /**
@@ -180,8 +263,8 @@ interface LazyGridScope {
      * leave it `null` when this matches the intended behavior, as providing a custom
      * implementation impacts performance
      * @param contentType a factory of the content types for the item. The item compositions of
-     * the same type could be reused more efficiently. Note that null is a valid type and items of such
-     * type will be considered compatible.
+     * the same type could be reused more efficiently. Note that null is a valid type and items
+     * of such type will be considered compatible.
      * @param itemContent the content displayed by a single item
      */
     fun items(

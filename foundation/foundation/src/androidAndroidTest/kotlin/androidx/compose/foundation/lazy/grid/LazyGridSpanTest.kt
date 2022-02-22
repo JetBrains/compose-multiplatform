@@ -53,7 +53,7 @@ class LazyGridSpanTest {
         val itemHeight = with(rule.density) { 10.toDp() }
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(columns),
+                columns = GridCells.Fixed(columns),
                 modifier = Modifier.requiredSize(columnWidth * columns, itemHeight * 3)
             ) {
                 items(
@@ -127,7 +127,7 @@ class LazyGridSpanTest {
         val spacing = with(rule.density) { 4.toDp() }
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(columns),
+                columns = GridCells.Fixed(columns),
                 modifier = Modifier.requiredSize(
                     columnWidth * columns + spacing * (columns - 1),
                     itemHeight
@@ -166,7 +166,7 @@ class LazyGridSpanTest {
         val itemHeight = with(rule.density) { 10.toDp() }
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(columns),
+                columns = GridCells.Fixed(columns),
                 modifier = Modifier.requiredSize(columnWidth * columns, itemHeight)
             ) {
                 items(
@@ -222,7 +222,7 @@ class LazyGridSpanTest {
         val itemHeight = with(rule.density) { 10.toDp() }
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(columns),
+                columns = GridCells.Fixed(columns),
                 modifier = Modifier.requiredSize(columnWidth * columns, itemHeight * 3)
             ) {
                 item(span = {

@@ -76,7 +76,7 @@ fun LazyGridDragAndDropDemo() {
     }
 
     LazyVerticalGrid(
-        cells = GridCells.Fixed(3),
+        columns = GridCells.Fixed(3),
         modifier = Modifier.dragContainer(dragDropState),
         state = gridState,
         contentPadding = PaddingValues(16.dp),

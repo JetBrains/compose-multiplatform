@@ -59,8 +59,8 @@ internal fun LazyGrid(
     modifier: Modifier = Modifier,
     /** State controlling the scroll position */
     state: LazyGridState,
-    /** The number of items per line in the grid e.g. the columns for vertical grid. */
-    slotsPerLine: Density.(Constraints) -> Int,
+    /** Prefix sums of cross axis sizes of slots per line, e.g. the columns for vertical grid. */
+    slotSizesSums: Density.(Constraints) -> List<Int>,
     /** The inner padding to be added for the whole content (not for each individual item) */
     contentPadding: PaddingValues = PaddingValues(0.dp),
     /** reverse the direction of scrolling and layout */
@@ -99,7 +99,7 @@ internal fun LazyGrid(
         state,
         overScrollController,
         spanLayoutProvider,
-        slotsPerLine,
+        slotSizesSums,
         contentPadding,
         reverseLayout,
         isVertical,
@@ -173,8 +173,8 @@ private fun rememberLazyGridMeasurePolicy(
     overScrollController: OverScrollController,
     /** Cache based provider for spans. */
     stateOfSpanLayoutProvider: State<LazyGridSpanLayoutProvider>,
-    /** The number of columns of the grid. */
-    slotsPerLine: Density.(Constraints) -> Int,
+    /** Prefix sums of cross axis sizes of slots of the grid. */
+    slotSizesSums: Density.(Constraints) -> List<Int>,
     /** The inner padding to be added for the whole content(nor for each individual item) */
     contentPadding: PaddingValues,
     /** reverse the direction of scrolling and layout */
@@ -190,7 +190,7 @@ private fun rememberLazyGridMeasurePolicy(
 ) = remember(
     state,
     overScrollController,
-    slotsPerLine,
+    slotSizesSums,
     contentPadding,
     reverseLayout,
     isVertical,
@@ -222,13 +222,12 @@ private fun rememberLazyGridMeasurePolicy(
         state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
 
         val spanLayoutProvider = stateOfSpanLayoutProvider.value
-        // Resolve slotsPerLine.
-        val resolvedSlotsPerLine = slotsPerLine(constraints)
-        spanLayoutProvider.slotsPerLine = resolvedSlotsPerLine
+        val resolvedSlotSizesSums = slotSizesSums(constraints)
+        spanLayoutProvider.slotsPerLine = resolvedSlotSizesSums.size
 
         // Update the state's cached Density and slotsPerLine
         state.density = this
-        state.slotsPerLine = resolvedSlotsPerLine
+        state.slotsPerLine = resolvedSlotSizesSums.size
 
         val spaceBetweenLinesDp = if (isVertical) {
             requireNotNull(verticalArrangement).spacing
@@ -266,9 +265,8 @@ private fun rememberLazyGridMeasurePolicy(
             )
         }
         val measuredLineProvider = LazyMeasuredLineProvider(
-            contentConstraints,
             isVertical,
-            resolvedSlotsPerLine,
+            resolvedSlotSizesSums,
             spaceBetweenSlots,
             itemsCount,
             spaceBetweenLines,
@@ -281,7 +279,7 @@ private fun rememberLazyGridMeasurePolicy(
                 spans = spans,
                 isVertical = isVertical,
                 reverseLayout = reverseLayout,
-                slotsPerLine = resolvedSlotsPerLine,
+                slotsPerLine = resolvedSlotSizesSums.size,
                 layoutDirection = layoutDirection,
                 mainAxisSpacing = mainAxisSpacing,
                 crossAxisSpacing = spaceBetweenSlots
@@ -326,7 +324,7 @@ private fun rememberLazyGridMeasurePolicy(
             measuredLineProvider = measuredLineProvider,
             measuredItemProvider = measuredItemProvider,
             mainAxisAvailableSize = mainAxisAvailableSize,
-            slotsPerLine = resolvedSlotsPerLine,
+            slotsPerLine = resolvedSlotSizesSums.size,
             beforeContentPadding = beforeContentPadding,
             afterContentPadding = afterContentPadding,
             firstVisibleLineIndex = firstVisibleLineIndex,

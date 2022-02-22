@@ -64,9 +64,11 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsAtLeast
+import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -96,7 +98,7 @@ class LazyGridTest {
 
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(3)
+                columns = GridCells.Fixed(3)
             ) {
                 item {
                     Spacer(
@@ -116,7 +118,7 @@ class LazyGridTest {
 
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(3),
+                columns = GridCells.Fixed(3),
                 modifier = Modifier.height(100.dp).width(300.dp)
             ) {
                 items(items) {
@@ -147,7 +149,7 @@ class LazyGridTest {
 
         rule.setContentWithTestViewConfiguration {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(3),
+                columns = GridCells.Fixed(3),
                 modifier = Modifier.height(100.dp).testTag(LazyGridTag)
             ) {
                 items(items) {
@@ -184,7 +186,7 @@ class LazyGridTest {
 
         rule.setContentWithTestViewConfiguration {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(3),
+                columns = GridCells.Fixed(3),
                 modifier = Modifier.height(200.dp).testTag(LazyGridTag)
             ) {
                 items(items) {
@@ -230,7 +232,7 @@ class LazyGridTest {
 
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Adaptive(130.dp),
+                columns = GridCells.Adaptive(130.dp),
                 modifier = Modifier.height(100.dp).width(300.dp)
             ) {
                 items(items) {
@@ -261,7 +263,7 @@ class LazyGridTest {
 
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Adaptive(301.dp),
+                columns = GridCells.Adaptive(301.dp),
                 modifier = Modifier.height(100.dp).width(300.dp)
             ) {
                 items(items) {
@@ -289,7 +291,7 @@ class LazyGridTest {
 
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Adaptive(itemSize),
+                columns = GridCells.Adaptive(itemSize),
                 modifier = Modifier.height(itemSize).width(itemSize * 3 + spacing * 2),
                 horizontalArrangement = Arrangement.spacedBy(spacing)
             ) {
@@ -324,7 +326,7 @@ class LazyGridTest {
 
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Adaptive(itemSize),
+                columns = GridCells.Adaptive(itemSize),
                 modifier = Modifier.height(itemSize).width(itemSize * 3 + spacing * 4),
                 horizontalArrangement = Arrangement.spacedBy(spacing),
                 contentPadding = PaddingValues(horizontal = spacing)
@@ -360,7 +362,7 @@ class LazyGridTest {
 
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Adaptive(itemSize),
+                columns = GridCells.Adaptive(itemSize),
                 modifier = Modifier.height(itemSize * 3 + spacing * 2).width(itemSize),
                 verticalArrangement = Arrangement.spacedBy(spacing)
             ) {
@@ -395,7 +397,7 @@ class LazyGridTest {
 
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Adaptive(itemSize),
+                columns = GridCells.Adaptive(itemSize),
                 modifier = Modifier.height(itemSize * 3 + spacing * 2).width(itemSize),
                 verticalArrangement = Arrangement.spacedBy(space = spacing),
                 contentPadding = PaddingValues(vertical = spacing)
@@ -431,7 +433,7 @@ class LazyGridTest {
 
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(2),
+                columns = GridCells.Fixed(2),
                 modifier = Modifier.height(itemSize * 2 + spacing).width(itemSize),
                 verticalArrangement = Arrangement.spacedBy(space = spacing),
             ) {
@@ -471,7 +473,7 @@ class LazyGridTest {
 
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(2),
+                columns = GridCells.Fixed(2),
                 modifier = Modifier.height(itemSize * 2).width(itemSize * 2 + spacing),
                 horizontalArrangement = Arrangement.spacedBy(space = spacing),
             ) {
@@ -511,7 +513,7 @@ class LazyGridTest {
 
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(2),
+                columns = GridCells.Fixed(2),
                 modifier = Modifier.height(itemSize * 2 + spacing).width(itemSize),
                 verticalArrangement = Arrangement.spacedBy(space = spacing),
                 contentPadding = PaddingValues(vertical = spacing)
@@ -552,7 +554,7 @@ class LazyGridTest {
 
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(2),
+                columns = GridCells.Fixed(2),
                 modifier = Modifier.height(itemSize * 2).width(itemSize * 2 + spacing * 3),
                 horizontalArrangement = Arrangement.spacedBy(space = spacing),
                 contentPadding = PaddingValues(horizontal = spacing)
@@ -692,7 +694,7 @@ class LazyGridTest {
 
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(2),
+                columns = GridCells.Fixed(2),
                 modifier = Modifier.requiredSize(itemSize * 2).testTag(LazyGridTag),
                 state = LazyGridState(firstVisibleItemIndex = Int.MAX_VALUE - 3)
             ) {
@@ -836,7 +838,7 @@ class LazyGridTest {
         rule.setContent {
             state = rememberLazyGridState()
             LazyVerticalGrid(
-                cells = GridCells.Fixed(2),
+                columns = GridCells.Fixed(2),
                 modifier = Modifier.height(itemHeight + 1.dp),
                 state = state
             ) {
@@ -985,6 +987,53 @@ class LazyGridTest {
         rule.onNodeWithTag(LazyGridTag)
             .captureToImage()
             .assertPixels { Color.Green }
+    }
+
+    @Test
+    fun customGridCells() {
+        val items = (1..5).map { it.toString() }
+
+        rule.setContent {
+            LazyVerticalGrid(
+                // Two columns in ratio 1:2
+                columns = object : GridCells {
+                    override fun Density.calculateCrossAxisCellSizes(
+                        availableSize: Int,
+                        spacing: Int
+                    ): List<Int> {
+                        val availableWidth = availableSize - spacing
+                        val columnWidth = availableWidth / 3
+                        return listOf(columnWidth, columnWidth * 2)
+                    }
+                },
+                modifier = Modifier.height(100.dp).width(300.dp)
+            ) {
+                items(items) {
+                    Spacer(Modifier.height(101.dp).testTag(it))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("1")
+            .assertWidthIsEqualTo(100.dp)
+
+        rule.onNodeWithTag("2")
+            .assertLeftPositionInRootIsEqualTo(100.dp)
+
+        rule.onNodeWithTag("2")
+            .assertWidthIsEqualTo(200.dp)
+
+        rule.onNodeWithTag("3")
+            .assertDoesNotExist()
+
+        rule.onNodeWithTag("4")
+            .assertDoesNotExist()
+
+        rule.onNodeWithTag("5")
+            .assertDoesNotExist()
     }
 }
 

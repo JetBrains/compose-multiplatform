@@ -211,7 +211,7 @@ private fun TabletScreen(gridColumns: Int) {
 private fun Grid(gridColumns: Int, modifier: Modifier = Modifier) {
     LazyVerticalGrid(
         modifier = modifier,
-        cells = GridCells.Fixed(gridColumns)
+        columns = GridCells.Fixed(gridColumns)
     ) {
         items(100) {
             Text(
