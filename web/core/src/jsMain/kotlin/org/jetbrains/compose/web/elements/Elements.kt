@@ -947,7 +947,7 @@ fun Style(
             }
         },
     ) {
-        DisposableEffect(cssRules) {
+        DisposableEffect(cssRules, cssRules.size) {
             val cssStylesheet = scopeElement.sheet as? CSSStyleSheet
             cssStylesheet?.setCSSRules(cssRules)
             onDispose {

@@ -263,6 +263,7 @@ fun FormattedCodeSnippet(code: String, language: String = "kotlin") {
                 backgroundColor(Color("transparent"))
             }
         }) {
+            @Suppress("DEPRECATION")
             DomSideEffect(code) {
                 it.setHighlightedCode(code)
             }
