@@ -5,12 +5,17 @@
 
 package org.jetbrains.compose.web.core.tests
 
+import androidx.compose.runtime.mutableStateOf
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.stringPresentation
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
 import org.jetbrains.compose.web.testutils.*
+import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.HTMLStyleElement
+import org.w3c.dom.css.CSSStyleSheet
+import org.w3c.dom.css.get
 import kotlin.test.*
 
 object AppCSSVariables {
@@ -319,5 +324,77 @@ class CSSVariableTests {
                 }
             }
         }
+    }
+
+    @Test
+    fun testChildStylesheetsGetApplied() = runTest {
+        val showContent = mutableStateOf(false)
+        composition {
+            Style(TestRootStylesheet2)
+            if (showContent.value) {
+                Div(attrs = {
+                    classes(ChildStylesheet2.content)
+                }) {}
+            }
+        }
+
+        val styleElem = root.children[0] as HTMLStyleElement
+        val cssStyleSheet = styleElem.sheet as CSSStyleSheet
+        assertEquals(1, cssStyleSheet.cssRules.length)
+        assertEquals(".cls1 { padding: 10px; }", cssStyleSheet.cssRules[0]!!.cssText)
+
+        showContent.value = true
+        waitForRecompositionComplete()
+
+        with(root.children[1] as HTMLDivElement) {
+            assertEquals("content", getAttribute("class"))
+        }
+
+        // 2nd recomposition occurs since TestRootStylesheet2 was changed during recomposition
+        // when ChildStylesheet2 was initialised after showContent was set into "true"
+        waitForRecompositionComplete()
+
+        val styleElem2 = root.children[0] as HTMLStyleElement
+        val cssStyleSheet2 = styleElem2.sheet as CSSStyleSheet
+        assertEquals(".cls1 { padding: 10px; }", cssStyleSheet2.cssRules[0]!!.cssText)
+        assertEquals(2, cssStyleSheet2.cssRules.length)
+        assertEquals(".content { color: red; }", cssStyleSheet2.cssRules[1]!!.cssText)
+    }
+
+    @Test
+    fun testChildStylesheetsGetApplied2() = runTest {
+        composition {
+            Style(TestRootStylesheet)
+            Div(attrs = { classes(ChildStylesheet.content) })
+        }
+
+        val styleElem = root.children[0] as HTMLStyleElement
+        val cssStyleSheet = styleElem.sheet as CSSStyleSheet
+        assertEquals(2, cssStyleSheet.cssRules.length)
+        assertEquals(".cls1 { padding: 10px; }", cssStyleSheet.cssRules[0]!!.cssText)
+        assertEquals(".content { color: red; }", cssStyleSheet.cssRules[1]!!.cssText)
+    }
+}
+
+private object TestRootStylesheet : StyleSheet(usePrefix = false) {
+    val cls1 by style {
+        padding(10.px)
+    }
+}
+private object ChildStylesheet : StyleSheet(TestRootStylesheet, usePrefix = false) {
+    val content by style {
+        color(Color.red)
+    }
+}
+
+// Use duplicates for another test to ensure uninitialized objects will be used
+private object TestRootStylesheet2 : StyleSheet(usePrefix = false) {
+    val cls1 by style {
+        padding(10.px)
+    }
+}
+private object ChildStylesheet2 : StyleSheet(TestRootStylesheet2, usePrefix = false) {
+    val content by style {
+        color(Color.red)
     }
 }
