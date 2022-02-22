@@ -91,14 +91,13 @@ open class StyleSheet(
             property: KProperty<*>
         ): ReadOnlyProperty<Any?, String> {
             val sheetName = if (usePrefix) "${sheet::class.simpleName}-" else ""
-            val selector = CSSSelector.CSSClass("$sheetName${property.name}")
+            val className = "$sheetName${property.name}"
+            val selector = CSSSelector.CSSClass(className)
             val (properties, rules) = buildCSS(selector, selector, cssBuilder)
             sheet.add(selector, properties)
             rules.forEach { sheet.add(it) }
 
-            return ReadOnlyProperty { _, _ ->
-                selector.className
-            }
+            return ReadOnlyProperty { _, _ -> className }
         }
     }
 
