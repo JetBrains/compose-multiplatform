@@ -16,29 +16,48 @@
 
 package androidx.compose.ui.platform
 
+import android.app.Application
+import android.database.ContentObserver
+import android.net.Uri
+import android.os.Looper
+import android.provider.Settings
 import android.view.View
 import android.view.ViewParent
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.PausableMonotonicFrameClock
 import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.InternalComposeUiApi
+import androidx.compose.ui.MotionDurationScale
 import androidx.compose.ui.R
+import androidx.core.os.HandlerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewTreeLifecycleOwner
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.android.asCoroutineDispatcher
-import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.android.asCoroutineDispatcher
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 /**
  * The [CompositionContext] that should be used as a parent for compositions at or below
@@ -70,6 +89,50 @@ fun View.findViewTreeCompositionContext(): CompositionContext? {
         parent = parent.getParent()
     }
     return found
+}
+
+private val animationScale = mutableMapOf<Application, StateFlow<Float>>()
+
+private fun getAnimationScaleFlowFor(application: Application): StateFlow<Float> {
+    return synchronized(animationScale) {
+        animationScale.getOrPut(application) {
+            val resolver = application.applicationContext.contentResolver
+            val animationScaleUri =
+                Settings.Global.getUriFor(Settings.Global.ANIMATOR_DURATION_SCALE)
+            val channel = Channel<Unit>(CONFLATED)
+            val contentObserver =
+                object : ContentObserver(HandlerCompat.createAsync(Looper.getMainLooper())) {
+                    override fun onChange(selfChange: Boolean, uri: Uri?) {
+                        channel.trySend(Unit)
+                    }
+                }
+
+            // TODO: Switch to callbackFlow when it becomes stable
+            flow {
+                resolver.registerContentObserver(animationScaleUri, false, contentObserver)
+                try {
+                    for (value in channel) {
+                        val newValue = Settings.Global.getFloat(
+                            application.contentResolver,
+                            Settings.Global.ANIMATOR_DURATION_SCALE,
+                            1f
+                        )
+                        emit(newValue)
+                    }
+                } finally {
+                    resolver.unregisterContentObserver(contentObserver)
+                }
+            }.stateIn(
+                MainScope(),
+                SharingStarted.WhileSubscribed(),
+                Settings.Global.getFloat(
+                    application.contentResolver,
+                    Settings.Global.ANIMATOR_DURATION_SCALE,
+                    1f
+                )
+            )
+        }
+    }
 }
 
 /**
@@ -263,18 +326,28 @@ fun View.createLifecycleAwareWindowRecomposer(
     // Only access AndroidUiDispatcher.CurrentThread if we would use an element from it,
     // otherwise prevent lazy initialization.
     val baseContext = if (coroutineContext[ContinuationInterceptor] == null ||
-        coroutineContext[MonotonicFrameClock] == null) {
-            AndroidUiDispatcher.CurrentThread + coroutineContext
+        coroutineContext[MonotonicFrameClock] == null
+    ) {
+        AndroidUiDispatcher.CurrentThread + coroutineContext
     } else coroutineContext
     val pausableClock = baseContext[MonotonicFrameClock]?.let {
         PausableMonotonicFrameClock(it).apply { pause() }
     }
-    val contextWithClock = baseContext + (pausableClock ?: EmptyCoroutineContext)
-    val recomposer = Recomposer(contextWithClock)
-    val runRecomposeScope = CoroutineScope(contextWithClock)
-    val viewTreeLifecycle = checkNotNull(lifecycle ?: ViewTreeLifecycleOwner.get(this)?.lifecycle) {
-        "ViewTreeLifecycleOwner not found from $this"
+
+    var systemDurationScaleSettingConsumer: MotionDurationScaleImpl? = null
+    val motionDurationScale = baseContext[MotionDurationScale] ?: MotionDurationScaleImpl().also {
+        systemDurationScaleSettingConsumer = it
     }
+
+    val contextWithClockAndMotionScale =
+        baseContext + (pausableClock ?: EmptyCoroutineContext) + motionDurationScale
+    val recomposer = Recomposer(contextWithClockAndMotionScale)
+    val runRecomposeScope = CoroutineScope(contextWithClockAndMotionScale)
+    val viewTreeLifecycle =
+        checkNotNull(lifecycle ?: ViewTreeLifecycleOwner.get(this)?.lifecycle) {
+            "ViewTreeLifecycleOwner not found from $this"
+        }
+
     // Removing the view holding the ViewTreeRecomposer means we may never be reattached again.
     // Since this factory function is used to create a new recomposer for each invocation and
     // doesn't reuse a single instance like other factories might, shut it down whenever it
@@ -290,22 +363,39 @@ fun View.createLifecycleAwareWindowRecomposer(
     )
     viewTreeLifecycle.addObserver(
         object : LifecycleEventObserver {
-            override fun onStateChanged(lifecycleOwner: LifecycleOwner, event: Lifecycle.Event) {
+            override fun onStateChanged(
+                lifecycleOwner: LifecycleOwner,
+                event: Lifecycle.Event
+            ) {
                 val self = this
                 when (event) {
-                    Lifecycle.Event.ON_CREATE ->
+                    Lifecycle.Event.ON_CREATE -> {
                         // Undispatched launch since we've configured this scope
                         // to be on the UI thread
                         runRecomposeScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                            var durationScaleJob: Job? = null
                             try {
+                                durationScaleJob = systemDurationScaleSettingConsumer?.let {
+                                    val durationScaleStateFlow = getAnimationScaleFlowFor(
+                                        context.applicationContext as Application
+                                    )
+                                    it.scaleFactor = durationScaleStateFlow.value
+                                    launch {
+                                        durationScaleStateFlow.collect { scaleFactor ->
+                                            it.scaleFactor = scaleFactor
+                                        }
+                                    }
+                                }
                                 recomposer.runRecomposeAndApplyChanges()
                             } finally {
+                                durationScaleJob?.cancel()
                                 // If runRecomposeAndApplyChanges returns or this coroutine is
                                 // cancelled it means we no longer care about this lifecycle.
                                 // Clean up the dangling references tied to this observer.
                                 lifecycleOwner.lifecycle.removeObserver(self)
                             }
                         }
+                    }
                     Lifecycle.Event.ON_START -> pausableClock?.resume()
                     Lifecycle.Event.ON_STOP -> pausableClock?.pause()
                     Lifecycle.Event.ON_DESTROY -> {
@@ -325,4 +415,8 @@ fun View.createLifecycleAwareWindowRecomposer(
         }
     )
     return recomposer
+}
+
+private class MotionDurationScaleImpl : MotionDurationScale {
+    override var scaleFactor by mutableStateOf(1f)
 }
