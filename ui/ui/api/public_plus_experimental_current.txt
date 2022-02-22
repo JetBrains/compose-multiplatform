@@ -387,24 +387,24 @@ package androidx.compose.ui.focus {
   public final class FocusNodeUtilsKt {
   }
 
-  public final class FocusOrder {
-    ctor public FocusOrder();
-    method public androidx.compose.ui.focus.FocusRequester getDown();
-    method public androidx.compose.ui.focus.FocusRequester getEnd();
-    method public androidx.compose.ui.focus.FocusRequester getLeft();
-    method public androidx.compose.ui.focus.FocusRequester getNext();
-    method public androidx.compose.ui.focus.FocusRequester getPrevious();
-    method public androidx.compose.ui.focus.FocusRequester getRight();
-    method public androidx.compose.ui.focus.FocusRequester getStart();
-    method public androidx.compose.ui.focus.FocusRequester getUp();
-    method public void setDown(androidx.compose.ui.focus.FocusRequester down);
-    method public void setEnd(androidx.compose.ui.focus.FocusRequester end);
-    method public void setLeft(androidx.compose.ui.focus.FocusRequester left);
-    method public void setNext(androidx.compose.ui.focus.FocusRequester next);
-    method public void setPrevious(androidx.compose.ui.focus.FocusRequester previous);
-    method public void setRight(androidx.compose.ui.focus.FocusRequester right);
-    method public void setStart(androidx.compose.ui.focus.FocusRequester start);
-    method public void setUp(androidx.compose.ui.focus.FocusRequester up);
+  @Deprecated public final class FocusOrder {
+    ctor @Deprecated public FocusOrder();
+    method @Deprecated public androidx.compose.ui.focus.FocusRequester getDown();
+    method @Deprecated public androidx.compose.ui.focus.FocusRequester getEnd();
+    method @Deprecated public androidx.compose.ui.focus.FocusRequester getLeft();
+    method @Deprecated public androidx.compose.ui.focus.FocusRequester getNext();
+    method @Deprecated public androidx.compose.ui.focus.FocusRequester getPrevious();
+    method @Deprecated public androidx.compose.ui.focus.FocusRequester getRight();
+    method @Deprecated public androidx.compose.ui.focus.FocusRequester getStart();
+    method @Deprecated public androidx.compose.ui.focus.FocusRequester getUp();
+    method @Deprecated public void setDown(androidx.compose.ui.focus.FocusRequester down);
+    method @Deprecated public void setEnd(androidx.compose.ui.focus.FocusRequester end);
+    method @Deprecated public void setLeft(androidx.compose.ui.focus.FocusRequester left);
+    method @Deprecated public void setNext(androidx.compose.ui.focus.FocusRequester next);
+    method @Deprecated public void setPrevious(androidx.compose.ui.focus.FocusRequester previous);
+    method @Deprecated public void setRight(androidx.compose.ui.focus.FocusRequester right);
+    method @Deprecated public void setStart(androidx.compose.ui.focus.FocusRequester start);
+    method @Deprecated public void setUp(androidx.compose.ui.focus.FocusRequester up);
     property public final androidx.compose.ui.focus.FocusRequester down;
     property public final androidx.compose.ui.focus.FocusRequester end;
     property public final androidx.compose.ui.focus.FocusRequester left;
@@ -415,20 +415,44 @@ package androidx.compose.ui.focus {
     property public final androidx.compose.ui.focus.FocusRequester up;
   }
 
-  public interface FocusOrderModifier extends androidx.compose.ui.Modifier.Element {
-    method public void populateFocusOrder(androidx.compose.ui.focus.FocusOrder focusOrder);
+  @Deprecated public interface FocusOrderModifier extends androidx.compose.ui.Modifier.Element {
+    method @Deprecated public void populateFocusOrder(androidx.compose.ui.focus.FocusOrder focusOrder);
   }
 
   public final class FocusOrderModifierKt {
-    method public static androidx.compose.ui.Modifier focusOrder(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusOrder,kotlin.Unit> focusOrderReceiver);
-    method public static androidx.compose.ui.Modifier focusOrder(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusRequester focusRequester);
-    method public static androidx.compose.ui.Modifier focusOrder(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusRequester focusRequester, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusOrder,kotlin.Unit> focusOrderReceiver);
+    method @Deprecated public static androidx.compose.ui.Modifier focusOrder(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusOrder,kotlin.Unit> focusOrderReceiver);
+    method @Deprecated public static androidx.compose.ui.Modifier focusOrder(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusRequester focusRequester);
+    method @Deprecated public static androidx.compose.ui.Modifier focusOrder(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusRequester focusRequester, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusOrder,kotlin.Unit> focusOrderReceiver);
   }
 
   public interface FocusProperties {
     method public boolean getCanFocus();
+    method public default androidx.compose.ui.focus.FocusRequester getDown();
+    method public default androidx.compose.ui.focus.FocusRequester getEnd();
+    method public default androidx.compose.ui.focus.FocusRequester getLeft();
+    method public default androidx.compose.ui.focus.FocusRequester getNext();
+    method public default androidx.compose.ui.focus.FocusRequester getPrevious();
+    method public default androidx.compose.ui.focus.FocusRequester getRight();
+    method public default androidx.compose.ui.focus.FocusRequester getStart();
+    method public default androidx.compose.ui.focus.FocusRequester getUp();
     method public void setCanFocus(boolean canFocus);
+    method public default void setDown(androidx.compose.ui.focus.FocusRequester _);
+    method public default void setEnd(androidx.compose.ui.focus.FocusRequester _);
+    method public default void setLeft(androidx.compose.ui.focus.FocusRequester _);
+    method public default void setNext(androidx.compose.ui.focus.FocusRequester _);
+    method public default void setPrevious(androidx.compose.ui.focus.FocusRequester _);
+    method public default void setRight(androidx.compose.ui.focus.FocusRequester _);
+    method public default void setStart(androidx.compose.ui.focus.FocusRequester _);
+    method public default void setUp(androidx.compose.ui.focus.FocusRequester _);
     property public abstract boolean canFocus;
+    property public default androidx.compose.ui.focus.FocusRequester down;
+    property public default androidx.compose.ui.focus.FocusRequester end;
+    property public default androidx.compose.ui.focus.FocusRequester left;
+    property public default androidx.compose.ui.focus.FocusRequester next;
+    property public default androidx.compose.ui.focus.FocusRequester previous;
+    property public default androidx.compose.ui.focus.FocusRequester right;
+    property public default androidx.compose.ui.focus.FocusRequester start;
+    property public default androidx.compose.ui.focus.FocusRequester up;
   }
 
   public final class FocusPropertiesKt {

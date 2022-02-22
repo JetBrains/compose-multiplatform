@@ -75,8 +75,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusOrder
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -515,7 +516,8 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
                         }
                         else -> false
                     }
-                }.focusOrder(focusItem1) {
+                }.focusRequester(focusItem1)
+                .focusProperties {
                     next = focusItem2
                 }
             )
@@ -531,9 +533,12 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
         }
         TextField(
             text2,
-            modifier = Modifier.height(200.dp).focusOrder(focusItem2) {
-                previous = focusItem1
-            },
+            modifier = Modifier
+                .height(200.dp)
+                .focusRequester(focusItem2)
+                .focusProperties {
+                    previous = focusItem1
+                },
             onValueChange = { text2 = it }
         )
 

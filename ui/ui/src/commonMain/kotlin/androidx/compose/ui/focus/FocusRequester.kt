@@ -112,9 +112,9 @@ class FocusRequester {
 
     companion object {
         /**
-         * Default [focusRequester], which when used in [Modifier.focusOrder][focusOrder] implies
-         * that we want to use the default system focus order, that is based on the position of the
-         * items on the screen.
+         * Default [focusRequester], which when used in [Modifier.focusProperties][focusProperties]
+         * implies that we want to use the default system focus order, that is based on the
+         * position of the items on the screen.
          */
         val Default = FocusRequester()
 

@@ -45,7 +45,7 @@ interface FocusManager {
      * Moves focus in the specified [direction][FocusDirection].
      *
      * If you are not satisfied with the default focus order, consider setting a custom order using
-     * [Modifier.focusOrder()][focusOrder].
+     * [Modifier.focusProperties()][focusProperties].
      *
      * @return true if focus was moved successfully. false if the focused item is unchanged.
      *
@@ -197,9 +197,8 @@ internal class FocusManagerImpl(
 
 private fun ModifiedFocusNode.updateProperties() {
     // Update the focus node with the current focus properties.
-    with(modifier.modifierLocalReadScope) {
-        setUpdatedProperties(ModifierLocalFocusProperties.current)
-    }
+    modifier.refreshFocusProperties()
+
     // Update the focus properties for all children.
     focusableChildren(excludeDeactivated = false).fastForEach { it.updateProperties() }
 }
