@@ -50,7 +50,7 @@ fun cloneTemplate(template: String, index: Int, content: String): File {
   return tempDir
 }
 
-val ignoreTill = java.time.LocalDate.parse("2022-02-20")
+val ignoreTill = java.time.LocalDate.parse("2022-03-10")
 
 fun isIgnored(tutorial: String): Boolean {
   if (java.time.LocalDate.now() > ignoreTill) return false
