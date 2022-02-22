@@ -259,7 +259,7 @@ private data class Raw(val selector: String) : CSSSelector() {
 
 private data class Combine(val selectors: MutableList<CSSSelector>) : CSSSelector() {
     override fun contains(other: CSSSelector): Boolean =
-        contains(this, other, selectors, true)
+        contains(this, other, selectors)
 
     override fun toString(): String = selectors.joinToString("")
     override fun asString(): String = selectors.joinToString("") { it.asString() }
@@ -267,7 +267,7 @@ private data class Combine(val selectors: MutableList<CSSSelector>) : CSSSelecto
 
 private data class Group(val selectors: List<CSSSelector>) : CSSSelector() {
     override fun contains(other: CSSSelector): Boolean =
-        contains(this, other, selectors, true)
+        contains(this, other, selectors)
 
     override fun toString(): String = selectors.joinToString(", ")
     override fun asString(): String = selectors.joinToString(", ") { it.asString() }
@@ -276,7 +276,7 @@ private data class Group(val selectors: List<CSSSelector>) : CSSSelector() {
 private data class Descendant(val parent: CSSSelector, val selected: CSSSelector) :
     CSSSelector() {
     override fun contains(other: CSSSelector): Boolean =
-        contains(this, other, listOf(parent, selected), true)
+        contains(this, other, listOf(parent, selected))
 
     override fun toString(): String = "$parent $selected"
     override fun asString(): String = "${parent.asString()} ${selected.asString()}"
@@ -284,7 +284,7 @@ private data class Descendant(val parent: CSSSelector, val selected: CSSSelector
 
 private data class Child(val parent: CSSSelector, val selected: CSSSelector) : CSSSelector() {
     override fun contains(other: CSSSelector): Boolean =
-        contains(this, other, listOf(parent, selected), true)
+        contains(this, other, listOf(parent, selected))
 
     override fun toString(): String = "$parent > $selected"
     override fun asString(): String = "${parent.asString()} > ${selected.asString()}"
@@ -292,7 +292,7 @@ private data class Child(val parent: CSSSelector, val selected: CSSSelector) : C
 
 private data class Sibling(val prev: CSSSelector, val selected: CSSSelector) : CSSSelector() {
     override fun contains(other: CSSSelector): Boolean =
-        contains(this, other, listOf(prev, selected), true)
+        contains(this, other, listOf(prev, selected))
 
     override fun toString(): String = "$prev ~ $selected"
     override fun asString(): String = "${prev.asString()} ~ ${selected.asString()}"
@@ -300,7 +300,7 @@ private data class Sibling(val prev: CSSSelector, val selected: CSSSelector) : C
 
 private data class Adjacent(val prev: CSSSelector, val selected: CSSSelector) : CSSSelector() {
     override fun contains(other: CSSSelector): Boolean =
-        contains(this, other, listOf(prev, selected), true)
+        contains(this, other, listOf(prev, selected))
 
     override fun toString(): String = "$prev + $selected"
     override fun asString(): String = "${prev.asString()} + ${selected.asString()}"
@@ -354,7 +354,7 @@ private open class PseudoClassInternal(val name: String) : CSSSelector() {
 
     class Host internal constructor(val selector: CSSSelector) : PseudoClassInternal("host") {
         override fun contains(other: CSSSelector): Boolean =
-            contains(this, other, listOf(selector), true)
+            contains(this, other, listOf(selector))
 
         override fun argsStr() = selector.asString()
     }
@@ -362,7 +362,7 @@ private open class PseudoClassInternal(val name: String) : CSSSelector() {
     // Etc
     class Not internal constructor(val selector: CSSSelector) : PseudoClassInternal("not") {
         override fun contains(other: CSSSelector): Boolean =
-            contains(this, other, listOf(selector), true)
+            contains(this, other, listOf(selector))
 
         override fun argsStr() = "$selector"
     }
@@ -380,7 +380,7 @@ private open class PseudoElementInternal(val name: String) : CSSSelector() {
 
     class Slotted internal constructor(val selector: CSSSelector) : PseudoElementInternal("slotted") {
         override fun contains(other: CSSSelector): Boolean =
-            contains(this, other, listOf(selector), true)
+            contains(this, other, listOf(selector))
 
         override fun argsStr() = selector.asString()
     }
