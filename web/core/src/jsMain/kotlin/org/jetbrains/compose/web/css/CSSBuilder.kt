@@ -12,7 +12,7 @@ class CSSBuilderImpl(
     rulesHolder: CSSRulesHolder
 ) : CSSRuleBuilderImpl(), CSSBuilder, CSSRulesHolder by rulesHolder {
     override fun style(selector: CSSSelector, cssRule: CSSBuilder.() -> Unit) {
-        val resolvedSelector = if (selector.contains(self, true) || selector.contains(currentRoot, true)) {
+        val resolvedSelector = if (selector.contains(self) || selector.contains(currentRoot)) {
             selector
         } else {
             desc(self, selector)

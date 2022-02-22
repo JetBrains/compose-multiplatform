@@ -36,14 +36,14 @@ sealed interface Nth {
 
 abstract class CSSSelector internal constructor() {
 
-    internal open fun contains(other: CSSSelector, strict: Boolean = false): Boolean {
-        return if (strict) this === other else this == other
+    internal open fun contains(other: CSSSelector): Boolean {
+        return this === other
     }
 
     @Suppress("SuspiciousEqualsCombination")
     protected fun contains(that: CSSSelector, other: CSSSelector, children: List<CSSSelector>, strict: Boolean): Boolean {
         return that === other || // exactly same selector
-                children.any { it.contains(other, strict) } || // contains it in children
+                children.any { it.contains(other) } || // contains it in children
                 (!strict && that == other) // equals structurally
     }
 
