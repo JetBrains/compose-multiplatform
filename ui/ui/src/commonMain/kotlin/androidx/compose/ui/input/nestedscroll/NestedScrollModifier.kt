@@ -27,29 +27,6 @@ import androidx.compose.ui.unit.Velocity
 import kotlinx.coroutines.CoroutineScope
 
 /**
- * A [Modifier.Element] that represents nested scroll node in the hierarchy
- */
-internal interface NestedScrollModifier : Modifier.Element {
-
-    /**
-     * Nested scroll events dispatcher to notify nested scrolling system about scroll events.
-     * This is to be used by the nodes that are scrollable themselves to notify
-     * [NestedScrollConnection]s in the tree.
-     *
-     * Note: The [connection] passed to the [NestedScrollModifier] doesn't count as an ancestor
-     * since it's the node itself
-     */
-    val dispatcher: NestedScrollDispatcher
-
-    /**
-     * Nested scroll connection to participate in the nested scroll events chain. Implementing
-     * this connection allows to react on the nested scroll related events and influence
-     * scrolling descendants and ascendants
-     */
-    val connection: NestedScrollConnection
-}
-
-/**
  * Interface to connect to the nested scroll system.
  *
  * Pass this connection to the [nestedScroll] modifier to participate in the nested scroll
@@ -359,11 +336,7 @@ fun Modifier.nestedScroll(
     // provide noop dispatcher if needed
     val resolvedDispatcher = dispatcher ?: remember { NestedScrollDispatcher() }
     remember(connection, resolvedDispatcher, scope) {
-        object : NestedScrollModifier {
-            override val dispatcher: NestedScrollDispatcher = resolvedDispatcher.also {
-                it.originNestedScrollScope = scope
-            }
-            override val connection: NestedScrollConnection = connection
-        }
+        resolvedDispatcher.originNestedScrollScope = scope
+        NestedScrollModifierLocal(resolvedDispatcher, connection)
     }
 }
