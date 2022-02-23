@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.text
+package androidx.compose.foundation.layout
 
-import androidx.compose.foundation.layout.InsetsValues
-import androidx.compose.foundation.layout.ValueInsets
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.add
-import androidx.compose.foundation.layout.exclude
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.union
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -52,6 +44,23 @@ class WindowInsetsTest {
     }
 
     @Test
+    fun valueInsets_toString() {
+        val insetsValues = InsetsValues(10, 11, 12, 13)
+        val insets = ValueInsets(insetsValues, "hello")
+
+        assertThat(insets.toString()).isEqualTo("hello(left=10, top=11, right=12, bottom=13)")
+    }
+
+    @Test
+    fun valueInsets_toString_afterUpdate() {
+        val insetsValues = InsetsValues(10, 11, 12, 13)
+        val insets = ValueInsets(insetsValues, "hello")
+        insets.value = InsetsValues(20, 21, 22, 23)
+
+        assertThat(insets.toString()).isEqualTo("hello(left=20, top=21, right=22, bottom=23)")
+    }
+
+    @Test
     fun fixedIntInsets() {
         val insets = WindowInsets(10, 11, 12, 13)
 
@@ -62,6 +71,13 @@ class WindowInsetsTest {
 
         assertThat(insets.getLeft(doubleDensity, LayoutDirection.Ltr)).isEqualTo(10)
         assertThat(insets.getLeft(density, LayoutDirection.Rtl)).isEqualTo(10)
+    }
+
+    @Test
+    fun fixedIntInsets_toString() {
+        val insets = WindowInsets(10, 11, 12, 13)
+
+        assertThat(insets.toString()).isEqualTo("Insets(left=10, top=11, right=12, bottom=13)")
     }
 
     @Test
@@ -78,6 +94,15 @@ class WindowInsetsTest {
     }
 
     @Test
+    fun fixedDpInsets_toString() {
+        val insets = WindowInsets(10.dp, 11.dp, 12.dp, 13.dp)
+
+        assertThat(insets.toString()).isEqualTo(
+            "Insets(left=10.0.dp, top=11.0.dp, right=12.0.dp, bottom=13.0.dp)"
+        )
+    }
+
+    @Test
     fun union() {
         val first = WindowInsets(10, 11, 12, 13)
         val second = WindowInsets(5, 20, 14, 2)
@@ -86,6 +111,17 @@ class WindowInsetsTest {
         assertThat(union.getTop(density)).isEqualTo(20)
         assertThat(union.getRight(density, LayoutDirection.Ltr)).isEqualTo(14)
         assertThat(union.getBottom(density)).isEqualTo(13)
+    }
+
+    @Test
+    fun union_toString() {
+        val first = WindowInsets(10, 11, 12, 13)
+        val second = WindowInsets(5, 20, 14, 2)
+        val union = first.union(second)
+        assertThat(union.toString()).isEqualTo(
+            "(Insets(left=10, top=11, right=12, bottom=13) ∪ " +
+                "Insets(left=5, top=20, right=14, bottom=2))"
+        )
     }
 
     @Test
@@ -100,6 +136,17 @@ class WindowInsetsTest {
     }
 
     @Test
+    fun exclude_toString() {
+        val first = WindowInsets(10, 11, 12, 13)
+        val second = WindowInsets(5, 20, 14, 2)
+        val exclude = first.exclude(second)
+        assertThat(exclude.toString()).isEqualTo(
+            "(Insets(left=10, top=11, right=12, bottom=13) - " +
+                "Insets(left=5, top=20, right=14, bottom=2))"
+        )
+    }
+
+    @Test
     fun add() {
         val first = WindowInsets(10, 11, 12, 13)
         val second = WindowInsets(5, 20, 14, 2)
@@ -111,6 +158,17 @@ class WindowInsetsTest {
     }
 
     @Test
+    fun add_toString() {
+        val first = WindowInsets(10, 11, 12, 13)
+        val second = WindowInsets(5, 20, 14, 2)
+        val add = first.add(second)
+        assertThat(add.toString()).isEqualTo(
+            "(Insets(left=10, top=11, right=12, bottom=13) + " +
+                "Insets(left=5, top=20, right=14, bottom=2))"
+        )
+    }
+
+    @Test
     fun onlyStart() {
         val insets = WindowInsets(10, 11, 12, 13).only(WindowInsetsSides.Start)
         assertThat(insets.getLeft(density, LayoutDirection.Ltr)).isEqualTo(10)
@@ -119,6 +177,16 @@ class WindowInsetsTest {
         assertThat(insets.getBottom(density)).isEqualTo(0)
         assertThat(insets.getLeft(density, LayoutDirection.Rtl)).isEqualTo(0)
         assertThat(insets.getRight(density, LayoutDirection.Rtl)).isEqualTo(12)
+    }
+
+    @Test
+    fun limitInsets_toString() {
+        val insets = WindowInsets(10, 11, 12, 13)
+            .only(WindowInsetsSides.Start + WindowInsetsSides.Vertical)
+        assertThat(insets.toString()).isEqualTo(
+            "(Insets(left=10, top=11, right=12, bottom=13) only " +
+                "WindowInsetsSides(Start+Top+Bottom))"
+        )
     }
 
     @Test
@@ -200,5 +268,12 @@ class WindowInsetsTest {
         assertThat(insets.getTop(density)).isEqualTo(11)
         assertThat(insets.getRight(density, LayoutDirection.Ltr)).isEqualTo(12)
         assertThat(insets.getBottom(density)).isEqualTo(13)
+    }
+
+    @Test
+    fun insetsValues_toString() {
+        assertThat(InsetsValues(1, 2, 3, 4).toString()).isEqualTo(
+            "InsetsValues(left=1, top=2, right=3, bottom=4)"
+        )
     }
 }
