@@ -1402,9 +1402,6 @@ package androidx.compose.ui.input.nestedscroll {
     method public default long onPreScroll(long available, int source);
   }
 
-  public final class NestedScrollDelegatingWrapperKt {
-  }
-
   public final class NestedScrollDispatcher {
     ctor public NestedScrollDispatcher();
     method public suspend Object? dispatchPostFling(long consumed, long available, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity> p);
@@ -1417,6 +1414,9 @@ package androidx.compose.ui.input.nestedscroll {
 
   public final class NestedScrollModifierKt {
     method public static androidx.compose.ui.Modifier nestedScroll(androidx.compose.ui.Modifier, androidx.compose.ui.input.nestedscroll.NestedScrollConnection connection, optional androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher? dispatcher);
+  }
+
+  public final class NestedScrollModifierLocalKt {
   }
 
   public final inline class NestedScrollSource {

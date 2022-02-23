@@ -26,8 +26,6 @@ import androidx.compose.ui.focus.FocusRequesterModifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.input.key.KeyInputModifier
-import androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapper
-import androidx.compose.ui.input.nestedscroll.NestedScrollModifier
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.layout.AlignmentLine
@@ -715,11 +713,6 @@ internal class LayoutNode(
                 }
                 if (mod is KeyInputModifier) {
                     wrapper = ModifiedKeyInputNode(wrapper, mod)
-                        .initialize()
-                        .assignChained(toWrap)
-                }
-                if (mod is NestedScrollModifier) {
-                    wrapper = NestedScrollDelegatingWrapper(wrapper, mod)
                         .initialize()
                         .assignChained(toWrap)
                 }
