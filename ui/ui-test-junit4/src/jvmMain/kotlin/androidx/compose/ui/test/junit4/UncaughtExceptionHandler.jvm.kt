@@ -38,6 +38,7 @@ import kotlin.coroutines.CoroutineContext
  * }
  * ```
  */
+// TODO(b/200151447): When this moves over to ui-test, move the code sample above to ui-test:samples
 internal class UncaughtExceptionHandler :
     AbstractCoroutineContextElement(CoroutineExceptionHandler),
     CoroutineExceptionHandler {
