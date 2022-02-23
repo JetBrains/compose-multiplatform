@@ -22,11 +22,15 @@ import android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Checkbox
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -42,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 
 private enum class ScrollableType {
     ScrollableColumn,
@@ -51,16 +56,24 @@ private enum class ScrollableType {
 @Composable
 fun TextFieldsInScrollableDemo() {
     var adjustResize by remember { mutableStateOf(false) }
+    var decorFitsSystemWindows by remember { mutableStateOf(true) }
     var scrollableType by remember { mutableStateOf(ScrollableType.values().first()) }
 
     @Suppress("DEPRECATION")
-    SoftInputMode(if (adjustResize) SOFT_INPUT_ADJUST_RESIZE else SOFT_INPUT_ADJUST_PAN)
+    SoftInputMode(
+        mode = if (adjustResize) SOFT_INPUT_ADJUST_RESIZE else SOFT_INPUT_ADJUST_PAN,
+        decorFitsSystemWindows = decorFitsSystemWindows
+    )
 
-    Column {
+    Column(Modifier.windowInsetsPadding(WindowInsets.ime)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("ADJUST_PAN")
             Switch(adjustResize, onCheckedChange = { adjustResize = it })
             Text("ADJUST_RESIZE")
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("Decor fits system windows: ")
+            Checkbox(decorFitsSystemWindows, onCheckedChange = { decorFitsSystemWindows = it })
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Scrollable column")
@@ -122,17 +135,19 @@ private fun DemoTextField(index: Int) {
  * function is composed.
  */
 @Composable
-private fun SoftInputMode(mode: Int) {
+private fun SoftInputMode(mode: Int, decorFitsSystemWindows: Boolean) {
     val context = LocalContext.current
-    DisposableEffect(context, mode) {
+    DisposableEffect(context, mode, decorFitsSystemWindows) {
         val activity = generateSequence(context) { (context as? ContextWrapper)?.baseContext }
             .filterIsInstance<Activity>()
             .firstOrNull()
             ?: return@DisposableEffect onDispose {}
         val originalMode = activity.window.attributes.softInputMode
         activity.window.setSoftInputMode(mode)
+        WindowCompat.setDecorFitsSystemWindows(activity.window, decorFitsSystemWindows)
         onDispose {
             activity.window.setSoftInputMode(originalMode)
+            WindowCompat.setDecorFitsSystemWindows(activity.window, true)
         }
     }
 }
