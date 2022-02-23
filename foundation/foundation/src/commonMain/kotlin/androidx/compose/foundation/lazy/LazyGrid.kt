@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
 /**
- * The DSL implementation of a lazy grid layout. It composes only visible rows of the grid.
+ * A lazy vertical grid layout. It composes only visible rows of the grid.
  * This API is not stable, please consider using stable components like [LazyColumn] and [Row]
  * to achieve the same result.
  *
@@ -76,13 +76,14 @@ fun LazyVerticalGrid(
     userScrollEnabled: Boolean = true,
     content: LazyGridScope.() -> Unit
 ) {
-    val slotSizesSums = rememberSlotSizesSums(columns, horizontalArrangement, contentPadding)
+    val slotSizesSums = rememberColumnWidthSums(columns, horizontalArrangement, contentPadding)
     LazyGrid(
         slotSizesSums = slotSizesSums,
         modifier = modifier,
         state = state,
         contentPadding = contentPadding,
         reverseLayout = reverseLayout,
+        isVertical = true,
         horizontalArrangement = horizontalArrangement,
         verticalArrangement = verticalArrangement,
         flingBehavior = flingBehavior,
@@ -91,10 +92,66 @@ fun LazyVerticalGrid(
     )
 }
 
-/** Returns prefix sums of slot sizes. */
+/**
+ * A lazy horizontal grid layout. It composes only visible columns of the grid.
+ * This API is not stable, please consider using stable components like [LazyRow] and [Column]
+ * to achieve the same result.
+ *
+ * Sample:
+ * @sample androidx.compose.foundation.samples.LazyHorizontalGridSample
+ *
+ * Sample with custom item spans:
+ * @sample androidx.compose.foundation.samples.LazyHorizontalGridSpanSample
+ *
+ * @param rows a class describing how cells form rows, see [GridCells] doc for more information
+ * @param modifier the modifier to apply to this layout
+ * @param state the state object to be used to control or observe the list's state
+ * @param contentPadding specify a padding around the whole content
+ * @param reverseLayout reverse the direction of scrolling and layout, when `true` items will be
+ * composed from the end to the start and [LazyGridState.firstVisibleItemIndex] == 0 will mean
+ * the first item is located at the end.
+ * @param verticalArrangement The vertical arrangement of the layout's children
+ * @param horizontalArrangement The horizontal arrangement of the layout's children
+ * @param flingBehavior logic describing fling behavior
+ * @param userScrollEnabled whether the scrolling via the user gestures or accessibility actions
+ * is allowed. You can still scroll programmatically using the state even when it is disabled.
+ * @param content the [LazyListScope] which describes the content
+ */
 @ExperimentalFoundationApi
 @Composable
-private fun rememberSlotSizesSums(
+fun LazyHorizontalGrid(
+    rows: GridCells,
+    modifier: Modifier = Modifier,
+    state: LazyGridState = rememberLazyGridState(),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    reverseLayout: Boolean = false,
+    horizontalArrangement: Arrangement.Horizontal =
+        if (!reverseLayout) Arrangement.Start else Arrangement.End,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
+    userScrollEnabled: Boolean = true,
+    content: LazyGridScope.() -> Unit
+) {
+    val slotSizesSums = rememberRowHeightSums(rows, verticalArrangement, contentPadding)
+    LazyGrid(
+        slotSizesSums = slotSizesSums,
+        modifier = modifier,
+        state = state,
+        contentPadding = contentPadding,
+        reverseLayout = reverseLayout,
+        isVertical = false,
+        horizontalArrangement = horizontalArrangement,
+        verticalArrangement = verticalArrangement,
+        flingBehavior = flingBehavior,
+        userScrollEnabled = userScrollEnabled,
+        content = content
+    )
+}
+
+/** Returns prefix sums of column widths. */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun rememberColumnWidthSums(
     columns: GridCells,
     horizontalArrangement: Arrangement.Horizontal,
     contentPadding: PaddingValues
@@ -114,6 +171,38 @@ private fun rememberSlotSizesSums(
             calculateCrossAxisCellSizes(
                 gridWidth,
                 horizontalArrangement.spacing.roundToPx()
+            ).toMutableList().apply {
+                for (i in 1 until size) {
+                    this[i] += this[i - 1]
+                }
+            }
+        }
+    }
+}
+
+/** Returns prefix sums of row heights. */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun rememberRowHeightSums(
+    rows: GridCells,
+    verticalArrangement: Arrangement.Vertical,
+    contentPadding: PaddingValues
+) = remember<Density.(Constraints) -> List<Int>>(
+    rows,
+    verticalArrangement,
+    contentPadding,
+) {
+    { constraints ->
+        require(constraints.maxHeight != Constraints.Infinity) {
+            "LazyHorizontalGrid's height should be bound by parent."
+        }
+        val verticalPadding = contentPadding.calculateTopPadding() +
+            contentPadding.calculateBottomPadding()
+        val gridHeight = constraints.maxHeight - verticalPadding.roundToPx()
+        with(rows) {
+            calculateCrossAxisCellSizes(
+                gridHeight,
+                verticalArrangement.spacing.roundToPx()
             ).toMutableList().apply {
                 for (i in 1 until size) {
                     this[i] += this[i - 1]

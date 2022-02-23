@@ -21,28 +21,34 @@ import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyGridState
+import androidx.compose.foundation.lazy.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.list.scrollBy
 import androidx.compose.foundation.lazy.list.setContentWithTestViewConfiguration
 import androidx.compose.foundation.lazy.rememberLazyGridState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
@@ -110,58 +116,59 @@ class LazyArrangementsTest {
         assertArrangementForTwoItems(arrangement)
     }
 
-    // @Test
-    // fun row_defaultArrangementIsStart() {
-    //     rule.setContent {
-    //         LazyRow(
-    //             modifier = Modifier.requiredSize(containerSize)
-    //         ) {
-    //             items(2) {
-    //                 Box(Modifier.requiredSize(itemSize).testTag(it.toString()))
-    //             }
-    //         }
-    //     }
+    @Test
+    fun horizontal_defaultArrangementIsStart() {
+        rule.setContent {
+            LazyHorizontalGrid(
+                modifier = Modifier.requiredSize(containerSize),
+                rows = GridCells.Fixed(1)
+            ) {
+                items(2) {
+                    Box(Modifier.requiredSize(itemSize).testTag(it.toString()))
+                }
+            }
+        }
 
-    //     assertArrangementForTwoItems(Arrangement.Start, LayoutDirection.Ltr)
-    // }
+        assertArrangementForTwoItems(Arrangement.Start, LayoutDirection.Ltr)
+    }
 
-    // @Test
-    // fun row_centerArrangement() {
-    //     composeRowWith(Arrangement.Center, LayoutDirection.Ltr)
-    //     assertArrangementForTwoItems(Arrangement.Center, LayoutDirection.Ltr)
-    // }
+    @Test
+    fun horizontal_centerArrangement() {
+        composeHorizontalWith(Arrangement.Center, LayoutDirection.Ltr)
+        assertArrangementForTwoItems(Arrangement.Center, LayoutDirection.Ltr)
+    }
 
-    // @Test
-    // fun row_endArrangement() {
-    //     composeRowWith(Arrangement.End, LayoutDirection.Ltr)
-    //     assertArrangementForTwoItems(Arrangement.End, LayoutDirection.Ltr)
-    // }
+    @Test
+    fun horizontal_endArrangement() {
+        composeHorizontalWith(Arrangement.End, LayoutDirection.Ltr)
+        assertArrangementForTwoItems(Arrangement.End, LayoutDirection.Ltr)
+    }
 
-    // @Test
-    // fun row_spacedArrangementNotFillingViewport() {
-    //     val arrangement = Arrangement.spacedBy(10.dp)
-    //     composeRowWith(arrangement, LayoutDirection.Ltr)
-    //     assertArrangementForTwoItems(arrangement, LayoutDirection.Ltr)
-    // }
+    @Test
+    fun horizontal_spacedArrangementNotFillingViewport() {
+        val arrangement = Arrangement.spacedBy(10.dp)
+        composeHorizontalWith(arrangement, LayoutDirection.Ltr)
+        assertArrangementForTwoItems(arrangement, LayoutDirection.Ltr)
+    }
 
-    // @Test
-    // fun row_rtl_startArrangement() {
-    //     composeRowWith(Arrangement.Center, LayoutDirection.Rtl)
-    //     assertArrangementForTwoItems(Arrangement.Center, LayoutDirection.Rtl)
-    // }
+    @Test
+    fun horizontal_rtl_startArrangement() {
+        composeHorizontalWith(Arrangement.Center, LayoutDirection.Rtl)
+        assertArrangementForTwoItems(Arrangement.Center, LayoutDirection.Rtl)
+    }
 
-    // @Test
-    // fun row_rtl_endArrangement() {
-    //     composeRowWith(Arrangement.End, LayoutDirection.Rtl)
-    //     assertArrangementForTwoItems(Arrangement.End, LayoutDirection.Rtl)
-    // }
+    @Test
+    fun horizontal_rtl_endArrangement() {
+        composeHorizontalWith(Arrangement.End, LayoutDirection.Rtl)
+        assertArrangementForTwoItems(Arrangement.End, LayoutDirection.Rtl)
+    }
 
-    // @Test
-    // fun row_rtl_spacedArrangementNotFillingViewport() {
-    //     val arrangement = Arrangement.spacedBy(10.dp)
-    //     composeRowWith(arrangement, LayoutDirection.Rtl)
-    //     assertArrangementForTwoItems(arrangement, LayoutDirection.Rtl)
-    // }
+    @Test
+    fun horizontal_rtl_spacedArrangementNotFillingViewport() {
+        val arrangement = Arrangement.spacedBy(10.dp)
+        composeHorizontalWith(arrangement, LayoutDirection.Rtl)
+        assertArrangementForTwoItems(arrangement, LayoutDirection.Rtl)
+    }
 
     // wrap content and spacing
 
@@ -184,23 +191,24 @@ class LazyArrangementsTest {
             .assertHeightIsEqualTo(itemSize * 3)
     }
 
-    // @Test
-    // fun row_spacing_affects_wrap_content() {
-    //     rule.setContent {
-    //         LazyRow(
-    //             horizontalArrangement = Arrangement.spacedBy(itemSize),
-    //             modifier = Modifier.testTag(ContainerTag)
-    //         ) {
-    //             items(2) {
-    //                 Box(Modifier.requiredSize(itemSize))
-    //             }
-    //         }
-    //     }
+    @Test
+    fun horizontal_spacing_affects_wrap_content() {
+        rule.setContent {
+            LazyHorizontalGrid(
+                horizontalArrangement = Arrangement.spacedBy(itemSize),
+                modifier = Modifier.height(itemSize).testTag(ContainerTag),
+                rows = GridCells.Fixed(1)
+            ) {
+                items(2) {
+                    Box(Modifier.requiredSize(itemSize))
+                }
+            }
+        }
 
-    //     rule.onNodeWithTag(ContainerTag)
-    //         .assertWidthIsEqualTo(itemSize * 3)
-    //         .assertHeightIsEqualTo(itemSize)
-    // }
+        rule.onNodeWithTag(ContainerTag)
+            .assertWidthIsEqualTo(itemSize * 3)
+            .assertHeightIsEqualTo(itemSize)
+    }
 
     // spacing added when we have enough items to fill the viewport
 
@@ -249,48 +257,50 @@ class LazyArrangementsTest {
             .assertTopPositionInRootIsEqualTo(itemSize * 2.5f)
     }
 
-    // @Test
-    // fun row_spacing_scrolledToTheStart() {
-    //     rule.setContent {
-    //         LazyRow(
-    //             horizontalArrangement = Arrangement.spacedBy(itemSize),
-    //             modifier = Modifier.requiredSize(itemSize * 3.5f)
-    //         ) {
-    //             items(3) {
-    //                 Box(Modifier.requiredSize(itemSize).testTag(it.toString()))
-    //             }
-    //         }
-    //     }
+    @Test
+    fun horizontal_spacing_scrolledToTheStart() {
+        rule.setContent {
+            LazyHorizontalGrid(
+                horizontalArrangement = Arrangement.spacedBy(itemSize),
+                modifier = Modifier.requiredSize(itemSize * 3.5f),
+                rows = GridCells.Fixed(1)
+            ) {
+                items(3) {
+                    Box(Modifier.requiredSize(itemSize).testTag(it.toString()))
+                }
+            }
+        }
 
-    //     rule.onNodeWithTag("0")
-    //         .assertLeftPositionInRootIsEqualTo(0.dp)
+        rule.onNodeWithTag("0")
+            .assertLeftPositionInRootIsEqualTo(0.dp)
 
-    //     rule.onNodeWithTag("1")
-    //         .assertLeftPositionInRootIsEqualTo(itemSize * 2)
-    // }
+        rule.onNodeWithTag("1")
+            .assertLeftPositionInRootIsEqualTo(itemSize * 2)
+    }
 
-    // @Test
-    // fun row_spacing_scrolledToTheEnd() {
-    //     rule.setContentWithTestViewConfiguration {
-    //         LazyRow(
-    //             horizontalArrangement = Arrangement.spacedBy(itemSize),
-    //             modifier = Modifier.requiredSize(itemSize * 3.5f).testTag(ContainerTag)
-    //         ) {
-    //             items(3) {
-    //                 Box(Modifier.requiredSize(itemSize).testTag(it.toString()))
-    //             }
-    //         }
-    //     }
+    @Test
+    fun horizontal_spacing_scrolledToTheEnd() {
+        rule.setContentWithTestViewConfiguration {
+            LazyHorizontalGrid(
+                horizontalArrangement = Arrangement.spacedBy(itemSize),
+                modifier = Modifier.requiredSize(itemSize * 3.5f).testTag(ContainerTag),
+                rows = GridCells.Fixed(1)
+            ) {
+                items(3) {
+                    Box(Modifier.requiredSize(itemSize).testTag(it.toString()))
+                }
+            }
+        }
 
-    //     rule.onNodeWithTag(ContainerTag)
-    //         .scrollBy(x = itemSize * 2, density = rule.density)
+        rule.onNodeWithTag(ContainerTag)
+            .scrollBy(x = itemSize * 2, density = rule.density)
 
-    //     rule.onNodeWithTag("1")
-    //         .assertLeftPositionInRootIsEqualTo(itemSize * 0.5f)
+        rule.onNodeWithTag("1")
+            .assertLeftPositionInRootIsEqualTo(itemSize * 0.5f)
 
-    //     rule.onNodeWithTag("2")
-    //         .assertLeftPositionInRootIsEqualTo(itemSize * 2.5f)
-    // }
+        rule.onNodeWithTag("2")
+            .assertLeftPositionInRootIsEqualTo(itemSize * 2.5f)
+    }
 
     @Test
     fun vertical_scrollingByExactlyTheItemSizePlusSpacer_switchesTheFirstVisibleItem() {
@@ -367,78 +377,80 @@ class LazyArrangementsTest {
         }
     }
 
-    // @Test
-    // fun row_scrollingByExactlyTheItemSizePlusSpacer_switchesTheFirstVisibleItem() {
-    //     val itemSizePx = 30
-    //     val spacingSizePx = 4
-    //     val itemSize = with(rule.density) { itemSizePx.toDp() }
-    //     val spacingSize = with(rule.density) { spacingSizePx.toDp() }
-    //     lateinit var state: LazyListState
-    //     rule.setContentWithTestViewConfiguration {
-    //         LazyRow(
-    //             Modifier.size(itemSize * 3),
-    //             state = rememberLazyListState().also { state = it },
-    //             horizontalArrangement = Arrangement.spacedBy(spacingSize)
-    //         ) {
-    //             items(5) {
-    //                 Spacer(
-    //                     Modifier.size(itemSize).testTag("$it")
-    //                 )
-    //             }
-    //         }
-    //     }
+    @Test
+    fun horizontal_scrollingByExactlyTheItemSizePlusSpacer_switchesTheFirstVisibleItem() {
+        val itemSizePx = 30
+        val spacingSizePx = 4
+        val itemSize = with(rule.density) { itemSizePx.toDp() }
+        val spacingSize = with(rule.density) { spacingSizePx.toDp() }
+        lateinit var state: LazyGridState
+        rule.setContentWithTestViewConfiguration {
+            LazyHorizontalGrid(
+                GridCells.Fixed(1),
+                Modifier.size(itemSize * 3),
+                state = rememberLazyGridState().also { state = it },
+                horizontalArrangement = Arrangement.spacedBy(spacingSize)
+            ) {
+                items(5) {
+                    Spacer(
+                        Modifier.size(itemSize).testTag("$it")
+                    )
+                }
+            }
+        }
 
-    //     rule.runOnIdle {
-    //         runBlocking {
-    //             state.scrollBy((itemSizePx + spacingSizePx).toFloat())
-    //         }
-    //     }
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy((itemSizePx + spacingSizePx).toFloat())
+            }
+        }
 
-    //     rule.onNodeWithTag("0")
-    //         .assertIsNotDisplayed()
+        rule.onNodeWithTag("0")
+            .assertIsNotDisplayed()
 
-    //     rule.runOnIdle {
-    //         assertThat(state.firstVisibleItemIndex).isEqualTo(1)
-    //         assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
-    //     }
-    // }
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(1)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+        }
+    }
 
-    // @Test
-    // fun row_scrollingByExactlyTheItemSizePlusHalfTheSpacer_staysOnTheSameItem() {
-    //     val itemSizePx = 30
-    //     val spacingSizePx = 4
-    //     val itemSize = with(rule.density) { itemSizePx.toDp() }
-    //     val spacingSize = with(rule.density) { spacingSizePx.toDp() }
-    //     lateinit var state: LazyListState
-    //     rule.setContentWithTestViewConfiguration {
-    //         LazyRow(
-    //             Modifier.size(itemSize * 3),
-    //             state = rememberLazyListState().also { state = it },
-    //             horizontalArrangement = Arrangement.spacedBy(spacingSize)
-    //         ) {
-    //             items(5) {
-    //                 Spacer(
-    //                     Modifier.size(itemSize).testTag("$it")
-    //                 )
-    //             }
-    //         }
-    //     }
+    @Test
+    fun horizontal_scrollingByExactlyTheItemSizePlusHalfTheSpacer_staysOnTheSameItem() {
+        val itemSizePx = 30
+        val spacingSizePx = 4
+        val itemSize = with(rule.density) { itemSizePx.toDp() }
+        val spacingSize = with(rule.density) { spacingSizePx.toDp() }
+        lateinit var state: LazyGridState
+        rule.setContentWithTestViewConfiguration {
+            LazyHorizontalGrid(
+                GridCells.Fixed(1),
+                Modifier.size(itemSize * 3),
+                state = rememberLazyGridState().also { state = it },
+                horizontalArrangement = Arrangement.spacedBy(spacingSize)
+            ) {
+                items(5) {
+                    Spacer(
+                        Modifier.size(itemSize).testTag("$it")
+                    )
+                }
+            }
+        }
 
-    //     rule.runOnIdle {
-    //         runBlocking {
-    //             state.scrollBy((itemSizePx + spacingSizePx / 2).toFloat())
-    //         }
-    //     }
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy((itemSizePx + spacingSizePx / 2).toFloat())
+            }
+        }
 
-    //     rule.onNodeWithTag("0")
-    //         .assertIsNotDisplayed()
+        rule.onNodeWithTag("0")
+            .assertIsNotDisplayed()
 
-    //     rule.runOnIdle {
-    //         assertThat(state.firstVisibleItemIndex).isEqualTo(0)
-    //         assertThat(state.firstVisibleItemScrollOffset)
-    //             .isEqualTo(itemSizePx + spacingSizePx / 2)
-    //     }
-    // }
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+            assertThat(state.firstVisibleItemScrollOffset)
+                .isEqualTo(itemSizePx + spacingSizePx / 2)
+        }
+    }
 
     // with reverseLayout == true
 
@@ -459,23 +471,24 @@ class LazyArrangementsTest {
         assertArrangementForTwoItems(Arrangement.Bottom, reverseLayout = true)
     }
 
-    // @Test
-    // fun row_defaultArrangementIsEndWithReverseLayout() {
-    //     rule.setContent {
-    //         LazyRow(
-    //             reverseLayout = true,
-    //             modifier = Modifier.requiredSize(containerSize)
-    //         ) {
-    //             items(2) {
-    //                 Item(it)
-    //             }
-    //         }
-    //     }
+    @Test
+    fun horizontal_defaultArrangementIsEndWithReverseLayout() {
+        rule.setContent {
+            LazyHorizontalGrid(
+                GridCells.Fixed(1),
+                reverseLayout = true,
+                modifier = Modifier.requiredSize(containerSize)
+            ) {
+                items(2) {
+                    Item(it)
+                }
+            }
+        }
 
-    //     assertArrangementForTwoItems(
-    //         Arrangement.End, LayoutDirection.Ltr, reverseLayout = true
-    //     )
-    // }
+        assertArrangementForTwoItems(
+            Arrangement.End, LayoutDirection.Ltr, reverseLayout = true
+        )
+    }
 
     @Test
     fun vertical_whenArrangementChanges() {
@@ -501,28 +514,29 @@ class LazyArrangementsTest {
         assertArrangementForTwoItems(Arrangement.Bottom)
     }
 
-    // @Test
-    // fun row_whenArrangementChanges() {
-    //     var arrangement by mutableStateOf(Arrangement.Start)
-    //     rule.setContent {
-    //         LazyRow(
-    //             modifier = Modifier.requiredSize(containerSize),
-    //             horizontalArrangement = arrangement
-    //         ) {
-    //             items(2) {
-    //                 Item(it)
-    //             }
-    //         }
-    //     }
+    @Test
+    fun horizontal_whenArrangementChanges() {
+        var arrangement by mutableStateOf(Arrangement.Start)
+        rule.setContent {
+            LazyHorizontalGrid(
+                GridCells.Fixed(1),
+                modifier = Modifier.requiredSize(containerSize),
+                horizontalArrangement = arrangement
+            ) {
+                items(2) {
+                    Item(it)
+                }
+            }
+        }
 
-    //     assertArrangementForTwoItems(Arrangement.Start, LayoutDirection.Ltr)
+        assertArrangementForTwoItems(Arrangement.Start, LayoutDirection.Ltr)
 
-    //     rule.runOnIdle {
-    //         arrangement = Arrangement.End
-    //     }
+        rule.runOnIdle {
+            arrangement = Arrangement.End
+        }
 
-    //     assertArrangementForTwoItems(Arrangement.End, LayoutDirection.Ltr)
-    // }
+        assertArrangementForTwoItems(Arrangement.End, LayoutDirection.Ltr)
+    }
 
     fun composeVerticalGridWith(arrangement: Arrangement.Vertical) {
         rule.setContent {
@@ -538,20 +552,24 @@ class LazyArrangementsTest {
         }
     }
 
-    // fun composeRowWith(arrangement: Arrangement.Horizontal, layoutDirection: LayoutDirection) {
-    //     rule.setContent {
-    //         CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
-    //             LazyRow(
-    //                 horizontalArrangement = arrangement,
-    //                 modifier = Modifier.requiredSize(containerSize)
-    //             ) {
-    //                 items(2) {
-    //                     Item(it)
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
+    fun composeHorizontalWith(
+        arrangement: Arrangement.Horizontal,
+        layoutDirection: LayoutDirection
+    ) {
+        rule.setContent {
+            CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+                LazyHorizontalGrid(
+                    horizontalArrangement = arrangement,
+                    modifier = Modifier.requiredSize(containerSize),
+                    rows = GridCells.Fixed(1)
+                ) {
+                    items(2) {
+                        Item(it)
+                    }
+                }
+            }
+        }
+    }
 
     @Composable
     fun Item(index: Int) {
@@ -580,32 +598,32 @@ class LazyArrangementsTest {
         }
     }
 
-    // fun assertArrangementForTwoItems(
-    //     arrangement: Arrangement.Horizontal,
-    //     layoutDirection: LayoutDirection,
-    //     reverseLayout: Boolean = false
-    // ) {
-    //     with(rule.density) {
-    //         val sizes = IntArray(2) {
-    //             val index = if (reverseLayout) if (it == 0) 1 else 0 else it
-    //             if (index == 0) itemSize.roundToPx() else smallerItemSize.roundToPx()
-    //         }
-    //         val outPositions = IntArray(2) { 0 }
-    //         with(arrangement) {
-    //             arrange(containerSize.roundToPx(), sizes, layoutDirection, outPositions)
-    //         }
+    fun assertArrangementForTwoItems(
+        arrangement: Arrangement.Horizontal,
+        layoutDirection: LayoutDirection,
+        reverseLayout: Boolean = false
+    ) {
+        with(rule.density) {
+            val sizes = IntArray(2) {
+                val index = if (reverseLayout) if (it == 0) 1 else 0 else it
+                if (index == 0) itemSize.roundToPx() else smallerItemSize.roundToPx()
+            }
+            val outPositions = IntArray(2) { 0 }
+            with(arrangement) {
+                arrange(containerSize.roundToPx(), sizes, layoutDirection, outPositions)
+            }
 
-    //         outPositions.forEachIndexed { index, position ->
-    //             val realIndex = if (reverseLayout) if (index == 0) 1 else 0 else index
-    //             val size = if (realIndex == 0) itemSize else smallerItemSize
-    //             val expectedPosition = if (layoutDirection == LayoutDirection.Ltr) {
-    //                 position.toDp()
-    //             } else {
-    //                 containerSize - position.toDp() - size
-    //             }
-    //             rule.onNodeWithTag("$realIndex")
-    //                 .assertLeftPositionInRootIsEqualTo(expectedPosition)
-    //         }
-    //     }
-    // }
+            outPositions.forEachIndexed { index, position ->
+                val realIndex = if (reverseLayout) if (index == 0) 1 else 0 else index
+                val size = if (realIndex == 0) itemSize else smallerItemSize
+                val expectedPosition = if (layoutDirection == LayoutDirection.Ltr) {
+                    position.toDp()
+                } else {
+                    containerSize - position.toDp() - size
+                }
+                rule.onNodeWithTag("$realIndex")
+                    .assertLeftPositionInRootIsEqualTo(expectedPosition)
+            }
+        }
+    }
 }
