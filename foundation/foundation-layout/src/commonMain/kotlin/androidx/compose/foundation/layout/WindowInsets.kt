@@ -81,6 +81,22 @@ value class WindowInsetsSides private constructor(private val value: Int) {
     internal fun hasAny(sides: WindowInsetsSides): Boolean =
         (value and sides.value) != 0
 
+    override fun toString(): String = "WindowInsetsSides(${valueToString()})"
+
+    private fun valueToString(): String = buildString {
+        fun appendPlus(text: String) {
+            if (isNotEmpty()) append('+')
+            append(text)
+        }
+
+        if (value and Start.value == Start.value) appendPlus("Start")
+        if (value and Left.value == Left.value) appendPlus("Left")
+        if (value and Top.value == Top.value) appendPlus("Top")
+        if (value and End.value == End.value) appendPlus("End")
+        if (value and Right.value == Right.value) appendPlus("Right")
+        if (value and Bottom.value == Bottom.value) appendPlus("Bottom")
+    }
+
     companion object {
         //    _---- allowLeft  in ltr
         //    /
@@ -305,7 +321,7 @@ private class FixedDpInsets(
  * be updated.
  */
 @Stable
-internal class ValueInsets(val insets: InsetsValues, val name: String) : WindowInsets {
+internal class ValueInsets(insets: InsetsValues, val name: String) : WindowInsets {
     internal var value by mutableStateOf(insets)
 
     override fun getLeft(density: Density, layoutDirection: LayoutDirection): Int = value.left
@@ -328,8 +344,8 @@ internal class ValueInsets(val insets: InsetsValues, val name: String) : WindowI
     }
 
     override fun toString(): String {
-        return "$name(left=${insets.left}, top=${insets.top}, " +
-            "right=${insets.right}, bottom=${insets.bottom})"
+        return "$name(left=${value.left}, top=${value.top}, " +
+            "right=${value.right}, bottom=${value.bottom})"
     }
 }
 
@@ -356,6 +372,9 @@ internal class InsetsValues(val left: Int, val top: Int, val right: Int, val bot
         result = 31 * result + bottom
         return result
     }
+
+    override fun toString(): String =
+        "InsetsValues(left=$left, top=$top, right=$right, bottom=$bottom)"
 }
 
 /**
@@ -567,6 +586,8 @@ private class LimitInsets(
         result = 31 * result + sides.hashCode()
         return result
     }
+
+    override fun toString(): String = "($insets only $sides)"
 }
 
 @Stable
