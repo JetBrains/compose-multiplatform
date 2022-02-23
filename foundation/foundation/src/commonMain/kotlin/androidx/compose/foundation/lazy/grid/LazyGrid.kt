@@ -66,7 +66,7 @@ internal fun LazyGrid(
     /** reverse the direction of scrolling and layout */
     reverseLayout: Boolean = false,
     /** The layout orientation of the grid */
-    isVertical: Boolean = true,
+    isVertical: Boolean,
     /** fling behavior to be used for flinging */
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     /** Whether scrolling via the user gestures is allowed. */
@@ -278,7 +278,6 @@ private fun rememberLazyGridMeasurePolicy(
                 items = items,
                 spans = spans,
                 isVertical = isVertical,
-                reverseLayout = reverseLayout,
                 slotsPerLine = resolvedSlotSizesSums.size,
                 layoutDirection = layoutDirection,
                 mainAxisSpacing = mainAxisSpacing,
