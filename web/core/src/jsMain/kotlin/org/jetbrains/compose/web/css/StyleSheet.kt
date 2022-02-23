@@ -1,20 +1,19 @@
 package org.jetbrains.compose.web.css
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateListOf
+import org.jetbrains.compose.web.ExperimentalComposeWebStyleApi
 import org.jetbrains.compose.web.css.selectors.CSSSelector
 import org.jetbrains.compose.web.dom.Style
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 class CSSRulesHolderState : CSSRulesHolder {
-    override var cssRules: CSSRuleDeclarationList by mutableStateOf(listOf())
+    override val cssRules = mutableStateListOf<CSSRuleDeclaration>()
+
 
     override fun add(cssRule: CSSRuleDeclaration) {
-        @Suppress("SuspiciousCollectionReassignment")
-        cssRules += cssRule
+        cssRules.add(cssRule)
     }
 }
 
