@@ -61,42 +61,10 @@ import androidx.compose.runtime.snapshots.Snapshot
  *   animations, like a slideIn or slideOut animation, are set up during a layout pass. If you
  *   start such an animation and advance time by two frames or more without allowing for a layout
  *   pass to happen, it will end immediately because it will be started before it is set up. For
- *   example:
- *   ```
- *     @Test
- *     fun testSlideOut() {
- *         var entered by mutableStateOf(true)
- *         composeTestRule.setContent {
- *             AnimatedVisibility(
- *                 visible = entered,
- *                 exit = slideOutHorizontally(tween(3000)) { -it }
- *             ) {
- *                 Box(Modifier.size(100.dp).testTag("box")) {}
- *             }
- *         }
+ *   example, here you see how you can control a slide out animation:
  *
- *         with(composeTestRule) {
- *             mainClock.autoAdvance = false
- *             onNodeWithTag("box").assertExists()
- *             entered = false
+ * @sample androidx.compose.ui.test.samples.testSlideOut
  *
- *             // Trigger recomposition
- *             mainClock.advanceTimeByFrame()
- *             // Await layout pass to set up animation
- *             waitForIdle()
- *             // Give animation a start time
- *             mainClock.advanceTimeByFrame()
- *
- *             // Advance clock by first half the animation duration
- *             mainClock.advanceTimeBy(1500)
- *             onNodeWithTag("box").assertExists()
- *
- *             // Advance clock by second half the animation duration
- *             mainClock.advanceTimeBy(1500)
- *             onNodeWithTag("box").assertDoesNotExist()
- *         }
- *     }
- *   ```
  * * After modifying a state variable, recomposition needs to happen to reflect the new state in
  *   the UI. Advancing the clock by [one frame][advanceTimeByFrame] will commit the changes and
  *   run exactly one recomposition.
@@ -115,45 +83,15 @@ import androidx.compose.runtime.snapshots.Snapshot
  *   [committed][Snapshot.sendApplyNotifications] before the compositions that read that variable
  *   are invalidated. This is currently not done by the test harness, but by a platform dependent
  *   implementation. On Android, for example, a message is posted on the main thread to call
- *   [sendApplyNotifications][Snapshot.sendApplyNotifications] when a state variable is written
- *   (which conveniently runs before `advanceTimeByFrame` on Android),
- *   which means that if the variable is written during a call to [advanceTimeBy], the composition
- *   will only be invalidated after `advanceTimeBy` has finished, regardless of the time by which
- *   you advanced the clock. You may call
- *   [sendApplyNotifications][Snapshot.sendApplyNotifications] manually after modifying a state
- *   variable to invalidate the composition and force a recomposition within 16ms of the current
- *   clock time. For example:
- *   ```
- *     @Test
- *     fun testControlClock() {
- *       var toggle by mutableStateOf(false)
- *       composeTestRule.setContent {
- *         var count by remember { mutableStateOf(0) }
- *         DisposableEffect(toggle) {
- *           count++
- *           // apply the change in `count` in the snapshot:
- *           Snapshot.sendApplyNotifications()
- *           onDispose {}
- *         }
- *         Text("Effect ran $count time(s), toggle is $toggle")
- *       }
+ *   `sendApplyNotifications` when a state variable is written (which conveniently runs before
+ *   `advanceTimeByFrame` on Android), which means that if the variable is written during a call
+ *   to [advanceTimeBy], the composition will only be invalidated after `advanceTimeBy` has
+ *   finished, regardless of the time by which you advanced the clock. You may call
+ *   `sendApplyNotifications` manually after modifying a state variable to invalidate the
+ *   composition and force a recomposition within 16ms of the current clock time. For example,
+ *   here you see how to use `sendApplyNotifications` and `advanceTimeBy`:
  *
- *       composeTestRule.onNodeWithText("Effect ran 1 time(s), toggle is false").assertExists()
- *       composeTestRule.mainClock.autoAdvance = false
- *
- *       // change the `toggle` state variable
- *       toggle = true
- *       // apply the change in `toggle` in the snapshot:
- *       Snapshot.sendApplyNotifications()
- *
- *       // recomposition hasn't yet happened:
- *       composeTestRule.onNodeWithText("Effect ran 1 time(s), toggle is false").assertExists()
- *       // forward the clock by 2 frames: 1 for `toggle` and then 1 for `count`
- *       composeTestRule.mainClock.advanceTimeBy(32)
- *       // UI now fully reflects the new state
- *       composeTestRule.onNodeWithText("Effect ran 2 time(s), toggle is true").assertExists()
- *     }
- *   ```
+ * @sample androidx.compose.ui.test.samples.testControlClock
  */
 interface MainTestClock {
     /**
