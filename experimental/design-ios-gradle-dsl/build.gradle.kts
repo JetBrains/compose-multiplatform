@@ -10,7 +10,7 @@ kotlin {
 
 compose.ios {
     application {
-        mainClass = "Main_ios.kt"
+        entryPoint = "Main_ios.kt"
         bundleID = "com.example-company.example-app"
         version = "1.2.3"
 
