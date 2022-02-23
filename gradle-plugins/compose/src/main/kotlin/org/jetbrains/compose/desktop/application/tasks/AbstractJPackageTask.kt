@@ -579,8 +579,8 @@ abstract class AbstractJPackageTask @Inject constructor(
         val packageVersion = packageVersion.get()!!
         plist[PlistKeys.CFBundleShortVersionString] = packageVersion
         // If building for the App Store, use "utilities" as default just like jpackage.
-        val category = macAppCategory.orNull ?: (if (macAppStore.orNull == true) "utilities" else null)
-        plist[PlistKeys.LSApplicationCategoryType] = category?.let { "public.app-category.$it" } ?: "Unknown"
+        val category = macAppCategory.orNull ?: (if (macAppStore.orNull == true) "public.app-category.utilities" else null)
+        plist[PlistKeys.LSApplicationCategoryType] = category ?: "Unknown"
         val packageBuildVersion = packageBuildVersion.orNull ?: packageVersion
         plist[PlistKeys.CFBundleVersion] = packageBuildVersion
         val year = Calendar.getInstance().get(Calendar.YEAR)
