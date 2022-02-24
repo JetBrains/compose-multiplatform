@@ -56,6 +56,9 @@ package androidx.compose.foundation {
     method public static androidx.compose.ui.Modifier focusable(androidx.compose.ui.Modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource? interactionSource);
   }
 
+  public final class FocusedBoundsKt {
+  }
+
   public final class HoverableKt {
     method public static androidx.compose.ui.Modifier hoverable(androidx.compose.ui.Modifier, androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional boolean enabled);
   }
