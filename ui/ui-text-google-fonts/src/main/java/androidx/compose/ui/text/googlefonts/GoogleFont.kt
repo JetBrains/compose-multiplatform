@@ -31,9 +31,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.core.provider.FontRequest
 import androidx.core.provider.FontsContractCompat
-import java.lang.IllegalStateException
 import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 import kotlin.coroutines.resume
 import kotlinx.coroutines.suspendCancellableCoroutine
 
@@ -130,7 +128,7 @@ internal data class GoogleFontImpl constructor(
 
     private fun bestEffortQueryParam() = if (bestEffort) "true" else "false"
     private fun FontStyle.toQueryParam(): Int = if (this == FontStyle.Italic) 1 else 0
-    private fun String.encode() = URLEncoder.encode(this, StandardCharsets.UTF_8.toString())
+    private fun String.encode() = URLEncoder.encode(this, "UTF-8")
 
     fun toTypefaceStyle(): Int {
         val isItalic = style == FontStyle.Italic
