@@ -108,6 +108,8 @@ internal fun LazyGrid(
         placementAnimator
     )
 
+    state.isVertical = isVertical
+
     state.prefetchPolicy = rememberLazyLayoutPrefetchPolicy()
 
     ScrollPositionUpdater(stateOfItemsProvider, state)
