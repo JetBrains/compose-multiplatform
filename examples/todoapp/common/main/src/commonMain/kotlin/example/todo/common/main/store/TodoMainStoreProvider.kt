@@ -28,19 +28,19 @@ internal class TodoMainStoreProvider(
             reducer = ReducerImpl
         ) {}
 
-    private sealed class Result {
-        data class ItemsLoaded(val items: List<TodoItem>) : Result()
-        data class ItemDoneChanged(val id: Long, val isDone: Boolean) : Result()
-        data class ItemDeleted(val id: Long) : Result()
-        data class TextChanged(val text: String) : Result()
+    private sealed class Msg {
+        data class ItemsLoaded(val items: List<TodoItem>) : Msg()
+        data class ItemDoneChanged(val id: Long, val isDone: Boolean) : Msg()
+        data class ItemDeleted(val id: Long) : Msg()
+        data class TextChanged(val text: String) : Msg()
     }
 
-    private inner class ExecutorImpl : ReaktiveExecutor<Intent, Unit, State, Result, Nothing>() {
+    private inner class ExecutorImpl : ReaktiveExecutor<Intent, Unit, State, Msg, Nothing>() {
         override fun executeAction(action: Unit, getState: () -> State) {
             database
                 .updates
                 .observeOn(mainScheduler)
-                .map(Result::ItemsLoaded)
+                .map(Msg::ItemsLoaded)
                 .subscribeScoped(onNext = ::dispatch)
         }
 
@@ -48,35 +48,35 @@ internal class TodoMainStoreProvider(
             when (intent) {
                 is Intent.SetItemDone -> setItemDone(id = intent.id, isDone = intent.isDone)
                 is Intent.DeleteItem -> deleteItem(id = intent.id)
-                is Intent.SetText -> dispatch(Result.TextChanged(text = intent.text))
+                is Intent.SetText -> dispatch(Msg.TextChanged(text = intent.text))
                 is Intent.AddItem -> addItem(state = getState())
             }
 
         private fun setItemDone(id: Long, isDone: Boolean) {
-            dispatch(Result.ItemDoneChanged(id = id, isDone = isDone))
+            dispatch(Msg.ItemDoneChanged(id = id, isDone = isDone))
             database.setDone(id = id, isDone = isDone).subscribeScoped()
         }
 
         private fun deleteItem(id: Long) {
-            dispatch(Result.ItemDeleted(id = id))
+            dispatch(Msg.ItemDeleted(id = id))
             database.delete(id = id).subscribeScoped()
         }
 
         private fun addItem(state: State) {
             if (state.text.isNotEmpty()) {
-                dispatch(Result.TextChanged(text = ""))
+                dispatch(Msg.TextChanged(text = ""))
                 database.add(text = state.text).subscribeScoped()
             }
         }
     }
 
-    private object ReducerImpl : Reducer<State, Result> {
-        override fun State.reduce(result: Result): State =
-            when (result) {
-                is Result.ItemsLoaded -> copy(items = result.items.sorted())
-                is Result.ItemDoneChanged -> update(id = result.id) { copy(isDone = result.isDone) }
-                is Result.ItemDeleted -> copy(items = items.filterNot { it.id == result.id })
-                is Result.TextChanged -> copy(text = result.text)
+    private object ReducerImpl : Reducer<State, Msg> {
+        override fun State.reduce(msg: Msg): State =
+            when (msg) {
+                is Msg.ItemsLoaded -> copy(items = msg.items.sorted())
+                is Msg.ItemDoneChanged -> update(id = msg.id) { copy(isDone = msg.isDone) }
+                is Msg.ItemDeleted -> copy(items = items.filterNot { it.id == msg.id })
+                is Msg.TextChanged -> copy(text = msg.text)
             }
 
         private inline fun State.update(id: Long, func: TodoItem.() -> TodoItem): State {
