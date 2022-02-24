@@ -85,7 +85,7 @@ internal object TextToolbarHelperMethods {
         view: View,
         actionModeCallback: ActionMode.Callback,
         type: Int
-    ): ActionMode {
+    ): ActionMode? {
         return view.startActionMode(
             actionModeCallback,
             type
