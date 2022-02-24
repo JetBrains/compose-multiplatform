@@ -23,6 +23,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyGridState
@@ -67,6 +68,7 @@ import androidx.test.filters.SdkSuppress
 import com.google.common.collect.Range
 import com.google.common.truth.IntegerSubject
 import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -1046,6 +1048,28 @@ class LazyGridTest(
 
         rule.onNodeWithTag("5")
             .assertDoesNotExist()
+    }
+
+    @Test
+    fun onlyOneInitialMeasurePass() {
+        val items by mutableStateOf((1..20).toList())
+        lateinit var state: LazyGridState
+        rule.setContent {
+            state = rememberLazyGridState()
+            LazyGrid(
+                1,
+                Modifier.requiredSize(100.dp).testTag(LazyGridTag),
+                state = state
+            ) {
+                items(items) {
+                    Spacer(Modifier.requiredSize(20.dp).testTag("$it"))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(state.numMeasurePasses).isEqualTo(1)
+        }
     }
 }
 
