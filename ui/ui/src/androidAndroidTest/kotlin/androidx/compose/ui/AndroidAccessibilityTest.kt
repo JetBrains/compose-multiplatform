@@ -2591,7 +2591,7 @@ class AndroidAccessibilityTest {
     @Test
     fun testSemanticsNodePositionAndBounds_doesNotThrow_whenLayoutNodeNotAttached() {
         var emitNode by mutableStateOf(true)
-        rule.setContent {
+        container.setContent {
             if (emitNode) {
                 with(LocalDensity.current) {
                     Box(Modifier.size(100.toDp()).testTag("tag"))
@@ -2614,7 +2614,7 @@ class AndroidAccessibilityTest {
 
     @Test
     fun testSemanticsSort_doesNotThrow_whenLayoutNodeWrapperNotAttached() {
-        rule.setContent {
+        container.setContent {
             with(LocalDensity.current) {
                 Box(Modifier.size(100.toDp()).testTag("parent")) {
                     Box(Modifier.size(100.toDp()).testTag("child"))
@@ -2638,7 +2638,7 @@ class AndroidAccessibilityTest {
 
     @Test
     fun testSemanticsSort_doesNotThrow_whenLayoutNodeWrapperNotAttached_compare() {
-        rule.setContent {
+        container.setContent {
             with(LocalDensity.current) {
                 Box(Modifier.size(100.toDp()).testTag("parent")) {
                     Box(Modifier.size(100.toDp()).testTag("child1")) {

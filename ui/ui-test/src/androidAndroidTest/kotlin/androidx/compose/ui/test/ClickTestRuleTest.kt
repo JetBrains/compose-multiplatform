@@ -72,7 +72,6 @@ class ClickTestRuleTest(private val config: TestConfig) {
         fun parameters() =
             listOf(
                 TestConfig(ClickCounterActivity::class.java, false),
-                TestConfig(ClickCounterActivity::class.java, true),
                 TestConfig(EmptyActivity::class.java, true),
                 TestConfig(null, true),
             )

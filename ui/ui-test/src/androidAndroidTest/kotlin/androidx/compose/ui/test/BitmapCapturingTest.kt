@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.testutils.assertContainsColor
 import androidx.compose.testutils.assertPixels
 import androidx.compose.testutils.expectError
@@ -155,7 +156,7 @@ class BitmapCapturingTest(val config: TestConfig) {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.P) // b/163023027
     fun captureDialog_verifyBackground() {
         // Test that we are really able to capture dialogs to bitmap.
-        rule.setContent {
+        setContent {
             AlertDialog(onDismissRequest = {}, confirmButton = {}, backgroundColor = Color.Red)
         }
 
@@ -167,7 +168,7 @@ class BitmapCapturingTest(val config: TestConfig) {
     @Test
     fun capturePopup_shouldFail() {
         // Test that we throw an error when trying to capture a popup.
-        rule.setContent {
+        setContent {
             Box {
                 Popup {
                     Text("Hello")
@@ -202,7 +203,7 @@ class BitmapCapturingTest(val config: TestConfig) {
 
     private fun composeCheckerboard() {
         with(rule.density) {
-            rule.setContent {
+            setContent {
                 Box(Modifier.background(colorBg)) {
                     Box(Modifier.padding(top = 20.toDp()).background(colorBg)) {
                         Column(Modifier.testTag(rootTag)) {
@@ -238,6 +239,13 @@ class BitmapCapturingTest(val config: TestConfig) {
                     }
                 }
             }
+        }
+    }
+
+    private fun setContent(content: @Composable () -> Unit) {
+        when (val activity = rule.activity) {
+            is ActivityWithActionBar -> activity.setContent(content)
+            else -> rule.setContent(content)
         }
     }
 }

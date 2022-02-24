@@ -20,6 +20,7 @@ package androidx.compose.ui.test
 
 import android.os.Build
 import android.view.View
+import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
@@ -146,6 +147,14 @@ internal class AndroidComposeTest<A : ComponentActivity>(
 
         // We always make sure we have the latest activity when setting a content
         val currentActivity = activity
+        // Check if the current activity hasn't already called setContent itself
+        val root = currentActivity.findViewById<ViewGroup>(android.R.id.content)
+        check(root == null || root.childCount == 0) {
+            "$currentActivity has already set content. If you have populated the Activity with " +
+                "a ComposeView, make sure to call setContent on that ComposeView instead of on " +
+                "the test rule; and make sure that that call to `setContent {}` is done after " +
+                "the ComposeTestRule has run"
+        }
 
         runOnUiThread {
             currentActivity.setContent(recomposer, composable)
