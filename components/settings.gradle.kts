@@ -15,3 +15,8 @@ pluginManagement {
 
 include(":SplitPane:library")
 include(":SplitPane:demo")
+
+include(":Kapp:library")
+include(":Kapp:demo")
+
+rootProject.name = "components"
