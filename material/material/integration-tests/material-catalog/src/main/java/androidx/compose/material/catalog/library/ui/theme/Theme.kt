@@ -16,6 +16,9 @@
 
 package androidx.compose.material.catalog.library.ui.theme
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -34,9 +37,10 @@ import androidx.compose.material.lightColors
 import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
-import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 
 @Composable
 fun CatalogTheme(
@@ -74,9 +78,10 @@ fun CatalogTheme(
         )
     }
     val view = LocalView.current
+    val context = LocalContext.current
     SideEffect {
-        ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars =
-            colors.primarySurface.isLightColor()
+        WindowCompat.getInsetsController(context.findActivity().window, view)
+            .isAppearanceLightStatusBars = colors.primarySurface.isLightColor()
     }
     MaterialTheme(
         colors = colors,
@@ -89,3 +94,10 @@ fun CatalogTheme(
         content = content
     )
 }
+
+private tailrec fun Context.findActivity(): Activity =
+    when (this) {
+        is Activity -> this
+        is ContextWrapper -> this.baseContext.findActivity()
+        else -> throw IllegalArgumentException("Could not find activity!")
+    }
