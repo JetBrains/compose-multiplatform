@@ -1923,7 +1923,12 @@ package androidx.compose.ui.layout {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier onGloballyPositioned(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LayoutCoordinates,kotlin.Unit> onGloballyPositioned);
   }
 
+  public interface OnPlacedModifier extends androidx.compose.ui.Modifier.Element {
+    method public void onPlaced(androidx.compose.ui.layout.LayoutCoordinates coordinates);
+  }
+
   public final class OnPlacedModifierKt {
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier onPlaced(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LayoutCoordinates,kotlin.Unit> onPlaced);
   }
 
   public interface OnRemeasuredModifier extends androidx.compose.ui.Modifier.Element {
