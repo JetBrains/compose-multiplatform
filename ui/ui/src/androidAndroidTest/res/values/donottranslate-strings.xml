@@ -33,6 +33,16 @@
         <item>345</item>
     </integer-array>
 
+    <plurals name="plurals_without_arguments">
+        <item quantity="one">There is one Android here</item>
+        <item quantity="other">There are a number of Androids here</item>
+    </plurals>
+
+    <plurals name="plurals_with_arguments">
+        <item quantity="one">There is %d Android here</item>
+        <item quantity="other">There are %d Androids here</item>
+    </plurals>
+
     <bool name="boolean_value">true</bool>
 
     <dimen name="dimension_value">32dp</dimen>
