@@ -31,14 +31,6 @@ import androidx.compose.ui.platform.synchronized
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastAll
-import kotlinx.coroutines.CancellableContinuation
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
@@ -48,6 +40,14 @@ import kotlin.coroutines.createCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.math.max
+import kotlinx.coroutines.CancellableContinuation
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
  * Receiver scope for awaiting pointer events in a call to
@@ -218,11 +218,10 @@ fun Modifier.pointerInput(
 ) {
     val density = LocalDensity.current
     val viewConfiguration = LocalViewConfiguration.current
-    remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.apply {
-        val filter = this
-        LaunchedEffect(this, key1) {
+    remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.also { filter ->
+        LaunchedEffect(filter, key1) {
             filter.coroutineScope = this
-            block()
+            filter.block()
         }
     }
 }
@@ -252,7 +251,7 @@ fun Modifier.pointerInput(
     val density = LocalDensity.current
     val viewConfiguration = LocalViewConfiguration.current
     remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.also { filter ->
-        LaunchedEffect(this, key1, key2) {
+        LaunchedEffect(filter, key1, key2) {
             filter.coroutineScope = this
             filter.block()
         }
@@ -280,11 +279,10 @@ fun Modifier.pointerInput(
 ) {
     val density = LocalDensity.current
     val viewConfiguration = LocalViewConfiguration.current
-    remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.apply {
-        val filter = this
-        LaunchedEffect(this, *keys) {
+    remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.also { filter ->
+        LaunchedEffect(filter, *keys) {
             filter.coroutineScope = this
-            block()
+            filter.block()
         }
     }
 }
