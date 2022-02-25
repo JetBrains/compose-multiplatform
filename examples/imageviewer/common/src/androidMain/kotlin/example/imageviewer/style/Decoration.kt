@@ -5,34 +5,34 @@ import androidx.compose.ui.res.painterResource
 import example.imageviewer.common.R
 
 @Composable
-fun icEmpty() = painterResource(R.raw.empty)
+fun icEmpty() = painterResource(R.drawable.empty)
 
 @Composable
-fun icBack() = painterResource(R.raw.back)
+fun icBack() = painterResource(R.drawable.back)
 
 @Composable
-fun icRefresh() = painterResource(R.raw.refresh)
+fun icRefresh() = painterResource(R.drawable.refresh)
 
 @Composable
-fun icDots() = painterResource(R.raw.dots)
+fun icDots() = painterResource(R.drawable.dots)
 
 @Composable
-fun icFilterGrayscaleOn() = painterResource(R.raw.grayscale_on)
+fun icFilterGrayscaleOn() = painterResource(R.drawable.grayscale_on)
 
 @Composable
-fun icFilterGrayscaleOff() = painterResource(R.raw.grayscale_off)
+fun icFilterGrayscaleOff() = painterResource(R.drawable.grayscale_off)
 
 @Composable
-fun icFilterPixelOn() = painterResource(R.raw.pixel_on)
+fun icFilterPixelOn() = painterResource(R.drawable.pixel_on)
 
 @Composable
-fun icFilterPixelOff() = painterResource(R.raw.pixel_off)
+fun icFilterPixelOff() = painterResource(R.drawable.pixel_off)
 
 @Composable
-fun icFilterBlurOn() = painterResource(R.raw.blur_on)
+fun icFilterBlurOn() = painterResource(R.drawable.blur_on)
 
 @Composable
-fun icFilterBlurOff() = painterResource(R.raw.blur_off)
+fun icFilterBlurOff() = painterResource(R.drawable.blur_off)
 
 @Composable
-fun icFilterUnknown() = painterResource(R.raw.filter_unknown)
+fun icFilterUnknown() = painterResource(R.drawable.filter_unknown)

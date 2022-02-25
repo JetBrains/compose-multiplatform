@@ -44,7 +44,7 @@ The Compose plugin version used in the wizard above may be not the last. Update 
 ```
 plugins {
     kotlin("jvm") version "1.6.10"
-    id("org.jetbrains.compose") version "1.0.1-rc2"
+    id("org.jetbrains.compose") version "1.1.0-rc01"
 }
 ```
 
@@ -80,7 +80,7 @@ import org.jetbrains.compose.compose
 
 plugins {
     kotlin("jvm") version "1.6.10"
-    id("org.jetbrains.compose") version "1.0.1-rc2"
+    id("org.jetbrains.compose") version "1.1.0-rc01"
 }
 
 repositories {
