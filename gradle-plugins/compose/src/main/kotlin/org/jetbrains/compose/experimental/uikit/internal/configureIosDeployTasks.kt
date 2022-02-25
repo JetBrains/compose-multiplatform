@@ -23,7 +23,6 @@ const val SDK_PREFIX_IPHONEOS = "iphoneos"
 internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitApplication) {
     val projectName = application.projectName
     val bundleIdPrefix = application.bundleIdPrefix
-    val developmentTeam = application.developmentTeam
     val xcodeGenSrc = rootProject.buildDir.resolve("xcodegen-$XCODE_GEN_TAG-src")
     val xcodeGenExecutable = xcodeGenSrc.resolve(".build/apple/Products/Release/xcodegen")
     val buildIosDir = buildDir.resolve("ios")
@@ -54,7 +53,6 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
         buildIosDir = buildIosDir,
         projectName = projectName,
         bundleIdPrefix = bundleIdPrefix,
-        developmentTeam = developmentTeam,
         xcodeGenExecutable = xcodeGenExecutable
     )
 

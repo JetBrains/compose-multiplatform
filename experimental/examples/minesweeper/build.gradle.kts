@@ -155,7 +155,6 @@ compose.experimental {
     uikit.application {
         bundleIdPrefix = "org.jetbrains"
         projectName = "ComposeMinesweeper"
-        developmentTeam = "N462MKSJ7M"
         deployConfigurations {
             simulator("IPhone8_en") {
                 //Usage: ./gradlew iosDeployIPhone8_en

@@ -13,7 +13,6 @@ internal fun Project.configureUseXcodeGenTask(
     buildIosDir: File,
     projectName: String,
     bundleIdPrefix: String,
-    developmentTeam: String,
     xcodeGenExecutable: File
 ) {
     tasks.composeIosTask<AbstractComposeIosTask>(TASK_USE_XCODE_GEN_NAME) {
@@ -26,7 +25,6 @@ internal fun Project.configureUseXcodeGenTask(
                 options:
                   bundleIdPrefix: $bundleIdPrefix
                 settings:
-                  DEVELOPMENT_TEAM: $developmentTeam
                   CODE_SIGN_IDENTITY: "iPhone Developer"
                   CODE_SIGN_STYLE: Automatic
                   MARKETING_VERSION: "1.0"
