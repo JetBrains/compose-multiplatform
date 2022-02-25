@@ -80,7 +80,7 @@ inline fun <reified T : Task> TaskContainer.composeIosTask(
     noinline configureFn: T.() -> Unit = {}
 ) = register(name, T::class.java, *args.toTypedArray()).apply {
     configure {
-        it.group = "compose iOS"
+        it.group = "Compose iOS"
         it.configureFn()
     }
 }
