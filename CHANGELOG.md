@@ -19,7 +19,7 @@
 - [Hide top-level dialog from the taskbar](https://github.com/JetBrains/androidx/pull/177)
 
 ### API changes
-- The first frame of the window draws offscreen now. If your application has too long start, measure your first frame, and move the heavy logic to background or to the next frames. You can measure the first frame with this snippet:
+- [The first frame of the window draws offscreen now](https://github.com/JetBrains/compose-jb/issues/1794). If your application has too long start, measure your first frame, and move the heavy logic to background or to the next frames. You can measure the first frame with this snippet:
 ```
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
