@@ -36,7 +36,7 @@ import org.junit.runner.RunWith
 class FragmentRemoveTest {
 
     @get:Rule
-    val rule = createAndroidComposeRule<InflatedFragmentActivity>()
+    val rule = createAndroidComposeRule<EmptyFragmentActivity>()
 
     @Test
     fun testRemoval() {
