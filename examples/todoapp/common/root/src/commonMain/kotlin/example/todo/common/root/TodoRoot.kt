@@ -1,6 +1,6 @@
 package example.todo.common.root
 
-import com.arkivanov.decompose.RouterState
+import com.arkivanov.decompose.router.RouterState
 import com.arkivanov.decompose.value.Value
 import example.todo.common.edit.TodoEdit
 import example.todo.common.main.TodoMain

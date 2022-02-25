@@ -30,17 +30,17 @@ internal class TodoEditStoreProvider(
             reducer = ReducerImpl
         ) {}
 
-    private sealed class Result {
-        data class Loaded(val item: TodoItem) : Result()
-        data class TextChanged(val text: String) : Result()
-        data class DoneChanged(val isDone: Boolean) : Result()
+    private sealed class Msg {
+        data class Loaded(val item: TodoItem) : Msg()
+        data class TextChanged(val text: String) : Msg()
+        data class DoneChanged(val isDone: Boolean) : Msg()
     }
 
-    private inner class ExecutorImpl : ReaktiveExecutor<Intent, Unit, State, Result, Label>() {
+    private inner class ExecutorImpl : ReaktiveExecutor<Intent, Unit, State, Msg, Label>() {
         override fun executeAction(action: Unit, getState: () -> State) {
             database
                 .load(id = id)
-                .map(Result::Loaded)
+                .map(Msg::Loaded)
                 .observeOn(mainScheduler)
                 .subscribeScoped(onSuccess = ::dispatch)
         }
@@ -52,24 +52,24 @@ internal class TodoEditStoreProvider(
             }
 
         private fun setText(text: String, state: State) {
-            dispatch(Result.TextChanged(text = text))
+            dispatch(Msg.TextChanged(text = text))
             publish(Label.Changed(TodoItem(text = text, isDone = state.isDone)))
             database.setText(id = id, text = text).subscribeScoped()
         }
 
         private fun setDone(isDone: Boolean, state: State) {
-            dispatch(Result.DoneChanged(isDone = isDone))
+            dispatch(Msg.DoneChanged(isDone = isDone))
             publish(Label.Changed(TodoItem(text = state.text, isDone = isDone)))
             database.setDone(id = id, isDone = isDone).subscribeScoped()
         }
     }
 
-    private object ReducerImpl : Reducer<State, Result> {
-        override fun State.reduce(result: Result): State =
-            when (result) {
-                is Result.Loaded -> copy(text = result.item.text, isDone = result.item.isDone)
-                is Result.TextChanged -> copy(text = result.text)
-                is Result.DoneChanged -> copy(isDone = result.isDone)
+    private object ReducerImpl : Reducer<State, Msg> {
+        override fun State.reduce(msg: Msg): State =
+            when (msg) {
+                is Msg.Loaded -> copy(text = msg.item.text, isDone = msg.item.isDone)
+                is Msg.TextChanged -> copy(text = msg.text)
+                is Msg.DoneChanged -> copy(isDone = msg.isDone)
             }
     }
 

@@ -11,13 +11,13 @@ kotlin {
         binaries {
             framework {
                 baseName = "Todo"
-                transitiveExport = true
                 linkerOpts.add("-lsqlite3")
                 export(project(":common:database"))
                 export(project(":common:main"))
                 export(project(":common:edit"))
                 export(Deps.ArkIvanov.Decompose.decompose)
                 export(Deps.ArkIvanov.MVIKotlin.mvikotlinMain)
+                export(Deps.ArkIvanov.Essenty.lifecycle)
             }
         }
     }
@@ -44,6 +44,7 @@ kotlin {
                 api(project(":common:edit"))
                 api(Deps.ArkIvanov.Decompose.decompose)
                 api(Deps.ArkIvanov.MVIKotlin.mvikotlinMain)
+                api(Deps.ArkIvanov.Essenty.lifecycle)
             }
         }
     }

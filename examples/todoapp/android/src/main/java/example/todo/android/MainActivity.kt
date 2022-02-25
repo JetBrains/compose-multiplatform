@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
     private fun todoRoot(componentContext: ComponentContext): TodoRoot =
         TodoRootComponent(
             componentContext = componentContext,
-            storeFactory = LoggingStoreFactory(TimeTravelStoreFactory(DefaultStoreFactory())),
+            storeFactory = LoggingStoreFactory(TimeTravelStoreFactory()),
             database = DefaultTodoSharedDatabase(TodoDatabaseDriver(context = this))
         )
 }
