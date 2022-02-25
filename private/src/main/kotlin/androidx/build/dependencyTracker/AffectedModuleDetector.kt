@@ -616,6 +616,12 @@ class AffectedModuleDetectorImpl constructor(
                 ":wear:compose:integration-tests:macrobenchmark",
                 ":wear:compose:integration-tests:macrobenchmark-target"
             ),
+            // Changing generator code changes the output for generated icons, which are tested in
+            // material-icons-extended.
+            setOf(
+                ":compose:material:material:icons:generator",
+                ":compose:material:material-icons-extended"
+            ),
         )
 
         val IGNORED_PATHS = setOf(
