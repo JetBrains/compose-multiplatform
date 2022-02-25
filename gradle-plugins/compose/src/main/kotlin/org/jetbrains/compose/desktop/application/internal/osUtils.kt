@@ -72,12 +72,14 @@ internal object MacUtils {
     val make: File by lazy {
         File("/usr/bin/make").checkExistingFile()
     }
+
+    val open: File by lazy {
+        File("/usr/bin/open").checkExistingFile()
+    }
+
 }
 
 internal object UnixUtils {
-    val sh: File by lazy {
-        File("/bin/sh").checkExistingFile()
-    }
     val git: File by lazy {
         File("/usr/bin/git").checkExistingFile()
     }

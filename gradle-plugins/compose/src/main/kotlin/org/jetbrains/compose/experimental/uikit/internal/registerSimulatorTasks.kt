@@ -6,13 +6,10 @@
 package org.jetbrains.compose.experimental.uikit.internal
 
 import org.gradle.api.*
-import org.gradle.api.tasks.TaskContainer
 import org.jetbrains.compose.desktop.application.internal.Arch
 import org.jetbrains.compose.desktop.application.internal.MacUtils
-import org.jetbrains.compose.desktop.application.internal.UnixUtils
 import org.jetbrains.compose.desktop.application.internal.currentArch
 import org.jetbrains.compose.experimental.dsl.DeployTarget
-import org.jetbrains.compose.experimental.dsl.ExperimentalUiKitApplication
 import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
 import java.io.File
 
@@ -55,10 +52,10 @@ fun Project.registerSimulatorTasks(
                 listOf("simctl", "boot", device.udid)
             )
             runExternalTool(
-                UnixUtils.sh,
+                MacUtils.open,
                 listOf(
-                    "-c",
-                    "open `xcode-select -p`/Applications/Simulator.app/ --args -CurrentDeviceUDID ${device.udid}"
+                    "-a", "Simulator",
+                    "--args", "-CurrentDeviceUDID", device.udid
                 )
             )
         }
