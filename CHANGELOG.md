@@ -1,3 +1,41 @@
+# 1.1.0 (Feb 2022)
+### Features
+- [Implement experimental accessebility support for Windows](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Accessibility)
+- [Implement A11y focus tracking by Tab] (https://github.com/JetBrains/compose-jb/issues/1772)
+
+### Fixes
+- Fixes for TextField ([1](https://github.com/JetBrains/compose-jb/issues/1834), [2](https://github.com/JetBrains/compose-jb/issues/1615), [3](https://github.com/JetBrains/compose-jb/issues/1781), [4](https://github.com/JetBrains/compose-jb/issues/1670))
+- [Fix exception when we initialize a window with visible = false, undecorated = true](https://github.com/JetBrains/compose-jb/issues/1652)
+- [Fix crash in ImageComposeScene](https://github.com/JetBrains/compose-jb/issues/1392)
+- [Fixes for situations, when hover state doesn't disappear during scrolling](https://github.com/JetBrains/compose-jb/issues/1324#issuecomment-981148420)
+- Fixes for Slider/Scrollbar dragging ([1](https://github.com/JetBrains/compose-jb/issues/643), [2](https://github.com/JetBrains/compose-jb/issues/691))
+- [Fixed a case where [event.modifiersEx] does not provide info about the pressed mouse button (AWT)](https://github.com/JetBrains/androidx/pull/181)
+- Fix [TextField crashes after selecting the text and then deactivating the text field](https://github.com/JetBrains/compose-jb/issues/1474)
+- [Fix consuming events by mouse clickable](https://github.com/JetBrains/androidx/pull/178)
+- [Hide top-level dialog from the taskbar](https://github.com/JetBrains/androidx/pull/177)
+
+### API changes
+- The first frame of the window draws offscreen now. If your application has too long start, measure your first frame, and move the heavy logic to background or to the next frames. You can measure the first frame with this snippet:
+```
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.window.singleWindowApplication
+
+private var time by mutableStateOf(System.nanoTime())
+private var frame by mutableStateOf(0)
+
+fun main() = singleWindowApplication {
+    if (frame == 0) {
+        frame++
+    } else if (frame == 1) {
+        val duration = ((System.nanoTime() - time) / 1E6).toLong()
+        println("First frame millis: $duration")
+    }
+}
+```
+- [`PointerEvent.awtEvent`, `KeyEvent.awtEvent` are deprecated](https://github.com/JetBrains/androidx/pull/198), use `PointerEvent.awtEventOrNull`, `KeyEvent.awtEventOrNull` instead. The event can be null, if it isn't sent by AWT (for example, Compose can send synthetic Move events on relayout)
+
 # 1.0.1 (Dec 2021)
 This is basically 1.0.0 that works with Kotlin 1.6.10
 
