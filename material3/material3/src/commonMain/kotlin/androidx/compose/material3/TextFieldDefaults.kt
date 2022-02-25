@@ -86,16 +86,14 @@ interface TextFieldColors {
      * Represents the color used for the label of this text field.
      *
      * @param enabled whether the text field is enabled
-     * @param error whether the text field should show error color according to the Material
-     * specifications. If the label is being used as a placeholder, this will be false even if
-     * the input is invalid, as the placeholder should not use the error color
+     * @param isError whether the text field's current value is in error
      * @param interactionSource the [InteractionSource] of this text field. Helps to determine if
      * the text field is in focus or not
      */
     @Composable
     fun labelColor(
         enabled: Boolean,
-        error: Boolean,
+        isError: Boolean,
         interactionSource: InteractionSource
     ): State<Color>
 
@@ -104,18 +102,30 @@ interface TextFieldColors {
      *
      * @param enabled whether the text field is enabled
      * @param isError whether the text field's current value is in error
+     * @param interactionSource the [InteractionSource] of this text field. Helps to determine if
+     * the text field is in focus or not
      */
     @Composable
-    fun leadingIconColor(enabled: Boolean, isError: Boolean): State<Color>
+    fun leadingIconColor(
+        enabled: Boolean,
+        isError: Boolean,
+        interactionSource: InteractionSource
+    ): State<Color>
 
     /**
      * Represents the color used for the trailing icon of this text field.
      *
      * @param enabled whether the text field is enabled
      * @param isError whether the text field's current value is in error
+     * @param interactionSource the [InteractionSource] of this text field. Helps to determine if
+     * the text field is in focus or not
      */
     @Composable
-    fun trailingIconColor(enabled: Boolean, isError: Boolean): State<Color>
+    fun trailingIconColor(
+        enabled: Boolean,
+        isError: Boolean,
+        interactionSource: InteractionSource
+    ): State<Color>
 
     /**
      * Represents the color used for the border indicator of this text field.
@@ -139,48 +149,6 @@ interface TextFieldColors {
      */
     @Composable
     fun cursorColor(isError: Boolean): State<Color>
-}
-
-/**
- * Temporary experimental interface, to expose interactionSource to
- * leadingIconColor and trailingIconColor.
- * TODO: Should be removed when b/198571248 is fixed.
- */
-@ExperimentalMaterial3Api
-interface TextFieldColorsWithIcons : TextFieldColors {
-    /**
-     * Represents the color used for the leading icon of this text field.
-     *
-     * @param enabled whether the text field is enabled
-     * @param isError whether the text field's current value is in error
-     * @param interactionSource the [InteractionSource] of this text field. Helps to determine if
-     * the text field is in focus or not
-     */
-    @Composable
-    fun leadingIconColor(
-        enabled: Boolean,
-        isError: Boolean,
-        interactionSource: InteractionSource
-    ): State<Color> {
-        return leadingIconColor(enabled, isError)
-    }
-
-    /**
-     * Represents the color used for the trailing icon of this text field.
-     *
-     * @param enabled whether the text field is enabled
-     * @param isError whether the text field's current value is in error
-     * @param interactionSource the [InteractionSource] of this text field. Helps to determine if
-     * the text field is in focus or not
-     */
-    @Composable
-    fun trailingIconColor(
-        enabled: Boolean,
-        isError: Boolean,
-        interactionSource: InteractionSource
-    ): State<Color> {
-        return trailingIconColor(enabled, isError)
-    }
 }
 
 /**
@@ -350,11 +318,13 @@ object TextFieldDefaults {
         disabledIndicatorColor: Color = FilledTextFieldTokens.DisabledActiveIndicatorColor.toColor()
             .copy(alpha = FilledTextFieldTokens.DisabledActiveIndicatorOpacity),
         errorIndicatorColor: Color = FilledTextFieldTokens.ErrorActiveIndicatorColor.toColor(),
-        leadingIconColor: Color = FilledTextFieldTokens.LeadingIconColor.toColor(),
+        focusedLeadingIconColor: Color = FilledTextFieldTokens.FocusLeadingIconColor.toColor(),
+        unfocusedLeadingIconColor: Color = FilledTextFieldTokens.LeadingIconColor.toColor(),
         disabledLeadingIconColor: Color = FilledTextFieldTokens.DisabledLeadingIconColor.toColor()
             .copy(alpha = FilledTextFieldTokens.DisabledLeadingIconOpacity),
         errorLeadingIconColor: Color = FilledTextFieldTokens.ErrorLeadingIconColor.toColor(),
-        trailingIconColor: Color = FilledTextFieldTokens.TrailingIconColor.toColor(),
+        focusedTrailingIconColor: Color = FilledTextFieldTokens.FocusTrailingIconColor.toColor(),
+        unfocusedTrailingIconColor: Color = FilledTextFieldTokens.TrailingIconColor.toColor(),
         disabledTrailingIconColor: Color = FilledTextFieldTokens.DisabledTrailingIconColor.toColor()
             .copy(alpha = FilledTextFieldTokens.DisabledTrailingIconOpacity),
         errorTrailingIconColor: Color = FilledTextFieldTokens.ErrorTrailingIconColor.toColor(),
@@ -376,10 +346,12 @@ object TextFieldDefaults {
             unfocusedIndicatorColor = unfocusedIndicatorColor,
             errorIndicatorColor = errorIndicatorColor,
             disabledIndicatorColor = disabledIndicatorColor,
-            leadingIconColor = leadingIconColor,
+            focusedLeadingIconColor = focusedLeadingIconColor,
+            unfocusedLeadingIconColor = unfocusedLeadingIconColor,
             disabledLeadingIconColor = disabledLeadingIconColor,
             errorLeadingIconColor = errorLeadingIconColor,
-            trailingIconColor = trailingIconColor,
+            focusedTrailingIconColor = focusedTrailingIconColor,
+            unfocusedTrailingIconColor = unfocusedTrailingIconColor,
             disabledTrailingIconColor = disabledTrailingIconColor,
             errorTrailingIconColor = errorTrailingIconColor,
             backgroundColor = backgroundColor,
@@ -409,11 +381,13 @@ object TextFieldDefaults {
         disabledBorderColor: Color = OutlinedTextFieldTokens.DisabledOutlineColor.toColor()
             .copy(alpha = OutlinedTextFieldTokens.DisabledOutlineOpacity),
         errorBorderColor: Color = OutlinedTextFieldTokens.ErrorOutlineColor.toColor(),
-        leadingIconColor: Color = OutlinedTextFieldTokens.LeadingIconColor.toColor(),
+        focusedLeadingIconColor: Color = OutlinedTextFieldTokens.FocusLeadingIconColor.toColor(),
+        unfocusedLeadingIconColor: Color = OutlinedTextFieldTokens.LeadingIconColor.toColor(),
         disabledLeadingIconColor: Color = OutlinedTextFieldTokens.DisabledLeadingIconColor.toColor()
             .copy(alpha = OutlinedTextFieldTokens.DisabledLeadingIconOpacity),
         errorLeadingIconColor: Color = OutlinedTextFieldTokens.ErrorLeadingIconColor.toColor(),
-        trailingIconColor: Color = OutlinedTextFieldTokens.TrailingIconColor.toColor(),
+        focusedTrailingIconColor: Color = OutlinedTextFieldTokens.FocusTrailingIconColor.toColor(),
+        unfocusedTrailingIconColor: Color = OutlinedTextFieldTokens.TrailingIconColor.toColor(),
         disabledTrailingIconColor: Color = OutlinedTextFieldTokens.DisabledTrailingIconColor
             .toColor().copy(alpha = OutlinedTextFieldTokens.DisabledTrailingIconOpacity),
         errorTrailingIconColor: Color = OutlinedTextFieldTokens.ErrorTrailingIconColor.toColor(),
@@ -435,10 +409,12 @@ object TextFieldDefaults {
             unfocusedIndicatorColor = unfocusedBorderColor,
             errorIndicatorColor = errorBorderColor,
             disabledIndicatorColor = disabledBorderColor,
-            leadingIconColor = leadingIconColor,
+            focusedLeadingIconColor = focusedLeadingIconColor,
+            unfocusedLeadingIconColor = unfocusedLeadingIconColor,
             disabledLeadingIconColor = disabledLeadingIconColor,
             errorLeadingIconColor = errorLeadingIconColor,
-            trailingIconColor = trailingIconColor,
+            focusedTrailingIconColor = focusedTrailingIconColor,
+            unfocusedTrailingIconColor = unfocusedTrailingIconColor,
             disabledTrailingIconColor = disabledTrailingIconColor,
             errorTrailingIconColor = errorTrailingIconColor,
             backgroundColor = backgroundColor,
@@ -650,10 +626,12 @@ private class DefaultTextFieldColors(
     private val unfocusedIndicatorColor: Color,
     private val errorIndicatorColor: Color,
     private val disabledIndicatorColor: Color,
-    private val leadingIconColor: Color,
+    private val focusedLeadingIconColor: Color,
+    private val unfocusedLeadingIconColor: Color,
     private val disabledLeadingIconColor: Color,
     private val errorLeadingIconColor: Color,
-    private val trailingIconColor: Color,
+    private val focusedTrailingIconColor: Color,
+    private val unfocusedTrailingIconColor: Color,
     private val disabledTrailingIconColor: Color,
     private val errorTrailingIconColor: Color,
     private val backgroundColor: Color,
@@ -666,23 +644,37 @@ private class DefaultTextFieldColors(
 ) : TextFieldColors {
 
     @Composable
-    override fun leadingIconColor(enabled: Boolean, isError: Boolean): State<Color> {
+    override fun leadingIconColor(
+        enabled: Boolean,
+        isError: Boolean,
+        interactionSource: InteractionSource
+    ): State<Color> {
+        val focused by interactionSource.collectIsFocusedAsState()
+
         return rememberUpdatedState(
             when {
                 !enabled -> disabledLeadingIconColor
                 isError -> errorLeadingIconColor
-                else -> leadingIconColor
+                focused -> focusedLeadingIconColor
+                else -> unfocusedLeadingIconColor
             }
         )
     }
 
     @Composable
-    override fun trailingIconColor(enabled: Boolean, isError: Boolean): State<Color> {
+    override fun trailingIconColor(
+        enabled: Boolean,
+        isError: Boolean,
+        interactionSource: InteractionSource
+    ): State<Color> {
+        val focused by interactionSource.collectIsFocusedAsState()
+
         return rememberUpdatedState(
             when {
                 !enabled -> disabledTrailingIconColor
                 isError -> errorTrailingIconColor
-                else -> trailingIconColor
+                focused -> focusedTrailingIconColor
+                else -> unfocusedTrailingIconColor
             }
         )
     }
@@ -721,14 +713,14 @@ private class DefaultTextFieldColors(
     @Composable
     override fun labelColor(
         enabled: Boolean,
-        error: Boolean,
+        isError: Boolean,
         interactionSource: InteractionSource
     ): State<Color> {
         val focused by interactionSource.collectIsFocusedAsState()
 
         val targetValue = when {
             !enabled -> disabledLabelColor
-            error -> errorLabelColor
+            isError -> errorLabelColor
             focused -> focusedLabelColor
             else -> unfocusedLabelColor
         }
@@ -759,10 +751,12 @@ private class DefaultTextFieldColors(
         if (unfocusedIndicatorColor != other.unfocusedIndicatorColor) return false
         if (errorIndicatorColor != other.errorIndicatorColor) return false
         if (disabledIndicatorColor != other.disabledIndicatorColor) return false
-        if (leadingIconColor != other.leadingIconColor) return false
+        if (focusedLeadingIconColor != other.focusedLeadingIconColor) return false
+        if (unfocusedLeadingIconColor != other.unfocusedLeadingIconColor) return false
         if (disabledLeadingIconColor != other.disabledLeadingIconColor) return false
         if (errorLeadingIconColor != other.errorLeadingIconColor) return false
-        if (trailingIconColor != other.trailingIconColor) return false
+        if (focusedTrailingIconColor != other.focusedTrailingIconColor) return false
+        if (unfocusedTrailingIconColor != other.unfocusedTrailingIconColor) return false
         if (disabledTrailingIconColor != other.disabledTrailingIconColor) return false
         if (errorTrailingIconColor != other.errorTrailingIconColor) return false
         if (backgroundColor != other.backgroundColor) return false
@@ -785,10 +779,12 @@ private class DefaultTextFieldColors(
         result = 31 * result + unfocusedIndicatorColor.hashCode()
         result = 31 * result + errorIndicatorColor.hashCode()
         result = 31 * result + disabledIndicatorColor.hashCode()
-        result = 31 * result + leadingIconColor.hashCode()
+        result = 31 * result + focusedLeadingIconColor.hashCode()
+        result = 31 * result + unfocusedLeadingIconColor.hashCode()
         result = 31 * result + disabledLeadingIconColor.hashCode()
         result = 31 * result + errorLeadingIconColor.hashCode()
-        result = 31 * result + trailingIconColor.hashCode()
+        result = 31 * result + focusedTrailingIconColor.hashCode()
+        result = 31 * result + unfocusedTrailingIconColor.hashCode()
         result = 31 * result + disabledTrailingIconColor.hashCode()
         result = 31 * result + errorTrailingIconColor.hashCode()
         result = 31 * result + backgroundColor.hashCode()
