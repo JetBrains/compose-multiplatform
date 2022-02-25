@@ -1,4 +1,6 @@
 # 1.1.0 (Feb 2022)
+## Desktop
+
 ### Features
 - [Implement experimental accessebility support for Windows](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Accessibility)
 - [Implement A11y focus tracking by Tab](https://github.com/JetBrains/compose-jb/issues/1772)
