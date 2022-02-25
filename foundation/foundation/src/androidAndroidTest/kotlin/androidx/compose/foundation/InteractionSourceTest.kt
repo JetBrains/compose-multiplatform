@@ -66,18 +66,25 @@ class InteractionSourceTest {
                 interactions.add(it)
             }
         }
+
         scope.launch {
             interactionSource.emit(TestInteraction1)
             interactionSource.emit(TestInteraction2)
+        }
 
+        rule.runOnIdle {
             assertThat(interactions)
                 .containsExactlyElementsIn(
                     listOf(TestInteraction1, TestInteraction2)
                 )
                 .inOrder()
+        }
 
+        scope.launch {
             interactionSource.emit(TestInteraction3)
+        }
 
+        rule.runOnIdle {
             assertThat(interactions)
                 .containsExactlyElementsIn(
                     listOf(TestInteraction1, TestInteraction2, TestInteraction3)
