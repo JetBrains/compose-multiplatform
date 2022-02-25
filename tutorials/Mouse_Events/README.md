@@ -293,7 +293,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.awt.awtEvent
+import androidx.compose.ui.awt.awtEventOrNull
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.window.singleWindowApplication
@@ -306,7 +306,7 @@ fun main() = singleWindowApplication {
         Modifier
             .fillMaxSize()
             .onPointerEvent(PointerEventType.Press) {
-                text = it.awtEvent.locationOnScreen?.toString().orEmpty()
+                text = it.awtEventOrNull?.locationOnScreen?.toString().orEmpty()
             },
         contentAlignment = Alignment.Center
     ) {
@@ -381,7 +381,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.singleWindowApplication
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
-import androidx.compose.ui.awt.awtEvent
+import androidx.compose.ui.awt.awtEventOrNull
 import androidx.compose.ui.input.pointer.isPrimaryPressed
 import java.awt.event.MouseEvent
 
@@ -397,9 +397,9 @@ fun main() = singleWindowApplication {
                     .fillMaxWidth(0.7f)
                     .fillMaxHeight(0.2f)
                     .onPointerEvent(PointerEventType.Press) {
-                        when(it.awtEvent.button) {
+                        when(it.awtEventOrNull?.button) {
                             MouseEvent.BUTTON1 ->
-                                when (it.awtEvent.clickCount) {
+                                when (it.awtEventOrNull?.clickCount) {
                                     1 -> { text = "Single click"}
                                     2 -> { text = "Double click"}
                                 }
