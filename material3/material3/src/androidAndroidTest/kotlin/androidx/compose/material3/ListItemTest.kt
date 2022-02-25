@@ -18,6 +18,7 @@ package androidx.compose.material3
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.tokens.ListTokens
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
@@ -36,15 +37,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.width
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.math.roundToInt
+import com.google.common.truth.Truth.assertThat
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 class ListItemTest {
 
     @get:Rule
@@ -52,27 +53,26 @@ class ListItemTest {
 
     val icon24x24 by lazy { ImageBitmap(width = 24.dp.toIntPx(), height = 24.dp.toIntPx()) }
     val icon40x40 by lazy { ImageBitmap(width = 40.dp.toIntPx(), height = 40.dp.toIntPx()) }
-    val icon56x56 by lazy { ImageBitmap(width = 56.dp.toIntPx(), height = 56.dp.toIntPx()) }
 
     @Test
     fun listItem_oneLine_size() {
-        val expectedHeightNoIcon = 48.dp
+        val expectedHeightNoIcon = ListTokens.ListItemContainerHeight
         rule
             .setMaterialContentForSizeAssertions {
-                ListItem(text = { Text("Primary text") })
+                ListItem(headlineText = { Text("Primary text") })
             }
             .assertHeightIsEqualTo(expectedHeightNoIcon)
             .assertWidthIsEqualTo(rule.rootWidth())
     }
 
     @Test
-    fun listItem_oneLine_withIcon24_size() {
-        val expectedHeightSmallIcon = 56.dp
+    fun listItem_oneLine_withIcon_size() {
+        val expectedHeightSmallIcon = ListTokens.ListItemContainerHeight
         rule
             .setMaterialContentForSizeAssertions {
                 ListItem(
-                    text = { Text("Primary text") },
-                    icon = { Icon(icon24x24, null) }
+                    headlineText = { Text("Primary text") },
+                    leadingContent = { Icon(icon24x24, null) }
                 )
             }
             .assertHeightIsEqualTo(expectedHeightSmallIcon)
@@ -80,27 +80,13 @@ class ListItemTest {
     }
 
     @Test
-    fun listItem_oneLine_withIcon56_size() {
-        val expectedHeightLargeIcon = 72.dp
-        rule
-            .setMaterialContentForSizeAssertions {
-                ListItem(
-                    text = { Text("Primary text") },
-                    icon = { Icon(icon56x56, null) }
-                )
-            }
-            .assertHeightIsEqualTo(expectedHeightLargeIcon)
-            .assertWidthIsEqualTo(rule.rootWidth())
-    }
-
-    @Test
     fun listItem_twoLine_size() {
-        val expectedHeightNoIcon = 64.dp
+        val expectedHeightNoIcon = 72.dp
         rule
             .setMaterialContentForSizeAssertions {
                 ListItem(
-                    text = { Text("Primary text") },
-                    secondaryText = { Text("Secondary text") }
+                    headlineText = { Text("Primary text") },
+                    supportingText = { Text("Secondary text") }
                 )
             }
             .assertHeightIsEqualTo(expectedHeightNoIcon)
@@ -114,9 +100,9 @@ class ListItemTest {
         rule
             .setMaterialContentForSizeAssertions {
                 ListItem(
-                    text = { Text("Primary text") },
-                    secondaryText = { Text("Secondary text") },
-                    icon = { Icon(icon24x24, null) }
+                    headlineText = { Text("Primary text") },
+                    supportingText = { Text("Secondary text") },
+                    leadingContent = { Icon(icon24x24, null) }
                 )
             }
             .assertHeightIsEqualTo(expectedHeightWithIcon)
@@ -130,55 +116,8 @@ class ListItemTest {
             .setMaterialContentForSizeAssertions {
                 ListItem(
                     overlineText = { Text("OVERLINE") },
-                    text = { Text("Primary text") },
-                    secondaryText = { Text("Secondary text") }
-                )
-            }
-            .assertHeightIsEqualTo(expectedHeight)
-            .assertWidthIsEqualTo(rule.rootWidth())
-    }
-
-    @Test
-    fun listItem_threeLine_noSingleLine_size() {
-        val expectedHeight = 88.dp
-        rule
-            .setMaterialContentForSizeAssertions {
-                ListItem(
-                    text = { Text("Primary text") },
-                    secondaryText = { Text("Secondary text with long text") },
-                    singleLineSecondaryText = false
-                )
-            }
-            .assertHeightIsEqualTo(expectedHeight)
-            .assertWidthIsEqualTo(rule.rootWidth())
-    }
-
-    @Test
-    fun listItem_threeLine_metaText_size() {
-        val expectedHeight = 88.dp
-        rule
-            .setMaterialContentForSizeAssertions {
-                ListItem(
-                    overlineText = { Text("OVERLINE") },
-                    text = { Text("Primary text") },
-                    secondaryText = { Text("Secondary text") },
-                    trailing = { Text("meta") }
-                )
-            }
-            .assertHeightIsEqualTo(expectedHeight)
-            .assertWidthIsEqualTo(rule.rootWidth())
-    }
-
-    @Test
-    fun listItem_threeLine_noSingleLine_metaText_size() {
-        val expectedHeight = 88.dp
-        rule
-            .setMaterialContentForSizeAssertions {
-                ListItem(
-                    text = { Text("Primary text") },
-                    secondaryText = { Text("Secondary text with long text") },
-                    singleLineSecondaryText = false,
-                    trailing = { Text("meta") }
+                    headlineText = { Text("Primary text") },
+                    supportingText = { Text("Secondary text") }
                 )
             }
             .assertHeightIsEqualTo(expectedHeight)
@@ -187,28 +126,35 @@ class ListItemTest {
 
     @Test
     fun listItem_oneLine_positioning_noIcon() {
-        val listItemHeight = 48.dp
-        val expectedLeftPadding = 16.dp
-        val expectedRightPadding = 16.dp
+        val listItemHeight = ListTokens.ListItemContainerHeight
+        val expectedStartPadding = 16.dp
+        val expectedEndPadding = 24.dp
 
         val textPosition = Ref<Offset>()
         val textSize = Ref<IntSize>()
         val trailingPosition = Ref<Offset>()
         val trailingSize = Ref<IntSize>()
-        rule.setMaterialContent {
+
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 ListItem(
-                    text = { Text("Primary text", Modifier.saveLayout(textPosition, textSize)) },
-                    trailing = {
-                        Image(icon24x24, null, Modifier.saveLayout(trailingPosition, trailingSize))
+                    headlineText = {
+                        Text("Primary text", Modifier.saveLayout(textPosition, textSize))
+                    },
+                    trailingContent = {
+                        Image(
+                            icon24x24,
+                            null,
+                            Modifier.saveLayout(trailingPosition, trailingSize))
                     }
                 )
             }
         }
+
         val ds = rule.onRoot().getUnclippedBoundsInRoot()
         rule.runOnIdleWithDensity {
             assertThat(textPosition.value!!.x).isEqualTo(
-                expectedLeftPadding.roundToPx()
+                expectedStartPadding.roundToPx()
                     .toFloat()
             )
             assertThat(textPosition.value!!.y).isEqualTo(
@@ -216,7 +162,7 @@ class ListItemTest {
             )
             assertThat(trailingPosition.value!!.x).isEqualTo(
                 ds.width.roundToPx() - trailingSize.value!!.width -
-                    expectedRightPadding.roundToPx().toFloat()
+                    expectedEndPadding.roundToPx().toFloat()
             )
             assertThat(trailingPosition.value!!.y).isEqualTo(
                 ((listItemHeight.roundToPx() - trailingSize.value!!.height) / 2f).roundToInt()
@@ -227,33 +173,40 @@ class ListItemTest {
 
     @Test
     fun listItem_oneLine_positioning_withIcon() {
-        val listItemHeight = 56.dp
-        val expectedLeftPadding = 16.dp
-        val expectedTextLeftPadding = 32.dp
+        val listItemHeight = ListTokens.ListItemContainerHeight
+        val expectedStartPadding = 16.dp
+        val expectedTextStartPadding = 16.dp
 
         val textPosition = Ref<Offset>()
         val textSize = Ref<IntSize>()
         val iconPosition = Ref<Offset>()
         val iconSize = Ref<IntSize>()
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 ListItem(
-                    text = { Text("Primary text", Modifier.saveLayout(textPosition, textSize)) },
-                    icon = { Image(icon24x24, null, Modifier.saveLayout(iconPosition, iconSize)) }
+                    headlineText = {
+                        Text("Primary text", Modifier.saveLayout(textPosition, textSize))
+                    },
+                    leadingContent = {
+                        Image(
+                            icon24x24,
+                            null,
+                            Modifier.saveLayout(iconPosition, iconSize))
+                    }
                 )
             }
         }
         rule.runOnIdleWithDensity {
             assertThat(iconPosition.value!!.x).isEqualTo(
-                expectedLeftPadding.roundToPx().toFloat()
+                expectedStartPadding.roundToPx().toFloat()
             )
             assertThat(iconPosition.value!!.y).isEqualTo(
                 ((listItemHeight.roundToPx() - iconSize.value!!.height) / 2f).roundToInt().toFloat()
             )
             assertThat(textPosition.value!!.x).isEqualTo(
-                expectedLeftPadding.roundToPx().toFloat() +
+                expectedStartPadding.roundToPx().toFloat() +
                     iconSize.value!!.width +
-                    expectedTextLeftPadding.roundToPx().toFloat()
+                    expectedTextStartPadding.roundToPx().toFloat()
             )
             assertThat(textPosition.value!!.y).isEqualTo(
                 ((listItemHeight.roundToPx() - textSize.value!!.height) / 2f).roundToInt().toFloat()
@@ -263,10 +216,8 @@ class ListItemTest {
 
     @Test
     fun listItem_twoLine_positioning_noIcon() {
-        val expectedLeftPadding = 16.dp
-        val expectedRightPadding = 16.dp
-        val expectedTextBaseline = 28.dp
-        val expectedSecondaryTextBaselineOffset = 20.dp
+        val expectedStartPadding = 16.dp
+        val expectedEndPadding = 24.dp
 
         val textPosition = Ref<Offset>()
         val textBaseline = Ref<Float>()
@@ -277,16 +228,16 @@ class ListItemTest {
         val trailingPosition = Ref<Offset>()
         val trailingBaseline = Ref<Float>()
         val trailingSize = Ref<IntSize>()
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 ListItem(
-                    text = {
+                    headlineText = {
                         Text(
                             "Primary text",
                             Modifier.saveLayout(textPosition, textSize, textBaseline)
                         )
                     },
-                    secondaryText = {
+                    supportingText = {
                         Text(
                             "Secondary text",
                             Modifier.saveLayout(
@@ -296,7 +247,7 @@ class ListItemTest {
                             )
                         )
                     },
-                    trailing = {
+                    trailingContent = {
                         Text(
                             "meta",
                             Modifier.saveLayout(trailingPosition, trailingSize, trailingBaseline)
@@ -308,35 +259,22 @@ class ListItemTest {
         val ds = rule.onRoot().getUnclippedBoundsInRoot()
         rule.runOnIdleWithDensity {
             assertThat(textPosition.value!!.x).isEqualTo(
-                expectedLeftPadding.roundToPx().toFloat()
-            )
-            assertThat(textBaseline.value!!).isEqualTo(
-                expectedTextBaseline.roundToPx().toFloat()
+                expectedStartPadding.roundToPx().toFloat()
             )
             assertThat(secondaryTextPosition.value!!.x).isEqualTo(
-                expectedLeftPadding.roundToPx().toFloat()
-            )
-            assertThat(secondaryTextBaseline.value!!).isEqualTo(
-                expectedTextBaseline.roundToPx().toFloat() +
-                    expectedSecondaryTextBaselineOffset.roundToPx().toFloat()
+                expectedStartPadding.roundToPx().toFloat()
             )
             assertThat(trailingPosition.value!!.x).isEqualTo(
                 ds.width.roundToPx() - trailingSize.value!!.width -
-                    expectedRightPadding.roundToPx().toFloat()
-            )
-            assertThat(trailingBaseline.value!!).isEqualTo(
-                expectedTextBaseline.roundToPx().toFloat()
+                    expectedEndPadding.roundToPx().toFloat()
             )
         }
     }
 
     @Test
-    fun listItem_twoLine_positioning_withSmallIcon() {
-        val expectedLeftPadding = 16.dp
-        val expectedIconTopPadding = 16.dp
-        val expectedContentLeftPadding = 32.dp
-        val expectedTextBaseline = 32.dp
-        val expectedSecondaryTextBaselineOffset = 20.dp
+    fun listItem_twoLine_positioning_withIcon() {
+        val expectedStartPadding = 16.dp
+        val expectedContentStartPadding = 16.dp
 
         val textPosition = Ref<Offset>()
         val textBaseline = Ref<Float>()
@@ -346,16 +284,16 @@ class ListItemTest {
         val secondaryTextSize = Ref<IntSize>()
         val iconPosition = Ref<Offset>()
         val iconSize = Ref<IntSize>()
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 ListItem(
-                    text = {
+                    headlineText = {
                         Text(
                             "Primary text",
                             Modifier.saveLayout(textPosition, textSize, textBaseline)
                         )
                     },
-                    secondaryText = {
+                    supportingText = {
                         Text(
                             "Secondary text",
                             Modifier.saveLayout(
@@ -365,7 +303,7 @@ class ListItemTest {
                             )
                         )
                     },
-                    icon = {
+                    leadingContent = {
                         Image(icon24x24, null, Modifier.saveLayout(iconPosition, iconSize))
                     }
                 )
@@ -373,120 +311,25 @@ class ListItemTest {
         }
         rule.runOnIdleWithDensity {
             assertThat(textPosition.value!!.x).isEqualTo(
-                expectedLeftPadding.roundToPx().toFloat() + iconSize.value!!.width +
-                    expectedContentLeftPadding.roundToPx().toFloat()
-            )
-            assertThat(textBaseline.value!!).isEqualTo(
-                expectedTextBaseline.roundToPx().toFloat()
+                expectedStartPadding.roundToPx().toFloat() + iconSize.value!!.width +
+                    expectedContentStartPadding.roundToPx().toFloat()
             )
             assertThat(secondaryTextPosition.value!!.x).isEqualTo(
-                expectedLeftPadding.roundToPx().toFloat() +
+                expectedStartPadding.roundToPx().toFloat() +
                     iconSize.value!!.width +
-                    expectedContentLeftPadding.roundToPx().toFloat()
-            )
-            assertThat(secondaryTextBaseline.value!!).isEqualTo(
-                expectedTextBaseline.roundToPx().toFloat() +
-                    expectedSecondaryTextBaselineOffset.roundToPx().toFloat()
+                    expectedContentStartPadding.roundToPx().toFloat()
             )
             assertThat(iconPosition.value!!.x).isEqualTo(
-                expectedLeftPadding.roundToPx().toFloat()
-            )
-            assertThat(iconPosition.value!!.y).isEqualTo(
-                expectedIconTopPadding.roundToPx().toFloat()
-            )
-        }
-    }
-
-    @Test
-    fun listItem_twoLine_positioning_withLargeIcon() {
-        val listItemHeight = 72.dp
-        val expectedLeftPadding = 16.dp
-        val expectedIconTopPadding = 16.dp
-        val expectedContentLeftPadding = 16.dp
-        val expectedTextBaseline = 32.dp
-        val expectedSecondaryTextBaselineOffset = 20.dp
-        val expectedRightPadding = 16.dp
-
-        val textPosition = Ref<Offset>()
-        val textBaseline = Ref<Float>()
-        val textSize = Ref<IntSize>()
-        val secondaryTextPosition = Ref<Offset>()
-        val secondaryTextBaseline = Ref<Float>()
-        val secondaryTextSize = Ref<IntSize>()
-        val iconPosition = Ref<Offset>()
-        val iconSize = Ref<IntSize>()
-        val trailingPosition = Ref<Offset>()
-        val trailingSize = Ref<IntSize>()
-        rule.setMaterialContent {
-            Box {
-                ListItem(
-                    text = {
-                        Text(
-                            "Primary text",
-                            Modifier.saveLayout(textPosition, textSize, textBaseline)
-                        )
-                    },
-                    secondaryText = {
-                        Text(
-                            "Secondary text",
-                            Modifier.saveLayout(
-                                secondaryTextPosition,
-                                secondaryTextSize,
-                                secondaryTextBaseline
-                            )
-                        )
-                    },
-                    icon = {
-                        Image(icon40x40, null, Modifier.saveLayout(iconPosition, iconSize))
-                    },
-                    trailing = {
-                        Image(icon24x24, null, Modifier.saveLayout(trailingPosition, trailingSize))
-                    }
-                )
-            }
-        }
-        val ds = rule.onRoot().getUnclippedBoundsInRoot()
-        rule.runOnIdleWithDensity {
-            assertThat(textPosition.value!!.x).isEqualTo(
-                expectedLeftPadding.roundToPx().toFloat() + iconSize.value!!.width +
-                    expectedContentLeftPadding.roundToPx().toFloat()
-            )
-            assertThat(textBaseline.value!!).isEqualTo(
-                expectedTextBaseline.roundToPx().toFloat()
-            )
-            assertThat(secondaryTextPosition.value!!.x).isEqualTo(
-                expectedLeftPadding.roundToPx().toFloat() +
-                    iconSize.value!!.width +
-                    expectedContentLeftPadding.roundToPx().toFloat()
-            )
-            assertThat(secondaryTextBaseline.value!!).isEqualTo(
-                expectedTextBaseline.roundToPx().toFloat() +
-                    expectedSecondaryTextBaselineOffset.roundToPx().toFloat()
-            )
-            assertThat(iconPosition.value!!.x).isEqualTo(
-                expectedLeftPadding.roundToPx().toFloat()
-            )
-            assertThat(iconPosition.value!!.y).isEqualTo(
-                expectedIconTopPadding.roundToPx().toFloat()
-            )
-            assertThat(trailingPosition.value!!.x).isEqualTo(
-                ds.width.roundToPx() - trailingSize.value!!.width -
-                    expectedRightPadding.roundToPx().toFloat()
-            )
-            assertThat(trailingPosition.value!!.y).isEqualTo(
-                ((listItemHeight.roundToPx() - trailingSize.value!!.height) / 2).toFloat()
+                expectedStartPadding.roundToPx().toFloat()
             )
         }
     }
 
     @Test
     fun listItem_threeLine_positioning_noOverline_metaText() {
-        val expectedLeftPadding = 16.dp
-        val expectedIconTopPadding = 16.dp
-        val expectedContentLeftPadding = 32.dp
-        val expectedTextBaseline = 28.dp
-        val expectedSecondaryTextBaselineOffset = 20.dp
-        val expectedRightPadding = 16.dp
+        val expectedStartPadding = 16.dp
+        val expectedContentStartPadding = 16.dp
+        val expectedEndPadding = 24.dp
 
         val textPosition = Ref<Offset>()
         val textBaseline = Ref<Float>()
@@ -498,18 +341,18 @@ class ListItemTest {
         val iconSize = Ref<IntSize>()
         val trailingPosition = Ref<Offset>()
         val trailingSize = Ref<IntSize>()
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 ListItem(
-                    text = {
+                    headlineText = {
                         Text(
                             "Primary text",
                             Modifier.saveLayout(textPosition, textSize, textBaseline)
                         )
                     },
-                    secondaryText = {
+                    supportingText = {
                         Text(
-                            "Secondary text",
+                            "Very long supporting text which will span two lines",
                             Modifier.saveLayout(
                                 secondaryTextPosition,
                                 secondaryTextSize,
@@ -517,11 +360,10 @@ class ListItemTest {
                             )
                         )
                     },
-                    singleLineSecondaryText = false,
-                    icon = {
+                    leadingContent = {
                         Image(icon24x24, null, Modifier.saveLayout(iconPosition, iconSize))
                     },
-                    trailing = {
+                    trailingContent = {
                         Image(icon24x24, null, Modifier.saveLayout(trailingPosition, trailingSize))
                     }
                 )
@@ -530,43 +372,27 @@ class ListItemTest {
         val ds = rule.onRoot().getUnclippedBoundsInRoot()
         rule.runOnIdleWithDensity {
             assertThat(textPosition.value!!.x).isEqualTo(
-                expectedLeftPadding.roundToPx().toFloat() + iconSize.value!!.width +
-                    expectedContentLeftPadding.roundToPx().toFloat()
-            )
-            assertThat(textBaseline.value!!).isEqualTo(
-                expectedTextBaseline.roundToPx().toFloat()
+                expectedStartPadding.roundToPx().toFloat() + iconSize.value!!.width +
+                    expectedContentStartPadding.roundToPx().toFloat()
             )
             assertThat(secondaryTextPosition.value!!.x).isEqualTo(
-                expectedLeftPadding.roundToPx().toFloat() + iconSize.value!!.width +
-                    expectedContentLeftPadding.roundToPx().toFloat()
+                expectedStartPadding.roundToPx().toFloat() + iconSize.value!!.width +
+                    expectedContentStartPadding.roundToPx().toFloat()
             )
-            assertThat(secondaryTextBaseline.value!!).isEqualTo(
-                expectedTextBaseline.roundToPx().toFloat() +
-                    expectedSecondaryTextBaselineOffset.roundToPx().toFloat()
-            )
-            assertThat(iconPosition.value!!.x).isEqualTo(expectedLeftPadding.roundToPx().toFloat())
-            assertThat(iconPosition.value!!.y).isEqualTo(
-                expectedIconTopPadding.roundToPx().toFloat()
-            )
+            assertThat(iconPosition.value!!.x).isEqualTo(expectedStartPadding.roundToPx().toFloat())
             assertThat(trailingPosition.value!!.x).isEqualTo(
                 ds.width.roundToPx() - trailingSize.value!!.width.toFloat() -
-                    expectedRightPadding.roundToPx().toFloat()
-            )
-            assertThat(trailingPosition.value!!.y).isEqualTo(
-                expectedIconTopPadding.roundToPx().toFloat()
+                    expectedEndPadding.roundToPx().toFloat()
             )
         }
     }
 
     @Test
     fun listItem_threeLine_positioning_overline_trailingIcon() {
-        val expectedLeftPadding = 16.dp
-        val expectedIconTopPadding = 16.dp
-        val expectedContentLeftPadding = 16.dp
-        val expectedOverlineBaseline = 28.dp
-        val expectedTextBaselineOffset = 20.dp
-        val expectedSecondaryTextBaselineOffset = 20.dp
-        val expectedRightPadding = 16.dp
+        val expectedTopPadding = 16.dp
+        val expectedStartPadding = 16.dp
+        val expectedContentStartPadding = 16.dp
+        val expectedEndPadding = 24.dp
 
         val textPosition = Ref<Offset>()
         val textBaseline = Ref<Float>()
@@ -582,7 +408,7 @@ class ListItemTest {
         val trailingPosition = Ref<Offset>()
         val trailingSize = Ref<IntSize>()
         val trailingBaseline = Ref<Float>()
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 ListItem(
                     overlineText = {
@@ -595,13 +421,13 @@ class ListItemTest {
                             )
                         )
                     },
-                    text = {
+                    headlineText = {
                         Text(
                             "Primary text",
                             Modifier.saveLayout(textPosition, textSize, textBaseline)
                         )
                     },
-                    secondaryText = {
+                    supportingText = {
                         Text(
                             "Secondary text",
                             Modifier.saveLayout(
@@ -611,14 +437,14 @@ class ListItemTest {
                             )
                         )
                     },
-                    icon = {
+                    leadingContent = {
                         Image(
                             icon40x40,
                             null,
                             Modifier.saveLayout(iconPosition, iconSize)
                         )
                     },
-                    trailing = {
+                    trailingContent = {
                         Text(
                             "meta",
                             Modifier.saveLayout(
@@ -635,44 +461,29 @@ class ListItemTest {
         val ds = rule.onRoot().getUnclippedBoundsInRoot()
         rule.runOnIdleWithDensity {
             assertThat(textPosition.value!!.x).isEqualTo(
-                expectedLeftPadding.roundToPx().toFloat() +
+                expectedStartPadding.roundToPx().toFloat() +
                     iconSize.value!!.width +
-                    expectedContentLeftPadding.roundToPx().toFloat()
-            )
-            assertThat(textBaseline.value!!).isEqualTo(
-                expectedOverlineBaseline.roundToPx().toFloat() +
-                    expectedTextBaselineOffset.roundToPx().toFloat()
-            )
-            assertThat(overlineTextPosition.value!!.x).isEqualTo(
-                expectedLeftPadding.roundToPx().toFloat() +
-                    iconSize.value!!.width +
-                    expectedContentLeftPadding.roundToPx().toFloat()
-            )
-            assertThat(overlineTextBaseline.value!!).isEqualTo(
-                expectedOverlineBaseline.roundToPx().toFloat()
+                    expectedContentStartPadding.roundToPx().toFloat()
             )
             assertThat(secondaryTextPosition.value!!.x).isEqualTo(
-                expectedLeftPadding.roundToPx().toFloat() +
+                expectedStartPadding.roundToPx().toFloat() +
                     iconSize.value!!.width +
-                    expectedContentLeftPadding.roundToPx().toFloat()
-            )
-            assertThat(secondaryTextBaseline.value!!).isEqualTo(
-                expectedOverlineBaseline.roundToPx().toFloat() +
-                    expectedTextBaselineOffset.roundToPx().toFloat() +
-                    expectedSecondaryTextBaselineOffset.roundToPx().toFloat()
+                    expectedContentStartPadding.roundToPx().toFloat()
             )
             assertThat(iconPosition.value!!.x).isEqualTo(
-                expectedLeftPadding.roundToPx().toFloat()
-            )
-            assertThat(iconPosition.value!!.y).isEqualTo(
-                expectedIconTopPadding.roundToPx().toFloat()
+                expectedStartPadding.roundToPx().toFloat()
             )
             assertThat(trailingPosition.value!!.x).isEqualTo(
                 ds.width.roundToPx() - trailingSize.value!!.width -
-                    expectedRightPadding.roundToPx().toFloat()
+                    expectedEndPadding.roundToPx().toFloat()
             )
-            assertThat(trailingBaseline.value!!).isEqualTo(
-                expectedOverlineBaseline.roundToPx().toFloat()
+            assertThat(overlineTextPosition.value!!.x).isEqualTo(
+                expectedStartPadding.roundToPx().toFloat() +
+                    iconSize.value!!.width +
+                    expectedContentStartPadding.roundToPx().toFloat()
+            )
+            assertThat(overlineTextPosition.value!!.y).isEqualTo(
+                expectedTopPadding.roundToPx().toFloat()
             )
         }
     }

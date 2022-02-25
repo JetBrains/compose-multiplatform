@@ -148,6 +148,17 @@ private val IconButtons = Component(
     examples = IconButtonExamples,
 )
 
+private val Lists = Component(
+    id = nextId(),
+    name = "Lists",
+    description = "Lists are continuous, vertical indexes of text or images.",
+    // No ListItem icon
+    tintIcon = true,
+    guidelinesUrl = "$ComponentGuidelinesUrl/list-item",
+    docsUrl = "$PackageSummaryUrl#listitem",
+    sourceUrl = "$Material3SourceUrl/ListItem.kt",
+    examples = ListsExamples,
+)
 private val Menus = Component(
     id = nextId(),
     name = "Menus",
@@ -297,6 +308,7 @@ val Components = listOf(
     ExtendedFloatingActionButton,
     FloatingActionButtons,
     IconButtons,
+    Lists,
     Menus,
     NavigationBar,
     NavigationDrawer,

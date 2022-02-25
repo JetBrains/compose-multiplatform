@@ -17,412 +17,516 @@
 package androidx.compose.material3
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.tokens.ListTokens
+import androidx.compose.material3.tokens.TypographyKeyTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.AlignmentLine
-import androidx.compose.ui.layout.FirstBaseline
-import androidx.compose.ui.layout.LastBaseline
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.fastForEachIndexed
-import kotlin.math.max
 
+// TODO: Provide M3 ListItem asset and doc link when available
 /**
- * <a href="https://material.io/components/lists" class="external" target="_blank">Material Design list</a> item.
+ * Material Design list item.
  *
  * Lists are continuous, vertical indexes of text or images.
  *
- * ![Lists image](https://developer.android.com/images/reference/androidx/compose/material/lists.png)
+ * This component can be used to achieve the list item templates existing in the spec. One-line list
+ * items have a singular line of headline text. Two-line list items additionally have either
+ * supporting or overline text. Three-line list items have either both supporting and overline text,
+ * or extended (two-line) supporting text. For example:
+ * - one-line item
+ * @sample androidx.compose.material3.samples.OneLineListItem
+ * - two-line item
+ * @sample androidx.compose.material3.samples.TwoLineListItem
+ * - three-line item
+ * @sample androidx.compose.material3.samples.ThreeLineListItem
  *
- * To make this [ListItem] clickable, use [Modifier.clickable].
- * To add a background to the [ListItem], wrap it with a [Surface].
- *
- * This component can be used to achieve the list item templates existing in the spec. For example:
- * - one-line items
- * @sample androidx.compose.material.samples.OneLineListItems
- * - two-line items
- * @sample androidx.compose.material.samples.TwoLineListItems
- * - three-line items
- * @sample androidx.compose.material.samples.ThreeLineListItems
- *
- * You can combine this component with a checkbox or switch as in the following examples:
- * @sample androidx.compose.material.samples.ClickableListItems
- *
- * @param modifier Modifier to be applied to the list item
- * @param icon The leading supporting visual of the list item
- * @param secondaryText The secondary text of the list item
- * @param singleLineSecondaryText Whether the secondary text is single line
- * @param overlineText The text displayed above the primary text
- * @param trailing The trailing meta text, icon, switch or checkbox
- * @param text The primary text of the list item
+ * @param headlineText the headline text of the list item
+ * @param modifier [Modifier] to be applied to the list item
+ * @param overlineText the text displayed above the headline text
+ * @param supportingText the supporting text of the list item
+ * @param leadingContent the leading supporting visual of the list item
+ * @param trailingContent the trailing meta text, icon, switch or checkbox
+ * @param colors [ListItemColors] that will be used to resolve the background and content color for
+ * this list item in different states. See [ListItemDefaults.colors]
+ * @param tonalElevation the tonal elevation of this list item
+ * @param shadowElevation the shadow elevation of this list item
  */
 @Composable
-@ExperimentalMaterialApi
+@ExperimentalMaterial3Api
 fun ListItem(
+    headlineText: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    icon: @Composable (() -> Unit)? = null,
-    secondaryText: @Composable (() -> Unit)? = null,
-    singleLineSecondaryText: Boolean = true,
     overlineText: @Composable (() -> Unit)? = null,
-    trailing: @Composable (() -> Unit)? = null,
-    text: @Composable () -> Unit
+    supportingText: @Composable (() -> Unit)? = null,
+    leadingContent: @Composable (() -> Unit)? = null,
+    trailingContent: @Composable (() -> Unit)? = null,
+    colors: ListItemColors = ListItemDefaults.colors(),
+    tonalElevation: Dp = ListItemDefaults.Elevation,
+    shadowElevation: Dp = ListItemDefaults.Elevation,
 ) {
-    val typography = MaterialTheme.typography
-
-    val styledText = applyTextStyle(typography.subtitle1, ContentAlpha.high, text)!!
-    val styledSecondaryText = applyTextStyle(typography.body2, ContentAlpha.medium, secondaryText)
-    val styledOverlineText = applyTextStyle(typography.overline, ContentAlpha.high, overlineText)
-    val styledTrailing = applyTextStyle(typography.caption, ContentAlpha.high, trailing)
-
-    val semanticsModifier = modifier.semantics(mergeDescendants = true) {}
-
-    if (styledSecondaryText == null && styledOverlineText == null) {
-        OneLine.ListItem(semanticsModifier, icon, styledText, styledTrailing)
-    } else if (
-        (styledOverlineText == null && singleLineSecondaryText) || styledSecondaryText == null
-    ) {
-        TwoLine.ListItem(
-            semanticsModifier,
-            icon,
-            styledText,
-            styledSecondaryText,
-            styledOverlineText,
-            styledTrailing
-        )
+    if (overlineText == null && supportingText == null) {
+        // One-Line List Item
+        ListItem(
+            modifier = modifier
+                .heightIn(min = ListTokens.ListItemContainerHeight)
+                .padding(
+                    vertical = ListItemVerticalPadding,
+                    horizontal = ListItemHorizontalPadding
+                ),
+            tonalElevation = tonalElevation,
+            shadowElevation = shadowElevation,
+        ) {
+            if (leadingContent != null) {
+                leadingContent(
+                    leadingContent = leadingContent,
+                    contentColor = colors.leadingIconColor(enabled = true).value,
+                    topAlign = false
+                )()
+            }
+            Box(
+                Modifier
+                    .weight(1f)
+                    .align(Alignment.CenterVertically)
+            ) {
+                ProvideTextStyleFromToken(
+                    colors.headlineColor(enabled = true).value,
+                    ListTokens.ListItemLabelTextFont,
+                    headlineText
+                )
+            }
+            if (trailingContent != null) {
+                trailingContent(
+                    trailingContent = trailingContent,
+                    contentColor = colors.trailingIconColor(enabled = true).value,
+                    topAlign = false
+                )()
+            }
+        }
+    } else if (overlineText == null) {
+        // Two-Line List Item
+        ListItem(
+            modifier = modifier
+                .heightIn(min = TwoLineListItemContainerHeight)
+                .padding(
+                    vertical = ListItemVerticalPadding,
+                    horizontal = ListItemHorizontalPadding
+                ),
+            tonalElevation = tonalElevation,
+            shadowElevation = shadowElevation,
+        ) {
+            if (leadingContent != null) {
+                leadingContent(
+                    leadingContent = leadingContent,
+                    contentColor = colors.leadingIconColor(enabled = true).value,
+                    topAlign = false
+                )()
+            }
+            Box(
+                Modifier
+                    .weight(1f)
+                    .align(Alignment.CenterVertically)
+            ) {
+                Column {
+                    ProvideTextStyleFromToken(
+                        colors.headlineColor(enabled = true).value,
+                        ListTokens.ListItemLabelTextFont,
+                        headlineText
+                    )
+                    ProvideTextStyleFromToken(
+                        colors.supportingColor(enabled = true).value,
+                        ListTokens.ListItemSupportingTextFont,
+                        supportingText!!
+                    )
+                }
+            }
+            if (trailingContent != null) {
+                trailingContent(
+                    trailingContent = trailingContent,
+                    contentColor = colors.trailingIconColor(enabled = true).value,
+                    topAlign = false
+                )()
+            }
+        }
+    } else if (supportingText == null) {
+        // Two-Line List Item
+        ListItem(
+            modifier = modifier
+                .heightIn(min = TwoLineListItemContainerHeight)
+                .padding(
+                    vertical = ListItemVerticalPadding,
+                    horizontal = ListItemHorizontalPadding
+                ),
+            tonalElevation = tonalElevation,
+            shadowElevation = shadowElevation,
+        ) {
+            if (leadingContent != null) {
+                leadingContent(
+                    leadingContent = leadingContent,
+                    contentColor = colors.leadingIconColor(enabled = true).value,
+                    topAlign = false
+                )()
+            }
+            Box(
+                Modifier
+                    .weight(1f)
+                    .align(Alignment.CenterVertically)
+            ) {
+                Column {
+                    ProvideTextStyleFromToken(
+                        colors.overlineColor(enabled = true).value,
+                        ListTokens.ListItemOverlineFont,
+                        overlineText
+                    )
+                    ProvideTextStyleFromToken(
+                        colors.headlineColor(enabled = true).value,
+                        ListTokens.ListItemLabelTextFont,
+                        headlineText
+                    )
+                }
+            }
+            if (trailingContent != null) {
+                trailingContent(
+                    trailingContent = trailingContent,
+                    contentColor = colors.trailingIconColor(enabled = true).value,
+                    topAlign = false
+                )()
+            }
+        }
     } else {
-        ThreeLine.ListItem(
-            semanticsModifier,
-            icon,
-            styledText,
-            styledSecondaryText,
-            styledOverlineText,
-            styledTrailing
-        )
+        // Three-Line List Item
+        ListItem(
+            modifier = modifier
+                .heightIn(min = ThreeLineListItemContainerHeight)
+                .padding(
+                    vertical = ListItemThreeLineVerticalPadding,
+                    horizontal = ListItemHorizontalPadding
+                ),
+            tonalElevation = tonalElevation,
+            shadowElevation = shadowElevation,
+        ) {
+            if (leadingContent != null) {
+                leadingContent(
+                    leadingContent = leadingContent,
+                    contentColor = colors.leadingIconColor(enabled = true).value,
+                    topAlign = true
+                )()
+            }
+            Box(
+                Modifier
+                    .weight(1f)
+                    .padding(end = ContentEndPadding),
+            ) {
+                Column {
+                    ProvideTextStyleFromToken(
+                        colors.overlineColor(enabled = true).value,
+                        ListTokens.ListItemOverlineFont,
+                        overlineText
+                    )
+                    ProvideTextStyleFromToken(
+                        colors.headlineColor(enabled = true).value,
+                        ListTokens.ListItemLabelTextFont,
+                        headlineText
+                    )
+                    ProvideTextStyleFromToken(
+                        colors.supportingColor(enabled = true).value,
+                        ListTokens.ListItemSupportingTextFont,
+                        supportingText
+                    )
+                }
+            }
+            if (trailingContent != null) {
+                trailingContent(
+                    trailingContent = trailingContent,
+                    contentColor = colors.trailingIconColor(enabled = true).value,
+                    topAlign = true
+                )()
+            }
+        }
     }
 }
 
-private object OneLine {
-    // TODO(popam): support wide icons
-    // TODO(popam): convert these to sp
-    // List item related defaults.
-    private val MinHeight = 48.dp
-    private val MinHeightWithIcon = 56.dp
-
-    // Icon related defaults.
-    private val IconMinPaddedWidth = 40.dp
-    private val IconLeftPadding = 16.dp
-    private val IconVerticalPadding = 8.dp
-
-    // Content related defaults.
-    private val ContentLeftPadding = 16.dp
-    private val ContentRightPadding = 16.dp
-
-    // Trailing related defaults.
-    private val TrailingRightPadding = 16.dp
-
-    @Composable
-    fun ListItem(
-        modifier: Modifier = Modifier,
-        icon: @Composable (() -> Unit)?,
-        text: @Composable (() -> Unit),
-        trailing: @Composable (() -> Unit)?
+// TODO(b/233782301): Complete 3-line list item
+// TODO: Provide M3 ListItem asset and doc link when available
+/**
+ * Material Design list item.
+ *
+ * Lists are continuous, vertical indexes of text or images. For more opinionated List Items,
+ * consider using another overload
+ *
+ * @param modifier [Modifier] to be applied to the list item
+ * @param shape defines the list item's shape
+ * @param containerColor the container color of this list item
+ * @param contentColor the content color of this list item
+ * @param tonalElevation the tonal elevation of this list item
+ * @param shadowElevation the shadow elevation of this list item
+ * @param content the content to be displayed in the middle section of this list item
+ */
+@Composable
+@ExperimentalMaterial3Api
+private fun ListItem(
+    modifier: Modifier = Modifier,
+    shape: Shape = ListItemDefaults.Shape,
+    containerColor: Color = ListItemDefaults.ContainerColor,
+    contentColor: Color = ListItemDefaults.ContentColor,
+    tonalElevation: Dp = ListItemDefaults.Elevation,
+    shadowElevation: Dp = ListItemDefaults.Elevation,
+    content: @Composable RowScope.() -> Unit,
+) {
+    Surface(
+        modifier = modifier,
+        shape = shape,
+        color = containerColor,
+        contentColor = contentColor,
+        tonalElevation = tonalElevation,
+        shadowElevation = shadowElevation,
     ) {
-        val minHeight = if (icon == null) MinHeight else MinHeightWithIcon
-        Row(modifier.heightIn(min = minHeight)) {
-            if (icon != null) {
-                Box(
-                    Modifier.align(Alignment.CenterVertically)
-                        .widthIn(min = IconLeftPadding + IconMinPaddedWidth)
-                        .padding(
-                            start = IconLeftPadding,
-                            top = IconVerticalPadding,
-                            bottom = IconVerticalPadding
-                        ),
-                    contentAlignment = Alignment.CenterStart
-                ) { icon() }
-            }
-            Box(
-                Modifier.weight(1f)
-                    .align(Alignment.CenterVertically)
-                    .padding(start = ContentLeftPadding, end = ContentRightPadding),
-                contentAlignment = Alignment.CenterStart
-            ) { text() }
-            if (trailing != null) {
+        Row(content = content)
+    }
+}
+
+@Composable
+private fun leadingContent(
+    leadingContent: @Composable (() -> Unit),
+    contentColor: Color,
+    topAlign: Boolean,
+): @Composable RowScope.() -> Unit {
+    return {
+        CompositionLocalProvider(
+            LocalContentColor provides contentColor) {
+            if (topAlign) {
+                Box(Modifier
+                    .padding(end = LeadingContentEndPadding),
+                    contentAlignment = Alignment.TopStart
+                ) { leadingContent() }
+            } else {
                 Box(
                     Modifier
                         .align(Alignment.CenterVertically)
-                        .padding(end = TrailingRightPadding)
-                ) { trailing() }
+                        .padding(end = LeadingContentEndPadding)
+                ) { leadingContent() }
             }
         }
     }
 }
 
-private object TwoLine {
-    // List item related defaults.
-    private val MinHeight = 64.dp
-    private val MinHeightWithIcon = 72.dp
-
-    // Icon related defaults.
-    private val IconMinPaddedWidth = 40.dp
-    private val IconLeftPadding = 16.dp
-    private val IconVerticalPadding = 16.dp
-
-    // Content related defaults.
-    private val ContentLeftPadding = 16.dp
-    private val ContentRightPadding = 16.dp
-    private val OverlineBaselineOffset = 24.dp
-    private val OverlineToPrimaryBaselineOffset = 20.dp
-    private val PrimaryBaselineOffsetNoIcon = 28.dp
-    private val PrimaryBaselineOffsetWithIcon = 32.dp
-    private val PrimaryToSecondaryBaselineOffsetNoIcon = 20.dp
-    private val PrimaryToSecondaryBaselineOffsetWithIcon = 20.dp
-
-    // Trailing related defaults.
-    private val TrailingRightPadding = 16.dp
-
-    @Composable
-    fun ListItem(
-        modifier: Modifier = Modifier,
-        icon: @Composable (() -> Unit)?,
-        text: @Composable (() -> Unit),
-        secondaryText: @Composable (() -> Unit)?,
-        overlineText: @Composable (() -> Unit)?,
-        trailing: @Composable (() -> Unit)?
-    ) {
-        val minHeight = if (icon == null) MinHeight else MinHeightWithIcon
-        Row(modifier.heightIn(min = minHeight)) {
-            val columnModifier = Modifier.weight(1f)
-                .padding(start = ContentLeftPadding, end = ContentRightPadding)
-
-            if (icon != null) {
-                Box(
-                    Modifier
-                        .sizeIn(
-                            minWidth = IconLeftPadding + IconMinPaddedWidth,
-                            minHeight = minHeight
-                        )
-                        .padding(
-                            start = IconLeftPadding,
-                            top = IconVerticalPadding,
-                            bottom = IconVerticalPadding
-                        ),
-                    contentAlignment = Alignment.TopStart
-                ) { icon() }
-            }
-
-            if (overlineText != null) {
-                BaselinesOffsetColumn(
-                    listOf(OverlineBaselineOffset, OverlineToPrimaryBaselineOffset),
-                    columnModifier
-                ) {
-                    overlineText()
-                    text()
-                }
-            } else {
-                BaselinesOffsetColumn(
-                    listOf(
-                        if (icon != null) {
-                            PrimaryBaselineOffsetWithIcon
-                        } else {
-                            PrimaryBaselineOffsetNoIcon
-                        },
-                        if (icon != null) {
-                            PrimaryToSecondaryBaselineOffsetWithIcon
-                        } else {
-                            PrimaryToSecondaryBaselineOffsetNoIcon
-                        }
-                    ),
-                    columnModifier
-                ) {
-                    text()
-                    secondaryText!!()
-                }
-            }
-            if (trailing != null) {
-                OffsetToBaselineOrCenter(
-                    if (icon != null) {
-                        PrimaryBaselineOffsetWithIcon
-                    } else {
-                        PrimaryBaselineOffsetNoIcon
-                    }
-                ) {
-                    Box(
-                        // TODO(popam): find way to center and wrap content without minHeight
-                        Modifier.heightIn(min = minHeight)
-                            .padding(end = TrailingRightPadding),
-                        contentAlignment = Alignment.Center
-                    ) { trailing() }
-                }
-            }
-        }
-    }
-}
-
-private object ThreeLine {
-    // List item related defaults.
-    private val MinHeight = 88.dp
-
-    // Icon related defaults.
-    private val IconMinPaddedWidth = 40.dp
-    private val IconLeftPadding = 16.dp
-    private val IconThreeLineVerticalPadding = 16.dp
-
-    // Content related defaults.
-    private val ContentLeftPadding = 16.dp
-    private val ContentRightPadding = 16.dp
-    private val ThreeLineBaselineFirstOffset = 28.dp
-    private val ThreeLineBaselineSecondOffset = 20.dp
-    private val ThreeLineBaselineThirdOffset = 20.dp
-    private val ThreeLineTrailingTopPadding = 16.dp
-
-    // Trailing related defaults.
-    private val TrailingRightPadding = 16.dp
-
-    @Composable
-    fun ListItem(
-        modifier: Modifier = Modifier,
-        icon: @Composable (() -> Unit)?,
-        text: @Composable (() -> Unit),
-        secondaryText: @Composable (() -> Unit),
-        overlineText: @Composable (() -> Unit)?,
-        trailing: @Composable (() -> Unit)?
-    ) {
-        Row(modifier.heightIn(min = MinHeight)) {
-            if (icon != null) {
-                val minSize = IconLeftPadding + IconMinPaddedWidth
-                Box(
-                    Modifier
-                        .sizeIn(minWidth = minSize, minHeight = minSize)
-                        .padding(
-                            start = IconLeftPadding,
-                            top = IconThreeLineVerticalPadding,
-                            bottom = IconThreeLineVerticalPadding
-                        ),
-                    contentAlignment = Alignment.CenterStart
-                ) { icon() }
-            }
-            BaselinesOffsetColumn(
-                listOf(
-                    ThreeLineBaselineFirstOffset,
-                    ThreeLineBaselineSecondOffset,
-                    ThreeLineBaselineThirdOffset
-                ),
-                Modifier.weight(1f)
-                    .padding(start = ContentLeftPadding, end = ContentRightPadding)
-            ) {
-                if (overlineText != null) overlineText()
-                text()
-                secondaryText()
-            }
-            if (trailing != null) {
-                OffsetToBaselineOrCenter(
-                    ThreeLineBaselineFirstOffset - ThreeLineTrailingTopPadding,
-                    Modifier.padding(top = ThreeLineTrailingTopPadding, end = TrailingRightPadding),
-                    trailing
-                )
-            }
-        }
-    }
-}
-
-/**
- * Layout that expects [Text] children, and positions them with specific offsets between the
- * top of the layout and the first text, as well as the last baseline and first baseline
- * for subsequent pairs of texts.
- */
-// TODO(popam): consider making this a layout composable in `foundation-layout`.
 @Composable
-private fun BaselinesOffsetColumn(
-    offsets: List<Dp>,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Layout(content, modifier) { measurables, constraints ->
-        val childConstraints = constraints.copy(minHeight = 0, maxHeight = Constraints.Infinity)
-        val placeables = measurables.map { it.measure(childConstraints) }
-
-        val containerWidth = placeables.fold(0) { maxWidth, placeable ->
-            max(maxWidth, placeable.width)
-        }
-        val y = Array(placeables.size) { 0 }
-        var containerHeight = 0
-        placeables.fastForEachIndexed { index, placeable ->
-            val toPreviousBaseline = if (index > 0) {
-                placeables[index - 1].height - placeables[index - 1][LastBaseline]
-            } else 0
-            val topPadding = max(
-                0,
-                offsets[index].roundToPx() - placeable[FirstBaseline] - toPreviousBaseline
-            )
-            y[index] = topPadding + containerHeight
-            containerHeight += topPadding + placeable.height
-        }
-
-        layout(containerWidth, containerHeight) {
-            placeables.fastForEachIndexed { index, placeable ->
-                placeable.placeRelative(0, y[index])
-            }
-        }
-    }
-}
-
-/**
- * Layout that takes a child and adds the necessary padding such that the first baseline of the
- * child is at a specific offset from the top of the container. If the child does not have
- * a first baseline, the layout will match the minHeight constraint and will center the
- * child.
- */
-// TODO(popam): support fallback alignment in AlignmentLineOffset, and use that here.
-@Composable
-private fun OffsetToBaselineOrCenter(
-    offset: Dp,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Layout(content, modifier) { measurables, constraints ->
-        val placeable = measurables[0].measure(constraints.copy(minHeight = 0))
-        val baseline = placeable[FirstBaseline]
-        val y: Int
-        val containerHeight: Int
-        if (baseline != AlignmentLine.Unspecified) {
-            y = offset.roundToPx() - baseline
-            containerHeight = max(constraints.minHeight, y + placeable.height)
-        } else {
-            containerHeight = max(constraints.minHeight, placeable.height)
-            y = Alignment.Center.align(
-                IntSize.Zero,
-                IntSize(0, containerHeight - placeable.height),
-                layoutDirection
-            ).y
-        }
-        layout(placeable.width, containerHeight) {
-            placeable.placeRelative(0, y)
-        }
-    }
-}
-
-private fun applyTextStyle(
-    textStyle: TextStyle,
-    contentAlpha: Float,
-    icon: @Composable (() -> Unit)?
-): @Composable (() -> Unit)? {
-    if (icon == null) return null
+private fun trailingContent(
+    trailingContent: @Composable (() -> Unit),
+    contentColor: Color,
+    topAlign: Boolean,
+): @Composable RowScope.() -> Unit {
     return {
-        CompositionLocalProvider(LocalContentAlpha provides contentAlpha) {
-            ProvideTextStyle(textStyle, icon)
+        if (topAlign) {
+            Box(Modifier
+                .padding(horizontal = TrailingHorizontalPadding),
+                contentAlignment = Alignment.TopStart
+            ) {
+                ProvideTextStyleFromToken(
+                    contentColor,
+                    ListTokens.ListItemTrailingSupportingTextFont,
+                    trailingContent
+                ) }
+        } else {
+            Box(
+                Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(horizontal = TrailingHorizontalPadding)
+            ) {
+                ProvideTextStyleFromToken(
+                    contentColor,
+                    ListTokens.ListItemTrailingSupportingTextFont,
+                    trailingContent
+                ) }
         }
     }
 }
+
+/**
+ * Contains the default values used by list items.
+ */
+object ListItemDefaults {
+    /** The default shape of a list item */
+    val Shape: Shape @Composable get() = ListTokens.ListItemContainerShape.toShape()
+
+    /** The default elevation of a list item */
+    val Elevation: Dp = ListTokens.ListItemContainerElevation
+
+    /** The container color of a list item */
+    val ContainerColor: Color @Composable get() = ListTokens.ListItemContainerColor.toColor()
+
+    /** The content color of a list item */
+    val ContentColor: Color @Composable get() = ListTokens.ListItemLabelTextColor.toColor()
+
+    /**
+     * Creates a [ListItemColors] that represents the default container and content colors used in a
+     * [ListItem].
+     *
+     * @param containerColor the container color of this list item when enabled.
+     * @param headlineColor the headline text content color of this list item when
+     * enabled.
+     * @param leadingIconColor the color of this list item's leading content when enabled.
+     * @param overlineColor the overline text color of this list item
+     * @param supportingColor the supporting text color of this list item
+     * @param trailingIconColor the color of this list item's trailing content when enabled.
+     * @param disabledHeadlineColor the content color of this list item when not enabled.
+     * @param disabledLeadingIconColor the color of this list item's leading content when not
+     * enabled.
+     * @param disabledTrailingIconColor the color of this list item's trailing content when not
+     * enabled.
+     */
+    @Composable
+    fun colors(
+        containerColor: Color = ListTokens.ListItemContainerColor.toColor(),
+        headlineColor: Color = ListTokens.ListItemLabelTextColor.toColor(),
+        leadingIconColor: Color = ListTokens.ListItemLeadingIconColor.toColor(),
+        overlineColor: Color = ListTokens.ListItemOverlineColor.toColor(),
+        supportingColor: Color = ListTokens.ListItemSupportingTextColor.toColor(),
+        trailingIconColor: Color = ListTokens.ListItemTrailingIconColor.toColor(),
+        disabledHeadlineColor: Color = ListTokens.ListItemDisabledLabelTextColor.toColor()
+            .copy(alpha = ListTokens.ListItemDisabledLabelTextOpacity),
+        disabledLeadingIconColor: Color = ListTokens.ListItemDisabledLeadingIconColor.toColor()
+            .copy(alpha = ListTokens.ListItemDisabledLeadingIconOpacity),
+        disabledTrailingIconColor: Color = ListTokens.ListItemDisabledTrailingIconColor.toColor()
+            .copy(alpha = ListTokens.ListItemDisabledTrailingIconOpacity)
+    ): ListItemColors =
+        DefaultListItemColors(
+            containerColor = containerColor,
+            headlineColor = headlineColor,
+            leadingIconColor = leadingIconColor,
+            overlineColor = overlineColor,
+            supportingTextColor = supportingColor,
+            trailingIconColor = trailingIconColor,
+            disabledHeadlineColor = disabledHeadlineColor,
+            disabledLeadingIconColor = disabledLeadingIconColor,
+            disabledTrailingIconColor = disabledTrailingIconColor,
+        )
+}
+
+/**
+ * Represents the container and content colors used in a list item in different states.
+ *
+ * - See [ListItemDefaults.colors] for the default colors used in a [ListItem].
+ */
+@Stable
+interface ListItemColors {
+
+    /** The container color of this [ListItem] based on enabled state */
+    @Composable
+    fun containerColor(enabled: Boolean): State<Color>
+
+    /** The color of this [ListItem]'s headline text based on enabled state */
+    @Composable
+    fun headlineColor(enabled: Boolean): State<Color>
+
+    /** The color of this [ListItem]'s leading content based on enabled state */
+    @Composable
+    fun leadingIconColor(enabled: Boolean): State<Color>
+
+    /** The color of this [ListItem]'s overline text based on enabled state */
+    @Composable
+    fun overlineColor(enabled: Boolean): State<Color>
+
+    /** The color of this [ListItem]'s supporting text based on enabled state */
+    @Composable
+    fun supportingColor(enabled: Boolean): State<Color>
+
+    /** The color of this [ListItem]'s trailing content based on enabled state */
+    @Composable
+    fun trailingIconColor(enabled: Boolean): State<Color>
+}
+
+/** Default [ListItemColors] implementation. */
+@Immutable
+private class DefaultListItemColors(
+    private val containerColor: Color,
+    private val headlineColor: Color,
+    private val leadingIconColor: Color,
+    private val overlineColor: Color,
+    private val supportingTextColor: Color,
+    private val trailingIconColor: Color,
+    private val disabledHeadlineColor: Color,
+    private val disabledLeadingIconColor: Color,
+    private val disabledTrailingIconColor: Color,
+) : ListItemColors {
+    @Composable
+    override fun containerColor(enabled: Boolean): State<Color> {
+        return rememberUpdatedState(containerColor)
+    }
+
+    @Composable
+    override fun headlineColor(enabled: Boolean): State<Color> {
+        return rememberUpdatedState(
+            if (enabled) headlineColor else disabledHeadlineColor
+        )
+    }
+
+    @Composable
+    override fun leadingIconColor(enabled: Boolean): State<Color> {
+        return rememberUpdatedState(
+            if (enabled) leadingIconColor else disabledLeadingIconColor
+        )
+    }
+
+    @Composable
+    override fun overlineColor(enabled: Boolean): State<Color> {
+        return rememberUpdatedState(overlineColor)
+    }
+
+    @Composable
+    override fun supportingColor(enabled: Boolean): State<Color> {
+        return rememberUpdatedState(supportingTextColor)
+    }
+
+    @Composable
+    override fun trailingIconColor(enabled: Boolean): State<Color> {
+        return rememberUpdatedState(
+            if (enabled) trailingIconColor else disabledTrailingIconColor
+        )
+    }
+}
+
+@Composable
+private fun ProvideTextStyleFromToken(
+    color: Color,
+    textToken: TypographyKeyTokens,
+    content: @Composable () -> Unit,
+) {
+    val textStyle = MaterialTheme.typography.fromToken(textToken)
+    CompositionLocalProvider(LocalContentColor provides color) {
+        ProvideTextStyle(textStyle, content)
+    }
+}
+
+// Container related defaults
+// TODO: Make sure these values stay up to date until replaced with tokens.
+private val TwoLineListItemContainerHeight = 72.dp
+private val ThreeLineListItemContainerHeight = 88.dp
+private val ListItemVerticalPadding = 8.dp
+private val ListItemThreeLineVerticalPadding = 16.dp
+private val ListItemHorizontalPadding = 16.dp
+
+// Icon related defaults.
+// TODO: Make sure these values stay up to date until replaced with tokens.
+private val LeadingContentEndPadding = 16.dp
+
+// Content related defaults.
+// TODO: Make sure these values stay up to date until replaced with tokens.
+private val ContentEndPadding = 8.dp
+
+// Trailing related defaults.
+// TODO: Make sure these values stay up to date until replaced with tokens.
+private val TrailingHorizontalPadding = 8.dp
