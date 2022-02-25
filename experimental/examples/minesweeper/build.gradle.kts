@@ -163,7 +163,7 @@ compose.experimental {
             }
             simulator("IPad_ru") {
                 //Usage: ./gradlew iosDeployIPad_ru
-                device = IOSDevices.IPAD_MINI_6
+                device = IOSDevices.IPAD_MINI_6th_Gen
                 buildConfiguration = "Debug"
             }
         }
