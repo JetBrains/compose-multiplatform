@@ -31,6 +31,7 @@ import org.jetbrains.skia.paragraph.Shadow as SkShadow
 import org.jetbrains.skia.paragraph.StrutStyle
 import org.jetbrains.skia.paragraph.TextBox
 import org.jetbrains.skia.paragraph.TextStyle as SkTextStyle
+import org.jetbrains.skia.paragraph.Rect as SkRect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.isSpecified
@@ -289,6 +290,8 @@ internal class ParagraphBuilder(
 ) {
     private lateinit var initialStyle: SpanStyle
     private lateinit var defaultStyle: ComputedStyle
+    internal lateinit var paragraphStyle: ParagraphStyle
+        private set
     private lateinit var ops: List<Op>
 
     /**
@@ -312,6 +315,7 @@ internal class ParagraphBuilder(
 
         var pos = 0
         val ps = textStyleToParagraphStyle(textStyle, defaultStyle)
+        paragraphStyle = ps
 
         if (maxLines != Int.MAX_VALUE) {
             ps.maxLinesCount = maxLines
@@ -524,6 +528,7 @@ internal class ParagraphBuilder(
                 else -> error("Unexpected size in textStyleToParagraphStyle")
             }
             strutStyle.height = lineHeight / fontSize
+            strutStyle.fontSize = fontSize
             pStyle.strutStyle = strutStyle
         }
         pStyle.direction = textDirection.toSkDirection()

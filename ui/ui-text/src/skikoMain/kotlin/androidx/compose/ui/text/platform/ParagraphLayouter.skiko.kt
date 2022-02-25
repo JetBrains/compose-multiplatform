@@ -71,6 +71,8 @@ class ParagraphLayouter(
     private var width: Float = -1f
 
     val defaultHeight get() = builder.defaultHeight
+    val defaultFont get() = builder.defaultFont
+    val paragraphStyle get() = builder.paragraphStyle
 
     fun layoutParagraph(
         width: Float = this.width,
