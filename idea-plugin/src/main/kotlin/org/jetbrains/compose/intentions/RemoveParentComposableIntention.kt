@@ -6,19 +6,17 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Iconable
 import com.intellij.psi.PsiElement
+import javax.swing.Icon
 import org.jetbrains.compose.desktop.ide.preview.PreviewIcons
 import org.jetbrains.compose.intentions.utils.composableFinder.ChildComposableFinder
 import org.jetbrains.compose.intentions.utils.composableFinder.ComposableFunctionFinder
 import org.jetbrains.compose.intentions.utils.getRootPsiElement.GetRootPsiElement
-import org.jetbrains.compose.intentions.utils.isIntentionAvailable.IsIntentionAvailable
+import org.jetbrains.compose.intentions.utils.isIntentionAvailable
 import org.jetbrains.kotlin.psi.KtCallExpression
-import javax.swing.Icon
 
 class RemoveParentComposableIntention :
     PsiElementBaseIntentionAction(),
-    Iconable,
-    PriorityAction,
-    IsIntentionAvailable {
+    PriorityAction {
 
     override fun getText(): String {
         return "Remove the parent Composable"
@@ -33,7 +31,7 @@ class RemoveParentComposableIntention :
     private val composableFunctionFinder: ComposableFunctionFinder = ChildComposableFinder()
 
     override fun isAvailable(project: Project, editor: Editor?, element: PsiElement): Boolean {
-        return element.isAvailable(composableFunctionFinder)
+        return element.isIntentionAvailable(composableFunctionFinder)
     }
 
     override fun invoke(project: Project, editor: Editor?, element: PsiElement) {
@@ -43,8 +41,6 @@ class RemoveParentComposableIntention :
                 ?: return
         callExpression.replace(lambdaBlock)
     }
-
-    override fun getIcon(flags: Int): Icon = PreviewIcons.COMPOSE
 
     override fun getPriority(): PriorityAction.Priority {
         return PriorityAction.Priority.NORMAL

@@ -20,23 +20,17 @@ class GetRootPsiElement {
      * 3. KtProperty - val systemUiController = rememberSystemUiController()
      * 4. KtValueArgumentList - ()
      */
-    tailrec operator fun invoke(element: PsiElement, iteration: Int = 0): PsiElement? {
-        // To avoid infinite loops
-        if (iteration > 5) {
-            // Looking for a better way to handle this - throw error or return null
-            return null
-        }
-
+    tailrec operator fun invoke(element: PsiElement): PsiElement? {
         return when (element) {
             is KtProperty -> element
             is KtNameReferenceExpression,
-            is KtValueArgumentList -> invoke(element.parent, iteration + 1)
+            is KtValueArgumentList -> invoke(element.parent)
             is KtDotQualifiedExpression,
             is KtCallExpression -> {
                 when (element.parent) {
                     is KtProperty,
-                    is KtDotQualifiedExpression -> invoke(element.parent, iteration + 1) // composable dot expression
-                    is KtPropertyDelegate -> invoke(element.parent.parent, iteration + 1) // composable dot expression
+                    is KtDotQualifiedExpression -> invoke(element.parent) // composable dot expression
+                    is KtPropertyDelegate -> invoke(element.parent.parent) // composable dot expression
                     else -> element
                 }
             }

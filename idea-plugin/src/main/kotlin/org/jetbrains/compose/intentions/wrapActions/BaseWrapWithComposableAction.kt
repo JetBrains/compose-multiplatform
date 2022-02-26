@@ -10,12 +10,11 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.compose.intentions.utils.composableFinder.ComposableFunctionFinder
 import org.jetbrains.compose.intentions.utils.composableFinder.ComposableFunctionFinderImpl
 import org.jetbrains.compose.intentions.utils.getRootPsiElement.GetRootPsiElement
-import org.jetbrains.compose.intentions.utils.isIntentionAvailable.IsIntentionAvailable
+import org.jetbrains.compose.intentions.utils.isIntentionAvailable
 
 abstract class BaseWrapWithComposableAction :
     PsiElementBaseIntentionAction(),
-    HighPriorityAction,
-    IsIntentionAvailable {
+    HighPriorityAction {
 
     private val composableFunctionFinder: ComposableFunctionFinder by lazy {
         ComposableFunctionFinderImpl()
@@ -30,7 +29,7 @@ abstract class BaseWrapWithComposableAction :
     }
 
     override fun isAvailable(project: Project, editor: Editor?, element: PsiElement): Boolean {
-        return element.isAvailable(composableFunctionFinder)
+        return element.isIntentionAvailable(composableFunctionFinder)
     }
 
     override fun startInWriteAction(): Boolean = true

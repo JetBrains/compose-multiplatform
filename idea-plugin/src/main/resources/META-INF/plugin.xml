@@ -55,22 +55,22 @@
 
         <defaultLiveTemplates file="templates/ComposeMultiplatformTemplates.xml"/>
 
-        <intentionAction id="wrap_group" order="first">
+        <intentionAction>
             <className>org.jetbrains.compose.intentions.WrapWithComposableIntentionGroup
             </className>
-            <category>Composable intentions</category>
+            <category>Compose Multiplatform</category>
         </intentionAction>
 
-        <intentionAction id="remove_composable" order="last">
+        <intentionAction>
             <className>org.jetbrains.compose.intentions.RemoveComposableIntention
             </className>
-            <category>Composable intentions</category>
+            <category>Compose Multiplatform</category>
         </intentionAction>
 
-        <intentionAction id="remove_parent_composable" order="last">
+        <intentionAction>
             <className>org.jetbrains.compose.intentions.RemoveParentComposableIntention
             </className>
-            <category>Composable intentions</category>
+            <category>Compose Multiplatform</category>
         </intentionAction>
 
     </extensions>

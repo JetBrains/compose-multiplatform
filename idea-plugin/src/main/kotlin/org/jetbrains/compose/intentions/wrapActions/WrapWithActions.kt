@@ -10,7 +10,7 @@ class WrapWithBoxIntention : BaseWrapWithComposableAction() {
     }
 
     override fun getTemplate(): TemplateImpl? {
-        return TemplateSettings.getInstance().getTemplate("WwB", "ComposeMultiplatformTemplates")
+        return TemplateSettings.getInstance().getTemplate("boxcomp", "ComposeMultiplatformTemplates")
     }
 }
 
@@ -21,7 +21,7 @@ class WrapWithCardIntention : BaseWrapWithComposableAction() {
     }
 
     override fun getTemplate(): TemplateImpl? {
-        return TemplateSettings.getInstance().getTemplate("WwC", "ComposeMultiplatformTemplates")
+        return TemplateSettings.getInstance().getTemplate("cardcomp", "ComposeMultiplatformTemplates")
     }
 }
 
@@ -32,7 +32,7 @@ class WrapWithColumnIntention : BaseWrapWithComposableAction() {
     }
 
     override fun getTemplate(): TemplateImpl? {
-        return TemplateSettings.getInstance().getTemplate("WwCol", "ComposeMultiplatformTemplates")
+        return TemplateSettings.getInstance().getTemplate("columncomp", "ComposeMultiplatformTemplates")
     }
 }
 
@@ -43,7 +43,7 @@ class WrapWithRowIntention : BaseWrapWithComposableAction() {
     }
 
     override fun getTemplate(): TemplateImpl? {
-        return TemplateSettings.getInstance().getTemplate("WwRow", "ComposeMultiplatformTemplates")
+        return TemplateSettings.getInstance().getTemplate("rowcomp", "ComposeMultiplatformTemplates")
     }
 }
 
@@ -54,7 +54,7 @@ class WrapWithLzyColumnIntention : BaseWrapWithComposableAction() {
     }
 
     override fun getTemplate(): TemplateImpl? {
-        return TemplateSettings.getInstance().getTemplate("WwLazyCol", "ComposeMultiplatformTemplates")
+        return TemplateSettings.getInstance().getTemplate("lazycolumncomp", "ComposeMultiplatformTemplates")
     }
 }
 
@@ -65,6 +65,6 @@ class WrapWithLzyRowIntention : BaseWrapWithComposableAction() {
     }
 
     override fun getTemplate(): TemplateImpl? {
-        return TemplateSettings.getInstance().getTemplate("WwLazyRow", "ComposeMultiplatformTemplates")
+        return TemplateSettings.getInstance().getTemplate("lazyrowcomp", "ComposeMultiplatformTemplates")
     }
 }

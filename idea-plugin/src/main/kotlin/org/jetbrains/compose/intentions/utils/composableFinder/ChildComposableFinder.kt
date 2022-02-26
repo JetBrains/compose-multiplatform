@@ -1,12 +1,12 @@
 package org.jetbrains.compose.intentions.utils.composableFinder
 
 import com.intellij.psi.PsiElement
-import org.jetbrains.compose.intentions.utils.isPsiElementComposable.IsPsiElementComposable
+import org.jetbrains.compose.intentions.utils.isComposable
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtLambdaArgument
 import org.jetbrains.kotlin.psi.psiUtil.getChildOfType
 
-class ChildComposableFinder : ComposableFunctionFinder, IsPsiElementComposable {
+class ChildComposableFinder : ComposableFunctionFinder {
 
     override fun isFunctionComposable(psiElement: PsiElement): Boolean {
 

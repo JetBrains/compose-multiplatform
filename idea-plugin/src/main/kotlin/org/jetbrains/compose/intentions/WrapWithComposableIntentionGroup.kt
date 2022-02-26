@@ -6,10 +6,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.ListPopup
 import com.intellij.openapi.ui.popup.PopupStep
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep
-import com.intellij.openapi.util.Iconable
 import com.intellij.psi.PsiFile
 import com.intellij.ui.popup.list.ListPopupImpl
-import org.jetbrains.compose.desktop.ide.preview.PreviewIcons
 import org.jetbrains.compose.intentions.wrapActions.BaseWrapWithComposableAction
 import org.jetbrains.compose.intentions.wrapActions.WrapWithBoxIntention
 import org.jetbrains.compose.intentions.wrapActions.WrapWithCardIntention
@@ -17,7 +15,6 @@ import org.jetbrains.compose.intentions.wrapActions.WrapWithColumnIntention
 import org.jetbrains.compose.intentions.wrapActions.WrapWithLzyColumnIntention
 import org.jetbrains.compose.intentions.wrapActions.WrapWithLzyRowIntention
 import org.jetbrains.compose.intentions.wrapActions.WrapWithRowIntention
-import javax.swing.Icon
 
 class WrapWithComposableIntentionGroup :
     IntentionActionGroup<BaseWrapWithComposableAction>(
@@ -29,8 +26,7 @@ class WrapWithComposableIntentionGroup :
             WrapWithLzyColumnIntention(),
             WrapWithLzyRowIntention()
         )
-    ),
-    Iconable {
+    ) {
 
     private fun createPopup(
         project: Project,
@@ -68,6 +64,4 @@ class WrapWithComposableIntentionGroup :
     override fun getGroupText(actions: List<BaseWrapWithComposableAction>): String {
         return "Wrap with Composable"
     }
-
-    override fun getIcon(flags: Int): Icon = PreviewIcons.COMPOSE
 }
