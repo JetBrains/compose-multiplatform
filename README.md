@@ -44,6 +44,7 @@ Preview functionality (check your application UI without building/running it) fo
        * [Swing interoperability](tutorials/Swing_Integration)
        * [Development for Android](tutorials/Development_for_Android)
        * [Navigation](tutorials/Navigation)
+       * [Accessebility](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Accessibility)
    * [tutorials: compose for web](tutorials/Web) - tutorials on using Compose for Web
        * [Getting started with Compose for Web](tutorials/Web/Getting_Started) 
        * [Building web UI](tutorials/Web/Building_UI)
