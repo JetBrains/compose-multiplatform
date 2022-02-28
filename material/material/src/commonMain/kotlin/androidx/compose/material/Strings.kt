@@ -28,6 +28,8 @@ internal inline class Strings private constructor(@Suppress("unused") private va
         val CloseSheet = Strings(2)
         val DefaultErrorMessage = Strings(3)
         val ExposedDropdownMenu = Strings(4)
+        val SliderRangeStart = Strings(5)
+        val SliderRangeEnd = Strings(6)
     }
 }
 

@@ -49,6 +49,7 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertRangeInfoEquals
 import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.isFocusable
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performSemanticsAction
@@ -930,5 +931,105 @@ class SliderTest {
             Truth.assertThat(sliderBounds.left).isEqualTo(100)
             Truth.assertThat(sliderBounds.right).isEqualTo(400)
         }
+    }
+
+    @OptIn(ExperimentalMaterialApi::class)
+    @Test
+    fun rangeSlider_semantics_continuous() {
+        val state = mutableStateOf(0f..1f)
+
+        rule.setMaterialContent {
+            RangeSlider(
+                modifier = Modifier.testTag(tag), values = state.value,
+                onValueChange = { state.value = it }
+            )
+        }
+
+        rule.onAllNodes(isFocusable(), true)[0]
+            .assertRangeInfoEquals(ProgressBarRangeInfo(0f, 0f..1f, 0))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.SetProgress))
+
+        rule.onAllNodes(isFocusable(), true)[1]
+            .assertRangeInfoEquals(ProgressBarRangeInfo(1f, 0f..1f, 0))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.SetProgress))
+
+        rule.runOnUiThread {
+            state.value = 0.5f..0.75f
+        }
+
+        rule.onAllNodes(isFocusable(), true)[0].assertRangeInfoEquals(
+            ProgressBarRangeInfo(
+                0.5f,
+                0f..0.75f,
+                0
+            )
+        )
+
+        rule.onAllNodes(isFocusable(), true)[1].assertRangeInfoEquals(
+            ProgressBarRangeInfo(
+                0.75f,
+                0.5f..1f,
+                0
+            )
+        )
+
+        rule.onAllNodes(isFocusable(), true)[0]
+            .performSemanticsAction(SemanticsActions.SetProgress) { it(0.6f) }
+
+        rule.onAllNodes(isFocusable(), true)[1]
+            .performSemanticsAction(SemanticsActions.SetProgress) { it(0.8f) }
+
+        rule.onAllNodes(isFocusable(), true)[0]
+            .assertRangeInfoEquals(ProgressBarRangeInfo(0.6f, 0f..0.8f, 0))
+
+        rule.onAllNodes(isFocusable(), true)[1]
+            .assertRangeInfoEquals(ProgressBarRangeInfo(0.8f, 0.6f..1f, 0))
+    }
+
+    @OptIn(ExperimentalMaterialApi::class)
+    @Test
+    fun rangeSlider_semantics_stepped() {
+        val state = mutableStateOf(0f..20f)
+        // Slider with [0,5,10,15,20] possible values
+        rule.setMaterialContent {
+            RangeSlider(
+                modifier = Modifier.testTag(tag), values = state.value,
+                steps = 3,
+                valueRange = 0f..20f,
+                onValueChange = { state.value = it },
+            )
+        }
+
+        rule.runOnUiThread {
+            state.value = 5f..10f
+        }
+
+        rule.onAllNodes(isFocusable(), true)[0].assertRangeInfoEquals(
+            ProgressBarRangeInfo(
+                5f,
+                0f..10f,
+                3
+            )
+        )
+
+        rule.onAllNodes(isFocusable(), true)[1].assertRangeInfoEquals(
+            ProgressBarRangeInfo(
+                10f,
+                5f..20f,
+                3,
+            )
+        )
+
+        rule.onAllNodes(isFocusable(), true)[0]
+            .performSemanticsAction(SemanticsActions.SetProgress) { it(10f) }
+
+        rule.onAllNodes(isFocusable(), true)[1]
+            .performSemanticsAction(SemanticsActions.SetProgress) { it(15f) }
+
+        rule.onAllNodes(isFocusable(), true)[0]
+            .assertRangeInfoEquals(ProgressBarRangeInfo(10f, 0f..15f, 3))
+
+        rule.onAllNodes(isFocusable(), true)[1]
+            .assertRangeInfoEquals(ProgressBarRangeInfo(15f, 10f..20f, 3))
     }
 }
