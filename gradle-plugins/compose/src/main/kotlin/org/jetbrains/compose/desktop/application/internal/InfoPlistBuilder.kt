@@ -5,16 +5,19 @@
 
 package org.jetbrains.compose.desktop.application.internal
 
-import org.jetbrains.compose.desktop.application.dsl.InfoPlistSettings
 import java.io.File
 import kotlin.reflect.KProperty
 
-internal class InfoPlistBuilder(private val extraPlistKeysRawXml: String?) {
+internal class InfoPlistBuilder(private val extraPlistKeysRawXml: String? = null) {
     private val values = LinkedHashMap<InfoPlistKey, String>()
 
     operator fun get(key: InfoPlistKey): String? = values[key]
-    operator fun set(key: InfoPlistKey, value: String) {
-        values[key] = value
+    operator fun set(key: InfoPlistKey, value: String?) {
+        if (value != null) {
+            values[key] = value
+        } else {
+            values.remove(key)
+        }
     }
 
     fun writeToFile(file: File) {

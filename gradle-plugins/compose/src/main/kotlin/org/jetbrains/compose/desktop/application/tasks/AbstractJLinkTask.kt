@@ -11,7 +11,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
-import org.jetbrains.compose.desktop.application.dsl.RuntimeCompressionLevel
+import org.jetbrains.compose.desktop.application.internal.RuntimeCompressionLevel
 import org.jetbrains.compose.desktop.application.internal.*
 import org.jetbrains.compose.desktop.application.internal.JavaRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.cliArg

@@ -12,7 +12,7 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.gradle.jvm.tasks.Jar
-import org.jetbrains.compose.desktop.application.dsl.Application
+import org.jetbrains.compose.desktop.application.dsl.JvmApplication
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.validation.validatePackageVersions
 import org.jetbrains.compose.desktop.application.tasks.*
@@ -27,7 +27,11 @@ private val defaultJvmArgs = listOf("-D$CONFIGURE_SWING_GLOBALS=true")
 // todo: multiple launchers
 // todo: file associations
 // todo: use workers
-fun configureApplicationImpl(project: Project, app: Application) {
+internal fun configureJvmApplication(
+    project: Project,
+    app: JvmApplication,
+    unpackDefaultResources: TaskProvider<AbstractUnpackDefaultComposeApplicationResourcesTask>
+) {
     if (app._isDefaultConfigurationEnabled) {
         if (project.plugins.hasPlugin(KOTLIN_MPP_PLUGIN_ID)) {
             project.configureFromMppPlugin(app)
@@ -37,11 +41,11 @@ fun configureApplicationImpl(project: Project, app: Application) {
         }
     }
     project.validatePackageVersions(app)
-    project.configurePackagingTasks(listOf(app))
+    project.configurePackagingTasks(listOf(app), unpackDefaultResources)
     project.configureWix()
 }
 
-internal fun Project.configureFromMppPlugin(mainApplication: Application) {
+internal fun Project.configureFromMppPlugin(mainApplication: JvmApplication) {
     var isJvmTargetConfigured = false
     mppExt.targets.all { target ->
         if (target.platformType == KotlinPlatformType.jvm) {
@@ -58,13 +62,12 @@ internal fun Project.configureFromMppPlugin(mainApplication: Application) {
     }
 }
 
-internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
-    val unpackDefaultResources = tasks.composeTask<AbstractUnpackDefaultComposeApplicationResourcesTask>(
-        "unpackDefaultComposeApplicationResources"
-    ) {}
-
+internal fun Project.configurePackagingTasks(
+    apps: Collection<JvmApplication>,
+    unpackDefaultResources: TaskProvider<AbstractUnpackDefaultComposeApplicationResourcesTask>
+) {
     for (app in apps) {
-        val checkRuntime = tasks.composeTask<AbstractCheckNativeDistributionRuntime>(
+        val checkRuntime = tasks.composeDesktopJvmTask<AbstractCheckNativeDistributionRuntime>(
             taskName("checkRuntime", app)
         ) {
             javaHome.set(provider { app.javaHomeOrDefault() })
@@ -73,7 +76,7 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
             )
         }
 
-        tasks.composeTask<AbstractSuggestModulesTask>(taskName("suggestRuntimeModules", app)) {
+        tasks.composeDesktopJvmTask<AbstractSuggestModulesTask>(taskName("suggestRuntimeModules", app)) {
             dependsOn(checkRuntime)
             javaHome.set(provider { app.javaHomeOrDefault() })
             modules.set(provider { app.nativeDistributions.modules })
@@ -85,7 +88,7 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
             }
         }
 
-        val prepareAppResources = tasks.composeTask<Sync>(
+        val prepareAppResources = tasks.composeDesktopJvmTask<Sync>(
             taskName("prepareAppResources", app)
         ) {
             val appResourcesRootDir = app.nativeDistributions.appResourcesRootDir
@@ -99,7 +102,7 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
             into(destDir)
         }
 
-        val createRuntimeImage = tasks.composeTask<AbstractJLinkTask>(
+        val createRuntimeImage = tasks.composeDesktopJvmTask<AbstractJLinkTask>(
             taskName("createRuntimeImage", app)
         ) {
             dependsOn(checkRuntime)
@@ -110,7 +113,7 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
             destinationDir.set(project.layout.buildDirectory.dir("compose/tmp/${app.name}/runtime"))
         }
 
-        val createDistributable = tasks.composeTask<AbstractJPackageTask>(
+        val createDistributable = tasks.composeDesktopJvmTask<AbstractJPackageTask>(
             taskName("createDistributable", app),
             args = listOf(TargetFormat.AppImage)
         ) {
@@ -124,7 +127,7 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
         }
 
         val packageFormats = app.nativeDistributions.targetFormats.map { targetFormat ->
-            val packageFormat = tasks.composeTask<AbstractJPackageTask>(
+            val packageFormat = tasks.composeDesktopJvmTask<AbstractJPackageTask>(
                 taskName("package", app, targetFormat.name),
                 args = listOf(targetFormat)
             ) {
@@ -158,14 +161,14 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
                 }
 
                 val notarizationRequestsDir = project.layout.buildDirectory.dir("compose/notarization/${app.name}")
-                val upload = tasks.composeTask<AbstractUploadAppForNotarizationTask>(
+                val upload = tasks.composeDesktopJvmTask<AbstractUploadAppForNotarizationTask>(
                     taskName("notarize", app, targetFormat.name),
                     args = listOf(targetFormat)
                 ) {
                     configureUploadForNotarizationTask(app, packageFormat, notarizationRequestsDir)
                 }
 
-                tasks.composeTask<AbstractCheckNotarizationStatusTask>(
+                tasks.composeDesktopJvmTask<AbstractCheckNotarizationStatusTask>(
                     taskName("checkNotarizationStatus", app)
                 ) {
                     configureCheckNotarizationStatusTask(app, notarizationRequestsDir)
@@ -175,27 +178,27 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
             packageFormat
         }
 
-        val packageAll = tasks.composeTask<DefaultTask>(taskName("package", app)) {
+        val packageAll = tasks.composeDesktopJvmTask<DefaultTask>(taskName("package", app)) {
             dependsOn(packageFormats)
         }
 
-        val packageUberJarForCurrentOS = project.tasks.composeTask<Jar>(taskName("package", app, "uberJarForCurrentOS")) {
+        val packageUberJarForCurrentOS = project.tasks.composeDesktopJvmTask<Jar>(taskName("package", app, "uberJarForCurrentOS")) {
             configurePackageUberJarForCurrentOS(app)
         }
 
-        val runDistributable = project.tasks.composeTask<AbstractRunDistributableTask>(
+        val runDistributable = project.tasks.composeDesktopJvmTask<AbstractRunDistributableTask>(
             taskName("runDistributable", app),
             args = listOf(createDistributable)
         )
 
-        val run = project.tasks.composeTask<JavaExec>(taskName("run", app)) {
+        val run = project.tasks.composeDesktopJvmTask<JavaExec>(taskName("run", app)) {
             configureRunTask(app, prepareAppResources = prepareAppResources)
         }
     }
 }
 
 internal fun AbstractJPackageTask.configurePackagingTask(
-    app: Application,
+    app: JvmApplication,
     createAppImage: TaskProvider<AbstractJPackageTask>? = null,
     createRuntimeImage: TaskProvider<AbstractJLinkTask>? = null,
     prepareAppResources: TaskProvider<Sync>? = null,
@@ -255,7 +258,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(
 }
 
 internal fun AbstractUploadAppForNotarizationTask.configureUploadForNotarizationTask(
-    app: Application,
+    app: JvmApplication,
     packageFormat: TaskProvider<AbstractJPackageTask>,
     requestsDir: Provider<Directory>
 ) {
@@ -266,7 +269,7 @@ internal fun AbstractUploadAppForNotarizationTask.configureUploadForNotarization
 }
 
 internal fun AbstractCheckNotarizationStatusTask.configureCheckNotarizationStatusTask(
-    app: Application,
+    app: JvmApplication,
     requestsDir: Provider<Directory>
 ) {
     requestDir.set(requestsDir)
@@ -274,14 +277,14 @@ internal fun AbstractCheckNotarizationStatusTask.configureCheckNotarizationStatu
 }
 
 internal fun AbstractNotarizationTask.configureCommonNotarizationSettings(
-    app: Application
+    app: JvmApplication
 ) {
     nonValidatedBundleID.set(app.nativeDistributions.macOS.bundleID)
     nonValidatedNotarizationSettings = app.nativeDistributions.macOS.notarization
 }
 
 internal fun AbstractJPackageTask.configurePlatformSettings(
-    app: Application,
+    app: JvmApplication,
     unpackDefaultResources: TaskProvider<AbstractUnpackDefaultComposeApplicationResourcesTask>
 ) {
     dependsOn(unpackDefaultResources)
@@ -339,7 +342,7 @@ internal fun AbstractJPackageTask.configurePlatformSettings(
 }
 
 private fun JavaExec.configureRunTask(
-    app: Application,
+    app: JvmApplication,
     prepareAppResources: TaskProvider<Sync>
 ) {
     dependsOn(prepareAppResources)
@@ -374,7 +377,7 @@ private fun JavaExec.configureRunTask(
     classpath = cp
 }
 
-private fun Jar.configurePackageUberJarForCurrentOS(app: Application) {
+private fun Jar.configurePackageUberJarForCurrentOS(app: JvmApplication) {
         fun flattenJars(files: FileCollection): FileCollection =
             project.files({
                 files.map { if (it.isZipOrJar()) project.zipTree(it) else it }
@@ -406,10 +409,10 @@ private fun File.isZipOrJar() =
     name.endsWith(".jar", ignoreCase = true)
         || name.endsWith(".zip", ignoreCase = true)
 
-internal fun Application.javaHomeOrDefault(): String =
+internal fun JvmApplication.javaHomeOrDefault(): String =
     javaHome ?: System.getProperty("java.home")
 
-private inline fun <reified T : Task> TaskContainer.composeTask(
+private inline fun <reified T : Task> TaskContainer.composeDesktopJvmTask(
     name: String,
     args: List<Any> = emptyList(),
     noinline configureFn: T.() -> Unit = {}
@@ -420,13 +423,12 @@ private inline fun <reified T : Task> TaskContainer.composeTask(
     }
 }
 
-internal fun Application._packageNameProvider(project: Project): Provider<String> =
+internal fun JvmApplication._packageNameProvider(project: Project): Provider<String> =
     project.provider { nativeDistributions.packageName ?: project.name }
 
-@OptIn(ExperimentalStdlibApi::class)
-private fun taskName(action: String, app: Application, suffix: String? = null): String =
-    listOf(
+private fun taskName(action: String, app: JvmApplication, suffix: String? = null): String =
+    listOfNotNull(
         action,
-        app.name.takeIf { it != "main" }?.capitalize(Locale.ROOT),
-        suffix?.capitalize(Locale.ROOT)
-    ).filterNotNull().joinToString("")
+        app.name.takeIf { it != "main" }?.uppercaseFirstChar(),
+        suffix?.uppercaseFirstChar()
+    ).joinToString("")

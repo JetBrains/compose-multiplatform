@@ -7,13 +7,13 @@ package org.jetbrains.compose.desktop.application.internal.validation
 
 import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.jetbrains.compose.desktop.application.dsl.Application
+import org.jetbrains.compose.desktop.application.dsl.JvmApplication
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.OS
 import org.jetbrains.compose.desktop.application.internal.packageBuildVersionFor
 import org.jetbrains.compose.desktop.application.internal.packageVersionFor
 
-internal fun Project.validatePackageVersions(app: Application) {
+internal fun Project.validatePackageVersions(app: JvmApplication) {
     val errors = ErrorsCollector()
 
     for (targetFormat in app.nativeDistributions.targetFormats) {

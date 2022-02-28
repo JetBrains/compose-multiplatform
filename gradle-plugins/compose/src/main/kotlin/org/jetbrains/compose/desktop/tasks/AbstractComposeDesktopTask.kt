@@ -16,16 +16,9 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.LocalState
 import org.gradle.process.ExecOperations
-import org.gradle.process.ExecResult
-import org.jetbrains.compose.desktop.application.internal.*
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
-import org.jetbrains.compose.desktop.application.internal.alsoOutputTo
-import org.jetbrains.compose.desktop.application.internal.ioFile
 import org.jetbrains.compose.desktop.application.internal.notNullProperty
-import java.io.File
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 abstract class AbstractComposeDesktopTask : DefaultTask() {
