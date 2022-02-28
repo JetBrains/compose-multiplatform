@@ -18,13 +18,11 @@ package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyGridState
-import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.rememberLazyGridState
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
@@ -34,23 +32,29 @@ import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import kotlinx.coroutines.runBlocking
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 @OptIn(ExperimentalFoundationApi::class)
 @LargeTest
-@RunWith(AndroidJUnit4::class)
-class LazyGridPrefetcherTest {
+@RunWith(Parameterized::class)
+class LazyGridPrefetcherTest(
+    orientation: Orientation
+) : BaseLazyGridTestWithOrientation(orientation) {
 
-    @get:Rule
-    val rule = createComposeRule()
+    companion object {
+        @JvmStatic
+        @Parameterized.Parameters(name = "{0}")
+        fun initParameters(): Array<Any> = arrayOf(
+            Orientation.Vertical,
+            Orientation.Horizontal,
+        )
+    }
 
     val itemsSizePx = 30
     val itemsSizeDp = with(rule.density) { itemsSizePx.toDp() }
@@ -255,7 +259,7 @@ class LazyGridPrefetcherTest {
         composeList(
             firstItem = 4,
             itemOffset = 5,
-            contentPadding = PaddingValues(vertical = halfItemSize)
+            contentPadding = PaddingValues(mainAxis = halfItemSize)
         )
 
         rule.onNodeWithTag("2")
@@ -309,14 +313,14 @@ class LazyGridPrefetcherTest {
                 val placeable = if (emit) {
                     subcompose(Unit) {
                         state = rememberLazyGridState()
-                        LazyVerticalGrid(
-                            GridCells.Fixed(2),
-                            Modifier.height(itemsSizeDp * 1.5f),
+                        LazyGrid(
+                            2,
+                            Modifier.mainAxisSize(itemsSizeDp * 1.5f),
                             state,
                         ) {
                             items(1000) {
                                 Spacer(
-                                    Modifier.height(itemsSizeDp)
+                                    Modifier.mainAxisSize(itemsSizeDp)
                                 )
                             }
                         }
@@ -363,9 +367,9 @@ class LazyGridPrefetcherTest {
                 initialFirstVisibleItemIndex = firstItem,
                 initialFirstVisibleItemScrollOffset = itemOffset
             )
-            LazyVerticalGrid(
-                GridCells.Fixed(2),
-                Modifier.height(itemsSizeDp * 1.5f),
+            LazyGrid(
+                2,
+                Modifier.mainAxisSize(itemsSizeDp * 1.5f),
                 state,
                 reverseLayout = reverseLayout,
                 contentPadding = contentPadding
@@ -380,7 +384,7 @@ class LazyGridPrefetcherTest {
                     }
                     Spacer(
                         Modifier
-                            .height(itemsSizeDp)
+                            .mainAxisSize(itemsSizeDp)
                             .testTag("$it")
                             .layout { measurable, constraints ->
                                 val placeable = measurable.measure(constraints)

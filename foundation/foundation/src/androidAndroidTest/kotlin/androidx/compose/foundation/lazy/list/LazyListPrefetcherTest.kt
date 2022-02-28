@@ -18,11 +18,10 @@ package androidx.compose.foundation.lazy.list
 
 import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.DisposableEffect
@@ -33,22 +32,28 @@ import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import kotlinx.coroutines.runBlocking
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 @LargeTest
-@RunWith(AndroidJUnit4::class)
-class LazyListPrefetcherTest {
+@RunWith(Parameterized::class)
+class LazyListPrefetcherTest(
+    orientation: Orientation
+) : BaseLazyListTestWithOrientation(orientation) {
 
-    @get:Rule
-    val rule = createComposeRule()
+    companion object {
+        @JvmStatic
+        @Parameterized.Parameters(name = "{0}")
+        fun initParameters(): Array<Any> = arrayOf(
+            Orientation.Vertical,
+            Orientation.Horizontal,
+        )
+    }
 
     val itemsSizePx = 30
     val itemsSizeDp = with(rule.density) { itemsSizePx.toDp() }
@@ -235,7 +240,7 @@ class LazyListPrefetcherTest {
         composeList(
             firstItem = 2,
             itemOffset = 5,
-            contentPadding = PaddingValues(vertical = halfItemSize)
+            contentPadding = PaddingValues(mainAxis = halfItemSize)
         )
 
         rule.onNodeWithTag("1")
@@ -282,23 +287,23 @@ class LazyListPrefetcherTest {
                 initialFirstVisibleItemIndex = 1,
                 initialFirstVisibleItemScrollOffset = itemsSizePx / 2
             )
-            LazyColumn(
-                Modifier.height(itemsSizeDp * 1.5f),
+            LazyColumnOrRow(
+                Modifier.mainAxisSize(itemsSizeDp * 1.5f),
                 state,
             ) {
                 stickyHeader {
                     Spacer(
                         Modifier
-                            .height(itemsSizeDp)
-                            .fillParentMaxWidth()
+                            .mainAxisSize(itemsSizeDp)
+                            .then(fillParentMaxCrossAxis())
                             .testTag("header")
                     )
                 }
                 items(100) {
                     Spacer(
                         Modifier
-                            .height(itemsSizeDp)
-                            .fillParentMaxWidth()
+                            .mainAxisSize(itemsSizeDp)
+                            .then(fillParentMaxCrossAxis())
                             .testTag("$it")
                     )
                 }
@@ -334,15 +339,15 @@ class LazyListPrefetcherTest {
                 val placeable = if (emit) {
                     subcompose(Unit) {
                         state = rememberLazyListState()
-                        LazyColumn(
-                            Modifier.height(itemsSizeDp * 1.5f),
+                        LazyColumnOrRow(
+                            Modifier.mainAxisSize(itemsSizeDp * 1.5f),
                             state,
                         ) {
                             items(1000) {
                                 Spacer(
                                     Modifier
-                                        .height(itemsSizeDp)
-                                        .fillParentMaxWidth()
+                                        .mainAxisSize(itemsSizeDp)
+                                        .then(fillParentMaxCrossAxis())
                                 )
                             }
                         }
@@ -389,8 +394,8 @@ class LazyListPrefetcherTest {
                 initialFirstVisibleItemIndex = firstItem,
                 initialFirstVisibleItemScrollOffset = itemOffset
             )
-            LazyColumn(
-                Modifier.height(itemsSizeDp * 1.5f),
+            LazyColumnOrRow(
+                Modifier.mainAxisSize(itemsSizeDp * 1.5f),
                 state,
                 reverseLayout = reverseLayout,
                 contentPadding = contentPadding
@@ -405,8 +410,8 @@ class LazyListPrefetcherTest {
                     }
                     Spacer(
                         Modifier
-                            .height(itemsSizeDp)
-                            .fillParentMaxWidth()
+                            .mainAxisSize(itemsSizeDp)
+                            .fillMaxCrossAxis()
                             .testTag("$it")
                             .layout { measurable, constraints ->
                                 val placeable = measurable.measure(constraints)

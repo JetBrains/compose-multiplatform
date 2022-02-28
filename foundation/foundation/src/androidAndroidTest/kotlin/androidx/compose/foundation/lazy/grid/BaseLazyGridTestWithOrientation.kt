@@ -32,7 +32,6 @@ import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyGridScope
 import androidx.compose.foundation.lazy.LazyGridState
 import androidx.compose.foundation.lazy.LazyHorizontalGrid
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.rememberLazyGridState
 import androidx.compose.runtime.Composable
@@ -116,7 +115,7 @@ open class BaseLazyGridTestWithOrientation(private val orientation: Orientation)
         position.assertIsEqualTo(expected, tolerance = 1.dp)
     }
 
-    fun SemanticsNodeInteraction.assertStartPositionInRootIsEqualTo(expectedStart: Dp) =
+    fun SemanticsNodeInteraction.assertMainAxisStartPositionInRootIsEqualTo(expectedStart: Dp) =
         if (vertical) {
             assertTopPositionInRootIsEqualTo(expectedStart)
         } else {
@@ -161,13 +160,13 @@ open class BaseLazyGridTestWithOrientation(private val orientation: Orientation)
         )
     }
 
-    fun LazyListState.scrollBy(offset: Dp) {
+    fun LazyGridState.scrollBy(offset: Dp) {
         runBlocking(Dispatchers.Main + AutoTestFrameClock()) {
             animateScrollBy(with(rule.density) { offset.roundToPx().toFloat() }, snap())
         }
     }
 
-    fun LazyListState.scrollTo(index: Int) {
+    fun LazyGridState.scrollTo(index: Int) {
         runBlocking(Dispatchers.Main + AutoTestFrameClock()) {
             scrollToItem(index)
         }
@@ -188,17 +187,47 @@ open class BaseLazyGridTestWithOrientation(private val orientation: Orientation)
         reverseLayout: Boolean = false,
         flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
         userScrollEnabled: Boolean = true,
-        spacedBy: Dp = 0.dp,
+        crossAxisSpacedBy: Dp = 0.dp,
+        mainAxisSpacedBy: Dp = 0.dp,
+        content: LazyGridScope.() -> Unit
+    ) = LazyGrid(
+        GridCells.Fixed(cells),
+        modifier,
+        state,
+        contentPadding,
+        reverseLayout,
+        flingBehavior,
+        userScrollEnabled,
+        crossAxisSpacedBy,
+        mainAxisSpacedBy,
+        content
+    )
+
+    @Composable
+    fun LazyGrid(
+        cells: GridCells,
+        modifier: Modifier = Modifier,
+        state: LazyGridState = rememberLazyGridState(),
+        contentPadding: PaddingValues = PaddingValues(0.dp),
+        reverseLayout: Boolean = false,
+        flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
+        userScrollEnabled: Boolean = true,
+        crossAxisSpacedBy: Dp = 0.dp,
+        mainAxisSpacedBy: Dp = 0.dp,
         content: LazyGridScope.() -> Unit
     ) {
         if (vertical) {
             val verticalArrangement = when {
-                spacedBy != 0.dp -> Arrangement.spacedBy(spacedBy)
+                mainAxisSpacedBy != 0.dp -> Arrangement.spacedBy(mainAxisSpacedBy)
                 !reverseLayout -> Arrangement.Top
                 else -> Arrangement.Bottom
             }
+            val horizontalArrangement = when {
+                crossAxisSpacedBy != 0.dp -> Arrangement.spacedBy(crossAxisSpacedBy)
+                else -> Arrangement.Start
+            }
             LazyVerticalGrid(
-                columns = GridCells.Fixed(cells),
+                columns = cells,
                 modifier = modifier,
                 state = state,
                 contentPadding = contentPadding,
@@ -206,16 +235,21 @@ open class BaseLazyGridTestWithOrientation(private val orientation: Orientation)
                 flingBehavior = flingBehavior,
                 userScrollEnabled = userScrollEnabled,
                 verticalArrangement = verticalArrangement,
+                horizontalArrangement = horizontalArrangement,
                 content = content
             )
         } else {
             val horizontalArrangement = when {
-                spacedBy != 0.dp -> Arrangement.spacedBy(spacedBy)
+                mainAxisSpacedBy != 0.dp -> Arrangement.spacedBy(mainAxisSpacedBy)
                 !reverseLayout -> Arrangement.Start
                 else -> Arrangement.End
             }
+            val verticalArrangement = when {
+                crossAxisSpacedBy != 0.dp -> Arrangement.spacedBy(crossAxisSpacedBy)
+                else -> Arrangement.Top
+            }
             LazyHorizontalGrid(
-                rows = GridCells.Fixed(cells),
+                rows = cells,
                 modifier = modifier,
                 state = state,
                 contentPadding = contentPadding,
@@ -223,6 +257,7 @@ open class BaseLazyGridTestWithOrientation(private val orientation: Orientation)
                 flingBehavior = flingBehavior,
                 userScrollEnabled = userScrollEnabled,
                 horizontalArrangement = horizontalArrangement,
+                verticalArrangement = verticalArrangement,
                 content = content
             )
         }

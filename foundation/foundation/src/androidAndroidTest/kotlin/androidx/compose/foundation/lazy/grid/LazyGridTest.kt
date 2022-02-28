@@ -19,25 +19,17 @@ package androidx.compose.foundation.lazy.grid
 import android.os.Build
 import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollBy
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyGridState
-import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.list.TestTouchSlop
-import androidx.compose.foundation.lazy.list.scrollBy
 import androidx.compose.foundation.lazy.list.setContentWithTestViewConfiguration
 import androidx.compose.foundation.lazy.rememberLazyGridState
 import androidx.compose.runtime.CompositionLocalProvider
@@ -60,15 +52,9 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsMatcher.Companion.keyIsDefined
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
-import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
-import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
-import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
-import androidx.compose.ui.test.assertWidthIsAtLeast
-import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeWithVelocity
@@ -77,33 +63,41 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.collect.Range
 import com.google.common.truth.IntegerSubject
 import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 @OptIn(ExperimentalFoundationApi::class)
 @MediumTest
-@RunWith(AndroidJUnit4::class)
-class LazyGridTest {
+@RunWith(Parameterized::class)
+class LazyGridTest(
+    private val orientation: Orientation
+) : BaseLazyGridTestWithOrientation(orientation) {
     private val LazyGridTag = "LazyGridTag"
 
-    @get:Rule
-    val rule = createComposeRule()
+    companion object {
+        @JvmStatic
+        @Parameterized.Parameters(name = "{0}")
+        fun initParameters(): Array<Any> = arrayOf(
+            Orientation.Vertical,
+            Orientation.Horizontal,
+        )
+    }
 
     @Test
     fun lazyGridShowsOneItem() {
         val itemTestTag = "itemTestTag"
 
         rule.setContent {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3)
+            LazyGrid(
+                cells = 3
             ) {
                 item {
                     Spacer(
@@ -118,16 +112,16 @@ class LazyGridTest {
     }
 
     @Test
-    fun lazyGridShowsOneRow() {
+    fun lazyGridShowsOneLine() {
         val items = (1..5).map { it.toString() }
 
         rule.setContent {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                modifier = Modifier.height(100.dp).width(300.dp)
+            LazyGrid(
+                cells = 3,
+                modifier = Modifier.axisSize(300.dp, 100.dp)
             ) {
                 items(items) {
-                    Spacer(Modifier.height(101.dp).testTag(it))
+                    Spacer(Modifier.mainAxisSize(101.dp).testTag(it))
                 }
             }
         }
@@ -149,22 +143,22 @@ class LazyGridTest {
     }
 
     @Test
-    fun lazyGridShowsSecondRowOnScroll() {
+    fun lazyGridShowsSecondLineOnScroll() {
         val items = (1..9).map { it.toString() }
 
         rule.setContentWithTestViewConfiguration {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                modifier = Modifier.height(100.dp).testTag(LazyGridTag)
+            LazyGrid(
+                cells = 3,
+                modifier = Modifier.mainAxisSize(100.dp).testTag(LazyGridTag)
             ) {
                 items(items) {
-                    Spacer(Modifier.height(101.dp).testTag(it))
+                    Spacer(Modifier.mainAxisSize(101.dp).testTag(it))
                 }
             }
         }
 
         rule.onNodeWithTag(LazyGridTag)
-            .scrollBy(y = 50.dp, density = rule.density)
+            .scrollBy(offset = 50.dp)
 
         rule.onNodeWithTag("4")
             .assertIsDisplayed()
@@ -186,22 +180,22 @@ class LazyGridTest {
     }
 
     @Test
-    fun lazyGridScrollHidesFirstRow() {
+    fun lazyGridScrollHidesFirstLine() {
         val items = (1..9).map { it.toString() }
 
         rule.setContentWithTestViewConfiguration {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                modifier = Modifier.height(200.dp).testTag(LazyGridTag)
+            LazyGrid(
+                cells = 3,
+                modifier = Modifier.mainAxisSize(200.dp).testTag(LazyGridTag)
             ) {
                 items(items) {
-                    Spacer(Modifier.height(101.dp).testTag(it))
+                    Spacer(Modifier.mainAxisSize(101.dp).testTag(it))
                 }
             }
         }
 
         rule.onNodeWithTag(LazyGridTag)
-            .scrollBy(y = 103.dp, density = rule.density)
+            .scrollBy(offset = 103.dp)
 
         rule.onNodeWithTag("1")
             .assertIsNotDisplayed()
@@ -232,25 +226,25 @@ class LazyGridTest {
     }
 
     @Test
-    fun adaptiveLazyGridFillsAllWidth() {
+    fun adaptiveLazyGridFillsAllCrossAxisSize() {
         val items = (1..5).map { it.toString() }
 
         rule.setContent {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(130.dp),
-                modifier = Modifier.height(100.dp).width(300.dp)
+            LazyGrid(
+                cells = GridCells.Adaptive(130.dp),
+                modifier = Modifier.axisSize(300.dp, 100.dp)
             ) {
                 items(items) {
-                    Spacer(Modifier.height(101.dp).testTag(it))
+                    Spacer(Modifier.mainAxisSize(101.dp).testTag(it))
                 }
             }
         }
 
         rule.onNodeWithTag("1")
-            .assertLeftPositionInRootIsEqualTo(0.dp)
+            .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
 
         rule.onNodeWithTag("2")
-            .assertLeftPositionInRootIsEqualTo(150.dp)
+            .assertCrossAxisStartPositionInRootIsEqualTo(150.dp)
 
         rule.onNodeWithTag("3")
             .assertDoesNotExist()
@@ -263,16 +257,16 @@ class LazyGridTest {
     }
 
     @Test
-    fun adaptiveLazyGridAtLeastOneColumn() {
+    fun adaptiveLazyGridAtLeastOneSlot() {
         val items = (1..3).map { it.toString() }
 
         rule.setContent {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(301.dp),
-                modifier = Modifier.height(100.dp).width(300.dp)
+            LazyGrid(
+                cells = GridCells.Adaptive(301.dp),
+                modifier = Modifier.axisSize(300.dp, 100.dp)
             ) {
                 items(items) {
-                    Spacer(Modifier.height(101.dp).testTag(it))
+                    Spacer(Modifier.mainAxisSize(101.dp).testTag(it))
                 }
             }
         }
@@ -295,10 +289,10 @@ class LazyGridTest {
         val itemSize = with(rule.density) { 100.toDp() }
 
         rule.setContent {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(itemSize),
-                modifier = Modifier.height(itemSize).width(itemSize * 3 + spacing * 2),
-                horizontalArrangement = Arrangement.spacedBy(spacing)
+            LazyGrid(
+                cells = GridCells.Adaptive(itemSize),
+                modifier = Modifier.axisSize(itemSize * 3 + spacing * 2, itemSize),
+                crossAxisSpacedBy = spacing
             ) {
                 items(items) {
                     Spacer(Modifier.size(itemSize).testTag(it))
@@ -308,18 +302,18 @@ class LazyGridTest {
 
         rule.onNodeWithTag("1")
             .assertIsDisplayed()
-            .assertLeftPositionInRootIsEqualTo(0.dp)
-            .assertWidthIsAtLeast(itemSize)
+            .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertCrossAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("2")
             .assertIsDisplayed()
-            .assertLeftPositionInRootIsEqualTo(itemSize + spacing)
-            .assertWidthIsAtLeast(itemSize)
+            .assertCrossAxisStartPositionInRootIsEqualTo(itemSize + spacing)
+            .assertCrossAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("3")
             .assertIsDisplayed()
-            .assertLeftPositionInRootIsEqualTo(itemSize * 2 + spacing * 2)
-            .assertWidthIsAtLeast(itemSize)
+            .assertCrossAxisStartPositionInRootIsEqualTo(itemSize * 2 + spacing * 2)
+            .assertCrossAxisSizeIsEqualTo(itemSize)
     }
 
     @Test
@@ -330,11 +324,11 @@ class LazyGridTest {
         val itemSize = with(rule.density) { 40.toDp() }
 
         rule.setContent {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(itemSize),
-                modifier = Modifier.height(itemSize).width(itemSize * 3 + spacing * 4),
-                horizontalArrangement = Arrangement.spacedBy(spacing),
-                contentPadding = PaddingValues(horizontal = spacing)
+            LazyGrid(
+                cells = GridCells.Adaptive(itemSize),
+                modifier = Modifier.axisSize(itemSize * 3 + spacing * 4, itemSize),
+                crossAxisSpacedBy = spacing,
+                contentPadding = PaddingValues(crossAxis = spacing)
             ) {
                 items(items) {
                     Spacer(Modifier.size(itemSize).testTag(it))
@@ -344,18 +338,18 @@ class LazyGridTest {
 
         rule.onNodeWithTag("1")
             .assertIsDisplayed()
-            .assertLeftPositionInRootIsEqualTo(spacing)
-            .assertWidthIsAtLeast(itemSize)
+            .assertCrossAxisStartPositionInRootIsEqualTo(spacing)
+            .assertCrossAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("2")
             .assertIsDisplayed()
-            .assertLeftPositionInRootIsEqualTo(itemSize + spacing * 2)
-            .assertWidthIsAtLeast(itemSize)
+            .assertCrossAxisStartPositionInRootIsEqualTo(itemSize + spacing * 2)
+            .assertCrossAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("3")
             .assertIsDisplayed()
-            .assertLeftPositionInRootIsEqualTo(itemSize * 2 + spacing * 3)
-            .assertWidthIsAtLeast(itemSize)
+            .assertCrossAxisStartPositionInRootIsEqualTo(itemSize * 2 + spacing * 3)
+            .assertCrossAxisSizeIsEqualTo(itemSize)
     }
 
     @Test
@@ -366,10 +360,10 @@ class LazyGridTest {
         val itemSize = with(rule.density) { 32.toDp() }
 
         rule.setContent {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(itemSize),
-                modifier = Modifier.height(itemSize * 3 + spacing * 2).width(itemSize),
-                verticalArrangement = Arrangement.spacedBy(spacing)
+            LazyGrid(
+                cells = GridCells.Adaptive(itemSize),
+                modifier = Modifier.axisSize(itemSize, itemSize * 3 + spacing * 2),
+                mainAxisSpacedBy = spacing
             ) {
                 items(items) {
                     Spacer(Modifier.size(itemSize).testTag(it))
@@ -379,18 +373,18 @@ class LazyGridTest {
 
         rule.onNodeWithTag("1")
             .assertIsDisplayed()
-            .assertTopPositionInRootIsEqualTo(0.dp)
-            .assertHeightIsAtLeast(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertMainAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("2")
             .assertIsDisplayed()
-            .assertTopPositionInRootIsEqualTo(itemSize + spacing)
-            .assertHeightIsAtLeast(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(itemSize + spacing)
+            .assertMainAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("3")
             .assertIsDisplayed()
-            .assertTopPositionInRootIsEqualTo(itemSize * 2 + spacing * 2)
-            .assertHeightIsAtLeast(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(itemSize * 2 + spacing * 2)
+            .assertMainAxisSizeIsEqualTo(itemSize)
     }
 
     @Test
@@ -401,11 +395,11 @@ class LazyGridTest {
         val itemSize = with(rule.density) { 72.toDp() }
 
         rule.setContent {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(itemSize),
-                modifier = Modifier.height(itemSize * 3 + spacing * 2).width(itemSize),
-                verticalArrangement = Arrangement.spacedBy(space = spacing),
-                contentPadding = PaddingValues(vertical = spacing)
+            LazyGrid(
+                cells = GridCells.Adaptive(itemSize),
+                modifier = Modifier.axisSize(itemSize, itemSize * 3 + spacing * 2),
+                mainAxisSpacedBy = spacing,
+                contentPadding = PaddingValues(mainAxis = spacing)
             ) {
                 items(items) {
                     Spacer(Modifier.size(itemSize).testTag(it))
@@ -415,18 +409,18 @@ class LazyGridTest {
 
         rule.onNodeWithTag("1")
             .assertIsDisplayed()
-            .assertTopPositionInRootIsEqualTo(spacing)
-            .assertHeightIsAtLeast(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(spacing)
+            .assertMainAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("2")
             .assertIsDisplayed()
-            .assertTopPositionInRootIsEqualTo(spacing * 2 + itemSize)
-            .assertHeightIsAtLeast(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(spacing * 2 + itemSize)
+            .assertMainAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("3")
             .assertIsDisplayed()
-            .assertTopPositionInRootIsEqualTo(spacing * 3 + itemSize * 2)
-            .assertHeightIsAtLeast(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(spacing * 3 + itemSize * 2)
+            .assertMainAxisSizeIsEqualTo(itemSize)
     }
 
     @Test
@@ -437,10 +431,10 @@ class LazyGridTest {
         val itemSize = with(rule.density) { 80.toDp() }
 
         rule.setContent {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.height(itemSize * 2 + spacing).width(itemSize),
-                verticalArrangement = Arrangement.spacedBy(space = spacing),
+            LazyGrid(
+                cells = 2,
+                modifier = Modifier.axisSize(itemSize, itemSize * 2 + spacing),
+                mainAxisSpacedBy = spacing,
             ) {
                 items(items) {
                     Spacer(Modifier.size(itemSize).testTag(it))
@@ -450,23 +444,23 @@ class LazyGridTest {
 
         rule.onNodeWithTag("1")
             .assertIsDisplayed()
-            .assertTopPositionInRootIsEqualTo(0.dp)
-            .assertHeightIsAtLeast(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertMainAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("2")
             .assertIsDisplayed()
-            .assertTopPositionInRootIsEqualTo(0.dp)
-            .assertHeightIsAtLeast(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertMainAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("3")
             .assertIsDisplayed()
-            .assertTopPositionInRootIsEqualTo(spacing + itemSize)
-            .assertHeightIsAtLeast(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(spacing + itemSize)
+            .assertMainAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("4")
             .assertIsDisplayed()
-            .assertTopPositionInRootIsEqualTo(spacing + itemSize)
-            .assertHeightIsAtLeast(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(spacing + itemSize)
+            .assertMainAxisSizeIsEqualTo(itemSize)
     }
 
     @Test
@@ -477,10 +471,10 @@ class LazyGridTest {
         val itemSize = with(rule.density) { 30.toDp() }
 
         rule.setContent {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.height(itemSize * 2).width(itemSize * 2 + spacing),
-                horizontalArrangement = Arrangement.spacedBy(space = spacing),
+            LazyGrid(
+                cells = 2,
+                modifier = Modifier.axisSize(itemSize * 2 + spacing, itemSize * 2),
+                crossAxisSpacedBy = spacing
             ) {
                 items(items) {
                     Spacer(Modifier.size(itemSize).testTag(it))
@@ -490,23 +484,23 @@ class LazyGridTest {
 
         rule.onNodeWithTag("1")
             .assertIsDisplayed()
-            .assertLeftPositionInRootIsEqualTo(0.dp)
-            .assertWidthIsAtLeast(itemSize)
+            .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertCrossAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("2")
             .assertIsDisplayed()
-            .assertLeftPositionInRootIsEqualTo(spacing + itemSize)
-            .assertWidthIsAtLeast(itemSize)
+            .assertCrossAxisStartPositionInRootIsEqualTo(spacing + itemSize)
+            .assertCrossAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("3")
             .assertIsDisplayed()
-            .assertLeftPositionInRootIsEqualTo(0.dp)
-            .assertWidthIsAtLeast(itemSize)
+            .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertCrossAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("4")
             .assertIsDisplayed()
-            .assertLeftPositionInRootIsEqualTo(spacing + itemSize)
-            .assertWidthIsAtLeast(itemSize)
+            .assertCrossAxisStartPositionInRootIsEqualTo(spacing + itemSize)
+            .assertCrossAxisSizeIsEqualTo(itemSize)
     }
 
     @Test
@@ -517,11 +511,11 @@ class LazyGridTest {
         val itemSize = with(rule.density) { 77.toDp() }
 
         rule.setContent {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.height(itemSize * 2 + spacing).width(itemSize),
-                verticalArrangement = Arrangement.spacedBy(space = spacing),
-                contentPadding = PaddingValues(vertical = spacing)
+            LazyGrid(
+                cells = 2,
+                modifier = Modifier.axisSize(itemSize, itemSize * 2 + spacing),
+                mainAxisSpacedBy = spacing,
+                contentPadding = PaddingValues(mainAxis = spacing)
             ) {
                 items(items) {
                     Spacer(Modifier.size(itemSize).testTag(it))
@@ -531,23 +525,23 @@ class LazyGridTest {
 
         rule.onNodeWithTag("1")
             .assertIsDisplayed()
-            .assertTopPositionInRootIsEqualTo(spacing)
-            .assertHeightIsAtLeast(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(spacing)
+            .assertMainAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("2")
             .assertIsDisplayed()
-            .assertTopPositionInRootIsEqualTo(spacing)
-            .assertHeightIsAtLeast(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(spacing)
+            .assertMainAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("3")
             .assertIsDisplayed()
-            .assertTopPositionInRootIsEqualTo(spacing * 2 + itemSize)
-            .assertHeightIsAtLeast(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(spacing * 2 + itemSize)
+            .assertMainAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("4")
             .assertIsDisplayed()
-            .assertTopPositionInRootIsEqualTo(spacing * 2 + itemSize)
-            .assertHeightIsAtLeast(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(spacing * 2 + itemSize)
+            .assertMainAxisSizeIsEqualTo(itemSize)
     }
 
     @Test
@@ -558,11 +552,11 @@ class LazyGridTest {
         val itemSize = with(rule.density) { 44.toDp() }
 
         rule.setContent {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.height(itemSize * 2).width(itemSize * 2 + spacing * 3),
-                horizontalArrangement = Arrangement.spacedBy(space = spacing),
-                contentPadding = PaddingValues(horizontal = spacing)
+            LazyGrid(
+                cells = 2,
+                modifier = Modifier.axisSize(itemSize * 2 + spacing * 3, itemSize * 2),
+                crossAxisSpacedBy = spacing,
+                contentPadding = PaddingValues(crossAxis = spacing)
             ) {
                 items(items) {
                     Spacer(Modifier.size(itemSize).testTag(it))
@@ -572,23 +566,23 @@ class LazyGridTest {
 
         rule.onNodeWithTag("1")
             .assertIsDisplayed()
-            .assertLeftPositionInRootIsEqualTo(spacing)
-            .assertWidthIsAtLeast(itemSize)
+            .assertCrossAxisStartPositionInRootIsEqualTo(spacing)
+            .assertCrossAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("2")
             .assertIsDisplayed()
-            .assertLeftPositionInRootIsEqualTo(spacing * 2 + itemSize)
-            .assertWidthIsAtLeast(itemSize)
+            .assertCrossAxisStartPositionInRootIsEqualTo(spacing * 2 + itemSize)
+            .assertCrossAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("3")
             .assertIsDisplayed()
-            .assertLeftPositionInRootIsEqualTo(spacing)
-            .assertWidthIsAtLeast(itemSize)
+            .assertCrossAxisStartPositionInRootIsEqualTo(spacing)
+            .assertCrossAxisSizeIsEqualTo(itemSize)
 
         rule.onNodeWithTag("4")
             .assertIsDisplayed()
-            .assertLeftPositionInRootIsEqualTo(spacing * 2 + itemSize)
-            .assertWidthIsAtLeast(itemSize)
+            .assertCrossAxisStartPositionInRootIsEqualTo(spacing * 2 + itemSize)
+            .assertCrossAxisSizeIsEqualTo(itemSize)
     }
 
     @Test
@@ -598,31 +592,31 @@ class LazyGridTest {
         val itemSize = with(rule.density) { 15.toDp() }
 
         rule.setContent {
-            LazyVerticalGrid(
-                GridCells.Fixed(2),
-                Modifier.requiredWidth(itemSize * 2)
+            LazyGrid(
+                cells = 2,
+                modifier = Modifier.crossAxisSize(itemSize * 2)
             ) {
                 items(items) {
-                    Spacer(Modifier.requiredHeight(itemSize).testTag(it))
+                    Spacer(Modifier.mainAxisSize(itemSize).testTag(it))
                 }
             }
         }
 
         rule.onNodeWithTag("1")
-            .assertTopPositionInRootIsEqualTo(0.dp)
-            .assertLeftPositionInRootIsEqualTo(0.dp)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
 
         rule.onNodeWithTag("2")
-            .assertTopPositionInRootIsEqualTo(0.dp)
-            .assertLeftPositionInRootIsEqualTo(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertCrossAxisStartPositionInRootIsEqualTo(itemSize)
 
         rule.onNodeWithTag("3")
-            .assertTopPositionInRootIsEqualTo(itemSize)
-            .assertLeftPositionInRootIsEqualTo(0.dp)
+            .assertMainAxisStartPositionInRootIsEqualTo(itemSize)
+            .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
 
         rule.onNodeWithTag("4")
-            .assertTopPositionInRootIsEqualTo(itemSize)
-            .assertLeftPositionInRootIsEqualTo(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(itemSize)
+            .assertCrossAxisStartPositionInRootIsEqualTo(itemSize)
     }
 
     @Test
@@ -632,31 +626,31 @@ class LazyGridTest {
         val itemSize = with(rule.density) { 15.toDp() }
 
         rule.setContent {
-            LazyVerticalGrid(
-                GridCells.Fixed(2),
-                Modifier.requiredWidth(itemSize * 2)
+            LazyGrid(
+                cells = 2,
+                Modifier.crossAxisSize(itemSize * 2)
             ) {
                 itemsIndexed(items) { index, item ->
-                    Spacer(Modifier.requiredHeight(itemSize).testTag("$index*$item"))
+                    Spacer(Modifier.mainAxisSize(itemSize).testTag("$index*$item"))
                 }
             }
         }
 
         rule.onNodeWithTag("0*1")
-            .assertTopPositionInRootIsEqualTo(0.dp)
-            .assertLeftPositionInRootIsEqualTo(0.dp)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
 
         rule.onNodeWithTag("1*2")
-            .assertTopPositionInRootIsEqualTo(0.dp)
-            .assertLeftPositionInRootIsEqualTo(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertCrossAxisStartPositionInRootIsEqualTo(itemSize)
 
         rule.onNodeWithTag("2*3")
-            .assertTopPositionInRootIsEqualTo(itemSize)
-            .assertLeftPositionInRootIsEqualTo(0.dp)
+            .assertMainAxisStartPositionInRootIsEqualTo(itemSize)
+            .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
 
         rule.onNodeWithTag("3*4")
-            .assertTopPositionInRootIsEqualTo(itemSize)
-            .assertLeftPositionInRootIsEqualTo(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(itemSize)
+            .assertCrossAxisStartPositionInRootIsEqualTo(itemSize)
     }
 
     @Test
@@ -666,10 +660,10 @@ class LazyGridTest {
         val composedIndexes = mutableListOf<Int>()
         rule.setContent {
             state = rememberLazyGridState()
-            LazyVerticalGrid(
-                GridCells.Fixed(1),
-                Modifier.fillMaxWidth().height(10.dp),
-                state
+            LazyGrid(
+                cells = 1,
+                modifier = Modifier.mainAxisSize(10.dp),
+                state = state
             ) {
                 items(count) { index ->
                     composedIndexes.add(index)
@@ -698,9 +692,9 @@ class LazyGridTest {
         val itemSize = with(rule.density) { 15.toDp() }
 
         rule.setContent {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.requiredSize(itemSize * 2).testTag(LazyGridTag),
+            LazyGrid(
+                cells = 2,
+                modifier = Modifier.size(itemSize * 2).testTag(LazyGridTag),
                 state = LazyGridState(firstVisibleItemIndex = Int.MAX_VALUE - 3)
             ) {
                 items(Int.MAX_VALUE) {
@@ -710,16 +704,16 @@ class LazyGridTest {
         }
 
         rule.onNodeWithTag("${Int.MAX_VALUE - 3}")
-            .assertTopPositionInRootIsEqualTo(0.dp)
-            .assertLeftPositionInRootIsEqualTo(0.dp)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
 
         rule.onNodeWithTag("${Int.MAX_VALUE - 2}")
-            .assertTopPositionInRootIsEqualTo(0.dp)
-            .assertLeftPositionInRootIsEqualTo(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertCrossAxisStartPositionInRootIsEqualTo(itemSize)
 
         rule.onNodeWithTag("${Int.MAX_VALUE - 1}")
-            .assertTopPositionInRootIsEqualTo(itemSize)
-            .assertLeftPositionInRootIsEqualTo(0.dp)
+            .assertMainAxisStartPositionInRootIsEqualTo(itemSize)
+            .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
 
         rule.onNodeWithTag("${Int.MAX_VALUE}").assertDoesNotExist()
         rule.onNodeWithTag("0").assertDoesNotExist()
@@ -729,9 +723,9 @@ class LazyGridTest {
     fun pointerInputScrollingIsAllowedWhenUserScrollingIsEnabled() {
         val itemSize = with(rule.density) { 30.toDp() }
         rule.setContentWithTestViewConfiguration {
-            LazyVerticalGrid(
-                GridCells.Fixed(1),
-                Modifier.size(itemSize * 3).testTag(LazyGridTag),
+            LazyGrid(
+                cells = 1,
+                modifier = Modifier.size(itemSize * 3).testTag(LazyGridTag),
                 userScrollEnabled = true,
             ) {
                 items(5) {
@@ -740,19 +734,21 @@ class LazyGridTest {
             }
         }
 
-        rule.onNodeWithTag(LazyGridTag).scrollBy(y = itemSize, density = rule.density)
+        rule.onNodeWithTag(LazyGridTag).apply {
+            scrollBy(offset = itemSize)
+        }
 
         rule.onNodeWithTag("1")
-            .assertTopPositionInRootIsEqualTo(0.dp)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
     }
 
     @Test
     fun pointerInputScrollingIsDisallowedWhenUserScrollingIsDisabled() {
         val itemSize = with(rule.density) { 30.toDp() }
         rule.setContentWithTestViewConfiguration {
-            LazyVerticalGrid(
-                GridCells.Fixed(1),
-                Modifier.size(itemSize * 3).testTag(LazyGridTag),
+            LazyGrid(
+                cells = 1,
+                modifier = Modifier.size(itemSize * 3).testTag(LazyGridTag),
                 userScrollEnabled = false,
             ) {
                 items(5) {
@@ -761,10 +757,10 @@ class LazyGridTest {
             }
         }
 
-        rule.onNodeWithTag(LazyGridTag).scrollBy(y = itemSize, density = rule.density)
+        rule.onNodeWithTag(LazyGridTag).scrollBy(offset = itemSize)
 
         rule.onNodeWithTag("1")
-            .assertTopPositionInRootIsEqualTo(itemSize)
+            .assertMainAxisStartPositionInRootIsEqualTo(itemSize)
     }
 
     @Test
@@ -773,9 +769,9 @@ class LazyGridTest {
         val itemSize = with(rule.density) { itemSizePx.toDp() }
         lateinit var state: LazyGridState
         rule.setContentWithTestViewConfiguration {
-            LazyVerticalGrid(
-                GridCells.Fixed(1),
-                Modifier.size(itemSize * 3),
+            LazyGrid(
+                cells = 1,
+                modifier = Modifier.size(itemSize * 3),
                 state = rememberLazyGridState().also { state = it },
                 userScrollEnabled = false,
             ) {
@@ -792,16 +788,16 @@ class LazyGridTest {
         }
 
         rule.onNodeWithTag("1")
-            .assertTopPositionInRootIsEqualTo(0.dp)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
     }
 
     @Test
     fun semanticScrollingIsDisallowedWhenUserScrollingIsDisabled() {
         val itemSize = with(rule.density) { 30.toDp() }
         rule.setContentWithTestViewConfiguration {
-            LazyVerticalGrid(
-                GridCells.Fixed(1),
-                Modifier.size(itemSize * 3).testTag(LazyGridTag),
+            LazyGrid(
+                cells = 1,
+                modifier = Modifier.size(itemSize * 3).testTag(LazyGridTag),
                 userScrollEnabled = false,
             ) {
                 items(5) {
@@ -814,42 +810,60 @@ class LazyGridTest {
             .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.ScrollBy))
             .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.ScrollToIndex))
             // but we still have a read only scroll range property
-            .assert(keyIsDefined(SemanticsProperties.VerticalScrollAxisRange))
+            .assert(
+                keyIsDefined(
+                    if (orientation == Orientation.Vertical) {
+                        SemanticsProperties.VerticalScrollAxisRange
+                    } else {
+                        SemanticsProperties.HorizontalScrollAxisRange
+                    }
+                )
+            )
     }
 
     @Test
     fun rtl() {
-        val gridWidth = 30
-        val gridWidthDp = with(rule.density) { gridWidth.toDp() }
+        val gridCrossAxisSize = 30
+        val gridCrossAxisSizeDp = with(rule.density) { gridCrossAxisSize.toDp() }
         rule.setContent {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                LazyVerticalGrid(GridCells.Fixed(3), Modifier.width(gridWidthDp)) {
+                LazyGrid(
+                    cells = 3,
+                    modifier = Modifier.crossAxisSize(gridCrossAxisSizeDp)
+                ) {
                     items(3) {
-                        Box(Modifier.height(1.dp).testTag("$it"))
+                        Box(Modifier.mainAxisSize(1.dp).testTag("$it"))
                     }
                 }
             }
         }
 
-        rule.onNodeWithTag("0").assertLeftPositionInRootIsEqualTo(gridWidthDp * 2 / 3)
-        rule.onNodeWithTag("1").assertLeftPositionInRootIsEqualTo(gridWidthDp / 3)
-        rule.onNodeWithTag("2").assertLeftPositionInRootIsEqualTo(0.dp)
+        val tags = if (orientation == Orientation.Vertical) {
+            listOf("0", "1", "2")
+        } else {
+            listOf("2", "1", "0")
+        }
+        rule.onNodeWithTag(tags[0])
+            .assertCrossAxisStartPositionInRootIsEqualTo(gridCrossAxisSizeDp * 2 / 3)
+        rule.onNodeWithTag(tags[1])
+            .assertCrossAxisStartPositionInRootIsEqualTo(gridCrossAxisSizeDp / 3)
+        rule.onNodeWithTag(tags[2]).assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
     }
 
     @Test
     fun withMissingItems() {
-        val itemHeight = with(rule.density) { 30.toDp() }
+        val itemMainAxisSize = with(rule.density) { 30.toDp() }
         lateinit var state: LazyGridState
         rule.setContent {
             state = rememberLazyGridState()
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.height(itemHeight + 1.dp),
+            LazyGrid(
+                cells = 2,
+                modifier = Modifier.mainAxisSize(itemMainAxisSize + 1.dp),
                 state = state
             ) {
                 items((0..8).map { it.toString() }) {
                     if (it != "3") {
-                        Box(Modifier.size(itemHeight).testTag(it))
+                        Box(Modifier.mainAxisSize(itemMainAxisSize).testTag(it))
                     }
                 }
             }
@@ -878,7 +892,7 @@ class LazyGridTest {
     fun passingNegativeItemsCountIsNotAllowed() {
         var exception: Exception? = null
         rule.setContentWithTestViewConfiguration {
-            LazyVerticalGrid(GridCells.Fixed(1)) {
+            LazyGrid(cells = 1) {
                 try {
                     items(-1) {
                         Box(Modifier)
@@ -908,11 +922,11 @@ class LazyGridTest {
 
         rule.setContentWithTestViewConfiguration {
             counter.value // just to trigger recomposition
-            LazyVerticalGrid(
-                GridCells.Fixed(1),
-                // this will return a new object everytime causing LazyVerticalGrid recomposition
+            LazyGrid(
+                cells = 1,
+                // this will return a new object everytime causing LazyGrid recomposition
                 // without causing remeasure
-                Modifier.composed { layoutModifier }
+                modifier = Modifier.composed { layoutModifier }
             ) {
                 items(1) {
                     Spacer(Modifier.size(10.dp))
@@ -937,9 +951,9 @@ class LazyGridTest {
 
         rule.setContentWithTestViewConfiguration {
             state = rememberLazyGridState()
-            LazyVerticalGrid(
-                GridCells.Fixed(1),
-                Modifier.composed {
+            LazyGrid(
+                cells = 1,
+                modifier = Modifier.composed {
                     recomposeCount++
                     Modifier
                 }.size(100.dp),
@@ -968,15 +982,14 @@ class LazyGridTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun zIndexOnItemAffectsDrawingOrder() {
         rule.setContentWithTestViewConfiguration {
-            LazyVerticalGrid(
-                GridCells.Fixed(1),
-                Modifier.size(6.dp).testTag(LazyGridTag)
+            LazyGrid(
+                cells = 1,
+                modifier = Modifier.size(6.dp).testTag(LazyGridTag)
             ) {
                 items(listOf(Color.Blue, Color.Green, Color.Red)) { color ->
                     Box(
                         Modifier
-                            .height(2.dp)
-                            .width(6.dp)
+                            .axisSize(6.dp, 2.dp)
                             .zIndex(if (color == Color.Green) 1f else 0f)
                             .drawBehind {
                                 drawRect(
@@ -999,37 +1012,33 @@ class LazyGridTest {
         val items = (1..5).map { it.toString() }
 
         rule.setContent {
-            LazyVerticalGrid(
+            LazyGrid(
                 // Two columns in ratio 1:2
-                columns = object : GridCells {
+                cells = object : GridCells {
                     override fun Density.calculateCrossAxisCellSizes(
                         availableSize: Int,
                         spacing: Int
                     ): List<Int> {
-                        val availableWidth = availableSize - spacing
-                        val columnWidth = availableWidth / 3
-                        return listOf(columnWidth, columnWidth * 2)
+                        val availableCrossAxis = availableSize - spacing
+                        val columnSize = availableCrossAxis / 3
+                        return listOf(columnSize, columnSize * 2)
                     }
                 },
-                modifier = Modifier.height(100.dp).width(300.dp)
+                modifier = Modifier.axisSize(300.dp, 100.dp)
             ) {
                 items(items) {
-                    Spacer(Modifier.height(101.dp).testTag(it))
+                    Spacer(Modifier.mainAxisSize(101.dp).testTag(it))
                 }
             }
         }
 
         rule.onNodeWithTag("1")
-            .assertLeftPositionInRootIsEqualTo(0.dp)
-
-        rule.onNodeWithTag("1")
-            .assertWidthIsEqualTo(100.dp)
+            .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertCrossAxisSizeIsEqualTo(100.dp)
 
         rule.onNodeWithTag("2")
-            .assertLeftPositionInRootIsEqualTo(100.dp)
-
-        rule.onNodeWithTag("2")
-            .assertWidthIsEqualTo(200.dp)
+            .assertCrossAxisStartPositionInRootIsEqualTo(100.dp)
+            .assertCrossAxisSizeIsEqualTo(200.dp)
 
         rule.onNodeWithTag("3")
             .assertDoesNotExist()
@@ -1039,6 +1048,28 @@ class LazyGridTest {
 
         rule.onNodeWithTag("5")
             .assertDoesNotExist()
+    }
+
+    @Test
+    fun onlyOneInitialMeasurePass() {
+        val items by mutableStateOf((1..20).toList())
+        lateinit var state: LazyGridState
+        rule.setContent {
+            state = rememberLazyGridState()
+            LazyGrid(
+                1,
+                Modifier.requiredSize(100.dp).testTag(LazyGridTag),
+                state = state
+            ) {
+                items(items) {
+                    Spacer(Modifier.requiredSize(20.dp).testTag("$it"))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(state.numMeasurePasses).isEqualTo(1)
+        }
     }
 }
 

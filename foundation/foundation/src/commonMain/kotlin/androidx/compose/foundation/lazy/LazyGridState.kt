@@ -173,6 +173,11 @@ class LazyGridState constructor(
     internal var density: Density = Density(1f, 1f)
 
     /**
+     * Needed for [notifyPrefetch].
+     */
+    internal var isVertical: Boolean = true
+
+    /**
      * The ScrollableController instance. We keep it as we need to call stopAnimation on it once
      * we reached the end of the grid.
      */
@@ -323,10 +328,14 @@ class LazyGridState constructor(
             val lineToPrefetch: Int
             val closestNextItemToPrefetch: Int
             if (scrollingForward) {
-                lineToPrefetch = info.visibleItemsInfo.last().row + 1
+                lineToPrefetch = 1 + info.visibleItemsInfo.last().let {
+                    if (isVertical) it.row else it.column
+                }
                 closestNextItemToPrefetch = info.visibleItemsInfo.last().index + 1
             } else {
-                lineToPrefetch = info.visibleItemsInfo.first().row - 1
+                lineToPrefetch = -1 + info.visibleItemsInfo.first().let {
+                    if (isVertical) it.row else it.column
+                }
                 closestNextItemToPrefetch = info.visibleItemsInfo.first().index - 1
             }
             if (lineToPrefetch != this.lineToPrefetch &&

@@ -131,7 +131,7 @@ class LazyGridLayoutInfoTest(
                 cells = 1,
                 state = rememberLazyGridState().also { state = it },
                 reverseLayout = reverseLayout,
-                spacedBy = itemSizeDp,
+                mainAxisSpacedBy = itemSizeDp,
                 modifier = Modifier.axisSize(itemSizeDp, itemSizeDp * 3.5f),
             ) {
                 items((0..11).toList()) {
