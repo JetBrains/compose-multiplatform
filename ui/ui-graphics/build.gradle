@@ -80,8 +80,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             configure([macosX64, macosArm64]) {
                 binaries.all {
                     freeCompilerArgs += darwinFlags
-                    // TODO: the current release binary surprises LLVM, so disable checks for now.
-                    freeCompilerArgs += "-Xdisable-phases=VerifyBitcode"
                 }
             }
             configure([uikitX64, uikitArm64]) {
@@ -89,8 +87,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                     freeCompilerArgs += darwinFlags
                     freeCompilerArgs +=
                         ["-linker-option", "-framework", "-linker-option", "UIKit"]
-                    // TODO: the current release binary surprises LLVM, so disable checks for now.
-                    freeCompilerArgs += "-Xdisable-phases=VerifyBitcode"
                 }
             }
         }
