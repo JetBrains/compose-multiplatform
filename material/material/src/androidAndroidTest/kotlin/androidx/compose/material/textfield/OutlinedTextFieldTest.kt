@@ -38,6 +38,7 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.OutlinedTextFieldTopPadding
 import androidx.compose.material.Strings
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
@@ -103,6 +104,7 @@ import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import kotlin.math.max
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -352,7 +354,8 @@ class OutlinedTextFieldTest {
             assertThat(labelPosition.value?.x).isEqualTo(
                 ExpectedPadding.roundToPx().toFloat()
             )
-            assertThat(labelPosition.value?.y).isEqualTo(0)
+
+            assertThat(labelPosition.value?.y).isEqualTo(getLabelPosition(labelSize))
         }
     }
 
@@ -385,7 +388,8 @@ class OutlinedTextFieldTest {
             assertThat(labelPosition.value?.x).isEqualTo(
                 ExpectedPadding.roundToPx().toFloat()
             )
-            assertThat(labelPosition.value?.y).isEqualTo(0)
+
+            assertThat(labelPosition.value?.y).isEqualTo(getLabelPosition(labelSize))
         }
     }
 
@@ -1312,5 +1316,13 @@ class OutlinedTextFieldTest {
         with(rule.density) {
             assertThat(height).isEqualTo((TextFieldDefaults.MinHeight).roundToPx())
         }
+    }
+
+    private fun getLabelPosition(labelSize: Ref<IntSize>): Int {
+        val labelHalfHeight = labelSize.value!!.height / 2
+        val paddingTop = with(rule.density) { OutlinedTextFieldTopPadding.toPx() }
+        // vertical position is the default padding - half height
+        // in case negative position, fix to 0
+        return max(paddingTop - labelHalfHeight, 0f).roundToInt()
     }
 }

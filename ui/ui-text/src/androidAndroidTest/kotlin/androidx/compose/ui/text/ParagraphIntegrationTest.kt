@@ -2706,6 +2706,24 @@ class ParagraphIntegrationTest {
     }
 
     @Test
+    fun lineHeight_IsNotAppliedToFirstLine() {
+        val text = "abcdefgh"
+        val fontSize = 20f
+        // Make the layout 4 lines
+        val layoutWidth = text.length * fontSize / 4
+        val lineHeight = 2f
+
+        val paragraph = simpleParagraph(
+            text = text,
+            style = TextStyle(fontSize = fontSize.sp, lineHeight = lineHeight.em),
+            width = layoutWidth
+        )
+
+        assertThat(paragraph.lineCount).isEqualTo(4)
+        assertThat(paragraph.getLineHeight(0)).isEqualTo(fontSize)
+    }
+
+    @Test
     fun testAnnotatedString_setFontSizeOnWholeText() {
         with(defaultDensity) {
             val text = "abcde"

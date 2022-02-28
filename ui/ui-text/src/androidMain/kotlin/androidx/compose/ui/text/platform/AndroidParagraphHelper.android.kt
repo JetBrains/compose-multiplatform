@@ -55,7 +55,14 @@ internal fun createCharSequence(
 
     val spannableString = SpannableString(text)
 
-    spannableString.setLineHeight(contextTextStyle.lineHeight, contextFontSize, density)
+    // includeFontPadding "true" did not apply the line height to first line in the
+    // latest android versions. disable line height for the first line.
+    spannableString.setLineHeight(
+        lineHeight = contextTextStyle.lineHeight,
+        contextFontSize = contextFontSize,
+        density = density,
+        applyToFirstLine = false
+    )
 
     spannableString.setTextIndent(contextTextStyle.textIndent, contextFontSize, density)
 
