@@ -16,6 +16,9 @@
 
 package androidx.compose.material3.catalog.library.ui.theme
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.darkColors
@@ -40,7 +43,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 
 @Composable
 fun CatalogTheme(
@@ -77,9 +80,11 @@ fun CatalogTheme(
     }
 
     val view = LocalView.current
+    val context = LocalContext.current
     val darkTheme = isSystemInDarkTheme()
     SideEffect {
-        ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = !darkTheme
+        WindowCompat.getInsetsController(context.findActivity().window, view)
+            .isAppearanceLightStatusBars = !darkTheme
     }
 
     CompositionLocalProvider(
@@ -176,3 +181,10 @@ private val DarkCustomColorScheme = darkColorScheme(
     onErrorContainer = Color(0xFFFFDAD4),
     outline = Color(0xFFA08D85),
 )
+
+private tailrec fun Context.findActivity(): Activity =
+    when (this) {
+        is Activity -> this
+        is ContextWrapper -> this.baseContext.findActivity()
+        else -> throw IllegalArgumentException("Could not find activity!")
+    }
