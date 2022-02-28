@@ -115,19 +115,20 @@ internal fun Spannable.setTextIndent(
 internal fun Spannable.setLineHeight(
     lineHeight: TextUnit,
     contextFontSize: Float,
-    density: Density
+    density: Density,
+    applyToFirstLine: Boolean
 ) {
     when (lineHeight.type) {
         TextUnitType.Sp -> with(density) {
             setSpan(
-                LineHeightSpan(ceil(lineHeight.toPx()).toInt()),
+                LineHeightSpan(ceil(lineHeight.toPx()).toInt(), applyToFirstLine),
                 0,
                 length
             )
         }
         TextUnitType.Em -> {
             setSpan(
-                LineHeightSpan(ceil(lineHeight.value * contextFontSize).toInt()),
+                LineHeightSpan(ceil(lineHeight.value * contextFontSize).toInt(), applyToFirstLine),
                 0,
                 length
             )
