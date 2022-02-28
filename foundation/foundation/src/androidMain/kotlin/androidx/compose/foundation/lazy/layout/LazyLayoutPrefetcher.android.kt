@@ -19,6 +19,7 @@ package androidx.compose.foundation.lazy.layout
 import android.view.Choreographer
 import android.view.Display
 import android.view.View
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.remember
@@ -31,6 +32,7 @@ import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.trace
 import java.util.concurrent.TimeUnit
 
+@ExperimentalFoundationApi
 @Composable
 internal actual fun LazyLayoutPrefetcher(
     prefetchPolicy: LazyLayoutPrefetchPolicy,
@@ -103,6 +105,7 @@ internal actual fun LazyLayoutPrefetcher(
  *    so critical given that we don't need to calculate the deadline.
  *    Tracking bug: 187393922
  */
+@ExperimentalFoundationApi
 internal class LazyLayoutPrefetcher(
     private val prefetchPolicy: LazyLayoutPrefetchPolicy,
     private val subcomposeLayoutState: SubcomposeLayoutState,

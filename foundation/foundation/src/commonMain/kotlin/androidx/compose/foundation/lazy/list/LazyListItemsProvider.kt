@@ -16,8 +16,10 @@
 
 package androidx.compose.foundation.lazy.list
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.layout.LazyLayoutItemsProvider
 
+@ExperimentalFoundationApi
 internal interface LazyListItemsProvider : LazyLayoutItemsProvider {
     /** The list of indexes of the sticky header items */
     val headerIndexes: List<Int>

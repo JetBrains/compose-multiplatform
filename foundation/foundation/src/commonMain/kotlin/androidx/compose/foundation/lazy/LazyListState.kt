@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollScope
@@ -76,6 +77,7 @@ fun rememberLazyListState(
  * @param firstVisibleItemScrollOffset the initial value for
  * [LazyListState.firstVisibleItemScrollOffset]
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Stable
 class LazyListState constructor(
     firstVisibleItemIndex: Int = 0,

@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.lazy.layout
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.Density
  * 3) Adds state restoration on top of the composable returned by [itemsProvider] with help of
  * [saveableStateHolder].
  */
+@ExperimentalFoundationApi
 internal class LazyLayoutItemContentFactory(
     private val saveableStateHolder: SaveableStateHolder,
     val itemsProvider: () -> LazyLayoutItemsProvider,
