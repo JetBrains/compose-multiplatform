@@ -34,6 +34,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
          */
         implementation(libs.kotlinStdlibCommon)
         implementation(libs.kotlinCoroutinesCore)
+        implementation(libs.atomicFu)
 
         api(project(":compose:ui:ui-graphics"))
         api(project(":compose:ui:ui-unit"))
@@ -99,6 +100,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             commonMain.dependencies {
                 implementation(libs.kotlinStdlibCommon)
                 implementation(libs.kotlinCoroutinesCore)
+                implementation(libs.atomicFu)
 
                 api(project(":compose:ui:ui-graphics"))
                 api(project(":compose:ui:ui-unit"))

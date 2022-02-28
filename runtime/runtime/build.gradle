@@ -38,13 +38,13 @@ dependencies {
 
         implementation("androidx.annotation:annotation:1.1.0")
         implementation(libs.kotlinStdlib)
+        implementation(libs.atomicFu)
 
         testImplementation(libs.kotlinTestJunit)
         testImplementation(libs.junit)
         testImplementation(libs.robolectric)
         // kotlinCoroutinesTest is copy-pasted in source code to support multiplarform tests
         // testImplementation(libs.kotlinCoroutinesTest)
-        testImplementation("org.jetbrains.kotlinx:atomicfu:0.14.4")
 
         androidTestImplementation(libs.kotlinTestJunit)
         androidTestImplementation(libs.testExtJunit)
@@ -91,6 +91,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             commonMain.dependencies {
                 implementation(libs.kotlinStdlibCommon)
                 implementation(libs.kotlinCoroutinesCore)
+                implementation(libs.atomicFu)
             }
             jvmMain.dependencies {
                 implementation(libs.kotlinStdlib)

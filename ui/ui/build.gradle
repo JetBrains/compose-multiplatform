@@ -37,6 +37,7 @@ dependencies {
          */
         implementation(libs.kotlinStdlibCommon)
         implementation(libs.kotlinCoroutinesCore)
+        implementation(libs.atomicFu)
 
         // when updating the runtime version please also update the runtime-saveable version
         implementation(project(":compose:runtime:runtime"))
@@ -134,6 +135,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             commonMain.dependencies {
                 implementation(libs.kotlinStdlibCommon)
                 implementation(libs.kotlinCoroutinesCore)
+                implementation(libs.atomicFu)
 
                 // when updating the runtime version please also update the runtime-saveable version
                 implementation(project(":compose:runtime:runtime"))
