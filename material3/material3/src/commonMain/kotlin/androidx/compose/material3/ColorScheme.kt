@@ -73,6 +73,8 @@ import kotlin.math.ln
  * @property surfaceVariant Another option for a color with similar uses of [surface].
  * @property onSurfaceVariant The color (and state variants) that can be used for content on top of
  * [surface].
+ * @property surfaceTint This color will be used by components that apply tonal elevation and is
+ * applied on top of [surface]. The higher the elevation the more this color is used.
  * @property inverseSurface A color that contrasts sharply with [surface]. Useful for surfaces that
  * sit on top of other surfaces with [surface] color.
  * @property inverseOnSurface A color that contrasts well with [inverseSurface]. Useful for content
@@ -107,6 +109,7 @@ class ColorScheme(
     onSurface: Color,
     surfaceVariant: Color,
     onSurfaceVariant: Color,
+    surfaceTint: Color,
     inverseSurface: Color,
     inverseOnSurface: Color,
     error: Color,
@@ -153,6 +156,8 @@ class ColorScheme(
         internal set
     var onSurfaceVariant by mutableStateOf(onSurfaceVariant, structuralEqualityPolicy())
         internal set
+    var surfaceTint by mutableStateOf(surfaceTint, structuralEqualityPolicy())
+        internal set
     var inverseSurface by mutableStateOf(inverseSurface, structuralEqualityPolicy())
         internal set
     var inverseOnSurface by mutableStateOf(inverseOnSurface, structuralEqualityPolicy())
@@ -189,6 +194,7 @@ class ColorScheme(
         onSurface: Color = this.onSurface,
         surfaceVariant: Color = this.surfaceVariant,
         onSurfaceVariant: Color = this.onSurfaceVariant,
+        surfaceTint: Color = this.surfaceTint,
         inverseSurface: Color = this.inverseSurface,
         inverseOnSurface: Color = this.inverseOnSurface,
         error: Color = this.error,
@@ -217,6 +223,7 @@ class ColorScheme(
             onSurface = onSurface,
             surfaceVariant = surfaceVariant,
             onSurfaceVariant = onSurfaceVariant,
+            surfaceTint = surfaceTint,
             inverseSurface = inverseSurface,
             inverseOnSurface = inverseOnSurface,
             error = error,
@@ -247,6 +254,7 @@ class ColorScheme(
             "onSurface=$onSurface" +
             "surfaceVariant=$surfaceVariant" +
             "onSurfaceVariant=$onSurfaceVariant" +
+            "surfaceTint=$surfaceTint" +
             "inverseSurface=$inverseSurface" +
             "inverseOnSurface=$inverseOnSurface" +
             "error=$error" +
@@ -281,6 +289,7 @@ fun lightColorScheme(
     onSurface: Color = ColorLightTokens.OnSurface,
     surfaceVariant: Color = ColorLightTokens.SurfaceVariant,
     onSurfaceVariant: Color = ColorLightTokens.OnSurfaceVariant,
+    surfaceTint: Color = primary,
     inverseSurface: Color = ColorLightTokens.InverseSurface,
     inverseOnSurface: Color = ColorLightTokens.InverseOnSurface,
     error: Color = ColorLightTokens.Error,
@@ -309,6 +318,7 @@ fun lightColorScheme(
         onSurface = onSurface,
         surfaceVariant = surfaceVariant,
         onSurfaceVariant = onSurfaceVariant,
+        surfaceTint = surfaceTint,
         inverseSurface = inverseSurface,
         inverseOnSurface = inverseOnSurface,
         error = error,
@@ -341,6 +351,7 @@ fun darkColorScheme(
     onSurface: Color = ColorDarkTokens.OnSurface,
     surfaceVariant: Color = ColorDarkTokens.SurfaceVariant,
     onSurfaceVariant: Color = ColorDarkTokens.OnSurfaceVariant,
+    surfaceTint: Color = primary,
     inverseSurface: Color = ColorDarkTokens.InverseSurface,
     inverseOnSurface: Color = ColorDarkTokens.InverseOnSurface,
     error: Color = ColorDarkTokens.Error,
@@ -369,6 +380,7 @@ fun darkColorScheme(
         onSurface = onSurface,
         surfaceVariant = surfaceVariant,
         onSurfaceVariant = onSurfaceVariant,
+        surfaceTint = surfaceTint,
         inverseSurface = inverseSurface,
         inverseOnSurface = inverseOnSurface,
         error = error,
@@ -443,16 +455,16 @@ fun contentColorFor(backgroundColor: Color) =
  * [ColorScheme.surface].
  */
 internal fun ColorScheme.applyTonalElevation(backgroundColor: Color, elevation: Dp): Color {
-    if (backgroundColor == surface) {
-        return surfaceColorAtElevation(elevation)
+    return if (backgroundColor == surface) {
+        surfaceColorAtElevation(elevation)
     } else {
-        return backgroundColor
+        backgroundColor
     }
 }
 
 /**
- * Returns the [ColorScheme.surface] color with an alpha of the [ColorScheme.primary] color overlaid
- * on top of it.
+ * Returns the [ColorScheme.surface] color with an alpha of the [ColorScheme.surfaceTint] color
+ * overlaid on top of it.
  * Computes the surface tonal color at different elevation levels e.g. surface1 through surface5.
  *
  * @param elevation Elevation value used to compute alpha of the color overlay layer.
@@ -462,7 +474,7 @@ internal fun ColorScheme.surfaceColorAtElevation(
 ): Color {
     if (elevation == 0.dp) return surface
     val alpha = ((4.5f * ln(elevation.value + 1)) + 2f) / 100f
-    return primary.copy(alpha = alpha).compositeOver(surface)
+    return surfaceTint.copy(alpha = alpha).compositeOver(surface)
 }
 
 /**
@@ -499,6 +511,7 @@ internal fun ColorScheme.updateColorSchemeFrom(other: ColorScheme) {
     onSurface = other.onSurface
     surfaceVariant = other.surfaceVariant
     onSurfaceVariant = other.onSurfaceVariant
+    surfaceTint = other.surfaceTint
     inverseSurface = other.inverseSurface
     inverseOnSurface = other.inverseOnSurface
     error = other.error
@@ -530,6 +543,7 @@ internal fun ColorScheme.fromToken(value: ColorSchemeKeyTokens): Color {
         ColorSchemeKeyTokens.OnSecondaryContainer -> onSecondaryContainer
         ColorSchemeKeyTokens.OnSurface -> onSurface
         ColorSchemeKeyTokens.OnSurfaceVariant -> onSurfaceVariant
+        ColorSchemeKeyTokens.SurfaceTint -> surfaceTint
         ColorSchemeKeyTokens.OnTertiary -> onTertiary
         ColorSchemeKeyTokens.OnTertiaryContainer -> onTertiaryContainer
         ColorSchemeKeyTokens.Outline -> outline

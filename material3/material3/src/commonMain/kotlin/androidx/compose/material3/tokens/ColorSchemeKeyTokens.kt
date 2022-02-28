@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_76
+// VERSION: v0_86
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -42,6 +42,7 @@ internal enum class ColorSchemeKeyTokens {
     Secondary,
     SecondaryContainer,
     Surface,
+    SurfaceTint,
     SurfaceVariant,
     Tertiary,
     TertiaryContainer,
