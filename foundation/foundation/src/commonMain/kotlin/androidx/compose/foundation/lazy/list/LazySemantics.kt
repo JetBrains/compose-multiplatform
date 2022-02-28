@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.lazy.list
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.lazy.LazyListState
@@ -35,6 +36,7 @@ import androidx.compose.ui.semantics.verticalScrollAxisRange
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+@ExperimentalFoundationApi
 @Suppress("ComposableModifierFactory", "ModifierInspectorInfo")
 @Composable
 internal fun Modifier.lazyListSemantics(

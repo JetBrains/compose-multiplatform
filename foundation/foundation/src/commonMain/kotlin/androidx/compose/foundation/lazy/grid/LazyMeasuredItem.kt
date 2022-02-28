@@ -19,7 +19,6 @@ package androidx.compose.foundation.lazy.grid
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.LazyGridItemInfo
-import androidx.compose.foundation.lazy.layout.LazyLayoutPlaceable
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -29,6 +28,7 @@ import androidx.compose.ui.unit.LayoutDirection
  * Represents one measured item of the lazy grid. It can in fact consist of multiple placeables
  * if the user emit multiple layout nodes in the item callback.
  */
+@OptIn(ExperimentalFoundationApi::class)
 internal class LazyMeasuredItem(
     val index: ItemIndex,
     val key: Any,
@@ -43,7 +43,7 @@ internal class LazyMeasuredItem(
     private val layoutDirection: LayoutDirection,
     private val beforeContentPadding: Int,
     private val afterContentPadding: Int,
-    val placeables: Array<LazyLayoutPlaceable>,
+    val placeables: Array<Placeable>,
     private val placementAnimator: LazyGridItemPlacementAnimator,
     /**
      * The offset which shouldn't affect any calculations but needs to be applied for the final
@@ -64,9 +64,7 @@ internal class LazyMeasuredItem(
     init {
         var maxMainAxis = 0
         placeables.forEach {
-            val placeable = it.placeable
-            maxMainAxis =
-                maxOf(maxMainAxis, if (isVertical) placeable.height else placeable.width)
+            maxMainAxis = maxOf(maxMainAxis, if (isVertical) it.height else it.width)
         }
         mainAxisSize = maxMainAxis
         mainAxisSizeWithSpacings = maxMainAxis + mainAxisSpacing
@@ -110,7 +108,7 @@ internal class LazyMeasuredItem(
 
         var placeableIndex = if (reverseLayout) placeables.lastIndex else 0
         while (if (reverseLayout) placeableIndex >= 0 else placeableIndex < placeables.size) {
-            val it = placeables[placeableIndex].placeable
+            val it = placeables[placeableIndex]
             val addIndex = if (reverseLayout) 0 else wrappers.size
             wrappers.add(
                 addIndex,

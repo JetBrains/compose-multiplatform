@@ -16,26 +16,29 @@
 
 package androidx.compose.foundation.lazy.layout
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.SubcomposeLayoutState
 import androidx.compose.ui.layout.SubcomposeSlotReusePolicy
+import androidx.compose.ui.unit.Constraints
 
 /**
  * A layout that only composes and lays out currently visible items. Can be used to build
  * efficient scrollable layouts.
  */
+@ExperimentalFoundationApi
 @Composable
 internal fun LazyLayout(
     itemsProvider: () -> LazyLayoutItemsProvider,
     modifier: Modifier = Modifier,
     prefetchPolicy: LazyLayoutPrefetchPolicy? = null,
-    measurePolicy: LazyMeasurePolicy
+    measurePolicy: LazyLayoutMeasureScope.(Constraints) -> MeasureResult
 ) {
     val currentItemsProvider = rememberUpdatedState(itemsProvider)
 
@@ -61,16 +64,15 @@ internal fun LazyLayout(
             { constraints ->
                 itemContentFactory.onBeforeMeasure(this, constraints)
 
-                val placeablesProvider = LazyLayoutPlaceablesProvider(
-                    itemContentFactory,
-                    this
-                )
-                with(measurePolicy) { measure(placeablesProvider, constraints) }
+                with(LazyLayoutMeasureScopeImpl(itemContentFactory, this)) {
+                    measurePolicy(constraints)
+                }
             }
         }
     )
 }
 
+@ExperimentalFoundationApi
 private class LazyLayoutItemReusePolicy(
     private val factory: LazyLayoutItemContentFactory
 ) : SubcomposeSlotReusePolicy {
@@ -102,6 +104,7 @@ private const val MaxItemsToRetainForReuse = 2
  * Platform specific implementation of lazy layout items prefetching - precomposing next items in
  * advance during the scrolling.
  */
+@ExperimentalFoundationApi
 @Composable
 internal expect fun LazyLayoutPrefetcher(
     prefetchPolicy: LazyLayoutPrefetchPolicy,
