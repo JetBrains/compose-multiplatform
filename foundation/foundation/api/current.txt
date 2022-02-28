@@ -400,13 +400,7 @@ package androidx.compose.foundation.lazy {
     method @Deprecated public static inline <T> void itemsIndexed(androidx.compose.foundation.lazy.LazyListScope, T![] items, optional kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,?>? key, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,? extends kotlin.Unit> itemContent);
   }
 
-  public final class LazyGridKt {
-  }
-
-  public final class LazyGridSpanKt {
-  }
-
-  public final class LazyGridStateKt {
+  public final class LazyGridDeprecatedKt {
   }
 
   @androidx.compose.foundation.lazy.LazyScopeMarker @androidx.compose.runtime.Stable public interface LazyItemScope {
@@ -488,6 +482,9 @@ package androidx.compose.foundation.lazy {
 
 package androidx.compose.foundation.lazy.grid {
 
+  public final class LazyGridDslKt {
+  }
+
   public final class LazyGridItemPlacementAnimatorKt {
   }
 
@@ -501,6 +498,12 @@ package androidx.compose.foundation.lazy.grid {
   }
 
   public final class LazyGridScrollingKt {
+  }
+
+  public final class LazyGridSpanKt {
+  }
+
+  public final class LazyGridStateKt {
   }
 
   public final class LazySemanticsKt {
