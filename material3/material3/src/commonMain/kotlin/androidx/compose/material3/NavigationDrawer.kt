@@ -36,7 +36,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.tokens.NavigationDrawerTokens
 import androidx.compose.material3.tokens.PaletteTokens
@@ -58,7 +57,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.dismiss
 import androidx.compose.ui.semantics.onClick
@@ -595,19 +593,14 @@ fun NavigationDrawerItem(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     Surface(
+        selected = selected,
+        onClick = onClick,
+        modifier = modifier
+            .height(NavigationDrawerTokens.ActiveIndicatorHeight)
+            .fillMaxWidth(),
         shape = shape,
         color = colors.containerColor(selected).value,
         interactionSource = interactionSource,
-        modifier = modifier
-            .height(NavigationDrawerTokens.ActiveIndicatorHeight)
-            .fillMaxWidth()
-            .selectable(
-                selected = selected,
-                onClick = onClick,
-                interactionSource = interactionSource,
-                role = Role.Tab,
-                indication = null
-            )
     ) {
         Row(
             Modifier.padding(start = 16.dp, end = 24.dp),

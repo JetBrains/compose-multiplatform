@@ -17,8 +17,6 @@
 package androidx.compose.material3
 
 import android.os.Build
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -164,16 +162,11 @@ class CardScreenshotTest {
 
     @Test
     fun filledCard_pressed() {
-        val interactionSource = MutableInteractionSource()
         rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
                 Card(
+                    onClick = {},
                     Modifier.size(width = 180.dp, height = 100.dp)
-                        .clickable(
-                            interactionSource = interactionSource,
-                            indication = null,
-                            onClick = {}),
-                    interactionSource = interactionSource
                 ) {
                     Box(Modifier.fillMaxSize()) {
                         Text(
@@ -190,16 +183,11 @@ class CardScreenshotTest {
 
     @Test
     fun elevatedCard_pressed() {
-        val interactionSource = MutableInteractionSource()
         rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
                 ElevatedCard(
+                    onClick = {},
                     Modifier.size(width = 180.dp, height = 100.dp)
-                        .clickable(
-                            interactionSource = interactionSource,
-                            indication = null,
-                            onClick = {}),
-                    interactionSource = interactionSource
                 ) {
                     Box(Modifier.fillMaxSize()) {
                         Text(
@@ -216,16 +204,11 @@ class CardScreenshotTest {
 
     @Test
     fun outlinedCard_pressed() {
-        val interactionSource = MutableInteractionSource()
         rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
                 OutlinedCard(
+                    onClick = {},
                     Modifier.size(width = 180.dp, height = 100.dp)
-                        .clickable(
-                            interactionSource = interactionSource,
-                            indication = null,
-                            onClick = {}),
-                    interactionSource
                 ) {
                     Box(Modifier.fillMaxSize()) {
                         Text(
@@ -243,16 +226,11 @@ class CardScreenshotTest {
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun filledCard_hover() {
-        val interactionSource = MutableInteractionSource()
         rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
                 Card(
+                    onClick = {},
                     Modifier.size(width = 180.dp, height = 100.dp)
-                        .clickable(
-                            interactionSource = interactionSource,
-                            indication = null,
-                            onClick = {}),
-                    interactionSource
                 ) {
                     Box(Modifier.fillMaxSize()) {
                         Text(
@@ -273,16 +251,11 @@ class CardScreenshotTest {
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun elevatedCard_hover() {
-        val interactionSource = MutableInteractionSource()
         rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
                 ElevatedCard(
+                    onClick = {},
                     Modifier.size(width = 180.dp, height = 100.dp)
-                        .clickable(
-                            interactionSource = interactionSource,
-                            indication = null,
-                            onClick = {}),
-                    interactionSource
                 ) {
                     Box(Modifier.fillMaxSize()) {
                         Text(
@@ -303,16 +276,11 @@ class CardScreenshotTest {
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun outlinedCard_hover() {
-        val interactionSource = MutableInteractionSource()
         rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
                 OutlinedCard(
+                    onClick = {},
                     Modifier.size(width = 180.dp, height = 100.dp)
-                        .clickable(
-                            interactionSource = interactionSource,
-                            indication = null,
-                            onClick = {}),
-                    interactionSource
                 ) {
                     Box(Modifier.fillMaxSize()) {
                         Text(
@@ -333,21 +301,15 @@ class CardScreenshotTest {
     @Test
     fun filledCard_focused() {
         val focusRequester = FocusRequester()
-        val interactionSource = MutableInteractionSource()
-
         rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
                 Card(
+                    onClick = {},
                     Modifier.size(width = 180.dp, height = 100.dp)
                         // Normally this is only focusable in non-touch mode, so let's force it to
                         // always be focusable so we can test how it appears
                         .focusProperties { canFocus = true }
                         .focusRequester(focusRequester)
-                        .clickable(
-                            interactionSource = interactionSource,
-                            indication = null,
-                            onClick = {}),
-                    interactionSource
                 ) {
                     Box(Modifier.fillMaxSize()) {
                         Text(
@@ -368,21 +330,15 @@ class CardScreenshotTest {
     @Test
     fun elevatedCard_focused() {
         val focusRequester = FocusRequester()
-        val interactionSource = MutableInteractionSource()
-
         rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
                 ElevatedCard(
+                    onClick = {},
                     Modifier.size(width = 180.dp, height = 100.dp)
                         // Normally this is only focusable in non-touch mode, so let's force it to
                         // always be focusable so we can test how it appears
                         .focusProperties { canFocus = true }
                         .focusRequester(focusRequester)
-                        .clickable(
-                            interactionSource = interactionSource,
-                            indication = null,
-                            onClick = {}),
-                    interactionSource
                 ) {
                     Box(Modifier.fillMaxSize()) {
                         Text(
@@ -403,21 +359,15 @@ class CardScreenshotTest {
     @Test
     fun outlinedCard_focused() {
         val focusRequester = FocusRequester()
-        val interactionSource = MutableInteractionSource()
-
         rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
                 OutlinedCard(
+                    onClick = {},
                     Modifier.size(width = 180.dp, height = 100.dp)
                         // Normally this is only focusable in non-touch mode, so let's force it to
                         // always be focusable so we can test how it appears
                         .focusProperties { canFocus = true }
                         .focusRequester(focusRequester)
-                        .clickable(
-                            interactionSource = interactionSource,
-                            indication = null,
-                            onClick = {}),
-                    interactionSource
                 ) {
                     Box(Modifier.fillMaxSize()) {
                         Text(

@@ -17,8 +17,6 @@
 package androidx.compose.material3.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -50,14 +48,9 @@ fun CardSample() {
 @Composable
 fun ClickableCardSample() {
     var count by remember { mutableStateOf(0) }
-    val interactionSource = remember { MutableInteractionSource() }
     Card(
-        interactionSource = interactionSource,
+        onClick = { count++ },
         modifier = Modifier.size(width = 180.dp, height = 100.dp)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = { count++ })
     ) {
         Box(Modifier.fillMaxSize()) {
             Text("Count: $count", Modifier.align(Alignment.Center))
@@ -78,16 +71,10 @@ fun ElevatedCardSample() {
 @Sampled
 @Composable
 fun ClickableElevatedCardSample() {
-    val interactionSource = remember { MutableInteractionSource() }
     var count by remember { mutableStateOf(0) }
     ElevatedCard(
-        interactionSource = interactionSource,
+        onClick = { count++ },
         modifier = Modifier.size(width = 180.dp, height = 100.dp)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = { count++ }
-            )
     ) {
         Box(Modifier.fillMaxSize()) {
             Text("Count: $count", Modifier.align(Alignment.Center))
@@ -108,16 +95,10 @@ fun OutlinedCardSample() {
 @Sampled
 @Composable
 fun ClickableOutlinedCardSample() {
-    val interactionSource = remember { MutableInteractionSource() }
     var count by remember { mutableStateOf(0) }
     OutlinedCard(
-        interactionSource = interactionSource,
+        onClick = { count++ },
         modifier = Modifier.size(width = 180.dp, height = 100.dp)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = { count++ }
-            )
     ) {
         Box(Modifier.fillMaxSize()) {
             Text("Count: $count", Modifier.align(Alignment.Center))

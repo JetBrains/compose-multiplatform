@@ -108,18 +108,29 @@ fun Surface(
     border: BorderStroke? = null,
     content: @Composable () -> Unit
 ) {
-    Surface(
-        modifier = modifier,
-        shape = shape,
-        color = color,
-        contentColor = contentColor,
-        tonalElevation = tonalElevation,
-        shadowElevation = shadowElevation,
-        border = border,
-        content = content,
-        clickAndSemanticsModifier =
-        Modifier.semantics(mergeDescendants = false) {}.pointerInput(Unit) {}
-    )
+    val absoluteElevation = LocalAbsoluteTonalElevation.current + tonalElevation
+    CompositionLocalProvider(
+        LocalContentColor provides contentColor,
+        LocalAbsoluteTonalElevation provides absoluteElevation
+    ) {
+        Box(
+            modifier = modifier
+                .surface(
+                    shape = shape,
+                    backgroundColor = surfaceColorAtElevation(
+                        color = color,
+                        elevation = absoluteElevation
+                    ),
+                    border = border,
+                    shadowElevation = shadowElevation
+                )
+                .semantics(mergeDescendants = false) {}
+                .pointerInput(Unit) {},
+            propagateMinConstraints = true
+        ) {
+            content()
+        }
+    }
 }
 
 /**
@@ -201,24 +212,35 @@ fun Surface(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit
 ) {
-    Surface(
-        modifier = modifier.minimumTouchTargetSize(),
-        shape = shape,
-        color = color,
-        contentColor = contentColor,
-        tonalElevation = tonalElevation,
-        shadowElevation = shadowElevation,
-        border = border,
-        content = content,
-        clickAndSemanticsModifier =
-        Modifier.clickable(
-            interactionSource = interactionSource,
-            indication = rememberRipple(),
-            enabled = enabled,
-            role = Role.Button,
-            onClick = onClick
-        )
-    )
+    val absoluteElevation = LocalAbsoluteTonalElevation.current + tonalElevation
+    CompositionLocalProvider(
+        LocalContentColor provides contentColor,
+        LocalAbsoluteTonalElevation provides absoluteElevation
+    ) {
+        Box(
+            modifier = modifier
+                .minimumTouchTargetSize()
+                .surface(
+                    shape = shape,
+                    backgroundColor = surfaceColorAtElevation(
+                        color = color,
+                        elevation = absoluteElevation
+                    ),
+                    border = border,
+                    shadowElevation = shadowElevation
+                )
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = rememberRipple(),
+                    enabled = enabled,
+                    role = Role.Button,
+                    onClick = onClick
+                ),
+            propagateMinConstraints = true
+        ) {
+            content()
+        }
+    }
 }
 
 /**
@@ -302,25 +324,36 @@ fun Surface(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit
 ) {
-    Surface(
-        modifier = modifier.minimumTouchTargetSize(),
-        shape = shape,
-        color = color,
-        contentColor = contentColor,
-        tonalElevation = tonalElevation,
-        shadowElevation = shadowElevation,
-        border = border,
-        content = content,
-        clickAndSemanticsModifier =
-        Modifier.selectable(
-            selected = selected,
-            interactionSource = interactionSource,
-            indication = rememberRipple(),
-            enabled = enabled,
-            role = Role.Tab,
-            onClick = onClick
-        )
-    )
+    val absoluteElevation = LocalAbsoluteTonalElevation.current + tonalElevation
+    CompositionLocalProvider(
+        LocalContentColor provides contentColor,
+        LocalAbsoluteTonalElevation provides absoluteElevation
+    ) {
+        Box(
+            modifier = modifier
+                .minimumTouchTargetSize()
+                .surface(
+                    shape = shape,
+                    backgroundColor = surfaceColorAtElevation(
+                        color = color,
+                        elevation = absoluteElevation
+                    ),
+                    border = border,
+                    shadowElevation = shadowElevation
+                )
+                .selectable(
+                    selected = selected,
+                    interactionSource = interactionSource,
+                    indication = rememberRipple(),
+                    enabled = enabled,
+                    role = Role.Tab,
+                    onClick = onClick
+                ),
+            propagateMinConstraints = true
+        ) {
+            content()
+        }
+    }
 }
 
 /**
@@ -404,59 +437,54 @@ fun Surface(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit
 ) {
-    Surface(
-        modifier = modifier.minimumTouchTargetSize(),
-        shape = shape,
-        color = color,
-        contentColor = contentColor,
-        tonalElevation = tonalElevation,
-        shadowElevation = shadowElevation,
-        border = border,
-        content = content,
-        clickAndSemanticsModifier =
-        Modifier.toggleable(
-            value = checked,
-            interactionSource = interactionSource,
-            indication = rememberRipple(),
-            enabled = enabled,
-            role = Role.Switch,
-            onValueChange = onCheckedChange
-        )
-    )
-}
-
-@Composable
-private fun Surface(
-    modifier: Modifier,
-    shape: Shape,
-    color: Color,
-    contentColor: Color,
-    border: BorderStroke?,
-    tonalElevation: Dp, // This will be used to compute surface tonal colors
-    shadowElevation: Dp,
-    clickAndSemanticsModifier: Modifier,
-    content: @Composable () -> Unit
-) {
     val absoluteElevation = LocalAbsoluteTonalElevation.current + tonalElevation
-    val backgroundColor =
-        if (color == MaterialTheme.colorScheme.surface) {
-            MaterialTheme.colorScheme.surfaceColorAtElevation(absoluteElevation)
-        } else {
-            color
-        }
     CompositionLocalProvider(
         LocalContentColor provides contentColor,
         LocalAbsoluteTonalElevation provides absoluteElevation
     ) {
         Box(
-            modifier
-                .shadow(shadowElevation, shape, clip = false)
-                .then(if (border != null) Modifier.border(border, shape) else Modifier)
-                .background(color = backgroundColor, shape = shape)
-                .clip(shape)
-                .then(clickAndSemanticsModifier),
+            modifier = modifier
+                .minimumTouchTargetSize()
+                .surface(
+                    shape = shape,
+                    backgroundColor = surfaceColorAtElevation(
+                        color = color,
+                        elevation = absoluteElevation
+                    ),
+                    border = border,
+                    shadowElevation = shadowElevation
+                )
+                .toggleable(
+                    value = checked,
+                    interactionSource = interactionSource,
+                    indication = rememberRipple(),
+                    enabled = enabled,
+                    role = Role.Switch,
+                    onValueChange = onCheckedChange
+                ),
             propagateMinConstraints = true
-        ) { content() }
+        ) {
+            content()
+        }
+    }
+}
+
+private fun Modifier.surface(
+    shape: Shape,
+    backgroundColor: Color,
+    border: BorderStroke?,
+    shadowElevation: Dp
+) = this.shadow(shadowElevation, shape, clip = false)
+    .then(if (border != null) Modifier.border(border, shape) else Modifier)
+    .background(color = backgroundColor, shape = shape)
+    .clip(shape)
+
+@Composable
+private fun surfaceColorAtElevation(color: Color, elevation: Dp): Color {
+    return if (color == MaterialTheme.colorScheme.surface) {
+        MaterialTheme.colorScheme.surfaceColorAtElevation(elevation)
+    } else {
+        color
     }
 }
 

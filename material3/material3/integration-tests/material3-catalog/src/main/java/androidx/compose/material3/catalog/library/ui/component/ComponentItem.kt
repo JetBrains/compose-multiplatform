@@ -17,8 +17,6 @@
 package androidx.compose.material3.catalog.library.ui.component
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -31,7 +29,6 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.catalog.library.model.Component
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -45,16 +42,11 @@ fun ComponentItem(
     component: Component,
     onClick: (component: Component) -> Unit
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
     OutlinedCard(
+        onClick = { onClick(component) },
         modifier = Modifier
             .height(ComponentItemHeight)
             .padding(ComponentItemOuterPadding)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = { onClick(component) }),
-        interactionSource = interactionSource
     ) {
         Box(modifier = Modifier.fillMaxSize().padding(ComponentItemInnerPadding)) {
             Image(

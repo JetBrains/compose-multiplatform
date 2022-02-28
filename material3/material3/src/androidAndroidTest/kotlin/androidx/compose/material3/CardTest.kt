@@ -155,12 +155,8 @@ class CardTest {
         rule.setContent {
             scope = rememberCoroutineScope()
             Card(
-                modifier =
-                Modifier.testTag("card")
-                    .clickable(
-                        interactionSource = interactionSource,
-                        indication = null,
-                        onClick = {}),
+                onClick = {},
+                modifier = Modifier.testTag("card"),
                 interactionSource = interactionSource
             ) { Spacer(Modifier.size(30.dp)) }
         }

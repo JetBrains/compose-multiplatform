@@ -19,14 +19,15 @@ package androidx.compose.material3
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.tokens.ExtendedFabPrimaryTokens
 import androidx.compose.material3.tokens.FabPrimaryLargeTokens
 import androidx.compose.material3.tokens.FabPrimarySmallTokens
 import androidx.compose.material3.tokens.FabPrimaryTokens
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -36,6 +37,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertTouchHeightIsEqualTo
+import androidx.compose.ui.test.assertTouchWidthIsEqualTo
 import androidx.compose.ui.test.assertWidthIsAtLeast
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -107,15 +110,37 @@ class FloatingActionButtonTest {
             .assertIsSquareWithSize(FabPrimaryTokens.ContainerHeight)
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun smallFabHasSizeFromSpec() {
         rule
             .setMaterialContentForSizeAssertions {
-                SmallFloatingActionButton(onClick = {}) {
-                    Icon(Icons.Filled.Favorite, null)
+                CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
+                    SmallFloatingActionButton(onClick = {}) {
+                        Icon(Icons.Filled.Favorite, null)
+                    }
                 }
             }
+            // Expecting the size to be equal to the token size.
             .assertIsSquareWithSize(FabPrimarySmallTokens.ContainerHeight)
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun smallFabHasMinTouchTarget() {
+        rule
+            .setMaterialContentForSizeAssertions {
+                CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides true) {
+                    SmallFloatingActionButton(onClick = {}) {
+                        Icon(Icons.Filled.Favorite, null)
+                    }
+                }
+            }
+            // Expecting the size to be equal to the minimum touch target.
+            .assertTouchWidthIsEqualTo(48.dp)
+            .assertTouchHeightIsEqualTo(48.dp)
+            .assertWidthIsEqualTo(48.dp)
+            .assertHeightIsEqualTo(48.dp)
     }
 
     @Test
