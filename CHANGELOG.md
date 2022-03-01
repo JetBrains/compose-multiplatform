@@ -3,7 +3,7 @@
 
 ### Features
 - [Implement experimental accessibility support for Windows](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Accessibility)
-- [Implement accessebility focus tracking by Tab](https://github.com/JetBrains/compose-jb/issues/1772)
+- [Implement accessibility focus tracking by Tab](https://github.com/JetBrains/compose-jb/issues/1772)
 - All bugfixes/features between  Jetpack Compose 1.1.0-beta02 and 1.1.0 (see the release notes for each module [here](https://developer.android.com/jetpack/androidx/releases/compose))
 - Android target depends on Jetpack Compose 1.1.0.
 
@@ -73,7 +73,7 @@ This is basically 1.0.0 that works with Kotlin 1.6.10
 ## Desktop
 
 ### Features
-- Accessability support on MacOS
+- Accessibility support on MacOS
 - Smart rendering fallback logic (no crashes on bad hardware/drivers anymore)
 - Performance improvement of software rendering (up to 100%)
 - Transparent window support
