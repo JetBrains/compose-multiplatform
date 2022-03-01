@@ -223,6 +223,7 @@ internal class AndroidComposeView(context: Context) :
 
     override val root = LayoutNode().also {
         it.measurePolicy = RootMeasurePolicy
+        // Composed modifiers cannot be added here directly
         it.modifier = Modifier
             .then(semanticsModifier)
             .then(rotaryInputModifier)
@@ -244,6 +245,7 @@ internal class AndroidComposeView(context: Context) :
 
     // OwnedLayers that are dirty and should be redrawn.
     private val dirtyLayers = mutableListOf<OwnedLayer>()
+
     // OwnerLayers that invalidated themselves during their last draw. They will be redrawn
     // during the next AndroidComposeView dispatchDraw pass.
     private var postponedDirtyLayers: MutableList<OwnedLayer>? = null
@@ -326,6 +328,7 @@ internal class AndroidComposeView(context: Context) :
     private val viewToWindowMatrix = Matrix()
     private val windowToViewMatrix = Matrix()
     private val tmpCalculationMatrix = Matrix()
+
     @VisibleForTesting
     internal var lastMatrixRecalculationAnimationTime = -1L
     private var forceUseMatrixCache = false
@@ -1076,11 +1079,11 @@ internal class AndroidComposeView(context: Context) :
     }
 
     override fun dispatchGenericMotionEvent(event: MotionEvent) = when (event.actionMasked) {
-            ACTION_SCROLL -> when {
-                event.isFromSource(SOURCE_ROTARY_ENCODER) -> handleRotaryEvent(event)
-                else -> handleMotionEvent(event).dispatchedToAPointerInputModifier
-            }
-            else -> super.dispatchGenericMotionEvent(event)
+        ACTION_SCROLL -> when {
+            event.isFromSource(SOURCE_ROTARY_ENCODER) -> handleRotaryEvent(event)
+            else -> handleMotionEvent(event).dispatchedToAPointerInputModifier
+        }
+        else -> super.dispatchGenericMotionEvent(event)
     }
 
     // TODO(shepshapard): Test this method.
