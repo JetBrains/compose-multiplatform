@@ -33,7 +33,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -180,7 +182,7 @@ class GoogleFontTest {
     @Test
     fun GoogleFont_TypefaceLoader_resumesOnCompletion() {
         val compatLoader = CapturingFontsContractCompatLoader()
-        runBlockingTest {
+        runTest(UnconfinedTestDispatcher()) {
             val deferred = async {
                 GoogleFontTypefaceLoader.awaitLoad(
                     context,
@@ -197,8 +199,8 @@ class GoogleFontTest {
     @Test
     fun GoogleFont_TypefaceLoader_throwsOnError() {
         val compatLoader = CapturingFontsContractCompatLoader()
-        runBlockingTest {
-            val deferred = async {
+        runTest(UnconfinedTestDispatcher()) {
+            val deferred = async(Job()) {
                 GoogleFontTypefaceLoader.awaitLoad(
                     context,
                     GoogleFont("Foo", TestProvider) as AndroidFont,

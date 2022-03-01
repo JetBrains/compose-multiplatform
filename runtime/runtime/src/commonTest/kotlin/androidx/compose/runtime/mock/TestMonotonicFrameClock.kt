@@ -28,13 +28,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.test.DelayController
-import kotlin.coroutines.ContinuationInterceptor
+import kotlinx.coroutines.test.TestCoroutineScheduler
 
 private const val DefaultFrameDelay = 16_000_000L
 
 /**
- * Construct a [TestMonotonicFrameClock] for [coroutineScope], obtaining the [DelayController]
+ * Construct a [TestMonotonicFrameClock] for [coroutineScope], obtaining the [TestCoroutineScheduler]
  * from the scope's [context][CoroutineScope.coroutineContext]. This frame clock may be used to
  * consistently drive time under controlled tests.
  *
@@ -49,28 +48,27 @@ fun TestMonotonicFrameClock(
     frameDelayNanos: Long = DefaultFrameDelay
 ): TestMonotonicFrameClock = TestMonotonicFrameClock(
     coroutineScope = coroutineScope,
-    delayController = coroutineScope.coroutineContext[ContinuationInterceptor].let { interceptor ->
-        requireNotNull(interceptor as? DelayController) {
-            "ContinuationInterceptor $interceptor of supplied scope must implement DelayController"
-        }
+    testCoroutineScheduler =
+    requireNotNull(coroutineScope.coroutineContext[TestCoroutineScheduler]) {
+        "coroutuineScope should have TestCoroutineScheduler"
     },
     frameDelayNanos = frameDelayNanos
 )
 
 /**
  * A [MonotonicFrameClock] with a time source controlled by a `kotlinx-coroutines-test`
- * [DelayController]. This frame clock may be used to consistently drive time under controlled
+ * [TestCoroutineScheduler]. This frame clock may be used to consistently drive time under controlled
  * tests.
  *
  * Calls to [withFrameNanos] will schedule an upcoming frame [frameDelayNanos] nanoseconds in the
  * future by launching into [coroutineScope] if such a frame has not yet been scheduled. The
- * current frame time for [withFrameNanos] is provided by [delayController]. It is strongly
- * suggested that [coroutineScope] contain the test dispatcher controlled by [delayController].
+ * current frame time for [withFrameNanos] is provided by [TestCoroutineScheduler]. It is strongly
+ * suggested that [coroutineScope] contain the test dispatcher controlled by [TestCoroutineScheduler].
  */
 @ExperimentalCoroutinesApi
 class TestMonotonicFrameClock(
     private val coroutineScope: CoroutineScope,
-    private val delayController: DelayController,
+    private val testCoroutineScheduler: TestCoroutineScheduler,
     @get:Suppress("MethodNameUnits") // Nanos for high-precision animation clocks
     val frameDelayNanos: Long = DefaultFrameDelay
 ) : MonotonicFrameClock {
@@ -105,7 +103,7 @@ class TestMonotonicFrameClock(
                     posted = false
                     val toRun = awaiters.toList()
                     awaiters.clear()
-                    val frameTime = delayController.currentTime * 1_000_000
+                    val frameTime = testCoroutineScheduler.currentTime * 1_000_000
                     // In case of awaiters on an immediate dispatcher, run all frame callbacks
                     // before resuming any associated continuations with the results.
                     toRun.map { it.runFrame(frameTime) }.forEach { it() }

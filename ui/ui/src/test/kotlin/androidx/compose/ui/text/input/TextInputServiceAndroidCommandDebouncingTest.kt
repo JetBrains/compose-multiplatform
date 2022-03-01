@@ -26,7 +26,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -37,18 +39,13 @@ class TextInputServiceAndroidCommandDebouncingTest {
     private val view = mock<View>()
     private val inputMethodManager = TestInputMethodManager()
     private val service = TextInputServiceAndroid(view, inputMethodManager)
-    private val scope = TestCoroutineScope(Job())
+    private val dispatcher = StandardTestDispatcher()
+    private val scope = TestScope(dispatcher + Job())
 
     @Before
     fun setUp() {
         // Default the view to focused because when it's not focused commands should be ignored.
         whenever(view.isFocused).thenReturn(true)
-
-        // Pause the dispatcher so that tests can send multiple commands before they get processed
-        // by the command event loop. This simulates how events are processed when multiple back-to-
-        // back focus events send commands to the service before the coroutine resumes on the next
-        // main loop iteration.
-        scope.pauseDispatcher()
         scope.launch { service.textInputCommandEventLoop() }
     }
 

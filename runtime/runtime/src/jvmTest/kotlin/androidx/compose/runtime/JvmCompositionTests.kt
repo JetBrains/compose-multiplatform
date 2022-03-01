@@ -26,8 +26,8 @@ import androidx.compose.runtime.mock.expectChanges
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotStateObserver
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import kotlin.concurrent.thread
 import kotlinx.coroutines.delay
 import kotlin.test.Test
@@ -50,7 +50,7 @@ class JvmCompositionTests {
         }
 
         for (i in 1..1000) {
-            runBlocking(TestCoroutineDispatcher()) {
+            runTest(UnconfinedTestDispatcher()) {
                 localRecomposerTest {
                     @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
                     var value by mutableStateOf(0)

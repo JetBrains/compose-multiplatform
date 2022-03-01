@@ -17,15 +17,17 @@
 package androidx.compose.runtime
 
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
+@ExperimentalCoroutinesApi
 class LatchTest {
     @Test
-    fun openDoesntSuspend() = runBlocking {
+    fun openDoesntSuspend() = runTest {
         val latch = Latch()
         assertTrue(latch.isOpen, "latch open after construction")
 
@@ -34,7 +36,7 @@ class LatchTest {
     }
 
     @Test
-    fun closedSuspendsReleasesAll() = runBlocking<Unit> {
+    fun closedSuspendsReleasesAll() = runTest {
         val latch = Latch()
         latch.closeLatch()
         assertTrue(!latch.isOpen, "latch.isOpen after close")
