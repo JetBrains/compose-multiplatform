@@ -750,8 +750,6 @@ internal class CompositionImpl(
             if (changes.isEmpty()) return
             applier.onBeginChanges()
 
-            slotTable.verifyWellFormed()
-
             // Apply all changes
             slotTable.write { slots ->
                 val applier = applier
@@ -762,8 +760,6 @@ internal class CompositionImpl(
             }
 
             applier.onEndChanges()
-
-            slotTable.verifyWellFormed()
 
             // Side effects run after lifecycle observers so that any remembered objects
             // that implement RememberObserver receive onRemembered before a side effect

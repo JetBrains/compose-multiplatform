@@ -3340,7 +3340,6 @@ internal class ComposerImpl(
                         slots.moveTo(anchor, 1, writer)
                         writer.endInsert()
                     }
-                    slotTable.verifyWellFormed()
                     val state = MovableContentState(slotTable)
                     parentContext.movableContentStateReleased(reference, state)
                 }
