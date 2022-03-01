@@ -17,8 +17,6 @@
 package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.lazy.GridItemSpan
-import androidx.compose.foundation.lazy.LazyGridItemSpanScope
 import androidx.compose.foundation.lazy.layout.LazyLayoutItemsProvider
 
 @OptIn(ExperimentalFoundationApi::class)

@@ -18,8 +18,6 @@ package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.lazy.LazyGridItemInfo
-import androidx.compose.foundation.lazy.LazyGridLayoutInfo
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.unit.IntSize
 

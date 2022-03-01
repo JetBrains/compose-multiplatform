@@ -17,7 +17,6 @@
 package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.lazy.GridItemSpan
 import androidx.compose.ui.unit.Constraints
 
 /**
