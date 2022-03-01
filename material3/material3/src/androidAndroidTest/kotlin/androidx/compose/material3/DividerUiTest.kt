@@ -95,7 +95,7 @@ class DividerUiTest {
         rule.setContent {
             sizePx = with(LocalDensity.current) { size.toPx().roundToInt() }
             dividerColor =
-                MaterialTheme.colorScheme.surfaceVariant
+                MaterialTheme.colorScheme.onSurfaceVariant
             Box(modifier = Modifier.size(size).background(Color.Black)) {
                 Divider(
                     modifier = Modifier.testTag(testTag).fillMaxWidth(),
