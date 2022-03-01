@@ -586,11 +586,13 @@ package androidx.compose.foundation.lazy.grid {
     property public abstract int row;
     property public abstract long size;
     field public static final androidx.compose.foundation.lazy.grid.LazyGridItemInfo.Companion Companion;
-    field public static final int Unknown = -1; // 0xffffffff
+    field public static final int UnknownColumn = -1; // 0xffffffff
+    field public static final int UnknownRow = -1; // 0xffffffff
   }
 
   @androidx.compose.foundation.ExperimentalFoundationApi public static final class LazyGridItemInfo.Companion {
-    field public static final int Unknown = -1; // 0xffffffff
+    field public static final int UnknownColumn = -1; // 0xffffffff
+    field public static final int UnknownRow = -1; // 0xffffffff
   }
 
   public final class LazyGridItemPlacementAnimatorKt {
