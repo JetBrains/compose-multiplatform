@@ -75,7 +75,7 @@ internal class ComposeIdlingResource(
         val wasBusy = hadSnapshotChanges || hadRecomposerChanges || hadAwaitersOnMainClock ||
             hadPendingSetContent || hadPendingMeasureLayout
 
-        if (wasBusy) {
+        if (!wasBusy) {
             return null
         }
 

@@ -20,11 +20,10 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.testutils.expectError
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.test.AndroidComposeTest
 import androidx.compose.ui.test.junit4.android.ComposeNotIdleException
 import androidx.compose.ui.test.onNodeWithText
@@ -58,11 +57,13 @@ class TimeOutTest {
 
     private var idlingResourcePolicy: IdlingPolicy? = null
     private var masterPolicy: IdlingPolicy? = null
-    // TODO(pavlis): Improve the error messages
-    private val expectedErrorDueToRecompositions =
-        ".*Idling resource timed out: possibly due to compose being busy.*"
-    private val expectedErrorGlobal =
-        ".*Global time out: possibly due to compose being busy.*"
+
+    private val expectedIdlingResourceTimeOut =
+        "Idling resource timed out: possibly due to compose being busy\\..*" +
+            "\\[busy\\] ComposeIdlingResource is busy due to .*pending recompositions.*\\..*"
+    private val expectedGlobalTimeOut =
+        "Global time out: possibly due to compose being busy\\..*" +
+            "\\[busy\\] ComposeIdlingResource is busy due to .*pending recompositions.*\\..*"
 
     @Before
     fun backupTimeOutPolicies() {
@@ -82,16 +83,13 @@ class TimeOutTest {
     }
 
     @Composable
-    fun InfiniteCase() {
+    fun InfiniteRecompositionCase() {
         Box {
             val infiniteCounter = remember { mutableStateOf(0) }
-
-            Text(
-                "Hello ${infiniteCounter.value}",
-                Modifier.onGloballyPositioned {
-                    infiniteCounter.value += 1
-                }
-            )
+            Text("Hello ${infiniteCounter.value}")
+            SideEffect {
+                infiniteCounter.value += 1
+            }
         }
     }
 
@@ -99,9 +97,9 @@ class TimeOutTest {
     fun infiniteRecompositions_resourceTimeout() = withComposeTest {
         IdlingPolicies.setIdlingResourceTimeout(300, TimeUnit.MILLISECONDS)
 
-        expectError<ComposeNotIdleException>(expectedMessage = expectedErrorDueToRecompositions) {
+        expectError<ComposeNotIdleException>(expectedMessage = expectedIdlingResourceTimeOut) {
             setContent {
-                InfiniteCase()
+                InfiniteRecompositionCase()
             }
         }
     }
@@ -110,9 +108,9 @@ class TimeOutTest {
     fun infiniteRecompositions_masterTimeout() = withComposeTest {
         IdlingPolicies.setMasterPolicyTimeout(300, TimeUnit.MILLISECONDS)
 
-        expectError<ComposeNotIdleException>(expectedMessage = expectedErrorGlobal) {
+        expectError<ComposeNotIdleException>(expectedMessage = expectedGlobalTimeOut) {
             setContent {
-                InfiniteCase()
+                InfiniteRecompositionCase()
             }
         }
     }
@@ -134,7 +132,7 @@ class TimeOutTest {
         count.value++ // Start infinite re-compositions
 
         IdlingPolicies.setMasterPolicyTimeout(300, TimeUnit.MILLISECONDS)
-        expectError<ComposeNotIdleException>(expectedMessage = expectedErrorGlobal) {
+        expectError<ComposeNotIdleException>(expectedMessage = expectedGlobalTimeOut) {
             onNodeWithText("Hello").assertExists()
         }
     }
@@ -184,7 +182,7 @@ class TimeOutTest {
         expectError<ComposeNotIdleException> {
             withComposeTest {
                 setContent {
-                    InfiniteCase()
+                    InfiniteRecompositionCase()
                 }
             }
         }
