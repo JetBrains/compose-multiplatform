@@ -16,8 +16,10 @@
 
 package androidx.compose.ui.window.dialog
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -517,6 +519,36 @@ class DialogTest {
         assertThat(onNodePreviewKeyEventKeys).isEqualTo(setOf(Key.T))
         assertThat(onNodeKeyEventKeys).isEqualTo(setOf(Key.T))
         assertThat(onWindowKeyEventKeys).isEqualTo(setOf(Key.T))
+
+        exitApplication()
+    }
+
+    @Test(timeout = 30000)
+    fun `should draw before dialog is visible`() = runApplicationTest {
+        var isComposed = false
+        var isDrawn = false
+        var isVisibleOnFirstComposition = false
+        var isVisibleOnFirstDraw = false
+
+        launchApplication {
+            Dialog(onCloseRequest = ::exitApplication) {
+                if (!isComposed) {
+                    isVisibleOnFirstComposition = window.isVisible
+                    isComposed = true
+                }
+
+                Canvas(Modifier.fillMaxSize()) {
+                    if (!isDrawn) {
+                        isVisibleOnFirstDraw = window.isVisible
+                        isDrawn = true
+                    }
+                }
+            }
+        }
+
+        awaitIdle()
+        assertThat(isVisibleOnFirstComposition).isFalse()
+        assertThat(isVisibleOnFirstDraw).isFalse()
 
         exitApplication()
     }

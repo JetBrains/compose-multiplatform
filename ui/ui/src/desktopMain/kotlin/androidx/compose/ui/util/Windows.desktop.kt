@@ -156,3 +156,13 @@ private val iconSize = Size(32f, 32f)
 internal fun Window.setIcon(painter: Painter?) {
     setIconImage(painter?.toAwtImage(density, layoutDirection, iconSize))
 }
+
+internal fun Window.makeDisplayable() {
+    val oldPreferredSize = preferredSize
+    preferredSize = size
+    try {
+        pack()
+    } finally {
+        preferredSize = oldPreferredSize
+    }
+}
