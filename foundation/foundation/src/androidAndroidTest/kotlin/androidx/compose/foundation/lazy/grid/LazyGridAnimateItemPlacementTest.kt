@@ -27,14 +27,6 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.requiredWidthIn
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyGridItemScope
-import androidx.compose.foundation.lazy.LazyGridScope
-import androidx.compose.foundation.lazy.LazyGridState
-import androidx.compose.foundation.lazy.LazyHorizontalGrid
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue

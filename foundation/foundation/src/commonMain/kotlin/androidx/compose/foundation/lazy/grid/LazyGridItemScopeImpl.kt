@@ -18,7 +18,6 @@ package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.lazy.LazyGridItemScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.platform.InspectorInfo

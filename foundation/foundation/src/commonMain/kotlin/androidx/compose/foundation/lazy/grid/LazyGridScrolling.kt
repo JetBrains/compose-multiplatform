@@ -21,8 +21,6 @@ import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.animateTo
 import androidx.compose.animation.core.copy
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.lazy.LazyGridItemInfo
-import androidx.compose.foundation.lazy.LazyGridState
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastFirstOrNull
 import kotlin.coroutines.cancellation.CancellationException

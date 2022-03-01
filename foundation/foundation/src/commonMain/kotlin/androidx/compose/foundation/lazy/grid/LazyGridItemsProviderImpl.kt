@@ -17,11 +17,6 @@
 package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.lazy.GridItemSpan
-import androidx.compose.foundation.lazy.LazyGridItemScope
-import androidx.compose.foundation.lazy.LazyGridItemSpanScope
-import androidx.compose.foundation.lazy.LazyGridScope
-import androidx.compose.foundation.lazy.LazyGridState
 import androidx.compose.foundation.lazy.getDefaultLazyKeyFor
 import androidx.compose.foundation.lazy.layout.IntervalHolder
 import androidx.compose.foundation.lazy.layout.IntervalList

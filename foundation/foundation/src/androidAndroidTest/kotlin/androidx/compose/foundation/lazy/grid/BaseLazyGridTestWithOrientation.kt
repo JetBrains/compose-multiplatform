@@ -28,12 +28,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyGridScope
-import androidx.compose.foundation.lazy.LazyGridState
-import androidx.compose.foundation.lazy.LazyHorizontalGrid
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.testutils.assertIsEqualTo

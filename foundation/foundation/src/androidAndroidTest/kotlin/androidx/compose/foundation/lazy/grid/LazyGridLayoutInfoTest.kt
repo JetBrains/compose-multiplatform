@@ -22,11 +22,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyGridLayoutInfo
-import androidx.compose.foundation.lazy.LazyGridState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.list.LayoutInfoTestParam
-import androidx.compose.foundation.lazy.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue

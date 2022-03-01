@@ -25,13 +25,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyGridState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.list.TestTouchSlop
 import androidx.compose.foundation.lazy.list.setContentWithTestViewConfiguration
-import androidx.compose.foundation.lazy.rememberLazyGridState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

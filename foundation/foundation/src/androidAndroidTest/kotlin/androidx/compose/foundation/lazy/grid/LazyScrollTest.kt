@@ -25,10 +25,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyGridState
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.rememberLazyGridState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Dp
