@@ -583,7 +583,7 @@ internal class ParagraphBuilder(
         )
 
         var pos = 0
-        val ps = textStyleToParagraphStyle(textStyle)
+        val ps = textStyleToParagraphStyle(textStyle, defaultStyle)
 
         if (maxLines != Int.MAX_VALUE) {
             ps.maxLinesCount = maxLines
@@ -770,8 +770,12 @@ internal class ParagraphBuilder(
         return null
     }
 
-    private fun textStyleToParagraphStyle(style: TextStyle): ParagraphStyle {
+    private fun textStyleToParagraphStyle(
+        style: TextStyle,
+        computedStyle: ComputedStyle
+    ): ParagraphStyle {
         val pStyle = ParagraphStyle()
+        pStyle.textStyle = makeSkTextStyle(computedStyle)
         style.textAlign?.let {
             pStyle.alignment = it.toSkAlignment()
         }
