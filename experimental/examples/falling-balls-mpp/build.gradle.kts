@@ -155,13 +155,13 @@ compose.experimental {
         bundleIdPrefix = "org.jetbrains"
         projectName = "FallingBalls"
         deployConfigurations {
-            simulator("IPhone8_en") {
-                //Usage: ./gradlew iosDeployIPhone8_en
+            simulator("IPhone8") {
+                //Usage: ./gradlew iosDeployIPhone8
                 device = IOSDevices.IPHONE_8
                 buildConfiguration = "Debug" // or "Release"
             }
-            simulator("IPad_ru") {
-                //Usage: ./gradlew iosDeployIPad_ru
+            simulator("IPad") {
+                //Usage: ./gradlew iosDeployIPad
                 device = IOSDevices.IPAD_MINI_6th_Gen
                 buildConfiguration = "Debug"
             }
