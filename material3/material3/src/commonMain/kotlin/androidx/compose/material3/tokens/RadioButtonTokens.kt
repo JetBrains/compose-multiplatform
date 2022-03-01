@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_76
+// VERSION: v0_86
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -33,7 +33,7 @@ internal object RadioButtonTokens {
     val SelectedIconColor = ColorSchemeKeyTokens.Primary
     val SelectedPressedIconColor = ColorSchemeKeyTokens.Primary
     val SelectedPressedStateLayerColor = ColorSchemeKeyTokens.OnSurface
-    val StateLayerSize = 48.0.dp
+    val StateLayerSize = 40.0.dp
     val UnselectedFocusIconColor = ColorSchemeKeyTokens.OnSurface
     val UnselectedFocusStateLayerColor = ColorSchemeKeyTokens.OnSurface
     val UnselectedHoverIconColor = ColorSchemeKeyTokens.OnSurface
