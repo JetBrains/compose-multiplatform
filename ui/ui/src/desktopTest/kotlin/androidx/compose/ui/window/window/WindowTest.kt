@@ -16,8 +16,10 @@
 
 package androidx.compose.ui.window.window
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
 import androidx.compose.material.Slider
@@ -41,16 +43,16 @@ import androidx.compose.ui.window.launchApplication
 import androidx.compose.ui.window.rememberWindowState
 import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
+import java.awt.Dimension
+import java.awt.GraphicsEnvironment
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import org.junit.Assume.assumeFalse
 import org.junit.Test
-import java.awt.Dimension
-import java.awt.GraphicsEnvironment
-import java.awt.event.WindowAdapter
-import java.awt.event.WindowEvent
 
 @OptIn(ExperimentalComposeUiApi::class)
 class WindowTest {
@@ -428,5 +430,35 @@ class WindowTest {
 
             assertThat(leakDetector.noLeak()).isTrue()
         }
+    }
+
+    @Test(timeout = 30000)
+    fun `should draw before window is visible`() = runApplicationTest {
+        var isComposed = false
+        var isDrawn = false
+        var isVisibleOnFirstComposition = false
+        var isVisibleOnFirstDraw = false
+
+        launchApplication {
+            Window(onCloseRequest = ::exitApplication) {
+                if (!isComposed) {
+                    isVisibleOnFirstComposition = window.isVisible
+                    isComposed = true
+                }
+
+                Canvas(Modifier.fillMaxSize()) {
+                    if (!isDrawn) {
+                        isVisibleOnFirstDraw = window.isVisible
+                        isDrawn = true
+                    }
+                }
+            }
+        }
+
+        awaitIdle()
+        assertThat(isVisibleOnFirstComposition).isFalse()
+        assertThat(isVisibleOnFirstDraw).isFalse()
+
+        exitApplication()
     }
 }
