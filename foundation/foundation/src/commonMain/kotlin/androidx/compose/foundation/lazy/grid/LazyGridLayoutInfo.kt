@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.lazy.grid
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.ui.unit.IntSize
 
@@ -26,7 +25,6 @@ import androidx.compose.ui.unit.IntSize
  *
  * Use [LazyGridState.layoutInfo] to retrieve this
  */
-@ExperimentalFoundationApi
 interface LazyGridLayoutInfo {
     /**
      * The list of [LazyGridItemInfo] representing all the currently visible items.

@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.layout.benchmark
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -206,7 +205,6 @@ private fun TabletScreen(gridColumns: Int) {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Grid(gridColumns: Int, modifier: Modifier = Modifier) {
     LazyVerticalGrid(

@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.lazy.grid
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
@@ -25,7 +24,6 @@ import androidx.compose.ui.unit.IntSize
  *
  * @see LazyGridLayoutInfo
  */
-@ExperimentalFoundationApi
 interface LazyGridItemInfo {
     /**
      * The index of the item in the grid.
@@ -62,7 +60,6 @@ interface LazyGridItemInfo {
      */
     val size: IntSize
 
-    @ExperimentalFoundationApi
     companion object {
         /**
          * Possible value for [row], when they are unknown. This can happen when the item is

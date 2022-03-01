@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.lazy.grid
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.height
@@ -32,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import org.junit.Rule
 import org.junit.Test
 
-@OptIn(ExperimentalFoundationApi::class)
 class LazyGridsIndexedTest {
 
     @get:Rule

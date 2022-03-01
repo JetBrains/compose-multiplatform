@@ -98,7 +98,6 @@ fun LazyGridDragAndDropDemo() {
     }
 }
 
-@ExperimentalFoundationApi
 @Composable
 fun rememberGridDragDropState(
     gridState: LazyGridState,
@@ -121,7 +120,6 @@ fun rememberGridDragDropState(
     return state
 }
 
-@ExperimentalFoundationApi
 class GridDragDropState internal constructor(
     private val state: LazyGridState,
     private val scope: CoroutineScope,
@@ -237,7 +235,6 @@ private operator fun Offset.plus(size: Size): Offset {
     return Offset(x + size.width, y + size.height)
 }
 
-@ExperimentalFoundationApi
 fun Modifier.dragContainer(dragDropState: GridDragDropState): Modifier {
     return pointerInput(dragDropState) {
         detectDragGesturesAfterLongPress(

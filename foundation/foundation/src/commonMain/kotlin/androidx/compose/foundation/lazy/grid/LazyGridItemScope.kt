@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.IntOffset
 /**
  * Receiver scope being used by the item content parameter of [LazyVerticalGrid].
  */
-@ExperimentalFoundationApi
 @Stable
 interface LazyGridItemScope {
     /**
