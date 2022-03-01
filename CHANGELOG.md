@@ -2,7 +2,7 @@
 ## Desktop
 
 ### Features
-- [Implement experimental accessebility support for Windows](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Accessibility)
+- [Implement experimental accessibility support for Windows](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Accessibility)
 - [Implement accessebility focus tracking by Tab](https://github.com/JetBrains/compose-jb/issues/1772)
 - All bugfixes/features between  Jetpack Compose 1.1.0-beta02 and 1.1.0 (see the release notes for each module [here](https://developer.android.com/jetpack/androidx/releases/compose))
 - Android target depends on Jetpack Compose 1.1.0.
