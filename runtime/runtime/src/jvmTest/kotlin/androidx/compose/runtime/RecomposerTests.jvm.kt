@@ -26,7 +26,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.CoroutineStart
@@ -38,13 +37,22 @@ import java.util.concurrent.atomic.AtomicLong
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 
 class RecomposerTestsJvm {
 
+    @ExperimentalCoroutinesApi
+    private fun runTestUnconfined(testBody: suspend TestScope.() -> Unit) {
+        runTest(UnconfinedTestDispatcher(), testBody = testBody)
+    }
+
     @Test
     @OptIn(ExperimentalComposeApi::class, ExperimentalCoroutinesApi::class)
-    fun concurrentRecompositionOffMainThread() = runBlocking<Unit> {
-        val dispatcher = TestCoroutineDispatcher()
+    fun concurrentRecompositionOffMainThread() = runTestUnconfined {
+        val dispatcher = testScheduler
         withContext(dispatcher) {
             val clock = TestMonotonicFrameClock(this)
             withContext(clock) {
@@ -80,8 +88,8 @@ class RecomposerTestsJvm {
 
     @Test
     @OptIn(ExperimentalComposeApi::class, ExperimentalCoroutinesApi::class)
-    fun concurrentRecompositionInvalidationDuringComposition() = runBlocking {
-        val dispatcher = TestCoroutineDispatcher()
+    fun concurrentRecompositionInvalidationDuringComposition() = runTestUnconfined {
+        val dispatcher = testScheduler
         val clock = AutoTestFrameClock()
         withContext(dispatcher + clock) {
             val recomposer = Recomposer(coroutineContext)
@@ -130,6 +138,7 @@ class RecomposerTestsJvm {
             recomposer.runRecomposeConcurrentlyAndApplyChanges(Dispatchers.Default)
         }
 
+        @OptIn(DelicateCoroutinesApi::class)
         newSingleThreadContext("specialThreadPool").use { pool ->
             val composition = Composition(UnitApplier(), recomposer, pool)
             var recomposition by mutableStateOf(false)

@@ -806,7 +806,7 @@ class MovableContentTests {
 
         isHorizontal = true
         Snapshot.sendApplyNotifications()
-        advanceTimeBy(10)
+        testCoroutineScheduler.advanceTimeBy(10)
 
         displayValue.value++
         expectChanges()

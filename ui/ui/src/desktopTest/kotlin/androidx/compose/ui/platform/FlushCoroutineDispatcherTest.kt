@@ -21,7 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -31,8 +31,7 @@ import kotlin.random.Random
 @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
 class FlushCoroutineDispatcherTest {
     @Test
-    fun `all tasks should run with flush`() = runBlockingTest {
-        pauseDispatcher()
+    fun `all tasks should run with flush`() = runTest {
         val dispatcher = FlushCoroutineDispatcher(this)
 
         val actualNumbers = mutableListOf<Int>()
@@ -56,8 +55,7 @@ class FlushCoroutineDispatcherTest {
     }
 
     @Test
-    fun `tasks should run even without flush`() = runBlockingTest {
-        pauseDispatcher()
+    fun `tasks should run even without flush`() = runTest {
         val dispatcher = FlushCoroutineDispatcher(this)
 
         val actualNumbers = mutableListOf<Int>()
@@ -73,7 +71,7 @@ class FlushCoroutineDispatcherTest {
             actualNumbers.add(3)
         }
 
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
 
         assertEquals(listOf(1, 2, 3), actualNumbers)
         assertFalse(dispatcher.hasTasks())

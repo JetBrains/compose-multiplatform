@@ -33,7 +33,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import kotlin.coroutines.cancellation.CancellationException
 import org.jetbrains.skia.Surface
@@ -44,7 +46,8 @@ internal class DesktopComposeTest : ComposeTest {
 
     override val density = Density(1f, 1f)
 
-    private val coroutineDispatcher = TestCoroutineDispatcher()
+    private val coroutineDispatcher = UnconfinedTestDispatcher()
+    private val testScope = TestScope(coroutineDispatcher)
     override val mainClock: MainTestClock =
         MainTestClockImpl(coroutineDispatcher, frameDelayMillis = 16L)
     private val uncaughtExceptionHandler = UncaughtExceptionHandler()
@@ -70,8 +73,9 @@ internal class DesktopComposeTest : ComposeTest {
         try {
             return block()
         } finally {
+            // call runTest instead of deprecated cleanupTestCoroutines()
+            testScope.runTest { }
             runOnUiThread(scene::close)
-            coroutineDispatcher.cleanupTestCoroutines()
             uncaughtExceptionHandler.throwUncaught()
         }
     }

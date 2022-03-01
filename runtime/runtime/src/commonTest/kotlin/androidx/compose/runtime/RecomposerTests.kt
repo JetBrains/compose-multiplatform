@@ -29,7 +29,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -39,8 +41,13 @@ import kotlin.test.assertTrue
 @OptIn(ExperimentalCoroutinesApi::class)
 class RecomposerTests {
 
+    private fun runTestUnconfined(block: suspend TestScope.() -> Unit): Unit =
+        runTest(UnconfinedTestDispatcher()) {
+            block()
+        }
+
     @Test
-    fun recomposerRecomposesWhileOpen() = runBlockingTest {
+    fun recomposerRecomposesWhileOpen() = runTestUnconfined {
         val testClock = TestMonotonicFrameClock(this)
         withContext(testClock) {
             val recomposer = Recomposer(coroutineContext)
@@ -81,7 +88,7 @@ class RecomposerTests {
     }
 
     @Test
-    fun recomposerRemainsOpenUntilEffectsJoin() = runBlockingTest {
+    fun recomposerRemainsOpenUntilEffectsJoin() = runTestUnconfined {
         val testClock = TestMonotonicFrameClock(this)
         withContext(testClock) {
             val recomposer = Recomposer(coroutineContext)

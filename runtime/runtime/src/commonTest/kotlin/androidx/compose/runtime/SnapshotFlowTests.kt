@@ -18,18 +18,20 @@ package androidx.compose.runtime
 
 import androidx.compose.runtime.snapshots.Snapshot
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.plus
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
-import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Suppress("RemoveExplicitTypeArguments")
 class SnapshotFlowTests {
     @Test
-    fun observeBasicChanges() = runBlocking<Unit> {
+    fun observeBasicChanges() = runTest {
         var state by mutableStateOf(1)
         var result = 0
 
@@ -51,11 +53,11 @@ class SnapshotFlowTests {
     }
 
     @Test
-    fun coalesceChanges() = runBlocking<Unit> {
+    fun coalesceChanges() = runTest {
         var state by mutableStateOf(1)
         var runCount = 0
 
-        // This test uses the runBlocking single-threaded dispatcher for observation, which means
+        // This test uses the runTest single-threaded dispatcher for observation, which means
         // we don't flush changes to the observer until we yield() intentionally.
         val collector = snapshotFlow { state }
             .onEach { runCount++ }
@@ -80,12 +82,12 @@ class SnapshotFlowTests {
     }
 
     @Test
-    fun ignoreUnrelatedChanges() = runBlocking<Unit> {
+    fun ignoreUnrelatedChanges() = runTest {
         val state by mutableStateOf(1)
         var unrelatedState by mutableStateOf(1)
         var runCount = 0
 
-        // This test uses the runBlocking single-threaded dispatcher for observation, which means
+        // This test uses the runTest single-threaded dispatcher for observation, which means
         // we don't flush changes to the observer until we yield() intentionally.
         val collector = snapshotFlow { state }
             .onEach { runCount++ }

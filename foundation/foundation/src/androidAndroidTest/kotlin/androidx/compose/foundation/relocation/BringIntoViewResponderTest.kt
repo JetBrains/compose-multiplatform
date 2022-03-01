@@ -35,7 +35,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -297,9 +298,7 @@ class BringIntoViewResponderTest {
                     .bringIntoViewRequester(bringIntoViewRequester)
             )
         }
-        val testScope = TestCoroutineScope().apply {
-            pauseDispatcher()
-        }
+        val testScope = TestScope()
         val requestJob = testScope.launch {
             bringIntoViewRequester.bringIntoView()
         }

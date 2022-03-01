@@ -28,9 +28,9 @@ import androidx.compose.ui.test.TestMonotonicFrameClock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.DelayController
-import kotlinx.coroutines.test.TestCoroutineScope
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -48,7 +48,7 @@ abstract class ComposeBenchmarkBase {
     val activityRule = androidx.test.rule.ActivityTestRule(ComposeActivity::class.java)
 
     @ExperimentalCoroutinesApi
-    suspend fun DelayController.measureCompose(block: @Composable () -> Unit) = coroutineScope {
+    suspend fun TestScope.measureCompose(block: @Composable () -> Unit) = coroutineScope {
         val activity = activityRule.activity
         val recomposer = Recomposer(coroutineContext)
         val emptyView = View(activity)
@@ -61,19 +61,19 @@ abstract class ComposeBenchmarkBase {
 
                 runWithTimingDisabled {
                     activity.setContentView(emptyView)
-                    advanceUntilIdle()
+                    testScheduler.advanceUntilIdle()
                     Runtime.getRuntime().gc()
                 }
             }
         } finally {
             activity.setContentView(emptyView)
-            advanceUntilIdle()
+            testScheduler.advanceUntilIdle()
             recomposer.cancel()
         }
     }
 
     @ExperimentalCoroutinesApi
-    suspend fun DelayController.measureRecomposeSuspending(
+    suspend fun TestScope.measureRecomposeSuspending(
         block: RecomposeReceiver.() -> Unit
     ) = coroutineScope {
         val receiver = RecomposeReceiver()
@@ -99,7 +99,7 @@ abstract class ComposeBenchmarkBase {
                 "recomposer does not have invalidations for frame",
                 recomposer.hasPendingWork
             )
-            advanceUntilIdle()
+            testScheduler.advanceUntilIdle()
             assertFalse(
                 "recomposer has invalidations for frame",
                 recomposer.hasPendingWork
@@ -107,7 +107,7 @@ abstract class ComposeBenchmarkBase {
             runWithTimingDisabled {
                 receiver.resetCb()
                 Snapshot.sendApplyNotifications()
-                advanceUntilIdle()
+                testScheduler.advanceUntilIdle()
             }
             iterations++
         }
@@ -120,12 +120,10 @@ abstract class ComposeBenchmarkBase {
 @ExperimentalCoroutinesApi
 fun runBlockingTestWithFrameClock(
     context: CoroutineContext = EmptyCoroutineContext,
-    testBody: suspend TestCoroutineScope.() -> Unit
-) {
-    runBlockingTest(context) {
-        withContext(TestMonotonicFrameClock(this)) {
-            testBody()
-        }
+    testBody: suspend TestScope.() -> Unit
+): Unit = runTest(UnconfinedTestDispatcher() + context) {
+    withContext(TestMonotonicFrameClock(this)) {
+        testBody()
     }
 }
 

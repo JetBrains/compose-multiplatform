@@ -34,8 +34,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,9 +46,9 @@ import org.junit.runner.RunWith
 @OptIn(ExperimentalTextApi::class)
 @ExperimentalCoroutinesApi
 class FontFamilyResolverImplTest {
-    private lateinit var scope: TestCoroutineScope
+    private lateinit var scope: TestScope
     private lateinit var typefaceLoader: AsyncTestTypefaceLoader
-    private lateinit var dispatcher: TestCoroutineDispatcher
+    private lateinit var dispatcher: TestDispatcher
     private lateinit var asyncTypefaceCache: AsyncTypefaceCache
     private lateinit var typefaceCache: TypefaceRequestCache
     private val context = InstrumentationRegistry.getInstrumentation().context
@@ -59,8 +60,8 @@ class FontFamilyResolverImplTest {
     fun setup() {
         asyncTypefaceCache = AsyncTypefaceCache()
         typefaceCache = TypefaceRequestCache()
-        dispatcher = TestCoroutineDispatcher()
-        scope = TestCoroutineScope(dispatcher)
+        dispatcher = UnconfinedTestDispatcher()
+        scope = TestScope(dispatcher)
         val injectedContext = scope.coroutineContext.minusKey(CoroutineExceptionHandler)
         subject = FontFamilyResolverImpl(
             fontLoader,

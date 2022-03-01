@@ -44,7 +44,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 
@@ -76,7 +76,7 @@ internal class SuspendingGestureTestUtil(
         check(!isExecuting) { "executeInComposition is not reentrant" }
         try {
             isExecuting = true
-            runBlockingTest {
+            runTest {
                 val frameClock = TestFrameClock()
 
                 withContext(frameClock) {

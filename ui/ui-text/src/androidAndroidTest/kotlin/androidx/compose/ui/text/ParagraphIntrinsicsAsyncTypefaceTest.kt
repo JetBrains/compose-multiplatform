@@ -35,7 +35,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -64,7 +65,7 @@ class ParagraphIntrinsicsAsyncTypefaceTest {
         val asyncFauxFont = AsyncFauxFont(loader)
         val fontFamily = asyncFauxFont.toFontFamily()
 
-        runBlockingTest {
+        runTest(UnconfinedTestDispatcher()) {
             val resolverJob = Job(coroutineContext[Job])
             val resolverContext = coroutineContext + resolverJob
             val fontFamilyResolver = createFontFamilyResolver(context, resolverContext)
@@ -96,7 +97,7 @@ class ParagraphIntrinsicsAsyncTypefaceTest {
         val asyncFauxFont = AsyncFauxFont(loader)
         val fontFamily = asyncFauxFont.toFontFamily()
 
-        runBlockingTest {
+        runTest(UnconfinedTestDispatcher()) {
             val resolverJob = Job(coroutineContext[Job])
             val resolverContext = coroutineContext + resolverJob
             val fontFamilyResolver = createFontFamilyResolver(context, resolverContext)
