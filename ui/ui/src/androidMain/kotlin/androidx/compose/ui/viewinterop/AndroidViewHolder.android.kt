@@ -35,6 +35,8 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.input.canScroll
+import androidx.compose.ui.input.consumeScrollContainerInfo
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.Measurable
@@ -181,6 +183,8 @@ internal abstract class AndroidViewHolder(
     private val nestedScrollingParentHelper: NestedScrollingParentHelper =
         NestedScrollingParentHelper(this)
 
+    private var isInScrollContainer: () -> Boolean = { true }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         view?.measure(widthMeasureSpec, heightMeasureSpec)
         setMeasuredDimension(view?.measuredWidth ?: 0, view?.measuredHeight ?: 0)
@@ -280,10 +284,14 @@ internal abstract class AndroidViewHolder(
                     (layoutNode.owner as? AndroidComposeView)
                         ?.drawAndroidView(this@AndroidViewHolder, canvas.nativeCanvas)
                 }
-            }.onGloballyPositioned {
+            }
+            .onGloballyPositioned {
                 // The global position of this LayoutNode can change with it being replaced. For
                 // these cases, we need to inform the View.
                 layoutAccordingTo(layoutNode)
+            }
+            .consumeScrollContainerInfo { scrollContainerInfo ->
+                isInScrollContainer = { scrollContainerInfo?.canScroll() == true }
             }
         layoutNode.modifier = modifier.then(coreModifier)
         onModifierChanged = { layoutNode.modifier = it.then(coreModifier) }
@@ -398,9 +406,7 @@ internal abstract class AndroidViewHolder(
         }
     }
 
-    // TODO: b/203141462 - consume whether the AndroidView() is inside a scrollable container, and
-    //  use that to set this. In the meantime set true as the defensive default.
-    override fun shouldDelayChildPressedState(): Boolean = true
+    override fun shouldDelayChildPressedState(): Boolean = isInScrollContainer()
 
     // NestedScrollingParent3
     override fun onStartNestedScroll(child: View, target: View, axes: Int, type: Int): Boolean {
