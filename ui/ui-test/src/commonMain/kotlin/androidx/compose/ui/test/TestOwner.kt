@@ -96,7 +96,12 @@ class TestContext internal constructor(internal val testOwner: TestOwner) {
     ): Iterable<SemanticsNode> {
         val roots = testOwner.getRoots(atLeastOneRootRequired).also {
             check(!atLeastOneRootRequired || it.isNotEmpty()) {
-                "No compose views found in the app. Is your Activity resumed?"
+                "No compose hierarchies found in the app. Possible reasons include: " +
+                    "(1) the Activity that calls setContent did not launch; " +
+                    "(2) setContent was not called; " +
+                    "(3) setContent was called before the ComposeTestRule ran. " +
+                    "If setContent is called by the Activity, make sure the Activity is " +
+                    "launched after the ComposeTestRule runs"
             }
         }
 

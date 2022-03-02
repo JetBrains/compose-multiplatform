@@ -37,7 +37,8 @@ class LaunchActivityTooEarlyTest {
             throw NotImplementedError("This is not called in this test")
         }.runTest {
             expectError<IllegalStateException>(
-                expectedMessage = "No compose views found in the app. Is your Activity resumed\\?"
+                expectedMessage = "No compose hierarchies found in the app\\. Possible reasons " +
+                    "include:.*\\bsetContent was called before the ComposeTestRule ran\\..*"
             ) {
                 onNodeWithText("Hello").assertExists()
             }
