@@ -1,3 +1,5 @@
 // Baseline format: 1.0
 RemovedClass: androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapperKt:
     Removed class androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapperKt
+RemovedClass: androidx.compose.ui.platform.TextToolbarKt:
+    Removed class androidx.compose.ui.platform.TextToolbarKt

@@ -2350,9 +2350,6 @@ package androidx.compose.ui.platform {
     property public abstract androidx.compose.ui.platform.TextToolbarStatus status;
   }
 
-  public final class TextToolbarKt {
-  }
-
   public enum TextToolbarStatus {
     enum_constant public static final androidx.compose.ui.platform.TextToolbarStatus Hidden;
     enum_constant public static final androidx.compose.ui.platform.TextToolbarStatus Shown;
