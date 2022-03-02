@@ -19,6 +19,7 @@ package androidx.compose.ui.test
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -31,18 +32,26 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.OnPlacedModifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -196,6 +205,37 @@ class LayoutCoordinatesHelperTest {
             invocations.forEach {
                 assertEquals(3, it)
             }
+        }
+    }
+
+    @Test
+    fun onPlacedModifierWithLayoutModifier() {
+        lateinit var coords: LayoutCoordinates
+
+        val modifier = object : OnPlacedModifier, LayoutModifier {
+            override fun MeasureScope.measure(
+                measurable: Measurable,
+                constraints: Constraints
+            ): MeasureResult {
+                val p = measurable.measure(Constraints.fixed(50, 50))
+                return layout(50, 50) {
+                    // coords should already be set by the time we are running this.
+                    assertThat(coords.size).isEqualTo(IntSize(50, 50))
+                    p.place(0, 0)
+                }
+            }
+
+            override fun onPlaced(coordinates: LayoutCoordinates) {
+                coords = coordinates
+            }
+        }
+
+        rule.setContent {
+            Box(Modifier.fillMaxSize().then(modifier))
+        }
+
+        rule.runOnIdle {
+            assertThat(coords.size).isEqualTo(IntSize(50, 50))
         }
     }
 
