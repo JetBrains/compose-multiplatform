@@ -188,12 +188,15 @@ object Release {
             getGroupReleaseZipTask(project, mavenGroup),
             getGlobalFullZipTask(project)
         )
-
-        val artifacts = extension.publishedArtifacts
+        val artifact = Artifact(
+            mavenGroup = mavenGroup,
+            projectName = project.name,
+            version = version.toString()
+        )
         val publishTask = project.tasks.named("publish")
         zipTasks.forEach {
             it.configure { zipTask ->
-                artifacts.forEach { artifact -> zipTask.addCandidate(artifact) }
+                zipTask.addCandidate(artifact)
 
                 // Add additional artifacts needed for Gradle Plugins
                 if (extension.type == LibraryType.GRADLE_PLUGIN) {
@@ -329,30 +332,6 @@ fun LibraryExtension.defaultPublishVariant(
         }
     }
 }
-
-val AndroidXExtension.publishedArtifacts: List<Artifact>
-    get() {
-        val groupString = mavenGroup?.group!!
-        val versionString = project.version.toString()
-        val artifacts = mutableListOf(
-            Artifact(
-                mavenGroup = groupString,
-                projectName = project.name,
-                version = versionString
-            )
-        )
-
-        // Add platform-specific artifacts, if necessary.
-        artifacts += publishPlatforms.map { suffix ->
-            Artifact(
-                mavenGroup = groupString,
-                projectName = "${project.name}-$suffix",
-                version = versionString
-            )
-        }
-
-        return artifacts
-    }
 
 /**
  * Converts the maven group into a readable task name.
