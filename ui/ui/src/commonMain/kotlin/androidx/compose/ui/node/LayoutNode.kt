@@ -659,7 +659,7 @@ internal class LayoutNode(
                     mod.onRemeasurementAvailable(this)
                 }
 
-                toWrap.entities.add(toWrap, mod)
+                toWrap.entities.addBeforeLayoutModifier(toWrap, mod)
 
                 if (mod is OnGloballyPositionedModifier) {
                     getOrCreateOnPositionedCallbacks() += toWrap to mod
@@ -667,6 +667,7 @@ internal class LayoutNode(
 
                 // Re-use the layoutNodeWrapper if possible.
                 reuseLayoutNodeWrapper(mod, toWrap)?.let {
+                    it.entities.addAfterLayoutModifier(it, mod)
                     return@foldOut it
                 }
 
@@ -721,6 +722,7 @@ internal class LayoutNode(
                         .initialize()
                         .assignChained(toWrap)
                 }
+                wrapper.entities.addAfterLayoutModifier(wrapper, mod)
                 wrapper
             }
 

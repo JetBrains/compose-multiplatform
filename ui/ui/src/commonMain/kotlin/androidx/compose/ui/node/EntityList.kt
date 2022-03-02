@@ -38,9 +38,10 @@ internal value class EntityList(
     val entities: Array<LayoutNodeEntity<*, *>?> = arrayOfNulls(TypeCount)
 ) {
     /**
-     * Add [LayoutNodeEntity] values for all types that [modifier] supports.
+     * Add [LayoutNodeEntity] values for types that [modifier] supports that should be
+     * added before the LayoutModifier.
      */
-    fun add(layoutNodeWrapper: LayoutNodeWrapper, modifier: Modifier) {
+    fun addBeforeLayoutModifier(layoutNodeWrapper: LayoutNodeWrapper, modifier: Modifier) {
         if (modifier is DrawModifier) {
             add(DrawEntity(layoutNodeWrapper, modifier), DrawEntityType.index)
         }
@@ -53,7 +54,12 @@ internal value class EntityList(
         if (modifier is ParentDataModifier) {
             add(SimpleEntity(layoutNodeWrapper, modifier), ParentDataEntityType.index)
         }
-        @OptIn(ExperimentalComposeUiApi::class)
+    }
+
+    /**
+     * Add [LayoutNodeEntity] values that must be added after the LayoutModifier.
+     */
+    fun addAfterLayoutModifier(layoutNodeWrapper: LayoutNodeWrapper, modifier: Modifier) {
         if (modifier is OnPlacedModifier) {
             add(SimpleEntity(layoutNodeWrapper, modifier), OnPlacedEntityType.index)
         }
