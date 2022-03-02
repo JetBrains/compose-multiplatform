@@ -19,7 +19,6 @@ package androidx.compose.material3
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.Interaction
@@ -52,7 +51,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collect
@@ -78,7 +76,7 @@ import kotlinx.coroutines.flow.collect
  * - See [TextButton] for a low-emphasis button with no border.
  * - See [FilledTonalButton] for a middle ground between [OutlinedButton] and [Button].
  *
- * The default text style for internal [Text] components will be set to [Typography.LabelLarge].
+ * The default text style for internal [Text] components will be set to [Typography.labelLarge].
  *
  * @param onClick Will be called when the user clicks the button.
  * @param modifier Modifier to be applied to the button.
@@ -99,6 +97,7 @@ import kotlinx.coroutines.flow.collect
  * @param contentPadding The spacing values to apply internally between the container and the
  * content.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Button(
     onClick: () -> Unit,
@@ -119,22 +118,16 @@ fun Button(
 
     // TODO(b/202880001): Apply shadow color from token (will not be possibly any time soon, if ever).
     Surface(
-        modifier = modifier
-            .minimumTouchTargetSize()
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                enabled = enabled,
-                role = Role.Button,
-                onClick = onClick
-            ),
-        interactionSource = interactionSource,
+        onClick = onClick,
+        modifier = modifier,
         shape = shape,
         color = containerColor,
         contentColor = contentColor,
         tonalElevation = tonalElevation,
         shadowElevation = shadowElevation,
-        border = border
+        border = border,
+        interactionSource = interactionSource,
+        enabled = enabled,
     ) {
         CompositionLocalProvider(LocalContentColor provides contentColor) {
             ProvideTextStyle(value = TypographyTokens.LabelLarge) {
