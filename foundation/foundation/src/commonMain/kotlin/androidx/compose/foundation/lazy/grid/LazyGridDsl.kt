@@ -21,7 +21,6 @@ import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.runtime.Composable
@@ -36,8 +35,6 @@ import androidx.compose.ui.unit.dp
 
 /**
  * A lazy vertical grid layout. It composes only visible rows of the grid.
- * This API is not stable, please consider using stable components like [LazyColumn] and [Row]
- * to achieve the same result.
  *
  * Sample:
  * @sample androidx.compose.foundation.samples.LazyVerticalGridSample
@@ -58,9 +55,8 @@ import androidx.compose.ui.unit.dp
  * @param flingBehavior logic describing fling behavior
  * @param userScrollEnabled whether the scrolling via the user gestures or accessibility actions
  * is allowed. You can still scroll programmatically using the state even when it is disabled.
- * @param content the [LazyListScope] which describes the content
+ * @param content the [LazyGridScope] which describes the content
  */
-@ExperimentalFoundationApi
 @Composable
 fun LazyVerticalGrid(
     columns: GridCells,
@@ -93,8 +89,6 @@ fun LazyVerticalGrid(
 
 /**
  * A lazy horizontal grid layout. It composes only visible columns of the grid.
- * This API is not stable, please consider using stable components like [LazyRow] and [Column]
- * to achieve the same result.
  *
  * Sample:
  * @sample androidx.compose.foundation.samples.LazyHorizontalGridSample
@@ -114,9 +108,8 @@ fun LazyVerticalGrid(
  * @param flingBehavior logic describing fling behavior
  * @param userScrollEnabled whether the scrolling via the user gestures or accessibility actions
  * is allowed. You can still scroll programmatically using the state even when it is disabled.
- * @param content the [LazyListScope] which describes the content
+ * @param content the [LazyGridScope] which describes the content
  */
-@ExperimentalFoundationApi
 @Composable
 fun LazyHorizontalGrid(
     rows: GridCells,
@@ -215,7 +208,6 @@ private fun rememberRowHeightSums(
  * This class describes the count and the sizes of columns in vertical grids,
  * or rows in horizontal grids.
  */
-@ExperimentalFoundationApi
 @Stable
 interface GridCells {
     /**
@@ -311,7 +303,6 @@ private fun calculateCellsCrossAxisSizeImpl(
 /**
  * Receiver scope which is used by [LazyVerticalGrid].
  */
-@ExperimentalFoundationApi
 interface LazyGridScope {
     /**
      * Adds a single item to the scope.
@@ -382,7 +373,6 @@ interface LazyGridScope {
  * type will be considered compatible.
  * @param itemContent the content displayed by a single item
  */
-@ExperimentalFoundationApi
 inline fun <T> LazyGridScope.items(
     items: List<T>,
     noinline key: ((item: T) -> Any)? = null,
@@ -416,7 +406,6 @@ inline fun <T> LazyGridScope.items(
  * type will be considered compatible.
  * @param itemContent the content displayed by a single item
  */
-@ExperimentalFoundationApi
 inline fun <T> LazyGridScope.itemsIndexed(
     items: List<T>,
     noinline key: ((index: Int, item: T) -> Any)? = null,
@@ -450,7 +439,6 @@ inline fun <T> LazyGridScope.itemsIndexed(
  * type will be considered compatible.
  * @param itemContent the content displayed by a single item
  */
-@ExperimentalFoundationApi
 inline fun <T> LazyGridScope.items(
     items: Array<T>,
     noinline key: ((item: T) -> Any)? = null,
@@ -484,7 +472,6 @@ inline fun <T> LazyGridScope.items(
  * type will be considered compatible.
  * @param itemContent the content displayed by a single item
  */
-@ExperimentalFoundationApi
 inline fun <T> LazyGridScope.itemsIndexed(
     items: Array<T>,
     noinline key: ((index: Int, item: T) -> Any)? = null,

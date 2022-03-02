@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.lazy.grid
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
@@ -25,7 +24,6 @@ import androidx.compose.ui.unit.IntSize
  *
  * @see LazyGridLayoutInfo
  */
-@ExperimentalFoundationApi
 interface LazyGridItemInfo {
     /**
      * The index of the item in the grid.
@@ -45,14 +43,14 @@ interface LazyGridItemInfo {
     /**
      * The row occupied by the top start point of the item.
      * If this is unknown, for example while this item is animating to exit the viewport and is
-     * still visible, the value will be [Unknown].
+     * still visible, the value will be [UnknownRow].
      */
     val row: Int
 
     /**
      * The column occupied by the top start point of the item.
      * If this is unknown, for example while this item is animating to exit the viewport and is
-     * still visible, the value will be [Unknown].
+     * still visible, the value will be [UnknownColumn].
      */
     val column: Int
 
@@ -62,12 +60,16 @@ interface LazyGridItemInfo {
      */
     val size: IntSize
 
-    @ExperimentalFoundationApi
     companion object {
         /**
-         * Possible value for [row] and [column], when they are unknown. This can happen when
-         * the item is visible while animating to exit the viewport.
+         * Possible value for [row], when they are unknown. This can happen when the item is
+         * visible while animating to exit the viewport.
          */
-        const val Unknown = -1
+        const val UnknownRow = -1
+        /**
+         * Possible value for [column], when they are unknown. This can happen when the item is
+         * visible while animating to exit the viewport.
+         */
+        const val UnknownColumn = -1
     }
 }

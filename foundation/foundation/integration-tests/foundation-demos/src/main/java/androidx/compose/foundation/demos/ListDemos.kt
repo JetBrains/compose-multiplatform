@@ -614,7 +614,6 @@ private fun NestedLazyDemo() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun LazyGridDemo() {
     val columnModes = listOf(
@@ -635,7 +634,6 @@ private fun LazyGridDemo() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun LazyGridForMode(mode: GridCells) {
     LazyVerticalGrid(columns = mode) {
@@ -651,7 +649,6 @@ private fun LazyGridForMode(mode: GridCells) {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun LazyGridWithSpacingDemo() {
     val columnModes = listOf(
@@ -787,7 +784,6 @@ private fun LazyGridWithSpacingDemo() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun LazyGridWithSpacingForMode(
     mode: GridCells,

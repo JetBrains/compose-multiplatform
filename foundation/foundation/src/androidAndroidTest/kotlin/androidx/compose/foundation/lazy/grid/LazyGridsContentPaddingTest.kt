@@ -18,7 +18,6 @@ package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.AutoTestFrameClock
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
@@ -52,7 +51,6 @@ import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalFoundationApi::class)
 class LazyGridsContentPaddingTest {
     private val LazyListTag = "LazyList"
     private val ItemTag = "item"
