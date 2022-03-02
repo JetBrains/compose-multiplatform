@@ -28,10 +28,10 @@ internal class DefaultTextToolbar : TextToolbar {
 
     override fun showMenu(
         rect: Rect,
-        onCopyRequested: ActionCallback?,
-        onPasteRequested: ActionCallback?,
-        onCutRequested: ActionCallback?,
-        onSelectAllRequested: ActionCallback?
+        onCopyRequested: (() -> Unit)?,
+        onPasteRequested: (() -> Unit)?,
+        onCutRequested: (() -> Unit)?,
+        onSelectAllRequested: (() -> Unit)?
     ) {
     }
 }
