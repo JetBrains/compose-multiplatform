@@ -46,4 +46,9 @@
     <string name="default_error_message">"Invalid input"</string>
     <!-- Default title of the popup window to be read by a screen reader. -->
     <string name="default_popup_window_title" tools:ignore="ExtraTranslation">"Pop-Up Window"</string>
+
+    <!-- Spoken content description of the start seek control in a range slider. -->
+    <string name="range_start">"Range start"</string>
+    <!-- Spoken content description of the end seek control in a range slider. -->
+    <string name="range_end">"Range end"</string>
 </resources>

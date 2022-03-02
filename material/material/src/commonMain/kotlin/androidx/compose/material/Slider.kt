@@ -38,6 +38,7 @@ import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -83,6 +84,7 @@ import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
@@ -382,6 +384,22 @@ fun RangeSlider(
         val coercedEnd = values.endInclusive.coerceIn(values.start, valueRange.endInclusive)
         val fractionStart = calcFraction(valueRange.start, valueRange.endInclusive, coercedStart)
         val fractionEnd = calcFraction(valueRange.start, valueRange.endInclusive, coercedEnd)
+        val startThumbSemantics = Modifier.sliderSemantics(
+            coercedStart,
+            tickFractions,
+            enabled,
+            { value -> onValueChangeState.value.invoke(value..coercedEnd) },
+            valueRange.start..coercedEnd,
+            steps
+        )
+        val endThumbSemantics = Modifier.sliderSemantics(
+            coercedEnd,
+            tickFractions,
+            enabled,
+            { value -> onValueChangeState.value.invoke(coercedStart..value) },
+            coercedStart..valueRange.endInclusive,
+            steps
+        )
 
         RangeSliderImpl(
             enabled,
@@ -393,6 +411,8 @@ fun RangeSlider(
             startInteractionSource,
             endInteractionSource,
             modifier = pressDrag,
+            startThumbSemantics,
+            endThumbSemantics
         )
     }
 }
@@ -551,10 +571,9 @@ private fun SliderImpl(
 
         val thumbSize = ThumbRadius * 2
         val offset = widthDp * positionFraction
-        val center = Modifier.align(Alignment.CenterStart)
 
         Track(
-            center.fillMaxSize(),
+            Modifier.fillMaxSize(),
             colors,
             enabled,
             0f,
@@ -563,7 +582,7 @@ private fun SliderImpl(
             thumbPx,
             trackStrokeWidth
         )
-        SliderThumb(center, offset, interactionSource, colors, enabled, thumbSize)
+        SliderThumb(Modifier, offset, interactionSource, colors, enabled, thumbSize)
     }
 }
 
@@ -577,9 +596,13 @@ private fun RangeSliderImpl(
     width: Float,
     startInteractionSource: MutableInteractionSource,
     endInteractionSource: MutableInteractionSource,
-    modifier: Modifier
+    modifier: Modifier,
+    startThumbSemantics: Modifier,
+    endThumbSemantics: Modifier
 ) {
 
+    val startContentDescription = getString(Strings.SliderRangeStart)
+    val endContentDescription = getString(Strings.SliderRangeEnd)
     Box(modifier.then(DefaultSliderConstraints)) {
         val trackStrokeWidth: Float
         val thumbPx: Float
@@ -605,7 +628,10 @@ private fun RangeSliderImpl(
         )
 
         SliderThumb(
-            Modifier.align(Alignment.CenterStart),
+            Modifier
+                .semantics(mergeDescendants = true) { contentDescription = startContentDescription }
+                .focusable(true, startInteractionSource)
+                .then(startThumbSemantics),
             offsetStart,
             startInteractionSource,
             colors,
@@ -613,7 +639,10 @@ private fun RangeSliderImpl(
             thumbSize
         )
         SliderThumb(
-            Modifier.align(Alignment.CenterStart),
+            Modifier
+                .semantics(mergeDescendants = true) { contentDescription = endContentDescription }
+                .focusable(true, endInteractionSource)
+                .then(endThumbSemantics),
             offsetEnd,
             endInteractionSource,
             colors,
@@ -624,7 +653,7 @@ private fun RangeSliderImpl(
 }
 
 @Composable
-private fun SliderThumb(
+private fun BoxScope.SliderThumb(
     modifier: Modifier,
     offset: Dp,
     interactionSource: MutableInteractionSource,
@@ -632,7 +661,7 @@ private fun SliderThumb(
     enabled: Boolean,
     thumbSize: Dp
 ) {
-    Box(modifier.padding(start = offset)) {
+    Box(Modifier.padding(start = offset).align(Alignment.CenterStart)) {
         val interactions = remember { mutableStateListOf<Interaction>() }
         LaunchedEffect(interactionSource) {
             interactionSource.interactions.collect { interaction ->
@@ -653,7 +682,7 @@ private fun SliderThumb(
             ThumbDefaultElevation
         }
         Spacer(
-            Modifier
+            modifier
                 .size(thumbSize, thumbSize)
                 .indication(
                     interactionSource = interactionSource,
