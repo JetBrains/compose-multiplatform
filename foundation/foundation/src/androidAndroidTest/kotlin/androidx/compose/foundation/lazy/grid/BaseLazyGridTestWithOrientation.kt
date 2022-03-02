@@ -18,7 +18,6 @@ package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.AutoTestFrameClock
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollableDefaults
@@ -45,7 +44,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 
-@OptIn(ExperimentalFoundationApi::class)
 open class BaseLazyGridTestWithOrientation(private val orientation: Orientation) {
 
     @get:Rule

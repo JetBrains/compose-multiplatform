@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.lazy.grid
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,7 +54,6 @@ import org.junit.runner.RunWith
  */
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalFoundationApi::class)
 class LazySemanticsTest {
     private val N = 20
     private val LazyGridTag = "lazy_grid"

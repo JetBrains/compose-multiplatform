@@ -164,7 +164,6 @@ private object ListsSnippetsStickyHeaders2 {
 }
 
 private object ListsSnippetsGrids {
-    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun PhotoGrid(photos: List<Photo>) {
         LazyVerticalGrid(

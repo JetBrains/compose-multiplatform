@@ -16,7 +16,6 @@
 
 package androidx.compose.material.catalog.library.ui.home
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -38,7 +37,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 fun Home(
     components: List<Component>,
     theme: Theme,

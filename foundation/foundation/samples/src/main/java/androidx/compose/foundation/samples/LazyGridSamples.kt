@@ -17,7 +17,6 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.height
@@ -43,7 +42,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collect
 
-@OptIn(ExperimentalFoundationApi::class)
 @Sampled
 @Composable
 fun LazyVerticalGridSample() {
@@ -67,7 +65,6 @@ fun LazyVerticalGridSample() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Sampled
 @Composable
 fun LazyVerticalGridSpanSample() {
@@ -98,7 +95,6 @@ fun LazyVerticalGridSpanSample() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Sampled
 @Composable
 fun LazyHorizontalGridSample() {
@@ -126,7 +122,6 @@ fun LazyHorizontalGridSample() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Sampled
 @Composable
 fun LazyHorizontalGridSpanSample() {
@@ -157,7 +152,6 @@ fun LazyHorizontalGridSpanSample() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Sampled
 @Composable
 fun UsingGridScrollPositionForSideEffectSample() {
@@ -170,7 +164,6 @@ fun UsingGridScrollPositionForSideEffectSample() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Sampled
 @Composable
 fun UsingGridScrollPositionInCompositionSample() {
@@ -185,7 +178,6 @@ fun UsingGridScrollPositionInCompositionSample() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Sampled
 @Composable
 fun UsingGridLayoutInfoForSideEffectSample() {
@@ -198,7 +190,6 @@ fun UsingGridLayoutInfoForSideEffectSample() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ScrollToTopButton(@Suppress("UNUSED_PARAMETER") gridState: LazyGridState) {
 }

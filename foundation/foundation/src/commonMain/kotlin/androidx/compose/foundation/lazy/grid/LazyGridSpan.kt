@@ -22,7 +22,6 @@ import androidx.compose.runtime.Immutable
 /**
  * Represents the span of an item in a [LazyVerticalGrid].
  */
-@ExperimentalFoundationApi
 @Suppress("INLINE_CLASS_DEPRECATED")
 @Immutable
 inline class GridItemSpan internal constructor(private val packedValue: Long) {
@@ -38,25 +37,21 @@ inline class GridItemSpan internal constructor(private val packedValue: Long) {
  * Creates a [GridItemSpan] with a specified [currentLineSpan]. This will be the horizontal span
  * for an item of a [LazyVerticalGrid].
  */
-@ExperimentalFoundationApi
 fun GridItemSpan(currentLineSpan: Int) = GridItemSpan(currentLineSpan.toLong())
 
 /**
  * Scope of lambdas used to calculate the spans of items in lazy grids.
  */
-@ExperimentalFoundationApi
 interface LazyGridItemSpanScope {
     /**
      * The max current line (horizontal for vertical grids) the item can occupy, such that
      * it will be positioned on the current line.
      */
-    @ExperimentalFoundationApi
     val maxCurrentLineSpan: Int
 
     /**
      * The max line span (horizontal for vertical grids) an item can occupy. This will be the
      * number of columns in vertical grids or the number of rows in horizontal grids.
      */
-    @ExperimentalFoundationApi
     val maxLineSpan: Int
 }

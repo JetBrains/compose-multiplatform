@@ -286,8 +286,8 @@ internal class LazyGridItemPlacementAnimator(
                         itemInfo.crossAxisOffset,
                         layoutWidth,
                         layoutHeight,
-                        LazyGridItemInfo.Unknown,
-                        LazyGridItemInfo.Unknown,
+                        LazyGridItemInfo.UnknownRow,
+                        LazyGridItemInfo.UnknownColumn,
                         measuredItem.mainAxisSize
                     )
                     positionedItems.add(item)

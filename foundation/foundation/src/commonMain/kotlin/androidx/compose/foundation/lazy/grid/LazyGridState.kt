@@ -49,7 +49,6 @@ import kotlin.math.abs
  * @param initialFirstVisibleItemScrollOffset the initial value for
  * [LazyGridState.firstVisibleItemScrollOffset]
  */
-@ExperimentalFoundationApi
 @Composable
 fun rememberLazyGridState(
     initialFirstVisibleItemIndex: Int = 0,
@@ -72,7 +71,7 @@ fun rememberLazyGridState(
  * @param firstVisibleItemScrollOffset the initial value for
  * [LazyGridState.firstVisibleItemScrollOffset]
  */
-@ExperimentalFoundationApi
+@OptIn(ExperimentalFoundationApi::class)
 @Stable
 class LazyGridState constructor(
     firstVisibleItemIndex: Int = 0,
