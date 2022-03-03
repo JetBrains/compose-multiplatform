@@ -21,8 +21,10 @@ import androidx.annotation.IntRange
 import androidx.compose.runtime.Composable
 
 /**
- * [Preview] can be applied to @[Composable] methods with no parameters to show them in the Android
- * Studio preview.
+ * [Preview] can be applied to either of the following:
+ * - @[Composable] methods with no parameters to show them in the Android Studio preview.
+ * - Annotation classes, that could then be used to annotate @[Composable] methods or other
+ * annotation classes, which will then be considered as indirectly annotated with that [Preview].
  *
  * The annotation contains a number of parameters that allow to define the way the @[Composable]
  * will be rendered within the preview.
@@ -53,6 +55,7 @@ import androidx.compose.runtime.Composable
 @MustBeDocumented
 @Retention(AnnotationRetention.SOURCE)
 @Target(
+    AnnotationTarget.ANNOTATION_CLASS,
     AnnotationTarget.FUNCTION
 )
 @Repeatable

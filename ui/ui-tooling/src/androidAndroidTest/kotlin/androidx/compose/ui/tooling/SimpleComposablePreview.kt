@@ -133,3 +133,14 @@ class TestGroup {
         }
     }
 }
+
+@Preview
+annotation class MyAnnotation()
+
+@Composable
+@MyAnnotation
+fun Multipreview() {
+    Surface(color = Color.Red) {
+        Text("Hello world")
+    }
+}
