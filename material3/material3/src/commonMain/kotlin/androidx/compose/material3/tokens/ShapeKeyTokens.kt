@@ -13,16 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// VERSION: v0_85
+// GENERATED CODE - DO NOT MODIFY BY HAND
 
-package androidx.compose.material3.demos
+package androidx.compose.material3.tokens
 
-import androidx.compose.integration.demos.common.ComposableDemo
-import androidx.compose.integration.demos.common.DemoCategory
-
-val Material3Demos = DemoCategory(
-    "Material 3",
-    listOf(
-        ComposableDemo("Color Scheme") { ColorSchemeDemo() },
-        ComposableDemo("Shape") { ShapeDemo() },
-    ),
-)
+internal enum class ShapeKeyTokens {
+    CornerExtraLarge,
+    CornerExtraLargeTop,
+    CornerExtraSmall,
+    CornerExtraSmallTop,
+    CornerFull,
+    CornerLarge,
+    CornerLargeEnd,
+    CornerLargeTop,
+    CornerMedium,
+    CornerNone,
+    CornerSmall,
+}

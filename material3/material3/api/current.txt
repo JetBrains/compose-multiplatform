@@ -226,14 +226,16 @@ package androidx.compose.material3 {
 
   public final class MaterialTheme {
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public androidx.compose.material3.ColorScheme getColorScheme();
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public androidx.compose.material3.Shapes getShapes();
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public androidx.compose.material3.Typography getTypography();
     property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final androidx.compose.material3.ColorScheme colorScheme;
+    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final androidx.compose.material3.Shapes shapes;
     property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final androidx.compose.material3.Typography typography;
     field public static final androidx.compose.material3.MaterialTheme INSTANCE;
   }
 
   public final class MaterialThemeKt {
-    method @androidx.compose.runtime.Composable public static void MaterialTheme(optional androidx.compose.material3.ColorScheme colorScheme, optional androidx.compose.material3.Typography typography, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void MaterialTheme(optional androidx.compose.material3.ColorScheme colorScheme, optional androidx.compose.material3.Shapes shapes, optional androidx.compose.material3.Typography typography, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
   public final class MenuDefaults {
@@ -321,6 +323,32 @@ package androidx.compose.material3 {
   }
 
   public final class ScaffoldKt {
+  }
+
+  @androidx.compose.runtime.Immutable public final class Shapes {
+    ctor public Shapes(optional androidx.compose.foundation.shape.CornerBasedShape extraSmall, optional androidx.compose.foundation.shape.CornerBasedShape small, optional androidx.compose.foundation.shape.CornerBasedShape medium, optional androidx.compose.foundation.shape.CornerBasedShape large, optional androidx.compose.foundation.shape.CornerBasedShape extraLarge);
+    method public androidx.compose.material3.Shapes copy(optional androidx.compose.foundation.shape.CornerBasedShape extraSmall, optional androidx.compose.foundation.shape.CornerBasedShape small, optional androidx.compose.foundation.shape.CornerBasedShape medium, optional androidx.compose.foundation.shape.CornerBasedShape large, optional androidx.compose.foundation.shape.CornerBasedShape extraLarge);
+    method public androidx.compose.foundation.shape.CornerBasedShape getExtraLarge();
+    method public androidx.compose.foundation.shape.CornerBasedShape getExtraSmall();
+    method public androidx.compose.foundation.shape.CornerBasedShape getLarge();
+    method public androidx.compose.foundation.shape.CornerBasedShape getMedium();
+    method public androidx.compose.foundation.shape.CornerBasedShape getSmall();
+    property public final androidx.compose.foundation.shape.CornerBasedShape extraLarge;
+    property public final androidx.compose.foundation.shape.CornerBasedShape extraSmall;
+    property public final androidx.compose.foundation.shape.CornerBasedShape large;
+    property public final androidx.compose.foundation.shape.CornerBasedShape medium;
+    property public final androidx.compose.foundation.shape.CornerBasedShape small;
+    field public static final androidx.compose.material3.Shapes.Companion Companion;
+  }
+
+  public static final class Shapes.Companion {
+    method public androidx.compose.foundation.shape.RoundedCornerShape getFull();
+    method public androidx.compose.ui.graphics.Shape getNone();
+    property public final androidx.compose.foundation.shape.RoundedCornerShape Full;
+    property public final androidx.compose.ui.graphics.Shape None;
+  }
+
+  public final class ShapesKt {
   }
 
   @androidx.compose.runtime.Stable public interface SliderColors {
