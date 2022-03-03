@@ -538,6 +538,7 @@ class AndroidXImplPlugin : Plugin<Project> {
             // Skip copying AndroidTest apks if they have no source code (no tests to run).
             if (!testApk || project.hasAndroidTestSourceCode()) {
                 addToTestZips(project, packageTask)
+                project.addToApkHashDump(packageTask)
             }
         }
         project.tasks.withType(ListingFileRedirectTask::class.java).forEach {
@@ -649,6 +650,7 @@ class AndroidXImplPlugin : Plugin<Project> {
     }
 
     companion object {
+        const val APK_HASH_DUMP = "apkHashDump"
         const val BUILD_TEST_APKS_TASK = "buildTestApks"
         const val CHECK_RELEASE_READY_TASK = "checkReleaseReady"
         const val CREATE_LIBRARY_BUILD_INFO_FILES_TASK = "createLibraryBuildInfoFiles"
