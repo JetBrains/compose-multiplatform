@@ -108,9 +108,8 @@ class CardTest {
         val count = mutableStateOf(0)
         rule.setMaterialContent {
             Card(
-                modifier = Modifier.testTag("card"),
-                role = Role.Checkbox,
-                onClick = { count.value += 1 }
+                onClick = { count.value += 1 },
+                modifier = Modifier.testTag("card")
             ) {
                 Text("${count.value}")
                 Spacer(Modifier.size(30.dp))
@@ -118,7 +117,7 @@ class CardTest {
         }
         rule.onNodeWithTag("card")
             .assertHasClickAction()
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Checkbox))
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
             .assertIsEnabled()
             // since we merge descendants we should have text on the same node
             .assertTextEquals("0")

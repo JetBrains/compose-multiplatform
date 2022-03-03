@@ -18,7 +18,6 @@ package androidx.compose.material
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,11 +28,9 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -49,6 +46,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
 /**
@@ -100,16 +99,14 @@ fun Chip(
 ) {
     val contentColor by colors.contentColor(enabled)
     Surface(
+        onClick = onClick,
         modifier = modifier,
+        enabled = enabled,
         shape = shape,
         color = colors.backgroundColor(enabled).value,
         contentColor = contentColor.copy(1.0f),
         border = border,
-        enabled = enabled,
-        onClick = onClick,
-        role = Role.Button,
         interactionSource = interactionSource,
-        indication = rememberRipple(),
     ) {
         CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
             ProvideTextStyle(
@@ -202,19 +199,14 @@ fun FilterChip(
     // TODO(b/113855296): Animate transition between unselected and selected
     val contentColor = colors.contentColor(enabled, selected)
     Surface(
+        selected = selected,
+        onClick = onClick,
+        modifier = modifier.semantics { role = Role.Checkbox },
         shape = shape,
         color = colors.backgroundColor(enabled, selected).value,
         contentColor = contentColor.value.copy(1.0f),
+        interactionSource = interactionSource,
         border = border,
-        modifier = modifier
-            .selectable(
-                selected = selected,
-                onClick = onClick,
-                enabled = enabled,
-                role = Role.Checkbox,
-                interactionSource = interactionSource,
-                indication = null
-            )
     ) {
         CompositionLocalProvider(LocalContentAlpha provides contentColor.value.alpha) {
             ProvideTextStyle(
@@ -225,7 +217,6 @@ fun FilterChip(
                         .defaultMinSize(
                             minHeight = ChipDefaults.MinHeight
                         )
-                        .indication(interactionSource, rememberRipple())
                         .padding(
                             start =
                             if (leadingIcon != null || (selected && selectedIcon != null)) {

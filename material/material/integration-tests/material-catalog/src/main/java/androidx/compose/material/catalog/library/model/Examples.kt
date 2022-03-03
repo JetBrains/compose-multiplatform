@@ -36,6 +36,7 @@ import androidx.compose.material.samples.CheckboxSample
 import androidx.compose.material.samples.ChipGroupSingleLineSample
 import androidx.compose.material.samples.ChipSample
 import androidx.compose.material.samples.CircularProgressIndicatorSample
+import androidx.compose.material.samples.ClickableCardSample
 import androidx.compose.material.samples.ClickableListItems
 import androidx.compose.material.samples.CompactNavigationRailSample
 import androidx.compose.material.samples.CustomAlertDialogSample
@@ -247,6 +248,13 @@ val CardsExamples = listOf(
         sourceUrl = CardsExampleSourceUrl
     ) {
         CardSample()
+    },
+    Example(
+        name = ::ClickableCardSample.name,
+        description = CardsExampleDescription,
+        sourceUrl = CardsExampleSourceUrl
+    ) {
+        ClickableCardSample()
     }
 )
 
