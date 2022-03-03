@@ -1124,7 +1124,8 @@ internal class AndroidComposeView(context: Context) :
         val axisValue = -event.getAxisValue(AXIS_SCROLL)
         val rotaryEvent = RotaryScrollEvent(
             verticalScrollPixels = axisValue * getScaledVerticalScrollFactor(config, context),
-            horizontalScrollPixels = axisValue * getScaledHorizontalScrollFactor(config, context)
+            horizontalScrollPixels = axisValue * getScaledHorizontalScrollFactor(config, context),
+            uptimeMillis = event.eventTime
         )
         return _focusManager.getActiveFocusModifier()?.propagateRotaryEvent(rotaryEvent) ?: false
     }
