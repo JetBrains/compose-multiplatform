@@ -174,4 +174,32 @@ class StringResourcesTest {
             }
         }
     }
+
+    @Test
+    fun pluralStringResource_withoutArguments() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+        rule.setContent {
+            CompositionLocalProvider(LocalContext provides context) {
+                assertThat(pluralStringResource(R.plurals.plurals_without_arguments, 1))
+                    .isEqualTo("There is one Android here")
+                assertThat(pluralStringResource(R.plurals.plurals_without_arguments, 42))
+                    .isEqualTo("There are a number of Androids here")
+            }
+        }
+    }
+
+    @Test
+    fun pluralStringResource_withArguments() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+        rule.setContent {
+            CompositionLocalProvider(LocalContext provides context) {
+                assertThat(pluralStringResource(R.plurals.plurals_with_arguments, 1, 1))
+                    .isEqualTo("There is 1 Android here")
+                assertThat(pluralStringResource(R.plurals.plurals_with_arguments, 42, 42))
+                    .isEqualTo("There are 42 Androids here")
+            }
+        }
+    }
 }

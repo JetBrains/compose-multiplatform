@@ -2697,6 +2697,8 @@ package androidx.compose.ui.res {
   }
 
   public final class StringResources_androidKt {
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static String pluralStringResource(@PluralsRes int id, int count);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static String pluralStringResource(@PluralsRes int id, int count, java.lang.Object... formatArgs);
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static String![] stringArrayResource(@ArrayRes int id);
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static String stringResource(@StringRes int id);
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static String stringResource(@StringRes int id, java.lang.Object... formatArgs);
