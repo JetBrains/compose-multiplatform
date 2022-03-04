@@ -22,16 +22,20 @@ import androidx.compose.ui.focus.FocusStateImpl.Captured
 import androidx.compose.ui.focus.FocusStateImpl.Deactivated
 import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
-import androidx.compose.ui.node.ModifiedFocusNode
 
 /**
  * Request focus for this node.
  *
- * In Compose, the parent [FocusNode][ModifiedFocusNode] controls focus for its focusable
+ * In Compose, the parent [FocusNode][FocusModifier] controls focus for its focusable
  * children. Calling this function will send a focus request to this
- * [FocusNode][ModifiedFocusNode]'s parent [FocusNode][ModifiedFocusNode].
+ * [FocusNode][FocusModifier]'s parent [FocusNode][FocusModifier].
  */
-internal fun ModifiedFocusNode.requestFocus() {
+internal fun FocusModifier.requestFocus() {
+    if (layoutNodeWrapper?.layoutNode?.owner == null) {
+        // Not placed yet. Try requestFocus() after placement.
+        focusRequestedOnPlaced = true
+        return
+    }
     when (focusState) {
         Active, Captured, Deactivated, DeactivatedParent -> {
             // There is no change in focus state, but we send a focus event to notify the user
@@ -41,7 +45,7 @@ internal fun ModifiedFocusNode.requestFocus() {
         ActiveParent -> if (clearChildFocus()) grantFocus()
 
         Inactive -> {
-            val focusParent = findParentFocusNode()
+            val focusParent = parent
             if (focusParent != null) {
                 focusParent.requestFocusForChild(this)
             } else if (requestFocusForOwner()) {
@@ -57,7 +61,7 @@ internal fun ModifiedFocusNode.requestFocus() {
  * Deactivated nodes are excluded from focus search, and reject requests to gain focus.
  * Calling this function activates a deactivated node.
  */
-internal fun ModifiedFocusNode.activateNode() {
+internal fun FocusModifier.activateNode() {
     when (focusState) {
         ActiveParent, Active, Captured, Inactive -> {}
         Deactivated -> focusState = Inactive
@@ -70,11 +74,11 @@ internal fun ModifiedFocusNode.activateNode() {
  *
  * Deactivated nodes are excluded from focus search.
  */
-internal fun ModifiedFocusNode.deactivateNode() {
+internal fun FocusModifier.deactivateNode() {
     when (focusState) {
         ActiveParent -> focusState = DeactivatedParent
         Active, Captured -> {
-            layoutNode.owner?.focusManager?.clearFocus(force = true)
+            layoutNodeWrapper?.layoutNode?.owner?.focusManager?.clearFocus(force = true)
             focusState = Deactivated
         }
         Inactive -> focusState = Deactivated
@@ -90,7 +94,7 @@ internal fun ModifiedFocusNode.deactivateNode() {
  *
  * @return true if the focus was successfully captured. False otherwise.
  */
-internal fun ModifiedFocusNode.captureFocus() = when (focusState) {
+internal fun FocusModifier.captureFocus() = when (focusState) {
     Active -> {
         focusState = Captured
         true
@@ -106,7 +110,7 @@ internal fun ModifiedFocusNode.captureFocus() = when (focusState) {
  *
  * @return true if the captured focus was released. False Otherwise.
  */
-internal fun ModifiedFocusNode.freeFocus() = when (focusState) {
+internal fun FocusModifier.freeFocus() = when (focusState) {
     Captured -> {
         focusState = Active
         true
@@ -118,11 +122,11 @@ internal fun ModifiedFocusNode.freeFocus() = when (focusState) {
 /**
  * This function clears focus from this node.
  *
- * Note: This function should only be called by a parent [focus node][ModifiedFocusNode] to
- * clear focus from one of its child [focus node][ModifiedFocusNode]s. It does not change the
+ * Note: This function should only be called by a parent [focus node][FocusModifier] to
+ * clear focus from one of its child [focus node][FocusModifier]s. It does not change the
  * state of the parent.
  */
-internal fun ModifiedFocusNode.clearFocus(forcedClear: Boolean = false): Boolean {
+internal fun FocusModifier.clearFocus(forcedClear: Boolean = false): Boolean {
     return when (focusState) {
         Active -> {
             focusState = Inactive
@@ -170,7 +174,7 @@ internal fun ModifiedFocusNode.clearFocus(forcedClear: Boolean = false): Boolean
  * Note: This is a private function that just changes the state of this node and does not affect any
  * other nodes in the hierarchy.
  */
-private fun ModifiedFocusNode.grantFocus() {
+private fun FocusModifier.grantFocus() {
     // No Focused Children, or we don't want to propagate focus to children.
     focusState = when (focusState) {
         Inactive, Active, ActiveParent -> Active
@@ -184,7 +188,7 @@ private fun ModifiedFocusNode.grantFocus() {
  * Note: This is a private function and should only be called by a parent to grant focus to one of
  * its child. It does not affect any other nodes in the hierarchy.
  */
-private fun ModifiedFocusNode.grantFocusToChild(childNode: ModifiedFocusNode): Boolean {
+private fun FocusModifier.grantFocusToChild(childNode: FocusModifier): Boolean {
     // It's very important that the child node is set before dispatching grantFocus, otherwise a
     // child may end up indirectly trying to walk the focus tree and get a null child.
     focusedChild = childNode
@@ -193,7 +197,7 @@ private fun ModifiedFocusNode.grantFocusToChild(childNode: ModifiedFocusNode): B
 }
 
 /** This function clears any focus from the focused child. */
-private fun ModifiedFocusNode.clearChildFocus(): Boolean {
+private fun FocusModifier.clearChildFocus(): Boolean {
     return if (requireNotNull(focusedChild).clearFocus()) {
         focusedChild = null
         true
@@ -203,16 +207,16 @@ private fun ModifiedFocusNode.clearChildFocus(): Boolean {
 }
 
 /**
- * Focusable children of this [focus node][ModifiedFocusNode] can use this function to request
+ * Focusable children of this [focus node][FocusModifier] can use this function to request
  * focus.
  *
  * @param childNode: The node that is requesting focus.
  * @return true if focus was granted, false otherwise.
  */
-private fun ModifiedFocusNode.requestFocusForChild(childNode: ModifiedFocusNode): Boolean {
+private fun FocusModifier.requestFocusForChild(childNode: FocusModifier): Boolean {
 
     // Only this node's children can ask for focus.
-    if (!focusableChildren(excludeDeactivated = false).contains(childNode)) {
+    if (childNode !in children) {
         error("Non child node cannot request focus.")
     }
 
@@ -236,7 +240,7 @@ private fun ModifiedFocusNode.requestFocusForChild(childNode: ModifiedFocusNode)
         // If this node is not [Active], we must gain focus first before granting it
         // to the requesting child.
         Inactive -> {
-            val focusParent = findParentFocusNode()
+            val focusParent = parent
             when {
                 // If this node is the root, request focus from the compose owner.
                 focusParent == null && requestFocusForOwner() -> {
@@ -264,6 +268,13 @@ private fun ModifiedFocusNode.requestFocusForChild(childNode: ModifiedFocusNode)
     }
 }
 
-private fun ModifiedFocusNode.requestFocusForOwner(): Boolean {
-    return layoutNode.owner?.requestFocus() ?: error("Owner not initialized.")
+private fun FocusModifier.requestFocusForOwner(): Boolean {
+    return layoutNodeWrapper?.layoutNode?.owner?.requestFocus() ?: error("Owner not initialized.")
+}
+
+/**
+ * Send the current [FocusModifier.focusState] to all [onFocusEvent] listeners.
+ */
+internal fun FocusModifier.sendOnFocusEvent() {
+    focusEventListener?.propagateFocusEvent()
 }

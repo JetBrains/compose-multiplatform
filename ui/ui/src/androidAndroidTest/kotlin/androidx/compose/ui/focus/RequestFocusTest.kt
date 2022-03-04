@@ -48,7 +48,7 @@ class RequestFocusTest {
 
         // Act.
         rule.runOnIdle {
-            focusModifier.focusNode.requestFocus()
+            focusModifier.requestFocus()
         }
 
         // Assert.
@@ -68,7 +68,7 @@ class RequestFocusTest {
 
         // Act.
         rule.runOnIdle {
-            focusModifier.focusNode.requestFocus()
+            focusModifier.requestFocus()
         }
 
         // Assert.
@@ -90,7 +90,7 @@ class RequestFocusTest {
 
         // Act.
         rule.runOnIdle {
-            focusModifier.focusNode.requestFocus()
+            focusModifier.requestFocus()
         }
 
         // Assert.
@@ -109,7 +109,7 @@ class RequestFocusTest {
 
         // Act.
         rule.runOnIdle {
-            focusModifier.focusNode.requestFocus()
+            focusModifier.requestFocus()
         }
     }
 
@@ -124,12 +124,12 @@ class RequestFocusTest {
             }
         }
         rule.runOnIdle {
-            focusModifier.focusedChild = childFocusModifier.focusNode
+            focusModifier.focusedChild = childFocusModifier
         }
 
         // Act.
         rule.runOnIdle {
-            focusModifier.focusNode.requestFocus()
+            focusModifier.requestFocus()
         }
 
         // Assert.
@@ -150,7 +150,7 @@ class RequestFocusTest {
 
         // Act.
         rule.runOnIdle {
-            focusModifier.focusNode.requestFocus()
+            focusModifier.requestFocus()
         }
     }
 
@@ -168,12 +168,12 @@ class RequestFocusTest {
             }
         }
         rule.runOnIdle {
-            focusModifier.focusedChild = childFocusModifier.focusNode
+            focusModifier.focusedChild = childFocusModifier
         }
 
         // Act.
         rule.runOnIdle {
-            focusModifier.focusNode.requestFocus()
+            focusModifier.requestFocus()
         }
 
         // Assert.
@@ -201,12 +201,12 @@ class RequestFocusTest {
             }
         }
         rule.runOnIdle {
-            focusModifier.focusedChild = childFocusModifier.focusNode
+            focusModifier.focusedChild = childFocusModifier
         }
 
         // Act.
         rule.runOnIdle {
-            focusModifier.focusNode.requestFocus()
+            focusModifier.requestFocus()
         }
 
         // Assert.
@@ -228,7 +228,7 @@ class RequestFocusTest {
 
         // Act.
         rule.runOnIdle {
-            rootFocusModifier.focusNode.requestFocus()
+            rootFocusModifier.requestFocus()
         }
 
         // Assert.
@@ -250,7 +250,7 @@ class RequestFocusTest {
 
         // Act.
         rule.runOnIdle {
-            rootFocusModifier.focusNode.requestFocus()
+            rootFocusModifier.requestFocus()
         }
 
         // Assert.
@@ -276,7 +276,7 @@ class RequestFocusTest {
 
         // Act.
         rule.runOnIdle {
-            focusModifier.focusNode.requestFocus()
+            focusModifier.requestFocus()
         }
 
         // Assert.
@@ -297,7 +297,7 @@ class RequestFocusTest {
 
         // Act.
         rule.runOnIdle {
-            rootFocusModifier.focusNode.requestFocus()
+            rootFocusModifier.requestFocus()
         }
 
         // Assert.
@@ -319,7 +319,7 @@ class RequestFocusTest {
 
         // Act.
         rule.runOnIdle {
-            rootFocusModifier.focusNode.requestFocus()
+            rootFocusModifier.requestFocus()
         }
 
         // Assert.
@@ -344,7 +344,7 @@ class RequestFocusTest {
 
         // Act.
         rule.runOnIdle {
-            parentFocusModifier.focusNode.requestFocus()
+            parentFocusModifier.requestFocus()
         }
 
         // Assert.
@@ -369,7 +369,7 @@ class RequestFocusTest {
 
         // Act.
         rule.runOnIdle {
-            childFocusModifier.focusNode.requestFocus()
+            childFocusModifier.requestFocus()
         }
         // Assert.
         rule.runOnIdle {
@@ -393,7 +393,7 @@ class RequestFocusTest {
 
         // Act.
         rule.runOnIdle {
-            childFocusModifier.focusNode.requestFocus()
+            childFocusModifier.requestFocus()
         }
 
         // Assert.
@@ -415,7 +415,7 @@ class RequestFocusTest {
 
         // After executing requestFocus, siblingNode will be 'Active'.
         rule.runOnIdle {
-            focusModifier.focusNode.requestFocus()
+            focusModifier.requestFocus()
         }
 
         // Assert.
@@ -436,12 +436,12 @@ class RequestFocusTest {
             }
         }
         rule.runOnIdle {
-            parentFocusModifier.focusedChild = focusModifier.focusNode
+            parentFocusModifier.focusedChild = focusModifier
         }
 
         // Act.
         rule.runOnIdle {
-            parentFocusModifier.focusNode.requestFocus()
+            parentFocusModifier.requestFocus()
         }
 
         // Assert.
@@ -462,12 +462,12 @@ class RequestFocusTest {
             }
         }
         rule.runOnIdle {
-            parentFocusModifier.focusedChild = focusModifier.focusNode
+            parentFocusModifier.focusedChild = focusModifier
         }
 
         // Act.
         rule.runOnIdle {
-            parentFocusModifier.focusNode.requestFocus()
+            parentFocusModifier.requestFocus()
         }
 
         // Assert.
@@ -490,12 +490,12 @@ class RequestFocusTest {
             }
         }
         rule.runOnIdle {
-            parentFocusModifier.focusedChild = siblingModifier.focusNode
+            parentFocusModifier.focusedChild = siblingModifier
         }
 
         // Act.
         rule.runOnIdle {
-            focusModifier.focusNode.requestFocus()
+            focusModifier.requestFocus()
         }
 
         // Assert.
@@ -519,12 +519,12 @@ class RequestFocusTest {
             }
         }
         rule.runOnIdle {
-            parentFocusModifier.focusedChild = siblingModifier.focusNode
+            parentFocusModifier.focusedChild = siblingModifier
         }
 
         // Act.
         rule.runOnIdle {
-            focusModifier.focusNode.requestFocus()
+            focusModifier.requestFocus()
         }
 
         // Assert.
@@ -554,8 +554,8 @@ class RequestFocusTest {
             }
         }
         rule.runOnIdle {
-            grandParentModifier.focusedChild = auntModifier.focusNode
-            auntModifier.focusedChild = cousinModifier.focusNode
+            grandParentModifier.focusedChild = auntModifier
+            auntModifier.focusedChild = cousinModifier
         }
 
         // Verify Setup.
@@ -566,7 +566,7 @@ class RequestFocusTest {
 
         // Act.
         rule.runOnIdle {
-            focusModifier.focusNode.requestFocus()
+            focusModifier.requestFocus()
         }
 
         // Assert.
@@ -592,7 +592,7 @@ class RequestFocusTest {
 
         // Act.
         rule.runOnIdle {
-            focusModifier.focusNode.requestFocus()
+            focusModifier.requestFocus()
         }
 
         // Assert.

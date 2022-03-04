@@ -25,7 +25,6 @@ import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.modifier.modifierLocalOf
-import androidx.compose.ui.node.ModifiedFocusNode
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
@@ -216,7 +215,7 @@ internal class FocusPropertiesModifier(
     }
 }
 
-internal fun ModifiedFocusNode.setUpdatedProperties(properties: FocusProperties) {
+internal fun FocusModifier.setUpdatedProperties(properties: FocusProperties) {
     if (properties.canFocus) activateNode() else deactivateNode()
 }
 
@@ -245,11 +244,12 @@ internal fun FocusProperties.clear() {
 }
 
 internal fun FocusModifier.refreshFocusProperties() {
+    val layoutNodeWrapper = layoutNodeWrapper ?: return
     focusProperties.clear()
-    focusNode.layoutNode.owner?.snapshotObserver?.observeReads(this,
+    layoutNodeWrapper.layoutNode.owner?.snapshotObserver?.observeReads(this,
         FocusModifier.RefreshFocusProperties
     ) {
         focusPropertiesModifier?.calculateProperties(focusProperties)
     }
-    focusNode.setUpdatedProperties(focusProperties)
+    setUpdatedProperties(focusProperties)
 }

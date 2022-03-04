@@ -17,7 +17,11 @@
 package androidx.compose.ui.input.key
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusModifier
+import androidx.compose.ui.focus.ModifierLocalParentFocusModifier
 import androidx.compose.ui.focus.findActiveFocusNode
+import androidx.compose.ui.modifier.ModifierLocalConsumer
+import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.node.ModifiedKeyInputNode
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.platform.inspectable
@@ -65,17 +69,23 @@ fun Modifier.onPreviewKeyEvent(onPreviewKeyEvent: (KeyEvent) -> Boolean): Modifi
 internal class KeyInputModifier(
     val onKeyEvent: ((KeyEvent) -> Boolean)?,
     val onPreviewKeyEvent: ((KeyEvent) -> Boolean)?
-) : Modifier.Element {
+) : Modifier.Element, ModifierLocalConsumer {
     lateinit var keyInputNode: ModifiedKeyInputNode
+    private var focusModifier: FocusModifier? = null
 
     fun processKeyInput(keyEvent: KeyEvent): Boolean {
-        val activeKeyInputNode = keyInputNode.findPreviousFocusWrapper()
+        val activeKeyInputNode = focusModifier
             ?.findActiveFocusNode()
+            ?.layoutNodeWrapper
             ?.findLastKeyInputWrapper()
             ?: error("KeyEvent can't be processed because this key input node is not active.")
         return with(activeKeyInputNode) {
             val consumed = propagatePreviewKeyEvent(keyEvent)
             if (consumed) true else propagateKeyEvent(keyEvent)
         }
+    }
+
+    override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) = with(scope) {
+        focusModifier = ModifierLocalParentFocusModifier.current
     }
 }

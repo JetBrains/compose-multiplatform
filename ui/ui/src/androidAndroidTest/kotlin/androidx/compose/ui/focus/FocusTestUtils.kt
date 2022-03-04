@@ -96,7 +96,7 @@ fun IterableSubject.isExactly(vararg expected: Any?) {
  */
 internal fun Modifier.focusTarget(focusModifier: FocusModifier) = composed {
     SideEffect {
-        focusModifier.focusNode.sendOnFocusEvent()
+        focusModifier.sendOnFocusEvent()
     }
     this.then(focusModifier).then(ResetFocusModifierLocals)
 }

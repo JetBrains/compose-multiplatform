@@ -17,7 +17,6 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.focus.requestFocus
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.semantics.AccessibilityAction
@@ -351,8 +350,8 @@ internal class ComposeAccessible(
 
         override fun requestFocus() {
             if (focused == false) {
-                semanticsNode.layoutNode.outerLayoutNodeWrapper.findLastFocusWrapper()
-                    ?.requestFocus()
+                semanticsNode.unmergedConfig.getOrNull(SemanticsActions.RequestFocus)
+                    ?.action?.invoke()
             }
         }
 

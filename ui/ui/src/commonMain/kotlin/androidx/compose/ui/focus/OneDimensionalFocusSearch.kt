@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.focus
 
+import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.ui.focus.FocusDirection.Companion.Next
 import androidx.compose.ui.focus.FocusDirection.Companion.Previous
 import androidx.compose.ui.focus.FocusStateImpl.Active
@@ -24,25 +25,23 @@ import androidx.compose.ui.focus.FocusStateImpl.Captured
 import androidx.compose.ui.focus.FocusStateImpl.Deactivated
 import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
-import androidx.compose.ui.node.ModifiedFocusNode
-import androidx.compose.ui.util.fastAny
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 private const val InvalidFocusDirection = "This function should only be used for 1-D focus search"
 private const val NoActiveChild = "ActiveParent must have a focusedChild"
 
-internal fun ModifiedFocusNode.oneDimensionalFocusSearch(
+internal fun FocusModifier.oneDimensionalFocusSearch(
     direction: FocusDirection,
-    onFound: (ModifiedFocusNode) -> Boolean
+    onFound: (FocusModifier) -> Boolean
 ): Boolean = when (direction) {
     Next -> forwardFocusSearch(onFound)
     Previous -> backwardFocusSearch(onFound)
     else -> error(InvalidFocusDirection)
 }
 
-private fun ModifiedFocusNode.forwardFocusSearch(
-    onFound: (ModifiedFocusNode) -> Boolean
+private fun FocusModifier.forwardFocusSearch(
+    onFound: (FocusModifier) -> Boolean
 ): Boolean = when (focusState) {
     ActiveParent, DeactivatedParent -> {
         val focusedChild = focusedChild ?: error(NoActiveChild)
@@ -52,8 +51,8 @@ private fun ModifiedFocusNode.forwardFocusSearch(
     Inactive -> onFound.invoke(this)
 }
 
-private fun ModifiedFocusNode.backwardFocusSearch(
-    onFound: (ModifiedFocusNode) -> Boolean
+private fun FocusModifier.backwardFocusSearch(
+    onFound: (FocusModifier) -> Boolean
 ): Boolean = when (focusState) {
     ActiveParent, DeactivatedParent -> {
         val focusedChild = focusedChild ?: error(NoActiveChild)
@@ -88,24 +87,20 @@ private fun ModifiedFocusNode.backwardFocusSearch(
 }
 
 // Search for the next sibling that should be granted focus.
-private fun ModifiedFocusNode.searchChildren(
-    focusedItem: ModifiedFocusNode,
+private fun FocusModifier.searchChildren(
+    focusedItem: FocusModifier,
     direction: FocusDirection,
-    onFound: (ModifiedFocusNode) -> Boolean
+    onFound: (FocusModifier) -> Boolean
 ): Boolean {
     check(focusState == ActiveParent || focusState == DeactivatedParent) {
         "This function should only be used within a parent that has focus."
     }
 
-    // TODO(b/192681045): Instead of fetching the children and then iterating on them, add a
-    //  forEachFocusableChild() function that does not allocate a list.
-    val focusableChildren = focusableChildren(excludeDeactivated = false)
-
     when (direction) {
-        Next -> focusableChildren.forEachItemAfter(focusedItem) { child ->
+        Next -> children.forEachItemAfter(focusedItem) { child ->
             if (child.forwardFocusSearch(onFound)) return true
         }
-        Previous -> focusableChildren.forEachItemBefore(focusedItem) { child ->
+        Previous -> children.forEachItemBefore(focusedItem) { child ->
             if (child.backwardFocusSearch(onFound)) return true
         }
         else -> error(InvalidFocusDirection)
@@ -120,21 +115,25 @@ private fun ModifiedFocusNode.searchChildren(
     return onFound.invoke(this)
 }
 
-private fun ModifiedFocusNode.pickChildForForwardSearch(
-    onFound: (ModifiedFocusNode) -> Boolean
-): Boolean = focusableChildren(excludeDeactivated = false)
-    .fastAny { it.forwardFocusSearch(onFound) }
+private fun FocusModifier.pickChildForForwardSearch(
+    onFound: (FocusModifier) -> Boolean
+): Boolean = children.any { it.forwardFocusSearch(onFound) }
 
-private fun ModifiedFocusNode.pickChildForBackwardSearch(
-    onFound: (ModifiedFocusNode) -> Boolean
-): Boolean = focusableChildren(excludeDeactivated = false)
-    .asReversed()
-    .fastAny { it.backwardFocusSearch(onFound) }
+private fun FocusModifier.pickChildForBackwardSearch(
+    onFound: (FocusModifier) -> Boolean
+): Boolean {
+    children.forEachReversed {
+        if (it.backwardFocusSearch(onFound)) {
+            return true
+        }
+    }
+    return false
+}
 
-private fun ModifiedFocusNode.isRoot() = findParentFocusNode() == null
+private fun FocusModifier.isRoot() = parent == null
 
 @OptIn(ExperimentalContracts::class)
-private inline fun <T> List<T>.forEachItemAfter(item: T, action: (T) -> Unit) {
+private inline fun <T> MutableVector<T>.forEachItemAfter(item: T, action: (T) -> Unit) {
     contract { callsInPlace(action) }
     var itemFound = false
     for (index in indices) {
@@ -148,7 +147,7 @@ private inline fun <T> List<T>.forEachItemAfter(item: T, action: (T) -> Unit) {
 }
 
 @OptIn(ExperimentalContracts::class)
-private inline fun <T> List<T>.forEachItemBefore(item: T, action: (T) -> Unit) {
+private inline fun <T> MutableVector<T>.forEachItemBefore(item: T, action: (T) -> Unit) {
     contract { callsInPlace(action) }
     var itemFound = false
     for (index in indices.reversed()) {

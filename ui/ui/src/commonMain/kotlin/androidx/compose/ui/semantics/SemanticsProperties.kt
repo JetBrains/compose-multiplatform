@@ -298,6 +298,11 @@ object SemanticsActions {
     val Dismiss = ActionPropertyKey<() -> Boolean>("Dismiss")
 
     /**
+     * @see SemanticsPropertyReceiver.requestFocus
+     */
+    val RequestFocus = ActionPropertyKey<() -> Boolean>("RequestFocus")
+
+    /**
      * @see SemanticsPropertyReceiver.customActions
      */
     val CustomActions =
@@ -1061,4 +1066,14 @@ fun SemanticsPropertyReceiver.dismiss(
     action: (() -> Boolean)?
 ) {
     this[SemanticsActions.Dismiss] = AccessibilityAction(label, action)
+}
+
+/**
+ * Action that gives input focus to this node.
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.RequestFocus] is called.
+ */
+fun SemanticsPropertyReceiver.requestFocus(label: String? = null, action: (() -> Boolean)?) {
+    this[SemanticsActions.RequestFocus] = AccessibilityAction(label, action)
 }

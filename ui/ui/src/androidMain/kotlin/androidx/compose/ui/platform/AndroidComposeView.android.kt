@@ -75,7 +75,7 @@ import androidx.compose.ui.focus.FocusDirection.Companion.Right
 import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
-import androidx.compose.ui.focus.FocusTag
+import androidx.compose.ui.focus.focusRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
@@ -115,7 +115,6 @@ import androidx.compose.ui.input.pointer.ProcessResult
 import androidx.compose.ui.input.rotary.RotaryScrollEvent
 import androidx.compose.ui.input.rotary.onRotaryScrollEvent
 import androidx.compose.ui.layout.RootMeasurePolicy
-import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.UsageByParent
@@ -537,7 +536,7 @@ internal class AndroidComposeView(context: Context) :
      * system for accurate focus searching and so ViewRootImpl will scroll correctly.
      */
     override fun getFocusedRect(rect: Rect) {
-        _focusManager.getActiveFocusModifier()?.focusNode?.boundsInRoot()?.let {
+        _focusManager.getActiveFocusModifier()?.focusRect()?.let {
             rect.left = it.left.roundToInt()
             rect.top = it.top.roundToInt()
             rect.right = it.right.roundToInt()
@@ -1597,6 +1596,7 @@ internal class AndroidComposeView(context: Context) :
     override fun shouldDelayChildPressedState(): Boolean = false
 
     companion object {
+        private const val FocusTag = "Compose Focus"
         private const val MaximumLayerCacheSize = 10
         private var systemPropertiesClass: Class<*>? = null
         private var getBooleanMethod: Method? = null
