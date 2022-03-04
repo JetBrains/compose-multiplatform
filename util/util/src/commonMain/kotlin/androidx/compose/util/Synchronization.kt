@@ -18,8 +18,10 @@ package androidx.compose.util
 
 internal class SynchronizedObject : kotlinx.atomicfu.locks.SynchronizedObject()
 
+@Suppress("CONFLICTING_OVERLOADS")
 internal fun createSynchronizedObject() = SynchronizedObject()
 
+@Suppress("CONFLICTING_OVERLOADS")
 @PublishedApi
 internal inline fun <R> synchronized(lock: SynchronizedObject, block: () -> R): R =
     kotlinx.atomicfu.locks.synchronized(lock, block)

@@ -86,13 +86,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
         }
     }
-} else {
-    android {
-        sourceSets.main.java {
-           srcDirs += "../../util/util/src/commonMain/kotlin"
-           srcDirs += "../../util/util/src/jvmMain/kotlin"
-        }
-    }
 }
 
 androidx {
