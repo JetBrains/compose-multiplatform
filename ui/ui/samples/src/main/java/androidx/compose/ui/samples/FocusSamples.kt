@@ -39,7 +39,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusOrder
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
@@ -169,7 +168,8 @@ fun CustomFocusOrderSample() {
         Row(Modifier.fillMaxWidth(), Arrangement.SpaceEvenly) {
             Box(
                 Modifier
-                    .focusOrder(item1) {
+                    .focusRequester(item1)
+                    .focusProperties {
                         next = item2
                         right = item2
                         down = item3
@@ -179,7 +179,8 @@ fun CustomFocusOrderSample() {
             )
             Box(
                 Modifier
-                    .focusOrder(item2) {
+                    .focusRequester(item2)
+                    .focusProperties {
                         next = item3
                         right = item1
                         down = item4
@@ -190,20 +191,24 @@ fun CustomFocusOrderSample() {
         }
         Row(Modifier.fillMaxWidth(), Arrangement.SpaceEvenly) {
             Box(
-                Modifier.focusOrder(item3) {
-                    next = item4
-                    right = item4
-                    up = item1
-                    previous = item2
-                }
+                Modifier
+                    .focusRequester(item3)
+                    .focusProperties {
+                        next = item4
+                        right = item4
+                        up = item1
+                        previous = item2
+                    }
             )
             Box(
-                Modifier.focusOrder(item4) {
-                    next = item1
-                    left = item3
-                    up = item2
-                    previous = item3
-                }
+                Modifier
+                    .focusRequester(item4)
+                    .focusProperties {
+                        next = item1
+                        left = item3
+                        up = item2
+                        previous = item3
+                    }
             )
         }
     }

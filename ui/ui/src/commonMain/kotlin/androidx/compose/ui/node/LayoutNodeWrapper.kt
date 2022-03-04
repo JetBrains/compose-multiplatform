@@ -20,7 +20,6 @@ package androidx.compose.ui.node
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusOrder
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.findFocusableChildren
 import androidx.compose.ui.geometry.MutableRect
@@ -989,15 +988,6 @@ internal abstract class LayoutNodeWrapper(
      */
     open fun invalidateConsumersOf(local: ModifierLocal<*>) {
         wrapped?.invalidateConsumersOf(local)
-    }
-
-    /**
-     * Search up the component tree for any parent/parents that have specified a custom focus order.
-     * Allowing parents higher up the hierarchy to overwrite the focus order specified by their
-     * children.
-     */
-    open fun populateFocusOrder(focusOrder: FocusOrder) {
-        wrappedBy?.populateFocusOrder(focusOrder)
     }
 
     /**

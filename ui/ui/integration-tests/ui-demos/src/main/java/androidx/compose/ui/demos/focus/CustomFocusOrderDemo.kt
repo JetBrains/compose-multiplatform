@@ -34,7 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusOrder
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.focus.onFocusChanged
@@ -60,41 +60,49 @@ fun CustomFocusOrderDemo() {
             Row(Modifier.fillMaxWidth(), SpaceEvenly) {
                 FocusableText(
                     text = "1",
-                    modifier = Modifier.focusOrder(item1) {
-                        next = item2
-                        right = item2
-                        down = item3
-                        previous = item4
-                    }
+                    modifier = Modifier
+                        .focusRequester(item1)
+                        .focusProperties {
+                            next = item2
+                            right = item2
+                            down = item3
+                            previous = item4
+                        }
                 )
                 FocusableText(
                     text = "2",
-                    modifier = Modifier.focusOrder(item2) {
-                        next = item3
-                        left = item1
-                        down = item4
-                        previous = item1
-                    }
+                    modifier = Modifier
+                        .focusRequester(item2)
+                        .focusProperties {
+                            next = item3
+                            left = item1
+                            down = item4
+                            previous = item1
+                        }
                 )
             }
             Row(Modifier.fillMaxWidth(), SpaceEvenly) {
                 FocusableText(
                     text = "3",
-                    modifier = Modifier.focusOrder(item3) {
-                        next = item4
-                        right = item4
-                        up = item1
-                        previous = item2
-                    }
+                    modifier = Modifier
+                        .focusRequester(item3)
+                        .focusProperties {
+                            next = item4
+                            right = item4
+                            up = item1
+                            previous = item2
+                        }
                 )
                 FocusableText(
                     text = "4",
-                    modifier = Modifier.focusOrder(item4) {
-                        next = item1
-                        left = item3
-                        up = item2
-                        previous = item3
-                    }
+                    modifier = Modifier
+                        .focusRequester(item4)
+                        .focusProperties {
+                            next = item1
+                            left = item3
+                            up = item2
+                            previous = item3
+                        }
                 )
             }
             DisposableEffect(Unit) {

@@ -18,7 +18,6 @@ package androidx.compose.ui.node
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusModifier
-import androidx.compose.ui.focus.FocusOrder
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.FocusStateImpl
 import androidx.compose.ui.focus.FocusStateImpl.Active
@@ -123,9 +122,5 @@ internal class ModifiedFocusNode(
 
     override fun propagateFocusEvent(focusState: FocusState) {
         // Do nothing. Stop propagating the focus change (since we hit another focus node).
-    }
-
-    override fun populateFocusOrder(focusOrder: FocusOrder) {
-        // Do nothing. Stop propagating the fetchFocusOrder (since we hit another focus node).
     }
 }
