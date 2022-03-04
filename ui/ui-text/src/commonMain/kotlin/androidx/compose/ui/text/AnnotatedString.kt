@@ -687,7 +687,7 @@ internal expect fun AnnotatedString.transform(
  */
 inline fun <R : Any> Builder.withStyle(
     style: SpanStyle,
-    crossinline block: Builder.() -> R
+    block: Builder.() -> R
 ): R {
     val index = pushStyle(style)
     return try {
