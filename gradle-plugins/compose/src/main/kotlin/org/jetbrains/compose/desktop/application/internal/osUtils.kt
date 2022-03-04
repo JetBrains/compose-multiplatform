@@ -68,6 +68,21 @@ internal object MacUtils {
     val xcrun: File by lazy {
         File("/usr/bin/xcrun").checkExistingFile()
     }
+
+    val make: File by lazy {
+        File("/usr/bin/make").checkExistingFile()
+    }
+
+    val open: File by lazy {
+        File("/usr/bin/open").checkExistingFile()
+    }
+
+}
+
+internal object UnixUtils {
+    val git: File by lazy {
+        File("/usr/bin/git").checkExistingFile()
+    }
 }
 
 internal fun jvmToolFile(toolName: String, javaHome: Provider<String>): File {

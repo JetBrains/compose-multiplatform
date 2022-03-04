@@ -4,6 +4,7 @@ import java.util.zip.ZipFile
 
 plugins {
     kotlin("jvm")
+    kotlin("plugin.serialization")
     id("com.gradle.plugin-publish")
     id("java-gradle-plugin")
     id("maven-publish")
@@ -66,6 +67,10 @@ dependencies {
 
     // include relocated download task to avoid potential runtime conflicts
     embedded("de.undercouch:gradle-download-task:4.1.1")
+
+    embedded("org.jetbrains.kotlinx:kotlinx-serialization-json:${BuildProperties.serializationVersion}")
+    embedded("org.jetbrains.kotlinx:kotlinx-serialization-core:${BuildProperties.serializationVersion}")
+    embedded("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:${BuildProperties.serializationVersion}")
     embedded(project(":preview-rpc"))
 }
 

@@ -11,6 +11,7 @@ object BuildProperties {
     const val group = "org.jetbrains.compose"
     const val website = "https://www.jetbrains.com/lp/compose/"
     const val vcs = "https://github.com/JetBrains/compose-jb"
+    const val serializationVersion = "1.2.1"
     fun composeVersion(project: Project): String =
         System.getenv("COMPOSE_GRADLE_PLUGIN_COMPOSE_VERSION")
             ?: project.findProperty("compose.version") as String
