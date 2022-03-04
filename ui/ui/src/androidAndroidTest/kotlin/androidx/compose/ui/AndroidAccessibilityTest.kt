@@ -904,6 +904,7 @@ class AndroidAccessibilityTest {
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Suppress("DEPRECATION")
     fun testAddExtraDataToAccessibilityNodeInfo_notMerged() {
         val tag = "TextField"
         lateinit var textLayoutResult: TextLayoutResult
