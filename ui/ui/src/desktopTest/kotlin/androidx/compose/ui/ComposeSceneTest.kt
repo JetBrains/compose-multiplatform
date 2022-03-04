@@ -44,7 +44,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState
-import androidx.compose.ui.focus.focusOrder
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -554,7 +555,8 @@ class ComposeSceneTest {
                     maxLines = 1,
                     modifier = Modifier
                         .onFocusChanged { field1FocusState = it }
-                        .focusOrder(focusItem1) {
+                        .focusRequester(focusItem1)
+                        .focusProperties {
                             next = focusItem2
                         }
                 )
@@ -564,7 +566,8 @@ class ComposeSceneTest {
                     maxLines = 1,
                     modifier = Modifier
                         .onFocusChanged { field2FocusState = it }
-                        .focusOrder(focusItem2) {
+                        .focusRequester(focusItem2)
+                        .focusProperties {
                             previous = focusItem1
                         }
                 )

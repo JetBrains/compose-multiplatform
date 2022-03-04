@@ -21,7 +21,8 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusEventModifier
 import androidx.compose.ui.focus.FocusModifier
-import androidx.compose.ui.focus.FocusOrderModifier
+import androidx.compose.ui.focus.FocusOrderToProperties
+import androidx.compose.ui.focus.FocusPropertiesModifier
 import androidx.compose.ui.focus.FocusRequesterModifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
@@ -52,6 +53,7 @@ import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRelayout
 import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRemeasure
 import androidx.compose.ui.node.LayoutNode.LayoutState.Ready
 import androidx.compose.ui.platform.ViewConfiguration
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.platform.nativeClass
 import androidx.compose.ui.platform.simpleIdentityToString
 import androidx.compose.ui.semantics.SemanticsEntity
@@ -707,8 +709,21 @@ internal class LayoutNode(
                         .initialize()
                         .assignChained(toWrap)
                 }
-                if (mod is FocusOrderModifier) {
-                    wrapper = ModifiedFocusOrderNode(wrapper, mod)
+                @Suppress("DEPRECATION")
+                if (mod is androidx.compose.ui.focus.FocusOrderModifier) {
+                    @Suppress("DEPRECATION")
+                    val scope = FocusOrderToProperties(mod::populateFocusOrder)
+                    val impl = FocusPropertiesModifier(
+                        focusPropertiesScope = scope,
+                        inspectorInfo = debugInspectorInfo {
+                            name = "focusProperties"
+                            properties["scope"] = scope
+                        }
+                    )
+                    wrapper = ModifierLocalProviderNode(wrapper, impl)
+                        .initialize()
+                        .assignChained(toWrap)
+                    wrapper = ModifierLocalConsumerNode(wrapper, impl)
                         .initialize()
                         .assignChained(toWrap)
                 }

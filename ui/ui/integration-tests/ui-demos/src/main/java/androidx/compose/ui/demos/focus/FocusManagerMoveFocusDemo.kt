@@ -43,7 +43,7 @@ import androidx.compose.ui.focus.FocusDirection.Companion.Previous
 import androidx.compose.ui.focus.FocusDirection.Companion.Right
 import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusOrder
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.focus.onFocusChanged
@@ -84,7 +84,8 @@ fun FocusManagerMoveFocusDemo() {
                 FocusableText(
                     text = "1",
                     modifier = Modifier
-                        .focusOrder(item1) {
+                        .focusRequester(item1)
+                        .focusProperties {
                             previous = item4
                             next = item2
                             right = item2
@@ -94,7 +95,8 @@ fun FocusManagerMoveFocusDemo() {
                 FocusableText(
                     text = "2",
                     modifier = Modifier
-                        .focusOrder(item2) {
+                        .focusRequester(item2)
+                        .focusProperties {
                             previous = item1
                             next = item3
                             left = item1
@@ -106,7 +108,8 @@ fun FocusManagerMoveFocusDemo() {
                 FocusableText(
                     text = "3",
                     modifier = Modifier
-                        .focusOrder(item3) {
+                        .focusRequester(item3)
+                        .focusProperties {
                             previous = item2
                             next = item4
                             right = item4
@@ -116,7 +119,8 @@ fun FocusManagerMoveFocusDemo() {
                 FocusableText(
                     text = "4",
                     modifier = Modifier
-                        .focusOrder(item4) {
+                        .focusRequester(item4)
+                        .focusProperties {
                             previous = item3
                             next = item1
                             left = item3

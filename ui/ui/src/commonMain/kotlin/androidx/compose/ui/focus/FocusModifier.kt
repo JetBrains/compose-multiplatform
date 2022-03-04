@@ -30,6 +30,7 @@ import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.modifier.ProvidableModifierLocal
 import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.node.ModifiedFocusNode
+import androidx.compose.ui.node.OwnerScope
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.NoInspectorInfo
@@ -46,6 +47,7 @@ internal class FocusModifier(
     //  using this internal constructor.
     inspectorInfo: InspectorInfo.() -> Unit = NoInspectorInfo
 ) : ModifierLocalConsumer,
+    OwnerScope,
     InspectorValueInfo(inspectorInfo) {
     // TODO(b/188684110): Move focusState and focusedChild to ModifiedFocusNode and make this
     //  modifier stateless.
@@ -56,6 +58,8 @@ internal class FocusModifier(
     private var rotaryScrollParent: FocusAwareInputModifier<RotaryScrollEvent>? = null
     lateinit var focusNode: ModifiedFocusNode
     lateinit var modifierLocalReadScope: ModifierLocalReadScope
+    var focusPropertiesModifier: FocusPropertiesModifier? = null
+    val focusProperties: FocusProperties = FocusPropertiesImpl()
 
     // Reading the FocusProperties ModifierLocal.
     override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) {
@@ -67,13 +71,23 @@ internal class FocusModifier(
             rotaryScrollParent = ModifierLocalRotaryScrollParent.current
 
             // Update the focus node with the current focus properties.
-            focusNode.setUpdatedProperties(ModifierLocalFocusProperties.current)
+            focusPropertiesModifier = ModifierLocalFocusProperties.current
+            refreshFocusProperties()
         }
     }
 
     @ExperimentalComposeUiApi
     fun propagateRotaryEvent(event: RotaryScrollEvent): Boolean {
         return rotaryScrollParent?.propagateFocusAwareEvent(event) ?: false
+    }
+
+    override val isValid: Boolean
+        get() = focusNode.isAttached
+
+    companion object {
+        val RefreshFocusProperties: (FocusModifier) -> Unit = { focusModifier ->
+            focusModifier.refreshFocusProperties()
+        }
     }
 }
 
@@ -131,8 +145,10 @@ internal val ModifierLocalHasFocusEventListener = modifierLocalOf { false }
  *         Modifier
  *             .focusRequester(item1)
  *             .onFocusChanged { ... }
- *             .focusOrder { next = item2 }
- *             .focusProperties { canFocus = false }
+ *             .focusProperties {
+ *                 canFocus = false
+ *                 next = item2
+ *             }
  *             .focusTarget()          // focusModifier1
  *     ) {
  *         Box(
@@ -140,7 +156,7 @@ internal val ModifierLocalHasFocusEventListener = modifierLocalOf { false }
  *         )
  *     }
  *
- * Here, the focusRequester, onFocusChanged, focusOrder and focusProperties modifiers provide
+ * Here, the focusRequester, onFocusChanged, and focusProperties modifiers provide
  * modifier local values that are intended for focusModifier1.
  *
  * We don't want these modifier locals to be read by focusModifier2.
@@ -151,11 +167,12 @@ internal val ModifierLocalHasFocusEventListener = modifierLocalOf { false }
 internal val ResetFocusModifierLocals: Modifier = Modifier
     // Reset the FocusProperties modifier local.
     .then(
-        object : ModifierLocalProvider<FocusProperties> {
-            override val key: ProvidableModifierLocal<FocusProperties>
+        @Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+        object : ModifierLocalProvider<FocusPropertiesModifier?> {
+            override val key: ProvidableModifierLocal<FocusPropertiesModifier?>
                 get() = ModifierLocalFocusProperties
-            override val value: FocusProperties
-                get() = DefaultFocusProperties
+            override val value: FocusPropertiesModifier?
+                get() = null
         }
 
     )
