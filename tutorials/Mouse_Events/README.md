@@ -236,7 +236,7 @@ fun main() = singleWindowApplication {
 <img alt="Application running" src="mouse_event.gif" height="500" />
 
 If you need to listen left/right clicks simultaneously, you should listen for raw events:
-```
+```kotlin
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
@@ -282,7 +282,7 @@ fun main() = singleWindowApplication {
 ### Swing interoperability
 
 Compose for Desktop uses Swing underneath and allows to access raw AWT events:
-```
+```kotlin
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
