@@ -23,7 +23,8 @@ dependencies {
     implementation(project(":compose:ui:ui-viewbinding"))
 
     implementation("androidx.fragment:fragment-ktx:1.2.5")
-    implementation("androidx.recyclerview:recyclerview:1.1.0")
+    implementation(project(":recyclerview:recyclerview"))
+    implementation(project(":customview:customview-poolingcontainer"))
     implementation("androidx.viewpager2:viewpager2:1.0.0")
 }
 
