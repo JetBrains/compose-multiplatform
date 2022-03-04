@@ -2382,11 +2382,18 @@ package androidx.compose.ui.platform {
   }
 
   public static final class ViewCompositionStrategy.Companion {
+    method public androidx.compose.ui.platform.ViewCompositionStrategy getDefault();
+    property public final androidx.compose.ui.platform.ViewCompositionStrategy Default;
   }
 
   public static final class ViewCompositionStrategy.DisposeOnDetachedFromWindow implements androidx.compose.ui.platform.ViewCompositionStrategy {
     method public kotlin.jvm.functions.Function0<kotlin.Unit> installFor(androidx.compose.ui.platform.AbstractComposeView view);
     field public static final androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnDetachedFromWindow INSTANCE;
+  }
+
+  public static final class ViewCompositionStrategy.DisposeOnDetachedFromWindowIfNotInPoolingContainer implements androidx.compose.ui.platform.ViewCompositionStrategy {
+    method public kotlin.jvm.functions.Function0<kotlin.Unit> installFor(androidx.compose.ui.platform.AbstractComposeView view);
+    field public static final androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnDetachedFromWindowIfNotInPoolingContainer INSTANCE;
   }
 
   public static final class ViewCompositionStrategy.DisposeOnLifecycleDestroyed implements androidx.compose.ui.platform.ViewCompositionStrategy {
