@@ -636,6 +636,7 @@ class AndroidViewTest {
             return bundle
         }
 
+        @Suppress("DEPRECATION")
         override fun onRestoreInstanceState(state: Parcelable?) {
             super.onRestoreInstanceState((state as Bundle).getParcelable("superState"))
             onRestoredValue(state.getString(key)!!)
