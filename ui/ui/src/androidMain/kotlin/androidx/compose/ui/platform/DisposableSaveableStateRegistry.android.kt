@@ -160,6 +160,7 @@ private val AcceptableClasses = arrayOf(
     SizeF::class.java
 )
 
+@Suppress("DEPRECATION")
 private fun Bundle.toMap(): Map<String, List<Any?>>? {
     val map = mutableMapOf<String, List<Any?>>()
     this.keySet().forEach { key ->
