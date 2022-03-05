@@ -344,26 +344,22 @@ private object RenderNodeVerificationHelper28 {
 
     @androidx.annotation.DoNotInline
     fun getAmbientShadowColor(renderNode: RenderNode): Int {
-        @Suppress("UsePropertyAccessSyntax")
-        return renderNode.getAmbientShadowColor()
+        return renderNode.ambientShadowColor
     }
 
     @androidx.annotation.DoNotInline
     fun setAmbientShadowColor(renderNode: RenderNode, target: Int) {
-        @Suppress("UsePropertyAccessSyntax")
-        renderNode.setAmbientShadowColor(target)
+        renderNode.ambientShadowColor = target
     }
 
     @androidx.annotation.DoNotInline
     fun getSpotShadowColor(renderNode: RenderNode): Int {
-        @Suppress("UsePropertyAccessSyntax")
-        return renderNode.getSpotShadowColor()
+        return renderNode.spotShadowColor
     }
 
     @androidx.annotation.DoNotInline
     fun setSpotShadowColor(renderNode: RenderNode, target: Int) {
-        @Suppress("UsePropertyAccessSyntax")
-        renderNode.setSpotShadowColor(target)
+        renderNode.spotShadowColor = target
     }
 }
 

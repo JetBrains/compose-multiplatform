@@ -44,8 +44,6 @@ internal interface OwnedLayer {
         translationX: Float,
         translationY: Float,
         shadowElevation: Float,
-        ambientShadowColor: Color,
-        spotShadowColor: Color,
         rotationX: Float,
         rotationY: Float,
         rotationZ: Float,
@@ -54,6 +52,8 @@ internal interface OwnedLayer {
         shape: Shape,
         clip: Boolean,
         renderEffect: RenderEffect?,
+        ambientShadowColor: Color,
+        spotShadowColor: Color,
         layoutDirection: LayoutDirection,
         density: Density
     )

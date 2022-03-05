@@ -71,8 +71,8 @@ import androidx.compose.ui.unit.Constraints
         "shadow color parameters",
     replaceWith = ReplaceWith(
         "Modifier.graphicsLayer(scaleX, scaleY, alpha, translationX, translationY, " +
-            "shadowElevation, DefaultShadowColor, DefaultShadowColor, rotationX, rotationY, " +
-            "rotationZ, cameraDistance, transformOrigin, shape, clip, null)",
+            "shadowElevation, rotationX, rotationY, rotationZ, cameraDistance, transformOrigin, " +
+            "shape, clip, null, DefaultShadowColor, DefaultShadowColor)",
         "androidx.compose.ui.graphics"
     ),
     level = DeprecationLevel.HIDDEN
@@ -153,8 +153,8 @@ fun Modifier.graphicsLayer(
     "Replace with graphicsLayer that consumes shadow color parameters",
     replaceWith = ReplaceWith(
         "Modifier.graphicsLayer(scaleX, scaleY, alpha, translationX, translationY, " +
-            "shadowElevation, DefaultShadowColor, DefaultShadowColor, rotationX, rotationY, " +
-            "rotationZ, cameraDistance, transformOrigin, shape, clip, null)",
+            "shadowElevation, rotationX, rotationY, rotationZ, cameraDistance, transformOrigin, " +
+            "shape, clip, null, DefaultShadowColor, DefaultShadowColor)",
         "androidx.compose.ui.graphics"
     ),
     level = DeprecationLevel.HIDDEN
@@ -202,7 +202,8 @@ fun Modifier.graphicsLayer(
  * [graphicsLayer] can also be used to apply effects to content, such as scaling ([scaleX], [scaleY]),
  * rotation ([rotationX], [rotationY], [rotationZ]), opacity ([alpha]), shadow
  * ([shadowElevation], [shape]), clipping ([clip], [shape]), as well as altering the result of the
- * layer with [RenderEffect].
+ * layer with [RenderEffect]. Shadow color and ambient colors can be modified by configuring the
+ * [spotShadowColor] and [ambientShadowColor] respectively.
  *
  * Note that if you provide a non-zero [shadowElevation] and if the passed [shape] is concave the
  * shadow will not be drawn on Android versions less than 10.
@@ -225,8 +226,6 @@ fun Modifier.graphicsLayer(
  * @param translationX see [GraphicsLayerScope.translationX]
  * @param translationY see [GraphicsLayerScope.translationY]
  * @param shadowElevation see [GraphicsLayerScope.shadowElevation]
- * @param ambientShadowColor see [GraphicsLayerScope.ambientShadowColor]
- * @param spotShadowColor see [GraphicsLayerScope.spotShadowColor]
  * @param rotationX see [GraphicsLayerScope.rotationX]
  * @param rotationY see [GraphicsLayerScope.rotationY]
  * @param rotationZ see [GraphicsLayerScope.rotationZ]
@@ -235,6 +234,8 @@ fun Modifier.graphicsLayer(
  * @param shape see [GraphicsLayerScope.shape]
  * @param clip see [GraphicsLayerScope.clip]
  * @param renderEffect see [GraphicsLayerScope.renderEffect]
+ * @param ambientShadowColor see [GraphicsLayerScope.ambientShadowColor]
+ * @param spotShadowColor see [GraphicsLayerScope.spotShadowColor]
  */
 @Stable
 fun Modifier.graphicsLayer(
@@ -244,8 +245,6 @@ fun Modifier.graphicsLayer(
     translationX: Float = 0f,
     translationY: Float = 0f,
     shadowElevation: Float = 0f,
-    ambientShadowColor: Color = DefaultShadowColor,
-    spotShadowColor: Color = DefaultShadowColor,
     rotationX: Float = 0f,
     rotationY: Float = 0f,
     rotationZ: Float = 0f,
@@ -253,7 +252,9 @@ fun Modifier.graphicsLayer(
     transformOrigin: TransformOrigin = TransformOrigin.Center,
     shape: Shape = RectangleShape,
     clip: Boolean = false,
-    renderEffect: RenderEffect? = null
+    renderEffect: RenderEffect? = null,
+    ambientShadowColor: Color = DefaultShadowColor,
+    spotShadowColor: Color = DefaultShadowColor,
 ) = this.then(
     SimpleGraphicsLayerModifier(
         scaleX = scaleX,
@@ -280,8 +281,6 @@ fun Modifier.graphicsLayer(
             properties["translationX"] = translationX
             properties["translationY"] = translationY
             properties["shadowElevation"] = shadowElevation
-            properties["ambientShadowColor"] = ambientShadowColor
-            properties["spotShadowColor"] = spotShadowColor
             properties["rotationX"] = rotationX
             properties["rotationY"] = rotationY
             properties["rotationZ"] = rotationZ
@@ -290,6 +289,8 @@ fun Modifier.graphicsLayer(
             properties["shape"] = shape
             properties["clip"] = clip
             properties["renderEffect"] = renderEffect
+            properties["ambientShadowColor"] = ambientShadowColor
+            properties["spotShadowColor"] = spotShadowColor
         }
     )
 )
@@ -365,8 +366,6 @@ private class SimpleGraphicsLayerModifier(
     private val translationX: Float,
     private val translationY: Float,
     private val shadowElevation: Float,
-    private val ambientShadowColor: Color,
-    private val spotShadowColor: Color,
     private val rotationX: Float,
     private val rotationY: Float,
     private val rotationZ: Float,
@@ -375,6 +374,8 @@ private class SimpleGraphicsLayerModifier(
     private val shape: Shape,
     private val clip: Boolean,
     private val renderEffect: RenderEffect?,
+    private val ambientShadowColor: Color,
+    private val spotShadowColor: Color,
     inspectorInfo: InspectorInfo.() -> Unit
 ) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
 
@@ -385,8 +386,6 @@ private class SimpleGraphicsLayerModifier(
         translationX = this@SimpleGraphicsLayerModifier.translationX
         translationY = this@SimpleGraphicsLayerModifier.translationY
         shadowElevation = this@SimpleGraphicsLayerModifier.shadowElevation
-        ambientShadowColor = this@SimpleGraphicsLayerModifier.ambientShadowColor
-        spotShadowColor = this@SimpleGraphicsLayerModifier.spotShadowColor
         rotationX = this@SimpleGraphicsLayerModifier.rotationX
         rotationY = this@SimpleGraphicsLayerModifier.rotationY
         rotationZ = this@SimpleGraphicsLayerModifier.rotationZ
@@ -395,6 +394,8 @@ private class SimpleGraphicsLayerModifier(
         shape = this@SimpleGraphicsLayerModifier.shape
         clip = this@SimpleGraphicsLayerModifier.clip
         renderEffect = this@SimpleGraphicsLayerModifier.renderEffect
+        ambientShadowColor = this@SimpleGraphicsLayerModifier.ambientShadowColor
+        spotShadowColor = this@SimpleGraphicsLayerModifier.spotShadowColor
     }
 
     override fun MeasureScope.measure(
@@ -414,8 +415,6 @@ private class SimpleGraphicsLayerModifier(
         result = 31 * result + translationX.hashCode()
         result = 31 * result + translationY.hashCode()
         result = 31 * result + shadowElevation.hashCode()
-        result = 31 * result + ambientShadowColor.hashCode()
-        result = 31 * result + spotShadowColor.hashCode()
         result = 31 * result + rotationX.hashCode()
         result = 31 * result + rotationY.hashCode()
         result = 31 * result + rotationZ.hashCode()
@@ -424,6 +423,8 @@ private class SimpleGraphicsLayerModifier(
         result = 31 * result + shape.hashCode()
         result = 31 * result + clip.hashCode()
         result = 31 * result + renderEffect.hashCode()
+        result = 31 * result + ambientShadowColor.hashCode()
+        result = 31 * result + spotShadowColor.hashCode()
         return result
     }
 
@@ -435,8 +436,6 @@ private class SimpleGraphicsLayerModifier(
             translationX == otherModifier.translationX &&
             translationY == otherModifier.translationY &&
             shadowElevation == otherModifier.shadowElevation &&
-            ambientShadowColor == otherModifier.ambientShadowColor &&
-            spotShadowColor == otherModifier.spotShadowColor &&
             rotationX == otherModifier.rotationX &&
             rotationY == otherModifier.rotationY &&
             rotationZ == otherModifier.rotationZ &&
@@ -444,7 +443,9 @@ private class SimpleGraphicsLayerModifier(
             transformOrigin == otherModifier.transformOrigin &&
             shape == otherModifier.shape &&
             clip == otherModifier.clip &&
-            renderEffect == otherModifier.renderEffect
+            renderEffect == otherModifier.renderEffect &&
+            ambientShadowColor == otherModifier.ambientShadowColor &&
+            spotShadowColor == otherModifier.spotShadowColor
     }
 
     override fun toString(): String =
@@ -455,8 +456,6 @@ private class SimpleGraphicsLayerModifier(
             "translationX=$translationX, " +
             "translationY=$translationY, " +
             "shadowElevation=$shadowElevation, " +
-            "ambientShadowColor=$ambientShadowColor, " +
-            "spotShadowColor=$spotShadowColor, " +
             "rotationX=$rotationX, " +
             "rotationY=$rotationY, " +
             "rotationZ=$rotationZ, " +
@@ -464,5 +463,7 @@ private class SimpleGraphicsLayerModifier(
             "transformOrigin=$transformOrigin, " +
             "shape=$shape, " +
             "clip=$clip, " +
-            "renderEffect=$renderEffect)"
+            "renderEffect=$renderEffect, " +
+            "ambientShadowColor=$ambientShadowColor, " +
+            "spotShadowColor=$spotShadowColor)"
 }

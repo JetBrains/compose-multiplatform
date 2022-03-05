@@ -249,8 +249,6 @@ class AndroidLayoutDrawTest {
                 translationX = 0f,
                 translationY = 0f,
                 shadowElevation = 0f,
-                ambientShadowColor = DefaultShadowColor,
-                spotShadowColor = DefaultShadowColor,
                 rotationX = 0f,
                 rotationY = 0f,
                 rotationZ = 0f,
@@ -260,7 +258,9 @@ class AndroidLayoutDrawTest {
                 clip = true,
                 layoutDirection = LayoutDirection.Ltr,
                 density = Density(1f),
-                renderEffect = null
+                renderEffect = null,
+                ambientShadowColor = DefaultShadowColor,
+                spotShadowColor = DefaultShadowColor
             )
         }
         // Verify that the camera distance is applied properly even after accounting for

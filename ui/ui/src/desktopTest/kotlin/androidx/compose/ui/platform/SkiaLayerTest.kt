@@ -394,9 +394,9 @@ class SkiaLayerTest {
         renderEffect: RenderEffect? = null
     ) {
         updateLayerProperties(
-            scaleX, scaleY, alpha, translationX, translationY, shadowElevation,
-            ambientShadowColor, spotShadowColor, rotationX, rotationY, rotationZ, cameraDistance,
-            transformOrigin, shape, clip, renderEffect, LayoutDirection.Ltr, Density(1f, 1f)
+            scaleX, scaleY, alpha, translationX, translationY, shadowElevation, rotationX,
+            rotationY, rotationZ, cameraDistance, transformOrigin, shape, clip, renderEffect,
+            ambientShadowColor, spotShadowColor, LayoutDirection.Ltr, Density(1f, 1f)
         )
     }
 }

@@ -87,7 +87,13 @@ interface GraphicsLayerScope : Density {
      * Note that this parameter is only supported on Android 9 (Pie) and above. On older versions,
      * this property always returns [Color.Black] and setting new values is ignored.
      */
+    // Add default getter/setter implementation to avoid breaking api changes due to abstract
+    // method additions. ReusableGraphicsLayer is the only implementation anyway.
     var ambientShadowColor: Color
+        get() = DefaultShadowColor
+        // Keep the parameter name so current.txt maintains it for named parameter usage
+        @Suppress("UNUSED_PARAMETER")
+        set(ambientShadowColor) {}
 
     /**
      * Sets the color of the spot shadow that is drawn when [shadowElevation] > 0f.
@@ -102,7 +108,13 @@ interface GraphicsLayerScope : Density {
      * Note that this parameter is only supported on Android 9 (Pie) and above. On older versions,
      * this property always returns [Color.Black] and setting new values is ignored.
      */
+    // Add default getter/setter implementation to avoid breaking api changes due to abstract
+    // method additions. ReusableGraphicsLayer is the only implementation anyway.
     var spotShadowColor: Color
+        get() = DefaultShadowColor
+        // Keep the parameter name so current.txt maintains it for named parameter usage
+        @Suppress("UNUSED_PARAMETER")
+        set(spotShadowColor) {}
 
     /**
      * The rotation, in degrees, of the contents around the horizontal axis in degrees. Default

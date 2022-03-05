@@ -129,8 +129,6 @@ internal class ViewLayer(
         translationX: Float,
         translationY: Float,
         shadowElevation: Float,
-        ambientShadowColor: Color,
-        spotShadowColor: Color,
         rotationX: Float,
         rotationY: Float,
         rotationZ: Float,
@@ -139,6 +137,8 @@ internal class ViewLayer(
         shape: Shape,
         clip: Boolean,
         renderEffect: RenderEffect?,
+        ambientShadowColor: Color,
+        spotShadowColor: Color,
         layoutDirection: LayoutDirection,
         density: Density
     ) {
@@ -431,13 +431,11 @@ private object ViewLayerVerificationHelper28 {
 
     @androidx.annotation.DoNotInline
     fun setOutlineAmbientShadowColor(view: View, target: Int) {
-        @Suppress("UsePropertyAccessSyntax")
-        view.setOutlineAmbientShadowColor(target)
+        view.outlineAmbientShadowColor = target
     }
 
     @androidx.annotation.DoNotInline
     fun setOutlineSpotShadowColor(view: View, target: Int) {
-        @Suppress("UsePropertyAccessSyntax")
-        view.setOutlineSpotShadowColor(target)
+        view.outlineSpotShadowColor = target
     }
 }

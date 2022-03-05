@@ -150,8 +150,6 @@ internal class SkiaLayer(
         translationX: Float,
         translationY: Float,
         shadowElevation: Float,
-        ambientShadowColor: Color,
-        spotShadowColor: Color,
         rotationX: Float,
         rotationY: Float,
         rotationZ: Float,
@@ -160,6 +158,8 @@ internal class SkiaLayer(
         shape: Shape,
         clip: Boolean,
         renderEffect: RenderEffect?,
+        ambientShadowColor: Color,
+        spotShadowColor: Color,
         layoutDirection: LayoutDirection,
         density: Density
     ) {
@@ -174,10 +174,10 @@ internal class SkiaLayer(
         this.alpha = alpha
         this.clip = clip
         this.shadowElevation = shadowElevation
-        this.ambientShadowColor = ambientShadowColor
-        this.spotShadowColor = spotShadowColor
         this.density = density
         this.renderEffect = renderEffect
+        this.ambientShadowColor = ambientShadowColor
+        this.spotShadowColor = spotShadowColor
         outlineCache.shape = shape
         outlineCache.layoutDirection = layoutDirection
         outlineCache.density = density

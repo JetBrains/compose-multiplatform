@@ -53,7 +53,7 @@ import androidx.compose.ui.unit.dp
     "Replace with shadow which accepts ambientColor and spotColor parameters",
     ReplaceWith(
         "Modifier.shadow(elevation, shape, clip, DefaultShadowColor, DefaultShadowColor)",
-        "androidx.compose.ui.graphics"
+        "androidx.compose.ui.draw"
     ),
     DeprecationLevel.HIDDEN
 )
