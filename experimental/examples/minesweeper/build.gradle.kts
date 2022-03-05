@@ -161,7 +161,7 @@ compose.experimental {
                 device = IOSDevices.IPHONE_8
                 buildConfiguration = "Debug" // or "Release"
             }
-            simulator("IPad) {
+            simulator("IPad") {
                 //Usage: ./gradlew iosDeployIPad
                 device = IOSDevices.IPAD_MINI_6th_Gen
                 buildConfiguration = "Debug"
