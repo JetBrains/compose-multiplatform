@@ -23,7 +23,6 @@ import androidx.compose.ui.focus.FocusOrderToProperties
 import androidx.compose.ui.focus.FocusPropertiesModifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
-import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.layout.AlignmentLine
@@ -725,11 +724,6 @@ internal class LayoutNode(
                         .initialize()
                         .assignChained(toWrap)
                     wrapper = ModifierLocalConsumerNode(wrapper, impl)
-                        .initialize()
-                        .assignChained(toWrap)
-                }
-                if (mod is KeyInputModifier) {
-                    wrapper = ModifiedKeyInputNode(wrapper, mod)
                         .initialize()
                         .assignChained(toWrap)
                 }

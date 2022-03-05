@@ -34,6 +34,7 @@ import androidx.compose.ui.focus.FocusStateImpl.Deactivated
 import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.layout.findRoot
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.LayoutDirection.Ltr
@@ -203,4 +204,40 @@ internal fun FocusModifier.activatedChildren(): MutableVector<FocusModifier> {
         }
     }
     return activated
+}
+
+/**
+ * Returns the inner-most KeyInputModifier on the same LayoutNode as this FocusModifier.
+ */
+@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+internal fun FocusModifier.findLastKeyInputModifier(): KeyInputModifier? {
+    val layoutNode = layoutNodeWrapper?.layoutNode ?: return null
+    var best: KeyInputModifier? = null
+    keyInputChildren.forEach { keyInputModifier ->
+        if (keyInputModifier.layoutNode == layoutNode) {
+            best = lastOf(keyInputModifier, best)
+        }
+    }
+    if (best != null) {
+        return best
+    }
+    // There isn't a KeyInputModifier after this, but there may be one before this.
+    return keyInputModifier
+}
+
+/**
+ * Returns [one] if it comes after [two] in the modifier chain or [two] if it comes after [one].
+ */
+@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+private fun lastOf(one: KeyInputModifier, two: KeyInputModifier?): KeyInputModifier {
+    var mod = two ?: return one
+    val layoutNode = one.layoutNode
+    while (mod != one) {
+        val parent = mod.parent
+        if (parent == null || parent.layoutNode != layoutNode) {
+            return one
+        }
+        mod = parent
+    }
+    return two
 }
