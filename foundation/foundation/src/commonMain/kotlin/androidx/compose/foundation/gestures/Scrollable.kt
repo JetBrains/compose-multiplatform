@@ -25,12 +25,14 @@ import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.gestures.Orientation.Horizontal
 import androidx.compose.foundation.gestures.Orientation.Vertical
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.onFocusedBoundsChanged
 import androidx.compose.foundation.relocation.BringIntoViewResponder
 import androidx.compose.foundation.relocation.bringIntoViewResponder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -48,6 +50,8 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.OnPlacedModifier
 import androidx.compose.ui.layout.OnRemeasuredModifier
 import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.modifier.modifierLocalOf
@@ -59,6 +63,7 @@ import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.abs
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 /**
@@ -123,9 +128,11 @@ internal fun Modifier.scrollable(
     },
     factory = {
         val overscrollModifier = overScrollController?.let { Modifier.overScroll(it) } ?: Modifier
-        val bringIntoViewResponder = remember(orientation, state, reverseDirection) {
-            BringIntoViewResponder(orientation, state, reverseDirection)
-        }
+        val coroutineScope = rememberCoroutineScope()
+        val keepFocusedChildInViewModifier =
+            remember(coroutineScope, orientation, state, reverseDirection) {
+                ContentInViewModifier(coroutineScope, orientation, state, reverseDirection)
+            }
 
         val scrollableContainerProvider = if (enabled) {
             ModifierLocalScrollableContainerProvider
@@ -134,7 +141,7 @@ internal fun Modifier.scrollable(
         }
 
         Modifier
-            .then(bringIntoViewResponder.modifier)
+            .then(keepFocusedChildInViewModifier.modifier)
             .then(overscrollModifier)
             .pointerScrollable(
                 interactionSource,
@@ -456,61 +463,127 @@ private class DefaultFlingBehavior(
     }
 }
 
+/**
+ * Handles any logic related to bringing or keeping content in view, including
+ * [BringIntoViewResponder] and ensuring the focused child stays in view when the scrollable area
+ * is shrunk.
+ */
 @OptIn(ExperimentalFoundationApi::class)
-private class BringIntoViewResponder(
+private class ContentInViewModifier(
+    private val scope: CoroutineScope,
     private val orientation: Orientation,
     private val scrollableState: ScrollableState,
-    private val reverseDirection: Boolean,
-) : BringIntoViewResponder, OnRemeasuredModifier {
-    private var size: IntSize = IntSize.Zero
+    private val reverseDirection: Boolean
+) : BringIntoViewResponder, OnRemeasuredModifier, OnPlacedModifier {
+    private var focusedChild: LayoutCoordinates? = null
+    private var coordinates: LayoutCoordinates? = null
+    private var oldSize: IntSize? = null
 
-    val modifier = Modifier.bringIntoViewResponder(this)
-        .then(this)
+    val modifier: Modifier = this
+        .onFocusedBoundsChanged { focusedChild = it }
+        .bringIntoViewResponder(this)
 
     override fun onRemeasured(size: IntSize) {
-        this.size = size
+        val coordinates = coordinates
+        val oldSize = oldSize
+        // We only care when this node becomes smaller than it previously was, so don't care about
+        // the initial measurement.
+        if (oldSize != null && oldSize != size && coordinates?.isAttached == true) {
+            onSizeChanged(coordinates, oldSize)
+        }
+        this.oldSize = size
+    }
+
+    override fun onPlaced(coordinates: LayoutCoordinates) {
+        this.coordinates = coordinates
     }
 
     override fun calculateRectForParent(localRect: Rect): Rect {
-        val size = size.toSize()
-        return when (orientation) {
-            Vertical -> localRect.translate(
-                translateX = 0f,
-                translateY = relocationDistance(localRect.top, localRect.bottom, size.height)
-            )
-            Horizontal -> localRect.translate(
-                translateX = relocationDistance(localRect.left, localRect.right, size.width),
-                translateY = 0f
-            )
+        val oldSize = checkNotNull(oldSize) {
+            "Expected BringIntoViewRequester to not be used before parents are placed."
         }
+        // oldSize will only be null before the initial measurement.
+        return computeDestination(localRect, oldSize)
     }
 
     override suspend fun bringChildIntoView(localRect: Rect) {
-        val destRect = calculateRectForParent(localRect)
-        val offset = when (orientation) {
-            Vertical -> localRect.top - destRect.top
-            Horizontal -> localRect.left - destRect.left
-        }
-        scrollableState.animateScrollBy(offset.reverseIfNeeded())
+        performBringIntoView(localRect, calculateRectForParent(localRect))
     }
 
-    private fun Float.reverseIfNeeded(): Float = if (reverseDirection) this * -1 else this
-}
+    private fun onSizeChanged(coordinates: LayoutCoordinates, oldSize: IntSize) {
+        val containerShrunk = if (orientation == Horizontal) {
+            coordinates.size.width < oldSize.width
+        } else {
+            coordinates.size.height < oldSize.height
+        }
+        // If the container is growing, then if the focused child is only partially visible it will
+        // soon be _more_ visible, so don't scroll.
+        if (!containerShrunk) return
 
-// Calculate the offset needed to bring one of the edges into view. The leadingEdge is the side
-// closest to the origin (For the x-axis this is 'left', for the y-axis this is 'top').
-// The trailing edge is the other side (For the x-axis this is 'right', for the y-axis this is
-// 'bottom').
-private fun relocationDistance(leadingEdge: Float, trailingEdge: Float, parentSize: Float) = when {
-    // If the item is already visible, no need to scroll.
-    leadingEdge >= 0 && trailingEdge <= parentSize -> 0f
+        val focusedBounds = focusedChild
+            ?.let { coordinates.localBoundingBoxOf(it, clipBounds = false) }
+            ?: return
+        val myOldBounds = Rect(Offset.Zero, oldSize.toSize())
+        val adjustedBounds = computeDestination(focusedBounds, coordinates.size)
+        val wasVisible = myOldBounds.overlaps(focusedBounds)
+        val isFocusedChildClipped = adjustedBounds != focusedBounds
 
-    // If the item is visible but larger than the parent, we don't scroll.
-    leadingEdge < 0 && trailingEdge > parentSize -> 0f
+        if (wasVisible && isFocusedChildClipped) {
+            scope.launch {
+                performBringIntoView(focusedBounds, adjustedBounds)
+            }
+        }
+    }
 
-    // Find the minimum scroll needed to make one of the edges coincide with the parent's edge.
-    abs(leadingEdge) < abs(trailingEdge - parentSize) -> leadingEdge
-    else -> trailingEdge - parentSize
+    /**
+     * Compute the destination given the source rectangle and current bounds.
+     *
+     * @param source The bounding box of the item that sent the request to be brought into view.
+     * @return the destination rectangle.
+     */
+    private fun computeDestination(source: Rect, intSize: IntSize): Rect {
+        val size = intSize.toSize()
+        return when (orientation) {
+            Vertical ->
+                source.translate(0f, relocationDistance(source.top, source.bottom, size.height))
+            Horizontal ->
+                source.translate(relocationDistance(source.left, source.right, size.width), 0f)
+        }
+    }
+
+    /**
+     * Using the source and destination bounds, perform an animated scroll.
+     */
+    private suspend fun performBringIntoView(source: Rect, destination: Rect) {
+        val offset = when (orientation) {
+            Vertical -> source.top - destination.top
+            Horizontal -> source.left - destination.left
+        }
+        val scrollDelta = if (reverseDirection) -offset else offset
+
+        // Note that this results in weird behavior if called before the previous
+        // performBringIntoView finishes due to b/220119990.
+        scrollableState.animateScrollBy(scrollDelta)
+    }
+
+    /**
+     * Calculate the offset needed to bring one of the edges into view. The leadingEdge is the side
+     * closest to the origin (For the x-axis this is 'left', for the y-axis this is 'top').
+     * The trailing edge is the other side (For the x-axis this is 'right', for the y-axis this is
+     * 'bottom').
+     */
+    private fun relocationDistance(leadingEdge: Float, trailingEdge: Float, parentSize: Float) =
+        when {
+            // If the item is already visible, no need to scroll.
+            leadingEdge >= 0 && trailingEdge <= parentSize -> 0f
+
+            // If the item is visible but larger than the parent, we don't scroll.
+            leadingEdge < 0 && trailingEdge > parentSize -> 0f
+
+            // Find the minimum scroll needed to make one of the edges coincide with the parent's edge.
+            abs(leadingEdge) < abs(trailingEdge - parentSize) -> leadingEdge
+            else -> trailingEdge - parentSize
+        }
 }
 
 // TODO: b/203141462 - make this public and move it to ui
