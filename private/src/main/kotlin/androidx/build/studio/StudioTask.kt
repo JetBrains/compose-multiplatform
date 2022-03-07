@@ -185,14 +185,20 @@ abstract class StudioTask : DefaultTask() {
     }
 
     private fun launchStudio() {
+        check(ideaProperties.exists()) {
+            "Invalid Studio properties file location: ${ideaProperties.canonicalPath}"
+        }
+        check(vmOptions.exists()) {
+            "Invalid Studio vm options file location: ${vmOptions.canonicalPath}"
+        }
         ProcessBuilder().apply {
             inheritIO()
             with(platformUtilities) { command(launchCommandArguments) }
 
             val additionalStudioEnvironmentProperties = mapOf(
                 // These environment variables are used to set up AndroidX's default configuration.
-                "STUDIO_PROPERTIES" to ideaProperties.absolutePath,
-                "STUDIO_VM_OPTIONS" to vmOptions.absolutePath,
+                "STUDIO_PROPERTIES" to ideaProperties.canonicalPath,
+                "STUDIO_VM_OPTIONS" to vmOptions.canonicalPath,
                 // This environment variable prevents Studio from showing IDE inspection warnings
                 // for nullability issues, if the context is deprecated. This environment variable
                 // is consumed by InteroperabilityDetector.kt
@@ -293,7 +299,7 @@ abstract class PlaygroundStudioTask : RootStudioTask() {
     override val additionalEnvironmentProperties: Map<String, String>
         get() = mapOf("ALLOW_PUBLIC_REPOS" to "true")
     override val ideaProperties
-        get() = supportRootFolder.resolve("../playground-common/idea.properties")
+        get() = supportRootFolder.resolve("playground-common/idea.properties")
     override val vmOptions
-        get() = supportRootFolder.resolve("../playground-common/studio.vmoptions")
+        get() = supportRootFolder.resolve("playground-common/studio.vmoptions")
 }
