@@ -19,6 +19,7 @@ import org.w3c.dom.HTMLBRElement
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLDataListElement
+import org.w3c.dom.HTMLDListElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLEmbedElement
@@ -95,6 +96,10 @@ private val Param: ElementBuilder<HTMLParamElement> = ElementBuilderImplementati
 private val Picture: ElementBuilder<HTMLPictureElement> = ElementBuilderImplementation("picture")
 private val Source: ElementBuilder<HTMLSourceElement> = ElementBuilderImplementation("source")
 private val Canvas: ElementBuilder<HTMLCanvasElement> = ElementBuilderImplementation("canvas")
+
+private val DList: ElementBuilder<HTMLDListElement> = ElementBuilderImplementation("dl")
+private val DTerm: ElementBuilder<HTMLElement> = ElementBuilderImplementation("dt")
+private val DDescription: ElementBuilder<HTMLElement> = ElementBuilderImplementation("dd")
 
 private val Div: ElementBuilder<HTMLDivElement> = ElementBuilderImplementation("div")
 private val A: ElementBuilder<HTMLAnchorElement> = ElementBuilderImplementation("a")
@@ -429,6 +434,42 @@ fun Canvas(
 ) {
     TagElement(
         elementBuilder = Canvas,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun DList(
+    attrs: AttrBuilderContext<HTMLDListElement>? = null,
+    content: ContentBuilder<HTMLDListElement>? = null
+) {
+    TagElement(
+        elementBuilder = DList,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun DDescription(
+    attrs: AttrBuilderContext<HTMLElement>? = null,
+    content: ContentBuilder<HTMLElement>? = null
+) {
+    TagElement(
+        elementBuilder = DDescription,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
+@Composable
+fun DTerm(
+    attrs: AttrBuilderContext<HTMLElement>? = null,
+    content: ContentBuilder<HTMLElement>? = null
+) {
+    TagElement(
+        elementBuilder = DTerm,
         applyAttrs = attrs,
         content = content
     )
