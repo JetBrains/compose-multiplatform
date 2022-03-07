@@ -641,7 +641,7 @@ abstract class SourcesVariantRule : ComponentMetadataRule {
     }
 }
 
-private const val DACKKA_DEPENDENCY = "com.google.devsite:dackka:0.0.15"
+private const val DACKKA_DEPENDENCY = "com.google.devsite:dackka:0.0.14"
 private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
 
 // List of packages to exclude from both Java and Kotlin refdoc generation
