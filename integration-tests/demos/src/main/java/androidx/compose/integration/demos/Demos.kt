@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.demos.LayoutDemos
 import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.foundation.demos.text.TextDemos
 import androidx.compose.material.demos.MaterialDemos
+import androidx.compose.material3.demos.Material3Demos
 import androidx.compose.ui.demos.CoreDemos
 import androidx.navigation.compose.demos.NavigationDemos
 
@@ -36,6 +37,7 @@ val AllDemosCategory = DemoCategory(
         CoreDemos,
         LayoutDemos,
         MaterialDemos,
+        Material3Demos,
         NavigationDemos,
         TextDemos
     )

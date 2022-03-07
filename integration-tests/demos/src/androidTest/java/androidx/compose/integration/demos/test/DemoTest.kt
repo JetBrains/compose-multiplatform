@@ -24,6 +24,7 @@ import androidx.compose.integration.demos.common.Demo
 import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.integration.demos.common.allDemos
 import androidx.compose.integration.demos.common.allLaunchableDemos
+import androidx.compose.material3.demos.Material3Demos
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.assertTextEquals
@@ -113,6 +114,17 @@ class DemoTest {
     @Test
     fun navigateThroughAllDemos_4() {
         navigateThroughAllDemos(SplitDemoCategories[3])
+    }
+
+    @Test
+    fun navigateThroughMaterial3Demos() {
+        val material3Demos = DemoCategory(
+            "Jetpack Compose Demos",
+            listOf(
+                Material3Demos,
+            )
+        )
+        navigateThroughAllDemos(material3Demos)
     }
 
     private fun navigateThroughAllDemos(root: DemoCategory, fastForwardClock: Boolean = false) {

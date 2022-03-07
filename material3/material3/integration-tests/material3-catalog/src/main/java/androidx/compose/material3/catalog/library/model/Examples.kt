@@ -33,7 +33,6 @@ import androidx.compose.material3.samples.CircularProgressIndicatorSample
 import androidx.compose.material3.samples.ClickableCardSample
 import androidx.compose.material3.samples.ClickableElevatedCardSample
 import androidx.compose.material3.samples.ClickableOutlinedCardSample
-import androidx.compose.material3.samples.ColorSchemeSample
 import androidx.compose.material3.samples.DismissibleNavigationDrawerSample
 import androidx.compose.material3.samples.ElevatedButtonSample
 import androidx.compose.material3.samples.ElevatedCardSample
@@ -183,17 +182,6 @@ val CardExamples = listOf(
         ClickableOutlinedCardSample()
     }
 )
-
-private const val ColorExampleDescription = "Color examples"
-private const val ColorExampleSourceUrl = "$SampleSourceUrl/ColorSamples.kt"
-val ColorExamples =
-    listOf(
-        Example(
-            name = ::ColorSchemeSample.name,
-            description = ColorExampleDescription,
-            sourceUrl = ColorExampleSourceUrl,
-        ) { ColorSchemeSample() },
-    )
 
 private const val CheckboxesExampleDescription = "Checkboxes examples"
 private const val CheckboxesExampleSourceUrl = "$SampleSourceUrl/CheckboxSamples.kt"
