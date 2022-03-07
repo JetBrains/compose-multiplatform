@@ -235,6 +235,7 @@ package androidx.compose.material3 {
   }
 
   public final class MenuDefaults {
+    method @androidx.compose.runtime.Composable public void Divider(optional androidx.compose.ui.Modifier modifier, optional long color, optional float thickness);
     method public androidx.compose.foundation.layout.PaddingValues getDropdownMenuItemContentPadding();
     method @androidx.compose.runtime.Composable public androidx.compose.material3.MenuItemColors itemColors(optional long textColor, optional long leadingIconColor, optional long trailingIconColor, optional long disabledTextColor, optional long disabledLeadingIconColor, optional long disabledTrailingIconColor);
     property public final androidx.compose.foundation.layout.PaddingValues DropdownMenuItemContentPadding;

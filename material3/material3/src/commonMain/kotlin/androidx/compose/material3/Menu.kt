@@ -52,6 +52,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
@@ -260,6 +261,27 @@ object MenuDefaults {
         horizontal = DropdownMenuItemHorizontalPadding,
         vertical = 0.dp
     )
+
+    /**
+     * Default [Divider], which can be optionally positioned at the bottom of the
+     * [DropdownMenuItemContent].
+     *
+     * @param modifier modifier for the divider's layout
+     * @param color color of the divider
+     * @param thickness thickness of the divider
+     */
+    @Composable
+    fun Divider(
+        modifier: Modifier = Modifier,
+        color: Color = MenuTokens.DividerColor.toColor(),
+        thickness: Dp = MenuTokens.DividerHeight,
+    ) {
+        androidx.compose.material3.Divider(
+            modifier = modifier,
+            color = color,
+            thickness = thickness,
+        )
+    }
 }
 
 /**
