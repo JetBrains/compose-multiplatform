@@ -38,6 +38,11 @@ internal class ModifierLocalConsumerNode(
         notifyConsumerOfChanges()
     }
 
+    override fun detach() {
+        super.detach()
+        modifier.onModifierLocalsUpdated(DetachedModifierLocalReadScope)
+    }
+
     override val <T> ModifierLocal<T>.current: T
         get() {
             // Track that we read this ModifierLocal so that it can be invalidated later
@@ -82,6 +87,10 @@ internal class ModifierLocalConsumerNode(
     companion object {
         val onReadValuesChanged: (ModifierLocalConsumerNode) -> Unit = { node ->
             node.notifyConsumerOfChanges()
+        }
+        val DetachedModifierLocalReadScope = object : ModifierLocalReadScope {
+            override val <T> ModifierLocal<T>.current: T
+                get() = defaultFactory()
         }
     }
 }
