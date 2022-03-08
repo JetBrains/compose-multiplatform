@@ -10,14 +10,13 @@ import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
 import java.io.File
 
 internal fun Project.configureUseXcodeGenTask(
-    buildIosDir: File,
     projectName: String,
     bundleIdPrefix: String,
     xcodeGenExecutable: File,
     teamId: String
 ) {
     tasks.composeIosTask<AbstractComposeIosTask>(TASK_USE_XCODE_GEN_NAME) {
-        dependsOn(TASK_INSTALL_XCODE_GEN_NAME)
+        dependsOn(TASK_INSTALL_XCODE_GEN)
         doLast {
             buildIosDir.mkdirs()
             buildIosDir.resolve("project.yml").writeText(

@@ -14,7 +14,6 @@ import java.io.File
 fun Project.registerConnectedDeviceTasks(
     id: String,
     deploy: DeployTarget.ConnectedDevice,
-    buildIosDir: File,
     projectName: String,
     iosDeployExecutable: File,
 ) {
@@ -47,7 +46,7 @@ fun Project.registerConnectedDeviceTasks(
     }
 
     val taskDeploy = tasks.composeIosTask<AbstractComposeIosTask>("iosDeploy$id") {
-        dependsOn(TASK_INSTALL_IOS_DEPLOY_NAME)
+        dependsOn(TASK_INSTALL_IOS_DEPLOY)
         dependsOn(taskBuild)
         doLast {
             runExternalTool(
@@ -55,7 +54,8 @@ fun Project.registerConnectedDeviceTasks(
                 listOf(
                     "--debug",
                     "--bundle", iosCompiledAppDir.absolutePath,
-                    "--no-wifi"
+//                    "--no-wifi" //todo disableWifiDevices
+                //todo identifier 00008110-0002183C1E69801E
                 )
             )
         }

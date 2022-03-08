@@ -15,7 +15,6 @@ import java.io.File
 fun Project.registerLocalFileTasks(
     id: String,
     deploy: DeployTarget.LocalFile,
-    buildIosDir: File,
     projectName: String,
     bundleIdPrefix: String
 ) {

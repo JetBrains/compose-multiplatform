@@ -17,7 +17,6 @@ import java.io.File
 fun Project.registerSimulatorTasks(
     id: String,
     deploy: DeployTarget.Simulator,
-    buildIosDir: File,
     projectName: String,
     bundleIdPrefix: String
 ) {
