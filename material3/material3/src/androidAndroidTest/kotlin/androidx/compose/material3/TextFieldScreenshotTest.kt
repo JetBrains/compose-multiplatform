@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.material.textfield
+package androidx.compose.material3
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
@@ -22,15 +22,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.GOLDEN_MATERIAL
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.setMaterialContent
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
@@ -75,11 +69,11 @@ class TextFieldScreenshotTest {
     val rule = createComposeRule()
 
     @get:Rule
-    val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
+    val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL3)
 
     @Test
     fun textField_withInput() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 val text = "Text"
                 TextField(
@@ -96,7 +90,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_notFocused() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 TextField(
                     value = "",
@@ -112,7 +106,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_focused() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                 TextField(
                     value = "",
@@ -130,7 +124,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_focused_rtl() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
                     TextField(
@@ -150,7 +144,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_error_focused() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val text = "Input"
             TextField(
                 value = TextFieldValue(text = text, selection = TextRange(text.length)),
@@ -168,7 +162,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_error_notFocused() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = "",
                 onValueChange = {},
@@ -182,24 +176,23 @@ class TextFieldScreenshotTest {
     }
 
     @Test
-    fun textField_textColor_fallbackToContentColor() {
-        rule.setMaterialContent {
-            CompositionLocalProvider(LocalContentColor provides Color.Green) {
-                val text = "Hello, world!"
-                TextField(
-                    value = TextFieldValue(text = text, selection = TextRange(text.length)),
-                    onValueChange = {},
-                    modifier = Modifier.requiredWidth(280.dp).testTag(TextFieldTag)
-                )
-            }
+    fun textField_textColor_customTextColor() {
+        rule.setMaterialContent(lightColorScheme()) {
+            val text = "Hello, world!"
+            TextField(
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
+                onValueChange = {},
+                modifier = Modifier.requiredWidth(280.dp).testTag(TextFieldTag),
+                colors = TextFieldDefaults.textFieldColors(textColor = Color.Green)
+            )
         }
 
-        assertAgainstGolden("filled_textField_textColor_defaultContentColor")
+        assertAgainstGolden("filled_textField_textColor_customTextColor")
     }
 
     @Test
     fun textField_multiLine_withLabel_textAlignedToTop() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val text = "Text"
             TextField(
                 value = TextFieldValue(text = text, selection = TextRange(text.length)),
@@ -216,7 +209,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_multiLine_withoutLabel_textAlignedToTop() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val text = "Text"
             TextField(
                 value = TextFieldValue(text = text, selection = TextRange(text.length)),
@@ -232,7 +225,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_multiLine_withLabel_placeholderAlignedToTop() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = "",
                 onValueChange = {},
@@ -251,7 +244,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_multiLine_withoutLabel_placeholderAlignedToTop() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = "",
                 onValueChange = {},
@@ -269,7 +262,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_multiLine_labelAlignedToTop() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = "",
                 onValueChange = {},
@@ -285,7 +278,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_singleLine_withLabel_textAlignedToTop() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val text = "Text"
             TextField(
                 value = TextFieldValue(text = text, selection = TextRange(text.length)),
@@ -301,7 +294,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_singleLine_withoutLabel_textCenteredVertically() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val text = "Text"
             TextField(
                 value = TextFieldValue(text = text, selection = TextRange(text.length)),
@@ -316,7 +309,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_singleLine_withLabel_placeholderAlignedToTop() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = "",
                 onValueChange = {},
@@ -334,7 +327,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_singleLine_withoutLabel_placeholderCenteredVertically() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = "",
                 onValueChange = {},
@@ -352,8 +345,8 @@ class TextFieldScreenshotTest {
     }
 
     @Test
-    fun textField_singleLine_labelCenteredVetically() {
-        rule.setMaterialContent {
+    fun textField_singleLine_labelCenteredVertically() {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = "",
                 onValueChange = {},
@@ -367,7 +360,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_disabled() {
-        rule.setContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = TextFieldValue("Text"),
                 onValueChange = {},
@@ -382,7 +375,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_disabled_notFocusable() {
-        rule.setContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = TextFieldValue("Text"),
                 onValueChange = {},
@@ -399,7 +392,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_disabled_notScrolled() {
-        rule.setContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = longText,
                 onValueChange = { },
@@ -422,7 +415,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_readOnly() {
-        rule.setContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = TextFieldValue("Text"),
                 onValueChange = {},
@@ -437,7 +430,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_readOnly_focused() {
-        rule.setContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = TextFieldValue("Text"),
                 onValueChange = {},
@@ -454,7 +447,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_readOnly_scrolled() {
-        rule.setContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = longText,
                 onValueChange = { },
@@ -477,7 +470,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_textCenterAligned() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val text = "Hello world"
             TextField(
                 value = TextFieldValue(text = text, selection = TextRange(text.length)),
@@ -493,7 +486,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_textAlignedToEnd() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val text = "Hello world"
             TextField(
                 value = TextFieldValue(text = text, selection = TextRange(text.length)),
@@ -509,7 +502,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_leadingTrailingIcons() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = "",
                 onValueChange = {},
@@ -525,7 +518,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_leadingTrailingIcons_error() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TextField(
                 value = "",
                 onValueChange = {},
@@ -540,6 +533,89 @@ class TextFieldScreenshotTest {
         assertAgainstGolden("textField_leadingTrailingIcons_error")
     }
 
+    @Test
+    fun textField_withInput_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
+                val text = "Text"
+                TextField(
+                    value = TextFieldValue(text = text, selection = TextRange(text.length)),
+                    onValueChange = {},
+                    label = { Text("Label") },
+                    modifier = Modifier.requiredWidth(280.dp)
+                )
+            }
+        }
+
+        assertAgainstGolden("filled_textField_withInput_dark")
+    }
+
+    @Test
+    fun textField_focused_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) {
+            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
+                TextField(
+                    value = "",
+                    onValueChange = {},
+                    label = { Text("Label") },
+                    modifier = Modifier.requiredWidth(280.dp)
+                )
+            }
+        }
+
+        rule.onNodeWithTag(TextFieldTag).focus()
+
+        assertAgainstGolden("filled_textField_focused_dark")
+    }
+
+    @Test
+    fun textField_error_focused_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) {
+            val text = "Input"
+            TextField(
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
+                onValueChange = {},
+                label = { Text("Label") },
+                isError = true,
+                modifier = Modifier.requiredWidth(280.dp).testTag(TextFieldTag)
+            )
+        }
+
+        rule.onNodeWithTag(TextFieldTag).focus()
+
+        assertAgainstGolden("filled_textField_focused_errorState_dark")
+    }
+
+    @Test
+    fun textField_disabled_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) {
+            TextField(
+                value = TextFieldValue("Text"),
+                onValueChange = {},
+                modifier = Modifier.requiredWidth(280.dp).testTag(TextFieldTag),
+                singleLine = true,
+                enabled = false
+            )
+        }
+
+        assertAgainstGolden("textField_disabled_dark")
+    }
+
+    @Test
+    fun textField_leadingTrailingIcons_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) {
+            TextField(
+                value = "",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.width(300.dp).testTag(TextFieldTag),
+                leadingIcon = { Icon(Icons.Default.Call, null) },
+                trailingIcon = { Icon(Icons.Default.Clear, null) }
+            )
+        }
+
+        assertAgainstGolden("textField_leadingTrailingIcons_dark")
+    }
     private fun SemanticsNodeInteraction.focus() {
         // split click into (down) and (move, up) to enforce a composition in between
         this.performTouchInput { down(center) }.performTouchInput { move(); up() }

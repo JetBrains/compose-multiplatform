@@ -461,6 +461,9 @@ object TextFieldDefaults {
      * decrease the paddings around the input field. If you need to customise the bottom indicator,
      * apply [indicatorLine] modifier to achieve that.
      *
+     * See example of using [TextFieldDecorationBox] to build your own custom text field
+     * @sample androidx.compose.material3.samples.CustomTextFieldBasedOnDecorationBox
+     *
      * @param value the input [String] shown by the text field
      * @param innerTextField input text field that this decoration box wraps. You will pass here a
      * framework-controlled composable parameter "innerTextField" from the decorationBox lambda of
@@ -553,6 +556,9 @@ object TextFieldDefaults {
      * For example, if you need to create a dense outlined text field, use [contentPadding]
      * parameter to decrease the paddings around the input field. If you need to change the
      * thickness of the border, use [border] parameter to achieve that.
+     *
+     * Example of custom text field based on [OutlinedTextFieldDecorationBox]:
+     * @sample androidx.compose.material3.samples.CustomOutlinedTextFieldBasedOnDecorationBox
      *
      * @param value the input [String] shown by the text field
      * @param innerTextField input text field that this decoration box wraps. You will pass here a

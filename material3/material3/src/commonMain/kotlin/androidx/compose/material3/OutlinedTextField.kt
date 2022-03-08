@@ -75,6 +75,9 @@ import kotlin.math.roundToInt
  * places like forms, where many text fields are placed together, their reduced emphasis helps
  * simplify the layout.
  *
+ * See example usage:
+ * @sample androidx.compose.material3.samples.SimpleOutlinedTextFieldSample
+ *
  * If apart from input text change you also want to observe the cursor location, selection range,
  * or IME composition use the OutlinedTextField overload with the [TextFieldValue] parameter
  * instead.
@@ -187,6 +190,9 @@ fun OutlinedTextField(
  * Outlined text fields have less visual emphasis than filled text fields. When they appear in
  * places like forms, where many text fields are placed together, their reduced emphasis helps
  * simplify the layout.
+ *
+ * See example usage:
+ * @sample androidx.compose.material3.samples.OutlinedTextFieldSample
  *
  * This overload provides access to the input text, cursor position and selection range and
  * IME composition. If you only want to observe an input text change, use the OutlinedTextField
@@ -784,6 +790,7 @@ This padding is used to allow label not overlap with the content above it. This 
 for default cases when developers do not override the label's font size. If they do, they will
 need to add additional padding themselves
 */
-private val OutlinedTextFieldTopPadding = 8.dp
+/* @VisibleForTesting */
+internal val OutlinedTextFieldTopPadding = 8.dp
 
 internal const val BorderId = "border"
