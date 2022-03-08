@@ -85,7 +85,7 @@ class IconComparisonTest(
         @JvmStatic
         @Parameterized.Parameters(name = "{1}")
         fun initIconSublist(): Array<Array<Any>> {
-            val numberOfChunks = 4
+            val numberOfChunks = 6
             val listSize = ceil(AllIcons.size / numberOfChunks.toFloat()).roundToInt()
             val subLists = AllIcons.chunked(listSize)
             return subLists.mapIndexed { index, list ->
