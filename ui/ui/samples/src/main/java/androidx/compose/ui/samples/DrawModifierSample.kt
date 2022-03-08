@@ -99,7 +99,8 @@ fun DrawWithCacheModifierStateParameterSample() {
 @Sampled
 @Composable
 fun DrawWithCacheContentSample() {
-    val vectorPainter = rememberVectorPainter(24.dp, 24.dp) { viewportWidth, viewportHeight ->
+    val vectorPainter = rememberVectorPainter(24.dp, 24.dp, autoMirror = true) {
+            viewportWidth, viewportHeight ->
         Path(
             pathData = PathData {
                 lineTo(viewportWidth, 0f)
