@@ -12,7 +12,6 @@ import java.io.File
 internal fun Project.configureUseXcodeGenTask(
     projectName: String,
     bundleIdPrefix: String,
-    xcodeGenExecutable: File,
     teamId: String
 ) {
     tasks.composeIosTask<AbstractComposeIosTask>(TASK_USE_XCODE_GEN_NAME) {

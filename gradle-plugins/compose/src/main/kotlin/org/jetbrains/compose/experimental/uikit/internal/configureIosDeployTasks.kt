@@ -26,7 +26,6 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
     configureUseXcodeGenTask(
         projectName = projectName,
         bundleIdPrefix = bundleIdPrefix,
-        xcodeGenExecutable = xcodeGenExecutable,
         teamId = application.teamId
     )
 
@@ -38,7 +37,7 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
                     id = id,
                     deploy = target.deploy,
                     projectName = projectName,
-                    bundleIdPrefix = bundleIdPrefix
+                    bundleIdPrefix = bundleIdPrefix,
                 )
             }
             is DeployTarget.LocalFile -> {
@@ -46,7 +45,6 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
                     id = id,
                     deploy = target.deploy,
                     projectName = projectName,
-                    bundleIdPrefix = bundleIdPrefix
                 )
             }
             is DeployTarget.ConnectedDevice -> {
@@ -54,7 +52,6 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
                     id = id,
                     deploy = target.deploy,
                     projectName = projectName,
-                    iosDeployExecutable = iosDeployExecutable
                 )
             }
         }

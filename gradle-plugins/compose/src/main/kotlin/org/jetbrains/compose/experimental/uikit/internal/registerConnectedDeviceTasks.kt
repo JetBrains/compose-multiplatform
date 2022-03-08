@@ -15,7 +15,6 @@ fun Project.registerConnectedDeviceTasks(
     id: String,
     deploy: DeployTarget.ConnectedDevice,
     projectName: String,
-    iosDeployExecutable: File,
 ) {
     val xcodeProjectDir = buildIosDir.resolve("$projectName.xcodeproj")
     val iosCompiledAppDir = xcodeProjectDir.resolve("build/Build/Products/Debug-iphoneos/$projectName.app")

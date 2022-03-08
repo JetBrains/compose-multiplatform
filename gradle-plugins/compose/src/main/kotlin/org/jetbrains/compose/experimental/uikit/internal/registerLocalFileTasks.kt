@@ -15,8 +15,7 @@ import java.io.File
 fun Project.registerLocalFileTasks(
     id: String,
     deploy: DeployTarget.LocalFile,
-    projectName: String,
-    bundleIdPrefix: String
+    projectName: String
 ) {
     val xcodeProjectDir = buildIosDir.resolve("$projectName.xcodeproj")
     val iosCompiledAppDir = xcodeProjectDir.resolve("build/Build/Products/Debug-iphoneos/$projectName.app")
