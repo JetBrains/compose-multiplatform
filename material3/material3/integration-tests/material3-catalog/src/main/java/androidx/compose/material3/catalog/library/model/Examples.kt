@@ -18,6 +18,9 @@
 
 package androidx.compose.material3.catalog.library.model
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.catalog.library.util.SampleSourceUrl
 import androidx.compose.material3.samples.AlertDialogSample
 import androidx.compose.material3.samples.AlertDialogWithIconSample
@@ -56,6 +59,8 @@ import androidx.compose.material3.samples.NavigationRailSample
 import androidx.compose.material3.samples.NavigationRailWithOnlySelectedLabelsSample
 import androidx.compose.material3.samples.OutlinedButtonSample
 import androidx.compose.material3.samples.OutlinedCardSample
+import androidx.compose.material3.samples.OutlinedTextFieldSample
+import androidx.compose.material3.samples.PasswordTextField
 import androidx.compose.material3.samples.PermanentNavigationDrawerSample
 import androidx.compose.material3.samples.PinnedSmallTopAppBar
 import androidx.compose.material3.samples.RadioButtonSample
@@ -68,15 +73,26 @@ import androidx.compose.material3.samples.ScrollingFancyIndicatorContainerTabs
 import androidx.compose.material3.samples.ScrollingTextTabs
 import androidx.compose.material3.samples.SimpleBottomAppBar
 import androidx.compose.material3.samples.SimpleCenterAlignedTopAppBar
+import androidx.compose.material3.samples.SimpleOutlinedTextFieldSample
 import androidx.compose.material3.samples.SimpleSmallTopAppBar
+import androidx.compose.material3.samples.SimpleTextFieldSample
 import androidx.compose.material3.samples.SliderSample
 import androidx.compose.material3.samples.SmallFloatingActionButtonSample
 import androidx.compose.material3.samples.StepsSliderSample
 import androidx.compose.material3.samples.TextAndIconTabs
+import androidx.compose.material3.samples.TextArea
 import androidx.compose.material3.samples.TextButtonSample
+import androidx.compose.material3.samples.TextFieldSample
+import androidx.compose.material3.samples.TextFieldWithErrorState
+import androidx.compose.material3.samples.TextFieldWithHelperMessage
+import androidx.compose.material3.samples.TextFieldWithHideKeyboardOnImeAction
+import androidx.compose.material3.samples.TextFieldWithIcons
+import androidx.compose.material3.samples.TextFieldWithPlaceholder
 import androidx.compose.material3.samples.TextTabs
 import androidx.compose.material3.samples.TriStateCheckboxSample
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 data class Example(
     val name: String,
@@ -531,3 +547,92 @@ val TabsExamples = listOf(
         ScrollingFancyIndicatorContainerTabs()
     }
 )
+
+private const val TextFieldsExampleDescription = "Text fields examples"
+private const val TextFieldsExampleSourceUrl = "$SampleSourceUrl/TextFieldSamples.kt"
+val TextFieldsExamples = listOf(
+    Example(
+        name = ::SimpleTextFieldSample.name,
+        description = TextFieldsExampleDescription,
+        sourceUrl = TextFieldsExampleSourceUrl
+    ) {
+        SimpleTextFieldSample()
+    },
+    Example(
+        name = ::TextFieldSample.name,
+        description = TextFieldsExampleDescription,
+        sourceUrl = TextFieldsExampleSourceUrl
+    ) {
+        TextFieldSample()
+    },
+    Example(
+        name = ::SimpleOutlinedTextFieldSample.name,
+        description = TextFieldsExampleDescription,
+        sourceUrl = TextFieldsExampleSourceUrl
+    ) {
+        SimpleOutlinedTextFieldSample()
+    },
+    Example(
+        name = ::OutlinedTextFieldSample.name,
+        description = TextFieldsExampleDescription,
+        sourceUrl = TextFieldsExampleSourceUrl
+    ) {
+        OutlinedTextFieldSample()
+    },
+    Example(
+        name = ::TextFieldWithIcons.name,
+        description = TextFieldsExampleDescription,
+        sourceUrl = TextFieldsExampleSourceUrl
+    ) {
+        TextFieldWithIcons()
+    },
+    Example(
+        name = ::TextFieldWithPlaceholder.name,
+        description = TextFieldsExampleDescription,
+        sourceUrl = TextFieldsExampleSourceUrl
+    ) {
+        TextFieldWithPlaceholder()
+    },
+    Example(
+        name = ::TextFieldWithErrorState.name,
+        description = TextFieldsExampleDescription,
+        sourceUrl = TextFieldsExampleSourceUrl
+    ) {
+        TextFieldWithErrorState()
+    },
+    Example(
+        name = ::TextFieldWithHelperMessage.name,
+        description = TextFieldsExampleDescription,
+        sourceUrl = TextFieldsExampleSourceUrl
+    ) {
+        TextFieldWithHelperMessage()
+    },
+    Example(
+        name = ::PasswordTextField.name,
+        description = TextFieldsExampleDescription,
+        sourceUrl = TextFieldsExampleSourceUrl
+    ) {
+        PasswordTextField()
+    },
+    Example(
+        name = ::TextFieldWithHideKeyboardOnImeAction.name,
+        description = TextFieldsExampleDescription,
+        sourceUrl = TextFieldsExampleSourceUrl
+    ) {
+        TextFieldWithHideKeyboardOnImeAction()
+    },
+    Example(
+        name = ::TextArea.name,
+        description = TextFieldsExampleDescription,
+        sourceUrl = TextFieldsExampleSourceUrl
+    ) {
+        TextArea()
+    }
+).map {
+    // By default text field samples are minimal and don't have a `width` modifier to restrict the
+    // width. As a result, they grow horizontally if enough text is typed. To prevent this behavior
+    // in Catalog app the code below restricts the width of every text field sample
+    it.copy(content = {
+        Box(Modifier.wrapContentWidth().width(280.dp)) { it.content() }
+    })
+}
