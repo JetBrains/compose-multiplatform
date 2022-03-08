@@ -154,6 +154,7 @@ compose.experimental {
     uikit.application {
         bundleIdPrefix = "org.jetbrains"
         projectName = "FallingBalls"
+        teamId = "JMS9FA69HB"
         deployConfigurations {
             simulator("IPhone8") {
                 //Usage: ./gradlew iosDeployIPhone8
@@ -163,6 +164,9 @@ compose.experimental {
             simulator("IPad") {
                 //Usage: ./gradlew iosDeployIPad
                 device = IOSDevices.IPAD_MINI_6th_Gen
+                buildConfiguration = "Debug"
+            }
+            connectedDevice("Device") {
                 buildConfiguration = "Debug"
             }
         }

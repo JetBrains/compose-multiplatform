@@ -17,6 +17,7 @@ abstract class ExperimentalUiKitApplication @Inject constructor(
 ) {
     var bundleIdPrefix: String by requiredDslProperty("require property [bundleIdPrefix] in uikit.application { ...")
     var projectName: String by requiredDslProperty("require property [projectName] in uikit.application { ...")
+    var teamId: String by requiredDslProperty("require property [teamId] in uikit.application { ...")
 
     val deployConfigurations: IosDeployConfigurations = objects.newInstance(IosDeployConfigurations::class.java)
     fun deployConfigurations(fn: Action<IosDeployConfigurations>) {

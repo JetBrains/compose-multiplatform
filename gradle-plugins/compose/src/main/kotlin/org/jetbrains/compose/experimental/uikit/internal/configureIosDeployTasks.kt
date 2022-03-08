@@ -53,7 +53,8 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
         buildIosDir = buildIosDir,
         projectName = projectName,
         bundleIdPrefix = bundleIdPrefix,
-        xcodeGenExecutable = xcodeGenExecutable
+        xcodeGenExecutable = xcodeGenExecutable,
+        teamId = application.teamId
     )
 
     application.deployConfigurations.deployTargets.forEach { target ->
@@ -61,6 +62,24 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
         when (target.deploy) {
             is DeployTarget.Simulator -> {
                 registerSimulatorTasks(
+                    id = id,
+                    deploy = target.deploy,
+                    buildIosDir = buildIosDir,
+                    projectName = projectName,
+                    bundleIdPrefix = bundleIdPrefix
+                )
+            }
+            is DeployTarget.LocalFile -> {
+                registerLocalFileTasks(
+                    id = id,
+                    deploy = target.deploy,
+                    buildIosDir = buildIosDir,
+                    projectName = projectName,
+                    bundleIdPrefix = bundleIdPrefix
+                )
+            }
+            is DeployTarget.ConnectedDevice -> {
+                registerConnectedDeviceTasks(
                     id = id,
                     deploy = target.deploy,
                     buildIosDir = buildIosDir,

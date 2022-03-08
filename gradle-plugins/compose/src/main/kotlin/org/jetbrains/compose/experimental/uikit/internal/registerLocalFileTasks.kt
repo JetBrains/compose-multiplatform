@@ -12,7 +12,7 @@ import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
 import java.io.File
 
 
-fun Project.registerIpaTasks(
+fun Project.registerLocalFileTasks(
     id: String,
     deploy: DeployTarget.LocalFile,
     buildIosDir: File,
@@ -20,11 +20,11 @@ fun Project.registerIpaTasks(
     bundleIdPrefix: String
 ) {
     val xcodeProjectDir = buildIosDir.resolve("$projectName.xcodeproj")
-    val iosCompiledAppDir = xcodeProjectDir.resolve("build/Build/Products/Debug-iphonesimulator/$projectName.app")
+    val iosCompiledAppDir = xcodeProjectDir.resolve("build/Build/Products/Debug-iphoneos/$projectName.app")
     val taskBuild = tasks.composeIosTask<AbstractComposeIosTask>("iosBuildIpa$id") {
         dependsOn(TASK_USE_XCODE_GEN_NAME)
         doLast {
-            val sdk = SDK_PREFIFX_SIMULATOR + getSimctlListData().runtimes.first().version // xcrun xcodebuild -showsdks
+            val sdk = SDK_PREFIX_IPHONEOS + getSimctlListData().runtimes.first().version // xcrun xcodebuild -showsdks
             val scheme = projectName // xcrun xcodebuild -list -project .
             repeat(2) {
                 // todo repeat(2) is workaround of error (domain=NSPOSIXErrorDomain, code=22)

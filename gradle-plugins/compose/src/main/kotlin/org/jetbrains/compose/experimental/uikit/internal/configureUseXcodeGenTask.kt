@@ -13,7 +13,8 @@ internal fun Project.configureUseXcodeGenTask(
     buildIosDir: File,
     projectName: String,
     bundleIdPrefix: String,
-    xcodeGenExecutable: File
+    xcodeGenExecutable: File,
+    teamId: String
 ) {
     tasks.composeIosTask<AbstractComposeIosTask>(TASK_USE_XCODE_GEN_NAME) {
         dependsOn(TASK_INSTALL_XCODE_GEN_NAME)
@@ -25,6 +26,7 @@ internal fun Project.configureUseXcodeGenTask(
                 options:
                   bundleIdPrefix: $bundleIdPrefix
                 settings:
+                  DEVELOPMENT_TEAM: "$teamId"
                   CODE_SIGN_IDENTITY: "iPhone Developer"
                   CODE_SIGN_STYLE: Automatic
                   MARKETING_VERSION: "1.0"
@@ -42,10 +44,11 @@ internal fun Project.configureUseXcodeGenTask(
                       path: plists/Ios/Info.plist
                       properties:
                         UILaunchStoryboardName: ""
+                        method: "development"
                     sources:
                       - "../../src/"
                     settings:
-                      LIBRARY_SEARCH_PATHS: "${'$'}(inherited)"
+                      LIBRARY_SEARCH_PATHS: "$(inherited)"
                       ENABLE_BITCODE: "YES"
                       ONLY_ACTIVE_ARCH: "NO"
                       VALID_ARCHS: "arm64"
