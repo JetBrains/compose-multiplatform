@@ -11,13 +11,12 @@ import org.jetbrains.compose.experimental.dsl.DeployTarget
 import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
 import java.io.File
 
-
 fun Project.registerConnectedDeviceTasks(
     id: String,
     deploy: DeployTarget.ConnectedDevice,
     buildIosDir: File,
     projectName: String,
-    bundleIdPrefix: String
+    iosDeployExecutable: File,
 ) {
     val xcodeProjectDir = buildIosDir.resolve("$projectName.xcodeproj")
     val iosCompiledAppDir = xcodeProjectDir.resolve("build/Build/Products/Debug-iphoneos/$projectName.app")
@@ -48,10 +47,11 @@ fun Project.registerConnectedDeviceTasks(
     }
 
     val taskDeploy = tasks.composeIosTask<AbstractComposeIosTask>("iosDeploy$id") {
+        dependsOn(TASK_INSTALL_IOS_DEPLOY_NAME)
         dependsOn(taskBuild)
         doLast {
             runExternalTool(
-                MacUtils.iosDeploy,
+                iosDeployExecutable,
                 listOf(
                     "--debug",
                     "--bundle", iosCompiledAppDir.absolutePath,

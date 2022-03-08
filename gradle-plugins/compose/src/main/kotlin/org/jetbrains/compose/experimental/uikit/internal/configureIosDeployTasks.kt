@@ -17,6 +17,9 @@ const val XCODE_GEN_GIT = "https://github.com/yonaskolb/XcodeGen.git"
 const val XCODE_GEN_TAG = "2.26.0"
 const val TASK_INSTALL_XCODE_GEN_NAME = "iosInstallXcodeGen"
 const val TASK_USE_XCODE_GEN_NAME = "iosUseXCodeGen"
+const val IOS_DEPLOY_GIT = "https://github.com/ios-control/ios-deploy.git"
+const val IOS_DEPLOY_TAG = "1.11.4"
+const val TASK_INSTALL_IOS_DEPLOY_NAME = "iosInstallIosDeploy"
 const val SDK_PREFIFX_SIMULATOR = "iphonesimulator"
 const val SDK_PREFIX_IPHONEOS = "iphoneos"
 
@@ -24,7 +27,9 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
     val projectName = application.projectName
     val bundleIdPrefix = application.bundleIdPrefix
     val xcodeGenSrc = rootProject.buildDir.resolve("xcodegen-$XCODE_GEN_TAG-src")
+    val iosDeploySrc = rootProject.buildDir.resolve("ios-deploy-$IOS_DEPLOY_TAG-src")
     val xcodeGenExecutable = xcodeGenSrc.resolve(".build/apple/Products/Release/xcodegen")
+    val iosDeployExecutable = iosDeploySrc.resolve("build/Release/ios-deploy")
     val buildIosDir = buildDir.resolve("ios")
 
     tasks.composeIosTask<AbstractComposeIosTask>(TASK_INSTALL_XCODE_GEN_NAME) {
@@ -45,6 +50,28 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
                 MacUtils.make,
                 listOf("build"),
                 workingDir = xcodeGenSrc
+            )
+        }
+    }
+
+    tasks.composeIosTask<AbstractComposeIosTask>(TASK_INSTALL_IOS_DEPLOY_NAME) {
+        onlyIf { !iosDeployExecutable.exists() }
+        doLast {
+            iosDeploySrc.deleteRecursively()
+            runExternalTool(
+                UnixUtils.git,
+                listOf(
+                    "clone",
+                    "--depth", "1",
+                    "--branch", IOS_DEPLOY_TAG,
+                    IOS_DEPLOY_GIT,
+                    iosDeploySrc.absolutePath
+                )
+            )
+            runExternalTool(
+                MacUtils.xcodeBuild,
+                listOf("-target", "ios-deploy"),
+                workingDir = iosDeploySrc
             )
         }
     }
@@ -84,7 +111,7 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
                     deploy = target.deploy,
                     buildIosDir = buildIosDir,
                     projectName = projectName,
-                    bundleIdPrefix = bundleIdPrefix
+                    iosDeployExecutable = iosDeployExecutable
                 )
             }
         }
