@@ -182,6 +182,15 @@ kotlin {
     }
 }
 
+compose.desktop.nativeApplication {
+    targets(kotlin.targets.getByName("macosX64"))
+    distributions {
+        targetFormats(TargetFormat.Dmg)
+        packageName = "FallingBalls"
+        packageVersion = "1.0.0"
+    }
+}
+
 // a temporary workaround for a bug in jsRun invocation - see https://youtrack.jetbrains.com/issue/KT-48273
 afterEvaluate {
     rootProject.extensions.configure<NodeJsRootExtension> {

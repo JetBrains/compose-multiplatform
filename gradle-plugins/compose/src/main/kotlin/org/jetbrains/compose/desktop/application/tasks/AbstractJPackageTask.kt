@@ -451,9 +451,8 @@ abstract class AbstractJPackageTask @Inject constructor(
         }
 
         // todo: incremental copy
+        cleanDirs(packagedResourcesDir)
         val destResourcesDir = packagedResourcesDir.ioFile
-        fileOperations.delete(destResourcesDir)
-        fileOperations.mkdir(destResourcesDir)
         val appResourcesDir = appResourcesDir.ioFileOrNull
         if (appResourcesDir != null) {
             for (file in appResourcesDir.walk()) {
@@ -467,8 +466,7 @@ abstract class AbstractJPackageTask @Inject constructor(
             }
         }
 
-        fileOperations.delete(jpackageResources)
-        fileOperations.mkdir(jpackageResources)
+        cleanDirs(jpackageResources)
         if (currentOS == OS.MacOS) {
             InfoPlistBuilder(macExtraPlistKeysRawXml.orNull)
                 .also { setInfoPlistValues(it) }

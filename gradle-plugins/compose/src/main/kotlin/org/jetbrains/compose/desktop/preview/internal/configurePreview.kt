@@ -1,7 +1,7 @@
 package org.jetbrains.compose.desktop.preview.internal
 
 import org.gradle.api.Project
-import org.jetbrains.compose.desktop.application.dsl.ConfigurationSource
+import org.jetbrains.compose.desktop.application.internal.ConfigurationSource
 import org.jetbrains.compose.desktop.preview.tasks.AbstractConfigureDesktopPreviewTask
 import org.jetbrains.compose.internal.*
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
@@ -33,4 +33,4 @@ private fun registerConfigurePreviewTask(project: Project, config: Configuration
 }
 
 private fun previewTaskName(targetName: String) =
-    "configureDesktopPreview${targetName.capitalize()}"
+    "configureDesktopPreview${targetName.uppercaseFirstChar()}"

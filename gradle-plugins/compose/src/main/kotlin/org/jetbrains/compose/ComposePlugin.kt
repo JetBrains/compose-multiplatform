@@ -20,7 +20,7 @@ import org.gradle.api.plugins.ExtensionAware
 import org.jetbrains.compose.android.AndroidExtension
 import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
-import org.jetbrains.compose.desktop.application.internal.configureApplicationImpl
+import org.jetbrains.compose.desktop.application.internal.configureDesktop
 import org.jetbrains.compose.desktop.application.internal.currentTarget
 import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
@@ -51,12 +51,7 @@ class ComposePlugin : Plugin<Project> {
         project.plugins.apply(ComposeCompilerKotlinSupportPlugin::class.java)
 
         project.afterEvaluate {
-            if (desktopExtension._isApplicationInitialized) {
-                // If application object was not accessed in a script,
-                // we want to avoid creating tasks like package, run, etc. to avoid conflicts with other plugins
-                configureApplicationImpl(project, desktopExtension.application)
-            }
-
+            configureDesktop(project, desktopExtension)
             project.configureExperimental(composeExtension, experimentalExtension)
 
             if (androidExtension.useAndroidX) {

@@ -37,8 +37,7 @@ abstract class AbstractJvmToolOperationTask(private val toolName: String) : Abst
     }
 
     protected open fun prepareWorkingDir(inputChanges: InputChanges) {
-        fileOperations.delete(workingDir)
-        fileOperations.mkdir(workingDir)
+        cleanDirs(workingDir)
     }
 
     protected open fun makeArgs(tmpDir: File): MutableList<String> = arrayListOf<String>().apply {

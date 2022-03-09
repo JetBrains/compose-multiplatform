@@ -7,6 +7,7 @@ package org.jetbrains.compose.desktop.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.Directory
+import org.gradle.api.file.FileSystemLocation
 import org.gradle.api.internal.file.FileOperations
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -15,16 +16,9 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.LocalState
 import org.gradle.process.ExecOperations
-import org.gradle.process.ExecResult
-import org.jetbrains.compose.desktop.application.internal.*
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
-import org.jetbrains.compose.desktop.application.internal.alsoOutputTo
-import org.jetbrains.compose.desktop.application.internal.ioFile
 import org.jetbrains.compose.desktop.application.internal.notNullProperty
-import java.io.File
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 abstract class AbstractComposeDesktopTask : DefaultTask() {
@@ -53,4 +47,11 @@ abstract class AbstractComposeDesktopTask : DefaultTask() {
     @get:Internal
     internal val runExternalTool: ExternalToolRunner
         get() = ExternalToolRunner(verbose, logsDir, execOperations)
+
+    protected fun cleanDirs(vararg dirs: Provider<out FileSystemLocation>) {
+        for (dir in dirs) {
+            fileOperations.delete(dir)
+            fileOperations.mkdir(dir)
+        }
+    }
 }

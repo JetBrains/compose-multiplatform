@@ -7,13 +7,13 @@ package org.jetbrains.compose.desktop.application.internal
 
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import org.jetbrains.compose.desktop.application.dsl.Application
-import org.jetbrains.compose.desktop.application.dsl.NativeDistributions
+import org.jetbrains.compose.desktop.application.dsl.JvmApplication
+import org.jetbrains.compose.desktop.application.dsl.JvmApplicationDistributions
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 internal fun packageVersionFor(
     project: Project,
-    app: Application,
+    app: JvmApplication,
     targetFormat: TargetFormat
 ): Provider<String?> =
     project.provider {
@@ -22,7 +22,7 @@ internal fun packageVersionFor(
             ?: "1.0.0"
     }
 
-private fun NativeDistributions.packageVersionFor(
+private fun JvmApplicationDistributions.packageVersionFor(
     targetFormat: TargetFormat
 ): String? {
     val formatSpecificVersion: String? = when (targetFormat) {
@@ -46,7 +46,7 @@ private fun NativeDistributions.packageVersionFor(
 
 internal fun packageBuildVersionFor(
     project: Project,
-    app: Application,
+    app: JvmApplication,
     targetFormat: TargetFormat
 ): Provider<String?> =
     project.provider {
@@ -57,7 +57,7 @@ internal fun packageBuildVersionFor(
             ?: "1.0.0"
     }
 
-private fun NativeDistributions.packageBuildVersionFor(
+private fun JvmApplicationDistributions.packageBuildVersionFor(
     targetFormat: TargetFormat
 ): String? {
     check(targetFormat.targetOS == OS.MacOS)
