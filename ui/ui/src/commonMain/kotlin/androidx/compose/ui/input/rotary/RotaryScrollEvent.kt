@@ -37,17 +37,26 @@ class RotaryScrollEvent internal constructor(
      * The amount to scroll (in pixels) in response to a [RotaryScrollEvent] in a container that
      * can scroll horizontally.
      */
-    val horizontalScrollPixels: Float
+    val horizontalScrollPixels: Float,
+
+    /**
+     * The time in milliseconds at which this even occurred. The start (`0`) time is
+     * platform-dependent.
+     */
+    val uptimeMillis: Long
 ) : FocusAwareEvent {
     override fun equals(other: Any?): Boolean = other is RotaryScrollEvent &&
         other.verticalScrollPixels == verticalScrollPixels &&
-        other.horizontalScrollPixels == horizontalScrollPixels
+        other.horizontalScrollPixels == horizontalScrollPixels &&
+        other.uptimeMillis == uptimeMillis
 
     override fun hashCode(): Int = 0
             .let { 31 * it + verticalScrollPixels.hashCode() }
             .let { 31 * it + horizontalScrollPixels.hashCode() }
+            .let { 31 * it + uptimeMillis.hashCode() }
 
     override fun toString(): String = "RotaryScrollEvent(" +
         "verticalScrollPixels=$verticalScrollPixels," +
-        "horizontalScrollPixels=$horizontalScrollPixels)"
+        "horizontalScrollPixels=$horizontalScrollPixels," +
+        "uptimeMillis=$uptimeMillis)"
 }

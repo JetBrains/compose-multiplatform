@@ -1845,8 +1845,10 @@ package androidx.compose.ui.input.rotary {
 
   @androidx.compose.ui.ExperimentalComposeUiApi public final class RotaryScrollEvent {
     method public float getHorizontalScrollPixels();
+    method public long getUptimeMillis();
     method public float getVerticalScrollPixels();
     property public final float horizontalScrollPixels;
+    property public final long uptimeMillis;
     property public final float verticalScrollPixels;
   }
 
