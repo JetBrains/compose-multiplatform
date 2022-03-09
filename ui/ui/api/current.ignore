@@ -9,3 +9,7 @@ RemovedClass: androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapp
     Removed class androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapperKt
 RemovedClass: androidx.compose.ui.platform.TextToolbarKt:
     Removed class androidx.compose.ui.platform.TextToolbarKt
+
+
+RemovedMethod: androidx.compose.ui.graphics.vector.ImageVector.Builder#Builder(String, float, float, float, float, long, int):
+    Removed constructor androidx.compose.ui.graphics.vector.ImageVector.Builder(String,float,float,float,float,long,int)

@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.testutils.assertPixels
@@ -54,6 +55,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalImageVectorCache
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.ImageVectorCache
 import androidx.compose.ui.unit.Density
@@ -336,7 +338,8 @@ class VectorTest {
         rule.setContent {
             val vectorPainter = rememberVectorPainter(
                 defaultWidth = defaultWidth,
-                defaultHeight = defaultHeight
+                defaultHeight = defaultHeight,
+                autoMirror = false
             ) { viewportWidth, viewportHeight ->
                 Path(
                     fill = SolidColor(Color.Blue),
@@ -492,6 +495,32 @@ class VectorTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun testVectorMirror() {
+        val tag = "mirroredVector"
+        rule.setContent {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                Image(
+                    painter = VectorMirror(20),
+                    contentDescription = null,
+                    modifier = Modifier.testTag(tag)
+                )
+            }
+        }
+        rule.onNodeWithTag(tag).captureToImage().toPixelMap().apply {
+            assertEquals(Color.Blue, this[2, 2])
+            assertEquals(Color.Blue, this[2, height - 3])
+            assertEquals(Color.Blue, this[width / 2 - 3, 2])
+            assertEquals(Color.Blue, this[width / 2 - 3, height - 3])
+
+            assertEquals(Color.Red, this[width - 3, 2])
+            assertEquals(Color.Red, this[width - 3, height - 3])
+            assertEquals(Color.Red, this[width / 2 + 3, 2])
+            assertEquals(Color.Red, this[width / 2 + 3, height - 3])
+        }
+    }
+
     @Composable
     private fun VectorTint(
         size: Int = 200,
@@ -517,6 +546,7 @@ class VectorTest {
         return rememberVectorPainter(
             defaultWidth = sizeDp,
             defaultHeight = sizeDp,
+            autoMirror = false,
             content = { _, _ ->
                 Path(
                     pathData = PathData {
@@ -543,7 +573,8 @@ class VectorTest {
         val background = Modifier.paint(
             rememberVectorPainter(
                 defaultWidth = sizeDp,
-                defaultHeight = sizeDp
+                defaultHeight = sizeDp,
+                autoMirror = false
             ) { _, _ ->
                 Path(
                     // Cyan background.
@@ -596,7 +627,8 @@ class VectorTest {
         val background = Modifier.paint(
             rememberVectorPainter(
                 defaultWidth = sizeDp,
-                defaultHeight = sizeDp
+                defaultHeight = sizeDp,
+                autoMirror = false
             ) { _, _ ->
                 Path(
                     pathData = PathData {
@@ -624,6 +656,38 @@ class VectorTest {
         )
         AtLeastSize(size = minimumSize, modifier = background) {
         }
+    }
+
+    @Composable
+    private fun VectorMirror(size: Int): VectorPainter {
+        val sizePx = size.toFloat()
+        val sizeDp = (size / LocalDensity.current.density).dp
+        return rememberVectorPainter(
+                defaultWidth = sizeDp,
+                defaultHeight = sizeDp,
+                autoMirror = true
+            ) { _, _ ->
+                Path(
+                    pathData = PathData {
+                        lineTo(sizePx / 2, 0f)
+                        lineTo(sizePx / 2, sizePx)
+                        lineTo(0f, sizePx)
+                        close()
+                    },
+                    fill = SolidColor(Color.Red)
+                )
+
+                Path(
+                    pathData = PathData {
+                        moveTo(sizePx / 2, 0f)
+                        lineTo(sizePx, 0f)
+                        lineTo(sizePx, sizePx)
+                        lineTo(sizePx / 2, sizePx)
+                        close()
+                    },
+                    fill = SolidColor(Color.Blue)
+                )
+            }
     }
 
     private fun takeScreenShot(width: Int, height: Int = width): Bitmap {

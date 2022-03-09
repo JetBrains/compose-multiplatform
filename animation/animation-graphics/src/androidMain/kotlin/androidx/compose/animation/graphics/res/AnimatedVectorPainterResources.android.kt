@@ -61,6 +61,7 @@ private fun rememberAnimatedVectorPainter(
         name = animatedImageVector.imageVector.name,
         tintColor = animatedImageVector.imageVector.tintColor,
         tintBlendMode = animatedImageVector.imageVector.tintBlendMode,
+        autoMirror = true
     ) { _, _ ->
         val transition = updateTransition(atEnd, label = animatedImageVector.imageVector.name)
         render(

@@ -617,6 +617,7 @@ package androidx.compose.ui.graphics {
 package androidx.compose.ui.graphics.vector {
 
   @androidx.compose.runtime.Immutable public final class ImageVector {
+    method public boolean getAutoMirror();
     method public float getDefaultHeight();
     method public float getDefaultWidth();
     method public String getName();
@@ -625,6 +626,7 @@ package androidx.compose.ui.graphics.vector {
     method public long getTintColor();
     method public float getViewportHeight();
     method public float getViewportWidth();
+    property public final boolean autoMirror;
     property public final float defaultHeight;
     property public final float defaultWidth;
     property public final String name;
@@ -637,7 +639,8 @@ package androidx.compose.ui.graphics.vector {
   }
 
   public static final class ImageVector.Builder {
-    ctor public ImageVector.Builder(optional String name, float defaultWidth, float defaultHeight, float viewportWidth, float viewportHeight, optional long tintColor, optional int tintBlendMode);
+    ctor public ImageVector.Builder(optional String name, float defaultWidth, float defaultHeight, float viewportWidth, float viewportHeight, optional long tintColor, optional int tintBlendMode, optional boolean autoMirror);
+    method @Deprecated public androidx.compose.ui.graphics.vector.ImageVector.Builder! Builder(optional String name, float defaultWidth, float defaultHeight, float viewportWidth, float viewportHeight, optional long tintColor, optional int tintBlendMode);
     method public androidx.compose.ui.graphics.vector.ImageVector.Builder addGroup(optional String name, optional float rotate, optional float pivotX, optional float pivotY, optional float scaleX, optional float scaleY, optional float translationX, optional float translationY, optional java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> clipPathData);
     method public androidx.compose.ui.graphics.vector.ImageVector.Builder addPath(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> pathData, optional int pathFillType, optional String name, optional androidx.compose.ui.graphics.Brush? fill, optional float fillAlpha, optional androidx.compose.ui.graphics.Brush? stroke, optional float strokeAlpha, optional float strokeLineWidth, optional int strokeLineCap, optional int strokeLineJoin, optional float strokeLineMiter, optional float trimPathStart, optional float trimPathEnd, optional float trimPathOffset);
     method public androidx.compose.ui.graphics.vector.ImageVector build();
@@ -745,7 +748,8 @@ package androidx.compose.ui.graphics.vector {
 
   public final class VectorPainterKt {
     method @androidx.compose.runtime.Composable public static void RenderVectorGroup(androidx.compose.ui.graphics.vector.VectorGroup group, optional java.util.Map<java.lang.String,? extends androidx.compose.ui.graphics.vector.VectorConfig> configs);
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableOpenTarget(index=0xffffffff) public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, optional long tintColor, optional int tintBlendMode, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> content);
+    method @Deprecated @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableOpenTarget(index=0xffffffff) public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, optional long tintColor, optional int tintBlendMode, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableOpenTarget(index=0xffffffff) public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, optional long tintColor, optional int tintBlendMode, optional boolean autoMirror, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> content);
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(androidx.compose.ui.graphics.vector.ImageVector image);
     field public static final String RootGroupName = "VectorRootGroup";
   }
