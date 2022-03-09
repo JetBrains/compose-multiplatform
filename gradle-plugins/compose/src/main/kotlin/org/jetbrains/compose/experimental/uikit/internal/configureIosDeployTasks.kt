@@ -34,12 +34,7 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
                 )
             }
             is DeployTarget.LocalFile -> {
-                registerLocalFileTasks(
-                    id = id,
-                    deploy = target.deploy,
-                    projectName = projectName,
-                    bundleIdPrefix = bundleIdPrefix,
-                )
+                TODO("DeployTarget.LocalFile not implemented")
             }
             is DeployTarget.ConnectedDevice -> {
                 registerConnectedDeviceTasks(
