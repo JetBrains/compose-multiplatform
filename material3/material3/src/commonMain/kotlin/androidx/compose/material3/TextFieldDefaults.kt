@@ -333,9 +333,9 @@ object TextFieldDefaults {
         disabledLabelColor: Color = FilledTextFieldTokens.DisabledLabelColor.toColor()
             .copy(alpha = FilledTextFieldTokens.DisabledLabelOpacity),
         errorLabelColor: Color = FilledTextFieldTokens.ErrorLabelColor.toColor(),
-        placeholderColor: Color = FilledTextFieldTokens.SupportingColor.toColor(),
-        disabledPlaceholderColor: Color = FilledTextFieldTokens.DisabledSupportingColor.toColor()
-            .copy(alpha = FilledTextFieldTokens.DisabledSupportingOpacity)
+        placeholderColor: Color = FilledTextFieldTokens.InputPlaceholderColor.toColor(),
+        disabledPlaceholderColor: Color = FilledTextFieldTokens.DisabledInputColor.toColor()
+            .copy(alpha = FilledTextFieldTokens.DisabledInputOpacity)
     ): TextFieldColors =
         DefaultTextFieldColors(
             textColor = textColor,
@@ -396,9 +396,9 @@ object TextFieldDefaults {
         disabledLabelColor: Color = OutlinedTextFieldTokens.DisabledLabelColor.toColor()
             .copy(alpha = OutlinedTextFieldTokens.DisabledLabelOpacity),
         errorLabelColor: Color = OutlinedTextFieldTokens.ErrorLabelColor.toColor(),
-        placeholderColor: Color = OutlinedTextFieldTokens.SupportingColor.toColor(),
-        disabledPlaceholderColor: Color = OutlinedTextFieldTokens.DisabledSupportingColor.toColor()
-            .copy(alpha = OutlinedTextFieldTokens.DisabledSupportingOpacity)
+        placeholderColor: Color = OutlinedTextFieldTokens.InputPlaceholderColor.toColor(),
+        disabledPlaceholderColor: Color = OutlinedTextFieldTokens.DisabledInputColor.toColor()
+            .copy(alpha = OutlinedTextFieldTokens.DisabledInputOpacity)
     ): TextFieldColors =
         DefaultTextFieldColors(
             textColor = textColor,
