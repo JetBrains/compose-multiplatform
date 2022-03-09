@@ -74,7 +74,8 @@ internal class ComposeWindowDelegate(
             layer.component.requestFocus()
         }
 
-        override fun getPreferredSize() = layer.component.preferredSize
+        override fun getPreferredSize() =
+            if (isPreferredSizeSet) super.getPreferredSize() else layer.component.preferredSize
 
         init {
             layout = null
