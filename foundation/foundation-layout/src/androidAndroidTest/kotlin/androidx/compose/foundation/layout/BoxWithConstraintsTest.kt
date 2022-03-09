@@ -220,7 +220,8 @@ class BoxWithConstraintsTest : LayoutTest() {
                     rememberVectorPainter(
                         name = "testPainter",
                         defaultWidth = 10.dp,
-                        defaultHeight = 10.dp
+                        defaultHeight = 10.dp,
+                        autoMirror = false
                     ) { _, _ ->
                         /* intentionally empty */
                     }

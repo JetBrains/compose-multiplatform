@@ -150,9 +150,12 @@ internal fun AndroidVectorParser.createVectorImageBuilder(
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_TYPE_ARRAY
     )
 
-    // TODO (njawad) handle mirroring here
-//        state.mAutoMirrored = TypedArrayUtils.getNamedBoolean(a, parser, "autoMirrored",
-//                AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_AUTO_MIRRORED, state.mAutoMirrored)
+    val autoMirror = getNamedBoolean(
+        vectorAttrs,
+        "autoMirrored",
+        AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_AUTO_MIRRORED,
+        false
+    )
 
     val viewportWidth = getNamedFloat(
         vectorAttrs,
@@ -244,7 +247,8 @@ internal fun AndroidVectorParser.createVectorImageBuilder(
         viewportWidth = viewportWidth,
         viewportHeight = viewportHeight,
         tintColor = tintColor,
-        tintBlendMode = tintBlendMode
+        tintBlendMode = tintBlendMode,
+        autoMirror = autoMirror
     )
 }
 
@@ -585,6 +589,30 @@ internal data class AndroidVectorParser(
     ): Float {
         with(typedArray) {
             val result = TypedArrayUtils.getNamedFloat(
+                this,
+                xmlParser,
+                attrName,
+                resId,
+                defaultValue
+            )
+            updateConfig(changingConfigurations)
+            return result
+        }
+    }
+
+    /**
+     * Helper method to parse a boolean with the given resource identifier and
+     * attribute name as well as update the configuration flags this
+     * float may depend on.
+     */
+    fun getNamedBoolean(
+        typedArray: TypedArray,
+        attrName: String,
+        @StyleableRes resId: Int,
+        defaultValue: Boolean
+    ): Boolean {
+        with(typedArray) {
+            val result = TypedArrayUtils.getNamedBoolean(
                 this,
                 xmlParser,
                 attrName,

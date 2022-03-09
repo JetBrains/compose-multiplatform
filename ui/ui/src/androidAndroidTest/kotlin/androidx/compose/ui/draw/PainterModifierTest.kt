@@ -710,6 +710,7 @@ class PainterModifierTest {
                         rememberVectorPainter(
                             defaultWidth = vectorWidthDp,
                             defaultHeight = vectorHeightDp,
+                            autoMirror = false,
                             content = { viewportWidth, viewportHeight ->
                                 Path(
                                     fill = SolidColor(Color.Red),
