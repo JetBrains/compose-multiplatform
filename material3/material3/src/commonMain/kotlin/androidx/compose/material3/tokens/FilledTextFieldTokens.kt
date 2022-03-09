@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_77
+// VERSION: v0_89
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -79,6 +79,9 @@ internal object FilledTextFieldTokens {
     val HoverTrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val InputColor = ColorSchemeKeyTokens.OnSurface
     val InputFont = TypographyKeyTokens.BodyLarge
+    val InputPlaceholderColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val InputPrefixColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val InputSuffixColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val LabelColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val LabelFont = TypographyKeyTokens.BodyLarge
     val LeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
