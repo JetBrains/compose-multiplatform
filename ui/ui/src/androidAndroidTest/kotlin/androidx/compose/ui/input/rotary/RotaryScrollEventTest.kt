@@ -146,6 +146,74 @@ class RotaryScrollEventTest {
         }
     }
 
+    @Test
+    fun rotaryEventHasTime() {
+        val TIME = 1234567890L
+
+        // Arrange.
+        ContentWithInitialFocus {
+            Box(
+                modifier = Modifier
+                    .onRotaryScrollEvent {
+                        receivedEvent = it
+                        true
+                    }
+                    .focusable(initiallyFocused = true)
+            )
+        }
+
+        // Act.
+        rule.runOnIdle {
+            rootView.dispatchGenericMotionEvent(
+                MotionEventBuilder.newBuilder()
+                    .setAction(ACTION_SCROLL)
+                    .setSource(SOURCE_ROTARY_ENCODER)
+                    .setEventTime(TIME)
+                    .build()
+            )
+        }
+
+        // Assert.
+        rule.runOnIdle {
+            with(checkNotNull(receivedEvent)) {
+                assertThat(uptimeMillis).isEqualTo(TIME)
+            }
+        }
+    }
+
+    @Test
+    fun rotaryEventUsesTestTime() {
+        val TIME_DELTA = 1234L
+
+        val receivedEvents = mutableListOf<RotaryScrollEvent>()
+        // Arrange.
+        ContentWithInitialFocus {
+            Box(
+                modifier = Modifier
+                    .onRotaryScrollEvent {
+                        receivedEvents.add(it)
+                        true
+                    }
+                    .focusable(initiallyFocused = true)
+            )
+        }
+
+        // Act.
+        @OptIn(ExperimentalTestApi::class)
+        rule.onRoot().performRotaryScrollInput {
+            rotateToScrollVertically(3.0f)
+            advanceEventTime(TIME_DELTA)
+            rotateToScrollVertically(3.0f)
+        }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(receivedEvents.size).isEqualTo(2)
+            assertThat(receivedEvents[1].uptimeMillis - receivedEvents[0].uptimeMillis)
+                .isEqualTo(TIME_DELTA)
+        }
+    }
+
     private fun Modifier.focusable(initiallyFocused: Boolean = false) = this
         .then(if (initiallyFocused) Modifier.focusRequester(initialFocus) else Modifier)
         .focusTarget()

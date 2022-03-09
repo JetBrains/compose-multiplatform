@@ -56,7 +56,8 @@ class FocusAwareEventPropagationTest {
     val rule = createComposeRule()
 
     @OptIn(ExperimentalComposeUiApi::class)
-    private val sentEvent: FocusAwareTestEvent = FocusAwareTestEvent(2f, 2f)
+    private val sentEvent: FocusAwareTestEvent =
+        FocusAwareTestEvent(1f, 2f, 3L)
     private var receivedEvent: FocusAwareTestEvent? = null
     private val initialFocus = FocusRequester()
 
@@ -162,7 +163,9 @@ class FocusAwareEventPropagationTest {
 
         // Assert.
         rule.runOnIdle {
-            assertThat(receivedEvent).isEqualTo(sentEvent)
+            // performFocusAwareInput generates a vertical scroll
+            assertThat(sentEvent.verticalScrollPixels)
+                .isEqualTo(receivedEvent?.verticalScrollPixels)
         }
     }
 
@@ -185,7 +188,9 @@ class FocusAwareEventPropagationTest {
 
         // Assert.
         rule.runOnIdle {
-            assertThat(receivedEvent).isEqualTo(sentEvent)
+            // performFocusAwareInput generates a vertical scroll
+            assertThat(sentEvent.verticalScrollPixels)
+                .isEqualTo(receivedEvent?.verticalScrollPixels)
         }
     }
 
