@@ -47,6 +47,7 @@ sealed interface DeployTarget {
 
     open class ConnectedDevice : DeployTarget {
         var buildConfiguration: String = "Debug"
+        var teamId: String = ""
     }
 }
 

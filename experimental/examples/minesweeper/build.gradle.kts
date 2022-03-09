@@ -155,7 +155,6 @@ compose.experimental {
     uikit.application {
         bundleIdPrefix = "org.jetbrains"
         projectName = "ComposeMinesweeper"
-        teamId = "JMS9FA69HB"
         deployConfigurations {
             simulator("IPhone8") {
                 //Usage: ./gradlew iosDeployIPhone8
@@ -167,12 +166,9 @@ compose.experimental {
                 device = IOSDevices.IPAD_MINI_6th_Gen
                 buildConfiguration = "Debug"
             }
-            localFile("Ipa") {
-                buildConfiguration = "Release"
-//                signingConfiguration = developmentSigning
-            }
             connectedDevice("Device") {
                 buildConfiguration = "Debug"
+                teamId = "JMS9FA69HB"
             }
         }
     }

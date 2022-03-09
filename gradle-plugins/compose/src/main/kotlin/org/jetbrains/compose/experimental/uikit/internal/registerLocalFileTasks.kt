@@ -9,18 +9,22 @@ import org.gradle.api.*
 import org.jetbrains.compose.desktop.application.internal.MacUtils
 import org.jetbrains.compose.experimental.dsl.DeployTarget
 import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
-import java.io.File
-
 
 fun Project.registerLocalFileTasks(
     id: String,
     deploy: DeployTarget.LocalFile,
-    projectName: String
+    projectName: String,
+    bundleIdPrefix: String
 ) {
-    val xcodeProjectDir = buildIosDir.resolve("$projectName.xcodeproj")
+    val taskGenerateXcodeProject = configureTaskToGenerateXcodeProject(
+        id = id,
+        projectName = projectName,
+        bundleIdPrefix = bundleIdPrefix,
+    )
+    val xcodeProjectDir = getBuildIosDir(id).resolve("$projectName.xcodeproj")
     val iosCompiledAppDir = xcodeProjectDir.resolve("build/Build/Products/Debug-iphoneos/$projectName.app")
     val taskBuild = tasks.composeIosTask<AbstractComposeIosTask>("iosBuildIpa$id") {
-        dependsOn(TASK_USE_XCODE_GEN_NAME)
+        dependsOn(taskGenerateXcodeProject)
         doLast {
             val sdk = SDK_PREFIX_IPHONEOS + getSimctlListData().runtimes.first().version // xcrun xcodebuild -showsdks
             val scheme = projectName // xcrun xcodebuild -list -project .

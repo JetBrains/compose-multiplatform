@@ -20,8 +20,14 @@ fun Project.registerSimulatorTasks(
     projectName: String,
     bundleIdPrefix: String
 ) {
-    val xcodeProjectDir = buildIosDir.resolve("$projectName.xcodeproj")
+    val xcodeProjectDir = getBuildIosDir(id).resolve("$projectName.xcodeproj")
     val deviceName = "device-$id"
+
+    val taskGenerateXcodeProject = configureTaskToGenerateXcodeProject(
+        id = id,
+        projectName = projectName,
+        bundleIdPrefix = bundleIdPrefix
+    )
 
     val taskCreateSimulator = tasks.composeIosTask<AbstractComposeIosTask>("iosSimulatorCreate$id") {
         onlyIf { getSimctlListData().devices.map { it.value }.flatten().none { it.name == deviceName } }
@@ -66,7 +72,7 @@ fun Project.registerSimulatorTasks(
     }
     val iosCompiledAppDir = xcodeProjectDir.resolve("build/Build/Products/Debug-iphonesimulator/$projectName.app")
     val taskBuild = tasks.composeIosTask<AbstractComposeIosTask>("iosSimulatorBuild$id") {
-        dependsOn(TASK_USE_XCODE_GEN_NAME)
+        dependsOn(taskGenerateXcodeProject)
         doLast {
             val sdk = SDK_PREFIFX_SIMULATOR + getSimctlListData().runtimes.first().version // xcrun xcodebuild -showsdks
             val scheme = projectName // xcrun xcodebuild -list -project .

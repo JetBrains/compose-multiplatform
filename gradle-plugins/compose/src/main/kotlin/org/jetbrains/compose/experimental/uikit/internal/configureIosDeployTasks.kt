@@ -10,11 +10,10 @@ import org.gradle.api.tasks.TaskContainer
 import org.jetbrains.compose.experimental.dsl.DeployTarget
 import org.jetbrains.compose.experimental.dsl.ExperimentalUiKitApplication
 
-const val TASK_USE_XCODE_GEN_NAME = "iosUseXCodeGen"
 const val SDK_PREFIFX_SIMULATOR = "iphonesimulator"
 const val SDK_PREFIX_IPHONEOS = "iphoneos"
 
-val Project.buildIosDir get() = buildDir.resolve("ios")
+fun Project.getBuildIosDir(id: String) = buildDir.resolve("ios").resolve(id)
 
 internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitApplication) {
     val projectName = application.projectName
@@ -22,12 +21,6 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
 
     configureInstallXcodeGenTask()
     configureInstallIosDeployTask()
-
-    configureUseXcodeGenTask(
-        projectName = projectName,
-        bundleIdPrefix = bundleIdPrefix,
-        teamId = application.teamId
-    )
 
     application.deployConfigurations.deployTargets.forEach { target ->
         val id = target.id // .replaceFirstChar { it.uppercase() } // todo upperCase first char? ./gradlew iosDeployId
@@ -45,6 +38,7 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
                     id = id,
                     deploy = target.deploy,
                     projectName = projectName,
+                    bundleIdPrefix = bundleIdPrefix,
                 )
             }
             is DeployTarget.ConnectedDevice -> {
@@ -52,6 +46,7 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
                     id = id,
                     deploy = target.deploy,
                     projectName = projectName,
+                    bundleIdPrefix = bundleIdPrefix,
                 )
             }
         }
