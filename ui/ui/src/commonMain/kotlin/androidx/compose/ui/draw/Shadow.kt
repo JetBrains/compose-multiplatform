@@ -18,6 +18,8 @@ package androidx.compose.ui.draw
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
@@ -47,11 +49,55 @@ import androidx.compose.ui.unit.dp
  * @param shape Defines a shape of the physical object
  * @param clip When active, the content drawing clips to the shape.
  */
+@Deprecated(
+    "Replace with shadow which accepts ambientColor and spotColor parameters",
+    ReplaceWith(
+        "Modifier.shadow(elevation, shape, clip, DefaultShadowColor, DefaultShadowColor)",
+        "androidx.compose.ui.draw"
+    ),
+    DeprecationLevel.HIDDEN
+)
 @Stable
 fun Modifier.shadow(
     elevation: Dp,
     shape: Shape = RectangleShape,
     clip: Boolean = elevation > 0.dp
+) = shadow(
+    elevation,
+    shape,
+    clip,
+    DefaultShadowColor,
+    DefaultShadowColor,
+)
+
+/**
+ * Creates a [graphicsLayer] that draws a shadow. The [elevation] defines the visual
+ * depth of the physical object. The physical object has a shape specified by [shape].
+ *
+ * If the passed [shape] is concave the shadow will not be drawn on Android versions less than 10.
+ *
+ * Note that [elevation] is only affecting the shadow size and doesn't change the drawing order.
+ * Use a [androidx.compose.ui.zIndex] modifier if you want to draw the elements with larger
+ * [elevation] after all the elements with a smaller one.
+ *
+ * Usage of this API renders this composable into a separate graphics layer
+ * @see graphicsLayer
+ *
+ * Example usage:
+ *
+ * @sample androidx.compose.ui.samples.ShadowSample
+ *
+ * @param elevation The elevation for the shadow in pixels
+ * @param shape Defines a shape of the physical object
+ * @param clip When active, the content drawing clips to the shape.
+ */
+@Stable
+fun Modifier.shadow(
+    elevation: Dp,
+    shape: Shape = RectangleShape,
+    clip: Boolean = elevation > 0.dp,
+    ambientColor: Color = DefaultShadowColor,
+    spotColor: Color = DefaultShadowColor,
 ) = if (elevation > 0.dp || clip) {
     inspectable(
         inspectorInfo = debugInspectorInfo {
@@ -59,12 +105,16 @@ fun Modifier.shadow(
             properties["elevation"] = elevation
             properties["shape"] = shape
             properties["clip"] = clip
+            properties["ambientColor"] = ambientColor
+            properties["spotColor"] = spotColor
         }
     ) {
         graphicsLayer {
             this.shadowElevation = elevation.toPx()
             this.shape = shape
             this.clip = clip
+            this.ambientShadowColor = ambientColor
+            this.spotShadowColor = spotColor
         }
     }
 } else {

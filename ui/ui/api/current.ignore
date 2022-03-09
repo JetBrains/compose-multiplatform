@@ -1,4 +1,10 @@
 // Baseline format: 1.0
+InvalidNullConversion: androidx.compose.ui.draw.ShadowKt#shadow(androidx.compose.ui.Modifier, float, androidx.compose.ui.graphics.Shape, boolean):
+    Attempted to remove @NonNull annotation from method androidx.compose.ui.draw.ShadowKt.shadow(androidx.compose.ui.Modifier,float,androidx.compose.ui.graphics.Shape,boolean)
+InvalidNullConversion: androidx.compose.ui.graphics.GraphicsLayerModifierKt#graphicsLayer(androidx.compose.ui.Modifier, float, float, float, float, float, float, float, float, float, float, long, androidx.compose.ui.graphics.Shape, boolean, androidx.compose.ui.graphics.RenderEffect):
+    Attempted to remove @NonNull annotation from method androidx.compose.ui.graphics.GraphicsLayerModifierKt.graphicsLayer(androidx.compose.ui.Modifier,float,float,float,float,float,float,float,float,float,float,long,androidx.compose.ui.graphics.Shape,boolean,androidx.compose.ui.graphics.RenderEffect)
+
+
 RemovedClass: androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapperKt:
     Removed class androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapperKt
 RemovedClass: androidx.compose.ui.platform.TextToolbarKt:
