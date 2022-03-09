@@ -167,7 +167,8 @@ compose.experimental {
             }
             connectedDevice("Device") {
                 buildConfiguration = "Debug"
-                teamId = "JMS9FA69HB"
+                teamId = "N462MKSJ7M"
+//                teamId = "JMS9FA69HB" // (Dima)
             }
         }
     }

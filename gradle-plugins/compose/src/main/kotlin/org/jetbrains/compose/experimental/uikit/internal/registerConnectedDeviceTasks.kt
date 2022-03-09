@@ -42,7 +42,8 @@ fun Project.registerConnectedDeviceTasks(
                         "-configuration", deploy.buildConfiguration,
                         "-derivedDataPath", "build",
                         "-arch", "arm64",
-                        "-sdk", sdk
+                        "-sdk", sdk,
+                        "-allowProvisioningUpdates"
                     ),
                     workingDir = xcodeProjectDir
                 )
