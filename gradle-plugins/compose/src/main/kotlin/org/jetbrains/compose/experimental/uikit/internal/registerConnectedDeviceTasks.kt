@@ -60,8 +60,6 @@ fun Project.registerConnectedDeviceTasks(
                 listOf(
                     "--debug",
                     "--bundle", iosCompiledAppDir.absolutePath,
-//                    "--no-wifi" //todo disableWifiDevices
-                //todo identifier 00008110-0002183C1E69801E
                 )
             )
         }
