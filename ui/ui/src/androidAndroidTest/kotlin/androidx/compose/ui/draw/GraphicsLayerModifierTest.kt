@@ -18,8 +18,10 @@ package androidx.compose.ui.draw
 
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.DefaultCameraDistance
+import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.InspectableValue
@@ -55,6 +57,8 @@ class GraphicsLayerModifierTest {
             ValueElement("translationX", 0.0f),
             ValueElement("translationY", 0.0f),
             ValueElement("shadowElevation", 0.0f),
+            ValueElement("ambientShadowColor", DefaultShadowColor),
+            ValueElement("spotShadowColor", DefaultShadowColor),
             ValueElement("rotationX", 2.0f),
             ValueElement("rotationY", 0.0f),
             ValueElement("rotationZ", 0.0f),
@@ -75,6 +79,8 @@ class GraphicsLayerModifierTest {
                 translationX = 3.0f,
                 translationY = 4.0f,
                 shadowElevation = 5.0f,
+                ambientShadowColor = Color(0xFF00FF42),
+                spotShadowColor = Color(0xFF00FF64),
                 rotationX = 6.0f,
                 rotationY = 7.0f,
                 rotationZ = 8.0f,
@@ -91,6 +97,8 @@ class GraphicsLayerModifierTest {
                     translationX = 3.0f,
                     translationY = 4.0f,
                     shadowElevation = 5.0f,
+                    ambientShadowColor = Color(0xFF00FF42),
+                    spotShadowColor = Color(0xFF00FF64),
                     rotationX = 6.0f,
                     rotationY = 7.0f,
                     rotationZ = 8.0f,
