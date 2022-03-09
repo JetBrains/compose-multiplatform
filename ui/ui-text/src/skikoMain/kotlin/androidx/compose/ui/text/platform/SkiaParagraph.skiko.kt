@@ -532,6 +532,11 @@ internal class ParagraphBuilder(
             pStyle.strutStyle = strutStyle
         }
         pStyle.direction = textDirection.toSkDirection()
+        textStyle.textIndent?.run {
+            with(density) {
+                pStyle.textIndent = SkTextIndent(firstLine.toPx(), restLine.toPx())
+            }
+        }
         return pStyle
     }
 

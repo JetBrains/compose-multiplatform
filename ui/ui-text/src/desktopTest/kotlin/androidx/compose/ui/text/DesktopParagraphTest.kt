@@ -27,7 +27,9 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.sp
@@ -316,6 +318,35 @@ class DesktopParagraphTest {
         Truth.assertThat(firstLineBottom - firstLineTop).isEqualTo(19.0f)
         Truth.assertThat(paragraphWithoutStyles.getLineTop(1)).isNotEqualTo(secondLineTop)
         Truth.assertThat(paragraphWithoutStyles.getLineBottom(1)).isNotEqualTo(secondLineBottom)
+    }
+
+    @Test
+    fun `applies text indent for paragraph`() {
+        fun measureLines(alignment: TextAlign, direction: TextDirection): List<Float> {
+            val paragraph = simpleParagraph(
+                text = "sample\ntext",
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    textIndent = TextIndent(50.sp, 20.sp),
+                    textAlign = alignment,
+                    textDirection = direction,
+                )
+            )
+            return listOf(
+                paragraph.getLineLeft(0),
+                paragraph.getLineRight(0),
+                paragraph.getLineLeft(1),
+                paragraph.getLineRight(1)
+            )
+        }
+        Truth.assertThat(measureLines(TextAlign.Left, TextDirection.Ltr)).isEqualTo(listOf(50f, 170f, 20f, 100f))
+        Truth.assertThat(measureLines(TextAlign.Center, TextDirection.Ltr)).isEqualTo(listOf(965f, 1085f, 970f, 1050f))
+        Truth.assertThat(measureLines(TextAlign.Right, TextDirection.Ltr)).isEqualTo(listOf(1830f, 1950f, 1900f, 1980f))
+        Truth.assertThat(measureLines(TextAlign.Justify, TextDirection.Ltr)).isEqualTo(listOf(50f, 170f, 20f, 100f))
+        Truth.assertThat(measureLines(TextAlign.Left, TextDirection.Rtl)).isEqualTo(listOf(50f, 170f, 20f, 100f))
+        Truth.assertThat(measureLines(TextAlign.Center, TextDirection.Rtl)).isEqualTo(listOf(915f, 1035f, 950f, 1030f))
+        Truth.assertThat(measureLines(TextAlign.Right, TextDirection.Rtl)).isEqualTo(listOf(1830f, 1950f, 1900f, 1980f))
+        Truth.assertThat(measureLines(TextAlign.Justify, TextDirection.Rtl)).isEqualTo(listOf(1830f, 1950f, 1900f, 1980f))
     }
 
     private fun simpleParagraph(
