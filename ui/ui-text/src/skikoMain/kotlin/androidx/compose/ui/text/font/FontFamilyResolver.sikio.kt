@@ -59,6 +59,7 @@ fun createFontFamilyResolver(
 ): FontFamily.Resolver {
     return FontFamilyResolverImpl(
         SkiaFontLoader(),
+        PlatformResolveInterceptor.Default,
         GlobalTypefaceRequestCache,
         FontListFontFamilyTypefaceAdapter(
             GlobalAsyncTypefaceCache,

@@ -26,6 +26,8 @@ import androidx.compose.ui.util.fastMap
 @ExperimentalTextApi
 internal class FontFamilyResolverImpl(
     internal val platformFontLoader: PlatformFontLoader /* exposed for desktop ParagraphBuilder */,
+    private val platformResolveInterceptor: PlatformResolveInterceptor =
+        PlatformResolveInterceptor.Default,
     private val typefaceRequestCache: TypefaceRequestCache = GlobalTypefaceRequestCache,
     private val fontListFontFamilyTypefaceAdapter: FontListFontFamilyTypefaceAdapter =
         FontListFontFamilyTypefaceAdapter(GlobalAsyncTypefaceCache),
@@ -33,7 +35,7 @@ internal class FontFamilyResolverImpl(
         PlatformFontFamilyTypefaceAdapter()
 ) : FontFamily.Resolver {
     private val createDefaultTypeface: (TypefaceRequest) -> Any = {
-        resolve(null, it.fontWeight, it.fontStyle, it.fontSynthesis).value
+        resolve(it.copy(fontFamily = null)).value
     }
 
     override suspend fun preload(
@@ -46,9 +48,9 @@ internal class FontFamilyResolverImpl(
 
         val typeRequests = fontFamily.fonts.fastMap {
             TypefaceRequest(
-                fontFamily,
-                it.weight,
-                it.style,
+                platformResolveInterceptor.interceptFontFamily(fontFamily),
+                platformResolveInterceptor.interceptFontWeight(it.weight),
+                platformResolveInterceptor.interceptFontStyle(it.style),
                 FontSynthesis.All,
                 platformFontLoader.cacheKey
             )
@@ -76,27 +78,54 @@ internal class FontFamilyResolverImpl(
         fontStyle: FontStyle,
         fontSynthesis: FontSynthesis,
     ): State<Any> {
-        val typeRequest = TypefaceRequest(
-            fontFamily,
-            fontWeight,
-            fontStyle,
-            fontSynthesis,
+        return resolve(TypefaceRequest(
+            platformResolveInterceptor.interceptFontFamily(fontFamily),
+            platformResolveInterceptor.interceptFontWeight(fontWeight),
+            platformResolveInterceptor.interceptFontStyle(fontStyle),
+            platformResolveInterceptor.interceptFontSynthesis(fontSynthesis),
             platformFontLoader.cacheKey
-        )
-        val result = typefaceRequestCache.runCached(typeRequest) { onAsyncCompletion ->
+        ))
+    }
+
+    /**
+     * Resolves the final [typefaceRequest] without interceptors.
+     */
+    private fun resolve(typefaceRequest: TypefaceRequest): State<Any> {
+        val result = typefaceRequestCache.runCached(typefaceRequest) { onAsyncCompletion ->
             fontListFontFamilyTypefaceAdapter.resolve(
-                typeRequest,
+                typefaceRequest,
                 platformFontLoader,
                 onAsyncCompletion,
                 createDefaultTypeface
             ) ?: platformFamilyTypefaceAdapter.resolve(
-                typeRequest,
+                typefaceRequest,
                 platformFontLoader,
                 onAsyncCompletion,
                 createDefaultTypeface
             ) ?: throw IllegalStateException("Could not load font")
         }
         return result
+    }
+}
+
+/**
+ * Platform level [FontFamily.Resolver] argument interceptor. This interface is
+ * intended to bridge accessibility constraints on any platform with
+ * Compose through the use of [FontFamilyResolverImpl.resolve].
+ */
+internal interface PlatformResolveInterceptor {
+
+    fun interceptFontFamily(fontFamily: FontFamily?): FontFamily? = fontFamily
+
+    fun interceptFontWeight(fontWeight: FontWeight): FontWeight = fontWeight
+
+    fun interceptFontStyle(fontStyle: FontStyle): FontStyle = fontStyle
+
+    fun interceptFontSynthesis(fontSynthesis: FontSynthesis): FontSynthesis = fontSynthesis
+
+    companion object {
+        // NO-OP default interceptor
+        internal val Default: PlatformResolveInterceptor = object : PlatformResolveInterceptor {}
     }
 }
 

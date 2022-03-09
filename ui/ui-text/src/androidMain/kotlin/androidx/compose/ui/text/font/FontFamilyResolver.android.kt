@@ -36,7 +36,10 @@ import kotlin.coroutines.CoroutineContext
 fun createFontFamilyResolver(
     context: Context
 ): FontFamily.Resolver {
-    return FontFamilyResolverImpl(AndroidFontLoader(context))
+    return FontFamilyResolverImpl(
+        AndroidFontLoader(context),
+        AndroidFontResolveInterceptor(context)
+    )
 }
 
 /**
@@ -69,6 +72,7 @@ fun createFontFamilyResolver(
 ): FontFamily.Resolver {
     return FontFamilyResolverImpl(
         AndroidFontLoader(context),
+        AndroidFontResolveInterceptor(context),
         GlobalTypefaceRequestCache,
         FontListFontFamilyTypefaceAdapter(
             GlobalAsyncTypefaceCache,
