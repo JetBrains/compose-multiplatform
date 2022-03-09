@@ -28,7 +28,8 @@ class MaterialIssueRegistry : IssueRegistry() {
     override val api = 13
     override val minApi = CURRENT_API
     override val issues get() = listOf(
-        ColorsDetector.ConflictingOnColor
+        ColorsDetector.ConflictingOnColor,
+        ScaffoldPaddingDetector.UnusedMaterialScaffoldPaddingParameter
     )
     override val vendor = Vendor(
         vendorName = "Jetpack Compose",
