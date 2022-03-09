@@ -37,6 +37,8 @@ import androidx.build.studio.StudioTask
 import androidx.build.testConfiguration.addAppApkToTestConfigGeneration
 import androidx.build.testConfiguration.addToTestZips
 import androidx.build.testConfiguration.configureTestConfigGeneration
+import com.android.build.api.dsl.ManagedVirtualDevice
+import com.android.build.api.dsl.TestOptions
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.HasAndroidTest
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
@@ -80,6 +82,7 @@ import java.io.File
 import java.time.Duration
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
+import org.gradle.kotlin.dsl.register
 
 /**
  * A plugin which enables all of the Gradle customizations for AndroidX.
@@ -415,6 +418,25 @@ class AndroidXImplPlugin : Plugin<Project> {
         }
     }
 
+    @Suppress("UnstableApiUsage") // Usage of ManagedVirtualDevice
+    private fun TestOptions.configureVirtualDevices() {
+        managedDevices.devices.register<ManagedVirtualDevice>("pixel2api29") {
+            device = "Pixel 2"
+            apiLevel = 29
+            systemImageSource = "aosp"
+        }
+        managedDevices.devices.register<ManagedVirtualDevice>("pixel2api30") {
+            device = "Pixel 2"
+            apiLevel = 30
+            systemImageSource = "aosp"
+        }
+        managedDevices.devices.register<ManagedVirtualDevice>("pixel2api31") {
+            device = "Pixel 2"
+            apiLevel = 31
+            systemImageSource = "aosp"
+        }
+    }
+
     private fun BaseExtension.configureAndroidBaseOptions(
         project: Project,
         androidXExtension: AndroidXExtension
@@ -434,6 +456,7 @@ class AndroidXImplPlugin : Plugin<Project> {
 
         testOptions.animationsDisabled = true
         testOptions.unitTests.isReturnDefaultValues = true
+        testOptions.configureVirtualDevices()
 
         // Include resources in Robolectric tests as a workaround for b/184641296 and
         // ensure the build directory exists as a workaround for b/187970292.
