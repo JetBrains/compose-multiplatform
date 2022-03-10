@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package androidx.compose.material3
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
@@ -40,16 +39,15 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
+import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@MediumTest
+@LargeTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
 @OptIn(ExperimentalTestApi::class)
@@ -59,8 +57,7 @@ class SwitchScreenshotTest {
     val rule = createComposeRule()
 
     @get:Rule
-    val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
-
+    val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL3)
     // TODO: this test tag as well as Boxes inside testa are temporarty, remove then b/157687898
     //  is fixed
     private val wrapperTestTag = "switchWrapper"
@@ -71,7 +68,7 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_checked() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrapperModifier) {
                 Switch(checked = true, onCheckedChange = { })
             }
@@ -81,7 +78,7 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_checked_rtl() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrapperModifier) {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Switch(checked = true, onCheckedChange = { })
@@ -93,7 +90,7 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_checked_customColor() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrapperModifier) {
                 Switch(
                     checked = true,
@@ -107,7 +104,7 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_unchecked() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrapperModifier) {
                 Switch(checked = false, onCheckedChange = { })
             }
@@ -117,7 +114,7 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_unchecked_rtl() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrapperModifier) {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Switch(checked = false, onCheckedChange = { })
@@ -128,18 +125,8 @@ class SwitchScreenshotTest {
     }
 
     @Test
-    fun switchTest_bigSizeSpecified() {
-        rule.setMaterialContent {
-            Box(wrapperModifier.requiredSize(50.dp)) {
-                Switch(checked = true, onCheckedChange = { })
-            }
-        }
-        assertToggeableAgainstGolden("switch_bigger_size")
-    }
-
-    @Test
     fun switchTest_pressed() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrapperModifier) {
                 Switch(checked = false, enabled = true, onCheckedChange = { })
             }
@@ -158,7 +145,7 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_disabled_checked() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrapperModifier) {
                 Switch(checked = true, enabled = false, onCheckedChange = { })
             }
@@ -168,7 +155,7 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_disabled_unchecked() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrapperModifier) {
                 Switch(checked = false, enabled = false, onCheckedChange = { })
             }
@@ -178,7 +165,7 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_unchecked_animateToChecked() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val isChecked = remember { mutableStateOf(false) }
             Box(wrapperModifier) {
                 Switch(
@@ -207,7 +194,7 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_checked_animateToUnchecked() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val isChecked = remember { mutableStateOf(true) }
             Box(wrapperModifier) {
                 Switch(
@@ -236,7 +223,7 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_hover() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrapperModifier) {
                 Switch(
                     checked = true,
@@ -256,8 +243,7 @@ class SwitchScreenshotTest {
     @Test
     fun switchTest_focus() {
         val focusRequester = FocusRequester()
-
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrapperModifier) {
                 Switch(
                     checked = true,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.material3.tokens.SwitchTokens
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -54,13 +54,9 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
-import androidx.compose.ui.test.swipeLeft
-import androidx.compose.ui.test.swipeRight
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -76,7 +72,7 @@ class SwitchTest {
 
     @Test
     fun switch_defaultSemantics() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Column {
                 Switch(modifier = Modifier.testTag("checked"), checked = true, onCheckedChange = {})
                 Switch(
@@ -99,7 +95,7 @@ class SwitchTest {
 
     @Test
     fun switch_toggle() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val (checked, onChecked) = remember { mutableStateOf(false) }
 
             // Box is needed because otherwise the control will be expanded to fill its parent
@@ -119,7 +115,7 @@ class SwitchTest {
 
     @Test
     fun switch_toggleTwice() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val (checked, onChecked) = remember { mutableStateOf(false) }
 
             // Box is needed because otherwise the control will be expanded to fill its parent
@@ -141,7 +137,7 @@ class SwitchTest {
 
     @Test
     fun switch_uncheckableWithNoLambda() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val (checked, _) = remember { mutableStateOf(false) }
             Switch(
                 modifier = Modifier.testTag(defaultSwitchTag),
@@ -157,8 +153,7 @@ class SwitchTest {
     @Test
     fun switch_untoggleable_whenEmptyLambda() {
         val parentTag = "parent"
-
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val (checked, _) = remember { mutableStateOf(false) }
             Box(Modifier.semantics(mergeDescendants = true) {}.testTag(parentTag)) {
                 Switch(
@@ -180,7 +175,7 @@ class SwitchTest {
 
     @Test
     fun switch_untoggleableAndMergeable_whenNullLambda() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val (checked, _) = remember { mutableStateOf(false) }
             Box(Modifier.semantics(mergeDescendants = true) {}.testTag(defaultSwitchTag)) {
                 Switch(
@@ -268,68 +263,6 @@ class SwitchTest {
         )
     }
 
-    @Test
-    fun switch_testDraggable() {
-        val state = mutableStateOf(false)
-        rule.setMaterialContent {
-
-            // Box is needed because otherwise the control will be expanded to fill its parent
-            Box {
-                Switch(
-                    modifier = Modifier.testTag(defaultSwitchTag),
-                    checked = state.value,
-                    onCheckedChange = { state.value = it }
-                )
-            }
-        }
-
-        rule.onNodeWithTag(defaultSwitchTag)
-            .performTouchInput { swipeRight() }
-
-        rule.runOnIdle {
-            Truth.assertThat(state.value).isEqualTo(true)
-        }
-
-        rule.onNodeWithTag(defaultSwitchTag)
-            .performTouchInput { swipeLeft() }
-
-        rule.runOnIdle {
-            Truth.assertThat(state.value).isEqualTo(false)
-        }
-    }
-
-    @Test
-    fun switch_testDraggable_rtl() {
-        val state = mutableStateOf(false)
-        rule.setMaterialContent {
-
-            // Box is needed because otherwise the control will be expanded to fill its parent
-            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                Box {
-                    Switch(
-                        modifier = Modifier.testTag(defaultSwitchTag),
-                        checked = state.value,
-                        onCheckedChange = { state.value = it }
-                    )
-                }
-            }
-        }
-
-        rule.onNodeWithTag(defaultSwitchTag)
-            .performTouchInput { swipeLeft() }
-
-        rule.runOnIdle {
-            Truth.assertThat(state.value).isEqualTo(true)
-        }
-
-        rule.onNodeWithTag(defaultSwitchTag)
-            .performTouchInput { swipeRight() }
-
-        rule.runOnIdle {
-            Truth.assertThat(state.value).isEqualTo(false)
-        }
-    }
-
     // regression test for b/191375128
     @Test
     fun switch_stateRestoration_stateChangeWhileSaved() {
@@ -385,7 +318,7 @@ class SwitchTest {
         rule.onNodeWithTag("2").assertIsOff()
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
+    @OptIn(ExperimentalMaterial3Api::class)
     private fun materialSizesTestForValue(
         checked: Boolean,
         clickable: Boolean,
@@ -412,8 +345,8 @@ class SwitchTest {
                 // want to multiply the error by two (one for each padding), so we get the exact
                 // padding based on the expected pixels consumed by the padding.
                 val paddingInDp = paddingInPixels.toDp()
-                assertWidthIsEqualTo(34.dp + paddingInDp * 2)
-                assertHeightIsEqualTo(20.dp + paddingInDp * 2)
+                assertWidthIsEqualTo(SwitchTokens.TrackWidth + paddingInDp * 2)
+                assertHeightIsEqualTo(SwitchTokens.HandleHeight + paddingInDp * 2)
             }
         }
     }
@@ -425,7 +358,7 @@ class SwitchTest {
     @Test
     fun switch_minTouchTargetArea(): Unit = with(rule.density) {
         var checked by mutableStateOf(false)
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             // Box is needed because otherwise the control will be expanded to fill its parent
             Box(Modifier.fillMaxSize()) {
                 Switch(

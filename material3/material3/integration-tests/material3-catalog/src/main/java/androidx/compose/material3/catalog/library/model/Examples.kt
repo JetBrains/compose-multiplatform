@@ -82,6 +82,7 @@ import androidx.compose.material3.samples.SimpleTextFieldSample
 import androidx.compose.material3.samples.SliderSample
 import androidx.compose.material3.samples.SmallFloatingActionButtonSample
 import androidx.compose.material3.samples.StepsSliderSample
+import androidx.compose.material3.samples.SwitchSample
 import androidx.compose.material3.samples.TextAndIconTabs
 import androidx.compose.material3.samples.TextArea
 import androidx.compose.material3.samples.TextButtonSample
@@ -494,6 +495,18 @@ val SnackbarsExamples = listOf(
     ) {
         ScaffoldWithCoroutinesSnackbar()
     }
+)
+
+private const val SwitchExampleDescription = "Switch examples"
+private const val SwitchExampleSourceUrl = "$SampleSourceUrl/Switch.kt"
+val SwitchExamples = listOf(
+    Example(
+        name = ::SwitchSample.name,
+        description = SwitchExampleDescription,
+        sourceUrl = SwitchExampleSourceUrl
+    ) {
+        SwitchSample()
+    },
 )
 
 private const val TabsExampleDescription = "Tabs examples"
