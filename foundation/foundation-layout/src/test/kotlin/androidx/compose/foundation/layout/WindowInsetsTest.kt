@@ -276,4 +276,15 @@ class WindowInsetsTest {
             "InsetsValues(left=1, top=2, right=3, bottom=4)"
         )
     }
+
+    @Test
+    fun paddingValuesWithDensity() {
+        val dpInsets = WindowInsets(20, 22, 24, 26)
+
+        val paddingValues = dpInsets.asPaddingValues(Density(2f))
+        assertThat(paddingValues.calculateLeftPadding(LayoutDirection.Ltr)).isEqualTo(10.dp)
+        assertThat(paddingValues.calculateTopPadding()).isEqualTo(11.dp)
+        assertThat(paddingValues.calculateRightPadding(LayoutDirection.Ltr)).isEqualTo(12.dp)
+        assertThat(paddingValues.calculateBottomPadding()).isEqualTo(13.dp)
+    }
 }
