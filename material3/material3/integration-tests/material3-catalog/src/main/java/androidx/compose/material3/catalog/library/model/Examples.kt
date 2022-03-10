@@ -38,6 +38,8 @@ import androidx.compose.material3.samples.DismissibleNavigationDrawerSample
 import androidx.compose.material3.samples.EditableExposedDropdownMenuSample
 import androidx.compose.material3.samples.ElevatedButtonSample
 import androidx.compose.material3.samples.ElevatedCardSample
+import androidx.compose.material3.samples.ElevatedFilterChipSample
+import androidx.compose.material3.samples.ElevatedSuggestionChipSample
 import androidx.compose.material3.samples.EnterAlwaysSmallTopAppBar
 import androidx.compose.material3.samples.ExitUntilCollapsedLargeTopAppBar
 import androidx.compose.material3.samples.ExitUntilCollapsedMediumTopAppBar
@@ -50,6 +52,8 @@ import androidx.compose.material3.samples.FancyTabs
 import androidx.compose.material3.samples.FilledIconButtonSample
 import androidx.compose.material3.samples.FilledIconToggleButtonSample
 import androidx.compose.material3.samples.FilledTonalButtonSample
+import androidx.compose.material3.samples.FilterChipSample
+import androidx.compose.material3.samples.FilterChipWithLeadingIconSample
 import androidx.compose.material3.samples.FilledTonalIconButtonSample
 import androidx.compose.material3.samples.FilledTonalIconToggleButtonSample
 import androidx.compose.material3.samples.FloatingActionButtonSample
@@ -90,6 +94,7 @@ import androidx.compose.material3.samples.SimpleTextFieldSample
 import androidx.compose.material3.samples.SliderSample
 import androidx.compose.material3.samples.SmallFloatingActionButtonSample
 import androidx.compose.material3.samples.StepsSliderSample
+import androidx.compose.material3.samples.SuggestionChipSample
 import androidx.compose.material3.samples.SwitchWithThumbIconSample
 import androidx.compose.material3.samples.SwitchSample
 import androidx.compose.material3.samples.TextAndIconTabs
@@ -213,6 +218,46 @@ val CheckboxesExamples = listOf(
         sourceUrl = CheckboxesExampleSourceUrl
     ) {
         TriStateCheckboxSample()
+    }
+)
+
+private const val ChipsExampleDescription = "Chips examples"
+private const val ChipsExampleSourceUrl = "$SampleSourceUrl/ChipSamples.kt"
+val ChipsExamples = listOf(
+    Example(
+        name = ::FilterChipSample.name,
+        description = ChipsExampleDescription,
+        sourceUrl = ChipsExampleSourceUrl
+    ) {
+        FilterChipSample()
+    },
+    Example(
+        name = ::ElevatedFilterChipSample.name,
+        description = ChipsExampleDescription,
+        sourceUrl = ChipsExampleSourceUrl
+    ) {
+        ElevatedFilterChipSample()
+    },
+    Example(
+        name = ::FilterChipWithLeadingIconSample.name,
+        description = ChipsExampleDescription,
+        sourceUrl = ChipsExampleSourceUrl
+    ) {
+        FilterChipWithLeadingIconSample()
+    },
+    Example(
+        name = ::SuggestionChipSample.name,
+        description = ChipsExampleDescription,
+        sourceUrl = ChipsExampleSourceUrl
+    ) {
+        SuggestionChipSample()
+    },
+    Example(
+        name = ::ElevatedSuggestionChipSample.name,
+        description = ChipsExampleDescription,
+        sourceUrl = ChipsExampleSourceUrl
+    ) {
+        ElevatedSuggestionChipSample()
     }
 )
 
