@@ -1195,7 +1195,7 @@ internal abstract class LayoutNodeWrapper(
 
         return if ((width > 0f || height > 0f) &&
             offsetFromEdge.x <= width && offsetFromEdge.y <= height) {
-            maxOf(offsetFromEdge.x, offsetFromEdge.y)
+            offsetFromEdge.getDistanceSquared()
         } else {
             Float.POSITIVE_INFINITY // miss
         }
