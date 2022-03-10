@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -95,22 +94,9 @@ private class FocusedBoundsObserverModifier(
  */
 @OptIn(ExperimentalFoundationApi::class)
 internal class FocusedBoundsModifier : ModifierLocalConsumer,
-    OnGloballyPositionedModifier,
-    RememberObserver {
+    OnGloballyPositionedModifier {
     private var observer: ((LayoutCoordinates?) -> Unit)? = null
     private var layoutCoordinates: LayoutCoordinates? = null
-
-    override fun onRemembered() {
-        // Nothing to do.
-    }
-
-    override fun onForgotten() {
-        observer?.invoke(null)
-    }
-
-    override fun onAbandoned() {
-        // Nothing to do.
-    }
 
     override fun onGloballyPositioned(coordinates: LayoutCoordinates) {
         layoutCoordinates = coordinates
@@ -123,6 +109,10 @@ internal class FocusedBoundsModifier : ModifierLocalConsumer,
 
     override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) {
         val newObserver = with(scope) { ModifierLocalFocusedBoundsObserver.current }
+        if (newObserver == null) {
+            // We're being removed from the hierarchy. Inform the previous listener.
+            observer?.invoke(null)
+        }
         observer = newObserver
         // Don't need to explicitly notify observers here because onGloballyPositioned will get
         // called after this method, and that will notify observers.
