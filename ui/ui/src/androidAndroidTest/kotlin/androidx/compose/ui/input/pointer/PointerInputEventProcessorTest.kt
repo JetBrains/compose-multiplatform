@@ -3235,11 +3235,11 @@ private class TestOwner : Owner {
         get() = false
         set(@Suppress("UNUSED_PARAMETER") value) {}
 
-    override fun onRequestMeasure(layoutNode: LayoutNode) {
+    override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
         delegate.requestRemeasure(layoutNode)
     }
 
-    override fun onRequestRelayout(layoutNode: LayoutNode) {
+    override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) {
         delegate.requestRelayout(layoutNode)
     }
 

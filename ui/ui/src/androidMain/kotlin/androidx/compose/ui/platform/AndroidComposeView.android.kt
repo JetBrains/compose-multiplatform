@@ -724,14 +724,14 @@ internal class AndroidComposeView(context: Context) :
         measureAndLayoutDelegate.forceMeasureTheSubtree(layoutNode)
     }
 
-    override fun onRequestMeasure(layoutNode: LayoutNode) {
-        if (measureAndLayoutDelegate.requestRemeasure(layoutNode)) {
+    override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
+        if (measureAndLayoutDelegate.requestRemeasure(layoutNode, forceRequest)) {
             scheduleMeasureAndLayout(layoutNode)
         }
     }
 
-    override fun onRequestRelayout(layoutNode: LayoutNode) {
-        if (measureAndLayoutDelegate.requestRelayout(layoutNode)) {
+    override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) {
+        if (measureAndLayoutDelegate.requestRelayout(layoutNode, forceRequest)) {
             scheduleMeasureAndLayout()
         }
     }

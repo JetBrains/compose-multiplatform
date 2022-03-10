@@ -2295,13 +2295,13 @@ private class MockOwner(
     override var showLayoutBounds: Boolean = false
     override val snapshotObserver = OwnerSnapshotObserver { it.invoke() }
 
-    override fun onRequestMeasure(layoutNode: LayoutNode) {
+    override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
         onRequestMeasureParams += layoutNode
-        layoutNode.layoutState = LayoutNode.LayoutState.NeedsRemeasure
+        layoutNode.markMeasurePending()
     }
 
-    override fun onRequestRelayout(layoutNode: LayoutNode) {
-        layoutNode.layoutState = LayoutNode.LayoutState.NeedsRelayout
+    override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) {
+        layoutNode.markLayoutPending()
     }
 
     override fun onAttach(node: LayoutNode) {
@@ -2443,7 +2443,7 @@ private fun LayoutNode(
             }
     }
     attach(MockOwner())
-    layoutState = LayoutNode.LayoutState.NeedsRemeasure
+    markMeasurePending()
     remeasure(Constraints())
     var wrapper: LayoutNodeWrapper? = outerLayoutNodeWrapper
     while (wrapper != null) {

@@ -85,25 +85,13 @@ internal class OuterMeasurablePlaceable(
         @Suppress("Deprecation")
         layoutNode.canMultiMeasure = layoutNode.canMultiMeasure ||
             (parent != null && parent.canMultiMeasure)
-        @Suppress("Deprecation")
-        if (layoutNode.layoutState == LayoutState.NeedsRemeasure ||
-            measurementConstraints != constraints
-        ) {
+        if (layoutNode.measurePending || measurementConstraints != constraints) {
             layoutNode.alignmentLines.usedByModifierMeasurement = false
             layoutNode._children.forEach { it.alignmentLines.usedDuringParentMeasurement = false }
             measuredOnce = true
-            layoutNode.layoutState = LayoutState.Measuring
-            measurementConstraints = constraints
             val outerWrapperPreviousMeasuredSize = outerWrapper.size
-            owner.snapshotObserver.observeMeasureSnapshotReads(layoutNode) {
-                outerWrapper.measure(constraints)
-            }
-            // The resulting layout state might be Ready. This can happen when the layout node's
-            // own modifier is querying an alignment line during measurement, therefore we
-            // need to also layout the layout node.
-            if (layoutNode.layoutState == LayoutState.Measuring) {
-                layoutNode.layoutState = LayoutState.NeedsRelayout
-            }
+            measurementConstraints = constraints
+            layoutNode.performMeasure(constraints)
             val sizeChanged = outerWrapper.size != outerWrapperPreviousMeasuredSize ||
                 outerWrapper.width != width ||
                 outerWrapper.height != height

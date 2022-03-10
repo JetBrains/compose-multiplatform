@@ -299,14 +299,14 @@ internal class SkiaBasedOwner(
         measureAndLayoutDelegate.forceMeasureTheSubtree(layoutNode)
     }
 
-    override fun onRequestMeasure(layoutNode: LayoutNode) {
-        if (measureAndLayoutDelegate.requestRemeasure(layoutNode)) {
+    override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
+        if (measureAndLayoutDelegate.requestRemeasure(layoutNode, forceRequest)) {
             requestLayout()
         }
     }
 
-    override fun onRequestRelayout(layoutNode: LayoutNode) {
-        if (measureAndLayoutDelegate.requestRelayout(layoutNode)) {
+    override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) {
+        if (measureAndLayoutDelegate.requestRelayout(layoutNode, forceRequest)) {
             requestLayout()
         }
     }
@@ -445,7 +445,9 @@ internal class SkiaBasedOwner(
         object : PointerIconService {
             override var current: PointerIcon
                 get() = desiredPointerIcon ?: PointerIconDefaults.Default
-                set(value) { desiredPointerIcon = value }
+                set(value) {
+                    desiredPointerIcon = value
+                }
         }
 }
 
