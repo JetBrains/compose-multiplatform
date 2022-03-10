@@ -17,11 +17,14 @@
 package androidx.build.metalava
 
 import androidx.build.checkapi.ApiLocation
+import androidx.build.getLibraryByName
 import androidx.build.java.JavaCompileInputs
 import androidx.build.logging.TERMINAL_RED
 import androidx.build.logging.TERMINAL_RESET
+import java.io.ByteArrayOutputStream
+import java.io.File
+import javax.inject.Inject
 import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.SetProperty
@@ -29,9 +32,6 @@ import org.gradle.process.ExecOperations
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 import org.gradle.workers.WorkerExecutor
-import java.io.ByteArrayOutputStream
-import java.io.File
-import javax.inject.Inject
 
 // MetalavaRunner stores common configuration for executing Metalava
 
@@ -92,13 +92,7 @@ abstract class MetalavaWorkAction @Inject constructor(
 
 fun Project.getMetalavaClasspath(): FileCollection {
     val configuration = configurations.findByName("metalava") ?: configurations.create("metalava") {
-        val libs = project.extensions.getByType(
-            VersionCatalogsExtension::class.java
-        ).find("libs").get()
-        val dependency = dependencies.create(
-            libs.findLibrary("metalava").get().get()
-        )
-        it.dependencies.add(dependency)
+        it.dependencies.add(dependencies.create(getLibraryByName("metalava")))
     }
     return project.files(configuration)
 }
