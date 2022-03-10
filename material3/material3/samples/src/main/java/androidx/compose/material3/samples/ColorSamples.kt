@@ -97,6 +97,16 @@ fun ColorSchemeSample() {
                     )
                 },
             )
+            Spacer(modifier = Modifier.height(16.dp))
+            DoubleTile(
+                leftTile = {
+                    ColorTile(
+                        text = "Surface Tint",
+                        color = colorScheme.surfaceTint,
+                    )
+                },
+                rightTile = { Box(Modifier.fillMaxWidth()) },
+            )
         }
         Spacer(modifier = Modifier.width(24.dp))
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
