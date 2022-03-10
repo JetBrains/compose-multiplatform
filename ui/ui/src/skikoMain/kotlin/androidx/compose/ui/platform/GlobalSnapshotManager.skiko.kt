@@ -24,7 +24,7 @@ package androidx.compose.ui.platform
  *
  * Composition bootstrapping mechanisms for a particular platform/framework should call
  * [ensureStarted] during setup to initialize periodic global snapshot notifications.
- * For desktop, these notifications are always sent on [Dispatchers.Swing]. Other platforms
+ * For desktop, these notifications are always sent on [MainUIDispatcher]. Other platforms
  * may establish different policies for these notifications.
  */
 internal expect object GlobalSnapshotManager {

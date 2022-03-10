@@ -23,7 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.swing.Swing
+import org.jetbrains.skiko.MainUIDispatcher
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  *
  * Composition bootstrapping mechanisms for a particular platform/framework should call
  * [ensureStarted] during setup to initialize periodic global snapshot notifications.
- * For desktop, these notifications are always sent on [Dispatchers.Swing]. Other platforms
+ * For desktop, these notifications are always sent on [MainUIDispatcher]. Other platforms
  * may establish different policies for these notifications.
  */
 internal actual object GlobalSnapshotManager {
@@ -43,7 +43,8 @@ internal actual object GlobalSnapshotManager {
     actual fun ensureStarted() {
         if (started.compareAndSet(false, true)) {
             val channel = Channel<Unit>(Channel.CONFLATED)
-            CoroutineScope(Dispatchers.Swing).launch {
+            Dispatchers.IO
+            CoroutineScope(MainUIDispatcher).launch {
                 channel.consumeEach {
                     // TODO(https://github.com/JetBrains/compose-jb/issues/1854) get rid of synchronized
                     synchronized(GlobalSnapshotManager) {

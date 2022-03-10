@@ -32,7 +32,7 @@ import org.jetbrains.skia.impl.Library
  * - sets UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
  *
  * Should be called before using any class from `java.swing.*`
- * (even before SwingUtilities.invokeLater or Dispatchers.Swing)
+ * (even before SwingUtilities.invokeLater or MainUIDispatcher)
  */
 @ExperimentalComposeUiApi
 fun configureSwingGlobalsForCompose(

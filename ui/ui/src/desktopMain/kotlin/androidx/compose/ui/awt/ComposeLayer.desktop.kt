@@ -31,9 +31,8 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.window.WindowExceptionHandler
 import androidx.compose.ui.window.density
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skia.Canvas
+import org.jetbrains.skiko.MainUIDispatcher
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkikoView
 import java.awt.Cursor
@@ -93,7 +92,7 @@ internal class ComposeLayer {
     }
 
     internal val scene = ComposeScene(
-        Dispatchers.Swing + coroutineExceptionHandler,
+        MainUIDispatcher + coroutineExceptionHandler,
         _component,
         Density(1f),
         _component::needRedraw,

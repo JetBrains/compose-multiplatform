@@ -39,10 +39,9 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.swing.Swing
+import org.jetbrains.skiko.MainUIDispatcher
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -118,7 +117,7 @@ class ImageComposeSceneTest {
 
     @Test(timeout = 5000)
     fun `closing ImageComposeScene should not cancel coroutineContext's Job`() {
-        runBlocking(Dispatchers.Swing) {
+        runBlocking(MainUIDispatcher) {
             val scene = ImageComposeScene(100, 100, coroutineContext = coroutineContext)
             scene.close()
         }

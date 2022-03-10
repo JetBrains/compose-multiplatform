@@ -24,9 +24,8 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.density
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.swing.Swing
+import org.jetbrains.skiko.MainUIDispatcher
 import org.junit.Assume
 import org.junit.Test
 import java.awt.Dimension
@@ -38,7 +37,7 @@ class ComposePanelTest {
     fun `don't override user preferred size`() {
         Assume.assumeFalse(GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance)
 
-        runBlocking(Dispatchers.Swing) {
+        runBlocking(MainUIDispatcher) {
             val composePanel = ComposePanel()
             composePanel.preferredSize = Dimension(234, 345)
             assertThat(composePanel.preferredSize).isEqualTo(Dimension(234, 345))
@@ -63,7 +62,7 @@ class ComposePanelTest {
     fun `pack to Compose content`() {
         Assume.assumeFalse(GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance)
 
-        runBlocking(Dispatchers.Swing) {
+        runBlocking(MainUIDispatcher) {
             val composePanel = ComposePanel()
             composePanel.setContent {
                 Box(Modifier.requiredSize(300.dp, 400.dp))
@@ -93,7 +92,7 @@ class ComposePanelTest {
 
         val layoutPassConstraints = mutableListOf<Constraints>()
 
-        runBlocking(Dispatchers.Swing) {
+        runBlocking(MainUIDispatcher) {
             val composePanel = ComposePanel()
             composePanel.setContent {
                 Box(Modifier.fillMaxSize().layout { _, constraints ->

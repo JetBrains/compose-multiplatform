@@ -50,11 +50,10 @@ import java.awt.Dimension
 import java.awt.GraphicsEnvironment
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.swing.Swing
+import org.jetbrains.skiko.MainUIDispatcher
 import org.junit.Assume.assumeFalse
 import org.junit.Test
 import kotlinx.coroutines.cancelAndJoin
@@ -416,7 +415,7 @@ class WindowTest {
 
         val oldRecomposers = Recomposer.runningRecomposers.value
 
-        runBlocking(Dispatchers.Swing) {
+        runBlocking(MainUIDispatcher) {
             repeat(10) {
                 val window = ComposeWindow()
                 window.size = Dimension(200, 200)

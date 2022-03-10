@@ -26,11 +26,10 @@ import androidx.compose.ui.node.Ref
 import androidx.compose.ui.util.UpdateEffect
 import androidx.compose.ui.util.makeDisplayable
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.swing.Swing
+import org.jetbrains.skiko.MainUIDispatcher
 import java.awt.Window
 
 /**
@@ -117,7 +116,7 @@ fun <T : Window> AwtWindow(
         // So we will have a wrong active window (window1).
 
         showJob.value?.cancel()
-        showJob.value = GlobalScope.launch(Dispatchers.Swing) {
+        showJob.value = GlobalScope.launch(MainUIDispatcher) {
             window().isVisible = currentVisible
         }
     }

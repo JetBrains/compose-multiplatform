@@ -24,16 +24,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import java.awt.GraphicsEnvironment
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.yield
+import org.jetbrains.skiko.MainUIDispatcher
 import org.junit.Assume.assumeFalse
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -52,7 +51,7 @@ internal fun runApplicationTest(
 ) {
     assumeFalse(GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance)
 
-    runBlocking(Dispatchers.Swing) {
+    runBlocking(MainUIDispatcher) {
         withTimeout(30000) {
             val exceptionHandler = TestExceptionHandler()
             withExceptionHandler(exceptionHandler) {

@@ -41,9 +41,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
+import org.jetbrains.skiko.MainUIDispatcher
 import kotlin.system.exitProcess
 
 /**
@@ -195,7 +195,7 @@ suspend fun awaitApplication(
     if (System.getProperty("compose.application.configure.swing.globals") == "true") {
         configureSwingGlobalsForCompose()
     }
-    withContext(Dispatchers.Swing) {
+    withContext(MainUIDispatcher) {
         withContext(YieldFrameClock) {
             GlobalSnapshotManager.ensureStarted()
 

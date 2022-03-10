@@ -24,21 +24,20 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.yield
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.FrameDispatcher
+import org.jetbrains.skiko.MainUIDispatcher
 import kotlin.coroutines.CoroutineContext
 
 internal fun renderingTest(
     width: Int,
     height: Int,
-    context: CoroutineContext = Dispatchers.Swing,
+    context: CoroutineContext = MainUIDispatcher,
     block: suspend RenderingTestScope.() -> Unit
-) = runBlocking(Dispatchers.Swing) {
+) = runBlocking(MainUIDispatcher) {
     val scope = RenderingTestScope(width, height, context)
     try {
         scope.block()
