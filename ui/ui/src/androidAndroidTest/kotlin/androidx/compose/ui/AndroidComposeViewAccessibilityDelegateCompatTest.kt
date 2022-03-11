@@ -96,7 +96,6 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -139,11 +138,6 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             accessibilityDelegate.accessibilityForceEnabledForTesting = true
         }
         info = AccessibilityNodeInfoCompat.obtain()
-    }
-
-    @After
-    fun cleanup() {
-        info.recycle()
     }
 
     @Test
@@ -423,7 +417,6 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         }
         accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
         assertEquals(ViewCompat.ACCESSIBILITY_LIVE_REGION_POLITE, info.liveRegion)
-        info.recycle()
 
         info = AccessibilityNodeInfoCompat.obtain()
         semanticsNode = createSemanticsNodeWithProperties(1, true) {

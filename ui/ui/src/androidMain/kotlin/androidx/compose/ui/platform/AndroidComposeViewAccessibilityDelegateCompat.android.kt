@@ -345,7 +345,6 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         val info: AccessibilityNodeInfoCompat = AccessibilityNodeInfoCompat.obtain()
         val semanticsNodeWithAdjustedBounds = currentSemanticsNodes[virtualViewId]
         if (semanticsNodeWithAdjustedBounds == null) {
-            info.recycle()
             return null
         }
         val semanticsNode: SemanticsNode = semanticsNodeWithAdjustedBounds.semanticsNode
