@@ -321,7 +321,7 @@ class DesktopCanvasTest : DesktopGraphicsTest() {
 
         canvas.drawVertices(
             Vertices(VertexMode.Triangles, positions, positions, colors, indices),
-            BlendMode.SrcOver,
+            BlendMode.DstOver,
             Paint()
         )
 
