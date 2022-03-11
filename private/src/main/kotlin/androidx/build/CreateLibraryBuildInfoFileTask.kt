@@ -33,6 +33,7 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import java.io.File
+import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 
 /**
  * This task generates a library build information file containing the artifactId, groupId, and
@@ -160,23 +161,7 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
                     task.artifactId.set(name)
                     task.groupId.set(group)
                     task.version.set(project.version.toString())
-                    task.kotlinVersion.set(
-                        project.provider {
-                            // For Kotlin libraries, populate the Kotlin version. Note that
-                            // we assume all of androidx uses the same version of the Kotlin
-                            // stdlib.
-                            project.configurations.filter {
-                                it.name == "releaseRuntimeElements"
-                            }.forEach { configuration ->
-                                configuration.allDependencies.forEach { dep ->
-                                    if (dep.group.toString().startsWith("org.jetbrains.kotlin")) {
-                                        return@provider androidx.build.dependencies.kotlinVersion
-                                    }
-                                }
-                            }
-                            null
-                        }
-                    )
+                    task.kotlinVersion.set(project.getKotlinPluginVersion())
                     task.projectDir.set(
                         project.projectDir.absolutePath.removePrefix(
                             project.getSupportRootFolder().absolutePath
