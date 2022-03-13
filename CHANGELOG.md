@@ -1,3 +1,40 @@
+# 1.1.1 (Mar 2022)
+## Desktop
+
+### Fixes
+- [Support textIndent](https://github.com/JetBrains/compose-jb/issues/1733)
+- [Fix cursor placement inside ligature](https://github.com/JetBrains/compose-jb/issues/1891)
+
+## API changes
+- [Compose doesn't depend on kotlinx-coroutines-swing](https://github.com/JetBrains/compose-jb/issues/1943)
+
+If you use `Dispatchers.Swing` or `Dispatchers.Main` in your code, add this dependency into `build.gradle.kts`:
+```
+dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
+}
+```
+
+Also, usage of `Dispatchers.Swing` or `Dispatchers.Main` inside internals of Compose is implementation details, and can be changed in the future. If you need to avoid race conditions with Compose UI, you can obtain appropriate coroutine scope via `rememberCoroutineScope`:
+```
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.window.application
+
+@OptIn(ExperimentalComposeUiApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
+fun main() = application {
+    val scope = rememberCoroutineScope()
+    val someApplicationObject = remember(scope) { SomeApplicationObject(scope) }
+    
+    DisposableEffect(Unit) {
+        SomeGlobalObject.init(scope)
+        onDispose {  }
+    }
+}
+```
+
 # 1.1.0 (Feb 2022)
 ## Desktop
 
