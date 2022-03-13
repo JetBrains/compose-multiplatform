@@ -232,6 +232,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.mockitoCore)
                 implementation(libs.mockitoKotlin)
                 implementation(libs.skikoCurrentOs)
+                implementation(libs.kotlinCoroutinesSwing)
                 implementation(project(":compose:material:material"))
                 implementation(project(":compose:ui:ui-test-junit4"))
             }

@@ -39,6 +39,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import kotlin.math.roundToInt
 
 @RunWith(JUnit4::class)
 class DesktopParagraphTest {
@@ -322,7 +323,7 @@ class DesktopParagraphTest {
 
     @Test
     fun `applies text indent for paragraph`() {
-        fun measureLines(alignment: TextAlign, direction: TextDirection): List<Float> {
+        fun measureLines(alignment: TextAlign, direction: TextDirection): List<Int> {
             val paragraph = simpleParagraph(
                 text = "sample\ntext",
                 style = TextStyle(
@@ -333,20 +334,20 @@ class DesktopParagraphTest {
                 )
             )
             return listOf(
-                paragraph.getLineLeft(0),
-                paragraph.getLineRight(0),
-                paragraph.getLineLeft(1),
-                paragraph.getLineRight(1)
+                paragraph.getLineLeft(0).roundToInt(),
+                paragraph.getLineRight(0).roundToInt(),
+                paragraph.getLineLeft(1).roundToInt(),
+                paragraph.getLineRight(1).roundToInt()
             )
         }
-        Truth.assertThat(measureLines(TextAlign.Left, TextDirection.Ltr)).isEqualTo(listOf(50f, 170f, 20f, 100f))
-        Truth.assertThat(measureLines(TextAlign.Center, TextDirection.Ltr)).isEqualTo(listOf(965f, 1085f, 970f, 1050f))
-        Truth.assertThat(measureLines(TextAlign.Right, TextDirection.Ltr)).isEqualTo(listOf(1830f, 1950f, 1900f, 1980f))
-        Truth.assertThat(measureLines(TextAlign.Justify, TextDirection.Ltr)).isEqualTo(listOf(50f, 170f, 20f, 100f))
-        Truth.assertThat(measureLines(TextAlign.Left, TextDirection.Rtl)).isEqualTo(listOf(50f, 170f, 20f, 100f))
-        Truth.assertThat(measureLines(TextAlign.Center, TextDirection.Rtl)).isEqualTo(listOf(915f, 1035f, 950f, 1030f))
-        Truth.assertThat(measureLines(TextAlign.Right, TextDirection.Rtl)).isEqualTo(listOf(1830f, 1950f, 1900f, 1980f))
-        Truth.assertThat(measureLines(TextAlign.Justify, TextDirection.Rtl)).isEqualTo(listOf(1830f, 1950f, 1900f, 1980f))
+        Truth.assertThat(measureLines(TextAlign.Left, TextDirection.Ltr)).isEqualTo(listOf(50, 170, 20, 100))
+        Truth.assertThat(measureLines(TextAlign.Center, TextDirection.Ltr)).isEqualTo(listOf(965, 1085, 970, 1050))
+        Truth.assertThat(measureLines(TextAlign.Right, TextDirection.Ltr)).isEqualTo(listOf(1830, 1950, 1900, 1980))
+        Truth.assertThat(measureLines(TextAlign.Justify, TextDirection.Ltr)).isEqualTo(listOf(50, 170, 20, 100))
+        Truth.assertThat(measureLines(TextAlign.Left, TextDirection.Rtl)).isEqualTo(listOf(50, 170, 20, 100))
+        Truth.assertThat(measureLines(TextAlign.Center, TextDirection.Rtl)).isEqualTo(listOf(915, 1035, 950, 1030))
+        Truth.assertThat(measureLines(TextAlign.Right, TextDirection.Rtl)).isEqualTo(listOf(1830, 1950, 1900, 1980))
+        Truth.assertThat(measureLines(TextAlign.Justify, TextDirection.Rtl)).isEqualTo(listOf(1830, 1950, 1900, 1980))
     }
 
     private fun simpleParagraph(
