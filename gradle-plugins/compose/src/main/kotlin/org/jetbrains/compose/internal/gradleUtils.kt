@@ -8,11 +8,11 @@ package org.jetbrains.compose.internal
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.Directory
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.logging.Logger
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import java.io.File
+import java.util.*
 
 internal inline fun Logger.info(fn: () -> String) {
     if (isInfoEnabled) {
@@ -36,3 +36,18 @@ internal inline fun <reified T : Task> Project.registerTask(
 
 internal fun Provider<String>.toDir(project: Project): Provider<Directory> =
     project.layout.dir(map { File(it) })
+
+val Project.localPropertiesFile get() = project.rootProject.file("local.properties")
+
+fun Project.getLocalProperty(key: String): String? {
+    if (localPropertiesFile.exists()) {
+        val properties = Properties()
+        localPropertiesFile.inputStream().buffered().use { input ->
+            properties.load(input)
+        }
+        return properties.getProperty(key)
+    } else {
+        localPropertiesFile.createNewFile()
+        return null
+    }
+}

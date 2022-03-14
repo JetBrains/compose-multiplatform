@@ -46,7 +46,7 @@ sealed class DeployTarget {
     }
 
     open class ConnectedDevice : DeployTarget() {
-        var teamId: String = ""
+        var teamId: String? = null
     }
 }
 

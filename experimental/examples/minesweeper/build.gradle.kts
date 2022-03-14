@@ -169,8 +169,6 @@ compose.experimental {
             connectedDevice("Device") {
                 //Usage: ./gradlew iosDeployDevice
                 buildConfiguration = "Debug"
-                teamId = "N462MKSJ7M"
-//                teamId = "JMS9FA69HB" // (Dima)
             }
         }
     }

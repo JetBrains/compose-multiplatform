@@ -9,6 +9,8 @@ import org.gradle.api.*
 import org.jetbrains.compose.desktop.application.internal.MacUtils
 import org.jetbrains.compose.experimental.dsl.DeployTarget
 import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
+import org.jetbrains.compose.internal.getLocalProperty
+import org.jetbrains.compose.internal.localPropertiesFile
 
 fun Project.registerConnectedDeviceTasks(
     id: String,
@@ -18,11 +20,20 @@ fun Project.registerConnectedDeviceTasks(
 ) {
     val xcodeProjectDir = getBuildIosDir(id).resolve("$projectName.xcodeproj")
     val iosCompiledAppDir = xcodeProjectDir.resolve("build/Build/Products/Debug-iphoneos/$projectName.app")
+    val teamIdKey = "compose.ios.teamId"
     val taskGenerateXcodeProject = configureTaskToGenerateXcodeProject(
         id = id,
         projectName = projectName,
         bundleIdPrefix = bundleIdPrefix,
-        teamId = deploy.teamId
+        teamId = deploy.teamId ?: getLocalProperty(teamIdKey)
+        ?: error(
+            buildString {
+                appendLine("In local.properties (${localPropertiesFile.absolutePath})")
+                appendLine("Add property")
+                appendLine("$teamIdKey=***")
+                appendLine("Or set teamId in deploy with id: $id")
+            }
+        )
     )
     val taskBuild = tasks.composeIosTask<AbstractComposeIosTask>("iosBuildIphoneOs$id") {
         dependsOn(taskGenerateXcodeProject)
@@ -43,7 +54,8 @@ fun Project.registerConnectedDeviceTasks(
                         "-derivedDataPath", "build",
                         "-arch", "arm64",
                         "-sdk", sdk,
-                        "-allowProvisioningUpdates"
+                        "-allowProvisioningUpdates",
+                        "-allowProvisioningDeviceRegistration",
                     ),
                     workingDir = xcodeProjectDir
                 )
