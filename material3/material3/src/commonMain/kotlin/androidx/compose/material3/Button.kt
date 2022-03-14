@@ -36,7 +36,6 @@ import androidx.compose.material3.tokens.FilledButtonTokens
 import androidx.compose.material3.tokens.FilledTonalButtonTokens
 import androidx.compose.material3.tokens.OutlinedButtonTokens
 import androidx.compose.material3.tokens.TextButtonTokens
-import androidx.compose.material3.tokens.TypographyTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -130,7 +129,7 @@ fun Button(
         enabled = enabled,
     ) {
         CompositionLocalProvider(LocalContentColor provides contentColor) {
-            ProvideTextStyle(value = TypographyTokens.LabelLarge) {
+            ProvideTextStyle(value = MaterialTheme.typography.labelLarge) {
                 Row(
                     Modifier.defaultMinSize(
                         minWidth = ButtonDefaults.MinWidth,
@@ -165,8 +164,7 @@ fun Button(
  * - See [OutlinedButton] for a medium-emphasis button with a border.
  * - See [TextButton] for a low-emphasis button with no border.
  *
- * The default text style for internal [Text] components will be set to
- * [TypographyTokens.LabelLarge].
+ * The default text style for internal [Text] components will be set to [Typography.labelLarge].
  *
  * @param onClick Will be called when the user clicks the button.
  * @param modifier Modifier to be applied to the button.
@@ -234,8 +232,7 @@ fun ElevatedButton(
  * - See [OutlinedButton] for a medium-emphasis button with a border.
  * - See [TextButton] for a low-emphasis button with no border.
  *
- * The default text style for internal [Text] components will be set to
- * [TypographyTokens.LabelLarge].
+ * The default text style for internal [Text] components will be set to [Typography.labelLarge].
  *
  * @param onClick Will be called when the user clicks the button.
  * @param modifier Modifier to be applied to the button.
@@ -301,8 +298,7 @@ fun FilledTonalButton(
  * - See [OutlinedButton] for a medium-emphasis button with a border.
  * - See [TextButton] for a low-emphasis button with no border.
  *
- * The default text style for internal [Text] components will be set to
- * [TypographyTokens.LabelLarge].
+ * The default text style for internal [Text] components will be set to [Typography.labelLarge].
  *
  * @param onClick Will be called when the user clicks the button.
  * @param modifier Modifier to be applied to the button.
@@ -368,8 +364,7 @@ fun OutlinedButton(
  * - See [FilledTonalButton] for a middle ground between [OutlinedButton] and [Button].
  * - See [OutlinedButton] for a medium-emphasis button with a border.
  *
- * The default text style for internal [Text] components will be set to
- * [TypographyTokens.LabelLarge].
+ * The default text style for internal [Text] components will be set to [Typography.labelLarge].
  *
  * @param onClick Will be called when the user clicks the button.
  * @param modifier Modifier to be applied to the button.
