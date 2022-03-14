@@ -18,6 +18,9 @@ package androidx.build
 
 import androidx.build.Multiplatform.Companion.isMultiplatformEnabled
 import com.android.build.gradle.LibraryPlugin
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
+import com.google.gson.stream.JsonWriter
 import groovy.util.Node
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -34,6 +37,8 @@ import org.gradle.kotlin.dsl.findByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
 import java.io.File
+import java.io.StringWriter
+import org.gradle.api.publish.maven.tasks.GenerateMavenPom
 
 fun Project.configureMavenArtifactUpload(extension: AndroidXExtension) {
     apply(mapOf("plugin" to "maven-publish"))
@@ -112,6 +117,30 @@ private fun Project.configureComponent(
         // Register it as part of release so that we create a Zip file for it
         Release.register(this, extension)
 
+        // Workarounds for https://github.com/gradle/gradle/issues/20011
+        project.tasks.withType(GenerateModuleMetadata::class.java).configureEach { task ->
+            task.doLast {
+                val metadataFile = task.outputFile.asFile.get()
+                val metadata = metadataFile.readText()
+                val sortedMetadata = sortGradleMetadataDependencies(metadata)
+
+                if (metadata != sortedMetadata) {
+                    metadataFile.writeText(sortedMetadata)
+                }
+            }
+        }
+        project.tasks.withType(GenerateMavenPom::class.java).configureEach { task ->
+            task.doLast {
+                val pomFile = task.destination
+                val pom = pomFile.readText()
+                val sortedPom = sortPomDependencies(pom)
+
+                if (pom != sortedPom) {
+                    pomFile.writeText(sortedPom)
+                }
+            }
+        }
+
         // Workaround for https://github.com/gradle/gradle/issues/11717
         project.tasks.withType(GenerateModuleMetadata::class.java).configureEach { task ->
             task.doLast {
@@ -130,6 +159,54 @@ private fun Project.configureComponent(
             configureMultiplatformPublication()
         }
     }
+}
+
+/**
+ * Looks for a dependencies XML element within [pom] and sorts its contents.
+ */
+fun sortPomDependencies(pom: String): String {
+    var sortedPom = pom
+    val regex = "(?s)<dependencies>\\n(.+?)<\\/dependency>\\s+<\\/dependencies>".toRegex()
+
+    var results = regex.findAll(pom)
+    results.forEach { result ->
+        val depsGroup = result.groups[1]
+        if (depsGroup != null) {
+            val depsRange = depsGroup.range
+            val deps = depsGroup.value
+            val sortedDeps = deps
+                .split("</dependency>\n")
+                .sorted()
+                .joinToString("</dependency>\n")
+
+            if (deps != sortedDeps) {
+                sortedPom = sortedPom.replaceRange(depsRange, sortedDeps)
+            }
+        }
+    }
+
+    return sortedPom
+}
+
+/**
+ * Looks for a dependencies JSON element within [metadata] and sorts its contents.
+ */
+fun sortGradleMetadataDependencies(metadata: String): String {
+    val gson = GsonBuilder().create()
+    val jsonObj = gson.fromJson(metadata, JsonObject::class.java)!!
+    jsonObj.getAsJsonArray("variants").forEach { entry ->
+        (entry as? JsonObject)?.getAsJsonArray("dependencies")?.let { jsonArray ->
+            val sortedSet = jsonArray.toSortedSet(compareBy { it.toString() })
+            jsonArray.removeAll { true }
+            sortedSet.forEach { element -> jsonArray.add(element) }
+        }
+    }
+
+    val stringWriter = StringWriter()
+    val jsonWriter = JsonWriter(stringWriter)
+    jsonWriter.setIndent("  ")
+    gson.toJson(jsonObj, jsonWriter)
+    return stringWriter.toString()
 }
 
 private fun Project.isMultiplatformPublicationEnabled(): Boolean {
