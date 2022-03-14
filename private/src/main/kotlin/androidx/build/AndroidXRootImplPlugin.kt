@@ -28,10 +28,11 @@ import androidx.build.uptodatedness.TaskUpToDateValidator
 import com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
-import org.gradle.api.GradleException
+import java.io.File
+import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.artifacts.component.ModuleComponentSelector
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
@@ -39,9 +40,6 @@ import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.extra
-import java.io.File
-import java.util.Locale
-import java.util.concurrent.ConcurrentHashMap
 
 abstract class AndroidXRootImplPlugin : Plugin<Project> {
     @Suppress("UnstableApiUsage")
@@ -265,22 +263,11 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
     }
 
     private fun Project.setDependencyVersions() {
-        val libs = project.extensions.getByType(
-            VersionCatalogsExtension::class.java
-        ).find("libs").get()
-        fun getVersion(key: String): String {
-            val version = libs.findVersion(key)
-            return if (version.isPresent) {
-                version.get().requiredVersion
-            } else {
-                throw GradleException("Could not find a version for `$key`")
-            }
-        }
-        androidx.build.dependencies.kotlinVersion = getVersion("kotlin")
-        androidx.build.dependencies.kotlinNativeVersion = getVersion("kotlinNative")
-        androidx.build.dependencies.kspVersion = getVersion("ksp")
-        androidx.build.dependencies.agpVersion = getVersion("androidGradlePlugin")
-        androidx.build.dependencies.guavaVersion = getVersion("guavaJre")
+        androidx.build.dependencies.kotlinVersion = getVersionByName("kotlin")
+        androidx.build.dependencies.kotlinNativeVersion = getVersionByName("kotlinNative")
+        androidx.build.dependencies.kspVersion = getVersionByName("ksp")
+        androidx.build.dependencies.agpVersion = getVersionByName("androidGradlePlugin")
+        androidx.build.dependencies.guavaVersion = getVersionByName("guavaJre")
     }
 
     companion object {
