@@ -99,7 +99,7 @@ class TextDelegate(
     internal var intrinsicsLayoutDirection: LayoutDirection? = null
 
     private val nonNullIntrinsics: MultiParagraphIntrinsics get() = paragraphIntrinsics
-        ?: throw IllegalStateException("layoutForIntrinsics must be called first")
+        ?: throw IllegalStateException("layoutIntrinsics must be called first")
 
     /**
      * The width for text if all soft wrap opportunities were taken.
