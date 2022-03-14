@@ -22,6 +22,7 @@ import androidx.compose.animation.core.animateDecay
 import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.MutatePriority
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.gestures.Orientation.Horizontal
 import androidx.compose.foundation.gestures.Orientation.Vertical
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -134,13 +135,8 @@ internal fun Modifier.scrollable(
                 ContentInViewModifier(coroutineScope, orientation, state, reverseDirection)
             }
 
-        val scrollableContainerProvider = if (enabled) {
-            ModifierLocalScrollableContainerProvider
-        } else {
-            Modifier
-        }
-
         Modifier
+            .focusGroup()
             .then(keepFocusedChildInViewModifier.modifier)
             .then(overscrollModifier)
             .pointerScrollable(
@@ -152,7 +148,7 @@ internal fun Modifier.scrollable(
                 overScrollController,
                 enabled
             )
-            .then(scrollableContainerProvider)
+            .then(if (enabled) ModifierLocalScrollableContainerProvider else Modifier)
     }
 )
 

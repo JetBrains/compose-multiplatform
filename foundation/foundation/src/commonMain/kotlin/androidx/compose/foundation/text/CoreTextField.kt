@@ -501,12 +501,12 @@ internal fun CoreTextField(
     // Modifiers that should be applied to the outer text field container. Usually those include
     // gesture and semantics modifiers.
     val decorationBoxModifier = modifier
-        .textFieldScrollable(scrollerPosition, interactionSource, enabled)
-        .then(pointerModifier)
-        .then(semanticsModifier)
         .then(focusModifier)
         .previewKeyEventToDeselectOnBack(state, manager)
         .then(textKeyInputModifier)
+        .textFieldScrollable(scrollerPosition, interactionSource, enabled)
+        .then(pointerModifier)
+        .then(semanticsModifier)
         .onGloballyPositioned {
             state.layoutResult?.decorationBoxCoordinates = it
         }

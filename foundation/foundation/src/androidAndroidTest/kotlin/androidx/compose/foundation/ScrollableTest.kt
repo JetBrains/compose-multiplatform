@@ -30,6 +30,7 @@ import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -40,6 +41,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -51,6 +57,7 @@ import androidx.compose.ui.materialize
 import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -920,8 +927,8 @@ class ScrollableTest {
 
         val preFlingValue = rule.runOnIdle { value }
         rule.runOnIdle {
-            // if scrollable respects prefling consumption, it should fling 0px since we
-            // preconsume all
+            // if scrollable respects pre-fling consumption, it should fling 0px since we
+            // pre-consume all
             assertThat(preFlingValue).isEqualTo(value)
         }
     }
@@ -1978,6 +1985,39 @@ class ScrollableTest {
             val second = requireNotNull(materialized)
             assertThat(first).isEqualTo(second)
         }
+    }
+
+    @Test
+    fun focusStaysInScrollableEvenThoughThereIsACloserItemOutside() {
+        lateinit var focusManager: FocusManager
+        val initialFocus = FocusRequester()
+        var nextItemIsFocused = false
+        rule.setContent {
+            focusManager = LocalFocusManager.current
+            Column {
+                Column(Modifier.size(10.dp).verticalScroll(rememberScrollState())) {
+                    Box(
+                        Modifier
+                            .size(10.dp)
+                            .focusRequester(initialFocus)
+                            .focusable()
+                    )
+                    Box(Modifier.size(10.dp))
+                    Box(
+                        Modifier
+                            .size(10.dp)
+                            .onFocusChanged { nextItemIsFocused = it.isFocused }
+                            .focusable()
+                    )
+                }
+                Box(Modifier.size(10.dp).focusable())
+            }
+        }
+
+        rule.runOnIdle { initialFocus.requestFocus() }
+        rule.runOnIdle { focusManager.moveFocus(FocusDirection.Down) }
+
+        rule.runOnIdle { assertThat(nextItemIsFocused).isTrue() }
     }
 
     private fun setScrollableContent(scrollableModifierFactory: @Composable () -> Modifier) {
