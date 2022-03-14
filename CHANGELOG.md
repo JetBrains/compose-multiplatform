@@ -5,7 +5,7 @@
 - [Support textIndent](https://github.com/JetBrains/compose-jb/issues/1733)
 - [Fix cursor placement inside ligature](https://github.com/JetBrains/compose-jb/issues/1891)
 
-## API changes
+### API changes
 - [Compose doesn't depend on kotlinx-coroutines-swing](https://github.com/JetBrains/compose-jb/issues/1943)
 
 If you use `Dispatchers.Swing` or `Dispatchers.Main` in your code, add this dependency into `build.gradle.kts`:
