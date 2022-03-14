@@ -54,7 +54,7 @@ class RecompositionHandler(private val artTooling: ArtTooling) {
     @GuardedBy("lock")
     private var lastMethodKey: Int = 0
 
-    fun changeCollectionMode(startCollecting: Boolean) {
+    fun changeCollectionMode(startCollecting: Boolean, keepCounts: Boolean) {
         synchronized(lock) {
             if (startCollecting != currentlyCollecting) {
                 if (!hooksInstalled) {
@@ -62,7 +62,9 @@ class RecompositionHandler(private val artTooling: ArtTooling) {
                 }
                 currentlyCollecting = startCollecting
             }
-            counts.clear()
+            if (!keepCounts) {
+                counts.clear()
+            }
         }
     }
 
