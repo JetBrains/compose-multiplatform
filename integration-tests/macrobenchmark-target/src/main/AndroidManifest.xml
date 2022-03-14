@@ -45,6 +45,14 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".FullyDrawnStartupActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.compose.integration.macrobenchmark.target.FULLY_DRAWN_STARTUP_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".IoSettingsActivity"
             android:exported="true">
 <!--            <intent-filter>-->
