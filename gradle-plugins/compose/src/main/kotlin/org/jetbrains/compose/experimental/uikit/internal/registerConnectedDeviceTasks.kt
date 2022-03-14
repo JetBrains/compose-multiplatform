@@ -6,6 +6,7 @@
 package org.jetbrains.compose.experimental.uikit.internal
 
 import org.gradle.api.*
+import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.compose.desktop.application.internal.MacUtils
 import org.jetbrains.compose.experimental.dsl.DeployTarget
 import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
@@ -16,7 +17,9 @@ fun Project.registerConnectedDeviceTasks(
     id: String,
     deploy: DeployTarget.ConnectedDevice,
     projectName: String,
-    bundleIdPrefix: String
+    bundleIdPrefix: String,
+    taskInstallXcodeGen: TaskProvider<*>,
+    taskInstallIosDeploy: TaskProvider<*>,
 ) {
     val xcodeProjectDir = getBuildIosDir(id).resolve("$projectName.xcodeproj")
     val iosCompiledAppDir = xcodeProjectDir.resolve("build/Build/Products/Debug-iphoneos/$projectName.app")
@@ -33,7 +36,8 @@ fun Project.registerConnectedDeviceTasks(
                 appendLine("$teamIdKey=***")
                 appendLine("Or set teamId in deploy with id: $id")
             }
-        )
+        ),
+        taskInstallXcodeGen = taskInstallXcodeGen,
     )
     val taskBuild = tasks.composeIosTask<AbstractComposeIosTask>("iosBuildIphoneOs$id") {
         dependsOn(taskGenerateXcodeProject)
@@ -64,7 +68,7 @@ fun Project.registerConnectedDeviceTasks(
     }
 
     val taskDeploy = tasks.composeIosTask<AbstractComposeIosTask>("iosDeploy$id") {
-        dependsOn(TASK_INSTALL_IOS_DEPLOY)
+        dependsOn(taskInstallIosDeploy)
         dependsOn(taskBuild)
         doLast {
             runExternalTool(

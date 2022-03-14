@@ -6,6 +6,7 @@
 package org.jetbrains.compose.experimental.uikit.internal
 
 import org.gradle.api.*
+import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.compose.desktop.application.internal.Arch
 import org.jetbrains.compose.desktop.application.internal.MacUtils
 import org.jetbrains.compose.desktop.application.internal.currentArch
@@ -18,7 +19,8 @@ fun Project.registerSimulatorTasks(
     id: String,
     deploy: DeployTarget.Simulator,
     projectName: String,
-    bundleIdPrefix: String
+    bundleIdPrefix: String,
+    taskInstallXcodeGen: TaskProvider<*>,
 ) {
     val xcodeProjectDir = getBuildIosDir(id).resolve("$projectName.xcodeproj")
     val deviceName = "device-$id"
@@ -26,7 +28,8 @@ fun Project.registerSimulatorTasks(
     val taskGenerateXcodeProject = configureTaskToGenerateXcodeProject(
         id = id,
         projectName = projectName,
-        bundleIdPrefix = bundleIdPrefix
+        bundleIdPrefix = bundleIdPrefix,
+        taskInstallXcodeGen = taskInstallXcodeGen,
     )
 
     val taskCreateSimulator = tasks.composeIosTask<AbstractComposeIosTask>("iosSimulatorCreate$id") {

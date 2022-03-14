@@ -14,8 +14,9 @@ internal fun Project.configureTaskToGenerateXcodeProject(
     projectName: String,
     bundleIdPrefix: String,
     teamId: String? = null,
+    taskInstallXcodeGen: TaskProvider<*>,
 ): TaskProvider<AbstractComposeIosTask> = tasks.composeIosTask<AbstractComposeIosTask>("iosGenerateXcodeProject$id") {
-    dependsOn(TASK_INSTALL_XCODE_GEN)
+    dependsOn(taskInstallXcodeGen)
     doLast {
         val buildIosDir = getBuildIosDir(id)
         buildIosDir.mkdirs()

@@ -7,6 +7,7 @@ package org.jetbrains.compose.experimental.uikit.internal
 
 import org.gradle.api.*
 import org.gradle.api.tasks.TaskContainer
+import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.compose.experimental.dsl.DeployTarget
 import org.jetbrains.compose.experimental.dsl.ExperimentalUiKitApplication
 
@@ -19,8 +20,8 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
     val projectName = application.projectName
     val bundleIdPrefix = application.bundleIdPrefix
 
-    configureInstallXcodeGenTask()
-    configureInstallIosDeployTask()
+    val taskInstallXcodeGen: TaskProvider<*> = configureInstallXcodeGenTask()
+    val taskInstallIosDeploy: TaskProvider<*> = configureInstallIosDeployTask()
 
     application.deployConfigurations.deployTargets.forEach { target ->
         val id = target.id // .replaceFirstChar { it.uppercase() } // todo upperCase first char? ./gradlew iosDeployId
@@ -31,6 +32,7 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
                     deploy = target.deploy,
                     projectName = projectName,
                     bundleIdPrefix = bundleIdPrefix,
+                    taskInstallXcodeGen = taskInstallXcodeGen,
                 )
             }
             is DeployTarget.LocalFile -> {
@@ -42,6 +44,8 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
                     deploy = target.deploy,
                     projectName = projectName,
                     bundleIdPrefix = bundleIdPrefix,
+                    taskInstallXcodeGen = taskInstallXcodeGen,
+                    taskInstallIosDeploy = taskInstallIosDeploy,
                 )
             }
         }
