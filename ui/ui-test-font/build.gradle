@@ -53,3 +53,7 @@ androidx {
     runApiTasks = new RunApiTasks.Yes()
     legacyDisableKotlinStrictApiMode = true
 }
+
+android {
+    namespace "androidx.compose.ui.text.font.test"
+}

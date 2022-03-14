@@ -127,3 +127,7 @@ androidx {
     inceptionYear = "2021"
     description = "Compose Animation Graphics Library for using animated-vector resources in Compose"
 }
+
+android {
+    namespace "androidx.compose.animation.graphics"
+}

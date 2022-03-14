@@ -38,3 +38,7 @@ dependencies {
     androidTestImplementation(libs.kotlinTestCommon)
     androidTestImplementation(libs.truth)
 }
+
+android {
+    namespace "androidx.compose.ui.benchmark"
+}

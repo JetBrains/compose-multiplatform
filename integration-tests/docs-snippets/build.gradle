@@ -68,6 +68,10 @@ androidx {
     description = "Compose Documentation Snippets on developer.android.com"
 }
 
+android {
+    namespace "androidx.compose.integration.docs"
+}
+
 android.defaultConfig.minSdkVersion 21
 android.buildFeatures.viewBinding true
 

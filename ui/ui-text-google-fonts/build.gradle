@@ -48,3 +48,7 @@ androidx {
     inceptionYear = "2022"
     description = "Compose Downloadable Fonts integration for Google Fonts"
 }
+
+android {
+    namespace "androidx.compose.ui.text.googlefonts"
+}

@@ -6,6 +6,8 @@ plugins {
 }
 
 android {
+
+    namespace "androidx.compose.integration.macrobenchmark.target"
     buildTypes {
         release {
             minifyEnabled true

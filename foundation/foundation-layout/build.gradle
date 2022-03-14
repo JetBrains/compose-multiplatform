@@ -133,3 +133,7 @@ androidx {
     description = "Compose layout implementations"
     legacyDisableKotlinStrictApiMode = true
 }
+
+android {
+    namespace "androidx.compose.foundation.layout"
+}

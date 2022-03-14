@@ -32,4 +32,5 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace "androidx.compose.ui.demos"
 }

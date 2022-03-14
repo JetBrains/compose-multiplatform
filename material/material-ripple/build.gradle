@@ -108,3 +108,7 @@ androidx {
     // visibility
     legacyDisableKotlinStrictApiMode = AndroidXComposePlugin.isMultiplatformEnabled(project)
 }
+
+android {
+    namespace "androidx.compose.material.ripple"
+}

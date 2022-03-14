@@ -111,6 +111,7 @@ android {
     defaultConfig {
         consumerProguardFiles 'proguard-rules.pro'
     }
+    namespace "androidx.compose.runtime"
 }
 
 androidx {

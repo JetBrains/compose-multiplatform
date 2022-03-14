@@ -118,3 +118,7 @@ androidx {
     inceptionYear = "2020"
     description = "Compose internal test utils."
 }
+
+android {
+    namespace "androidx.compose.testutils"
+}

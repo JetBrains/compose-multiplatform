@@ -48,3 +48,7 @@ androidx {
     inceptionYear = "2021"
     description = "Contains the sample code for the AndroidX Compose Material You components."
 }
+
+android {
+    namespace "androidx.compose.material3.samples"
+}
