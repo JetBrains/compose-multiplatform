@@ -123,6 +123,9 @@ val taskNamesKnownToDuplicateOutputs = setOf(
     // To-be removed when we can use updateLintBaselineDebug
     "replaceLintBaseline",
     "updateLintBaselineDebug",
+    // b/224564238
+    "updateLintBaselineWithExpandProjectionDebug",
+    "updateLintBaselineWithExpandProjectionRelease"
 )
 
 fun shouldValidateTaskOutput(task: Task): Boolean {
