@@ -139,13 +139,13 @@ private fun ensureIconsExistInAllThemes(icons: List<Icon>) {
     }
 
     val expectedIconNames = groupedIcons.values.map { themeIcons ->
-        themeIcons.map { icon -> icon.kotlinName }
+        themeIcons.map { icon -> icon.kotlinName }.sorted()
     }
 
     expectedIconNames.first().let { expected ->
         expectedIconNames.forEach { actual ->
             check(actual == expected) {
-                "Not all icons were found in all themes"
+                "Not all icons were found in all themes $actual $expected"
             }
         }
     }
