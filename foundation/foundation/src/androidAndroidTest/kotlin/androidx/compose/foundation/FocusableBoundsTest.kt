@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -57,6 +58,7 @@ class FocusableBoundsTest {
     private val size = 10f
     private val sizeDp = with(rule.density) { 10f.toDp() }
 
+    @Ignore // b/222529358
     @Test
     fun onFocusedBoundsPositioned_notified_whenChildGainsFocus() {
         val focusRequester = FocusRequester()
@@ -85,6 +87,7 @@ class FocusableBoundsTest {
         }
     }
 
+    @Ignore // b/222529358
     @Test
     fun onFocusedBoundsPositioned_notified_whenFocusMovesBetweenChildren() {
         val (focusRequester1, focusRequester2) = FocusRequester.createRefs()
@@ -131,6 +134,7 @@ class FocusableBoundsTest {
         }
     }
 
+    @Ignore // b/222529358
     @Test
     fun onFocusedBoundsPositioned_notified_whenFocusedBoundsMoves() {
         val focusRequester = FocusRequester()
@@ -176,6 +180,7 @@ class FocusableBoundsTest {
         }
     }
 
+    @Ignore // b/222529358
     @Test
     fun onFocusedChildPositioned_notNotified_whenFocusableChildEntersComposition() {
         val focusRequester = FocusRequester()
@@ -207,6 +212,7 @@ class FocusableBoundsTest {
         }
     }
 
+    @Ignore // b/222529358
     @Test
     fun onFocusedBoundsPositioned_notified_whenFocusedBoundsLeavesComposition() {
         val focusRequester = FocusRequester()
@@ -241,6 +247,7 @@ class FocusableBoundsTest {
         }
     }
 
+    @Ignore // b/222529358
     @Test
     fun onFocusedBoundsPositioned_notified_whenFocusedBoundsIsDisabled() {
         val focusRequester = FocusRequester()
@@ -276,6 +283,7 @@ class FocusableBoundsTest {
         }
     }
 
+    @Ignore // b/222529358
     @Test
     fun onFocusedBoundsPositioned_notified_whenFocusCleared() {
         val focusRequester = FocusRequester()
@@ -311,6 +319,7 @@ class FocusableBoundsTest {
         }
     }
 
+    @Ignore // b/222529358
     @Test
     fun onFocusedBoundsPositioned_notified_whenFocusMovesOutsideObserver() {
         val (focusRequester1, focusRequester2) = FocusRequester.createRefs()
@@ -353,6 +362,7 @@ class FocusableBoundsTest {
         }
     }
 
+    @Ignore // b/222529358
     @Test
     fun onFocusedBoundsPositioned_notified_whenMultipleObservers() {
         val focusRequester = FocusRequester()
@@ -393,6 +403,7 @@ class FocusableBoundsTest {
         }
     }
 
+    @Ignore // b/222529358
     @Test
     fun onFocusedBoundsPositioned_notified_whenAddedToParentWithAlreadyFocusedBounds() {
         val focusRequester = FocusRequester()
@@ -489,6 +500,7 @@ class FocusableBoundsTest {
         }
     }
 
+    @Ignore // b/222529358
     @Test
     fun onFocusedBoundsPositioned_notified_whenNewObserverAddedBelowExisting() {
         val focusRequester = FocusRequester()
