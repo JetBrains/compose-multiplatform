@@ -197,7 +197,9 @@ internal class SkiaParagraph(
     override fun getHorizontalPosition(offset: Int, usePrimaryDirection: Boolean): Float {
         val prevBox = getBoxBackwardByOffset(offset)
         val nextBox = getBoxForwardByOffset(offset)
+        val isRtl = paragraphIntrinsics.textDirection == ResolvedTextDirection.Rtl
         return when {
+            prevBox == null && nextBox == null -> if (isRtl) width else 0f
             prevBox == null && nextBox == null -> 0f
             prevBox == null -> nextBox!!.cursorHorizontalPosition(true)
             nextBox == null -> prevBox.cursorHorizontalPosition()
