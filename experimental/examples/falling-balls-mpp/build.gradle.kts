@@ -167,7 +167,7 @@ compose.experimental {
             }
             connectedDevice("Device") {
                 //Usage: ./gradlew iosDeployDevice
-                buildConfiguration = "Debug"
+                buildConfiguration = "Release"
             }
         }
     }

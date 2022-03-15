@@ -22,7 +22,8 @@ fun Project.registerConnectedDeviceTasks(
     taskInstallIosDeploy: TaskProvider<*>,
 ) {
     val xcodeProjectDir = getBuildIosDir(id).resolve("$projectName.xcodeproj")
-    val iosCompiledAppDir = xcodeProjectDir.resolve("build/Build/Products/Debug-iphoneos/$projectName.app")
+    val iosCompiledAppDir =
+        xcodeProjectDir.resolve("build/Build/Products/${deploy.buildConfiguration}-iphoneos/$projectName.app")
     val teamIdKey = "compose.ios.teamId"
     val taskGenerateXcodeProject = configureTaskToGenerateXcodeProject(
         id = id,

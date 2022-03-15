@@ -73,7 +73,8 @@ fun Project.registerSimulatorTasks(
         Arch.X64 -> "x86_64"
         Arch.Arm64 -> "arm64"
     }
-    val iosCompiledAppDir = xcodeProjectDir.resolve("build/Build/Products/Debug-iphonesimulator/$projectName.app")
+    val iosCompiledAppDir =
+        xcodeProjectDir.resolve("build/Build/Products/${deploy.buildConfiguration}-iphonesimulator/$projectName.app")
     val taskBuild = tasks.composeIosTask<AbstractComposeIosTask>("iosSimulatorBuild$id") {
         dependsOn(taskGenerateXcodeProject)
         doLast {
