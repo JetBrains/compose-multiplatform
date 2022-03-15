@@ -68,9 +68,8 @@ internal class FocusManagerImpl(
      * A [Modifier] that can be added to the [Owners][androidx.compose.ui.node.Owner] modifier
      * list that contains the modifiers required by the focus system. (Eg, a root focus modifier).
      */
-    val modifier: Modifier
-        // TODO(b/168831247): return an empty Modifier when there are no focusable children.
-        get() = Modifier.focusTarget(focusModifier)
+    // TODO(b/168831247): return an empty Modifier when there are no focusable children.
+    val modifier: Modifier = Modifier.focusTarget(focusModifier)
 
     lateinit var layoutDirection: LayoutDirection
 

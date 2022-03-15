@@ -21,23 +21,50 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.focus.FocusStateImpl.Deactivated
+import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 @MediumTest
-@RunWith(AndroidJUnit4::class)
-class FocusEventCountTest {
+@RunWith(Parameterized::class)
+class FocusEventCountTest(focusEventType: String) {
+    private val onFocusEvent = if (focusEventType == UseOnFocusEvent) {
+        OnFocusEventCall
+    } else {
+        FocusEventModifierCall
+    }
+
     @get:Rule
     val rule = createComposeRule()
+
+    companion object {
+        val OnFocusEventCall: Modifier.((FocusState) -> Unit) -> Modifier = {
+            onFocusEvent(it)
+        }
+        val FocusEventModifierCall: Modifier.((FocusState) -> Unit) -> Modifier = {
+            focusEventModifier(it)
+        }
+        const val UseOnFocusEvent = "onFocusEvent"
+        const val UseFocusEventModifier = "FocusEventModifier"
+
+        @JvmStatic
+        @Parameterized.Parameters(name = "onFocusEvent = {0}")
+        fun initParameters() = listOf(UseOnFocusEvent, UseFocusEventModifier)
+
+        private fun Modifier.focusEventModifier(event: (FocusState) -> Unit) = this.then(
+            object : FocusEventModifier {
+                override fun onFocusEvent(focusState: FocusState) = event(focusState)
+            }
+        )
+    }
 
     @Test
     fun initially_onFocusEventIsCalledOnce() {

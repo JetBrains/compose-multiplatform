@@ -19,7 +19,6 @@ import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusEventModifier
 import androidx.compose.ui.focus.FocusModifier
 import androidx.compose.ui.focus.FocusOrderToProperties
 import androidx.compose.ui.focus.FocusPropertiesModifier
@@ -696,11 +695,6 @@ internal class LayoutNode(
                 }
                 if (mod is FocusModifier) {
                     wrapper = ModifiedFocusNode(wrapper, mod)
-                        .initialize()
-                        .assignChained(toWrap)
-                }
-                if (mod is FocusEventModifier) {
-                    wrapper = ModifiedFocusEventNode(wrapper, mod)
                         .initialize()
                         .assignChained(toWrap)
                 }

@@ -20,7 +20,6 @@ package androidx.compose.ui.node
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.findFocusableChildren
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
@@ -968,15 +967,6 @@ internal abstract class LayoutNodeWrapper(
      * It searches the wrapper list associated with this [LayoutNodeWrapper].
      */
     abstract fun findLastFocusWrapper(): ModifiedFocusNode?
-
-    /**
-     * When the focus state changes, a [LayoutNodeWrapper] calls this function on the wrapper
-     * that wraps it. The focus state change must be propagated to the parents until we reach
-     * another [focus node][ModifiedFocusNode].
-     */
-    open fun propagateFocusEvent(focusState: FocusState) {
-        wrappedBy?.propagateFocusEvent(focusState)
-    }
 
     /**
      * Returns the ModifierLocalProviderNode that has the value for [local].

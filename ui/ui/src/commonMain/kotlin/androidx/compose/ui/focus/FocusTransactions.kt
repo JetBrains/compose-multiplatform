@@ -36,7 +36,7 @@ internal fun ModifiedFocusNode.requestFocus() {
         Active, Captured, Deactivated, DeactivatedParent -> {
             // There is no change in focus state, but we send a focus event to notify the user
             // that the focus request is completed.
-            sendOnFocusEvent(focusState)
+            sendOnFocusEvent()
         }
         ActiveParent -> if (clearChildFocus()) grantFocus()
 
