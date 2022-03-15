@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,33 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package androidx.compose.material3
 
 import android.graphics.Rect
 import android.view.View
 import android.view.ViewTreeObserver
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.forEachGesture
-import androidx.compose.foundation.interaction.InteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.internal.ExposedDropdownMenuPopup
+import androidx.compose.material3.internal.ExposedDropdownMenuPopup
+import androidx.compose.material3.tokens.FilledAutocompleteTokens
+import androidx.compose.material3.tokens.OutlinedAutocompleteTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -63,29 +59,33 @@ import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.util.fastAll
-import kotlinx.coroutines.coroutineScope
 import kotlin.math.max
+import kotlinx.coroutines.coroutineScope
 
 /**
- * [Material Design Exposed Dropdown Menu](https://material.io/components/menus#exposed-dropdown-menu).
+ * <a href="https://m3.material.io/components/menus/overview" class="external" target="_blank">Material Design Exposed Dropdown Menu</a>.
  *
- * Box for Exposed Dropdown Menu. Expected to contain [TextField] and
- * [ExposedDropdownMenuBoxScope.ExposedDropdownMenu] as a content.
+ * Exposed dropdown menus display the currently selected item in a text field above the menu. In
+ * some cases, it can accept and display user input (whether or not it’s listed as a menu choice).
+ * If the text field input is used to filter results in the menu, the component is also known as
+ * "autocomplete" or a "combobox".
+ *
+ * The [ExposedDropdownMenuBox] is expected to contain a [TextField] (or [OutlinedTextField]) and
+ * [ExposedDropdownMenuBoxScope.ExposedDropdownMenu] as content.
  *
  * An example of read-only Exposed Dropdown Menu:
- *
- * @sample androidx.compose.material.samples.ExposedDropdownMenuSample
+ * @sample androidx.compose.material3.samples.ExposedDropdownMenuSample
  *
  * An example of editable Exposed Dropdown Menu:
+ * @sample androidx.compose.material3.samples.EditableExposedDropdownMenuSample
  *
- * @sample androidx.compose.material.samples.EditableExposedDropdownMenuSample
- *
- * @param expanded Whether Dropdown Menu should be expanded or not.
- * @param onExpandedChange Executes when the user clicks on the ExposedDropdownMenuBox.
- * @param modifier The modifier to apply to this layout
+ * @param expanded Whether the dropdown menu is expanded or not.
+ * @param onExpandedChange Executes when the user clicks on the ExposedDropdownMenuBox and the
+ * expansion state changes.
+ * @param modifier The modifier to apply to this layout.
  * @param content The content to be displayed inside ExposedDropdownMenuBox.
  */
-@ExperimentalMaterialApi
+@ExperimentalMaterial3Api
 @Composable
 fun ExposedDropdownMenuBox(
     expanded: Boolean,
@@ -195,7 +195,7 @@ private class OnGlobalLayoutListener(
 /**
  * Scope for [ExposedDropdownMenuBox].
  */
-@ExperimentalMaterialApi
+@ExperimentalMaterial3Api
 interface ExposedDropdownMenuBoxScope {
     /**
      * Modifier which should be applied to an [ExposedDropdownMenu]
@@ -273,7 +273,7 @@ interface ExposedDropdownMenuBoxScope {
 /**
  * Contains default values used by Exposed Dropdown Menu.
  */
-@ExperimentalMaterialApi
+@ExperimentalMaterial3Api
 object ExposedDropdownMenuDefaults {
     /**
      * Default trailing icon for Exposed Dropdown Menu.
@@ -282,7 +282,7 @@ object ExposedDropdownMenuDefaults {
      * is expanded or not. Affects the appearance of the icon.
      * @param onIconClick Called when the icon was clicked.
      */
-    @ExperimentalMaterialApi
+    @ExperimentalMaterial3Api
     @Composable
     fun TrailingIcon(
         expanded: Boolean,
@@ -311,79 +311,91 @@ object ExposedDropdownMenuDefaults {
      * (including label, placeholder, leading and trailing icons) colors used in a [TextField].
      *
      * @param textColor Represents the color used for the input text of this text field.
-     * @param disabledTextColor Represents the color used for the input text of this text field
-     * when it's disabled.
+     * @param disabledTextColor Represents the color used for the input text of this text field when
+     * it's disabled.
      * @param backgroundColor Represents the background color for this text field.
      * @param cursorColor Represents the cursor color for this text field.
-     * @param errorCursorColor Represents the cursor color for this text field
-     * when it's in error state.
-     * @param focusedIndicatorColor Represents the indicator color for this text field
-     * when it's focused.
-     * @param unfocusedIndicatorColor Represents the indicator color for this text field
-     * when it's not focused.
-     * @param disabledIndicatorColor Represents the indicator color for this text field
-     * when it's disabled.
-     * @param errorIndicatorColor Represents the indicator color for this text field
-     * when it's in error state.
-     * @param leadingIconColor Represents the leading icon color for this text field.
-     * @param disabledLeadingIconColor Represents the leading icon color for this text field
-     * when it's disabled.
-     * @param errorLeadingIconColor Represents the leading icon color for this text field
-     * when it's in error state.
-     * @param trailingIconColor Represents the trailing icon color for this text field.
-     * @param focusedTrailingIconColor Represents the trailing icon color for this text field
-     * when it's focused.
-     * @param disabledTrailingIconColor Represents the trailing icon color for this text field
-     * when it's disabled.
-     * @param errorTrailingIconColor Represents the trailing icon color for this text field
-     * when it's in error state.
-     * @param focusedLabelColor Represents the label color for this text field
-     * when it's focused.
-     * @param unfocusedLabelColor Represents the label color for this text field
-     * when it's not focused.
-     * @param disabledLabelColor Represents the label color for this text field
-     * when it's disabled.
-     * @param errorLabelColor Represents the label color for this text field
-     * when it's in error state.
+     * @param errorCursorColor Represents the cursor color for this text field when it's in error
+     * state.
+     * @param focusedIndicatorColor Represents the indicator color for this text field when it's
+     * focused.
+     * @param unfocusedIndicatorColor Represents the indicator color for this text field when it's
+     * not focused.
+     * @param disabledIndicatorColor Represents the indicator color for this text field when it's
+     * disabled.
+     * @param errorIndicatorColor Represents the indicator color for this text field when it's in
+     * error state.
+     * @param focusedLeadingIconColor Represents the leading icon color for this text field when
+     * it's focused.
+     * @param unfocusedLeadingIconColor Represents the leading icon color for this text field when
+     * it's not focused.
+     * @param disabledLeadingIconColor Represents the leading icon color for this text field when
+     * it's disabled.
+     * @param errorLeadingIconColor Represents the leading icon color for this text field when it's
+     * in error state.
+     * @param focusedTrailingIconColor Represents the trailing icon color for this text field when
+     * it's focused.
+     * @param unfocusedTrailingIconColor Represents the trailing icon color for this text field when
+     * it's not focused.
+     * @param disabledTrailingIconColor Represents the trailing icon color for this text field when
+     * it's disabled.
+     * @param errorTrailingIconColor Represents the trailing icon color for this text field when
+     * it's in error state.
+     * @param focusedLabelColor Represents the label color for this text field when it's focused.
+     * @param unfocusedLabelColor Represents the label color for this text field when it's not
+     * focused.
+     * @param disabledLabelColor Represents the label color for this text field when it's disabled.
+     * @param errorLabelColor Represents the label color for this text field when it's in error
+     * state.
      * @param placeholderColor Represents the placeholder color for this text field.
-     * @param disabledPlaceholderColor Represents the placeholder color for this text field
-     * when it's disabled.
+     * @param disabledPlaceholderColor Represents the placeholder color for this text field when
+     * it's disabled.
      */
     @Composable
     fun textFieldColors(
-        textColor: Color = LocalContentColor.current.copy(LocalContentAlpha.current),
-        disabledTextColor: Color = textColor.copy(ContentAlpha.disabled),
-        backgroundColor: Color =
-            MaterialTheme.colors.onSurface.copy(alpha = TextFieldDefaults.BackgroundOpacity),
-        cursorColor: Color = MaterialTheme.colors.primary,
-        errorCursorColor: Color = MaterialTheme.colors.error,
+        textColor: Color = FilledAutocompleteTokens.FieldInputTextColor.toColor(),
+        disabledTextColor: Color = FilledAutocompleteTokens.FieldDisabledInputTextColor.toColor()
+            .copy(alpha = FilledAutocompleteTokens.FieldDisabledInputTextOpacity),
+        backgroundColor: Color = FilledAutocompleteTokens.TextFieldContainerColor.toColor(),
+        cursorColor: Color = FilledAutocompleteTokens.TextFieldCaretColor.toColor(),
+        errorCursorColor: Color = FilledAutocompleteTokens.TextFieldErrorFocusCaretColor.toColor(),
         focusedIndicatorColor: Color =
-            MaterialTheme.colors.primary.copy(alpha = ContentAlpha.high),
+            FilledAutocompleteTokens.TextFieldFocusActiveIndicatorColor.toColor(),
         unfocusedIndicatorColor: Color =
-            MaterialTheme.colors.onSurface.copy(
-                alpha = TextFieldDefaults.UnfocusedIndicatorLineOpacity
-            ),
-        disabledIndicatorColor: Color = unfocusedIndicatorColor.copy(alpha = ContentAlpha.disabled),
-        errorIndicatorColor: Color = MaterialTheme.colors.error,
-        leadingIconColor: Color =
-            MaterialTheme.colors.onSurface.copy(alpha = TextFieldDefaults.IconOpacity),
-        disabledLeadingIconColor: Color = leadingIconColor.copy(alpha = ContentAlpha.disabled),
-        errorLeadingIconColor: Color = leadingIconColor,
-        trailingIconColor: Color =
-            MaterialTheme.colors.onSurface.copy(alpha = TextFieldDefaults.IconOpacity),
+            FilledAutocompleteTokens.TextFieldActiveIndicatorColor.toColor(),
+        disabledIndicatorColor: Color =
+            FilledAutocompleteTokens.TextFieldDisabledActiveIndicatorColor.toColor()
+                .copy(alpha = FilledAutocompleteTokens.TextFieldDisabledActiveIndicatorOpacity),
+        errorIndicatorColor: Color =
+            FilledAutocompleteTokens.TextFieldErrorActiveIndicatorColor.toColor(),
+        focusedLeadingIconColor: Color =
+            FilledAutocompleteTokens.TextFieldFocusLeadingIconColor.toColor(),
+        unfocusedLeadingIconColor: Color =
+            FilledAutocompleteTokens.TextFieldLeadingIconColor.toColor(),
+        disabledLeadingIconColor: Color =
+            FilledAutocompleteTokens.TextFieldDisabledLeadingIconColor.toColor()
+                .copy(alpha = FilledAutocompleteTokens.TextFieldDisabledLeadingIconOpacity),
+        errorLeadingIconColor: Color =
+            FilledAutocompleteTokens.TextFieldErrorLeadingIconColor.toColor(),
         focusedTrailingIconColor: Color =
-            MaterialTheme.colors.primary.copy(alpha = ContentAlpha.high),
-        disabledTrailingIconColor: Color = trailingIconColor.copy(alpha = ContentAlpha.disabled),
-        errorTrailingIconColor: Color = MaterialTheme.colors.error,
-        focusedLabelColor: Color =
-            MaterialTheme.colors.primary.copy(alpha = ContentAlpha.high),
-        unfocusedLabelColor: Color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium),
-        disabledLabelColor: Color = unfocusedLabelColor.copy(ContentAlpha.disabled),
-        errorLabelColor: Color = MaterialTheme.colors.error,
-        placeholderColor: Color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium),
-        disabledPlaceholderColor: Color = placeholderColor.copy(ContentAlpha.disabled)
+            FilledAutocompleteTokens.TextFieldFocusTrailingIconColor.toColor(),
+        unfocusedTrailingIconColor: Color =
+            FilledAutocompleteTokens.TextFieldTrailingIconColor.toColor(),
+        disabledTrailingIconColor: Color =
+            FilledAutocompleteTokens.TextFieldDisabledTrailingIconColor.toColor()
+                .copy(alpha = FilledAutocompleteTokens.TextFieldDisabledTrailingIconOpacity),
+        errorTrailingIconColor: Color =
+            FilledAutocompleteTokens.TextFieldErrorTrailingIconColor.toColor(),
+        focusedLabelColor: Color = FilledAutocompleteTokens.FieldFocusLabelTextColor.toColor(),
+        unfocusedLabelColor: Color = FilledAutocompleteTokens.FieldLabelTextColor.toColor(),
+        disabledLabelColor: Color = FilledAutocompleteTokens.FieldDisabledLabelTextColor.toColor(),
+        errorLabelColor: Color = FilledAutocompleteTokens.FieldErrorLabelTextColor.toColor(),
+        placeholderColor: Color = FilledAutocompleteTokens.FieldSupportingTextColor.toColor(),
+        disabledPlaceholderColor: Color =
+            FilledAutocompleteTokens.FieldDisabledInputTextColor.toColor()
+                .copy(alpha = FilledAutocompleteTokens.FieldDisabledInputTextOpacity)
     ): TextFieldColors =
-        DefaultTextFieldForExposedDropdownMenusColors(
+        TextFieldDefaults.textFieldColors(
             textColor = textColor,
             disabledTextColor = disabledTextColor,
             cursorColor = cursorColor,
@@ -392,11 +404,12 @@ object ExposedDropdownMenuDefaults {
             unfocusedIndicatorColor = unfocusedIndicatorColor,
             errorIndicatorColor = errorIndicatorColor,
             disabledIndicatorColor = disabledIndicatorColor,
-            leadingIconColor = leadingIconColor,
+            focusedLeadingIconColor = focusedLeadingIconColor,
+            unfocusedLeadingIconColor = unfocusedLeadingIconColor,
             disabledLeadingIconColor = disabledLeadingIconColor,
             errorLeadingIconColor = errorLeadingIconColor,
-            trailingIconColor = trailingIconColor,
             focusedTrailingIconColor = focusedTrailingIconColor,
+            unfocusedTrailingIconColor = unfocusedTrailingIconColor,
             disabledTrailingIconColor = disabledTrailingIconColor,
             errorTrailingIconColor = errorTrailingIconColor,
             backgroundColor = backgroundColor,
@@ -414,89 +427,103 @@ object ExposedDropdownMenuDefaults {
      * [OutlinedTextField].
      *
      * @param textColor Represents the color used for the input text of this text field.
-     * @param disabledTextColor Represents the color used for the input text of this text field
-     * when it's disabled.
+     * @param disabledTextColor Represents the color used for the input text of this text field when
+     * it's disabled.
      * @param backgroundColor Represents the background color for this text field.
      * @param cursorColor Represents the cursor color for this text field.
-     * @param errorCursorColor Represents the cursor color for this text field
-     * when it's in error state.
-     * @param focusedBorderColor Represents the border color for this text field
-     * when it's focused.
-     * @param unfocusedBorderColor Represents the border color for this text field
-     * when it's not focused.
-     * @param disabledBorderColor Represents the border color for this text field
-     * when it's disabled.
-     * @param errorBorderColor Represents the border color for this text field
-     * when it's in error state.
-     * @param leadingIconColor Represents the leading icon color for this text field.
-     * @param disabledLeadingIconColor Represents the leading icon color for this text field
-     * when it's disabled.
-     * @param errorLeadingIconColor Represents the leading icon color for this text field
-     * when it's in error state.
-     * @param trailingIconColor Represents the trailing icon color for this text field.
-     * @param focusedTrailingIconColor Represents the trailing icon color for this text field
-     * when it's focused.
-     * @param disabledTrailingIconColor Represents the trailing icon color for this text field
-     * when it's disabled.
-     * @param errorTrailingIconColor Represents the trailing icon color for this text field
-     * when it's in error state.
-     * @param focusedLabelColor Represents the label color for this text field
-     * when it's focused.
-     * @param unfocusedLabelColor Represents the label color for this text field
-     * when it's not focused.
-     * @param disabledLabelColor Represents the label color for this text field
-     * when it's disabled.
-     * @param errorLabelColor Represents the label color for this text field
-     * when it's in error state.
+     * @param errorCursorColor Represents the cursor color for this text field when it's in error
+     * state.
+     * @param focusedBorderColor Represents the border color for this text field when it's focused.
+     * @param unfocusedBorderColor Represents the border color for this text field when it's not
+     * focused.
+     * @param disabledBorderColor Represents the border color for this text field when it's
+     * disabled.
+     * @param errorBorderColor Represents the border color for this text field when it's in error
+     * state.
+     * @param focusedLeadingIconColor Represents the leading icon color for this text field when
+     * it's focused.
+     * @param unfocusedLeadingIconColor Represents the leading icon color for this text field when
+     * it's not focused.
+     * @param disabledLeadingIconColor Represents the leading icon color for this text field when
+     * it's disabled.
+     * @param errorLeadingIconColor Represents the leading icon color for this text field when it's
+     * in error state.
+     * @param focusedTrailingIconColor Represents the trailing icon color for this text field when
+     * it's focused.
+     * @param unfocusedTrailingIconColor Represents the trailing icon color for this text field when
+     * it's not focused.
+     * @param disabledTrailingIconColor Represents the trailing icon color for this text field when
+     * it's disabled.
+     * @param errorTrailingIconColor Represents the trailing icon color for this text field when
+     * it's in error state.
+     * @param focusedLabelColor Represents the label color for this text field when it's focused.
+     * @param unfocusedLabelColor Represents the label color for this text field when it's not
+     * focused.
+     * @param disabledLabelColor Represents the label color for this text field when it's disabled.
+     * @param errorLabelColor Represents the label color for this text field when it's in error
+     * state.
      * @param placeholderColor Represents the placeholder color for this text field.
-     * @param disabledPlaceholderColor Represents the placeholder color for this text field
-     * when it's disabled.
+     * @param disabledPlaceholderColor Represents the placeholder color for this text field when
+     * it's disabled.
      */
     @Composable
     fun outlinedTextFieldColors(
-        textColor: Color = LocalContentColor.current.copy(LocalContentAlpha.current),
-        disabledTextColor: Color = textColor.copy(ContentAlpha.disabled),
+        textColor: Color = OutlinedAutocompleteTokens.FieldInputTextColor.toColor(),
+        disabledTextColor: Color = OutlinedAutocompleteTokens.FieldDisabledInputTextColor.toColor()
+            .copy(alpha = OutlinedAutocompleteTokens.FieldDisabledInputTextOpacity),
         backgroundColor: Color = Color.Transparent,
-        cursorColor: Color = MaterialTheme.colors.primary,
-        errorCursorColor: Color = MaterialTheme.colors.error,
-        focusedBorderColor: Color =
-            MaterialTheme.colors.primary.copy(alpha = ContentAlpha.high),
-        unfocusedBorderColor: Color =
-            MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
-        disabledBorderColor: Color = unfocusedBorderColor.copy(alpha = ContentAlpha.disabled),
-        errorBorderColor: Color = MaterialTheme.colors.error,
-        leadingIconColor: Color =
-            MaterialTheme.colors.onSurface.copy(alpha = TextFieldDefaults.IconOpacity),
-        disabledLeadingIconColor: Color = leadingIconColor.copy(alpha = ContentAlpha.disabled),
-        errorLeadingIconColor: Color = leadingIconColor,
-        trailingIconColor: Color =
-            MaterialTheme.colors.onSurface.copy(alpha = TextFieldDefaults.IconOpacity),
+        cursorColor: Color = OutlinedAutocompleteTokens.TextFieldCaretColor.toColor(),
+        errorCursorColor: Color =
+            OutlinedAutocompleteTokens.TextFieldErrorFocusCaretColor.toColor(),
+        focusedBorderColor: Color = OutlinedAutocompleteTokens.TextFieldFocusOutlineColor.toColor(),
+        unfocusedBorderColor: Color = OutlinedAutocompleteTokens.TextFieldOutlineColor.toColor(),
+        disabledBorderColor: Color =
+            OutlinedAutocompleteTokens.TextFieldDisabledOutlineColor.toColor()
+                .copy(alpha = OutlinedAutocompleteTokens.TextFieldDisabledOutlineOpacity),
+        errorBorderColor: Color = OutlinedAutocompleteTokens.TextFieldErrorOutlineColor.toColor(),
+        focusedLeadingIconColor: Color =
+            OutlinedAutocompleteTokens.TextFieldFocusLeadingIconColor.toColor(),
+        unfocusedLeadingIconColor: Color =
+            OutlinedAutocompleteTokens.TextFieldLeadingIconColor.toColor(),
+        disabledLeadingIconColor: Color =
+            OutlinedAutocompleteTokens.TextFieldDisabledLeadingIconColor.toColor()
+                .copy(alpha = OutlinedAutocompleteTokens.TextFieldDisabledLeadingIconOpacity),
+        errorLeadingIconColor: Color =
+            OutlinedAutocompleteTokens.TextFieldErrorLeadingIconColor.toColor(),
         focusedTrailingIconColor: Color =
-            MaterialTheme.colors.primary.copy(alpha = ContentAlpha.high),
-        disabledTrailingIconColor: Color = trailingIconColor.copy(alpha = ContentAlpha.disabled),
-        errorTrailingIconColor: Color = MaterialTheme.colors.error,
-        focusedLabelColor: Color =
-            MaterialTheme.colors.primary.copy(alpha = ContentAlpha.high),
-        unfocusedLabelColor: Color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium),
-        disabledLabelColor: Color = unfocusedLabelColor.copy(ContentAlpha.disabled),
-        errorLabelColor: Color = MaterialTheme.colors.error,
-        placeholderColor: Color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium),
-        disabledPlaceholderColor: Color = placeholderColor.copy(ContentAlpha.disabled)
+            OutlinedAutocompleteTokens.TextFieldFocusTrailingIconColor.toColor(),
+        unfocusedTrailingIconColor: Color =
+            OutlinedAutocompleteTokens.TextFieldTrailingIconColor.toColor(),
+        disabledTrailingIconColor: Color =
+            OutlinedAutocompleteTokens.TextFieldDisabledTrailingIconColor.toColor()
+                .copy(alpha = OutlinedAutocompleteTokens.TextFieldDisabledTrailingIconOpacity),
+        errorTrailingIconColor: Color =
+            OutlinedAutocompleteTokens.TextFieldErrorTrailingIconColor.toColor(),
+        focusedLabelColor: Color = OutlinedAutocompleteTokens.FieldFocusLabelTextColor.toColor(),
+        unfocusedLabelColor: Color = OutlinedAutocompleteTokens.FieldLabelTextColor.toColor(),
+        disabledLabelColor: Color = OutlinedAutocompleteTokens.FieldDisabledLabelTextColor.toColor()
+            .copy(alpha = OutlinedAutocompleteTokens.FieldDisabledLabelTextOpacity),
+        errorLabelColor: Color = OutlinedAutocompleteTokens.FieldErrorLabelTextColor.toColor(),
+        placeholderColor: Color = OutlinedAutocompleteTokens.FieldSupportingTextColor.toColor(),
+        disabledPlaceholderColor: Color =
+            OutlinedAutocompleteTokens.FieldDisabledInputTextColor.toColor()
+                .copy(alpha = OutlinedAutocompleteTokens.FieldDisabledInputTextOpacity)
     ): TextFieldColors =
-        DefaultTextFieldForExposedDropdownMenusColors(
+        TextFieldDefaults.outlinedTextFieldColors(
             textColor = textColor,
             disabledTextColor = disabledTextColor,
             cursorColor = cursorColor,
             errorCursorColor = errorCursorColor,
-            focusedIndicatorColor = focusedBorderColor,
-            unfocusedIndicatorColor = unfocusedBorderColor,
-            errorIndicatorColor = errorBorderColor,
-            disabledIndicatorColor = disabledBorderColor,
-            leadingIconColor = leadingIconColor,
+            focusedBorderColor = focusedBorderColor,
+            unfocusedBorderColor = unfocusedBorderColor,
+            errorBorderColor = errorBorderColor,
+            disabledBorderColor = disabledBorderColor,
+            focusedLeadingIconColor = focusedLeadingIconColor,
+            unfocusedLeadingIconColor = unfocusedLeadingIconColor,
             disabledLeadingIconColor = disabledLeadingIconColor,
             errorLeadingIconColor = errorLeadingIconColor,
-            trailingIconColor = trailingIconColor,
             focusedTrailingIconColor = focusedTrailingIconColor,
+            unfocusedTrailingIconColor = unfocusedTrailingIconColor,
             disabledTrailingIconColor = disabledTrailingIconColor,
             errorTrailingIconColor = errorTrailingIconColor,
             backgroundColor = backgroundColor,
@@ -549,188 +576,4 @@ private fun updateHeight(
     val heightBelow =
         visibleWindowBounds.bottom - visibleWindowBounds.top - coordinates.boundsInWindow().bottom
     onHeightUpdate(max(heightAbove, heightBelow).toInt() - verticalMarginInPx)
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-@Immutable
-private class DefaultTextFieldForExposedDropdownMenusColors(
-    private val textColor: Color,
-    private val disabledTextColor: Color,
-    private val cursorColor: Color,
-    private val errorCursorColor: Color,
-    private val focusedIndicatorColor: Color,
-    private val unfocusedIndicatorColor: Color,
-    private val errorIndicatorColor: Color,
-    private val disabledIndicatorColor: Color,
-    private val leadingIconColor: Color,
-    private val disabledLeadingIconColor: Color,
-    private val errorLeadingIconColor: Color,
-    private val trailingIconColor: Color,
-    private val focusedTrailingIconColor: Color,
-    private val disabledTrailingIconColor: Color,
-    private val errorTrailingIconColor: Color,
-    private val backgroundColor: Color,
-    private val focusedLabelColor: Color,
-    private val unfocusedLabelColor: Color,
-    private val disabledLabelColor: Color,
-    private val errorLabelColor: Color,
-    private val placeholderColor: Color,
-    private val disabledPlaceholderColor: Color
-) : TextFieldColorsWithIcons {
-
-    @Composable
-    override fun leadingIconColor(enabled: Boolean, isError: Boolean): State<Color> {
-        return rememberUpdatedState(
-            when {
-                !enabled -> disabledLeadingIconColor
-                isError -> errorLeadingIconColor
-                else -> leadingIconColor
-            }
-        )
-    }
-
-    @Composable
-    override fun trailingIconColor(enabled: Boolean, isError: Boolean): State<Color> {
-        return rememberUpdatedState(
-            when {
-                !enabled -> disabledTrailingIconColor
-                isError -> errorTrailingIconColor
-                else -> trailingIconColor
-            }
-        )
-    }
-
-    @Composable
-    override fun trailingIconColor(
-        enabled: Boolean,
-        isError: Boolean,
-        interactionSource: InteractionSource
-    ): State<Color> {
-        val focused by interactionSource.collectIsFocusedAsState()
-
-        return rememberUpdatedState(
-            when {
-                !enabled -> disabledTrailingIconColor
-                isError -> errorTrailingIconColor
-                focused -> focusedTrailingIconColor
-                else -> trailingIconColor
-            }
-        )
-    }
-
-    @Composable
-    override fun indicatorColor(
-        enabled: Boolean,
-        isError: Boolean,
-        interactionSource: InteractionSource
-    ): State<Color> {
-        val focused by interactionSource.collectIsFocusedAsState()
-
-        val targetValue = when {
-            !enabled -> disabledIndicatorColor
-            isError -> errorIndicatorColor
-            focused -> focusedIndicatorColor
-            else -> unfocusedIndicatorColor
-        }
-        return if (enabled) {
-            animateColorAsState(targetValue, tween(durationMillis = AnimationDuration))
-        } else {
-            rememberUpdatedState(targetValue)
-        }
-    }
-
-    @Composable
-    override fun backgroundColor(enabled: Boolean): State<Color> {
-        return rememberUpdatedState(backgroundColor)
-    }
-
-    @Composable
-    override fun placeholderColor(enabled: Boolean): State<Color> {
-        return rememberUpdatedState(if (enabled) placeholderColor else disabledPlaceholderColor)
-    }
-
-    @Composable
-    override fun labelColor(
-        enabled: Boolean,
-        error: Boolean,
-        interactionSource: InteractionSource
-    ): State<Color> {
-        val focused by interactionSource.collectIsFocusedAsState()
-
-        val targetValue = when {
-            !enabled -> disabledLabelColor
-            error -> errorLabelColor
-            focused -> focusedLabelColor
-            else -> unfocusedLabelColor
-        }
-        return rememberUpdatedState(targetValue)
-    }
-
-    @Composable
-    override fun textColor(enabled: Boolean): State<Color> {
-        return rememberUpdatedState(if (enabled) textColor else disabledTextColor)
-    }
-
-    @Composable
-    override fun cursorColor(isError: Boolean): State<Color> {
-        return rememberUpdatedState(if (isError) errorCursorColor else cursorColor)
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || this::class != other::class) return false
-
-        other as DefaultTextFieldForExposedDropdownMenusColors
-
-        if (textColor != other.textColor) return false
-        if (disabledTextColor != other.disabledTextColor) return false
-        if (cursorColor != other.cursorColor) return false
-        if (errorCursorColor != other.errorCursorColor) return false
-        if (focusedIndicatorColor != other.focusedIndicatorColor) return false
-        if (unfocusedIndicatorColor != other.unfocusedIndicatorColor) return false
-        if (errorIndicatorColor != other.errorIndicatorColor) return false
-        if (disabledIndicatorColor != other.disabledIndicatorColor) return false
-        if (leadingIconColor != other.leadingIconColor) return false
-        if (disabledLeadingIconColor != other.disabledLeadingIconColor) return false
-        if (errorLeadingIconColor != other.errorLeadingIconColor) return false
-        if (trailingIconColor != other.trailingIconColor) return false
-        if (focusedTrailingIconColor != other.focusedTrailingIconColor) return false
-        if (disabledTrailingIconColor != other.disabledTrailingIconColor) return false
-        if (errorTrailingIconColor != other.errorTrailingIconColor) return false
-        if (backgroundColor != other.backgroundColor) return false
-        if (focusedLabelColor != other.focusedLabelColor) return false
-        if (unfocusedLabelColor != other.unfocusedLabelColor) return false
-        if (disabledLabelColor != other.disabledLabelColor) return false
-        if (errorLabelColor != other.errorLabelColor) return false
-        if (placeholderColor != other.placeholderColor) return false
-        if (disabledPlaceholderColor != other.disabledPlaceholderColor) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = textColor.hashCode()
-        result = 31 * result + disabledTextColor.hashCode()
-        result = 31 * result + cursorColor.hashCode()
-        result = 31 * result + errorCursorColor.hashCode()
-        result = 31 * result + focusedIndicatorColor.hashCode()
-        result = 31 * result + unfocusedIndicatorColor.hashCode()
-        result = 31 * result + errorIndicatorColor.hashCode()
-        result = 31 * result + disabledIndicatorColor.hashCode()
-        result = 31 * result + leadingIconColor.hashCode()
-        result = 31 * result + disabledLeadingIconColor.hashCode()
-        result = 31 * result + errorLeadingIconColor.hashCode()
-        result = 31 * result + trailingIconColor.hashCode()
-        result = 31 * result + focusedTrailingIconColor.hashCode()
-        result = 31 * result + disabledTrailingIconColor.hashCode()
-        result = 31 * result + errorTrailingIconColor.hashCode()
-        result = 31 * result + backgroundColor.hashCode()
-        result = 31 * result + focusedLabelColor.hashCode()
-        result = 31 * result + unfocusedLabelColor.hashCode()
-        result = 31 * result + disabledLabelColor.hashCode()
-        result = 31 * result + errorLabelColor.hashCode()
-        result = 31 * result + placeholderColor.hashCode()
-        result = 31 * result + disabledPlaceholderColor.hashCode()
-        return result
-    }
 }

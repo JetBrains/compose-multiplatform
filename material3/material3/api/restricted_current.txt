@@ -193,6 +193,9 @@ package androidx.compose.material3 {
   public final class ElevationKt {
   }
 
+  public final class ExposedDropdownMenuKt {
+  }
+
   public final class FloatingActionButtonDefaults {
     method @androidx.compose.runtime.Composable public androidx.compose.material3.FloatingActionButtonElevation elevation(optional float defaultElevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation);
     method public float getLargeIconSize();
@@ -540,6 +543,13 @@ package androidx.compose.material3 {
   }
 
   public final class TypographyKt {
+  }
+
+}
+
+package androidx.compose.material3.internal {
+
+  public final class ExposedDropdownMenuPopupKt {
   }
 
 }

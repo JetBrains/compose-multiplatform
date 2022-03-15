@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class ExposedDropdownMenuTest {
@@ -67,7 +67,7 @@ class ExposedDropdownMenuTest {
     @Test
     fun expandedBehaviour_expandsOnClickAndCollapsesOnOutside() {
         var textFieldBounds = Rect.Zero
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             var expanded by remember { mutableStateOf(false) }
             ExposedDropdownMenuForTest(
                 expanded = expanded,
@@ -97,7 +97,7 @@ class ExposedDropdownMenuTest {
 
     @Test
     fun expandedBehaviour_collapseOnTextFieldClick() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             var expanded by remember { mutableStateOf(true) }
             ExposedDropdownMenuForTest(
                 expanded = expanded,
@@ -117,7 +117,7 @@ class ExposedDropdownMenuTest {
 
     @Test
     fun expandedBehaviour_expandsAndFocusesTextFieldOnTrailingIconClick() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             var expanded by remember { mutableStateOf(false) }
             ExposedDropdownMenuForTest(
                 expanded = expanded,
@@ -139,7 +139,7 @@ class ExposedDropdownMenuTest {
     fun uiProperties_menuMatchesTextWidth() {
         var textFieldBounds by mutableStateOf(Rect.Zero)
         var menuBounds by mutableStateOf(Rect.Zero)
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             var expanded by remember { mutableStateOf(true) }
             ExposedDropdownMenuForTest(
                 expanded = expanded,
@@ -163,7 +163,7 @@ class ExposedDropdownMenuTest {
 
     @Test
     fun EDMBehaviour_rightOptionIsChosen() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             var expanded by remember { mutableStateOf(true) }
             ExposedDropdownMenuForTest(
                 expanded = expanded,
@@ -253,16 +253,13 @@ class ExposedDropdownMenuTest {
                     onDismissRequest = { onExpandChange(false) }
                 ) {
                     DropdownMenuItem(
+                        text = { Text(OptionName) },
                         onClick = {
                             selectedOptionText = OptionName
                             onExpandChange(false)
                         },
                         modifier = Modifier.testTag(MenuItemTag)
-                    ) {
-                        Text(
-                            text = OptionName
-                        )
-                    }
+                    )
                 }
             }
         }

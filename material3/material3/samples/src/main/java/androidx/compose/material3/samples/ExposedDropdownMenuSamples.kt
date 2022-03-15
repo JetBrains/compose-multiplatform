@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,19 @@
 package androidx.compose.material3.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ExposedDropdownMenuBox
-import androidx.compose.material.ExposedDropdownMenuDefaults
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Sampled
 @Composable
 fun ExposedDropdownMenuSample() {
@@ -39,43 +39,34 @@ fun ExposedDropdownMenuSample() {
     // We want to react on tap/press on TextField to show menu
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = {
-            expanded = !expanded
-        }
+        onExpandedChange = { expanded = !expanded },
     ) {
         TextField(
             readOnly = true,
             value = selectedOptionText,
-            onValueChange = { },
+            onValueChange = {},
             label = { Text("Label") },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(
-                    expanded = expanded
-                )
-            },
-            colors = ExposedDropdownMenuDefaults.textFieldColors()
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
         )
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = {
-                expanded = false
-            }
+            onDismissRequest = { expanded = false },
         ) {
             options.forEach { selectionOption ->
                 DropdownMenuItem(
+                    text = { Text(selectionOption) },
                     onClick = {
                         selectedOptionText = selectionOption
                         expanded = false
                     }
-                ) {
-                    Text(text = selectionOption)
-                }
+                )
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Sampled
 @Composable
 fun EditableExposedDropdownMenuSample() {
@@ -84,40 +75,30 @@ fun EditableExposedDropdownMenuSample() {
     var selectedOptionText by remember { mutableStateOf("") }
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = {
-            expanded = !expanded
-        }
+        onExpandedChange = { expanded = !expanded },
     ) {
         TextField(
             value = selectedOptionText,
             onValueChange = { selectedOptionText = it },
             label = { Text("Label") },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(
-                    expanded = expanded
-                )
-            },
-            colors = ExposedDropdownMenuDefaults.textFieldColors()
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
         )
         // filter options based on text field value
-        val filteringOptions =
-            options.filter { it.contains(selectedOptionText, ignoreCase = true) }
+        val filteringOptions = options.filter { it.contains(selectedOptionText, ignoreCase = true) }
         if (filteringOptions.isNotEmpty()) {
             ExposedDropdownMenu(
                 expanded = expanded,
-                onDismissRequest = {
-                    expanded = false
-                }
+                onDismissRequest = { expanded = false },
             ) {
                 filteringOptions.forEach { selectionOption ->
                     DropdownMenuItem(
+                        text = { Text(selectionOption) },
                         onClick = {
                             selectedOptionText = selectionOption
                             expanded = false
                         }
-                    ) {
-                        Text(text = selectionOption)
-                    }
+                    )
                 }
             }
         }
