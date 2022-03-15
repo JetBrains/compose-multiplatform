@@ -76,12 +76,10 @@ class RecompositionTest {
         rule.onNodeWithText("Click row 1").performClick()
         rule.onNodeWithText("Click row 2").performClick()
         rule.waitForIdle()
-        Thread.sleep(2000)
-        rule.waitForIdle()
 
         val rootId =
             WindowInspector.getGlobalWindowViews().map { it.uniqueDrawingId }.single().toLong()
-        val composables = inspectorTester.sendCommand(
+        var composables = inspectorTester.sendCommand(
             GetComposablesCommand(rootId, skipSystemComposables = false)
         ).getComposablesResponse
 
@@ -89,44 +87,105 @@ class RecompositionTest {
             GetAllParametersCommand(rootId, skipSystemComposables = false)
         ).getAllParametersResponse
 
+        var nodes = Nodes(composables, parameters)
+        assertThat(nodes.button1.recomposeCount).isEqualTo(3)
+        assertThat(nodes.text1.recomposeCount).isEqualTo(3)
+        assertThat(nodes.button2.recomposeCount).isEqualTo(1)
+        assertThat(nodes.text2.recomposeCount).isEqualTo(1)
+
+        // Stop counting but keep the current counts:
+        inspectorTester.sendCommand(
+            GetUpdateSettingsCommand(includeRecomposeCounts = false, keepRecomposeCounts = true)
+        ).updateSettingsResponse
+
+        rule.onNodeWithText("Click row 1").performClick()
+        rule.onNodeWithText("Click row 2").performClick()
+        rule.waitForIdle()
+
+        composables = inspectorTester.sendCommand(
+            GetComposablesCommand(rootId, skipSystemComposables = false)
+        ).getComposablesResponse
+        nodes = Nodes(composables, parameters)
+
+        assertThat(nodes.button1.recomposeCount).isEqualTo(3)
+        assertThat(nodes.text1.recomposeCount).isEqualTo(3)
+        assertThat(nodes.button2.recomposeCount).isEqualTo(1)
+        assertThat(nodes.text2.recomposeCount).isEqualTo(1)
+
+        // Continue counting:
+        inspectorTester.sendCommand(
+            GetUpdateSettingsCommand(includeRecomposeCounts = true, keepRecomposeCounts = true)
+        ).updateSettingsResponse
+
+        rule.onNodeWithText("Click row 1").performClick()
+        rule.onNodeWithText("Click row 2").performClick()
+        rule.waitForIdle()
+
+        composables = inspectorTester.sendCommand(
+            GetComposablesCommand(rootId, skipSystemComposables = false)
+        ).getComposablesResponse
+        nodes = Nodes(composables, parameters)
+
+        assertThat(nodes.button1.recomposeCount).isEqualTo(4)
+        assertThat(nodes.text1.recomposeCount).isEqualTo(4)
+        assertThat(nodes.button2.recomposeCount).isEqualTo(2)
+        assertThat(nodes.text2.recomposeCount).isEqualTo(2)
+
+        // Continue counting but reset the counts:
+        inspectorTester.sendCommand(
+            GetUpdateSettingsCommand(includeRecomposeCounts = true, keepRecomposeCounts = false)
+        ).updateSettingsResponse
+
+        rule.onNodeWithText("Click row 1").performClick()
+        rule.onNodeWithText("Click row 2").performClick()
+        rule.waitForIdle()
+
+        composables = inspectorTester.sendCommand(
+            GetComposablesCommand(rootId, skipSystemComposables = false)
+        ).getComposablesResponse
+        nodes = Nodes(composables, parameters)
+
+        assertThat(nodes.button1.recomposeCount).isEqualTo(1)
+        assertThat(nodes.text1.recomposeCount).isEqualTo(1)
+        assertThat(nodes.button2.recomposeCount).isEqualTo(1)
+        assertThat(nodes.text2.recomposeCount).isEqualTo(1)
+    }
+
+    private class Nodes(composables: GetComposablesResponse, parameters: GetAllParametersResponse) {
         val button1 = nodeWithText("Button", composables, parameters) { it == "Click row 1" }
         val button2 = nodeWithText("Button", composables, parameters) { it == "Click row 2" }
         val text1 =
             nodeWithText("Text", composables, parameters) { it.startsWith("Row 1 click count: ") }
         val text2 =
             nodeWithText("Text", composables, parameters) { it.startsWith("Row 2 click count: ") }
-        assertThat(button1.recomposeCount).isEqualTo(3)
-        assertThat(text1.recomposeCount).isEqualTo(3)
-        assertThat(button2.recomposeCount).isEqualTo(1)
-        assertThat(text2.recomposeCount).isEqualTo(1)
-    }
 
-    private fun nodeWithText(
-        name: String,
-        composables: GetComposablesResponse,
-        parameters: GetAllParametersResponse,
-        predicate: (String) -> Boolean
-    ): ComposableNode {
-        val strings = composables.stringsList.toMap()
-        return composables.rootsList.single().nodesList
-            .flatMap { it.flatten() }
-            .single { strings[it.name] == name && hasText(it, parameters, predicate) }
-    }
-
-    private fun hasText(
-        node: ComposableNode,
-        parameters: GetAllParametersResponse,
-        predicate: (String) -> Boolean
-    ): Boolean {
-        val strings = parameters.stringsList.toMap()
-        val group = parameters.parameterGroupsList.single { it.composableId == node.id }
-        if (group.parameterList.any {
-                strings[it.name] == "text" &&
-                    it.type == Parameter.Type.STRING &&
-                    predicate(strings[it.int32Value]!!)
-            }) {
-            return true
+        private fun nodeWithText(
+            name: String,
+            composables: GetComposablesResponse,
+            parameters: GetAllParametersResponse,
+            predicate: (String) -> Boolean
+        ): ComposableNode {
+            val strings = composables.stringsList.toMap()
+            return composables.rootsList.single().nodesList
+                .flatMap { it.flatten() }
+                .single { strings[it.name] == name && hasText(it, parameters, predicate) }
         }
-        return node.childrenList.any { hasText(it, parameters, predicate) }
+
+        private fun hasText(
+            node: ComposableNode,
+            parameters: GetAllParametersResponse,
+            predicate: (String) -> Boolean
+        ): Boolean {
+            val strings = parameters.stringsList.toMap()
+            val group = parameters.parameterGroupsList.single { it.composableId == node.id }
+            if (group.parameterList.any {
+                    strings[it.name] == "text" &&
+                        it.type == Parameter.Type.STRING &&
+                        predicate(strings[it.int32Value]!!)
+                }) {
+                return true
+            }
+            return node.childrenList.any { hasText(it, parameters, predicate) }
+        }
     }
 }

@@ -84,11 +84,13 @@ fun GetComposablesCommand(
     }.build()
 
 fun GetUpdateSettingsCommand(
-    includeRecomposeCounts: Boolean
+    includeRecomposeCounts: Boolean,
+    keepRecomposeCounts: Boolean = false
 ): Command =
     Command.newBuilder().apply {
         updateSettingsCommand = UpdateSettingsCommand.newBuilder()
             .setIncludeRecomposeCounts(includeRecomposeCounts)
+            .setKeepRecomposeCounts(keepRecomposeCounts)
             .build()
     }.build()
 

@@ -508,8 +508,8 @@ private fun CompositionGroup.getGroup(parentContext: SourceInformationContext?):
             box,
             location,
             identity = if (!context?.name.isNullOrEmpty() &&
-                            location?.sourceFile != null &&
-                            (box.bottom - box.top > 0 || box.right - box.left > 0)) {
+                (box.bottom - box.top > 0 || box.right - box.left > 0)
+            ) {
                 this.identity
             } else {
                 null

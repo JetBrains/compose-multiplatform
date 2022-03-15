@@ -275,7 +275,10 @@ class ComposeLayoutInspector(
         updateSettingsCommand: UpdateSettingsCommand,
         callback: CommandCallback
     ) {
-        recompositionHandler.changeCollectionMode(updateSettingsCommand.includeRecomposeCounts)
+        recompositionHandler.changeCollectionMode(
+            updateSettingsCommand.includeRecomposeCounts,
+            updateSettingsCommand.keepRecomposeCounts
+        )
         callback.reply {
             updateSettingsResponse = UpdateSettingsResponse.getDefaultInstance()
         }

@@ -286,9 +286,12 @@ message GetParameterDetailsResponse {
 }
 
 message UpdateSettingsCommand {
-  // If true, start (or continue) counting  repositions after resetting current counts.
+  // If true, start (or continue) counting repositions.
   // If false stop counting recompositions.
   bool include_recompose_counts = 1;
+  // If true, the recomposition counts will be kept.
+  // If false, the recomposition counts will be reset.
+  bool keep_recompose_counts = 2;
 }
 
 // The active settings after handling of an UpdateSettingsCommand
