@@ -7,6 +7,7 @@ package org.jetbrains.compose.experimental.dsl
 
 import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
+import java.io.File
 import javax.inject.Inject
 
 open class IosDeployConfigurations @Inject constructor(
@@ -18,12 +19,32 @@ open class IosDeployConfigurations @Inject constructor(
         configureSimulator.execute(currentSimulator)
         deployTargets.add(DeployTargetWithId(id, currentSimulator))
     }
+
+    public fun localFile(id: String, configureLocalFile: Action<DeployTarget.LocalFile>) {
+        val current = objects.newInstance(DeployTarget.LocalFile::class.java)
+        configureLocalFile.execute(current)
+        deployTargets.add(DeployTargetWithId(id, current))
+    }
+
+    public fun connectedDevice(id: String, configureConnectedDevice: Action<DeployTarget.ConnectedDevice>) {
+        val current = objects.newInstance(DeployTarget.ConnectedDevice::class.java)
+        configureConnectedDevice.execute(current)
+        deployTargets.add(DeployTargetWithId(id, current))
+    }
+
 }
 
 sealed interface DeployTarget {
     open class Simulator : DeployTarget {
         var device: IOSDevices = IOSDevices.IPHONE_8
-        var buildConfiguration: String = "Debug"
+    }
+
+    open class LocalFile : DeployTarget {
+        var outputFile: File? = null
+    }
+
+    open class ConnectedDevice : DeployTarget {
+        var teamId: String? = null
     }
 }
 

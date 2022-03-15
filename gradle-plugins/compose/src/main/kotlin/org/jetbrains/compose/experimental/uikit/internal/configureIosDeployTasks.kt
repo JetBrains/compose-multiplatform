@@ -7,65 +7,49 @@ package org.jetbrains.compose.experimental.uikit.internal
 
 import org.gradle.api.*
 import org.gradle.api.tasks.TaskContainer
-import org.jetbrains.compose.desktop.application.internal.MacUtils
-import org.jetbrains.compose.desktop.application.internal.UnixUtils
+import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.compose.experimental.dsl.DeployTarget
 import org.jetbrains.compose.experimental.dsl.ExperimentalUiKitApplication
-import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
 
-const val XCODE_GEN_GIT = "https://github.com/yonaskolb/XcodeGen.git"
-const val XCODE_GEN_TAG = "2.26.0"
-const val TASK_INSTALL_XCODE_GEN_NAME = "iosInstallXcodeGen"
-const val TASK_USE_XCODE_GEN_NAME = "iosUseXCodeGen"
 const val SDK_PREFIFX_SIMULATOR = "iphonesimulator"
 const val SDK_PREFIX_IPHONEOS = "iphoneos"
+const val TEAM_ID_PROPERTY_KEY = "compose.ios.teamId"
+const val RELATIVE_PRODUCTS_PATH = "build/Build/Products"
+
+fun Project.getBuildIosDir(id: String) = buildDir.resolve("ios").resolve(id)
 
 internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitApplication) {
     val projectName = application.projectName
     val bundleIdPrefix = application.bundleIdPrefix
-    val xcodeGenSrc = rootProject.buildDir.resolve("xcodegen-$XCODE_GEN_TAG-src")
-    val xcodeGenExecutable = xcodeGenSrc.resolve(".build/apple/Products/Release/xcodegen")
-    val buildIosDir = buildDir.resolve("ios")
 
-    tasks.composeIosTask<AbstractComposeIosTask>(TASK_INSTALL_XCODE_GEN_NAME) {
-        onlyIf { !xcodeGenExecutable.exists() }
-        doLast {
-            xcodeGenSrc.deleteRecursively()
-            runExternalTool(
-                UnixUtils.git,
-                listOf(
-                    "clone",
-                    "--depth", "1",
-                    "--branch", XCODE_GEN_TAG,
-                    XCODE_GEN_GIT,
-                    xcodeGenSrc.absolutePath
-                )
-            )
-            runExternalTool(
-                MacUtils.make,
-                listOf("build"),
-                workingDir = xcodeGenSrc
-            )
-        }
-    }
-
-    configureUseXcodeGenTask(
-        buildIosDir = buildIosDir,
-        projectName = projectName,
-        bundleIdPrefix = bundleIdPrefix,
-        xcodeGenExecutable = xcodeGenExecutable
-    )
+    val taskInstallXcodeGen: TaskProvider<*> = configureInstallXcodeGenTask()
+    val taskInstallIosDeploy: TaskProvider<*> = configureInstallIosDeployTask()
 
     application.deployConfigurations.deployTargets.forEach { target ->
-        val id = target.id // .replaceFirstChar { it.uppercase() } // todo upperCase first char? ./gradlew iosDeployId
+        val id = target.id // .replaceFirstChar { it.uppercase() }
         when (target.deploy) {
             is DeployTarget.Simulator -> {
                 registerSimulatorTasks(
                     id = id,
                     deploy = target.deploy,
-                    buildIosDir = buildIosDir,
                     projectName = projectName,
-                    bundleIdPrefix = bundleIdPrefix
+                    bundleIdPrefix = bundleIdPrefix,
+                    taskInstallXcodeGen = taskInstallXcodeGen,
+                    configurations = application.configurations,
+                )
+            }
+            is DeployTarget.LocalFile -> {
+                TODO("DeployTarget.LocalFile not implemented")
+            }
+            is DeployTarget.ConnectedDevice -> {
+                registerConnectedDeviceTasks(
+                    id = id,
+                    deploy = target.deploy,
+                    projectName = projectName,
+                    bundleIdPrefix = bundleIdPrefix,
+                    taskInstallXcodeGen = taskInstallXcodeGen,
+                    taskInstallIosDeploy = taskInstallIosDeploy,
+                    configurations = application.configurations,
                 )
             }
         }

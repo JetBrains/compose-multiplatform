@@ -69,6 +69,10 @@ internal object MacUtils {
         File("/usr/bin/xcrun").checkExistingFile()
     }
 
+    val xcodeBuild: File by lazy {
+        File("/usr/bin/xcodebuild").checkExistingFile()
+    }
+
     val make: File by lazy {
         File("/usr/bin/make").checkExistingFile()
     }
