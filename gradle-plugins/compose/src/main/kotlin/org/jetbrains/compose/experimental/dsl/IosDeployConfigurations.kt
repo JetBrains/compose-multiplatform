@@ -34,18 +34,16 @@ open class IosDeployConfigurations @Inject constructor(
 
 }
 
-sealed class DeployTarget {
-    var buildConfiguration: String = "Debug"
-
-    open class Simulator : DeployTarget() {
+sealed interface DeployTarget {
+    open class Simulator : DeployTarget {
         var device: IOSDevices = IOSDevices.IPHONE_8
     }
 
-    open class LocalFile : DeployTarget() {
+    open class LocalFile : DeployTarget {
         var outputFile: File? = null
     }
 
-    open class ConnectedDevice : DeployTarget() {
+    open class ConnectedDevice : DeployTarget {
         var teamId: String? = null
     }
 }

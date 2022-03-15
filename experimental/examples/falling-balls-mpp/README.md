@@ -5,8 +5,8 @@
   `./gradlew jsBrowserDevelopmentRun`
 
 ## Run on iOS simulator
-  `./gradlew iosDeployIPhone8`
-  `./gradlew iosDeployIPad`
+  `./gradlew iosDeployIPhone8Debug`
+  `./gradlew iosDeployIPadDebug`
 
 ## Prepare Xcode to launch on iOS device
 1) **Add your Apple ID.**  
@@ -30,5 +30,5 @@ Certificates will remain in login.keychain
 
 ## Run on iOS device
 set teamId in local.properties  
-`./gradlew iosDeployDevice`  
+`./gradlew iosDeployDeviceRelease`  
 During the build, you will be prompted to access login.keychain  

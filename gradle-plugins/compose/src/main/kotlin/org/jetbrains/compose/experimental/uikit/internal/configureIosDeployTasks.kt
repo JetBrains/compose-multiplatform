@@ -14,6 +14,7 @@ import org.jetbrains.compose.experimental.dsl.ExperimentalUiKitApplication
 const val SDK_PREFIFX_SIMULATOR = "iphonesimulator"
 const val SDK_PREFIX_IPHONEOS = "iphoneos"
 const val TEAM_ID_PROPERTY_KEY = "compose.ios.teamId"
+const val RELATIVE_PRODUCTS_PATH = "build/Build/Products"
 
 fun Project.getBuildIosDir(id: String) = buildDir.resolve("ios").resolve(id)
 
@@ -25,7 +26,7 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
     val taskInstallIosDeploy: TaskProvider<*> = configureInstallIosDeployTask()
 
     application.deployConfigurations.deployTargets.forEach { target ->
-        val id = target.id // .replaceFirstChar { it.uppercase() } // todo upperCase first char? ./gradlew iosDeployId
+        val id = target.id // .replaceFirstChar { it.uppercase() }
         when (target.deploy) {
             is DeployTarget.Simulator -> {
                 registerSimulatorTasks(
@@ -34,6 +35,7 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
                     projectName = projectName,
                     bundleIdPrefix = bundleIdPrefix,
                     taskInstallXcodeGen = taskInstallXcodeGen,
+                    configurations = application.configurations,
                 )
             }
             is DeployTarget.LocalFile -> {
@@ -47,6 +49,7 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
                     bundleIdPrefix = bundleIdPrefix,
                     taskInstallXcodeGen = taskInstallXcodeGen,
                     taskInstallIosDeploy = taskInstallIosDeploy,
+                    configurations = application.configurations,
                 )
             }
         }

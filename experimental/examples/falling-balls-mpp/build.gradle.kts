@@ -156,18 +156,15 @@ compose.experimental {
         projectName = "FallingBalls"
         deployConfigurations {
             simulator("IPhone8") {
-                //Usage: ./gradlew iosDeployIPhone8
+                //Usage: ./gradlew iosDeployIPhone8Debug
                 device = IOSDevices.IPHONE_8
-                buildConfiguration = "Debug" // or "Release"
             }
             simulator("IPad") {
-                //Usage: ./gradlew iosDeployIPad
+                //Usage: ./gradlew iosDeployIPadDebug
                 device = IOSDevices.IPAD_MINI_6th_Gen
-                buildConfiguration = "Debug"
             }
             connectedDevice("Device") {
-                //Usage: ./gradlew iosDeployDevice
-                buildConfiguration = "Release"
+                //Usage: ./gradlew iosDeployDeviceRelease
             }
         }
     }

@@ -17,7 +17,7 @@ abstract class ExperimentalUiKitApplication @Inject constructor(
 ) {
     var bundleIdPrefix: String by requiredDslProperty("require property [bundleIdPrefix] in uikit.application { ...")
     var projectName: String by requiredDslProperty("require property [projectName] in uikit.application { ...")
-    val configuration: List<UiKitConfiguration> = listOf(
+    val configurations: List<UiKitConfiguration> = listOf(
         UiKitConfiguration("Debug"),
         UiKitConfiguration("Release"),
     )
