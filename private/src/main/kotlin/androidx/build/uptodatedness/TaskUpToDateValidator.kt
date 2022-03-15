@@ -200,6 +200,22 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     "lintTargetSdk30Debug",
     "lintTargetSdkLatestDebug",
 
+    // b/223287425
+    "lintReportWithKaptDebug",
+    "lintAnalyzeWithKaptDebug",
+    "lintReportWithKspDebug",
+    "lintAnalyzeWithKspDebug",
+    "lintReportTargetSdk29Debug",
+    "lintAnalyzeTargetSdk29Debug",
+    "lintReportTargetSdk30Debug",
+    "lintAnalyzeTargetSdk30Debug",
+    "lintReportTargetSdkLatestDebug",
+    "lintAnalyzeTargetSdkLatestDebug",
+    "lintReportWithNullAwareTypeConverterDebug",
+    "lintAnalyzeWithNullAwareTypeConverterDebug",
+    "lintReportWithoutExpandProjectionDebug",
+    "lintAnalyzeWithoutExpandProjectionDebug",
+
     // We know that these tasks are never up to date due to maven-metadata.xml changing
     // https://github.com/gradle/gradle/issues/11203
     "partiallyDejetifyArchive",

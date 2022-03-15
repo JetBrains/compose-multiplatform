@@ -41,7 +41,7 @@ abstract class SdkResourceGenerator : DefaultTask() {
     abstract val debugKeystore: RegularFileProperty
 
     @get:Input
-    val compileSdkVersion: Int = SupportConfig.TARGET_SDK_VERSION
+    val compileSdkVersion: String = SupportConfig.COMPILE_SDK_VERSION
 
     @get:Input
     val buildToolsVersion: String = SupportConfig.BUILD_TOOLS_VERSION
