@@ -13,6 +13,7 @@ import org.jetbrains.compose.experimental.dsl.ExperimentalUiKitApplication
 
 const val SDK_PREFIFX_SIMULATOR = "iphonesimulator"
 const val SDK_PREFIX_IPHONEOS = "iphoneos"
+const val TEAM_ID_PROPERTY_KEY = "compose.ios.teamId"
 
 fun Project.getBuildIosDir(id: String) = buildDir.resolve("ios").resolve(id)
 

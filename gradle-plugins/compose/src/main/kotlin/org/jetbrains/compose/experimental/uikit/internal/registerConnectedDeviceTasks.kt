@@ -24,17 +24,16 @@ fun Project.registerConnectedDeviceTasks(
     val xcodeProjectDir = getBuildIosDir(id).resolve("$projectName.xcodeproj")
     val iosCompiledAppDir =
         xcodeProjectDir.resolve("build/Build/Products/${deploy.buildConfiguration}-iphoneos/$projectName.app")
-    val teamIdKey = "compose.ios.teamId"
     val taskGenerateXcodeProject = configureTaskToGenerateXcodeProject(
         id = id,
         projectName = projectName,
         bundleIdPrefix = bundleIdPrefix,
-        teamId = deploy.teamId ?: getLocalProperty(teamIdKey)
+        teamId = deploy.teamId ?: getLocalProperty(TEAM_ID_PROPERTY_KEY)
         ?: error(
             buildString {
                 appendLine("In local.properties (${localPropertiesFile.absolutePath})")
                 appendLine("Add property")
-                appendLine("$teamIdKey=***")
+                appendLine("$TEAM_ID_PROPERTY_KEY=***")
                 appendLine("Or set teamId in deploy with id: $id")
             }
         ),
