@@ -80,18 +80,6 @@ private val Card = Component(
     examples = CardExamples
 )
 
-private val Color = Component(
-    id = nextId(),
-    name = "Color",
-    description = "Color is used to express style and communicate meaning.",
-    // No color icon
-    tintIcon = true,
-    guidelinesUrl = "$StyleGuidelinesUrl/color/overview",
-    docsUrl = "$DocsUrl/ColorScheme",
-    sourceUrl = "$Material3SourceUrl/ColorScheme.kt",
-    examples = ColorExamples
-)
-
 private val Checkboxes = Component(
     id = nextId(),
     name = "Checkboxes",
@@ -284,7 +272,6 @@ val Components = listOf(
     Buttons,
     Card,
     Checkboxes,
-    Color,
     Dialogs,
     ExtendedFloatingActionButton,
     FloatingActionButtons,

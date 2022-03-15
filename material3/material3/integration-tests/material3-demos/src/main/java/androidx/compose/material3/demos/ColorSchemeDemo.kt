@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.material3.samples
+package androidx.compose.material3.demos
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
@@ -37,7 +37,7 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ColorSchemeSample() {
+fun ColorSchemeDemo() {
     val colorScheme = MaterialTheme.colorScheme
     Row(
         modifier = Modifier.padding(8.dp),
