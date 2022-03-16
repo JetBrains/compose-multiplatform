@@ -31,4 +31,6 @@
     <string name="close_sheet" msgid="7573152094250666567">"ಶೀಟ್ ಮುಚ್ಚಿರಿ"</string>
     <string name="default_error_message" msgid="8038256446254964252">"ಅಮಾನ್ಯ ಇನ್‌ಪುಟ್"</string>
     <string name="default_popup_window_title" msgid="6312721426453364202">"ಪಾಪ್-ಅಪ್ ವಿಂಡೋ"</string>
+    <string name="range_start" msgid="7097486360902471446">"ಶ್ರೇಣಿಯ ಪ್ರಾರಂಭ"</string>
+    <string name="range_end" msgid="5941395253238309765">"ಶ್ರೇಣಿಯ ಅಂತ್ಯ"</string>
 </resources>
