@@ -39,7 +39,7 @@ class BeyondBoundsLayoutTest {
     val rule = createComposeRule()
 
     @Test
-    fun noBeyondBoundsLayoutParent_callsOnCompletedLambda_untilConditionIsFalse() {
+    fun noBeyondBoundsLayoutParent_conditionBlockReturnsFalse() {
         // Arrange.
         lateinit var beyondBoundsRequester: BeyondBoundsLayout
         var blockInvoked = false
@@ -52,20 +52,20 @@ class BeyondBoundsLayoutTest {
         }
 
         // Act.
-        rule.runOnIdle {
-            beyondBoundsRequester.requestBeyondBoundsLayout(
-                direction = After,
-                until = { false },
-                onBeyondBoundsLayoutCompleted = { blockInvoked = true }
-            )
+        val returnValue = rule.runOnIdle {
+            beyondBoundsRequester.requestBeyondBoundsLayout(direction = After) {
+                blockInvoked = true
+                false
+            }
         }
 
         // Assert.
         assertThat(blockInvoked).isTrue()
+        assertThat(returnValue).isFalse()
     }
 
     @Test
-    fun noBeyondBoundsLayoutParent_callsOnCompletedLambda_untilConditionIsTrue() {
+    fun noBeyondBoundsLayoutParent_conditionBlockReturnsTrue() {
         // Arrange.
         lateinit var beyondBoundsRequester: BeyondBoundsLayout
         var blockInvoked = false
@@ -78,26 +78,25 @@ class BeyondBoundsLayoutTest {
         }
 
         // Act.
-        rule.runOnIdle {
-            beyondBoundsRequester.requestBeyondBoundsLayout(
-                direction = After,
-                until = { true },
-                onBeyondBoundsLayoutCompleted = { blockInvoked = true }
-            )
+        val returnValue = rule.runOnIdle {
+            beyondBoundsRequester.requestBeyondBoundsLayout(direction = After) {
+                blockInvoked = true
+                true
+            }
         }
 
         // Assert.
-       assertThat(blockInvoked).isTrue()
+        assertThat(blockInvoked).isTrue()
+        assertThat(returnValue).isTrue()
     }
 
     @Test
-    fun beyondBoundsLayoutParent_isInvoked() {
+    fun beyondBoundsLayoutParent_conditionBlockReturnsFalse() {
         // Arrange.
         lateinit var beyondBoundsLayoutRequest: BeyondBoundsLayoutRequest
         lateinit var beyondBoundsRequester: BeyondBoundsLayout
-        val until: () -> Boolean = { false }
+        val block: () -> Boolean = { false }
         val direction = After
-        val onCompleted = { }
         rule.setContent {
             Box(
                 Modifier
@@ -105,11 +104,11 @@ class BeyondBoundsLayoutTest {
                         object : BeyondBoundsLayout {
                             override fun requestBeyondBoundsLayout(
                                 direction: BeyondBoundsLayoutDirection,
-                                until: () -> Boolean,
-                                onBeyondBoundsLayoutCompleted: () -> Unit
-                            ) {
+                                block: () -> Boolean
+                            ): Boolean {
                                 beyondBoundsLayoutRequest =
-                                    BeyondBoundsLayoutRequest(direction, until, onCompleted)
+                                    BeyondBoundsLayoutRequest(direction, block)
+                                return block.invoke()
                             }
                         }
                     }
@@ -120,22 +119,55 @@ class BeyondBoundsLayoutTest {
         }
 
         // Act.
-        rule.runOnIdle {
-            beyondBoundsRequester.requestBeyondBoundsLayout(
-                direction = direction,
-                until = until,
-                onBeyondBoundsLayoutCompleted = onCompleted
-            )
+        val returnValue = rule.runOnIdle {
+            beyondBoundsRequester.requestBeyondBoundsLayout(direction, block)
         }
 
         // Assert.
-        assertThat(beyondBoundsLayoutRequest)
-            .isEqualTo(BeyondBoundsLayoutRequest(direction, until, onCompleted))
+        assertThat(beyondBoundsLayoutRequest).isEqualTo(BeyondBoundsLayoutRequest(direction, block))
+        assertThat(returnValue).isFalse()
+    }
+
+    @Test
+    fun beyondBoundsLayoutParent_conditionBlockReturnsTrue() {
+        // Arrange.
+        lateinit var beyondBoundsLayoutRequest: BeyondBoundsLayoutRequest
+        lateinit var beyondBoundsRequester: BeyondBoundsLayout
+        val block: () -> Boolean = { true }
+        val direction = After
+        rule.setContent {
+            Box(
+                Modifier
+                    .modifierLocalProvider(ModifierLocalBeyondBoundsLayout) {
+                        object : BeyondBoundsLayout {
+                            override fun requestBeyondBoundsLayout(
+                                direction: BeyondBoundsLayoutDirection,
+                                block: () -> Boolean
+                            ): Boolean {
+                                beyondBoundsLayoutRequest =
+                                    BeyondBoundsLayoutRequest(direction, block)
+                                return block.invoke()
+                            }
+                        }
+                    }
+                    .modifierLocalConsumer {
+                        beyondBoundsRequester = ModifierLocalBeyondBoundsLayout.current
+                    }
+            )
+        }
+
+        // Act.
+        val returnValue = rule.runOnIdle {
+            beyondBoundsRequester.requestBeyondBoundsLayout(direction, block)
+        }
+
+        // Assert.
+        assertThat(beyondBoundsLayoutRequest).isEqualTo(BeyondBoundsLayoutRequest(direction, block))
+        assertThat(returnValue).isTrue()
     }
 
     private data class BeyondBoundsLayoutRequest(
         val direction: BeyondBoundsLayoutDirection? = null,
-        val until: (() -> Boolean)? = null,
-        val onCompleted: (() -> Unit)? = null
+        val block: (() -> Boolean)? = null,
     )
 }

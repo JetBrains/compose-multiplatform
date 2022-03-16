@@ -1739,7 +1739,7 @@ package androidx.compose.ui.layout {
   }
 
   public interface BeyondBoundsLayout {
-    method public void requestBeyondBoundsLayout(int direction, kotlin.jvm.functions.Function0<java.lang.Boolean> until, kotlin.jvm.functions.Function0<kotlin.Unit> onBeyondBoundsLayoutCompleted);
+    method public boolean requestBeyondBoundsLayout(int direction, kotlin.jvm.functions.Function0<java.lang.Boolean> block);
   }
 
   public final inline class BeyondBoundsLayoutDirection {
