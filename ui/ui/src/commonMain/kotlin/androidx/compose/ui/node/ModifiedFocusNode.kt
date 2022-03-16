@@ -18,7 +18,6 @@ package androidx.compose.ui.node
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusModifier
-import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.FocusStateImpl
 import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
@@ -44,7 +43,7 @@ internal class ModifiedFocusNode(
         get() = modifier.focusState
         set(value) {
             modifier.focusState = value
-            sendOnFocusEvent(value)
+            sendOnFocusEvent()
         }
 
     var focusedChild: ModifiedFocusNode?
@@ -57,21 +56,21 @@ internal class ModifiedFocusNode(
     //  For now we just use the bounds of this node.
     fun focusRect(): Rect = findRoot().localBoundingBoxOf(this, clipBounds = false)
 
-    fun sendOnFocusEvent(focusState: FocusState) {
-        if (isAttached && modifier.hasFocusListeners) {
-            wrappedBy?.propagateFocusEvent(focusState)
+    fun sendOnFocusEvent() {
+        if (isAttached) {
+            modifier.focusEventListener?.propagateFocusEvent()
         }
     }
 
     override fun onModifierChanged() {
         super.onModifierChanged()
-        sendOnFocusEvent(focusState)
+        sendOnFocusEvent()
     }
 
     // TODO(b/202621526) Handle cases where a focus modifier is attached to a node that is focused.
     override fun attach() {
         super.attach()
-        sendOnFocusEvent(focusState)
+        sendOnFocusEvent()
     }
 
     override fun detach() {
@@ -88,7 +87,8 @@ internal class ModifiedFocusNode(
                 if (parentFocusNode != null) {
                     parentFocusNode.modifier.focusedChild = nextFocusNode
                     if (nextFocusNode != null) {
-                        sendOnFocusEvent(nextFocusNode.focusState)
+                        focusState = nextFocusNode.focusState
+                        sendOnFocusEvent()
                     } else {
                         parentFocusNode.focusState = when (parentFocusNode.focusState) {
                             ActiveParent -> Inactive
@@ -101,7 +101,8 @@ internal class ModifiedFocusNode(
             Deactivated -> {
                 val nextFocusNode = wrapped.findNextFocusWrapper(excludeDeactivated = false)
                     ?: layoutNode.searchChildrenForFocusNode(excludeDeactivated = false)
-                sendOnFocusEvent(nextFocusNode?.focusState ?: Inactive)
+                focusState = nextFocusNode?.focusState ?: Inactive
+                sendOnFocusEvent()
             }
             // Do nothing, as the nextFocusNode is also Inactive.
             Inactive -> {}
@@ -118,9 +119,5 @@ internal class ModifiedFocusNode(
         } else {
             this
         }
-    }
-
-    override fun propagateFocusEvent(focusState: FocusState) {
-        // Do nothing. Stop propagating the focus change (since we hit another focus node).
     }
 }

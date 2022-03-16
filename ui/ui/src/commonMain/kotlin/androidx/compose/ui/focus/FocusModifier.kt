@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.focus
 
+import androidx.compose.runtime.RememberObserver
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -28,7 +30,6 @@ import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.modifier.ProvidableModifierLocal
-import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.node.ModifiedFocusNode
 import androidx.compose.ui.node.OwnerScope
 import androidx.compose.ui.platform.InspectorInfo
@@ -48,12 +49,13 @@ internal class FocusModifier(
     inspectorInfo: InspectorInfo.() -> Unit = NoInspectorInfo
 ) : ModifierLocalConsumer,
     OwnerScope,
+    RememberObserver,
     InspectorValueInfo(inspectorInfo) {
     // TODO(b/188684110): Move focusState and focusedChild to ModifiedFocusNode and make this
     //  modifier stateless.
     var focusState: FocusStateImpl = initialFocus
     var focusedChild: ModifiedFocusNode? = null
-    var hasFocusListeners: Boolean = false
+    var focusEventListener: FocusEventModifierLocal? = null
     @OptIn(ExperimentalComposeUiApi::class)
     private var rotaryScrollParent: FocusAwareInputModifier<RotaryScrollEvent>? = null
     lateinit var focusNode: ModifiedFocusNode
@@ -66,7 +68,12 @@ internal class FocusModifier(
         modifierLocalReadScope = scope
 
         with(scope) {
-            hasFocusListeners = ModifierLocalHasFocusEventListener.current
+            val newFocusEventListener = ModifierLocalFocusEvent.current
+            if (newFocusEventListener != focusEventListener) {
+                focusEventListener?.removeFocusModifier(this@FocusModifier)
+                newFocusEventListener?.addFocusModifier(this@FocusModifier)
+                focusEventListener = newFocusEventListener
+            }
             @OptIn(ExperimentalComposeUiApi::class)
             rotaryScrollParent = ModifierLocalRotaryScrollParent.current
 
@@ -89,6 +96,17 @@ internal class FocusModifier(
             focusModifier.refreshFocusProperties()
         }
     }
+
+    override fun onRemembered() {
+    }
+
+    override fun onForgotten() {
+        focusEventListener?.removeFocusModifier(this)
+        focusEventListener = null
+    }
+
+    override fun onAbandoned() {
+    }
 }
 
 /**
@@ -106,6 +124,9 @@ internal class FocusModifier(
  */
 fun Modifier.focusTarget(): Modifier = composed(debugInspectorInfo { name = "focusTarget" }) {
     val focusModifier = remember { FocusModifier(Inactive) }
+    SideEffect {
+        focusModifier.focusNode.sendOnFocusEvent()
+    }
     focusTarget(focusModifier)
 }
 
@@ -118,6 +139,9 @@ fun Modifier.focusTarget(): Modifier = composed(debugInspectorInfo { name = "foc
 )
 fun Modifier.focusModifier(): Modifier = composed(debugInspectorInfo { name = "focusModifier" }) {
     val focusModifier = remember { FocusModifier(Inactive) }
+    SideEffect {
+        focusModifier.focusNode.sendOnFocusEvent()
+    }
     focusTarget(focusModifier)
 }
 
@@ -129,13 +153,6 @@ fun Modifier.focusModifier(): Modifier = composed(debugInspectorInfo { name = "f
 internal fun Modifier.focusTarget(focusModifier: FocusModifier): Modifier {
     return this.then(focusModifier).then(ResetFocusModifierLocals)
 }
-
-/**
- * This modifier local is used as a temporary work-around to improve performance.
- * Instead of sending focus state change events up the hierarchy, we only send it if we have
- * listeners that need this state.
- */
-internal val ModifierLocalHasFocusEventListener = modifierLocalOf { false }
 
 /**
  * The Focus Modifier reads the state of some Modifier Locals that are set by the parents. Consider
@@ -176,12 +193,13 @@ internal val ResetFocusModifierLocals: Modifier = Modifier
         }
 
     )
-    // Update the HasFocusEventListener modifier local value to false.
+    // Update the FocusEvent listener modifier local value to null.
     .then(
-        object : ModifierLocalProvider<Boolean> {
-            override val key: ProvidableModifierLocal<Boolean>
-                get() = ModifierLocalHasFocusEventListener
-            override val value: Boolean
-                get() = false
+        @Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+        object : ModifierLocalProvider<FocusEventModifierLocal?> {
+            override val key: ProvidableModifierLocal<FocusEventModifierLocal?>
+                get() = ModifierLocalFocusEvent
+            override val value: FocusEventModifierLocal?
+                get() = null
         }
     )
