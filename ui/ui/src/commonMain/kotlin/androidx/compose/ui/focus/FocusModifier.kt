@@ -16,26 +16,39 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.focus.FocusStateImpl.Active
+import androidx.compose.ui.focus.FocusStateImpl.Captured
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
+import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
+import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
+import androidx.compose.ui.focus.FocusStateImpl.Deactivated
 import androidx.compose.ui.input.focus.FocusAwareInputModifier
 import androidx.compose.ui.input.rotary.ModifierLocalRotaryScrollParent
 import androidx.compose.ui.input.rotary.RotaryScrollEvent
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.OnPlacedModifier
 import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.modifier.ProvidableModifierLocal
-import androidx.compose.ui.node.ModifiedFocusNode
+import androidx.compose.ui.modifier.modifierLocalOf
+import androidx.compose.ui.node.LayoutNodeWrapper
 import androidx.compose.ui.node.OwnerScope
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.NoInspectorInfo
 import androidx.compose.ui.platform.debugInspectorInfo
+
+/**
+ * Used to build a tree of [FocusModifier] elements. This contains the parent.
+ */
+internal val ModifierLocalParentFocusModifier = modifierLocalOf<FocusModifier?> { null }
 
 /**
  * A [Modifier.Element] that wraps makes the modifiers on the right into a Focusable. Use a
@@ -48,27 +61,48 @@ internal class FocusModifier(
     //  using this internal constructor.
     inspectorInfo: InspectorInfo.() -> Unit = NoInspectorInfo
 ) : ModifierLocalConsumer,
+    ModifierLocalProvider<FocusModifier?>,
     OwnerScope,
-    RememberObserver,
+    OnPlacedModifier,
     InspectorValueInfo(inspectorInfo) {
     // TODO(b/188684110): Move focusState and focusedChild to ModifiedFocusNode and make this
     //  modifier stateless.
+    var parent: FocusModifier? = null
+    val children = mutableVectorOf<FocusModifier>()
     var focusState: FocusStateImpl = initialFocus
-    var focusedChild: ModifiedFocusNode? = null
+        set(value) {
+            field = value
+            sendOnFocusEvent()
+        }
+    var focusedChild: FocusModifier? = null
     var focusEventListener: FocusEventModifierLocal? = null
     @OptIn(ExperimentalComposeUiApi::class)
     private var rotaryScrollParent: FocusAwareInputModifier<RotaryScrollEvent>? = null
-    lateinit var focusNode: ModifiedFocusNode
     lateinit var modifierLocalReadScope: ModifierLocalReadScope
     var focusPropertiesModifier: FocusPropertiesModifier? = null
     val focusProperties: FocusProperties = FocusPropertiesImpl()
     var focusRequester: FocusRequesterModifierLocal? = null
+    var layoutNodeWrapper: LayoutNodeWrapper? = null
+    var focusRequestedOnPlaced = false
 
     // Reading the FocusProperties ModifierLocal.
     override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) {
         modifierLocalReadScope = scope
 
         with(scope) {
+            val newParent = ModifierLocalParentFocusModifier.current
+            if (newParent != parent) {
+                if (newParent == null) {
+                    when (focusState) {
+                        Active, Captured -> layoutNodeWrapper?.layoutNode?.owner
+                            ?.focusManager?.clearFocus(force = true)
+                        ActiveParent, DeactivatedParent, Deactivated, Inactive -> { } // do nothing
+                    }
+                }
+                parent?.children?.remove(this@FocusModifier)
+                parent = newParent
+                newParent?.children?.add(this@FocusModifier)
+            }
             val newFocusEventListener = ModifierLocalFocusEvent.current
             if (newFocusEventListener != focusEventListener) {
                 focusEventListener?.removeFocusModifier(this@FocusModifier)
@@ -95,8 +129,10 @@ internal class FocusModifier(
         return rotaryScrollParent?.propagateFocusAwareEvent(event) ?: false
     }
 
+    // For the RefreshFocusProperties observation. This shouldn't change on the root, so
+    // we don't need to keep lambdas around for the root element.
     override val isValid: Boolean
-        get() = focusNode.isAttached
+        get() = parent != null
 
     companion object {
         val RefreshFocusProperties: (FocusModifier) -> Unit = { focusModifier ->
@@ -104,17 +140,21 @@ internal class FocusModifier(
         }
     }
 
-    override fun onRemembered() {
-    }
+    override val key: ProvidableModifierLocal<FocusModifier?>
+        get() = ModifierLocalParentFocusModifier
+    override val value: FocusModifier
+        get() = this
 
-    override fun onForgotten() {
-        focusEventListener?.removeFocusModifier(this)
-        focusEventListener = null
-        focusRequester?.removeFocusModifier(this)
-        focusRequester = null
-    }
-
-    override fun onAbandoned() {
+    override fun onPlaced(coordinates: LayoutCoordinates) {
+        val wasNull = layoutNodeWrapper == null
+        layoutNodeWrapper = coordinates as LayoutNodeWrapper
+        if (wasNull) {
+            refreshFocusProperties()
+        }
+        if (focusRequestedOnPlaced) {
+            focusRequestedOnPlaced = false
+            requestFocus()
+        }
     }
 }
 
@@ -134,7 +174,7 @@ internal class FocusModifier(
 fun Modifier.focusTarget(): Modifier = composed(debugInspectorInfo { name = "focusTarget" }) {
     val focusModifier = remember { FocusModifier(Inactive) }
     SideEffect {
-        focusModifier.focusNode.sendOnFocusEvent()
+        focusModifier.sendOnFocusEvent()
     }
     focusTarget(focusModifier)
 }
@@ -149,7 +189,7 @@ fun Modifier.focusTarget(): Modifier = composed(debugInspectorInfo { name = "foc
 fun Modifier.focusModifier(): Modifier = composed(debugInspectorInfo { name = "focusModifier" }) {
     val focusModifier = remember { FocusModifier(Inactive) }
     SideEffect {
-        focusModifier.focusNode.sendOnFocusEvent()
+        focusModifier.sendOnFocusEvent()
     }
     focusTarget(focusModifier)
 }

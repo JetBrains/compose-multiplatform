@@ -19,7 +19,6 @@ import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusModifier
 import androidx.compose.ui.focus.FocusOrderToProperties
 import androidx.compose.ui.focus.FocusPropertiesModifier
 import androidx.compose.ui.geometry.Offset
@@ -670,8 +669,27 @@ internal class LayoutNode(
 
                 // Re-use the layoutNodeWrapper if possible.
                 reuseLayoutNodeWrapper(mod, toWrap)?.let {
-                    it.entities.addAfterLayoutModifier(it, mod)
-                    return@foldOut it
+                    var wrapper = it
+                    @Suppress("DEPRECATION")
+                    if (mod is androidx.compose.ui.focus.FocusOrderModifier) {
+                        @Suppress("DEPRECATION")
+                        val scope = FocusOrderToProperties(mod::populateFocusOrder)
+                        val impl = FocusPropertiesModifier(
+                            focusPropertiesScope = scope,
+                            inspectorInfo = debugInspectorInfo {
+                                name = "focusProperties"
+                                properties["scope"] = scope
+                            }
+                        )
+                        wrapper = ModifierLocalProviderNode(wrapper, impl)
+                            .initialize()
+                            .assignChained(toWrap)
+                        wrapper = ModifierLocalConsumerNode(wrapper, impl)
+                            .initialize()
+                            .assignChained(toWrap)
+                    }
+                    it.entities.addAfterLayoutModifier(wrapper, mod)
+                    return@foldOut wrapper
                 }
 
                 // The order in which the following blocks occur matters. For example, the
@@ -692,11 +710,6 @@ internal class LayoutNode(
                 }
                 if (mod is ModifierLocalConsumer) {
                     wrapper = ModifierLocalConsumerNode(wrapper, mod)
-                        .initialize()
-                        .assignChained(toWrap)
-                }
-                if (mod is FocusModifier) {
-                    wrapper = ModifiedFocusNode(wrapper, mod)
                         .initialize()
                         .assignChained(toWrap)
                 }

@@ -28,7 +28,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.InputMode
@@ -36,6 +38,7 @@ import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.platform.inspectable
 import androidx.compose.ui.semantics.focused
+import androidx.compose.ui.semantics.requestFocus
 import androidx.compose.ui.semantics.semantics
 import kotlinx.coroutines.launch
 
@@ -64,6 +67,7 @@ fun Modifier.focusable(
     val scope = rememberCoroutineScope()
     val focusedInteraction = remember { mutableStateOf<FocusInteraction.Focus?>(null) }
     var isFocused by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
 
     // Focusables have a few different cases where they need to make sure they stay visible:
     //
@@ -111,8 +115,13 @@ fun Modifier.focusable(
         Modifier
             .semantics {
                 this.focused = isFocused
+                requestFocus {
+                    focusRequester.requestFocus()
+                    isFocused
+                }
             }
             .bringIntoViewRequester(bringIntoViewRequester)
+            .focusRequester(focusRequester)
             .then(focusedChildModifier)
             .onFocusChanged {
                 isFocused = it.isFocused

@@ -44,7 +44,6 @@ import androidx.collection.SparseArrayCompat
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.R
 import androidx.compose.ui.fastJoinToString
-import androidx.compose.ui.focus.requestFocus
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.toAndroidRect
@@ -1245,13 +1244,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 ) ?: false
             }
             AccessibilityNodeInfoCompat.ACTION_FOCUS -> {
-                if (node.unmergedConfig.getOrNull(SemanticsProperties.Focused) == false) {
-                    node.layoutNode.outerLayoutNodeWrapper.findLastFocusWrapper()
-                        ?.requestFocus() ?: return false
-                    return true
-                } else {
-                    return false
-                }
+                return node.unmergedConfig.getOrNull(SemanticsActions.RequestFocus)
+                    ?.action?.invoke() ?: false
             }
             AccessibilityNodeInfoCompat.ACTION_CLEAR_FOCUS -> {
                 return if (node.unmergedConfig.getOrNull(SemanticsProperties.Focused) == true) {
@@ -1580,6 +1574,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     // fun clearNode(semanticsNodeId: Int) { // clear the actionIdToId and labelToActionId nodes }
 
     private val semanticsChangeChecker = Runnable {
+        view.measureAndLayout()
         checkForSemanticsChanges()
         checkingForSemanticsChanges = false
     }

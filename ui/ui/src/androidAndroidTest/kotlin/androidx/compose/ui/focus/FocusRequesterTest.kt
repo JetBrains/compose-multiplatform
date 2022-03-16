@@ -294,6 +294,41 @@ class FocusRequesterTest {
         }
     }
 
+    @Test
+    fun requestFocus_firstFocusableChildIsFocused_differentDepths() {
+        // Arrange.
+        lateinit var focusState1: FocusState
+        lateinit var focusState2: FocusState
+        val focusRequester = FocusRequester()
+        rule.setFocusableContent {
+            Column(
+                modifier = Modifier.focusRequester(focusRequester)
+            ) {
+                Box {
+                    Box(
+                        modifier = Modifier
+                            .onFocusChanged { focusState1 = it }
+                            .focusTarget()
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .onFocusChanged { focusState2 = it }
+                        .focusTarget()
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            // Act.
+            focusRequester.requestFocus()
+
+            // Assert.
+            assertThat(focusState1.isFocused).isTrue()
+            assertThat(focusState2.isFocused).isFalse()
+        }
+    }
+
     @ExperimentalComposeUiApi
     @Test
     fun requestFocusForAnyChild_triggersOnFocusChangedInParent() {

@@ -50,12 +50,6 @@ internal class InnerPlaceable(
         return this
     }
 
-    override fun findPreviousFocusWrapper() = wrappedBy?.findPreviousFocusWrapper()
-
-    override fun findNextFocusWrapper(excludeDeactivated: Boolean): ModifiedFocusNode? = null
-
-    override fun findLastFocusWrapper(): ModifiedFocusNode? = findPreviousFocusWrapper()
-
     override fun findPreviousKeyInputWrapper() = wrappedBy?.findPreviousKeyInputWrapper()
 
     override fun findNextKeyInputWrapper(): ModifiedKeyInputNode? = null

@@ -20,7 +20,6 @@ package androidx.compose.ui.node
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.findFocusableChildren
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -54,7 +53,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.minus
 import androidx.compose.ui.unit.plus
-import androidx.compose.ui.util.fastForEach
 
 /**
  * Measurable and Placeable type that has a position.
@@ -944,31 +942,6 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
-     * Returns the first [focus node][ModifiedFocusNode] in the wrapper list that wraps this
-     * [LayoutNodeWrapper].
-     *
-     * Note: This method tried to find [ModifiedFocusNode] in the
-     * modifiers before the one wrapped with this [LayoutNodeWrapper] and goes up the hierarchy of
-     * [LayoutNode]s if needed.
-     */
-    abstract fun findPreviousFocusWrapper(): ModifiedFocusNode?
-
-    /**
-     * Returns the next [focus node][ModifiedFocusNode] in the wrapper list that is wrapped by
-     * this [LayoutNodeWrapper].
-     *
-     * Note: This method only goes to the modifiers that follow the one wrapped by
-     * this [LayoutNodeWrapper], it doesn't to the children [LayoutNode]s.
-     */
-    abstract fun findNextFocusWrapper(excludeDeactivated: Boolean): ModifiedFocusNode?
-
-    /**
-     * Returns the last [focus node][ModifiedFocusNode] found following this [LayoutNodeWrapper].
-     * It searches the wrapper list associated with this [LayoutNodeWrapper].
-     */
-    abstract fun findLastFocusWrapper(): ModifiedFocusNode?
-
-    /**
      * Returns the ModifierLocalProviderNode that has the value for [local].
      */
     open fun findModifierLocalProvider(local: ModifierLocal<*>): ModifierLocalProviderNode<*>? =
@@ -998,29 +971,6 @@ internal abstract class LayoutNodeWrapper(
         val rectInParentBounds = rect.translate(boundingBoxInParentCoordinates.topLeft)
 
         parent.propagateRelocationRequest(rectInParentBounds)
-    }
-
-    /**
-     * Find the first ancestor that is a [ModifiedFocusNode].
-     */
-    internal fun findParentFocusNode(): ModifiedFocusNode? {
-        // TODO(b/152066829): We shouldn't need to search through the parentLayoutNode, as the
-        // wrappedBy property should automatically point to the last layoutWrapper of the parent.
-        // Find out why this doesn't work.
-        var focusParent = wrappedBy?.findPreviousFocusWrapper()
-        if (focusParent != null) {
-            return focusParent
-        }
-
-        var parentLayoutNode = layoutNode.parent
-        while (parentLayoutNode != null) {
-            focusParent = parentLayoutNode.outerLayoutNodeWrapper.findLastFocusWrapper()
-            if (focusParent != null) {
-                return focusParent
-            }
-            parentLayoutNode = parentLayoutNode.parent
-        }
-        return null
     }
 
     /**
@@ -1066,7 +1016,7 @@ internal abstract class LayoutNodeWrapper(
     abstract fun findNextKeyInputWrapper(): ModifiedKeyInputNode?
 
     /**
-     * Returns the last [focus node][ModifiedFocusNode] found following this [LayoutNodeWrapper].
+     * Returns the last [key input][ModifiedKeyInputNode] found following this [LayoutNodeWrapper].
      * It searches the wrapper list associated with this [LayoutNodeWrapper]
      */
     abstract fun findLastKeyInputWrapper(): ModifiedKeyInputNode?
@@ -1118,25 +1068,6 @@ internal abstract class LayoutNodeWrapper(
             ancestor1 === other.layoutNode -> other
             else -> ancestor1.innerLayoutNodeWrapper
         }
-    }
-
-    // TODO(b/152051577): Measure the performance of focusableChildren.
-    //  Consider caching the children.
-    fun focusableChildren(excludeDeactivated: Boolean): List<ModifiedFocusNode> {
-        // Check the modifier chain that this focus node is part of. If it has a focus modifier,
-        // that means you have found the only focusable child for this node.
-        val focusableChild = wrapped?.findNextFocusWrapper(excludeDeactivated)
-        // findChildFocusNodeInWrapperChain()
-        if (focusableChild != null) {
-            return listOf(focusableChild)
-        }
-
-        // Go through all your children and find the first focusable node from each child.
-        val focusableChildren = mutableListOf<ModifiedFocusNode>()
-        layoutNode.children.fastForEach {
-            it.findFocusableChildren(focusableChildren, excludeDeactivated)
-        }
-        return focusableChildren
     }
 
     fun shouldSharePointerInputWithSiblings(): Boolean =

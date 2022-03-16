@@ -25,9 +25,7 @@ import androidx.compose.ui.focus.FocusStateImpl.Captured
 import androidx.compose.ui.focus.FocusStateImpl.Deactivated
 import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
-import androidx.compose.ui.node.ModifiedFocusNode
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.util.fastForEach
 
 interface FocusManager {
     /**
@@ -95,7 +93,7 @@ internal class FocusManagerImpl(
      * all the focus modifiers in the component hierarchy.
      */
     fun releaseFocus() {
-        focusModifier.focusNode.clearFocus(forcedClear = true)
+        focusModifier.clearFocus(forcedClear = true)
     }
 
     /**
@@ -112,7 +110,7 @@ internal class FocusManagerImpl(
         // focus. So after clearing focus within the compose hierarchy, we should restore focus to
         // the root focus modifier to maintain consistency with the host view.
         val rootInitialState = focusModifier.focusState
-        if (focusModifier.focusNode.clearFocus(force)) {
+        if (focusModifier.clearFocus(force)) {
             focusModifier.focusState = when (rootInitialState) {
                 Active, ActiveParent, Captured -> Active
                 Deactivated, DeactivatedParent -> Deactivated
@@ -129,7 +127,7 @@ internal class FocusManagerImpl(
     override fun moveFocus(focusDirection: FocusDirection): Boolean {
 
         // If there is no active node in this sub-hierarchy, we can't move focus.
-        val source = focusModifier.focusNode.findActiveFocusNode() ?: return false
+        val source = focusModifier.findActiveFocusNode() ?: return false
 
         // Check if a custom focus traversal order is specified.
         val nextFocusRequester = source.customFocusSearch(focusDirection, layoutDirection)
@@ -140,9 +138,9 @@ internal class FocusManagerImpl(
             return true
         }
 
-        return focusModifier.focusNode.focusSearch(focusDirection, layoutDirection) { destination ->
+        return focusModifier.focusSearch(focusDirection, layoutDirection) { destination ->
             if (destination == source) return@focusSearch false
-            checkNotNull(destination.findParentFocusNode()) { "Move focus landed at the root." }
+            checkNotNull(destination.parent) { "Move focus landed at the root." }
             // If we found a potential next item, move focus to it.
             destination.requestFocus()
             true
@@ -158,7 +156,7 @@ internal class FocusManagerImpl(
      * to change a property, and need to see the change in the current snapshot, use this API.
      */
     fun fetchUpdatedFocusProperties() {
-        focusModifier.focusNode.updateProperties()
+        focusModifier.updateProperties()
     }
 
     /**
@@ -194,12 +192,12 @@ internal class FocusManagerImpl(
     }
 }
 
-private fun ModifiedFocusNode.updateProperties() {
+private fun FocusModifier.updateProperties() {
     // Update the focus node with the current focus properties.
-    modifier.refreshFocusProperties()
+    refreshFocusProperties()
 
     // Update the focus properties for all children.
-    focusableChildren(excludeDeactivated = false).fastForEach { it.updateProperties() }
+    children.forEach { it.updateProperties() }
 }
 
 /**
@@ -210,7 +208,7 @@ private fun FocusModifier.findActiveItem(): FocusModifier? {
     return when (focusState) {
         Active, Captured -> this
         ActiveParent, DeactivatedParent -> {
-            focusedChild?.modifier?.findActiveItem() ?: error("no child")
+            focusedChild?.findActiveItem() ?: error("no child")
         }
         Deactivated, Inactive -> null
     }
