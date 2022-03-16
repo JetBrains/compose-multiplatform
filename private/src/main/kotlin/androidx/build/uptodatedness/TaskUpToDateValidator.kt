@@ -215,6 +215,8 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     "lintAnalyzeWithNullAwareTypeConverterDebug",
     "lintReportWithoutExpandProjectionDebug",
     "lintAnalyzeWithoutExpandProjectionDebug",
+    "lintReportWithExpandProjectionDebug",
+    "lintAnalyzeWithExpandProjectionDebug",
 
     // We know that these tasks are never up to date due to maven-metadata.xml changing
     // https://github.com/gradle/gradle/issues/11203
