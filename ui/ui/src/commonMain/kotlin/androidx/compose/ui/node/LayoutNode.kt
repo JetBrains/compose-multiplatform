@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusModifier
 import androidx.compose.ui.focus.FocusOrderToProperties
 import androidx.compose.ui.focus.FocusPropertiesModifier
-import androidx.compose.ui.focus.FocusRequesterModifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.input.key.KeyInputModifier
@@ -698,11 +697,6 @@ internal class LayoutNode(
                 }
                 if (mod is FocusModifier) {
                     wrapper = ModifiedFocusNode(wrapper, mod)
-                        .initialize()
-                        .assignChained(toWrap)
-                }
-                if (mod is FocusRequesterModifier) {
-                    wrapper = ModifiedFocusRequesterNode(wrapper, mod)
                         .initialize()
                         .assignChained(toWrap)
                 }
