@@ -29,6 +29,8 @@ import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Deactivated
 import androidx.compose.ui.input.focus.FocusAwareInputModifier
+import androidx.compose.ui.input.key.KeyInputModifier
+import androidx.compose.ui.input.key.ModifierLocalKeyInput
 import androidx.compose.ui.input.rotary.ModifierLocalRotaryScrollParent
 import androidx.compose.ui.input.rotary.RotaryScrollEvent
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -85,6 +87,18 @@ internal class FocusModifier(
     var layoutNodeWrapper: LayoutNodeWrapper? = null
     var focusRequestedOnPlaced = false
 
+    /**
+     * The KeyInputModifier that this FocusModifier comes after.
+     */
+    var keyInputModifier: KeyInputModifier? = null
+        private set
+
+    /**
+     * All KeyInputModifiers that read this [FocusModifier] in the
+     * [ModifierLocalParentFocusModifier].
+     */
+    val keyInputChildren = mutableVectorOf<KeyInputModifier>()
+
     // Reading the FocusProperties ModifierLocal.
     override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) {
         modifierLocalReadScope = scope
@@ -118,8 +132,11 @@ internal class FocusModifier(
             @OptIn(ExperimentalComposeUiApi::class)
             rotaryScrollParent = ModifierLocalRotaryScrollParent.current
 
+            keyInputModifier = ModifierLocalKeyInput.current
+
             // Update the focus node with the current focus properties.
             focusPropertiesModifier = ModifierLocalFocusProperties.current
+
             refreshFocusProperties()
         }
     }

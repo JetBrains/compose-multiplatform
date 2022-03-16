@@ -71,7 +71,7 @@ class LayoutNodeWrapperInitializationTest {
 
         // Assert.
         rule.runOnIdle {
-            assertThat(keyInputModifier.keyInputNode).isNotNull()
+            assertThat(keyInputModifier.layoutNode).isNotNull()
         }
     }
 
@@ -144,7 +144,7 @@ class LayoutNodeWrapperInitializationTest {
 
         // Assert.
         rule.runOnIdle {
-            assertThat(keyInputModifier.keyInputNode).isNotNull()
+            assertThat(keyInputModifier.layoutNode).isNotNull()
         }
     }
 

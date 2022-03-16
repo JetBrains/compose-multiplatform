@@ -974,54 +974,6 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
-     *  Find the first ancestor that is a [ModifiedKeyInputNode].
-     */
-    internal fun findParentKeyInputNode(): ModifiedKeyInputNode? {
-        // TODO(b/152066829): We shouldn't need to search through the parentLayoutNode, as the
-        // wrappedBy property should automatically point to the last layoutWrapper of the parent.
-        // Find out why this doesn't work.
-        var keyInputParent = wrappedBy?.findPreviousKeyInputWrapper()
-        if (keyInputParent != null) {
-            return keyInputParent
-        }
-
-        var parentLayoutNode = layoutNode.parent
-        while (parentLayoutNode != null) {
-            keyInputParent = parentLayoutNode.outerLayoutNodeWrapper.findLastKeyInputWrapper()
-            if (keyInputParent != null) {
-                return keyInputParent
-            }
-            parentLayoutNode = parentLayoutNode.parent
-        }
-        return null
-    }
-
-    /**
-     * Returns the first [ModifiedKeyInputNode] in the wrapper list that wraps this
-     * [LayoutNodeWrapper].
-     *
-     * Note: This method tried to find [ModifiedKeyInputNode] in the
-     * modifiers before the one wrapped with this [LayoutNodeWrapper] and goes up the hierarchy of
-     * [LayoutNode]s if needed.
-     */
-    abstract fun findPreviousKeyInputWrapper(): ModifiedKeyInputNode?
-
-    /**
-     * Returns the next [ModifiedKeyInputNode] in the wrapper list that is wrapped by this
-     * [LayoutNodeWrapper].
-     *
-     * Note: This method only goes to the modifiers that follow the one wrapped by
-     * this [LayoutNodeWrapper], it doesn't to the children [LayoutNode]s.
-     */
-    abstract fun findNextKeyInputWrapper(): ModifiedKeyInputNode?
-
-    /**
-     * Returns the last [key input][ModifiedKeyInputNode] found following this [LayoutNodeWrapper].
-     * It searches the wrapper list associated with this [LayoutNodeWrapper]
-     */
-    abstract fun findLastKeyInputWrapper(): ModifiedKeyInputNode?
-
-    /**
      * Called when [LayoutNode.modifier] has changed and all the LayoutNodeWrappers have been
      * configured.
      */

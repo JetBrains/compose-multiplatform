@@ -108,15 +108,6 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
         return this
     }
 
-    override fun findPreviousKeyInputWrapper() = wrappedBy?.findPreviousKeyInputWrapper()
-
-    override fun findNextKeyInputWrapper() = wrapped.findNextKeyInputWrapper()
-
-    override fun findLastKeyInputWrapper(): ModifiedKeyInputNode? {
-        val wrapper = layoutNode.innerLayoutNodeWrapper.findPreviousKeyInputWrapper()
-        return if (wrapper !== this) wrapper else null
-    }
-
     override fun minIntrinsicWidth(height: Int) = wrapped.minIntrinsicWidth(height)
 
     override fun maxIntrinsicWidth(height: Int) = wrapped.maxIntrinsicWidth(height)
