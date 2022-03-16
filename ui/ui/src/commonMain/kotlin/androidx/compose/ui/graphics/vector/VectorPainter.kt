@@ -26,7 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.UiComposable
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
@@ -79,7 +78,7 @@ fun rememberVectorPainter(
     name: String = RootGroupName,
     tintColor: Color = Color.Unspecified,
     tintBlendMode: BlendMode = BlendMode.SrcIn,
-    content: @Composable @UiComposable (viewportWidth: Float, viewportHeight: Float) -> Unit
+    content: @Composable @VectorComposable (viewportWidth: Float, viewportHeight: Float) -> Unit
 ): VectorPainter =
     rememberVectorPainter(
         defaultWidth,
@@ -121,7 +120,7 @@ fun rememberVectorPainter(
     tintColor: Color = Color.Unspecified,
     tintBlendMode: BlendMode = BlendMode.SrcIn,
     autoMirror: Boolean = false,
-    content: @Composable @UiComposable (viewportWidth: Float, viewportHeight: Float) -> Unit
+    content: @Composable @VectorComposable (viewportWidth: Float, viewportHeight: Float) -> Unit
 ): VectorPainter {
     val density = LocalDensity.current
     val widthPx = with(density) { defaultWidth.toPx() }
