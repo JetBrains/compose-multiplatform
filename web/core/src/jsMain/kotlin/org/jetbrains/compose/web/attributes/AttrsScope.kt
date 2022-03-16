@@ -27,7 +27,8 @@ typealias AttrsBuilder<T> = AttrsScopeBuilder<T>
  * are extracted to a separate methods.
  *
  */
-interface AttrsScope<TElement : Element>: EventsListenerScope {
+@HtmlAttrMarker
+interface AttrsScope<TElement : Element> : EventsListenerScope {
     /**
      * [style] add inline CSS-style properties to the element via [StyleScope] context
      *
