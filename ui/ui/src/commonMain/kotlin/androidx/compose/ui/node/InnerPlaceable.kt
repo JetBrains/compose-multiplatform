@@ -50,12 +50,6 @@ internal class InnerPlaceable(
         return this
     }
 
-    override fun findPreviousKeyInputWrapper() = wrappedBy?.findPreviousKeyInputWrapper()
-
-    override fun findNextKeyInputWrapper(): ModifiedKeyInputNode? = null
-
-    override fun findLastKeyInputWrapper(): ModifiedKeyInputNode? = findPreviousKeyInputWrapper()
-
     override fun minIntrinsicWidth(height: Int) =
         layoutNode.intrinsicsPolicy.minIntrinsicWidth(height)
 
