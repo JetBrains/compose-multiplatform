@@ -62,6 +62,7 @@ internal class FocusModifier(
     lateinit var modifierLocalReadScope: ModifierLocalReadScope
     var focusPropertiesModifier: FocusPropertiesModifier? = null
     val focusProperties: FocusProperties = FocusPropertiesImpl()
+    var focusRequester: FocusRequesterModifierLocal? = null
 
     // Reading the FocusProperties ModifierLocal.
     override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) {
@@ -73,6 +74,12 @@ internal class FocusModifier(
                 focusEventListener?.removeFocusModifier(this@FocusModifier)
                 newFocusEventListener?.addFocusModifier(this@FocusModifier)
                 focusEventListener = newFocusEventListener
+            }
+            val newFocusRequester = ModifierLocalFocusRequester.current
+            if (newFocusRequester != focusRequester) {
+                focusRequester?.removeFocusModifier(this@FocusModifier)
+                newFocusRequester?.addFocusModifier(this@FocusModifier)
+                focusRequester = newFocusRequester
             }
             @OptIn(ExperimentalComposeUiApi::class)
             rotaryScrollParent = ModifierLocalRotaryScrollParent.current
@@ -103,6 +110,8 @@ internal class FocusModifier(
     override fun onForgotten() {
         focusEventListener?.removeFocusModifier(this)
         focusEventListener = null
+        focusRequester?.removeFocusModifier(this)
+        focusRequester = null
     }
 
     override fun onAbandoned() {
@@ -200,6 +209,16 @@ internal val ResetFocusModifierLocals: Modifier = Modifier
             override val key: ProvidableModifierLocal<FocusEventModifierLocal?>
                 get() = ModifierLocalFocusEvent
             override val value: FocusEventModifierLocal?
+                get() = null
+        }
+    )
+    // Update the FocusRequesters modifier local value to null.
+    .then(
+        @Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+        object : ModifierLocalProvider<FocusRequesterModifierLocal?> {
+            override val key: ProvidableModifierLocal<FocusRequesterModifierLocal?>
+                get() = ModifierLocalFocusRequester
+            override val value: FocusRequesterModifierLocal?
                 get() = null
         }
     )
