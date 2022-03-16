@@ -53,7 +53,7 @@ internal class LayoutTreeConsistencyChecker(
         if (isPlaced ||
             placeOrder != LayoutNode.NotPlacedPlaceOrder && parent?.isPlaced == true
         ) {
-            if (layoutState == LayoutNode.LayoutState.NeedsRemeasure &&
+            if (measurePending &&
                 postponedMeasureRequests.contains(this)
             ) {
                 // this node is waiting to be measured by parent or if this will not happen
@@ -62,15 +62,15 @@ internal class LayoutTreeConsistencyChecker(
             }
             // remeasure or relayout is scheduled
             val parentLayoutState = parent?.layoutState
-            if (layoutState == LayoutNode.LayoutState.NeedsRemeasure) {
+            if (measurePending) {
                 return relayoutNodes.contains(this) ||
-                    parentLayoutState == LayoutNode.LayoutState.NeedsRemeasure ||
+                    parent?.measurePending == true ||
                     parentLayoutState == LayoutNode.LayoutState.Measuring
             }
-            if (layoutState == LayoutNode.LayoutState.NeedsRelayout) {
+            if (layoutPending) {
                 return relayoutNodes.contains(this) ||
-                    parentLayoutState == LayoutNode.LayoutState.NeedsRemeasure ||
-                    parentLayoutState == LayoutNode.LayoutState.NeedsRelayout ||
+                    parent?.measurePending == true ||
+                    parent?.layoutPending == true ||
                     parentLayoutState == LayoutNode.LayoutState.Measuring ||
                     parentLayoutState == LayoutNode.LayoutState.LayingOut
             }

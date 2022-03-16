@@ -3638,13 +3638,13 @@ private class MockOwner(
         TODO("Not yet implemented")
     }
 
-    override fun onRequestMeasure(layoutNode: LayoutNode) {
+    override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
         onRequestMeasureParams += layoutNode
-        layoutNode.layoutState = LayoutNode.LayoutState.NeedsRemeasure
+        layoutNode.markMeasurePending()
     }
 
-    override fun onRequestRelayout(layoutNode: LayoutNode) {
-        layoutNode.layoutState = LayoutNode.LayoutState.NeedsRelayout
+    override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) {
+        layoutNode.markLayoutPending()
     }
 
     override fun onAttach(node: LayoutNode) {

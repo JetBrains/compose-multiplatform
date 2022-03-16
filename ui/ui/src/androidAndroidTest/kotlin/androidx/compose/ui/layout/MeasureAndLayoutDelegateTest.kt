@@ -17,7 +17,6 @@
 package androidx.compose.ui.layout
 
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.node.LayoutNode.LayoutState
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.unit.Constraints
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -1165,7 +1164,7 @@ class MeasureAndLayoutDelegateTest {
                     delegate.requestRelayout(root)
                     root.runDuringLayout {
                         // this means the root.first will be measured before laying out the root
-                        assertThat(root.first.layoutState).isEqualTo(LayoutState.NeedsRelayout)
+                        assertThat(root.first.layoutPending).isTrue()
                     }
                     assertThat(delegate.measureAndLayout()).isFalse()
                 }
