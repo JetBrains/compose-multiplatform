@@ -601,7 +601,7 @@ internal class LayoutNodeSubcompositionsState(
         nodeToNodeState.forEach { (_, nodeState) ->
             nodeState.forceRecompose = true
         }
-        if (root.layoutState != LayoutState.NeedsRemeasure) {
+        if (!root.measurePending) {
             root.requestRemeasure()
         }
     }

@@ -140,14 +140,18 @@ internal interface Owner {
         set
 
     /**
-     * Called by [LayoutNode] to request the Owner a new measurement+layout.
+     * Called by [LayoutNode] to request the Owner a new measurement+layout. [forceRequest] defines
+     * whether the node should bypass the logic that would reject measure requests, and therefore
+     * force the measure request to be evaluated even when it's already pending measure.
      */
-    fun onRequestMeasure(layoutNode: LayoutNode)
+    fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean = false)
 
     /**
-     * Called by [LayoutNode] to request the Owner a new layout.
+     * Called by [LayoutNode] to request the Owner a new layout. [forceRequest] defines
+     * whether the node should bypass the logic that would reject relayout requests, and therefore
+     * force the relayout request to be evaluated even when it's already pending measure/layout.
      */
-    fun onRequestRelayout(layoutNode: LayoutNode)
+    fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean = false)
 
     /**
      * Called by [LayoutNode] when it is attached to the view system and now has an owner.

@@ -46,11 +46,9 @@ import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalProvider
+import androidx.compose.ui.node.LayoutNode.LayoutState.Idle
 import androidx.compose.ui.node.LayoutNode.LayoutState.LayingOut
 import androidx.compose.ui.node.LayoutNode.LayoutState.Measuring
-import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRelayout
-import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRemeasure
-import androidx.compose.ui.node.LayoutNode.LayoutState.Ready
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.platform.nativeClass
@@ -167,8 +165,12 @@ internal class LayoutNode(
 
     /**
      * The layout state the node is currently in.
+     *
+     * The mutation of [layoutState] is confined to [LayoutNode], and is therefore read-only
+     * outside LayoutNode. This makes the state machine easier to reason about.
      */
-    internal var layoutState = Ready
+    internal var layoutState = Idle
+        private set
 
     /**
      * A cache of modifiers to be used when setting and reusing previous modifiers.
@@ -590,25 +592,26 @@ internal class LayoutNode(
      */
     private var _innerLayerWrapper: LayoutNodeWrapper? = null
     internal var innerLayerWrapperIsDirty = true
-    private val innerLayerWrapper: LayoutNodeWrapper? get() {
-        if (innerLayerWrapperIsDirty) {
-            var delegate: LayoutNodeWrapper? = innerLayoutNodeWrapper
-            val final = outerLayoutNodeWrapper.wrappedBy
-            _innerLayerWrapper = null
-            while (delegate != final) {
-                if (delegate?.layer != null) {
-                    _innerLayerWrapper = delegate
-                    break
+    private val innerLayerWrapper: LayoutNodeWrapper?
+        get() {
+            if (innerLayerWrapperIsDirty) {
+                var delegate: LayoutNodeWrapper? = innerLayoutNodeWrapper
+                val final = outerLayoutNodeWrapper.wrappedBy
+                _innerLayerWrapper = null
+                while (delegate != final) {
+                    if (delegate?.layer != null) {
+                        _innerLayerWrapper = delegate
+                        break
+                    }
+                    delegate = delegate?.wrappedBy
                 }
-                delegate = delegate?.wrappedBy
             }
+            val layerWrapper = _innerLayerWrapper
+            if (layerWrapper != null) {
+                requireNotNull(layerWrapper.layer)
+            }
+            return layerWrapper
         }
-        val layerWrapper = _innerLayerWrapper
-        if (layerWrapper != null) {
-            requireNotNull(layerWrapper.layer)
-        }
-        return layerWrapper
-    }
 
     /**
      * Invalidates the inner-most layer as part of this LayoutNode or from the containing
@@ -766,7 +769,7 @@ internal class LayoutNode(
                 outerWrapper != innerLayoutNodeWrapper
             ) {
                 requestRemeasure()
-            } else if (layoutState == Ready && addedCallback) {
+            } else if (layoutState == Idle && !measurePending && addedCallback) {
                 // We need to notify the callbacks of a change in position since there's
                 // a new one.
                 requestRemeasure()
@@ -949,12 +952,13 @@ internal class LayoutNode(
     internal fun layoutChildren() {
         alignmentLines.recalculateQueryOwner()
 
-        if (layoutState == NeedsRelayout) {
+        if (layoutPending) {
             onBeforeLayoutChildren()
         }
         // as a result of the previous operation we can figure out a child has been resized
         // and we need to be remeasured, not relaid out
-        if (layoutState == NeedsRelayout) {
+        if (layoutPending) {
+            layoutPending = false
             layoutState = LayingOut
             val owner = requireOwner()
             owner.snapshotObserver.observeLayoutSnapshotReads(this) {
@@ -988,8 +992,7 @@ internal class LayoutNode(
                         child.alignmentLines.usedDuringParentLayout
                 }
             }
-
-            layoutState = Ready
+            layoutState = Idle
         }
 
         if (alignmentLines.usedDuringParentLayout) {
@@ -1017,22 +1020,18 @@ internal class LayoutNode(
     }
 
     private fun rescheduleRemeasureOrRelayout(it: LayoutNode) {
-        when (val state = it.layoutState) {
-            NeedsRemeasure, NeedsRelayout -> {
-                // we need to reset the state before requesting as otherwise the request
-                // would be ignored.
-                it.layoutState = Ready
+        when (it.layoutState) {
+            Idle -> {
                 // this node was scheduled for remeasure or relayout while it was not
                 // placed. such requests are ignored for non-placed nodes so we have to
                 // re-schedule remeasure or relayout.
-                if (state == NeedsRemeasure) {
-                    it.requestRemeasure()
+                if (it.measurePending) {
+                    it.requestRemeasure(forceRequest = true)
+                } else if (it.layoutPending) {
+                    it.requestRelayout(forceRequest = true)
                 } else {
-                    it.requestRelayout()
+                    // no extra work required and node is ready to be displayed
                 }
-            }
-            Ready -> {
-                // no extra work required and node is ready to be displayed
             }
             else -> throw IllegalStateException("Unexpected state ${it.layoutState}")
         }
@@ -1071,7 +1070,7 @@ internal class LayoutNode(
      */
     private fun onBeforeLayoutChildren() {
         _children.forEach {
-            if (it.layoutState == NeedsRemeasure &&
+            if (it.measurePending &&
                 it.measuredByParent == UsageByParent.InMeasureBlock
             ) {
                 if (it.remeasure()) {
@@ -1111,9 +1110,9 @@ internal class LayoutNode(
     private fun alignmentLinesQueriedByModifier() {
         if (layoutState == Measuring) {
             alignmentLines.usedByModifierMeasurement = true
-            // We quickly transition to NeedsRelayout as we need the alignment lines now.
+            // We quickly transition to layoutPending as we need the alignment lines now.
             // Later we will see that we also laid out as part of measurement and will skip layout.
-            if (alignmentLines.dirty) layoutState = NeedsRelayout
+            if (alignmentLines.dirty) markLayoutPending()
         } else {
             // Note this can also happen for onGloballyPositioned queries.
             alignmentLines.usedByModifierLayout = true
@@ -1127,10 +1126,10 @@ internal class LayoutNode(
     /**
      * Used to request a new measurement + layout pass from the owner.
      */
-    internal fun requestRemeasure() {
+    internal fun requestRemeasure(forceRequest: Boolean = false) {
         val owner = owner ?: return
         if (!ignoreRemeasureRequests && !isVirtual) {
-            owner.onRequestMeasure(this)
+            owner.onRequestMeasure(this, forceRequest)
         }
     }
 
@@ -1143,9 +1142,9 @@ internal class LayoutNode(
     /**
      * Used to request a new layout pass from the owner.
      */
-    internal fun requestRelayout() {
+    internal fun requestRelayout(forceRequest: Boolean = false) {
         if (!isVirtual) {
-            owner?.onRequestRelayout(this)
+            owner?.onRequestRelayout(this, forceRequest)
         }
     }
 
@@ -1158,7 +1157,7 @@ internal class LayoutNode(
     }
 
     internal fun dispatchOnPositionedCallbacks() {
-        if (layoutState != Ready) {
+        if (layoutState != Idle || layoutPending || measurePending) {
             return // it hasn't yet been properly positioned, so don't make a call
         }
         if (!isPlaced) {
@@ -1280,8 +1279,10 @@ internal class LayoutNode(
     }
 
     // Delegation from Measurable to measurableAndPlaceable
-    override fun measure(constraints: Constraints) =
-        outerMeasurablePlaceable.measure(constraints)
+    override fun measure(constraints: Constraints): Placeable {
+        val placeable = outerMeasurablePlaceable.measure(constraints)
+        return placeable
+    }
 
     /**
      * Return true if the measured size has been changed
@@ -1290,9 +1291,61 @@ internal class LayoutNode(
         constraints: Constraints? = outerMeasurablePlaceable.lastConstraints
     ): Boolean {
         return if (constraints != null) {
-            outerMeasurablePlaceable.remeasure(constraints)
+            val sizeChanged = outerMeasurablePlaceable.remeasure(constraints)
+            sizeChanged
         } else {
             false
+        }
+    }
+
+    /**
+     * Tracks whether another measure pass is needed for the LayoutNode.
+     * Mutation to [measurePending] is confined to LayoutNode. It can only be set true from outside
+     * of LayoutNode via [markMeasurePending]. It is cleared (i.e. set false) during the measure
+     * pass (i.e. in [performMeasure]).
+     */
+    internal var measurePending: Boolean = false
+        private set
+
+    /**
+     * Tracks whether another layout pass is needed for the LayoutNode.
+     * Mutation to [layoutPending] is confined to LayoutNode. It can only be set true from outside
+     * of LayoutNode via [markLayoutPending]. It is cleared (i.e. set false) during the layout pass
+     * (i.e. in [layoutChildren]).
+     */
+    internal var layoutPending: Boolean = false
+        private set
+
+    /**
+     * Marks the layoutNode dirty for another layout pass.
+     */
+    internal fun markLayoutPending() {
+        layoutPending = true
+    }
+
+    /**
+     * Marks the layoutNode dirty for another measure pass.
+     */
+    internal fun markMeasurePending() {
+        measurePending = true
+    }
+
+    /**
+     * Performs measure with the given constraints and perform necessary state mutations before
+     * and after the measurement.
+     */
+    internal fun performMeasure(constraints: Constraints) {
+        layoutState = Measuring
+        measurePending = false
+        requireOwner().snapshotObserver.observeMeasureSnapshotReads(this) {
+            outerLayoutNodeWrapper.measure(constraints)
+        }
+        // The resulting layout state might be Ready. This can happen when the layout node's
+        // own modifier is querying an alignment line during measurement, therefore we
+        // need to also layout the layout node.
+        if (layoutState == Measuring) {
+            markLayoutPending()
+            layoutState = Idle
         }
     }
 
@@ -1414,26 +1467,20 @@ internal class LayoutNode(
      */
     internal enum class LayoutState {
         /**
-         * Request remeasure was called on the node.
-         */
-        NeedsRemeasure,
-        /**
          * Node is currently being measured.
          */
         Measuring,
-        /**
-         * Request relayout was called on the node or the node was just measured and is going to
-         * layout soon (measure stage is always being followed by the layout stage).
-         */
-        NeedsRelayout,
+
         /**
          * Node is currently being laid out.
          */
         LayingOut,
+
         /**
-         * Node is measured and laid out or not yet attached to the [Owner] (see [LayoutNode.owner]).
+         * Node is not currently measuring or laying out. It could be pending measure or pending
+         * layout depending on the [measurePending] and [layoutPending] flags.
          */
-        Ready
+        Idle,
     }
 
     internal enum class UsageByParent {

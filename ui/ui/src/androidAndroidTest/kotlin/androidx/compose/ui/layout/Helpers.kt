@@ -71,7 +71,7 @@ private class FakeOwner(
     override val measureIteration: Long
         get() = delegate.measureIteration
 
-    override fun onRequestMeasure(layoutNode: LayoutNode) {
+    override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
         delegate.requestRemeasure(layoutNode)
     }
 
@@ -96,7 +96,7 @@ private class FakeOwner(
         TODO("Not yet implemented")
     }
 
-    override fun onLayoutChange(layoutNode: LayoutNode) { }
+    override fun onLayoutChange(layoutNode: LayoutNode) {}
 
     @OptIn(InternalCoreApi::class)
     override var showLayoutBounds: Boolean = false
@@ -130,6 +130,7 @@ private class FakeOwner(
         get() = TODO("Not yet implemented")
     override val windowInfo: WindowInfo
         get() = TODO("Not yet implemented")
+
     @Suppress("OverridingDeprecatedMember", "DEPRECATION")
     override val fontLoader: Font.ResourceLoader
         get() = TODO("Not yet implemented")
@@ -147,7 +148,9 @@ private class FakeOwner(
     override fun createLayer(drawBlock: (Canvas) -> Unit, invalidateParentLayer: () -> Unit) =
         TODO("Not yet implemented")
 
-    override fun onRequestRelayout(layoutNode: LayoutNode) = TODO("Not yet implemented")
+    override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) =
+        TODO("Not yet implemented")
+
     override fun calculatePositionInWindow(localPosition: Offset) = TODO("Not yet implemented")
     override fun calculateLocalPosition(positionInWindow: Offset) = TODO("Not yet implemented")
     override fun requestFocus() = TODO("Not yet implemented")
@@ -192,15 +195,17 @@ internal fun assertNotRelaidOut(node: LayoutNode, block: (LayoutNode) -> Unit) {
 }
 
 internal fun assertMeasureRequired(node: LayoutNode) {
-    Truth.assertThat(node.layoutState).isEqualTo(LayoutNode.LayoutState.NeedsRemeasure)
+    Truth.assertThat(node.measurePending).isTrue()
 }
 
 internal fun assertMeasuredAndLaidOut(node: LayoutNode) {
-    Truth.assertThat(node.layoutState).isEqualTo(LayoutNode.LayoutState.Ready)
+    Truth.assertThat(node.layoutState).isEqualTo(LayoutNode.LayoutState.Idle)
+    Truth.assertThat(node.layoutPending).isFalse()
+    Truth.assertThat(node.measurePending).isFalse()
 }
 
 internal fun assertLayoutRequired(node: LayoutNode) {
-    Truth.assertThat(node.layoutState).isEqualTo(LayoutNode.LayoutState.NeedsRelayout)
+    Truth.assertThat(node.layoutPending).isTrue()
 }
 
 internal fun assertRemeasured(
