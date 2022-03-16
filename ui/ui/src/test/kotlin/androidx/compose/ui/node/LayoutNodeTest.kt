@@ -72,6 +72,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -746,19 +747,31 @@ class LayoutNodeTest {
     @Test
     fun layoutNodeWrapperAttachedWhenLayoutNodeAttached() {
         val layoutNode = LayoutNode()
-        val layoutModifier = Modifier.graphicsLayer { }
+        // 2 modifiers at the start
+        val layoutModifier = Modifier.graphicsLayer { }.graphicsLayer { }
 
         layoutNode.modifier = layoutModifier
         val oldLayoutNodeWrapper = layoutNode.outerLayoutNodeWrapper
+        val oldInnerLayoutNodeWrapper = oldLayoutNodeWrapper.wrapped
         assertFalse(oldLayoutNodeWrapper.isAttached)
+        assertNotNull(oldInnerLayoutNodeWrapper)
+        assertFalse(oldInnerLayoutNodeWrapper!!.isAttached)
 
         layoutNode.attach(MockOwner())
         assertTrue(oldLayoutNodeWrapper.isAttached)
 
+        // only 1 modifier now, so one should be detached and the other can be reused
         layoutNode.modifier = Modifier.graphicsLayer()
         val newLayoutNodeWrapper = layoutNode.outerLayoutNodeWrapper
+
+        // one can be reused, but we don't care which one
+        val notReused = if (newLayoutNodeWrapper == oldLayoutNodeWrapper) {
+            oldInnerLayoutNodeWrapper
+        } else {
+            oldLayoutNodeWrapper
+        }
         assertTrue(newLayoutNodeWrapper.isAttached)
-        assertFalse(oldLayoutNodeWrapper.isAttached)
+        assertFalse(notReused.isAttached)
     }
 
     @Test
@@ -2118,8 +2131,8 @@ class LayoutNodeTest {
         val wrapper1 = root.outerLayoutNodeWrapper
         val wrapper2 = root.outerLayoutNodeWrapper.wrapped
 
-        assertEquals(modifier1, (wrapper1 as DelegatingLayoutNodeWrapper<*>).modifier)
-        assertEquals(modifier2, (wrapper2 as DelegatingLayoutNodeWrapper<*>).modifier)
+        assertEquals(modifier1, (wrapper1 as ModifiedLayoutNode).modifier)
+        assertEquals(modifier2, (wrapper2 as ModifiedLayoutNode).modifier)
 
         root.modifier = modifier2.then(modifier1)
 
@@ -2127,11 +2140,11 @@ class LayoutNodeTest {
         assertEquals(wrapper1, root.outerLayoutNodeWrapper.wrapped)
         assertEquals(
             modifier1,
-            (root.outerLayoutNodeWrapper.wrapped as DelegatingLayoutNodeWrapper<*>).modifier
+            (root.outerLayoutNodeWrapper.wrapped as ModifiedLayoutNode).modifier
         )
         assertEquals(
             modifier2,
-            (root.outerLayoutNodeWrapper as DelegatingLayoutNodeWrapper<*>).modifier
+            (root.outerLayoutNodeWrapper as ModifiedLayoutNode).modifier
         )
     }
 
