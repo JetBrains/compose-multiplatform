@@ -29,11 +29,10 @@ val ModifierLocalBeyondBoundsLayout: ProvidableModifierLocal<BeyondBoundsLayout>
 private val DefaultBeyondBoundsLayout = object : BeyondBoundsLayout {
     override fun requestBeyondBoundsLayout(
         direction: BeyondBoundsLayoutDirection,
-        until: () -> Boolean,
-        onBeyondBoundsLayoutCompleted: () -> Unit
-    ) {
+        block: () -> Boolean,
+    ): Boolean {
         // Do nothing, just invoke the lambda.
-        onBeyondBoundsLayoutCompleted.invoke()
+        return block.invoke()
     }
 }
 
@@ -54,16 +53,18 @@ interface BeyondBoundsLayout {
      * by the parent that provided the modifier local.
      *
      * @param direction The direction from the visible bounds in which more items are requested.
-     * @param until Continue to add layout more items until this condition is satisfied.
-     * @param onBeyondBoundsLayoutCompleted This block is executed after the requested items are
-     * laid out. The items are guaranteed to be present within the scope of the block and the parent
+     * @param block Continue to add layout more items until this block returns true or there are no
+     * more items to add.
+     * @return whether the terminating condition was satisfied. It returns true if we stopped adding
+     * items because [block] returned true, and false if we stopped for other reasons. (eg. We ran
+     * out of items to add).
+     * The items are only guaranteed to be present within the scope of the block and the parent
      * can dispose the extra items as soon as this block finishes executing.
      */
     fun requestBeyondBoundsLayout(
         direction: BeyondBoundsLayoutDirection,
-        until: () -> Boolean,
-        onBeyondBoundsLayoutCompleted: () -> Unit
-    )
+        block: () -> Boolean
+    ): Boolean
 }
 
 /**
