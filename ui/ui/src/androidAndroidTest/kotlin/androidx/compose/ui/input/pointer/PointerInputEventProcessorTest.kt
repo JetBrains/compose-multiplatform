@@ -3187,6 +3187,7 @@ internal fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = M
 
 @OptIn(ExperimentalComposeUiApi::class, InternalCoreApi::class)
 private class TestOwner : Owner {
+    val onEndListeners = mutableListOf<() -> Unit>()
     var position: IntOffset = IntOffset.Zero
     override val root = LayoutNode(0, 0, 500, 500)
 
@@ -3291,10 +3292,16 @@ private class TestOwner : Owner {
         get() = TODO("Not yet implemented")
     override val snapshotObserver = OwnerSnapshotObserver { it.invoke() }
     override fun registerOnEndApplyChangesListener(listener: () -> Unit) {
-        TODO("Not yet implemented")
+        onEndListeners += listener
     }
 
     override fun onEndApplyChanges() {
+        while (onEndListeners.isNotEmpty()) {
+            onEndListeners.removeAt(0).invoke()
+        }
+    }
+
+    override fun registerOnLayoutCompletedListener(listener: Owner.OnLayoutCompletedListener) {
         TODO("Not yet implemented")
     }
 

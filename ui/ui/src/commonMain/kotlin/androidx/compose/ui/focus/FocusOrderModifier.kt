@@ -234,3 +234,16 @@ internal class FocusOrderToProperties(
         focusOrderReceiver(FocusOrder(focusProperties))
     }
 }
+
+/**
+ * Used internally for FocusOrderModifiers so that we can compare the modifiers and can reuse
+ * the ModifierLocalConsumerEntity and ModifierLocalProviderEntity.
+ */
+@Suppress("DEPRECATION")
+internal class FocusOrderModifierToProperties(
+    val modifier: FocusOrderModifier
+) : (FocusProperties) -> Unit {
+    override fun invoke(focusProperties: FocusProperties) {
+        modifier.populateFocusOrder(FocusOrder(focusProperties))
+    }
+}

@@ -254,11 +254,20 @@ internal interface Owner {
      */
     fun onEndApplyChanges()
 
+    /**
+     * [listener] will be notified after the current or next layout has finished.
+     */
+    fun registerOnLayoutCompletedListener(listener: OnLayoutCompletedListener)
+
     companion object {
         /**
          * Enables additional (and expensive to do in production) assertions. Useful to be set
          * to true during the tests covering our core logic.
          */
         var enableExtraAssertions: Boolean = false
+    }
+
+    interface OnLayoutCompletedListener {
+        fun onLayoutComplete()
     }
 }
