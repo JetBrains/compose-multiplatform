@@ -7,6 +7,7 @@
 
 package org.jetbrains.compose.web.css
 
+import org.jetbrains.compose.web.attributes.HtmlAttrMarker
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import kotlin.properties.ReadOnlyProperty
 
@@ -22,6 +23,7 @@ typealias StyleBuilder = StyleScope
  * 1. Add inlined css properties to the element (@see [property])
  * 2. Set values to CSS variables (@see [variable])
  */
+@HtmlAttrMarker
 interface StyleScope {
     /**
      * Adds arbitrary CSS property to the inline style of the element
