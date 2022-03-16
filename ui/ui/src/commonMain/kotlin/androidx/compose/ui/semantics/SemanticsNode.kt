@@ -19,10 +19,10 @@ package androidx.compose.ui.semantics
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.AlignmentLine
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.LayoutInfo
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.node.EntityList
 import androidx.compose.ui.node.LayoutNode

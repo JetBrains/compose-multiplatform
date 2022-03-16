@@ -18,7 +18,6 @@ package androidx.compose.ui.focus
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.node.ModifiedFocusNode
 import androidx.compose.ui.unit.LayoutDirection
 
 /**
@@ -197,12 +196,10 @@ fun Modifier.focusOrder(
  * Allowing parents higher up the hierarchy to overwrite the focus order specified by their
  * children.
  */
-internal fun ModifiedFocusNode.customFocusSearch(
+internal fun FocusModifier.customFocusSearch(
     focusDirection: FocusDirection,
     layoutDirection: LayoutDirection
 ): FocusRequester {
-    val focusProperties = modifier.focusProperties
-
     return when (focusDirection) {
         FocusDirection.Next -> focusProperties.next
         FocusDirection.Previous -> focusProperties.previous

@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.focus
 
+import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.ui.focus.FocusDirection.Companion.Down
 import androidx.compose.ui.focus.FocusDirection.Companion.Left
 import androidx.compose.ui.focus.FocusDirection.Companion.Right
@@ -27,8 +28,6 @@ import androidx.compose.ui.focus.FocusStateImpl.Deactivated
 import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.node.ModifiedFocusNode
-import androidx.compose.ui.util.fastForEach
 import kotlin.math.absoluteValue
 import kotlin.math.max
 
@@ -36,15 +35,15 @@ private const val InvalidFocusDirection = "This function should only be used for
 private const val NoActiveChild = "ActiveParent must have a focusedChild"
 
 /**
- *  Perform a search among the immediate children of this [node][ModifiedFocusNode] in the
+ *  Perform a search among the immediate children of this [node][FocusModifier] in the
  *  specified [direction][FocusDirection] and return the node that is to be focused next. If one
  *  of the children is currently focused, we start from that point and search in the specified
  *  [direction][FocusDirection]. If none of the children are currently focused, we pick the
  *  top-left or bottom right based on the specified [direction][FocusDirection].
  */
-internal fun ModifiedFocusNode.twoDimensionalFocusSearch(
+internal fun FocusModifier.twoDimensionalFocusSearch(
     direction: FocusDirection,
-    onFound: (ModifiedFocusNode) -> Boolean
+    onFound: (FocusModifier) -> Boolean
 ): Boolean {
     when (focusState) {
         Inactive -> return onFound.invoke(this)
@@ -71,11 +70,11 @@ internal fun ModifiedFocusNode.twoDimensionalFocusSearch(
             // The 2-D focus search starts form the root. If we reached here, it means that there
             // was no intermediate node that was ActiveParent. This is an initial focus scenario.
             // We need to search among this node's children to find the best focus candidate.
-            val focusableChildren = focusableChildren(excludeDeactivated = true)
+            val activated = activatedChildren()
 
             // If there are aren't multiple children to choose from, return the first child.
-            if (focusableChildren.size <= 1) {
-                return focusableChildren.firstOrNull()?.let { onFound.invoke(it) } ?: false
+            if (activated.size <= 1) {
+                return activated.firstOrNull()?.let { onFound.invoke(it) } ?: false
             }
 
             // To start the search, we pick one of the four corners of this node as the initially
@@ -85,20 +84,21 @@ internal fun ModifiedFocusNode.twoDimensionalFocusSearch(
                 Left, Up -> focusRect().bottomRight()
                 else -> error(InvalidFocusDirection)
             }
-            val nextCandidate = focusableChildren.findBestCandidate(initialFocusRect, direction)
+            val nextCandidate = activated.findBestCandidate(initialFocusRect, direction)
             return nextCandidate?.let { onFound.invoke(it) } ?: false
         }
     }
 }
 
-private fun ModifiedFocusNode.searchChildren(
-    focusedItem: ModifiedFocusNode,
+private fun FocusModifier.searchChildren(
+    focusedItem: FocusModifier,
     direction: FocusDirection,
-    onFound: (ModifiedFocusNode) -> Boolean
+    onFound: (FocusModifier) -> Boolean
 ): Boolean {
-    val children = focusableChildren(excludeDeactivated = false).toMutableList()
-    while (children.isNotEmpty()) {
-        val nextItem = children.findBestCandidate(focusedItem.focusRect(), direction)
+    val childrenCopy = MutableVector<FocusModifier>(children.size)
+    childrenCopy.addAll(children)
+    while (childrenCopy.isNotEmpty()) {
+        val nextItem = childrenCopy.findBestCandidate(focusedItem.focusRect(), direction)
             ?: return false
 
         // If the result is not deactivated, this is a valid next item.
@@ -109,7 +109,7 @@ private fun ModifiedFocusNode.searchChildren(
 
         // If there are no results among the children of the deactivated node,
         // repeat the search by excluding this deactivated node.
-        children.remove(nextItem)
+        childrenCopy.remove(nextItem)
     }
     return false
 }
@@ -118,10 +118,11 @@ private fun ModifiedFocusNode.searchChildren(
 // TODO(b/182319711): For Left/Right focus moves, Consider finding the first candidate in the beam
 //  and then only comparing candidates in the beam. If nothing is in the beam, then consider all
 //  valid candidates.
-private fun List<ModifiedFocusNode>.findBestCandidate(
+@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+private fun MutableVector<FocusModifier>.findBestCandidate(
     focusRect: Rect,
     direction: FocusDirection
-): ModifiedFocusNode? {
+): FocusModifier? {
     // Pick an impossible rectangle as the initial best candidate Rect.
     var bestCandidate = when (direction) {
         Left -> focusRect.translate(focusRect.width + 1, 0f)
@@ -131,8 +132,8 @@ private fun List<ModifiedFocusNode>.findBestCandidate(
         else -> error(InvalidFocusDirection)
     }
 
-    var searchResult: ModifiedFocusNode? = null
-    fastForEach { candidateNode ->
+    var searchResult: FocusModifier? = null
+    forEach { candidateNode ->
         val candidateRect = candidateNode.focusRect()
         if (isBetterCandidate(candidateRect, bestCandidate, focusRect, direction)) {
             bestCandidate = candidateRect
@@ -290,7 +291,8 @@ private fun Rect.topLeft() = Rect(left, top, left, top)
 private fun Rect.bottomRight() = Rect(right, bottom, right, bottom)
 
 // Find the active descendant.
-private fun ModifiedFocusNode.activeNode(): ModifiedFocusNode {
-    check(modifier.focusState == ActiveParent || modifier.focusState == DeactivatedParent)
+@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+private fun FocusModifier.activeNode(): FocusModifier {
+    check(focusState == ActiveParent || focusState == DeactivatedParent)
     return findActiveFocusNode() ?: error(NoActiveChild)
 }

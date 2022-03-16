@@ -246,8 +246,7 @@ class FocusEventCountTest(focusEventType: String) {
         // Assert.
         rule.runOnIdle {
             assertThat(focusStates).isExactly(
-                Inactive, // triggered by onFocusEvent node's onModifierChanged().
-                Inactive, // triggered by focus node's onModifierChanged().
+                Inactive, // triggered by focus node's SideEffect.
             )
         }
     }
@@ -273,8 +272,7 @@ class FocusEventCountTest(focusEventType: String) {
         // Assert.
         rule.runOnIdle {
             assertThat(focusStates).isExactly(
-                Inactive, // triggered by onFocusEvent node's onModifierChanged().
-                Inactive, // triggered by focus node's onModifierChanged().
+                Inactive, // triggered by focus node's property change.
             )
         }
     }

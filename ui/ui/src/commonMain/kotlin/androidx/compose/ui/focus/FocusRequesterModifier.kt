@@ -26,7 +26,6 @@ import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.modifier.ProvidableModifierLocal
 import androidx.compose.ui.modifier.modifierLocalOf
-import androidx.compose.ui.node.ModifiedFocusNode
 import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
@@ -93,14 +92,20 @@ internal class FocusRequesterModifierLocal(
         parent?.removeFocusModifiers(removedModifiers)
     }
 
-    fun findFocusNode(): ModifiedFocusNode? {
+    @Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+    fun findFocusNode(): FocusModifier? {
         // find the first child:
         val first = focusModifiers.fold(null as FocusModifier?) { mod1, mod2 ->
-            if (mod1 == null) {
-                return@fold mod2
+            var layoutNode1 = mod1?.layoutNodeWrapper?.layoutNode ?: return@fold mod2
+            var layoutNode2 = mod2.layoutNodeWrapper?.layoutNode ?: return@fold mod1
+
+            while (layoutNode1.depth > layoutNode2.depth) {
+                layoutNode1 = layoutNode1.parent!!
             }
-            var layoutNode1 = mod1.focusNode.layoutNode
-            var layoutNode2 = mod2.focusNode.layoutNode
+
+            while (layoutNode2.depth > layoutNode1.depth) {
+                layoutNode2 = layoutNode2.parent!!
+            }
 
             while (layoutNode1.parent != layoutNode2.parent) {
                 layoutNode1 = layoutNode1.parent!!
@@ -112,7 +117,7 @@ internal class FocusRequesterModifierLocal(
             if (index1 < index2) mod1 else mod2
         }
 
-        return first?.focusNode
+        return first
     }
 }
 

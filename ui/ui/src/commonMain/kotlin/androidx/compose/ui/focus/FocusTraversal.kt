@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.focus
 
+import androidx.compose.runtime.collection.MutableVector
+import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusDirection.Companion.Down
 import androidx.compose.ui.focus.FocusDirection.Companion.In
@@ -31,7 +33,8 @@ import androidx.compose.ui.focus.FocusStateImpl.Captured
 import androidx.compose.ui.focus.FocusStateImpl.Deactivated
 import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
-import androidx.compose.ui.node.ModifiedFocusNode
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.findRoot
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.LayoutDirection.Ltr
 import androidx.compose.ui.unit.LayoutDirection.Rtl
@@ -136,10 +139,10 @@ inline class FocusDirection internal constructor(@Suppress("unused") private val
  * @param onFound This lambda is invoked if focus search finds the next focus node.
  * @return if no focus node is found, we return false. otherwise we return the result of [onFound].
  */
-internal fun ModifiedFocusNode.focusSearch(
+internal fun FocusModifier.focusSearch(
     focusDirection: FocusDirection,
     layoutDirection: LayoutDirection,
-    onFound: (ModifiedFocusNode) -> Boolean
+    onFound: (FocusModifier) -> Boolean
 ): Boolean {
     return when (focusDirection) {
         Next, Previous -> oneDimensionalFocusSearch(focusDirection, onFound)
@@ -158,7 +161,8 @@ internal fun ModifiedFocusNode.focusSearch(
     }
 }
 
-internal fun ModifiedFocusNode.findActiveFocusNode(): ModifiedFocusNode? {
+@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+internal fun FocusModifier.findActiveFocusNode(): FocusModifier? {
     return when (focusState) {
         Active, Captured -> this
         ActiveParent, DeactivatedParent -> focusedChild?.findActiveFocusNode()
@@ -166,9 +170,37 @@ internal fun ModifiedFocusNode.findActiveFocusNode(): ModifiedFocusNode? {
     }
 }
 
-internal fun ModifiedFocusNode.findActiveParent(): ModifiedFocusNode? = findParentFocusNode()?.let {
+@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+internal fun FocusModifier.findActiveParent(): FocusModifier? = parent?.let {
         when (focusState) {
             Active, Captured, Deactivated, DeactivatedParent, Inactive -> it.findActiveParent()
             ActiveParent -> this
         }
     }
+
+/**
+ * Returns the bounding box of the focus layout area in the root or [Rect.Zero] if the
+ * FocusModifier has not had a layout.
+ */
+internal fun FocusModifier.focusRect(): Rect = layoutNodeWrapper?.let {
+    it.findRoot().localBoundingBoxOf(it, clipBounds = false)
+} ?: Rect.Zero
+
+/**
+ * Returns all [FocusModifier] children that are not [FocusStateImpl.isDeactivated]. Any
+ * child that is deactivated will add activated children instead.
+ */
+internal fun FocusModifier.activatedChildren(): MutableVector<FocusModifier> {
+    if (!children.any { it.focusState.isDeactivated }) {
+        return children
+    }
+    val activated = mutableVectorOf<FocusModifier>()
+    children.forEach { child ->
+        if (!child.focusState.isDeactivated) {
+            activated += child
+        } else {
+            activated.addAll(child.activatedChildren())
+        }
+    }
+    return activated
+}

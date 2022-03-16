@@ -5,6 +5,8 @@ InvalidNullConversion: androidx.compose.ui.graphics.GraphicsLayerModifierKt#grap
     Attempted to remove @NonNull annotation from method androidx.compose.ui.graphics.GraphicsLayerModifierKt.graphicsLayer(androidx.compose.ui.Modifier,float,float,float,float,float,float,float,float,float,float,long,androidx.compose.ui.graphics.Shape,boolean,androidx.compose.ui.graphics.RenderEffect)
 
 
+RemovedClass: androidx.compose.ui.focus.FocusNodeUtilsKt:
+    Removed class androidx.compose.ui.focus.FocusNodeUtilsKt
 RemovedClass: androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapperKt:
     Removed class androidx.compose.ui.input.nestedscroll.NestedScrollDelegatingWrapperKt
 RemovedClass: androidx.compose.ui.platform.TextToolbarKt:
