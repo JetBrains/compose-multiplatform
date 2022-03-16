@@ -16,7 +16,6 @@
 
 package androidx.build
 
-import androidx.build.Multiplatform.Companion.isMultiplatformEnabled
 import androidx.build.checkapi.shouldConfigureApiTasks
 import groovy.lang.Closure
 import org.gradle.api.GradleException
@@ -186,12 +185,28 @@ open class AndroidXExtension(val project: Project) {
 
     var bypassCoordinateValidation = false
 
-    var multiplatform: Boolean
+    /**
+     * Which KMP platforms are published by this project, as a list of artifact suffixes or an empty
+     * list for non-KMP projects.
+     *
+     * Setting this property to a non-empty list also sets the [multiplatform] property to `true`.
+     */
+    var publishPlatforms: List<String> = emptyList()
+        set(value) {
+            multiplatform = value.isNotEmpty()
+            field = value
+        }
+
+    /**
+     * Whether this project uses KMP.
+     *
+     * Consider setting the [publishPlatforms] property instead to ensure KMP artifacts are
+     * published.
+     */
+    var multiplatform: Boolean = false
         set(value) {
             Multiplatform.setEnabledForProject(project, value)
-        }
-        get() {
-            return project.isMultiplatformEnabled()
+            field = value
         }
 
     fun shouldEnforceKotlinStrictApiMode(): Boolean {
