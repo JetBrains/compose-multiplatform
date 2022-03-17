@@ -127,3 +127,7 @@ androidx {
     description = "Compose animation library"
     legacyDisableKotlinStrictApiMode = true
 }
+
+android {
+    namespace "androidx.compose.animation"
+}

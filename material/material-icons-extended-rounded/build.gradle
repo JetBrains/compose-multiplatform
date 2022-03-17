@@ -15,3 +15,7 @@
  */
 
 apply from: "../material-icons-extended/generate.gradle"
+
+android {
+    namespace "androidx.compose.material.icons.extended"
+}

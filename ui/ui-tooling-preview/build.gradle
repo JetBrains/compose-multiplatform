@@ -74,3 +74,7 @@ androidx {
             " @Preview composables in user apps."
     legacyDisableKotlinStrictApiMode = true
 }
+
+android {
+    namespace "androidx.compose.ui.tooling.preview"
+}

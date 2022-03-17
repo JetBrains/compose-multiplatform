@@ -146,3 +146,7 @@ androidx {
     inceptionYear = "2020"
     description = "Compose Material Design extended icons. This module contains all Material icons. It is a very large dependency and should not be included directly."
 }
+
+android {
+    namespace "androidx.compose.material.icons.extended"
+}

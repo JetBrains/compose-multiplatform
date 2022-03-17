@@ -42,3 +42,7 @@ androidx {
     inceptionYear = "2021"
     description = "This is a project for the Compose Material Catalog."
 }
+
+android {
+    namespace "androidx.compose.material.catalog.library"
+}

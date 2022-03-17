@@ -32,3 +32,7 @@ androidx {
     inceptionYear = "2020"
     description = "Stubs for classes in older Android APIs"
 }
+
+android {
+    namespace "androidx.compose.ui.androidstubs"
+}

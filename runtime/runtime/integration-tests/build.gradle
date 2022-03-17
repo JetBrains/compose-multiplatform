@@ -49,6 +49,10 @@ dependencies {
     }
 }
 
+android {
+    namespace "androidx.compose.runtime.integrationtests"
+}
+
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     androidXComposeMultiplatform {
         android()

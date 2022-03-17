@@ -85,3 +85,7 @@ androidx {
     description = "Compose Material Design core icons. This module contains the most commonly used set of Material icons."
     legacyDisableKotlinStrictApiMode = true
 }
+
+android {
+    namespace "androidx.compose.material.icons"
+}

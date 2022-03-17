@@ -167,4 +167,5 @@ androidx {
 android {
     sourceSets.androidTest.assets.srcDirs +=
             project.rootDir.absolutePath + "/../../golden/compose/material/material"
+    namespace "androidx.compose.material"
 }

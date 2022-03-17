@@ -41,3 +41,7 @@ androidx {
     inceptionYear = "2019"
     description = "Contains the sample code for the Androidx Compose UI Livedata Interop System"
 }
+
+android {
+    namespace "androidx.compose.runtime.livedata.samples"
+}

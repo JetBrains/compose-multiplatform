@@ -154,6 +154,10 @@ androidx {
     legacyDisableKotlinStrictApiMode = true
 }
 
+android {
+    namespace "androidx.compose.ui.graphics"
+}
+
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     tasks.findByName("desktopTest").configure {
         systemProperties["GOLDEN_PATH"] = project.rootDir.absolutePath + "/../../golden"
