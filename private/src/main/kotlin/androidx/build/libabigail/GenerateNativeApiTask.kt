@@ -32,7 +32,6 @@ import org.gradle.workers.WorkParameters
 import org.gradle.workers.WorkerExecutor
 import java.io.File
 import javax.inject.Inject
-import org.gradle.api.tasks.InputFile
 
 private const val ARCH_PREFIX = "android."
 internal val architectures = listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
@@ -48,9 +47,6 @@ abstract class GenerateNativeApiTask : DefaultTask() {
 
     @get:InputDirectory
     abstract val prefabDirectory: Property<File>
-
-    @get:InputFile
-    abstract val symbolFile: Property<File>
 
     @get:Internal
     abstract val projectRootDir: Property<File>
@@ -111,7 +107,6 @@ abstract class GenerateNativeApiTask : DefaultTask() {
                     outputFilePath.parentFile.mkdirs()
                     workQueue.submit(AbiDwWorkAction::class.java) { parameters ->
                         parameters.rootDir = projectRootDir.get().toString()
-                        parameters.symbolList = symbolFile.get().toString()
                         parameters.pathToLib = artifact.canonicalPath
                         parameters.outputFilePath = outputFilePath.toString()
                     }
@@ -123,7 +118,6 @@ abstract class GenerateNativeApiTask : DefaultTask() {
 
 interface AbiDwParameters : WorkParameters {
     var rootDir: String
-    var symbolList: String
     var pathToLib: String
     var outputFilePath: String
 }
@@ -137,12 +131,6 @@ abstract class AbiDwWorkAction @Inject constructor(private val execOperations: E
             it.args = listOf(
                 "--drop-private-types",
                 "--no-show-locs",
-                // Do not actually pass the symbol list to `abidw`. As long as the version script
-                // is being used to build the library `abidw` will only document the visible symbols
-                // and there are currently some unresolved issues with certain symbols being
-                // incorrectly omitted from the output of abidw.
-                // "-w",
-                // parameters.symbolList,
                 "--out-file",
                 tempFile.toString(),
                 parameters.pathToLib
