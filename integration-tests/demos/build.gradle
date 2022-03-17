@@ -45,4 +45,5 @@ android {
         // part of CI.
         archivesBaseName = "compose-demos-testapp"
     }
+    namespace "androidx.compose.integration.demos"
 }

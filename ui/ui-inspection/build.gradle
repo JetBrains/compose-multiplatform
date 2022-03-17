@@ -90,6 +90,7 @@ android {
         // Restriction not important for inspectors, which only runs at dev-time
         disable("SyntheticAccessor")
     }
+    namespace "androidx.compose.ui.inspection"
 }
 
 tasks.withType(KotlinCompile).configureEach {

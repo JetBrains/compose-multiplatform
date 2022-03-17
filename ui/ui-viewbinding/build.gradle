@@ -51,3 +51,7 @@ androidx {
     description = "Compose integration with ViewBinding"
     legacyDisableKotlinStrictApiMode = true
 }
+
+android {
+    namespace "androidx.compose.ui.viewbinding"
+}

@@ -43,3 +43,7 @@ androidx {
     inceptionYear = "2019"
     description = "Contains the sample code for the Compose runtime"
 }
+
+android {
+    namespace "androidx.compose.runtime.samples"
+}

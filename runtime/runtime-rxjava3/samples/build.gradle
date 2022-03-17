@@ -41,3 +41,7 @@ androidx {
     inceptionYear = "2020"
     description = "Contains the sample code for the Androidx Compose RxJava 3 Integration System"
 }
+
+android {
+    namespace "androidx.compose.runtime.rxjava3.samples"
+}

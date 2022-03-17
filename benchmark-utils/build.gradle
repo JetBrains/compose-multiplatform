@@ -37,3 +37,7 @@ dependencies {
     // any dependency on this module.
     compileOnly(project(":compose:ui:ui-android-stubs"))
 }
+
+android {
+    namespace "androidx.compose.benchmarkutils"
+}

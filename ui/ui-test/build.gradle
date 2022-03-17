@@ -36,6 +36,7 @@ android {
     lintOptions {
         disable("InvalidPackage")
     }
+    namespace "androidx.compose.ui.test"
 }
 
 dependencies {

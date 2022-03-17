@@ -269,6 +269,7 @@ android {
 android {
     sourceSets.androidTest.assets.srcDirs +=
             project.rootDir.absolutePath + "/../../golden/compose/ui/ui"
+    namespace "androidx.compose.ui"
 }
 
 // Diagnostics for b/188565660

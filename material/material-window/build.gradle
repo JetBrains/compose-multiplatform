@@ -105,3 +105,7 @@ androidx {
     inceptionYear = "2022"
     description = "Provides window size classes for building responsive UI"
 }
+
+android {
+    namespace "androidx.compose.material.window"
+}

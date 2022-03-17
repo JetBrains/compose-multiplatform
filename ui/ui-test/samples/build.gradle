@@ -46,3 +46,7 @@ androidx {
     inceptionYear = "2022"
     description = "Contains samples for AndroidX Compose Testing."
 }
+
+android {
+    namespace "androidx.compose.ui.test.samples"
+}

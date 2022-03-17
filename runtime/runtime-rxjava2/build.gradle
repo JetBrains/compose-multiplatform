@@ -49,3 +49,7 @@ androidx {
     description = "Compose integration with RxJava 2"
     legacyDisableKotlinStrictApiMode = true
 }
+
+android {
+    namespace "androidx.compose.runtime.rxjava2"
+}

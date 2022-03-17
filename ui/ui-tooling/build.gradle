@@ -133,3 +133,7 @@ androidx {
     description = "Compose tooling library. This library exposes information to our tools for better IDE support."
     legacyDisableKotlinStrictApiMode = true
 }
+
+android {
+    namespace "androidx.compose.ui.tooling"
+}
