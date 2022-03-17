@@ -104,7 +104,7 @@ internal suspend fun AwaitPointerEventScope.awaitPointerSlopOrCancellation(
 
     while (true) {
         val event = awaitPointerEvent()
-        val dragEvent = event.changes.fastFirstOrNull { it.id == pointer }!!
+        val dragEvent = event.changes.fastFirstOrNull { it.id == pointer } ?: return null
         if (dragEvent.positionChangeConsumed()) {
             return null
         } else if (dragEvent.changedToUpIgnoreConsumed()) {
@@ -198,7 +198,7 @@ suspend fun AwaitPointerEventScope.awaitDragOrCancellation(
         return null // The pointer has already been lifted, so the gesture is canceled
     }
     val change = awaitDragOrUp(pointerId) { it.positionChangedIgnoreConsumed() }
-    return if (change.positionChangeConsumed()) null else change
+    return if (change?.positionChangeConsumed() == false) change else null
 }
 
 /**
@@ -404,7 +404,7 @@ suspend fun AwaitPointerEventScope.awaitVerticalDragOrCancellation(
         return null // The pointer has already been lifted, so the gesture is canceled
     }
     val change = awaitDragOrUp(pointerId) { it.positionChangeIgnoreConsumed().y != 0f }
-    return if (change.positionChangeConsumed()) null else change
+    return if (change?.positionChangeConsumed() == false) change else null
 }
 
 /**
@@ -548,7 +548,7 @@ suspend fun AwaitPointerEventScope.awaitHorizontalDragOrCancellation(
         return null // The pointer has already been lifted, so the gesture is canceled
     }
     val change = awaitDragOrUp(pointerId) { it.positionChangeIgnoreConsumed().x != 0f }
-    return if (change.positionChangeConsumed()) null else change
+    return if (change?.positionChangeConsumed() == false) change else null
 }
 
 /**
@@ -626,7 +626,7 @@ private suspend inline fun AwaitPointerEventScope.drag(
     }
     var pointer = pointerId
     while (true) {
-        val change = awaitDragOrUp(pointer) { motionFromChange(it) != 0f }
+        val change = awaitDragOrUp(pointer) { motionFromChange(it) != 0f } ?: return false
 
         if (motionConsumed(change)) {
             return false
@@ -647,15 +647,18 @@ private suspend inline fun AwaitPointerEventScope.drag(
  * governing the drag. When the final pointer is lifted, that [PointerInputChange] is
  * returned. When a drag is detected, that [PointerInputChange] is returned. A drag is
  * only detected when [hasDragged] returns `true`.
+ *
+ * `null` is returned if there was an error in the pointer input stream and the pointer
+ * that was down was dropped before the 'up' was received.
  */
 private suspend inline fun AwaitPointerEventScope.awaitDragOrUp(
     pointerId: PointerId,
     hasDragged: (PointerInputChange) -> Boolean
-): PointerInputChange {
+): PointerInputChange? {
     var pointer = pointerId
     while (true) {
         val event = awaitPointerEvent()
-        val dragEvent = event.changes.fastFirstOrNull { it.id == pointer }!!
+        val dragEvent = event.changes.fastFirstOrNull { it.id == pointer } ?: return null
         if (dragEvent.changedToUpIgnoreConsumed()) {
             val otherDown = event.changes.fastFirstOrNull { it.pressed }
             if (otherDown == null) {
@@ -705,7 +708,7 @@ private suspend inline fun AwaitPointerEventScope.awaitPointerSlopOrCancellation
 
     while (true) {
         val event = awaitPointerEvent()
-        val dragEvent = event.changes.fastFirstOrNull { it.id == pointer }!!
+        val dragEvent = event.changes.fastFirstOrNull { it.id == pointer } ?: return null
         if (dragEvent.positionChangeConsumed()) {
             return null
         } else if (dragEvent.changedToUpIgnoreConsumed()) {
