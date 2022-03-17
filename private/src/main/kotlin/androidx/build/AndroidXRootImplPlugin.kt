@@ -192,6 +192,8 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
             it.from(project.getTestConfigDirectory())
             // We're mostly zipping a bunch of .apk files that are already compressed
             it.entryCompression = ZipEntryCompression.STORED
+            // Archive is greater than 4Gb :O
+            it.isZip64()
         }
         project.tasks.register(
             ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK, Zip::class.java
@@ -201,6 +203,8 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
             it.from(project.getConstrainedTestConfigDirectory())
             // We're mostly zipping a bunch of .apk files that are already compressed
             it.entryCompression = ZipEntryCompression.STORED
+            // Archive is greater than 4Gb :O
+            it.isZip64()
         }
 
         AffectedModuleDetector.configure(gradle, this)
