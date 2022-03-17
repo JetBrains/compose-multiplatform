@@ -694,6 +694,19 @@ package androidx.compose.foundation.lazy.layout {
   public final class LazyLayoutPrefetcher_androidKt {
   }
 
+  @androidx.compose.foundation.ExperimentalFoundationApi public interface PinnableParent {
+    method public androidx.compose.foundation.lazy.layout.PinnableParent.PinnedItemsHandle pinBeyondBoundsItems();
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi public static interface PinnableParent.PinnedItemsHandle {
+    method public void unpin();
+  }
+
+  public final class PinnableParentKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.ui.modifier.ProvidableModifierLocal<androidx.compose.foundation.lazy.layout.PinnableParent> getModifierLocalPinnableParent();
+    property @androidx.compose.foundation.ExperimentalFoundationApi public static final androidx.compose.ui.modifier.ProvidableModifierLocal<androidx.compose.foundation.lazy.layout.PinnableParent> ModifierLocalPinnableParent;
+  }
+
 }
 
 package androidx.compose.foundation.lazy.list {
