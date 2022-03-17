@@ -21,6 +21,9 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -214,8 +217,8 @@ class FloatingActionButtonScreenshotTest {
     fun text() {
         rule.setMaterialContent(lightColorScheme()) {
             ExtendedFloatingActionButton(
-                text = { Text("EXTENDED") },
-                onClick = {}
+                onClick = {},
+                content = { Text("EXTENDED") },
             )
         }
 
@@ -302,6 +305,29 @@ class FloatingActionButtonScreenshotTest {
         rule.waitForIdle()
 
         assertRootAgainstGolden("fab_focus")
+    }
+
+    @Test
+    fun extended_fab_half_way_animation() {
+        rule.mainClock.autoAdvance = false
+
+        var expanded by mutableStateOf(true)
+        rule.setMaterialContent(lightColorScheme()) {
+            ExtendedFloatingActionButton(
+                expanded = expanded,
+                onClick = {},
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.primary,
+                icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
+                text = { Text(text = "Extended FAB") },
+            )
+        }
+
+        rule.runOnIdle { expanded = false }
+
+        rule.mainClock.advanceTimeBy(127)
+
+        assertRootAgainstGolden("fab_extended_animation")
     }
 
     private fun assertClickableAgainstGolden(goldenName: String) {
