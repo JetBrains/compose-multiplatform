@@ -221,7 +221,7 @@ package androidx.compose.foundation.layout {
     method public static androidx.compose.foundation.layout.WindowInsets WindowInsets(optional int left, optional int top, optional int right, optional int bottom);
     method public static androidx.compose.foundation.layout.WindowInsets WindowInsets(optional float left, optional float top, optional float right, optional float bottom);
     method public static androidx.compose.foundation.layout.WindowInsets add(androidx.compose.foundation.layout.WindowInsets, androidx.compose.foundation.layout.WindowInsets insets);
-    method @androidx.compose.runtime.Composable public static androidx.compose.foundation.layout.PaddingValues asPaddingValues(androidx.compose.foundation.layout.WindowInsets);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static androidx.compose.foundation.layout.PaddingValues asPaddingValues(androidx.compose.foundation.layout.WindowInsets);
     method public static androidx.compose.foundation.layout.PaddingValues asPaddingValues(androidx.compose.foundation.layout.WindowInsets, androidx.compose.ui.unit.Density density);
     method public static androidx.compose.foundation.layout.WindowInsets exclude(androidx.compose.foundation.layout.WindowInsets, androidx.compose.foundation.layout.WindowInsets insets);
     method public static androidx.compose.foundation.layout.WindowInsets only(androidx.compose.foundation.layout.WindowInsets, int sides);

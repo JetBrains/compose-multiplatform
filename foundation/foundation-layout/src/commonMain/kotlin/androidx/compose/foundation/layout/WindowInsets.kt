@@ -18,6 +18,7 @@ package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -212,6 +213,7 @@ fun WindowInsets.only(sides: WindowInsetsSides): WindowInsets = LimitInsets(this
  *
  * @sample androidx.compose.foundation.layout.samples.paddingValuesSample
  */
+@ReadOnlyComposable
 @Composable
 fun WindowInsets.asPaddingValues(): PaddingValues = InsetsPaddingValues(this, LocalDensity.current)
 
