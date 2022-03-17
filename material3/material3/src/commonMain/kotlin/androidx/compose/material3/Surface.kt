@@ -50,8 +50,7 @@ import androidx.compose.ui.unit.dp
  * elevation, which influences how that piece of surface visually relates to other surfaces and how
  * that surface is modified by tonal variance.
  *
- * If you want to have a Surface that handles clicks or selections, consider using another
- * overload.
+ * See the other overloads for clickable, selectable, and toggleable surfaces.
  *
  * The Surface is responsible for:
  *
