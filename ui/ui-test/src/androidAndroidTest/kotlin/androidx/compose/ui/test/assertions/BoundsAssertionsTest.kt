@@ -17,6 +17,7 @@
 package androidx.compose.ui.test.assertions
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -24,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
+import androidx.compose.testutils.WithMinimumTouchTargetSize
 import androidx.compose.testutils.expectError
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +39,8 @@ import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertTouchHeightIsEqualTo
+import androidx.compose.ui.test.assertTouchWidthIsEqualTo
 import androidx.compose.ui.test.assertWidthIsAtLeast
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.getAlignmentLinePosition
@@ -44,23 +48,25 @@ import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import kotlin.math.max
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.math.max
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class BoundsAssertionsTest {
+    companion object {
+        private const val tag = "box"
+    }
 
     @get:Rule
     val rule = createComposeRule()
-
-    val tag = "box"
 
     private fun composeBox() {
         rule.setContent {
@@ -79,6 +85,19 @@ class BoundsAssertionsTest {
                 }
             }
         }
+    }
+
+    @Composable
+    private fun SmallBox(
+        modifier: Modifier = Modifier,
+        tag: String = BoundsAssertionsTest.tag
+    ) {
+        Box(
+            modifier = modifier
+                .testTag(tag)
+                .requiredSize(10.dp, 10.dp)
+                .background(color = Color.Black)
+        )
     }
 
     @Test
@@ -128,6 +147,38 @@ class BoundsAssertionsTest {
         expectError<AssertionError> {
             rule.onNodeWithTag(tag)
                 .assertHeightIsAtLeast(101.dp)
+        }
+    }
+
+    @Test
+    fun assertTouchSizeEquals() {
+        rule.setContent {
+            WithMinimumTouchTargetSize(DpSize(20.dp, 20.dp)) {
+                SmallBox(Modifier.clickable {})
+            }
+        }
+
+        rule.onNodeWithTag(tag)
+            .assertTouchWidthIsEqualTo(20.dp)
+            .assertTouchHeightIsEqualTo(20.dp)
+    }
+
+    @Test
+    fun assertTouchSizeEquals_fail() {
+        rule.setContent {
+            WithMinimumTouchTargetSize(DpSize(20.dp, 20.dp)) {
+                SmallBox(Modifier.clickable {})
+            }
+        }
+
+        expectError<AssertionError> {
+            rule.onNodeWithTag(tag)
+                .assertTouchWidthIsEqualTo(19.dp)
+        }
+
+        expectError<AssertionError> {
+            rule.onNodeWithTag(tag)
+                .assertTouchHeightIsEqualTo(21.dp)
         }
     }
 
@@ -265,7 +316,7 @@ class BoundsAssertionsTest {
         }
     }
 
-    private fun getSizeTest(content: @Composable() () -> Unit) {
+    private fun getSizeTest(content: @Composable () -> Unit) {
         // When we have a node that is [not] measured and not placed
         rule.setContent(content)
 

@@ -41,6 +41,7 @@ import androidx.compose.ui.materialize
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -96,7 +97,9 @@ internal class SuspendingGestureTestUtil(
             compose(recomposer) {
                 CompositionLocalProvider(
                     LocalDensity provides Density(1f),
-                    LocalViewConfiguration provides TestViewConfiguration()
+                    LocalViewConfiguration provides TestViewConfiguration(
+                        minimumTouchTargetSize = DpSize.Zero
+                    )
                 ) {
                     pointerInputFilter = currentComposer
                         .materialize(Modifier.pointerInput(Unit, gestureDetector)) as
