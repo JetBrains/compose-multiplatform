@@ -19,7 +19,6 @@ package androidx.build.libabigail
 import androidx.build.addToBuildOnServer
 import androidx.build.addToCheckTask
 import androidx.build.checkapi.getRequiredCompatibilityApiLocation
-import androidx.build.libabigail.symbolfiles.GenerateSymbolFileTask
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import java.io.File
@@ -39,16 +38,6 @@ object NativeApiTasks {
             LibraryExtension::class.java
         ).prefab.names.toList()
 
-        val generateSymbolFileTask = project.tasks.register(
-            "generateSymbolFile",
-            GenerateSymbolFileTask::class.java
-        ) { task ->
-            task.description = "Generate a list of public symbols from a version script in the " +
-                "project directory"
-            task.buildDir.set(project.buildDir)
-            task.projectDir.set(project.projectDir)
-        }
-
         // Generates API files from source in the build directory
         val generateNativeApi = project.tasks.register(
             "generateNativeApi",
@@ -57,13 +46,11 @@ object NativeApiTasks {
             task.group = apiGroup
             task.description = "Generates API files from native source"
             task.projectRootDir.set(project.rootDir)
-            task.symbolFile.set(generateSymbolFileTask.get().getOutputFile())
             task.prefabDirectory.set(
                 project.buildDir.resolve("intermediates/prefab_package/release/prefab")
             )
             task.artifactNames.set(artifactNames)
             task.apiLocation.set(builtApiLocation)
-            task.dependsOn("generateSymbolFile")
             task.dependsOn("prefabReleasePackage")
         }
 
