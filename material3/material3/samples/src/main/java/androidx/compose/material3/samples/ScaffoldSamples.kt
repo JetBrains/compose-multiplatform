@@ -88,9 +88,10 @@ fun SimpleScaffoldWithTopBar() {
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                text = { Text("Inc") },
                 onClick = { /* fab click handler */ }
-            )
+            ) {
+                Text("Inc")
+            }
         },
         content = { innerPadding ->
             LazyColumn(contentPadding = innerPadding) {
@@ -118,7 +119,6 @@ fun ScaffoldWithSimpleSnackbar() {
         floatingActionButton = {
             var clickCount by remember { mutableStateOf(0) }
             ExtendedFloatingActionButton(
-                text = { Text("Show snackbar") },
                 onClick = {
                     // show snackbar as a suspend function
                     scope.launch {
@@ -127,7 +127,7 @@ fun ScaffoldWithSimpleSnackbar() {
                         )
                     }
                 }
-            )
+            ) { Text("Show snackbar") }
         },
         content = { innerPadding ->
             Text(
@@ -149,7 +149,6 @@ fun ScaffoldWithIndefiniteSnackbar() {
         floatingActionButton = {
             var clickCount by remember { mutableStateOf(0) }
             ExtendedFloatingActionButton(
-                text = { Text("Show snackbar") },
                 onClick = {
                     // show snackbar as a suspend function
                     scope.launch {
@@ -161,7 +160,7 @@ fun ScaffoldWithIndefiniteSnackbar() {
                         )
                     }
                 }
-            )
+            ) { Text("Show snackbar") }
         },
         content = { innerPadding ->
             Text(
@@ -225,7 +224,6 @@ fun ScaffoldWithCustomSnackbar() {
         floatingActionButton = {
             var clickCount by remember { mutableStateOf(0) }
             ExtendedFloatingActionButton(
-                text = { Text("Show snackbar") },
                 onClick = {
                     scope.launch {
                         snackbarHostState.showSnackbar(
@@ -236,7 +234,7 @@ fun ScaffoldWithCustomSnackbar() {
                         )
                     }
                 }
-            )
+            ) { Text("Show snackbar") }
         },
         content = { innerPadding ->
             Text(
@@ -277,12 +275,11 @@ fun ScaffoldWithCoroutinesSnackbar() {
         floatingActionButton = {
             var clickCount by remember { mutableStateOf(0) }
             ExtendedFloatingActionButton(
-                text = { Text("Show snackbar") },
                 onClick = {
                     // offset snackbar data to the business logic
                     channel.trySend(++clickCount)
                 }
-            )
+            ) { Text("Show snackbar") }
         },
         content = { innerPadding ->
             Text(

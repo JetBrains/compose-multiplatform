@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.catalog.library.util.SampleSourceUrl
 import androidx.compose.material3.samples.AlertDialogSample
 import androidx.compose.material3.samples.AlertDialogWithIconSample
+import androidx.compose.material3.samples.AnimatedExtendedFloatingActionButtonSample
 import androidx.compose.material3.samples.BottomAppBarWithFAB
 import androidx.compose.material3.samples.ButtonSample
 import androidx.compose.material3.samples.ButtonWithIconSample
@@ -40,6 +41,7 @@ import androidx.compose.material3.samples.EnterAlwaysSmallTopAppBar
 import androidx.compose.material3.samples.ExitUntilCollapsedLargeTopAppBar
 import androidx.compose.material3.samples.ExitUntilCollapsedMediumTopAppBar
 import androidx.compose.material3.samples.ExtendedFloatingActionButtonSample
+import androidx.compose.material3.samples.ExtendedFloatingActionButtonTextSample
 import androidx.compose.material3.samples.FancyTabs
 import androidx.compose.material3.samples.FancyIndicatorTabs
 import androidx.compose.material3.samples.FancyIndicatorContainerTabs
@@ -278,6 +280,16 @@ val ExtendedFABExamples =
             description = ExtendedFABExampleDescription,
             sourceUrl = ExtendedFABExampleSourceUrl,
         ) { ExtendedFloatingActionButtonSample() },
+        Example(
+            name = ::ExtendedFloatingActionButtonTextSample.name,
+            description = ExtendedFABExampleDescription,
+            sourceUrl = ExtendedFABExampleSourceUrl,
+        ) { ExtendedFloatingActionButtonTextSample() },
+        Example(
+            name = ::AnimatedExtendedFloatingActionButtonSample.name,
+            description = ExtendedFABExampleDescription,
+            sourceUrl = ExtendedFABExampleSourceUrl,
+        ) { AnimatedExtendedFloatingActionButtonSample() },
     )
 
 private const val FloatingActionButtonsExampleDescription = "Floating action button examples"
