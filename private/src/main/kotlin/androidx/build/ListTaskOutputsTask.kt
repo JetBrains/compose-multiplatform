@@ -127,7 +127,11 @@ val taskNamesKnownToDuplicateOutputs = setOf(
     "updateLintBaselineWithExpandProjectionDebug",
     "updateLintBaselineWithExpandProjectionRelease",
     "updateLintBaselineWithNullAwareTypeConverterDebug",
-    "updateLintBaselineWithNullAwareTypeConverterRelease"
+    "updateLintBaselineWithNullAwareTypeConverterRelease",
+    "updateLintBaselineWithoutExpandProjectionDebug",
+    "updateLintBaselineWithoutExpandProjectionRelease",
+    "updateLintBaselineWithoutNullAwareTypeConverterDebug",
+    "updateLintBaselineWithoutNullAwareTypeConverterRelease"
 )
 
 fun shouldValidateTaskOutput(task: Task): Boolean {
