@@ -252,6 +252,14 @@ internal class SuspendingGestureTestUtil(
     )
 
     /**
+     * Removes all pointers from the active pointers. This can simulate a faulty pointer stream
+     * for robustness testing.
+     */
+    fun clearPointerStream() {
+        activePointers.clear()
+    }
+
+    /**
      * Updates all changes so that all events are at the current time.
      */
     private fun updateCurrentTime() {
