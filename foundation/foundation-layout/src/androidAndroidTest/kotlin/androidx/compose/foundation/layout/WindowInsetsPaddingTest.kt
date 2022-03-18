@@ -728,6 +728,27 @@ class WindowInsetsPaddingTest {
         }
     }
 
+    @Test
+    fun disableConsuming() {
+        setContent {
+            AndroidView(factory = { context ->
+                ComposeView(context).also {
+                    it.consumeWindowInsets = false
+                    it.setContent {
+                        Box(Modifier.fillMaxSize().statusBarsPadding())
+                    }
+                }
+            })
+        }
+
+        // wait for layout
+        rule.waitForIdle()
+
+        val remaining =
+            sendInsets(WindowInsetsCompat.Type.statusBars(), AndroidXInsets.of(0, 20, 0, 0))
+        assertThat(remaining.getInsets(WindowInsetsCompat.Type.statusBars()).top).isEqualTo(20)
+    }
+
     private fun sendInsets(
         type: Int,
         sentInsets: AndroidXInsets = AndroidXInsets.of(10, 11, 12, 13)
