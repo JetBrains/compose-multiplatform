@@ -28,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -52,13 +51,14 @@ import androidx.compose.ui.unit.round
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -132,7 +132,6 @@ class LayoutCoordinatesHelperTest {
         )
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
     @Test
     fun onPlaced_alignmentChange() {
         var offset by mutableStateOf(IntOffset(0, 0))
@@ -165,7 +164,7 @@ class LayoutCoordinatesHelperTest {
         }
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
+    @Ignore("b/225198728")
     @Test
     fun onPlaced_invocation() {
         var additionalOffset by mutableStateOf(IntOffset.Zero)
@@ -190,21 +189,15 @@ class LayoutCoordinatesHelperTest {
             }
         }
         rule.runOnIdle {
-            invocations.forEach {
-                assertEquals(1, it)
-            }
+            assertThat(invocations).containsExactlyElementsIn(listOf(1, 1, 1))
             alignment = Alignment.TopStart
         }
         rule.runOnIdle {
-            invocations.forEach {
-                assertEquals(2, it)
-            }
+            assertThat(invocations).containsExactlyElementsIn(listOf(2, 2, 2))
             additionalOffset = IntOffset(0, 10)
         }
         rule.runOnIdle {
-            invocations.forEach {
-                assertEquals(3, it)
-            }
+            assertThat(invocations).containsExactlyElementsIn(listOf(3, 3, 3))
         }
     }
 
@@ -239,7 +232,6 @@ class LayoutCoordinatesHelperTest {
         }
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
     private fun LayoutCoordinates.placementInParent() =
         parentCoordinates!!.localPositionOf(this, Offset.Zero).round()
 }
