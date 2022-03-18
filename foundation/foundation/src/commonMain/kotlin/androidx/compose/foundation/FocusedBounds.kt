@@ -55,18 +55,22 @@ fun Modifier.onFocusedBoundsChanged(onPositioned: (LayoutCoordinates?) -> Unit):
         remember(onPositioned) { FocusedBoundsObserverModifier(onPositioned) }
     }
 
+fun interface InvokeOnLayoutCoordinates {
+    fun invoke(focusedBounds: LayoutCoordinates?)
+}
+
 private class FocusedBoundsObserverModifier(
     private val handler: (LayoutCoordinates?) -> Unit
 ) : ModifierLocalConsumer,
     ModifierLocalProvider<((LayoutCoordinates?) -> Unit)?>,
-        (LayoutCoordinates?) -> Unit {
+    InvokeOnLayoutCoordinates {
     private var parent: ((LayoutCoordinates?) -> Unit)? = null
     private var lastBounds: LayoutCoordinates? = null
 
     override val key: ProvidableModifierLocal<((LayoutCoordinates?) -> Unit)?>
         get() = ModifierLocalFocusedBoundsObserver
     override val value: (LayoutCoordinates?) -> Unit
-        get() = this
+        get() = { invoke(it) }
 
     override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) {
         val newParent = with(scope) { ModifierLocalFocusedBoundsObserver.current }
