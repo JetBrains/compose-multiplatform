@@ -32,10 +32,6 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.runBlockingTest
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
-import kotlinx.test.IgnoreJsTarget
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -45,7 +41,7 @@ import kotlin.test.assertTrue
 @OptIn(ExperimentalCoroutinesApi::class)
 class RecomposerTests {
 
-    private fun runTestUnconfined(block: suspend TestScope.() -> Unit): Unit =
+    private fun runTestUnconfined(block: suspend TestScope.() -> Unit) =
         runTest(UnconfinedTestDispatcher()) {
             block()
         }

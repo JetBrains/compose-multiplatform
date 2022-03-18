@@ -43,8 +43,7 @@ dependencies {
         testImplementation(libs.kotlinTestJunit)
         testImplementation(libs.junit)
         testImplementation(libs.robolectric)
-        // kotlinCoroutinesTest is copy-pasted in source code to support multiplarform tests
-        // testImplementation(libs.kotlinCoroutinesTest)
+        testImplementation(libs.kotlinCoroutinesTest)
 
         androidTestImplementation(libs.kotlinTestJunit)
         androidTestImplementation(libs.testExtJunit)
@@ -71,7 +70,13 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
     kotlin {
         targets.js {
-            nodejs {}
+            nodejs {
+                testTask {
+                    useMocha {
+                        timeout = 8000
+                    }
+                }
+            }
             browser() {
                 testTask {
                     testLogging.showStandardStreams = true
@@ -116,8 +121,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                     implementation(libs.testRules)
                     implementation(libs.testRunner)
                     implementation(libs.truth)
-                    // kotlinCoroutinesTest is copy-pasted in source code to support multiplarform tests
-                    // implementation(libs.kotlinCoroutinesTest)
+                    implementation(libs.kotlinCoroutinesTest)
                 }
             }
 
@@ -128,8 +132,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
             jvmTest.dependencies {
                 implementation(libs.kotlinTestJunit)
-                // kotlinCoroutinesTest is copy-pasted in source code to support multiplarform tests
-                // implementation(libs.kotlinCoroutinesTest)
+                implementation(libs.kotlinCoroutinesTest)
             }
             jsTest {
                 dependencies {

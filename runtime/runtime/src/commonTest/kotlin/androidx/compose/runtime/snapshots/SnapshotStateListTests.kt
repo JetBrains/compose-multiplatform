@@ -21,13 +21,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.test._runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SnapshotStateListTests {
     @Test
     fun canCreateAStateList() {
@@ -549,7 +551,7 @@ class SnapshotStateListTests {
     }
 
     @Test
-    fun concurrentGlobalModification_add(): Unit = _runBlocking {
+    fun concurrentGlobalModification_add() = runTest(UnconfinedTestDispatcher()) {
         repeat(100) {
             val list = mutableStateListOf<Int>()
             coroutineScope {
@@ -567,7 +569,7 @@ class SnapshotStateListTests {
     }
 
     @Test
-    fun concurrentGlobalModifications_addAll(): Unit = _runBlocking {
+    fun concurrentGlobalModifications_addAll() = runTest(UnconfinedTestDispatcher()) {
         repeat(100) {
             val list = mutableStateListOf<Int>()
             coroutineScope {

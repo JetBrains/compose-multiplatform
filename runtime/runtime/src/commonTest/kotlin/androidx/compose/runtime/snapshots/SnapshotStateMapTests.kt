@@ -26,10 +26,11 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import kotlinx.test.IgnoreJsAndNative
 import kotlinx.test.IgnoreJsTarget
 import kotlinx.test.IgnoreNativeTarget
-import kotlinx.test._runBlocking
 
 class SnapshotStateMapTests {
     @Test
@@ -505,7 +506,7 @@ class SnapshotStateMapTests {
     @Test
     @IgnoreJsTarget
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun concurrentModificationInGlobal_put_new() = _runBlocking {
+    fun concurrentModificationInGlobal_put_new() = runTest(UnconfinedTestDispatcher()) {
         repeat(100) {
             val map = mutableStateMapOf<Int, String>()
             coroutineScope {
@@ -525,7 +526,7 @@ class SnapshotStateMapTests {
     @Test
     @IgnoreJsTarget
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun concurrentModificationInGlobal_put_replace() = _runBlocking {
+    fun concurrentModificationInGlobal_put_replace() = runTest(UnconfinedTestDispatcher()) {
         repeat(100) {
             val map = mutableStateMapOf(*Array(100) { it to "default" })
             coroutineScope {

@@ -60,7 +60,7 @@ import kotlinx.test.IgnoreJsTarget
 fun Container(content: @Composable () -> Unit) = content()
 
 @Stable
-@OptIn(InternalComposeApi::class)
+@OptIn(InternalComposeApi::class, ExperimentalCoroutinesApi::class)
 @Suppress("unused")
 class CompositionTests {
     @Test
@@ -1975,6 +1975,7 @@ class CompositionTests {
     }
 
     @Test
+    @IgnoreJsTarget
     fun testRememberObserver_Abandon_Recompose() {
         val abandonedObjects = mutableListOf<RememberObserver>()
         val observed = object : RememberObserver {
