@@ -22,7 +22,6 @@ import androidx.compose.lint.test.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -39,7 +38,6 @@ class RememberDetectorTest : LintDetectorTest() {
     override fun getIssues(): MutableList<Issue> =
         mutableListOf(RememberDetector.RememberReturnType)
 
-    @Ignore("b/223287425")
     @Test
     fun returnsUnit() {
         lint().files(
@@ -123,9 +121,6 @@ class RememberDetectorTest : LintDetectorTest() {
             Stubs.Composable,
             Stubs.Remember
         )
-            // TODO: incorrect missing import warning, because androidx.compose.runtime.remember
-            //  resolves to multiple functions. Remove when this is fixed in a future Lint version
-            .allowCompilationErrors()
             .run()
             .expect(
                 """
@@ -164,7 +159,6 @@ src/androidx/compose/runtime/foo/FooState.kt:69: Error: remember calls must not 
             )
     }
 
-    @Ignore("b/223287425")
     @Test
     fun returnsValue_explicitUnitType() {
         lint().files(
@@ -248,9 +242,6 @@ src/androidx/compose/runtime/foo/FooState.kt:69: Error: remember calls must not 
             Stubs.Composable,
             Stubs.Remember
         )
-            // TODO: incorrect missing import warning, because androidx.compose.runtime.remember
-            //  resolves to multiple functions. Remove when this is fixed in a future Lint version
-            .allowCompilationErrors()
             .run()
             .expect(
                 """
@@ -362,9 +353,6 @@ src/androidx/compose/runtime/foo/FooState.kt:69: Error: remember calls must not 
             Stubs.Composable,
             Stubs.Remember
         )
-            // TODO: incorrect missing import warning, because androidx.compose.runtime.remember
-            //  resolves to multiple functions. Remove when this is fixed in a future Lint version
-            .allowCompilationErrors()
             .run()
             .expectClean()
     }
