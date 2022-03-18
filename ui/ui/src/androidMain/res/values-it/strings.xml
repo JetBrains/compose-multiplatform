@@ -31,4 +31,6 @@
     <string name="close_sheet" msgid="7573152094250666567">"Chiudi il foglio"</string>
     <string name="default_error_message" msgid="8038256446254964252">"Valore non valido"</string>
     <string name="default_popup_window_title" msgid="6312721426453364202">"Finestra popup"</string>
+    <string name="range_start" msgid="7097486360902471446">"Inizio intervallo"</string>
+    <string name="range_end" msgid="5941395253238309765">"Fine intervallo"</string>
 </resources>

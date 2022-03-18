@@ -31,4 +31,6 @@
     <string name="close_sheet" msgid="7573152094250666567">"पाना बन्द गर्नुहोस्"</string>
     <string name="default_error_message" msgid="8038256446254964252">"अवैद्य इन्पुट"</string>
     <string name="default_popup_window_title" msgid="6312721426453364202">"पपअप विन्डो"</string>
+    <string name="range_start" msgid="7097486360902471446">"दायराको सुरुवात बिन्दु"</string>
+    <string name="range_end" msgid="5941395253238309765">"दायराको अन्तिम बिन्दु"</string>
 </resources>

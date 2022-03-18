@@ -31,4 +31,6 @@
     <string name="close_sheet" msgid="7573152094250666567">"ஷீட்டை மூடும்"</string>
     <string name="default_error_message" msgid="8038256446254964252">"தவறான உள்ளீடு"</string>
     <string name="default_popup_window_title" msgid="6312721426453364202">"பாப்-அப் சாளரம்"</string>
+    <string name="range_start" msgid="7097486360902471446">"வரம்பு தொடக்கம்"</string>
+    <string name="range_end" msgid="5941395253238309765">"வரம்பு முடிவு"</string>
 </resources>
