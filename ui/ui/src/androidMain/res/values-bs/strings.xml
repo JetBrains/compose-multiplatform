@@ -31,4 +31,6 @@
     <string name="close_sheet" msgid="7573152094250666567">"Zatvaranje tabele"</string>
     <string name="default_error_message" msgid="8038256446254964252">"Pogrešan unos"</string>
     <string name="default_popup_window_title" msgid="6312721426453364202">"Skočni prozor"</string>
+    <string name="range_start" msgid="7097486360902471446">"Početak raspona"</string>
+    <string name="range_end" msgid="5941395253238309765">"Kraj raspona"</string>
 </resources>
