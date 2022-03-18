@@ -475,6 +475,36 @@ class DragGestureDetectorTest(dragType: GestureType) {
             assertTrue(endOrder == -1)
         }
     }
+
+    // An error in the pointer input stream should stop the gesture without error.
+    @Test
+    fun interruptedBeforeDrag() = util.executeInComposition {
+        down()
+        clearPointerStream()
+        // The next stream doesn't have the existing pointer, so we lose the dragging
+        down().up()
+        assertFalse(gestureStarted)
+    }
+
+    // An error in the pointer input stream should stop the gesture without error.
+    @Test
+    fun interruptedBeforeTouchSlop() = util.executeInComposition {
+        down().moveBy(dragMotion / 2f)
+        clearPointerStream()
+        // The next stream doesn't have the existing pointer, so we lose the dragging
+        down().up()
+        assertFalse(gestureStarted)
+    }
+
+    // An error in the pointer input stream should end in a drag cancellation.
+    @Test
+    fun interruptedAfterTouchSlop() = util.executeInComposition {
+        down().moveBy(dragMotion * 2f)
+        clearPointerStream()
+        // The next stream doesn't have the existing pointer, so we lose the dragging
+        down().up()
+        assertTrue(gestureCanceled)
+    }
 }
 
 @RunWith(JUnit4::class)
