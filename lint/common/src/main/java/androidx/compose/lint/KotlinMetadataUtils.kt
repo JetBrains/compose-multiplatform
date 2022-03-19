@@ -118,9 +118,23 @@ private fun KmDeclarationContainer.findKmFunctionForPsiMethod(method: PsiMethod)
     // Strip any mangled part of the name in case of inline classes
     val expectedName = method.name.substringBefore("-")
     val expectedSignature = ClassUtil.getAsmMethodSignature(method)
+    // Since Kotlin 1.6 PSI updates, in some cases what used to be `void` return types are converted
+    // to `kotlin.Unit`, even though in the actual metadata they are still void. Try to match those
+    // cases as well
+    val unitReturnTypeSuffix = "Lkotlin/Unit;"
+    val expectedSignatureConvertedFromUnitToVoid = if (
+        expectedSignature.endsWith(unitReturnTypeSuffix)
+    ) {
+        expectedSignature.substringBeforeLast(unitReturnTypeSuffix) + "V"
+    } else {
+        expectedSignature
+    }
 
     return functions.find {
-        it.name == expectedName && it.signature?.desc == expectedSignature
+        it.name == expectedName && (
+            it.signature?.desc == expectedSignature ||
+                it.signature?.desc == expectedSignatureConvertedFromUnitToVoid
+        )
     }
 }
 
