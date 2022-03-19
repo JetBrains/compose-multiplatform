@@ -32,6 +32,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -55,7 +56,7 @@ import androidx.compose.ui.unit.em
 fun TextFontPaddingDemo() {
     Column(Modifier.verticalScroll(rememberScrollState())) {
         FontPaddingRow("ABCDEfgHIjKgpvyzgpvyzgpvyzgpvyz")
-        FontPaddingRow("ဪไန််မ့်၇ဤဩဦနိမြသကိမ့်ဪไန််မ့်၇ဤဩဦနိမြသကိမ့်")
+        FontPaddingRow("مرحبا" + "ဪไန််မ့်၇ဤဩဦနိမြသကိမ့်" + "مرحبا" + "ဪไန််မ့်၇ဤဩဦနိမြသကိမ့်")
         CenteredInContainerRow()
         CenterInCircleRow()
         MultiStyleText()
@@ -84,23 +85,28 @@ private fun FontPaddingColumn(text: String, overflow: TextOverflow) {
     val widthWodifier = Modifier.width(width)
     Column {
         SecondTagLine(tag = "no-softwrap,~5chars width")
-        Text(
-            text,
-            style = TextStyle(fontSize = fontSize),
-            softWrap = false,
-            maxLines = 1,
-            modifier = widthWodifier,
-            overflow = overflow
-        )
+        SelectionContainer {
+            Text(
+                text,
+                style = TextStyle(fontSize = fontSize),
+                softWrap = false,
+                maxLines = 1,
+                modifier = widthWodifier,
+                overflow = overflow
+            )
+        }
 
         SecondTagLine(tag = "maxLines=2,~5chars width")
-        Text(
-            text,
-            style = TextStyle(fontSize = fontSize),
-            modifier = widthWodifier,
-            maxLines = 2,
-            overflow = overflow
-        )
+
+        SelectionContainer {
+            Text(
+                text,
+                style = TextStyle(fontSize = fontSize),
+                modifier = widthWodifier,
+                maxLines = 2,
+                overflow = overflow
+            )
+        }
     }
 }
 
