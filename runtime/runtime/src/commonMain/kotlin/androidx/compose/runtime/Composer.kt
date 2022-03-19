@@ -184,8 +184,11 @@ private class Pending(
             groupInfo.nodeCount = newCount
             if (difference != 0) {
                 groupInfos.values.forEach { childGroupInfo ->
-                    if (childGroupInfo.nodeIndex >= index && childGroupInfo != groupInfo)
-                        childGroupInfo.nodeIndex += difference
+                    if (childGroupInfo.nodeIndex >= index && childGroupInfo != groupInfo) {
+                        val newIndex = childGroupInfo.nodeIndex + difference
+                        if (newIndex >= 0)
+                            childGroupInfo.nodeIndex = newIndex
+                    }
                 }
             }
             return true
