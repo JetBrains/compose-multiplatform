@@ -43,7 +43,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         implementation("androidx.compose.runtime:runtime-saveable:1.1.0-rc01")
         implementation(project(":compose:ui:ui-util"))
         implementation(libs.kotlinStdlib)
-        implementation("androidx.core:core:1.5.0")
+        implementation("androidx.core:core:1.7.0")
         implementation('androidx.collection:collection:1.0.0')
 
         testImplementation(project(":compose:ui:ui-test-font"))
@@ -121,7 +121,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
-                implementation("androidx.core:core:1.5.0")
+                implementation("androidx.core:core:1.7.0")
                 implementation('androidx.collection:collection:1.0.0')
             }
 
