@@ -268,7 +268,7 @@ class TextFieldInteractionsTest {
         rule.runOnIdle {
             // Not asserting total size as we have other interactions here too
             assertThat(interactions.filterIsInstance<DragInteraction.Start>()).hasSize(1)
-            assertThat(interactions.filterIsInstance<DragInteraction.Stop>()).hasSize(1)
+            assertThat(interactions.filterIsInstance<DragInteraction.Cancel>()).hasSize(1)
         }
     }
 
@@ -356,7 +356,7 @@ class TextFieldInteractionsTest {
         rule.runOnIdle {
             // Not asserting total size as we have other interactions here too
             assertThat(interactions.filterIsInstance<DragInteraction.Start>()).hasSize(1)
-            assertThat(interactions.filterIsInstance<DragInteraction.Stop>()).hasSize(1)
+            assertThat(interactions.filterIsInstance<DragInteraction.Cancel>()).hasSize(1)
         }
     }
 }

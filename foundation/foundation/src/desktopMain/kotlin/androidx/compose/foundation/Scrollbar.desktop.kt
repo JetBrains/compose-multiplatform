@@ -47,7 +47,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.Layout
@@ -284,7 +283,7 @@ private fun Modifier.scrollbarDrag(
                 currentDraggedInteraction.value = interaction
                 val isSuccess = drag(down.id) { change ->
                     currentOnDelta.invoke(change.positionChange())
-                    change.consumePositionChange()
+                    change.consume()
                 }
                 val finishInteraction = if (isSuccess) {
                     DragInteraction.Stop(interaction)

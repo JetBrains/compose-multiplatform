@@ -496,7 +496,7 @@ class HitPathTrackerTest {
         val pif1 = PointerInputFilterMock(
             pointerEventHandler = { pointerEvent, _, _ ->
                 pointerEvent.changes.map {
-                    it.consumeDownChange()
+                    if (it.pressed != it.previousPressed) it.consume()
                     it
                 }
             }
@@ -510,7 +510,7 @@ class HitPathTrackerTest {
 
         PointerInputChangeSubject
             .assertThat(internalPointerEvent.changes.values.first())
-            .isStructurallyEqualTo(down(13).apply { consumeDownChange() })
+            .isStructurallyEqualTo(down(13).apply { if (pressed != previousPressed) consume() })
     }
 
     @Test
@@ -520,7 +520,7 @@ class HitPathTrackerTest {
             log = log,
             pointerEventHandler = { pointerEvent, _, _ ->
                 pointerEvent.changes.map {
-                    it.consumePositionChange()
+                    it.consume()
                 }
                 pointerEvent.changes
             }
@@ -530,7 +530,7 @@ class HitPathTrackerTest {
             log = log,
             pointerEventHandler = { pointerEvent, _, _ ->
                 pointerEvent.changes.map {
-                    it.consumePositionChange()
+                    it.consume()
                 }
                 pointerEvent.changes
             }
@@ -540,7 +540,7 @@ class HitPathTrackerTest {
             log = log,
             pointerEventHandler = { pointerEvent, _, _ ->
                 pointerEvent.changes.map {
-                    it.consumePositionChange()
+                    it.consume()
                 }
                 pointerEvent.changes
             }
@@ -549,7 +549,7 @@ class HitPathTrackerTest {
         hitPathTracker.addHitPath(PointerId(13), listOf(pif1, pif2, pif3))
         val actualChange = down(13).moveTo(10, 0f, 0f)
         val expectedChange = actualChange.deepCopy()
-        val consumedExpectedChange = actualChange.deepCopy().apply { consumePositionChange() }
+        val consumedExpectedChange = actualChange.deepCopy().apply { consume() }
 
         val internalPointerEvent = internalPointerEventOf(actualChange)
 
@@ -629,7 +629,7 @@ class HitPathTrackerTest {
             pointerEventHandler =
                 { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        it.consumePositionChange()
+                        if (it.positionChange() != Offset.Zero) it.consume()
                     }
                     pointerEvent.changes
                 }
@@ -639,7 +639,7 @@ class HitPathTrackerTest {
             pointerEventHandler =
                 { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        it.consumePositionChange()
+                        if (it.positionChange() != Offset.Zero) it.consume()
                     }
                     pointerEvent.changes
                 }
@@ -649,7 +649,7 @@ class HitPathTrackerTest {
             pointerEventHandler =
                 { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        it.consumeAllChanges()
+                        it.consume()
                     }
                     pointerEvent.changes
                 }
@@ -659,7 +659,7 @@ class HitPathTrackerTest {
             pointerEventHandler =
                 { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        it.consumeAllChanges()
+                        it.consume()
                     }
                     pointerEvent.changes
                 }
@@ -670,8 +670,8 @@ class HitPathTrackerTest {
         val actualEvent2 = down(5).moveTo(10, 0f, 30f)
         val expectedEvent1 = actualEvent1.deepCopy()
         val expectedEvent2 = actualEvent2.deepCopy()
-        val consumedExpectedEvent1 = expectedEvent1.deepCopy().apply { consumePositionChange() }
-        val consumedExpectedEvent2 = expectedEvent2.deepCopy().apply { consumePositionChange() }
+        val consumedExpectedEvent1 = expectedEvent1.deepCopy().apply { consume() }
+        val consumedExpectedEvent2 = expectedEvent2.deepCopy().apply { consume() }
 
         val internalPointerEvent = internalPointerEventOf(actualEvent1, actualEvent2)
 
@@ -778,7 +778,7 @@ class HitPathTrackerTest {
             pointerEventHandler =
                 { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        it.consumePositionChange()
+                        if (it.positionChange() != Offset.Zero) it.consume()
                     }
                     pointerEvent.changes
                 }
@@ -789,7 +789,7 @@ class HitPathTrackerTest {
             pointerEventHandler =
                 { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        it.consumePositionChange()
+                        if (it.positionChange() != Offset.Zero) it.consume()
                     }
                     pointerEvent.changes
                 }
@@ -800,7 +800,7 @@ class HitPathTrackerTest {
             pointerEventHandler =
                 { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        it.consumePositionChange()
+                        if (it.positionChange() != Offset.Zero) it.consume()
                     }
                     pointerEvent.changes
                 }
@@ -812,8 +812,8 @@ class HitPathTrackerTest {
         val actualEvent2 = down(5).moveTo(10, 0f, 30f)
         val expectedEvent1 = actualEvent1.deepCopy()
         val expectedEvent2 = actualEvent2.deepCopy()
-        val consumedEvent1 = expectedEvent1.deepCopy().apply { consumePositionChange() }
-        val consumedEvent2 = expectedEvent2.deepCopy().apply { consumePositionChange() }
+        val consumedEvent1 = expectedEvent1.deepCopy().apply { consume() }
+        val consumedEvent2 = expectedEvent2.deepCopy().apply { consume() }
 
         val internalPointerEvent = internalPointerEventOf(actualEvent1, actualEvent2)
 
@@ -886,7 +886,7 @@ class HitPathTrackerTest {
             pointerEventHandler =
                 { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        it.consumePositionChange()
+                        it.consume()
                     }
                     pointerEvent.changes
                 }
@@ -896,7 +896,7 @@ class HitPathTrackerTest {
             pointerEventHandler =
                 { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        it.consumePositionChange()
+                        it.consume()
                     }
                     pointerEvent.changes
                 }
@@ -908,8 +908,8 @@ class HitPathTrackerTest {
         val actualEvent2 = down(5).moveTo(10, 0f, 0f)
         val expectedEvent1 = actualEvent1.deepCopy()
         val expectedEvent2 = actualEvent2.deepCopy()
-        val consumedEvent1 = expectedEvent1.deepCopy().apply { consumePositionChange() }
-        val consumedEvent2 = expectedEvent2.deepCopy().apply { consumePositionChange() }
+        val consumedEvent1 = expectedEvent1.deepCopy().apply { consume() }
+        val consumedEvent2 = expectedEvent2.deepCopy().apply { consume() }
 
         val internalPointerEvent = internalPointerEventOf(actualEvent1, actualEvent2)
 

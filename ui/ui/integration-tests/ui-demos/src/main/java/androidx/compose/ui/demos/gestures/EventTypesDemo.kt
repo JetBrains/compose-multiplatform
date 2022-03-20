@@ -35,7 +35,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -79,7 +78,7 @@ fun EventTypesDemo() {
             awaitPointerEventScope {
                 while (true) {
                     val event = awaitPointerEvent()
-                    event.changes.forEach { it.consumeAllChanges() }
+                    event.changes.forEach { it.consume() }
                     addEvent(event, outerPointerEvents)
                 }
             }
@@ -111,7 +110,7 @@ private fun addEvent(
     event: PointerEvent,
     events: MutableList<Pair<PointerEventType, Any>>,
 ) {
-    event.changes.forEach { it.consumeAllChanges() }
+    event.changes.forEach { it.consume() }
     val scrollTotal = event.changes.foldRight(Offset.Zero) { c, acc -> acc + c.scrollDelta }
     if (events.lastOrNull()?.first == event.type) {
         val (type, value) = events.last()

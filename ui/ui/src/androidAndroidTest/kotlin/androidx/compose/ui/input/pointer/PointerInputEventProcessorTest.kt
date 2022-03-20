@@ -278,7 +278,7 @@ class PointerInputEventProcessorTest {
                 5,
                 offsets[index] - childOffset,
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
         }
 
@@ -456,9 +456,7 @@ class PointerInputEventProcessorTest {
             3,
             Offset(0f, 0f),
             true,
-            consumed = ConsumedData(
-                positionChange = false
-            )
+            isInitiallyConsumed = false
         )
         val expectedOutput = PointerInputChange(
             id = PointerId(0),
@@ -468,19 +466,18 @@ class PointerInputEventProcessorTest {
             3,
             Offset(0f, 0f),
             true,
-            consumed = ConsumedData(
-                positionChange = true
-            )
+            isInitiallyConsumed = true
         )
 
         val pointerInputFilter = PointerInputFilterMock(
             mutableListOf(),
             pointerEventHandler = { pointerEvent, pass, _ ->
                 if (pass == PointerEventPass.Initial) {
-                    pointerEvent
+                    val change = pointerEvent
                         .changes
                         .first()
-                        .consumePositionChange()
+
+                    if (change.positionChanged()) change.consume()
                 }
             }
         )
@@ -636,7 +633,7 @@ class PointerInputEventProcessorTest {
                 7,
                 offset - additionalOffset,
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             ),
             PointerInputChange(
                 id = PointerId(0),
@@ -646,7 +643,7 @@ class PointerInputEventProcessorTest {
                 7,
                 offset - middleOffset - additionalOffset,
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             ),
             PointerInputChange(
                 id = PointerId(0),
@@ -656,7 +653,7 @@ class PointerInputEventProcessorTest {
                 7,
                 offset - middleOffset - childOffset - additionalOffset,
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
         )
 
@@ -806,7 +803,7 @@ class PointerInputEventProcessorTest {
                 5,
                 offset1,
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
         val expectedChange2 =
             PointerInputChange(
@@ -817,7 +814,7 @@ class PointerInputEventProcessorTest {
                 5,
                 offset2 - Offset(50f, 50f),
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         // Act
@@ -957,7 +954,7 @@ class PointerInputEventProcessorTest {
                 5,
                 offset1,
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
         val expectedChange2 =
             PointerInputChange(
@@ -968,7 +965,7 @@ class PointerInputEventProcessorTest {
                 5,
                 offset2 - Offset(50f, 50f),
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
         val expectedChange3 =
             PointerInputChange(
@@ -979,7 +976,7 @@ class PointerInputEventProcessorTest {
                 5,
                 offset3 - Offset(100f, 100f),
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         // Act
@@ -1133,7 +1130,7 @@ class PointerInputEventProcessorTest {
                 7,
                 offset1,
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
         val expectedChange2 =
             PointerInputChange(
@@ -1144,7 +1141,7 @@ class PointerInputEventProcessorTest {
                 7,
                 offset2 - Offset(25f, 50f),
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
         val expectedChange3 =
             PointerInputChange(
@@ -1155,7 +1152,7 @@ class PointerInputEventProcessorTest {
                 7,
                 offset3,
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         // Act
@@ -1250,7 +1247,7 @@ class PointerInputEventProcessorTest {
                 11,
                 offset1,
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
         val expectedChange2 =
             PointerInputChange(
@@ -1261,7 +1258,7 @@ class PointerInputEventProcessorTest {
                 11,
                 offset2 - Offset(50f, 25f),
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
         val expectedChange3 =
             PointerInputChange(
@@ -1272,7 +1269,7 @@ class PointerInputEventProcessorTest {
                 11,
                 offset3,
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         // Act
@@ -1432,7 +1429,7 @@ class PointerInputEventProcessorTest {
                         offsetsTopLeft[it].y
                     ),
                     false,
-                    consumed = ConsumedData()
+                    isInitiallyConsumed = false
                 )
             }
 
@@ -1452,7 +1449,7 @@ class PointerInputEventProcessorTest {
                         offsetsTopRight[it].y
                     ),
                     false,
-                    consumed = ConsumedData()
+                    isInitiallyConsumed = false
                 )
             }
 
@@ -1472,7 +1469,7 @@ class PointerInputEventProcessorTest {
                         offsetsBottomLeft[it].y - 3f
                     ),
                     false,
-                    consumed = ConsumedData()
+                    isInitiallyConsumed = false
                 )
             }
 
@@ -1492,7 +1489,7 @@ class PointerInputEventProcessorTest {
                         offsetsBottomRight[it].y - 3f
                     ),
                     false,
-                    consumed = ConsumedData()
+                    isInitiallyConsumed = false
                 )
             }
 
@@ -1598,7 +1595,7 @@ class PointerInputEventProcessorTest {
                     11,
                     offsetsThatHit[it] - Offset(1f, 1f),
                     false,
-                    consumed = ConsumedData()
+                    isInitiallyConsumed = false
                 )
             }
 
@@ -1653,7 +1650,7 @@ class PointerInputEventProcessorTest {
                 7,
                 offset1 - Offset(25f, 50f),
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         // Act
@@ -1733,7 +1730,7 @@ class PointerInputEventProcessorTest {
                 7,
                 offset1 - Offset(1f + 2f + 3f + 4f, 5f + 6f + 7f + 8f),
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         // Act
@@ -1815,7 +1812,7 @@ class PointerInputEventProcessorTest {
                     6f + 7f + 8f + 9f + 10f
                 ),
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         val expectedChange2 =
@@ -1827,7 +1824,7 @@ class PointerInputEventProcessorTest {
                 3,
                 offset1 - Offset(3f + 4f + 5f, 8f + 9f + 10f),
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         // Act
@@ -1971,7 +1968,7 @@ class PointerInputEventProcessorTest {
                 5,
                 Offset(250f, 250f),
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         // Act
@@ -2050,7 +2047,7 @@ class PointerInputEventProcessorTest {
                     5,
                     Offset(200f, 200f),
                     false,
-                    consumed = ConsumedData()
+                    isInitiallyConsumed = false
                 )
             )
 
@@ -2064,7 +2061,7 @@ class PointerInputEventProcessorTest {
                     5,
                     Offset(200f, 200f),
                     true,
-                    consumed = ConsumedData()
+                    isInitiallyConsumed = false
                 ),
                 PointerInputChange(
                     id = PointerId(9),
@@ -2074,7 +2071,7 @@ class PointerInputEventProcessorTest {
                     10,
                     Offset(300f, 300f),
                     false,
-                    consumed = ConsumedData()
+                    isInitiallyConsumed = false
                 )
             )
 
@@ -2161,7 +2158,7 @@ class PointerInputEventProcessorTest {
                 5,
                 Offset(100f, 100f),
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         val expectedChange2 =
@@ -2173,7 +2170,7 @@ class PointerInputEventProcessorTest {
                 5,
                 Offset(100f, 100f),
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         // Act
@@ -2249,7 +2246,7 @@ class PointerInputEventProcessorTest {
                 5,
                 Offset(200f, 200f),
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         val expectedMove =
@@ -2261,7 +2258,7 @@ class PointerInputEventProcessorTest {
                 5,
                 Offset(200f, 200f),
                 true,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         // Act
@@ -2328,7 +2325,7 @@ class PointerInputEventProcessorTest {
                 5,
                 Offset(200f, 200f),
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         // Act
@@ -2396,7 +2393,7 @@ class PointerInputEventProcessorTest {
                 5,
                 Offset(200f, 200f),
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         val expectedDown2 =
@@ -2408,7 +2405,7 @@ class PointerInputEventProcessorTest {
                 10,
                 Offset(200f, 200f),
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         // Act
@@ -2481,7 +2478,7 @@ class PointerInputEventProcessorTest {
                 7,
                 offset,
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         val expectedUpChange =
@@ -2493,7 +2490,7 @@ class PointerInputEventProcessorTest {
                 7,
                 offset,
                 true,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         // Act
@@ -2637,7 +2634,7 @@ class PointerInputEventProcessorTest {
                 7,
                 offset,
                 false,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         val expectedUpChange =
@@ -2649,7 +2646,7 @@ class PointerInputEventProcessorTest {
                 7,
                 offset,
                 true,
-                consumed = ConsumedData()
+                isInitiallyConsumed = false
             )
 
         // Act
@@ -2918,7 +2915,7 @@ class PointerInputEventProcessorTest {
                 pointerEventHandler = { pointerEvent, pass, _ ->
                     if (pass == PointerEventPass.Initial) {
                         pointerEvent.changes.forEach {
-                            it.consumePositionChange()
+                            if (it.positionChange() != Offset.Zero) it.consume()
                         }
                     }
                 }
@@ -3225,6 +3222,7 @@ private class TestOwner : Owner {
         get() = TODO("Not yet implemented")
     override val windowInfo: WindowInfo
         get() = TODO("Not yet implemented")
+
     @Suppress("OverridingDeprecatedMember", "DEPRECATION")
     override val fontLoader: Font.ResourceLoader
         get() = TODO("Not yet implemented")

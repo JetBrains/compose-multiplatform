@@ -79,7 +79,6 @@ import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerType
-import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalDensity
@@ -783,7 +782,7 @@ private suspend fun AwaitPointerEventScope.awaitSlop(
 ): Pair<PointerInputChange, Float>? {
     var initialDelta = 0f
     val postPointerSlop = { pointerInput: PointerInputChange, offset: Float ->
-        pointerInput.consumePositionChange()
+        pointerInput.consume()
         initialDelta = offset
     }
     val afterSlopResult = awaitHorizontalPointerSlopOrCancellation(id, type, postPointerSlop)

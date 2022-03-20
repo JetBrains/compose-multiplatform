@@ -27,7 +27,6 @@ import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
-import androidx.compose.ui.input.pointer.positionChangeConsumed
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastFirstOrNull
@@ -61,7 +60,7 @@ private suspend inline fun AwaitPointerEventScope.awaitPointerSlopOrCancellation
     while (true) {
         val event = awaitPointerEvent()
         val dragEvent = event.changes.fastFirstOrNull { it.id == pointer }!!
-        if (dragEvent.positionChangeConsumed()) {
+        if (dragEvent.isConsumed) {
             return null
         } else if (dragEvent.changedToUpIgnoreConsumed()) {
             val otherDown = event.changes.fastFirstOrNull { it.pressed }
@@ -82,7 +81,7 @@ private suspend inline fun AwaitPointerEventScope.awaitPointerSlopOrCancellation
             if (inDirection < touchSlop) {
                 // verify that nothing else consumed the drag event
                 awaitPointerEvent(PointerEventPass.Final)
-                if (dragEvent.positionChangeConsumed()) {
+                if (dragEvent.isConsumed) {
                     return null
                 }
             } else {
@@ -90,7 +89,7 @@ private suspend inline fun AwaitPointerEventScope.awaitPointerSlopOrCancellation
                     dragEvent,
                     totalPositionChange - (sign(totalPositionChange) * touchSlop)
                 )
-                if (dragEvent.positionChangeConsumed()) {
+                if (dragEvent.isConsumed) {
                     return dragEvent
                 } else {
                     totalPositionChange = 0f

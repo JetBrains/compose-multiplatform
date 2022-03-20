@@ -479,12 +479,15 @@ internal class SuspendingPointerInputFilter(
             return // There aren't any pressed pointers, so we don't need to send any events.
         }
         val newChanges = lastEvent.changes.fastMapNotNull { old ->
-            old.copy(
-                currentPressed = false,
+            PointerInputChange(
+                id = old.id,
+                position = old.position,
+                uptimeMillis = old.uptimeMillis,
+                pressed = false,
                 previousPosition = old.position,
-                previousTime = old.uptimeMillis,
+                previousUptimeMillis = old.uptimeMillis,
                 previousPressed = old.pressed,
-                consumed = ConsumedData(downChange = old.pressed)
+                isInitiallyConsumed = old.pressed
             )
         }
 

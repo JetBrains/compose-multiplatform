@@ -49,7 +49,7 @@ fun Modifier.pointerMoveFilter(
                 else -> false
             }
             if (consumed) {
-                event.changes.forEach { it.consumeAllChanges() }
+                event.changes.forEach { it.consume() }
             }
         }
     }

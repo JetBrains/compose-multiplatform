@@ -82,7 +82,8 @@ internal class PointerInputEventProcessor(val root: LayoutNode) {
         val anyMovementConsumed = if (internalPointerEvent.suppressMovementConsumption) {
             false
         } else {
-            internalPointerEvent.changes.values.any { it.consumed.positionChange }
+            internalPointerEvent.changes.values
+                .any { it.positionChangedIgnoreConsumed() && it.isConsumed }
         }
 
         return ProcessResult(dispatchedToSomething, anyMovementConsumed)
@@ -145,7 +146,7 @@ private class PointerInputChangeEventProducer {
                     previousTime,
                     previousPosition,
                     previousDown,
-                    ConsumedData(),
+                    false,
                     it.type,
                     it.historical,
                     it.scrollDelta
