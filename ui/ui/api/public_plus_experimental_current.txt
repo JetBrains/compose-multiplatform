@@ -1659,14 +1659,14 @@ package androidx.compose.ui.input.pointer {
     method public int getMove();
     method public int getPress();
     method public int getRelease();
-    method @androidx.compose.ui.ExperimentalComposeUiApi public int getScroll();
+    method public int getScroll();
     method public int getUnknown();
     property public final int Enter;
     property public final int Exit;
     property public final int Move;
     property public final int Press;
     property public final int Release;
-    property @androidx.compose.ui.ExperimentalComposeUiApi public final int Scroll;
+    property public final int Scroll;
     property public final int Unknown;
   }
 
@@ -1723,10 +1723,12 @@ package androidx.compose.ui.input.pointer {
   }
 
   @androidx.compose.runtime.Immutable public final class PointerInputChange {
-    ctor public PointerInputChange(long id, long uptimeMillis, long position, boolean pressed, long previousUptimeMillis, long previousPosition, boolean previousPressed, androidx.compose.ui.input.pointer.ConsumedData consumed, optional int type);
+    ctor public PointerInputChange(long id, long uptimeMillis, long position, boolean pressed, long previousUptimeMillis, long previousPosition, boolean previousPressed, androidx.compose.ui.input.pointer.ConsumedData consumed, optional int type, optional long scrollDelta);
+    method @Deprecated public androidx.compose.ui.input.pointer.PointerInputChange! PointerInputChange(long id, long uptimeMillis, long position, boolean pressed, long previousUptimeMillis, long previousPosition, boolean previousPressed, androidx.compose.ui.input.pointer.ConsumedData consumed, optional int type);
     method @androidx.compose.ui.ExperimentalComposeUiApi public void consume();
-    method public androidx.compose.ui.input.pointer.PointerInputChange copy(optional long id, optional long currentTime, optional long currentPosition, optional boolean currentPressed, optional long previousTime, optional long previousPosition, optional boolean previousPressed, optional androidx.compose.ui.input.pointer.ConsumedData consumed, optional int type);
-    method @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.input.pointer.PointerInputChange copy(optional long id, optional long currentTime, optional long currentPosition, optional boolean currentPressed, optional long previousTime, optional long previousPosition, optional boolean previousPressed, optional androidx.compose.ui.input.pointer.ConsumedData consumed, optional int type, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange> historical);
+    method public androidx.compose.ui.input.pointer.PointerInputChange copy(optional long id, optional long currentTime, optional long currentPosition, optional boolean currentPressed, optional long previousTime, optional long previousPosition, optional boolean previousPressed, optional androidx.compose.ui.input.pointer.ConsumedData consumed, optional int type, optional long scrollDelta);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.input.pointer.PointerInputChange copy(optional long id, optional long currentTime, optional long currentPosition, optional boolean currentPressed, optional long previousTime, optional long previousPosition, optional boolean previousPressed, optional androidx.compose.ui.input.pointer.ConsumedData consumed, optional int type, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange> historical, optional long scrollDelta);
+    method @Deprecated public androidx.compose.ui.input.pointer.PointerInputChange! copy(optional long id, optional long currentTime, optional long currentPosition, optional boolean currentPressed, optional long previousTime, optional long previousPosition, optional boolean previousPressed, optional androidx.compose.ui.input.pointer.ConsumedData consumed, optional int type);
     method public androidx.compose.ui.input.pointer.ConsumedData getConsumed();
     method @androidx.compose.ui.ExperimentalComposeUiApi public java.util.List<androidx.compose.ui.input.pointer.HistoricalChange> getHistorical();
     method public long getId();
@@ -1735,7 +1737,7 @@ package androidx.compose.ui.input.pointer {
     method public long getPreviousPosition();
     method public boolean getPreviousPressed();
     method public long getPreviousUptimeMillis();
-    method @androidx.compose.ui.ExperimentalComposeUiApi public long getScrollDelta();
+    method public long getScrollDelta();
     method public int getType();
     method public long getUptimeMillis();
     method @androidx.compose.ui.ExperimentalComposeUiApi public boolean isConsumed();
@@ -1748,7 +1750,7 @@ package androidx.compose.ui.input.pointer {
     property public final long previousPosition;
     property public final boolean previousPressed;
     property public final long previousUptimeMillis;
-    property @androidx.compose.ui.ExperimentalComposeUiApi public final long scrollDelta;
+    property public final long scrollDelta;
     property public final int type;
     property public final long uptimeMillis;
   }
