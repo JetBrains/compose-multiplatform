@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.IntSize
  *
  * Use [LazyGridState.layoutInfo] to retrieve this
  */
-interface LazyGridLayoutInfo {
+sealed interface LazyGridLayoutInfo {
     /**
      * The list of [LazyGridItemInfo] representing all the currently visible items.
      */
