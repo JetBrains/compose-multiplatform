@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.IntSize
  *
  * @see LazyGridLayoutInfo
  */
-interface LazyGridItemInfo {
+sealed interface LazyGridItemInfo {
     /**
      * The index of the item in the grid.
      */
