@@ -567,7 +567,6 @@ internal class AndroidComposeView(context: Context) :
 
     override fun onResume(owner: LifecycleOwner) {
         // Refresh in onResume in case the value has changed.
-        @OptIn(InternalCoreApi::class)
         showLayoutBounds = getIsShowingLayoutBounds()
     }
 
@@ -582,6 +581,19 @@ internal class AndroidComposeView(context: Context) :
     override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
         _windowInfo.isWindowFocused = hasWindowFocus
         super.onWindowFocusChanged(hasWindowFocus)
+
+        if (hasWindowFocus) {
+            // Refresh in onResume in case the value has changed from the quick settings tile, in
+            // which case the activity won't be paused/resumed (b/225937688).
+            getIsShowingLayoutBounds().also { newShowLayoutBounds ->
+                if (showLayoutBounds != newShowLayoutBounds) {
+                    showLayoutBounds = newShowLayoutBounds
+                    // Unlike in onResume, getting window focus doesn't automatically trigger a new
+                    // draw pass, so we have to do that manually.
+                    invalidateDescendants()
+                }
+            }
+        }
     }
 
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean {
