@@ -27,6 +27,8 @@ import androidx.compose.ui.text.font.PlatformFontLoader
 import androidx.compose.ui.text.font.PlatformFontFamilyTypefaceAdapter
 import androidx.compose.ui.text.font.TypefaceRequestCache
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.text.font.AndroidFontResolveInterceptor
+import androidx.compose.ui.text.font.PlatformResolveInterceptor
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
@@ -43,13 +45,18 @@ fun Paragraph.bitmap(): Bitmap {
 @OptIn(ExperimentalTextApi::class)
 internal fun UncachedFontFamilyResolver(
     context: Context
-): FontFamily.Resolver = UncachedFontFamilyResolver(AndroidFontLoader(context))
+): FontFamily.Resolver = UncachedFontFamilyResolver(
+    AndroidFontLoader(context),
+    AndroidFontResolveInterceptor(context)
+)
 
 @OptIn(ExperimentalTextApi::class)
 internal fun UncachedFontFamilyResolver(
-    platformFontLoader: PlatformFontLoader
+    platformFontLoader: PlatformFontLoader,
+    platformResolveInterceptor: PlatformResolveInterceptor
 ): FontFamily.Resolver = FontFamilyResolverImpl(
     platformFontLoader,
+    platformResolveInterceptor,
     TypefaceRequestCache(),
     FontListFontFamilyTypefaceAdapter(AsyncTypefaceCache()),
     PlatformFontFamilyTypefaceAdapter()

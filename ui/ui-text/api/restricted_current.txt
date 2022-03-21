@@ -550,6 +550,9 @@ package androidx.compose.ui.text.font {
   public final class AndroidFontLoader_androidKt {
   }
 
+  public final class AndroidFontResolveInterceptor_androidKt {
+  }
+
   public final class AndroidFontUtils_androidKt {
   }
 
