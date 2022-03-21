@@ -245,6 +245,22 @@ package androidx.compose.material3 {
   @kotlin.RequiresOptIn(message="This material API is experimental and is likely to change or to be removed in" + " the future.") public @interface ExperimentalMaterial3Api {
   }
 
+  @androidx.compose.material3.ExperimentalMaterial3Api public interface ExposedDropdownMenuBoxScope {
+    method @androidx.compose.runtime.Composable public default void ExposedDropdownMenu(boolean expanded, kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> content);
+    method public androidx.compose.ui.Modifier exposedDropdownSize(androidx.compose.ui.Modifier, optional boolean matchTextFieldWidth);
+  }
+
+  @androidx.compose.material3.ExperimentalMaterial3Api public final class ExposedDropdownMenuDefaults {
+    method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public void TrailingIcon(boolean expanded, optional kotlin.jvm.functions.Function0<kotlin.Unit> onIconClick);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.TextFieldColors outlinedTextFieldColors(optional long textColor, optional long disabledTextColor, optional long backgroundColor, optional long cursorColor, optional long errorCursorColor, optional long focusedBorderColor, optional long unfocusedBorderColor, optional long disabledBorderColor, optional long errorBorderColor, optional long focusedLeadingIconColor, optional long unfocusedLeadingIconColor, optional long disabledLeadingIconColor, optional long errorLeadingIconColor, optional long focusedTrailingIconColor, optional long unfocusedTrailingIconColor, optional long disabledTrailingIconColor, optional long errorTrailingIconColor, optional long focusedLabelColor, optional long unfocusedLabelColor, optional long disabledLabelColor, optional long errorLabelColor, optional long placeholderColor, optional long disabledPlaceholderColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.TextFieldColors textFieldColors(optional long textColor, optional long disabledTextColor, optional long backgroundColor, optional long cursorColor, optional long errorCursorColor, optional long focusedIndicatorColor, optional long unfocusedIndicatorColor, optional long disabledIndicatorColor, optional long errorIndicatorColor, optional long focusedLeadingIconColor, optional long unfocusedLeadingIconColor, optional long disabledLeadingIconColor, optional long errorLeadingIconColor, optional long focusedTrailingIconColor, optional long unfocusedTrailingIconColor, optional long disabledTrailingIconColor, optional long errorTrailingIconColor, optional long focusedLabelColor, optional long unfocusedLabelColor, optional long disabledLabelColor, optional long errorLabelColor, optional long placeholderColor, optional long disabledPlaceholderColor);
+    field public static final androidx.compose.material3.ExposedDropdownMenuDefaults INSTANCE;
+  }
+
+  public final class ExposedDropdownMenuKt {
+    method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void ExposedDropdownMenuBox(boolean expanded, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onExpandedChange, optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function1<? super androidx.compose.material3.ExposedDropdownMenuBoxScope,kotlin.Unit> content);
+  }
+
   @androidx.compose.material3.ExperimentalMaterial3Api public final inline class FabPosition {
     ctor public FabPosition();
   }
@@ -669,6 +685,13 @@ package androidx.compose.material3 {
   }
 
   public final class TypographyKt {
+  }
+
+}
+
+package androidx.compose.material3.internal {
+
+  public final class ExposedDropdownMenuPopupKt {
   }
 
 }
