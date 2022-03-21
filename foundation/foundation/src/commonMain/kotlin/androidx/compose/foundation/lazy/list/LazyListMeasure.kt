@@ -66,10 +66,11 @@ internal fun measureLazyList(
             measureResult = layout(constraints.minWidth, constraints.minHeight) {},
             visibleItemsInfo = emptyList(),
             viewportStartOffset = -beforeContentPadding,
-            viewportEndOffset = afterContentPadding,
+            viewportEndOffset = mainAxisAvailableSize + afterContentPadding,
             totalItemsCount = 0,
             reverseLayout = reverseLayout,
-            orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal
+            orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
+            afterContentPadding = afterContentPadding
         )
     } else {
         var currentFirstItemIndex = firstVisibleItemIndex
@@ -256,8 +257,6 @@ internal fun measureLazyList(
             itemProvider = itemProvider
         )
 
-        val maximumVisibleOffset = minOf(currentMainAxisOffset, maxOffset) + afterContentPadding
-
         return LazyListMeasureResult(
             firstVisibleItem = firstItem,
             firstVisibleItemScrollOffset = currentFirstItemScrollOffset,
@@ -273,11 +272,12 @@ internal fun measureLazyList(
                 headerItem?.place(this)
             },
             viewportStartOffset = -beforeContentPadding,
-            viewportEndOffset = maximumVisibleOffset,
+            viewportEndOffset = maxOffset + afterContentPadding,
             visibleItemsInfo = positionedItems,
             totalItemsCount = itemsCount,
             reverseLayout = reverseLayout,
-            orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal
+            orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
+            afterContentPadding = afterContentPadding
         )
     }
 }
