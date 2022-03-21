@@ -54,6 +54,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.referentialEqualityPolicy
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.InternalComposeUiApi
@@ -378,7 +379,20 @@ internal class AndroidComposeView(context: Context) :
     @Suppress("DEPRECATION", "OverridingDeprecatedMember")
     override val fontLoader: Font.ResourceLoader = AndroidFontResourceLoader(context)
 
-    override val fontFamilyResolver: FontFamily.Resolver = createFontFamilyResolver(context)
+    // Backed by mutableStateOf so that the local provider recomposes when it changes
+    // FontFamily.Resolver is not guaranteed to be stable or immutable, hence referential check
+    override var fontFamilyResolver: FontFamily.Resolver by mutableStateOf(
+        createFontFamilyResolver(context),
+        referentialEqualityPolicy()
+    )
+        private set
+
+    // keeps track of changes in font weight adjustment to update fontFamilyResolver
+    private var currentFontWeightAdjustment: Int =
+        context.resources.configuration.fontWeightAdjustmentCompat
+
+    private val Configuration.fontWeightAdjustmentCompat: Int
+        get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) fontWeightAdjustment else 0
 
     // Backed by mutableStateOf so that the ambient provider recomposes when it changes
     override var layoutDirection by mutableStateOf(
@@ -1409,6 +1423,10 @@ internal class AndroidComposeView(context: Context) :
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         density = Density(context)
+        if (newConfig.fontWeightAdjustmentCompat != currentFontWeightAdjustment) {
+            currentFontWeightAdjustment = newConfig.fontWeightAdjustmentCompat
+            fontFamilyResolver = createFontFamilyResolver(context)
+        }
         configurationChangeObserver(newConfig)
     }
 

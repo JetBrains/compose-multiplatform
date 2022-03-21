@@ -50,6 +50,7 @@ class FontFamilyResolverImplCancellationTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val fontLoader = AndroidFontLoader(context)
+    private val fontResolveInterceptor = AndroidFontResolveInterceptor(context)
 
     @Before
     fun setup() {
@@ -62,6 +63,7 @@ class FontFamilyResolverImplCancellationTest {
         val injectedContext = scope.coroutineContext.minusKey(CoroutineExceptionHandler)
         subject = FontFamilyResolverImpl(
             fontLoader,
+            fontResolveInterceptor,
             typefaceRequestCache,
             FontListFontFamilyTypefaceAdapter(asyncTypefaceCache, injectedContext))
         typefaceLoader = AsyncTestTypefaceLoader()

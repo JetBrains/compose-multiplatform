@@ -557,7 +557,8 @@ internal fun updateTextDelegate(
         current.overflow != overflow ||
         current.maxLines != maxLines ||
         current.density != density ||
-        current.placeholders != placeholders
+        current.placeholders != placeholders ||
+        current.fontFamilyResolver !== fontFamilyResolver
     ) {
         TextDelegate(
             text = text,
@@ -592,7 +593,8 @@ internal fun updateTextDelegate(
         current.softWrap != softWrap ||
         current.overflow != overflow ||
         current.maxLines != maxLines ||
-        current.density != density
+        current.density != density ||
+        current.fontFamilyResolver !== fontFamilyResolver
     ) {
         TextDelegate(
             text = AnnotatedString(text),
