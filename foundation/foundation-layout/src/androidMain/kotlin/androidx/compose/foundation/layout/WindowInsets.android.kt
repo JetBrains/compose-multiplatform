@@ -23,7 +23,11 @@ import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.NonRestartableComposable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalView
@@ -174,6 +178,141 @@ val WindowInsets.Companion.safeContent: WindowInsets
     get() = WindowInsetsHolder.current().safeContent
 
 /**
+ * The insets that the [WindowInsetsCompat.Type.captionBar] will consume if shown.
+ * If it cannot be shown then this will be empty.
+ */
+@ExperimentalLayoutApi
+val WindowInsets.Companion.captionBarIgnoringVisibility: WindowInsets
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @ExperimentalLayoutApi
+    @Composable
+    @NonRestartableComposable
+    get() = WindowInsetsHolder.current().captionBarIgnoringVisibility
+
+/**
+ * The insets that [WindowInsetsCompat.Type.navigationBars] will consume if shown.
+ * These insets represent where system UI places navigation bars. Interactive UI should
+ * avoid the navigation bars area. If navigation bars cannot be shown, then this will be
+ * empty.
+ */
+@ExperimentalLayoutApi
+val WindowInsets.Companion.navigationBarsIgnoringVisibility: WindowInsets
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @ExperimentalLayoutApi
+    @Composable
+    @NonRestartableComposable
+    get() = WindowInsetsHolder.current().navigationBarsIgnoringVisibility
+
+/**
+ * The insets that [WindowInsetsCompat.Type.statusBars] will consume if shown.
+ * If the status bar can never be shown, then this will be empty.
+ */
+@ExperimentalLayoutApi
+val WindowInsets.Companion.statusBarsIgnoringVisibility: WindowInsets
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @ExperimentalLayoutApi
+    @Composable
+    @NonRestartableComposable
+    get() = WindowInsetsHolder.current().statusBarsIgnoringVisibility
+
+/**
+ * The insets that [WindowInsetsCompat.Type.systemBars] will consume if shown.
+ *
+ * If system bars can never be shown, then this will be empty.
+ */
+@ExperimentalLayoutApi
+val WindowInsets.Companion.systemBarsIgnoringVisibility: WindowInsets
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @ExperimentalLayoutApi
+    @Composable
+    @NonRestartableComposable
+    get() = WindowInsetsHolder.current().systemBarsIgnoringVisibility
+
+/**
+ * The insets that [WindowInsetsCompat.Type.tappableElement] will consume if active.
+ *
+ * If there are never tappable elements then this is empty.
+ */
+@ExperimentalLayoutApi
+val WindowInsets.Companion.tappableElementIgnoringVisibility: WindowInsets
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @ExperimentalLayoutApi
+    @Composable
+    @NonRestartableComposable
+    get() = WindowInsetsHolder.current().tappableElementIgnoringVisibility
+
+/**
+ * `true` when the [caption bar][captionBar] is being displayed, irrespective of
+ * whether it intersects with the Window.
+ */
+@ExperimentalLayoutApi
+val WindowInsets.Companion.isCaptionBarVisible: Boolean
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @ExperimentalLayoutApi
+    @Composable
+    @NonRestartableComposable
+    get() = WindowInsetsHolder.current().isCaptionBarVisible
+
+/**
+ * `true` when the [soft keyboard][ime] is being displayed, irrespective of
+ * whether it intersects with the Window.
+ */
+@ExperimentalLayoutApi
+val WindowInsets.Companion.isImeVisible: Boolean
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @ExperimentalLayoutApi
+    @Composable
+    @NonRestartableComposable
+    get() = WindowInsetsHolder.current().isImeVisible
+
+/**
+ * `true` when the [statusBars] are being displayed, irrespective of
+ * whether they intersects with the Window.
+ */
+@ExperimentalLayoutApi
+val WindowInsets.Companion.areStatusBarsVisible: Boolean
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @ExperimentalLayoutApi
+    @Composable
+    @NonRestartableComposable
+    get() = WindowInsetsHolder.current().areStatusBarsVisible
+
+/**
+ * `true` when the [navigationBars] are being displayed, irrespective of
+ * whether they intersects with the Window.
+ */
+@ExperimentalLayoutApi
+val WindowInsets.Companion.areNavigationBarsVisible: Boolean
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @ExperimentalLayoutApi
+    @Composable
+    @NonRestartableComposable
+    get() = WindowInsetsHolder.current().areNavigationBarsVisible
+
+/**
+ * `true` when the [systemBars] are being displayed, irrespective of
+ * whether they intersects with the Window.
+ */
+@ExperimentalLayoutApi
+val WindowInsets.Companion.areSystemBarsVisible: Boolean
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @ExperimentalLayoutApi
+    @Composable
+    @NonRestartableComposable
+    get() = WindowInsetsHolder.current().areSystemBarsVisible
+/**
+ * `true` when the [tappableElement] is being displayed, irrespective of
+ * whether they intersects with the Window.
+ */
+@ExperimentalLayoutApi
+val WindowInsets.Companion.isTappableElementVisible: Boolean
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @ExperimentalLayoutApi
+    @Composable
+    @NonRestartableComposable
+    get() = WindowInsetsHolder.current().isTappableElementVisible
+
+/**
  * The insets for various values in the current window.
  */
 internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat?) {
@@ -204,6 +343,43 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
     val safeGestures: WindowInsets =
         tappableElement.union(mandatorySystemGestures).union(systemGestures).union(waterfall)
     val safeContent: WindowInsets = safeDrawing.union(safeGestures)
+
+    val captionBarIgnoringVisibility = valueInsetsIgnoringVisibility(
+        insets,
+        WindowInsetsCompat.Type.captionBar(),
+        "captionBarIgnoringVisibility"
+    )
+    val navigationBarsIgnoringVisibility = valueInsetsIgnoringVisibility(
+        insets, WindowInsetsCompat.Type.navigationBars(), "navigationBarsIgnoringVisibility"
+    )
+    val statusBarsIgnoringVisibility = valueInsetsIgnoringVisibility(
+        insets,
+        WindowInsetsCompat.Type.statusBars(),
+        "statusBarsIgnoringVisibility"
+    )
+    val systemBarsIgnoringVisibility = valueInsetsIgnoringVisibility(
+        insets,
+        WindowInsetsCompat.Type.systemBars(),
+        "systemBarsIgnoringVisibility"
+    )
+    val tappableElementIgnoringVisibility = valueInsetsIgnoringVisibility(
+        insets,
+        WindowInsetsCompat.Type.tappableElement(),
+        "tappableElementIgnoringVisibility"
+    )
+
+    var isCaptionBarVisible by mutableStateIsVisible(insets, WindowInsetsCompat.Type.captionBar())
+    var isImeVisible by mutableStateIsVisible(insets, WindowInsetsCompat.Type.ime())
+    var areNavigationBarsVisible by mutableStateIsVisible(
+        insets,
+        WindowInsetsCompat.Type.navigationBars()
+    )
+    var areStatusBarsVisible by mutableStateIsVisible(insets, WindowInsetsCompat.Type.statusBars())
+    var areSystemBarsVisible by mutableStateIsVisible(insets, WindowInsetsCompat.Type.systemBars())
+    var isTappableElementVisible by mutableStateIsVisible(
+        insets,
+        WindowInsetsCompat.Type.tappableElement()
+    )
 
     /**
      * `true` unless the `ComposeView` [ComposeView.consumeWindowInsets] is set to `false`.
@@ -268,20 +444,41 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
             }
             captionBar.value =
                 insets.getInsets(WindowInsetsCompat.Type.captionBar()).toInsetsValues()
+            captionBarIgnoringVisibility.value = insets.getInsetsIgnoringVisibility(
+                WindowInsetsCompat.Type.captionBar()
+            ).toInsetsValues()
+            isCaptionBarVisible = insets.isVisible(WindowInsetsCompat.Type.captionBar())
             ime.value =
                 insets.getInsets(WindowInsetsCompat.Type.ime()).toInsetsValues()
+            isImeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
             displayCutout.value =
                 insets.getInsets(WindowInsetsCompat.Type.displayCutout()).toInsetsValues()
             navigationBars.value =
                 insets.getInsets(WindowInsetsCompat.Type.navigationBars()).toInsetsValues()
+            navigationBarsIgnoringVisibility.value = insets.getInsetsIgnoringVisibility(
+                WindowInsetsCompat.Type.navigationBars()
+            ).toInsetsValues()
+            areNavigationBarsVisible = insets.isVisible(WindowInsetsCompat.Type.navigationBars())
             statusBars.value =
                 insets.getInsets(WindowInsetsCompat.Type.statusBars()).toInsetsValues()
+            statusBarsIgnoringVisibility.value = insets.getInsetsIgnoringVisibility(
+                WindowInsetsCompat.Type.statusBars()
+            ).toInsetsValues()
+            areStatusBarsVisible = insets.isVisible(WindowInsetsCompat.Type.statusBars())
             systemBars.value =
                 insets.getInsets(WindowInsetsCompat.Type.systemBars()).toInsetsValues()
+            systemBarsIgnoringVisibility.value = insets.getInsetsIgnoringVisibility(
+                WindowInsetsCompat.Type.systemBars()
+            ).toInsetsValues()
+            areSystemBarsVisible = insets.isVisible(WindowInsetsCompat.Type.systemBars())
             systemGestures.value =
                 insets.getInsets(WindowInsetsCompat.Type.systemGestures()).toInsetsValues()
             tappableElement.value =
                 insets.getInsets(WindowInsetsCompat.Type.tappableElement()).toInsetsValues()
+            tappableElementIgnoringVisibility.value = insets.getInsetsIgnoringVisibility(
+                WindowInsetsCompat.Type.tappableElement()
+            ).toInsetsValues()
+            isTappableElementVisible = insets.isVisible(WindowInsetsCompat.Type.tappableElement())
             mandatorySystemGestures.value =
                 insets.getInsets(WindowInsetsCompat.Type.mandatorySystemGestures()).toInsetsValues()
 
@@ -356,6 +553,31 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
         ): ValueInsets {
             val initial = windowInsets?.getInsets(type) ?: AndroidXInsets.NONE
             return ValueInsets(initial, name)
+        }
+
+        /**
+         * Creates a [ValueInsets] using the "ignoring visibility" value from [windowInsets]
+         * if it isn't `null`
+         */
+        private fun valueInsetsIgnoringVisibility(
+            windowInsets: WindowInsetsCompat?,
+            type: Int,
+            name: String
+        ): ValueInsets {
+            val initial = windowInsets?.getInsetsIgnoringVisibility(type) ?: AndroidXInsets.NONE
+            return ValueInsets(initial, name)
+        }
+
+        /**
+         * Creates a [ValueInsets] using the "ignoring visibility" value from [windowInsets]
+         * if it isn't `null`
+         */
+        private fun mutableStateIsVisible(
+            windowInsets: WindowInsetsCompat?,
+            type: Int
+        ): MutableState<Boolean> {
+            val initial = windowInsets?.isVisible(type) ?: true
+            return mutableStateOf(initial)
         }
     }
 }
