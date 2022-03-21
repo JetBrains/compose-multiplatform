@@ -578,6 +578,16 @@ package androidx.compose.ui.text.font {
     method @Deprecated public static androidx.compose.ui.text.font.FontFamily.Resolver createFontFamilyResolver(androidx.compose.ui.text.font.Font.ResourceLoader fontResourceLoader, android.content.Context context);
   }
 
+  @androidx.compose.ui.text.ExperimentalTextApi @kotlin.jvm.JvmInline public final value class DeviceFontFamilyName {
+    ctor public DeviceFontFamilyName(String name);
+    method public String getName();
+    property public final String name;
+  }
+
+  public final class DeviceFontFamilyNameFontKt {
+    method @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(String familyName, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
+  }
+
   public abstract sealed class FileBasedFontFamily extends androidx.compose.ui.text.font.FontFamily {
   }
 
