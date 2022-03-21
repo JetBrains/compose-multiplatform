@@ -28,6 +28,10 @@ configurations {
 dependencies {
     cacheableApi(libs.toml)
     cacheableImplementation(libs.gson)
+    cacheableImplementation(libs.dom4j) {
+        // Optional dependency where Ivy fails to parse the POM file.
+        exclude(group:"net.java.dev.msv", module:"xsdlib")
+    }
     cacheableApi(libs.androidGradlePluginz)
     cacheableImplementation(libs.dexMemberList)
     cacheableApi(libs.kotlinGradlePluginz)
