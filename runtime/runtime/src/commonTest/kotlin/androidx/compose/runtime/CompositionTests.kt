@@ -38,6 +38,7 @@ import androidx.compose.runtime.mock.compositionTest
 import androidx.compose.runtime.mock.contact
 import androidx.compose.runtime.mock.expectChanges
 import androidx.compose.runtime.mock.expectNoChanges
+import androidx.compose.runtime.mock.revalidate
 import androidx.compose.runtime.mock.skip
 import androidx.compose.runtime.mock.validate
 import androidx.compose.runtime.snapshots.Snapshot
@@ -2413,6 +2414,37 @@ class CompositionTests {
         validate()
     }
 
+    @Test // regression test for b/199136503
+    fun testMovingSlotsButNotNodes() = compositionTest {
+        val order = mutableStateListOf(1, 2, 3, 4, 5)
+        val includeText = mutableStateMapOf(4 to 4)
+        compose {
+            for (i in order) {
+                key(i) {
+                    if (i in includeText) {
+                        Text("Text for $i")
+                    }
+                }
+            }
+            Text("End")
+        }
+
+        validate {
+            for (i in order) {
+                if (i in includeText) {
+                    Text("Text for $i")
+                }
+            }
+            Text("End")
+        }
+
+        order.swap(3, 5)
+        includeText.remove(4)
+        includeText.set(3, 3)
+        expectChanges()
+        revalidate()
+    }
+
     @Test
     fun evenOddWithMovement() = compositionTest {
         var includeEven = true
@@ -3293,4 +3325,15 @@ private interface Ordered {
 
 private interface Named {
     val name: String
+}
+
+private fun Int.isOdd() = this % 2 == 1
+private fun Int.isEven() = this % 2 == 0
+
+fun <T> MutableList<T>.swap(a: T, b: T) {
+    val aIndex = indexOf(a)
+    val bIndex = indexOf(b)
+    require(aIndex >= 0 && bIndex >= 0)
+    set(aIndex, b)
+    set(bIndex, a)
 }
