@@ -2371,6 +2371,9 @@ package androidx.compose.ui.platform {
   public final class JvmActuals_jvmKt {
   }
 
+  public final class NestedScrollInteropAdapterKt {
+  }
+
   public final class ShapeContainingUtilKt {
   }
 
