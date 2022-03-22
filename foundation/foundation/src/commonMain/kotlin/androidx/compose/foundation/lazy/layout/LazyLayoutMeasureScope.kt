@@ -18,10 +18,19 @@ package androidx.compose.foundation.lazy.layout
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.SubcomposeMeasureScope
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isSpecified
+import androidx.compose.ui.unit.sp
 
 @ExperimentalFoundationApi
 internal interface LazyLayoutMeasureScope : MeasureScope {
@@ -29,6 +38,46 @@ internal interface LazyLayoutMeasureScope : MeasureScope {
      * Subcompose and measure the item of lazy layout.
      */
     fun measure(index: Int, constraints: Constraints): Array<Placeable>
+
+    /**
+     * Below overrides added to work around https://youtrack.jetbrains.com/issue/KT-51672
+     * Must be kept in sync until resolved.
+     */
+
+    @Stable
+    override fun TextUnit.toDp(): Dp {
+        check(type == TextUnitType.Sp) { "Only Sp can convert to Px" }
+        return Dp(value * fontScale)
+    }
+
+    @Stable
+    override fun Int.toDp(): Dp = (this / density).dp
+
+    @Stable
+    override fun Float.toDp(): Dp = (this / density).dp
+
+    @Stable
+    override fun Float.toSp(): TextUnit = (this / (fontScale * density)).sp
+
+    @Stable
+    override fun Int.toSp(): TextUnit = (this / (fontScale * density)).sp
+
+    @Stable
+    override fun Dp.toSp(): TextUnit = (value / fontScale).sp
+
+    @Stable
+    override fun DpSize.toSize(): Size = if (isSpecified) {
+        Size(width.toPx(), height.toPx())
+    } else {
+        Size.Unspecified
+    }
+
+    @Stable
+    override fun Size.toDpSize(): DpSize = if (isSpecified) {
+        DpSize(width.toDp(), height.toDp())
+    } else {
+        DpSize.Unspecified
+    }
 }
 
 @ExperimentalFoundationApi
@@ -59,4 +108,24 @@ internal class LazyLayoutMeasureScopeImpl internal constructor(
             }
         }
     }
+
+    /**
+     * Below overrides added to work around https://youtrack.jetbrains.com/issue/KT-51672
+     */
+
+    override fun TextUnit.toDp(): Dp = with(subcomposeMeasureScope) { toDp() }
+
+    override fun Int.toDp(): Dp = with(subcomposeMeasureScope) { toDp() }
+
+    override fun Float.toDp(): Dp = with(subcomposeMeasureScope) { toDp() }
+
+    override fun Float.toSp(): TextUnit = with(subcomposeMeasureScope) { toSp() }
+
+    override fun Int.toSp(): TextUnit = with(subcomposeMeasureScope) { toSp() }
+
+    override fun Dp.toSp(): TextUnit = with(subcomposeMeasureScope) { toSp() }
+
+    override fun DpSize.toSize(): Size = with(subcomposeMeasureScope) { toSize() }
+
+    override fun Size.toDpSize(): DpSize = with(subcomposeMeasureScope) { toDpSize() }
 }
