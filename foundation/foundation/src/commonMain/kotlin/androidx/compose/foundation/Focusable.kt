@@ -34,9 +34,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.platform.InspectableModifier
 import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.platform.inspectable
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.requestFocus
 import androidx.compose.ui.semantics.semantics
@@ -176,10 +176,9 @@ fun Modifier.focusable(
  */
 @ExperimentalFoundationApi
 fun Modifier.focusGroup(): Modifier {
-   return inspectable(inspectorInfo = debugInspectorInfo { name = "focusGroup" }) {
-       focusProperties { canFocus = false }
-           .focusTarget()
-   }
+    return this.then(focusGroupInspectorInfo)
+        .focusProperties { canFocus = false }
+        .focusTarget()
 }
 
 // TODO: b/202856230 - consider either making this / a similar API public, or add a parameter to
@@ -203,3 +202,7 @@ internal fun Modifier.focusableInNonTouchMode(
         .focusProperties { canFocus = inputModeManager.inputMode != InputMode.Touch }
         .focusable(enabled, interactionSource)
 }
+
+private val focusGroupInspectorInfo = InspectableModifier(
+    debugInspectorInfo { name = "focusGroup" }
+)
