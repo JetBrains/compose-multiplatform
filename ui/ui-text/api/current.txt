@@ -4,6 +4,9 @@ package androidx.compose.ui.text {
   public final class ActualAtomicReferenceJvmKt {
   }
 
+  public final class AndroidTextStyle_androidKt {
+  }
+
   @androidx.compose.runtime.Immutable public final class AnnotatedString implements java.lang.CharSequence {
     ctor public AnnotatedString(String text, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.ParagraphStyle>> paragraphStyles);
     method public operator char get(int index);

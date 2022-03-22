@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 private val DefaultFontSize = 14.sp
 private val DefaultLetterSpacing = 0.sp
 private val DefaultBackgroundColor = Color.Transparent
+
 // TODO(nona): Introduce TextUnit.Original for representing "do not change the original result".
 //  Need to distinguish from Inherit.
 private val DefaultLineHeight = TextUnit.Unspecified
@@ -75,6 +76,7 @@ private val DefaultColor = Color.Black
  * [LayoutDirection] as the primary signal.
  * @param textIndent The indentation of the paragraph.
  * @param lineHeight Line height for the [Paragraph] in [TextUnit] unit, e.g. SP or EM.
+ * @param platformStyle Platform specific [TextStyle] parameters.
  *
  * @see AnnotatedString
  * @see SpanStyle
@@ -87,7 +89,7 @@ private val DefaultColor = Color.Black
 // This would also result in a slightly better equals implementation when we are comparing things
 // with shared parts (ie, "Structural sharing")
 @Immutable
-class TextStyle(
+class TextStyle @ExperimentalTextApi constructor(
     val color: Color = Color.Unspecified,
     val fontSize: TextUnit = TextUnit.Unspecified,
     val fontWeight: FontWeight? = null,
@@ -105,9 +107,54 @@ class TextStyle(
     val textAlign: TextAlign? = null,
     val textDirection: TextDirection? = null,
     val lineHeight: TextUnit = TextUnit.Unspecified,
-    val textIndent: TextIndent? = null
+    val textIndent: TextIndent? = null,
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @get:ExperimentalTextApi val platformStyle: PlatformTextStyle? = null
 ) {
-    internal constructor(spanStyle: SpanStyle, paragraphStyle: ParagraphStyle) : this (
+    @OptIn(ExperimentalTextApi::class)
+    constructor(
+        color: Color = Color.Unspecified,
+        fontSize: TextUnit = TextUnit.Unspecified,
+        fontWeight: FontWeight? = null,
+        fontStyle: FontStyle? = null,
+        fontSynthesis: FontSynthesis? = null,
+        fontFamily: FontFamily? = null,
+        fontFeatureSettings: String? = null,
+        letterSpacing: TextUnit = TextUnit.Unspecified,
+        baselineShift: BaselineShift? = null,
+        textGeometricTransform: TextGeometricTransform? = null,
+        localeList: LocaleList? = null,
+        background: Color = Color.Unspecified,
+        textDecoration: TextDecoration? = null,
+        shadow: Shadow? = null,
+        textAlign: TextAlign? = null,
+        textDirection: TextDirection? = null,
+        lineHeight: TextUnit = TextUnit.Unspecified,
+        textIndent: TextIndent? = null
+    ) : this(
+        color = color,
+        fontSize = fontSize,
+        fontWeight = fontWeight,
+        fontStyle = fontStyle,
+        fontSynthesis = fontSynthesis,
+        fontFamily = fontFamily,
+        fontFeatureSettings = fontFeatureSettings,
+        letterSpacing = letterSpacing,
+        baselineShift = baselineShift,
+        textGeometricTransform = textGeometricTransform,
+        localeList = localeList,
+        background = background,
+        textDecoration = textDecoration,
+        shadow = shadow,
+        textAlign = textAlign,
+        textDirection = textDirection,
+        lineHeight = lineHeight,
+        textIndent = textIndent,
+        platformStyle = null
+    )
+
+    @OptIn(ExperimentalTextApi::class)
+    internal constructor(spanStyle: SpanStyle, paragraphStyle: ParagraphStyle) : this(
         color = spanStyle.color,
         fontSize = spanStyle.fontSize,
         fontWeight = spanStyle.fontWeight,
@@ -125,7 +172,11 @@ class TextStyle(
         textAlign = paragraphStyle.textAlign,
         textDirection = paragraphStyle.textDirection,
         lineHeight = paragraphStyle.lineHeight,
-        textIndent = paragraphStyle.textIndent
+        textIndent = paragraphStyle.textIndent,
+        platformStyle = createPlatformTextStyleInternal(
+            spanStyle.platformStyle,
+            paragraphStyle.platformStyle
+        )
     )
 
     init {
@@ -137,6 +188,7 @@ class TextStyle(
         }
     }
 
+    @OptIn(ExperimentalTextApi::class)
     @Stable
     fun toSpanStyle(): SpanStyle = SpanStyle(
         color = color,
@@ -152,15 +204,18 @@ class TextStyle(
         localeList = localeList,
         background = background,
         textDecoration = textDecoration,
-        shadow = shadow
+        shadow = shadow,
+        platformStyle = platformStyle?.spanStyle
     )
 
+    @OptIn(ExperimentalTextApi::class)
     @Stable
     fun toParagraphStyle(): ParagraphStyle = ParagraphStyle(
         textAlign = textAlign,
         textDirection = textDirection,
         lineHeight = lineHeight,
-        textIndent = textIndent
+        textIndent = textIndent,
+        platformStyle = platformStyle?.paragraphStyle
     )
 
     /**
@@ -267,6 +322,52 @@ class TextStyle(
         )
     }
 
+    @ExperimentalTextApi
+    fun copy(
+        color: Color = this.color,
+        fontSize: TextUnit = this.fontSize,
+        fontWeight: FontWeight? = this.fontWeight,
+        fontStyle: FontStyle? = this.fontStyle,
+        fontSynthesis: FontSynthesis? = this.fontSynthesis,
+        fontFamily: FontFamily? = this.fontFamily,
+        fontFeatureSettings: String? = this.fontFeatureSettings,
+        letterSpacing: TextUnit = this.letterSpacing,
+        baselineShift: BaselineShift? = this.baselineShift,
+        textGeometricTransform: TextGeometricTransform? = this.textGeometricTransform,
+        localeList: LocaleList? = this.localeList,
+        background: Color = this.background,
+        textDecoration: TextDecoration? = this.textDecoration,
+        shadow: Shadow? = this.shadow,
+        textAlign: TextAlign? = this.textAlign,
+        textDirection: TextDirection? = this.textDirection,
+        lineHeight: TextUnit = this.lineHeight,
+        textIndent: TextIndent? = this.textIndent,
+        platformStyle: PlatformTextStyle? = this.platformStyle
+    ): TextStyle {
+        return TextStyle(
+            color = color,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            fontStyle = fontStyle,
+            fontSynthesis = fontSynthesis,
+            fontFamily = fontFamily,
+            fontFeatureSettings = fontFeatureSettings,
+            letterSpacing = letterSpacing,
+            baselineShift = baselineShift,
+            textGeometricTransform = textGeometricTransform,
+            localeList = localeList,
+            background = background,
+            textDecoration = textDecoration,
+            shadow = shadow,
+            textAlign = textAlign,
+            textDirection = textDirection,
+            lineHeight = lineHeight,
+            textIndent = textIndent,
+            platformStyle = platformStyle
+        )
+    }
+
+    @OptIn(ExperimentalTextApi::class)
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is TextStyle) return false
@@ -289,10 +390,12 @@ class TextStyle(
         if (textDirection != other.textDirection) return false
         if (lineHeight != other.lineHeight) return false
         if (textIndent != other.textIndent) return false
+        if (platformStyle != other.platformStyle) return false
 
         return true
     }
 
+    @OptIn(ExperimentalTextApi::class)
     override fun hashCode(): Int {
         var result = color.hashCode()
         result = 31 * result + fontSize.hashCode()
@@ -312,9 +415,11 @@ class TextStyle(
         result = 31 * result + (textDirection?.hashCode() ?: 0)
         result = 31 * result + lineHeight.hashCode()
         result = 31 * result + (textIndent?.hashCode() ?: 0)
+        result = 31 * result + (platformStyle?.hashCode() ?: 0)
         return result
     }
 
+    @OptIn(ExperimentalTextApi::class)
     override fun toString(): String {
         return "TextStyle(" +
             "color=$color, " +
@@ -333,7 +438,8 @@ class TextStyle(
             "shadow=$shadow, textAlign=$textAlign, " +
             "textDirection=$textDirection, " +
             "lineHeight=$lineHeight, " +
-            "textIndent=$textIndent" +
+            "textIndent=$textIndent, " +
+            "platformStyle=$platformStyle" +
             ")"
     }
 
@@ -374,6 +480,7 @@ fun lerp(start: TextStyle, stop: TextStyle, fraction: Float): TextStyle {
  * @param direction a layout direction to be used for resolving text layout direction algorithm
  * @return resolved text style.
  */
+@OptIn(ExperimentalTextApi::class)
 fun resolveDefaults(style: TextStyle, direction: LayoutDirection) = TextStyle(
     color = style.color.takeOrElse { DefaultColor },
     fontSize = if (style.fontSize.isUnspecified) DefaultFontSize else style.fontSize,
@@ -396,7 +503,8 @@ fun resolveDefaults(style: TextStyle, direction: LayoutDirection) = TextStyle(
     textAlign = style.textAlign ?: TextAlign.Start,
     textDirection = resolveTextDirection(direction, style.textDirection),
     lineHeight = if (style.lineHeight.isUnspecified) DefaultLineHeight else style.lineHeight,
-    textIndent = style.textIndent ?: TextIndent.None
+    textIndent = style.textIndent ?: TextIndent.None,
+    platformStyle = style.platformStyle
 )
 
 /**
@@ -416,5 +524,17 @@ internal fun resolveTextDirection(
             LayoutDirection.Rtl -> TextDirection.Rtl
         }
         else -> textDirection
+    }
+}
+
+@OptIn(ExperimentalTextApi::class)
+private fun createPlatformTextStyleInternal(
+    platformSpanStyle: PlatformSpanStyle?,
+    platformParagraphStyle: PlatformParagraphStyle?
+): PlatformTextStyle? {
+    return if (platformSpanStyle == null && platformParagraphStyle == null) {
+        null
+    } else {
+        createPlatformTextStyle(platformSpanStyle, platformParagraphStyle)
     }
 }

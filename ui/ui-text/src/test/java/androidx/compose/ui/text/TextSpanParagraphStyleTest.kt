@@ -66,7 +66,10 @@ class TextSpanParagraphStyleTest {
     }
 
     private fun <T : Any> constructorParams(clazz: KClass<T>): List<Parameter> {
-        return clazz.primaryConstructor?.parameters?.map { Parameter(it) } ?: listOf()
+        return clazz.primaryConstructor?.parameters?.map { Parameter(it) }?.filter {
+            // types of platformStyle is different for each of TextStyle/ParagraphStyle/SpanStyle
+            "platformStyle" != it.name
+        } ?: listOf()
     }
 
     private data class Parameter(

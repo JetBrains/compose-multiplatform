@@ -45,6 +45,7 @@ import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
 class TextStyleTest {
+    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `constructor with default values`() {
         val style = TextStyle()
@@ -58,6 +59,7 @@ class TextStyleTest {
         assertThat(style.background).isEqualTo(Color.Unspecified)
         assertThat(style.textDecoration).isNull()
         assertThat(style.fontFamily).isNull()
+        assertThat(style.platformStyle).isNull()
     }
 
     @Test
@@ -497,6 +499,17 @@ class TextStyleTest {
         val newStyle = style.merge(TextStyle(textIndent = null))
 
         assertThat(newStyle.textIndent).isNull()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge with null platformStyles null has null platformStyle`() {
+        val style = TextStyle(platformStyle = null)
+        val otherStyle = TextStyle(platformStyle = null)
+
+        val mergedStyle = style.merge(otherStyle)
+
+        assertThat(mergedStyle.platformStyle).isNull()
     }
 
     @Test
@@ -968,6 +981,17 @@ class TextStyleTest {
         val newStyle = lerp(start = style1, stop = style2, fraction = 0.4f)
 
         assertThat(newStyle.lineHeight).isEqualTo(TextUnit.Unspecified)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp with null platformStyles has null platformStyle`() {
+        val style = TextStyle(platformStyle = null)
+        val otherStyle = TextStyle(platformStyle = null)
+
+        val lerpedStyle = lerp(start = style, stop = otherStyle, fraction = 0.5f)
+
+        assertThat(lerpedStyle.platformStyle).isNull()
     }
 
     @Test
