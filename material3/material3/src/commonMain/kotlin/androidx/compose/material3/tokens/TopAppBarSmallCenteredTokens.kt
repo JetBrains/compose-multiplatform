@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_76
+// VERSION: v0_92
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -21,12 +21,13 @@ package androidx.compose.material3.tokens
 import androidx.compose.ui.unit.dp
 
 internal object TopAppBarSmallCenteredTokens {
-    val AvatarShape = ShapeTokens.CornerFull
+    val AvatarShape = ShapeKeyTokens.CornerFull
     val AvatarSize = 30.0.dp
     val ContainerColor = ColorSchemeKeyTokens.Surface
     val ContainerElevation = ElevationTokens.Level0
     val ContainerHeight = 64.0.dp
-    val ContainerShape = ShapeTokens.CornerNone
+    val ContainerShape = ShapeKeyTokens.CornerNone
+    val ContainerSurfaceTintLayerColor = ColorSchemeKeyTokens.SurfaceTint
     val HeadlineColor = ColorSchemeKeyTokens.OnSurface
     val HeadlineFont = TypographyKeyTokens.TitleLarge
     val LeadingIconColor = ColorSchemeKeyTokens.OnSurface

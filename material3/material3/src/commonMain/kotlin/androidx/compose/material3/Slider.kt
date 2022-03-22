@@ -412,8 +412,12 @@ private fun SliderThumb(
                     indication = rememberRipple(bounded = false, radius = thumbRippleRadius)
                 )
                 .hoverable(interactionSource = interactionSource)
-                .shadow(if (enabled) elevation else 0.dp, SliderTokens.HandleShape, clip = false)
-                .background(colors.thumbColor(enabled).value, SliderTokens.HandleShape)
+                .shadow(
+                    if (enabled) elevation else 0.dp,
+                    SliderTokens.HandleShape.toShape(),
+                    clip = false,
+                )
+                .background(colors.thumbColor(enabled).value, SliderTokens.HandleShape.toShape())
         )
     }
 }

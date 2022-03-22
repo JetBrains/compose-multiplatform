@@ -126,7 +126,7 @@ internal fun DropdownMenuContent(
             this.alpha = alpha
             transformOrigin = transformOriginState.value
         },
-        shape = MenuTokens.ContainerShape,
+        shape = MenuTokens.ContainerShape.toShape(),
         color = MaterialTheme.colorScheme.fromToken(MenuTokens.ContainerColor),
         tonalElevation = MenuTokens.ContainerElevation,
         shadowElevation = MenuTokens.ContainerElevation

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_76
+// VERSION: v0_92
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -23,21 +23,21 @@ import androidx.compose.ui.unit.dp
 internal object OutlinedCardTokens {
     val ContainerColor = ColorSchemeKeyTokens.Surface
     val ContainerElevation = ElevationTokens.Level0
-    val ContainerShape = ShapeTokens.CornerMedium
+    val ContainerShape = ShapeKeyTokens.CornerMedium
+    val ContainerSurfaceTintLayerColor = ColorSchemeKeyTokens.SurfaceTint
+    val DisabledContainerElevation = ElevationTokens.Level0
+    val DisabledOutlineColor = ColorSchemeKeyTokens.Outline
+    const val DisabledOutlineOpacity = 0.12f
     val DraggedContainerElevation = ElevationTokens.Level3
     val DraggedOutlineColor = ColorSchemeKeyTokens.Outline
-    val DraggedStateLayerColor = ColorSchemeKeyTokens.OnSurface
     val FocusContainerElevation = ElevationTokens.Level0
     val FocusOutlineColor = ColorSchemeKeyTokens.OnSurface
-    val FocusStateLayerColor = ColorSchemeKeyTokens.OnSurface
     val HoverContainerElevation = ElevationTokens.Level1
     val HoverOutlineColor = ColorSchemeKeyTokens.Outline
-    val HoverStateLayerColor = ColorSchemeKeyTokens.OnSurface
     val IconColor = ColorSchemeKeyTokens.Primary
     val IconSize = 24.0.dp
     val OutlineColor = ColorSchemeKeyTokens.Outline
     val OutlineWidth = 1.0.dp
     val PressedContainerElevation = ElevationTokens.Level0
     val PressedOutlineColor = ColorSchemeKeyTokens.Outline
-    val PressedStateLayerColor = ColorSchemeKeyTokens.OnSurface
 }

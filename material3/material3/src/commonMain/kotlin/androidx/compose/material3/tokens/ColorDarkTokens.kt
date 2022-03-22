@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_86
+// VERSION: v0_92
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -42,7 +42,7 @@ internal object ColorDarkTokens {
     val Secondary = PaletteTokens.Secondary80
     val SecondaryContainer = PaletteTokens.Secondary30
     val Surface = PaletteTokens.Neutral10
-    val SurfaceTintColor = Primary
+    val SurfaceTint = Primary
     val SurfaceVariant = PaletteTokens.NeutralVariant30
     val Tertiary = PaletteTokens.Tertiary80
     val TertiaryContainer = PaletteTokens.Tertiary30

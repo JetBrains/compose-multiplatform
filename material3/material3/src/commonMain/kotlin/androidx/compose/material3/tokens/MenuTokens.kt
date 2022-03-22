@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_76
+// VERSION: v0_92
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -23,20 +23,18 @@ import androidx.compose.ui.unit.dp
 internal object MenuTokens {
     val ContainerColor = ColorSchemeKeyTokens.Surface
     val ContainerElevation = ElevationTokens.Level2
-    val ContainerShape = ShapeTokens.CornerExtraSmall
+    val ContainerShape = ShapeKeyTokens.CornerExtraSmall
+    val ContainerSurfaceTintLayerColor = ColorSchemeKeyTokens.SurfaceTint
     val DividerColor = ColorSchemeKeyTokens.SurfaceVariant
     val DividerHeight = 1.0.dp
     val ListItemContainerHeight = 48.0.dp
     val ListItemDisabledLabelTextColor = ColorSchemeKeyTokens.OnSurface
     const val ListItemDisabledLabelTextOpacity = 0.38f
     val ListItemFocusLabelTextColor = ColorSchemeKeyTokens.OnSurface
-    val ListItemFocusStateLayerColor = ColorSchemeKeyTokens.OnSurface
     val ListItemHoverLabelTextColor = ColorSchemeKeyTokens.OnSurface
-    val ListItemHoverStateLayerColor = ColorSchemeKeyTokens.OnSurface
     val ListItemLabelTextColor = ColorSchemeKeyTokens.OnSurface
     val ListItemLabelTextFont = TypographyKeyTokens.LabelLarge
     val ListItemPressedLabelTextColor = ColorSchemeKeyTokens.OnSurface
-    val ListItemPressedStateLayerColor = ColorSchemeKeyTokens.OnSurface
     val ListItemSelectedContainerColor = ColorSchemeKeyTokens.SurfaceVariant
     val ListItemDisabledLeadingIconColor = ColorSchemeKeyTokens.OnSurface
     const val ListItemDisabledLeadingIconOpacity = 0.38f

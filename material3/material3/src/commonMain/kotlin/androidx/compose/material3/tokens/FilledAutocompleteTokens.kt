@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_90
+// VERSION: v0_92
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 internal object FilledAutocompleteTokens {
     val MenuContainerColor = ColorSchemeKeyTokens.Surface
     val MenuContainerElevation = ElevationTokens.Level2
-    val MenuContainerShape = ShapeTokens.CornerExtraSmall
+    val MenuContainerShape = ShapeKeyTokens.CornerExtraSmall
     val MenuContainerSurfaceTintLayerColor = ColorSchemeKeyTokens.SurfaceTint
     val MenuDividerColor = ColorSchemeKeyTokens.SurfaceVariant
     val MenuDividerHeight = 1.0.dp
@@ -36,7 +36,7 @@ internal object FilledAutocompleteTokens {
     val TextFieldCaretColor = ColorSchemeKeyTokens.Primary
     val TextFieldContainerColor = ColorSchemeKeyTokens.SurfaceVariant
     val TextFieldContainerHeight = 56.0.dp
-    val TextFieldContainerShape = ShapeTokens.CornerExtraSmallTop
+    val TextFieldContainerShape = ShapeKeyTokens.CornerExtraSmallTop
     val TextFieldDisabledActiveIndicatorColor = ColorSchemeKeyTokens.OnSurface
     val TextFieldDisabledActiveIndicatorHeight = 1.0.dp
     const val TextFieldDisabledActiveIndicatorOpacity = 0.38f
@@ -64,7 +64,6 @@ internal object FilledAutocompleteTokens {
     val FieldErrorHoverInputTextColor = ColorSchemeKeyTokens.OnSurface
     val FieldErrorHoverLabelTextColor = ColorSchemeKeyTokens.OnErrorContainer
     val TextFieldErrorHoverLeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
-    val TextFieldErrorHoverStateLayerColor = ColorSchemeKeyTokens.OnSurface
     val FieldErrorHoverSupportingTextColor = ColorSchemeKeyTokens.Error
     val TextFieldErrorHoverTrailingIconColor = ColorSchemeKeyTokens.OnErrorContainer
     val FieldErrorInputTextColor = ColorSchemeKeyTokens.OnSurface
@@ -84,7 +83,6 @@ internal object FilledAutocompleteTokens {
     val FieldHoverInputTextColor = ColorSchemeKeyTokens.OnSurface
     val FieldHoverLabelTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val TextFieldHoverLeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
-    val TextFieldHoverStateLayerColor = ColorSchemeKeyTokens.OnSurface
     val FieldHoverSupportingTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val TextFieldHoverTrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val FieldInputTextColor = ColorSchemeKeyTokens.OnSurface

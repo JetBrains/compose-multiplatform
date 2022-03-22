@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_76
+// VERSION: v0_92
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -22,24 +22,21 @@ import androidx.compose.ui.unit.dp
 
 internal object OutlinedButtonTokens {
     val ContainerHeight = 40.0.dp
-    val ContainerShape = ShapeTokens.CornerFull
+    val ContainerShape = ShapeKeyTokens.CornerFull
     val DisabledLabelTextColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledLabelTextOpacity = 0.38f
     val DisabledOutlineColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledOutlineOpacity = 0.12f
     val FocusLabelTextColor = ColorSchemeKeyTokens.Primary
     val FocusOutlineColor = ColorSchemeKeyTokens.Primary
-    val FocusStateLayerColor = ColorSchemeKeyTokens.Primary
     val HoverLabelTextColor = ColorSchemeKeyTokens.Primary
     val HoverOutlineColor = ColorSchemeKeyTokens.Outline
-    val HoverStateLayerColor = ColorSchemeKeyTokens.Primary
     val LabelTextColor = ColorSchemeKeyTokens.Primary
     val LabelTextFont = TypographyKeyTokens.LabelLarge
     val OutlineColor = ColorSchemeKeyTokens.Outline
     val OutlineWidth = 1.0.dp
     val PressedLabelTextColor = ColorSchemeKeyTokens.Primary
     val PressedOutlineColor = ColorSchemeKeyTokens.Outline
-    val PressedStateLayerColor = ColorSchemeKeyTokens.Primary
     val DisabledIconColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledIconOpacity = 0.38f
     val FocusIconColor = ColorSchemeKeyTokens.Primary
