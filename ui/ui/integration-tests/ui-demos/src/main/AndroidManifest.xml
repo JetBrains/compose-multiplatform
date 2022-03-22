@@ -15,7 +15,8 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <application>
+    <application
+        android:theme="@style/Theme.MaterialComponents.Light">
         <activity
             android:name=".viewinterop.ComposeNothingInAndroidTap"
             android:configChanges="orientation|screenSize"
@@ -44,5 +45,9 @@
             android:name=".viewinterop.ComposeInAndroidDialogDismissDialogDuringDispatch"
             android:configChanges="orientation|screenSize"
             android:label="Dialog" />
+        <activity
+            android:name=".viewinterop.ComposeInAndroidCoordinatorLayout"
+            android:configChanges="orientation|screenSize"
+            android:label="Compose in Coordinator Layout Activity" />
     </application>
 </manifest>
