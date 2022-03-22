@@ -39,10 +39,16 @@ import java.util.EnumSet
  * body of a composable function / lambda.
  */
 class ComposableCoroutineCreationDetector : Detector(), SourceCodeScanner {
-    override fun getApplicableMethodNames() = listOf(Async.shortName, Launch.shortName)
+    override fun getApplicableMethodNames() = listOf(
+        Async.shortName,
+        Launch.shortName,
+        LaunchIn.shortName,
+    )
 
     override fun visitMethodCall(context: JavaContext, node: UCallExpression, method: PsiMethod) {
-        if (!method.isInPackageName(CoroutinePackageName)) return
+        if (!(method.isInPackageName(CoroutinePackageName) ||
+                method.isInPackageName(FlowPackageName))
+        ) return
 
         if (node.isInvokedWithinComposable()) {
             context.report(
@@ -77,5 +83,7 @@ class ComposableCoroutineCreationDetector : Detector(), SourceCodeScanner {
 }
 
 private val CoroutinePackageName = Package("kotlinx.coroutines")
+private val FlowPackageName = Package("kotlinx.coroutines.flow")
 private val Async = Name(CoroutinePackageName, "async")
 private val Launch = Name(CoroutinePackageName, "launch")
+private val LaunchIn = Name(FlowPackageName, "launchIn")
