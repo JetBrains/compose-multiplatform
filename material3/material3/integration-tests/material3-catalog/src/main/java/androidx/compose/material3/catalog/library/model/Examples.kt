@@ -25,6 +25,7 @@ import androidx.compose.material3.catalog.library.util.SampleSourceUrl
 import androidx.compose.material3.samples.AlertDialogSample
 import androidx.compose.material3.samples.AlertDialogWithIconSample
 import androidx.compose.material3.samples.AnimatedExtendedFloatingActionButtonSample
+import androidx.compose.material3.samples.AssistChipSample
 import androidx.compose.material3.samples.BottomAppBarWithFAB
 import androidx.compose.material3.samples.ButtonSample
 import androidx.compose.material3.samples.ButtonWithIconSample
@@ -36,6 +37,7 @@ import androidx.compose.material3.samples.ClickableElevatedCardSample
 import androidx.compose.material3.samples.ClickableOutlinedCardSample
 import androidx.compose.material3.samples.DismissibleNavigationDrawerSample
 import androidx.compose.material3.samples.EditableExposedDropdownMenuSample
+import androidx.compose.material3.samples.ElevatedAssistChipSample
 import androidx.compose.material3.samples.ElevatedButtonSample
 import androidx.compose.material3.samples.ElevatedCardSample
 import androidx.compose.material3.samples.ElevatedFilterChipSample
@@ -60,6 +62,8 @@ import androidx.compose.material3.samples.FloatingActionButtonSample
 import androidx.compose.material3.samples.IconButtonSample
 import androidx.compose.material3.samples.IconTabs
 import androidx.compose.material3.samples.IconToggleButtonSample
+import androidx.compose.material3.samples.InputChipSample
+import androidx.compose.material3.samples.InputChipWithAvatarSample
 import androidx.compose.material3.samples.LargeFloatingActionButtonSample
 import androidx.compose.material3.samples.LeadingIconTabs
 import androidx.compose.material3.samples.LinearProgressIndicatorSample
@@ -225,6 +229,20 @@ private const val ChipsExampleDescription = "Chips examples"
 private const val ChipsExampleSourceUrl = "$SampleSourceUrl/ChipSamples.kt"
 val ChipsExamples = listOf(
     Example(
+        name = ::AssistChipSample.name,
+        description = ChipsExampleDescription,
+        sourceUrl = ChipsExampleSourceUrl
+    ) {
+        AssistChipSample()
+    },
+    Example(
+        name = ::ElevatedAssistChipSample.name,
+        description = ChipsExampleDescription,
+        sourceUrl = ChipsExampleSourceUrl
+    ) {
+        ElevatedAssistChipSample()
+    },
+    Example(
         name = ::FilterChipSample.name,
         description = ChipsExampleDescription,
         sourceUrl = ChipsExampleSourceUrl
@@ -244,6 +262,20 @@ val ChipsExamples = listOf(
         sourceUrl = ChipsExampleSourceUrl
     ) {
         FilterChipWithLeadingIconSample()
+    },
+    Example(
+        name = ::InputChipSample.name,
+        description = ChipsExampleDescription,
+        sourceUrl = ChipsExampleSourceUrl
+    ) {
+        InputChipSample()
+    },
+    Example(
+        name = ::InputChipWithAvatarSample.name,
+        description = ChipsExampleDescription,
+        sourceUrl = ChipsExampleSourceUrl
+    ) {
+        InputChipWithAvatarSample()
     },
     Example(
         name = ::SuggestionChipSample.name,
