@@ -2561,7 +2561,7 @@ package androidx.compose.ui.platform {
     field public static final androidx.compose.ui.platform.LocalSoftwareKeyboardController INSTANCE;
   }
 
-  public final class NestedScrollInteropAdapterKt {
+  public final class NestedScrollInteropConnectionKt {
     method @androidx.compose.runtime.Composable @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.ui.input.nestedscroll.NestedScrollConnection rememberNestedScrollInteropConnection(androidx.compose.ui.platform.ComposeView view);
   }
 
