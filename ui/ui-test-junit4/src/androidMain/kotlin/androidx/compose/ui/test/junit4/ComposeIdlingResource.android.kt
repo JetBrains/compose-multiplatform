@@ -16,10 +16,12 @@
 
 package androidx.compose.ui.test.junit4
 
+import android.view.View
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.test.IdlingResource
+import androidx.core.view.ancestors
 
 /**
  * Provides an idle check to be registered into Espresso.
@@ -64,7 +66,9 @@ internal class ComposeIdlingResource(
                 composeRootRegistry.getCreatedComposeRoots().any { it.isBusyAttaching }
 
             val composeRoots = composeRootRegistry.getRegisteredComposeRoots()
-            hadPendingMeasureLayout = composeRoots.any { it.hasPendingMeasureOrLayout }
+            hadPendingMeasureLayout = composeRoots.any {
+                it.hasPendingMeasureOrLayout && !it.view.isGone
+            }
 
             return !shouldPumpTime() &&
                 !hadPendingSetContent &&
@@ -109,4 +113,11 @@ internal val ViewRootForTest.isBusyAttaching: Boolean
         // windowManager.addView(). If the rootView doesn't have a parent, the view hasn't been
         // attached to a window yet, or is removed again.
         return view.rootView.parent != null && !view.isAttachedToWindow
+    }
+
+internal val View.isGone: Boolean
+    get() {
+        // A View is GONE if _its_ visibility is GONE, but
+        // also if any of its _parents'_ visibility is GONE
+        return visibility == View.GONE || ancestors.any { (it as? View)?.visibility == View.GONE }
     }
