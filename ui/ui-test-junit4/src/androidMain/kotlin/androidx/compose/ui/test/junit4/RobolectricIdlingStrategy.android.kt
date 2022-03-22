@@ -88,7 +88,7 @@ internal class RobolectricIdlingStrategy(
      */
     private fun requestLayoutIfNeeded(): Boolean {
         val composeRoots = composeRootRegistry.getRegisteredComposeRoots()
-        return composeRoots.filter { it.hasPendingMeasureOrLayout }
+        return composeRoots.filter { it.hasPendingMeasureOrLayout && !it.view.isGone }
             .onEach { it.view.requestLayout() }
             .isNotEmpty()
     }
