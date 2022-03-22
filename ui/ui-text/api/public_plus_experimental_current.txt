@@ -4,6 +4,9 @@ package androidx.compose.ui.text {
   public final class ActualAtomicReferenceJvmKt {
   }
 
+  public final class AndroidTextStyle_androidKt {
+  }
+
   @androidx.compose.runtime.Immutable public final class AnnotatedString implements java.lang.CharSequence {
     ctor public AnnotatedString(String text, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.ParagraphStyle>> paragraphStyles);
     method public operator char get(int index);
@@ -219,16 +222,20 @@ package androidx.compose.ui.text {
   }
 
   @androidx.compose.runtime.Immutable public final class ParagraphStyle {
+    ctor @androidx.compose.ui.text.ExperimentalTextApi public ParagraphStyle(optional androidx.compose.ui.text.style.TextAlign? textAlign, optional androidx.compose.ui.text.style.TextDirection? textDirection, optional long lineHeight, optional androidx.compose.ui.text.style.TextIndent? textIndent, optional androidx.compose.ui.text.PlatformParagraphStyle? platformStyle);
     ctor public ParagraphStyle(optional androidx.compose.ui.text.style.TextAlign? textAlign, optional androidx.compose.ui.text.style.TextDirection? textDirection, optional long lineHeight, optional androidx.compose.ui.text.style.TextIndent? textIndent);
     method public androidx.compose.ui.text.ParagraphStyle copy(optional androidx.compose.ui.text.style.TextAlign? textAlign, optional androidx.compose.ui.text.style.TextDirection? textDirection, optional long lineHeight, optional androidx.compose.ui.text.style.TextIndent? textIndent);
+    method @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.ParagraphStyle copy(optional androidx.compose.ui.text.style.TextAlign? textAlign, optional androidx.compose.ui.text.style.TextDirection? textDirection, optional long lineHeight, optional androidx.compose.ui.text.style.TextIndent? textIndent, optional androidx.compose.ui.text.PlatformParagraphStyle? platformStyle);
     method public operator boolean equals(Object? other);
     method public long getLineHeight();
+    method @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.PlatformParagraphStyle? getPlatformStyle();
     method public androidx.compose.ui.text.style.TextAlign? getTextAlign();
     method public androidx.compose.ui.text.style.TextDirection? getTextDirection();
     method public androidx.compose.ui.text.style.TextIndent? getTextIndent();
     method @androidx.compose.runtime.Stable public androidx.compose.ui.text.ParagraphStyle merge(optional androidx.compose.ui.text.ParagraphStyle? other);
     method @androidx.compose.runtime.Stable public operator androidx.compose.ui.text.ParagraphStyle plus(androidx.compose.ui.text.ParagraphStyle other);
     property public final long lineHeight;
+    property @androidx.compose.ui.text.ExperimentalTextApi public final androidx.compose.ui.text.PlatformParagraphStyle? platformStyle;
     property public final androidx.compose.ui.text.style.TextAlign? textAlign;
     property public final androidx.compose.ui.text.style.TextDirection? textDirection;
     property public final androidx.compose.ui.text.style.TextIndent? textIndent;
@@ -271,12 +278,49 @@ package androidx.compose.ui.text {
     property public final int Top;
   }
 
+  @androidx.compose.ui.text.ExperimentalTextApi public final class PlatformParagraphStyle {
+    ctor @Deprecated public PlatformParagraphStyle(optional boolean includeFontPadding);
+    method @Deprecated public boolean getIncludeFontPadding();
+    method public androidx.compose.ui.text.PlatformParagraphStyle lerp(androidx.compose.ui.text.PlatformParagraphStyle stop, float fraction);
+    method public androidx.compose.ui.text.PlatformParagraphStyle merge(androidx.compose.ui.text.PlatformParagraphStyle? other);
+    property @Deprecated public final boolean includeFontPadding;
+    field public static final androidx.compose.ui.text.PlatformParagraphStyle.Companion Companion;
+  }
+
+  public static final class PlatformParagraphStyle.Companion {
+    method public androidx.compose.ui.text.PlatformParagraphStyle getDefault();
+    property public final androidx.compose.ui.text.PlatformParagraphStyle Default;
+  }
+
+  @androidx.compose.ui.text.ExperimentalTextApi public final class PlatformSpanStyle {
+    ctor public PlatformSpanStyle();
+    method public androidx.compose.ui.text.PlatformSpanStyle lerp(androidx.compose.ui.text.PlatformSpanStyle stop, float fraction);
+    method public androidx.compose.ui.text.PlatformSpanStyle merge(androidx.compose.ui.text.PlatformSpanStyle? other);
+    field public static final androidx.compose.ui.text.PlatformSpanStyle.Companion Companion;
+  }
+
+  public static final class PlatformSpanStyle.Companion {
+    method public androidx.compose.ui.text.PlatformSpanStyle getDefault();
+    property public final androidx.compose.ui.text.PlatformSpanStyle Default;
+  }
+
+  @androidx.compose.ui.text.ExperimentalTextApi public final class PlatformTextStyle {
+    ctor public PlatformTextStyle(androidx.compose.ui.text.PlatformSpanStyle? spanStyle, androidx.compose.ui.text.PlatformParagraphStyle? paragraphStyle);
+    ctor @Deprecated public PlatformTextStyle(optional boolean includeFontPadding);
+    method public androidx.compose.ui.text.PlatformParagraphStyle? getParagraphStyle();
+    method public androidx.compose.ui.text.PlatformSpanStyle? getSpanStyle();
+    property public final androidx.compose.ui.text.PlatformParagraphStyle? paragraphStyle;
+    property public final androidx.compose.ui.text.PlatformSpanStyle? spanStyle;
+  }
+
   public final class SaversKt {
   }
 
   @androidx.compose.runtime.Immutable public final class SpanStyle {
+    ctor @androidx.compose.ui.text.ExperimentalTextApi public SpanStyle(optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontSynthesis? fontSynthesis, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional String? fontFeatureSettings, optional long letterSpacing, optional androidx.compose.ui.text.style.BaselineShift? baselineShift, optional androidx.compose.ui.text.style.TextGeometricTransform? textGeometricTransform, optional androidx.compose.ui.text.intl.LocaleList? localeList, optional long background, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.graphics.Shadow? shadow, optional androidx.compose.ui.text.PlatformSpanStyle? platformStyle);
     ctor public SpanStyle(optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontSynthesis? fontSynthesis, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional String? fontFeatureSettings, optional long letterSpacing, optional androidx.compose.ui.text.style.BaselineShift? baselineShift, optional androidx.compose.ui.text.style.TextGeometricTransform? textGeometricTransform, optional androidx.compose.ui.text.intl.LocaleList? localeList, optional long background, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.graphics.Shadow? shadow);
     method public androidx.compose.ui.text.SpanStyle copy(optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontSynthesis? fontSynthesis, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional String? fontFeatureSettings, optional long letterSpacing, optional androidx.compose.ui.text.style.BaselineShift? baselineShift, optional androidx.compose.ui.text.style.TextGeometricTransform? textGeometricTransform, optional androidx.compose.ui.text.intl.LocaleList? localeList, optional long background, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.graphics.Shadow? shadow);
+    method @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.SpanStyle copy(optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontSynthesis? fontSynthesis, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional String? fontFeatureSettings, optional long letterSpacing, optional androidx.compose.ui.text.style.BaselineShift? baselineShift, optional androidx.compose.ui.text.style.TextGeometricTransform? textGeometricTransform, optional androidx.compose.ui.text.intl.LocaleList? localeList, optional long background, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.graphics.Shadow? shadow, optional androidx.compose.ui.text.PlatformSpanStyle? platformStyle);
     method public operator boolean equals(Object? other);
     method public long getBackground();
     method public androidx.compose.ui.text.style.BaselineShift? getBaselineShift();
@@ -289,6 +333,7 @@ package androidx.compose.ui.text {
     method public androidx.compose.ui.text.font.FontWeight? getFontWeight();
     method public long getLetterSpacing();
     method public androidx.compose.ui.text.intl.LocaleList? getLocaleList();
+    method @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.PlatformSpanStyle? getPlatformStyle();
     method public androidx.compose.ui.graphics.Shadow? getShadow();
     method public androidx.compose.ui.text.style.TextDecoration? getTextDecoration();
     method public androidx.compose.ui.text.style.TextGeometricTransform? getTextGeometricTransform();
@@ -305,6 +350,7 @@ package androidx.compose.ui.text {
     property public final androidx.compose.ui.text.font.FontWeight? fontWeight;
     property public final long letterSpacing;
     property public final androidx.compose.ui.text.intl.LocaleList? localeList;
+    property @androidx.compose.ui.text.ExperimentalTextApi public final androidx.compose.ui.text.PlatformSpanStyle? platformStyle;
     property public final androidx.compose.ui.graphics.Shadow? shadow;
     property public final androidx.compose.ui.text.style.TextDecoration? textDecoration;
     property public final androidx.compose.ui.text.style.TextGeometricTransform? textGeometricTransform;
@@ -423,8 +469,10 @@ package androidx.compose.ui.text {
   }
 
   @androidx.compose.runtime.Immutable public final class TextStyle {
+    ctor @androidx.compose.ui.text.ExperimentalTextApi public TextStyle(optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontSynthesis? fontSynthesis, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional String? fontFeatureSettings, optional long letterSpacing, optional androidx.compose.ui.text.style.BaselineShift? baselineShift, optional androidx.compose.ui.text.style.TextGeometricTransform? textGeometricTransform, optional androidx.compose.ui.text.intl.LocaleList? localeList, optional long background, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.graphics.Shadow? shadow, optional androidx.compose.ui.text.style.TextAlign? textAlign, optional androidx.compose.ui.text.style.TextDirection? textDirection, optional long lineHeight, optional androidx.compose.ui.text.style.TextIndent? textIndent, optional androidx.compose.ui.text.PlatformTextStyle? platformStyle);
     ctor public TextStyle(optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontSynthesis? fontSynthesis, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional String? fontFeatureSettings, optional long letterSpacing, optional androidx.compose.ui.text.style.BaselineShift? baselineShift, optional androidx.compose.ui.text.style.TextGeometricTransform? textGeometricTransform, optional androidx.compose.ui.text.intl.LocaleList? localeList, optional long background, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.graphics.Shadow? shadow, optional androidx.compose.ui.text.style.TextAlign? textAlign, optional androidx.compose.ui.text.style.TextDirection? textDirection, optional long lineHeight, optional androidx.compose.ui.text.style.TextIndent? textIndent);
     method public androidx.compose.ui.text.TextStyle copy(optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontSynthesis? fontSynthesis, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional String? fontFeatureSettings, optional long letterSpacing, optional androidx.compose.ui.text.style.BaselineShift? baselineShift, optional androidx.compose.ui.text.style.TextGeometricTransform? textGeometricTransform, optional androidx.compose.ui.text.intl.LocaleList? localeList, optional long background, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.graphics.Shadow? shadow, optional androidx.compose.ui.text.style.TextAlign? textAlign, optional androidx.compose.ui.text.style.TextDirection? textDirection, optional long lineHeight, optional androidx.compose.ui.text.style.TextIndent? textIndent);
+    method @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.TextStyle copy(optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontSynthesis? fontSynthesis, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional String? fontFeatureSettings, optional long letterSpacing, optional androidx.compose.ui.text.style.BaselineShift? baselineShift, optional androidx.compose.ui.text.style.TextGeometricTransform? textGeometricTransform, optional androidx.compose.ui.text.intl.LocaleList? localeList, optional long background, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.graphics.Shadow? shadow, optional androidx.compose.ui.text.style.TextAlign? textAlign, optional androidx.compose.ui.text.style.TextDirection? textDirection, optional long lineHeight, optional androidx.compose.ui.text.style.TextIndent? textIndent, optional androidx.compose.ui.text.PlatformTextStyle? platformStyle);
     method public long getBackground();
     method public androidx.compose.ui.text.style.BaselineShift? getBaselineShift();
     method public long getColor();
@@ -437,6 +485,7 @@ package androidx.compose.ui.text {
     method public long getLetterSpacing();
     method public long getLineHeight();
     method public androidx.compose.ui.text.intl.LocaleList? getLocaleList();
+    method @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.PlatformTextStyle? getPlatformStyle();
     method public androidx.compose.ui.graphics.Shadow? getShadow();
     method public androidx.compose.ui.text.style.TextAlign? getTextAlign();
     method public androidx.compose.ui.text.style.TextDecoration? getTextDecoration();
@@ -463,6 +512,7 @@ package androidx.compose.ui.text {
     property public final long letterSpacing;
     property public final long lineHeight;
     property public final androidx.compose.ui.text.intl.LocaleList? localeList;
+    property @androidx.compose.ui.text.ExperimentalTextApi public final androidx.compose.ui.text.PlatformTextStyle? platformStyle;
     property public final androidx.compose.ui.graphics.Shadow? shadow;
     property public final androidx.compose.ui.text.style.TextAlign? textAlign;
     property public final androidx.compose.ui.text.style.TextDecoration? textDecoration;

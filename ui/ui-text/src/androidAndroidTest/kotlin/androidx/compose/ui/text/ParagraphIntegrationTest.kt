@@ -3656,12 +3656,11 @@ class ParagraphIntegrationTest {
                 )
             )
 
-            val expectedPath = Path()
-            val lineRight = paragraph.getLineRight(0)
-            expectedPath.addRect(Rect(lineRight / 2, 0f, lineRight, fontSizeInPx))
-
             // Try to select "\uDD1E\uD834\uDD1F", only "\uD834\uDD1F" is selected.
             val actualPath = paragraph.getPathForRange(1, text.length)
+
+            val expectedPath = Path()
+            expectedPath.addRect(Rect(fontSizeInPx, 0f, 2 * fontSizeInPx, fontSizeInPx))
 
             val diff = Path.combine(PathOperation.Difference, expectedPath, actualPath).getBounds()
             assertThat(diff).isEqualTo(Rect.Zero)
@@ -3682,12 +3681,11 @@ class ParagraphIntegrationTest {
                 )
             )
 
-            val expectedPath = Path()
-            val lineRight = paragraph.getLineRight(0)
-            expectedPath.addRect(Rect(lineRight / 2, 0f, lineRight, fontSizeInPx))
-
             // Try to select "\uDD1E\uD834", actually "\uD834\uDD1F" is selected.
             val actualPath = paragraph.getPathForRange(1, text.length - 1)
+
+            val expectedPath = Path()
+            expectedPath.addRect(Rect(fontSizeInPx, 0f, 2 * fontSizeInPx, fontSizeInPx))
 
             val diff = Path.combine(PathOperation.Difference, expectedPath, actualPath).getBounds()
             assertThat(diff).isEqualTo(Rect.Zero)
@@ -3708,12 +3706,11 @@ class ParagraphIntegrationTest {
                 )
             )
 
-            val expectedPath = Path()
-            val lineRight = paragraph.getLineRight(0)
-            expectedPath.addRect(Rect(lineRight / 2, 0f, lineRight / 2, fontSizeInPx))
-
             // Try to select "\uDD1E", get vertical line segment after this character.
             val actualPath = paragraph.getPathForRange(1, 2)
+
+            val expectedPath = Path()
+            expectedPath.addRect(Rect(fontSizeInPx, 0f, fontSizeInPx, fontSizeInPx))
 
             val diff = Path.combine(PathOperation.Difference, expectedPath, actualPath).getBounds()
             assertThat(diff).isEqualTo(Rect.Zero)
@@ -3723,7 +3720,7 @@ class ParagraphIntegrationTest {
     @Test
     fun testGetPathForRange_Emoji_Sequence() {
         with(defaultDensity) {
-            val text = "\u1F600\u1F603\u1F604\u1F606"
+            val text = "\uD83D\uDE00\uD83D\uDE03\uD83D\uDE04\uD83D\uDE06"
             val fontSize = 20.sp
             val fontSizeInPx = fontSize.toPx()
             val paragraph = simpleParagraph(
@@ -3734,20 +3731,11 @@ class ParagraphIntegrationTest {
                 )
             )
 
-            val expectedPath = Path()
-            val lineLeft = paragraph.getLineLeft(0)
-            val lineRight = paragraph.getLineRight(0)
-            expectedPath.addRect(
-                Rect(
-                    lineLeft + fontSizeInPx,
-                    0f,
-                    lineRight - fontSizeInPx,
-                    fontSizeInPx
-                )
-            )
-
             // Select "\u1F603\u1F604"
             val actualPath = paragraph.getPathForRange(1, text.length - 1)
+
+            val expectedPath = Path()
+            expectedPath.addRect(Rect(fontSizeInPx, 0f, fontSizeInPx * 3, fontSizeInPx))
 
             val diff = Path.combine(PathOperation.Difference, expectedPath, actualPath).getBounds()
             assertThat(diff).isEqualTo(Rect.Zero)

@@ -41,16 +41,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun TextFontPaddingDemo() {
@@ -61,6 +64,44 @@ fun TextFontPaddingDemo() {
         CenterInCircleRow()
         MultiStyleText()
         InlineContent()
+        Configuration()
+    }
+}
+
+@OptIn(ExperimentalTextApi::class)
+@Composable
+private fun Configuration() {
+    val fontSize = 72.sp
+    val width = with(LocalDensity.current) { fontSize.toDp() } * 5
+    val padding = Modifier.padding(8.dp)
+    val latinText = "ABCDEfgHIjKgpvyzgpvyzgpvyzgpvyz"
+    val tallText = "ဪไန််မ့်၇ဤဩဦနိမြသကိမ့်ဪไန််မ့်၇ဤဩဦနိမြသကိမ့်"
+    val style = TextStyle(fontSize = fontSize)
+    Row(padding.horizontalScroll(rememberScrollState())) {
+        for (text in arrayOf(latinText, tallText)) {
+            Box {
+                Column(padding.width(width)) {
+                    @Suppress("DEPRECATION")
+                    Text(
+                        text,
+                        style = style.copy(
+                            color = Color.Red,
+                            platformStyle = PlatformTextStyle(includeFontPadding = false)
+                        )
+                    )
+                }
+                Column(padding.width(width)) {
+                    @Suppress("DEPRECATION")
+                    Text(
+                        text,
+                        style = style.copy(
+                            platformStyle = PlatformTextStyle(includeFontPadding = true)
+                        )
+                    )
+                }
+            }
+            Spacer(padding)
+        }
     }
 }
 

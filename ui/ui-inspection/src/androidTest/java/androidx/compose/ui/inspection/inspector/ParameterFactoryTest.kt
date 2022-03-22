@@ -889,7 +889,7 @@ class ParameterFactoryTest {
                 parameter("fontSize", ParameterType.String, "Unspecified", index = 5)
                 parameter("letterSpacing", ParameterType.String, "Unspecified", index = 9)
                 parameter("lineHeight", ParameterType.String, "Unspecified", index = 10)
-                parameter("textDecoration", ParameterType.String, "Underline", index = 14)
+                parameter("textDecoration", ParameterType.String, "Underline", index = 15)
             }
         }
     }

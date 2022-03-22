@@ -39,6 +39,7 @@ import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
@@ -1316,6 +1317,33 @@ AndroidParagraphTest {
         )
 
         assertThat(floatWidth).isEqualTo(paragraph.width)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun withIncludeFontPadding() {
+        val text = "A"
+
+        @Suppress("DEPRECATION")
+        val style = TextStyle(
+            fontSize = 20.sp,
+            platformStyle = PlatformTextStyle(includeFontPadding = true)
+        )
+
+        val paragraphPaddingTrue = simpleParagraph(
+            text = text,
+            style = style,
+            width = Float.MAX_VALUE
+        )
+
+        @Suppress("DEPRECATION")
+        val paragraphPaddingFalse = simpleParagraph(
+            text = text,
+            style = style.copy(platformStyle = PlatformTextStyle(includeFontPadding = false)),
+            width = Float.MAX_VALUE
+        )
+
+        assertThat(paragraphPaddingTrue.height).isNotEqualTo(paragraphPaddingFalse.height)
     }
 
     private fun simpleParagraph(

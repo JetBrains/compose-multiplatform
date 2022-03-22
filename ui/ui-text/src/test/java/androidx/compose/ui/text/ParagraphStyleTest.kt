@@ -158,6 +158,15 @@ class ParagraphStyleTest {
         assertThat(newStyle.textIndent).isNull()
     }
 
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge null platformStyles`() {
+        val style1 = ParagraphStyle(platformStyle = null)
+        val style2 = ParagraphStyle(platformStyle = null)
+
+        assertThat(style1.merge(style2).platformStyle).isNull()
+    }
+
     @Test
     fun `plus operator merges`() {
         val style = ParagraphStyle(
@@ -295,5 +304,16 @@ class ParagraphStyleTest {
 
         assertThat(newStyle.lineHeight).isEqualTo(TextUnit.Unspecified)
         assertThat(anotherNewStyle.lineHeight).isEqualTo(22.sp)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp with null platformStyles has null platformStyle`() {
+        val style = ParagraphStyle(platformStyle = null)
+        val otherStyle = ParagraphStyle(platformStyle = null)
+
+        val lerpedStyle = lerp(start = style, stop = otherStyle, fraction = 0.5f)
+
+        assertThat(lerpedStyle.platformStyle).isNull()
     }
 }
