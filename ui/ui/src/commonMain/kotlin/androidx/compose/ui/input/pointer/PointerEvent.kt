@@ -348,13 +348,9 @@ inline class PointerEventType private constructor(internal val value: Int) {
          * A scroll event was sent. This can happen, for example, due to a mouse scroll wheel.
          * This event indicates that the [PointerInputChange.scrollDelta]'s [Offset] is non-zero.
          */
-        @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
-        @ExperimentalComposeUiApi
-        @get:ExperimentalComposeUiApi
         val Scroll = PointerEventType(6)
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
     override fun toString(): String = when (this) {
         Press -> "Press"
         Release -> "Release"
@@ -401,6 +397,7 @@ inline class PointerEventType private constructor(internal val value: Int) {
  * @param consumed Which aspects of this change have been consumed.
  * @param type The device type that produced the event, such as [mouse][PointerType.Mouse],
  * or [touch][PointerType.Touch].git
+ * @param scrollDelta The amount of scroll wheel movement in the horizontal and vertical directions.
  */
 @Immutable
 @OptIn(ExperimentalComposeUiApi::class)
@@ -413,8 +410,41 @@ class PointerInputChange(
     val previousPosition: Offset,
     val previousPressed: Boolean,
     val consumed: ConsumedData,
-    val type: PointerType = PointerType.Touch
+    val type: PointerType = PointerType.Touch,
+    val scrollDelta: Offset = Offset.Zero
 ) {
+
+    @Deprecated(
+        level = DeprecationLevel.HIDDEN,
+        replaceWith = ReplaceWith(
+            "this(id, uptimeMillis, position, pressed, previousUptimeMillis," +
+                " previousPosition, previousPressed, consumed, type, Offset.Zero)"
+        ),
+        message = "Use another constructor with scrollDelta parameter instead"
+    )
+    constructor(
+        id: PointerId,
+        uptimeMillis: Long,
+        position: Offset,
+        pressed: Boolean,
+        previousUptimeMillis: Long,
+        previousPosition: Offset,
+        previousPressed: Boolean,
+        consumed: ConsumedData,
+        type: PointerType = PointerType.Touch
+    ) : this(
+        id,
+        uptimeMillis,
+        position,
+        pressed,
+        previousUptimeMillis,
+        previousPosition,
+        previousPressed,
+        consumed,
+        type,
+        Offset.Zero
+    )
+
     /**
      * Optional high-frequency pointer moves in between the last two dispatched events.
      * Can be used for extra accuracy when touchscreen rate exceeds framerate.
@@ -428,16 +458,6 @@ class PointerInputChange(
     val historical: List<HistoricalChange>
         get() = _historical ?: listOf()
     private var _historical: List<HistoricalChange>? = null
-
-    /**
-     * The amount of scroll wheel movement in the horizontal and vertical directions.
-     */
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
-    @ExperimentalComposeUiApi
-    @get:ExperimentalComposeUiApi
-    val scrollDelta: Offset
-        get() = _scrollDelta
-    private var _scrollDelta: Offset = Offset.Zero
 
     /**
      * Indicates whether the change was consumed or not. Note that the change must be consumed in
@@ -484,12 +504,19 @@ class PointerInputChange(
         previousPosition,
         previousPressed,
         consumed,
-        type
+        type,
+        scrollDelta
     ) {
         _historical = historical
-        _scrollDelta = scrollDelta
     }
 
+    @Deprecated(
+        level = DeprecationLevel.HIDDEN,
+        replaceWith = ReplaceWith(
+            "copy(id,currentTime, currentPosition, currentPressed, previousTime," +
+                "previousPosition, previousPressed, consumed, type, this.scrollDelta)"
+        ),
+        message = "Use another copy() method with scrollDelta parameter instead")
     fun copy(
         id: PointerId = this.id,
         currentTime: Long = this.uptimeMillis,
@@ -499,7 +526,7 @@ class PointerInputChange(
         previousPosition: Offset = this.previousPosition,
         previousPressed: Boolean = this.previousPressed,
         consumed: ConsumedData = this.consumed,
-        type: PointerType = this.type
+        type: PointerType = this.type,
     ): PointerInputChange = PointerInputChange(
         id,
         currentTime,
@@ -514,6 +541,31 @@ class PointerInputChange(
         this.scrollDelta
     )
 
+    fun copy(
+        id: PointerId = this.id,
+        currentTime: Long = this.uptimeMillis,
+        currentPosition: Offset = this.position,
+        currentPressed: Boolean = this.pressed,
+        previousTime: Long = this.previousUptimeMillis,
+        previousPosition: Offset = this.previousPosition,
+        previousPressed: Boolean = this.previousPressed,
+        consumed: ConsumedData = this.consumed,
+        type: PointerType = this.type,
+        scrollDelta: Offset = this.scrollDelta
+    ): PointerInputChange = PointerInputChange(
+        id,
+        currentTime,
+        currentPosition,
+        currentPressed,
+        previousTime,
+        previousPosition,
+        previousPressed,
+        consumed,
+        type,
+        this.historical,
+        scrollDelta
+    )
+
     @ExperimentalComposeUiApi
     fun copy(
         id: PointerId = this.id,
@@ -525,33 +577,8 @@ class PointerInputChange(
         previousPressed: Boolean = this.previousPressed,
         consumed: ConsumedData = this.consumed,
         type: PointerType = this.type,
-        historical: List<HistoricalChange>
-    ): PointerInputChange = PointerInputChange(
-        id,
-        currentTime,
-        currentPosition,
-        currentPressed,
-        previousTime,
-        previousPosition,
-        previousPressed,
-        consumed,
-        type,
-        historical,
-        this.scrollDelta
-    )
-
-    internal fun copy(
-        id: PointerId = this.id,
-        currentTime: Long = this.uptimeMillis,
-        currentPosition: Offset = this.position,
-        currentPressed: Boolean = this.pressed,
-        previousTime: Long = this.previousUptimeMillis,
-        previousPosition: Offset = this.previousPosition,
-        previousPressed: Boolean = this.previousPressed,
-        consumed: ConsumedData = this.consumed,
-        type: PointerType = this.type,
-        historical: List<HistoricalChange> = this.historical,
-        scrollDelta: Offset
+        historical: List<HistoricalChange>,
+        scrollDelta: Offset = this.scrollDelta
     ): PointerInputChange = PointerInputChange(
         id,
         currentTime,
@@ -661,8 +688,8 @@ enum class PointerEventPass {
 fun PointerInputChange.changedToDown() = !consumed.downChange && !previousPressed && pressed
 
 /**
- * True if this [PointerInputChange] represents a pointer coming in contact with the screen, whether
- * or not that change has been consumed.
+ * True if this [PointerInputChange] represents a pointer coming in contact with the screen,
+ * whether or not that change has been consumed.
  */
 fun PointerInputChange.changedToDownIgnoreConsumed() = !previousPressed && pressed
 

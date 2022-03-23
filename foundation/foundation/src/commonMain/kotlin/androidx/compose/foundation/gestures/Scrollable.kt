@@ -247,14 +247,11 @@ private fun Modifier.mouseWheelScroll(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 private suspend fun AwaitPointerEventScope.awaitScrollEvent(): PointerEvent {
     var event: PointerEvent
     do {
         event = awaitPointerEvent()
-    } while (
-        event.type != PointerEventType.Scroll
-    )
+    } while (event.type != PointerEventType.Scroll)
     return event
 }
 

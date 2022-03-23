@@ -29,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
@@ -51,7 +50,6 @@ private fun TextItem(text: String, color: Color) {
 }
 
 @Composable
-@OptIn(ExperimentalComposeUiApi::class)
 private fun DrawEvents(events: List<Pair<PointerEventType, Any>>) {
     for (i in events.lastIndex downTo 0) {
         val (type, value) = events[i]
@@ -109,7 +107,6 @@ fun EventTypesDemo() {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 private fun addEvent(
     event: PointerEvent,
     events: MutableList<Pair<PointerEventType, Any>>,
