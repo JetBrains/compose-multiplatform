@@ -47,10 +47,15 @@ import androidx.compose.material3.samples.ExtendedFloatingActionButtonTextSample
 import androidx.compose.material3.samples.FancyIndicatorContainerTabs
 import androidx.compose.material3.samples.FancyIndicatorTabs
 import androidx.compose.material3.samples.FancyTabs
+import androidx.compose.material3.samples.FilledIconButtonSample
+import androidx.compose.material3.samples.FilledIconToggleButtonSample
 import androidx.compose.material3.samples.FilledTonalButtonSample
+import androidx.compose.material3.samples.FilledTonalIconButtonSample
+import androidx.compose.material3.samples.FilledTonalIconToggleButtonSample
 import androidx.compose.material3.samples.FloatingActionButtonSample
 import androidx.compose.material3.samples.IconButtonSample
 import androidx.compose.material3.samples.IconTabs
+import androidx.compose.material3.samples.IconToggleButtonSample
 import androidx.compose.material3.samples.LargeFloatingActionButtonSample
 import androidx.compose.material3.samples.LeadingIconTabs
 import androidx.compose.material3.samples.LinearProgressIndicatorSample
@@ -63,6 +68,8 @@ import androidx.compose.material3.samples.NavigationRailSample
 import androidx.compose.material3.samples.NavigationRailWithOnlySelectedLabelsSample
 import androidx.compose.material3.samples.OutlinedButtonSample
 import androidx.compose.material3.samples.OutlinedCardSample
+import androidx.compose.material3.samples.OutlinedIconButtonSample
+import androidx.compose.material3.samples.OutlinedIconToggleButtonSample
 import androidx.compose.material3.samples.OutlinedTextFieldSample
 import androidx.compose.material3.samples.PasswordTextField
 import androidx.compose.material3.samples.PermanentNavigationDrawerSample
@@ -94,7 +101,6 @@ import androidx.compose.material3.samples.TextFieldWithHideKeyboardOnImeAction
 import androidx.compose.material3.samples.TextFieldWithIcons
 import androidx.compose.material3.samples.TextFieldWithPlaceholder
 import androidx.compose.material3.samples.TextTabs
-import androidx.compose.material3.samples.IconToggleButtonSample
 import androidx.compose.material3.samples.TriStateCheckboxSample
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -332,7 +338,37 @@ val IconButtonExamples =
             name = ::IconToggleButtonSample.name,
             description = IconButtonExampleDescription,
             sourceUrl = IconButtonExampleSourceUrl,
-        ) { IconToggleButtonSample() }
+        ) { IconToggleButtonSample() },
+        Example(
+            name = ::FilledIconButtonSample.name,
+            description = IconButtonExampleDescription,
+            sourceUrl = IconButtonExampleSourceUrl,
+        ) { FilledIconButtonSample() },
+        Example(
+            name = ::FilledIconToggleButtonSample.name,
+            description = IconButtonExampleDescription,
+            sourceUrl = IconButtonExampleSourceUrl,
+        ) { FilledIconToggleButtonSample() },
+        Example(
+            name = ::FilledTonalIconButtonSample.name,
+            description = IconButtonExampleDescription,
+            sourceUrl = IconButtonExampleSourceUrl,
+        ) { FilledTonalIconButtonSample() },
+        Example(
+            name = ::FilledTonalIconToggleButtonSample.name,
+            description = IconButtonExampleDescription,
+            sourceUrl = IconButtonExampleSourceUrl,
+        ) { FilledTonalIconToggleButtonSample() },
+        Example(
+            name = ::OutlinedIconButtonSample.name,
+            description = IconButtonExampleDescription,
+            sourceUrl = IconButtonExampleSourceUrl,
+        ) { OutlinedIconButtonSample() },
+        Example(
+            name = ::OutlinedIconToggleButtonSample.name,
+            description = IconButtonExampleDescription,
+            sourceUrl = IconButtonExampleSourceUrl,
+        ) { OutlinedIconToggleButtonSample() }
     )
 
 private const val MenusExampleDescription = "Menus examples"
