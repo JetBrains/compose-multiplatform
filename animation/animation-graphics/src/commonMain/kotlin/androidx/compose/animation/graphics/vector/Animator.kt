@@ -19,10 +19,14 @@ package androidx.compose.animation.graphics.vector
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.KeyframesSpec
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.repeatable
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
@@ -62,7 +66,7 @@ internal sealed class Animator {
             }
         }
         for ((propertyName, values) in propertyValuesMap) {
-            values.timestamps.sortBy { it.time }
+            values.timestamps.sortBy { it.timeMillis }
             val state = values.createState(transition, propertyName, overallDuration)
             @Suppress("UNCHECKED_CAST")
             when (propertyName) {
@@ -95,34 +99,34 @@ internal sealed class Animator {
 }
 
 internal class Timestamp<T>(
-    val time: Int,
-    val value: T,
-    val easing: Easing
-)
+    val timeMillis: Int,
+    val durationMillis: Int,
+    val repeatCount: Int,
+    val repeatMode: RepeatMode,
+    val holder: PropertyValuesHolder<T>
+) {
+    fun asAnimationSpec(): FiniteAnimationSpec<T> {
+        @Suppress("UNCHECKED_CAST")
+        val spec = when (holder) {
+            is PropertyValuesHolderFloat -> holder.asKeyframeSpec(durationMillis)
+            is PropertyValuesHolderColor -> holder.asKeyframeSpec(durationMillis)
+            else -> throw RuntimeException("Unexpected value type: $holder")
+        } as KeyframesSpec<T>
+        return if (repeatCount > 0) {
+            repeatable(
+                iterations = repeatCount + 1,
+                animation = spec,
+                repeatMode = repeatMode
+            )
+        } else {
+            spec
+        }
+    }
+}
 
 internal sealed class PropertyValues<T> {
 
     val timestamps = mutableListOf<Timestamp<T>>()
-
-    fun addKeyframes(
-        keyframes: List<Keyframe<T>>,
-        overallDuration: Int,
-        parentDelay: Int,
-        totalDuration: Int,
-        startDelay: Int
-    ) {
-        val startFraction = (parentDelay + startDelay).toFloat() / overallDuration
-        val fractionRatio = (totalDuration - startDelay).toFloat() / overallDuration
-        timestamps.addAll(
-            keyframes.map { keyframe ->
-                Timestamp(
-                    ((keyframe.fraction * fractionRatio + startFraction) * overallDuration).toInt(),
-                    keyframe.value,
-                    keyframe.interpolator
-                )
-            }
-        )
-    }
 
     @Composable
     abstract fun createState(
@@ -135,33 +139,11 @@ internal sealed class PropertyValues<T> {
         overallDuration: Int
     ): @Composable Transition.Segment<Boolean>.() -> FiniteAnimationSpec<T> {
         return {
-            if (targetState) { // Start to end
-                keyframes {
-                    durationMillis = overallDuration
-                    timestamps.fastForEach { timestamp ->
-                        timestamp.value at timestamp.time with timestamp.easing
-                    }
-                }
-            } else {
-                keyframes {
-                    durationMillis = overallDuration
-                    timestamps.asReversed().fastForEach { timestamp ->
-                        timestamp.value at
-                            overallDuration - timestamp.time with
-                            timestamp.easing.transpose()
-                    }
-                }
-            }
-        }
-    }
-
-    protected fun targetValueByState(): @Composable (state: Boolean) -> T {
-        return { atEnd ->
-            if (atEnd) {
-                timestamps.last().value
-            } else {
-                timestamps.first().value
-            }
+            @Suppress("UNCHECKED_CAST")
+            val spec = combined(timestamps.map { timestamp ->
+                timestamp.timeMillis to timestamp.asAnimationSpec()
+            })
+            if (targetState) spec else spec.reversed(overallDuration)
         }
     }
 }
@@ -177,7 +159,15 @@ private class FloatPropertyValues : PropertyValues<Float>() {
         return transition.animateFloat(
             transitionSpec = createAnimationSpec(overallDuration),
             label = propertyName,
-            targetValueByState = targetValueByState()
+            targetValueByState = { atEnd ->
+                if (atEnd) {
+                    (timestamps.last().holder as PropertyValuesHolderFloat)
+                        .animatorKeyframes.last().value
+                } else {
+                    (timestamps.first().holder as PropertyValuesHolderFloat)
+                        .animatorKeyframes.first().value
+                }
+            }
         )
     }
 }
@@ -193,12 +183,20 @@ private class ColorPropertyValues : PropertyValues<Color>() {
         return transition.animateColor(
             transitionSpec = createAnimationSpec(overallDuration),
             label = propertyName,
-            targetValueByState = targetValueByState()
+            targetValueByState = { atEnd ->
+                if (atEnd) {
+                    (timestamps.last().holder as PropertyValuesHolderColor)
+                        .animatorKeyframes.last().value
+                } else {
+                    (timestamps.first().holder as PropertyValuesHolderColor)
+                        .animatorKeyframes.first().value
+                }
+            }
         )
     }
 }
 
-internal class PathPropertyValues : PropertyValues<List<PathNode>>() {
+private class PathPropertyValues : PropertyValues<List<PathNode>>() {
 
     @Composable
     override fun createState(
@@ -208,51 +206,30 @@ internal class PathPropertyValues : PropertyValues<List<PathNode>>() {
     ): State<List<PathNode>> {
         val timeState = transition.animateFloat(
             transitionSpec = {
-                if (targetState) { // Start to end
-                    keyframes {
-                        durationMillis = overallDuration
-                        timestamps.fastForEach { timestamp ->
-                            timestamp.time.toFloat() at timestamp.time with timestamp.easing
-                        }
-                    }
-                } else {
-                    keyframes {
-                        durationMillis = overallDuration
-                        timestamps.asReversed().fastForEach { timestamp ->
-                            timestamp.time.toFloat() at
-                                overallDuration - timestamp.time with
-                                timestamp.easing.transpose()
-                        }
-                    }
-                }
+                val spec = tween<Float>(durationMillis = overallDuration, easing = LinearEasing)
+                if (targetState) spec else spec.reversed(overallDuration)
             },
             label = propertyName
         ) { atEnd ->
-            if (atEnd) {
-                timestamps.last().time
-            } else {
-                timestamps.first().time
-            }.toFloat()
+            if (atEnd) overallDuration.toFloat() else 0f
         }
         return derivedStateOf { interpolate(timeState.value) }
     }
 
-    private fun interpolate(time: Float): List<PathNode> {
-        val index = (timestamps.indexOfFirst { it.time >= time } - 1)
-            .coerceAtLeast(0)
-        val easing = timestamps[index + 1].easing
-        val innerFraction = easing.transform(
-            (
-                (time - timestamps[index].time) /
-                    (timestamps[index + 1].time - timestamps[index].time)
-                )
-                .coerceIn(0f, 1f)
-        )
-        return lerp(
-            timestamps[index].value,
-            timestamps[index + 1].value,
-            innerFraction
-        )
+    private fun interpolate(timeMillis: Float): List<PathNode> {
+        val timestamp = timestamps.lastOrNull { it.timeMillis <= timeMillis } ?: timestamps.first()
+        var fraction = (timeMillis - timestamp.timeMillis) / timestamp.durationMillis
+        if (timestamp.repeatCount != 0) {
+            var count = 0
+            while (fraction > 1f) {
+                fraction -= 1f
+                count++
+            }
+            if (timestamp.repeatMode == RepeatMode.Reverse && count % 2 != 0) {
+                fraction = 1f - fraction
+            }
+        }
+        return (timestamp.holder as PropertyValuesHolderPath).interpolate(fraction)
     }
 }
 
@@ -284,12 +261,14 @@ internal data class ObjectAnimator(
                     val values =
                         propertyValuesMap[holder.propertyName] as FloatPropertyValues?
                             ?: FloatPropertyValues()
-                    values.addKeyframes(
-                        holder.animatorKeyframes,
-                        overallDuration,
-                        parentDelay,
-                        totalDuration,
-                        startDelay
+                    values.timestamps.add(
+                        Timestamp(
+                            parentDelay + startDelay,
+                            duration,
+                            repeatCount,
+                            repeatMode,
+                            holder
+                        )
                     )
                     propertyValuesMap[holder.propertyName] = values
                 }
@@ -297,12 +276,14 @@ internal data class ObjectAnimator(
                     val values =
                         propertyValuesMap[holder.propertyName] as ColorPropertyValues?
                             ?: ColorPropertyValues()
-                    values.addKeyframes(
-                        holder.animatorKeyframes,
-                        overallDuration,
-                        parentDelay,
-                        totalDuration,
-                        startDelay
+                    values.timestamps.add(
+                        Timestamp(
+                            parentDelay + startDelay,
+                            duration,
+                            repeatCount,
+                            repeatMode,
+                            holder
+                        )
                     )
                     propertyValuesMap[holder.propertyName] = values
                 }
@@ -310,12 +291,14 @@ internal data class ObjectAnimator(
                     val values =
                         propertyValuesMap[holder.propertyName] as PathPropertyValues?
                             ?: PathPropertyValues()
-                    values.addKeyframes(
-                        holder.animatorKeyframes,
-                        overallDuration,
-                        parentDelay,
-                        totalDuration,
-                        startDelay
+                    values.timestamps.add(
+                        Timestamp(
+                            parentDelay + startDelay,
+                            duration,
+                            repeatCount,
+                            repeatMode,
+                            holder
+                        )
                     )
                     propertyValuesMap[holder.propertyName] = values
                 }
@@ -386,7 +369,17 @@ internal sealed class PropertyValuesHolder1D<T>(
 internal class PropertyValuesHolderFloat(
     propertyName: String,
     override val animatorKeyframes: List<Keyframe<Float>>
-) : PropertyValuesHolder1D<Float>(propertyName)
+) : PropertyValuesHolder1D<Float>(propertyName) {
+
+    fun asKeyframeSpec(duration: Int): KeyframesSpec<Float> {
+        return keyframes {
+            durationMillis = duration
+            for (keyframe in animatorKeyframes) {
+                keyframe.value at (duration * keyframe.fraction).toInt() with keyframe.interpolator
+            }
+        }
+    }
+}
 
 internal class PropertyValuesHolderInt(
     propertyName: String,
@@ -396,12 +389,39 @@ internal class PropertyValuesHolderInt(
 internal class PropertyValuesHolderColor(
     propertyName: String,
     override val animatorKeyframes: List<Keyframe<Color>>
-) : PropertyValuesHolder1D<Color>(propertyName)
+) : PropertyValuesHolder1D<Color>(propertyName) {
+
+    fun asKeyframeSpec(duration: Int): KeyframesSpec<Color> {
+        return keyframes {
+            durationMillis = duration
+            for (keyframe in animatorKeyframes) {
+                keyframe.value at (duration * keyframe.fraction).toInt() with keyframe.interpolator
+            }
+        }
+    }
+}
 
 internal class PropertyValuesHolderPath(
     propertyName: String,
     override val animatorKeyframes: List<Keyframe<List<PathNode>>>
-) : PropertyValuesHolder1D<List<PathNode>>(propertyName)
+) : PropertyValuesHolder1D<List<PathNode>>(propertyName) {
+
+    fun interpolate(fraction: Float): List<PathNode> {
+        val index = (animatorKeyframes.indexOfFirst { it.fraction >= fraction } - 1)
+            .coerceAtLeast(0)
+        val easing = animatorKeyframes[index + 1].interpolator
+        val innerFraction = easing.transform(
+            ((fraction - animatorKeyframes[index].fraction) /
+                (animatorKeyframes[index + 1].fraction - animatorKeyframes[index].fraction))
+                .coerceIn(0f, 1f)
+        )
+        return lerp(
+            animatorKeyframes[index].value,
+            animatorKeyframes[index + 1].value,
+            innerFraction
+        )
+    }
+}
 
 internal data class Keyframe<T>(
     val fraction: Float,
@@ -458,10 +478,6 @@ internal class StateVectorConfig : VectorConfig {
             is VectorProperty.TrimPathOffset -> trimPathOffsetState?.value ?: defaultValue
         } as T
     }
-}
-
-private fun Easing.transpose(): Easing {
-    return Easing { x -> 1 - this.transform(1 - x) }
 }
 
 private fun lerp(start: List<PathNode>, stop: List<PathNode>, fraction: Float): List<PathNode> {

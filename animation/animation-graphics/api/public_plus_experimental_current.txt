@@ -34,6 +34,9 @@ package androidx.compose.animation.graphics.vector {
   public static final class AnimatedImageVector.Companion {
   }
 
+  public final class AnimatorAnimationSpecsKt {
+  }
+
   public final class AnimatorKt {
   }
 
