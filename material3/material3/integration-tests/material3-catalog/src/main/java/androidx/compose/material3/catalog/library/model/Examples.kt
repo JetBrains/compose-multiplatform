@@ -44,19 +44,20 @@ import androidx.compose.material3.samples.ExitUntilCollapsedMediumTopAppBar
 import androidx.compose.material3.samples.ExposedDropdownMenuSample
 import androidx.compose.material3.samples.ExtendedFloatingActionButtonSample
 import androidx.compose.material3.samples.ExtendedFloatingActionButtonTextSample
-import androidx.compose.material3.samples.FancyTabs
-import androidx.compose.material3.samples.FancyIndicatorTabs
 import androidx.compose.material3.samples.FancyIndicatorContainerTabs
+import androidx.compose.material3.samples.FancyIndicatorTabs
+import androidx.compose.material3.samples.FancyTabs
 import androidx.compose.material3.samples.FilledTonalButtonSample
 import androidx.compose.material3.samples.FloatingActionButtonSample
+import androidx.compose.material3.samples.IconButtonSample
 import androidx.compose.material3.samples.IconTabs
 import androidx.compose.material3.samples.LargeFloatingActionButtonSample
-import androidx.compose.material3.samples.LinearProgressIndicatorSample
 import androidx.compose.material3.samples.LeadingIconTabs
+import androidx.compose.material3.samples.LinearProgressIndicatorSample
 import androidx.compose.material3.samples.MenuSample
+import androidx.compose.material3.samples.ModalNavigationDrawerSample
 import androidx.compose.material3.samples.NavigationBarSample
 import androidx.compose.material3.samples.NavigationBarWithOnlySelectedLabelsSample
-import androidx.compose.material3.samples.ModalNavigationDrawerSample
 import androidx.compose.material3.samples.NavigationRailBottomAlignSample
 import androidx.compose.material3.samples.NavigationRailSample
 import androidx.compose.material3.samples.NavigationRailWithOnlySelectedLabelsSample
@@ -93,6 +94,7 @@ import androidx.compose.material3.samples.TextFieldWithHideKeyboardOnImeAction
 import androidx.compose.material3.samples.TextFieldWithIcons
 import androidx.compose.material3.samples.TextFieldWithPlaceholder
 import androidx.compose.material3.samples.TextTabs
+import androidx.compose.material3.samples.IconToggleButtonSample
 import androidx.compose.material3.samples.TriStateCheckboxSample
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -315,6 +317,22 @@ val FloatingActionButtonsExamples =
             description = FloatingActionButtonsExampleDescription,
             sourceUrl = FloatingActionButtonsExampleSourceUrl,
         ) { SmallFloatingActionButtonSample() }
+    )
+
+private const val IconButtonExampleDescription = "Icon button examples"
+private const val IconButtonExampleSourceUrl = "$SampleSourceUrl/IconButtonSamples.kt"
+val IconButtonExamples =
+    listOf(
+        Example(
+            name = ::IconButtonSample.name,
+            description = IconButtonExampleDescription,
+            sourceUrl = IconButtonExampleSourceUrl,
+        ) { IconButtonSample() },
+        Example(
+            name = ::IconToggleButtonSample.name,
+            description = IconButtonExampleDescription,
+            sourceUrl = IconButtonExampleSourceUrl,
+        ) { IconToggleButtonSample() }
     )
 
 private const val MenusExampleDescription = "Menus examples"
