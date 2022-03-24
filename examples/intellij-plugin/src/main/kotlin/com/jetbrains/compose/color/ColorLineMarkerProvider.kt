@@ -14,28 +14,34 @@ import org.jetbrains.kotlin.psi.KtConstantExpression
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.uast.*
 import kotlin.random.Random
+import kotlin.random.nextUInt
 
 class ColorLineMarkerProvider : LineMarkerProvider {
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? {
         val ktPsiFactory = KtPsiFactory(element.project)
-        val uElement = element.toUElement() ?: return null
+        val uElement: UElement = element.toUElement() ?: return null
         element.text
-        if (uElement.isNumberLiteral()) {
-            return LineMarkerInfo(
-                element,
-                element.textRange,
-                AllIcons.General.Information,
-                null,
-                { mouseEvent, psiElement: PsiElement ->
-                    psiElement.replace(ktPsiFactory.createExpression(Random.nextInt().toString()))
-                },
-                GutterIconRenderer.Alignment.RIGHT,
-                { "change color literal" }
-            )
-        } else {
-            return null
+        if (uElement is UCallExpression) {
+            if (uElement.kind == UastCallKind.METHOD_CALL && uElement.methodIdentifier?.name == "Color") {
+                return LineMarkerInfo(
+                    element,
+                    element.textRange,
+                    AllIcons.General.Information,
+                    null,
+                    { mouseEvent, psiElement: PsiElement ->
+                        psiElement.replace(
+                            ktPsiFactory.createExpression(
+                                "Color(0x${Random.nextUInt().toString(16)})"
+                            )
+                        )
+                    },
+                    GutterIconRenderer.Alignment.RIGHT,
+                    { "change color literal" }
+                )
+            }
         }
+        return null
     }
 
     override fun collectSlowLineMarkers(
