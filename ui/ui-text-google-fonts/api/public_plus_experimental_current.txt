@@ -11,6 +11,7 @@ package androidx.compose.ui.text.googlefonts {
 
   @androidx.compose.ui.text.ExperimentalTextApi public static final class GoogleFont.Provider {
     ctor public GoogleFont.Provider(String providerAuthority, String providerPackage, java.util.List<? extends java.util.List<byte[]>> certificates);
+    ctor public GoogleFont.Provider(String providerAuthority, String providerPackage, @ArrayRes int certificates);
   }
 
   public final class GoogleFontKt {

@@ -23,6 +23,7 @@ import android.content.Context
 import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.ArrayRes
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.AndroidFont
 import androidx.compose.ui.text.font.Font
@@ -93,11 +94,62 @@ class GoogleFont(val name: String, val bestEffort: Boolean = true) {
     @ExperimentalTextApi
     // contains Google in name because this function provides integration with fonts.google.com
     @Suppress("MentionsGoogle")
-    class Provider(
+    class Provider private constructor(
         internal val providerAuthority: String,
         internal val providerPackage: String,
-        internal val certificates: List<List<ByteArray>>
+        internal val certificates: List<List<ByteArray>>?,
+        @ArrayRes internal val certificatesRes: Int
     ) {
+
+        /**
+         * Describe a downloadable fonts provider using a list of certificates.
+         *
+         * The font provider is matched by `providerAuthority` and `packageName`, then the resulting
+         * provider has it's certificates validated against `certificates`.
+         *
+         * If the certificates check success, the provider is used for downloadable fonts.
+         *
+         * If the certificates check fails, the provider will not be used and any downloadable fonts
+         * requests configured with it will fail.
+         *
+         * @param providerAuthority The authority of the Font Provider to be used for the request.
+         * @param providerPackage The package for the Font Provider to be used for the request. This
+         * is used to verify the identity of the provider.
+         * @param certificates The list of sets of hashes for the certificates the provider should
+         * be signed with. This is used to verify the identity of the provider. Each set in the
+         * list represents one collection of signature hashes. Refer to your font provider's
+         * documentation for these values.
+         */
+        constructor(
+            providerAuthority: String,
+            providerPackage: String,
+            certificates: List<List<ByteArray>>
+        ) : this(providerAuthority, providerPackage, certificates, 0)
+
+        /**
+         * Describe a downloadable fonts provider using a resource array for certificates.
+         *
+         * The font provider is matched by `providerAuthority` and `packageName`, then the resulting
+         * provider has it's certificates validated against `certificates`.
+         *
+         * If the certificates check success, the provider is used for downloadable fonts.
+         *
+         * If the certificates check fails, the provider will not be used and any downloadable fonts
+         * requests configured with it will fail.
+         *
+         * @param providerAuthority The authority of the Font Provider to be used for the request.
+         * @param providerPackage The package for the Font Provider to be used for the request. This
+         * is used to verify the identity of the provider.
+         * @param certificates A resource array with the list of sets of hashes for the certificates
+         * the provider should be signed with. This is used to verify the identity of the provider.
+         * Each set in the list represents one collection of signature hashes. Refer to your
+         * font provider's documentation for these values.
+         */
+        constructor(
+            providerAuthority: String,
+            providerPackage: String,
+            @ArrayRes certificates: Int
+        ) : this(providerAuthority, providerPackage, null, certificates)
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -135,12 +187,23 @@ internal data class GoogleFontImpl constructor(
     fun toFontRequest(): FontRequest {
         val query = "name=${name.encode()}&weight=${weight.weight}" +
             "&italic=${style.toQueryParam()}&besteffort=${bestEffortQueryParam()}"
-        return FontRequest(
-            fontProvider.providerAuthority,
-            fontProvider.providerPackage,
-            query,
-            fontProvider.certificates
-        )
+
+        val certs = fontProvider.certificates
+        if (certs != null) {
+            return FontRequest(
+                fontProvider.providerAuthority,
+                fontProvider.providerPackage,
+                query,
+                certs
+            )
+        } else {
+            return FontRequest(
+                fontProvider.providerAuthority,
+                fontProvider.providerPackage,
+                query,
+                fontProvider.certificatesRes
+            )
+        }
     }
 
     private fun bestEffortQueryParam() = if (bestEffort) "true" else "false"

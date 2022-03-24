@@ -150,6 +150,13 @@ class GoogleFontTest {
     }
 
     @Test
+    fun GoogleFontImpl_providercerts_fromRes_passedDown() {
+        val provider = GoogleFont.Provider("a", "b", 17)
+        val font = Font(GoogleFont("a"), provider) as GoogleFontImpl
+        assertThat(font.toFontRequest().certificatesArrayResId).isEqualTo(17)
+    }
+
+    @Test
     fun GoogleFontImpl_TypefaceStyle_Normal() {
         val font = Font(GoogleFont("a"), TestProvider) as GoogleFontImpl
         assertThat(font.toTypefaceStyle()).isEqualTo(Typeface.NORMAL)
@@ -226,6 +233,24 @@ class GoogleFontTest {
             "Font(GoogleFont(\"Font Family\", bestEffort=true), weight=FontWeight(weight=400), " +
                 "style=Normal)"
         )
+    }
+
+    @Test
+    fun GoogleFont_Provider_withResId() {
+        val provider = GoogleFont.Provider("provider", "package", 17)
+        assertThat(provider.certificatesRes).isEqualTo(17)
+        assertThat(provider.certificates).isNull()
+    }
+
+    @Test
+    fun GoogleFont_Provider_withCertsArray() {
+        val provider = GoogleFont.Provider(
+            "provider",
+            "package",
+            listOf(listOf(ByteArray(100) { it.toByte() }))
+        )
+        assertThat(provider.certificatesRes).isEqualTo(0)
+        assertThat(provider.certificates).isNotNull()
     }
 
     private class CapturingFontsContractCompatLoader : FontsContractCompatLoader {
