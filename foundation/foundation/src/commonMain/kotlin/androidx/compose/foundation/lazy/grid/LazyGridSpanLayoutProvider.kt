@@ -24,18 +24,13 @@ import kotlin.math.sqrt
 internal class LazyGridSpanLayoutProvider(private val itemsProvider: LazyGridItemsProvider) {
     class LineConfiguration(val firstItemIndex: Int, val spans: List<GridItemSpan>)
 
-    /** Caches the index of the first item on lines 0, [bucketSize], 2 * [bucketSize], etc. */
-    private val bucketStartItemIndex = ArrayList<Int>().apply { add(0) }
-    /**
-     * Caches the span of the first item on lines 0, [bucketSize], 2 * [bucketSize], etc., but
-     * only if this item caused "line break".
-     */
-    private val bucketStartKnownSpan = ArrayList<Int>().apply { add(0) }
+    /** Caches the bucket info on lines 0, [bucketSize], 2 * [bucketSize], etc. */
+    private val buckets = ArrayList<Bucket>().apply { add(Bucket(0)) }
     /**
      * The interval at each we will store the starting element of lines. These will be then
      * used to calculate the layout of arbitrary lines, by starting from the closest
      * known "bucket start". The smaller the bucketSize, the smaller cost for calculating layout
-     * of arbitrary lines but the higher memory usage for [bucketStartItemIndex].
+     * of arbitrary lines but the higher memory usage for [buckets].
      */
     private val bucketSize get() = sqrt(1.0 * totalSize / slotsPerLine).toInt() + 1
     /** Caches the last calculated line index, useful when scrolling in main axis direction. */
@@ -87,18 +82,20 @@ internal class LazyGridSpanLayoutProvider(private val itemsProvider: LazyGridIte
             )
         }
 
-        val bucket = lineIndex / bucketSize
+        val bucketIndex = min(lineIndex / bucketSize, buckets.size - 1)
         // We can calculate the items on the line from the closest cached bucket start item.
-        var currentLine = min(bucket, bucketStartItemIndex.size - 1) * bucketSize
-        var currentItemIndex = bucketStartItemIndex[min(bucket, bucketStartItemIndex.size - 1)]
-        var knownCurrentItemSpan = bucketStartKnownSpan[min(bucket, bucketStartItemIndex.size - 1)]
+        var currentLine = bucketIndex * bucketSize
+        var currentItemIndex = buckets[bucketIndex].firstItemIndex
+        var knownCurrentItemSpan = buckets[bucketIndex].firstItemKnownSpan
         // ... but try using the more localised cached values.
         if (lastLineIndex in currentLine..lineIndex) {
             // The last calculated value is a better start point. Common when scrolling main axis.
             currentLine = lastLineIndex
             currentItemIndex = lastLineStartItemIndex
             knownCurrentItemSpan = lastLineStartKnownSpan
-        } else if (bucket == cachedBucketIndex && lineIndex - currentLine < cachedBucket.size) {
+        } else if (bucketIndex == cachedBucketIndex &&
+            lineIndex - currentLine < cachedBucket.size
+        ) {
             // It happens that the needed line start is fully cached. Common when scrolling in
             // reverse main axis, as we decided to cacheThisBucket previously.
             currentItemIndex = cachedBucket[lineIndex - currentLine]
@@ -109,7 +106,7 @@ internal class LazyGridSpanLayoutProvider(private val itemsProvider: LazyGridIte
         val cacheThisBucket = currentLine % bucketSize == 0 &&
             lineIndex - currentLine in 2 until bucketSize
         if (cacheThisBucket) {
-            cachedBucketIndex = bucket
+            cachedBucketIndex = bucketIndex
             cachedBucket.clear()
         }
 
@@ -139,9 +136,8 @@ internal class LazyGridSpanLayoutProvider(private val itemsProvider: LazyGridIte
             if (currentLine % bucketSize == 0 && currentItemIndex < totalSize) {
                 val currentLineBucket = currentLine / bucketSize
                 // This should happen, as otherwise this should have been used as starting point.
-                check(bucketStartItemIndex.size == currentLineBucket)
-                bucketStartItemIndex.add(currentItemIndex)
-                bucketStartKnownSpan.add(knownCurrentItemSpan)
+                check(buckets.size == currentLineBucket)
+                buckets.add(Bucket(currentItemIndex, knownCurrentItemSpan))
             }
         }
 
@@ -180,11 +176,11 @@ internal class LazyGridSpanLayoutProvider(private val itemsProvider: LazyGridIte
             return LineIndex(itemIndex / slotsPerLine)
         }
 
-        val lowerBoundBucket = bucketStartItemIndex.binarySearch { it - itemIndex }.let {
+        val lowerBoundBucket = buckets.binarySearch { it.firstItemIndex - itemIndex }.let {
             if (it >= 0) it else -it - 2
         }
         var currentLine = lowerBoundBucket * bucketSize
-        var currentItemIndex = bucketStartItemIndex[lowerBoundBucket]
+        var currentItemIndex = buckets[lowerBoundBucket].firstItemIndex
 
         require(currentItemIndex <= itemIndex)
         var spansUsed = 0
@@ -202,8 +198,8 @@ internal class LazyGridSpanLayoutProvider(private val itemsProvider: LazyGridIte
             }
             if (currentLine % bucketSize == 0) {
                 val currentLineBucket = currentLine / bucketSize
-                if (currentLineBucket >= bucketStartItemIndex.size) {
-                    bucketStartItemIndex.add(currentItemIndex - if (spansUsed > 0) 1 else 0)
+                if (currentLineBucket >= buckets.size) {
+                    buckets.add(Bucket(currentItemIndex - if (spansUsed > 0) 1 else 0))
                 }
             }
         }
@@ -224,13 +220,20 @@ internal class LazyGridSpanLayoutProvider(private val itemsProvider: LazyGridIte
     }
 
     private fun invalidateCache() {
-        bucketStartItemIndex.clear()
-        bucketStartItemIndex.add(0)
+        buckets.clear()
+        buckets.add(Bucket(0))
         lastLineIndex = 0
         lastLineStartItemIndex = 0
         cachedBucketIndex = -1
         cachedBucket.clear()
     }
+
+    private class Bucket(
+        /** Index of the first item in the bucket */
+        val firstItemIndex: Int,
+        /** Known span of the first item. Not zero only if this item caused "line break". */
+        val firstItemKnownSpan: Int = 0
+    )
 
     private object LazyGridItemSpanScopeImpl : LazyGridItemSpanScope {
         override var maxCurrentLineSpan = 0
