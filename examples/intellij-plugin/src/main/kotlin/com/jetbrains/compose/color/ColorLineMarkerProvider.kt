@@ -44,7 +44,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                     { mouseEvent, psiElement: PsiElement ->
 
                         class ChooseColorDialog() : DialogWrapper(project) {
-                            val colorState = mutableStateOf(0u)
+                            val colorState = mutableStateOf(0uL)
                             init {
                                 title = "Choose color"
                                 init()
@@ -57,11 +57,8 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                                         var color by remember { colorState }
                                         WidgetTheme(darkTheme = true) {
                                             Surface(modifier = Modifier.fillMaxSize()) {
-                                                Button(onClick = {
-                                                    color = Random.nextUInt()
-
-                                                }) {
-                                                    Text("Change color")
+                                                ColorPicker(color) {
+                                                    color = it
                                                 }
                                             }
                                         }
@@ -75,7 +72,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                             val color = chooseColorDialog.colorState.value
                             psiElement.replace(
                                 ktPsiFactory.createExpression(
-                                    "Color(0x${color.toString(16)})"
+                                    "Color(0x${color.toString(16)}uL)"
                                 )
                             )
                         }
