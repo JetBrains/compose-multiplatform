@@ -47,10 +47,16 @@ fun ColorPallet(colorState: MutableState<Color>) {
                         val event = awaitPointerEvent()
                         if (event.buttons.isPrimaryPressed) {
                             val position = event.changes.first().position
-                            currentColor = currentColor.toHsv().copy(
-                                hue = position.x.mod(360f),
-                                saturation = position.y / 256
-                            ).toRgb()
+                            currentColor = try {
+                                currentColor.toHsv().copy(
+                                    hue = position.x.mod(360f),
+                                    saturation = position.y / 256
+                                ).toRgb()
+                            } catch (t:Throwable) {
+                                t.printStackTrace()
+                                println("exception $t")
+                                currentColor
+                            }
                         }
                     }
                 }

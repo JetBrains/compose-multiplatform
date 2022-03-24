@@ -65,7 +65,7 @@ fun Color.toHsv(): HSV {
  */
 fun HSV.toRgb(): Color {
     val c = value * saturation
-    val x = c * (1 - abs((hue / 60).mod(2f) - 1))
+    val x = minOf(c * (1 - abs((hue / 60).mod(2f) - 1)), 1f)
     if (x.isNaN()) {
         println("x.isNaN()")
     }
@@ -78,6 +78,6 @@ fun HSV.toRgb(): Color {
         hue >= 240 && hue < 300 -> Color(x, 0f, c)
         else -> Color(c, 0f, x)
     }
-    return Color(m + tempColor.red, m + tempColor.green, m + tempColor.blue)
+    return Color(minOf(m + tempColor.red, 1f), minOf(m + tempColor.green, 1f), minOf( m + tempColor.blue, 1f))
 }
 
