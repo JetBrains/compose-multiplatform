@@ -26,6 +26,8 @@ import javax.swing.JComponent
 import kotlin.random.Random
 import kotlin.random.nextUInt
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import com.intellij.openapi.application.ApplicationManager
 
 class ColorLineMarkerProvider : LineMarkerProvider {
@@ -44,7 +46,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                     { mouseEvent, psiElement: PsiElement ->
 
                         class ChooseColorDialog() : DialogWrapper(project) {
-                            val colorState = mutableStateOf(0xffL)
+                            val colorState = mutableStateOf(Color(0xff_ff_ff_ff))
 
                             init {
                                 title = "Choose color"
@@ -53,15 +55,12 @@ class ColorLineMarkerProvider : LineMarkerProvider {
 
                             override fun createCenterPanel(): JComponent =
                                 ComposePanel().apply {
-                                    setBounds(0, 0, 600, 600)
+                                    setBounds(0, 0, 400, 400)
                                     setContent {
-
                                         var color by remember { colorState }
                                         WidgetTheme(darkTheme = true) {
                                             Surface(modifier = Modifier.fillMaxSize()) {
-                                                ColorPallet(color) {
-                                                    color = it
-                                                }
+                                                ColorPallet(colorState)
                                             }
                                         }
                                     }
@@ -75,7 +74,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                             ApplicationManager.getApplication().runWriteAction {
                                 psiElement.replace(
                                     ktPsiFactory.createExpression(
-                                        "Color(0x${color.toString(16)})"
+                                        "Color(${color.hexStr()})"
                                     )
                                 )
                             }

@@ -23,27 +23,22 @@ import androidx.compose.ui.window.DialogState
 import androidx.compose.ui.window.WindowPosition
 
 @Composable
-fun ColorPallet(initColor: Long, onSelect: (Long) -> Unit) {
+fun ColorPallet(colorState:MutableState<Color>) {
   Column {
     Row {
       listOf(Color.Red, Color.Green, Color.Blue, Color.Black, Color.Gray, Color.Yellow, Color.Cyan).forEach {
         val width = 40f
         val height = 40f
         Canvas(Modifier.size(width.dp, height.dp).clickable {
-          onSelect((it.value shr 32).toLong())
+          colorState.value = it
         }) {
           drawRect(color = it, size = Size(width, height))
         }
       }
     }
     Divider(Modifier.size(5.dp))
-    var currentColor: Color by remember { mutableStateOf(Color(initColor)) }
+    var currentColor: Color by remember { colorState }
 
-    Canvas(Modifier.size(50.dp, 50.dp).clickable {
-      onSelect((currentColor.toArgb().toUInt()).toLong())
-    }) {
-      drawRect(currentColor, size = Size(50f, 50f))
-    }
     Divider(Modifier.size(5.dp))
     Row {
       Canvas(Modifier.size(256.dp, 256.dp).pointerInput(Unit) {
@@ -84,7 +79,15 @@ fun ColorPallet(initColor: Long, onSelect: (Long) -> Unit) {
       }
     }
 
+    Row {
+      Text("color hex: ${currentColor.hexStr()}")
+    }
+    Row {
+      Canvas(Modifier.size(100.dp, 100.dp)) {
+        drawRect(color = currentColor, size = Size(100f, 100f))
+      }
+    }
   }
 }
 
-
+fun Color.hexStr() = "0x" + toArgb().toUInt().toString(16)
