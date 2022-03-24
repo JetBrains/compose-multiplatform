@@ -58,11 +58,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                                     setBounds(0, 0, 400, 400)
                                     setContent {
                                         var color by remember { colorState }
-                                        WidgetTheme(darkTheme = true) {
-                                            Surface(modifier = Modifier.fillMaxSize()) {
-                                                ColorPallet(colorState)
-                                            }
-                                        }
+                                        ColorPallet(colorState)
                                     }
                                 }
                         }
