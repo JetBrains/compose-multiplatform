@@ -630,6 +630,9 @@ package androidx.compose.foundation.lazy.layout {
   public final class LazyLayoutPrefetcher_androidKt {
   }
 
+  public final class PinnableParentKt {
+  }
+
 }
 
 package androidx.compose.foundation.lazy.list {
