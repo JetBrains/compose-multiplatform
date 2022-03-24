@@ -5,21 +5,33 @@
 
 package com.jetbrains.compose.color
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Button
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.ComposePanel
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.editor.markup.GutterIconRenderer
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.psi.KtConstantExpression
+import com.jetbrains.compose.theme.WidgetTheme
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.uast.*
+import javax.swing.JComponent
 import kotlin.random.Random
 import kotlin.random.nextUInt
+import androidx.compose.runtime.*
 
 class ColorLineMarkerProvider : LineMarkerProvider {
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? {
-        val ktPsiFactory = KtPsiFactory(element.project)
+        val project = element.project
+        val ktPsiFactory = KtPsiFactory(project)
         val uElement: UElement = element.toUElement() ?: return null
         element.text
         if (uElement is UCallExpression) {
@@ -30,11 +42,43 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                     AllIcons.General.Information,
                     null,
                     { mouseEvent, psiElement: PsiElement ->
-                        psiElement.replace(
-                            ktPsiFactory.createExpression(
-                                "Color(0x${Random.nextUInt().toString(16)})"
+
+                        class ChooseColorDialog() : DialogWrapper(project) {
+                            val colorState = mutableStateOf(0u)
+                            init {
+                                title = "Choose color"
+                                init()
+                            }
+
+                            override fun createCenterPanel(): JComponent =
+                                ComposePanel().apply {
+                                    setBounds(0, 0, 600, 600)
+                                    setContent {
+                                        var color by remember { colorState }
+                                        WidgetTheme(darkTheme = true) {
+                                            Surface(modifier = Modifier.fillMaxSize()) {
+                                                Button(onClick = {
+                                                    color = Random.nextUInt()
+
+                                                }) {
+                                                    Text("Change color")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                        }
+
+                        val chooseColorDialog = ChooseColorDialog()
+                        val result = chooseColorDialog.showAndGet()
+                        if (result) {
+                            val color = chooseColorDialog.colorState.value
+                            psiElement.replace(
+                                ktPsiFactory.createExpression(
+                                    "Color(0x${color.toString(16)})"
+                                )
                             )
-                        )
+                        }
                     },
                     GutterIconRenderer.Alignment.RIGHT,
                     { "change color literal" }
