@@ -17,6 +17,7 @@
 package androidx.compose.ui.text.font
 
 import android.graphics.Typeface
+import android.os.Build
 import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 
@@ -56,6 +57,72 @@ internal fun getAndroidTypefaceStyle(isBold: Boolean, isItalic: Boolean): Int {
         Typeface.ITALIC
     } else {
         Typeface.NORMAL
+    }
+}
+
+/**
+ * Creates a Typeface object based on the system installed fonts. [genericFontFamily] is used
+ * to define the main family to create the Typeface such as serif, sans-serif.
+ *
+ * [fontWeight] is used to define the thickness of the Typeface. Before Android 28 font weight
+ * cannot be defined therefore this function assumes anything at and above [FontWeight.W600]
+ * is bold and any value less than [FontWeight.W600] is normal.
+ *
+ * @param genericFontFamily generic font family name such as serif, sans-serif
+ * @param fontWeight the font weight to create the typeface in
+ * @param fontStyle the font style to create the typeface in
+ */
+internal fun createAndroidTypeface(
+    genericFontFamily: String? = null,
+    fontWeight: FontWeight = FontWeight.Normal,
+    fontStyle: FontStyle = FontStyle.Normal
+): Typeface {
+    if (fontStyle == FontStyle.Normal &&
+        fontWeight == FontWeight.Normal &&
+        genericFontFamily.isNullOrEmpty()
+    ) {
+        return Typeface.DEFAULT
+    }
+
+    return if (Build.VERSION.SDK_INT < 28) {
+        val targetStyle = getAndroidTypefaceStyle(fontWeight, fontStyle)
+        if (genericFontFamily.isNullOrEmpty()) {
+            Typeface.defaultFromStyle(targetStyle)
+        } else {
+            Typeface.create(genericFontFamily, targetStyle)
+        }
+    } else {
+        val familyTypeface = if (genericFontFamily == null) {
+            Typeface.DEFAULT
+        } else {
+            Typeface.create(genericFontFamily, Typeface.NORMAL)
+        }
+
+        TypefaceHelperMethodsApi28.create(
+            familyTypeface,
+            fontWeight.weight,
+            fontStyle == FontStyle.Italic
+        )
+    }
+}
+
+/**
+ * Creates a Typeface using Typface.create(Typeface, ...) with API level branching.
+ */
+internal fun createAndroidTypeface(
+    typeface: Typeface,
+    fontWeight: FontWeight = FontWeight.Normal,
+    fontStyle: FontStyle = FontStyle.Normal
+): Typeface {
+    return if (Build.VERSION.SDK_INT < 28) {
+        val targetStyle = getAndroidTypefaceStyle(fontWeight, fontStyle)
+        Typeface.create(typeface, targetStyle)
+    } else {
+        TypefaceHelperMethodsApi28.create(
+            typeface,
+            fontWeight.weight,
+            fontStyle == FontStyle.Italic
+        )
     }
 }
 
