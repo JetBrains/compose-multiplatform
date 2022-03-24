@@ -20,6 +20,10 @@ import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.layout.ModifierLocalPinnableParent
+import androidx.compose.foundation.lazy.layout.PinnableParent
+import androidx.compose.foundation.lazy.layout.PinnableParent.PinnedItemsHandle
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +33,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.modifier.modifierLocalProvider
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -40,11 +45,11 @@ import androidx.compose.ui.test.isFocusable
 import androidx.compose.ui.test.isNotFocusable
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.junit.After
 import org.junit.Before
@@ -59,7 +64,7 @@ class FocusableTest {
     @get:Rule
     val rule = createComposeRule()
 
-    val focusTag = "myFocusable"
+    private val focusTag = "myFocusable"
 
     @Before
     fun before() {
@@ -148,7 +153,7 @@ class FocusableTest {
         val interactionSource = MutableInteractionSource()
         val (focusRequester, otherFocusRequester) = FocusRequester.createRefs()
 
-        var scope: CoroutineScope? = null
+        lateinit var scope: CoroutineScope
 
         rule.setContent {
             scope = rememberCoroutineScope()
@@ -171,7 +176,7 @@ class FocusableTest {
 
         val interactions = mutableListOf<Interaction>()
 
-        scope!!.launch {
+        scope.launch {
             interactionSource.interactions.collect { interactions.add(it) }
         }
 
@@ -208,7 +213,7 @@ class FocusableTest {
         val focusRequester = FocusRequester()
         var emitFocusableText by mutableStateOf(true)
 
-        var scope: CoroutineScope? = null
+        lateinit var scope: CoroutineScope
 
         rule.setContent {
             scope = rememberCoroutineScope()
@@ -227,7 +232,7 @@ class FocusableTest {
 
         val interactions = mutableListOf<Interaction>()
 
-        scope!!.launch {
+        scope.launch {
             interactionSource.interactions.collect { interactions.add(it) }
         }
 
@@ -258,6 +263,40 @@ class FocusableTest {
         }
     }
 
+    @OptIn(ExperimentalFoundationApi::class)
+    @Test
+    fun focusable_pinsAndUnpins_whenItIsFocused() {
+        // Arrange.
+        val focusRequester = FocusRequester()
+        var onPinInvoked = false
+        var onUnpinInvoked = false
+        rule.setContent {
+            Box(
+                 Modifier
+                     .size(100.dp)
+                     .pinnableParent(
+                         onPin = {
+                             onPinInvoked = true
+                             TestPinnedItemsHandle { onUnpinInvoked = true }
+                         }
+                     )
+                     .focusRequester(focusRequester)
+                     .focusable()
+            )
+        }
+
+        // Act.
+        rule.runOnUiThread {
+            focusRequester.requestFocus()
+        }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(onPinInvoked).isTrue()
+            assertThat(onUnpinInvoked).isTrue()
+        }
+    }
+
     @Test
     fun focusableText_testInspectorValue() {
         rule.setContent {
@@ -269,6 +308,25 @@ class FocusableTest {
                     "enabled",
                     "interactionSource"
                 )
+        }
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    @ExperimentalFoundationApi
+    private fun Modifier.pinnableParent(onPin: () -> PinnedItemsHandle): Modifier {
+        return modifierLocalProvider(ModifierLocalPinnableParent) {
+            object : PinnableParent {
+                override fun pinBeyondBoundsItems(): PinnedItemsHandle {
+                    return onPin()
+                }
+            }
+        }
+    }
+
+    @ExperimentalFoundationApi
+    private class TestPinnedItemsHandle(val onUnpin: () -> Unit) : PinnedItemsHandle {
+        override fun unpin() {
+            onUnpin.invoke()
         }
     }
 }

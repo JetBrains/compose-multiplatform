@@ -85,7 +85,6 @@ fun FocusGroupSample() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Sampled
 @Composable
 fun FocusableFocusGroupSample() {
