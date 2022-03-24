@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
@@ -36,15 +37,12 @@ fun ColorPallet(initColor: Long, onSelect: (Long) -> Unit) {
       }
     }
     Divider(Modifier.size(5.dp))
-    var red: Int by remember { mutableStateOf((Color(initColor).red * 0xFF).toInt()) }
-    var green: Int by remember { mutableStateOf((Color(initColor).green * 0xFF).toInt()) }
-    var blue: Int by remember { mutableStateOf((Color(initColor).blue * 0xFF).toInt()) }
-    val currentColor: ULong by derivedStateOf { Color(red, green, blue).value }
+    var currentColor: Color by remember { mutableStateOf(Color(initColor)) }
 
     Canvas(Modifier.size(50.dp, 50.dp).clickable {
-      onSelect((currentColor shr 32).toLong())
+      onSelect((currentColor.toArgb().toUInt()).toLong())
     }) {
-      drawRect(Color(currentColor), size = Size(50f, 50f))
+      drawRect(currentColor, size = Size(50f, 50f))
     }
     Divider(Modifier.size(5.dp))
     Row {
@@ -53,8 +51,8 @@ fun ColorPallet(initColor: Long, onSelect: (Long) -> Unit) {
           while (true) {
             val event = awaitPointerEvent()
             if (event.buttons.isPrimaryPressed) {
-              red = event.changes.first().position.x.toInt()
-              green = event.changes.first().position.y.toInt()
+              currentColor = currentColor.copy(red = event.changes.first().position.x / 256)
+              currentColor = currentColor.copy(green = event.changes.first().position.y / 256)
             }
           }
         }
@@ -62,7 +60,7 @@ fun ColorPallet(initColor: Long, onSelect: (Long) -> Unit) {
         for (r in 0..0xFF) {
           for (g in 0..0xFF) {
             drawRect(
-              color = Color(red = r, green = g, blue = blue),
+              color = currentColor.copy(red = r / 255f, green = g / 255f),
               topLeft = Offset(r.toFloat(), g.toFloat()),
               size = Size(1f, 1f)
             )
@@ -75,7 +73,7 @@ fun ColorPallet(initColor: Long, onSelect: (Long) -> Unit) {
           while (true) {
             val event = awaitPointerEvent()
             if (event.buttons.isPrimaryPressed) {
-              blue = event.changes.first().position.y.toInt()
+              currentColor = currentColor.copy(blue = event.changes.first().position.y / 256)
             }
           }
         }
@@ -85,11 +83,7 @@ fun ColorPallet(initColor: Long, onSelect: (Long) -> Unit) {
         }
       }
     }
-    Button(onClick = {
-      onSelect((currentColor shr 32).toLong())
-    }) {
-      Text("Done")
-    }
+
   }
 }
 

@@ -44,7 +44,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                     { mouseEvent, psiElement: PsiElement ->
 
                         class ChooseColorDialog() : DialogWrapper(project) {
-                            val colorState = mutableStateOf(0L)
+                            val colorState = mutableStateOf(0xffL)
 
                             init {
                                 title = "Choose color"
@@ -55,6 +55,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                                 ComposePanel().apply {
                                     setBounds(0, 0, 600, 600)
                                     setContent {
+
                                         var color by remember { colorState }
                                         WidgetTheme(darkTheme = true) {
                                             Surface(modifier = Modifier.fillMaxSize()) {
