@@ -244,7 +244,7 @@ object TextFieldDefaults {
         isError: Boolean,
         interactionSource: InteractionSource,
         colors: TextFieldColors,
-        shape: Shape = OutlinedTextFieldTokens.ContainerShape,
+        shape: Shape = OutlinedTextFieldTokens.ContainerShape.toShape(),
         focusedBorderThickness: Dp = FocusedBorderThickness,
         unfocusedBorderThickness: Dp = UnfocusedBorderThickness
     ) {

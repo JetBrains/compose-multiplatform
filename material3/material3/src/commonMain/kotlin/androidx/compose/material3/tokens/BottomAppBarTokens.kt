@@ -15,15 +15,15 @@
  */
 // VERSION: v0_75
 // GENERATED CODE - DO NOT MODIFY BY HAND
+
 package androidx.compose.material3.tokens
 
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 
 internal object BottomAppBarTokens {
     val ContainerColor = ColorSchemeKeyTokens.Surface
     val ContainerElevation = ElevationTokens.Level2
     val ContainerHeight = 64.0.dp
-    val ContainerShape = RoundedCornerShape(0.dp)
+    val ContainerShape = ShapeKeyTokens.CornerNone
     val FabContainerHeight = 72.0.dp
 }

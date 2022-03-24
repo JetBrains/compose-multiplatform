@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_76
+// VERSION: v0_92
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -24,7 +24,7 @@ internal object FilledButtonTokens {
     val ContainerColor = ColorSchemeKeyTokens.Primary
     val ContainerElevation = ElevationTokens.Level0
     val ContainerHeight = 40.0.dp
-    val ContainerShape = ShapeTokens.CornerFull
+    val ContainerShape = ShapeKeyTokens.CornerFull
     val DisabledContainerColor = ColorSchemeKeyTokens.OnSurface
     val DisabledContainerElevation = ElevationTokens.Level0
     const val DisabledContainerOpacity = 0.12f
@@ -32,18 +32,14 @@ internal object FilledButtonTokens {
     const val DisabledLabelTextOpacity = 0.38f
     val DraggedContainerElevation = ElevationTokens.Level3
     val DraggedLabelTextColor = ColorSchemeKeyTokens.OnPrimary
-    val DraggedStateLayerColor = ColorSchemeKeyTokens.OnPrimary
     val FocusContainerElevation = ElevationTokens.Level0
     val FocusLabelTextColor = ColorSchemeKeyTokens.OnPrimary
-    val FocusStateLayerColor = ColorSchemeKeyTokens.OnPrimary
     val HoverContainerElevation = ElevationTokens.Level1
     val HoverLabelTextColor = ColorSchemeKeyTokens.OnPrimary
-    val HoverStateLayerColor = ColorSchemeKeyTokens.OnPrimary
     val LabelTextColor = ColorSchemeKeyTokens.OnPrimary
     val LabelTextFont = TypographyKeyTokens.LabelLarge
     val PressedContainerElevation = ElevationTokens.Level0
     val PressedLabelTextColor = ColorSchemeKeyTokens.OnPrimary
-    val PressedStateLayerColor = ColorSchemeKeyTokens.OnPrimary
     val DisabledIconColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledIconOpacity = 0.38f
     val DraggedIconColor = ColorSchemeKeyTokens.OnPrimary

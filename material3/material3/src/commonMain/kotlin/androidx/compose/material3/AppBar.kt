@@ -320,7 +320,7 @@ fun BottomAppBar(
         contentColor = contentColor,
         tonalElevation = tonalElevation,
         // TODO(b/209583788): Consider adding a shape parameter if updated design guidance allows
-        shape = BottomAppBarTokens.ContainerShape,
+        shape = BottomAppBarTokens.ContainerShape.toShape(),
         modifier = modifier
     ) {
         Row(
@@ -377,7 +377,7 @@ fun BottomAppBar(
         contentColor = contentColor,
         tonalElevation = tonalElevation,
         // TODO(b/209583788): Consider adding a shape parameter if updated design guidance allows
-        shape = BottomAppBarTokens.ContainerShape,
+        shape = BottomAppBarTokens.ContainerShape.toShape(),
         modifier = modifier
     ) {
         Row(

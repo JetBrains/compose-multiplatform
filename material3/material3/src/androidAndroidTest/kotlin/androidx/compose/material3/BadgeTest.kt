@@ -103,8 +103,10 @@ class BadgeTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun badge_noContent_shape() {
+        var shape = Shapes.None
         var errorColor = Color.Unspecified
         rule.setMaterialContent(lightColorScheme()) {
+            shape = BadgeTokens.Shape.toShape()
             errorColor = BadgeTokens.Color.toColor()
             Badge(modifier = Modifier.testTag(TestBadgeTag))
         }
@@ -113,7 +115,7 @@ class BadgeTest {
             .captureToImage()
             .assertShape(
                 density = rule.density,
-                shape = BadgeTokens.Shape,
+                shape = shape,
                 shapeColor = errorColor,
                 backgroundColor = Color.White,
                 shapeOverlapPixelCount = with(rule.density) { 1.dp.toPx() }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_76
+// VERSION: v0_92
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -25,8 +25,8 @@ internal object BadgeTokens {
     val LargeColor = ColorSchemeKeyTokens.Error
     val LargeLabelTextColor = ColorSchemeKeyTokens.OnError
     val LargeLabelTextFont = TypographyKeyTokens.LabelSmall
-    val LargeShape = ShapeTokens.CornerFull
+    val LargeShape = ShapeKeyTokens.CornerFull
     val LargeSize = 16.0.dp
-    val Shape = ShapeTokens.CornerFull
+    val Shape = ShapeKeyTokens.CornerFull
     val Size = 6.0.dp
 }

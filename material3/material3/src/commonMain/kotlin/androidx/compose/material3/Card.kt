@@ -74,7 +74,7 @@ import kotlinx.coroutines.flow.collect
 @Composable
 fun Card(
     modifier: Modifier = Modifier,
-    shape: Shape = FilledCardTokens.ContainerShape,
+    shape: Shape = FilledCardTokens.ContainerShape.toShape(),
     containerColor: Color = FilledCardTokens.ContainerColor.toColor(),
     contentColor: Color = contentColorFor(containerColor),
     border: BorderStroke? = null,
@@ -129,7 +129,7 @@ fun Card(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = FilledCardTokens.ContainerShape,
+    shape: Shape = FilledCardTokens.ContainerShape.toShape(),
     containerColor: Color = FilledCardTokens.ContainerColor.toColor(),
     contentColor: Color = contentColorFor(containerColor),
     border: BorderStroke? = null,
@@ -178,7 +178,7 @@ fun Card(
 @Composable
 fun ElevatedCard(
     modifier: Modifier = Modifier,
-    shape: Shape = ElevatedCardTokens.ContainerShape,
+    shape: Shape = ElevatedCardTokens.ContainerShape.toShape(),
     containerColor: Color = ElevatedCardTokens.ContainerColor.toColor(),
     contentColor: Color = contentColorFor(containerColor),
     elevation: CardElevation = CardDefaults.elevatedCardElevation(),
@@ -227,7 +227,7 @@ fun ElevatedCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = ElevatedCardTokens.ContainerShape,
+    shape: Shape = ElevatedCardTokens.ContainerShape.toShape(),
     containerColor: Color = ElevatedCardTokens.ContainerColor.toColor(),
     contentColor: Color = contentColorFor(containerColor),
     elevation: CardElevation = CardDefaults.elevatedCardElevation(),
@@ -272,7 +272,7 @@ fun ElevatedCard(
 @Composable
 fun OutlinedCard(
     modifier: Modifier = Modifier,
-    shape: Shape = OutlinedCardTokens.ContainerShape,
+    shape: Shape = OutlinedCardTokens.ContainerShape.toShape(),
     containerColor: Color = OutlinedCardTokens.ContainerColor.toColor(),
     contentColor: Color = contentColorFor(containerColor),
     border: BorderStroke = BorderStroke(
@@ -326,7 +326,7 @@ fun OutlinedCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = OutlinedCardTokens.ContainerShape,
+    shape: Shape = OutlinedCardTokens.ContainerShape.toShape(),
     containerColor: Color = OutlinedCardTokens.ContainerColor.toColor(),
     contentColor: Color = contentColorFor(containerColor),
     border: BorderStroke = BorderStroke(

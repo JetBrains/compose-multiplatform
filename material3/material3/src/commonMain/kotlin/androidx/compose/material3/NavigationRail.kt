@@ -189,9 +189,9 @@ fun NavigationRailItem(
                     .background(
                         color = colors.indicatorColor.copy(alpha = animationProgress),
                         shape = if (label != null) {
-                            NavigationRailTokens.ActiveIndicatorShape
+                            NavigationRailTokens.ActiveIndicatorShape.toShape()
                         } else {
-                            NavigationRailTokens.NoLabelActiveIndicatorShape
+                            NavigationRailTokens.NoLabelActiveIndicatorShape.toShape()
                         }
                     )
             )

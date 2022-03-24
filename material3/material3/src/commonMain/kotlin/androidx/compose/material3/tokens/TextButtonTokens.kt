@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_76
+// VERSION: v0_92
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -22,19 +22,14 @@ import androidx.compose.ui.unit.dp
 
 internal object TextButtonTokens {
     val ContainerHeight = 40.0.dp
-    val ContainerShape = ShapeTokens.CornerFull
-    val DisabledContainerColor = ColorSchemeKeyTokens.OnSurface
-    const val DisabledContainerOpacity = 0.12f
+    val ContainerShape = ShapeKeyTokens.CornerFull
     val DisabledLabelTextColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledLabelTextOpacity = 0.38f
     val FocusLabelTextColor = ColorSchemeKeyTokens.Primary
-    val FocusStateLayerColor = ColorSchemeKeyTokens.Primary
     val HoverLabelTextColor = ColorSchemeKeyTokens.Primary
-    val HoverStateLayerColor = ColorSchemeKeyTokens.Primary
     val LabelTextColor = ColorSchemeKeyTokens.Primary
     val LabelTextFont = TypographyKeyTokens.LabelLarge
     val PressedLabelTextColor = ColorSchemeKeyTokens.Primary
-    val PressedStateLayerColor = ColorSchemeKeyTokens.Primary
     val DisabledIconColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledIconOpacity = 0.38f
     val FocusIconColor = ColorSchemeKeyTokens.Primary

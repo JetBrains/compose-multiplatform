@@ -43,7 +43,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasureResult
@@ -185,7 +184,7 @@ fun RowScope.NavigationBarItem(
                 Modifier.layoutId(IndicatorLayoutIdTag)
                     .background(
                         color = colors.indicatorColor.copy(alpha = animationProgress),
-                        shape = IndicatorShape
+                        shape = NavigationBarTokens.ActiveIndicatorShape.toShape(),
                     )
             )
         }
@@ -481,8 +480,6 @@ private val NavigationBarItemHorizontalPadding: Dp = 4.dp
 
 /*@VisibleForTesting*/
 internal val NavigationBarItemVerticalPadding: Dp = 16.dp
-
-private val IndicatorShape: Shape = NavigationBarTokens.ActiveIndicatorShape
 
 private val IndicatorHorizontalPadding: Dp =
     (NavigationBarTokens.ActiveIndicatorWidth - NavigationBarTokens.IconSize) / 2

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_77
+// VERSION: v0_92
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -25,9 +25,6 @@ internal object CheckboxTokens {
     val ContainerHeight = 18.0.dp
     val ContainerShape = RoundedCornerShape(2.0.dp)
     val ContainerWidth = 18.0.dp
-    val ErrorFocusStateLayerColor = ColorSchemeKeyTokens.Error
-    val ErrorHoverStateLayerColor = ColorSchemeKeyTokens.Error
-    val ErrorPressedStateLayerColor = ColorSchemeKeyTokens.Error
     val IconSize = 18.0.dp
     val SelectedContainerColor = ColorSchemeKeyTokens.Primary
     val SelectedDisabledContainerColor = ColorSchemeKeyTokens.OnSurface
@@ -48,18 +45,15 @@ internal object CheckboxTokens {
     val SelectedFocusContainerColor = ColorSchemeKeyTokens.Primary
     val SelectedFocusIconColor = ColorSchemeKeyTokens.OnPrimary
     val SelectedFocusOutlineWidth = 0.0.dp
-    val SelectedFocusStateLayerColor = ColorSchemeKeyTokens.Primary
     val SelectedHoverContainerColor = ColorSchemeKeyTokens.Primary
     val SelectedHoverIconColor = ColorSchemeKeyTokens.OnPrimary
     val SelectedHoverOutlineWidth = 0.0.dp
-    val SelectedHoverStateLayerColor = ColorSchemeKeyTokens.Primary
     val SelectedIconColor = ColorSchemeKeyTokens.OnPrimary
     val SelectedOutlineWidth = 0.0.dp
     val SelectedPressedContainerColor = ColorSchemeKeyTokens.Primary
     val SelectedPressedIconColor = ColorSchemeKeyTokens.OnPrimary
     val SelectedPressedOutlineWidth = 0.0.dp
-    val SelectedPressedStateLayerColor = ColorSchemeKeyTokens.OnSurface
-    val StateLayerShape = ShapeTokens.CornerFull
+    val StateLayerShape = ShapeKeyTokens.CornerFull
     val StateLayerSize = 40.0.dp
     const val UnselectedDisabledContainerOpacity = 0.38f
     val UnselectedDisabledOutlineColor = ColorSchemeKeyTokens.OnSurface
@@ -73,13 +67,10 @@ internal object CheckboxTokens {
     val UnselectedErrorPressedOutlineWidth = 2.0.dp
     val UnselectedFocusOutlineColor = ColorSchemeKeyTokens.OnSurface
     val UnselectedFocusOutlineWidth = 2.0.dp
-    val UnselectedFocusStateLayerColor = ColorSchemeKeyTokens.OnSurface
     val UnselectedHoverOutlineColor = ColorSchemeKeyTokens.OnSurface
     val UnselectedHoverOutlineWidth = 2.0.dp
-    val UnselectedHoverStateLayerColor = ColorSchemeKeyTokens.OnSurface
     val UnselectedOutlineColor = ColorSchemeKeyTokens.OnSurface
     val UnselectedOutlineWidth = 2.0.dp
     val UnselectedPressedOutlineColor = ColorSchemeKeyTokens.OnSurface
     val UnselectedPressedOutlineWidth = 2.0.dp
-    val UnselectedPressedStateLayerColor = ColorSchemeKeyTokens.Primary
 }
