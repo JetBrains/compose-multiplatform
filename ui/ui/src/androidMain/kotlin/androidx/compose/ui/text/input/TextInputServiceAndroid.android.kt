@@ -420,6 +420,10 @@ internal fun EditorInfo.update(imeOptions: ImeOptions, textFieldValue: TextField
             this.inputType =
                 InputType.TYPE_CLASS_NUMBER or EditorInfo.TYPE_NUMBER_VARIATION_PASSWORD
         }
+        KeyboardType.Decimal -> {
+            this.inputType =
+                InputType.TYPE_CLASS_NUMBER or EditorInfo.TYPE_NUMBER_FLAG_DECIMAL
+        }
         else -> error("Invalid Keyboard Type")
     }
 

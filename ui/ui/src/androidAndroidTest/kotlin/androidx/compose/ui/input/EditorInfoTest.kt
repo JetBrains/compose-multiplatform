@@ -178,6 +178,24 @@ class EditorInfoTest {
     }
 
     @Test
+    fun test_fill_editor_info_decimal_number() {
+        val info = EditorInfo()
+        info.update(
+            ImeOptions(
+                keyboardType = KeyboardType.Decimal,
+                imeAction = ImeAction.Default
+            )
+        )
+
+        assertThat((InputType.TYPE_CLASS_NUMBER and info.inputType) != 0).isTrue()
+        assertThat((InputType.TYPE_NUMBER_FLAG_DECIMAL and info.inputType) != 0).isTrue()
+        assertThat(
+            (EditorInfo.IME_MASK_ACTION and info.imeOptions)
+                == EditorInfo.IME_ACTION_UNSPECIFIED
+        ).isTrue()
+    }
+
+    @Test
     fun test_fill_editor_info_action_none() {
         val info = EditorInfo()
         info.update(

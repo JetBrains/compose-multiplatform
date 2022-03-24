@@ -101,6 +101,20 @@ private val ImeOptionsList = listOf(
             imeAction = ImeAction.Send
         ),
         name = "multiLine/Number/Send"
+    ),
+    ImeOptionsData(
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Decimal
+        ),
+        name = "singleLine/Decimal"
+    ),
+    ImeOptionsData(
+        singleLine = false,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Decimal
+        ),
+        name = "multiLine/Decimal"
     )
 )
 
