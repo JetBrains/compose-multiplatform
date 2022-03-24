@@ -76,7 +76,7 @@ fun AlertDialog(
     icon: @Composable (() -> Unit)? = null,
     title: @Composable (() -> Unit)? = null,
     text: @Composable (() -> Unit)? = null,
-    shape: Shape = DialogTokens.ContainerShape,
+    shape: Shape = DialogTokens.ContainerShape.toShape(),
     containerColor: Color = DialogTokens.ContainerColor.toColor(),
     tonalElevation: Dp = DialogTokens.ContainerElevation,
     iconContentColor: Color = DialogTokens.IconColor.toColor(),

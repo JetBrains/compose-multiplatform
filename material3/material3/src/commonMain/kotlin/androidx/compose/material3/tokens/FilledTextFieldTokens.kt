@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_89
+// VERSION: v0_92
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -26,7 +26,7 @@ internal object FilledTextFieldTokens {
     val CaretColor = ColorSchemeKeyTokens.Primary
     val ContainerColor = ColorSchemeKeyTokens.SurfaceVariant
     val ContainerHeight = 56.0.dp
-    val ContainerShape = ShapeTokens.CornerExtraSmallTop
+    val ContainerShape = ShapeKeyTokens.CornerExtraSmallTop
     val DisabledActiveIndicatorColor = ColorSchemeKeyTokens.OnSurface
     val DisabledActiveIndicatorHeight = 1.0.dp
     const val DisabledActiveIndicatorOpacity = 0.38f
@@ -54,7 +54,6 @@ internal object FilledTextFieldTokens {
     val ErrorHoverInputColor = ColorSchemeKeyTokens.OnSurface
     val ErrorHoverLabelColor = ColorSchemeKeyTokens.OnErrorContainer
     val ErrorHoverLeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
-    val ErrorHoverStateLayerColor = ColorSchemeKeyTokens.OnSurface
     val ErrorHoverSupportingColor = ColorSchemeKeyTokens.Error
     val ErrorHoverTrailingIconColor = ColorSchemeKeyTokens.OnErrorContainer
     val ErrorInputColor = ColorSchemeKeyTokens.OnSurface
@@ -74,7 +73,6 @@ internal object FilledTextFieldTokens {
     val HoverInputColor = ColorSchemeKeyTokens.OnSurface
     val HoverLabelColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val HoverLeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
-    val HoverStateLayerColor = ColorSchemeKeyTokens.OnSurface
     val HoverSupportingColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val HoverTrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val InputColor = ColorSchemeKeyTokens.OnSurface

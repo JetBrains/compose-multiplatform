@@ -135,7 +135,11 @@ fun Badge(
     content: @Composable (RowScope.() -> Unit)? = null,
 ) {
     val size = if (content != null) BadgeTokens.LargeSize else BadgeTokens.Size
-    val shape = if (content != null) BadgeTokens.LargeShape else BadgeTokens.Shape
+    val shape = if (content != null) {
+        BadgeTokens.LargeShape.toShape()
+    } else {
+        BadgeTokens.Shape.toShape()
+    }
 
     // Draw badge container.
     Row(

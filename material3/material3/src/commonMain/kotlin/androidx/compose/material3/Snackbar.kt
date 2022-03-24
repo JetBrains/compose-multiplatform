@@ -87,7 +87,7 @@ fun Snackbar(
     action: @Composable (() -> Unit)? = null,
     dismissAction: @Composable (() -> Unit)? = null,
     actionOnNewLine: Boolean = false,
-    shape: Shape = SnackbarTokens.ContainerShape,
+    shape: Shape = SnackbarTokens.ContainerShape.toShape(),
     containerColor: Color = SnackbarTokens.ContainerColor.toColor(),
     contentColor: Color = SnackbarTokens.SupportingTextColor.toColor(),
     content: @Composable () -> Unit
@@ -167,7 +167,7 @@ fun Snackbar(
     snackbarData: SnackbarData,
     modifier: Modifier = Modifier,
     actionOnNewLine: Boolean = false,
-    shape: Shape = SnackbarTokens.ContainerShape,
+    shape: Shape = SnackbarTokens.ContainerShape.toShape(),
     containerColor: Color = SnackbarTokens.ContainerColor.toColor(),
     contentColor: Color = SnackbarTokens.SupportingTextColor.toColor(),
     actionColor: Color = SnackbarTokens.ActionLabelTextColor.toColor()

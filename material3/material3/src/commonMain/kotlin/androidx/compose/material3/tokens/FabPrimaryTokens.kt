@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_76
+// VERSION: v0_92
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -24,14 +24,12 @@ internal object FabPrimaryTokens {
     val ContainerColor = ColorSchemeKeyTokens.PrimaryContainer
     val ContainerElevation = ElevationTokens.Level3
     val ContainerHeight = 56.0.dp
-    val ContainerShape = ShapeTokens.CornerLarge
+    val ContainerShape = ShapeKeyTokens.CornerLarge
     val ContainerWidth = 56.0.dp
     val FocusContainerElevation = ElevationTokens.Level3
     val FocusIconColor = ColorSchemeKeyTokens.OnPrimaryContainer
-    val FocusStateLayerColor = ColorSchemeKeyTokens.OnPrimaryContainer
     val HoverContainerElevation = ElevationTokens.Level4
     val HoverIconColor = ColorSchemeKeyTokens.OnPrimaryContainer
-    val HoverStateLayerColor = ColorSchemeKeyTokens.OnPrimaryContainer
     val IconColor = ColorSchemeKeyTokens.OnPrimaryContainer
     val IconSize = 24.0.dp
     val LoweredContainerElevation = ElevationTokens.Level1
@@ -40,5 +38,4 @@ internal object FabPrimaryTokens {
     val LoweredPressedContainerElevation = ElevationTokens.Level1
     val PressedContainerElevation = ElevationTokens.Level3
     val PressedIconColor = ColorSchemeKeyTokens.OnPrimaryContainer
-    val PressedStateLayerColor = ColorSchemeKeyTokens.OnPrimaryContainer
 }
