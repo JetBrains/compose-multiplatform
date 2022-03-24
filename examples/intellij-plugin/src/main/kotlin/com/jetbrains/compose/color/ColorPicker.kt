@@ -22,43 +22,14 @@ import androidx.compose.ui.window.DialogState
 import androidx.compose.ui.window.WindowPosition
 
 @Composable
-fun ColorPicker(currentColor: ULong, onChangeColor: (ULong) -> Unit) {
-  var dialogOpen by remember { mutableStateOf(false) }
-  fun select(color: ULong) {
-    dialogOpen = false
-    onChangeColor(color)
-  }
-  Row(modifier = Modifier.clickable {
-    dialogOpen = !dialogOpen
-  }) {
-    Canvas(modifier = Modifier.size(30.dp)) {
-      drawRect(color = Color(currentColor))
-    }
-    Text("color")
-  }
-  if (dialogOpen) {
-    Dialog(
-      state = DialogState(width = 500.dp, height = 500.dp, position = WindowPosition(Alignment.TopStart)),
-      onCloseRequest = {
-        dialogOpen = false
-      }
-    ) {
-      ColorPallet(currentColor) {
-        select(it)
-      }
-    }
-  }
-}
-
-@Composable
-fun ColorPallet(initColor: ULong, onSelect: (ULong) -> Unit) {
+fun ColorPallet(initColor: Long, onSelect: (Long) -> Unit) {
   Column {
     Row {
       listOf(Color.Red, Color.Green, Color.Blue, Color.Black, Color.Gray, Color.Yellow, Color.Cyan).forEach {
         val width = 40f
         val height = 40f
         Canvas(Modifier.size(width.dp, height.dp).clickable {
-          onSelect(it.value)
+          onSelect((it.value shr 32).toLong())
         }) {
           drawRect(color = it, size = Size(width, height))
         }
@@ -71,7 +42,7 @@ fun ColorPallet(initColor: ULong, onSelect: (ULong) -> Unit) {
     val currentColor: ULong by derivedStateOf { Color(red, green, blue).value }
 
     Canvas(Modifier.size(50.dp, 50.dp).clickable {
-      onSelect(currentColor)
+      onSelect((currentColor shr 32).toLong())
     }) {
       drawRect(Color(currentColor), size = Size(50f, 50f))
     }
@@ -115,7 +86,7 @@ fun ColorPallet(initColor: ULong, onSelect: (ULong) -> Unit) {
       }
     }
     Button(onClick = {
-      onSelect(currentColor)
+      onSelect((currentColor shr 32).toLong())
     }) {
       Text("Done")
     }

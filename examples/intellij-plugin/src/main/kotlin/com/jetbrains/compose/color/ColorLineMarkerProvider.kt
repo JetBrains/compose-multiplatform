@@ -26,6 +26,7 @@ import javax.swing.JComponent
 import kotlin.random.Random
 import kotlin.random.nextUInt
 import androidx.compose.runtime.*
+import com.intellij.openapi.application.ApplicationManager
 
 class ColorLineMarkerProvider : LineMarkerProvider {
 
@@ -33,7 +34,6 @@ class ColorLineMarkerProvider : LineMarkerProvider {
         val project = element.project
         val ktPsiFactory = KtPsiFactory(project)
         val uElement: UElement = element.toUElement() ?: return null
-        element.text
         if (uElement is UCallExpression) {
             if (uElement.kind == UastCallKind.METHOD_CALL && uElement.methodIdentifier?.name == "Color") {
                 return LineMarkerInfo(
@@ -44,7 +44,8 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                     { mouseEvent, psiElement: PsiElement ->
 
                         class ChooseColorDialog() : DialogWrapper(project) {
-                            val colorState = mutableStateOf(0uL)
+                            val colorState = mutableStateOf(0L)
+
                             init {
                                 title = "Choose color"
                                 init()
@@ -57,7 +58,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                                         var color by remember { colorState }
                                         WidgetTheme(darkTheme = true) {
                                             Surface(modifier = Modifier.fillMaxSize()) {
-                                                ColorPicker(color) {
+                                                ColorPallet(color) {
                                                     color = it
                                                 }
                                             }
@@ -70,11 +71,13 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                         val result = chooseColorDialog.showAndGet()
                         if (result) {
                             val color = chooseColorDialog.colorState.value
-                            psiElement.replace(
-                                ktPsiFactory.createExpression(
-                                    "Color(0x${color.toString(16)}uL)"
+                            ApplicationManager.getApplication().runWriteAction {
+                                psiElement.replace(
+                                    ktPsiFactory.createExpression(
+                                        "Color(0x${color.toString(16)})"
+                                    )
                                 )
-                            )
+                            }
                         }
                     },
                     GutterIconRenderer.Alignment.RIGHT,
@@ -94,3 +97,4 @@ class ColorLineMarkerProvider : LineMarkerProvider {
 }
 
 //fun UElement.isIntegerLiteral(): Boolean = this is ULiteralExpression && this.value is Int
+
