@@ -34,18 +34,41 @@ val Color.hsvSaturation
 
 val Color.hsvValue get() = max
 
-fun Color.toHsv() = HSV(
-    hue = hsvHue,
-    saturation = hsvSaturation,
-    value = hsvValue
-)
+/**
+ * https://www.rapidtables.com/convert/color/rgb-to-hsv.html
+ */
+fun Color.toHsv(): HSV {
+    val max = maxOf(red, green, blue)
+    val min = minOf(red, green, blue)
+    val delta = max - min
+    val h = when {
+        delta == 0f -> 0f
+        max == red -> 60 * ((green - blue) / delta).mod(6f)
+        max == green -> 60 * ((blue - red) / delta + 2)
+        max == blue -> 60 * ((red - green) / delta + 4)
+        else -> 0f
+    }
+    val s = when {
+        max == 0f -> 0f
+        else -> delta / max
+    }
+    val v = max
+    return HSV(
+        hue = h,
+        saturation = s,
+        value = v
+    )
+}
 
 /**
  * https://www.rapidtables.com/convert/color/hsv-to-rgb.html
  */
 fun HSV.toRgb(): Color {
     val c = value * saturation
-    val x = c * (1 - abs((hue / 60).mod(2.0) - 1)).toFloat()
+    val x = c * (1 - abs((hue / 60).mod(2f) - 1))
+    if (x.isNaN()) {
+        println("x.isNaN()")
+    }
     val m = value - c
     val tempColor = when {
         hue >= 0 && hue < 60 -> Color(c, x, 0f)
