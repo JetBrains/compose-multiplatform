@@ -31,7 +31,7 @@ import org.gradle.kotlin.dsl.setProperty
 
 /**
  * Task for verifying the androidx dependency-stability-suffix rule
- * (A library is only as stable as its lease stable dependency)
+ * (A library is only as stable as its least stable dependency)
  */
 abstract class VerifyDependencyVersionsTask : DefaultTask() {
 
