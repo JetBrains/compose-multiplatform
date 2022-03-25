@@ -49,8 +49,11 @@ internal class LazyListMeasureResult(
     /** see [LazyListLayoutInfo.reverseLayout] */
     override val reverseLayout: Boolean,
     /** see [LazyListLayoutInfo.orientation] */
-    override val orientation: Orientation
+    override val orientation: Orientation,
+    /** see [LazyListLayoutInfo.afterContentPadding] */
+    override val afterContentPadding: Int
 ) : LazyListLayoutInfo, MeasureResult by measureResult {
     override val viewportSize: IntSize
         get() = IntSize(width, height)
+    override val beforeContentPadding: Int get() = -viewportStartOffset
 }

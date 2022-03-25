@@ -70,10 +70,11 @@ internal fun measureLazyGrid(
             measureResult = layout(constraints.minWidth, constraints.minHeight) {},
             visibleItemsInfo = emptyList(),
             viewportStartOffset = -beforeContentPadding,
-            viewportEndOffset = afterContentPadding,
+            viewportEndOffset = mainAxisAvailableSize + afterContentPadding,
             totalItemsCount = 0,
             reverseLayout = reverseLayout,
             orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
+            afterContentPadding = afterContentPadding
         )
     } else {
         var currentFirstLineIndex = firstVisibleLineIndex
@@ -244,8 +245,6 @@ internal fun measureLazyGrid(
             measuredItemProvider = measuredItemProvider
         )
 
-        val maximumVisibleOffset = minOf(currentMainAxisOffset, maxOffset) + afterContentPadding
-
         return LazyGridMeasureResult(
             firstVisibleLine = firstLine,
             firstVisibleLineScrollOffset = currentFirstLineScrollOffset,
@@ -255,11 +254,12 @@ internal fun measureLazyGrid(
                 positionedItems.fastForEach { it.place(this) }
             },
             viewportStartOffset = -beforeContentPadding,
-            viewportEndOffset = maximumVisibleOffset,
+            viewportEndOffset = mainAxisAvailableSize + afterContentPadding,
             visibleItemsInfo = positionedItems,
             totalItemsCount = itemsCount,
             reverseLayout = reverseLayout,
-            orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal
+            orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
+            afterContentPadding = afterContentPadding
         )
     }
 }

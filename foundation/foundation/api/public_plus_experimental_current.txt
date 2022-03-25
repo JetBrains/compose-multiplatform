@@ -483,6 +483,8 @@ package androidx.compose.foundation.lazy {
   }
 
   public interface LazyListLayoutInfo {
+    method public default int getAfterContentPadding();
+    method public default int getBeforeContentPadding();
     method public default androidx.compose.foundation.gestures.Orientation getOrientation();
     method public default boolean getReverseLayout();
     method public int getTotalItemsCount();
@@ -490,6 +492,8 @@ package androidx.compose.foundation.lazy {
     method public default long getViewportSize();
     method public int getViewportStartOffset();
     method public java.util.List<androidx.compose.foundation.lazy.LazyListItemInfo> getVisibleItemsInfo();
+    property public default int afterContentPadding;
+    property public default int beforeContentPadding;
     property public default androidx.compose.foundation.gestures.Orientation orientation;
     property public default boolean reverseLayout;
     property public abstract int totalItemsCount;
@@ -616,6 +620,8 @@ package androidx.compose.foundation.lazy.grid {
   }
 
   public sealed interface LazyGridLayoutInfo {
+    method public int getAfterContentPadding();
+    method public int getBeforeContentPadding();
     method public androidx.compose.foundation.gestures.Orientation getOrientation();
     method public boolean getReverseLayout();
     method public int getTotalItemsCount();
@@ -623,6 +629,8 @@ package androidx.compose.foundation.lazy.grid {
     method public long getViewportSize();
     method public int getViewportStartOffset();
     method public java.util.List<androidx.compose.foundation.lazy.grid.LazyGridItemInfo> getVisibleItemsInfo();
+    property public abstract int afterContentPadding;
+    property public abstract int beforeContentPadding;
     property public abstract androidx.compose.foundation.gestures.Orientation orientation;
     property public abstract boolean reverseLayout;
     property public abstract int totalItemsCount;

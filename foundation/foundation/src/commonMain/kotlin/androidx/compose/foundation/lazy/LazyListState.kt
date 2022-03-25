@@ -406,4 +406,6 @@ private object EmptyLazyListLayoutInfo : LazyListLayoutInfo {
     override val viewportSize = IntSize.Zero
     override val orientation = Orientation.Vertical
     override val reverseLayout = false
+    override val beforeContentPadding = 0
+    override val afterContentPadding = 0
 }

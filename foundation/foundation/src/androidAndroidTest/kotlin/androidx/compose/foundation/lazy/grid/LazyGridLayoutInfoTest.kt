@@ -316,6 +316,7 @@ class LazyGridLayoutInfoTest(
         rule.runOnIdle {
             assertThat(state.layoutInfo.viewportStartOffset).isEqualTo(-startPaddingPx)
             assertThat(state.layoutInfo.viewportEndOffset).isEqualTo(sizePx - startPaddingPx)
+            assertThat(state.layoutInfo.afterContentPadding).isEqualTo(endPaddingPx)
             assertThat(state.layoutInfo.viewportSize).isEqualTo(
                 if (isVertical) {
                     IntSize(sizePx * 2, sizePx)
@@ -343,6 +344,85 @@ class LazyGridLayoutInfoTest(
             assertThat(state.layoutInfo.visibleItemsInfo.size).isEqualTo(2)
             assertThat(state.layoutInfo.visibleItemsInfo.first().index).isEqualTo(0)
             assertThat(state.layoutInfo.visibleItemsInfo.last().index).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun emptyContent() {
+        lateinit var state: LazyGridState
+        val sizePx = 45
+        val startPaddingPx = 10
+        val endPaddingPx = 15
+        val sizeDp = with(rule.density) { sizePx.toDp() }
+        val beforeContentPaddingDp = with(rule.density) {
+            if (!reverseLayout) startPaddingPx.toDp() else endPaddingPx.toDp()
+        }
+        val afterContentPaddingDp = with(rule.density) {
+            if (!reverseLayout) endPaddingPx.toDp() else startPaddingPx.toDp()
+        }
+        rule.setContent {
+            LazyGrid(
+                cells = 1,
+                modifier = Modifier.mainAxisSize(sizeDp).crossAxisSize(sizeDp * 2),
+                state = rememberLazyGridState().also { state = it },
+                reverseLayout = reverseLayout,
+                contentPadding = PaddingValues(
+                    beforeContent = beforeContentPaddingDp,
+                    afterContent = afterContentPaddingDp
+                )
+            ) {
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(state.layoutInfo.viewportStartOffset).isEqualTo(-startPaddingPx)
+            assertThat(state.layoutInfo.viewportEndOffset).isEqualTo(sizePx - startPaddingPx)
+            assertThat(state.layoutInfo.beforeContentPadding).isEqualTo(startPaddingPx)
+            assertThat(state.layoutInfo.afterContentPadding).isEqualTo(endPaddingPx)
+            assertThat(state.layoutInfo.viewportSize).isEqualTo(
+                if (vertical) IntSize(sizePx * 2, sizePx) else IntSize(sizePx, sizePx * 2)
+            )
+        }
+    }
+
+    @Test
+    fun viewportIsLargerThenTheContent() {
+        lateinit var state: LazyGridState
+        val sizePx = 45
+        val startPaddingPx = 10
+        val endPaddingPx = 15
+        val sizeDp = with(rule.density) { sizePx.toDp() }
+        val beforeContentPaddingDp = with(rule.density) {
+            if (!reverseLayout) startPaddingPx.toDp() else endPaddingPx.toDp()
+        }
+        val afterContentPaddingDp = with(rule.density) {
+            if (!reverseLayout) endPaddingPx.toDp() else startPaddingPx.toDp()
+        }
+        rule.setContent {
+            LazyGrid(
+                cells = 1,
+                modifier = Modifier.mainAxisSize(sizeDp).crossAxisSize(sizeDp * 2),
+                state = rememberLazyGridState().also { state = it },
+                reverseLayout = reverseLayout,
+                contentPadding = PaddingValues(
+                    beforeContent = beforeContentPaddingDp,
+                    afterContent = afterContentPaddingDp
+                )
+            ) {
+                item {
+                    Box(Modifier.size(sizeDp / 2))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(state.layoutInfo.viewportStartOffset).isEqualTo(-startPaddingPx)
+            assertThat(state.layoutInfo.viewportEndOffset).isEqualTo(sizePx - startPaddingPx)
+            assertThat(state.layoutInfo.beforeContentPadding).isEqualTo(startPaddingPx)
+            assertThat(state.layoutInfo.afterContentPadding).isEqualTo(endPaddingPx)
+            assertThat(state.layoutInfo.viewportSize).isEqualTo(
+                if (vertical) IntSize(sizePx * 2, sizePx) else IntSize(sizePx, sizePx * 2)
+            )
         }
     }
 
