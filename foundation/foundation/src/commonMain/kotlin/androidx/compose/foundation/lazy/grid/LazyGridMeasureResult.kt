@@ -50,7 +50,10 @@ internal class LazyGridMeasureResult(
     override val reverseLayout: Boolean,
     /** see [LazyGridLayoutInfo.orientation] */
     override val orientation: Orientation,
+    /** see [LazyGridLayoutInfo.afterContentPadding] */
+    override val afterContentPadding: Int
 ) : LazyGridLayoutInfo, MeasureResult by measureResult {
     override val viewportSize: IntSize
         get() = IntSize(width, height)
+    override val beforeContentPadding: Int get() = -viewportStartOffset
 }

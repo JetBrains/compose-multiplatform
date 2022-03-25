@@ -19,6 +19,7 @@ package androidx.compose.foundation.lazy.list
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -287,6 +288,7 @@ class LazyListLayoutInfoTest(
         rule.runOnIdle {
             assertThat(state.layoutInfo.viewportStartOffset).isEqualTo(-startPaddingPx)
             assertThat(state.layoutInfo.viewportEndOffset).isEqualTo(sizePx - startPaddingPx)
+            assertThat(state.layoutInfo.afterContentPadding).isEqualTo(endPaddingPx)
             assertThat(state.layoutInfo.viewportSize).isEqualTo(
                 if (vertical) IntSize(sizePx * 2, sizePx) else IntSize(sizePx, sizePx * 2)
             )
@@ -309,6 +311,83 @@ class LazyListLayoutInfoTest(
             assertThat(state.layoutInfo.visibleItemsInfo.size).isEqualTo(2)
             assertThat(state.layoutInfo.visibleItemsInfo.first().index).isEqualTo(0)
             assertThat(state.layoutInfo.visibleItemsInfo.last().index).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun emptyContent() {
+        lateinit var state: LazyListState
+        val sizePx = 45
+        val startPaddingPx = 10
+        val endPaddingPx = 15
+        val sizeDp = with(rule.density) { sizePx.toDp() }
+        val beforeContentPaddingDp = with(rule.density) {
+            if (!reverseLayout) startPaddingPx.toDp() else endPaddingPx.toDp()
+        }
+        val afterContentPaddingDp = with(rule.density) {
+            if (!reverseLayout) endPaddingPx.toDp() else startPaddingPx.toDp()
+        }
+        rule.setContent {
+            LazyColumnOrRow(
+                Modifier.mainAxisSize(sizeDp).crossAxisSize(sizeDp * 2),
+                state = rememberLazyListState().also { state = it },
+                reverseLayout = reverseLayout,
+                contentPadding = PaddingValues(
+                    beforeContent = beforeContentPaddingDp,
+                    afterContent = afterContentPaddingDp
+                )
+            ) {
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(state.layoutInfo.viewportStartOffset).isEqualTo(-startPaddingPx)
+            assertThat(state.layoutInfo.viewportEndOffset).isEqualTo(sizePx - startPaddingPx)
+            assertThat(state.layoutInfo.beforeContentPadding).isEqualTo(startPaddingPx)
+            assertThat(state.layoutInfo.afterContentPadding).isEqualTo(endPaddingPx)
+            assertThat(state.layoutInfo.viewportSize).isEqualTo(
+                if (vertical) IntSize(sizePx * 2, sizePx) else IntSize(sizePx, sizePx * 2)
+            )
+        }
+    }
+
+    @Test
+    fun viewportIsLargerThenTheContent() {
+        lateinit var state: LazyListState
+        val sizePx = 45
+        val startPaddingPx = 10
+        val endPaddingPx = 15
+        val sizeDp = with(rule.density) { sizePx.toDp() }
+        val beforeContentPaddingDp = with(rule.density) {
+            if (!reverseLayout) startPaddingPx.toDp() else endPaddingPx.toDp()
+        }
+        val afterContentPaddingDp = with(rule.density) {
+            if (!reverseLayout) endPaddingPx.toDp() else startPaddingPx.toDp()
+        }
+        rule.setContent {
+            LazyColumnOrRow(
+                Modifier.mainAxisSize(sizeDp).crossAxisSize(sizeDp * 2),
+                state = rememberLazyListState().also { state = it },
+                reverseLayout = reverseLayout,
+                contentPadding = PaddingValues(
+                    beforeContent = beforeContentPaddingDp,
+                    afterContent = afterContentPaddingDp
+                )
+            ) {
+                item {
+                    Box(Modifier.size(sizeDp / 2))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(state.layoutInfo.viewportStartOffset).isEqualTo(-startPaddingPx)
+            assertThat(state.layoutInfo.viewportEndOffset).isEqualTo(sizePx - startPaddingPx)
+            assertThat(state.layoutInfo.beforeContentPadding).isEqualTo(startPaddingPx)
+            assertThat(state.layoutInfo.afterContentPadding).isEqualTo(endPaddingPx)
+            assertThat(state.layoutInfo.viewportSize).isEqualTo(
+                if (vertical) IntSize(sizePx * 2, sizePx) else IntSize(sizePx, sizePx * 2)
+            )
         }
     }
 

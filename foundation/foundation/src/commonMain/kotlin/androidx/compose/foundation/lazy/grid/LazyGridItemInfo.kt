@@ -36,7 +36,7 @@ sealed interface LazyGridItemInfo {
     val key: Any
 
     /**
-     * The offset of the item. It is relative to the top start of the lazy grid container.
+     * The offset of the item in pixels. It is relative to the top start of the lazy grid container.
      */
     val offset: IntOffset
 
@@ -55,7 +55,7 @@ sealed interface LazyGridItemInfo {
     val column: Int
 
     /**
-     * The size of the item. Note that if you emit multiple layouts in the composable
+     * The pixel size of the item. Note that if you emit multiple layouts in the composable
      * slot for the item then this size will be calculated as the max of their sizes.
      */
     val size: IntSize
