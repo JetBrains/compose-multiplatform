@@ -88,7 +88,7 @@ class FontFamilyResolverFileTest {
     fun customSingleFont_fromAssetManager() {
         val defaultTypeface = resolveAsTypeface()
 
-        val fontFamily = Font(context.assets, assetFontPath).toFontFamily()
+        val fontFamily = Font(assetFontPath, context.assets).toFontFamily()
 
         val typeface = resolveAsTypeface(fontFamily = fontFamily)
 

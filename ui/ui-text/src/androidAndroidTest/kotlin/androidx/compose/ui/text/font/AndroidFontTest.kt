@@ -67,8 +67,10 @@ class AndroidFontTest {
         }
     }
 
-    private fun makeAssetFont() =
-        Font(assetManager = context.assets, path = assetFontPath) as AndroidFont
+    private fun makeAssetFont() = Font(assetFontPath, context.assets) as AndroidFont
+
+    @Suppress("DEPRECATION")
+    private fun makeAssetFontDeprecated() = Font(context.assets, assetFontPath) as AndroidFont
 
     @Test
     fun test_load_from_assets() {
@@ -93,6 +95,27 @@ class AndroidFontTest {
     @Test
     fun assetFont_doesntThrowForAsync() {
         val font = makeAssetFont()
+        // don't care about result, but it's not supposed to throw
+        font.typefaceLoader.loadBlocking(context, font)
+    }
+
+    @Test
+    fun assetFont_isBlocking_Deprecated() {
+        val font = makeAssetFontDeprecated()
+        assertThat(font.loadingStrategy).isEqualTo(Blocking)
+    }
+
+    @Test
+    fun assetFont_returnsSameInstance_Deprecated() {
+        val font = makeAssetFontDeprecated()
+        val typeface1 = font.typefaceLoader.loadBlocking(context, font)
+        val typeface2 = font.typefaceLoader.loadBlocking(context, font)
+        assertThat(typeface1).isSameInstanceAs(typeface2)
+    }
+
+    @Test
+    fun assetFont_doesntThrowForAsync_Deprecated() {
+        val font = makeAssetFontDeprecated()
         // don't care about result, but it's not supposed to throw
         font.typefaceLoader.loadBlocking(context, font)
     }
