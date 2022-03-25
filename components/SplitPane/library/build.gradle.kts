@@ -15,7 +15,6 @@ kotlin {
             dependencies {
                 api(compose.runtime)
                 api(compose.foundation)
-                api(compose.material)
             }
         }
         named("desktopMain") {}
