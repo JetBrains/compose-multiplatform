@@ -1,6 +1,9 @@
 // Signature format: 4.0
 package androidx.compose.ui.text.googlefonts {
 
+  public final class FontProviderHelperKt {
+  }
+
   @androidx.compose.ui.text.ExperimentalTextApi public final class GoogleFont {
     ctor public GoogleFont(String name, optional boolean bestEffort);
     method public boolean getBestEffort();
@@ -16,6 +19,7 @@ package androidx.compose.ui.text.googlefonts {
 
   public final class GoogleFontKt {
     method @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(androidx.compose.ui.text.googlefonts.GoogleFont googleFont, androidx.compose.ui.text.googlefonts.GoogleFont.Provider fontProvider, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
+    method @WorkerThread @androidx.compose.ui.text.ExperimentalTextApi public static boolean isAvailableOnDevice(androidx.compose.ui.text.googlefonts.GoogleFont.Provider, android.content.Context context);
   }
 
 }
