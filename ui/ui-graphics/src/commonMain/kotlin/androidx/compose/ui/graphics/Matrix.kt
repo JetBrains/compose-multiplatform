@@ -27,8 +27,8 @@ import kotlin.math.min
 import kotlin.math.sin
 
 // TODO(mount): This class needs some optimization
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-inline class Matrix(
+@kotlin.jvm.JvmInline
+value class Matrix(
     val values: FloatArray = floatArrayOf(
         1f, 0f, 0f, 0f,
         0f, 1f, 0f, 0f,

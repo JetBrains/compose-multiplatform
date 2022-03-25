@@ -117,9 +117,3 @@ androidx {
 android {
     namespace "androidx.compose.ui.unit"
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += ["-XXLanguage:+InlineClasses"]
-    }
-}

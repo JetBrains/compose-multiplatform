@@ -23,9 +23,9 @@ import androidx.compose.runtime.Immutable
  *
  * See [Paint.style].
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class PaintingStyle internal constructor(@Suppress("unused") private val value: Int) {
+@kotlin.jvm.JvmInline
+value class PaintingStyle internal constructor(@Suppress("unused") private val value: Int) {
 
     companion object {
 

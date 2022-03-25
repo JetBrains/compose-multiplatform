@@ -4,8 +4,8 @@ package androidx.compose.material.window {
   public final class AndroidSizeClass_androidKt {
   }
 
-  @androidx.compose.runtime.Immutable public final inline class HeightSizeClass {
-    ctor public HeightSizeClass();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class HeightSizeClass {
+    field public static final androidx.compose.material.window.HeightSizeClass.Companion Companion;
   }
 
   public static final class HeightSizeClass.Companion {
@@ -31,8 +31,8 @@ package androidx.compose.material.window {
   public final class TestOnly_jvmKt {
   }
 
-  @androidx.compose.runtime.Immutable public final inline class WidthSizeClass {
-    ctor public WidthSizeClass();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class WidthSizeClass {
+    field public static final androidx.compose.material.window.WidthSizeClass.Companion Companion;
   }
 
   public static final class WidthSizeClass.Companion {

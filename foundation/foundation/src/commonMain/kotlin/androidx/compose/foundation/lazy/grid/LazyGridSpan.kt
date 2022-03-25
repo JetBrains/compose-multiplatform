@@ -22,9 +22,9 @@ import androidx.compose.runtime.Immutable
 /**
  * Represents the span of an item in a [LazyVerticalGrid].
  */
-@Suppress("INLINE_CLASS_DEPRECATED")
 @Immutable
-inline class GridItemSpan internal constructor(private val packedValue: Long) {
+@kotlin.jvm.JvmInline
+value class GridItemSpan internal constructor(private val packedValue: Long) {
     /**
      * The span of the item on the current line. This will be the horizontal span for items of
      * [LazyVerticalGrid].

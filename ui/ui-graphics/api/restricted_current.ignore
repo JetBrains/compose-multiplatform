@@ -1,0 +1,37 @@
+// Baseline format: 1.0
+RemovedMethod: androidx.compose.ui.graphics.BlendMode#BlendMode():
+    Removed constructor androidx.compose.ui.graphics.BlendMode()
+RemovedMethod: androidx.compose.ui.graphics.ClipOp#ClipOp():
+    Removed constructor androidx.compose.ui.graphics.ClipOp()
+RemovedMethod: androidx.compose.ui.graphics.Color#Color():
+    Removed constructor androidx.compose.ui.graphics.Color()
+RemovedMethod: androidx.compose.ui.graphics.ColorMatrix#ColorMatrix():
+    Removed constructor androidx.compose.ui.graphics.ColorMatrix()
+RemovedMethod: androidx.compose.ui.graphics.FilterQuality#FilterQuality():
+    Removed constructor androidx.compose.ui.graphics.FilterQuality()
+RemovedMethod: androidx.compose.ui.graphics.ImageBitmapConfig#ImageBitmapConfig():
+    Removed constructor androidx.compose.ui.graphics.ImageBitmapConfig()
+RemovedMethod: androidx.compose.ui.graphics.Matrix#Matrix():
+    Removed constructor androidx.compose.ui.graphics.Matrix()
+RemovedMethod: androidx.compose.ui.graphics.PaintingStyle#PaintingStyle():
+    Removed constructor androidx.compose.ui.graphics.PaintingStyle()
+RemovedMethod: androidx.compose.ui.graphics.PathFillType#PathFillType():
+    Removed constructor androidx.compose.ui.graphics.PathFillType()
+RemovedMethod: androidx.compose.ui.graphics.PathOperation#PathOperation():
+    Removed constructor androidx.compose.ui.graphics.PathOperation()
+RemovedMethod: androidx.compose.ui.graphics.PointMode#PointMode():
+    Removed constructor androidx.compose.ui.graphics.PointMode()
+RemovedMethod: androidx.compose.ui.graphics.StampedPathEffectStyle#StampedPathEffectStyle():
+    Removed constructor androidx.compose.ui.graphics.StampedPathEffectStyle()
+RemovedMethod: androidx.compose.ui.graphics.StrokeCap#StrokeCap():
+    Removed constructor androidx.compose.ui.graphics.StrokeCap()
+RemovedMethod: androidx.compose.ui.graphics.StrokeJoin#StrokeJoin():
+    Removed constructor androidx.compose.ui.graphics.StrokeJoin()
+RemovedMethod: androidx.compose.ui.graphics.TileMode#TileMode():
+    Removed constructor androidx.compose.ui.graphics.TileMode()
+RemovedMethod: androidx.compose.ui.graphics.VertexMode#VertexMode():
+    Removed constructor androidx.compose.ui.graphics.VertexMode()
+RemovedMethod: androidx.compose.ui.graphics.colorspace.ColorModel#ColorModel():
+    Removed constructor androidx.compose.ui.graphics.colorspace.ColorModel()
+RemovedMethod: androidx.compose.ui.graphics.colorspace.RenderIntent#RenderIntent():
+    Removed constructor androidx.compose.ui.graphics.colorspace.RenderIntent()

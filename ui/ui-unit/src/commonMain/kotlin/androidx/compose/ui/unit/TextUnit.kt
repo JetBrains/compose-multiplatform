@@ -42,8 +42,8 @@ private const val UNIT_TYPE_EM = 0x02L shl 32 // 0x2_0000_0000
 /**
  * An enum class defining for type of [TextUnit].
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-inline class TextUnitType(internal val type: Long) {
+@kotlin.jvm.JvmInline
+value class TextUnitType(internal val type: Long) {
     override fun toString(): String {
         return when (this) {
             Unspecified -> "Unspecified"
@@ -74,9 +74,9 @@ fun TextUnit(value: Float, type: TextUnitType): TextUnit = pack(type.type, value
  * Note that do not store this value in your persistent storage or send to another process since
  * the internal representation may be changed in future.
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class TextUnit internal constructor(internal val packedValue: Long) {
+@kotlin.jvm.JvmInline
+value class TextUnit internal constructor(internal val packedValue: Long) {
     /**
      * This is the same as multiplying the [TextUnit] by -1.0.
      *

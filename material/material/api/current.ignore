@@ -1,0 +1,3 @@
+// Baseline format: 1.0
+RemovedMethod: androidx.compose.material.FabPosition#FabPosition():
+    Removed constructor androidx.compose.material.FabPosition()

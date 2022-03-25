@@ -33,8 +33,8 @@ package androidx.compose.ui.text.font
  *
  *  @sample androidx.compose.ui.text.samples.FontFamilySynthesisSample
  **/
-@Suppress("INLINE_CLASS_DEPRECATED")
-inline class FontSynthesis internal constructor(internal val value: Int) {
+@kotlin.jvm.JvmInline
+value class FontSynthesis internal constructor(internal val value: Int) {
 
     override fun toString(): String {
         return when (this) {

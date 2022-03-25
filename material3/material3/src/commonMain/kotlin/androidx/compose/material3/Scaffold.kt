@@ -222,8 +222,8 @@ private fun ScaffoldLayout(
  */
 // TODO(b/200553810): Mark as experimental
 @ExperimentalMaterial3Api
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-inline class FabPosition internal constructor(@Suppress("unused") private val value: Int) {
+@kotlin.jvm.JvmInline
+value class FabPosition internal constructor(@Suppress("unused") private val value: Int) {
     companion object {
         /**
          * Position FAB at the bottom of the screen in the center, above the [NavigationBar] (if it

@@ -20,8 +20,8 @@ package androidx.compose.ui.text.input
  * Options to request software keyboard to capitalize the text. Applies to languages which
  * has upper-case and lower-case letters.
  */
-@Suppress("INLINE_CLASS_DEPRECATED")
-inline class KeyboardCapitalization internal constructor(internal val value: Int) {
+@kotlin.jvm.JvmInline
+value class KeyboardCapitalization internal constructor(internal val value: Int) {
 
     override fun toString(): String {
         return when (this) {

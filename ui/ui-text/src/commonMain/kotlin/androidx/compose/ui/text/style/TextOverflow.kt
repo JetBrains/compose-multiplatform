@@ -19,8 +19,8 @@ package androidx.compose.ui.text.style
 import androidx.compose.runtime.Stable
 
 /** How overflowing text should be handled. */
-@Suppress("INLINE_CLASS_DEPRECATED")
-inline class TextOverflow internal constructor(internal val value: Int) {
+@kotlin.jvm.JvmInline
+value class TextOverflow internal constructor(internal val value: Int) {
 
     override fun toString(): String {
         return when (this) {

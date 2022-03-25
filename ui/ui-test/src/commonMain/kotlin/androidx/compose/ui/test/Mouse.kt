@@ -21,9 +21,9 @@ package androidx.compose.ui.test
  * All methods that accept a scroll axis use [Vertical] as the default, since most mice only have
  * a vertical scroll wheel.
  */
-@Suppress("INLINE_CLASS_DEPRECATED")
 @ExperimentalTestApi
-inline class ScrollWheel private constructor(val value: Int) {
+@kotlin.jvm.JvmInline
+value class ScrollWheel private constructor(val value: Int) {
     @ExperimentalTestApi
     companion object {
         val Horizontal = ScrollWheel(0)
@@ -34,9 +34,9 @@ inline class ScrollWheel private constructor(val value: Int) {
 /**
  * Representation of a mouse button with its associated [ID][buttonId] for the current platform.
  */
-@Suppress("INLINE_CLASS_DEPRECATED")
 @ExperimentalTestApi
-expect inline class MouseButton(val buttonId: Int) {
+@kotlin.jvm.JvmInline
+expect value class MouseButton(val buttonId: Int) {
     @ExperimentalTestApi
     companion object {
         /**

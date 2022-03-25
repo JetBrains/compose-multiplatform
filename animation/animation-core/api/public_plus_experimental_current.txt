@@ -432,12 +432,16 @@ package androidx.compose.animation.core {
     property public final T? visibilityThreshold;
   }
 
-  public final inline class StartOffset {
-    ctor public StartOffset();
+  @kotlin.jvm.JvmInline public final value class StartOffset {
+    ctor public StartOffset(int offsetMillis, optional int offsetType);
+    method public int getOffsetMillis();
+    method public int getOffsetType();
+    property public final int offsetMillis;
+    property public final int offsetType;
   }
 
-  public final inline class StartOffsetType {
-    ctor public StartOffsetType();
+  @kotlin.jvm.JvmInline public final value class StartOffsetType {
+    field public static final androidx.compose.animation.core.StartOffsetType.Companion Companion;
   }
 
   public static final class StartOffsetType.Companion {

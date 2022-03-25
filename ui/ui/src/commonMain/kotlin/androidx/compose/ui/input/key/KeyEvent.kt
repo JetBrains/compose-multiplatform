@@ -30,8 +30,8 @@ expect class NativeKeyEvent
  *
  * @sample androidx.compose.ui.samples.KeyEventSample
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-inline class KeyEvent(val nativeKeyEvent: NativeKeyEvent)
+@kotlin.jvm.JvmInline
+value class KeyEvent(val nativeKeyEvent: NativeKeyEvent)
 
 /**
  * The key that was pressed.
@@ -98,8 +98,8 @@ expect val KeyEvent.isShiftPressed: Boolean
  *
  * @sample androidx.compose.ui.samples.KeyEventTypeSample
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-inline class KeyEventType internal constructor(@Suppress("unused") private val value: Int) {
+@kotlin.jvm.JvmInline
+value class KeyEventType internal constructor(@Suppress("unused") private val value: Int) {
 
     override fun toString(): String {
         return when (this) {

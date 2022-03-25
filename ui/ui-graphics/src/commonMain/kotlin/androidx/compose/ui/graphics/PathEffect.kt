@@ -97,9 +97,9 @@ internal expect fun actualStampedPathEffect(
  *
  * @sample androidx.compose.ui.graphics.samples.StampedPathEffectSample
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class StampedPathEffectStyle internal constructor(
+@kotlin.jvm.JvmInline
+value class StampedPathEffectStyle internal constructor(
     @Suppress("unused") private val value: Int
 ) {
 
