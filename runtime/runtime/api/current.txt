@@ -705,6 +705,10 @@ package androidx.compose.runtime.internal {
     property public abstract int startOffset;
   }
 
+  @androidx.compose.runtime.ComposeCompilerApi @kotlin.annotation.Repeatable @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.RUNTIME) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget.CLASS) public static @interface FunctionKeyMeta.Container {
+    method public abstract androidx.compose.runtime.internal.FunctionKeyMeta[] value();
+  }
+
   @androidx.compose.runtime.ComposeCompilerApi @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.RUNTIME) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget.CLASS) public @interface FunctionKeyMetaClass {
     method public abstract String file();
     property public abstract String file;

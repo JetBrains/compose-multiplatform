@@ -744,7 +744,7 @@ package androidx.compose.runtime.internal {
   @androidx.compose.runtime.ExperimentalComposeApi @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.CONSTRUCTOR}) public @interface Decoy {
     method public abstract String[] signature();
     method public abstract String targetName();
-    property public abstract String![] signature;
+    property public abstract String[] signature;
     property public abstract String targetName;
   }
 
@@ -766,6 +766,10 @@ package androidx.compose.runtime.internal {
     property public abstract int endOffset;
     property public abstract int key;
     property public abstract int startOffset;
+  }
+
+  @androidx.compose.runtime.ComposeCompilerApi @kotlin.annotation.Repeatable @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.RUNTIME) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget.CLASS) public static @interface FunctionKeyMeta.Container {
+    method public abstract androidx.compose.runtime.internal.FunctionKeyMeta[] value();
   }
 
   @androidx.compose.runtime.ComposeCompilerApi @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.RUNTIME) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget.CLASS) public @interface FunctionKeyMetaClass {
