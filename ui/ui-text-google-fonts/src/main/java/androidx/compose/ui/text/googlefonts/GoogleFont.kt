@@ -24,6 +24,7 @@ import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.ArrayRes
+import androidx.annotation.WorkerThread
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.AndroidFont
 import androidx.compose.ui.text.font.Font
@@ -173,6 +174,22 @@ class GoogleFont(val name: String, val bestEffort: Boolean = true) {
     }
 }
 
+/**
+ * Check if the downloadable fonts provider is available on device.
+ *
+ * This is not necessary for normal usage, but may be useful in debugging downloadable fonts
+ * behavior.
+ *
+ * @param context for looking up font provider in
+ * @return true if the provider is usable for downloadable fonts, false if it's not found
+ * @throws IllegalStateException if the provider is on device, but certificates don't match
+ */
+@ExperimentalTextApi
+@WorkerThread
+fun GoogleFont.Provider.isAvailableOnDevice(
+    @Suppress("ContextFirst") context: Context, // extension function
+): Boolean = checkAvailable(context.packageManager, context.resources)
+
 @ExperimentalTextApi
 internal data class GoogleFontImpl constructor(
     val name: String,
@@ -183,7 +200,6 @@ internal data class GoogleFontImpl constructor(
 ) : AndroidFont(FontLoadingStrategy.Async) {
     override val typefaceLoader: TypefaceLoader
         get() = GoogleFontTypefaceLoader
-
     fun toFontRequest(): FontRequest {
         val query = "name=${name.encode()}&weight=${weight.weight}" +
             "&italic=${style.toQueryParam()}&besteffort=${bestEffortQueryParam()}"
@@ -207,9 +223,9 @@ internal data class GoogleFontImpl constructor(
     }
 
     private fun bestEffortQueryParam() = if (bestEffort) "true" else "false"
+
     private fun FontStyle.toQueryParam(): Int = if (this == FontStyle.Italic) 1 else 0
     private fun String.encode() = URLEncoder.encode(this, "UTF-8")
-
     fun toTypefaceStyle(): Int {
         val isItalic = style == FontStyle.Italic
         val isBold = weight >= FontWeight.Bold
@@ -232,7 +248,6 @@ internal object GoogleFontTypefaceLoader : AndroidFont.TypefaceLoader {
     override fun loadBlocking(context: Context, font: AndroidFont): Typeface? {
         error("GoogleFont only support async loading: $font")
     }
-
     override suspend fun awaitLoad(context: Context, font: AndroidFont): Typeface? {
         return awaitLoad(context, font, DefaultFontsContractCompatLoader)
     }
