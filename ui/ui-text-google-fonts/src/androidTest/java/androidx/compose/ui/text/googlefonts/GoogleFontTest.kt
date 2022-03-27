@@ -17,14 +17,19 @@
 package androidx.compose.ui.text.googlefonts
 
 import android.content.Context
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager.NameNotFoundException
+import android.content.res.AssetManager
 import android.graphics.Typeface
 import android.os.Handler
+import androidx.annotation.WorkerThread
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.AndroidFont
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontLoadingStrategy
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.googlefonts.test.R
 import androidx.core.provider.FontRequest
 import androidx.core.provider.FontsContractCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -32,10 +37,11 @@ import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -253,6 +259,83 @@ class GoogleFontTest {
         assertThat(provider.certificates).isNotNull()
     }
 
+    // disabled for CI, enable locally to test gms certs integrations
+    private val RunRealGmsIntegrationTests = false
+
+    @Test(expected = IllegalStateException::class)
+    fun GoogleFontProvider_isAvailableOnDevice_throwsCorrectly() {
+        assumeTrue(RunRealGmsIntegrationTests)
+        // only run this where gms is present
+        val packageInfo = getComAndroidGmsOrNull()
+        assumeTrue(packageInfo != null)
+
+        val provider = GoogleFont.Provider(
+            "com.google.android.gms.fonts",
+            "com.google.android.gms",
+            listOf() /* this is never a valid cert */
+        )
+        provider.isAvailableOnDevice(context)
+    }
+
+    @Test
+    fun GoogleFontProvider_isAvailableOnDevice_realCerts_isTrue() {
+        assumeTrue(RunRealGmsIntegrationTests)
+
+        // only run this where gms is present
+        val packageInfo = getComAndroidGmsOrNull()
+        assumeTrue(packageInfo != null)
+
+        val provider = GoogleFont.Provider(
+            "com.google.android.gms.fonts",
+            "com.google.android.gms",
+            listOf(
+                listOf(loadComGoogleAndroidGmsProdCertificateByteArray(context.assets)),
+                listOf(loadComGoogleAndroidGmsDevCertificateByteArray(context.assets))
+            )
+        )
+
+        assertThat(provider.isAvailableOnDevice(context)).isTrue()
+    }
+
+    @Test
+    fun GoogleFontProvider_isAvailableOnDevice_realCerts_xml_isTrue() {
+        assumeTrue(RunRealGmsIntegrationTests)
+
+        // only run this where gms is present
+        val packageInfo = getComAndroidGmsOrNull()
+        assumeTrue(packageInfo != null)
+
+        val provider = GoogleFont.Provider(
+            "com.google.android.gms.fonts",
+            "com.google.android.gms",
+            R.array.com_google_android_gms_fonts_certs
+        )
+        assertThat(provider.isAvailableOnDevice(context)).isTrue()
+    }
+
+    @Test
+    fun GoogleFontProvider_isNotAvailableOnDevice_isFalse() {
+        // only run this where gms not present, can run on CI
+        val packageInfo = getComAndroidGmsOrNull()
+        assumeTrue(packageInfo == null)
+
+        val provider = GoogleFont.Provider(
+            "com.google.android.gms.fonts",
+            "com.google.android.gms",
+            listOf() /* this is never a valid cert */
+        )
+        assertThat(provider.isAvailableOnDevice(context)).isFalse()
+    }
+
+    @Suppress("DEPRECATION")
+    private fun getComAndroidGmsOrNull(): PackageInfo? {
+        return try {
+            context.packageManager.getPackageInfo("com.google.android.gms", 0)
+        } catch (ex: NameNotFoundException) {
+            null
+        }
+    }
+
     private class CapturingFontsContractCompatLoader : FontsContractCompatLoader {
         var callback: FontsContractCompat.FontRequestCallback? = null
 
@@ -265,5 +348,19 @@ class GoogleFontTest {
         ) {
             this.callback = callback
         }
+    }
+}
+
+@WorkerThread
+private fun loadComGoogleAndroidGmsProdCertificateByteArray(assetManager: AssetManager): ByteArray {
+    return assetManager.open("ComGoogleAndroidGmsCertificate.prod").use {
+        it.readBytes()
+    }
+}
+
+@WorkerThread
+private fun loadComGoogleAndroidGmsDevCertificateByteArray(assetManager: AssetManager): ByteArray {
+    return assetManager.open("ComGoogleAndroidGmsCertificate.dev").use {
+        it.readBytes()
     }
 }
