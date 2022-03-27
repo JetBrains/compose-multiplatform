@@ -280,6 +280,7 @@ class TextStyle @ExperimentalTextApi constructor(
     @Stable
     operator fun plus(other: SpanStyle): TextStyle = this.merge(other)
 
+    @OptIn(ExperimentalTextApi::class)
     fun copy(
         color: Color = this.color,
         fontSize: TextUnit = this.fontSize,
@@ -318,7 +319,8 @@ class TextStyle @ExperimentalTextApi constructor(
             textAlign = textAlign,
             textDirection = textDirection,
             lineHeight = lineHeight,
-            textIndent = textIndent
+            textIndent = textIndent,
+            platformStyle = this.platformStyle
         )
     }
 
