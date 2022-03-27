@@ -22,8 +22,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.style.lerp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.isUnspecified
+
+private val DefaultLineHeight = TextUnit.Unspecified
 
 /**
  * Paragraph styling configuration for a paragraph. The difference between [SpanStyle] and
@@ -38,8 +41,8 @@ import androidx.compose.ui.unit.isUnspecified
  * @param textAlign The alignment of the text within the lines of the paragraph.
  * @param textDirection The algorithm to be used to resolve the final text direction:
  * Left To Right or Right To Left.
- * @param textIndent The indentation of the paragraph.
  * @param lineHeight Line height for the [Paragraph] in [TextUnit] unit, e.g. SP or EM.
+ * @param textIndent The indentation of the paragraph.
  * @param platformStyle Platform specific [ParagraphStyle] parameters.
  *
  * @see Paragraph
@@ -57,6 +60,27 @@ class ParagraphStyle @ExperimentalTextApi constructor(
     @get:ExperimentalTextApi val platformStyle: PlatformParagraphStyle? = null
 ) {
 
+    /**
+     * Paragraph styling configuration for a paragraph. The difference between [SpanStyle] and
+     * `ParagraphStyle` is that, `ParagraphStyle` can be applied to a whole [Paragraph] while
+     * [SpanStyle] can be applied at the character level.
+     * Once a portion of the text is marked with a `ParagraphStyle`, that portion will be separated from
+     * the remaining as if a line feed character was added.
+     *
+     * @sample androidx.compose.ui.text.samples.ParagraphStyleSample
+     * @sample androidx.compose.ui.text.samples.ParagraphStyleAnnotatedStringsSample
+     *
+     * @param textAlign The alignment of the text within the lines of the paragraph.
+     * @param textDirection The algorithm to be used to resolve the final text direction:
+     * Left To Right or Right To Left.
+     * @param lineHeight Line height for the [Paragraph] in [TextUnit] unit, e.g. SP or EM.
+     * @param textIndent The indentation of the paragraph.
+     *
+     * @see Paragraph
+     * @see AnnotatedString
+     * @see SpanStyle
+     * @see TextStyle
+     */
     @OptIn(ExperimentalTextApi::class)
     constructor(
         textAlign: TextAlign? = null,
@@ -228,3 +252,15 @@ private fun lerpPlatformStyle(
     val stopNonNull = stop ?: PlatformParagraphStyle.Default
     return startNonNull.lerp(stopNonNull, fraction)
 }
+
+@OptIn(ExperimentalTextApi::class)
+internal fun resolveParagraphStyleDefaults(
+    style: ParagraphStyle,
+    direction: LayoutDirection
+) = ParagraphStyle(
+    textAlign = style.textAlign ?: TextAlign.Start,
+    textDirection = resolveTextDirection(direction, style.textDirection),
+    lineHeight = if (style.lineHeight.isUnspecified) DefaultLineHeight else style.lineHeight,
+    textIndent = style.textIndent ?: TextIndent.None,
+    platformStyle = style.platformStyle
+)
