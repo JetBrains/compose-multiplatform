@@ -205,6 +205,22 @@ fun Modifier.pointerInput(
  * pointer input events. Extension functions on [PointerInputScope] or [AwaitPointerEventScope]
  * may be defined to perform higher-level gesture detection. The pointer input handling [block]
  * will be cancelled and **re-started** when [pointerInput] is recomposed with a different [key1].
+ *
+ * When a [pointerInput] modifier is created by composition, if [block] captures any local
+ * variables to operate on, two patterns are common for working with changes to those variables
+ * depending on the desired behavior.
+ *
+ * Specifying the captured value as a [key][key1] parameter will cause [block] to cancel
+ * and restart from the beginning if the value changes:
+ *
+ * @sample androidx.compose.ui.samples.keyedPointerInputModifier
+ *
+ * If [block] should **not** restart when a captured value is changed but the value should still
+ * be updated for its next use, use
+ * [rememberUpdatedState][androidx.compose.runtime.rememberUpdatedState] to update a value holder
+ * that is accessed by [block]:
+ *
+ * @sample androidx.compose.ui.samples.rememberedUpdatedParameterPointerInputModifier
  */
 fun Modifier.pointerInput(
     key1: Any?,
@@ -235,6 +251,22 @@ fun Modifier.pointerInput(
  * may be defined to perform higher-level gesture detection. The pointer input handling [block]
  * will be cancelled and **re-started** when [pointerInput] is recomposed with a different [key1] or
  * [key2].
+ *
+ * When a [pointerInput] modifier is created by composition, if [block] captures any local
+ * variables to operate on, two patterns are common for working with changes to those variables
+ * depending on the desired behavior.
+ *
+ * Specifying the captured value as a [key][key1] parameter will cause [block] to cancel
+ * and restart from the beginning if the value changes:
+ *
+ * @sample androidx.compose.ui.samples.keyedPointerInputModifier
+ *
+ * If [block] should **not** restart when a captured value is changed but the value should still
+ * be updated for its next use, use
+ * [rememberUpdatedState][androidx.compose.runtime.rememberUpdatedState] to update a value holder
+ * that is accessed by [block]:
+ *
+ * @sample androidx.compose.ui.samples.rememberedUpdatedParameterPointerInputModifier
  */
 fun Modifier.pointerInput(
     key1: Any?,
@@ -266,6 +298,22 @@ fun Modifier.pointerInput(
  * pointer input events. Extension functions on [PointerInputScope] or [AwaitPointerEventScope]
  * may be defined to perform higher-level gesture detection. The pointer input handling [block]
  * will be cancelled and **re-started** when [pointerInput] is recomposed with any different [keys].
+ *
+ * When a [pointerInput] modifier is created by composition, if [block] captures any local
+ * variables to operate on, two patterns are common for working with changes to those variables
+ * depending on the desired behavior.
+ *
+ * Specifying the captured value as a [key][keys] parameter will cause [block] to cancel
+ * and restart from the beginning if the value changes:
+ *
+ * @sample androidx.compose.ui.samples.keyedPointerInputModifier
+ *
+ * If [block] should **not** restart when a captured value is changed but the value should still
+ * be updated for its next use, use
+ * [rememberUpdatedState][androidx.compose.runtime.rememberUpdatedState] to update a value holder
+ * that is accessed by [block]:
+ *
+ * @sample androidx.compose.ui.samples.rememberedUpdatedParameterPointerInputModifier
  */
 fun Modifier.pointerInput(
     vararg keys: Any?,
