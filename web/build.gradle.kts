@@ -130,6 +130,9 @@ subprojects {
             url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         }
         maven {
+            url = uri("https://maven.pkg.jetbrains.space/public/p/kotlinx-coroutines/maven")
+        }
+        maven {
             url = uri("https://packages.jetbrains.team/maven/p/ui/dev")
         }
         google()
