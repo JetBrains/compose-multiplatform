@@ -5,29 +5,19 @@
 
 package com.jetbrains.compose.color
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Button
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposePanel
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.editor.markup.GutterIconRenderer
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.psi.PsiElement
-import com.jetbrains.compose.theme.WidgetTheme
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.uast.*
 import javax.swing.JComponent
-import kotlin.random.Random
-import kotlin.random.nextUInt
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import com.intellij.openapi.application.ApplicationManager
 
 class ColorLineMarkerProvider : LineMarkerProvider {
@@ -70,7 +60,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                             ApplicationManager.getApplication().runWriteAction {
                                 psiElement.replace(
                                     ktPsiFactory.createExpression(
-                                        "Color(${color.hexStr()})"
+                                        "Color(${color.toHexString()})"
                                     )
                                 )
                             }

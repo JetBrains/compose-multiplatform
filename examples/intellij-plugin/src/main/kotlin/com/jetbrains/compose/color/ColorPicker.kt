@@ -5,11 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -18,9 +16,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogState
-import androidx.compose.ui.window.WindowPosition
 
 @Composable
 fun ColorPallet(colorState: MutableState<Color>) {
@@ -40,8 +35,10 @@ fun ColorPallet(colorState: MutableState<Color>) {
         var currentColor: Color by remember { colorState }
 
         Divider(Modifier.size(5.dp))
+        val width = 300f
+        val height = 256f
         Row {
-            Canvas(Modifier.size(360.dp, 256.dp).pointerInput(Unit) {
+            Canvas(Modifier.size(width.dp, height.dp).pointerInput(Unit) {
                 awaitPointerEventScope {
                     while (true) {
                         val event = awaitPointerEvent()
@@ -49,10 +46,10 @@ fun ColorPallet(colorState: MutableState<Color>) {
                             val position = event.changes.first().position
                             currentColor = try {
                                 currentColor.toHsv().copy(
-                                    hue = position.x.mod(360f),
-                                    saturation = position.y / 256
+                                    hue = limit0to1(position.x / width) * HSV.HUE_MAX_VALUE,
+                                    saturation = limit0to1(position.y / height)
                                 ).toRgb()
-                            } catch (t:Throwable) {
+                            } catch (t: Throwable) {
                                 t.printStackTrace()
                                 println("exception $t")
                                 currentColor
@@ -61,30 +58,34 @@ fun ColorPallet(colorState: MutableState<Color>) {
                     }
                 }
             }) {
-                for (x in 0..360) {
-                    for (y in 0..255) {
-                        val hue = x
-                        val saturation = y / 255f
+                for (x in 0..width.toInt()) {
+                    for (y in 0..height.toInt()) {
+                        val hue = (x / width) * HSV.HUE_MAX_VALUE
+                        val saturation = y / height
                         drawRect(
-                            color = currentColor.toHsv().copy(hue = hue.toFloat(), saturation = saturation).toRgb(),
-                            topLeft = Offset(hue.toFloat(), y.toFloat()),
+                            color = currentColor.toHsv().copy(hue = hue, saturation = saturation).toRgb(),
+                            topLeft = Offset(x.toFloat(), y.toFloat()),
                             size = Size(1f, 1f)
                         )
                     }
                 }
             }
             val BAND_WIDTH = 40
-            Canvas(Modifier.size(BAND_WIDTH.dp, 256.dp).pointerInput(Unit) {
+            Canvas(Modifier.size(BAND_WIDTH.dp, height.dp).pointerInput(Unit) {
                 awaitPointerEventScope {
                     while (true) {
                         val event = awaitPointerEvent()
                         if (event.buttons.isPrimaryPressed) {
-                            currentColor = currentColor.toHsv().copy(value = event.changes.first().position.y / 256f).toRgb()
+                            val position = event.changes.first().position
+                            currentColor =
+                                currentColor.toHsv().copy(
+                                    value = limit0to1(position.y / height)
+                                ).toRgb()
                         }
                     }
                 }
             }) {
-                for (y in 0..255) {
+                for (y in 0..height.toInt()) {
                     val value = y / 255f
                     drawRect(
                         color = currentColor.toHsv().copy(value = value).toRgb(), topLeft = Offset(0f, y.toFloat()),
@@ -95,7 +96,7 @@ fun ColorPallet(colorState: MutableState<Color>) {
         }
 
         Row {
-            Text("color hex: ${currentColor.hexStr()}")
+            Text("color hex: ${currentColor.toHexString()}")
         }
         Row {
             Canvas(Modifier.size(100.dp, 100.dp)) {
@@ -105,4 +106,6 @@ fun ColorPallet(colorState: MutableState<Color>) {
     }
 }
 
-fun Color.hexStr() = "0x" + toArgb().toUInt().toString(16)
+fun Color.toHexString() = "0x" + toArgb().toUInt().toString(16)
+fun limit(value: Float, min: Float, max: Float) = maxOf(value, min).mod(max)
+fun limit0to1(value: Float) = limit(value = value, 0f, 1f)
