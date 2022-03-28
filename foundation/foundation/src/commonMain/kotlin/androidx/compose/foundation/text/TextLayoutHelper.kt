@@ -17,6 +17,7 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -89,10 +90,13 @@ internal fun TextLayoutResult.canReuse(
 
 /**
  * Returns true if text layout created with this TextStyle can be reused for the [other] TextStyle.
+ *
+ * The only parameters that do not require a layout change are color, textDecoration and shadow
+ * since they are set on the paint directly in TextPainter.
  */
+@OptIn(ExperimentalTextApi::class)
 internal fun TextStyle.canReuseLayout(other: TextStyle): Boolean {
-    return (this === other) || (
-        fontSize == other.fontSize &&
+    return (this === other) || (fontSize == other.fontSize &&
         fontWeight == other.fontWeight &&
         fontStyle == other.fontStyle &&
         fontSynthesis == other.fontSynthesis &&
@@ -106,6 +110,6 @@ internal fun TextStyle.canReuseLayout(other: TextStyle): Boolean {
         textAlign == other.textAlign &&
         textDirection == other.textDirection &&
         lineHeight == other.lineHeight &&
-        textIndent == other.textIndent
-        )
+        textIndent == other.textIndent &&
+        platformStyle == other.platformStyle)
 }
