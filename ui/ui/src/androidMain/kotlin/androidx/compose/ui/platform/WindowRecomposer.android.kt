@@ -376,13 +376,16 @@ fun View.createLifecycleAwareWindowRecomposer(
                             var durationScaleJob: Job? = null
                             try {
                                 durationScaleJob = systemDurationScaleSettingConsumer?.let {
-                                    val durationScaleStateFlow = getAnimationScaleFlowFor(
-                                        context.applicationContext as Application
-                                    )
-                                    it.scaleFactor = durationScaleStateFlow.value
-                                    launch {
-                                        durationScaleStateFlow.collect { scaleFactor ->
-                                            it.scaleFactor = scaleFactor
+                                    // We need the following nullability check because the cast will
+                                    // fail in layoutlib. A long-term plan for this workaround is
+                                    // being tracked by b/227155163.
+                                    (context.applicationContext as? Application)?.let { app ->
+                                        val durationScaleStateFlow = getAnimationScaleFlowFor(app)
+                                        it.scaleFactor = durationScaleStateFlow.value
+                                        launch {
+                                            durationScaleStateFlow.collect { scaleFactor ->
+                                                it.scaleFactor = scaleFactor
+                                            }
                                         }
                                     }
                                 }
