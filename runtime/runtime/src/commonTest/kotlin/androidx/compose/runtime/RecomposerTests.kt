@@ -280,6 +280,30 @@ class RecomposerTests {
             "child did not inherit parent recomposeCoroutineContext"
         )
     }
+
+    @Test
+    fun readDuringWithoutReadObservationDoesntCauseRecomposition() = compositionTest {
+        var someState by mutableStateOf(0)
+        var recompostions = 0
+
+        @Composable
+        fun use(@Suppress("UNUSED_PARAMETER") i: Int) {
+        }
+
+        compose {
+            recompostions++
+            use(
+                Snapshot.withoutReadObservation { someState }
+            )
+        }
+
+        assertEquals(1, recompostions)
+
+        someState++
+        advance()
+
+        assertEquals(1, recompostions)
+    }
 }
 
 class UnitApplier : Applier<Unit> {

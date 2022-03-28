@@ -20,9 +20,13 @@ package androidx.compose.runtime.snapshots
 
 import androidx.compose.runtime.AtomicReference
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisallowComposableCalls
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.SnapshotThreadLocal
 import androidx.compose.runtime.synchronized
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 /**
  * A snapshot of the values return by mutable states and other state objects. All state object
@@ -409,9 +413,10 @@ sealed class Snapshot(
                 val snapshot =
                     if (currentSnapshot == null || currentSnapshot is MutableSnapshot)
                         TransparentObserverMutableSnapshot(
-                            currentSnapshot as? MutableSnapshot,
-                            readObserver,
-                            writeObserver
+                            previousSnapshot = currentSnapshot as? MutableSnapshot,
+                            specifiedReadObserver = readObserver,
+                            specifiedWriteObserver = writeObserver,
+                            mergeParentObservers = true
                         )
                     else if (readObserver == null) return block()
                     else currentSnapshot.takeNestedSnapshot(readObserver)
@@ -421,6 +426,26 @@ sealed class Snapshot(
                     snapshot.dispose()
                 }
             } else return block()
+        }
+
+        @PublishedApi
+        internal fun createNonObservableSnapshot(): Snapshot =
+            createTransparentSnapshotWithNoParentReadObserver(
+                previousSnapshot = threadSnapshot.get()
+            )
+
+        /**
+         * Passed [block] will be run with all the currently set snapshot read observers disabled.
+         */
+        @OptIn(ExperimentalContracts::class)
+        inline fun <T> withoutReadObservation(block: @DisallowComposableCalls () -> T): T {
+            contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+            val snapshot = createNonObservableSnapshot()
+            try {
+                return snapshot.enter(block)
+            } finally {
+                snapshot.dispose()
+            }
         }
 
         /**
@@ -1369,13 +1394,15 @@ internal class NestedMutableSnapshot(
 internal class TransparentObserverMutableSnapshot(
     private val previousSnapshot: MutableSnapshot?,
     internal val specifiedReadObserver: ((Any) -> Unit)?,
-    internal val specifiedWriteObserver: ((Any) -> Unit)?
+    internal val specifiedWriteObserver: ((Any) -> Unit)?,
+    private val mergeParentObservers: Boolean
 ) : MutableSnapshot(
     INVALID_SNAPSHOT,
     SnapshotIdSet.EMPTY,
     mergedReadObserver(
         specifiedReadObserver,
-        previousSnapshot?.readObserver ?: currentGlobalSnapshot.get().readObserver
+        previousSnapshot?.readObserver ?: currentGlobalSnapshot.get().readObserver,
+        mergeParentObservers
     ),
     mergedWriteObserver(
         specifiedWriteObserver,
@@ -1415,16 +1442,42 @@ internal class TransparentObserverMutableSnapshot(
     override fun recordModified(state: StateObject) =
         currentSnapshot.recordModified(state)
 
-    override fun takeNestedSnapshot(readObserver: ((Any) -> Unit)?): Snapshot =
-        currentSnapshot.takeNestedSnapshot(mergedReadObserver(readObserver, this.readObserver))
+    override fun takeNestedSnapshot(readObserver: ((Any) -> Unit)?): Snapshot {
+        val mergedReadObserver = mergedReadObserver(readObserver, this.readObserver)
+        return if (!mergeParentObservers) {
+            createTransparentSnapshotWithNoParentReadObserver(
+                previousSnapshot = currentSnapshot.takeNestedSnapshot(null),
+                readObserver = readObserver
+            )
+        } else {
+            currentSnapshot.takeNestedSnapshot(mergedReadObserver)
+        }
+    }
 
     override fun takeNestedMutableSnapshot(
         readObserver: ((Any) -> Unit)?,
         writeObserver: ((Any) -> Unit)?
-    ): MutableSnapshot = currentSnapshot.takeNestedMutableSnapshot(
-        mergedReadObserver(readObserver, this.readObserver),
-        mergedWriteObserver(writeObserver, this.writeObserver)
-    )
+    ): MutableSnapshot {
+        val mergedReadObserver = mergedReadObserver(readObserver, this.readObserver)
+        val mergedWriteObserver = mergedWriteObserver(writeObserver, this.writeObserver)
+        return if (!mergeParentObservers) {
+            val nestedSnapshot = currentSnapshot.takeNestedMutableSnapshot(
+                readObserver = null,
+                writeObserver = mergedWriteObserver
+            )
+            TransparentObserverMutableSnapshot(
+                previousSnapshot = nestedSnapshot,
+                specifiedReadObserver = mergedReadObserver,
+                specifiedWriteObserver = mergedWriteObserver,
+                mergeParentObservers = false
+            )
+        } else {
+            currentSnapshot.takeNestedMutableSnapshot(
+                mergedReadObserver,
+                mergedWriteObserver
+            )
+        }
+    }
 
     override fun notifyObjectsInitialized() = currentSnapshot.notifyObjectsInitialized()
 
@@ -1434,16 +1487,108 @@ internal class TransparentObserverMutableSnapshot(
     override fun nestedDeactivated(snapshot: Snapshot) = unsupported()
 }
 
+/**
+ * A pseudo snapshot that doesn't introduce isolation but does introduce observers.
+ */
+internal class TransparentObserverSnapshot(
+    private val previousSnapshot: Snapshot?,
+    specifiedReadObserver: ((Any) -> Unit)?,
+    private val mergeParentObservers: Boolean
+) : Snapshot(
+    INVALID_SNAPSHOT,
+    SnapshotIdSet.EMPTY,
+) {
+    override val readObserver: ((Any) -> Unit)? = mergedReadObserver(
+        specifiedReadObserver,
+        previousSnapshot?.readObserver ?: currentGlobalSnapshot.get().readObserver,
+        mergeParentObservers
+    )
+    override val writeObserver: ((Any) -> Unit)? = null
+
+    override val root: Snapshot = this
+
+    private val currentSnapshot: Snapshot
+        get() = previousSnapshot ?: currentGlobalSnapshot.get()
+
+    override fun dispose() {
+        // Explicitly don't call super.dispose()
+        disposed = true
+    }
+
+    override var id: Int
+        get() = currentSnapshot.id
+        @Suppress("UNUSED_PARAMETER")
+        set(value) { unsupported() }
+
+    override var invalid get() = currentSnapshot.invalid
+        @Suppress("UNUSED_PARAMETER")
+        set(value) = unsupported()
+
+    override fun hasPendingChanges(): Boolean = currentSnapshot.hasPendingChanges()
+
+    override var modified: MutableSet<StateObject>?
+        get() = currentSnapshot.modified
+        @Suppress("UNUSED_PARAMETER")
+        set(value) = unsupported()
+
+    override val readOnly: Boolean
+        get() = currentSnapshot.readOnly
+
+    override fun recordModified(state: StateObject) =
+        currentSnapshot.recordModified(state)
+
+    override fun takeNestedSnapshot(readObserver: ((Any) -> Unit)?): Snapshot {
+        val mergedReadObserver = mergedReadObserver(readObserver, this.readObserver)
+        return if (!mergeParentObservers) {
+            createTransparentSnapshotWithNoParentReadObserver(
+                previousSnapshot = currentSnapshot.takeNestedSnapshot(null),
+                readObserver = readObserver
+            )
+        } else {
+            currentSnapshot.takeNestedSnapshot(mergedReadObserver)
+        }
+    }
+
+    override fun notifyObjectsInitialized() = currentSnapshot.notifyObjectsInitialized()
+
+    /** Should never be called. */
+    override fun nestedActivated(snapshot: Snapshot) = unsupported()
+
+    override fun nestedDeactivated(snapshot: Snapshot) = unsupported()
+}
+
+private fun createTransparentSnapshotWithNoParentReadObserver(
+    previousSnapshot: Snapshot?,
+    readObserver: ((Any) -> Unit)? = null,
+): Snapshot = if (previousSnapshot is MutableSnapshot || previousSnapshot == null) {
+    TransparentObserverMutableSnapshot(
+        previousSnapshot = previousSnapshot as? MutableSnapshot,
+        specifiedReadObserver = readObserver,
+        specifiedWriteObserver = null,
+        mergeParentObservers = false
+    )
+} else {
+    TransparentObserverSnapshot(
+        previousSnapshot = previousSnapshot,
+        specifiedReadObserver = readObserver,
+        mergeParentObservers = false
+    )
+}
+
 private fun mergedReadObserver(
     readObserver: ((Any) -> Unit)?,
-    parentObserver: ((Any) -> Unit)?
-): ((Any) -> Unit)? =
-    if (readObserver != null && parentObserver != null && readObserver != parentObserver) {
+    parentObserver: ((Any) -> Unit)?,
+    mergeReadObserver: Boolean = true
+): ((Any) -> Unit)? {
+    @Suppress("NAME_SHADOWING")
+    val parentObserver = if (mergeReadObserver) parentObserver else null
+    return if (readObserver != null && parentObserver != null && readObserver != parentObserver) {
         { state: Any ->
             readObserver(state)
             parentObserver(state)
         }
     } else readObserver ?: parentObserver
+}
 
 private fun mergedWriteObserver(
     writeObserver: ((Any) -> Unit)?,

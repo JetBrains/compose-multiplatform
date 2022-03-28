@@ -17,9 +17,7 @@
 package androidx.compose.runtime.snapshots
 
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -216,13 +214,14 @@ class SnapshotStateObserverTestsCommon {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun pauseStopsObserving() {
         val data = "data"
         var changes = 0
 
         runSimpleTest { stateObserver, state ->
-            stateObserver.observeReads(data, { _ -> changes++ }) {
+            stateObserver.observeReads(data, { changes++ }) {
                 stateObserver.withNoObservations {
                     state.value
                 }
@@ -233,6 +232,40 @@ class SnapshotStateObserverTestsCommon {
     }
 
     @Test
+    fun withoutReadObservationStopsObserving() {
+        val data = "data"
+        var changes = 0
+
+        runSimpleTest { stateObserver, state ->
+            stateObserver.observeReads(data, { changes++ }) {
+                Snapshot.withoutReadObservation {
+                    state.value
+                }
+            }
+        }
+
+        assertEquals(0, changes)
+    }
+
+    @Test
+    fun changeAfterWithoutReadObservationIsObserving() {
+        val data = "data"
+        var changes = 0
+
+        runSimpleTest { stateObserver, state ->
+            stateObserver.observeReads(data, { changes++ }) {
+                Snapshot.withoutReadObservation {
+                    state.value
+                }
+                state.value
+            }
+        }
+
+        assertEquals(1, changes)
+    }
+
+    @Suppress("DEPRECATION")
+    @Test
     fun nestedPauseStopsObserving() {
         val data = "data"
         var changes = 0
@@ -241,6 +274,25 @@ class SnapshotStateObserverTestsCommon {
             stateObserver.observeReads(data, { _ -> changes++ }) {
                 stateObserver.withNoObservations {
                     stateObserver.withNoObservations {
+                        state.value
+                    }
+                    state.value
+                }
+            }
+        }
+
+        assertEquals(0, changes)
+    }
+
+    @Test
+    fun nestedWithoutReadObservation() {
+        val data = "data"
+        var changes = 0
+
+        runSimpleTest { stateObserver, state ->
+            stateObserver.observeReads(data, { changes++ }) {
+                Snapshot.withoutReadObservation {
+                    Snapshot.withoutReadObservation {
                         state.value
                     }
                     state.value
@@ -265,6 +317,7 @@ class SnapshotStateObserverTestsCommon {
         assertEquals(1, changes)
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun observeWithinPause() {
         val data = "data"
@@ -282,6 +335,106 @@ class SnapshotStateObserverTestsCommon {
         }
         assertEquals(0, changes1)
         assertEquals(1, changes2)
+    }
+
+    @Test
+    fun observeWithinWithoutReadObservation() {
+        val data = "data"
+        var changes1 = 0
+        var changes2 = 0
+
+        runSimpleTest { stateObserver, state ->
+            stateObserver.observeReads(data, { changes1++ }) {
+                Snapshot.withoutReadObservation {
+                    stateObserver.observeReads(data, { changes2++ }) {
+                        state.value
+                    }
+                }
+            }
+        }
+        assertEquals(0, changes1)
+        assertEquals(1, changes2)
+    }
+
+    @Test
+    fun withoutReadsPausesNestedObservation() {
+        var changes1 = 0
+        var changes2 = 0
+
+        runSimpleTest { stateObserver, state ->
+            stateObserver.observeReads("scope1", { changes1++ }) {
+                stateObserver.observeReads("scope2", { changes2++ }) {
+                    Snapshot.withoutReadObservation {
+                        state.value
+                    }
+                }
+            }
+        }
+        assertEquals(0, changes1)
+        assertEquals(0, changes2)
+    }
+
+    @Test
+    fun withoutReadsPausesNestedObservationWhenNewMutableSnapshotIsEnteredWithin() {
+        var changes1 = 0
+        var changes2 = 0
+
+        runSimpleTest { stateObserver, state ->
+            stateObserver.observeReads("scope1", { changes1++ }) {
+                stateObserver.observeReads("scope2", { changes2++ }) {
+                    Snapshot.withoutReadObservation {
+                        val newSnapshot = Snapshot.takeMutableSnapshot()
+                        newSnapshot.enter {
+                            state.value
+                        }
+                        newSnapshot.apply().check()
+                        newSnapshot.dispose()
+                    }
+                }
+            }
+        }
+        assertEquals(0, changes1)
+        assertEquals(0, changes2)
+    }
+
+    @Test
+    fun withoutReadsPausesNestedObservationWhenNewSnapshotIsEnteredWithin() {
+        var changes1 = 0
+        var changes2 = 0
+
+        runSimpleTest { stateObserver, state ->
+            stateObserver.observeReads("scope1", { changes1++ }) {
+                stateObserver.observeReads("scope2", { changes2++ }) {
+                    Snapshot.withoutReadObservation {
+                        val newSnapshot = Snapshot.takeSnapshot()
+                        newSnapshot.enter {
+                            state.value
+                        }
+                        newSnapshot.dispose()
+                    }
+                }
+            }
+        }
+        assertEquals(0, changes1)
+        assertEquals(0, changes2)
+    }
+
+    @Test
+    fun withoutReadsInReadOnlySnapshot() {
+        var changes = 0
+
+        runSimpleTest { stateObserver, state ->
+            stateObserver.observeReads("scope", { changes++ }) {
+                val newSnapshot = Snapshot.takeSnapshot()
+                newSnapshot.enter {
+                    Snapshot.withoutReadObservation {
+                        state.value
+                    }
+                }
+                newSnapshot.dispose()
+            }
+        }
+        assertEquals(0, changes)
     }
 
     private fun runSimpleTest(
