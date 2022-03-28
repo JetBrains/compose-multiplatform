@@ -23,13 +23,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.debugInspectorInfo
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -53,7 +54,6 @@ fun Modifier.hoverable(
         properties["enabled"] = enabled
     }
 ) {
-    val scope = rememberCoroutineScope()
     var hoverInteraction by remember { mutableStateOf<HoverInteraction.Enter?>(null) }
 
     suspend fun emitEnter() {
@@ -91,20 +91,25 @@ fun Modifier.hoverable(
 
     if (enabled) {
         Modifier
-// TODO(b/202505231):
-//  because we only react to input events, and not on layout changes, we can have a situation when
-//  Composable is under the cursor, but not hovered. To fix that, we have two ways:
-//  a. Trigger Enter/Exit on any layout change, inside Owner
-//  b. Manually react on layout changes via Modifier.onGloballyPosition, and check something like
-//  LocalPointerPosition.current
             .pointerInput(interactionSource) {
-                val currentContext = currentCoroutineContext()
-                awaitPointerEventScope {
-                    while (currentContext.isActive) {
-                        val event = awaitPointerEvent()
-                        when (event.type) {
-                            PointerEventType.Enter -> scope.launch { emitEnter() }
-                            PointerEventType.Exit -> scope.launch { emitExit() }
+                coroutineScope {
+                    val currentContext = currentCoroutineContext()
+                    val outerScope = this
+                    awaitPointerEventScope {
+                        while (currentContext.isActive) {
+                            val event = awaitPointerEvent()
+                            when (event.type) {
+                                PointerEventType.Enter -> outerScope.launch(
+                                    start = CoroutineStart.UNDISPATCHED
+                                ) {
+                                    emitEnter()
+                                }
+                                PointerEventType.Exit -> outerScope.launch(
+                                    start = CoroutineStart.UNDISPATCHED
+                                ) {
+                                    emitExit()
+                                }
+                            }
                         }
                     }
                 }
