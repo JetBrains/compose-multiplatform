@@ -55,8 +55,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Density
 import java.util.Locale as JavaLocale
-import androidx.compose.ui.text.DefaultIncludeFontPadding
-import androidx.compose.ui.text.ExperimentalTextApi
 
 /**
  * Android specific implementation for [Paragraph]
@@ -118,13 +116,6 @@ internal class AndroidParagraph constructor(
             null
         }
 
-        @OptIn(ExperimentalTextApi::class)
-        val platformParagraphStyle = style.platformStyle?.paragraphStyle
-        @OptIn(ExperimentalTextApi::class)
-        @Suppress("DEPRECATION")
-        val includeFontPadding =
-            platformParagraphStyle?.includeFontPadding ?: DefaultIncludeFontPadding
-
         layout = TextLayout(
             charSequence = paragraphIntrinsics.charSequence,
             width = width,
@@ -136,7 +127,7 @@ internal class AndroidParagraph constructor(
             maxLines = maxLines,
             justificationMode = justificationMode,
             layoutIntrinsics = paragraphIntrinsics.layoutIntrinsics,
-            includePadding = includeFontPadding,
+            includePadding = style.isIncludeFontPaddingEnabled(),
             fallbackLineSpacing = true
         )
     }
