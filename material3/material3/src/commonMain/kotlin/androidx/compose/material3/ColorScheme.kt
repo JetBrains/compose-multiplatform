@@ -416,7 +416,6 @@ fun ColorScheme.contentColorFor(backgroundColor: Color): Color =
         error -> onError
         surface -> onSurface
         surfaceVariant -> onSurfaceVariant
-        error -> onError
         primaryContainer -> onPrimaryContainer
         secondaryContainer -> onSecondaryContainer
         tertiaryContainer -> onTertiaryContainer
