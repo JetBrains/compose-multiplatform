@@ -47,12 +47,12 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
@@ -63,6 +63,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.TextStyle
@@ -93,7 +94,6 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalTestApi::class)
 class OutlinedTextFieldTest {
     private val ExpectedMinimumTextFieldHeight = TextFieldDefaults.MinHeight
     private val ExpectedDefaultTextFieldWidth = TextFieldDefaults.MinWidth
@@ -1245,6 +1245,39 @@ class OutlinedTextFieldTest {
 
         with(rule.density) {
             assertThat(height).isEqualTo((TextFieldDefaults.MinHeight).roundToPx())
+        }
+    }
+
+    @Test
+    fun outlinedTextField_stringOverload_doesNotCallOnValueChange_whenCompositionUpdatesOnly() {
+        var callbackCounter = 0
+
+        rule.setContent {
+            val focusManager = LocalFocusManager.current
+            val text = remember { mutableStateOf("A") }
+
+            OutlinedTextField(
+                value = text.value,
+                onValueChange = {
+                    callbackCounter += 1
+                    text.value = it
+
+                    // causes TextFieldValue's composition clearing
+                    focusManager.clearFocus(true)
+                },
+                modifier = Modifier.testTag(TextFieldTag)
+            )
+        }
+
+        rule.onNodeWithTag(TextFieldTag)
+            .performClick()
+        rule.waitForIdle()
+
+        rule.onNodeWithTag(TextFieldTag)
+            .performTextClearance()
+
+        rule.runOnIdle {
+            assertThat(callbackCounter).isEqualTo(1)
         }
     }
 
