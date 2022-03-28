@@ -212,6 +212,7 @@ private val Sliders = Component(
     name = "Sliders",
     description = "Sliders allow users to make selections from a range of values.",
     // No slider icon
+    tintIcon = true,
     guidelinesUrl = "", // No guidelines yet
     docsUrl = "", // No docs yet
     sourceUrl = "$Material3SourceUrl/Slider.kt",
@@ -229,6 +230,19 @@ private val Snackbars = Component(
     docsUrl = "$DocsUrl#snackbar",
     sourceUrl = "$Material3SourceUrl/Snackbar.kt",
     examples = SnackbarsExamples
+)
+
+private val Switches = Component(
+    id = nextId(),
+    name = "Switches",
+    description = "Switches toggle the state of a single setting on or off.",
+    // No switch icon
+    // No guidelines yet
+    tintIcon = true,
+    guidelinesUrl = "",
+    docsUrl = "",
+    sourceUrl = "$Material3SourceUrl/Switch.kt",
+    examples = SwitchExamples
 )
 
 private val Tabs = Component(
@@ -283,6 +297,7 @@ val Components = listOf(
     RadioButtons,
     Sliders,
     Snackbars,
+    Switches,
     Tabs,
     TextFields,
     TopAppBar
