@@ -25,12 +25,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsCompat
 import java.util.WeakHashMap
+import androidx.compose.ui.R
 import org.jetbrains.annotations.TestOnly
 
 internal fun AndroidXInsets.toInsetsValues(): InsetsValues =
@@ -38,6 +40,19 @@ internal fun AndroidXInsets.toInsetsValues(): InsetsValues =
 
 internal fun ValueInsets(insets: AndroidXInsets, name: String): ValueInsets =
     ValueInsets(insets.toInsetsValues(), name)
+
+/**
+ * Indicates whether access to [WindowInsets] within the [content][ComposeView.setContent]
+ * should consume the Android  [android.view.WindowInsets]. The default value is `true`, meaning
+ * that access to [WindowInsets.Companion] will consume the Android WindowInsets.
+ *
+ * This property should be set prior to first composition.
+ */
+var ComposeView.consumeWindowInsets: Boolean
+    get() = getTag(R.id.consume_window_insets_tag) as? Boolean ?: true
+    set(value) {
+        setTag(R.id.consume_window_insets_tag, value)
+    }
 
 /**
  * For the [WindowInsetsCompat.Type.captionBar].
@@ -191,10 +206,15 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
     val safeContent: WindowInsets = safeDrawing.union(safeGestures)
 
     /**
+     * `true` unless the `ComposeView` [ComposeView.consumeWindowInsets] is set to `false`.
+     */
+    var consumes = true
+
+    /**
      * The number of accesses to [WindowInsetsHolder]. When this reaches
      * zero, the listeners are removed. When it increases to 1, the listeners are added.
      */
-    private var consumers = 0
+    private var accessCount = 0
 
     private val insetsListener = InsetsListener(this)
 
@@ -203,8 +223,8 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
      * first one is added, listeners are set and when the last is removed, the listeners
      * are removed.
      */
-    fun incrementConsumers(view: View) {
-        if (consumers == 0) {
+    fun incrementAccessors(view: View) {
+        if (accessCount == 0) {
             // add listeners
             ViewCompat.setOnApplyWindowInsetsListener(view, insetsListener)
 
@@ -214,7 +234,7 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
                 ViewCompat.setWindowInsetsAnimationCallback(view, insetsListener)
             }
         }
-        consumers++
+        accessCount++
     }
 
     /**
@@ -222,9 +242,9 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
      * first one is added, listeners are set and when the last is removed, the listeners
      * are removed.
      */
-    fun decrementConsumers(view: View) {
-        consumers--
-        if (consumers == 0) {
+    fun decrementAccessors(view: View) {
+        accessCount--
+        if (accessCount == 0) {
             // remove listeners
             ViewCompat.setOnApplyWindowInsetsListener(view, null)
             ViewCompat.setWindowInsetsAnimationCallback(view, null)
@@ -299,9 +319,11 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
             val insets = getOrCreateFor(view)
 
             DisposableEffect(insets) {
-                insets.incrementConsumers(view)
+                insets.incrementAccessors(view)
+                insets.consumes = (view.parent as? View)?.getTag(R.id.consume_window_insets_tag)
+                    as? Boolean ?: true
                 onDispose {
-                    insets.decrementConsumers(view)
+                    insets.decrementAccessors(view)
                 }
             }
             return insets
@@ -360,11 +382,11 @@ private class InsetsListener(
         runningAnimations: MutableList<WindowInsetsAnimationCompat>
     ): WindowInsetsCompat {
         composeInsets.update(insets)
-        return WindowInsetsCompat.CONSUMED
+        return if (composeInsets.consumes) WindowInsetsCompat.CONSUMED else insets
     }
 
     override fun onApplyWindowInsets(view: View, insets: WindowInsetsCompat): WindowInsetsCompat {
         composeInsets.update(insets)
-        return WindowInsetsCompat.CONSUMED
+        return if (composeInsets.consumes) WindowInsetsCompat.CONSUMED else insets
     }
 }

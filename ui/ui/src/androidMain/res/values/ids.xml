@@ -53,4 +53,5 @@
     <item name="androidx_compose_ui_view_composition_context" type="id" />
     <item name="compose_view_saveable_id_tag" type="id" />
     <item name="hide_in_inspector_tag" type="id" />
+    <item name="consume_window_insets_tag" type="id" />
 </resources>
