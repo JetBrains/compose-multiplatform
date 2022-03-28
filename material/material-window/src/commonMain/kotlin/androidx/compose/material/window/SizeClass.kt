@@ -22,11 +22,17 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 
 /**
- * Window size classes are a set of opinionated viewport breakpoints to design, develop, and test resizable application layouts against.
+ * Window size classes are a set of opinionated viewport breakpoints to design, develop, and test
+ * responsive application layouts against.
  * For more details check <a href="https://developer.android.com/guide/topics/large-screens/support-different-screen-sizes" class="external" target="_blank">Support different screen sizes</a> documentation.
  *
- * @param width width-based size class of the window
- * @param height height-based size class of the window
+ * SizeClass contains a [WidthSizeClass] and [HeightSizeClass], representing the size classes for
+ * this window's width and height respectively.
+ *
+ * See [calculateSizeClass] to calculate the size class for the Activity's current window
+ *
+ * @param width width-based window size class
+ * @param height height-based window size class
  */
 @Immutable
 class SizeClass private constructor(
@@ -35,7 +41,8 @@ class SizeClass private constructor(
 ) {
     companion object {
         /**
-         * Calculates [SizeClass] for a given [size]. Should be used for testing purposes only
+         * Calculates [SizeClass] for a given [size]. Should be used for testing purposes only - to
+         * calculate a [SizeClass] for the Activity's current window see [calculateSizeClass].
          *
          * @param size of the window
          * @return size class corresponding to the given width and height
@@ -71,33 +78,34 @@ class SizeClass private constructor(
 }
 
 /**
- * Width-based size class of the window.
+ * Width-based window size class.
  *
  * A size class represents a breakpoint that can be used to build responsive layouts. Each size
  * class breakpoint represents a majority case for typical device scenarios so your layouts will
  * work well on most devices and configurations.
  *
- * For more details check <a href="https://developer.android.com/guide/topics/large-screens/support-different-screen-sizes#window_size_classes" class="external" target="_blank">Window size classes documentation</a>.
+ * For more details see <a href="https://developer.android.com/guide/topics/large-screens/support-different-screen-sizes#window_size_classes" class="external" target="_blank">Window size classes documentation</a>.
  */
 @Immutable
 @kotlin.jvm.JvmInline
-value class WidthSizeClass private constructor(private val value: Int) {
+value class WidthSizeClass private constructor(private val value: String) {
     companion object {
         /** Represents the majority of phones in portrait. */
-        val Compact = WidthSizeClass(0)
+        val Compact = WidthSizeClass("Compact")
 
         /**
-         * Represents the majority of tablets in portrait and large unfolded inner displays in portrait.
+         * Represents the majority of tablets in portrait and large unfolded inner displays in
+         * portrait.
          */
-        val Medium = WidthSizeClass(1)
+        val Medium = WidthSizeClass("Medium")
 
         /**
          * Represents the majority of tablets in landscape and large unfolded inner displays in
          * landscape.
          */
-        val Expanded = WidthSizeClass(2)
+        val Expanded = WidthSizeClass("Expanded")
 
-        /** Calculates [WidthSizeClass] size class for given [width] */
+        /** Calculates the [WidthSizeClass] for a given [width] */
         internal fun fromWidth(width: Dp): WidthSizeClass {
             require(width >= 0.dp) { "Width must not be negative" }
             return when {
@@ -110,28 +118,28 @@ value class WidthSizeClass private constructor(private val value: Int) {
 }
 
 /**
- * Height-based size class of the window.
+ * Height-based window size class.
  *
  * A size class represents a breakpoint that can be used to build responsive layouts. Each size
  * class breakpoint represents a majority case for typical device scenarios so your layouts will
  * work well on most devices and configurations.
  *
- * For more details check <a href="https://developer.android.com/guide/topics/large-screens/support-different-screen-sizes#window_size_classes" class="external" target="_blank">Window size classes documentation</a>.
+ * For more details see <a href="https://developer.android.com/guide/topics/large-screens/support-different-screen-sizes#window_size_classes" class="external" target="_blank">Window size classes documentation</a>.
  */
 @Immutable
 @kotlin.jvm.JvmInline
-value class HeightSizeClass private constructor(private val value: Int) {
+value class HeightSizeClass private constructor(private val value: String) {
     companion object {
         /** Represents the majority of phones in landscape */
-        val Compact = HeightSizeClass(0)
+        val Compact = HeightSizeClass("Compact")
 
         /** Represents the majority of tablets in landscape and majority of phones in portrait */
-        val Medium = HeightSizeClass(1)
+        val Medium = HeightSizeClass("Medium")
 
         /** Represents the majority of tablets in portrait */
-        val Expanded = HeightSizeClass(2)
+        val Expanded = HeightSizeClass("Expanded")
 
-        /** Calculates [HeightSizeClass] size class for given [height] */
+        /** Calculates the [HeightSizeClass] for a given [height] */
         internal fun fromHeight(height: Dp): HeightSizeClass {
             require(height >= 0.dp) { "Height must not be negative" }
             return when {

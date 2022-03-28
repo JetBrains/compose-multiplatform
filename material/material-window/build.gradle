@@ -49,6 +49,8 @@ dependencies {
         androidTestImplementation(libs.testRunner)
         androidTestImplementation(libs.junit)
         androidTestImplementation(libs.truth)
+
+        samples(project(":compose:material:material-window:material-window-samples"))
     }
 }
 
@@ -94,6 +96,9 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.truth)
             }
         }
+    }
+    dependencies {
+        samples(project(":compose:material:material-window:material-window-samples"))
     }
 }
 

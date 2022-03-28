@@ -43,7 +43,7 @@ class AndroidSizeClassTest {
     fun widthSizeClass_correctCalculation() {
         var actualWidthSizeClass: WidthSizeClass? = null
         rule.setContent {
-            actualWidthSizeClass = rule.activity.rememberWidthSizeClass()
+            actualWidthSizeClass = rule.activity.calculateSizeClass().width
         }
 
         rule.runOnIdle {
@@ -61,7 +61,7 @@ class AndroidSizeClassTest {
     fun heightSizeClass_correctCalculation() {
         var actualHeightSizeClass: HeightSizeClass? = null
         rule.setContent {
-            actualHeightSizeClass = rule.activity.rememberHeightSizeClass()
+            actualHeightSizeClass = rule.activity.calculateSizeClass().height
         }
 
         rule.runOnIdle {
@@ -83,7 +83,7 @@ class AndroidSizeClassTest {
         val density = mutableStateOf(Density(1f))
         rule.setContent {
             CompositionLocalProvider(LocalDensity provides density.value) {
-                actualSizeClass = rule.activity.rememberSizeClass()
+                actualSizeClass = rule.activity.calculateSizeClass()
             }
         }
 

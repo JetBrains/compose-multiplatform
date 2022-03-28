@@ -2,9 +2,7 @@
 package androidx.compose.material.window {
 
   public final class AndroidSizeClass_androidKt {
-    method @androidx.compose.material.window.ExperimentalMaterialWindowApi @androidx.compose.runtime.Composable public static int rememberHeightSizeClass(android.app.Activity);
-    method @androidx.compose.material.window.ExperimentalMaterialWindowApi @androidx.compose.runtime.Composable public static androidx.compose.material.window.SizeClass rememberSizeClass(android.app.Activity);
-    method @androidx.compose.material.window.ExperimentalMaterialWindowApi @androidx.compose.runtime.Composable public static int rememberWidthSizeClass(android.app.Activity);
+    method @androidx.compose.material.window.ExperimentalMaterialWindowApi @androidx.compose.runtime.Composable public static androidx.compose.material.window.SizeClass calculateSizeClass(android.app.Activity);
   }
 
   @kotlin.RequiresOptIn(message="This material-window API is experimental and is likely to change or to be removed in" + " the future.") public @interface ExperimentalMaterialWindowApi {
@@ -15,19 +13,19 @@ package androidx.compose.material.window {
   }
 
   public static final class HeightSizeClass.Companion {
-    method public int getCompact();
-    method public int getExpanded();
-    method public int getMedium();
-    property public final int Compact;
-    property public final int Expanded;
-    property public final int Medium;
+    method public String getCompact();
+    method public String getExpanded();
+    method public String getMedium();
+    property public final String Compact;
+    property public final String Expanded;
+    property public final String Medium;
   }
 
   @androidx.compose.runtime.Immutable public final class SizeClass {
-    method public int getHeight();
-    method public int getWidth();
-    property public final int height;
-    property public final int width;
+    method public String getHeight();
+    method public String getWidth();
+    property public final String height;
+    property public final String width;
     field public static final androidx.compose.material.window.SizeClass.Companion Companion;
   }
 
@@ -43,12 +41,12 @@ package androidx.compose.material.window {
   }
 
   public static final class WidthSizeClass.Companion {
-    method public int getCompact();
-    method public int getExpanded();
-    method public int getMedium();
-    property public final int Compact;
-    property public final int Expanded;
-    property public final int Medium;
+    method public String getCompact();
+    method public String getExpanded();
+    method public String getMedium();
+    property public final String Compact;
+    property public final String Expanded;
+    property public final String Medium;
   }
 
 }
