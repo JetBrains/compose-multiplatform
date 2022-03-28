@@ -19,6 +19,8 @@ package androidx.compose.ui.text.platform
 import android.graphics.Typeface
 import android.text.SpannableString
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.DefaultIncludeFontPadding
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -56,12 +58,13 @@ internal fun createCharSequence(
     val spannableString = SpannableString(text)
 
     // includeFontPadding "true" did not apply the line height to first line in the
-    // latest android versions. disable line height for the first line.
+    // latest android versions. disable line height for the first line if includeFontPadding is
+    // false.
     spannableString.setLineHeight(
         lineHeight = contextTextStyle.lineHeight,
         contextFontSize = contextFontSize,
         density = density,
-        applyToFirstLine = false
+        applyToFirstLine = contextTextStyle.isIncludeFontPaddingEnabled()
     )
 
     spannableString.setTextIndent(contextTextStyle.textIndent, contextFontSize, density)
@@ -76,4 +79,10 @@ internal fun createCharSequence(
     spannableString.setPlaceholders(placeholders, density)
 
     return spannableString
+}
+
+@OptIn(ExperimentalTextApi::class)
+@Suppress("DEPRECATION")
+internal fun TextStyle.isIncludeFontPaddingEnabled(): Boolean {
+    return platformStyle?.paragraphStyle?.includeFontPadding ?: DefaultIncludeFontPadding
 }
