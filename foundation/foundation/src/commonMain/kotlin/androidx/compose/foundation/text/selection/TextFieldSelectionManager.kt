@@ -835,9 +835,6 @@ internal fun TextFieldSelectionManager.isSelectionHandleInVisibleBound(
     getHandlePosition(isStartHandle)
 ) ?: false
 
-// TODO(b/180075467) it should be part of PointerEvent API in one way or another
-internal expect val PointerEvent.isShiftPressed: Boolean
-
 /**
  * Optionally shows a magnifier widget, if the current platform supports it, for the current state
  * of a [TextFieldSelectionManager]. Should check [TextFieldSelectionManager.draggingHandle] to see

@@ -27,6 +27,7 @@ import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.isPrimaryPressed
+import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.util.fastAll
 
@@ -90,7 +91,7 @@ internal suspend fun PointerInputScope.mouseSelectionDetector(
                 val down = awaitMouseEventDown()
                 clicksCounter.update(down)
                 val downChange = down.changes[0]
-                if (down.isShiftPressed) {
+                if (down.keyboardModifiers.isShiftPressed) {
                     val started = observer.onExtend(downChange.position)
                     if (started) {
                         downChange.consume()

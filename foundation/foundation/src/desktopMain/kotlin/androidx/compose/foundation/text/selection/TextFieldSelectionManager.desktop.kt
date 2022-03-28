@@ -20,9 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.awtEventOrNull
 import androidx.compose.ui.input.pointer.PointerEvent
 
-internal actual val PointerEvent.isShiftPressed: Boolean
-    get() = awtEventOrNull?.isShiftDown ?: false
-
 /**
  * Magnification is not supported on desktop.
  */

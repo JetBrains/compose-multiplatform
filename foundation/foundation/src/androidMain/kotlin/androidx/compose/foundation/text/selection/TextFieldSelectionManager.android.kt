@@ -30,9 +30,6 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 
-internal actual val PointerEvent.isShiftPressed: Boolean
-    get() = false
-
 // We use composed{} to read a local, but don't provide inspector info because the underlying
 // magnifier modifier provides more meaningful inspector info.
 @SuppressLint("ModifierInspectorInfo")
