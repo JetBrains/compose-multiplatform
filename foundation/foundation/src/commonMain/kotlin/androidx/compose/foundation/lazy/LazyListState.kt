@@ -23,7 +23,7 @@ import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchPolicy
+import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState
 import androidx.compose.foundation.lazy.list.DataIndex
 import androidx.compose.foundation.lazy.list.LazyListItemPlacementAnimator
 import androidx.compose.foundation.lazy.list.LazyListItemsProvider
@@ -288,7 +288,7 @@ class LazyListState constructor(
         if (abs(scrollToBeConsumed) > 0.5f) {
             val preScrollToBeConsumed = scrollToBeConsumed
             remeasurement?.forceRemeasure()
-            if (prefetchingEnabled && prefetchPolicy != null) {
+            if (prefetchingEnabled) {
                 notifyPrefetch(preScrollToBeConsumed - scrollToBeConsumed)
             }
         }
@@ -328,18 +328,18 @@ class LazyListState constructor(
                     // is not going to be reached anytime soon so it is safer to dispose it.
                     // if this item is already visible it is safe to call the method anyway
                     // as it will be no-op
-                    prefetchPolicy?.cancelScheduledPrefetch()
+                    prefetchState.cancelScheduledPrefetch()
                 }
                 this.wasScrollingForward = scrollingForward
                 this.indexToPrefetch = indexToPrefetch
-                prefetchPolicy?.scheduleForPrefetch(
+                prefetchState.schedulePrefetch(
                     listOf(indexToPrefetch to premeasureConstraints)
                 )
             }
         }
     }
 
-    internal var prefetchPolicy: LazyLayoutPrefetchPolicy? = null
+    internal val prefetchState = LazyLayoutPrefetchState()
 
     /**
      * Animate (smooth scroll) to the given item.

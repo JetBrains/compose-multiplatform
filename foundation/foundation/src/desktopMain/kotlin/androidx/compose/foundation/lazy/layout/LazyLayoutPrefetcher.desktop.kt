@@ -23,7 +23,7 @@ import androidx.compose.ui.layout.SubcomposeLayoutState
 @ExperimentalFoundationApi
 @Composable
 internal actual fun LazyLayoutPrefetcher(
-    prefetchPolicy: LazyLayoutPrefetchPolicy,
+    prefetchState: LazyLayoutPrefetchState,
     itemContentFactory: LazyLayoutItemContentFactory,
     subcomposeLayoutState: SubcomposeLayoutState
 ) {

@@ -17,35 +17,36 @@
 package androidx.compose.foundation.lazy.layout
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Constraints
-
-/** Creates a [LazyLayoutPrefetchPolicy]. */
-@ExperimentalFoundationApi
-@Composable
-internal fun rememberLazyLayoutPrefetchPolicy(): LazyLayoutPrefetchPolicy = remember {
-    LazyLayoutPrefetchPolicy()
-}
 
 /**
  * Controller for lazy items prefetching, used by lazy layouts to instruct the prefetcher.
  */
 @ExperimentalFoundationApi
 @Stable
-internal class LazyLayoutPrefetchPolicy {
-    internal var prefetcher: Subscriber? = null
+internal class LazyLayoutPrefetchState {
+    internal var prefetcher: Prefetcher? by mutableStateOf(null)
 
-    /** Schedules new items to prefetch, specified by [indices]. */
-    fun scheduleForPrefetch(indices: List<Pair<Int, Constraints>>) =
-        prefetcher?.scheduleForPrefetch(indices)
+    /**
+     * Schedules prefetching for the new items.
+     *
+     * @param items list of index to constraints pairs for the items to be prefetched.
+     */
+    fun schedulePrefetch(items: List<Pair<Int, Constraints>>) =
+        prefetcher?.schedulePrefetch(items)
 
-    /** Notifies the prefetcher that previously scheduled items are no longer likely to be needed. */
+    /**
+     * Notifies the prefetcher that previously scheduled items are no longer likely to be needed.
+     * Already precomposed items will be disposed.
+     */
     fun cancelScheduledPrefetch() = prefetcher?.cancelScheduledPrefetch()
 
-    interface Subscriber {
-        fun scheduleForPrefetch(indices: List<Pair<Int, Constraints>>)
+    internal interface Prefetcher {
+        fun schedulePrefetch(items: List<Pair<Int, Constraints>>)
         fun cancelScheduledPrefetch()
     }
 }

@@ -35,14 +35,14 @@ import java.util.concurrent.TimeUnit
 @ExperimentalFoundationApi
 @Composable
 internal actual fun LazyLayoutPrefetcher(
-    prefetchPolicy: LazyLayoutPrefetchPolicy,
+    prefetchState: LazyLayoutPrefetchState,
     itemContentFactory: LazyLayoutItemContentFactory,
     subcomposeLayoutState: SubcomposeLayoutState
 ) {
     val view = LocalView.current
-    remember(subcomposeLayoutState, prefetchPolicy, view) {
+    remember(subcomposeLayoutState, prefetchState, view) {
         LazyLayoutPrefetcher(
-            prefetchPolicy,
+            prefetchState,
             subcomposeLayoutState,
             itemContentFactory,
             view
@@ -107,12 +107,12 @@ internal actual fun LazyLayoutPrefetcher(
  */
 @ExperimentalFoundationApi
 internal class LazyLayoutPrefetcher(
-    private val prefetchPolicy: LazyLayoutPrefetchPolicy,
+    private val prefetchState: LazyLayoutPrefetchState,
     private val subcomposeLayoutState: SubcomposeLayoutState,
     private val itemContentFactory: LazyLayoutItemContentFactory,
     private val view: View
 ) : RememberObserver,
-    LazyLayoutPrefetchPolicy.Subscriber,
+    LazyLayoutPrefetchState.Prefetcher,
     Runnable,
     Choreographer.FrameCallback {
 
@@ -258,10 +258,10 @@ internal class LazyLayoutPrefetcher(
         }
     }
 
-    override fun scheduleForPrefetch(indices: List<Pair<Int, Constraints>>) {
+    override fun schedulePrefetch(items: List<Pair<Int, Constraints>>) {
         indicesToPrefetch.clear()
         premeasureConstraints.clear()
-        indices.fastForEach {
+        items.fastForEach {
             indicesToPrefetch.add(it.first)
             premeasureConstraints.add(it.second)
         }
@@ -280,13 +280,13 @@ internal class LazyLayoutPrefetcher(
     }
 
     override fun onRemembered() {
-        prefetchPolicy.prefetcher = this
+        prefetchState.prefetcher = this
         isActive = true
     }
 
     override fun onForgotten() {
         isActive = false
-        prefetchPolicy.prefetcher = null
+        prefetchState.prefetcher = null
         view.removeCallbacks(this)
         choreographer.removeFrameCallback(this)
     }
