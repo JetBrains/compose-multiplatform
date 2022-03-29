@@ -18,14 +18,27 @@ package androidx.compose.foundation.lazy.layout
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 
+/**
+ * Provides all the needed info about the items which could be later composed and displayed as
+ * children or [LazyLayout].
+ */
+@Stable
 @ExperimentalFoundationApi
-internal interface LazyLayoutItemsProvider {
-    /** Returns the content lambda for the given index and scope object */
-    fun getContent(index: Int): @Composable () -> Unit
+interface LazyLayoutItemsProvider {
 
     /** The total number of items in the lazy layout (visible or not). */
     val itemsCount: Int
+
+    /** Returns the content lambda for the given index and scope object */
+    fun getContent(index: Int): @Composable () -> Unit
+
+    /**
+     * Returns the content type for the item on this index. It is used to improve the item
+     * compositions reusing efficiency.
+     **/
+    fun getContentType(index: Int): Any?
 
     /**
      * Returns the key for the item on this index.
@@ -39,12 +52,6 @@ internal interface LazyLayoutItemsProvider {
      * the list as an optimization.
      **/
     val keyToIndexMap: Map<Any, Int>
-
-    /**
-     * Returns the content type for the item on this index. It is used to improve the item
-     * compositions reusing efficiency.
-     **/
-    fun getContentType(index: Int): Any?
 }
 
 /**
@@ -53,4 +60,5 @@ internal interface LazyLayoutItemsProvider {
  * 2) This class is saveable via a default SaveableStateRegistry on the platform.
  * 3) This objects can't be equals to any object which could be provided by a user as a custom key.
  */
-internal expect fun getDefaultLazyLayoutKey(index: Int): Any
+@ExperimentalFoundationApi
+expect fun getDefaultLazyLayoutKey(index: Int): Any

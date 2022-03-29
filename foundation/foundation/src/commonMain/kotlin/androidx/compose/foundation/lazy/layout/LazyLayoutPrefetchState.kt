@@ -24,11 +24,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Constraints
 
 /**
- * Controller for lazy items prefetching, used by lazy layouts to instruct the prefetcher.
+ * State for lazy items prefetching, used by lazy layouts to instruct the prefetcher.
  */
 @ExperimentalFoundationApi
 @Stable
-internal class LazyLayoutPrefetchState {
+class LazyLayoutPrefetchState {
     internal var prefetcher: Prefetcher? by mutableStateOf(null)
 
     /**

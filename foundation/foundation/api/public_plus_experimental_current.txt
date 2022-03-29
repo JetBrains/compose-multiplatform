@@ -691,13 +691,46 @@ package androidx.compose.foundation.lazy.layout {
   public final class IntervalListKt {
   }
 
+  @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public interface LazyLayoutItemsProvider {
+    method public kotlin.jvm.functions.Function0<kotlin.Unit> getContent(int index);
+    method public Object? getContentType(int index);
+    method public int getItemsCount();
+    method public Object getKey(int index);
+    method public java.util.Map<java.lang.Object,java.lang.Integer> getKeyToIndexMap();
+    property public abstract int itemsCount;
+    property public abstract java.util.Map<java.lang.Object,java.lang.Integer> keyToIndexMap;
+  }
+
   public final class LazyLayoutKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static void LazyLayout(androidx.compose.foundation.lazy.layout.LazyLayoutItemsProvider itemsProvider, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState? prefetchState, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measurePolicy);
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public sealed interface LazyLayoutMeasureScope extends androidx.compose.ui.layout.MeasureScope {
+    method public androidx.compose.ui.layout.Placeable![] measure(int index, long constraints);
+    method @androidx.compose.runtime.Stable public default float toDp(long);
+    method @androidx.compose.runtime.Stable public default float toDp(int);
+    method @androidx.compose.runtime.Stable public default float toDp(float);
+    method @androidx.compose.runtime.Stable public default long toDpSize(long);
+    method @androidx.compose.runtime.Stable public default long toSize(long);
+    method @androidx.compose.runtime.Stable public default long toSp(float);
+    method @androidx.compose.runtime.Stable public default long toSp(int);
+    method @androidx.compose.runtime.Stable public default long toSp(float);
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public final class LazyLayoutPrefetchState {
+    ctor public LazyLayoutPrefetchState();
+    method public androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState.PrefetchHandle schedulePrefetch(int index, long constraints);
+  }
+
+  public static sealed interface LazyLayoutPrefetchState.PrefetchHandle {
+    method public void cancel();
   }
 
   public final class LazyLayoutPrefetcher_androidKt {
   }
 
   public final class Lazy_androidKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static Object getDefaultLazyLayoutKey(int index);
   }
 
   @androidx.compose.foundation.ExperimentalFoundationApi public interface PinnableParent {
