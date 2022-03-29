@@ -46,7 +46,12 @@ internal fun Project.configureTaskToGenerateXcodeProject(
                     UILaunchStoryboardName: ""
                     method: "development"
                 sources:
-                  - "../../../src/"
+                  - path: "../../../src/"
+                    excludes:
+                      - "jvm*/**"
+                      - "desktop*/**"
+                      - "android*/**"
+                      - "*Test/**"
                 settings:
                   LIBRARY_SEARCH_PATHS: "$(inherited)"
                   ENABLE_BITCODE: "YES"
