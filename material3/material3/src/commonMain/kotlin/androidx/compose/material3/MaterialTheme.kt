@@ -17,6 +17,8 @@
 package androidx.compose.material3
 
 import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material.ripple.RippleTheme
@@ -52,7 +54,6 @@ import androidx.compose.runtime.remember
  * @param typography A set of text styles to be used as this hierarchy's typography system
  * @param shapes A set of corner shapes to be used as this hierarchy's shape system
  */
-
 @Composable
 fun MaterialTheme(
     colorScheme: ColorScheme = MaterialTheme.colorScheme,
@@ -68,11 +69,13 @@ fun MaterialTheme(
         updateColorSchemeFrom(colorScheme)
     }
     val rippleIndication = rememberRipple()
+    val selectionColors = rememberTextSelectionColors(rememberedColorScheme)
     CompositionLocalProvider(
         LocalColorScheme provides rememberedColorScheme,
         LocalIndication provides rippleIndication,
         LocalRippleTheme provides MaterialRippleTheme,
         LocalShapes provides shapes,
+        LocalTextSelectionColors provides selectionColors,
         LocalTypography provides typography,
     ) {
         ProvideTextStyle(value = typography.bodyLarge, content = content)
@@ -124,3 +127,18 @@ private val DefaultRippleAlpha = RippleAlpha(
     draggedAlpha = StateTokens.DraggedStateLayerOpacity,
     hoveredAlpha = StateTokens.HoverStateLayerOpacity
 )
+
+@Composable
+/*@VisibleForTesting*/
+internal fun rememberTextSelectionColors(colorScheme: ColorScheme): TextSelectionColors {
+    val primaryColor = colorScheme.primary
+    return remember(primaryColor) {
+        TextSelectionColors(
+            handleColor = primaryColor,
+            backgroundColor = primaryColor.copy(alpha = TextSelectionBackgroundOpacity),
+        )
+    }
+}
+
+/*@VisibleForTesting*/
+internal const val TextSelectionBackgroundOpacity = 0.4f
