@@ -2,6 +2,7 @@ package androidx.compose.ui.text.platform
 
 import android.graphics.Paint
 import android.graphics.Typeface
+import android.text.Spanned
 import android.text.TextPaint
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.BackgroundColorSpan
@@ -40,6 +41,7 @@ import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.android.style.LineHeightSpan
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
@@ -1344,6 +1346,62 @@ AndroidParagraphTest {
         )
 
         assertThat(paragraphPaddingTrue.height).isNotEqualTo(paragraphPaddingFalse.height)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun line_height_span_applyToFirstLine_is_true_when_includeFontPadding_is_true() {
+        val text = "ABC"
+
+        @Suppress("DEPRECATION")
+        val style = TextStyle(
+            fontSize = 20.sp,
+            lineHeight = 25.sp,
+            platformStyle = PlatformTextStyle(includeFontPadding = true)
+        )
+
+        val paragraph = simpleParagraph(
+            text = text,
+            style = style,
+            width = Float.MAX_VALUE
+        )
+
+        assertThat(paragraph.charSequence).isInstanceOf(Spanned::class.java)
+
+        val spanned = paragraph.charSequence as Spanned
+        val lineHeightSpans = spanned.getSpans(0, spanned.length, LineHeightSpan::class.java)
+
+        assertThat(lineHeightSpans).isNotNull()
+        assertThat(lineHeightSpans).hasLength(1)
+        assertThat(lineHeightSpans[0].applyToFirstLine).isTrue()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun line_height_span_applyToFirstLine_is_false_when_includeFontPadding_is_false() {
+        val text = "ABC"
+
+        @Suppress("DEPRECATION")
+        val style = TextStyle(
+            fontSize = 20.sp,
+            lineHeight = 25.sp,
+            platformStyle = PlatformTextStyle(includeFontPadding = false)
+        )
+
+        val paragraph = simpleParagraph(
+            text = text,
+            style = style,
+            width = Float.MAX_VALUE
+        )
+
+        assertThat(paragraph.charSequence).isInstanceOf(Spanned::class.java)
+
+        val spanned = paragraph.charSequence as Spanned
+        val lineHeightSpans = spanned.getSpans(0, spanned.length, LineHeightSpan::class.java)
+
+        assertThat(lineHeightSpans).isNotNull()
+        assertThat(lineHeightSpans).hasLength(1)
+        assertThat(lineHeightSpans[0].applyToFirstLine).isFalse()
     }
 
     private fun simpleParagraph(

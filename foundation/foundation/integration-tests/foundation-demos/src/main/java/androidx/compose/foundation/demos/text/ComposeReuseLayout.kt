@@ -40,6 +40,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+/**
+ * TextStyle parameters color, textDecoration and shadow currently have special treatment that
+ * they are sent to TextPainter and set on the paint. Previously we did this for performance
+ * reasons.
+ *
+ * Some of the text params definitely change the text metrics and require re-layout of the text.
+ * However something like background do not change text metrics and ideally could have not required
+ * text relayout.
+ *
+ * While updating the TextStyle.canReuseLayout code, I realized that background is in the list of
+ * attributes that requires relayout. This demo contains 2 attributes that does not require layout
+ * (color and shadow) and 1 that does require relayout (background); all three changing colors.
+ *
+ * The goal was to see animations do work on those attributes.
+ */
 @Composable
 fun TextReuseLayoutDemo() {
     val colorAnimationSpec = remember {
