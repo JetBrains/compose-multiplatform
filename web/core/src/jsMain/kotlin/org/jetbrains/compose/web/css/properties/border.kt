@@ -83,26 +83,26 @@ fun StyleScope.borderWidth(width: CSSNumeric) {
     property("border-width", width)
 }
 
-fun StyleScope.borderWidth(topLeft: CSSNumeric, bottomRight: CSSNumeric) {
-    property("border-width", "$topLeft $bottomRight")
+fun StyleScope.borderWidth(topBottom: CSSNumeric, leftRight: CSSNumeric) {
+    property("border-width", "$topBottom $leftRight")
 }
 
 fun StyleScope.borderWidth(
-    topLeft: CSSNumeric,
-    topRightAndBottomLeft: CSSNumeric,
-    bottomRight: CSSNumeric
+    top: CSSNumeric,
+    leftRight: CSSNumeric,
+    bottom: CSSNumeric
 ) {
-    property("border-width", "$topLeft $topRightAndBottomLeft $bottomRight")
+    property("border-width", "$top $leftRight $bottom")
 }
 
 fun StyleScope.borderWidth(
-    topLeft: CSSNumeric,
-    topRight: CSSNumeric,
-    bottomRight: CSSNumeric,
-    bottomLeft: CSSNumeric
+    top: CSSNumeric,
+    right: CSSNumeric,
+    bottom: CSSNumeric,
+    left: CSSNumeric
 ) {
     property(
         "border-width",
-        "$topLeft $topRight $bottomRight $bottomLeft"
+        "$top $right $bottom $left"
     )
 }
