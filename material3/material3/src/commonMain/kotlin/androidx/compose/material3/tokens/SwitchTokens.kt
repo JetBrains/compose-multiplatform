@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_92
+// VERSION: v0_93
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -21,43 +21,60 @@ package androidx.compose.material3.tokens
 import androidx.compose.ui.unit.dp
 
 internal object SwitchTokens {
-    val DisabledHandleElevation = ElevationTokens.Level0
-    const val DisabledHandleOpacity = 0.38f
-    val DisabledSelectedHandleColor = ColorSchemeKeyTokens.OnSurface
-    val DisabledSelectedIconColor = ColorSchemeKeyTokens.OnPrimary
+    val DisabledSelectedHandleColor = ColorSchemeKeyTokens.Surface
+    const val DisabledSelectedHandleOpacity = 1.0f
+    val DisabledSelectedIconColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledSelectedIconOpacity = 0.38f
     val DisabledSelectedTrackColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledTrackOpacity = 0.12f
     val DisabledUnselectedHandleColor = ColorSchemeKeyTokens.OnSurface
-    val DisabledUnselectedIconColor = ColorSchemeKeyTokens.OnPrimary
+    const val DisabledUnselectedHandleOpacity = 0.38f
+    val DisabledUnselectedIconColor = ColorSchemeKeyTokens.SurfaceVariant
     const val DisabledUnselectedIconOpacity = 0.38f
-    val DisabledUnselectedTrackColor = ColorSchemeKeyTokens.OnSurface
-    val HandleElevation = ElevationTokens.Level1
-    val HandleHeight = 20.0.dp
+    val DisabledUnselectedTrackColor = ColorSchemeKeyTokens.SurfaceVariant
+    val DisabledUnselectedTrackOutlineColor = ColorSchemeKeyTokens.OnSurface
     val HandleShape = ShapeKeyTokens.CornerFull
-    val HandleWidth = 20.0.dp
-    val SelectedFocusHandleColor = ColorSchemeKeyTokens.Primary
-    val SelectedFocusTrackColor = ColorSchemeKeyTokens.PrimaryContainer
-    val SelectedHandleColor = ColorSchemeKeyTokens.Primary
-    val SelectedHoverHandleColor = ColorSchemeKeyTokens.Primary
-    val SelectedHoverTrackColor = ColorSchemeKeyTokens.PrimaryContainer
-    val SelectedIconColor = ColorSchemeKeyTokens.OnPrimary
-    val SelectedIconSize = 18.0.dp
-    val SelectedPressedHandleColor = ColorSchemeKeyTokens.Primary
-    val SelectedPressedTrackColor = ColorSchemeKeyTokens.PrimaryContainer
-    val SelectedTrackColor = ColorSchemeKeyTokens.PrimaryContainer
+    val PressedHandleHeight = 28.0.dp
+    val PressedHandleWidth = 28.0.dp
+    val SelectedFocusHandleColor = ColorSchemeKeyTokens.PrimaryContainer
+    val SelectedFocusIconColor = ColorSchemeKeyTokens.OnPrimaryContainer
+    val SelectedFocusTrackColor = ColorSchemeKeyTokens.Primary
+    val SelectedHandleColor = ColorSchemeKeyTokens.OnPrimary
+    val SelectedHandleHeight = 24.0.dp
+    val SelectedHandleWidth = 24.0.dp
+    val SelectedHoverHandleColor = ColorSchemeKeyTokens.PrimaryContainer
+    val SelectedHoverIconColor = ColorSchemeKeyTokens.OnPrimaryContainer
+    val SelectedHoverTrackColor = ColorSchemeKeyTokens.Primary
+    val SelectedIconColor = ColorSchemeKeyTokens.OnPrimaryContainer
+    val SelectedIconSize = 16.0.dp
+    val SelectedPressedHandleColor = ColorSchemeKeyTokens.PrimaryContainer
+    val SelectedPressedIconColor = ColorSchemeKeyTokens.OnPrimaryContainer
+    val SelectedPressedTrackColor = ColorSchemeKeyTokens.Primary
+    val SelectedTrackColor = ColorSchemeKeyTokens.Primary
+    val StateLayerShape = ShapeKeyTokens.CornerFull
     val StateLayerSize = 40.0.dp
-    val TrackHeight = 14.0.dp
+    val TrackHeight = 32.0.dp
+    val TrackOutlineWidth = 2.0.dp
     val TrackShape = ShapeKeyTokens.CornerFull
-    val TrackWidth = 36.0.dp
-    val UnselectedFocusHandleColor = ColorSchemeKeyTokens.OnSurface
-    val UnselectedFocusTrackColor = ColorSchemeKeyTokens.Outline
-    val UnselectedHandleColor = ColorSchemeKeyTokens.OnSurface
-    val UnselectedHoverHandleColor = ColorSchemeKeyTokens.OnSurface
-    val UnselectedHoverTrackColor = ColorSchemeKeyTokens.Outline
-    val UnselectedIconColor = ColorSchemeKeyTokens.OnPrimary
-    val UnselectedIconSize = 18.0.dp
-    val UnselectedPressedHandleColor = ColorSchemeKeyTokens.OnSurface
-    val UnselectedPressedTrackColor = ColorSchemeKeyTokens.Outline
-    val UnselectedTrackColor = ColorSchemeKeyTokens.Outline
+    val TrackWidth = 52.0.dp
+    val UnselectedFocusHandleColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedFocusIconColor = ColorSchemeKeyTokens.SurfaceVariant
+    val UnselectedFocusTrackColor = ColorSchemeKeyTokens.SurfaceVariant
+    val UnselectedFocusTrackOutlineColor = ColorSchemeKeyTokens.Outline
+    val UnselectedHandleColor = ColorSchemeKeyTokens.Outline
+    val UnselectedHandleHeight = 16.0.dp
+    val UnselectedHandleWidth = 16.0.dp
+    val UnselectedHoverHandleColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedHoverIconColor = ColorSchemeKeyTokens.SurfaceVariant
+    val UnselectedHoverTrackColor = ColorSchemeKeyTokens.SurfaceVariant
+    val UnselectedHoverTrackOutlineColor = ColorSchemeKeyTokens.Outline
+    val UnselectedIconColor = ColorSchemeKeyTokens.SurfaceVariant
+    val UnselectedIconSize = 16.0.dp
+    val UnselectedPressedHandleColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedPressedIconColor = ColorSchemeKeyTokens.SurfaceVariant
+    val UnselectedPressedTrackColor = ColorSchemeKeyTokens.SurfaceVariant
+    val UnselectedPressedTrackOutlineColor = ColorSchemeKeyTokens.Outline
+    val UnselectedTrackColor = ColorSchemeKeyTokens.SurfaceVariant
+    val IconHandleHeight = 24.0.dp
+    val IconHandleWidth = 24.0.dp
 }

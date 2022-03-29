@@ -570,17 +570,21 @@ package androidx.compose.material3 {
   }
 
   @androidx.compose.runtime.Stable public interface SwitchColors {
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> borderColor(boolean enabled, boolean checked);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> iconColor(boolean enabled, boolean checked);
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> thumbColor(boolean enabled, boolean checked);
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> trackColor(boolean enabled, boolean checked);
   }
 
   public final class SwitchDefaults {
-    method @androidx.compose.runtime.Composable public androidx.compose.material3.SwitchColors colors(optional long checkedThumbColor, optional long checkedTrackColor, optional long uncheckedThumbColor, optional long uncheckedTrackColor, optional long disabledCheckedThumbColor, optional long disabledCheckedTrackColor, optional long disabledUncheckedThumbColor, optional long disabledUncheckedTrackColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.SwitchColors colors(optional long checkedThumbColor, optional long checkedTrackColor, optional long checkedBorderColor, optional long checkedIconColor, optional long uncheckedThumbColor, optional long uncheckedTrackColor, optional long uncheckedBorderColor, optional long uncheckedIconColor, optional long disabledCheckedThumbColor, optional long disabledCheckedTrackColor, optional long disabledCheckedBorderColor, optional long disabledCheckedIconColor, optional long disabledUncheckedThumbColor, optional long disabledUncheckedTrackColor, optional long disabledUncheckedBorderColor, optional long disabledUncheckedIconColor);
+    method public float getIconSize();
+    property public final float IconSize;
     field public static final androidx.compose.material3.SwitchDefaults INSTANCE;
   }
 
   public final class SwitchKt {
-    method @androidx.compose.runtime.Composable public static void Switch(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit>? onCheckedChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material3.SwitchColors colors);
+    method @androidx.compose.runtime.Composable public static void Switch(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit>? onCheckedChange, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit>? thumbContent, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material3.SwitchColors colors);
   }
 
   public final class TabKt {

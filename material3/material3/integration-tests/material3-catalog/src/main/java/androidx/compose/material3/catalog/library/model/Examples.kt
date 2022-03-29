@@ -90,6 +90,7 @@ import androidx.compose.material3.samples.SimpleTextFieldSample
 import androidx.compose.material3.samples.SliderSample
 import androidx.compose.material3.samples.SmallFloatingActionButtonSample
 import androidx.compose.material3.samples.StepsSliderSample
+import androidx.compose.material3.samples.SwitchWithThumbIconSample
 import androidx.compose.material3.samples.SwitchSample
 import androidx.compose.material3.samples.TextAndIconTabs
 import androidx.compose.material3.samples.TextArea
@@ -560,6 +561,14 @@ val SwitchExamples = listOf(
         sourceUrl = SwitchExampleSourceUrl
     ) {
         SwitchSample()
+    },
+
+    Example(
+        name = ::SwitchWithThumbIconSample.name,
+        description = SwitchExampleDescription,
+        sourceUrl = SwitchExampleSourceUrl
+    ) {
+        SwitchWithThumbIconSample()
     },
 )
 
