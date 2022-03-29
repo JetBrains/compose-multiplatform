@@ -19,14 +19,11 @@ package androidx.compose.material.catalog.ui.theme
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
-import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -42,13 +39,10 @@ fun CatalogTheme(content: @Composable () -> Unit) {
         WindowCompat.getInsetsController(context.findActivity().window, view)
             .isAppearanceLightStatusBars = !darkTheme
     }
-    // TODO: M3 MaterialTheme doesn't provide LocalIndication, remove when it does
-    CompositionLocalProvider(LocalIndication provides rememberRipple()) {
-        MaterialTheme(
-            colorScheme = colorScheme,
-            content = content
-        )
-    }
+    MaterialTheme(
+        colorScheme = colorScheme,
+        content = content
+    )
 }
 
 private tailrec fun Context.findActivity(): Activity =
