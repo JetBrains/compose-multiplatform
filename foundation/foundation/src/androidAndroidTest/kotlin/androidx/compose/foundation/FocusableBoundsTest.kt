@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.IntOffset
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Ignore
@@ -447,6 +448,7 @@ class FocusableBoundsTest {
     }
 
     @Test
+    @FlakyTest(bugId = 225229487)
     fun onFocusedBoundsPositioned_notified_whenNewObserverAddedAboveExisting() {
         val focusRequester = FocusRequester()
         val focusedBounds = mutableListOf<Pair<Int, Rect?>>()
