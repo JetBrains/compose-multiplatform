@@ -721,6 +721,44 @@ class SliderTest {
 
     @OptIn(ExperimentalMaterialApi::class)
     @Test
+    fun rangeSlider_drag_overlap_thumbs() {
+        val state = mutableStateOf(0.5f..1f)
+        var slop = 0f
+
+        rule.setMaterialContent {
+            slop = LocalViewConfiguration.current.touchSlop
+            RangeSlider(
+                modifier = Modifier.testTag(tag),
+                values = state.value,
+                onValueChange = { state.value = it }
+            )
+        }
+
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                down(centerRight)
+                moveBy(Offset(-slop, 0f))
+                moveBy(Offset(-width.toFloat(), 0f))
+                up()
+            }
+        rule.runOnIdle {
+            Truth.assertThat(state.value).isEqualTo(0.5f..0.5f)
+        }
+
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                down(center)
+                moveBy(Offset(-slop, 0f))
+                moveBy(Offset(-width.toFloat(), 0f))
+                up()
+            }
+        rule.runOnIdle {
+            Truth.assertThat(state.value).isEqualTo(0.0f..0.5f)
+        }
+    }
+
+    @OptIn(ExperimentalMaterialApi::class)
+    @Test
     fun rangeSlider_tap() {
         val state = mutableStateOf(0f..1f)
 
