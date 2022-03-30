@@ -22,6 +22,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventType
@@ -49,6 +50,7 @@ import kotlinx.coroutines.swing.Swing
 import org.junit.Assume
 import org.junit.Test
 
+@OptIn(ExperimentalComposeUiApi::class)
 class ComposeWindowTest {
     @Test
     fun `catch exception on setContent`() = runApplicationTest {
@@ -131,34 +133,6 @@ class ComposeWindowTest {
             awaitIdle()
             assertThat(caughtExceptions.size).isEqualTo(1)
             assertThat(caughtExceptions.last()).isInstanceOf(TestException::class.java)
-        } finally {
-            window.dispose()
-        }
-    }
-
-    // bug https://github.com/JetBrains/compose-jb/issues/1448
-    @Test
-    fun `dispose window in event handler`() = runApplicationTest {
-        val window = ComposeWindow()
-        try {
-            var isClickHappened = false
-            window.size = Dimension(300, 400)
-            window.setContent {
-                Box(modifier = Modifier.fillMaxSize().background(Color.Blue).clickable {
-                    isClickHappened = true
-                    window.dispose()
-                })
-            }
-            window.isVisible = true
-            window.sendMouseEvent(MOUSE_ENTERED, 100, 50)
-            awaitIdle()
-            window.sendMouseEvent(MOUSE_MOVED, 100, 50)
-            awaitIdle()
-            window.sendMouseEvent(MOUSE_PRESSED, 100, 50, modifiers = BUTTON1_DOWN_MASK)
-            awaitIdle()
-            window.sendMouseEvent(MOUSE_RELEASED, 100, 50)
-            awaitIdle()
-            assertThat(isClickHappened).isTrue()
         } finally {
             window.dispose()
         }
