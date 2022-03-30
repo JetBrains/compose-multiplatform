@@ -23,6 +23,8 @@ import androidx.compose.ui.text.platform.AndroidTypeface
 @ExperimentalTextApi
 internal actual class PlatformFontFamilyTypefaceAdapter : FontFamilyTypefaceAdapter {
 
+    private val platformTypefaceResolver = PlatformTypefaces()
+
     override fun resolve(
         typefaceRequest: TypefaceRequest,
         platformFontLoader: PlatformFontLoader,
@@ -30,13 +32,12 @@ internal actual class PlatformFontFamilyTypefaceAdapter : FontFamilyTypefaceAdap
         createDefaultTypeface: (TypefaceRequest) -> Any
     ): TypefaceResult? {
         val result: Typeface = when (typefaceRequest.fontFamily) {
-            null, is DefaultFontFamily -> createAndroidTypeface(
-                null,
+            null, is DefaultFontFamily -> platformTypefaceResolver.createDefault(
                 typefaceRequest.fontWeight,
                 typefaceRequest.fontStyle
             )
-            is GenericFontFamily -> createAndroidTypeface(
-                typefaceRequest.fontFamily.name,
+            is GenericFontFamily -> platformTypefaceResolver.createNamed(
+                typefaceRequest.fontFamily,
                 typefaceRequest.fontWeight,
                 typefaceRequest.fontStyle
             )

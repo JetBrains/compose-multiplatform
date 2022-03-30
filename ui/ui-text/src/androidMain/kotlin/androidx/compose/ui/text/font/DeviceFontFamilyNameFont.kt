@@ -78,7 +78,11 @@ private class DeviceFontFamilyNameFont constructor(
     override val style: FontStyle
 ) : AndroidFont(FontLoadingStrategy.OptionalLocal, NamedFontLoader) {
 
-    val resolvedTypeface: Typeface? = lookupFont(familyName.name, weight, style)
+    val resolvedTypeface: Typeface? = PlatformTypefaces().optionalOnDeviceFontFamilyByName(
+        familyName.name,
+        weight,
+        style
+    )
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -102,22 +106,6 @@ private class DeviceFontFamilyNameFont constructor(
 
     override fun toString(): String {
         return "Font(familyName=\"$familyName\", weight=$weight, style=$style)"
-    }
-}
-
-/**
- * This basically checks to see if the family name isn't falling back to the Typeface loaded by
- * Typeface.DEFAULT.
- *
- * If so, we consider the family present and return the resulting typeface.
- */
-private fun lookupFont(familyName: String, weight: FontWeight, style: FontStyle): Typeface? {
-    if (familyName.isEmpty()) return null
-    val typeface = createAndroidTypeface(familyName, weight, style)
-    return typeface.takeIf {
-        // Typeface may lookup missed results via either Typeface.DEFAULT or null, check both
-        it != createAndroidTypeface(Typeface.DEFAULT, weight, style) &&
-            it != createAndroidTypeface(null, weight, style)
     }
 }
 
