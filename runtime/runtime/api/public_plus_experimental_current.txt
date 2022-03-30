@@ -857,6 +857,7 @@ package androidx.compose.runtime.snapshots {
     method public androidx.compose.runtime.snapshots.MutableSnapshot takeMutableSnapshot(optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver, optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? writeObserver);
     method public androidx.compose.runtime.snapshots.Snapshot takeSnapshot(optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver);
     method public inline <R> R! withMutableSnapshot(kotlin.jvm.functions.Function0<? extends R> block);
+    method public inline <T> T! withoutReadObservation(kotlin.jvm.functions.Function0<? extends T> block);
     property public final androidx.compose.runtime.snapshots.Snapshot current;
   }
 
@@ -975,7 +976,7 @@ package androidx.compose.runtime.snapshots {
     method public <T> void observeReads(T scope, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> onValueChangedForScope, kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method public void start();
     method public void stop();
-    method public void withNoObservations(kotlin.jvm.functions.Function0<kotlin.Unit> block);
+    method @Deprecated public void withNoObservations(kotlin.jvm.functions.Function0<kotlin.Unit> block);
   }
 
   public interface StateObject {

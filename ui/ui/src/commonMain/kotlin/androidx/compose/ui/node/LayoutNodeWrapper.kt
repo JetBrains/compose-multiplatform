@@ -18,6 +18,7 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.MutableRect
@@ -239,14 +240,11 @@ internal abstract class LayoutNodeWrapper(
 
     fun onMeasured() {
         if (entities.has(EntityList.RemeasureEntityType)) {
-            val invokeRemeasureCallbacks = {
+            Snapshot.withoutReadObservation {
                 entities.forEach(EntityList.RemeasureEntityType) {
                     it.modifier.onRemeasured(measuredSize)
                 }
             }
-            layoutNode.owner?.snapshotObserver?.withNoSnapshotReadObservation(
-                invokeRemeasureCallbacks
-            ) ?: invokeRemeasureCallbacks()
         }
     }
 
