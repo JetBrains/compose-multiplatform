@@ -4,6 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
@@ -35,14 +36,24 @@ fun ColorPicker(colorState: MutableState<Color>) {
         var currentColor: Color by remember { colorState }
 
         Divider(Modifier.size(5.dp))
-        val width = 300f
-        val height = 256f
+        var width by remember { mutableStateOf(300) }
+        var height by remember { mutableStateOf(256) }
         fun calcHue(x: Float) = limit0to1(x / width) * HSV.HUE_MAX_VALUE
         fun calcSaturation(y: Float) = 1 - limit0to1(y / height)
         fun calcValue(y: Float) = 1 - limit0to1(y / height)
 
         Row {
-            Canvas(Modifier.size(width.dp, height.dp).pointerInput(Unit) {
+            Text("color hex: ${currentColor.toHexString()}")
+        }
+        Row {
+            Canvas(Modifier.size(100.dp, 100.dp)) {
+                drawRect(color = currentColor, size = Size(100f, 100f))
+            }
+        }
+        Row(Modifier.fillMaxSize()) {
+            Canvas(Modifier.fillMaxSize(0.9f).pointerInput(Unit) {
+                width = size.width
+                height = size.height
                 awaitPointerEventScope {
                     while (true) {
                         val event = awaitPointerEvent()
@@ -62,8 +73,8 @@ fun ColorPicker(colorState: MutableState<Color>) {
                     }
                 }
             }) {
-                for (x in 0..width.toInt()) {
-                    for (y in 0..height.toInt()) {
+                for (x in 0..width) {
+                    for (y in 0..height) {
                         drawRect(
                             color = currentColor.toHsv().copy(
                                 hue = calcHue(x.toFloat()),
@@ -76,7 +87,7 @@ fun ColorPicker(colorState: MutableState<Color>) {
                 }
             }
             val bandWidth = 40
-            Canvas(Modifier.size(bandWidth.dp, height.dp).pointerInput(Unit) {
+            Canvas(Modifier.fillMaxSize(0.1f).pointerInput(Unit) {
                 awaitPointerEventScope {
                     while (true) {
                         val event = awaitPointerEvent()
@@ -90,22 +101,13 @@ fun ColorPicker(colorState: MutableState<Color>) {
                     }
                 }
             }) {
-                for (y in 0..height.toInt()) {
+                for (y in 0..height) {
                     drawRect(
                         color = currentColor.toHsv().copy(value = calcValue(y.toFloat())).toRgb(),
                         topLeft = Offset(0f, y.toFloat()),
                         size = Size(bandWidth.toFloat(), 1f)
                     )
                 }
-            }
-        }
-
-        Row {
-            Text("color hex: ${currentColor.toHexString()}")
-        }
-        Row {
-            Canvas(Modifier.size(100.dp, 100.dp)) {
-                drawRect(color = currentColor, size = Size(100f, 100f))
             }
         }
     }
