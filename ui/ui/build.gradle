@@ -58,8 +58,7 @@ dependencies {
 
         implementation("androidx.core:core:1.5.0")
         implementation('androidx.collection:collection:1.0.0')
-        // TODO(b/211779215): Consider pinning this to a specific version
-        implementation project(":customview:customview-poolingcontainer")
+        implementation("androidx.customview:customview-poolingcontainer:1.0.0-alpha01")
         implementation("androidx.savedstate:savedstate:1.1.0")
         implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
         implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
@@ -146,8 +145,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation("androidx.autofill:autofill:1.0.0")
                 implementation(libs.kotlinCoroutinesAndroid)
 
-                // TODO(b/211779215): Consider pinning this to a specific version
-                implementation project(":customview:customview-poolingcontainer")
+                implementation("androidx.customview:customview-poolingcontainer:1.0.0-alpha01")
                 implementation("androidx.savedstate:savedstate:1.1.0")
                 implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
                 implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
