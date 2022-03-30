@@ -696,9 +696,6 @@ package androidx.compose.foundation.lazy.layout {
   public final class LazyLayoutKt {
   }
 
-  public final class LazyLayoutPrefetchPolicyKt {
-  }
-
   public final class LazyLayoutPrefetcher_androidKt {
   }
 
