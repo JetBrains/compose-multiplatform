@@ -83,3 +83,13 @@ Material Design defines the qualities that can be expressed by UI regions, surfa
 | ---- | -------- | --------------- |
 | **Surfaces** | [Surface] | Material surface |
 | **Layout** | [Scaffold] | Basic Material Design visual layout structure |
+
+### Icons
+
+|      | **APIs** | **Description** |
+| ---- | -------- | --------------- |
+| **Icon** | [Icon] | Icon |
+| **Icon button** | [IconButton] | Icon button |
+| **Icon toggle button** | [IconToggleButton] | Icon toggle button |
+
+Also check out the `androidx.compose.material.icons` [package](/reference/kotlin/androidx/compose/material/icons/package-summary).
