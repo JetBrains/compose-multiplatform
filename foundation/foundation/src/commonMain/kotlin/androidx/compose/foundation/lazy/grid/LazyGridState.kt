@@ -23,7 +23,7 @@ import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchPolicy
+import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -289,7 +289,7 @@ class LazyGridState constructor(
         if (abs(scrollToBeConsumed) > 0.5f) {
             val preScrollToBeConsumed = scrollToBeConsumed
             remeasurement?.forceRemeasure()
-            if (prefetchingEnabled && prefetchPolicy != null) {
+            if (prefetchingEnabled) {
                 notifyPrefetch(preScrollToBeConsumed - scrollToBeConsumed)
             }
         }
@@ -309,8 +309,8 @@ class LazyGridState constructor(
     }
 
     private fun notifyPrefetch(delta: Float) {
-        val prefetchPolicy = prefetchPolicy
-        if (!prefetchingEnabled || prefetchPolicy == null) {
+        val prefetchPolicy = prefetchState
+        if (!prefetchingEnabled) {
             return
         }
         val info = layoutInfo
@@ -342,12 +342,12 @@ class LazyGridState constructor(
                 }
                 this.wasScrollingForward = scrollingForward
                 this.lineToPrefetch = lineToPrefetch
-                prefetchPolicy.scheduleForPrefetch(prefetchInfoRetriever(LineIndex(lineToPrefetch)))
+                prefetchPolicy.schedulePrefetch(prefetchInfoRetriever(LineIndex(lineToPrefetch)))
             }
         }
     }
 
-    internal var prefetchPolicy: LazyLayoutPrefetchPolicy? = null
+    internal val prefetchState = LazyLayoutPrefetchState()
 
     /**
      * Animate (smooth scroll) to the given item.

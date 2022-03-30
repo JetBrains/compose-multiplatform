@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.lazy.layout.LazyLayout
 import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
-import androidx.compose.foundation.lazy.layout.rememberLazyLayoutPrefetchPolicy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
@@ -109,8 +108,6 @@ internal fun LazyGrid(
 
     state.isVertical = isVertical
 
-    state.prefetchPolicy = rememberLazyLayoutPrefetchPolicy()
-
     ScrollPositionUpdater(stateOfItemsProvider, state)
 
     LazyLayout(
@@ -144,7 +141,7 @@ internal fun LazyGrid(
                 overScrollController = overScrollController,
                 enabled = userScrollEnabled
             ),
-        prefetchPolicy = state.prefetchPolicy,
+        prefetchState = state.prefetchState,
         measurePolicy = measurePolicy,
         itemsProvider = { stateOfItemsProvider.value }
     )

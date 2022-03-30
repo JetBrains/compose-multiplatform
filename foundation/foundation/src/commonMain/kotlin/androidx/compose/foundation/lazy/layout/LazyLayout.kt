@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.Constraints
 internal fun LazyLayout(
     itemsProvider: () -> LazyLayoutItemsProvider,
     modifier: Modifier = Modifier,
-    prefetchPolicy: LazyLayoutPrefetchPolicy? = null,
+    prefetchState: LazyLayoutPrefetchState? = null,
     measurePolicy: LazyLayoutMeasureScope.(Constraints) -> MeasureResult
 ) {
     val currentItemsProvider = rememberUpdatedState(itemsProvider)
@@ -49,9 +49,9 @@ internal fun LazyLayout(
     val subcomposeLayoutState = remember {
         SubcomposeLayoutState(LazyLayoutItemReusePolicy(itemContentFactory))
     }
-    prefetchPolicy?.let {
+    prefetchState?.let {
         LazyLayoutPrefetcher(
-            prefetchPolicy,
+            prefetchState,
             itemContentFactory,
             subcomposeLayoutState
         )
@@ -107,7 +107,7 @@ private const val MaxItemsToRetainForReuse = 2
 @ExperimentalFoundationApi
 @Composable
 internal expect fun LazyLayoutPrefetcher(
-    prefetchPolicy: LazyLayoutPrefetchPolicy,
+    prefetchState: LazyLayoutPrefetchState,
     itemContentFactory: LazyLayoutItemContentFactory,
     subcomposeLayoutState: SubcomposeLayoutState
 )

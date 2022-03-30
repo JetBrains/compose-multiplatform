@@ -5,6 +5,8 @@ RemovedClass: androidx.compose.foundation.lazy.LazyGridSpanKt:
     Removed class androidx.compose.foundation.lazy.LazyGridSpanKt
 RemovedClass: androidx.compose.foundation.lazy.layout.LazyLayoutItemContentFactoryKt:
     Removed class androidx.compose.foundation.lazy.layout.LazyLayoutItemContentFactoryKt
+RemovedClass: androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchPolicyKt:
+    Removed class androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchPolicyKt
 RemovedClass: androidx.compose.foundation.lazy.layout.LazyLayoutStateKt:
     Removed class androidx.compose.foundation.lazy.layout.LazyLayoutStateKt
 RemovedClass: androidx.compose.foundation.lazy.list.IntervalListKt:
