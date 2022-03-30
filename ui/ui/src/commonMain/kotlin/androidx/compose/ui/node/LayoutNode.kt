@@ -1149,14 +1149,6 @@ internal class LayoutNode(
         }
     }
 
-    /**
-     * Execute your code within the [block] if you want some code to not be observed for the
-     * model reads even if you are currently inside some observed scope like measuring.
-     */
-    internal fun withNoSnapshotReadObservation(block: () -> Unit) {
-        requireOwner().snapshotObserver.withNoSnapshotReadObservation(block)
-    }
-
     internal fun dispatchOnPositionedCallbacks() {
         if (layoutState != Idle || layoutPending || measurePending) {
             return // it hasn't yet been properly positioned, so don't make a call

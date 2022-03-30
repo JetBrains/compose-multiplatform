@@ -27,6 +27,7 @@ import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.SubcomposeLayoutState.PrecomposedSlotHandle
 import androidx.compose.ui.UiComposable
@@ -376,7 +377,7 @@ internal class LayoutNodeSubcompositionsState(
     }
 
     private fun subcompose(node: LayoutNode, nodeState: NodeState) {
-        node.withNoSnapshotReadObservation {
+        Snapshot.withoutReadObservation {
             ignoreRemeasureRequests {
                 val content = nodeState.content
                 nodeState.composition = subcomposeInto(
