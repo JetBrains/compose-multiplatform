@@ -3041,6 +3041,12 @@ package androidx.compose.ui.semantics {
     field public static final androidx.compose.ui.semantics.SemanticsProperties INSTANCE;
   }
 
+  @androidx.compose.ui.ExperimentalComposeUiApi public final class SemanticsPropertiesAndroid {
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> getTestTagsAsResourceId();
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> TestTagsAsResourceId;
+    field public static final androidx.compose.ui.semantics.SemanticsPropertiesAndroid INSTANCE;
+  }
+
   public final class SemanticsPropertiesKt {
     method public static void collapse(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
     method public static void copyText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
@@ -3104,6 +3110,11 @@ package androidx.compose.ui.semantics {
     method public static void setTextSelectionRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver, long);
     method public static void setToggleableState(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.state.ToggleableState);
     method public static void setVerticalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ScrollAxisRange);
+  }
+
+  public final class SemanticsProperties_androidKt {
+    method public static boolean getTestTagsAsResourceId(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static void setTestTagsAsResourceId(androidx.compose.ui.semantics.SemanticsPropertyReceiver, boolean);
   }
 
   public final class SemanticsPropertyKey<T> {

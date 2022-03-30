@@ -68,6 +68,7 @@ import androidx.compose.ui.semantics.SemanticsConfiguration
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.SemanticsPropertiesAndroid
 import androidx.compose.ui.semantics.SemanticsEntity
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.semantics.outerSemantics
@@ -512,6 +513,29 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 
         if (semanticsNode.unmergedConfig.isMergingSemanticsOfDescendants) {
             info.isScreenReaderFocusable = true
+        }
+
+        // Map testTag to resourceName if testTagsAsResourceId == true (which can be set by an ancestor)
+        val testTag = semanticsNode.unmergedConfig.getOrNull(SemanticsProperties.TestTag)
+        if (testTag != null) {
+            var testTagsAsResourceId = false
+            var current: SemanticsNode? = semanticsNode
+            while (current != null) {
+                if (current.unmergedConfig.contains(
+                    SemanticsPropertiesAndroid.TestTagsAsResourceId
+                )) {
+                    testTagsAsResourceId = current.unmergedConfig.get(
+                        SemanticsPropertiesAndroid.TestTagsAsResourceId
+                    )
+                    break
+                } else {
+                    current = current.parent
+                }
+            }
+
+            if (testTagsAsResourceId) {
+                info.viewIdResourceName = testTag
+            }
         }
 
         semanticsNode.unmergedConfig.getOrNull(SemanticsProperties.Heading)?.let {
