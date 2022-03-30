@@ -37,6 +37,10 @@ fun ColorPicker(colorState: MutableState<Color>) {
         Divider(Modifier.size(5.dp))
         val width = 300f
         val height = 256f
+        fun calcHue(x: Float) = limit0to1(x / width) * HSV.HUE_MAX_VALUE
+        fun calcSaturation(y: Float) = 1 - limit0to1(y / height)
+        fun calcValue(y: Float) = 1 - limit0to1(y / height)
+
         Row {
             Canvas(Modifier.size(width.dp, height.dp).pointerInput(Unit) {
                 awaitPointerEventScope {
@@ -46,8 +50,8 @@ fun ColorPicker(colorState: MutableState<Color>) {
                             val position = event.changes.first().position
                             currentColor = try {
                                 currentColor.toHsv().copy(
-                                    hue = limit0to1(position.x / width) * HSV.HUE_MAX_VALUE,
-                                    saturation = limit0to1(position.y / height)
+                                    hue = calcHue(position.x),
+                                    saturation = calcSaturation(position.y)
                                 ).toRgb()
                             } catch (t: Throwable) {
                                 t.printStackTrace()
@@ -60,10 +64,11 @@ fun ColorPicker(colorState: MutableState<Color>) {
             }) {
                 for (x in 0..width.toInt()) {
                     for (y in 0..height.toInt()) {
-                        val hue = (x / width) * HSV.HUE_MAX_VALUE
-                        val saturation = y / height
                         drawRect(
-                            color = currentColor.toHsv().copy(hue = hue, saturation = saturation).toRgb(),
+                            color = currentColor.toHsv().copy(
+                                hue = calcHue(x.toFloat()),
+                                saturation = calcSaturation(y.toFloat())
+                            ).toRgb(),
                             topLeft = Offset(x.toFloat(), y.toFloat()),
                             size = Size(1f, 1f)
                         )
@@ -79,16 +84,16 @@ fun ColorPicker(colorState: MutableState<Color>) {
                             val position = event.changes.first().position
                             currentColor =
                                 currentColor.toHsv().copy(
-                                    value = limit0to1(position.y / height)
+                                    value = calcValue(position.y)
                                 ).toRgb()
                         }
                     }
                 }
             }) {
                 for (y in 0..height.toInt()) {
-                    val value = y / height
                     drawRect(
-                        color = currentColor.toHsv().copy(value = value).toRgb(), topLeft = Offset(0f, y.toFloat()),
+                        color = currentColor.toHsv().copy(value = calcValue(y.toFloat())).toRgb(),
+                        topLeft = Offset(0f, y.toFloat()),
                         size = Size(bandWidth.toFloat(), 1f)
                     )
                 }
