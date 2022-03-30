@@ -18,7 +18,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ColorPallet(colorState: MutableState<Color>) {
+fun ColorPicker(colorState: MutableState<Color>) {
     Column {
         Row {
             listOf(Color.Red, Color.Green, Color.Blue, Color.Black, Color.Gray, Color.Yellow, Color.Cyan).forEach {
@@ -70,8 +70,8 @@ fun ColorPallet(colorState: MutableState<Color>) {
                     }
                 }
             }
-            val BAND_WIDTH = 40
-            Canvas(Modifier.size(BAND_WIDTH.dp, height.dp).pointerInput(Unit) {
+            val bandWidth = 40
+            Canvas(Modifier.size(bandWidth.dp, height.dp).pointerInput(Unit) {
                 awaitPointerEventScope {
                     while (true) {
                         val event = awaitPointerEvent()
@@ -86,10 +86,10 @@ fun ColorPallet(colorState: MutableState<Color>) {
                 }
             }) {
                 for (y in 0..height.toInt()) {
-                    val value = y / 255f
+                    val value = y / height
                     drawRect(
                         color = currentColor.toHsv().copy(value = value).toRgb(), topLeft = Offset(0f, y.toFloat()),
-                        size = Size(BAND_WIDTH.toFloat(), 1f)
+                        size = Size(bandWidth.toFloat(), 1f)
                     )
                 }
             }
@@ -107,5 +107,8 @@ fun ColorPallet(colorState: MutableState<Color>) {
 }
 
 fun Color.toHexString() = "0x" + toArgb().toUInt().toString(16)
-fun limit(value: Float, min: Float, max: Float) = maxOf(value, min).mod(max)
+fun limit(value: Float, min: Float, max: Float) = minOf(
+    maxOf(value, min),
+    max
+)
 fun limit0to1(value: Float) = limit(value = value, 0f, 1f)

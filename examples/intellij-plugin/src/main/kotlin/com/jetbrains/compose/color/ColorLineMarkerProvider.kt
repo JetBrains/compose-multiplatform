@@ -16,7 +16,6 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.uast.*
 import javax.swing.JComponent
-import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import com.intellij.openapi.application.ApplicationManager
 
@@ -47,8 +46,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                                 ComposePanel().apply {
                                     setBounds(0, 0, 400, 400)
                                     setContent {
-                                        var color by remember { colorState }
-                                        ColorPallet(colorState)
+                                        ColorPicker(colorState)
                                     }
                                 }
                         }
