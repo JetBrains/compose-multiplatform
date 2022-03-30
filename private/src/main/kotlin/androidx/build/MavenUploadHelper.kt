@@ -38,6 +38,10 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
 import java.io.File
 import java.io.StringWriter
+import org.dom4j.DocumentFactory
+import org.dom4j.DocumentHelper
+import org.dom4j.Element
+import org.dom4j.io.XMLWriter
 import org.gradle.api.publish.maven.tasks.GenerateMavenPom
 
 fun Project.configureMavenArtifactUpload(extension: AndroidXExtension) {
@@ -165,27 +169,43 @@ private fun Project.configureComponent(
  * Looks for a dependencies XML element within [pom] and sorts its contents.
  */
 fun sortPomDependencies(pom: String): String {
-    var sortedPom = pom
-    val regex = "(?s)<dependencies>\\n(.+?)<\\/dependency>\\s+<\\/dependencies>".toRegex()
+    // Workaround for using the default namespace in dom4j.
+    val namespaceUris = mapOf("ns" to "http://maven.apache.org/POM/4.0.0")
+    DocumentFactory.getInstance().xPathNamespaceURIs = namespaceUris
+    val document = DocumentHelper.parseText(pom)
 
-    var results = regex.findAll(pom)
-    results.forEach { result ->
-        val depsGroup = result.groups[1]
-        if (depsGroup != null) {
-            val depsRange = depsGroup.range
-            val deps = depsGroup.value
-            val sortedDeps = deps
-                .split("</dependency>\n")
-                .sorted()
-                .joinToString("</dependency>\n")
+    // For each <dependencies> element, sort the contained elements in-place.
+    document.rootElement
+        .selectNodes("ns:dependencies")
+        .filterIsInstance<Element>()
+        .forEach { element ->
+            val deps = element.elements()
+            val sortedDeps = deps.toSortedSet(compareBy { it.stringValue }).toList()
 
-            if (deps != sortedDeps) {
-                sortedPom = sortedPom.replaceRange(depsRange, sortedDeps)
+            // Content contains formatting nodes, so to avoid modifying those we replace
+            // each element with the sorted element from its respective index. Note this
+            // will not move adjacent elements, so any comments would remain in their
+            // original order.
+            element.content().replaceAll {
+                val index = deps.indexOf(it)
+                if (index >= 0) {
+                    sortedDeps[index]
+                } else {
+                    it
+                }
             }
         }
+
+    // Write to string. Note that this does not preserve the original indent level, but it
+    // does preserve line breaks -- not that any of this matters for client XML parsing.
+    val stringWriter = StringWriter()
+    XMLWriter(stringWriter).apply {
+        setIndentLevel(2)
+        write(document)
+        close()
     }
 
-    return sortedPom
+    return stringWriter.toString()
 }
 
 /**
