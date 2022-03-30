@@ -154,7 +154,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.savedstate.SavedStateRegistryOwner
-import androidx.savedstate.ViewTreeSavedStateRegistryOwner
+import androidx.savedstate.findViewTreeSavedStateRegistryOwner
 import java.lang.reflect.Method
 import kotlin.math.roundToInt
 
@@ -1038,7 +1038,7 @@ internal class AndroidComposeView(context: Context) :
         }
 
         val lifecycleOwner = ViewTreeLifecycleOwner.get(this)
-        val savedStateRegistryOwner = ViewTreeSavedStateRegistryOwner.get(this)
+        val savedStateRegistryOwner = findViewTreeSavedStateRegistryOwner()
 
         val oldViewTreeOwners = viewTreeOwners
         // We need to change the ViewTreeOwner if there isn't one yet (null)

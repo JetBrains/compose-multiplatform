@@ -25,7 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentContainerView
 import androidx.savedstate.SavedStateRegistryOwner
-import androidx.savedstate.ViewTreeSavedStateRegistryOwner
+import androidx.savedstate.findViewTreeSavedStateRegistryOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
@@ -64,9 +64,8 @@ class SavedStateRegistryOwnerInFragmentTest {
                 .replace(100, fragment)
                 .commit()
         }
-
         assertTrue(fragment.latch.await(1, TimeUnit.SECONDS))
-        assertEquals(ViewTreeSavedStateRegistryOwner.get(fragment.view!!), fragment.owner)
+        assertEquals(fragment.requireView().findViewTreeSavedStateRegistryOwner(), fragment.owner)
     }
 
     class TestFragment : Fragment() {
