@@ -121,14 +121,14 @@ internal fun Spannable.setLineHeight(
     when (lineHeight.type) {
         TextUnitType.Sp -> with(density) {
             setSpan(
-                LineHeightSpan(ceil(lineHeight.toPx()).toInt(), applyToFirstLine),
+                LineHeightSpan(lineHeight.toPx(), applyToFirstLine),
                 0,
                 length
             )
         }
         TextUnitType.Em -> {
             setSpan(
-                LineHeightSpan(ceil(lineHeight.value * contextFontSize).toInt(), applyToFirstLine),
+                LineHeightSpan(lineHeight.value * contextFontSize, applyToFirstLine),
                 0,
                 length
             )
