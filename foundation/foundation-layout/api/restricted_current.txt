@@ -298,7 +298,7 @@ package androidx.compose.foundation.layout {
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static androidx.compose.foundation.layout.WindowInsets getSystemGestures(androidx.compose.foundation.layout.WindowInsets.Companion);
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static androidx.compose.foundation.layout.WindowInsets getTappableElement(androidx.compose.foundation.layout.WindowInsets.Companion);
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static androidx.compose.foundation.layout.WindowInsets getWaterfall(androidx.compose.foundation.layout.WindowInsets.Companion);
-    method public static void setConsumeWindowInsets(androidx.compose.ui.platform.ComposeView, boolean value);
+    method public static void setConsumeWindowInsets(androidx.compose.ui.platform.ComposeView, boolean);
   }
 
 }

@@ -206,16 +206,16 @@ package androidx.compose.material3 {
 
   @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Stable public final class DrawerState {
     ctor public DrawerState(androidx.compose.material3.DrawerValue initialValue, optional kotlin.jvm.functions.Function1<? super androidx.compose.material3.DrawerValue,java.lang.Boolean> confirmStateChange);
-    method @androidx.compose.material3.ExperimentalMaterial3Api public suspend Object? animateTo(androidx.compose.material3.DrawerValue targetValue, androidx.compose.animation.core.AnimationSpec<java.lang.Float> anim, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? close(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method @androidx.compose.material3.ExperimentalMaterial3Api public suspend Object? animateTo(androidx.compose.material3.DrawerValue targetValue, androidx.compose.animation.core.AnimationSpec<java.lang.Float> anim, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? close(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public androidx.compose.material3.DrawerValue getCurrentValue();
     method @androidx.compose.material3.ExperimentalMaterial3Api public androidx.compose.runtime.State<java.lang.Float> getOffset();
     method @androidx.compose.material3.ExperimentalMaterial3Api public androidx.compose.material3.DrawerValue getTargetValue();
     method public boolean isAnimationRunning();
     method public boolean isClosed();
     method public boolean isOpen();
-    method public suspend Object? open(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method @androidx.compose.material3.ExperimentalMaterial3Api public suspend Object? snapTo(androidx.compose.material3.DrawerValue targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? open(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method @androidx.compose.material3.ExperimentalMaterial3Api public suspend Object? snapTo(androidx.compose.material3.DrawerValue targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public final androidx.compose.material3.DrawerValue currentValue;
     property public final boolean isAnimationRunning;
     property public final boolean isClosed;
@@ -488,8 +488,8 @@ package androidx.compose.material3 {
   @androidx.compose.runtime.Stable public final class SnackbarHostState {
     ctor public SnackbarHostState();
     method public androidx.compose.material3.SnackbarData? getCurrentSnackbarData();
-    method public suspend Object? showSnackbar(String message, optional String? actionLabel, optional boolean withDismissAction, optional androidx.compose.material3.SnackbarDuration duration, optional kotlin.coroutines.Continuation<? super androidx.compose.material3.SnackbarResult> p);
-    method @androidx.compose.material3.ExperimentalMaterial3Api public suspend Object? showSnackbar(androidx.compose.material3.SnackbarVisuals visuals, kotlin.coroutines.Continuation<? super androidx.compose.material3.SnackbarResult> p);
+    method public suspend Object? showSnackbar(String message, optional String? actionLabel, optional boolean withDismissAction, optional androidx.compose.material3.SnackbarDuration duration, optional kotlin.coroutines.Continuation<? super androidx.compose.material3.SnackbarResult>);
+    method @androidx.compose.material3.ExperimentalMaterial3Api public suspend Object? showSnackbar(androidx.compose.material3.SnackbarVisuals visuals, kotlin.coroutines.Continuation<? super androidx.compose.material3.SnackbarResult>);
     property public final androidx.compose.material3.SnackbarData? currentSnackbarData;
   }
 
@@ -648,9 +648,9 @@ package androidx.compose.material3 {
     method public float getOffset();
     method public float getOffsetLimit();
     method public float getScrollFraction();
-    method public void setContentOffset(float contentOffset);
-    method public void setOffset(float offset);
-    method public void setOffsetLimit(float offsetLimit);
+    method public void setContentOffset(float);
+    method public void setOffset(float);
+    method public void setOffsetLimit(float);
     property public abstract float contentOffset;
     property public abstract androidx.compose.ui.input.nestedscroll.NestedScrollConnection nestedScrollConnection;
     property public abstract float offset;

@@ -72,7 +72,7 @@ package androidx.compose.animation {
     method public androidx.compose.animation.SizeTransform? getSizeTransform();
     method public androidx.compose.animation.EnterTransition getTargetContentEnter();
     method public float getTargetContentZIndex();
-    method public void setTargetContentZIndex(float targetContentZIndex);
+    method public void setTargetContentZIndex(float);
     property public final androidx.compose.animation.ExitTransition initialContentExit;
     property public final androidx.compose.animation.SizeTransform? sizeTransform;
     property public final androidx.compose.animation.EnterTransition targetContentEnter;

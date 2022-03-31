@@ -309,7 +309,7 @@ package androidx.compose.foundation.layout {
     method @androidx.compose.foundation.layout.ExperimentalLayoutApi @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static boolean isCaptionBarVisible(androidx.compose.foundation.layout.WindowInsets.Companion);
     method @androidx.compose.foundation.layout.ExperimentalLayoutApi @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static boolean isImeVisible(androidx.compose.foundation.layout.WindowInsets.Companion);
     method @androidx.compose.foundation.layout.ExperimentalLayoutApi @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static boolean isTappableElementVisible(androidx.compose.foundation.layout.WindowInsets.Companion);
-    method public static void setConsumeWindowInsets(androidx.compose.ui.platform.ComposeView, boolean value);
+    method public static void setConsumeWindowInsets(androidx.compose.ui.platform.ComposeView, boolean);
   }
 
 }
