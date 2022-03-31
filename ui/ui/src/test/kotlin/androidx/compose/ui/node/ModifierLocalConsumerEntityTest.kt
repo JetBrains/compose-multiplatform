@@ -53,7 +53,7 @@ import org.junit.runners.JUnit4
 
 @OptIn(ExperimentalComposeUiApi::class)
 @RunWith(JUnit4::class)
-class ModifierLocalConsumerNodeTest {
+class ModifierLocalConsumerEntityTest {
 
     private val default = "Default"
     private val ModifierLocalString = modifierLocalOf { "Default" }
@@ -282,6 +282,7 @@ class ModifierLocalConsumerNodeTest {
             if (isAttached) { forEachLayoutNodeWrapper { it.detach() } }
             this.modifier = modifier
             if (isAttached) { forEachLayoutNodeWrapper { it.attach() } }
+            owner?.onEndApplyChanges()
         }
     }
 
@@ -299,6 +300,10 @@ class ModifierLocalConsumerNodeTest {
             while (listeners.isNotEmpty()) {
                 listeners.removeAt(0).invoke()
             }
+        }
+
+        override fun registerOnLayoutCompletedListener(listener: Owner.OnLayoutCompletedListener) {
+            TODO("Not yet implemented")
         }
 
         override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {}

@@ -43,7 +43,6 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.layout.findRoot
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.modifier.ModifierLocal
 import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.semantics.SemanticsEntity
 import androidx.compose.ui.semantics.SemanticsModifier
@@ -937,20 +936,6 @@ internal abstract class LayoutNodeWrapper(
         } else {
             wrappedBy?.invalidateLayer()
         }
-    }
-
-    /**
-     * Returns the ModifierLocalProviderNode that has the value for [local].
-     */
-    open fun findModifierLocalProvider(local: ModifierLocal<*>): ModifierLocalProviderNode<*>? =
-        wrappedBy?.findModifierLocalProvider(local)
-
-    /**
-     * Invalidates any [ModifierLocalConsumerNode] in the subtree that has read a
-     * default value for [local].
-     */
-    open fun invalidateConsumersOf(local: ModifierLocal<*>) {
-        wrapped?.invalidateConsumersOf(local)
     }
 
     /**

@@ -96,6 +96,10 @@ private class FakeOwner(
         TODO("Not yet implemented")
     }
 
+    override fun registerOnLayoutCompletedListener(listener: Owner.OnLayoutCompletedListener) {
+        TODO("Not yet implemented")
+    }
+
     override fun onLayoutChange(layoutNode: LayoutNode) {}
 
     @OptIn(InternalCoreApi::class)

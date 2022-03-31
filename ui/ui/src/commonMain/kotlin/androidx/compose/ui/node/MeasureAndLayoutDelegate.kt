@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.runtime.collection.mutableVectorOf
+import androidx.compose.ui.layout.OnGloballyPositionedModifier
 import androidx.compose.ui.node.LayoutNode.LayoutState.LayingOut
 import androidx.compose.ui.node.LayoutNode.LayoutState.Measuring
 import androidx.compose.ui.node.LayoutNode.LayoutState.Idle
@@ -30,7 +32,7 @@ import androidx.compose.ui.util.fastForEach
  * Use [requestRemeasure] to schedule remeasuring or [requestRelayout] to schedule relayout.
  *
  * Use [measureAndLayout] to perform scheduled actions and [dispatchOnPositionedCallbacks] to
- * dispatch [OnPositionedModifier] callbacks for the nodes affected by the previous
+ * dispatch [OnGloballyPositionedModifier] callbacks for the nodes affected by the previous
  * [measureAndLayout] execution.
  */
 internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
@@ -53,6 +55,11 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
      * Dispatches on positioned callbacks.
      */
     private val onPositionedDispatcher = OnPositionedDispatcher()
+
+    /**
+     * List of listeners that must be called after layout has completed.
+     */
+    private val onLayoutCompletedListeners = mutableVectorOf<Owner.OnLayoutCompletedListener>()
 
     /**
      * The current measure iteration. The value is incremented during the [measureAndLayout]
@@ -206,6 +213,7 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
                 onLayout?.invoke()
             }
         }
+        callOnLayoutCompletedListeners()
         return rootNodeResized
     }
 
@@ -221,6 +229,7 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
                 onPositionedDispatcher.onNodePositioned(layoutNode)
             }
         }
+        callOnLayoutCompletedListeners()
     }
 
     private inline fun performMeasureAndLayout(block: () -> Unit) {
@@ -237,6 +246,15 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
             }
             consistencyChecker?.assertConsistent()
         }
+    }
+
+    fun registerOnLayoutCompletedListener(listener: Owner.OnLayoutCompletedListener) {
+        onLayoutCompletedListeners += listener
+    }
+
+    private fun callOnLayoutCompletedListeners() {
+        onLayoutCompletedListeners.forEach { it.onLayoutComplete() }
+        onLayoutCompletedListeners.clear()
     }
 
     /**

@@ -19,7 +19,7 @@ import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusOrderToProperties
+import androidx.compose.ui.focus.FocusOrderModifierToProperties
 import androidx.compose.ui.focus.FocusPropertiesModifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
@@ -43,6 +43,8 @@ import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalProvider
+import androidx.compose.ui.modifier.ProvidableModifierLocal
+import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.node.LayoutNode.LayoutState.Idle
 import androidx.compose.ui.node.LayoutNode.LayoutState.LayingOut
 import androidx.compose.ui.node.LayoutNode.LayoutState.Measuring
@@ -74,7 +76,8 @@ internal class LayoutNode(
     // This whole concept will be replaced with a proper subcomposition logic which allows to
     // subcompose multiple times into the same LayoutNode and define offsets.
     private val isVirtual: Boolean = false
-) : Measurable, Remeasurement, OwnerScope, LayoutInfo, ComposeUiNode {
+) : Measurable, Remeasurement, OwnerScope, LayoutInfo, ComposeUiNode,
+    Owner.OnLayoutCompletedListener {
 
     private var virtualChildrenCount = 0
 
@@ -333,8 +336,8 @@ internal class LayoutNode(
 
         requestRemeasure()
         parent?.requestRemeasure()
-        innerLayoutNodeWrapper.attach()
-        forEachDelegate { it.attach() }
+        forEachDelegateIncludingInner { it.attach() }
+        forEachModifierLocalProvider { it.attach() }
         onAttach?.invoke(owner)
     }
 
@@ -355,8 +358,8 @@ internal class LayoutNode(
         }
         alignmentLines.reset()
         onDetach?.invoke(owner)
-        forEachDelegate { it.detach() }
-        innerLayoutNodeWrapper.detach()
+        forEachModifierLocalProvider { it.detach() }
+        forEachDelegateIncludingInner { it.detach() }
 
         if (outerSemantics != null) {
             owner.onSemanticsChange()
@@ -611,6 +614,22 @@ internal class LayoutNode(
         }
 
     /**
+     * The head of the [ModifierLocalProviderEntity] linked list. The head is always a sentinel
+     * provider that doesn't provide any value, so consumers attached to it don't read any
+     * provided values from this LayoutNode and instead reads only from ModifierLocalProviders
+     * on parent LayoutNodes.
+     */
+    internal val modifierLocalsHead =
+        ModifierLocalProviderEntity(this, SentinelModifierLocalProvider)
+
+    /**
+     * The tail of the [ModifierLocalProviderEntity] linked list. This is used for finding
+     * the ModifierLocalProvider by following backwards along the linked list.
+     */
+    internal var modifierLocalsTail = modifierLocalsHead
+        private set
+
+    /**
      * Invalidates the inner-most layer as part of this LayoutNode or from the containing
      * LayoutNode. This is added for performance so that LayoutNodeWrapper.invalidateLayer() can be
      * faster.
@@ -669,67 +688,11 @@ internal class LayoutNode(
                 // Re-use the layoutNodeWrapper if possible.
                 reuseLayoutNodeWrapper(mod, toWrap)?.let {
                     var wrapper = it
-                    @Suppress("DEPRECATION")
-                    if (mod is androidx.compose.ui.focus.FocusOrderModifier) {
-                        @Suppress("DEPRECATION")
-                        val scope = FocusOrderToProperties(mod::populateFocusOrder)
-                        val impl = FocusPropertiesModifier(
-                            focusPropertiesScope = scope,
-                            inspectorInfo = debugInspectorInfo {
-                                name = "focusProperties"
-                                properties["scope"] = scope
-                            }
-                        )
-                        wrapper = ModifierLocalProviderNode(wrapper, impl)
-                            .initialize()
-                            .assignChained(toWrap)
-                        wrapper = ModifierLocalConsumerNode(wrapper, impl)
-                            .initialize()
-                            .assignChained(toWrap)
-                    }
                     it.entities.addAfterLayoutModifier(wrapper, mod)
                     return@foldOut wrapper
                 }
 
-                // The order in which the following blocks occur matters. For example, the
-                // DrawModifier block should be before the LayoutModifier block so that a
-                // Modifier that implements both DrawModifier and LayoutModifier will have
-                // it's draw bounds reflect the dimensions defined by the LayoutModifier.
-                // Please ensure that ModifierLocalProvider is the first item here so that
-                // other layoutNodeWrappers don't accidentally use values that they provided.
-                // Also ensure that ModifierLocalConsumer is the next item here, so that it is
-                // created after all the other LayoutNodeWrappers are created, (So that the
-                // other layoutNodeWrappers are initialized by the time
-                // onModifierLocalsUpdated() is called.
                 var wrapper = toWrap
-                if (mod is ModifierLocalProvider<*>) {
-                    wrapper = ModifierLocalProviderNode(wrapper, mod)
-                        .initialize()
-                        .assignChained(toWrap)
-                }
-                if (mod is ModifierLocalConsumer) {
-                    wrapper = ModifierLocalConsumerNode(wrapper, mod)
-                        .initialize()
-                        .assignChained(toWrap)
-                }
-                @Suppress("DEPRECATION")
-                if (mod is androidx.compose.ui.focus.FocusOrderModifier) {
-                    @Suppress("DEPRECATION")
-                    val scope = FocusOrderToProperties(mod::populateFocusOrder)
-                    val impl = FocusPropertiesModifier(
-                        focusPropertiesScope = scope,
-                        inspectorInfo = debugInspectorInfo {
-                            name = "focusProperties"
-                            properties["scope"] = scope
-                        }
-                    )
-                    wrapper = ModifierLocalProviderNode(wrapper, impl)
-                        .initialize()
-                        .assignChained(toWrap)
-                    wrapper = ModifierLocalConsumerNode(wrapper, impl)
-                        .initialize()
-                        .assignChained(toWrap)
-                }
                 if (mod is LayoutModifier) {
                     wrapper = ModifiedLayoutNode(wrapper, mod)
                         .initialize()
@@ -738,6 +701,8 @@ internal class LayoutNode(
                 wrapper.entities.addAfterLayoutModifier(wrapper, mod)
                 wrapper
             }
+
+            setModifierLocals(value)
 
             outerWrapper.wrappedBy = parent?.innerLayoutNodeWrapper
             outerMeasurablePlaceable.outerWrapper = outerWrapper
@@ -748,7 +713,6 @@ internal class LayoutNode(
                     it.detach()
                 }
 
-                // TODO(mount): simplify this once everything is an Entity.
                 // attach() all new LayoutNodeWrappers
                 forEachDelegateIncludingInner {
                     if (!it.isAttached) {
@@ -774,6 +738,10 @@ internal class LayoutNode(
                 // We need to notify the callbacks of a change in position since there's
                 // a new one.
                 requestRemeasure()
+            } else if (innerLayoutNodeWrapper.entities.has(EntityList.OnPlacedEntityType)) {
+                // We need to be sure that OnPlacedModifiers are called, even if we don't
+                // have a relayout.
+                owner?.registerOnLayoutCompletedListener(this)
             }
             // If the parent data has changed, the parent needs remeasurement.
             val oldParentData = parentData
@@ -1197,6 +1165,122 @@ internal class LayoutNode(
         innerLayoutNodeWrapper.layer?.invalidate()
     }
 
+    private fun setModifierLocals(modifier: Modifier) {
+        // Collect existing consumers and providers
+        val consumers = mutableVectorOf<ModifierLocalConsumerEntity>()
+        var node: ModifierLocalProviderEntity? = modifierLocalsHead
+        while (node != null) {
+            consumers.addAll(node.consumers)
+            node.consumers.clear()
+            node = node.next
+        }
+
+        // Create the chain
+        modifierLocalsTail = modifier.foldIn(modifierLocalsHead) { lastProvider, mod ->
+            // Ensure that ModifierLocalConsumers come before ModifierLocalProviders
+            // so that consumers don't consume values from their own providers.
+            var provider = lastProvider
+
+            // Special handling for FocusOrderModifier -- we have to use modifier local
+            // consumers and providers for it.
+            @Suppress("DEPRECATION")
+            if (mod is androidx.compose.ui.focus.FocusOrderModifier) {
+                val focusPropertiesModifier = findFocusPropertiesModifier(mod, consumers)
+                    ?: run {
+                        // Have to create a new consumer/provider
+                        val scope = FocusOrderModifierToProperties(mod)
+                        FocusPropertiesModifier(
+                            focusPropertiesScope = scope,
+                            inspectorInfo = debugInspectorInfo {
+                                name = "focusProperties"
+                                properties["scope"] = scope
+                            }
+                        )
+                    }
+                addModifierLocalConsumer(focusPropertiesModifier, provider, consumers)
+                provider = addModifierLocalProvider(focusPropertiesModifier, provider)
+            }
+            if (mod is ModifierLocalConsumer) {
+                addModifierLocalConsumer(mod, provider, consumers)
+            }
+            if (mod is ModifierLocalProvider<*>) {
+                provider = addModifierLocalProvider(mod, provider)
+            }
+            provider
+        }
+        // Capture the value after the tail. Anything after the tail can be removed.
+        node = modifierLocalsTail.next
+
+        // Terminate the linked list at the tail.
+        modifierLocalsTail.next = null
+
+        if (isAttached) {
+            // These have been removed and should be detached
+            consumers.forEach { it.detach() }
+
+            // detach all removed providers
+            while (node != null) {
+                node.detach()
+                node = node.next
+            }
+
+            // Attach or invalidate all providers and consumers
+            forEachModifierLocalProvider { it.attachDelayed() }
+        }
+    }
+
+    @Suppress("DEPRECATION", "ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+    private fun findFocusPropertiesModifier(
+        mod: androidx.compose.ui.focus.FocusOrderModifier,
+        consumers: MutableVector<ModifierLocalConsumerEntity>
+    ): FocusPropertiesModifier? = consumers.firstOrNull {
+            it.modifier is FocusPropertiesModifier &&
+                it.modifier.focusPropertiesScope is FocusOrderModifierToProperties &&
+                it.modifier.focusPropertiesScope.modifier === mod
+        }?.modifier as? FocusPropertiesModifier
+
+    private fun addModifierLocalConsumer(
+        mod: ModifierLocalConsumer,
+        provider: ModifierLocalProviderEntity,
+        consumers: MutableVector<ModifierLocalConsumerEntity>
+    ) {
+        val index = consumers.indexOfFirst { it.modifier === mod }
+        val consumer = if (index < 0) {
+            // Not found, so make a new one:
+            ModifierLocalConsumerEntity(provider, mod)
+        } else {
+            // Reuse the existing one:
+            consumers.removeAt(index).also { it.provider = provider }
+        }
+        provider.consumers += consumer
+    }
+
+    private fun addModifierLocalProvider(
+        mod: ModifierLocalProvider<*>,
+        provider: ModifierLocalProviderEntity
+    ): ModifierLocalProviderEntity {
+        // Look for the existing one:
+        var providerNode = provider.next
+        while (providerNode != null && providerNode.modifier !== mod) {
+            providerNode = providerNode.next
+        }
+        if (providerNode == null) {
+            // Couldn't find one to reuse, so create a new one:
+            providerNode = ModifierLocalProviderEntity(this, mod)
+        } else {
+            // Reuse the existing one, just tell the linked list to skip it.
+            providerNode.prev?.next = providerNode.next
+            providerNode.next?.prev = providerNode.prev
+        }
+        // Add the provider:
+        providerNode.next = provider.next
+        provider.next?.prev = providerNode
+        provider.next = providerNode
+        providerNode.prev = provider
+
+        return providerNode
+    }
+
     /**
      * Reuses a [DelegatingLayoutNodeWrapper] from [wrapperCache] if one matches the class
      * type of [modifier]. This walks backward through the [wrapperCache] and
@@ -1366,6 +1450,12 @@ internal class LayoutNode(
         }
     }
 
+    override fun onLayoutComplete() {
+        innerLayoutNodeWrapper.entities.forEach(EntityList.OnPlacedEntityType) {
+            it.modifier.onPlaced(innerLayoutNodeWrapper)
+        }
+    }
+
     /**
      * Calls [block] on all [DelegatingLayoutNodeWrapper]s in the LayoutNodeWrapper chain.
      */
@@ -1387,6 +1477,17 @@ internal class LayoutNode(
         while (delegate != final && delegate != null) {
             block(delegate)
             delegate = delegate.wrapped
+        }
+    }
+
+    /**
+     * Iterates over the [ModifierLocalProviderEntity]s and execute [block] on each one.
+     */
+    private inline fun forEachModifierLocalProvider(block: (ModifierLocalProviderEntity) -> Unit) {
+        var node: ModifierLocalProviderEntity? = modifierLocalsHead
+        while (node != null) {
+            block(node)
+            node = node.next
         }
     }
 
@@ -1452,6 +1553,20 @@ internal class LayoutNode(
                 get() = 16f
             override val minimumTouchTargetSize: DpSize
                 get() = DpSize.Zero
+        }
+
+        // key for EmptyModifierLocalProvider
+        private val ModifierLocalNothing = modifierLocalOf {
+            error("default value for sentinel shouldn't be read")
+        }
+
+        // sentinel value for a provider that doesn't supply any values. This is important
+        // for modifier local consumers that don't have any provider before it in the chain.
+        private val SentinelModifierLocalProvider = object : ModifierLocalProvider<Nothing> {
+            override val key: ProvidableModifierLocal<Nothing>
+                get() = ModifierLocalNothing
+            override val value: Nothing
+                get() = error("Sentinel ModifierLocal shouldn't be read")
         }
     }
 
