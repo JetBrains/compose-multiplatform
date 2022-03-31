@@ -17,7 +17,6 @@ package androidx.compose.ui.node
 
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusOrderModifierToProperties
 import androidx.compose.ui.focus.FocusPropertiesModifier
@@ -50,7 +49,6 @@ import androidx.compose.ui.node.LayoutNode.LayoutState.LayingOut
 import androidx.compose.ui.node.LayoutNode.LayoutState.Measuring
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.platform.nativeClass
 import androidx.compose.ui.platform.simpleIdentityToString
 import androidx.compose.ui.semantics.SemanticsEntity
 import androidx.compose.ui.semantics.outerSemantics
@@ -175,7 +173,7 @@ internal class LayoutNode(
     /**
      * A cache of modifiers to be used when setting and reusing previous modifiers.
      */
-    private var wrapperCache = mutableVectorOf<DelegatingLayoutNodeWrapper<*>>()
+    private var wrapperCache = mutableVectorOf<ModifiedLayoutNode>()
 
     /**
      * [requestRemeasure] calls will be ignored while this flag is true.
@@ -647,7 +645,6 @@ internal class LayoutNode(
     /**
      * The [Modifier] currently applied to this node.
      */
-    @OptIn(ExperimentalComposeUiApi::class)
     override var modifier: Modifier = Modifier
         set(value) {
             if (value == field) return
@@ -685,18 +682,12 @@ internal class LayoutNode(
                     getOrCreateOnPositionedCallbacks() += toWrap to mod
                 }
 
-                // Re-use the layoutNodeWrapper if possible.
-                reuseLayoutNodeWrapper(mod, toWrap)?.let {
-                    var wrapper = it
-                    it.entities.addAfterLayoutModifier(wrapper, mod)
-                    return@foldOut wrapper
-                }
-
-                var wrapper = toWrap
-                if (mod is LayoutModifier) {
-                    wrapper = ModifiedLayoutNode(wrapper, mod)
-                        .initialize()
-                        .assignChained(toWrap)
+                val wrapper = if (mod is LayoutModifier) {
+                    // Re-use the layoutNodeWrapper if possible.
+                    (reuseLayoutNodeWrapper(toWrap, mod)
+                        ?: ModifiedLayoutNode(toWrap, mod)).apply { onInitialize() }
+                } else {
+                    toWrap
                 }
                 wrapper.entities.addAfterLayoutModifier(wrapper, mod)
                 wrapper
@@ -714,18 +705,18 @@ internal class LayoutNode(
                 }
 
                 // attach() all new LayoutNodeWrappers
-                forEachDelegateIncludingInner {
-                    if (!it.isAttached) {
-                        it.attach()
+                forEachDelegateIncludingInner { layoutNodeWrapper ->
+                    if (!layoutNodeWrapper.isAttached) {
+                        layoutNodeWrapper.attach()
                     } else {
-                        it.entities.forEach { it.onAttach() }
+                        layoutNodeWrapper.entities.forEach { it.onAttach() }
                     }
                 }
             }
             wrapperCache.clear()
 
             // call onModifierChanged() on all LayoutNodeWrappers
-            forEachDelegate { it.onModifierChanged() }
+            forEachDelegateIncludingInner { it.onModifierChanged() }
 
             // Optimize the case where the layout itself is not modified. A common reason for
             // this is if no wrapping actually occurs above because no LayoutModifiers are
@@ -1137,7 +1128,6 @@ internal class LayoutNode(
     override fun getModifierInfo(): List<ModifierInfo> {
         val infoList = mutableVectorOf<ModifierInfo>()
         forEachDelegate { wrapper ->
-            wrapper as DelegatingLayoutNodeWrapper<*>
             val layer = wrapper.layer
             val info = ModifierInfo(wrapper.modifier, wrapper, layer)
             infoList += info
@@ -1282,16 +1272,12 @@ internal class LayoutNode(
     }
 
     /**
-     * Reuses a [DelegatingLayoutNodeWrapper] from [wrapperCache] if one matches the class
-     * type of [modifier]. This walks backward through the [wrapperCache] and
-     * extracts all [DelegatingLayoutNodeWrapper]s that are
-     * [chained][DelegatingLayoutNodeWrapper.isChained] together.
-     * If none can be reused, `null` is returned.
+     * Reuses a [ModifiedLayoutNode] from [wrapperCache]. If none can be reused, `null` is returned.
      */
     private fun reuseLayoutNodeWrapper(
-        modifier: Modifier.Element,
-        wrapper: LayoutNodeWrapper
-    ): DelegatingLayoutNodeWrapper<*>? {
+        toWrap: LayoutNodeWrapper,
+        modifier: LayoutModifier
+    ): ModifiedLayoutNode? {
         if (wrapperCache.isEmpty()) {
             return null
         }
@@ -1301,9 +1287,9 @@ internal class LayoutNode(
         }
 
         if (lastIndex < 0) {
-            // Look for class match
+            // Look for one that isn't reused
             lastIndex = wrapperCache.indexOfLast {
-                !it.toBeReusedForSameModifier && it.modifier.nativeClass() == modifier.nativeClass()
+                !it.toBeReusedForSameModifier
             }
         }
 
@@ -1311,27 +1297,19 @@ internal class LayoutNode(
             return null
         }
 
-        val endWrapper = wrapperCache.removeAt(lastIndex--)
-        endWrapper.wrapped = wrapper
-        endWrapper.setModifierTo(modifier)
-        endWrapper.initialize()
-
-        var startWrapper = endWrapper
-        while (startWrapper.isChained) {
-            startWrapper = wrapperCache.removeAt(lastIndex--)
-            startWrapper.setModifierTo(modifier)
-            startWrapper.initialize()
+        return wrapperCache.removeAt(lastIndex).also {
+            it.modifier = modifier
+            it.wrapped = toWrap
         }
-        return startWrapper
     }
 
     /**
-     * Copies all [DelegatingLayoutNodeWrapper]s currently in use and returns them in a new
+     * Copies all [ModifiedLayoutNode]s currently in use and returns them in a new
      * Array.
      */
     private fun copyWrappersToCache() {
         forEachDelegate {
-            wrapperCache += it as DelegatingLayoutNodeWrapper<*>
+            wrapperCache += it
         }
     }
 
@@ -1341,24 +1319,16 @@ internal class LayoutNode(
         }
 
         modifier.foldIn(Unit) { _, mod ->
-            var wrapper = wrapperCache.lastOrNull {
+            val wrapper = wrapperCache.lastOrNull {
                 it.modifier === mod && !it.toBeReusedForSameModifier
             }
-            // we want to walk up the chain up all LayoutNodeWrappers for the same modifier
-            while (wrapper != null) {
-                wrapper.toBeReusedForSameModifier = true
-                wrapper = if (wrapper.isChained)
-                    wrapper.wrappedBy as? DelegatingLayoutNodeWrapper<*>
-                else
-                    null
-            }
+            wrapper?.toBeReusedForSameModifier = true
         }
     }
 
     // Delegation from Measurable to measurableAndPlaceable
     override fun measure(constraints: Constraints): Placeable {
-        val placeable = outerMeasurablePlaceable.measure(constraints)
-        return placeable
+        return outerMeasurablePlaceable.measure(constraints)
     }
 
     /**
@@ -1457,19 +1427,19 @@ internal class LayoutNode(
     }
 
     /**
-     * Calls [block] on all [DelegatingLayoutNodeWrapper]s in the LayoutNodeWrapper chain.
+     * Calls [block] on all [ModifiedLayoutNode]s in the LayoutNodeWrapper chain.
      */
-    private inline fun forEachDelegate(block: (LayoutNodeWrapper) -> Unit) {
+    private inline fun forEachDelegate(block: (ModifiedLayoutNode) -> Unit) {
         var delegate = outerLayoutNodeWrapper
         val inner = innerLayoutNodeWrapper
         while (delegate != inner) {
-            block(delegate)
-            delegate = delegate.wrapped!!
+            block(delegate as ModifiedLayoutNode)
+            delegate = delegate.wrapped
         }
     }
 
     /**
-     * Calls [block] on all [DelegatingLayoutNodeWrapper]s in the LayoutNodeWrapper chain.
+     * Calls [block] on all [LayoutNodeWrapper]s in the LayoutNodeWrapper chain.
      */
     private inline fun forEachDelegateIncludingInner(block: (LayoutNodeWrapper) -> Unit) {
         var delegate: LayoutNodeWrapper? = outerLayoutNodeWrapper
@@ -1616,27 +1586,4 @@ internal fun LayoutNode.requireOwner(): Owner {
  */
 internal fun LayoutNode.add(child: LayoutNode) {
     insertAt(children.size, child)
-}
-
-/**
- * Sets [DelegatingLayoutNodeWrapper#isChained] to `true` of the [wrapped][this.wrapped] when it
- * is part of a chain of LayoutNodes for the same modifier.
- *
- * @param originalWrapper The LayoutNodeWrapper that the modifier chain should be wrapping.
- */
-@Suppress("NOTHING_TO_INLINE")
-private inline fun <T : DelegatingLayoutNodeWrapper<*>> T.assignChained(
-    originalWrapper: LayoutNodeWrapper
-): T {
-    if (originalWrapper !== wrapped) {
-        val wrapper = wrapped as DelegatingLayoutNodeWrapper<*>
-        wrapper.isChained = true
-    }
-    return this
-}
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun <T : DelegatingLayoutNodeWrapper<*>> T.initialize(): T {
-    onInitialize()
-    return this
 }

@@ -203,12 +203,8 @@ internal abstract class LayoutNodeWrapper(
     final override val parentCoordinates: LayoutCoordinates?
         get() {
             check(isAttached) { ExpectAttachedLayoutCoordinates }
-            return wrappedBy?.getWrappedByCoordinates()
+            return wrappedBy
         }
-
-    protected open fun getWrappedByCoordinates(): LayoutCoordinates? {
-        return wrappedBy?.getWrappedByCoordinates()
-    }
 
     // True when the wrapper is running its own placing block to obtain the position of the
     // wrapped, but is not interested in the position of the wrapped of the wrapped.
