@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.PaintingStyle
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.modifier.ModifierLocal
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
@@ -75,6 +74,9 @@ internal class InnerPlaceable(
         // get(line), to obtain the position of the alignment line the wrapper currently needs
         // our position in order ot know how to offset the value we provided).
         if (wrappedBy?.isShallowPlacing == true) return
+
+        onPlaced()
+
         layoutNode.onNodePlaced()
     }
 
@@ -92,10 +94,6 @@ internal class InnerPlaceable(
         if (owner.showLayoutBounds) {
             drawBorder(canvas, innerBoundsPaint)
         }
-    }
-
-    override fun invalidateConsumersOf(local: ModifierLocal<*>) {
-        layoutNode._children.forEach { it.outerLayoutNodeWrapper.invalidateConsumersOf(local) }
     }
 
     override fun <T : LayoutNodeEntity<T, M>, C, M : Modifier> hitTestChild(

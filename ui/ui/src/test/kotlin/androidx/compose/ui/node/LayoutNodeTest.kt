@@ -2337,6 +2337,10 @@ private class MockOwner(
     override fun onEndApplyChanges() {
     }
 
+    override fun registerOnLayoutCompletedListener(listener: Owner.OnLayoutCompletedListener) {
+        TODO("Not yet implemented")
+    }
+
     override fun createLayer(
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit

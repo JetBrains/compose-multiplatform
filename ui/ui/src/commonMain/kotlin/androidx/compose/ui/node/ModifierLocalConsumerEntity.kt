@@ -21,49 +21,54 @@ import androidx.compose.ui.modifier.ModifierLocal
 import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalReadScope
 
-internal class ModifierLocalConsumerNode(
-    wrapped: LayoutNodeWrapper,
-    modifier: ModifierLocalConsumer
-) : DelegatingLayoutNodeWrapper<ModifierLocalConsumer>(wrapped, modifier), () -> Unit,
-    ModifierLocalReadScope {
+internal class ModifierLocalConsumerEntity(
+    var provider: ModifierLocalProviderEntity,
+    val modifier: ModifierLocalConsumer
+) : () -> Unit, OwnerScope, ModifierLocalReadScope {
     private val modifierLocalsRead = mutableVectorOf<ModifierLocal<*>>()
+    var isAttached = false
+        private set
 
-    override fun onModifierChanged() {
-        super.onModifierChanged()
+    override val isValid: Boolean
+        get() = isAttached
+
+    fun attach() {
+        isAttached = true
         notifyConsumerOfChanges()
     }
 
-    override fun attach() {
-        super.attach()
-        notifyConsumerOfChanges()
+    /**
+     * The attach has been done, but we want to notify changes after the tree is completely applied.
+     */
+    fun attachDelayed() {
+        isAttached = true
+        invalidateConsumer()
     }
 
-    override fun detach() {
-        super.detach()
+    fun detach() {
         modifier.onModifierLocalsUpdated(DetachedModifierLocalReadScope)
+        isAttached = false
     }
 
     override val <T> ModifierLocal<T>.current: T
         get() {
-            // Track that we read this ModifierLocal so that it can be invalidated later
             modifierLocalsRead += this
-            val provider = wrappedBy?.findModifierLocalProvider(this)
+            val provider = provider.findModifierLocalProvider(this)
             return if (provider == null) {
                 defaultFactory()
             } else {
                 // We need a cast because type information is erased.
                 // When we check for equality of the key it implies that the types are equal too.
                 @Suppress("UNCHECKED_CAST")
-                provider.modifier.value as T
+                provider.value as T
             }
         }
 
-    override fun invalidateConsumersOf(local: ModifierLocal<*>) {
+    fun invalidateConsumersOf(local: ModifierLocal<*>) {
         if (local in modifierLocalsRead) {
             // Trigger the value to be read again
-            layoutNode.owner?.registerOnEndApplyChangesListener(this)
+            provider.layoutNode.owner?.registerOnEndApplyChangesListener(this)
         }
-        super.invalidateConsumersOf(local)
     }
 
     fun notifyConsumerOfChanges() {
@@ -72,20 +77,30 @@ internal class ModifierLocalConsumerNode(
         if (!isAttached) return
 
         modifierLocalsRead.clear()
-        layoutNode.requireOwner().snapshotObserver.observeReads(this, onReadValuesChanged) {
+        val snapshotObserver = provider.layoutNode.requireOwner().snapshotObserver
+        snapshotObserver.observeReads(this, onReadValuesChanged) {
             modifier.onModifierLocalsUpdated(this)
         }
     }
 
     /**
-     * The listener for [UiApplier.onEndChanges].
+     * Called when the modifiers have changed and we don't know what may have happened, so
+     * the consumer has to be re-run after the tree is configured.
+     */
+    fun invalidateConsumer() {
+        provider.layoutNode.owner?.registerOnEndApplyChangesListener(this)
+    }
+
+    /**
+     * The listener for [UiApplier.onEndChanges]. This is called when we need to trigger
+     * the consumer to update its values.
      */
     override fun invoke() {
         notifyConsumerOfChanges()
     }
 
     companion object {
-        val onReadValuesChanged: (ModifierLocalConsumerNode) -> Unit = { node ->
+        val onReadValuesChanged: (ModifierLocalConsumerEntity) -> Unit = { node ->
             node.notifyConsumerOfChanges()
         }
         val DetachedModifierLocalReadScope = object : ModifierLocalReadScope {

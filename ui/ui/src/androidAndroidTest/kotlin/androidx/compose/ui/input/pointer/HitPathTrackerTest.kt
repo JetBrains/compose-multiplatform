@@ -3638,6 +3638,10 @@ private class MockOwner(
         TODO("Not yet implemented")
     }
 
+    override fun registerOnLayoutCompletedListener(listener: Owner.OnLayoutCompletedListener) {
+        TODO("Not yet implemented")
+    }
+
     override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
         onRequestMeasureParams += layoutNode
         layoutNode.markMeasurePending()

@@ -896,6 +896,11 @@ internal class AndroidComposeView(context: Context) :
         accessibilityDelegate.onLayoutChange(layoutNode)
     }
 
+    override fun registerOnLayoutCompletedListener(listener: Owner.OnLayoutCompletedListener) {
+        measureAndLayoutDelegate.registerOnLayoutCompletedListener(listener)
+        scheduleMeasureAndLayout()
+    }
+
     override fun getFocusDirection(keyEvent: KeyEvent): FocusDirection? {
         return when (keyEvent.key) {
             Tab -> if (keyEvent.isShiftPressed) Previous else Next

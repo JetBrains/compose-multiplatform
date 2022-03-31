@@ -45,14 +45,22 @@ import org.junit.runners.Parameterized
 @ExperimentalComposeUiApi
 @MediumTest
 @RunWith(Parameterized::class)
-class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
+class CustomFocusTraversalTest(
+    private val moveFocusProgrammatically: Boolean,
+    private val useFocusOrderModifier: Boolean
+) {
     @get:Rule
     val rule = createComposeRule()
 
     companion object {
         @JvmStatic
-        @Parameterized.Parameters(name = "moveFocusProgrammatically = {0}")
-        fun initParameters() = listOf(true, false)
+        @Parameterized.Parameters(name = "moveFocusProgrammatically = {0}, useFocusModifier = {1}")
+        fun initParameters() = listOf(
+            arrayOf(true, true),
+            arrayOf(true, false),
+            arrayOf(false, true),
+            arrayOf(false, false)
+        )
     }
 
     @Test
@@ -69,7 +77,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 Box(
                     Modifier
                         .focusRequester(item1)
-                        .focusProperties { next = item3 }
+                        .dynamicFocusProperties { next = item3 }
                         .onFocusChanged { item1Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -130,7 +138,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 Box(
                     Modifier
                         .focusRequester(item3)
-                        .focusProperties { previous = item1 }
+                        .dynamicFocusProperties { previous = item1 }
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -181,7 +189,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 Box(
                     Modifier
                         .focusRequester(item3)
-                        .focusProperties { up = item1 }
+                        .dynamicFocusProperties { up = item1 }
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -221,7 +229,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 Box(
                     Modifier
                         .focusRequester(item1)
-                        .focusProperties { down = item3 }
+                        .dynamicFocusProperties { down = item3 }
                         .onFocusChanged { item1Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -283,7 +291,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 Box(
                     Modifier
                         .focusRequester(item3)
-                        .focusProperties { left = item1 }
+                        .dynamicFocusProperties { left = item1 }
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -323,7 +331,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 Box(
                     Modifier
                         .focusRequester(item1)
-                        .focusProperties { right = item3 }
+                        .dynamicFocusProperties { right = item3 }
                         .onFocusChanged { item1Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -387,7 +395,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 Box(
                     Modifier
                         .focusRequester(item3)
-                        .focusProperties { start = item1 }
+                        .dynamicFocusProperties { start = item1 }
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -429,7 +437,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 Box(
                     Modifier
                         .focusRequester(item1)
-                        .focusProperties { end = item3 }
+                        .dynamicFocusProperties { end = item3 }
                         .onFocusChanged { item1Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -478,11 +486,11 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
         rule.setFocusableContent {
             focusManager = LocalFocusManager.current
             Row {
-                Box(Modifier.focusProperties { next = item4 }) {
+                Box(Modifier.dynamicFocusProperties { next = item4 }) {
                     Box(
                         Modifier
                             .focusRequester(item1)
-                            .focusProperties { next = item3 }
+                            .dynamicFocusProperties { next = item3 }
                             .onFocusChanged { item1Focused = it.isFocused }
                             .focusTarget()
                     )
@@ -537,11 +545,11 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
         rule.setFocusableContent {
             focusManager = LocalFocusManager.current
             Row {
-                Box(Modifier.focusProperties { next = FocusRequester.Default }) {
+                Box(Modifier.dynamicFocusProperties { next = FocusRequester.Default }) {
                     Box(
                         Modifier
                             .focusRequester(item1)
-                            .focusProperties { next = item3 }
+                            .dynamicFocusProperties { next = item3 }
                             .onFocusChanged { item1Focused = it.isFocused }
                             .focusTarget()
                     )
@@ -589,11 +597,11 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
         rule.setFocusableContent {
             focusManager = LocalFocusManager.current
             Row {
-                Box(Modifier.focusProperties { }) {
+                Box(Modifier.dynamicFocusProperties { }) {
                     Box(
                         Modifier
                             .focusRequester(item1)
-                            .focusProperties { next = item3 }
+                            .dynamicFocusProperties { next = item3 }
                             .onFocusChanged { item1Focused = it.isFocused }
                             .focusTarget()
                     )
@@ -627,6 +635,23 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
             assertThat(item1Focused).isFalse()
             assertThat(item2Focused).isFalse()
             assertThat(item3Focused).isTrue()
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    fun Modifier.dynamicFocusProperties(block: FocusOrder.() -> Unit): Modifier =
+        if (useFocusOrderModifier) {
+            this.then(ReceiverFocusOrderModifier(block))
+        } else {
+            focusProperties(FocusOrderToProperties(block))
+        }
+
+    @Suppress("DEPRECATION")
+    class ReceiverFocusOrderModifier(
+        val block: FocusOrder.() -> Unit
+    ) : FocusOrderModifier {
+        override fun populateFocusOrder(focusOrder: FocusOrder) {
+            focusOrder.block()
         }
     }
 }
