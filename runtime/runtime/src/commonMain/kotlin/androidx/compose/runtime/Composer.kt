@@ -2669,7 +2669,7 @@ internal class ComposerImpl(
         // All movable content has a compound hash value rooted at the content itself so the hash
         // value doesn't change as the content moves in the tree.
         val savedCompoundKeyHash = compoundKeyHash
-        compoundKeyHash = movableContentKey xor content.hashCode()
+        compoundKeyHash = movableContentKey
 
         // Either insert a place-holder to be inserted later (either created new or moved from
         // another location) or (re)compose the movable content. This is forced if a new value
