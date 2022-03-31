@@ -19,9 +19,9 @@ package androidx.compose.material
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 
-@Suppress("INLINE_CLASS_DEPRECATED")
 @Immutable
-internal inline class Strings private constructor(@Suppress("unused") private val value: Int) {
+@kotlin.jvm.JvmInline
+internal value class Strings private constructor(@Suppress("unused") private val value: Int) {
     companion object {
         val NavigationMenu = Strings(0)
         val CloseDrawer = Strings(1)

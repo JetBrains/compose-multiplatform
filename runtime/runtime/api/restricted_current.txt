@@ -420,9 +420,9 @@ package androidx.compose.runtime {
     method public void updateScope(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.Composer,? super java.lang.Integer,kotlin.Unit> block);
   }
 
-  public final inline class SkippableUpdater<T> {
-    ctor public SkippableUpdater();
-    method public inline void update(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> block);
+  @kotlin.jvm.JvmInline public final value class SkippableUpdater<T> {
+    ctor public SkippableUpdater(@kotlin.PublishedApi androidx.compose.runtime.Composer composer);
+    method public inline void update(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,kotlin.Unit> block);
   }
 
   public final class SlotTableKt {
@@ -572,11 +572,14 @@ package androidx.compose.runtime {
   public final class TraceKt {
   }
 
-  public final inline class Updater<T> {
-    ctor public Updater();
-    method public void reconcile(kotlin.jvm.functions.Function1<? super T,? extends kotlin.Unit> block);
-    method public inline void set(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,? extends kotlin.Unit> block);
-    method public inline void update(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,? extends kotlin.Unit> block);
+  @kotlin.jvm.JvmInline public final value class Updater<T> {
+    ctor public Updater(@kotlin.PublishedApi androidx.compose.runtime.Composer composer);
+    method public void init(kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
+    method public void reconcile(kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
+    method public inline void set(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit> block);
+    method public <V> void set(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
+    method public inline void update(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit> block);
+    method public <V> void update(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
   }
 
 }

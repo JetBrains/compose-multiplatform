@@ -175,8 +175,8 @@ package androidx.compose.ui.graphics {
     method public static android.graphics.Canvas.VertexMode toAndroidVertexMode(int);
   }
 
-  @androidx.compose.runtime.Immutable public final inline class BlendMode {
-    ctor public BlendMode();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class BlendMode {
+    field public static final androidx.compose.ui.graphics.BlendMode.Companion Companion;
   }
 
   public static final class BlendMode.Companion {
@@ -317,8 +317,8 @@ package androidx.compose.ui.graphics {
     method public static inline void withSaveLayer(androidx.compose.ui.graphics.Canvas, androidx.compose.ui.geometry.Rect bounds, androidx.compose.ui.graphics.Paint paint, kotlin.jvm.functions.Function0<kotlin.Unit> block);
   }
 
-  @androidx.compose.runtime.Immutable public final inline class ClipOp {
-    ctor public ClipOp();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class ClipOp {
+    field public static final androidx.compose.ui.graphics.ClipOp.Companion Companion;
   }
 
   public static final class ClipOp.Companion {
@@ -328,16 +328,28 @@ package androidx.compose.ui.graphics {
     property public final int Intersect;
   }
 
-  @androidx.compose.runtime.Immutable public final inline class Color {
-    ctor public Color();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class Color {
+    ctor public Color(long value);
     method @androidx.compose.runtime.Stable public operator float component1();
     method @androidx.compose.runtime.Stable public operator float component2();
     method @androidx.compose.runtime.Stable public operator float component3();
     method @androidx.compose.runtime.Stable public operator float component4();
-    method @androidx.compose.runtime.Stable public operator androidx.compose.ui.graphics.colorspace.ColorSpace! component5();
+    method @androidx.compose.runtime.Stable public operator androidx.compose.ui.graphics.colorspace.ColorSpace component5();
+    method public long convert(androidx.compose.ui.graphics.colorspace.ColorSpace colorSpace);
     method @androidx.compose.runtime.Stable public long copy(optional float alpha, optional float red, optional float green, optional float blue);
+    method public float getAlpha();
+    method public float getBlue();
+    method public androidx.compose.ui.graphics.colorspace.ColorSpace getColorSpace();
+    method public float getGreen();
+    method public float getRed();
     method public long getValue();
+    property public final float alpha;
+    property public final float blue;
+    property public final androidx.compose.ui.graphics.colorspace.ColorSpace colorSpace;
+    property public final float green;
+    property public final float red;
     property public final long value;
+    field public static final androidx.compose.ui.graphics.Color.Companion Companion;
   }
 
   public static final class Color.Companion {
@@ -395,11 +407,20 @@ package androidx.compose.ui.graphics {
     method @androidx.compose.runtime.Stable public static int toArgb(long);
   }
 
-  public final inline class ColorMatrix {
-    ctor public ColorMatrix();
+  @kotlin.jvm.JvmInline public final value class ColorMatrix {
+    ctor public ColorMatrix(optional float[] values);
+    method public void convertRgbToYuv();
+    method public void convertYuvToRgb();
     method public inline operator float get(int row, int column);
     method public float[] getValues();
+    method public void reset();
     method public inline operator void set(int row, int column, float v);
+    method public void set(float[] src);
+    method public void setToRotateBlue(float degrees);
+    method public void setToRotateGreen(float degrees);
+    method public void setToRotateRed(float degrees);
+    method public void setToSaturation(float sat);
+    method public void setToScale(float redScale, float greenScale, float blueScale, float alphaScale);
     method public operator void timesAssign(float[] colorMatrix);
     property public final float[] values;
   }
@@ -408,10 +429,10 @@ package androidx.compose.ui.graphics {
     method @kotlin.PublishedApi internal static float degrees(float radians);
   }
 
-  @androidx.compose.runtime.Immutable public final inline class FilterQuality {
-    ctor public FilterQuality();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class FilterQuality {
     method public int getValue();
     property public final int value;
+    field public static final androidx.compose.ui.graphics.FilterQuality.Companion Companion;
   }
 
   public static final class FilterQuality.Companion {
@@ -447,10 +468,10 @@ package androidx.compose.ui.graphics {
   public static final class ImageBitmap.Companion {
   }
 
-  @androidx.compose.runtime.Immutable public final inline class ImageBitmapConfig {
-    ctor public ImageBitmapConfig();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class ImageBitmapConfig {
     method public int getValue();
     property public final int value;
+    field public static final androidx.compose.ui.graphics.ImageBitmapConfig.Companion Companion;
   }
 
   public static final class ImageBitmapConfig.Companion {
@@ -476,13 +497,36 @@ package androidx.compose.ui.graphics {
     property public long intrinsicSize;
   }
 
-  public final inline class Matrix {
-    ctor public Matrix();
+  @kotlin.jvm.JvmInline public final value class Matrix {
+    ctor public Matrix(optional float[] values);
     method public inline operator float get(int row, int column);
     method public float[] getValues();
+    method public void invert();
+    method public long map(long point);
+    method public androidx.compose.ui.geometry.Rect map(androidx.compose.ui.geometry.Rect rect);
+    method public void map(androidx.compose.ui.geometry.MutableRect rect);
+    method public void reset();
+    method public void rotateX(float degrees);
+    method public void rotateY(float degrees);
+    method public void rotateZ(float degrees);
+    method public void scale(optional float x, optional float y, optional float z);
     method public inline operator void set(int row, int column, float v);
+    method public void setFrom(float[] matrix);
     method public operator void timesAssign(float[] m);
+    method public void translate(optional float x, optional float y, optional float z);
     property public final float[] values;
+    field public static final androidx.compose.ui.graphics.Matrix.Companion Companion;
+    field public static final int Perspective0 = 3; // 0x3
+    field public static final int Perspective1 = 7; // 0x7
+    field public static final int Perspective2 = 15; // 0xf
+    field public static final int ScaleX = 0; // 0x0
+    field public static final int ScaleY = 5; // 0x5
+    field public static final int ScaleZ = 10; // 0xa
+    field public static final int SkewX = 4; // 0x4
+    field public static final int SkewY = 1; // 0x1
+    field public static final int TranslateX = 12; // 0xc
+    field public static final int TranslateY = 13; // 0xd
+    field public static final int TranslateZ = 14; // 0xe
   }
 
   public static final class Matrix.Companion {
@@ -581,8 +625,8 @@ package androidx.compose.ui.graphics {
     field public static final float DefaultAlpha = 1.0f;
   }
 
-  @androidx.compose.runtime.Immutable public final inline class PaintingStyle {
-    ctor public PaintingStyle();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class PaintingStyle {
+    field public static final androidx.compose.ui.graphics.PaintingStyle.Companion Companion;
   }
 
   public static final class PaintingStyle.Companion {
@@ -639,8 +683,8 @@ package androidx.compose.ui.graphics {
     method public androidx.compose.ui.graphics.PathEffect stampedPathEffect(androidx.compose.ui.graphics.Path shape, float advance, float phase, int style);
   }
 
-  @androidx.compose.runtime.Immutable public final inline class PathFillType {
-    ctor public PathFillType();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class PathFillType {
+    field public static final androidx.compose.ui.graphics.PathFillType.Companion Companion;
   }
 
   public static final class PathFillType.Companion {
@@ -657,8 +701,8 @@ package androidx.compose.ui.graphics {
     property public abstract float length;
   }
 
-  @androidx.compose.runtime.Immutable public final inline class PathOperation {
-    ctor public PathOperation();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class PathOperation {
+    field public static final androidx.compose.ui.graphics.PathOperation.Companion Companion;
   }
 
   public static final class PathOperation.Companion {
@@ -697,8 +741,8 @@ package androidx.compose.ui.graphics {
     property public final int width;
   }
 
-  @androidx.compose.runtime.Immutable public final inline class PointMode {
-    ctor public PointMode();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class PointMode {
+    field public static final androidx.compose.ui.graphics.PointMode.Companion Companion;
   }
 
   public static final class PointMode.Companion {
@@ -782,8 +826,8 @@ package androidx.compose.ui.graphics {
     property public final long value;
   }
 
-  @androidx.compose.runtime.Immutable public final inline class StampedPathEffectStyle {
-    ctor public StampedPathEffectStyle();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class StampedPathEffectStyle {
+    field public static final androidx.compose.ui.graphics.StampedPathEffectStyle.Companion Companion;
   }
 
   public static final class StampedPathEffectStyle.Companion {
@@ -795,8 +839,8 @@ package androidx.compose.ui.graphics {
     property public final int Translate;
   }
 
-  @androidx.compose.runtime.Immutable public final inline class StrokeCap {
-    ctor public StrokeCap();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class StrokeCap {
+    field public static final androidx.compose.ui.graphics.StrokeCap.Companion Companion;
   }
 
   public static final class StrokeCap.Companion {
@@ -808,8 +852,8 @@ package androidx.compose.ui.graphics {
     property public final int Square;
   }
 
-  @androidx.compose.runtime.Immutable public final inline class StrokeJoin {
-    ctor public StrokeJoin();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class StrokeJoin {
+    field public static final androidx.compose.ui.graphics.StrokeJoin.Companion Companion;
   }
 
   public static final class StrokeJoin.Companion {
@@ -825,8 +869,8 @@ package androidx.compose.ui.graphics {
     method public android.graphics.Shader createShader(long size);
   }
 
-  @androidx.compose.runtime.Immutable public final inline class TileMode {
-    ctor public TileMode();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class TileMode {
+    field public static final androidx.compose.ui.graphics.TileMode.Companion Companion;
   }
 
   public static final class TileMode.Companion {
@@ -840,8 +884,8 @@ package androidx.compose.ui.graphics {
     property public final int Repeated;
   }
 
-  @androidx.compose.runtime.Immutable public final inline class VertexMode {
-    ctor public VertexMode();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class VertexMode {
+    field public static final androidx.compose.ui.graphics.VertexMode.Companion Companion;
   }
 
   public static final class VertexMode.Companion {
@@ -884,8 +928,10 @@ package androidx.compose.ui.graphics.colorspace {
     property public final androidx.compose.ui.graphics.colorspace.Adaptation VonKries;
   }
 
-  @androidx.compose.runtime.Immutable public final inline class ColorModel {
-    ctor public ColorModel();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class ColorModel {
+    method public int getComponentCount();
+    property public final int componentCount;
+    field public static final androidx.compose.ui.graphics.colorspace.ColorModel.Companion Companion;
   }
 
   public static final class ColorModel.Companion {
@@ -997,8 +1043,8 @@ package androidx.compose.ui.graphics.colorspace {
     field public static final androidx.compose.ui.graphics.colorspace.Illuminant INSTANCE;
   }
 
-  @androidx.compose.runtime.Immutable public final inline class RenderIntent {
-    ctor public RenderIntent();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class RenderIntent {
+    field public static final androidx.compose.ui.graphics.colorspace.RenderIntent.Companion Companion;
   }
 
   public static final class RenderIntent.Companion {

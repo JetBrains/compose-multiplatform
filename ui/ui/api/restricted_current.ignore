@@ -15,7 +15,41 @@ RemovedClass: androidx.compose.ui.platform.TextToolbarKt:
     Removed class androidx.compose.ui.platform.TextToolbarKt
 
 
+RemovedMethod: androidx.compose.ui.draw.BlurredEdgeTreatment#BlurredEdgeTreatment():
+    Removed constructor androidx.compose.ui.draw.BlurredEdgeTreatment()
+RemovedMethod: androidx.compose.ui.focus.FocusDirection#FocusDirection():
+    Removed constructor androidx.compose.ui.focus.FocusDirection()
+RemovedMethod: androidx.compose.ui.graphics.TransformOrigin#TransformOrigin():
+    Removed constructor androidx.compose.ui.graphics.TransformOrigin()
 RemovedMethod: androidx.compose.ui.graphics.vector.ImageVector.Builder#Builder(String, float, float, float, float, long, int):
     Removed constructor androidx.compose.ui.graphics.vector.ImageVector.Builder(String,float,float,float,float,long,int)
+RemovedMethod: androidx.compose.ui.hapticfeedback.HapticFeedbackType#HapticFeedbackType():
+    Removed constructor androidx.compose.ui.hapticfeedback.HapticFeedbackType()
+RemovedMethod: androidx.compose.ui.input.InputMode#InputMode():
+    Removed constructor androidx.compose.ui.input.InputMode()
+RemovedMethod: androidx.compose.ui.input.key.Key#Key():
+    Removed constructor androidx.compose.ui.input.key.Key()
+RemovedMethod: androidx.compose.ui.input.key.KeyEvent#KeyEvent():
+    Removed constructor androidx.compose.ui.input.key.KeyEvent()
+RemovedMethod: androidx.compose.ui.input.key.KeyEventType#KeyEventType():
+    Removed constructor androidx.compose.ui.input.key.KeyEventType()
+RemovedMethod: androidx.compose.ui.input.nestedscroll.NestedScrollSource#NestedScrollSource():
+    Removed constructor androidx.compose.ui.input.nestedscroll.NestedScrollSource()
+RemovedMethod: androidx.compose.ui.input.pointer.PointerButtons#PointerButtons():
+    Removed constructor androidx.compose.ui.input.pointer.PointerButtons()
+RemovedMethod: androidx.compose.ui.input.pointer.PointerEventType#PointerEventType():
+    Removed constructor androidx.compose.ui.input.pointer.PointerEventType()
+RemovedMethod: androidx.compose.ui.input.pointer.PointerId#PointerId():
+    Removed constructor androidx.compose.ui.input.pointer.PointerId()
 RemovedMethod: androidx.compose.ui.input.pointer.PointerInputChange#PointerInputChange(long, long, long, boolean, long, long, boolean, androidx.compose.ui.input.pointer.ConsumedData, int):
     Removed constructor androidx.compose.ui.input.pointer.PointerInputChange(long,long,long,boolean,long,long,boolean,androidx.compose.ui.input.pointer.ConsumedData,int)
+RemovedMethod: androidx.compose.ui.input.pointer.PointerKeyboardModifiers#PointerKeyboardModifiers():
+    Removed constructor androidx.compose.ui.input.pointer.PointerKeyboardModifiers()
+RemovedMethod: androidx.compose.ui.input.pointer.PointerType#PointerType():
+    Removed constructor androidx.compose.ui.input.pointer.PointerType()
+RemovedMethod: androidx.compose.ui.layout.ScaleFactor#ScaleFactor():
+    Removed constructor androidx.compose.ui.layout.ScaleFactor()
+RemovedMethod: androidx.compose.ui.semantics.LiveRegionMode#LiveRegionMode():
+    Removed constructor androidx.compose.ui.semantics.LiveRegionMode()
+RemovedMethod: androidx.compose.ui.semantics.Role#Role():
+    Removed constructor androidx.compose.ui.semantics.Role()

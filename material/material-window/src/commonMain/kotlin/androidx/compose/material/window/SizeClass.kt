@@ -79,9 +79,9 @@ class SizeClass private constructor(
  *
  * For more details check <a href="https://developer.android.com/guide/topics/large-screens/support-different-screen-sizes#window_size_classes" class="external" target="_blank">Window size classes documentation</a>.
  */
-@Suppress("INLINE_CLASS_DEPRECATED")
 @Immutable
-inline class WidthSizeClass private constructor(private val value: Int) {
+@kotlin.jvm.JvmInline
+value class WidthSizeClass private constructor(private val value: Int) {
     companion object {
         /** Represents the majority of phones in portrait. */
         val Compact = WidthSizeClass(0)
@@ -118,9 +118,9 @@ inline class WidthSizeClass private constructor(private val value: Int) {
  *
  * For more details check <a href="https://developer.android.com/guide/topics/large-screens/support-different-screen-sizes#window_size_classes" class="external" target="_blank">Window size classes documentation</a>.
  */
-@Suppress("INLINE_CLASS_DEPRECATED")
 @Immutable
-inline class HeightSizeClass private constructor(private val value: Int) {
+@kotlin.jvm.JvmInline
+value class HeightSizeClass private constructor(private val value: Int) {
     companion object {
         /** Represents the majority of phones in landscape */
         val Compact = HeightSizeClass(0)

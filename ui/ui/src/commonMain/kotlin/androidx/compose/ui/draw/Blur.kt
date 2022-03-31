@@ -52,8 +52,8 @@ import androidx.compose.ui.unit.dp
  * @see TileMode.Decal
 */
 @Immutable
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-inline class BlurredEdgeTreatment(val shape: Shape?) {
+@kotlin.jvm.JvmInline
+value class BlurredEdgeTreatment(val shape: Shape?) {
 
     companion object {
 

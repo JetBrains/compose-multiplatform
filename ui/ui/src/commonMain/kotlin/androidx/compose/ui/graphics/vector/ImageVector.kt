@@ -760,14 +760,11 @@ inline fun ImageVector.Builder.group(
     clearGroup()
 }
 
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-private inline class Stack<T>(private val backing: ArrayList<T> = ArrayList<T>()) {
+@kotlin.jvm.JvmInline
+private value class Stack<T>(private val backing: ArrayList<T> = ArrayList<T>()) {
     val size: Int get() = backing.size
 
-    fun push(value: T) = backing.add(value)
+    fun push(value: T): Boolean = backing.add(value)
     fun pop(): T = backing.removeAt(size - 1)
     fun peek(): T = backing[size - 1]
-    fun isEmpty() = backing.isEmpty()
-    fun isNotEmpty() = !isEmpty()
-    fun clear() = backing.clear()
 }

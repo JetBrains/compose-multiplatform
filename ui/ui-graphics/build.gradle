@@ -163,11 +163,3 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         systemProperties["GOLDEN_PATH"] = project.rootDir.absolutePath + "/../../golden"
     }
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-            "-XXLanguage:+InlineClasses"
-        ]
-    }
-}

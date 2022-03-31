@@ -41,9 +41,9 @@ import kotlin.math.min
  *     val lineThicknessPx = lineThickness.toPx(context)
  * [toPx] is normally needed only for painting operations.
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class Dp(val value: Float) : Comparable<Dp> {
+@kotlin.jvm.JvmInline
+value class Dp(val value: Float) : Comparable<Dp> {
     /**
      * Add two [Dp]s together.
      */
@@ -257,9 +257,9 @@ fun DpOffset(x: Dp, y: Dp): DpOffset = DpOffset(packFloats(x.value, y.value))
 /**
  * A two-dimensional offset using [Dp] for units
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class DpOffset internal constructor(@PublishedApi internal val packedValue: Long) {
+@kotlin.jvm.JvmInline
+value class DpOffset internal constructor(@PublishedApi internal val packedValue: Long) {
 
     /**
      * The horizontal aspect of the offset in [Dp]
@@ -375,9 +375,9 @@ fun DpSize(width: Dp, height: Dp): DpSize = DpSize(packFloats(width.value, heigh
 /**
  * A two-dimensional Size using [Dp] for units
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class DpSize internal constructor(@PublishedApi internal val packedValue: Long) {
+@kotlin.jvm.JvmInline
+value class DpSize internal constructor(@PublishedApi internal val packedValue: Long) {
 
     /**
      * The horizontal aspect of the Size in [Dp]

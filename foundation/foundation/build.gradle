@@ -169,9 +169,3 @@ androidx {
     description = "Higher level abstractions of the Compose UI primitives. This library is design system agnostic, providing the high-level building blocks for both application and design-system developers"
     legacyDisableKotlinStrictApiMode = true
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += ["-XXLanguage:+InlineClasses"]
-    }
-}

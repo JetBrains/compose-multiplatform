@@ -262,10 +262,11 @@ package androidx.compose.ui.test {
     property public abstract long currentTime;
   }
 
-  @androidx.compose.ui.test.ExperimentalTestApi public final inline class MouseButton {
-    ctor public MouseButton();
+  @androidx.compose.ui.test.ExperimentalTestApi @kotlin.jvm.JvmInline public final value class MouseButton {
+    ctor public MouseButton(int buttonId);
     method public int getButtonId();
     property public final int buttonId;
+    field public static final androidx.compose.ui.test.MouseButton.Companion Companion;
   }
 
   @androidx.compose.ui.test.ExperimentalTestApi public static final class MouseButton.Companion {
@@ -323,10 +324,10 @@ package androidx.compose.ui.test {
     method public void rotateToScrollVertically(float verticalScrollPixels);
   }
 
-  @androidx.compose.ui.test.ExperimentalTestApi public final inline class ScrollWheel {
-    ctor public ScrollWheel();
+  @androidx.compose.ui.test.ExperimentalTestApi @kotlin.jvm.JvmInline public final value class ScrollWheel {
     method public int getValue();
     property public final int value;
+    field public static final androidx.compose.ui.test.ScrollWheel.Companion Companion;
   }
 
   @androidx.compose.ui.test.ExperimentalTestApi public static final class ScrollWheel.Companion {

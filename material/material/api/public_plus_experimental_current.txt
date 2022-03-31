@@ -420,8 +420,8 @@ package androidx.compose.material {
     method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void ExposedDropdownMenuBox(boolean expanded, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onExpandedChange, optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function1<? super androidx.compose.material.ExposedDropdownMenuBoxScope,kotlin.Unit> content);
   }
 
-  public final inline class FabPosition {
-    ctor public FabPosition();
+  @kotlin.jvm.JvmInline public final value class FabPosition {
+    field public static final androidx.compose.material.FabPosition.Companion Companion;
   }
 
   public static final class FabPosition.Companion {

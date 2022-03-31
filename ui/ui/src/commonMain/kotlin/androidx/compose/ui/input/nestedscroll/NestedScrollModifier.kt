@@ -219,8 +219,8 @@ class NestedScrollDispatcher {
 /**
  * Possible sources of scroll events in the [NestedScrollConnection]
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-inline class NestedScrollSource internal constructor(
+@kotlin.jvm.JvmInline
+value class NestedScrollSource internal constructor(
     @Suppress("unused") private val value: Int
 ) {
     override fun toString(): String {

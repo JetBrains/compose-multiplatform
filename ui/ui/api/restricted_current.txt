@@ -183,10 +183,11 @@ package androidx.compose.ui.draw {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier blur(androidx.compose.ui.Modifier, float radius, optional androidx.compose.ui.graphics.Shape edgeTreatment);
   }
 
-  @androidx.compose.runtime.Immutable public final inline class BlurredEdgeTreatment {
-    ctor public BlurredEdgeTreatment();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class BlurredEdgeTreatment {
+    ctor public BlurredEdgeTreatment(androidx.compose.ui.graphics.Shape? shape);
     method public androidx.compose.ui.graphics.Shape? getShape();
     property public final androidx.compose.ui.graphics.Shape? shape;
+    field public static final androidx.compose.ui.draw.BlurredEdgeTreatment.Companion Companion;
   }
 
   public static final class BlurredEdgeTreatment.Companion {
@@ -266,8 +267,8 @@ package androidx.compose.ui.focus {
     method public static androidx.compose.ui.Modifier onFocusChanged(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusChanged);
   }
 
-  public final inline class FocusDirection {
-    ctor public FocusDirection();
+  @kotlin.jvm.JvmInline public final value class FocusDirection {
+    field public static final androidx.compose.ui.focus.FocusDirection.Companion Companion;
   }
 
   public static final class FocusDirection.Companion {
@@ -498,10 +499,15 @@ package androidx.compose.ui.graphics {
     field public static final float DefaultCameraDistance = 8.0f;
   }
 
-  @androidx.compose.runtime.Immutable public final inline class TransformOrigin {
-    ctor public TransformOrigin();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class TransformOrigin {
     method @androidx.compose.runtime.Stable public inline operator float component1();
     method @androidx.compose.runtime.Stable public inline operator float component2();
+    method public long copy(optional float pivotFractionX, optional float pivotFractionY);
+    method public float getPivotFractionX();
+    method public float getPivotFractionY();
+    property public final float pivotFractionX;
+    property public final float pivotFractionY;
+    field public static final androidx.compose.ui.graphics.TransformOrigin.Companion Companion;
   }
 
   public static final class TransformOrigin.Companion {
@@ -768,8 +774,9 @@ package androidx.compose.ui.hapticfeedback {
     method public void performHapticFeedback(int hapticFeedbackType);
   }
 
-  public final inline class HapticFeedbackType {
-    ctor public HapticFeedbackType();
+  @kotlin.jvm.JvmInline public final value class HapticFeedbackType {
+    ctor public HapticFeedbackType(int value);
+    field public static final androidx.compose.ui.hapticfeedback.HapticFeedbackType.Companion Companion;
   }
 
   public static final class HapticFeedbackType.Companion {
@@ -784,8 +791,8 @@ package androidx.compose.ui.hapticfeedback {
 
 package androidx.compose.ui.input {
 
-  public final inline class InputMode {
-    ctor public InputMode();
+  @kotlin.jvm.JvmInline public final value class InputMode {
+    field public static final androidx.compose.ui.input.InputMode.Companion Companion;
   }
 
   public static final class InputMode.Companion {
@@ -804,10 +811,11 @@ package androidx.compose.ui.input {
 
 package androidx.compose.ui.input.key {
 
-  public final inline class Key {
-    ctor public Key();
+  @kotlin.jvm.JvmInline public final value class Key {
+    ctor public Key(long keyCode);
     method public long getKeyCode();
     property public final long keyCode;
+    field public static final androidx.compose.ui.input.key.Key.Companion Companion;
   }
 
   public static final class Key.Companion {
@@ -1387,14 +1395,14 @@ package androidx.compose.ui.input.key {
     property public final long ZoomOut;
   }
 
-  public final inline class KeyEvent {
-    ctor public KeyEvent();
+  @kotlin.jvm.JvmInline public final value class KeyEvent {
+    ctor public KeyEvent(android.view.KeyEvent nativeKeyEvent);
     method public android.view.KeyEvent getNativeKeyEvent();
     property public final android.view.KeyEvent nativeKeyEvent;
   }
 
-  public final inline class KeyEventType {
-    ctor public KeyEventType();
+  @kotlin.jvm.JvmInline public final value class KeyEventType {
+    field public static final androidx.compose.ui.input.key.KeyEventType.Companion Companion;
   }
 
   public static final class KeyEventType.Companion {
@@ -1454,8 +1462,8 @@ package androidx.compose.ui.input.nestedscroll {
   public final class NestedScrollModifierLocalKt {
   }
 
-  public final inline class NestedScrollSource {
-    ctor public NestedScrollSource();
+  @kotlin.jvm.JvmInline public final value class NestedScrollSource {
+    field public static final androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion Companion;
   }
 
   public static final class NestedScrollSource.Companion {
@@ -1495,8 +1503,8 @@ package androidx.compose.ui.input.pointer {
     property public final boolean positionChange;
   }
 
-  public final inline class PointerButtons {
-    ctor public PointerButtons();
+  @kotlin.jvm.JvmInline public final value class PointerButtons {
+    ctor public PointerButtons(int packedValue);
   }
 
   public final class PointerEvent {
@@ -1544,8 +1552,8 @@ package androidx.compose.ui.input.pointer {
     ctor public PointerEventTimeoutCancellationException(long time);
   }
 
-  public final inline class PointerEventType {
-    ctor public PointerEventType();
+  @kotlin.jvm.JvmInline public final value class PointerEventType {
+    field public static final androidx.compose.ui.input.pointer.PointerEventType.Companion Companion;
   }
 
   public static final class PointerEventType.Companion {
@@ -1599,8 +1607,8 @@ package androidx.compose.ui.input.pointer {
     method public static androidx.compose.ui.input.pointer.PointerIcon PointerIcon(int pointerIconType);
   }
 
-  public final inline class PointerId {
-    ctor public PointerId();
+  @kotlin.jvm.JvmInline public final value class PointerId {
+    ctor public PointerId(long value);
     method public long getValue();
     property public final long value;
   }
@@ -1672,12 +1680,12 @@ package androidx.compose.ui.input.pointer {
   public final class PointerInteropUtils_androidKt {
   }
 
-  public final inline class PointerKeyboardModifiers {
-    ctor public PointerKeyboardModifiers();
+  @kotlin.jvm.JvmInline public final value class PointerKeyboardModifiers {
+    ctor public PointerKeyboardModifiers(int packedValue);
   }
 
-  public final inline class PointerType {
-    ctor public PointerType();
+  @kotlin.jvm.JvmInline public final value class PointerType {
+    field public static final androidx.compose.ui.input.pointer.PointerType.Companion Companion;
   }
 
   public static final class PointerType.Companion {
@@ -1745,8 +1753,8 @@ package androidx.compose.ui.layout {
     method public boolean requestBeyondBoundsLayout(int direction, kotlin.jvm.functions.Function0<java.lang.Boolean> block);
   }
 
-  public final inline class BeyondBoundsLayoutDirection {
-    ctor public BeyondBoundsLayoutDirection();
+  @kotlin.jvm.JvmInline public final value class BeyondBoundsLayoutDirection {
+    field public static final androidx.compose.ui.layout.BeyondBoundsLayoutDirection.Companion Companion;
   }
 
   public static final class BeyondBoundsLayoutDirection.Companion {
@@ -2041,12 +2049,17 @@ package androidx.compose.ui.layout {
     method public void onRemeasurementAvailable(androidx.compose.ui.layout.Remeasurement remeasurement);
   }
 
-  @androidx.compose.runtime.Immutable public final inline class ScaleFactor {
-    ctor public ScaleFactor();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class ScaleFactor {
     method @androidx.compose.runtime.Stable public inline operator float component1();
     method @androidx.compose.runtime.Stable public inline operator float component2();
+    method public long copy(optional float scaleX, optional float scaleY);
     method @androidx.compose.runtime.Stable public operator long div(float operand);
+    method public float getScaleX();
+    method public float getScaleY();
     method @androidx.compose.runtime.Stable public operator long times(float operand);
+    property public final float scaleX;
+    property public final float scaleY;
+    field public static final androidx.compose.ui.layout.ScaleFactor.Companion Companion;
   }
 
   public static final class ScaleFactor.Companion {
@@ -2639,8 +2652,8 @@ package androidx.compose.ui.semantics {
     property public final String label;
   }
 
-  @androidx.compose.runtime.Immutable public final inline class LiveRegionMode {
-    ctor public LiveRegionMode();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class LiveRegionMode {
+    field public static final androidx.compose.ui.semantics.LiveRegionMode.Companion Companion;
   }
 
   public static final class LiveRegionMode.Companion {
@@ -2666,8 +2679,8 @@ package androidx.compose.ui.semantics {
     property public final androidx.compose.ui.semantics.ProgressBarRangeInfo Indeterminate;
   }
 
-  @androidx.compose.runtime.Immutable public final inline class Role {
-    ctor public Role();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class Role {
+    field public static final androidx.compose.ui.semantics.Role.Companion Companion;
   }
 
   public static final class Role.Companion {

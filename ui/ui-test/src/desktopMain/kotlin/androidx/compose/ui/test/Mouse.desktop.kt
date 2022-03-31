@@ -20,9 +20,9 @@ package androidx.compose.ui.test
 
 // TODO: use constants instead of literals
 
-@Suppress("INLINE_CLASS_DEPRECATED")
 @ExperimentalTestApi
-actual inline class MouseButton(val buttonId: Int) {
+@JvmInline
+actual value class MouseButton(val buttonId: Int) {
     @ExperimentalTestApi
     actual companion object {
         /**

@@ -111,8 +111,8 @@ import kotlin.math.min
  * [color spaces][ColorSpaces] for the exact ranges.
  */
 @Immutable
-@Suppress("INLINE_CLASS_DEPRECATED")
-inline class Color(val value: ULong) {
+@kotlin.jvm.JvmInline
+value class Color(val value: ULong) {
     /**
      * Returns this color's color space.
      *

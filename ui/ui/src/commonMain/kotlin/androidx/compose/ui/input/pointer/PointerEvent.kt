@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-@file:Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-
 package androidx.compose.ui.input.pointer
 
 import androidx.compose.runtime.Immutable
@@ -144,7 +142,8 @@ expect class PointerEvent internal constructor(
 /**
  * Contains the state of pointer buttons (e.g. mouse and stylus buttons).
  */
-inline class PointerButtons(internal val packedValue: NativePointerButtons)
+@kotlin.jvm.JvmInline
+value class PointerButtons(internal val packedValue: NativePointerButtons)
 
 /**
  * `true` when the primary button (left mouse button) is pressed or `false` when
@@ -205,7 +204,8 @@ expect fun PointerButtons.indexOfLastPressed(): Int
  * Contains the state of modifier keys, such as Shift, Control, and Alt, as well as the state
  * of the lock keys, such as Caps Lock and Num Lock.
  */
-inline class PointerKeyboardModifiers(internal val packedValue: NativePointerKeyboardModifiers)
+@kotlin.jvm.JvmInline
+value class PointerKeyboardModifiers(internal val packedValue: NativePointerKeyboardModifiers)
 
 /**
  * `true` when the Control key is pressed.
@@ -262,7 +262,8 @@ expect val PointerKeyboardModifiers.isNumLockOn: Boolean
 /**
  * The device type that produces a [PointerInputChange], such as a mouse or stylus.
  */
-inline class PointerType private constructor(private val value: Int) {
+@kotlin.jvm.JvmInline
+value class PointerType private constructor(private val value: Int) {
 
     override fun toString(): String = when (value) {
         1 -> "Touch"
@@ -303,7 +304,8 @@ inline class PointerType private constructor(private val value: Int) {
 /**
  * Indicates the primary reason that the [PointerEvent] was sent.
  */
-inline class PointerEventType private constructor(internal val value: Int) {
+@kotlin.jvm.JvmInline
+value class PointerEventType private constructor(internal val value: Int) {
     companion object {
         /**
          * An unknown reason for the event.
@@ -636,7 +638,8 @@ class HistoricalChange(
  *
  * @param value The actual value of the id.
  */
-inline class PointerId(val value: Long)
+@kotlin.jvm.JvmInline
+value class PointerId(val value: Long)
 
 /**
  * Describes what aspects of a change has been consumed.
