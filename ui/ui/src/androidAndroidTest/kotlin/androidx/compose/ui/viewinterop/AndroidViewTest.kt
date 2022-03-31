@@ -485,8 +485,9 @@ class AndroidViewTest {
         val compositionSavedStateRegistryOwner = object : SavedStateRegistryOwner {
             // We don't actually need to ever get actual instances.
             override fun getLifecycle(): Lifecycle = throw UnsupportedOperationException()
-            override fun getSavedStateRegistry(): SavedStateRegistry =
-                throw UnsupportedOperationException()
+
+            override val savedStateRegistry: SavedStateRegistry
+                get() = throw UnsupportedOperationException()
         }
         var childViewTreeSavedStateRegistryOwner: SavedStateRegistryOwner? = null
 

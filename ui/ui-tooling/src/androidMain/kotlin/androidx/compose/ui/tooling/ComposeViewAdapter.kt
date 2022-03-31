@@ -728,7 +728,9 @@ internal class ComposeViewAdapter : FrameLayout {
             lifecycle.currentState = Lifecycle.State.RESUMED
         }
 
-        override fun getSavedStateRegistry(): SavedStateRegistry = controller.savedStateRegistry
+        override val savedStateRegistry: SavedStateRegistry
+            get() = controller.savedStateRegistry
+
         override fun getLifecycle(): Lifecycle = lifecycle
     }
 
