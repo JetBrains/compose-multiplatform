@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.2.0-alpha07" type="baseline" client="gradle" dependencies="false" name="AGP (7.2.0-alpha07)" variant="all" version="7.2.0-alpha07">
+<issues format="6" by="lint 7.3.0-alpha07" type="baseline" client="gradle" dependencies="false" name="AGP (7.3.0-alpha07)" variant="all" version="7.3.0-alpha07">
 
     <issue
         id="NewApi"
@@ -19,19 +19,8 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
-            line="226"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="NewApi"
-        message="Call requires API level 29 (current min is 21): `setCameraDistance`"
-        errorLine1="            this.cameraDistance = cameraDistance"
-        errorLine2="                                  ~~~~~~~~~~~~~~">
-        <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
             line="227"
-            column="35"/>
+            column="9"/>
     </issue>
 
     <issue
@@ -41,7 +30,7 @@
         errorLine2="                 ~~~~~~~~~~~~~~">
         <location
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
-            line="227"
+            line="228"
             column="18"/>
     </issue>
 
@@ -52,7 +41,7 @@
         errorLine2="          ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
-            line="228"
+            line="229"
             column="11"/>
     </issue>
 
@@ -63,19 +52,8 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
-            line="233"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="NewApi"
-        message="Call requires API level 23 (current min is 21): `setCameraDistance`"
-        errorLine1="            this.cameraDistance = cameraDistance"
-        errorLine2="                                  ~~~~~~~~~~~~~~">
-        <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
             line="234"
-            column="35"/>
+            column="9"/>
     </issue>
 
     <issue
@@ -85,7 +63,7 @@
         errorLine2="                 ~~~~~~~~~~~~~~">
         <location
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
-            line="234"
+            line="235"
             column="18"/>
     </issue>
 
@@ -96,7 +74,7 @@
         errorLine2="          ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
-            line="235"
+            line="236"
             column="11"/>
     </issue>
 
@@ -107,7 +85,7 @@
         errorLine2="                 ~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
-            line="3866"
+            line="3869"
             column="18"/>
     </issue>
 
@@ -184,7 +162,7 @@
         errorLine2="                          ~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/ShadowTest.kt"
-            line="343"
+            line="377"
             column="27"/>
     </issue>
 
@@ -195,7 +173,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~">
         <location
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/graphics/vector/VectorTest.kt"
-            line="590"
+            line="694"
             column="36"/>
     </issue>
 
@@ -263,61 +241,6 @@
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"
             line="179"
             column="9"/>
-    </issue>
-
-    <issue
-        id="MissingTestSizeAnnotation"
-        message="Missing test size annotation"
-        errorLine1="    fun pointerPositionAtMeasuredSize(): Unit = with(rule.density) {"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/input/pointer/RestrictedSizeTest.kt"
-            line="47"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="MissingTestSizeAnnotation"
-        message="Missing test size annotation"
-        errorLine1="    fun pointerOutOfLayoutBounds(): Unit = with(rule.density) {"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/input/pointer/RestrictedSizeTest.kt"
-            line="75"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="MissingTestSizeAnnotation"
-        message="Missing test size annotation"
-        errorLine1="    fun semanticsSizeTooSmall(): Unit = with(rule.density) {"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/input/pointer/RestrictedSizeTest.kt"
-            line="107"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="MissingTestSizeAnnotation"
-        message="Missing test size annotation"
-        errorLine1="    fun clippedTouchInMinimumTouchTarget(): Unit = with(rule.density) {"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/input/pointer/RestrictedSizeTest.kt"
-            line="124"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="VisibleForTests"
-        message="This method should only be accessed from tests or within private scope"
-        errorLine1="        ic?.mTextFieldValue = newValue"
-        errorLine2="            ~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/text/input/TextInputServiceAndroid.android.kt"
-            line="207"
-            column="13"/>
     </issue>
 
 </issues>
