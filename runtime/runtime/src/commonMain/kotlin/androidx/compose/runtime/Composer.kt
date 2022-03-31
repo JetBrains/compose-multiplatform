@@ -3695,8 +3695,8 @@ internal class ComposerImpl(
  *
  * @see ComposeNode
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-inline class Updater<T> constructor(
+@kotlin.jvm.JvmInline
+value class Updater<T> constructor(
     @PublishedApi internal val composer: Composer
 ) {
     /**
@@ -3816,8 +3816,9 @@ inline class Updater<T> constructor(
         }
     }
 }
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-inline class SkippableUpdater<T> constructor(
+
+@kotlin.jvm.JvmInline
+value class SkippableUpdater<T> constructor(
     @PublishedApi internal val composer: Composer
 ) {
     inline fun update(block: Updater<T>.() -> Unit) {

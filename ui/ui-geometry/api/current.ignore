@@ -1,0 +1,7 @@
+// Baseline format: 1.0
+RemovedMethod: androidx.compose.ui.geometry.CornerRadius#CornerRadius():
+    Removed constructor androidx.compose.ui.geometry.CornerRadius()
+RemovedMethod: androidx.compose.ui.geometry.Offset#Offset():
+    Removed constructor androidx.compose.ui.geometry.Offset()
+RemovedMethod: androidx.compose.ui.geometry.Size#Size():
+    Removed constructor androidx.compose.ui.geometry.Size()

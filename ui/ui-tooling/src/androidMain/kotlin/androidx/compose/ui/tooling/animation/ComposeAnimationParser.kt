@@ -73,8 +73,8 @@ internal class AnimatedVisibilityComposeAnimation(parent: Transition<Any>, paren
 /**
  * Represents the states of [AnimatedVisibilityComposeAnimation]s.
  */
-@Suppress("INLINE_CLASS_DEPRECATED")
-internal inline class AnimatedVisibilityState private constructor(val value: String) {
+@JvmInline
+internal value class AnimatedVisibilityState private constructor(val value: String) {
 
     override fun toString() = value
 

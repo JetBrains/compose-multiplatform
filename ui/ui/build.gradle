@@ -252,8 +252,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         freeCompilerArgs += [
-            "-Xopt-in=kotlin.Experimental",
-            "-XXLanguage:+InlineClasses"
+            "-Xopt-in=kotlin.Experimental"
         ]
     }
 }

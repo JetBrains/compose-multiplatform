@@ -1,0 +1,19 @@
+// Baseline format: 1.0
+RemovedMethod: androidx.compose.ui.unit.Constraints#Constraints():
+    Removed constructor androidx.compose.ui.unit.Constraints()
+RemovedMethod: androidx.compose.ui.unit.Dp#Dp():
+    Removed constructor androidx.compose.ui.unit.Dp()
+RemovedMethod: androidx.compose.ui.unit.DpOffset#DpOffset():
+    Removed constructor androidx.compose.ui.unit.DpOffset()
+RemovedMethod: androidx.compose.ui.unit.DpSize#DpSize():
+    Removed constructor androidx.compose.ui.unit.DpSize()
+RemovedMethod: androidx.compose.ui.unit.IntOffset#IntOffset():
+    Removed constructor androidx.compose.ui.unit.IntOffset()
+RemovedMethod: androidx.compose.ui.unit.IntSize#IntSize():
+    Removed constructor androidx.compose.ui.unit.IntSize()
+RemovedMethod: androidx.compose.ui.unit.TextUnit#TextUnit():
+    Removed constructor androidx.compose.ui.unit.TextUnit()
+RemovedMethod: androidx.compose.ui.unit.TextUnitType#TextUnitType():
+    Removed constructor androidx.compose.ui.unit.TextUnitType()
+RemovedMethod: androidx.compose.ui.unit.Velocity#Velocity():
+    Removed constructor androidx.compose.ui.unit.Velocity()

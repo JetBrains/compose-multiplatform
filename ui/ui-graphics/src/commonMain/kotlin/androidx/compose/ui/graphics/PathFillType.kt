@@ -24,9 +24,9 @@ import androidx.compose.runtime.Immutable
  *
  * This enum is used by the [Path.fillType] property.
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class PathFillType internal constructor(@Suppress("unused") private val value: Int) {
+@kotlin.jvm.JvmInline
+value class PathFillType internal constructor(@Suppress("unused") private val value: Int) {
     companion object {
         /**
          * The interior is defined by a non-zero sum of signed edge crossings.

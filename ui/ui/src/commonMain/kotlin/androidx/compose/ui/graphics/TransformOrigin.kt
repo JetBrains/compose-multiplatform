@@ -32,9 +32,9 @@ fun TransformOrigin(pivotFractionX: Float, pivotFractionY: Float): TransformOrig
 /**
  * A two-dimensional position represented as a fraction of the Layer's width and height
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class TransformOrigin internal constructor(@PublishedApi internal val packedValue: Long) {
+@kotlin.jvm.JvmInline
+value class TransformOrigin internal constructor(@PublishedApi internal val packedValue: Long) {
 
     /**
      * Return the position along the x-axis that should be used as the

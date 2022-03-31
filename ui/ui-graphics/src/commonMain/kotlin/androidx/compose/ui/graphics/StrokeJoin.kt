@@ -25,9 +25,9 @@ import androidx.compose.runtime.Immutable
  * rectangles, not points drawn as lines with [Canvas.drawPoints].
  * See [Paint.strokeJoin].
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class StrokeJoin internal constructor(@Suppress("unused") private val value: Int) {
+@kotlin.jvm.JvmInline
+value class StrokeJoin internal constructor(@Suppress("unused") private val value: Int) {
     companion object {
         /**
          * Joins between line segments form sharp corners.

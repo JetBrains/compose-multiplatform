@@ -549,9 +549,9 @@ class ScrollAxisRange(
  * exact role is not listed, [SemanticsPropertyReceiver.role] should not be set and the framework
  * will automatically resolve it.
  */
-@Suppress("INLINE_CLASS_DEPRECATED")
 @Immutable
-inline class Role private constructor(@Suppress("unused") private val value: Int) {
+@kotlin.jvm.JvmInline
+value class Role private constructor(@Suppress("unused") private val value: Int) {
     companion object {
         /**
          * This element is a button control. Associated semantics properties for accessibility:
@@ -608,9 +608,9 @@ inline class Role private constructor(@Suppress("unused") private val value: Int
  * automatically notify the user about changes to the node's content description or text, or to
  * the content descriptions or text of the node's children (where applicable).
  */
-@Suppress("INLINE_CLASS_DEPRECATED")
 @Immutable
-inline class LiveRegionMode private constructor(@Suppress("unused") private val value: Int) {
+@kotlin.jvm.JvmInline
+value class LiveRegionMode private constructor(@Suppress("unused") private val value: Int) {
     companion object {
         /**
          * Live region mode specifying that accessibility services should announce

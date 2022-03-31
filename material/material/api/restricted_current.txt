@@ -270,8 +270,8 @@ package androidx.compose.material {
   public final class ExposedDropdownMenuKt {
   }
 
-  public final inline class FabPosition {
-    ctor public FabPosition();
+  @kotlin.jvm.JvmInline public final value class FabPosition {
+    field public static final androidx.compose.material.FabPosition.Companion Companion;
   }
 
   public static final class FabPosition.Companion {

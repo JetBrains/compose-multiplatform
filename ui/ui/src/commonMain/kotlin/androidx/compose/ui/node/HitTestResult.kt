@@ -314,8 +314,8 @@ internal class HitTestResult<T> : List<T> {
     }
 }
 
-@Suppress("INLINE_CLASS_DEPRECATED")
-private inline class DistanceAndInLayer(val packedValue: Long) {
+@kotlin.jvm.JvmInline
+private value class DistanceAndInLayer(val packedValue: Long) {
     val distance: Float
         get() = unpackFloat1(packedValue)
 

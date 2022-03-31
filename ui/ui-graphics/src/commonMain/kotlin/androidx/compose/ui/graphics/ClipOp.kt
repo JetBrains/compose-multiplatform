@@ -24,9 +24,9 @@ import androidx.compose.runtime.Immutable
  *
  * Used by [Canvas.clipRect].
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class ClipOp internal constructor(@Suppress("unused") private val value: Int) {
+@kotlin.jvm.JvmInline
+value class ClipOp internal constructor(@Suppress("unused") private val value: Int) {
     companion object {
         /** Subtract the new region from the existing region. */
         val Difference = ClipOp(0)

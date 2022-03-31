@@ -500,8 +500,9 @@ package androidx.compose.foundation.lazy.grid {
     method public java.util.List<java.lang.Integer> calculateCrossAxisCellSizes(androidx.compose.ui.unit.Density, int availableSize, int spacing);
   }
 
-  @androidx.compose.runtime.Immutable public final inline class GridItemSpan {
-    ctor public GridItemSpan();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class GridItemSpan {
+    method public int getCurrentLineSpan();
+    property public final int currentLineSpan;
   }
 
   public final class LazyGridDslKt {

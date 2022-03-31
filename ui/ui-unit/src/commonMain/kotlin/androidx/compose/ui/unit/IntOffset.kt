@@ -16,7 +16,7 @@
 
 @file:Suppress(
     "NOTHING_TO_INLINE",
-    "INLINE_CLASS_DEPRECATED",
+    "",
     "EXPERIMENTAL_FEATURE_WARNING"
 )
 
@@ -42,7 +42,8 @@ fun IntOffset(x: Int, y: Int): IntOffset =
  * A two-dimensional position using [Int] pixels for units
  */
 @Immutable
-inline class IntOffset internal constructor(@PublishedApi internal val packedValue: Long) {
+@kotlin.jvm.JvmInline
+value class IntOffset internal constructor(@PublishedApi internal val packedValue: Long) {
 
     /**
      * The horizontal aspect of the position in [Int] pixels.

@@ -71,8 +71,8 @@ interface BeyondBoundsLayout {
  * The direction (from the visible bounds) that a [BeyondBoundsLayout] is requesting more
  * items to be laid.
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-inline class BeyondBoundsLayoutDirection internal constructor(
+@kotlin.jvm.JvmInline
+value class BeyondBoundsLayoutDirection internal constructor(
     @Suppress("unused") private val value: Int
 ) {
     companion object {

@@ -28,9 +28,9 @@ import androidx.compose.ui.util.lerp
  *
  * @param multiplier shift the baseline by multiplier * (baseline - ascent)
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class BaselineShift(val multiplier: Float) {
+@kotlin.jvm.JvmInline
+value class BaselineShift(val multiplier: Float) {
     companion object {
         /**
          * Default baseline shift for superscript.

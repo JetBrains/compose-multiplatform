@@ -26,9 +26,9 @@ import androidx.compose.runtime.Immutable
  *
  * @see ColorSpace.connect
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class RenderIntent internal constructor(@Suppress("unused") private val value: Int) {
+@kotlin.jvm.JvmInline
+value class RenderIntent internal constructor(@Suppress("unused") private val value: Int) {
     companion object {
         /**
          * Compresses the source gamut into the destination gamut.
