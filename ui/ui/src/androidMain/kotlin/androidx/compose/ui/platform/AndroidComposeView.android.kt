@@ -723,17 +723,21 @@ internal class AndroidComposeView(context: Context) :
     }
 
     override fun measureAndLayout(sendPointerUpdate: Boolean) {
-        val resend = if (sendPointerUpdate) resendMotionEventOnLayout else null
-        val rootNodeResized = measureAndLayoutDelegate.measureAndLayout(resend)
-        if (rootNodeResized) {
-            requestLayout()
+        trace("AndroidOwner:measureAndLayout") {
+            val resend = if (sendPointerUpdate) resendMotionEventOnLayout else null
+            val rootNodeResized = measureAndLayoutDelegate.measureAndLayout(resend)
+            if (rootNodeResized) {
+                requestLayout()
+            }
+            measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
         }
-        measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
     }
 
     override fun measureAndLayout(layoutNode: LayoutNode, constraints: Constraints) {
-        measureAndLayoutDelegate.measureAndLayout(layoutNode, constraints)
-        measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
+        trace("AndroidOwner:measureAndLayout") {
+            measureAndLayoutDelegate.measureAndLayout(layoutNode, constraints)
+            measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
+        }
     }
 
     override fun forceMeasureTheSubtree(layoutNode: LayoutNode) {
