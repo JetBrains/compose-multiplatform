@@ -436,6 +436,17 @@ class MutableVectorTest {
     }
 
     @Test
+    fun addAllArray() {
+        val a = arrayOf(3, 4, 5)
+        val v = mutableVectorOf(1, 2)
+        v.addAll(a)
+        assertEquals(5, v.size)
+        assertEquals(3, v[2])
+        assertEquals(4, v[3])
+        assertEquals(5, v[4])
+    }
+
+    @Test
     fun clear() {
         val l = mutableVectorOf<Int>()
         l.addAll(list)
@@ -443,7 +454,7 @@ class MutableVectorTest {
         l.clear()
         assertTrue(l.isEmpty())
         repeat(5) {
-            l.content[it] == null
+            assertNull(l.content[it])
         }
     }
 
