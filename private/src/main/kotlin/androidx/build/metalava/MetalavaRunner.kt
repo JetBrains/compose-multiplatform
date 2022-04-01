@@ -198,9 +198,11 @@ fun generateApi(
     workerExecutor: WorkerExecutor,
     pathToManifest: String? = null
 ) {
+    // API lint runs on the experimental pass, which also includes public API. This means API lint
+    // can safely be skipped on the public pass.
     generateApi(
         metalavaClasspath, files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-        apiLocation, GenerateApiMode.PublicApi, apiLintMode, workerExecutor, pathToManifest
+        apiLocation, GenerateApiMode.PublicApi, ApiLintMode.Skip, workerExecutor, pathToManifest
     )
     generateApi(
         metalavaClasspath, files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
