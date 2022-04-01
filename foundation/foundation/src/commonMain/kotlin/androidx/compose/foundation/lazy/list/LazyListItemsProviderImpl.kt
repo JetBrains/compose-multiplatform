@@ -19,9 +19,9 @@ package androidx.compose.foundation.lazy.list
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.getDefaultLazyKeyFor
 import androidx.compose.foundation.lazy.layout.IntervalHolder
 import androidx.compose.foundation.lazy.layout.IntervalList
+import androidx.compose.foundation.lazy.layout.getDefaultLazyLayoutKey
 import androidx.compose.foundation.lazy.layout.intervalForIndex
 import androidx.compose.foundation.lazy.layout.intervalIndexForItemIndex
 import androidx.compose.runtime.Composable
@@ -95,7 +95,7 @@ internal class LazyListItemsSnapshot(
         val interval = getIntervalForIndex(index)
         val localIntervalIndex = index - interval.startIndex
         val key = interval.content.key?.invoke(localIntervalIndex)
-        return key ?: getDefaultLazyKeyFor(index)
+        return key ?: getDefaultLazyLayoutKey(index)
     }
 
     fun getContent(index: Int): @Composable () -> Unit {

@@ -27,7 +27,11 @@ internal interface LazyLayoutItemsProvider {
     /** The total number of items in the lazy layout (visible or not). */
     val itemsCount: Int
 
-    /** Returns the key for the item on this index */
+    /**
+     * Returns the key for the item on this index.
+     *
+     * @see getDefaultLazyLayoutKey which you can use if the user didn't provide a key.
+     */
     fun getKey(index: Int): Any
 
     /**
@@ -42,3 +46,11 @@ internal interface LazyLayoutItemsProvider {
      **/
     fun getContentType(index: Int): Any?
 }
+
+/**
+ * This creates an object meeting following requirements:
+ * 1) Objects created for the same index are equals and never equals for different indexes.
+ * 2) This class is saveable via a default SaveableStateRegistry on the platform.
+ * 3) This objects can't be equals to any object which could be provided by a user as a custom key.
+ */
+internal expect fun getDefaultLazyLayoutKey(index: Int): Any

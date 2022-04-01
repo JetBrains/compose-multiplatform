@@ -479,9 +479,6 @@ package androidx.compose.foundation.lazy {
   @kotlin.DslMarker public @interface LazyScopeMarker {
   }
 
-  public final class Lazy_androidKt {
-  }
-
 }
 
 package androidx.compose.foundation.lazy.grid {
@@ -634,6 +631,9 @@ package androidx.compose.foundation.lazy.layout {
   }
 
   public final class LazyLayoutPrefetcher_androidKt {
+  }
+
+  public final class Lazy_androidKt {
   }
 
   public final class PinnableParentKt {
