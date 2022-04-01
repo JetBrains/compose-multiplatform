@@ -420,4 +420,32 @@ class ModifierLocalSameLayoutNodeTest {
         // Assert.
         rule.runOnIdle { assertThat(readString).isEqualTo(providedValue) }
     }
+
+    /**
+     * We don't want the same modifier local invalidated multiple times for the same change.
+     */
+    @Test
+    fun modifierLocalCallsOnce() {
+        var calls = 0
+        val localString = modifierLocalOf { defaultValue }
+        val provider1 = Modifier.modifierLocalProvider(localString) { "ProvidedValue" }
+        val provider2 = Modifier.modifierLocalProvider(localString) { "Another ProvidedValue" }
+        var providerChoice by mutableStateOf(provider1)
+        val consumer = Modifier.modifierLocalConsumer {
+            localString.current // read the value
+            calls++
+        }
+        rule.setContent {
+            Box(providerChoice.then(consumer))
+        }
+
+        rule.runOnIdle {
+            calls = 0
+            providerChoice = provider2
+        }
+
+        rule.runOnIdle {
+            assertThat(calls).isEqualTo(1)
+        }
+    }
 }
