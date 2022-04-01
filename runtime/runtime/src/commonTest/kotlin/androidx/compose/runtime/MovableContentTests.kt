@@ -29,6 +29,7 @@ import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotEquals
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
@@ -1251,6 +1252,37 @@ class MovableContentTests {
         data.value++
         expectChanges()
         revalidate()
+    }
+
+    @Test
+    fun movableContentOfTheSameFunctionShouldHaveStableKeys() = compositionTest {
+        val hashList1 = mutableListOf<Int>()
+        val hashList2 = mutableListOf<Int>()
+        val composable1: @Composable () -> Unit = {
+            hashList1.add(currentCompositeKeyHash)
+        }
+        val composable2: @Composable () -> Unit = {
+            hashList2.add(currentCompositeKeyHash)
+        }
+        val movableContent1A = movableContentOf(composable1)
+        val movableContent1B = movableContentOf(composable1)
+        val movableContent2A = movableContentOf(composable2)
+        val movableContent2B = movableContentOf(composable2)
+        compose {
+            movableContent1A()
+            movableContent1B()
+            movableContent1A()
+            movableContent1B()
+            movableContent2A()
+            movableContent2B()
+            movableContent2A()
+            movableContent2B()
+        }
+
+        fun List<Int>.assertAllTheSame() = forEach { assertEquals(it, first()) }
+        hashList1.assertAllTheSame()
+        hashList2.assertAllTheSame()
+        assertNotEquals(hashList1.first(), hashList2.first())
     }
 }
 
