@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.lazy.grid
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.mutableStateOf
 
 /**
@@ -28,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
  * block as otherwise the extra remeasurement will be scheduled once we update the values in the
  * end of the measure block.
  */
+@OptIn(ExperimentalFoundationApi::class)
 internal class LazyGridScrollPosition(
     initialIndex: Int = 0,
     initialScrollOffset: Int = 0

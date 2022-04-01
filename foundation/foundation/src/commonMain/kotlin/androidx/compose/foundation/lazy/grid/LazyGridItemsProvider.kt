@@ -19,7 +19,7 @@ package androidx.compose.foundation.lazy.grid
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.layout.LazyLayoutItemsProvider
 
-@OptIn(ExperimentalFoundationApi::class)
+@ExperimentalFoundationApi
 internal interface LazyGridItemsProvider : LazyLayoutItemsProvider {
     /** Returns the span for the given [index] */
     fun LazyGridItemSpanScope.getSpan(index: Int): GridItemSpan

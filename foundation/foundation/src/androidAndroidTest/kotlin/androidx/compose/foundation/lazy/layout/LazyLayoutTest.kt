@@ -53,14 +53,12 @@ class LazyLayoutTest {
                 override fun placeChildren() {}
             }
         }
-        val itemsProvider = {
-            object : LazyLayoutItemsProvider {
-                override fun getContent(index: Int): @Composable () -> Unit = {}
-                override val itemsCount: Int = 0
-                override fun getKey(index: Int) = Unit
-                override val keyToIndexMap: Map<Any, Int> = emptyMap()
-                override fun getContentType(index: Int): Any? = null
-            }
+        val itemsProvider = object : LazyLayoutItemsProvider {
+            override fun getContent(index: Int): @Composable () -> Unit = {}
+            override val itemsCount: Int = 0
+            override fun getKey(index: Int) = Unit
+            override val keyToIndexMap: Map<Any, Int> = emptyMap()
+            override fun getContentType(index: Int): Any? = null
         }
 
         rule.setContent {
