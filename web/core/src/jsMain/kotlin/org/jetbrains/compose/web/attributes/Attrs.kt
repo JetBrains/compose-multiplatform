@@ -194,8 +194,8 @@ fun AttrsScope<HTMLInputElement>.placeholder(value: String) =
 fun AttrsScope<HTMLInputElement>.readOnly() =
     attr("readonly", "")
 
-fun AttrsScope<HTMLInputElement>.required(value: Boolean = true) =
-    attr("required", value.toString())
+fun AttrsScope<HTMLInputElement>.required() =
+    attr("required", "")
 
 fun AttrsScope<HTMLInputElement>.size(value: Int) =
     attr("size", value.toString())
