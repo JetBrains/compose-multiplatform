@@ -6,8 +6,8 @@ package androidx.compose.animation.core {
 
   public final class Animatable<T, V extends androidx.compose.animation.core.AnimationVector> {
     ctor public Animatable(T? initialValue, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, optional T? visibilityThreshold);
-    method public suspend Object? animateDecay(T? initialVelocity, androidx.compose.animation.core.DecayAnimationSpec<T> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Animatable<T,V>,kotlin.Unit>? block, optional kotlin.coroutines.Continuation<? super androidx.compose.animation.core.AnimationResult<T,V>> p);
-    method public suspend Object? animateTo(T? targetValue, optional androidx.compose.animation.core.AnimationSpec<T> animationSpec, optional T? initialVelocity, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Animatable<T,V>,kotlin.Unit>? block, optional kotlin.coroutines.Continuation<? super androidx.compose.animation.core.AnimationResult<T,V>> p);
+    method public suspend Object? animateDecay(T? initialVelocity, androidx.compose.animation.core.DecayAnimationSpec<T> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Animatable<T,V>,kotlin.Unit>? block, optional kotlin.coroutines.Continuation<? super androidx.compose.animation.core.AnimationResult<T,V>>);
+    method public suspend Object? animateTo(T? targetValue, optional androidx.compose.animation.core.AnimationSpec<T> animationSpec, optional T? initialVelocity, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Animatable<T,V>,kotlin.Unit>? block, optional kotlin.coroutines.Continuation<? super androidx.compose.animation.core.AnimationResult<T,V>>);
     method public androidx.compose.runtime.State<T> asState();
     method public T? getLowerBound();
     method public T! getTargetValue();
@@ -17,8 +17,8 @@ package androidx.compose.animation.core {
     method public T! getVelocity();
     method public V getVelocityVector();
     method public boolean isRunning();
-    method public suspend Object? snapTo(T? targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? stop(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? snapTo(T? targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? stop(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public void updateBounds(optional T? lowerBound, optional T? upperBound);
     property public final boolean isRunning;
     property public final T? lowerBound;
@@ -314,8 +314,8 @@ package androidx.compose.animation.core {
   }
 
   public final class InfiniteAnimationPolicyKt {
-    method public static suspend inline <R> Object? withInfiniteAnimationFrameMillis(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
-    method public static suspend <R> Object? withInfiniteAnimationFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    method public static suspend inline <R> Object? withInfiniteAnimationFrameMillis(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R>);
+    method public static suspend <R> Object? withInfiniteAnimationFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R>);
   }
 
   public final class InfiniteRepeatableSpec<T> implements androidx.compose.animation.core.AnimationSpec<T> {
@@ -357,8 +357,8 @@ package androidx.compose.animation.core {
     method public infix androidx.compose.animation.core.KeyframesSpec.KeyframeEntity<T> at(T?, int timeStamp);
     method public int getDelayMillis();
     method public int getDurationMillis();
-    method public void setDelayMillis(int delayMillis);
-    method public void setDurationMillis(int durationMillis);
+    method public void setDelayMillis(int);
+    method public void setDurationMillis(int);
     method public infix void with(androidx.compose.animation.core.KeyframesSpec.KeyframeEntity<T>, androidx.compose.animation.core.Easing easing);
     property public final int delayMillis;
     property public final int durationMillis;
@@ -369,7 +369,7 @@ package androidx.compose.animation.core {
     method public S! getCurrentState();
     method public S! getTargetState();
     method public boolean isIdle();
-    method public void setTargetState(S! targetState);
+    method public void setTargetState(S!);
     property public final S! currentState;
     property public final boolean isIdle;
     property public final S! targetState;
@@ -452,11 +452,11 @@ package androidx.compose.animation.core {
   }
 
   public final class SuspendAnimationKt {
-    method public static suspend Object? animate(float initialValue, float targetValue, optional float initialVelocity, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public static suspend <T, V extends androidx.compose.animation.core.AnimationVector> Object? animate(androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? initialValue, T? targetValue, optional T? initialVelocity, optional androidx.compose.animation.core.AnimationSpec<T> animationSpec, kotlin.jvm.functions.Function2<? super T,? super T,kotlin.Unit> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public static suspend Object? animateDecay(float initialValue, float initialVelocity, androidx.compose.animation.core.FloatDecayAnimationSpec animationSpec, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public static suspend <T, V extends androidx.compose.animation.core.AnimationVector> Object? animateDecay(androidx.compose.animation.core.AnimationState<T,V>, androidx.compose.animation.core.DecayAnimationSpec<T> animationSpec, optional boolean sequentialAnimation, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.AnimationScope<T,V>,kotlin.Unit> block, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public static suspend <T, V extends androidx.compose.animation.core.AnimationVector> Object? animateTo(androidx.compose.animation.core.AnimationState<T,V>, T? targetValue, optional androidx.compose.animation.core.AnimationSpec<T> animationSpec, optional boolean sequentialAnimation, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.AnimationScope<T,V>,kotlin.Unit> block, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public static suspend Object? animate(float initialValue, float targetValue, optional float initialVelocity, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public static suspend <T, V extends androidx.compose.animation.core.AnimationVector> Object? animate(androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, T? initialValue, T? targetValue, optional T? initialVelocity, optional androidx.compose.animation.core.AnimationSpec<T> animationSpec, kotlin.jvm.functions.Function2<? super T,? super T,kotlin.Unit> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public static suspend Object? animateDecay(float initialValue, float initialVelocity, androidx.compose.animation.core.FloatDecayAnimationSpec animationSpec, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public static suspend <T, V extends androidx.compose.animation.core.AnimationVector> Object? animateDecay(androidx.compose.animation.core.AnimationState<T,V>, androidx.compose.animation.core.DecayAnimationSpec<T> animationSpec, optional boolean sequentialAnimation, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.AnimationScope<T,V>,kotlin.Unit> block, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public static suspend <T, V extends androidx.compose.animation.core.AnimationVector> Object? animateTo(androidx.compose.animation.core.AnimationState<T,V>, T? targetValue, optional androidx.compose.animation.core.AnimationSpec<T> animationSpec, optional boolean sequentialAnimation, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.AnimationScope<T,V>,kotlin.Unit> block, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
   }
 
   public final class TargetBasedAnimation<T, V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.animation.core.Animation<T,V> {

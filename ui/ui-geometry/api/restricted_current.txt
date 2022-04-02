@@ -43,10 +43,10 @@ package androidx.compose.ui.geometry {
     method @androidx.compose.runtime.Stable public void intersect(float left, float top, float right, float bottom);
     method public boolean isEmpty();
     method public void set(float left, float top, float right, float bottom);
-    method public void setBottom(float bottom);
-    method public void setLeft(float left);
-    method public void setRight(float right);
-    method public void setTop(float top);
+    method public void setBottom(float);
+    method public void setLeft(float);
+    method public void setRight(float);
+    method public void setTop(float);
     property public final float bottom;
     property public final inline float height;
     property public final boolean isEmpty;

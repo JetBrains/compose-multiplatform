@@ -231,12 +231,12 @@ package androidx.compose.material {
 
   @androidx.compose.runtime.Stable public final class DrawerState {
     ctor public DrawerState(androidx.compose.material.DrawerValue initialValue, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.DrawerValue,java.lang.Boolean> confirmStateChange);
-    method public suspend Object? close(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? close(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public androidx.compose.material.DrawerValue getCurrentValue();
     method public boolean isAnimationRunning();
     method public boolean isClosed();
     method public boolean isOpen();
-    method public suspend Object? open(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? open(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public final androidx.compose.material.DrawerValue currentValue;
     property public final boolean isAnimationRunning;
     property public final boolean isClosed;
@@ -485,7 +485,7 @@ package androidx.compose.material {
   @androidx.compose.runtime.Stable public final class SnackbarHostState {
     ctor public SnackbarHostState();
     method public androidx.compose.material.SnackbarData? getCurrentSnackbarData();
-    method public suspend Object? showSnackbar(String message, optional String? actionLabel, optional androidx.compose.material.SnackbarDuration duration, optional kotlin.coroutines.Continuation<? super androidx.compose.material.SnackbarResult> p);
+    method public suspend Object? showSnackbar(String message, optional String? actionLabel, optional androidx.compose.material.SnackbarDuration duration, optional kotlin.coroutines.Continuation<? super androidx.compose.material.SnackbarResult>);
     property public final androidx.compose.material.SnackbarData? currentSnackbarData;
   }
 

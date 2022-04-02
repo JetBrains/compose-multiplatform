@@ -121,8 +121,8 @@ package androidx.compose.foundation {
 
   @androidx.compose.runtime.Stable public final class MutatorMutex {
     ctor public MutatorMutex();
-    method public suspend <R> Object? mutate(optional androidx.compose.foundation.MutatePriority priority, kotlin.jvm.functions.Function1<? super kotlin.coroutines.Continuation<? super R>,?> block, kotlin.coroutines.Continuation<? super R> p);
-    method public suspend <T, R> Object? mutateWith(T? receiver, optional androidx.compose.foundation.MutatePriority priority, kotlin.jvm.functions.Function2<? super T,? super kotlin.coroutines.Continuation<? super R>,?> block, kotlin.coroutines.Continuation<? super R> p);
+    method public suspend <R> Object? mutate(optional androidx.compose.foundation.MutatePriority priority, kotlin.jvm.functions.Function1<? super kotlin.coroutines.Continuation<? super R>,?> block, kotlin.coroutines.Continuation<? super R>);
+    method public suspend <T, R> Object? mutateWith(T? receiver, optional androidx.compose.foundation.MutatePriority priority, kotlin.jvm.functions.Function2<? super T,? super kotlin.coroutines.Continuation<? super R>,?> block, kotlin.coroutines.Continuation<? super R>);
   }
 
   public final class ProgressSemanticsKt {
@@ -138,14 +138,14 @@ package androidx.compose.foundation {
 
   @androidx.compose.runtime.Stable public final class ScrollState implements androidx.compose.foundation.gestures.ScrollableState {
     ctor public ScrollState(int initial);
-    method public suspend Object? animateScrollTo(int value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? animateScrollTo(int value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public float dispatchRawDelta(float delta);
     method public androidx.compose.foundation.interaction.InteractionSource getInteractionSource();
     method public int getMaxValue();
     method public int getValue();
     method public boolean isScrollInProgress();
-    method public suspend Object? scroll(androidx.compose.foundation.MutatePriority scrollPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? scrollTo(int value, kotlin.coroutines.Continuation<? super java.lang.Float> p);
+    method public suspend Object? scroll(androidx.compose.foundation.MutatePriority scrollPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? scrollTo(int value, kotlin.coroutines.Continuation<? super java.lang.Float>);
     property public final androidx.compose.foundation.interaction.InteractionSource interactionSource;
     property public boolean isScrollInProgress;
     property public final int maxValue;
@@ -177,19 +177,19 @@ package androidx.compose.foundation.gestures {
   }
 
   public final class DragGestureDetectorKt {
-    method public static suspend Object? awaitDragOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
-    method public static suspend Object? awaitHorizontalDragOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
-    method public static suspend Object? awaitHorizontalTouchSlopOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super java.lang.Float,kotlin.Unit> onTouchSlopReached, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
-    method public static suspend Object? awaitTouchSlopOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onTouchSlopReached, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
-    method public static suspend Object? awaitVerticalDragOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
-    method public static suspend Object? awaitVerticalTouchSlopOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super java.lang.Float,kotlin.Unit> onTouchSlopReached, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
-    method public static suspend Object? detectDragGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onDragStart, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragEnd, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragCancel, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onDrag, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public static suspend Object? detectDragGesturesAfterLongPress(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onDragStart, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragEnd, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragCancel, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onDrag, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public static suspend Object? detectHorizontalDragGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onDragStart, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragEnd, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragCancel, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super java.lang.Float,kotlin.Unit> onHorizontalDrag, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public static suspend Object? detectVerticalDragGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onDragStart, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragEnd, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragCancel, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super java.lang.Float,kotlin.Unit> onVerticalDrag, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public static suspend Object? drag(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.pointer.PointerInputChange,kotlin.Unit> onDrag, kotlin.coroutines.Continuation<? super java.lang.Boolean> p);
-    method public static suspend Object? horizontalDrag(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.pointer.PointerInputChange,kotlin.Unit> onDrag, kotlin.coroutines.Continuation<? super java.lang.Boolean> p);
-    method public static suspend Object? verticalDrag(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.pointer.PointerInputChange,kotlin.Unit> onDrag, kotlin.coroutines.Continuation<? super java.lang.Boolean> p);
+    method public static suspend Object? awaitDragOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>);
+    method public static suspend Object? awaitHorizontalDragOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>);
+    method public static suspend Object? awaitHorizontalTouchSlopOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super java.lang.Float,kotlin.Unit> onTouchSlopReached, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>);
+    method public static suspend Object? awaitTouchSlopOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onTouchSlopReached, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>);
+    method public static suspend Object? awaitVerticalDragOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>);
+    method public static suspend Object? awaitVerticalTouchSlopOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super java.lang.Float,kotlin.Unit> onTouchSlopReached, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>);
+    method public static suspend Object? detectDragGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onDragStart, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragEnd, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragCancel, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onDrag, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public static suspend Object? detectDragGesturesAfterLongPress(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onDragStart, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragEnd, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragCancel, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onDrag, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public static suspend Object? detectHorizontalDragGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onDragStart, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragEnd, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragCancel, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super java.lang.Float,kotlin.Unit> onHorizontalDrag, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public static suspend Object? detectVerticalDragGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onDragStart, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragEnd, optional kotlin.jvm.functions.Function0<kotlin.Unit> onDragCancel, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super java.lang.Float,kotlin.Unit> onVerticalDrag, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public static suspend Object? drag(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.pointer.PointerInputChange,kotlin.Unit> onDrag, kotlin.coroutines.Continuation<? super java.lang.Boolean>);
+    method public static suspend Object? horizontalDrag(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.pointer.PointerInputChange,kotlin.Unit> onDrag, kotlin.coroutines.Continuation<? super java.lang.Boolean>);
+    method public static suspend Object? verticalDrag(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.pointer.PointerInputChange,kotlin.Unit> onDrag, kotlin.coroutines.Continuation<? super java.lang.Boolean>);
   }
 
   public interface DragScope {
@@ -204,15 +204,15 @@ package androidx.compose.foundation.gestures {
 
   public interface DraggableState {
     method public void dispatchRawDelta(float delta);
-    method public suspend Object? drag(optional androidx.compose.foundation.MutatePriority dragPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.DragScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? drag(optional androidx.compose.foundation.MutatePriority dragPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.DragScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
   }
 
   @androidx.compose.runtime.Stable public interface FlingBehavior {
-    method public suspend Object? performFling(androidx.compose.foundation.gestures.ScrollScope, float initialVelocity, kotlin.coroutines.Continuation<? super java.lang.Float> p);
+    method public suspend Object? performFling(androidx.compose.foundation.gestures.ScrollScope, float initialVelocity, kotlin.coroutines.Continuation<? super java.lang.Float>);
   }
 
   public final class ForEachGestureKt {
-    method public static suspend Object? forEachGesture(androidx.compose.ui.input.pointer.PointerInputScope, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public static suspend Object? forEachGesture(androidx.compose.ui.input.pointer.PointerInputScope, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
   }
 
   public final class GestureCancellationException extends java.util.concurrent.CancellationException {
@@ -240,14 +240,14 @@ package androidx.compose.foundation.gestures {
   }
 
   public interface PressGestureScope extends androidx.compose.ui.unit.Density {
-    method public suspend Object? awaitRelease(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? tryAwaitRelease(kotlin.coroutines.Continuation<? super java.lang.Boolean> p);
+    method public suspend Object? awaitRelease(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? tryAwaitRelease(kotlin.coroutines.Continuation<? super java.lang.Boolean>);
   }
 
   public final class ScrollExtensionsKt {
-    method public static suspend Object? animateScrollBy(androidx.compose.foundation.gestures.ScrollableState, float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.coroutines.Continuation<? super java.lang.Float> p);
-    method public static suspend Object? scrollBy(androidx.compose.foundation.gestures.ScrollableState, float value, kotlin.coroutines.Continuation<? super java.lang.Float> p);
-    method public static suspend Object? stopScroll(androidx.compose.foundation.gestures.ScrollableState, optional androidx.compose.foundation.MutatePriority scrollPriority, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public static suspend Object? animateScrollBy(androidx.compose.foundation.gestures.ScrollableState, float value, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.coroutines.Continuation<? super java.lang.Float>);
+    method public static suspend Object? scrollBy(androidx.compose.foundation.gestures.ScrollableState, float value, kotlin.coroutines.Continuation<? super java.lang.Float>);
+    method public static suspend Object? stopScroll(androidx.compose.foundation.gestures.ScrollableState, optional androidx.compose.foundation.MutatePriority scrollPriority, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
   }
 
   public interface ScrollScope {
@@ -266,7 +266,7 @@ package androidx.compose.foundation.gestures {
   public interface ScrollableState {
     method public float dispatchRawDelta(float delta);
     method public boolean isScrollInProgress();
-    method public suspend Object? scroll(optional androidx.compose.foundation.MutatePriority scrollPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? scroll(optional androidx.compose.foundation.MutatePriority scrollPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public abstract boolean isScrollInProgress;
   }
 
@@ -276,9 +276,9 @@ package androidx.compose.foundation.gestures {
   }
 
   public final class TapGestureDetectorKt {
-    method public static suspend Object? awaitFirstDown(androidx.compose.ui.input.pointer.AwaitPointerEventScope, optional boolean requireUnconsumed, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
-    method public static suspend Object? detectTapGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit>? onDoubleTap, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit>? onLongPress, optional kotlin.jvm.functions.Function3<? super androidx.compose.foundation.gestures.PressGestureScope,? super androidx.compose.ui.geometry.Offset,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> onPress, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit>? onTap, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public static suspend Object? waitForUpOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange> p);
+    method public static suspend Object? awaitFirstDown(androidx.compose.ui.input.pointer.AwaitPointerEventScope, optional boolean requireUnconsumed, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>);
+    method public static suspend Object? detectTapGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit>? onDoubleTap, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit>? onLongPress, optional kotlin.jvm.functions.Function3<? super androidx.compose.foundation.gestures.PressGestureScope,? super androidx.compose.ui.geometry.Offset,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> onPress, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit>? onTap, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public static suspend Object? waitForUpOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>);
   }
 
   public final class TransformGestureDetectorKt {
@@ -287,7 +287,7 @@ package androidx.compose.foundation.gestures {
     method public static long calculatePan(androidx.compose.ui.input.pointer.PointerEvent);
     method public static float calculateRotation(androidx.compose.ui.input.pointer.PointerEvent);
     method public static float calculateZoom(androidx.compose.ui.input.pointer.PointerEvent);
-    method public static suspend Object? detectTransformGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional boolean panZoomLock, kotlin.jvm.functions.Function4<? super androidx.compose.ui.geometry.Offset,? super androidx.compose.ui.geometry.Offset,? super java.lang.Float,? super java.lang.Float,kotlin.Unit> onGesture, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public static suspend Object? detectTransformGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional boolean panZoomLock, kotlin.jvm.functions.Function4<? super androidx.compose.ui.geometry.Offset,? super androidx.compose.ui.geometry.Offset,? super java.lang.Float,? super java.lang.Float,kotlin.Unit> onGesture, kotlin.coroutines.Continuation<? super kotlin.Unit>);
   }
 
   public interface TransformScope {
@@ -300,20 +300,20 @@ package androidx.compose.foundation.gestures {
 
   public interface TransformableState {
     method public boolean isTransformInProgress();
-    method public suspend Object? transform(optional androidx.compose.foundation.MutatePriority transformPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.TransformScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? transform(optional androidx.compose.foundation.MutatePriority transformPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.TransformScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public abstract boolean isTransformInProgress;
   }
 
   public final class TransformableStateKt {
     method public static androidx.compose.foundation.gestures.TransformableState TransformableState(kotlin.jvm.functions.Function3<? super java.lang.Float,? super androidx.compose.ui.geometry.Offset,? super java.lang.Float,kotlin.Unit> onTransformation);
-    method public static suspend Object? animatePanBy(androidx.compose.foundation.gestures.TransformableState, long offset, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.geometry.Offset> animationSpec, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public static suspend Object? animateRotateBy(androidx.compose.foundation.gestures.TransformableState, float degrees, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public static suspend Object? animateZoomBy(androidx.compose.foundation.gestures.TransformableState, float zoomFactor, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public static suspend Object? panBy(androidx.compose.foundation.gestures.TransformableState, long offset, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public static suspend Object? animatePanBy(androidx.compose.foundation.gestures.TransformableState, long offset, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.geometry.Offset> animationSpec, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public static suspend Object? animateRotateBy(androidx.compose.foundation.gestures.TransformableState, float degrees, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public static suspend Object? animateZoomBy(androidx.compose.foundation.gestures.TransformableState, float zoomFactor, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public static suspend Object? panBy(androidx.compose.foundation.gestures.TransformableState, long offset, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method @androidx.compose.runtime.Composable public static androidx.compose.foundation.gestures.TransformableState rememberTransformableState(kotlin.jvm.functions.Function3<? super java.lang.Float,? super androidx.compose.ui.geometry.Offset,? super java.lang.Float,kotlin.Unit> onTransformation);
-    method public static suspend Object? rotateBy(androidx.compose.foundation.gestures.TransformableState, float degrees, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public static suspend Object? stopTransformation(androidx.compose.foundation.gestures.TransformableState, optional androidx.compose.foundation.MutatePriority terminationPriority, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public static suspend Object? zoomBy(androidx.compose.foundation.gestures.TransformableState, float zoomFactor, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public static suspend Object? rotateBy(androidx.compose.foundation.gestures.TransformableState, float degrees, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public static suspend Object? stopTransformation(androidx.compose.foundation.gestures.TransformableState, optional androidx.compose.foundation.MutatePriority terminationPriority, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public static suspend Object? zoomBy(androidx.compose.foundation.gestures.TransformableState, float zoomFactor, kotlin.coroutines.Continuation<? super kotlin.Unit>);
   }
 
 }
@@ -390,7 +390,7 @@ package androidx.compose.foundation.interaction {
   }
 
   @androidx.compose.runtime.Stable public interface MutableInteractionSource extends androidx.compose.foundation.interaction.InteractionSource {
-    method public suspend Object? emit(androidx.compose.foundation.interaction.Interaction interaction, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? emit(androidx.compose.foundation.interaction.Interaction interaction, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public boolean tryEmit(androidx.compose.foundation.interaction.Interaction interaction);
   }
 
@@ -513,15 +513,15 @@ package androidx.compose.foundation.lazy {
 
   @androidx.compose.runtime.Stable public final class LazyListState implements androidx.compose.foundation.gestures.ScrollableState {
     ctor public LazyListState(optional int firstVisibleItemIndex, optional int firstVisibleItemScrollOffset);
-    method public suspend Object? animateScrollToItem(int index, optional int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? animateScrollToItem(int index, optional int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public float dispatchRawDelta(float delta);
     method public int getFirstVisibleItemIndex();
     method public int getFirstVisibleItemScrollOffset();
     method public androidx.compose.foundation.interaction.InteractionSource getInteractionSource();
     method public androidx.compose.foundation.lazy.LazyListLayoutInfo getLayoutInfo();
     method public boolean isScrollInProgress();
-    method public suspend Object? scroll(androidx.compose.foundation.MutatePriority scrollPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? scrollToItem(int index, optional int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? scroll(androidx.compose.foundation.MutatePriority scrollPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? scrollToItem(int index, optional int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public final int firstVisibleItemIndex;
     property public final int firstVisibleItemScrollOffset;
     property public final androidx.compose.foundation.interaction.InteractionSource interactionSource;
@@ -658,15 +658,15 @@ package androidx.compose.foundation.lazy.grid {
 
   @androidx.compose.runtime.Stable public final class LazyGridState implements androidx.compose.foundation.gestures.ScrollableState {
     ctor public LazyGridState(optional int firstVisibleItemIndex, optional int firstVisibleItemScrollOffset);
-    method public suspend Object? animateScrollToItem(int index, optional int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? animateScrollToItem(int index, optional int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public float dispatchRawDelta(float delta);
     method public int getFirstVisibleItemIndex();
     method public int getFirstVisibleItemScrollOffset();
     method public androidx.compose.foundation.interaction.InteractionSource getInteractionSource();
     method public androidx.compose.foundation.lazy.grid.LazyGridLayoutInfo getLayoutInfo();
     method public boolean isScrollInProgress();
-    method public suspend Object? scroll(androidx.compose.foundation.MutatePriority scrollPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? scrollToItem(int index, optional int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? scroll(androidx.compose.foundation.MutatePriority scrollPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? scrollToItem(int index, optional int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public final int firstVisibleItemIndex;
     property public final int firstVisibleItemScrollOffset;
     property public final androidx.compose.foundation.interaction.InteractionSource interactionSource;
@@ -746,7 +746,7 @@ package androidx.compose.foundation.relocation {
   }
 
   @androidx.compose.foundation.ExperimentalFoundationApi public sealed interface BringIntoViewRequester {
-    method public suspend Object? bringIntoView(optional androidx.compose.ui.geometry.Rect? rect, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? bringIntoView(optional androidx.compose.ui.geometry.Rect? rect, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
   }
 
   public final class BringIntoViewRequesterKt {
@@ -755,7 +755,7 @@ package androidx.compose.foundation.relocation {
   }
 
   @androidx.compose.foundation.ExperimentalFoundationApi public interface BringIntoViewResponder {
-    method @androidx.compose.foundation.ExperimentalFoundationApi public suspend Object? bringChildIntoView(androidx.compose.ui.geometry.Rect localRect, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public suspend Object? bringChildIntoView(androidx.compose.ui.geometry.Rect localRect, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method @androidx.compose.foundation.ExperimentalFoundationApi public androidx.compose.ui.geometry.Rect calculateRectForParent(androidx.compose.ui.geometry.Rect localRect);
   }
 
