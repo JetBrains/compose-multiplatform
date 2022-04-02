@@ -51,11 +51,11 @@ package androidx.compose.material {
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public final class BackdropScaffoldState extends androidx.compose.material.SwipeableState<androidx.compose.material.BackdropValue> {
     ctor public BackdropScaffoldState(androidx.compose.material.BackdropValue initialValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.BackdropValue,java.lang.Boolean> confirmStateChange, optional androidx.compose.material.SnackbarHostState snackbarHostState);
-    method public suspend Object? conceal(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? conceal(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public androidx.compose.material.SnackbarHostState getSnackbarHostState();
     method public boolean isConcealed();
     method public boolean isRevealed();
-    method public suspend Object? reveal(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? reveal(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public final boolean isConcealed;
     property public final boolean isRevealed;
     property public final androidx.compose.material.SnackbarHostState snackbarHostState;
@@ -78,12 +78,12 @@ package androidx.compose.material {
 
   @androidx.compose.material.ExperimentalMaterialApi public final class BottomDrawerState extends androidx.compose.material.SwipeableState<androidx.compose.material.BottomDrawerValue> {
     ctor public BottomDrawerState(androidx.compose.material.BottomDrawerValue initialValue, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomDrawerValue,java.lang.Boolean> confirmStateChange);
-    method public suspend Object? close(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? expand(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? close(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? expand(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public boolean isClosed();
     method public boolean isExpanded();
     method public boolean isOpen();
-    method public suspend Object? open(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? open(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public final boolean isClosed;
     property public final boolean isExpanded;
     property public final boolean isOpen;
@@ -137,8 +137,8 @@ package androidx.compose.material {
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public final class BottomSheetState extends androidx.compose.material.SwipeableState<androidx.compose.material.BottomSheetValue> {
     ctor public BottomSheetState(androidx.compose.material.BottomSheetValue initialValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomSheetValue,java.lang.Boolean> confirmStateChange);
-    method public suspend Object? collapse(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? expand(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? collapse(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? expand(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public boolean isCollapsed();
     method public boolean isExpanded();
     property public final boolean isCollapsed;
@@ -316,10 +316,10 @@ package androidx.compose.material {
 
   @androidx.compose.material.ExperimentalMaterialApi public final class DismissState extends androidx.compose.material.SwipeableState<androidx.compose.material.DismissValue> {
     ctor public DismissState(androidx.compose.material.DismissValue initialValue, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.DismissValue,java.lang.Boolean> confirmStateChange);
-    method public suspend Object? dismiss(androidx.compose.material.DismissDirection direction, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? dismiss(androidx.compose.material.DismissDirection direction, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public androidx.compose.material.DismissDirection? getDismissDirection();
     method public boolean isDismissed(androidx.compose.material.DismissDirection direction);
-    method public suspend Object? reset(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? reset(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public final androidx.compose.material.DismissDirection? dismissDirection;
     field public static final androidx.compose.material.DismissState.Companion Companion;
   }
@@ -359,16 +359,16 @@ package androidx.compose.material {
 
   @androidx.compose.runtime.Stable public final class DrawerState {
     ctor public DrawerState(androidx.compose.material.DrawerValue initialValue, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.DrawerValue,java.lang.Boolean> confirmStateChange);
-    method @androidx.compose.material.ExperimentalMaterialApi public suspend Object? animateTo(androidx.compose.material.DrawerValue targetValue, androidx.compose.animation.core.AnimationSpec<java.lang.Float> anim, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? close(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method @androidx.compose.material.ExperimentalMaterialApi public suspend Object? animateTo(androidx.compose.material.DrawerValue targetValue, androidx.compose.animation.core.AnimationSpec<java.lang.Float> anim, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? close(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public androidx.compose.material.DrawerValue getCurrentValue();
     method @androidx.compose.material.ExperimentalMaterialApi public androidx.compose.runtime.State<java.lang.Float> getOffset();
     method @androidx.compose.material.ExperimentalMaterialApi public androidx.compose.material.DrawerValue getTargetValue();
     method public boolean isAnimationRunning();
     method public boolean isClosed();
     method public boolean isOpen();
-    method public suspend Object? open(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method @androidx.compose.material.ExperimentalMaterialApi public suspend Object? snapTo(androidx.compose.material.DrawerValue targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? open(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method @androidx.compose.material.ExperimentalMaterialApi public suspend Object? snapTo(androidx.compose.material.DrawerValue targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public final androidx.compose.material.DrawerValue currentValue;
     property public final boolean isAnimationRunning;
     property public final boolean isClosed;
@@ -519,9 +519,9 @@ package androidx.compose.material {
   @androidx.compose.material.ExperimentalMaterialApi public final class ModalBottomSheetState extends androidx.compose.material.SwipeableState<androidx.compose.material.ModalBottomSheetValue> {
     ctor public ModalBottomSheetState(androidx.compose.material.ModalBottomSheetValue initialValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, boolean isSkipHalfExpanded, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.ModalBottomSheetValue,java.lang.Boolean> confirmStateChange);
     ctor public ModalBottomSheetState(androidx.compose.material.ModalBottomSheetValue initialValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.ModalBottomSheetValue,java.lang.Boolean> confirmStateChange);
-    method public suspend Object? hide(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? hide(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public boolean isVisible();
-    method public suspend Object? show(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? show(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public final boolean isVisible;
     field public static final androidx.compose.material.ModalBottomSheetState.Companion Companion;
   }
@@ -679,7 +679,7 @@ package androidx.compose.material {
   @androidx.compose.runtime.Stable public final class SnackbarHostState {
     ctor public SnackbarHostState();
     method public androidx.compose.material.SnackbarData? getCurrentSnackbarData();
-    method public suspend Object? showSnackbar(String message, optional String? actionLabel, optional androidx.compose.material.SnackbarDuration duration, optional kotlin.coroutines.Continuation<? super androidx.compose.material.SnackbarResult> p);
+    method public suspend Object? showSnackbar(String message, optional String? actionLabel, optional androidx.compose.material.SnackbarDuration duration, optional kotlin.coroutines.Continuation<? super androidx.compose.material.SnackbarResult>);
     property public final androidx.compose.material.SnackbarData? currentSnackbarData;
   }
 
@@ -737,7 +737,7 @@ package androidx.compose.material {
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public class SwipeableState<T> {
     ctor public SwipeableState(T? initialValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> confirmStateChange);
-    method @androidx.compose.material.ExperimentalMaterialApi public final suspend Object? animateTo(T? targetValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> anim, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method @androidx.compose.material.ExperimentalMaterialApi public final suspend Object? animateTo(T? targetValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> anim, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public final T! getCurrentValue();
     method public final float getDirection();
     method public final androidx.compose.runtime.State<java.lang.Float> getOffset();
@@ -746,8 +746,8 @@ package androidx.compose.material {
     method public final T! getTargetValue();
     method public final boolean isAnimationRunning();
     method public final float performDrag(float delta);
-    method public final suspend Object? performFling(float velocity, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method @androidx.compose.material.ExperimentalMaterialApi public final suspend Object? snapTo(T? targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public final suspend Object? performFling(float velocity, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method @androidx.compose.material.ExperimentalMaterialApi public final suspend Object? snapTo(T? targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public final T! currentValue;
     property public final float direction;
     property public final boolean isAnimationRunning;

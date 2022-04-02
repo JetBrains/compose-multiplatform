@@ -558,7 +558,7 @@ package androidx.compose.ui.text.font {
   }
 
   public static interface AndroidFont.TypefaceLoader {
-    method public suspend Object? awaitLoad(android.content.Context context, androidx.compose.ui.text.font.AndroidFont font, kotlin.coroutines.Continuation<? super android.graphics.Typeface> p);
+    method public suspend Object? awaitLoad(android.content.Context context, androidx.compose.ui.text.font.AndroidFont font, kotlin.coroutines.Continuation<? super android.graphics.Typeface>);
     method public android.graphics.Typeface? loadBlocking(android.content.Context context, androidx.compose.ui.text.font.AndroidFont font);
   }
 
@@ -625,7 +625,7 @@ package androidx.compose.ui.text.font {
   }
 
   public static sealed interface FontFamily.Resolver {
-    method public suspend Object? preload(androidx.compose.ui.text.font.FontFamily fontFamily, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? preload(androidx.compose.ui.text.font.FontFamily fontFamily, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public androidx.compose.runtime.State<java.lang.Object> resolve(optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional androidx.compose.ui.text.font.FontWeight fontWeight, optional int fontStyle, optional int fontSynthesis);
   }
 

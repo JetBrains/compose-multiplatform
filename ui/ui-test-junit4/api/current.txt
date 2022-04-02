@@ -11,7 +11,7 @@ package androidx.compose.ui.test.junit4 {
   public final class AndroidComposeTestRule<R extends org.junit.rules.TestRule, A extends androidx.activity.ComponentActivity> implements androidx.compose.ui.test.junit4.ComposeContentTestRule {
     ctor public AndroidComposeTestRule(R activityRule, kotlin.jvm.functions.Function1<? super R,? extends A> activityProvider);
     method public org.junit.runners.model.Statement apply(org.junit.runners.model.Statement base, org.junit.runner.Description description);
-    method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public A getActivity();
     method public R getActivityRule();
     method public androidx.compose.ui.unit.Density getDensity();
@@ -57,7 +57,7 @@ package androidx.compose.ui.test.junit4 {
   }
 
   public interface ComposeTestRule extends org.junit.rules.TestRule androidx.compose.ui.test.SemanticsNodeInteractionsProvider {
-    method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public androidx.compose.ui.unit.Density getDensity();
     method public androidx.compose.ui.test.MainTestClock getMainClock();
     method public void registerIdlingResource(androidx.compose.ui.test.IdlingResource idlingResource);

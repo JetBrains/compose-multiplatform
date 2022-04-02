@@ -257,7 +257,7 @@ package androidx.compose.ui.test {
     method public void advanceTimeUntil(optional long timeoutMillis, kotlin.jvm.functions.Function0<java.lang.Boolean> condition);
     method public boolean getAutoAdvance();
     method public long getCurrentTime();
-    method public void setAutoAdvance(boolean autoAdvance);
+    method public void setAutoAdvance(boolean);
     property public abstract boolean autoAdvance;
     property public abstract long currentTime;
   }
@@ -414,7 +414,7 @@ package androidx.compose.ui.test {
     ctor public TestMonotonicFrameClock(kotlinx.coroutines.CoroutineScope coroutineScope, kotlinx.coroutines.test.TestCoroutineScheduler delayController, optional long frameDelayNanos);
     method public long getFrameDelayNanos();
     method public boolean getHasAwaiters();
-    method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R>);
     property public final long frameDelayNanos;
     property public final boolean hasAwaiters;
   }
