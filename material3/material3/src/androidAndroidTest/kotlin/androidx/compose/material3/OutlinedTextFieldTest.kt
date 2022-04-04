@@ -929,14 +929,14 @@ class OutlinedTextFieldTest {
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-    fun testOutlinedTextField_appliesBackgroundColor() {
+    fun testOutlinedTextField_appliesContainerColor() {
         rule.setMaterialContent(lightColorScheme()) {
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
                 modifier = Modifier.testTag(TextFieldTag),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
-                    backgroundColor = Color.Red,
+                    containerColor = Color.Red,
                     unfocusedBorderColor = Color.Red
                 ),
                 shape = RectangleShape

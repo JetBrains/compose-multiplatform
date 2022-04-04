@@ -149,7 +149,7 @@ import kotlin.math.roundToInt
  * appearance / behavior of this TextField in different [Interaction]s.
  * @param shape the shape of the text field's container
  * @param colors [TextFieldColors] that will be used to resolve color of the text, content
- * (including label, placeholder, leading and trailing icons, indicator line) and background for
+ * (including label, placeholder, leading and trailing icons, indicator line) and container for
  * this text field in different states. See [TextFieldDefaults.textFieldColors]
  */
 @Composable
@@ -184,7 +184,7 @@ fun TextField(
     BasicTextField(
         value = value,
         modifier = modifier
-            .background(colors.backgroundColor(enabled).value, shape)
+            .background(colors.containerColor(enabled).value, shape)
             .indicatorLine(enabled, isError, interactionSource, colors)
             .defaultMinSize(
                 minWidth = TextFieldDefaults.MinWidth,
@@ -281,7 +281,7 @@ fun TextField(
  * appearance / behavior of this TextField in different [Interaction]s.
  * @param shape the shape of the text field's container
  * @param colors [TextFieldColors] that will be used to resolve color of the text, content
- * (including label, placeholder, leading and trailing icons, indicator line) and background for
+ * (including label, placeholder, leading and trailing icons, indicator line) and container for
  * this text field in different states. See [TextFieldDefaults.textFieldColors]
  */
 @Composable
@@ -316,7 +316,7 @@ fun TextField(
     BasicTextField(
         value = value,
         modifier = modifier
-            .background(colors.backgroundColor(enabled).value, shape)
+            .background(colors.containerColor(enabled).value, shape)
             .indicatorLine(enabled, isError, interactionSource, colors)
             .defaultMinSize(
                 minWidth = TextFieldDefaults.MinWidth,

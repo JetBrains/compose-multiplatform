@@ -307,13 +307,13 @@ object ExposedDropdownMenuDefaults {
     }
 
     /**
-     * Creates a [TextFieldColors] that represents the default input text, background and content
+     * Creates a [TextFieldColors] that represents the default input text, container, and content
      * (including label, placeholder, leading and trailing icons) colors used in a [TextField].
      *
      * @param textColor Represents the color used for the input text of this text field.
      * @param disabledTextColor Represents the color used for the input text of this text field when
      * it's disabled.
-     * @param backgroundColor Represents the background color for this text field.
+     * @param containerColor Represents the container color for this text field.
      * @param cursorColor Represents the cursor color for this text field.
      * @param errorCursorColor Represents the cursor color for this text field when it's in error
      * state.
@@ -356,7 +356,7 @@ object ExposedDropdownMenuDefaults {
         textColor: Color = FilledAutocompleteTokens.FieldInputTextColor.toColor(),
         disabledTextColor: Color = FilledAutocompleteTokens.FieldDisabledInputTextColor.toColor()
             .copy(alpha = FilledAutocompleteTokens.FieldDisabledInputTextOpacity),
-        backgroundColor: Color = FilledAutocompleteTokens.TextFieldContainerColor.toColor(),
+        containerColor: Color = FilledAutocompleteTokens.TextFieldContainerColor.toColor(),
         cursorColor: Color = FilledAutocompleteTokens.TextFieldCaretColor.toColor(),
         errorCursorColor: Color = FilledAutocompleteTokens.TextFieldErrorFocusCaretColor.toColor(),
         focusedIndicatorColor: Color =
@@ -412,7 +412,7 @@ object ExposedDropdownMenuDefaults {
             unfocusedTrailingIconColor = unfocusedTrailingIconColor,
             disabledTrailingIconColor = disabledTrailingIconColor,
             errorTrailingIconColor = errorTrailingIconColor,
-            backgroundColor = backgroundColor,
+            containerColor = containerColor,
             focusedLabelColor = focusedLabelColor,
             unfocusedLabelColor = unfocusedLabelColor,
             disabledLabelColor = disabledLabelColor,
@@ -422,14 +422,14 @@ object ExposedDropdownMenuDefaults {
         )
 
     /**
-     * Creates a [TextFieldColors] that represents the default input text, background and content
+     * Creates a [TextFieldColors] that represents the default input text, container, and content
      * (including label, placeholder, leading and trailing icons) colors used in an
      * [OutlinedTextField].
      *
      * @param textColor Represents the color used for the input text of this text field.
      * @param disabledTextColor Represents the color used for the input text of this text field when
      * it's disabled.
-     * @param backgroundColor Represents the background color for this text field.
+     * @param containerColor Represents the container color for this text field.
      * @param cursorColor Represents the cursor color for this text field.
      * @param errorCursorColor Represents the cursor color for this text field when it's in error
      * state.
@@ -471,7 +471,7 @@ object ExposedDropdownMenuDefaults {
         textColor: Color = OutlinedAutocompleteTokens.FieldInputTextColor.toColor(),
         disabledTextColor: Color = OutlinedAutocompleteTokens.FieldDisabledInputTextColor.toColor()
             .copy(alpha = OutlinedAutocompleteTokens.FieldDisabledInputTextOpacity),
-        backgroundColor: Color = Color.Transparent,
+        containerColor: Color = Color.Transparent,
         cursorColor: Color = OutlinedAutocompleteTokens.TextFieldCaretColor.toColor(),
         errorCursorColor: Color =
             OutlinedAutocompleteTokens.TextFieldErrorFocusCaretColor.toColor(),
@@ -526,7 +526,7 @@ object ExposedDropdownMenuDefaults {
             unfocusedTrailingIconColor = unfocusedTrailingIconColor,
             disabledTrailingIconColor = disabledTrailingIconColor,
             errorTrailingIconColor = errorTrailingIconColor,
-            backgroundColor = backgroundColor,
+            containerColor = containerColor,
             focusedLabelColor = focusedLabelColor,
             unfocusedLabelColor = unfocusedLabelColor,
             disabledLabelColor = disabledLabelColor,

@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
- * Represents the colors of the input text, background and content (including label, placeholder,
+ * Represents the colors of the input text, container, and content (including label, placeholder,
  * leading and trailing icons) used in a text field in different states.
  *
  * See [TextFieldDefaults.textFieldColors] for the default colors used in [TextField].
@@ -67,12 +67,12 @@ interface TextFieldColors {
     fun textColor(enabled: Boolean): State<Color>
 
     /**
-     * Represents the background color for this text field.
+     * Represents the container color for this text field.
      *
      * @param enabled whether the text field is enabled
      */
     @Composable
-    fun backgroundColor(enabled: Boolean): State<Color>
+    fun containerColor(enabled: Boolean): State<Color>
 
     /**
      * Represents the color used for the placeholder of this text field.
@@ -302,7 +302,7 @@ object TextFieldDefaults {
     ): PaddingValues = PaddingValues(start, top, end, bottom)
 
     /**
-     * Creates a [TextFieldColors] that represents the default input text, background and content
+     * Creates a [TextFieldColors] that represents the default input text, container, and content
      * (including label, placeholder, leading and trailing icons) colors used in a [TextField].
      */
     @Composable
@@ -310,7 +310,7 @@ object TextFieldDefaults {
         textColor: Color = FilledTextFieldTokens.InputColor.toColor(),
         disabledTextColor: Color = FilledTextFieldTokens.DisabledInputColor.toColor()
             .copy(alpha = FilledTextFieldTokens.DisabledInputOpacity),
-        backgroundColor: Color = FilledTextFieldTokens.ContainerColor.toColor(),
+        containerColor: Color = FilledTextFieldTokens.ContainerColor.toColor(),
         cursorColor: Color = FilledTextFieldTokens.CaretColor.toColor(),
         errorCursorColor: Color = FilledTextFieldTokens.ErrorFocusCaretColor.toColor(),
         focusedIndicatorColor: Color = FilledTextFieldTokens.FocusActiveIndicatorColor.toColor(),
@@ -354,7 +354,7 @@ object TextFieldDefaults {
             unfocusedTrailingIconColor = unfocusedTrailingIconColor,
             disabledTrailingIconColor = disabledTrailingIconColor,
             errorTrailingIconColor = errorTrailingIconColor,
-            backgroundColor = backgroundColor,
+            containerColor = containerColor,
             focusedLabelColor = focusedLabelColor,
             unfocusedLabelColor = unfocusedLabelColor,
             disabledLabelColor = disabledLabelColor,
@@ -364,7 +364,7 @@ object TextFieldDefaults {
         )
 
     /**
-     * Creates a [TextFieldColors] that represents the default input text, background and content
+     * Creates a [TextFieldColors] that represents the default input text, container, and content
      * (including label, placeholder, leading and trailing icons) colors used in an
      * [OutlinedTextField].
      */
@@ -373,7 +373,7 @@ object TextFieldDefaults {
         textColor: Color = OutlinedTextFieldTokens.InputColor.toColor(),
         disabledTextColor: Color = OutlinedTextFieldTokens.DisabledInputColor.toColor()
             .copy(alpha = OutlinedTextFieldTokens.DisabledInputOpacity),
-        backgroundColor: Color = Color.Transparent,
+        containerColor: Color = Color.Transparent,
         cursorColor: Color = OutlinedTextFieldTokens.CaretColor.toColor(),
         errorCursorColor: Color = OutlinedTextFieldTokens.ErrorFocusCaretColor.toColor(),
         focusedBorderColor: Color = OutlinedTextFieldTokens.FocusOutlineColor.toColor(),
@@ -417,7 +417,7 @@ object TextFieldDefaults {
             unfocusedTrailingIconColor = unfocusedTrailingIconColor,
             disabledTrailingIconColor = disabledTrailingIconColor,
             errorTrailingIconColor = errorTrailingIconColor,
-            backgroundColor = backgroundColor,
+            containerColor = containerColor,
             focusedLabelColor = focusedLabelColor,
             unfocusedLabelColor = unfocusedLabelColor,
             disabledLabelColor = disabledLabelColor,
@@ -634,7 +634,7 @@ private class DefaultTextFieldColors(
     private val unfocusedTrailingIconColor: Color,
     private val disabledTrailingIconColor: Color,
     private val errorTrailingIconColor: Color,
-    private val backgroundColor: Color,
+    private val containerColor: Color,
     private val focusedLabelColor: Color,
     private val unfocusedLabelColor: Color,
     private val disabledLabelColor: Color,
@@ -701,8 +701,8 @@ private class DefaultTextFieldColors(
     }
 
     @Composable
-    override fun backgroundColor(enabled: Boolean): State<Color> {
-        return rememberUpdatedState(backgroundColor)
+    override fun containerColor(enabled: Boolean): State<Color> {
+        return rememberUpdatedState(containerColor)
     }
 
     @Composable
@@ -759,7 +759,7 @@ private class DefaultTextFieldColors(
         if (unfocusedTrailingIconColor != other.unfocusedTrailingIconColor) return false
         if (disabledTrailingIconColor != other.disabledTrailingIconColor) return false
         if (errorTrailingIconColor != other.errorTrailingIconColor) return false
-        if (backgroundColor != other.backgroundColor) return false
+        if (containerColor != other.containerColor) return false
         if (focusedLabelColor != other.focusedLabelColor) return false
         if (unfocusedLabelColor != other.unfocusedLabelColor) return false
         if (disabledLabelColor != other.disabledLabelColor) return false
@@ -787,7 +787,7 @@ private class DefaultTextFieldColors(
         result = 31 * result + unfocusedTrailingIconColor.hashCode()
         result = 31 * result + disabledTrailingIconColor.hashCode()
         result = 31 * result + errorTrailingIconColor.hashCode()
-        result = 31 * result + backgroundColor.hashCode()
+        result = 31 * result + containerColor.hashCode()
         result = 31 * result + focusedLabelColor.hashCode()
         result = 31 * result + unfocusedLabelColor.hashCode()
         result = 31 * result + disabledLabelColor.hashCode()
