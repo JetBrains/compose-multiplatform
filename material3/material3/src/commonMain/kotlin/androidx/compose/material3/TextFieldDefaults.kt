@@ -28,6 +28,8 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.TextFieldDefaults.OutlinedTextFieldDecorationBox
 import androidx.compose.material3.tokens.FilledTextFieldTokens
 import androidx.compose.material3.tokens.OutlinedTextFieldTokens
@@ -150,6 +152,12 @@ interface TextFieldColors {
      */
     @Composable
     fun cursorColor(isError: Boolean): State<Color>
+
+    /**
+     * Represents the colors used for text selection in this text field.
+     */
+    val selectionColors: TextSelectionColors
+        @Composable get
 }
 
 /**
@@ -319,6 +327,7 @@ object TextFieldDefaults {
      * @param containerColor the container color for this text field
      * @param cursorColor the cursor color for this text field
      * @param errorCursorColor the cursor color for this text field when in error state
+     * @param selectionColors the colors used when the input text of this text field is selected
      * @param focusedIndicatorColor the indicator color for this text field when focused
      * @param unfocusedIndicatorColor the indicator color for this text field when not focused
      * @param disabledIndicatorColor the indicator color for this text field when disabled
@@ -348,6 +357,7 @@ object TextFieldDefaults {
         containerColor: Color = FilledTextFieldTokens.ContainerColor.toColor(),
         cursorColor: Color = FilledTextFieldTokens.CaretColor.toColor(),
         errorCursorColor: Color = FilledTextFieldTokens.ErrorFocusCaretColor.toColor(),
+        selectionColors: TextSelectionColors = LocalTextSelectionColors.current,
         focusedIndicatorColor: Color = FilledTextFieldTokens.FocusActiveIndicatorColor.toColor(),
         unfocusedIndicatorColor: Color = FilledTextFieldTokens.ActiveIndicatorColor.toColor(),
         disabledIndicatorColor: Color = FilledTextFieldTokens.DisabledActiveIndicatorColor.toColor()
@@ -377,6 +387,7 @@ object TextFieldDefaults {
             disabledTextColor = disabledTextColor,
             cursorColor = cursorColor,
             errorCursorColor = errorCursorColor,
+            textSelectionColors = selectionColors,
             focusedIndicatorColor = focusedIndicatorColor,
             unfocusedIndicatorColor = unfocusedIndicatorColor,
             errorIndicatorColor = errorIndicatorColor,
@@ -408,6 +419,7 @@ object TextFieldDefaults {
      * @param containerColor the container color for this text field
      * @param cursorColor the cursor color for this text field
      * @param errorCursorColor the cursor color for this text field when in error state
+     * @param selectionColors the colors used when the input text of this text field is selected
      * @param focusedBorderColor the border color for this text field when focused
      * @param unfocusedBorderColor the border color for this text field when not focused
      * @param disabledBorderColor the border color for this text field when disabled
@@ -436,6 +448,7 @@ object TextFieldDefaults {
         containerColor: Color = Color.Transparent,
         cursorColor: Color = OutlinedTextFieldTokens.CaretColor.toColor(),
         errorCursorColor: Color = OutlinedTextFieldTokens.ErrorFocusCaretColor.toColor(),
+        selectionColors: TextSelectionColors = LocalTextSelectionColors.current,
         focusedBorderColor: Color = OutlinedTextFieldTokens.FocusOutlineColor.toColor(),
         unfocusedBorderColor: Color = OutlinedTextFieldTokens.OutlineColor.toColor(),
         disabledBorderColor: Color = OutlinedTextFieldTokens.DisabledOutlineColor.toColor()
@@ -465,6 +478,7 @@ object TextFieldDefaults {
             disabledTextColor = disabledTextColor,
             cursorColor = cursorColor,
             errorCursorColor = errorCursorColor,
+            textSelectionColors = selectionColors,
             focusedIndicatorColor = focusedBorderColor,
             unfocusedIndicatorColor = unfocusedBorderColor,
             errorIndicatorColor = errorBorderColor,
@@ -681,6 +695,7 @@ private class DefaultTextFieldColors(
     private val disabledTextColor: Color,
     private val cursorColor: Color,
     private val errorCursorColor: Color,
+    private val textSelectionColors: TextSelectionColors,
     private val focusedIndicatorColor: Color,
     private val unfocusedIndicatorColor: Color,
     private val errorIndicatorColor: Color,
@@ -796,6 +811,9 @@ private class DefaultTextFieldColors(
         return rememberUpdatedState(if (isError) errorCursorColor else cursorColor)
     }
 
+    override val selectionColors: TextSelectionColors
+        @Composable get() = textSelectionColors
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
@@ -806,6 +824,7 @@ private class DefaultTextFieldColors(
         if (disabledTextColor != other.disabledTextColor) return false
         if (cursorColor != other.cursorColor) return false
         if (errorCursorColor != other.errorCursorColor) return false
+        if (textSelectionColors != other.textSelectionColors) return false
         if (focusedIndicatorColor != other.focusedIndicatorColor) return false
         if (unfocusedIndicatorColor != other.unfocusedIndicatorColor) return false
         if (errorIndicatorColor != other.errorIndicatorColor) return false
@@ -834,6 +853,7 @@ private class DefaultTextFieldColors(
         result = 31 * result + disabledTextColor.hashCode()
         result = 31 * result + cursorColor.hashCode()
         result = 31 * result + errorCursorColor.hashCode()
+        result = 31 * result + textSelectionColors.hashCode()
         result = 31 * result + focusedIndicatorColor.hashCode()
         result = 31 * result + unfocusedIndicatorColor.hashCode()
         result = 31 * result + errorIndicatorColor.hashCode()
