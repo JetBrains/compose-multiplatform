@@ -62,6 +62,7 @@ import java.awt.event.MouseEvent.MOUSE_PRESSED
 import java.awt.event.MouseEvent.MOUSE_RELEASED
 import java.awt.event.MouseEvent.SHIFT_DOWN_MASK
 import java.awt.event.MouseWheelEvent.WHEEL_UNIT_SCROLL
+import org.jetbrains.skiko.hostOs
 import org.junit.Test
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -493,7 +494,8 @@ class WindowInputEventTest {
         assertThat(receivedButtons.size).isEqualTo(1)
         assertThat(receivedButtons.last()).isEqualTo(
             PointerButtons(
-                isPrimaryPressed = true,
+                // on macOs ctrl + primary click is treated as secondary click
+                isPrimaryPressed = !hostOs.isMacOS,
                 isSecondaryPressed = true,
             )
         )
@@ -519,7 +521,8 @@ class WindowInputEventTest {
         assertThat(receivedButtons.size).isEqualTo(2)
         assertThat(receivedButtons.last()).isEqualTo(
             PointerButtons(
-                isPrimaryPressed = true,
+                // on macOs ctrl + primary click is treated as secondary click
+                isPrimaryPressed = !hostOs.isMacOS,
                 isSecondaryPressed = true,
             )
         )

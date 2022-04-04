@@ -28,6 +28,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.isLinux
+import androidx.compose.ui.isMacOs
 import androidx.compose.ui.isWindows
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.WindowInfo
@@ -694,7 +695,7 @@ class WindowStateTest {
 
     @Test
     fun `set window size by its content when window is on the screen`() = runApplicationTest(
-        useDelay = isLinux
+        useDelay = isLinux || isMacOs
     ) {
         lateinit var window: ComposeWindow
         val state = WindowState(size = DpSize(100.dp, 100.dp))
