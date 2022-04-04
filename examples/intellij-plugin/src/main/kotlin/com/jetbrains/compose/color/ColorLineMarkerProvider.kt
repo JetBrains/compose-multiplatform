@@ -5,7 +5,10 @@
 
 package com.jetbrains.compose.color
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Surface
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposePanel
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
@@ -18,7 +21,8 @@ import org.jetbrains.uast.*
 import javax.swing.JComponent
 import androidx.compose.ui.graphics.Color
 import com.intellij.openapi.application.ApplicationManager
-import org.jetbrains.uast.kotlin.KotlinULiteralExpression
+import com.jetbrains.compose.theme.WidgetTheme
+import org.intellij.datavis.r.inlays.components.GraphicsManager
 
 class ColorLineMarkerProvider : LineMarkerProvider {
 
@@ -29,14 +33,24 @@ class ColorLineMarkerProvider : LineMarkerProvider {
         if (uElement is UCallExpression) {
             if (uElement.kind == UastCallKind.METHOD_CALL && uElement.methodIdentifier?.name == "Color") {
                 val colorLiteral = uElement.valueArguments.firstOrNull() as? ULiteralExpression
-                val color = colorLiteral?.getLongValue()?.let { Color(it) } ?: Color(0xffffffff)
+                val colorLongValue = colorLiteral?.getLongValue()
+                val color = try {
+                    Color(colorLongValue!!)
+                } catch (t: Throwable) {
+                    Color(0xffffffff)
+                }
+
                 return LineMarkerInfo(
                     element,
                     element.textRange,
                     AllIcons.General.Information,
                     null,
-                    { mouseEvent, psiElement: PsiElement ->
-
+                    { _, psiElement: PsiElement ->
+                        val isDarkMode = try {
+                            GraphicsManager.getInstance(project)?.isDarkModeEnabled ?: false
+                        } catch (t: Throwable) {
+                            false
+                        }
                         class ChooseColorDialog() : DialogWrapper(project) {
                             val colorState = mutableStateOf(color)
 
@@ -49,7 +63,11 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                                 ComposePanel().apply {
                                     setBounds(0, 0, 400, 400)
                                     setContent {
-                                        ColorPicker(colorState)
+                                        WidgetTheme(darkTheme = isDarkMode) {
+                                            Surface(modifier = Modifier.fillMaxSize()) {
+                                                ColorPicker(colorState)
+                                            }
+                                        }
                                     }
                                 }
                         }
