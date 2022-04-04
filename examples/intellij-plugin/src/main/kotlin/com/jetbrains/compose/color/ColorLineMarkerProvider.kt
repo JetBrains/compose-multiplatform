@@ -18,6 +18,7 @@ import org.jetbrains.uast.*
 import javax.swing.JComponent
 import androidx.compose.ui.graphics.Color
 import com.intellij.openapi.application.ApplicationManager
+import org.jetbrains.uast.kotlin.KotlinULiteralExpression
 
 class ColorLineMarkerProvider : LineMarkerProvider {
 
@@ -27,6 +28,8 @@ class ColorLineMarkerProvider : LineMarkerProvider {
         val uElement: UElement = element.toUElement() ?: return null
         if (uElement is UCallExpression) {
             if (uElement.kind == UastCallKind.METHOD_CALL && uElement.methodIdentifier?.name == "Color") {
+                val colorLiteral = uElement.valueArguments.firstOrNull() as? ULiteralExpression
+                val color = colorLiteral?.getLongValue()?.let { Color(it) } ?: Color(0xffffffff)
                 return LineMarkerInfo(
                     element,
                     element.textRange,
@@ -35,7 +38,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                     { mouseEvent, psiElement: PsiElement ->
 
                         class ChooseColorDialog() : DialogWrapper(project) {
-                            val colorState = mutableStateOf(Color(0xff_ff_ff_ff))
+                            val colorState = mutableStateOf(color)
 
                             init {
                                 title = "Choose color"
