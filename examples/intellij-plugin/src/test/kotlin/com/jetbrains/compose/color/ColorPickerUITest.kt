@@ -6,14 +6,19 @@
 package com.jetbrains.compose.color
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 
 fun main() = application {
+    val windowState = remember { WindowState(width = 400.dp, height = 400.dp) }
     Window(
         onCloseRequest = ::exitApplication,
-        title = "ColorPicker"
+        title = "ColorPicker",
+        state = windowState
     ) {
         ColorPicker(mutableStateOf(Color(0xffaabbcc)))
     }
