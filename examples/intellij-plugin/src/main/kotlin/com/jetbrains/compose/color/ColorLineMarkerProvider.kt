@@ -32,9 +32,8 @@ class ColorLineMarkerProvider : LineMarkerProvider {
         val uElement: UElement = element.toUElement() ?: return null
         if (uElement is UCallExpression) {
             if (uElement.kind == UastCallKind.METHOD_CALL && uElement.methodIdentifier?.name == "Color") {
-                val colorLiteral = uElement.valueArguments.firstOrNull() as? ULiteralExpression
-                val colorLongValue = colorLiteral?.getLongValue()
-                val color = try {
+                val colorLongValue = (uElement.valueArguments.firstOrNull() as? ULiteralExpression)?.getLongValue()
+                val previousColor = try {
                     Color(colorLongValue!!)
                 } catch (t: Throwable) {
                     Color(0xffffffff)
@@ -52,7 +51,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                             false
                         }
                         class ChooseColorDialog() : DialogWrapper(project) {
-                            val colorState = mutableStateOf(color)
+                            val colorState = mutableStateOf(previousColor)
 
                             init {
                                 title = "Choose color"
