@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.dp
 private val DEFAULT_COLORS =
     listOf(Color.Red, Color.Green, Color.Blue, Color.Black, Color.Gray, Color.Yellow, Color.Cyan)
 
+private const val VALUE_BAND_RATIO = 0.07f
+
 @Composable
 fun ColorPicker(colorState: MutableState<Color>) {
     var currentColor: Color by remember { colorState }
@@ -45,9 +47,8 @@ fun ColorPicker(colorState: MutableState<Color>) {
         Divider(Modifier.size(2.dp))
         var width by remember { mutableStateOf(300) }
         var height by remember { mutableStateOf(256) }
-        val valueBandRatio = 0.07f
-        val rainbowWidth by derivedStateOf { (width * (1 - valueBandRatio)).toInt() }
-        val bandWidth by derivedStateOf { width * valueBandRatio }
+        val rainbowWidth by derivedStateOf { (width * (1 - VALUE_BAND_RATIO)).toInt() }
+        val bandWidth by derivedStateOf { width * VALUE_BAND_RATIO }
         fun calcHue(x: Float) = limit0to1(x / rainbowWidth) * HSV.HUE_MAX_VALUE
         fun calcSaturation(y: Float) = 1 - limit0to1(y / height)
         fun calcValue(y: Float) = 1 - limit0to1(y / height)
