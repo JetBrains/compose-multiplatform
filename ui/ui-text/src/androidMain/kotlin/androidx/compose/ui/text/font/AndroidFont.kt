@@ -195,17 +195,12 @@ abstract class AndroidFont @OptIn(ExperimentalTextApi::class) constructor(
          * to throw. Note that this method will never be called for fonts with
          * [FontLoadingStrategy.Async].
          *
-         * This method may throw a [RuntimeException] if the font fails to load, though it is
-         * preferred to return null if the font is [FontLoadingStrategy.OptionalLocal] for
-         * performance.
-         *
          * It is possible for [loadBlocking] to be called for the same instance of [AndroidFont] in
          * parallel. Implementations should support parallel concurrent loads, or de-dup.
          *
          * @param context current Android context for loading the font
          * @param font the font to load which contains this loader as [AndroidFont.typefaceLoader]
          * @return [android.graphics.Typeface] for loaded font, or null if the font fails to load
-         * @throws RuntimeException subclass may optionally be thrown if the font fails to load
          */
         fun loadBlocking(context: Context, font: AndroidFont): Typeface?
 
@@ -232,7 +227,6 @@ abstract class AndroidFont @OptIn(ExperimentalTextApi::class) constructor(
          * @param context current Android context for loading the font
          * @param font the font to load which contains this loader as [AndroidFont.typefaceLoader]
          * @return [android.graphics.Typeface] for loaded font, or null if not available
-         * @throws RuntimeException subclass may optionally be thrown if the font fails to load
          *
          */
         suspend fun awaitLoad(context: Context, font: AndroidFont): Typeface?
