@@ -13,11 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package androidx.compose.ui
 
-package androidx.compose.foundation.text.selection
+import androidx.compose.ui.platform.AccessibilityController
+import androidx.compose.ui.platform.AccessibilityControllerImpl
+import androidx.compose.ui.platform.PlatformComponent
+import androidx.compose.ui.platform.SkiaBasedOwner
 
-import androidx.compose.ui.input.pointer.PointerEvent
-import androidx.compose.ui.Modifier
+internal actual fun ComposeScene.onPlatformInputMethodEvent(event: Any) {
+    TODO("implement native,js onPlatformInputMethodEvent")
+}
 
-internal actual fun Modifier.textFieldMagnifier(manager: TextFieldSelectionManager): Modifier =
-    TODO("implement js textFieldMagnifier")
+internal actual fun makeAccessibilityController(
+    skiaBasedOwner: SkiaBasedOwner,
+    component: PlatformComponent
+): AccessibilityController = AccessibilityControllerImpl(skiaBasedOwner, component)

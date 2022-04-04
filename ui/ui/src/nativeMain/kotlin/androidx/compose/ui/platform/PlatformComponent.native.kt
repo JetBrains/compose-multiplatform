@@ -18,9 +18,17 @@ package androidx.compose.ui.platform
 
 import androidx.compose.ui.unit.Density
 
-internal actual interface PlatformComponent : PlatformInputComponent, PlatformComponentWithCursor
+internal actual interface PlatformComponent : PlatformInputComponent, PlatformComponentWithCursor {
+    actual val windowInfo: WindowInfo
+}
 
 internal actual interface PlatformComponentWithCursor
 
 internal actual object DummyPlatformComponent : PlatformComponent {
+    override val windowInfo = WindowInfoImpl().apply {
+        // true is a better default if platform doesn't provide WindowInfo.
+        // otherwise UI will be rendered always in unfocused mode
+        // (hidden textfield cursor, gray titlebar, etc)
+        isWindowFocused = true
+    }
 }

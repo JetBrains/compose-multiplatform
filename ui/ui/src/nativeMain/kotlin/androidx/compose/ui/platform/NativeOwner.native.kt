@@ -16,11 +16,13 @@
 
 package androidx.compose.ui.platform
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.PointerIconDefaults
 
 internal actual fun sendKeyEvent(
     platformInputService: PlatformInput,
@@ -45,4 +47,18 @@ internal actual fun setPointerIcon(
     icon: PointerIcon?
 ) {
     println("TODO: implement setPointerIcon for Native")
+}
+
+internal actual fun commitPointerIcon(
+    containerCursor: PlatformComponentWithCursor?
+) {
+    println("TODO: implement commitPointerIcon for Native")
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+internal actual fun getPointerIcon(
+    containerCursor: PlatformComponentWithCursor?
+): PointerIcon {
+    println("TODO: implement commitPointerIcon for Native")
+    return PointerIconDefaults.Default
 }

@@ -38,6 +38,7 @@ import org.jetbrains.skiko.SkikoTouchEvent
 import org.jetbrains.skiko.SkikoTouchEventKind
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.platform.WindowInfoImpl
 
 internal class ComposeLayer {
     private var isDisposed = false
@@ -87,6 +88,8 @@ internal class ComposeLayer {
                 nativeEvent = event
             )
         }
+
+        override val windowInfo = WindowInfoImpl()
     }
 
     val view = ComponentImpl()
