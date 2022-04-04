@@ -38,6 +38,9 @@ fun ColorPicker(colorState: MutableState<Color>) {
         Divider(Modifier.size(5.dp))
         var width by remember { mutableStateOf(300) }
         var height by remember { mutableStateOf(256) }
+        val valueBandRatio = 0.07f
+        val rainbowWidth by derivedStateOf { (width * (1 - valueBandRatio)).toInt() }
+        val bandWidth by derivedStateOf { width * valueBandRatio }
         fun calcHue(x: Float) = limit0to1(x / width) * HSV.HUE_MAX_VALUE
         fun calcSaturation(y: Float) = 1 - limit0to1(y / height)
         fun calcValue(y: Float) = 1 - limit0to1(y / height)
@@ -51,7 +54,7 @@ fun ColorPicker(colorState: MutableState<Color>) {
             }
         }
         Row(Modifier.fillMaxSize()) {
-            Canvas(Modifier.fillMaxSize(0.9f).pointerInput(Unit) {
+            Canvas(Modifier.fillMaxSize().pointerInput(Unit) {
                 width = size.width
                 height = size.height
                 awaitPointerEventScope {
@@ -59,21 +62,28 @@ fun ColorPicker(colorState: MutableState<Color>) {
                         val event = awaitPointerEvent()
                         if (event.buttons.isPrimaryPressed) {
                             val position = event.changes.first().position
-                            currentColor = try {
-                                currentColor.toHsv().copy(
-                                    hue = calcHue(position.x),
-                                    saturation = calcSaturation(position.y)
-                                ).toRgb()
-                            } catch (t: Throwable) {
-                                t.printStackTrace()
-                                println("exception $t")
-                                currentColor
+                            if (position.x < rainbowWidth) {
+                                currentColor = try {
+                                    currentColor.toHsv().copy(
+                                        hue = calcHue(position.x),
+                                        saturation = calcSaturation(position.y)
+                                    ).toRgb()
+                                } catch (t: Throwable) {
+                                    t.printStackTrace()
+                                    println("exception $t")
+                                    currentColor
+                                }
+                            } else {
+                                currentColor =
+                                    currentColor.toHsv().copy(
+                                        value = calcValue(position.y)
+                                    ).toRgb()
                             }
                         }
                     }
                 }
             }) {
-                for (x in 0..width) {
+                for (x in 0..rainbowWidth) {
                     for (y in 0..height) {
                         drawRect(
                             color = currentColor.toHsv().copy(
@@ -85,30 +95,16 @@ fun ColorPicker(colorState: MutableState<Color>) {
                         )
                     }
                 }
-            }
-            val bandWidth = 40
-            Canvas(Modifier.fillMaxSize(0.1f).pointerInput(Unit) {
-                awaitPointerEventScope {
-                    while (true) {
-                        val event = awaitPointerEvent()
-                        if (event.buttons.isPrimaryPressed) {
-                            val position = event.changes.first().position
-                            currentColor =
-                                currentColor.toHsv().copy(
-                                    value = calcValue(position.y)
-                                ).toRgb()
-                        }
-                    }
-                }
-            }) {
+                val valueBandX = rainbowWidth + 1
                 for (y in 0..height) {
                     drawRect(
                         color = currentColor.toHsv().copy(value = calcValue(y.toFloat())).toRgb(),
-                        topLeft = Offset(0f, y.toFloat()),
-                        size = Size(bandWidth.toFloat(), 1f)
+                        topLeft = Offset(valueBandX.toFloat(), y.toFloat()),
+                        size = Size(bandWidth, 1f)
                     )
                 }
             }
+
         }
     }
 }
@@ -118,4 +114,5 @@ fun limit(value: Float, min: Float, max: Float) = minOf(
     maxOf(value, min),
     max
 )
+
 fun limit0to1(value: Float) = limit(value = value, 0f, 1f)
