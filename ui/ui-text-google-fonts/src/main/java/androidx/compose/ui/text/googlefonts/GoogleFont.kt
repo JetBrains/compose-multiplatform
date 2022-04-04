@@ -197,9 +197,7 @@ internal data class GoogleFontImpl constructor(
     override val weight: FontWeight,
     override val style: FontStyle,
     val bestEffort: Boolean
-) : AndroidFont(FontLoadingStrategy.Async) {
-    override val typefaceLoader: TypefaceLoader
-        get() = GoogleFontTypefaceLoader
+) : AndroidFont(FontLoadingStrategy.Async, GoogleFontTypefaceLoader) {
     fun toFontRequest(): FontRequest {
         val query = "name=${name.encode()}&weight=${weight.weight}" +
             "&italic=${style.toQueryParam()}&besteffort=${bestEffortQueryParam()}"

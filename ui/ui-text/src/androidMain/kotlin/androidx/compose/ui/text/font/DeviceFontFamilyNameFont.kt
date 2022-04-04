@@ -76,8 +76,7 @@ private class DeviceFontFamilyNameFont constructor(
     private val familyName: DeviceFontFamilyName,
     override val weight: FontWeight,
     override val style: FontStyle
-) : AndroidFont(FontLoadingStrategy.OptionalLocal) {
-    override val typefaceLoader: TypefaceLoader = NamedFontLoader
+) : AndroidFont(FontLoadingStrategy.OptionalLocal, NamedFontLoader) {
 
     val resolvedTypeface: Typeface? = lookupFont(familyName.name, weight, style)
 

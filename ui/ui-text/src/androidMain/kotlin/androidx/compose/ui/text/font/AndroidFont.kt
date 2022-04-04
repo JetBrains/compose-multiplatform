@@ -144,17 +144,14 @@ fun Font(
  * fun Font(CustomFontDescription(...), FontWeight, FontStyle): Font
  *```
  *
+ * @param loadingStrategy loadingStrategy this font will provide in fallback chains
+ * @param typefaceLoader a loader that knows how to load this [AndroidFont], may be shared between
+ * several fonts
  */
 abstract class AndroidFont @OptIn(ExperimentalTextApi::class) constructor(
-    final override val loadingStrategy: FontLoadingStrategy
+    final override val loadingStrategy: FontLoadingStrategy,
+    val typefaceLoader: TypefaceLoader
 ) : Font {
-
-    /**
-     * A loader that knows how to load this [AndroidFont].
-     *
-     * This may be shared between several fonts.
-     */
-    abstract val typefaceLoader: TypefaceLoader
 
     /**
      * Loader for loading an [AndroidFont] and producing an [android.graphics.Typeface].
@@ -242,9 +239,11 @@ abstract class AndroidFont @OptIn(ExperimentalTextApi::class) constructor(
     }
 }
 
-internal abstract class AndroidPreloadedFont : AndroidFont(Blocking) {
+internal abstract class AndroidPreloadedFont : AndroidFont(
+    Blocking,
+    AndroidPreloadedFontTypefaceLoader
+) {
     abstract val typefaceInternal: Typeface?
-    override val typefaceLoader: TypefaceLoader = AndroidPreloadedFontTypefaceLoader
     abstract val cacheKey: String?
 }
 

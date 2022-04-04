@@ -535,11 +535,11 @@ package androidx.compose.ui.text.caches {
 package androidx.compose.ui.text.font {
 
   public abstract class AndroidFont implements androidx.compose.ui.text.font.Font {
-    ctor public AndroidFont(int loadingStrategy);
+    ctor public AndroidFont(int loadingStrategy, androidx.compose.ui.text.font.AndroidFont.TypefaceLoader typefaceLoader);
     method public final int getLoadingStrategy();
-    method public abstract androidx.compose.ui.text.font.AndroidFont.TypefaceLoader getTypefaceLoader();
+    method public final androidx.compose.ui.text.font.AndroidFont.TypefaceLoader getTypefaceLoader();
     property public final int loadingStrategy;
-    property public abstract androidx.compose.ui.text.font.AndroidFont.TypefaceLoader typefaceLoader;
+    property public final androidx.compose.ui.text.font.AndroidFont.TypefaceLoader typefaceLoader;
   }
 
   public static interface AndroidFont.TypefaceLoader {

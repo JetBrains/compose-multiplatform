@@ -176,8 +176,7 @@ class MaxLinesHeightModifierTest {
             }
         }
         val fontFamily = FontFamily(
-            object : AndroidFont(FontLoadingStrategy.Async) {
-                override val typefaceLoader: TypefaceLoader = asyncLoader
+            object : AndroidFont(FontLoadingStrategy.Async, asyncLoader) {
                 override val weight: FontWeight = FontWeight.Normal
                 override val style: FontStyle = FontStyle.Normal
             },

@@ -18,7 +18,6 @@ package androidx.compose.ui.text.font.testutils
 
 import android.content.Context
 import android.graphics.Typeface
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.AndroidFont
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontLoadingStrategy.Companion.Async
@@ -132,39 +131,36 @@ class AsyncTestTypefaceLoader : AndroidFont.TypefaceLoader {
     }
 }
 
-@OptIn(ExperimentalTextApi::class)
 class AsyncFauxFont(
-    override val typefaceLoader: AsyncTestTypefaceLoader,
+    typefaceLoader: AsyncTestTypefaceLoader,
     override val weight: FontWeight = FontWeight.Normal,
     override val style: FontStyle = FontStyle.Normal,
     val name: String = "AsyncFauxFont"
-) : AndroidFont(Async) {
+) : AndroidFont(Async, typefaceLoader) {
     override fun toString(): String {
         return "$name[$weight, $style]"
     }
 }
 
-@OptIn(ExperimentalTextApi::class)
 class OptionalFauxFont(
-    override val typefaceLoader: AsyncTestTypefaceLoader,
+    typefaceLoader: AsyncTestTypefaceLoader,
     internal val typeface: Typeface?,
     override val weight: FontWeight = FontWeight.Normal,
     override val style: FontStyle = FontStyle.Normal,
     val name: String = "OptionalFauxFont"
-) : AndroidFont(OptionalLocal) {
+) : AndroidFont(OptionalLocal, typefaceLoader) {
     override fun toString(): String {
         return "$name[$weight, $style]"
     }
 }
 
-@OptIn(ExperimentalTextApi::class)
 class BlockingFauxFont(
-    override val typefaceLoader: AsyncTestTypefaceLoader,
+    typefaceLoader: AsyncTestTypefaceLoader,
     internal val typeface: Typeface,
     override val weight: FontWeight = FontWeight.Normal,
     override val style: FontStyle = FontStyle.Normal,
     val name: String = "BlockingFauxFont"
-) : AndroidFont(Blocking) {
+) : AndroidFont(Blocking, typefaceLoader) {
     override fun toString(): String {
         return "$name[$weight, $style]"
     }
