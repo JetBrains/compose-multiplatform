@@ -19,10 +19,9 @@ import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 
-private val DEFAULT_COLORS =
-    listOf(Color.Red, Color.Green, Color.Blue, Color.Black, Color.Gray, Color.Yellow, Color.Cyan)
-
 private const val VALUE_BAND_RATIO = 0.07f
+private val DEFAULT_COLORS =
+    listOf(Color.Red, Color.Green, Color.Blue, Color.Black, Color.Gray, Color.Yellow, Color.Cyan, Color.Magenta)
 
 @Composable
 fun ColorPicker(colorState: MutableState<Color>) {

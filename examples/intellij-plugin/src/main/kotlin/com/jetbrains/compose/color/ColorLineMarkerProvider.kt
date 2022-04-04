@@ -79,6 +79,3 @@ class ColorLineMarkerProvider : LineMarkerProvider {
 
     }
 }
-
-//fun UElement.isIntegerLiteral(): Boolean = this is ULiteralExpression && this.value is Int
-
