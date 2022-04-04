@@ -20,9 +20,15 @@ import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.uast.*
 import javax.swing.JComponent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.graphics.toArgb
 import com.intellij.openapi.application.ApplicationManager
 import com.jetbrains.compose.theme.WidgetTheme
 import org.intellij.datavis.r.inlays.components.GraphicsManager
+import java.awt.Component
+import java.awt.Graphics
+import javax.swing.Icon
 
 class ColorLineMarkerProvider : LineMarkerProvider {
 
@@ -39,10 +45,23 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                     Color(0xffffffff)
                 }
 
+                val iconSize = 20
                 return LineMarkerInfo(
                     element,
                     element.textRange,
-                    AllIcons.General.Information,
+                    object : Icon {
+                        override fun paintIcon(c: Component?, g: Graphics?, x: Int, y: Int) {
+                            g?.color = java.awt.Color(
+                                previousColor.red,
+                                previousColor.green,
+                                previousColor.blue,
+                                previousColor.alpha
+                            )
+                            g?.fillRect(0, 0, iconSize, iconSize)
+                        }
+                        override fun getIconWidth(): Int = iconSize
+                        override fun getIconHeight(): Int = iconSize
+                    },
                     null,
                     { _, psiElement: PsiElement ->
                         val isDarkMode = try {
