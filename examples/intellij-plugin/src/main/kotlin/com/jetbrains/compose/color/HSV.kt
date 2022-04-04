@@ -9,9 +9,18 @@ import androidx.compose.ui.graphics.Color
 import kotlin.math.abs
 
 data class HSV(
-    val hue: Float, // 0.0 .. 360.0
-    val saturation: Float, // 0.0 .. 1.0
-    val value: Float // 0.0 . 1.0
+    /**
+     * 0.0 .. 360.0
+     */
+    val hue: Float,
+    /**
+     * 0.0 .. 1.0
+     */
+    val saturation: Float,
+    /**
+     * 0.0 . 1.0¬
+     */
+    val value: Float
 ) {
     companion object {
         const val HUE_MAX_VALUE = 360f

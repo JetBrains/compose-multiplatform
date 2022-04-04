@@ -1,58 +1,56 @@
 package com.jetbrains.compose.color
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 
+private val DEFAULT_COLORS =
+    listOf(Color.Red, Color.Green, Color.Blue, Color.Black, Color.Gray, Color.Yellow, Color.Cyan)
+
 @Composable
 fun ColorPicker(colorState: MutableState<Color>) {
+    var currentColor: Color by remember { colorState }
     Column {
         Row {
-            listOf(Color.Red, Color.Green, Color.Blue, Color.Black, Color.Gray, Color.Yellow, Color.Cyan).forEach {
-                val width = 40f
-                val height = 40f
-                Canvas(Modifier.size(width.dp, height.dp).clickable {
-                    colorState.value = it
-                }) {
-                    drawRect(color = it, size = Size(width, height))
-                }
+            DEFAULT_COLORS.forEach {
+                Box(Modifier.size(30.dp).background(color = it).clickable {
+                    currentColor = it
+                })
             }
         }
-        Divider(Modifier.size(5.dp))
-        var currentColor: Color by remember { colorState }
-
-        Divider(Modifier.size(5.dp))
+        Divider(Modifier.size(2.dp))
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text("Result color:")
+            Divider(Modifier.size(2.dp))
+            TextField(modifier = Modifier.width(120f.dp), value = currentColor.toHexString(), onValueChange = {})
+            Divider(Modifier.size(2.dp))
+            val size = 60f
+            Box(Modifier.size(size.dp).background(color = currentColor))
+        }
+        Divider(Modifier.size(2.dp))
         var width by remember { mutableStateOf(300) }
         var height by remember { mutableStateOf(256) }
         val valueBandRatio = 0.07f
         val rainbowWidth by derivedStateOf { (width * (1 - valueBandRatio)).toInt() }
         val bandWidth by derivedStateOf { width * valueBandRatio }
-        fun calcHue(x: Float) = limit0to1(x / width) * HSV.HUE_MAX_VALUE
+        fun calcHue(x: Float) = limit0to1(x / rainbowWidth) * HSV.HUE_MAX_VALUE
         fun calcSaturation(y: Float) = 1 - limit0to1(y / height)
         fun calcValue(y: Float) = 1 - limit0to1(y / height)
-
-        Row {
-            Text("color hex: ${currentColor.toHexString()}")
-        }
-        Row {
-            Canvas(Modifier.size(100.dp, 100.dp)) {
-                drawRect(color = currentColor, size = Size(100f, 100f))
-            }
-        }
         Row(Modifier.fillMaxSize()) {
             Canvas(Modifier.fillMaxSize().pointerInput(Unit) {
                 width = size.width
@@ -103,8 +101,15 @@ fun ColorPicker(colorState: MutableState<Color>) {
                         size = Size(bandWidth, 1f)
                     )
                 }
+                val circleX = (currentColor.toHsv().hue / 360) * rainbowWidth
+                val circleY = (1 - currentColor.toHsv().saturation) * height
+                drawCircle(
+                    center = Offset(circleX, circleY),
+                    color = Color.Black,
+                    radius = 5f,
+                    style = Stroke(width = 3f)
+                )
             }
-
         }
     }
 }
