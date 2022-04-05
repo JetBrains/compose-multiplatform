@@ -91,6 +91,8 @@ RemovedClass: androidx.compose.foundation.lazy.LazyGridKt:
     Removed class androidx.compose.foundation.lazy.LazyGridKt
 RemovedClass: androidx.compose.foundation.lazy.LazyGridSpanKt:
     Removed class androidx.compose.foundation.lazy.LazyGridSpanKt
+RemovedClass: androidx.compose.foundation.lazy.Lazy_androidKt:
+    Removed class androidx.compose.foundation.lazy.Lazy_androidKt
 RemovedClass: androidx.compose.foundation.lazy.layout.LazyLayoutItemContentFactoryKt:
     Removed class androidx.compose.foundation.lazy.layout.LazyLayoutItemContentFactoryKt
 RemovedClass: androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchPolicyKt:
