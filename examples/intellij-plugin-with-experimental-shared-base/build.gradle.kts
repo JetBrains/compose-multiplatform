@@ -18,17 +18,18 @@ repositories {
 }
 
 dependencies {
-    // runtime dependency is provided by org.jetbrains.compose.intellij.platform
-    compileOnly(compose.desktop.currentOs)
-
-    testImplementation("junit", "junit", "4.12")
+//    compileOnly(compose.desktop.currentOs) runtime dependency is provided by org.jetbrains.compose.intellij.platform
+    testImplementation(kotlin("test"))
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version.set("2021.3")
     plugins.set(
-        listOf("org.jetbrains.compose.intellij.platform:0.1.0")
+        listOf(
+            "org.jetbrains.compose.intellij.platform:0.1.0",
+            "org.jetbrains.kotlin"
+        )
     )
 }
 

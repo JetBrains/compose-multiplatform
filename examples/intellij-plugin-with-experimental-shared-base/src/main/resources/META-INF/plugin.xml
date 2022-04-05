@@ -11,6 +11,7 @@ A plugin demonstrates Jetpack compose capabilities on IntelliJ Platform
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.compose.intellij.platform</depends>
+    <depends>org.jetbrains.kotlin</depends>
 
     <actions>
         <!-- Add your actions here -->
@@ -19,4 +20,8 @@ A plugin demonstrates Jetpack compose capabilities on IntelliJ Platform
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
     </actions>
+    <extensions defaultExtensionNs="com.intellij">
+        <codeInsight.lineMarkerProvider language="kotlin" implementationClass="com.jetbrains.compose.color.ColorLineMarkerProvider" />
+    </extensions>
+
 </idea-plugin>
