@@ -22,7 +22,4 @@ A plugin demonstrates Jetpack compose capabilities on IntelliJ Platform
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
     </actions>
-    <extensions defaultExtensionNs="com.intellij">
-        <codeInsight.lineMarkerProvider language="kotlin" implementationClass="com.jetbrains.compose.color.ColorLineMarkerProvider" />
-    </extensions>
 </idea-plugin>
