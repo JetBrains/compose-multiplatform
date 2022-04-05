@@ -80,10 +80,10 @@ internal fun LazyGrid(
 
     val itemScope = remember { LazyGridItemScopeImpl() }
 
-    val stateOfItemsProvider = rememberStateOfItemsProvider(state, content, itemScope)
+    val itemsProvider = rememberItemsProvider(state, content, itemScope)
 
-    val spanLayoutProvider = remember(stateOfItemsProvider) {
-        derivedStateOf { LazyGridSpanLayoutProvider(stateOfItemsProvider.value) }
+    val spanLayoutProvider = remember(itemsProvider) {
+        derivedStateOf { LazyGridSpanLayoutProvider(itemsProvider) }
     }
 
     val scope = rememberCoroutineScope()
@@ -93,7 +93,7 @@ internal fun LazyGrid(
     state.placementAnimator = placementAnimator
 
     val measurePolicy = rememberLazyGridMeasurePolicy(
-        stateOfItemsProvider,
+        itemsProvider,
         state,
         overScrollController,
         spanLayoutProvider,
@@ -108,13 +108,13 @@ internal fun LazyGrid(
 
     state.isVertical = isVertical
 
-    ScrollPositionUpdater(stateOfItemsProvider, state)
+    ScrollPositionUpdater(itemsProvider, state)
 
     LazyLayout(
         modifier = modifier
             .then(state.remeasurementModifier)
             .lazyGridSemantics(
-                stateOfItemsProvider = stateOfItemsProvider,
+                itemsProvider = itemsProvider,
                 state = state,
                 coroutineScope = scope,
                 isVertical = isVertical,
@@ -143,7 +143,7 @@ internal fun LazyGrid(
             ),
         prefetchState = state.prefetchState,
         measurePolicy = measurePolicy,
-        itemsProvider = { stateOfItemsProvider.value }
+        itemsProvider = itemsProvider
     )
 }
 
@@ -151,10 +151,9 @@ internal fun LazyGrid(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ScrollPositionUpdater(
-    stateOfItemsProvider: State<LazyGridItemsProvider>,
+    itemsProvider: LazyGridItemsProvider,
     state: LazyGridState
 ) {
-    val itemsProvider = stateOfItemsProvider.value
     if (itemsProvider.itemsCount > 0) {
         state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
     }
@@ -163,8 +162,8 @@ private fun ScrollPositionUpdater(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun rememberLazyGridMeasurePolicy(
-    /** State containing the items provider of the list. */
-    stateOfItemsProvider: State<LazyGridItemsProvider>,
+    /** Items provider of the list. */
+    itemsProvider: LazyGridItemsProvider,
     /** The state of the list. */
     state: LazyGridState,
     /** The overscroll controller. */
@@ -216,7 +215,6 @@ private fun rememberLazyGridMeasurePolicy(
         val afterContentPadding = totalMainAxisPadding - beforeContentPadding
         val contentConstraints = constraints.offset(-totalHorizontalPadding, -totalVerticalPadding)
 
-        val itemsProvider = stateOfItemsProvider.value
         state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
 
         val spanLayoutProvider = stateOfSpanLayoutProvider.value

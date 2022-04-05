@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.Constraints
 @ExperimentalFoundationApi
 @Composable
 internal fun LazyLayout(
-    itemsProvider: () -> LazyLayoutItemsProvider,
+    itemsProvider: LazyLayoutItemsProvider,
     modifier: Modifier = Modifier,
     prefetchState: LazyLayoutPrefetchState? = null,
     measurePolicy: LazyLayoutMeasureScope.(Constraints) -> MeasureResult
@@ -44,7 +44,7 @@ internal fun LazyLayout(
 
     val saveableStateHolder = rememberSaveableStateHolder()
     val itemContentFactory = remember {
-        LazyLayoutItemContentFactory(saveableStateHolder) { currentItemsProvider.value.invoke() }
+        LazyLayoutItemContentFactory(saveableStateHolder) { currentItemsProvider.value }
     }
     val subcomposeLayoutState = remember {
         SubcomposeLayoutState(LazyLayoutItemReusePolicy(itemContentFactory))
