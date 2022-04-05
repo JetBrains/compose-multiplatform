@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.lazy
+package androidx.compose.foundation.lazy.layout
 
 import android.annotation.SuppressLint
 import android.os.Parcel
 import android.os.Parcelable
 
-internal actual fun getDefaultLazyKeyFor(index: Int): Any = DefaultLazyKey(index)
+internal actual fun getDefaultLazyLayoutKey(index: Int): Any = DefaultLazyKey(index)
 
 @SuppressLint("BanParcelableUsage")
 private data class DefaultLazyKey(private val index: Int) : Parcelable {
