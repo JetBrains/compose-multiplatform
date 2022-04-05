@@ -232,6 +232,17 @@ class LayoutCoordinatesHelperTest {
         }
     }
 
+    @Test
+    fun onBoxPlaced_failing() {
+        var coordinates: LayoutCoordinates? = null
+        rule.setContent {
+            Box(Modifier.onPlaced { coordinates = it })
+        }
+        rule.runOnIdle {
+            assertThat(coordinates).isNotNull()
+        }
+    }
+
     private fun LayoutCoordinates.placementInParent() =
         parentCoordinates!!.localPositionOf(this, Offset.Zero).round()
 }
