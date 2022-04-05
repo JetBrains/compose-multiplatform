@@ -193,6 +193,8 @@ private fun shouldVerifyConfiguration(configuration: Configuration): Boolean {
 
     // Don't check any configurations that directly bundle the dependencies with the output
     if (name == "bundleInside") return false
+    if (name == "embedThemesDebug") return false
+    if (name == "embedThemesRelease") return false
 
     // Don't check any compile-only configurations
     if (name.startsWith("compile")) return false
