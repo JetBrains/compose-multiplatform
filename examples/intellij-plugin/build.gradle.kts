@@ -19,13 +19,12 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
-    testImplementation(kotlin("test"))
+    testImplementation("junit", "junit", "4.12")
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version.set("2021.3")
-    plugins.set(listOf("org.jetbrains.kotlin"))
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
