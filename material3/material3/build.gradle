@@ -49,7 +49,7 @@ dependencies {
         api("androidx.compose.ui:ui-text:1.0.1")
 
         // TODO: remove next 3 dependencies when b/202810604 is fixed
-        implementation("androidx.savedstate:savedstate:1.1.0")
+        implementation(project(":savedstate:savedstate-ktx"))
         implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
         implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
 

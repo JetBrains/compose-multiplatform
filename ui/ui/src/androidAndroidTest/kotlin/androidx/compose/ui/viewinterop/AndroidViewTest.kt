@@ -71,7 +71,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryOwner
-import androidx.savedstate.ViewTreeSavedStateRegistryOwner
+import androidx.savedstate.findViewTreeSavedStateRegistryOwner
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
@@ -507,7 +507,7 @@ class AndroidViewTest {
                             override fun onAttachedToWindow() {
                                 super.onAttachedToWindow()
                                 childViewTreeSavedStateRegistryOwner =
-                                    ViewTreeSavedStateRegistryOwner.get(this)
+                                    findViewTreeSavedStateRegistryOwner()
                             }
                         }
                     }
