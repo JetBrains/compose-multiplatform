@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.Density
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.savedstate.SavedStateRegistryOwner
-import androidx.savedstate.ViewTreeSavedStateRegistryOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import kotlin.math.roundToInt
 
 /**
@@ -132,12 +132,12 @@ internal abstract class AndroidViewHolder(
             }
         }
 
-    /** Sets the [ViewTreeSavedStateRegistryOwner] for this view. */
+    /** Sets the ViewTreeSavedStateRegistryOwner for this view. */
     var savedStateRegistryOwner: SavedStateRegistryOwner? = null
         set(value) {
             if (value !== field) {
                 field = value
-                ViewTreeSavedStateRegistryOwner.set(this, value)
+                setViewTreeSavedStateRegistryOwner(value)
             }
         }
 

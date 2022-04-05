@@ -59,7 +59,7 @@ dependencies {
         implementation("androidx.core:core:1.5.0")
         implementation('androidx.collection:collection:1.0.0')
         implementation("androidx.customview:customview-poolingcontainer:1.0.0-alpha01")
-        implementation project(":savedstate:savedstate")
+        implementation project(":savedstate:savedstate-ktx")
         implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
         implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
         implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
@@ -146,7 +146,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.kotlinCoroutinesAndroid)
 
                 implementation("androidx.customview:customview-poolingcontainer:1.0.0-alpha01")
-                implementation project(":savedstate:savedstate")
+                implementation project(":savedstate:savedstate-ktx")
                 implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
                 implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
                 implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
