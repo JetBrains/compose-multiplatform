@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.platform
 
-import android.app.Application
+import android.content.Context
 import android.database.ContentObserver
 import android.net.Uri
 import android.os.Looper
@@ -91,12 +91,14 @@ fun View.findViewTreeCompositionContext(): CompositionContext? {
     return found
 }
 
-private val animationScale = mutableMapOf<Application, StateFlow<Float>>()
+private val animationScale = mutableMapOf<Context, StateFlow<Float>>()
 
-private fun getAnimationScaleFlowFor(application: Application): StateFlow<Float> {
+// Callers of this function should pass an application context. Passing an activity context might
+// result in activity leaks.
+private fun getAnimationScaleFlowFor(applicationContext: Context): StateFlow<Float> {
     return synchronized(animationScale) {
-        animationScale.getOrPut(application) {
-            val resolver = application.applicationContext.contentResolver
+        animationScale.getOrPut(applicationContext) {
+            val resolver = applicationContext.contentResolver
             val animationScaleUri =
                 Settings.Global.getUriFor(Settings.Global.ANIMATOR_DURATION_SCALE)
             val channel = Channel<Unit>(CONFLATED)
@@ -113,7 +115,7 @@ private fun getAnimationScaleFlowFor(application: Application): StateFlow<Float>
                 try {
                     for (value in channel) {
                         val newValue = Settings.Global.getFloat(
-                            application.contentResolver,
+                            applicationContext.contentResolver,
                             Settings.Global.ANIMATOR_DURATION_SCALE,
                             1f
                         )
@@ -126,7 +128,7 @@ private fun getAnimationScaleFlowFor(application: Application): StateFlow<Float>
                 MainScope(),
                 SharingStarted.WhileSubscribed(),
                 Settings.Global.getFloat(
-                    application.contentResolver,
+                    applicationContext.contentResolver,
                     Settings.Global.ANIMATOR_DURATION_SCALE,
                     1f
                 )
@@ -376,16 +378,13 @@ fun View.createLifecycleAwareWindowRecomposer(
                             var durationScaleJob: Job? = null
                             try {
                                 durationScaleJob = systemDurationScaleSettingConsumer?.let {
-                                    // We need the following nullability check because the cast will
-                                    // fail in layoutlib. A long-term plan for this workaround is
-                                    // being tracked by b/227155163.
-                                    (context.applicationContext as? Application)?.let { app ->
-                                        val durationScaleStateFlow = getAnimationScaleFlowFor(app)
-                                        it.scaleFactor = durationScaleStateFlow.value
-                                        launch {
-                                            durationScaleStateFlow.collect { scaleFactor ->
-                                                it.scaleFactor = scaleFactor
-                                            }
+                                    val durationScaleStateFlow = getAnimationScaleFlowFor(
+                                        context.applicationContext
+                                    )
+                                    it.scaleFactor = durationScaleStateFlow.value
+                                    launch {
+                                        durationScaleStateFlow.collect { scaleFactor ->
+                                            it.scaleFactor = scaleFactor
                                         }
                                     }
                                 }
