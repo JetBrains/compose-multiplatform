@@ -468,8 +468,7 @@ class FontFamilyResolverImplTest {
             }
         }
         val fontFamily = FontFamily(
-            object : AndroidFont(FontLoadingStrategy.Blocking) {
-                override val typefaceLoader: TypefaceLoader = unstableLoader
+            object : AndroidFont(FontLoadingStrategy.Blocking, unstableLoader) {
                 override val weight: FontWeight = FontWeight.Normal
                 override val style: FontStyle = FontStyle.Normal
             }

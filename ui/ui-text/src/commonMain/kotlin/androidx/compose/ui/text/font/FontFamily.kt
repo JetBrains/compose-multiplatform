@@ -80,7 +80,7 @@ sealed class FontFamily(canLoadSynchronously: Boolean) {
          * Platform specific [FontFamily] will resolve according to platform behavior, as documented
          * for each [FontFamily].
          *
-         * @param fontFamily family to resolve
+         * @param fontFamily family to resolve. If `null` will use [FontFamily.Default]
          * @param fontWeight desired font weight
          * @param fontStyle desired font style
          * @param fontSynthesis configuration for font synthesis

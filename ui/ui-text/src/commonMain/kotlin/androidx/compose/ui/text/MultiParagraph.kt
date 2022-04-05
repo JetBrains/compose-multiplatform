@@ -101,15 +101,15 @@ class MultiParagraph(
      *
      * @param annotatedString the text to be laid out
      * @param style the [TextStyle] to be applied to the whole text
+     * @param width how wide the text is allowed to be
+     * @param density density of the device
+     * @param fontFamilyResolver to be used to load the font given in [SpanStyle]s
      * @param placeholders a list of [Placeholder]s that specify ranges of text which will be
      * skipped during layout and replaced with [Placeholder]. It's required that the range of each
      * [Placeholder] doesn't cross paragraph boundary, otherwise [IllegalArgumentException] is
      * thrown.
      * @param maxLines the maximum number of lines that the text can have
      * @param ellipsis whether to ellipsize text, applied only when [maxLines] is set
-     * @param width how wide the text is allowed to be
-     * @param density density of the device
-     * @param fontFamilyResolver to be used to load the font given in [SpanStyle]s
      *
      * @see Placeholder
      * @throws IllegalArgumentException if [ParagraphStyle.textDirection] is not set, or
@@ -118,12 +118,12 @@ class MultiParagraph(
     constructor(
         annotatedString: AnnotatedString,
         style: TextStyle,
-        placeholders: List<AnnotatedString.Range<Placeholder>> = listOf(),
-        maxLines: Int = Int.MAX_VALUE,
-        ellipsis: Boolean = false,
         width: Float,
         density: Density,
-        fontFamilyResolver: FontFamily.Resolver
+        fontFamilyResolver: FontFamily.Resolver,
+        placeholders: List<AnnotatedString.Range<Placeholder>> = listOf(),
+        maxLines: Int = Int.MAX_VALUE,
+        ellipsis: Boolean = false
     ) : this(
         intrinsics = MultiParagraphIntrinsics(
             annotatedString = annotatedString,
