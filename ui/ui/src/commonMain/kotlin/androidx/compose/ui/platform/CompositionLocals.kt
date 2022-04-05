@@ -101,6 +101,9 @@ val LocalFontLoader = staticCompositionLocalOf<Font.ResourceLoader> {
     noLocalProvidedFor("LocalFontLoader")
 }
 
+/**
+ * The CompositionLocal for compose font resolution from FontFamily.
+ */
 val LocalFontFamilyResolver = staticCompositionLocalOf<FontFamily.Resolver> {
     noLocalProvidedFor("LocalFontFamilyResolver")
 }

@@ -567,8 +567,7 @@ class FontListFontFamilyTypefaceAdapterTest {
                 return null
             }
         }
-        val asyncFont = object : AndroidFont(FontLoadingStrategy.Async) {
-            override val typefaceLoader: TypefaceLoader = cancellingLoader
+        val asyncFont = object : AndroidFont(FontLoadingStrategy.Async, cancellingLoader) {
             override val weight: FontWeight = FontWeight.Normal
             override val style: FontStyle = FontStyle.Normal
         }
@@ -644,8 +643,7 @@ class FontListFontFamilyTypefaceAdapterTest {
                 return Typeface.SERIF
             }
         }
-        val font = object : AndroidFont(FontLoadingStrategy.Async) {
-            override val typefaceLoader: TypefaceLoader = typefaceLoader
+        val font = object : AndroidFont(FontLoadingStrategy.Async, typefaceLoader) {
             override val weight: FontWeight = FontWeight.W400
             override val style: FontStyle = FontStyle.Normal
         }

@@ -172,7 +172,7 @@ fun AsyncFontFamilyDemo() {
 // example of defining custom font typeface resolver for use in a FontFamily
 // this is typically done to add _new_ types of font resources to Compose
 object ExampleAsyncFontTypefaceLoader : AndroidFont.TypefaceLoader {
-    override fun loadBlocking(context: Context, font: AndroidFont): android.graphics.Typeface? {
+    override fun loadBlocking(context: Context, font: AndroidFont): Typeface? {
         return when (font) {
             is DemoOptionalFont -> null // all optional fonts fail
             is DemoBlockingFont -> font.typeface
@@ -184,7 +184,7 @@ object ExampleAsyncFontTypefaceLoader : AndroidFont.TypefaceLoader {
     override suspend fun awaitLoad(
         context: Context,
         font: AndroidFont
-    ): android.graphics.Typeface {
+    ): Typeface {
         // delayed fonts take the specified delay
         font as DemoAsyncFont
         delay(font.delay)
@@ -192,32 +192,22 @@ object ExampleAsyncFontTypefaceLoader : AndroidFont.TypefaceLoader {
     }
 }
 
-@OptIn(ExperimentalTextApi::class)
 class DemoAsyncFont(
     override val weight: FontWeight,
     override val style: FontStyle,
     val delay: Long,
-    val typeface: android.graphics.Typeface = android.graphics.Typeface.MONOSPACE
-) : AndroidFont(Async) {
-    override val typefaceLoader: TypefaceLoader
-        get() = ExampleAsyncFontTypefaceLoader
-}
+    val typeface: Typeface = Typeface.MONOSPACE
+) : AndroidFont(Async, ExampleAsyncFontTypefaceLoader)
 
 @OptIn(ExperimentalTextApi::class)
 class DemoOptionalFont(
     override val weight: FontWeight,
     override val style: FontStyle,
-) : AndroidFont(OptionalLocal) {
-    override val typefaceLoader: TypefaceLoader
-        get() = ExampleAsyncFontTypefaceLoader
-}
+) : AndroidFont(OptionalLocal, ExampleAsyncFontTypefaceLoader)
 
 @OptIn(ExperimentalTextApi::class)
 class DemoBlockingFont(
     override val weight: FontWeight,
     override val style: FontStyle,
-    val typeface: android.graphics.Typeface
-) : AndroidFont(OptionalLocal) {
-    override val typefaceLoader: TypefaceLoader
-        get() = ExampleAsyncFontTypefaceLoader
-}
+    val typeface: Typeface
+) : AndroidFont(OptionalLocal, ExampleAsyncFontTypefaceLoader)

@@ -95,7 +95,7 @@ package androidx.compose.ui.text {
   public final class MultiParagraph {
     ctor public MultiParagraph(androidx.compose.ui.text.MultiParagraphIntrinsics intrinsics, optional int maxLines, optional boolean ellipsis, float width);
     ctor @Deprecated public MultiParagraph(androidx.compose.ui.text.AnnotatedString annotatedString, androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional int maxLines, optional boolean ellipsis, float width, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
-    ctor public MultiParagraph(androidx.compose.ui.text.AnnotatedString annotatedString, androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional int maxLines, optional boolean ellipsis, float width, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.FontFamily.Resolver fontFamilyResolver);
+    ctor public MultiParagraph(androidx.compose.ui.text.AnnotatedString annotatedString, androidx.compose.ui.text.TextStyle style, float width, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.FontFamily.Resolver fontFamilyResolver, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional int maxLines, optional boolean ellipsis);
     method public androidx.compose.ui.text.style.ResolvedTextDirection getBidiRunDirection(int offset);
     method public androidx.compose.ui.geometry.Rect getBoundingBox(int offset);
     method public androidx.compose.ui.geometry.Rect getCursorRect(int offset);
@@ -217,7 +217,7 @@ package androidx.compose.ui.text {
 
   public final class ParagraphKt {
     method @Deprecated public static androidx.compose.ui.text.Paragraph Paragraph(String text, androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional int maxLines, optional boolean ellipsis, float width, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
-    method public static androidx.compose.ui.text.Paragraph Paragraph(String text, androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional int maxLines, optional boolean ellipsis, float width, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.FontFamily.Resolver fontFamilyResolver);
+    method public static androidx.compose.ui.text.Paragraph Paragraph(String text, androidx.compose.ui.text.TextStyle style, float width, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.FontFamily.Resolver fontFamilyResolver, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional int maxLines, optional boolean ellipsis);
     method public static androidx.compose.ui.text.Paragraph Paragraph(androidx.compose.ui.text.ParagraphIntrinsics paragraphIntrinsics, optional int maxLines, optional boolean ellipsis, float width);
   }
 
@@ -609,11 +609,11 @@ package androidx.compose.ui.text.caches {
 package androidx.compose.ui.text.font {
 
   public abstract class AndroidFont implements androidx.compose.ui.text.font.Font {
-    ctor public AndroidFont(int loadingStrategy);
+    ctor public AndroidFont(int loadingStrategy, androidx.compose.ui.text.font.AndroidFont.TypefaceLoader typefaceLoader);
     method public final int getLoadingStrategy();
-    method public abstract androidx.compose.ui.text.font.AndroidFont.TypefaceLoader getTypefaceLoader();
+    method public final androidx.compose.ui.text.font.AndroidFont.TypefaceLoader getTypefaceLoader();
     property public final int loadingStrategy;
-    property public abstract androidx.compose.ui.text.font.AndroidFont.TypefaceLoader typefaceLoader;
+    property public final androidx.compose.ui.text.font.AndroidFont.TypefaceLoader typefaceLoader;
   }
 
   public static interface AndroidFont.TypefaceLoader {

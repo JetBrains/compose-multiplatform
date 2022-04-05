@@ -296,27 +296,27 @@ fun Paragraph(
  *
  * @param text the text to be laid out
  * @param style the [TextStyle] to be applied to the whole text
+ * @param width how wide the text is allowed to be
+ * @param density density of the device
+ * @param fontFamilyResolver [FontFamily.Resolver] to be used to load the font given in [SpanStyle]s
  * @param spanStyles [SpanStyle]s to be applied to parts of text
  * @param placeholders a list of placeholder metrics which tells [Paragraph] where should
  * be left blank to leave space for inline elements.
  * @param maxLines the maximum number of lines that the text can have
  * @param ellipsis whether to ellipsize text, applied only when [maxLines] is set
- * @param width how wide the text is allowed to be
- * @param density density of the device
- * @param fontFamilyResolver [FontFamily.Resolver] to be used to load the font given in [SpanStyle]s
  *
  * @throws IllegalArgumentException if [ParagraphStyle.textDirection] is not set
  */
 fun Paragraph(
     text: String,
     style: TextStyle,
+    width: Float,
+    density: Density,
+    fontFamilyResolver: FontFamily.Resolver,
     spanStyles: List<AnnotatedString.Range<SpanStyle>> = listOf(),
     placeholders: List<AnnotatedString.Range<Placeholder>> = listOf(),
     maxLines: Int = DefaultMaxLines,
-    ellipsis: Boolean = false,
-    width: Float,
-    density: Density,
-    fontFamilyResolver: FontFamily.Resolver
+    ellipsis: Boolean = false
 ): Paragraph = ActualParagraph(
     text,
     style,
