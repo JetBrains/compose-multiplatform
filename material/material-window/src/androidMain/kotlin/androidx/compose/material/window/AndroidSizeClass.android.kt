@@ -21,50 +21,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.runtime.remember
 import androidx.window.layout.WindowMetricsCalculator
 
 /**
- * Calculates [SizeClass] of the window.
+ * Calculates the window's [SizeClass] for this [Activity].
  *
- * Whenever device configutation changes result in change of the width or height based
- * size classes, for example on device rotation or window resizing, this will return a new
- * [SizeClass] instance.
+ * A new [SizeClass] will be returned whenever a configuration change causes the width or height of
+ * the window to cross a breakpoint, such as when the device is rotated or the window is resized.
+ *
+ * @sample androidx.compose.material.window.samples.AndroidSizeClassSample
  */
 @ExperimentalMaterialWindowApi
 @Composable
-fun Activity.rememberSizeClass(): SizeClass {
-    // observe configuration changes and recalculate size class on corresponding changes
-    val configuration = LocalConfiguration.current
+fun Activity.calculateSizeClass(): SizeClass {
+    // Observe view configuration changes and recalculate the size class on each change. We can't
+    // use Activity#onConfigurationChanged as this will sometimes fail to be called on different
+    // API levels, hence why this function needs to be @Composable so we can observe the
+    // ComposeView's configuration changes.
+    LocalConfiguration.current
     val density = LocalDensity.current
-    return remember(
-        configuration.screenLayout,
-        configuration.screenHeightDp,
-        configuration.screenWidthDp,
-        configuration.orientation,
-        configuration.densityDpi,
-        density.density
-    ) {
-        val metrics = WindowMetricsCalculator.getOrCreate().computeCurrentWindowMetrics(this)
-        val size = with(density) { metrics.bounds.toComposeRect().size.toDpSize() }
-        SizeClass.calculateFromSize(size)
-    }
+    val metrics = WindowMetricsCalculator.getOrCreate().computeCurrentWindowMetrics(this)
+    val size = with(density) { metrics.bounds.toComposeRect().size.toDpSize() }
+    return SizeClass.calculateFromSize(size)
 }
-
-/**
- * Calculates [WidthSizeClass] of the window.
- *
- * @see rememberSizeClass
- */
-@ExperimentalMaterialWindowApi
-@Composable
-fun Activity.rememberWidthSizeClass(): WidthSizeClass = rememberSizeClass().width
-
-/**
- * Calculates [HeightSizeClass] of the window.
- *
- * @see rememberSizeClass
- */
-@ExperimentalMaterialWindowApi
-@Composable
-fun Activity.rememberHeightSizeClass(): HeightSizeClass = rememberSizeClass().height
