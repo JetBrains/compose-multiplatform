@@ -889,7 +889,17 @@ class ParameterFactoryTest {
                 parameter("fontSize", ParameterType.String, "Unspecified", index = 5)
                 parameter("letterSpacing", ParameterType.String, "Unspecified", index = 9)
                 parameter("lineHeight", ParameterType.String, "Unspecified", index = 10)
-                parameter("textDecoration", ParameterType.String, "Underline", index = 15)
+                parameter("paragraphStyle", ParameterType.String, "ParagraphStyle", index = 12) {
+                    parameter("lineHeight", ParameterType.String, "Unspecified", index = 0)
+                }
+                parameter("spanStyle", ParameterType.String, "SpanStyle", index = 15) {
+                    parameter("background", ParameterType.String, "Unspecified")
+                    parameter("color", ParameterType.Color, Color.Red.toArgb(), index = 2)
+                    parameter("fontSize", ParameterType.String, "Unspecified", index = 5)
+                    parameter("letterSpacing", ParameterType.String, "Unspecified", index = 9)
+                    parameter("textDecoration", ParameterType.String, "Underline", index = 13)
+                }
+                parameter("textDecoration", ParameterType.String, "Underline", index = 17)
             }
         }
     }

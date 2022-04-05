@@ -35,6 +35,15 @@ import androidx.compose.ui.text.style.lerp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.unit.sp
+
+/** The default font size if none is specified. */
+private val DefaultFontSize = 14.sp
+private val DefaultLetterSpacing = 0.sp
+private val DefaultBackgroundColor = Color.Transparent
+// TODO(nona): Introduce TextUnit.Original for representing "do not change the original result".
+//  Need to distinguish from Inherit.
+private val DefaultColor = Color.Black
 
 /**
  * Styling configuration for a text span. This configuration only allows character level styling,
@@ -51,7 +60,7 @@ import androidx.compose.ui.unit.lerp
  * @param fontWeight The typeface thickness to use when painting the text (e.g., bold).
  * @param fontStyle The typeface variant to use when drawing the letters (e.g., italic).
  * @param fontSynthesis Whether to synthesize font weight and/or style when the requested weight or
- *  style cannot be found in the provided custom font family.
+ *  style cannot be found in the provided font family.
  * @param fontFamily The font family to be used when rendering the text.
  * @param fontFeatureSettings The advanced typography settings provided by font. The format is the
  *  same as the CSS font-feature-settings attribute:
@@ -89,6 +98,38 @@ class SpanStyle @ExperimentalTextApi constructor(
     @get:ExperimentalTextApi val platformStyle: PlatformSpanStyle? = null
 ) {
 
+    /**
+     * Styling configuration for a text span. This configuration only allows character level styling,
+     * in order to set paragraph level styling such as line height, or text alignment please see
+     * [ParagraphStyle].
+     *
+     * @sample androidx.compose.ui.text.samples.SpanStyleSample
+     *
+     * @sample androidx.compose.ui.text.samples.AnnotatedStringBuilderSample
+     *
+     * @param color The text color.
+     * @param fontSize The size of glyphs (in logical pixels) to use when painting the text. This
+     * may be [TextUnit.Unspecified] for inheriting from another [SpanStyle].
+     * @param fontWeight The typeface thickness to use when painting the text (e.g., bold).
+     * @param fontStyle The typeface variant to use when drawing the letters (e.g., italic).
+     * @param fontSynthesis Whether to synthesize font weight and/or style when the requested weight
+     * or style cannot be found in the provided font family.
+     * @param fontFamily The font family to be used when rendering the text.
+     * @param fontFeatureSettings The advanced typography settings provided by font. The format is
+     * the same as the CSS font-feature-settings attribute:
+     *  https://www.w3.org/TR/css-fonts-3/#font-feature-settings-prop
+     * @param letterSpacing The amount of space (in em) to add between each letter.
+     * @param baselineShift The amount by which the text is shifted up from the current baseline.
+     * @param textGeometricTransform The geometric transformation applied the text.
+     * @param localeList The locale list used to select region-specific glyphs.
+     * @param background The background color for the text.
+     * @param textDecoration The decorations to paint on the text (e.g., an underline).
+     * @param shadow The shadow effect applied on the text.
+     *
+     * @see AnnotatedString
+     * @see TextStyle
+     * @see ParagraphStyle
+     */
     @OptIn(ExperimentalTextApi::class)
     constructor(
         color: Color = Color.Unspecified,
@@ -416,3 +457,26 @@ private fun lerpPlatformStyle(
     val stopNonNull = stop ?: PlatformSpanStyle.Default
     return startNonNull.lerp(stopNonNull, fraction)
 }
+
+@OptIn(ExperimentalTextApi::class)
+internal fun resolveSpanStyleDefaults(style: SpanStyle) = SpanStyle(
+    color = style.color.takeOrElse { DefaultColor },
+    fontSize = if (style.fontSize.isUnspecified) DefaultFontSize else style.fontSize,
+    fontWeight = style.fontWeight ?: FontWeight.Normal,
+    fontStyle = style.fontStyle ?: FontStyle.Normal,
+    fontSynthesis = style.fontSynthesis ?: FontSynthesis.All,
+    fontFamily = style.fontFamily ?: FontFamily.Default,
+    fontFeatureSettings = style.fontFeatureSettings ?: "",
+    letterSpacing = if (style.letterSpacing.isUnspecified) {
+        DefaultLetterSpacing
+    } else {
+        style.letterSpacing
+    },
+    baselineShift = style.baselineShift ?: BaselineShift.None,
+    textGeometricTransform = style.textGeometricTransform ?: TextGeometricTransform.None,
+    localeList = style.localeList ?: LocaleList.current,
+    background = style.background.takeOrElse { DefaultBackgroundColor },
+    textDecoration = style.textDecoration ?: TextDecoration.None,
+    shadow = style.shadow ?: Shadow.None,
+    platformStyle = style.platformStyle
+)

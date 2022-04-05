@@ -524,7 +524,12 @@ class TextLayoutHelperTest {
             getProperty("textDirection"),
             getProperty("lineHeight"),
             getProperty("textIndent"),
-            getProperty("platformStyle")
+            getProperty("platformStyle"),
+            // ParagraphStyle and SpanStyle properties are already compared, TextStyle should have
+            // paragraph style attributes is tested in:
+            // ui-text/../androidx/compose/ui/text/TextSpanParagraphStyleTest.kt
+            getProperty("paragraphStyle"),
+            getProperty("spanStyle")
         )
 
         val textStyleProperties = TextStyle::class.memberProperties.map { Property(it) }
