@@ -18,8 +18,7 @@ repositories {
 }
 
 dependencies {
-    // runtime dependency is provided by org.jetbrains.compose.intellij.platform
-//    compileOnly(compose.desktop.currentOs)
+//    compileOnly(compose.desktop.currentOs) runtime dependency is provided by org.jetbrains.compose.intellij.platform
     testImplementation(kotlin("test"))
 }
 
