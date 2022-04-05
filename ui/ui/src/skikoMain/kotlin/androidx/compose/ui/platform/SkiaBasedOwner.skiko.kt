@@ -190,7 +190,7 @@ internal class SkiaBasedOwner(
     private val pointerInputEventProcessor = PointerInputEventProcessor(root)
     private val measureAndLayoutDelegate = MeasureAndLayoutDelegate(root)
 
-    private val endApplyChangesListeners = mutableVectorOf<() -> Unit>()
+    private val endApplyChangesListeners = mutableVectorOf<(() -> Unit)?>()
 
     init {
         snapshotObserver.startObserving()
@@ -436,18 +436,26 @@ internal class SkiaBasedOwner(
     }
 
     override fun onEndApplyChanges() {
-        // Iterate through the whole list, even if listeners are added.
-        var i = 0
-        while (i < endApplyChangesListeners.size) {
-            val listener = endApplyChangesListeners[i]
-            listener()
-            i++
+        // Listeners can add more items to the list and we want to ensure that they
+        // are executed after being added, so loop until the list is empty
+        while (endApplyChangesListeners.isNotEmpty()) {
+            val size = endApplyChangesListeners.size
+            for (i in 0 until size) {
+                val listener = endApplyChangesListeners[i]
+                // null out the item so that if the listener is re-added then we execute it again.
+                endApplyChangesListeners[i] = null
+                listener?.invoke()
+            }
+            // Remove all the items that were visited. Removing items shifts all items after
+            // to the front of the list, so removing in a chunk is cheaper than removing one-by-one
+            endApplyChangesListeners.removeRange(0, size)
         }
-        endApplyChangesListeners.clear()
     }
 
     override fun registerOnEndApplyChangesListener(listener: () -> Unit) {
-        endApplyChangesListeners += listener
+        if (listener !in endApplyChangesListeners) {
+            endApplyChangesListeners += listener
+        }
     }
 
     override fun registerOnLayoutCompletedListener(listener: Owner.OnLayoutCompletedListener) {
