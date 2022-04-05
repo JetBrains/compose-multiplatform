@@ -21,7 +21,6 @@ import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.CollectionInfo
@@ -40,7 +39,7 @@ import kotlinx.coroutines.launch
 @Suppress("ComposableModifierFactory", "ModifierInspectorInfo")
 @Composable
 internal fun Modifier.lazyListSemantics(
-    stateOfItemsProvider: State<LazyListItemsProvider>,
+    itemsProvider: LazyListItemsProvider,
     state: LazyListState,
     coroutineScope: CoroutineScope,
     isVertical: Boolean,
@@ -48,16 +47,16 @@ internal fun Modifier.lazyListSemantics(
     userScrollEnabled: Boolean
 ) = this.then(
     remember(
-        stateOfItemsProvider,
+        itemsProvider,
         state,
         isVertical,
         reverseScrolling,
         userScrollEnabled
     ) {
         val indexForKeyMapping: (Any) -> Int = { needle ->
-            val key = stateOfItemsProvider.value::getKey
+            val key = itemsProvider::getKey
             var result = -1
-            for (index in 0 until stateOfItemsProvider.value.itemsCount) {
+            for (index in 0 until itemsProvider.itemsCount) {
                 if (key(index) == needle) {
                     result = index
                     break
@@ -78,7 +77,7 @@ internal fun Modifier.lazyListSemantics(
                 if (state.canScrollForward) {
                     // If we can scroll further, we don't know the end yet,
                     // but it's upper bounded by #items + 1
-                    stateOfItemsProvider.value.itemsCount + 1f
+                    itemsProvider.itemsCount + 1f
                 } else {
                     // If we can't scroll further, the current value is the max
                     state.firstVisibleItemIndex + state.firstVisibleItemScrollOffset / 100_000f
