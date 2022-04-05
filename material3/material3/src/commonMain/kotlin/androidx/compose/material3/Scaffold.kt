@@ -182,17 +182,18 @@ private fun ScaffoldLayout(
                 0
             }
 
-            val bodyContentHeight = layoutHeight - topBarHeight
-
             val bodyContentPlaceables = subcompose(ScaffoldLayoutContent.MainContent) {
-                val innerPadding = PaddingValues(bottom = bottomBarHeight.toDp())
+                val innerPadding = PaddingValues(
+                    top = topBarHeight.toDp(),
+                    bottom = bottomBarHeight.toDp()
+                )
                 content(innerPadding)
-            }.map { it.measure(looseConstraints.copy(maxHeight = bodyContentHeight)) }
+            }.map { it.measure(looseConstraints) }
 
             // Placing to control drawing order to match default elevation of each placeable
 
             bodyContentPlaceables.forEach {
-                it.place(0, topBarHeight)
+                it.place(0, 0)
             }
             topBarPlaceables.forEach {
                 it.place(0, 0)
