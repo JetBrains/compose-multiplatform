@@ -24,12 +24,6 @@ import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState
-import androidx.compose.foundation.lazy.list.DataIndex
-import androidx.compose.foundation.lazy.list.LazyListItemPlacementAnimator
-import androidx.compose.foundation.lazy.list.LazyListItemsProvider
-import androidx.compose.foundation.lazy.list.LazyListMeasureResult
-import androidx.compose.foundation.lazy.list.LazyListScrollPosition
-import androidx.compose.foundation.lazy.list.doSmoothScrollToItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue

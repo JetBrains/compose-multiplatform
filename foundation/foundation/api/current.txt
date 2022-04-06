@@ -409,6 +409,9 @@ package androidx.compose.foundation.lazy {
     method public androidx.compose.ui.Modifier fillParentMaxWidth(androidx.compose.ui.Modifier, optional float fraction);
   }
 
+  public final class LazyListHeadersKt {
+  }
+
   public interface LazyListItemInfo {
     method public int getIndex();
     method public Object getKey();
@@ -418,6 +421,15 @@ package androidx.compose.foundation.lazy {
     property public abstract Object key;
     property public abstract int offset;
     property public abstract int size;
+  }
+
+  public final class LazyListItemPlacementAnimatorKt {
+  }
+
+  public final class LazyListItemsProviderImplKt {
+  }
+
+  public final class LazyListKt {
   }
 
   public interface LazyListLayoutInfo {
@@ -441,11 +453,17 @@ package androidx.compose.foundation.lazy {
     property public abstract java.util.List<androidx.compose.foundation.lazy.LazyListItemInfo> visibleItemsInfo;
   }
 
+  public final class LazyListMeasureKt {
+  }
+
   @androidx.compose.foundation.lazy.LazyScopeMarker public interface LazyListScope {
     method public default void item(optional Object? key, optional Object? contentType, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,kotlin.Unit> content);
     method @Deprecated public void item(optional Object? key, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,? extends kotlin.Unit> content);
     method public default void items(int count, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,?>? key, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,?> contentType, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,kotlin.Unit> itemContent);
     method @Deprecated public void items(int count, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,?>? key, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? extends kotlin.Unit> itemContent);
+  }
+
+  public final class LazyListScrollingKt {
   }
 
   @androidx.compose.runtime.Stable public final class LazyListState implements androidx.compose.foundation.gestures.ScrollableState {
@@ -477,6 +495,9 @@ package androidx.compose.foundation.lazy {
   }
 
   @kotlin.DslMarker public @interface LazyScopeMarker {
+  }
+
+  public final class LazySemanticsKt {
   }
 
 }
@@ -637,31 +658,6 @@ package androidx.compose.foundation.lazy.layout {
   }
 
   public final class PinnableParentKt {
-  }
-
-}
-
-package androidx.compose.foundation.lazy.list {
-
-  public final class LazyListHeadersKt {
-  }
-
-  public final class LazyListItemPlacementAnimatorKt {
-  }
-
-  public final class LazyListItemsProviderImplKt {
-  }
-
-  public final class LazyListKt {
-  }
-
-  public final class LazyListMeasureKt {
-  }
-
-  public final class LazyListScrollingKt {
-  }
-
-  public final class LazySemanticsKt {
   }
 
 }
