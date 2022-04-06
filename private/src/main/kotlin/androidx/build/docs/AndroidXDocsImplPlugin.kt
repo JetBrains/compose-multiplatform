@@ -568,6 +568,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
         project.tasks.whenTaskAdded { task ->
             if (task is Test || task.name.startsWith("assemble") ||
                 task.name == "lint" ||
+                task.name == "lintAnalyzeDebug" ||
                 task.name == "transformDexArchiveWithExternalLibsDexMergerForPublicDebug" ||
                 task.name == "transformResourcesWithMergeJavaResForPublicDebug" ||
                 task.name == "checkPublicDebugDuplicateClasses"
