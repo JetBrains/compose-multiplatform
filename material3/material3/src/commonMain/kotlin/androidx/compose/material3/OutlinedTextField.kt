@@ -163,7 +163,7 @@ fun OutlinedTextField(
         } else {
             modifier
         }
-            .background(colors.backgroundColor(enabled).value, shape)
+            .background(colors.containerColor(enabled).value, shape)
             .defaultMinSize(
                 minWidth = TextFieldDefaults.MinWidth,
                 minHeight = TextFieldDefaults.MinHeight
@@ -305,7 +305,7 @@ fun OutlinedTextField(
         } else {
             modifier
         }
-            .background(colors.backgroundColor(enabled).value, shape)
+            .background(colors.containerColor(enabled).value, shape)
             .defaultMinSize(
                 minWidth = TextFieldDefaults.MinWidth,
                 minHeight = TextFieldDefaults.MinHeight

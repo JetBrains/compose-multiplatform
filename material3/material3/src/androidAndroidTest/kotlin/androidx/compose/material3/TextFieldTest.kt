@@ -106,7 +106,6 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.junit.Rule
 import org.junit.Test
@@ -1019,7 +1018,7 @@ class TextFieldTest {
                 onValueChange = {},
                 visualTransformation = PasswordVisualTransformation('\u0020'),
                 shape = RectangleShape,
-                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White)
+                colors = TextFieldDefaults.textFieldColors(containerColor = Color.White)
             )
         }
 
@@ -1038,7 +1037,7 @@ class TextFieldTest {
     @Test
     @LargeTest
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-    fun testTextField_alphaNotApplied_toCustomBackgroundColorAndTransparentColors() {
+    fun testTextField_alphaNotApplied_toCustomContainerColorAndTransparentColors() {
 
         rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.background(color = Color.White)) {
@@ -1055,7 +1054,7 @@ class TextFieldTest {
                         Icon(Icons.Default.Favorite, null, tint = Color.Transparent)
                     },
                     colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = Color.Blue,
+                        containerColor = Color.Blue,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         textColor = Color.Transparent,
@@ -1120,7 +1119,7 @@ class TextFieldTest {
                     Text("label", color = Color.Red, modifier = Modifier.background(Color.Red))
                 },
                 textStyle = TextStyle(color = Color.Blue),
-                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White)
+                colors = TextFieldDefaults.textFieldColors(containerColor = Color.White)
             )
         }
         rule.onNode(SemanticsMatcher.keyIsDefined(SemanticsProperties.Text), true)
@@ -1162,7 +1161,7 @@ class TextFieldTest {
                 },
                 textStyle = TextStyle(color = Color.White),
                 colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White,
+                    containerColor = Color.White,
                     unfocusedIndicatorColor = Color.Transparent
                 )
             )
