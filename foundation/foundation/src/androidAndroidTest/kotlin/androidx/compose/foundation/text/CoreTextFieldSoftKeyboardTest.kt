@@ -33,6 +33,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import org.junit.Rule
@@ -68,6 +69,7 @@ class CoreTextFieldSoftKeyboardTest {
         keyboardHelper.waitForKeyboardVisibility(visible = true)
     }
 
+    @FlakyTest(bugId = 228258574)
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
     @Test
     fun keyboardShownOnInitialFocus() {
