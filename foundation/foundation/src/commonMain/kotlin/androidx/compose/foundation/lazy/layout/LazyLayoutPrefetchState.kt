@@ -32,21 +32,29 @@ internal class LazyLayoutPrefetchState {
     internal var prefetcher: Prefetcher? by mutableStateOf(null)
 
     /**
-     * Schedules prefetching for the new items.
+     * Schedules precomposition and premeasure for the new item.
      *
-     * @param items list of index to constraints pairs for the items to be prefetched.
+     * @param index item index to prefetch.
+     * @param constraints [Constraints] to use for premeasuring.
      */
-    fun schedulePrefetch(items: List<Pair<Int, Constraints>>) =
-        prefetcher?.schedulePrefetch(items)
+    fun schedulePrefetch(index: Int, constraints: Constraints): PrefetchHandle {
+        return prefetcher?.schedulePrefetch(index, constraints) ?: DummyHandle
+    }
 
-    /**
-     * Notifies the prefetcher that previously scheduled items are no longer likely to be needed.
-     * Already precomposed items will be disposed.
-     */
-    fun cancelScheduledPrefetch() = prefetcher?.cancelScheduledPrefetch()
+    sealed interface PrefetchHandle {
+        /**
+         * Notifies the prefetcher that previously scheduled item is no longer needed. If the item
+         * was precomposed already it will be disposed.
+         */
+        fun cancel()
+    }
 
     internal interface Prefetcher {
-        fun schedulePrefetch(items: List<Pair<Int, Constraints>>)
-        fun cancelScheduledPrefetch()
+        fun schedulePrefetch(index: Int, constraints: Constraints): PrefetchHandle
     }
+}
+
+@ExperimentalFoundationApi
+private object DummyHandle : LazyLayoutPrefetchState.PrefetchHandle {
+    override fun cancel() {}
 }

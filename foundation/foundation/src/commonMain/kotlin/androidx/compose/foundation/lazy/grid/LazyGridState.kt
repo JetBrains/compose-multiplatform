@@ -26,6 +26,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
@@ -37,6 +38,7 @@ import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.util.fastForEach
 import kotlin.math.abs
 
 /**
@@ -194,6 +196,12 @@ class LazyGridState constructor(
     private var lineToPrefetch = -1
 
     /**
+     * The list of handles associated with the items from the [lineToPrefetch] line.
+     */
+    private var currentLinePrefetchHandles =
+        mutableVectorOf<LazyLayoutPrefetchState.PrefetchHandle>()
+
+    /**
      * Keeps the scrolling direction during the previous calculation in order to be able to
      * detect the scrolling direction change.
      */
@@ -309,7 +317,7 @@ class LazyGridState constructor(
     }
 
     private fun notifyPrefetch(delta: Float) {
-        val prefetchPolicy = prefetchState
+        val prefetchState = prefetchState
         if (!prefetchingEnabled) {
             return
         }
@@ -338,11 +346,16 @@ class LazyGridState constructor(
                     // is not going to be reached anytime soon so it is safer to dispose it.
                     // if this line is already visible it is safe to call the method anyway
                     // as it will be no-op
-                    prefetchPolicy.cancelScheduledPrefetch()
+                    currentLinePrefetchHandles.forEach { it.cancel() }
                 }
                 this.wasScrollingForward = scrollingForward
                 this.lineToPrefetch = lineToPrefetch
-                prefetchPolicy.schedulePrefetch(prefetchInfoRetriever(LineIndex(lineToPrefetch)))
+                currentLinePrefetchHandles.clear()
+                prefetchInfoRetriever(LineIndex(lineToPrefetch)).fastForEach {
+                    currentLinePrefetchHandles.add(
+                        prefetchState.schedulePrefetch(it.first, it.second)
+                    )
+                }
             }
         }
     }
