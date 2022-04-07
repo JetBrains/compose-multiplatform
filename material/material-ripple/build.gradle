@@ -33,8 +33,8 @@ dependencies {
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block below
          */
-        api("androidx.compose.foundation:foundation:1.1.0-rc01")
-        api("androidx.compose.runtime:runtime:1.1.0-rc01")
+        api("androidx.compose.foundation:foundation:1.1.1")
+        api("androidx.compose.runtime:runtime:1.1.1")
 
         implementation(libs.kotlinStdlibCommon)
         implementation("androidx.compose.animation:animation:1.0.0")

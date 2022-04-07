@@ -43,7 +43,7 @@ dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 
     if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-        api("androidx.compose.runtime:runtime:1.1.0-rc01")
+        api("androidx.compose.runtime:runtime:1.1.1")
         api(project(":compose:ui:ui"))
         api(project(":compose:ui:ui-graphics"))
         api(project(":compose:ui:ui-text"))

@@ -36,7 +36,7 @@ if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         kotlinPlugin(project(":compose:compiler:compiler"))
 
         api("androidx.compose.ui:ui:1.0.0")
-        implementation("androidx.compose.runtime:runtime:1.1.0-rc01")
+        implementation("androidx.compose.runtime:runtime:1.1.1")
         implementation(libs.kotlinStdlib)
 
         samples(project(":compose:material:material-icons-core:material-icons-core-samples"))
