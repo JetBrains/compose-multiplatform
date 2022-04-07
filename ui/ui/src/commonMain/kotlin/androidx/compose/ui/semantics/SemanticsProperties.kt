@@ -774,9 +774,16 @@ fun SemanticsPropertyReceiver.dialog() {
  */
 var SemanticsPropertyReceiver.role by SemanticsProperties.Role
 
-// TODO(b/138172781): Move to FoundationSemanticsProperties.kt
 /**
  * Test tag attached to this semantics node.
+ *
+ * This can be used to find nodes in testing frameworks:
+ * - In Compose's built-in unit test framework, use with
+ * [onNodeWithTag][androidx.compose.ui.test.onNodeWithTag].
+ * - For newer AccessibilityNodeInfo-based integration test frameworks, it can be matched in the
+ * extras with key "androidx.compose.ui.semantics.testTag"
+ * - For legacy AccessibilityNodeInfo-based integration tests, it's optionally exposed as the
+ * resource id if [testTagsAsResourceId] is true (for matching with 'By.res' in UIAutomator).
  */
 var SemanticsPropertyReceiver.testTag by SemanticsProperties.TestTag
 
