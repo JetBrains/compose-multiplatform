@@ -34,6 +34,7 @@ import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import androidx.compose.ui.text.matchers.assertThat
+import androidx.compose.ui.unit.Constraints
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -608,7 +609,7 @@ class ParagraphFillBoundingBoxesTest {
             placeholders = placeholders,
             maxLines = Int.MAX_VALUE,
             ellipsis = false,
-            width = width,
+            constraints = Constraints(maxWidth = width.ceilToInt()),
             density = defaultDensity,
             fontFamilyResolver = fontFamilyResolver
         ) as AndroidParagraph

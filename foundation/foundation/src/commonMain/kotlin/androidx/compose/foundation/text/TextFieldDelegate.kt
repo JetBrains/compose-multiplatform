@@ -75,7 +75,7 @@ internal fun computeSizeForDefaultText(
         ellipsis = false,
         density = density,
         fontFamilyResolver = fontFamilyResolver,
-        width = Float.POSITIVE_INFINITY
+        constraints = Constraints()
     )
     return IntSize(paragraph.minIntrinsicWidth.toIntPx(), paragraph.height.toIntPx())
 }

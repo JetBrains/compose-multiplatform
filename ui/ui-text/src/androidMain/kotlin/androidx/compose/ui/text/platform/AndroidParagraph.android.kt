@@ -55,6 +55,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Density
 import java.util.Locale as JavaLocale
+import androidx.compose.ui.text.ceilToInt
+import androidx.compose.ui.unit.Constraints
 
 /**
  * Android specific implementation for [Paragraph]
@@ -64,11 +66,11 @@ import java.util.Locale as JavaLocale
 // implements Paragraph and ParagraphIntrinsics? it seems like all of these types are immutable
 // and have similar sets of responsibilities.
 @OptIn(InternalPlatformTextApi::class)
-internal class AndroidParagraph constructor(
+internal class AndroidParagraph(
     val paragraphIntrinsics: AndroidParagraphIntrinsics,
     val maxLines: Int,
     val ellipsis: Boolean,
-    override val width: Float
+    val constraints: Constraints
 ) : Paragraph {
 
     constructor(
@@ -78,7 +80,7 @@ internal class AndroidParagraph constructor(
         placeholders: List<AnnotatedString.Range<Placeholder>>,
         maxLines: Int,
         ellipsis: Boolean,
-        width: Float,
+        constraints: Constraints,
         fontFamilyResolver: FontFamily.Resolver,
         density: Density
     ) : this(
@@ -92,14 +94,13 @@ internal class AndroidParagraph constructor(
         ),
         maxLines = maxLines,
         ellipsis = ellipsis,
-        width = width
+        constraints = constraints
     )
 
     private val layout: TextLayout
 
     init {
         require(maxLines >= 1) { "maxLines should be greater than 0" }
-        require(width >= 0f) { "width should not be negative" }
 
         val style = paragraphIntrinsics.style
 
@@ -131,6 +132,9 @@ internal class AndroidParagraph constructor(
             fallbackLineSpacing = true
         )
     }
+
+    override val width: Float
+        get() = constraints.maxWidth.toFloat()
 
     override val height: Float
         get() = layout.height.toFloat()
@@ -431,7 +435,7 @@ internal actual fun ActualParagraph(
     ),
     maxLines,
     ellipsis,
-    width
+   Constraints(maxWidth = width.ceilToInt())
 )
 
 internal actual fun ActualParagraph(
@@ -441,7 +445,7 @@ internal actual fun ActualParagraph(
     placeholders: List<AnnotatedString.Range<Placeholder>>,
     maxLines: Int,
     ellipsis: Boolean,
-    width: Float,
+    constraints: Constraints,
     density: Density,
     fontFamilyResolver: FontFamily.Resolver
 ): Paragraph = AndroidParagraph(
@@ -455,17 +459,17 @@ internal actual fun ActualParagraph(
     ),
     maxLines,
     ellipsis,
-    width
+    constraints
 )
 
 internal actual fun ActualParagraph(
     paragraphIntrinsics: ParagraphIntrinsics,
     maxLines: Int,
     ellipsis: Boolean,
-    width: Float
+    constraints: Constraints
 ): Paragraph = AndroidParagraph(
     paragraphIntrinsics as AndroidParagraphIntrinsics,
     maxLines,
     ellipsis,
-    width
+    constraints
 )

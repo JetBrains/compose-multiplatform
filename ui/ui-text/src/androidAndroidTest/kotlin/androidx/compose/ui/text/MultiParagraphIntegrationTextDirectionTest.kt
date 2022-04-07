@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
@@ -147,7 +148,7 @@ class MultiParagraphIntegrationTextDirectionTest {
             val fontSizeInPx = fontSize.toPx()
 
             val width = multiParagraphIntrinsics(text, fontSize).maxIntrinsicWidth
-
+            assertThat(width).isLessThan(Int.MAX_VALUE)
             val paragraph = multiParagraph(
                 text = text,
                 fontSize = fontSize,
@@ -283,7 +284,7 @@ class MultiParagraphIntegrationTextDirectionTest {
                 localeList = localeList,
                 textDirection = textDirection
             ),
-            width = width,
+            constraints = Constraints(maxWidth = width.ceilToInt()),
             density = defaultDensity,
             fontFamilyResolver = UncachedFontFamilyResolver(context)
         )

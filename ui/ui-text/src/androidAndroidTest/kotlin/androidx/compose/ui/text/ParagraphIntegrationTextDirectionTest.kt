@@ -18,6 +18,7 @@ package androidx.compose.ui.text
 
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.ResolvedTextDirection
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -59,7 +60,7 @@ class ParagraphIntegrationTextDirectionTest {
         val paragraph = Paragraph(
             text = "",
             style = TextStyle(textDirection = null),
-            width = Float.MAX_VALUE,
+            constraints = Constraints(),
             density = defaultDensity,
             fontFamilyResolver = resourceLoader
         )
@@ -74,7 +75,7 @@ class ParagraphIntegrationTextDirectionTest {
         val paragraph = Paragraph(
             text = "",
             style = TextStyle(textDirection = null),
-            width = Float.MAX_VALUE,
+            constraints = Constraints(),
             density = defaultDensity,
             fontFamilyResolver = resourceLoader
         )
@@ -87,7 +88,7 @@ class ParagraphIntegrationTextDirectionTest {
         val paragraph = Paragraph(
             text = "",
             style = TextStyle(textDirection = null, localeList = ltrLocaleList),
-            width = Float.MAX_VALUE,
+            constraints = Constraints(),
             density = defaultDensity,
             fontFamilyResolver = resourceLoader
         )
@@ -100,7 +101,7 @@ class ParagraphIntegrationTextDirectionTest {
         val paragraph = Paragraph(
             text = "",
             style = TextStyle(textDirection = null, localeList = rtlLocaleList),
-            width = Float.MAX_VALUE,
+            constraints = Constraints(),
             density = defaultDensity,
             fontFamilyResolver = resourceLoader
         )

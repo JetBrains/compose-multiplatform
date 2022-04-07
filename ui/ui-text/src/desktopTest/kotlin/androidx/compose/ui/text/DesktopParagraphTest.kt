@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.sp
 import com.google.common.truth.Truth
@@ -294,7 +295,7 @@ class DesktopParagraphTest {
             ).merge(style),
             maxLines = maxLines,
             ellipsis = ellipsis,
-            width = width,
+            constraints = Constraints(maxWidth = width.ceilToInt()),
             density = density ?: defaultDensity,
             fontFamilyResolver = fontFamilyResolver
         )
@@ -327,7 +328,7 @@ class DesktopParagraphTest {
             paragraphIntrinsics = intrinsics,
             maxLines = maxLines,
             ellipsis = ellipsis,
-            width = width,
+            constraints = Constraints(maxWidth = width.ceilToInt()),
         )
     }
 }
