@@ -39,7 +39,7 @@ import kotlin.math.floor
  * 2) [NestedScrollingChildHelper] by implementing this interface it should be able to receive
  * deltas from dispatching children on the Compose side.
  */
-internal class NestedScrollInteropAdapter(
+internal class NestedScrollInteropConnection(
     private val view: ComposeView
 ) : NestedScrollConnection {
 
@@ -66,8 +66,8 @@ internal class NestedScrollInteropAdapter(
             consumedScrollCache.fill(0)
 
             nestedScrollChildHelper.dispatchNestedPreScroll(
-                available.x.toViewOffset(),
-                available.y.toViewOffset(),
+                composeToViewOffset(available.x),
+                composeToViewOffset(available.y),
                 consumedScrollCache,
                 null,
                 source.toViewType()
@@ -93,10 +93,10 @@ internal class NestedScrollInteropAdapter(
             consumedScrollCache.fill(0)
 
             nestedScrollChildHelper.dispatchNestedScroll(
-                consumed.x.toViewOffset(),
-                consumed.y.toViewOffset(),
-                available.x.toViewOffset(),
-                available.y.toViewOffset(),
+                composeToViewOffset(consumed.x),
+                composeToViewOffset(consumed.y),
+                composeToViewOffset(available.x),
+                composeToViewOffset(available.y),
                 null,
                 source.toViewType(),
                 consumedScrollCache,
@@ -158,7 +158,7 @@ internal class NestedScrollInteropAdapter(
 private fun Float.ceilAwayFromZero(): Float = if (this >= 0) ceil(this) else floor(this)
 
 // Compose coordinate system is the opposite of view's system
-private fun Float.toViewOffset(): Int = ceilAwayFromZero().toInt() * -1
+internal fun composeToViewOffset(offset: Float): Int = offset.ceilAwayFromZero().toInt() * -1
 
 // Compose scrolling sign system is the opposite of view's system
 private fun Int.reverseAxis(): Float = this * -1f
@@ -223,13 +223,15 @@ private val Offset.scrollAxes: Int
  * [androidx.coordinatorlayout.widget.CoordinatorLayout].
  *
  * Learn how to enable nested scroll interop:
- * @sample androidx.compose.ui.samples.NestedScrollInteropSample
+ * @sample androidx.compose.ui.samples.ComposeInCooperatingViewNestedScrollInteropSample
  *
  * @param view The [ComposeView] that hosts the [Composable] during Compose in View interop.
  *
  */
 @ExperimentalComposeUiApi
 @Composable
-fun rememberNestedScrollInteropConnection(view: ComposeView): NestedScrollConnection = remember {
-    NestedScrollInteropAdapter(view)
+fun rememberNestedScrollInteropConnection(
+    view: ComposeView
+): NestedScrollConnection = remember(view) {
+    NestedScrollInteropConnection(view)
 }
