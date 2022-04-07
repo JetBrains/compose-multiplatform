@@ -24,6 +24,7 @@ val TextDemos = DemoCategory(
     listOf(
         ComposableDemo("Static text") { TextDemo() },
         ComposableDemo("Brush") { TextBrushDemo() },
+        ComposableDemo("Ellipsize") { EllipsizeDemo() },
         ComposableDemo("Typeface") { TypefaceDemo() },
         ComposableDemo("FontFamily fallback") { FontFamilyDemo() },
         ComposableDemo("All system font families") { SystemFontFamilyDemo() },

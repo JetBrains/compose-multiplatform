@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.text
 
+import androidx.compose.ui.text.android.style.ceilToInt
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -503,12 +504,38 @@ class ParagraphPlaceholderIntegrationTest {
         assertThat(placeholderRects[1]).isNull()
     }
 
+    @Test
+    fun placeHolderRects_withLimitedHeight_ellipsized() {
+        val text = "ABC"
+        val fontSize = 20f
+
+        val placeholder = Placeholder(1.em, 1.em, PlaceholderVerticalAlign.TextCenter)
+        val placeholders = listOf(
+            AnnotatedString.Range(placeholder, 0, 1),
+            AnnotatedString.Range(placeholder, 2, 3)
+        )
+        val paragraph = simpleParagraph(
+            text = text,
+            placeholders = placeholders,
+            fontSize = fontSize.sp,
+            width = 2 * fontSize,
+            height = 1.3f * fontSize,
+            ellipsis = true
+        )
+        val placeholderRects = paragraph.placeholderRects
+        assertThat(placeholderRects.size).isEqualTo(placeholders.size)
+        assertThat(placeholderRects[0]).isNotNull()
+        // The second placeholder should be ellipsized.
+        assertThat(placeholderRects[1]).isNull()
+    }
+
     private fun simpleParagraph(
         text: String = "",
         fontSize: TextUnit = TextUnit.Unspecified,
         spanStyles: List<AnnotatedString.Range<SpanStyle>> = listOf(),
         placeholders: List<AnnotatedString.Range<Placeholder>> = listOf(),
         width: Float = Float.MAX_VALUE,
+        height: Float = Float.MAX_VALUE,
         maxLines: Int = Int.MAX_VALUE,
         ellipsis: Boolean = false
     ): Paragraph {
@@ -522,7 +549,7 @@ class ParagraphPlaceholderIntegrationTest {
             placeholders = placeholders,
             maxLines = maxLines,
             ellipsis = ellipsis,
-            constraints = Constraints(maxWidth = width.ceilToInt()),
+            constraints = Constraints(maxWidth = width.ceilToInt(), maxHeight = height.ceilToInt()),
             density = defaultDensity,
             fontFamilyResolver = UncachedFontFamilyResolver(context)
         )

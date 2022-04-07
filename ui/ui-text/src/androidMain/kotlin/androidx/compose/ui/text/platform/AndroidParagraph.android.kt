@@ -121,20 +121,30 @@ internal class AndroidParagraph(
             null
         }
 
-        layout = TextLayout(
-            charSequence = paragraphIntrinsics.charSequence,
-            width = width,
-            textPaint = textPaint,
-            ellipsize = ellipsize,
+        val firstLayout = constructTextLayout(
             alignment = alignment,
-            textDirectionHeuristic = paragraphIntrinsics.textDirectionHeuristic,
-            lineSpacingMultiplier = DEFAULT_LINESPACING_MULTIPLIER,
-            maxLines = maxLines,
             justificationMode = justificationMode,
-            layoutIntrinsics = paragraphIntrinsics.layoutIntrinsics,
-            includePadding = style.isIncludeFontPaddingEnabled(),
-            fallbackLineSpacing = true
+            ellipsize = ellipsize,
+            maxLines = maxLines
         )
+
+        // Ellipsize if there's not enough vertical space to fit all lines
+        if (ellipsis && firstLayout.height > constraints.maxHeight && maxLines > 1) {
+            val calculatedMaxLines =
+                firstLayout.numberOfLinesThatFitMaxHeight(constraints.maxHeight)
+            layout = if (calculatedMaxLines > 0 && calculatedMaxLines != maxLines) {
+                constructTextLayout(
+                    alignment = alignment,
+                    justificationMode = justificationMode,
+                    ellipsize = ellipsize,
+                    maxLines = calculatedMaxLines
+                )
+            } else {
+                firstLayout
+            }
+        } else {
+            layout = firstLayout
+        }
 
         layout.getShaderBrushSpans().forEach { shaderBrushSpan ->
             shaderBrushSpan.size = Size(width, height)
@@ -442,6 +452,27 @@ internal class AndroidParagraph(
             nativeCanvas.restore()
         }
     }
+
+    private fun constructTextLayout(
+        alignment: Int,
+        justificationMode: Int,
+        ellipsize: TextUtils.TruncateAt?,
+        maxLines: Int
+    ) =
+        TextLayout(
+            charSequence = paragraphIntrinsics.charSequence,
+            width = width,
+            textPaint = textPaint,
+            ellipsize = ellipsize,
+            alignment = alignment,
+            textDirectionHeuristic = paragraphIntrinsics.textDirectionHeuristic,
+            lineSpacingMultiplier = DEFAULT_LINESPACING_MULTIPLIER,
+            maxLines = maxLines,
+            justificationMode = justificationMode,
+            layoutIntrinsics = paragraphIntrinsics.layoutIntrinsics,
+            includePadding = paragraphIntrinsics.style.isIncludeFontPaddingEnabled(),
+            fallbackLineSpacing = true
+        )
 }
 
 /**
@@ -457,11 +488,21 @@ private fun toLayoutAlign(align: TextAlign?): Int = when (align) {
     else -> DEFAULT_ALIGNMENT
 }
 
+@OptIn(InternalPlatformTextApi::class)
+private fun TextLayout.numberOfLinesThatFitMaxHeight(maxHeight: Int): Int {
+    for (lineIndex in 0 until lineCount) {
+        if (getLineBottom(lineIndex) > maxHeight) return lineIndex
+    }
+    return lineCount
+}
+
 @Suppress("DEPRECATION")
 @Deprecated(
     "Font.ResourceLoader is deprecated, instead pass FontFamily.Resolver",
-    replaceWith = ReplaceWith("ActualParagraph(text, style, spanStyles, placeholders, " +
-        "maxLines, ellipsis, width, density, fontFamilyResolver)"),
+    replaceWith = ReplaceWith(
+        "ActualParagraph(text, style, spanStyles, placeholders, " +
+            "maxLines, ellipsis, width, density, fontFamilyResolver)"
+    ),
 )
 internal actual fun ActualParagraph(
     text: String,
@@ -484,7 +525,7 @@ internal actual fun ActualParagraph(
     ),
     maxLines,
     ellipsis,
-   Constraints(maxWidth = width.ceilToInt())
+    Constraints(maxWidth = width.ceilToInt())
 )
 
 internal actual fun ActualParagraph(
