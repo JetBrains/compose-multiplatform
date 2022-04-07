@@ -14,25 +14,34 @@
  * limitations under the License.
  */
 
+import groovy.lang.Tuple;
+
 def init = new Properties()
 ext.init = init
 
-def chooseOutDir(subdir = "") {
+def getOutDir(subdir = "") {
     /*
      * The OUT_DIR is a temporary directory you can use to put things during the build.
      */
     def outDir = System.env.OUT_DIR
+    def buildSrcOut
     if (outDir == null) {
         def checkoutRoot = System.getProperty("CHECKOUT_ROOT")
         if (checkoutRoot == null) {
             checkoutRoot = new File("${buildscript.sourceFile.parent}/../../..")
         }
         outDir = new File("${checkoutRoot}/out${subdir}")
-        project.ext.buildSrcOut = new File("${checkoutRoot}/out/buildSrc")
+        buildSrcOut = new File("${checkoutRoot}/out/buildSrc")
     } else {
         outDir = new File(outDir)
-        project.ext.buildSrcOut = new File("${outDir}/buildSrc")
+        buildSrcOut = new File("${outDir}/buildSrc")
     }
+    return new Tuple(outDir, buildSrcOut)
+}
+
+def chooseOutDir(subdir = "") {
+    def (outDir, buildSrcOut) = getOutDir(subdir)
+    project.ext.buildSrcOut = buildSrcOut
     project.ext.outDir = outDir
     buildDir = new File(outDir, "$project.name/build")
                 .getCanonicalFile()
@@ -42,4 +51,5 @@ def chooseOutDir(subdir = "") {
     }
 }
 
+ext.init.getOutDir = this.&getOutDir
 ext.init.chooseOutDir = this.&chooseOutDir
