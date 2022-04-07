@@ -100,6 +100,7 @@ import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.TestActivity
@@ -2278,6 +2279,79 @@ class AndroidAccessibilityTest {
             ),
             textRect
         )
+    }
+
+    @Test
+    @OptIn(ExperimentalComposeUiApi::class)
+    fun testTestTagsAsResourceId() {
+        val tag1 = "box1"
+        val tag2 = "box2"
+        val tag3 = "box3"
+        val tag4 = "box4"
+        val tag5 = "box5"
+        val tag6 = "box6"
+        val tag7 = "box7"
+        container.setContent {
+            with(LocalDensity.current) {
+                Column {
+                    Box(Modifier.size(100.toDp()).testTag(tag1))
+                    Box(Modifier.semantics { testTagsAsResourceId = true }) {
+                        Box(Modifier.size(100.toDp()).testTag(tag2))
+                    }
+                    Box(Modifier.semantics { testTagsAsResourceId = false }) {
+                        Box(Modifier.size(100.toDp()).testTag(tag3))
+                    }
+                    Box(Modifier.semantics { testTagsAsResourceId = true }) {
+                        Box(Modifier.semantics { testTagsAsResourceId = false }) {
+                            Box(Modifier.size(100.toDp()).testTag(tag4))
+                        }
+                    }
+                    Box(Modifier.semantics { testTagsAsResourceId = false }) {
+                        Box(Modifier.semantics { testTagsAsResourceId = true }) {
+                            Box(Modifier.size(100.toDp()).testTag(tag5))
+                        }
+                    }
+                    Box(Modifier.semantics(true) { testTagsAsResourceId = true }) {
+                        Box(Modifier.semantics { testTagsAsResourceId = false }) {
+                            Box(Modifier.size(100.toDp()).testTag(tag6))
+                        }
+                    }
+                    Box(Modifier.semantics(true) { testTagsAsResourceId = false }) {
+                        Box(Modifier.semantics { testTagsAsResourceId = true }) {
+                            Box(Modifier.size(100.toDp()).testTag(tag7))
+                        }
+                    }
+                }
+            }
+        }
+
+        val node1 = rule.onNodeWithTag(tag1).fetchSemanticsNode()
+        val info1 = provider.createAccessibilityNodeInfo(node1.id)!!
+        assertEquals(null, info1.viewIdResourceName)
+
+        val node2 = rule.onNodeWithTag(tag2).fetchSemanticsNode()
+        val info2 = provider.createAccessibilityNodeInfo(node2.id)!!
+        assertEquals(tag2, info2.viewIdResourceName)
+
+        val node3 = rule.onNodeWithTag(tag3).fetchSemanticsNode()
+        val info3 = provider.createAccessibilityNodeInfo(node3.id)!!
+        assertEquals(null, info3.viewIdResourceName)
+
+        val node4 = rule.onNodeWithTag(tag4).fetchSemanticsNode()
+        val info4 = provider.createAccessibilityNodeInfo(node4.id)!!
+        assertEquals(null, info4.viewIdResourceName)
+
+        val node5 = rule.onNodeWithTag(tag5).fetchSemanticsNode()
+        val info5 = provider.createAccessibilityNodeInfo(node5.id)!!
+        assertEquals(tag5, info5.viewIdResourceName)
+
+        val node6 = rule.onNodeWithTag(tag6, true).fetchSemanticsNode()
+        val info6 = provider.createAccessibilityNodeInfo(node6.id)!!
+        assertEquals(null, info6.viewIdResourceName)
+
+        val node7 = rule.onNodeWithTag(tag7, true).fetchSemanticsNode()
+        val info7 = provider.createAccessibilityNodeInfo(node7.id)!!
+        assertEquals(tag7, info7.viewIdResourceName)
     }
 
     @Test
