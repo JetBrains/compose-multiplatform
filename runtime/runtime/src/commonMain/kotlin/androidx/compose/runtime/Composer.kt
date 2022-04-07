@@ -1188,6 +1188,8 @@ internal class ComposerImpl(
 
     private var writer: SlotWriter = insertTable.openWriter().also { it.close() }
     private var writerHasAProvider = false
+    private var providerCache: CompositionLocalMap? = null
+
     private var insertAnchor: Anchor = insertTable.read { it.anchor(0) }
     private val insertFixups = mutableListOf<Change>()
 
@@ -1328,6 +1330,7 @@ internal class ComposerImpl(
         parentProvider = parentContext.getCompositionLocalScope()
         providersInvalidStack.push(providersInvalid.asInt())
         providersInvalid = changed(parentProvider)
+        providerCache = null
         if (!forceRecomposeScopes) {
             forceRecomposeScopes = parentContext.collectingParameterInformation
         }
@@ -1770,6 +1773,8 @@ internal class ComposerImpl(
      * Return the current [CompositionLocal] scope which was provided by a parent group.
      */
     private fun currentCompositionLocalScope(group: Int? = null): CompositionLocalMap {
+        if (group == null)
+            providerCache?.let { return it }
         if (inserting && writerHasAProvider) {
             var current = writer.parent
             while (current > 0) {
@@ -1777,7 +1782,9 @@ internal class ComposerImpl(
                     writer.groupObjectKey(current) == compositionLocalMap
                 ) {
                     @Suppress("UNCHECKED_CAST")
-                    return writer.groupAux(current) as CompositionLocalMap
+                    val providers = writer.groupAux(current) as CompositionLocalMap
+                    providerCache = providers
+                    return providers
                 }
                 current = writer.parent(current)
             }
@@ -1789,12 +1796,15 @@ internal class ComposerImpl(
                     reader.groupObjectKey(current) == compositionLocalMap
                 ) {
                     @Suppress("UNCHECKED_CAST")
-                    return providerUpdates[current]
+                    val providers = providerUpdates[current]
                         ?: reader.groupAux(current) as CompositionLocalMap
+                    providerCache = providers
+                    return providers
                 }
                 current = reader.parent(current)
             }
         }
+        providerCache = parentProvider
         return parentProvider
     }
 
@@ -1864,6 +1874,7 @@ internal class ComposerImpl(
         }
         providersInvalidStack.push(providersInvalid.asInt())
         providersInvalid = invalid
+        providerCache = providers
         start(compositionLocalMapKey, compositionLocalMap, false, providers)
     }
 
@@ -1872,6 +1883,7 @@ internal class ComposerImpl(
         endGroup()
         endGroup()
         providersInvalid = providersInvalidStack.pop().asBool()
+        providerCache = null
     }
 
     @InternalComposeApi
@@ -1929,6 +1941,7 @@ internal class ComposerImpl(
             // Append to the end of the table
             writer.skipToGroupEnd()
             writerHasAProvider = false
+            providerCache = null
         }
     }
 
@@ -2034,6 +2047,7 @@ internal class ComposerImpl(
                 // inserted into in the table.
                 reader.beginEmpty()
                 inserting = true
+                providerCache = null
                 ensureWriter()
                 writer.beginInsert()
                 val startIndex = writer.currentGroup
@@ -2294,6 +2308,10 @@ internal class ComposerImpl(
                     recomposeCompoundKey
                 )
 
+                // We have moved so the cached lookup of the provider is invalid
+                providerCache = null
+
+                // Invoke the scope's composition function
                 firstInRange.scope.compose(this)
 
                 // Restore the parent of the reader to the previous parent
@@ -2741,6 +2759,8 @@ internal class ComposerImpl(
         // needs to be created as a late change.
         if (inserting && !force) {
             writerHasAProvider = true
+            providerCache = null
+
             // Create an anchor to the movable group
             val anchor = writer.anchor(writer.parent(writer.parent))
             val reference = MovableContentStateReference(
