@@ -43,7 +43,7 @@ dependencies {
         api(libs.kotlinStdlibCommon)
         api(libs.testExtJunit)
 
-        implementation("androidx.compose.runtime:runtime-saveable:1.1.0-rc01")
+        implementation("androidx.compose.runtime:runtime-saveable:1.1.1")
         implementation("androidx.activity:activity-compose:1.3.0")
         implementation("androidx.annotation:annotation:1.1.0")
         implementation("androidx.lifecycle:lifecycle-common:2.3.0")
