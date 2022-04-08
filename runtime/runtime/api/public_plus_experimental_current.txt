@@ -169,7 +169,7 @@ package androidx.compose.runtime {
 
   public static final class Composer.Companion {
     method public Object getEmpty();
-    method @androidx.compose.runtime.InternalComposeTracingApi public void setTracer(androidx.compose.runtime.CompositionTracer tracer);
+    method @androidx.compose.runtime.ExperimentalComposeApi public void setTracer(androidx.compose.runtime.CompositionTracer tracer);
     property public final Object Empty;
   }
 
@@ -180,7 +180,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public static void sourceInformationMarkerEnd(androidx.compose.runtime.Composer composer);
     method @androidx.compose.runtime.ComposeCompilerApi public static void sourceInformationMarkerStart(androidx.compose.runtime.Composer composer, int key, String sourceInformation);
     method @androidx.compose.runtime.ComposeCompilerApi public static void traceEventEnd();
-    method @androidx.compose.runtime.ComposeCompilerApi public static void traceEventStart(int key, int dirty1, int dirty2, String info);
+    method @androidx.compose.runtime.ComposeCompilerApi public static void traceEventStart(int key, String info);
   }
 
   public interface Composition {
@@ -221,9 +221,9 @@ package androidx.compose.runtime {
     method public static <T> androidx.compose.runtime.ProvidableCompositionLocal<T> staticCompositionLocalOf(kotlin.jvm.functions.Function0<? extends T> defaultFactory);
   }
 
-  @androidx.compose.runtime.InternalComposeTracingApi public interface CompositionTracer {
+  @androidx.compose.runtime.ExperimentalComposeApi public interface CompositionTracer {
     method public void traceEventEnd();
-    method public void traceEventStart(int key, int dirty1, int dirty2, String info);
+    method public void traceEventStart(int key, String info);
   }
 
   public sealed interface ControlledComposition extends androidx.compose.runtime.Composition {
@@ -288,9 +288,6 @@ package androidx.compose.runtime {
   }
 
   @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level.ERROR, message="This is internal API for Compose modules that may change frequently " + "and without warning.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY}) public @interface InternalComposeApi {
-  }
-
-  @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level.ERROR, message="This is internal API that may change frequently and without warning.") public @interface InternalComposeTracingApi {
   }
 
   @androidx.compose.runtime.InternalComposeApi public interface InternalRecomposeScope {
