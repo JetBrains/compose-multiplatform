@@ -598,7 +598,7 @@ class SurfaceTest {
                                     awaitPointerEventScope {
                                         hitTested.value = true
                                         val event = awaitPointerEvent(PointerEventPass.Final)
-                                        Truth.assertThat(event.changes[0].consumed.downChange)
+                                        Truth.assertThat(event.changes[0].isConsumed)
                                             .isFalse()
                                     }
                                 }

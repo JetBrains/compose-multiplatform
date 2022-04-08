@@ -29,7 +29,6 @@ import androidx.compose.runtime.withRunningRecomposer
 import androidx.compose.testutils.TestViewConfiguration
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.ConsumedData
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
@@ -136,7 +135,7 @@ internal class SuspendingGestureTestUtil(
             previousUptimeMillis = lastTime,
             previousPosition = Offset(x, y),
             previousPressed = false,
-            ConsumedData()
+            isInitiallyConsumed = false
         )
         activePointers[change.id] = change
         invokeOverAllPasses(change, initial, main, final)
@@ -180,7 +179,7 @@ internal class SuspendingGestureTestUtil(
             uptimeMillis = lastTime,
             pressed = false,
             position = position,
-            consumed = ConsumedData()
+            isInitiallyConsumed = false
         )
         activePointers[change.id] = change
         invokeOverAllPasses(change, initial, main, final)
@@ -210,7 +209,7 @@ internal class SuspendingGestureTestUtil(
             uptimeMillis = lastTime,
             position = Offset(x, y),
             pressed = true,
-            consumed = ConsumedData()
+            isInitiallyConsumed = false
         )
         initial(change)
         activePointers[change.id] = change
@@ -276,7 +275,7 @@ internal class SuspendingGestureTestUtil(
                         uptimeMillis = currentTime,
                         pressed = change.pressed,
                         position = change.position,
-                        consumed = ConsumedData()
+                        isInitiallyConsumed = false
                     )
                 )
             }

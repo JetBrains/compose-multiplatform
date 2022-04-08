@@ -187,7 +187,7 @@ class SuspendingPointerInputFilterTest {
                         0,
                         Offset(6f, 6f),
                         true,
-                        consumed = ConsumedData(downChange = true)
+                        isInitiallyConsumed = true
                     ),
                     PointerInputChange(
                         PointerId(1),
@@ -197,7 +197,7 @@ class SuspendingPointerInputFilterTest {
                         0,
                         Offset(10f, 10f),
                         false,
-                        consumed = ConsumedData()
+                        isInitiallyConsumed = false
                     )
                 )
             )
@@ -418,7 +418,7 @@ private class PointerInputChangeEmitter(id: Int = 0) {
             previousTime,
             previousPosition,
             previousPressed,
-            consumed = ConsumedData()
+            isInitiallyConsumed = false
         ).also {
             previousTime = time
             previousPosition = position
