@@ -48,7 +48,6 @@ import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.junit.Rule
 import org.junit.Test
@@ -74,7 +73,7 @@ class CardTest {
                     Card(
                         modifier = Modifier.semantics(mergeDescendants = true) {}.testTag("card"),
                         shape = shape,
-                        containerColor = cardColor
+                        colors = CardDefaults.cardColors(containerColor = cardColor)
                     ) { Box(Modifier.size(50.dp, 50.dp)) }
                 }
             }
