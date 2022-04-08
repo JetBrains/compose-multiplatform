@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.IntOffset
  * Receiver scope being used by the item content parameter of [LazyVerticalGrid].
  */
 @Stable
+@LazyGridScopeMarker
 sealed interface LazyGridItemScope {
     /**
      * This modifier animates the item placement within the Lazy grid.
