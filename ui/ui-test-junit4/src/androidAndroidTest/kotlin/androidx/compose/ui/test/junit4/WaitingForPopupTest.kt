@@ -21,21 +21,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.isPopup
+import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalTestApi::class)
 class WaitingForPopupTest {
-    @get:Rule
-    val rule = createComposeRule()
-
     @Composable
     private fun ShowPopup() {
         Popup {
@@ -44,43 +43,43 @@ class WaitingForPopupTest {
     }
 
     @Test
-    fun popupInFirstComposition() {
-        rule.setContent {
+    fun popupInFirstComposition() = runComposeUiTest {
+        setContent {
             ShowPopup()
         }
-        rule.onNode(isPopup()).assertExists()
+        onNode(isPopup()).assertExists()
     }
 
     @Test
-    fun popupInLaterComposition() {
+    fun popupInLaterComposition() = runComposeUiTest {
         val showPopup = mutableStateOf(false)
-        rule.setContent {
+        setContent {
             if (showPopup.value) {
                 ShowPopup()
             }
         }
-        rule.onNode(isPopup()).assertDoesNotExist()
+        onNode(isPopup()).assertDoesNotExist()
         showPopup.value = true
-        rule.onNode(isPopup()).assertExists()
+        onNode(isPopup()).assertExists()
     }
 
     @Test
-    fun popupTogglingRepeatedly() {
+    fun popupTogglingRepeatedly() = runComposeUiTest {
         val showPopup = mutableStateOf(false)
-        rule.setContent {
+        setContent {
             if (showPopup.value) {
                 ShowPopup()
             }
         }
-        rule.onNode(isPopup()).assertDoesNotExist()
+        onNode(isPopup()).assertDoesNotExist()
 
         // (no particular reason for 4x, could've been 10x just as well)
         repeat(4) {
             showPopup.value = !showPopup.value
             if (showPopup.value) {
-                rule.onNode(isPopup()).assertExists()
+                onNode(isPopup()).assertExists()
             } else {
-                rule.onNode(isPopup()).assertDoesNotExist()
+                onNode(isPopup()).assertDoesNotExist()
             }
         }
     }

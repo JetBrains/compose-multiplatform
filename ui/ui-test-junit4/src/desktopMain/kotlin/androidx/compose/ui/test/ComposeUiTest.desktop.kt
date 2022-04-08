@@ -1,5 +1,3 @@
-// ktlint-disable filename
-
 /*
  * Copyright 2022 The Android Open Source Project
  *
@@ -40,9 +38,16 @@ import kotlinx.coroutines.yield
 import kotlin.coroutines.cancellation.CancellationException
 import org.jetbrains.skia.Surface
 
+@ExperimentalTestApi
+@OptIn(InternalTestApi::class)
+actual fun runComposeUiTest(block: ComposeUiTest.() -> Unit) {
+    DesktopComposeUiTest().runTest(block)
+}
+
 @InternalTestApi
+@ExperimentalTestApi
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalCoroutinesApi::class)
-internal class DesktopComposeTest : ComposeTest {
+class DesktopComposeUiTest : ComposeUiTest {
 
     override val density = Density(1f, 1f)
 
@@ -68,7 +73,7 @@ internal class DesktopComposeTest : ComposeTest {
     private val testOwner = DesktopTestOwner()
     private val testContext = createTestContext(testOwner)
 
-    fun <R> runTest(block: ComposeTest.() -> R): R {
+    fun <R> runTest(block: ComposeUiTest.() -> R): R {
         scene = runOnUiThread(::createUi)
         try {
             return block()
@@ -192,14 +197,28 @@ internal class DesktopComposeTest : ComposeTest {
         }
 
         override fun <T> runOnUiThread(action: () -> T): T {
-            return this@DesktopComposeTest.runOnUiThread(action)
+            return this@DesktopComposeUiTest.runOnUiThread(action)
         }
 
         override fun getRoots(atLeastOneRootExpected: Boolean): Set<RootForTest> {
-            return this@DesktopComposeTest.scene.roots
+            return this@DesktopComposeUiTest.scene.roots
         }
 
         override val mainClock get() =
-            this@DesktopComposeTest.mainClock
+            this@DesktopComposeUiTest.mainClock
     }
+}
+
+@ExperimentalTestApi
+actual sealed interface ComposeUiTest : SemanticsNodeInteractionsProvider {
+    actual val density: Density
+    actual val mainClock: MainTestClock
+    actual fun <T> runOnUiThread(action: () -> T): T
+    actual fun <T> runOnIdle(action: () -> T): T
+    actual fun waitForIdle()
+    actual suspend fun awaitIdle()
+    actual fun waitUntil(timeoutMillis: Long, condition: () -> Boolean)
+    actual fun registerIdlingResource(idlingResource: IdlingResource)
+    actual fun unregisterIdlingResource(idlingResource: IdlingResource)
+    actual fun setContent(composable: @Composable () -> Unit)
 }

@@ -18,7 +18,8 @@ package androidx.compose.ui.test.junit4
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ComposeScene
-import androidx.compose.ui.test.DesktopComposeTest
+import androidx.compose.ui.test.DesktopComposeUiTest
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.MainTestClock
@@ -33,11 +34,12 @@ import org.junit.runners.model.Statement
 actual fun createComposeRule(): ComposeContentTestRule = DesktopComposeTestRule()
 
 @InternalTestApi
+@OptIn(ExperimentalTestApi::class)
 class DesktopComposeTestRule private constructor(
-    private val composeTest: DesktopComposeTest
+    private val composeTest: DesktopComposeUiTest
 ) : ComposeContentTestRule {
 
-    constructor() : this(DesktopComposeTest())
+    constructor() : this(DesktopComposeUiTest())
 
     var scene: ComposeScene
         get() = composeTest.scene

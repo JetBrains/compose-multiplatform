@@ -18,7 +18,8 @@ package androidx.compose.ui.test.junit4
 
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.test.AndroidComposeTest
+import androidx.compose.ui.test.AndroidComposeUiTestEnvironment
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.MainTestClock
 import androidx.compose.ui.test.SemanticsMatcher
@@ -102,10 +103,12 @@ fun createEmptyComposeRule(): ComposeTestRule =
         }
     )
 
+@OptIn(ExperimentalTestApi::class)
 class AndroidComposeTestRule<R : TestRule, A : ComponentActivity> private constructor(
     val activityRule: R,
-    private val composeTest: AndroidComposeTest<A>
+    private val environment: AndroidComposeUiTestEnvironment<A>
 ) : ComposeContentTestRule {
+    private val composeTest = environment.test
 
     /**
      * Android specific implementation of [ComposeContentTestRule], where compose content is hosted
@@ -127,7 +130,7 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity> private constr
      */
     constructor(activityRule: R, activityProvider: (R) -> A) : this(
         activityRule,
-        AndroidComposeTest { activityProvider(activityRule) }
+        AndroidComposeUiTestEnvironment { activityProvider(activityRule) }
     )
 
     /**
@@ -135,13 +138,13 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity> private constr
      *
      * Avoid calling often as it can involve synchronization and can be slow.
      */
-    val activity: A get() = composeTest.activity
+    val activity: A get() = checkNotNull(composeTest.activity) { "Host activity not found" }
 
     override fun apply(base: Statement, description: Description): Statement {
         val testStatement = activityRule.apply(base, description)
         return object : Statement() {
             override fun evaluate() {
-                composeTest.runTest {
+                environment.runTest {
                     testStatement.evaluate()
                 }
             }
@@ -163,9 +166,9 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity> private constr
      * REPLACE ALL OVERRIDES BELOW WITH DELEGATION: ComposeTest by composeTest
      */
 
-    override val density: Density = composeTest.density
+    override val density: Density get() = composeTest.density
 
-    override val mainClock: MainTestClock = composeTest.mainClock
+    override val mainClock: MainTestClock get() = composeTest.mainClock
 
     override fun <T> runOnUiThread(action: () -> T): T = composeTest.runOnUiThread(action)
 

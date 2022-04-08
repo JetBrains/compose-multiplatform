@@ -1,7 +1,10 @@
 // Signature format: 4.0
 package androidx.compose.ui.test {
 
-  public final class ComposeTestKt {
+  public final class ComposeUiTestKt {
+  }
+
+  public final class ComposeUiTest_androidKt {
   }
 
 }
