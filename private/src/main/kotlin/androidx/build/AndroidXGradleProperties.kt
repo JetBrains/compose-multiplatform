@@ -144,6 +144,13 @@ const val KMP_ENABLE_JS = "androidx.kmp.js.enabled"
  */
 const val KMP_ENABLE_LINUX = "androidx.kmp.linux.enabled"
 
+/**
+ * If true, include all native targets when building KMP.
+ * Replaces KMP_ENABLE_MAC and KMP_ENABLE_LINUX in collections, and will eventually be
+ * consolidated into the AndroidX plugin.
+ */
+const val KMP_ENABLE_NATIVE = "androidx.kmp.native.enabled"
+
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALL_WARNINGS_AS_ERRORS,
     ALTERNATIVE_PROJECT_URL,
@@ -171,7 +178,8 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     KMP_GITHUB_BUILD,
     KMP_ENABLE_MAC,
     KMP_ENABLE_JS,
-    KMP_ENABLE_LINUX
+    KMP_ENABLE_LINUX,
+    KMP_ENABLE_NATIVE
 )
 
 /**
