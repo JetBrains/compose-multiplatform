@@ -650,6 +650,46 @@ class ColorSpaceTest {
     }
 
     @Test
+    fun testOkLab() {
+        val connector = ColorSpaces.Oklab.connect()
+
+        // Red+green
+        val source1 = floatArrayOf(1.000f, -0.065f, 0.241f)
+        val expected1 = floatArrayOf(1.000f, 1.000f, 0.000f)
+
+        val r1 = connector.transform(source1[0], source1[1], source1[2])
+        assertArrayEquals(expected1, r1, 1e-3f)
+
+        // Green+blue
+        val source2 = floatArrayOf(1.000f, -0.125f, -0.217f)
+        val expected2 = floatArrayOf(0.000f, 1.000f, 1.000f)
+
+        val r2 = connector.transform(source2[0], source2[1], source2[2])
+        assertArrayEquals(expected2, r2, 1e-3f)
+
+        // Red+blue
+        val source3 = floatArrayOf(0.500f, 0.250f, 0.000f)
+        val expected3 = floatArrayOf(0.768f, 0.000f, 0.366f)
+
+        val r3 = connector.transform(source3[0], source3[1], source3[2])
+        assertArrayEquals(expected3, r3, 1e-3f)
+
+        // White
+        val source4 = floatArrayOf(1.000f, 0.000f, 0.000f)
+        val expected4 = floatArrayOf(1.000f, 1.000f, 1.000f)
+
+        val r4 = connector.transform(source4[0], source4[1], source4[2])
+        assertArrayEquals(expected4, r4, 1e-3f)
+
+        // Black
+        val source5 = floatArrayOf(0.000f, 0.000f, 0.000f)
+        val expected5 = floatArrayOf(0.000f, 0.000f, 0.000f)
+
+        val r5 = connector.transform(source5[0], source5[1], source5[2])
+        assertArrayEquals(expected5, r5, 1e-3f)
+    }
+
+    @Test
     fun testXYZ() {
         val xyz = ColorSpaces.CieXyz
 
@@ -730,7 +770,7 @@ class ColorSpaceTest {
 
     @Test
     fun testIdempotentTransferFunctions() {
-        ColorSpaces.ColorSpacesArray
+        ColorSpacesArray
             .filter { cs -> cs.model == ColorModel.Rgb }
             .map { cs -> cs as Rgb }
             .forEach { cs ->
@@ -742,7 +782,7 @@ class ColorSpaceTest {
 
     @Test
     fun testMatch() {
-        for (cs in ColorSpaces.ColorSpacesArray) {
+        for (cs in ColorSpacesArray) {
             if (cs.model == ColorModel.Rgb) {
                 var rgb = cs as Rgb
                 // match() cannot match extended sRGB
