@@ -14,13 +14,12 @@ import androidx.compose.runtime.*
 
 @Composable
 fun CounterPanel(stateWithIdeLifecycle: MutableState<CounterState>) {
-    var stateIDE by remember { stateWithIdeLifecycle }
     var stateInline by remember { mutableStateOf(CounterState()) }
     Column {
-        Text("Counter with IDE lifecycle: ${stateIDE.counter}")
+        Text("Counter with IDE lifecycle: ${stateWithIdeLifecycle.value.counter}")
         Button(onClick = {
-            stateIDE = stateIDE.copy(
-                counter = stateIDE.counter + 1
+            stateWithIdeLifecycle.value = stateWithIdeLifecycle.value.copy(
+                counter = stateWithIdeLifecycle.value.counter + 1
             )
         }) {
             Text("Increment state with IDE lifecycle")
