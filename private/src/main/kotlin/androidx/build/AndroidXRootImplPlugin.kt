@@ -112,10 +112,6 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
         )
 
         extra.set("projects", ConcurrentHashMap<String, String>())
-        buildOnServerTask.dependsOn(tasks.named(CheckExternalDependencyLicensesTask.TASK_NAME))
-        // Anchor task that invokes running all subprojects :validateProperties tasks which ensure that
-        // Android Studio sync is able to succeed.
-        val validateAllProperties = tasks.register("validateAllProperties")
         subprojects { project ->
             // Add a method for each sub project where they can declare an optional
             // dependency on a project or its latest snapshot artifact.
@@ -159,13 +155,7 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
                 buildOnServerTask.dependsOn("${project.path}:jar")
             }
 
-            val validateProperties = project.tasks.register(
-                "validateProperties",
-                ValidatePropertiesTask::class.java
-            )
-            validateAllProperties.configure {
-                it.dependsOn(validateProperties)
-            }
+            project.tasks.register("validateProperties", ValidatePropertiesTask::class.java)
         }
         project.configureRootProjectForLint()
 
