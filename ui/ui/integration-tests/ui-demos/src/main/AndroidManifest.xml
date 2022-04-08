@@ -49,5 +49,10 @@
             android:name=".viewinterop.ComposeInAndroidCoordinatorLayout"
             android:configChanges="orientation|screenSize"
             android:label="Compose in Coordinator Layout Activity" />
+
+        <activity
+            android:name=".viewinterop.ViewComposeViewNestedScrollInteropDemo"
+            android:configChanges="orientation|screenSize"
+            android:label="Coordinator Layout Activity with Compose > View" />
     </application>
 </manifest>
