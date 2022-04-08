@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.lazy.list
+package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.lazy.LazyListItemInfo
-import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.unit.IntSize
 
