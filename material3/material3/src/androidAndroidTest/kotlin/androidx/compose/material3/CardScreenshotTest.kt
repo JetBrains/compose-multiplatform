@@ -93,6 +93,48 @@ class CardScreenshotTest {
     }
 
     @Test
+    fun filledCard_disabled_lightTheme() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
+                Card(
+                    onClick = {},
+                    Modifier.size(width = 180.dp, height = 100.dp),
+                    enabled = false
+                ) {
+                    Box(Modifier.fillMaxSize()) {
+                        Text(
+                            "Filled Card",
+                            Modifier.align(Alignment.Center)
+                        )
+                    }
+                }
+            }
+        }
+        assertAgainstGolden("filledCard_disabled_lightTheme")
+    }
+
+    @Test
+    fun filledCard_disabled_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
+                Card(
+                    onClick = {},
+                    Modifier.size(width = 180.dp, height = 100.dp),
+                    enabled = false
+                ) {
+                    Box(Modifier.fillMaxSize()) {
+                        Text(
+                            "Filled Card",
+                            Modifier.align(Alignment.Center)
+                        )
+                    }
+                }
+            }
+        }
+        assertAgainstGolden("filledCard_disabled_darkTheme")
+    }
+
+    @Test
     fun elevatedCard_lightTheme() {
         rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
@@ -127,6 +169,48 @@ class CardScreenshotTest {
     }
 
     @Test
+    fun elevatedCard_disabled_lightTheme() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
+                ElevatedCard(
+                    onClick = {},
+                    Modifier.size(width = 180.dp, height = 100.dp),
+                    enabled = false
+                ) {
+                    Box(Modifier.fillMaxSize()) {
+                        Text(
+                            "Elevated Card",
+                            Modifier.align(Alignment.Center)
+                        )
+                    }
+                }
+            }
+        }
+        assertAgainstGolden("elevatedCard_disabled_lightTheme")
+    }
+
+    @Test
+    fun elevatedCard_disabled_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
+                ElevatedCard(
+                    onClick = {},
+                    Modifier.size(width = 180.dp, height = 100.dp),
+                    enabled = false
+                ) {
+                    Box(Modifier.fillMaxSize()) {
+                        Text(
+                            "Elevated Card",
+                            Modifier.align(Alignment.Center)
+                        )
+                    }
+                }
+            }
+        }
+        assertAgainstGolden("elevatedCard_disabled_darkTheme")
+    }
+
+    @Test
     fun outlinedCard_lightTheme() {
         rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
@@ -158,6 +242,48 @@ class CardScreenshotTest {
             }
         }
         assertAgainstGolden("outlinedCard_darkTheme")
+    }
+
+    @Test
+    fun outlinedCard_disabled_lightTheme() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
+                OutlinedCard(
+                    onClick = {},
+                    Modifier.size(width = 180.dp, height = 100.dp),
+                    enabled = false
+                ) {
+                    Box(Modifier.fillMaxSize()) {
+                        Text(
+                            "Outlined Card",
+                            Modifier.align(Alignment.Center)
+                        )
+                    }
+                }
+            }
+        }
+        assertAgainstGolden("outlinedCard_disabled_lightTheme")
+    }
+
+    @Test
+    fun outlinedCard_disabled_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
+                OutlinedCard(
+                    onClick = {},
+                    Modifier.size(width = 180.dp, height = 100.dp),
+                    enabled = false
+                ) {
+                    Box(Modifier.fillMaxSize()) {
+                        Text(
+                            "Outlined Card",
+                            Modifier.align(Alignment.Center)
+                        )
+                    }
+                }
+            }
+        }
+        assertAgainstGolden("outlinedCard_disabled_darkTheme")
     }
 
     @Test
