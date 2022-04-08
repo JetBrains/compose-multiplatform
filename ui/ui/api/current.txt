@@ -2107,7 +2107,17 @@ package androidx.compose.ui.layout {
 
   public interface SubcomposeSlotReusePolicy {
     method public boolean areCompatible(Object? slotId, Object? reusableSlotId);
-    method public void getSlotsToRetain(java.util.Set<java.lang.Object> slotIds);
+    method public void getSlotsToRetain(androidx.compose.ui.layout.SubcomposeSlotReusePolicy.SlotIdsSet slotIds);
+  }
+
+  public static final class SubcomposeSlotReusePolicy.SlotIdsSet implements java.util.Collection<java.lang.Object> kotlin.jvm.internal.markers.KMappedMarker {
+    method public void clear();
+    method public java.util.Iterator<java.lang.Object> iterator();
+    method public boolean remove(Object? slotId);
+    method public boolean removeAll(java.util.Collection<?> slotIds);
+    method public boolean removeAll(kotlin.jvm.functions.Function1<java.lang.Object,java.lang.Boolean> predicate);
+    method public boolean retainAll(java.util.Collection<?> slotIds);
+    method public boolean retainAll(kotlin.jvm.functions.Function1<java.lang.Object,java.lang.Boolean> predicate);
   }
 
   public final class TestModifierUpdaterKt {

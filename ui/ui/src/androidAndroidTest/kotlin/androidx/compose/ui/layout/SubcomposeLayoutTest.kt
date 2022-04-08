@@ -1406,7 +1406,7 @@ class SubcomposeLayoutTest {
     fun customPolicy_retainingExactItem() {
         val items = mutableStateOf(listOf(0, 1, 2, 3, 4))
         val policy = object : SubcomposeSlotReusePolicy {
-            override fun getSlotsToRetain(slotIds: MutableSet<Any?>) {
+            override fun getSlotsToRetain(slotIds: SubcomposeSlotReusePolicy.SlotIdsSet) {
                 assertThat(slotIds).containsExactly(1, 2, 4).inOrder()
                 slotIds.remove(1)
                 slotIds.remove(4)
@@ -1445,7 +1445,7 @@ class SubcomposeLayoutTest {
         val items = mutableStateOf(listOf(0, 1, 2, 3, 4))
         var expectedReusable = arrayOf<Int>()
         val policy = object : SubcomposeSlotReusePolicy {
-            override fun getSlotsToRetain(slotIds: MutableSet<Any?>) {
+            override fun getSlotsToRetain(slotIds: SubcomposeSlotReusePolicy.SlotIdsSet) {
                 assertThat(slotIds).containsExactly(*expectedReusable).inOrder()
             }
 
@@ -1479,7 +1479,7 @@ class SubcomposeLayoutTest {
         var expectedSlotId: Any? = null
         var expectedreusableSlotId: Any? = null
         val policy = object : SubcomposeSlotReusePolicy {
-            override fun getSlotsToRetain(slotIds: MutableSet<Any?>) {
+            override fun getSlotsToRetain(slotIds: SubcomposeSlotReusePolicy.SlotIdsSet) {
                 callbackCalled = true
                 assertThat(slotIds).containsExactly(*expectedReusable).inOrder()
             }
@@ -1519,7 +1519,7 @@ class SubcomposeLayoutTest {
         }
         val items = mutableStateOf(listOf(0, 1, 2, 3, 4, 5, 6))
         val policy = object : SubcomposeSlotReusePolicy {
-            override fun getSlotsToRetain(slotIds: MutableSet<Any?>) {
+            override fun getSlotsToRetain(slotIds: SubcomposeSlotReusePolicy.SlotIdsSet) {
                 slotIds.removeAll { !isOdd(it) }
             }
 
@@ -1559,7 +1559,7 @@ class SubcomposeLayoutTest {
         }
         val items = mutableStateOf(listOf(0, 1, 2, 3))
         val policy = object : SubcomposeSlotReusePolicy {
-            override fun getSlotsToRetain(slotIds: MutableSet<Any?>) {}
+            override fun getSlotsToRetain(slotIds: SubcomposeSlotReusePolicy.SlotIdsSet) {}
 
             override fun areCompatible(slotId: Any?, reusableSlotId: Any?): Boolean {
                 return isOdd(slotId) == isOdd(reusableSlotId)
