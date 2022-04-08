@@ -5,9 +5,7 @@
 
 package com.jetbrains.compose.panel
 
-import androidx.compose.material.Text
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.awt.ComposePanel
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAware
@@ -15,35 +13,32 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
+import com.jetbrains.compose.IntellijTheme
 import java.awt.Dimension
 
 class ComposeToolWindow : ToolWindowFactory, DumbAware {
 
-  override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-    ApplicationManager.getApplication().invokeLater {
-      toolWindow.contentManager.addContent(
-        ContentFactory.SERVICE.getInstance().createContent(
-          composePanel,
-          "Compose tool window",
-          false
-        )
-      )
-    }
-  }
-
-  companion object {
-    val stateWithIdeLifecycle = mutableStateOf(CounterState())
-
-    val composePanel: ComposePanel by lazy {
-      val panel = ComposePanel()
-      panel.apply {
-        this.size = Dimension(300, 300)
-        setContent {
-          CounterPanel(stateWithIdeLifecycle)
+    override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
+        ApplicationManager.getApplication().invokeLater {
+            toolWindow.contentManager.addContent(
+                ContentFactory.SERVICE.getInstance().createContent(
+                    ComposePanel().apply {
+                        size = Dimension(300, 300)
+                        setContent {
+                            IntellijTheme(project) {
+                                CounterPanel(stateWithIdeLifecycle)
+                            }
+                        }
+                    },
+                    "Compose tool window",
+                    false
+                )
+            )
         }
-      }
-      panel
     }
-  }
+
+    companion object {
+        val stateWithIdeLifecycle = mutableStateOf(CounterState())
+    }
 
 }

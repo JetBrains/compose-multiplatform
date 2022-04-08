@@ -13,16 +13,25 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.*
 
 @Composable
-fun CounterPanel(mutableState: MutableState<CounterState>) {
-    var state by remember { mutableState }
+fun CounterPanel(stateWithIdeLifecycle: MutableState<CounterState>) {
+    var stateIDE by remember { stateWithIdeLifecycle }
+    var stateInline by remember { mutableStateOf(CounterState()) }
     Column {
-        Text("Counter: ${state.counter}")
+        Text("Counter with IDE lifecycle: ${stateIDE.counter}")
         Button(onClick = {
-            state = state.copy(
-                counter = state.counter + 1
+            stateIDE = stateIDE.copy(
+                counter = stateIDE.counter + 1
             )
         }) {
-            Text("Increment")
+            Text("Increment state with IDE lifecycle")
+        }
+        Text("Counter with @Composable lifecycle: ${stateInline.counter}")
+        Button(onClick = {
+            stateInline = stateInline.copy(
+                counter = stateInline.counter + 1
+            )
+        }) {
+            Text("Increment state with @Composable lifecycle")
         }
     }
 }
