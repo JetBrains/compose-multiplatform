@@ -82,6 +82,7 @@ import java.io.File
 import java.time.Duration
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
+import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.register
 
 /**
@@ -119,8 +120,37 @@ class AndroidXImplPlugin : Plugin<Project> {
         project.configureExternalDependencyLicenseCheck()
         project.configureProjectStructureValidation(extension)
         project.configureProjectVersionValidation(extension)
+        project.registerProjectOrArtifact()
 
         project.configurations.create("samples")
+    }
+
+    private fun Project.registerProjectOrArtifact() {
+        // Add a method for each sub project where they can declare an optional
+        // dependency on a project or its latest snapshot artifact.
+        if (!StudioType.isPlayground(this)) {
+            // In AndroidX build, this is always enforced to the project
+            extra.set(
+                PROJECT_OR_ARTIFACT_EXT_NAME,
+                KotlinClosure1<String, Project>(
+                    function = {
+                        // this refers to the first parameter of the closure.
+                        project(this)
+                    }
+                )
+            )
+        } else {
+            // In Playground builds, they are converted to the latest SNAPSHOT artifact if the
+            // project is not included in that playground.
+            extra.set(
+                PROJECT_OR_ARTIFACT_EXT_NAME,
+                KotlinClosure1<String, Any>(
+                    function = {
+                        AndroidXPlaygroundRootImplPlugin.projectOrArtifact(rootProject, this)
+                    }
+                )
+            )
+        }
     }
 
     /**
@@ -942,3 +972,5 @@ fun AndroidXExtension.validateMavenVersion() {
         )
     }
 }
+
+const val PROJECT_OR_ARTIFACT_EXT_NAME = "projectOrArtifact"
