@@ -303,6 +303,7 @@ private fun calculateCellsCrossAxisSizeImpl(
 /**
  * Receiver scope which is used by [LazyVerticalGrid].
  */
+@LazyGridScopeMarker
 sealed interface LazyGridScope {
     /**
      * Adds a single item to the scope.

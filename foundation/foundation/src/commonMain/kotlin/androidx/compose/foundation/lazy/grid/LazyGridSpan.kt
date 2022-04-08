@@ -42,6 +42,7 @@ fun GridItemSpan(currentLineSpan: Int) = GridItemSpan(currentLineSpan.toLong())
 /**
  * Scope of lambdas used to calculate the spans of items in lazy grids.
  */
+@LazyGridScopeMarker
 sealed interface LazyGridItemSpanScope {
     /**
      * The max current line (horizontal for vertical grids) the item can occupy, such that
