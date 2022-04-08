@@ -600,6 +600,16 @@ sealed interface Composer {
     /**
      * A Compose compiler plugin API. DO NOT call directly.
      *
+     * Deactivates the content to the end of the group by treating content as if it was deleted and
+     * replaces all slot table entries for calls to [cache] to be [Empty]. This must be called as
+     * the first call for a group.
+     */
+    @ComposeCompilerApi
+    fun deactivateToEndGroup(changed: Boolean)
+
+    /**
+     * A Compose compiler plugin API. DO NOT call directly.
+     *
      * Skips the current group. This called by the compiler to indicate that the current group
      * can be skipped, for example, this is generated to skip the [startDefaults] group the
      * default group is was not invalidated.
@@ -2571,6 +2581,54 @@ internal class ComposerImpl(
         }
     }
 
+    @ComposeCompilerApi
+    override fun deactivateToEndGroup(changed: Boolean) {
+        runtimeCheck(groupNodeCount == 0) {
+            "No nodes can be emitted before calling dactivateToEndGroup"
+        }
+        if (!inserting) {
+            if (!changed) {
+                skipReaderToGroupEnd()
+                return
+            }
+            val start = reader.currentGroup
+            val end = reader.currentEnd
+            for (group in start until end) {
+                reader.forEachData(group) { index, data ->
+                    when (data) {
+                        is RememberObserver -> {
+                            reader.reposition(group)
+                            recordSlotTableOperation { _, slots, rememberManager ->
+                                runtimeCheck(data == slots.slot(group, index)) {
+                                    "Slot table is out of sync"
+                                }
+                                rememberManager.forgetting(data)
+                                slots.set(index, Composer.Empty)
+                            }
+                        }
+                        is RecomposeScopeImpl -> {
+                            val composition = data.composition
+                            if (composition != null) {
+                                composition.pendingInvalidScopes = true
+                                data.composition = null
+                            }
+                            reader.reposition(group)
+                            recordSlotTableOperation { _, slots, _ ->
+                                runtimeCheck(data == slots.slot(group, index)) {
+                                    "Slot table is out of sync"
+                                }
+                                slots.set(index, Composer.Empty)
+                            }
+                        }
+                    }
+                }
+            }
+            invalidations.removeRange(start, end)
+            reader.reposition(start)
+            reader.skipToGroupEnd()
+        }
+    }
+
     /**
      * Start a restart group. A restart group creates a recompose scope and sets it as the current
      * recompose scope of the composition. If the recompose scope is invalidated then this group
@@ -2592,7 +2650,14 @@ internal class ComposerImpl(
             scope.start(snapshot.id)
         } else {
             val invalidation = invalidations.removeLocation(reader.parent)
-            val scope = reader.next() as RecomposeScopeImpl
+            val slot = reader.next()
+            val scope = if (slot == Composer.Empty) {
+                // This code is executed when a previously deactivate region is becomes active
+                // again. See Composer.deactivateToEndGroup()
+                val newScope = RecomposeScopeImpl(composition as CompositionImpl)
+                updateValue(newScope)
+                newScope
+            } else slot as RecomposeScopeImpl
             scope.requiresRecompose = invalidation != null
             invalidateStack.push(scope)
             scope.start(snapshot.id)

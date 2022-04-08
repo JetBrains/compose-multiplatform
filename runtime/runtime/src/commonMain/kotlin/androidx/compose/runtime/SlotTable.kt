@@ -1012,6 +1012,15 @@ internal class SlotReader(
         return result
     }
 
+    internal fun forEachData(group: Int, block: (index: Int, data: Any?) -> Unit) {
+        val start = groups.slotAnchor(group)
+        val end = if (group + 1 < table.groupsSize)
+            table.groups.dataAnchor(group + 1) else table.slotsSize
+        for (index in start until end) {
+            block(index - start, slots[index])
+        }
+    }
+
     override fun toString(): String = "SlotReader(current=$currentGroup, key=$groupKey, " +
         "parent=$parent, end=$currentEnd)"
 

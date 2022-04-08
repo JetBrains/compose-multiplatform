@@ -77,6 +77,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void ReusableComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function0<? extends kotlin.Unit> content);
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ExplicitGroupsComposable public static inline <T, reified E extends androidx.compose.runtime.Applier<?>> void ReusableComposeNode(kotlin.jvm.functions.Function0<? extends T> factory, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.SkippableUpdater<T>,? extends kotlin.Unit> skippableUpdate, kotlin.jvm.functions.Function0<? extends kotlin.Unit> content);
     method @androidx.compose.runtime.Composable public static inline void ReusableContent(Object? key, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ExplicitGroupsComposable public static inline void ReusableContentHost(boolean active, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static androidx.compose.runtime.Composer getCurrentComposer();
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ExplicitGroupsComposable public static int getCurrentCompositeKeyHash();
     method @androidx.compose.runtime.Composable public static androidx.compose.runtime.CompositionLocalContext getCurrentCompositionLocalContext();
@@ -111,6 +112,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public default boolean changed(double value);
     method public void collectParameterInformation();
     method @androidx.compose.runtime.ComposeCompilerApi public <T> void createNode(kotlin.jvm.functions.Function0<? extends T> factory);
+    method @androidx.compose.runtime.ComposeCompilerApi public void deactivateToEndGroup(boolean changed);
     method @androidx.compose.runtime.ComposeCompilerApi public void disableReusing();
     method @androidx.compose.runtime.ComposeCompilerApi public void enableReusing();
     method @androidx.compose.runtime.ComposeCompilerApi public void endDefaults();
