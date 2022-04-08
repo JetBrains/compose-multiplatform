@@ -114,6 +114,13 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
         }
         val isPresubmit = isPresubmitBuild()
         configBuilder.isPostsubmit(!isPresubmit)
+        // Will be using the constrained configs for all devices api 26 and below.
+        // Don't attempt to remove APKs after testing. We can't remove the apk on API < 27 due to a
+        // platform crash that occurs when handling a PACKAGE_CHANGED broadcast after the package has
+        // been removed. See b/37264334.
+        if (isConstrained) {
+            configBuilder.cleanupApks(false)
+        }
         when (affectedModuleDetectorSubset.get()) {
             ProjectSubset.DEPENDENT_PROJECTS -> {
                 // Don't ever run full tests of RV if it is dependent, since they take > 45 minutes
