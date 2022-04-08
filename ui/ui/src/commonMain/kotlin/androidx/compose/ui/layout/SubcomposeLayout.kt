@@ -264,11 +264,10 @@ class SubcomposeLayoutState(
  */
 interface SubcomposeSlotReusePolicy {
     /**
-     * This function will be called with [slotIds] mutable set initially populated with the slot
-     * ids available to reuse. You can remove from the set slots you don't want to retain so
-     * they are available to be reused in the future.
+     * This function will be called with [slotIds] set populated with the slot ids available to
+     * reuse. In the implementation you can remove slots you don't want to retain.
      */
-    fun getSlotsToRetain(slotIds: MutableSet<Any?>)
+    fun getSlotsToRetain(slotIds: SlotIdsSet)
 
     /**
      * Returns true if the content previously composed with [reusableSlotId] is compatible with
@@ -276,6 +275,60 @@ interface SubcomposeSlotReusePolicy {
      * Slots could be considered incompatible if they display completely different types of the UI.
      */
     fun areCompatible(slotId: Any?, reusableSlotId: Any?): Boolean
+
+    /**
+     * Set containing slot ids currently available to reuse. Used by [getSlotsToRetain].
+     *
+     * This class works exactly as [MutableSet], but doesn't allow to add new items in it.
+     */
+    class SlotIdsSet internal constructor(
+        private val set: MutableSet<Any?> = mutableSetOf()
+    ) : Collection<Any?> by set {
+
+        internal fun add(slotId: Any?) = set.add(slotId)
+
+        override fun iterator(): MutableIterator<Any?> = set.iterator()
+
+        /**
+         * Removes a [slotId] from this set, if it is present.
+         *
+         * @return `true` if the slot id was removed, `false` if the set was not modified.
+         */
+        fun remove(slotId: Any?): Boolean = set.remove(slotId)
+
+        /**
+         * Removes all slot ids from [slotIds] that are also contained in this set.
+         *
+         * @return `true` if any slot id was removed, `false` if the set was not modified.
+         */
+        fun removeAll(slotIds: Collection<Any?>): Boolean = set.remove(slotIds)
+
+        /**
+         * Removes all slot ids that match the given [predicate].
+         *
+         * @return `true` if any slot id was removed, `false` if the set was not modified.
+         */
+        fun removeAll(predicate: (Any?) -> Boolean): Boolean = set.removeAll(predicate)
+
+        /**
+         * Retains only the slot ids that are contained in [slotIds].
+         *
+         * @return `true` if any slot id was removed, `false` if the set was not modified.
+         */
+        fun retainAll(slotIds: Collection<Any?>): Boolean = set.retainAll(slotIds)
+
+        /**
+         * Retains only slotIds that match the given [predicate].
+         *
+         * @return `true` if any slot id was removed, `false` if the set was not modified.
+         */
+        fun retainAll(predicate: (Any?) -> Boolean): Boolean = set.retainAll(predicate)
+
+        /**
+         * Removes all slot ids from this set.
+         */
+        fun clear() = set.clear()
+    }
 }
 
 /**
@@ -316,7 +369,7 @@ internal class LayoutNodeSubcompositionsState(
     private val slotIdToNode = mutableMapOf<Any?, LayoutNode>()
     private val scope = Scope()
     private val precomposeMap = mutableMapOf<Any?, LayoutNode>()
-    private val reusableSlotIdsCache = mutableSetOf<Any?>()
+    private val reusableSlotIdsSet = SubcomposeSlotReusePolicy.SlotIdsSet()
 
     /**
      * `root.foldedChildren` list consist of:
@@ -419,17 +472,17 @@ internal class LayoutNodeSubcompositionsState(
         val lastReusableIndex = root.foldedChildren.size - precomposedCount - 1
         if (startIndex <= lastReusableIndex) {
             // construct the set of available slot ids
-            reusableSlotIdsCache.clear()
+            reusableSlotIdsSet.clear()
             for (i in startIndex..lastReusableIndex) {
-                reusableSlotIdsCache.add(getSlotIdAtIndex(i))
+                reusableSlotIdsSet.add(getSlotIdAtIndex(i))
             }
 
-            slotReusePolicy.getSlotsToRetain(reusableSlotIdsCache)
+            slotReusePolicy.getSlotsToRetain(reusableSlotIdsSet)
             // iterating backwards so it is easier to remove items
             var i = lastReusableIndex
             while (i >= startIndex) {
                 val slotId = getSlotIdAtIndex(i)
-                if (reusableSlotIdsCache.contains(slotId)) {
+                if (reusableSlotIdsSet.contains(slotId)) {
                     root.foldedChildren[i].measuredByParent = UsageByParent.NotUsed
                     reusableCount++
                 } else {
@@ -653,7 +706,7 @@ private class FixedCountSubcomposeSlotReusePolicy(
     private val maxSlotsToRetainForReuse: Int
 ) : SubcomposeSlotReusePolicy {
 
-    override fun getSlotsToRetain(slotIds: MutableSet<Any?>) {
+    override fun getSlotsToRetain(slotIds: SubcomposeSlotReusePolicy.SlotIdsSet) {
         if (slotIds.size > maxSlotsToRetainForReuse) {
             var count = 0
             with(slotIds.iterator()) {
@@ -673,7 +726,7 @@ private class FixedCountSubcomposeSlotReusePolicy(
 }
 
 private object NoOpSubcomposeSlotReusePolicy : SubcomposeSlotReusePolicy {
-    override fun getSlotsToRetain(slotIds: MutableSet<Any?>) {
+    override fun getSlotsToRetain(slotIds: SubcomposeSlotReusePolicy.SlotIdsSet) {
         slotIds.clear()
     }
 
