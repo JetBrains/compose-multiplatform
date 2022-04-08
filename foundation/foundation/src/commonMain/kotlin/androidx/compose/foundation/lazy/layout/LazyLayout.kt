@@ -84,7 +84,7 @@ private class LazyLayoutItemReusePolicy(
 ) : SubcomposeSlotReusePolicy {
     private val countPerType = mutableMapOf<Any?, Int>()
 
-    override fun getSlotsToRetain(slotIds: MutableSet<Any?>) {
+    override fun getSlotsToRetain(slotIds: SubcomposeSlotReusePolicy.SlotIdsSet) {
         countPerType.clear()
         with(slotIds.iterator()) {
             while (hasNext()) {
