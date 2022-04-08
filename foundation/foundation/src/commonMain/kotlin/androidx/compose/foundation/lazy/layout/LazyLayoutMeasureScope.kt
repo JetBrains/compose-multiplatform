@@ -20,6 +20,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.SubcomposeMeasureScope
@@ -32,17 +33,32 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
 
+/**
+ * The receiver scope of a [LazyLayout]'s measure lambda. The return value of the
+ * measure lambda is [MeasureResult], which should be returned by [layout].
+ *
+ * Main difference from the regular flow of writing any custom layout is that you have a new
+ * function [measure] which accepts item index and constraints, composes the item based and then
+ * measures all the layouts emitted in the item content block.
+ */
+@Stable
 @ExperimentalFoundationApi
-internal interface LazyLayoutMeasureScope : MeasureScope {
+sealed interface LazyLayoutMeasureScope : MeasureScope {
     /**
      * Subcompose and measure the item of lazy layout.
+     *
+     * @param index the item index. Should be no larger that [LazyLayoutItemsProvider.itemsCount].
+     * @param constraints [Constraints] to measure the children emitted into an item content
+     * composable specified via [LazyLayoutItemsProvider.getContent].
+     *
+     * @return Array of [Placeable]s. Note that if you emitted multiple children into the item
+     * composable you will receive multiple placeables, each of them will be measured with
+     * the passed [constraints].
      */
     fun measure(index: Int, constraints: Constraints): Array<Placeable>
 
-    /**
-     * Below overrides added to work around https://youtrack.jetbrains.com/issue/KT-51672
-     * Must be kept in sync until resolved.
-     */
+    // Below overrides added to work around https://youtrack.jetbrains.com/issue/KT-51672
+    // Must be kept in sync until resolved.
 
     @Stable
     override fun TextUnit.toDp(): Dp {
@@ -81,7 +97,6 @@ internal interface LazyLayoutMeasureScope : MeasureScope {
 }
 
 @ExperimentalFoundationApi
-@Stable
 internal class LazyLayoutMeasureScopeImpl internal constructor(
     private val itemContentFactory: LazyLayoutItemContentFactory,
     private val subcomposeMeasureScope: SubcomposeMeasureScope

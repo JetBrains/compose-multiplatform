@@ -471,6 +471,9 @@ package androidx.compose.foundation.lazy {
     method public androidx.compose.ui.Modifier fillParentMaxWidth(androidx.compose.ui.Modifier, optional float fraction);
   }
 
+  public final class LazyListHeadersKt {
+  }
+
   public interface LazyListItemInfo {
     method public int getIndex();
     method public Object getKey();
@@ -480,6 +483,15 @@ package androidx.compose.foundation.lazy {
     property public abstract Object key;
     property public abstract int offset;
     property public abstract int size;
+  }
+
+  public final class LazyListItemPlacementAnimatorKt {
+  }
+
+  public final class LazyListItemsProviderImplKt {
+  }
+
+  public final class LazyListKt {
   }
 
   public interface LazyListLayoutInfo {
@@ -503,12 +515,18 @@ package androidx.compose.foundation.lazy {
     property public abstract java.util.List<androidx.compose.foundation.lazy.LazyListItemInfo> visibleItemsInfo;
   }
 
+  public final class LazyListMeasureKt {
+  }
+
   @androidx.compose.foundation.lazy.LazyScopeMarker public interface LazyListScope {
     method public default void item(optional Object? key, optional Object? contentType, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,kotlin.Unit> content);
     method @Deprecated public void item(optional Object? key, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,? extends kotlin.Unit> content);
     method public default void items(int count, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,?>? key, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,?> contentType, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,kotlin.Unit> itemContent);
     method @Deprecated public void items(int count, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,?>? key, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? extends kotlin.Unit> itemContent);
     method @androidx.compose.foundation.ExperimentalFoundationApi public void stickyHeader(optional Object? key, optional Object? contentType, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,kotlin.Unit> content);
+  }
+
+  public final class LazyListScrollingKt {
   }
 
   @androidx.compose.runtime.Stable public final class LazyListState implements androidx.compose.foundation.gestures.ScrollableState {
@@ -540,6 +558,9 @@ package androidx.compose.foundation.lazy {
   }
 
   @kotlin.DslMarker public @interface LazyScopeMarker {
+  }
+
+  public final class LazySemanticsKt {
   }
 
 }
@@ -691,13 +712,46 @@ package androidx.compose.foundation.lazy.layout {
   public final class IntervalListKt {
   }
 
+  @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public interface LazyLayoutItemsProvider {
+    method public kotlin.jvm.functions.Function0<kotlin.Unit> getContent(int index);
+    method public Object? getContentType(int index);
+    method public int getItemsCount();
+    method public Object getKey(int index);
+    method public java.util.Map<java.lang.Object,java.lang.Integer> getKeyToIndexMap();
+    property public abstract int itemsCount;
+    property public abstract java.util.Map<java.lang.Object,java.lang.Integer> keyToIndexMap;
+  }
+
   public final class LazyLayoutKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static void LazyLayout(androidx.compose.foundation.lazy.layout.LazyLayoutItemsProvider itemsProvider, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState? prefetchState, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measurePolicy);
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public sealed interface LazyLayoutMeasureScope extends androidx.compose.ui.layout.MeasureScope {
+    method public androidx.compose.ui.layout.Placeable![] measure(int index, long constraints);
+    method @androidx.compose.runtime.Stable public default float toDp(long);
+    method @androidx.compose.runtime.Stable public default float toDp(int);
+    method @androidx.compose.runtime.Stable public default float toDp(float);
+    method @androidx.compose.runtime.Stable public default long toDpSize(long);
+    method @androidx.compose.runtime.Stable public default long toSize(long);
+    method @androidx.compose.runtime.Stable public default long toSp(float);
+    method @androidx.compose.runtime.Stable public default long toSp(int);
+    method @androidx.compose.runtime.Stable public default long toSp(float);
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public final class LazyLayoutPrefetchState {
+    ctor public LazyLayoutPrefetchState();
+    method public androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState.PrefetchHandle schedulePrefetch(int index, long constraints);
+  }
+
+  public static sealed interface LazyLayoutPrefetchState.PrefetchHandle {
+    method public void cancel();
   }
 
   public final class LazyLayoutPrefetcher_androidKt {
   }
 
   public final class Lazy_androidKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static Object getDefaultLazyLayoutKey(int index);
   }
 
   @androidx.compose.foundation.ExperimentalFoundationApi public interface PinnableParent {
@@ -711,31 +765,6 @@ package androidx.compose.foundation.lazy.layout {
   public final class PinnableParentKt {
     method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.ui.modifier.ProvidableModifierLocal<androidx.compose.foundation.lazy.layout.PinnableParent> getModifierLocalPinnableParent();
     property @androidx.compose.foundation.ExperimentalFoundationApi public static final androidx.compose.ui.modifier.ProvidableModifierLocal<androidx.compose.foundation.lazy.layout.PinnableParent> ModifierLocalPinnableParent;
-  }
-
-}
-
-package androidx.compose.foundation.lazy.list {
-
-  public final class LazyListHeadersKt {
-  }
-
-  public final class LazyListItemPlacementAnimatorKt {
-  }
-
-  public final class LazyListItemsProviderImplKt {
-  }
-
-  public final class LazyListKt {
-  }
-
-  public final class LazyListMeasureKt {
-  }
-
-  public final class LazyListScrollingKt {
-  }
-
-  public final class LazySemanticsKt {
   }
 
 }
