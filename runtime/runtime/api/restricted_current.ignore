@@ -5,6 +5,8 @@ AddSealed: androidx.compose.runtime.ControlledComposition:
     Cannot add 'sealed' modifier to class androidx.compose.runtime.ControlledComposition: Incompatible change
 
 
+AddedAbstractMethod: androidx.compose.runtime.Composer#deactivateToEndGroup(boolean):
+    Added method androidx.compose.runtime.Composer.deactivateToEndGroup(boolean)
 AddedAbstractMethod: androidx.compose.runtime.ControlledComposition#applyLateChanges():
     Added method androidx.compose.runtime.ControlledComposition.applyLateChanges()
 AddedAbstractMethod: androidx.compose.runtime.ControlledComposition#changesApplied():

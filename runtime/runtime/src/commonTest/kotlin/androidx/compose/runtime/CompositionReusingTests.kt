@@ -24,12 +24,15 @@ import androidx.compose.runtime.mock.Text
 import androidx.compose.runtime.mock.View
 import androidx.compose.runtime.mock.compositionTest
 import androidx.compose.runtime.mock.expectChanges
+import androidx.compose.runtime.mock.expectNoChanges
 import androidx.compose.runtime.mock.flatten
 import androidx.compose.runtime.mock.revalidate
 import androidx.compose.runtime.mock.validate
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
 
 @Stable
 class CompositionReusingTests {
@@ -218,6 +221,130 @@ class CompositionReusingTests {
         expectChanges()
         revalidate()
         assertEquals(compositeHashForKey1, lastCompositeHash)
+    }
+
+    @Test
+    fun reusableContentHostCanDeactivate() = compositionTest {
+        var reuseKey by mutableStateOf(0)
+        var active by mutableStateOf(true)
+
+        val rememberedState = object : RememberObserver {
+            var currentlyRemembered = false
+            var rememberCount = 0
+            var forgottenCount = 0
+            var abandonCount = 0
+
+            override fun toString(): String = "Some text"
+
+            override fun onRemembered() {
+                rememberCount++
+                currentlyRemembered = true
+            }
+
+            override fun onForgotten() {
+                forgottenCount++
+                currentlyRemembered = false
+            }
+
+            override fun onAbandoned() {
+                abandonCount++
+                currentlyRemembered = false
+            }
+        }
+
+        compose {
+            ReusableContentHost(active) {
+                Linear {
+                    ReusableContent(reuseKey) {
+                        Linear {
+                            val state = remember { rememberedState }
+                            Text(state.toString())
+                        }
+                    }
+                }
+            }
+        }
+
+        validate {
+            Linear {
+                Linear {
+                    Text(rememberedState.toString())
+                }
+            }
+        }
+
+        assertTrue(rememberedState.currentlyRemembered)
+
+        active = false
+        expectChanges()
+        revalidate()
+        assertFalse(rememberedState.currentlyRemembered)
+
+        active = true
+        expectChanges()
+        revalidate()
+        assertTrue(rememberedState.currentlyRemembered)
+
+        reuseKey++
+        expectChanges()
+        revalidate()
+        assertTrue(rememberedState.currentlyRemembered)
+    }
+
+    @Test
+    fun reusableContentHostCanDisableRecompose() = compositionTest {
+        var active by mutableStateOf(true)
+        var outer by mutableStateOf("Outer")
+        var name by mutableStateOf("Value")
+
+        val rememberedState = object : RememberObserver {
+            var currentlyRemembered = false
+            override fun toString(): String = "Test"
+            override fun onRemembered() { currentlyRemembered = true }
+            override fun onForgotten() { currentlyRemembered = false }
+            override fun onAbandoned() { currentlyRemembered = false }
+        }
+
+        compose {
+            Text(outer)
+            ReusableContentHost(active) {
+                Linear {
+                    val state = remember { rememberedState }
+                    Text("$state $name")
+                }
+            }
+        }
+
+        validate {
+            Text(outer)
+            Linear {
+                Text("$rememberedState $name")
+            }
+        }
+
+        active = false
+        expectChanges()
+
+        name = "New value"
+
+        // Name should not be observed.
+        expectNoChanges()
+
+        // Intentionally not calling revalidate() here as the tree that needs updating is disabled
+        // and out of sync with the state of name
+
+        outer = "New outer"
+        expectChanges()
+
+        // Still not valid yet but should have recomposed
+
+        active = true
+        expectChanges()
+        revalidate()
+
+        name = "New new value"
+        expectChanges()
+        revalidate()
     }
 }
 
