@@ -47,7 +47,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -215,7 +214,7 @@ fun Modifier.dragContainer(dragDropState: DragDropState): Modifier {
     return pointerInput(dragDropState) {
         detectDragGesturesAfterLongPress(
             onDrag = { change, offset ->
-                change.consumeAllChanges()
+                change.consume()
                 dragDropState.onDrag(offset = offset)
             },
             onDragStart = { offset -> dragDropState.onDragStart(offset) },

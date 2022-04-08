@@ -26,8 +26,6 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.changedToDown
-import androidx.compose.ui.input.pointer.consumeAllChanges
-import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.util.fastAll
@@ -95,10 +93,10 @@ internal suspend fun PointerInputScope.mouseSelectionDetector(
                 if (down.isShiftPressed) {
                     val started = observer.onExtend(downChange.position)
                     if (started) {
-                        downChange.consumeDownChange()
+                        downChange.consume()
                         drag(downChange.id) {
                             if (observer.onExtendDrag(it.position)) {
-                                it.consumeAllChanges()
+                                it.consume()
                             }
                         }
                     }
@@ -110,10 +108,10 @@ internal suspend fun PointerInputScope.mouseSelectionDetector(
                     }
                     val started = observer.onStart(downChange.position, selectionMode)
                     if (started) {
-                        downChange.consumeDownChange()
+                        downChange.consume()
                         drag(downChange.id) {
                             if (observer.onDrag(it.position, selectionMode)) {
-                                it.consumeAllChanges()
+                                it.consume()
                             }
                         }
                     }

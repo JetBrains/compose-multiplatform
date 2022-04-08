@@ -28,12 +28,10 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputScope
-import androidx.compose.ui.input.pointer.positionChangeConsumed
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToDownIgnoreConsumed
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.platform.debugInspectorInfo
@@ -103,7 +101,7 @@ private suspend fun PointerInputScope.detectZoom(
             awaitPointerEventScope {
                 do {
                     val event = awaitPointerEvent()
-                    val canceled = event.changes.fastAny { it.positionChangeConsumed() }
+                    val canceled = event.changes.fastAny { it.isConsumed }
                     if (!canceled) {
                         val zoomChange = event.calculateZoom()
                         val rotationChange = event.calculateRotation()
@@ -138,7 +136,7 @@ private suspend fun PointerInputScope.detectZoom(
                             }
                             event.changes.fastForEach {
                                 if (it.positionChanged()) {
-                                    it.consumeAllChanges()
+                                    it.consume()
                                 }
                             }
                         }

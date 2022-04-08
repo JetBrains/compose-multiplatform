@@ -33,7 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalDensity
@@ -63,7 +62,7 @@ fun RawDragGestureFilterDemo() {
                             val down = awaitFirstDown(requireUnconsumed = false)
                             drag(down.id) { change ->
                                 offset.value += change.positionChange()
-                                change.consumeAllChanges()
+                                change.consume()
                             }
                         }
                     }

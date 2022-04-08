@@ -31,7 +31,6 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.changedToDown
-import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.util.fastAll
@@ -112,7 +111,7 @@ private fun Modifier.contextMenuDetector(
                 awaitPointerEventScope {
                     val event = awaitEventFirstDown()
                     if (event.buttons.isSecondaryPressed) {
-                        event.changes.forEach { it.consumeDownChange() }
+                        event.changes.forEach { it.consume() }
                         state.status =
                             ContextMenuState.Status.Open(Rect(event.changes[0].position, 0f))
                     }

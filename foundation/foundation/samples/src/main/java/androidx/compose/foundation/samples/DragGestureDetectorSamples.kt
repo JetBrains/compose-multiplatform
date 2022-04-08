@@ -42,15 +42,14 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.onSizeChanged
@@ -83,7 +82,7 @@ fun AwaitHorizontalDragOrCancellationSample() {
                                     val originalX = offsetX.value
                                     val newValue =
                                         (originalX + over).coerceIn(0f, width - 50.dp.toPx())
-                                    change.consumePositionChange()
+                                    change.consume()
                                     offsetX.value = newValue
                                 }
                             while (change != null && change.pressed) {
@@ -92,7 +91,7 @@ fun AwaitHorizontalDragOrCancellationSample() {
                                     val originalX = offsetX.value
                                     val newValue = (originalX + change.positionChange().x)
                                         .coerceIn(0f, width - 50.dp.toPx())
-                                    change.consumePositionChange()
+                                    change.consume()
                                     offsetX.value = newValue
                                 }
                             }
@@ -127,7 +126,7 @@ fun HorizontalDragSample() {
                                     val originalX = offsetX.value
                                     val newValue =
                                         (originalX + over).coerceIn(0f, width - 50.dp.toPx())
-                                    change.consumePositionChange()
+                                    change.consume()
                                     offsetX.value = newValue
                                 }
                             if (change != null) {
@@ -135,7 +134,7 @@ fun HorizontalDragSample() {
                                     val originalX = offsetX.value
                                     val newValue = (originalX + it.positionChange().x)
                                         .coerceIn(0f, width - 50.dp.toPx())
-                                    it.consumePositionChange()
+                                    it.consume()
                                     offsetX.value = newValue
                                 }
                             }
@@ -196,7 +195,7 @@ fun AwaitVerticalDragOrCancellationSample() {
                                     val originalY = offsetY.value
                                     val newValue = (originalY + over)
                                         .coerceIn(0f, height - 50.dp.toPx())
-                                    change.consumePositionChange()
+                                    change.consume()
                                     offsetY.value = newValue
                                 }
                             while (change != null && change.pressed) {
@@ -205,7 +204,7 @@ fun AwaitVerticalDragOrCancellationSample() {
                                     val originalY = offsetY.value
                                     val newValue = (originalY + change.positionChange().y)
                                         .coerceIn(0f, height - 50.dp.toPx())
-                                    change.consumePositionChange()
+                                    change.consume()
                                     offsetY.value = newValue
                                 }
                             }
@@ -240,7 +239,7 @@ fun VerticalDragSample() {
                                     val originalY = offsetY.value
                                     val newValue = (originalY + over)
                                         .coerceIn(0f, height - 50.dp.toPx())
-                                    change.consumePositionChange()
+                                    change.consume()
                                     offsetY.value = newValue
                                 }
                             if (change != null) {
@@ -248,7 +247,7 @@ fun VerticalDragSample() {
                                     val originalY = offsetY.value
                                     val newValue = (originalY + it.positionChange().y)
                                         .coerceIn(0f, height - 50.dp.toPx())
-                                    it.consumePositionChange()
+                                    it.consume()
                                     offsetY.value = newValue
                                 }
                             }
@@ -310,7 +309,7 @@ fun AwaitDragOrCancellationSample() {
                                     x = summed.x.coerceIn(0f, size.width - 50.dp.toPx()),
                                     y = summed.y.coerceIn(0f, size.height - 50.dp.toPx())
                                 )
-                                change.consumePositionChange()
+                                change.consume()
                                 offsetX.value = newValue.x
                                 offsetY.value = newValue.y
                             }
@@ -323,7 +322,7 @@ fun AwaitDragOrCancellationSample() {
                                         x = summed.x.coerceIn(0f, size.width - 50.dp.toPx()),
                                         y = summed.y.coerceIn(0f, size.height - 50.dp.toPx())
                                     )
-                                    change.consumePositionChange()
+                                    change.consume()
                                     offsetX.value = newValue.x
                                     offsetY.value = newValue.y
                                 }
@@ -360,7 +359,7 @@ fun DragSample() {
                                     x = summed.x.coerceIn(0f, size.width - 50.dp.toPx()),
                                     y = summed.y.coerceIn(0f, size.height - 50.dp.toPx())
                                 )
-                                change.consumePositionChange()
+                                change.consume()
                                 offsetX.value = newValue.x
                                 offsetY.value = newValue.y
                             }
@@ -372,7 +371,7 @@ fun DragSample() {
                                         x = summed.x.coerceIn(0f, size.width - 50.dp.toPx()),
                                         y = summed.y.coerceIn(0f, size.height - 50.dp.toPx())
                                     )
-                                    it.consumePositionChange()
+                                    it.consume()
                                     offsetX.value = newValue.x
                                     offsetY.value = newValue.y
                                 }

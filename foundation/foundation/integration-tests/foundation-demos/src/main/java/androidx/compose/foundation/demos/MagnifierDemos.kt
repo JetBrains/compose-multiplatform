@@ -47,7 +47,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.PointerId
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -126,7 +125,7 @@ fun MultitouchCustomMagnifierDemo() {
                             } else {
                                 magnifierOffsets -= it.id
                             }
-                            it.consumeAllChanges()
+                            it.consume()
                         }
                     }
                 }

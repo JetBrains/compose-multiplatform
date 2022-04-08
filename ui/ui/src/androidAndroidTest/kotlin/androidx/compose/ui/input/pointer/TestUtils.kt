@@ -242,8 +242,10 @@ internal fun PointerEvent.deepCopy() =
 internal fun pointerEventOf(
     vararg changes: PointerInputChange,
     motionEvent: MotionEvent = MotionEventDouble
-) = PointerEvent(changes.toList(),
-    InternalPointerEvent(changes.map { it.id to it }.toMap(), motionEvent))
+) = PointerEvent(
+    changes.toList(),
+    InternalPointerEvent(changes.map { it.id to it }.toMap(), motionEvent)
+)
 
 internal fun InternalPointerEvent(
     changes: Map<PointerId, PointerInputChange>,
@@ -350,7 +352,7 @@ internal fun hoverInternalPointerEvent(
         0L,
         Offset(0f, 0f),
         false,
-        ConsumedData(),
+        false,
         PointerType.Mouse
     )
 
@@ -413,12 +415,9 @@ internal class PointerEventSubject(
             check("previousPressed")
                 .that(actualChanges[i].previousPressed)
                 .isEqualTo(expectedChanges[i].previousPressed)
-            check("consumed.downChange")
-                .that(actualChanges[i].consumed.downChange)
-                .isEqualTo(expectedChanges[i].consumed.downChange)
-            check("consumed.positionChange")
-                .that(actualChanges[i].consumed.positionChange)
-                .isEqualTo(expectedChanges[i].consumed.positionChange)
+            check("consumed")
+                .that(actualChanges[i].isConsumed)
+                .isEqualTo(expectedChanges[i].isConsumed)
         }
     }
 }
@@ -440,27 +439,14 @@ internal class PointerInputChangeSubject(
         }
     }
 
-    fun nothingConsumed() {
-        downNotConsumed()
-        positionChangeNotConsumed()
+    fun changeConsumed() {
+        check("consumedChange")
+            .that(actual.isConsumed).isEqualTo(true)
     }
 
-    fun downConsumed() {
-        check("consumed.downChange").that(actual.consumed.downChange).isEqualTo(true)
-    }
-
-    fun downNotConsumed() {
-        check("consumed.downChange").that(actual.consumed.downChange).isEqualTo(false)
-    }
-
-    fun positionChangeConsumed() {
-        check("consumed.positionChangeConsumed")
-            .that(actual.consumed.positionChange).isEqualTo(true)
-    }
-
-    fun positionChangeNotConsumed() {
-        check("consumed.positionChange not Consumed")
-            .that(actual.consumed.positionChange).isEqualTo(false)
+    fun changeNotConsumed() {
+        check("consumedChange")
+            .that(actual.isConsumed).isEqualTo(false)
     }
 
     fun isStructurallyEqualTo(expected: PointerInputChange) {
@@ -483,15 +469,21 @@ internal class PointerInputChangeSubject(
         check("previousPressed")
             .that(actual.previousPressed)
             .isEqualTo(expected.previousPressed)
-        check("consumed.downChange")
-            .that(actual.consumed.downChange)
-            .isEqualTo(expected.consumed.downChange)
-        check("consumed.positionChange")
-            .that(actual.consumed.positionChange)
-            .isEqualTo(expected.consumed.positionChange)
+        check("consumed")
+            .that(actual.isConsumed)
+            .isEqualTo(expected.isConsumed)
     }
 }
 
-internal fun PointerInputChange.deepCopy() = copy(
-    consumed = ConsumedData(consumed.positionChange, consumed.downChange)
+internal fun PointerInputChange.deepCopy() = PointerInputChange(
+    id = this.id,
+    uptimeMillis = this.uptimeMillis,
+    position = this.position,
+    pressed = this.pressed,
+    previousUptimeMillis = this.previousUptimeMillis,
+    previousPosition = this.previousPosition,
+    previousPressed = this.previousPressed,
+    isInitiallyConsumed = this.isConsumed,
+    type = this.type,
+    scrollDelta = this.scrollDelta
 )
