@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.input.pointer
 
-import android.os.Build
 import android.view.PointerIcon.TYPE_CROSSHAIR
 import android.view.PointerIcon.TYPE_HAND
 import android.view.PointerIcon.TYPE_DEFAULT
@@ -50,14 +49,7 @@ internal class AndroidPointerIcon(val pointerIcon: android.view.PointerIcon) : P
 
         other as AndroidPointerIcon
 
-        if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                pointerIcon != other.pointerIcon
-            } else {
-                pointerIcon !== other.pointerIcon
-            }
-        ) return false
-
-        return true
+        return pointerIcon == other.pointerIcon
     }
 
     override fun hashCode(): Int {
