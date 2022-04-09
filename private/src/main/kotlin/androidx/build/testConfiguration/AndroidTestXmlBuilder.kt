@@ -23,6 +23,7 @@ class ConfigBuilder {
     var isPostsubmit: Boolean = true
     lateinit var minSdk: String
     var runAllTests: Boolean = true
+    var cleanupApks: Boolean = true
     val tags: MutableList<String> = mutableListOf()
     lateinit var testApkName: String
     lateinit var testRunner: String
@@ -33,6 +34,7 @@ class ConfigBuilder {
     fun isPostsubmit(isPostsubmit: Boolean) = apply { this.isPostsubmit = isPostsubmit }
     fun minSdk(minSdk: String) = apply { this.minSdk = minSdk }
     fun runAllTests(runAllTests: Boolean) = apply { this.runAllTests = runAllTests }
+    fun cleanupApks(cleanupApks: Boolean) = apply { this.cleanupApks = cleanupApks }
     fun tag(tag: String) = apply { this.tags.add(tag) }
     fun testApkName(testApkName: String) = apply { this.testApkName = testApkName }
     fun testRunner(testRunner: String) = apply { this.testRunner = testRunner }
@@ -55,7 +57,7 @@ class ConfigBuilder {
             }
         }
         sb.append(SETUP_INCLUDE)
-            .append(TARGET_PREPARER_OPEN)
+            .append(TARGET_PREPARER_OPEN.replace("CLEANUP_APKS", cleanupApks.toString()))
             .append(APK_INSTALL_OPTION.replace("APK_NAME", testApkName))
         if (!appApkName.isNullOrEmpty())
             sb.append(APK_INSTALL_OPTION.replace("APK_NAME", appApkName!!))
@@ -283,15 +285,12 @@ private val SETUP_INCLUDE = """
 
 /**
  * Specify the following options on the APK installer:
- * - Don't attempt to remove APKs after testing. We can't remove the apk on API < 27 due to a
- *   platform crash that occurs when handling a PACKAGE_CHANGED broadcast after the package has
- *   been removed. See b/37264334.
  * - Pass the -t argument when installing APKs. This allows testonly APKs to be installed, which
  *   includes all APKs built against a pre-release SDK. See b/205571374.
  */
 private val TARGET_PREPARER_OPEN = """
     <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
-    <option name="cleanup-apks" value="false" />
+    <option name="cleanup-apks" value="CLEANUP_APKS" />
     <option name="install-arg" value="-t" />
 
 """.trimIndent()
