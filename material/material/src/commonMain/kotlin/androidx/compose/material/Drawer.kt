@@ -197,7 +197,7 @@ class DrawerState(
      * swipe finishes. If an animation is running, this is the target value of that animation.
      * Finally, if no swipe or animation is in progress, this is the same as the [currentValue].
      */
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @ExperimentalMaterialApi
     @get:ExperimentalMaterialApi
     val targetValue: DrawerValue
@@ -206,7 +206,7 @@ class DrawerState(
     /**
      * The current position (in pixels) of the drawer sheet.
      */
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @ExperimentalMaterialApi
     @get:ExperimentalMaterialApi
     val offset: State<Float>

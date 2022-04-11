@@ -168,9 +168,9 @@ private class OnGlobalLayoutListener(
         registerOnGlobalLayoutListener()
     }
 
-    override fun onViewAttachedToWindow(p0: View?) = registerOnGlobalLayoutListener()
+    override fun onViewAttachedToWindow(p0: View) = registerOnGlobalLayoutListener()
 
-    override fun onViewDetachedFromWindow(p0: View?) = unregisterOnGlobalLayoutListener()
+    override fun onViewDetachedFromWindow(p0: View) = unregisterOnGlobalLayoutListener()
 
     override fun onGlobalLayout() = onGlobalLayoutCallback()
 

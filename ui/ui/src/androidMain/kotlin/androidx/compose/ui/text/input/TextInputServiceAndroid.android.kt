@@ -334,7 +334,7 @@ internal class TextInputServiceAndroid(
         }
     }
 
-    @Suppress("OverridingDeprecatedMember")
+    @Deprecated("This method should not be called, used BringIntoViewRequester instead.")
     override fun notifyFocusedRect(rect: Rect) {
         focusedRect = AndroidRect(
             rect.left.roundToInt(),

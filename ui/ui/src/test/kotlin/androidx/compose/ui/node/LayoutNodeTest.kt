@@ -2299,7 +2299,11 @@ private class MockOwner(
         get() = TODO("Not yet implemented")
     override val windowInfo: WindowInfo
         get() = TODO("Not yet implemented")
-    @Suppress("DEPRECATION", "OverridingDeprecatedMember")
+    @Deprecated(
+        "fontLoader is deprecated, use fontFamilyResolver",
+        replaceWith = ReplaceWith("fontFamilyResolver")
+    )
+    @Suppress("DEPRECATION")
     override val fontLoader: Font.ResourceLoader
         get() = TODO("Not yet implemented")
     override val fontFamilyResolver: FontFamily.Resolver

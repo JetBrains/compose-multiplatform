@@ -94,7 +94,7 @@ class SpanStyle @ExperimentalTextApi constructor(
     val background: Color = Color.Unspecified,
     val textDecoration: TextDecoration? = null,
     val shadow: Shadow? = null,
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalTextApi val platformStyle: PlatformSpanStyle? = null
 ) {
 

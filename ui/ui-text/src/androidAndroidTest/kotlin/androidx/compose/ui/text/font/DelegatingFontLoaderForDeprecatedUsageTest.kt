@@ -163,6 +163,10 @@ class DelegatingFontLoaderForDeprecatedUsageTest {
     private class TrackingLoader : Font.ResourceLoader {
         val loads = mutableListOf<Font>()
 
+        @Deprecated(
+            "Replaced by FontFamily.Resolver, this method should not be called",
+            replaceWith = ReplaceWith("FontFamily.Resolver.resolve(font, )")
+        )
         @Suppress("DEPRECATION")
         override fun load(font: Font): Any {
             loads.add(font)

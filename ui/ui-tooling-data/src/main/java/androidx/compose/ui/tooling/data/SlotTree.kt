@@ -650,7 +650,7 @@ private const val STABLE_BITS = 0b100
  */
 @UiToolingDataApi
 val Group.position: String?
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @UiToolingDataApi
     get() = keyPosition(key)
 

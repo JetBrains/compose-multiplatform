@@ -183,7 +183,7 @@ val WindowInsets.Companion.safeContent: WindowInsets
  */
 @ExperimentalLayoutApi
 val WindowInsets.Companion.captionBarIgnoringVisibility: WindowInsets
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @ExperimentalLayoutApi
     @Composable
     @NonRestartableComposable
@@ -197,7 +197,7 @@ val WindowInsets.Companion.captionBarIgnoringVisibility: WindowInsets
  */
 @ExperimentalLayoutApi
 val WindowInsets.Companion.navigationBarsIgnoringVisibility: WindowInsets
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @ExperimentalLayoutApi
     @Composable
     @NonRestartableComposable
@@ -209,7 +209,7 @@ val WindowInsets.Companion.navigationBarsIgnoringVisibility: WindowInsets
  */
 @ExperimentalLayoutApi
 val WindowInsets.Companion.statusBarsIgnoringVisibility: WindowInsets
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @ExperimentalLayoutApi
     @Composable
     @NonRestartableComposable
@@ -222,7 +222,7 @@ val WindowInsets.Companion.statusBarsIgnoringVisibility: WindowInsets
  */
 @ExperimentalLayoutApi
 val WindowInsets.Companion.systemBarsIgnoringVisibility: WindowInsets
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @ExperimentalLayoutApi
     @Composable
     @NonRestartableComposable
@@ -235,7 +235,7 @@ val WindowInsets.Companion.systemBarsIgnoringVisibility: WindowInsets
  */
 @ExperimentalLayoutApi
 val WindowInsets.Companion.tappableElementIgnoringVisibility: WindowInsets
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @ExperimentalLayoutApi
     @Composable
     @NonRestartableComposable
@@ -247,7 +247,7 @@ val WindowInsets.Companion.tappableElementIgnoringVisibility: WindowInsets
  */
 @ExperimentalLayoutApi
 val WindowInsets.Companion.isCaptionBarVisible: Boolean
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @ExperimentalLayoutApi
     @Composable
     @NonRestartableComposable
@@ -259,7 +259,7 @@ val WindowInsets.Companion.isCaptionBarVisible: Boolean
  */
 @ExperimentalLayoutApi
 val WindowInsets.Companion.isImeVisible: Boolean
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @ExperimentalLayoutApi
     @Composable
     @NonRestartableComposable
@@ -271,7 +271,7 @@ val WindowInsets.Companion.isImeVisible: Boolean
  */
 @ExperimentalLayoutApi
 val WindowInsets.Companion.areStatusBarsVisible: Boolean
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @ExperimentalLayoutApi
     @Composable
     @NonRestartableComposable
@@ -283,7 +283,7 @@ val WindowInsets.Companion.areStatusBarsVisible: Boolean
  */
 @ExperimentalLayoutApi
 val WindowInsets.Companion.areNavigationBarsVisible: Boolean
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @ExperimentalLayoutApi
     @Composable
     @NonRestartableComposable
@@ -295,7 +295,7 @@ val WindowInsets.Companion.areNavigationBarsVisible: Boolean
  */
 @ExperimentalLayoutApi
 val WindowInsets.Companion.areSystemBarsVisible: Boolean
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @ExperimentalLayoutApi
     @Composable
     @NonRestartableComposable
@@ -306,7 +306,7 @@ val WindowInsets.Companion.areSystemBarsVisible: Boolean
  */
 @ExperimentalLayoutApi
 val WindowInsets.Companion.isTappableElementVisible: Boolean
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @ExperimentalLayoutApi
     @Composable
     @NonRestartableComposable

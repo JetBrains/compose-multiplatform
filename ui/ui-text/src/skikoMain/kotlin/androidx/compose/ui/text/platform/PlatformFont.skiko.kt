@@ -137,6 +137,10 @@ class FontLoader : Font.ResourceLoader {
     //  proper interfaces or they are broken (.makeFromFile(*, 1) always fails)
     //  2. variable fonts. for them we also need to extend definition interfaces to support
     //  custom variation settings
+    @Deprecated(
+        "Replaced by FontFamily.Resolver, this method should not be called",
+        ReplaceWith("FontFamily.Resolver.resolve(font, )"),
+    )
     override fun load(font: Font): SkTypeface {
         if (font !is PlatformFont) {
             throw IllegalArgumentException("Unsupported font type: $font")

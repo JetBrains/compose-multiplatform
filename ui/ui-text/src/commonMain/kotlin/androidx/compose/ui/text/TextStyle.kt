@@ -51,7 +51,7 @@ class TextStyle
 internal constructor(
     internal val spanStyle: SpanStyle,
     internal val paragraphStyle: ParagraphStyle,
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalTextApi val platformStyle: PlatformTextStyle? = null
 ) {
     @OptIn(ExperimentalTextApi::class)
