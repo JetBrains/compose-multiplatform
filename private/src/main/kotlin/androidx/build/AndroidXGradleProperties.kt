@@ -106,6 +106,12 @@ const val PLAYGROUND_METALAVA_BUILD_ID = "androidx.playground.metalavaBuildId"
 const val PLAYGROUND_DOKKA_BUILD_ID = "androidx.playground.dokkaBuildId"
 
 /**
+ * Filepath to the java agent of YourKit for profiling
+ * If this value is set, profiling via YourKit will automatically be enabled
+ */
+const val PROFILE_YOURKIT_AGENT_PATH = "androidx.profile.yourkitAgentPath"
+
+/**
  * Specifies to validate that the build doesn't generate any unrecognized messages
  * This prevents developers from inadvertently adding new warnings to the build output
  */
@@ -161,6 +167,7 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     PLAYGROUND_SNAPSHOT_BUILD_ID,
     PLAYGROUND_METALAVA_BUILD_ID,
     PLAYGROUND_DOKKA_BUILD_ID,
+    PROFILE_YOURKIT_AGENT_PATH,
     KMP_GITHUB_BUILD,
     KMP_ENABLE_MAC,
     KMP_ENABLE_JS,
