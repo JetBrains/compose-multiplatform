@@ -404,8 +404,8 @@ package androidx.compose.material3 {
   }
 
   public final class SnackbarKt {
-    method @androidx.compose.runtime.Composable public static void Snackbar(optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit>? action, optional kotlin.jvm.functions.Function0<kotlin.Unit>? dismissAction, optional boolean actionOnNewLine, optional androidx.compose.ui.graphics.Shape shape, optional long containerColor, optional long contentColor, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static void Snackbar(androidx.compose.material3.SnackbarData snackbarData, optional androidx.compose.ui.Modifier modifier, optional boolean actionOnNewLine, optional androidx.compose.ui.graphics.Shape shape, optional long containerColor, optional long contentColor, optional long actionColor);
+    method @androidx.compose.runtime.Composable public static void Snackbar(optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit>? action, optional kotlin.jvm.functions.Function0<kotlin.Unit>? dismissAction, optional boolean actionOnNewLine, optional androidx.compose.ui.graphics.Shape shape, optional long containerColor, optional long contentColor, optional long actionContentColor, optional long dismissActionContentColor, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void Snackbar(androidx.compose.material3.SnackbarData snackbarData, optional androidx.compose.ui.Modifier modifier, optional boolean actionOnNewLine, optional androidx.compose.ui.graphics.Shape shape, optional long containerColor, optional long contentColor, optional long actionColor, optional long actionContentColor, optional long dismissActionContentColor);
   }
 
   public enum SnackbarResult {

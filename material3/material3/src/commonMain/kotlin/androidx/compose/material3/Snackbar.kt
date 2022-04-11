@@ -37,6 +37,7 @@ import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import kotlin.math.max
 import kotlin.math.min
@@ -78,6 +79,10 @@ import kotlin.math.min
  * @param containerColor background color of the Snackbar
  * @param contentColor the preferred color for content inside this Snackbar. Also see
  * [LocalContentColor] which is used by [Text] and [Icon] by default.
+ * @param actionContentColor the preferred content color for the optional [action] inside this
+ * Snackbar
+ * @param dismissActionContentColor the preferred content color for the optional [dismissAction]
+ * inside this Snackbar
  * @param content content to show information about a process that an app has performed or will
  * perform
  */
@@ -90,6 +95,8 @@ fun Snackbar(
     shape: Shape = SnackbarTokens.ContainerShape.toShape(),
     containerColor: Color = SnackbarTokens.ContainerColor.toColor(),
     contentColor: Color = SnackbarTokens.SupportingTextColor.toColor(),
+    actionContentColor: Color = SnackbarTokens.ActionLabelTextColor.toColor(),
+    dismissActionContentColor: Color = SnackbarTokens.IconColor.toColor(),
     content: @Composable () -> Unit
 ) {
     Surface(
@@ -100,18 +107,32 @@ fun Snackbar(
         shadowElevation = SnackbarTokens.ContainerElevation
     ) {
         val textStyle = MaterialTheme.typography.fromToken(SnackbarTokens.SupportingTextFont)
+        val actionTextStyle = MaterialTheme.typography.fromToken(SnackbarTokens.ActionLabelTextFont)
         CompositionLocalProvider(LocalTextStyle provides textStyle) {
             when {
                 action == null -> OneRowSnackbar(
                     text = content,
                     action = null,
-                    dismissAction = dismissAction
+                    dismissAction = dismissAction,
+                    actionTextStyle,
+                    actionContentColor,
+                    dismissActionContentColor
                 )
-                actionOnNewLine -> NewLineButtonSnackbar(content, action, dismissAction)
+                actionOnNewLine -> NewLineButtonSnackbar(
+                    content,
+                    action,
+                    dismissAction,
+                    actionTextStyle,
+                    actionContentColor,
+                    dismissActionContentColor
+                )
                 else -> OneRowSnackbar(
                     text = content,
                     action = action,
-                    dismissAction = dismissAction
+                    dismissAction = dismissAction,
+                    actionTextStyle,
+                    actionContentColor,
+                    dismissActionContentColor
                 )
             }
         }
@@ -161,6 +182,10 @@ fun Snackbar(
  * @param contentColor the preferred color for content inside this Snackbar. Also see
  * [LocalContentColor] which is used by [Text] and [Icon] by default.
  * @param actionColor color of the Snackbar's action
+ * @param actionContentColor the preferred content color for the optional action inside this
+ * Snackbar. See [SnackbarVisuals.actionLabel].
+ * @param dismissActionContentColor the preferred content color for the optional dismiss action
+ * inside this Snackbar. See [SnackbarVisuals.withDismissAction].
  */
 @Composable
 fun Snackbar(
@@ -170,7 +195,9 @@ fun Snackbar(
     shape: Shape = SnackbarTokens.ContainerShape.toShape(),
     containerColor: Color = SnackbarTokens.ContainerColor.toColor(),
     contentColor: Color = SnackbarTokens.SupportingTextColor.toColor(),
-    actionColor: Color = SnackbarTokens.ActionLabelTextColor.toColor()
+    actionColor: Color = SnackbarTokens.ActionLabelTextColor.toColor(),
+    actionContentColor: Color = SnackbarTokens.ActionLabelTextColor.toColor(),
+    dismissActionContentColor: Color = SnackbarTokens.IconColor.toColor(),
 ) {
     val actionLabel = snackbarData.visuals.actionLabel
     val actionComposable: (@Composable () -> Unit)? = if (actionLabel != null) {
@@ -208,6 +235,8 @@ fun Snackbar(
         shape = shape,
         containerColor = containerColor,
         contentColor = contentColor,
+        actionContentColor = actionContentColor,
+        dismissActionContentColor = dismissActionContentColor,
         content = { Text(snackbarData.visuals.message) }
     )
 }
@@ -216,7 +245,10 @@ fun Snackbar(
 private fun NewLineButtonSnackbar(
     text: @Composable () -> Unit,
     action: @Composable () -> Unit,
-    dismissAction: @Composable (() -> Unit)?
+    dismissAction: @Composable (() -> Unit)?,
+    actionTextStyle: TextStyle,
+    actionContentColor: Color,
+    dismissActionContentColor: Color
 ) {
     Column(
         modifier = Modifier
@@ -238,19 +270,14 @@ private fun NewLineButtonSnackbar(
                 .padding(end = if (dismissAction == null) HorizontalSpacingButtonSide else 0.dp)
         ) {
             Row {
-                val actionTextColor = SnackbarTokens.ActionLabelTextColor.toColor()
-                val actionTextStyle =
-                    MaterialTheme.typography.fromToken(SnackbarTokens.ActionLabelTextFont)
                 CompositionLocalProvider(
-                    LocalContentColor provides actionTextColor,
+                    LocalContentColor provides actionContentColor,
                     LocalTextStyle provides actionTextStyle,
                     content = action
                 )
-
                 if (dismissAction != null) {
-                    val dismissActionColor = SnackbarTokens.IconColor.toColor()
                     CompositionLocalProvider(
-                        LocalContentColor provides dismissActionColor,
+                        LocalContentColor provides dismissActionContentColor,
                         content = dismissAction
                     )
                 }
@@ -263,7 +290,10 @@ private fun NewLineButtonSnackbar(
 private fun OneRowSnackbar(
     text: @Composable () -> Unit,
     action: @Composable (() -> Unit)?,
-    dismissAction: @Composable (() -> Unit)?
+    dismissAction: @Composable (() -> Unit)?,
+    actionTextStyle: TextStyle,
+    actionTextColor: Color,
+    dismissActionColor: Color
 ) {
     val textTag = "text"
     val actionTag = "action"
@@ -273,9 +303,6 @@ private fun OneRowSnackbar(
             Box(Modifier.layoutId(textTag).padding(vertical = SnackbarVerticalPadding)) { text() }
             if (action != null) {
                 Box(Modifier.layoutId(actionTag)) {
-                    val actionTextColor = SnackbarTokens.ActionLabelTextColor.toColor()
-                    val actionTextStyle =
-                        MaterialTheme.typography.fromToken(SnackbarTokens.ActionLabelTextFont)
                     CompositionLocalProvider(
                         LocalContentColor provides actionTextColor,
                         LocalTextStyle provides actionTextStyle,
@@ -285,7 +312,6 @@ private fun OneRowSnackbar(
             }
             if (dismissAction != null) {
                 Box(Modifier.layoutId(dismissActionTag)) {
-                    val dismissActionColor = SnackbarTokens.IconColor.toColor()
                     CompositionLocalProvider(
                         LocalContentColor provides dismissActionColor,
                         content = dismissAction
