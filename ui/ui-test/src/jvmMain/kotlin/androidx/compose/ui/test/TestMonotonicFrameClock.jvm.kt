@@ -115,7 +115,7 @@ class TestMonotonicFrameClock(
 /**
  * The frame delay time for the [TestMonotonicFrameClock] in milliseconds.
  */
-@Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+@Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
 @get:ExperimentalCoroutinesApi // Required to annotate Java-facing APIs
 @ExperimentalCoroutinesApi // Required by kotlinc to use frameDelayNanos
 val TestMonotonicFrameClock.frameDelayMillis: Long

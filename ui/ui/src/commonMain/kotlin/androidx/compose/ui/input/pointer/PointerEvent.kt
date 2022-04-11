@@ -95,7 +95,7 @@ abstract class PointerInputFilter {
      * level, so if any [PointerInputFilter]s on a Layout has [shareWithSiblings] set to `true`
      * then the Layout will share with siblings.
      */
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @ExperimentalComposeUiApi
     @get:ExperimentalComposeUiApi
     open val shareWithSiblings: Boolean
@@ -485,7 +485,7 @@ class PointerInputChange(
     // With these experimental annotations, the API can be either cleanly removed or
     // stabilized. It doesn't appear in current.txt; and in experimental_current.txt,
     // it has the same effect as a primary constructor val.
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @ExperimentalComposeUiApi
     @get:ExperimentalComposeUiApi
     val historical: List<HistoricalChange>

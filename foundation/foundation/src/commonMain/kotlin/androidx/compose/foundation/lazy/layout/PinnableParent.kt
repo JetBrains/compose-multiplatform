@@ -28,7 +28,7 @@ import androidx.compose.ui.modifier.modifierLocalOf
  *
  * This API is experimental and will change in the future.
  */
-@Suppress("OPT_IN_MARKER_ON_WRONG_TARGET", "EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+@Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
 @get: ExperimentalFoundationApi
 @ExperimentalFoundationApi
 val ModifierLocalPinnableParent = modifierLocalOf<PinnableParent?> { null }

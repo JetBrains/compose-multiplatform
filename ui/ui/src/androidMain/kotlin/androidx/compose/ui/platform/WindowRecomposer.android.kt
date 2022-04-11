@@ -356,8 +356,8 @@ fun View.createLifecycleAwareWindowRecomposer(
     // becomes detached. This can easily happen as part of setting a new content view.
     addOnAttachStateChangeListener(
         object : View.OnAttachStateChangeListener {
-            override fun onViewAttachedToWindow(v: View?) {}
-            override fun onViewDetachedFromWindow(v: View?) {
+            override fun onViewAttachedToWindow(v: View) {}
+            override fun onViewDetachedFromWindow(v: View) {
                 removeOnAttachStateChangeListener(this)
                 recomposer.cancel()
             }

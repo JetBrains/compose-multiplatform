@@ -66,7 +66,7 @@ interface Font {
     /**
      * Loading strategy for this font.
      */
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalTextApi
     @ExperimentalTextApi
     val loadingStrategy: FontLoadingStrategy
@@ -175,7 +175,7 @@ class ResourceFont internal constructor(
     loadingStrategy: FontLoadingStrategy = FontLoadingStrategy.Async
 ) : Font {
 
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET", "CanBePrimaryConstructorProperty")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET", "CanBePrimaryConstructorProperty")
     @get:ExperimentalTextApi
     @ExperimentalTextApi
     override val loadingStrategy: FontLoadingStrategy = loadingStrategy

@@ -44,7 +44,7 @@ val LocalAccessibilityManager = staticCompositionLocalOf<AccessibilityManager?> 
  * The CompositionLocal that can be used to trigger autofill actions.
  * Eg. [Autofill.requestAutofillForNode].
  */
-@Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+@Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
 @get:ExperimentalComposeUiApi
 @ExperimentalComposeUiApi
 val LocalAutofill = staticCompositionLocalOf<Autofill?> { null }
@@ -55,7 +55,7 @@ val LocalAutofill = staticCompositionLocalOf<Autofill?> { null }
  * [AutofillTree] is a temporary data structure that will be replaced by Autofill Semantics
  * (b/138604305).
  */
-@Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+@Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
 @get:ExperimentalComposeUiApi
 @ExperimentalComposeUiApi
 val LocalAutofillTree = staticCompositionLocalOf<AutofillTree> {

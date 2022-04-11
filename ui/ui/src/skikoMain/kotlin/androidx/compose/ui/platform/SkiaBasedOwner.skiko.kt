@@ -205,6 +205,10 @@ internal class SkiaBasedOwner(
 
     override val textInputService = TextInputService(platformInputService)
 
+    @Deprecated(
+        "fontLoader is deprecated, use fontFamilyResolver",
+        replaceWith = ReplaceWith("fontFamilyResolver")
+    )
     override val fontLoader = FontLoader()
 
     override val fontFamilyResolver = createFontFamilyResolver()
