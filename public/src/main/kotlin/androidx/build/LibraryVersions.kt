@@ -43,7 +43,7 @@ object LibraryVersions {
     val COLLECTION2 = Version("1.3.0-alpha01")
     val CONTENTPAGER = Version("1.1.0-alpha01")
     val COMPOSE_MATERIAL3 = Version(System.getenv("COMPOSE_CUSTOM_VERSION") ?: "1.0.0-alpha03")
-    val COMPOSE = Version(System.getenv("COMPOSE_CUSTOM_VERSION") ?: "1.1.1")
+    val COMPOSE = Version(System.getenv("COMPOSE_CUSTOM_VERSION") ?: "1.1.2")
     val COORDINATORLAYOUT = Version("1.2.0-rc01")
     val CORE = Version("1.8.0-alpha02")
     val CORE_ANIMATION = Version("1.0.0-alpha03")
