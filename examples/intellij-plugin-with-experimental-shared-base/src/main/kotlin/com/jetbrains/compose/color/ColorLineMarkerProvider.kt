@@ -5,30 +5,22 @@
 
 package com.jetbrains.compose.color
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Surface
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposePanel
+import androidx.compose.ui.graphics.Color
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
-import com.intellij.icons.AllIcons
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.psi.PsiElement
+import com.jetbrains.compose.IntellijTheme
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.uast.*
-import javax.swing.JComponent
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.graphics.toArgb
-import com.intellij.openapi.application.ApplicationManager
-import com.jetbrains.compose.theme.WidgetTheme
-import org.intellij.datavis.r.inlays.components.GraphicsManager
 import java.awt.Component
 import java.awt.Graphics
 import javax.swing.Icon
+import javax.swing.JComponent
 
 class ColorLineMarkerProvider : LineMarkerProvider {
 
@@ -59,16 +51,14 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                             )
                             g?.fillRect(0, 0, iconSize, iconSize)
                         }
+
                         override fun getIconWidth(): Int = iconSize
                         override fun getIconHeight(): Int = iconSize
                     },
                     null,
                     { _, psiElement: PsiElement ->
-                        val isDarkMode = try {
-                            GraphicsManager.getInstance(project)?.isDarkModeEnabled ?: false
-                        } catch (t: Throwable) {
-                            false
-                        }
+
+
                         class ChooseColorDialog() : DialogWrapper(project) {
                             val colorState = mutableStateOf(previousColor)
 
@@ -81,10 +71,8 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                                 ComposePanel().apply {
                                     setBounds(0, 0, 400, 400)
                                     setContent {
-                                        WidgetTheme(darkTheme = isDarkMode) {
-                                            Surface(modifier = Modifier.fillMaxSize()) {
-                                                ColorPicker(colorState)
-                                            }
+                                        IntellijTheme(project) {
+                                            ColorPicker(colorState)
                                         }
                                     }
                                 }
