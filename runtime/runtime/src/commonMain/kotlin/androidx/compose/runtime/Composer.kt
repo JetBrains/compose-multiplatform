@@ -1023,10 +1023,10 @@ sealed interface Composer {
         }
 
         /**
-         * Experimental API for specifying a tracer used for instrumenting frequent
+         * Internal API for specifying a tracer used for instrumenting frequent
          * operations, e.g. recompositions.
          */
-        @ExperimentalComposeApi
+        @InternalComposeTracingApi
         fun setTracer(tracer: CompositionTracer) {
             compositionTracer = tracer
         }
@@ -1081,25 +1081,48 @@ fun sourceInformationMarkerStart(composer: Composer, key: Int, sourceInformation
     composer.sourceInformationMarkerStart(key, sourceInformation)
 }
 
-@ExperimentalComposeApi
+/**
+ * Internal tracing API.
+ *
+ * Should be called without thread synchronization with occasional information loss.
+ */
+@InternalComposeTracingApi
 interface CompositionTracer {
-    fun traceEventStart(key: Int, info: String): Unit
+    fun traceEventStart(key: Int, dirty1: Int, dirty2: Int, info: String): Unit
     fun traceEventEnd(): Unit
 }
 
-@OptIn(ExperimentalComposeApi::class)
+@OptIn(InternalComposeTracingApi::class)
 private var compositionTracer: CompositionTracer? = null
 
-@OptIn(ExperimentalComposeApi::class)
+/**
+ * Internal tracing API.
+ *
+ * Should be called without thread synchronization with occasional information loss.
+ */
+@OptIn(InternalComposeTracingApi::class)
 @ComposeCompilerApi
 fun isTraceInProgress(): Boolean = compositionTracer != null
 
-@OptIn(ExperimentalComposeApi::class)
+/**
+ * Internal tracing API.
+ *
+ * Should be called without thread synchronization with occasional information loss.
+ *
+ * @param dirty1 $dirty metadata: forced-recomposition and function parameters 1..10 if present
+ * @param dirty2 $dirty2 metadata: forced-recomposition and function parameters 11..20 if present
+ */
+@OptIn(InternalComposeTracingApi::class)
 @ComposeCompilerApi
-fun traceEventStart(key: Int, info: String): Unit =
-    compositionTracer?.traceEventStart(key, info) ?: Unit
+fun traceEventStart(key: Int, dirty1: Int, dirty2: Int, info: String): Unit =
+    compositionTracer?.traceEventStart(key, dirty1, dirty2, info) ?: Unit
 
-@OptIn(ExperimentalComposeApi::class)
+/**
+ * Internal tracing API.
+ *
+ * Should be called without thread synchronization with occasional information loss.
+ */
+@OptIn(InternalComposeTracingApi::class)
 @ComposeCompilerApi
 fun traceEventEnd(): Unit = compositionTracer?.traceEventEnd() ?: Unit
 
