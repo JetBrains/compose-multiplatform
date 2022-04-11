@@ -1894,7 +1894,7 @@ package androidx.compose.ui.layout {
   }
 
   public interface BeyondBoundsLayout {
-    method public boolean requestBeyondBoundsLayout(int direction, kotlin.jvm.functions.Function0<java.lang.Boolean> block);
+    method public <T> T? searchBeyondBounds(int direction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.BeyondBoundsLayoutScope,? extends T> block);
   }
 
   @kotlin.jvm.JvmInline public final value class BeyondBoundsLayoutDirection {
@@ -1919,6 +1919,11 @@ package androidx.compose.ui.layout {
   public final class BeyondBoundsLayoutKt {
     method public static androidx.compose.ui.modifier.ProvidableModifierLocal<androidx.compose.ui.layout.BeyondBoundsLayout> getModifierLocalBeyondBoundsLayout();
     property public static final androidx.compose.ui.modifier.ProvidableModifierLocal<androidx.compose.ui.layout.BeyondBoundsLayout> ModifierLocalBeyondBoundsLayout;
+  }
+
+  public interface BeyondBoundsLayoutScope {
+    method public boolean getHasMoreContent();
+    property public abstract boolean hasMoreContent;
   }
 
   @androidx.compose.runtime.Stable public interface ContentScale {

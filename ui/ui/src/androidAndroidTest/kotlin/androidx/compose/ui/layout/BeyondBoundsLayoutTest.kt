@@ -38,136 +38,276 @@ class BeyondBoundsLayoutTest {
     @get:Rule
     val rule = createComposeRule()
 
+    // The result of an imaginary operation that is run after we add the beyondBounds items we need.
+    private val OperationResult = 10
+
     @Test
-    fun noBeyondBoundsLayoutParent_conditionBlockReturnsFalse() {
+    fun noBeyondBoundsItems() {
         // Arrange.
-        lateinit var beyondBoundsRequester: BeyondBoundsLayout
+        var parent: BeyondBoundsLayout? = null
         var blockInvoked = false
         rule.setContent {
             Box(
-                Modifier.modifierLocalConsumer {
-                    beyondBoundsRequester = ModifierLocalBeyondBoundsLayout.current
-                }
+                Modifier
+                    .parentWithoutNonVisibleItems()
+                    .modifierLocalConsumer {
+                        parent = ModifierLocalBeyondBoundsLayout.current
+                    }
             )
         }
 
         // Act.
         val returnValue = rule.runOnIdle {
-            beyondBoundsRequester.requestBeyondBoundsLayout(direction = After) {
+            parent!!.searchBeyondBounds(After) {
                 blockInvoked = true
-                false
+                OperationResult
             }
         }
 
         // Assert.
-        assertThat(blockInvoked).isTrue()
-        assertThat(returnValue).isFalse()
+        assertThat(blockInvoked).isFalse()
+        assertThat(returnValue).isNull()
     }
 
     @Test
-    fun noBeyondBoundsLayoutParent_conditionBlockReturnsTrue() {
+    fun noItemFound() {
         // Arrange.
-        lateinit var beyondBoundsRequester: BeyondBoundsLayout
-        var blockInvoked = false
+        var parent: BeyondBoundsLayout? = null
+        var blockInvokeCount = 0
         rule.setContent {
             Box(
-                Modifier.modifierLocalConsumer {
-                    beyondBoundsRequester = ModifierLocalBeyondBoundsLayout.current
-                }
+                Modifier
+                    .parentWithFiveNonVisibleItems()
+                    .modifierLocalConsumer {
+                        parent = ModifierLocalBeyondBoundsLayout.current
+                    }
             )
         }
 
         // Act.
         val returnValue = rule.runOnIdle {
-            beyondBoundsRequester.requestBeyondBoundsLayout(direction = After) {
-                blockInvoked = true
-                true
+            assertThat(parent).isNotNull()
+            parent?.searchBeyondBounds<Int>(After) {
+                blockInvokeCount++
+                // Always return null, to continue searching and indicate that
+                // we didn't find the item we were looking for.
+                null
             }
         }
 
         // Assert.
-        assertThat(blockInvoked).isTrue()
-        assertThat(returnValue).isTrue()
+        assertThat(blockInvokeCount).isEqualTo(5)
+        assertThat(returnValue).isNull()
     }
 
     @Test
-    fun beyondBoundsLayoutParent_conditionBlockReturnsFalse() {
+    fun hasMoreItemsReturnsFalseWhenItemsRunOut() {
         // Arrange.
-        lateinit var beyondBoundsLayoutRequest: BeyondBoundsLayoutRequest
-        lateinit var beyondBoundsRequester: BeyondBoundsLayout
-        val block: () -> Boolean = { false }
-        val direction = After
+        var parent: BeyondBoundsLayout? = null
+        val callMap = mutableMapOf<Int, Int?>()
+        var iterationCount = 0
         rule.setContent {
             Box(
                 Modifier
-                    .modifierLocalProvider(ModifierLocalBeyondBoundsLayout) {
-                        object : BeyondBoundsLayout {
-                            override fun requestBeyondBoundsLayout(
-                                direction: BeyondBoundsLayoutDirection,
-                                block: () -> Boolean
-                            ): Boolean {
-                                beyondBoundsLayoutRequest =
-                                    BeyondBoundsLayoutRequest(direction, block)
-                                return block.invoke()
-                            }
-                        }
-                    }
+                    .parentWithFiveNonVisibleItems()
                     .modifierLocalConsumer {
-                        beyondBoundsRequester = ModifierLocalBeyondBoundsLayout.current
+                        parent = ModifierLocalBeyondBoundsLayout.current
                     }
             )
         }
 
         // Act.
         val returnValue = rule.runOnIdle {
-            beyondBoundsRequester.requestBeyondBoundsLayout(direction, block)
+            assertThat(parent).isNotNull()
+            parent?.searchBeyondBounds(After) {
+                val returnValue = if (hasMoreContent) null else OperationResult
+                callMap[++iterationCount] = returnValue
+                returnValue
+            }
         }
 
         // Assert.
-        assertThat(beyondBoundsLayoutRequest).isEqualTo(BeyondBoundsLayoutRequest(direction, block))
-        assertThat(returnValue).isFalse()
+        assertThat(callMap).containsExactlyEntriesIn(
+            mapOf(
+                1 to null,
+                2 to null,
+                3 to null,
+                4 to null,
+                5 to OperationResult,
+            )
+        )
+        assertThat(returnValue).isEqualTo(OperationResult)
     }
 
     @Test
-    fun beyondBoundsLayoutParent_conditionBlockReturnsTrue() {
+    fun itemFoundOnFirstIteration() {
         // Arrange.
-        lateinit var beyondBoundsLayoutRequest: BeyondBoundsLayoutRequest
-        lateinit var beyondBoundsRequester: BeyondBoundsLayout
-        val block: () -> Boolean = { true }
-        val direction = After
+        var parent: BeyondBoundsLayout? = null
         rule.setContent {
             Box(
                 Modifier
-                    .modifierLocalProvider(ModifierLocalBeyondBoundsLayout) {
-                        object : BeyondBoundsLayout {
-                            override fun requestBeyondBoundsLayout(
-                                direction: BeyondBoundsLayoutDirection,
-                                block: () -> Boolean
-                            ): Boolean {
-                                beyondBoundsLayoutRequest =
-                                    BeyondBoundsLayoutRequest(direction, block)
-                                return block.invoke()
-                            }
-                        }
-                    }
+                    .parentWithFiveNonVisibleItems()
                     .modifierLocalConsumer {
-                        beyondBoundsRequester = ModifierLocalBeyondBoundsLayout.current
+                        parent = ModifierLocalBeyondBoundsLayout.current
                     }
             )
         }
 
         // Act.
         val returnValue = rule.runOnIdle {
-            beyondBoundsRequester.requestBeyondBoundsLayout(direction, block)
+            assertThat(parent).isNotNull()
+            parent?.searchBeyondBounds(After) {
+                // After the first item was added, we were able to perform our operation.
+                OperationResult
+            }
         }
 
         // Assert.
-        assertThat(beyondBoundsLayoutRequest).isEqualTo(BeyondBoundsLayoutRequest(direction, block))
-        assertThat(returnValue).isTrue()
+        assertThat(returnValue).isEqualTo(OperationResult)
     }
 
-    private data class BeyondBoundsLayoutRequest(
-        val direction: BeyondBoundsLayoutDirection? = null,
-        val block: (() -> Boolean)? = null,
-    )
+    @Test
+    fun itemFoundOnThirdIteration() {
+        // Arrange.
+        var parent: BeyondBoundsLayout? = null
+        rule.setContent {
+            Box(
+                Modifier
+                    .parentWithFiveNonVisibleItems()
+                    .modifierLocalConsumer {
+                        parent = ModifierLocalBeyondBoundsLayout.current
+                    }
+            )
+        }
+
+        // Act.
+        val returnValue = rule.runOnIdle {
+            assertThat(parent).isNotNull()
+            var iterationCount = 0
+            parent?.searchBeyondBounds(After) {
+                if (iterationCount++ < 3) null else OperationResult
+            }
+        }
+
+        // Assert.
+        assertThat(returnValue).isEqualTo(OperationResult)
+    }
+
+    @Test
+    fun iteratorCountWhenCalledMultipleTimes() {
+        // Arrange.
+        var parent: BeyondBoundsLayout? = null
+        var block1InvokeCount = 0
+        var block2InvokeCount = 0
+        var returnValue1: Int? = null
+        var returnValue2: Int? = null
+        rule.setContent {
+            Box(
+                Modifier
+                    .parentWithFiveNonVisibleItems()
+                    .modifierLocalConsumer {
+                        parent = ModifierLocalBeyondBoundsLayout.current
+                    }
+            )
+        }
+
+        // Act.
+        rule.runOnIdle {
+            assertThat(parent).isNotNull()
+            returnValue1 = parent?.searchBeyondBounds<Int>(After) {
+                block1InvokeCount++
+                // Always return null, to indicate that we didn't find the item we were looking for.
+                null
+            }
+            returnValue2 = parent?.searchBeyondBounds<Int>(After) {
+                block2InvokeCount++
+                // Always return null, to indicate that we didn't find the item we were looking for.
+                null
+            }
+        }
+
+        // Assert.
+        assertThat(block1InvokeCount++).isEqualTo(5)
+        assertThat(block2InvokeCount++).isEqualTo(5)
+        assertThat(returnValue1).isNull()
+        assertThat(returnValue2).isNull()
+    }
+
+    @Test
+    fun reentrantIteratorCount() {
+        // Arrange.
+        var parent: BeyondBoundsLayout? = null
+        val direction = After
+        var block1InvokeCount = 0
+        var block2InvokeCount = 0
+        var returnValue1: Int? = null
+        var returnValue2: Int? = null
+        rule.setContent {
+            Box(
+                Modifier
+                    .parentWithFiveNonVisibleItems()
+                    .modifierLocalConsumer {
+                        parent = ModifierLocalBeyondBoundsLayout.current
+                    }
+            )
+        }
+
+        // Act.
+        rule.runOnIdle {
+            assertThat(parent).isNotNull()
+            returnValue1 = parent?.searchBeyondBounds<Int>(direction) {
+                block1InvokeCount++
+
+                if (!hasMoreContent) {
+                    // Re-entrant call.
+                    returnValue2 =
+                        parent?.searchBeyondBounds<Int>(direction) {
+                            block2InvokeCount++
+                            // Always return null, to indicate that we didn't find the item we were looking for.
+                            null
+                        }
+                }
+
+                // Always return null, to indicate that we didn't find the item we were looking for.
+                null
+            }
+        }
+
+        // Assert.
+        assertThat(block1InvokeCount++).isEqualTo(5)
+        assertThat(block2InvokeCount++).isEqualTo(5)
+        assertThat(returnValue1).isNull()
+        assertThat(returnValue2).isNull()
+    }
+
+    private fun Modifier.parentWithoutNonVisibleItems(): Modifier {
+        return this.modifierLocalProvider(ModifierLocalBeyondBoundsLayout) {
+            object : BeyondBoundsLayout {
+                override fun <T> searchBeyondBounds(
+                    direction: BeyondBoundsLayoutDirection,
+                    block: BeyondBoundsLayoutScope.() -> T?
+                ): T? = null
+            }
+        }
+    }
+
+    private fun Modifier.parentWithFiveNonVisibleItems(): Modifier {
+        return this.modifierLocalProvider(ModifierLocalBeyondBoundsLayout) {
+            object : BeyondBoundsLayout {
+                override fun <T> searchBeyondBounds(
+                    direction: BeyondBoundsLayoutDirection,
+                    block: BeyondBoundsLayoutScope.() -> T?
+                ): T? {
+                    var count = 5
+                    var result: T? = null
+                    while (count-- > 0 && result == null) {
+                        result = block.invoke(BeyondBoundsScope(hasMoreContent = count > 0))
+                    }
+                    return result
+                }
+            }
+        }
+    }
+
+    private class BeyondBoundsScope(override val hasMoreContent: Boolean) : BeyondBoundsLayoutScope
 }
