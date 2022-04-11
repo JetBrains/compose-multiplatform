@@ -38,7 +38,6 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.build.event.BuildEventsListenerRegistry
-import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.extra
 
 abstract class AndroidXRootImplPlugin : Plugin<Project> {
@@ -53,7 +52,6 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
         project.configureRootProject()
     }
 
-    @OptIn(ExperimentalStdlibApi::class) // string extensions
     private fun Project.configureRootProject() {
         project.validateAllAndroidxArgumentsAreRecognized()
         tasks.register("listAndroidXProperties", ListAndroidXPropertiesTask::class.java)
@@ -113,20 +111,6 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
 
         extra.set("projects", ConcurrentHashMap<String, String>())
         subprojects { project ->
-            // Add a method for each sub project where they can declare an optional
-            // dependency on a project or its latest snapshot artifact.
-            // In AndroidX build, this is always enforsed to the project while in Playground
-            // builds, they are converted to the latest SNAPSHOT artifact if the project is
-            // not included in that playground. see: AndroidXPlaygroundRootPlugin
-            project.extra.set(
-                PROJECT_OR_ARTIFACT_EXT_NAME,
-                KotlinClosure1<String, Project>(
-                    function = {
-                        // this refers to the first parameter of the closure.
-                        project.project(this)
-                    }
-                )
-            )
             project.afterEvaluate {
                 if (project.plugins.hasPlugin(LibraryPlugin::class.java) ||
                     project.plugins.hasPlugin(AppPlugin::class.java)
@@ -262,9 +246,5 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
         androidx.build.dependencies.kspVersion = getVersionByName("ksp")
         androidx.build.dependencies.agpVersion = getVersionByName("androidGradlePlugin")
         androidx.build.dependencies.guavaVersion = getVersionByName("guavaJre")
-    }
-
-    companion object {
-        const val PROJECT_OR_ARTIFACT_EXT_NAME = "projectOrArtifact"
     }
 }
