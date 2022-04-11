@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -34,6 +35,7 @@ object PointerIconDefaults {
 /**
  * Represents a pointer icon to use in [Modifier.pointerHoverIcon]
  */
+@Stable
 interface PointerIcon
 
 internal expect val pointerIconDefault: PointerIcon
@@ -55,6 +57,7 @@ internal interface PointerIconService {
  * @param overrideDescendants when false (by default) descendants are able to set their own pointer
  * icon. if true it overrides descendants' icon.
  */
+@Stable
 fun Modifier.pointerHoverIcon(icon: PointerIcon, overrideDescendants: Boolean = false) =
     composed(
         inspectorInfo = debugInspectorInfo {
