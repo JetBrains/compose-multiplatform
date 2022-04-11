@@ -296,9 +296,88 @@ class LazyLayoutTest {
 
         rule.runOnIdle {
             handle.cancel()
-            // this is currently failing because the node is left for reuse, but will work after
-            // we merge aosp/2056467
-            // assertThat(composed).isFalse()
+        }
+
+        rule.runOnIdle {
+            assertThat(composed).isFalse()
+        }
+    }
+
+    @Test
+    fun keptForReuseItemIsDisposedWhenCanceled() {
+        val needChild = mutableStateOf(true)
+        var composed = true
+        val itemsProvider = itemProvider({ 1 }) {
+            {
+                DisposableEffect(Unit) {
+                    composed = true
+                    onDispose {
+                        composed = false
+                    }
+                }
+            }
+        }
+
+        rule.setContent {
+            LazyLayout(itemsProvider) { constraints ->
+                if (needChild.value) {
+                    measure(0, constraints)
+                }
+                layout(10, 10) {}
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(composed).isTrue()
+            needChild.value = false
+        }
+
+        rule.runOnIdle {
+            assertThat(composed).isFalse()
+        }
+    }
+
+    @Test
+    fun nodeIsReusedWithoutExtraRemeasure() {
+        var indexToCompose by mutableStateOf<Int?>(0)
+        var remeasuresCount = 0
+        val modifier = Modifier.layout { measurable, constraints ->
+            val placeable = measurable.measure(constraints)
+            remeasuresCount++
+            layout(placeable.width, placeable.height) {
+                placeable.place(0, 0)
+            }
+        }.fillMaxSize()
+        val itemsProvider = itemProvider({ 2 }) {
+            { Box(modifier) }
+        }
+
+        rule.setContent {
+            LazyLayout(itemsProvider) { constraints ->
+                val node = if (indexToCompose != null) {
+                    measure(indexToCompose!!, constraints).first()
+                } else {
+                    null
+                }
+                layout(10, 10) {
+                    node?.place(0, 0)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(remeasuresCount).isEqualTo(1)
+            // node will be kept for reuse
+            indexToCompose = null
+        }
+
+        rule.runOnIdle {
+            // node with index 0 should be now reused for index 1
+            indexToCompose = 1
+        }
+
+        rule.runOnIdle {
+            assertThat(remeasuresCount).isEqualTo(1)
         }
     }
 

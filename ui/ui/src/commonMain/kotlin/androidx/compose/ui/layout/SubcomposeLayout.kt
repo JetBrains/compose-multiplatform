@@ -22,11 +22,15 @@ import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.ReusableContentHost
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentComposer
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.SubcomposeLayoutState.PrecomposedSlotHandle
@@ -440,7 +444,9 @@ internal class LayoutNodeSubcompositionsState(
                     // Do not optimize this by passing nodeState.content directly; the additional
                     // composable function call from the lambda expression affects the scope of
                     // recomposition and recomposition of siblings.
-                    composable = { content() }
+                    composable = {
+                        ReusableContentHost(nodeState.active, content)
+                    }
                 )
             }
         }
@@ -481,13 +487,16 @@ internal class LayoutNodeSubcompositionsState(
             // iterating backwards so it is easier to remove items
             var i = lastReusableIndex
             while (i >= startIndex) {
-                val slotId = getSlotIdAtIndex(i)
+                val node = root.foldedChildren[i]
+                val nodeState = nodeToNodeState[node]!!
+                val slotId = nodeState.slotId
                 if (reusableSlotIdsSet.contains(slotId)) {
                     root.foldedChildren[i].measuredByParent = UsageByParent.NotUsed
                     reusableCount++
+                    nodeState.active = false
                 } else {
                     ignoreRemeasureRequests {
-                        val nodeState = nodeToNodeState.remove(root.foldedChildren[i])!!
+                        nodeToNodeState.remove(node)
                         nodeState.composition?.dispose()
                         root.removeAt(i, 1)
                     }
@@ -550,7 +559,11 @@ internal class LayoutNodeSubcompositionsState(
                 move(index, reusableNodesSectionStart, 1)
             }
             reusableCount--
-            root.foldedChildren[reusableNodesSectionStart]
+            val node = root.foldedChildren[reusableNodesSectionStart]
+            val nodeState = nodeToNodeState[node]!!
+            nodeState.active = true
+            Snapshot.sendApplyNotifications()
+            node
         }
     }
 
@@ -689,6 +702,7 @@ internal class LayoutNodeSubcompositionsState(
         var composition: Composition? = null
     ) {
         var forceRecompose = false
+        var active by mutableStateOf(true)
     }
 
     private inner class Scope : SubcomposeMeasureScope {
