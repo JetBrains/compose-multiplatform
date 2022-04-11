@@ -256,7 +256,7 @@ sealed class AndroidComposeUiTestEnvironment<A : ComponentActivity> {
 
     init {
         val frameClock = TestMonotonicFrameClock(frameCoroutineScope)
-        mainClockImpl = MainTestClockImpl(testCoroutineDispatcher, frameClock)
+        mainClockImpl = MainTestClockImpl(testCoroutineDispatcher.scheduler, frameClock)
         val infiniteAnimationPolicy = object : InfiniteAnimationPolicy {
             override suspend fun <R> onInfiniteOperation(block: suspend () -> R): R {
                 if (mainClockImpl.autoAdvance) {
