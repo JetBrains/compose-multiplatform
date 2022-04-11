@@ -1052,7 +1052,7 @@ sealed interface Composer {
  * [remember] when it determines these optimizations are safe.
  */
 @ComposeCompilerApi
-inline fun <T> Composer.cache(invalid: Boolean, block: () -> T): T {
+inline fun <T> Composer.cache(invalid: Boolean, block: @DisallowComposableCalls () -> T): T {
     @Suppress("UNCHECKED_CAST")
     return rememberedValue().let {
         if (invalid || it === Composer.Empty) {
