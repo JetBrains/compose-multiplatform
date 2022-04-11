@@ -162,7 +162,8 @@ fun Surface(
  * 5) Click handling. This version of surface will react to the clicks, calling [onClick] lambda,
  * updating the [interactionSource] when [PressInteraction] occurs, and showing ripple indication in
  * response to press events. If you don't need click handling, consider using the Surface function
- * that doesn't require [onClick] param.
+ * that doesn't require [onClick] param. If you need to set a custom label for the [onClick], apply
+ * a `Modifier.semantics { onClick(label = "YOUR_LABEL", action = null) }` to the Surface.
  *
  * 6) Semantics for clicks. Just like with [Modifier.clickable], clickable version of Surface will
  * produce semantics to indicate that it is clicked. Also, by default, accessibility services will
