@@ -825,7 +825,6 @@ private fun Project.configureJavaCompilationWarnings(task: KotlinCompile) {
         task.kotlinOptions.allWarningsAsErrors = true
     }
     task.kotlinOptions.freeCompilerArgs += listOf(
-        "-Xskip-runtime-version-check",
         "-Xskip-metadata-version-check"
     )
 }
