@@ -18,6 +18,7 @@ package androidx.compose.ui.text.font
 
 import android.content.Context
 import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.InternalTextApi
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -77,6 +78,25 @@ fun createFontFamilyResolver(
         FontListFontFamilyTypefaceAdapter(
             GlobalAsyncTypefaceCache,
             coroutineContext
+        )
+    )
+}
+
+/**
+ * Create a FontFamily.resolver that does not share a cache with other FontFamily.Resolvers.
+ *
+ * This is primarily useful for testing or benchmarking.
+ *
+ * @suppress
+ */
+@OptIn(ExperimentalTextApi::class)
+@InternalTextApi // exposed for benchmarking, not a stable API.
+fun emptyCacheFontFamilyResolver(context: Context): FontFamily.Resolver {
+    return FontFamilyResolverImpl(
+        AndroidFontLoader(context),
+        typefaceRequestCache = TypefaceRequestCache(),
+        fontListFontFamilyTypefaceAdapter = FontListFontFamilyTypefaceAdapter(
+            AsyncTypefaceCache()
         )
     )
 }
