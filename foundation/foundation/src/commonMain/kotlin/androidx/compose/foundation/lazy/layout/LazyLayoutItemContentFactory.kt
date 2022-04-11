@@ -103,7 +103,11 @@ internal class LazyLayoutItemContentFactory(
         var lastKnownIndex by mutableStateOf(initialIndex)
             private set
 
-        val content: @Composable () -> Unit = @Composable {
+        private var _content: (@Composable () -> Unit)? = null
+        val content: (@Composable () -> Unit)
+            get() = _content ?: createContentLambda().also { _content = it }
+
+        private fun createContentLambda() = @Composable {
             val itemsProvider = itemsProvider()
             val index = itemsProvider.keyToIndexMap[key]?.also {
                 lastKnownIndex = it
@@ -117,7 +121,8 @@ internal class LazyLayoutItemContentFactory(
             }
             DisposableEffect(key) {
                 onDispose {
-                    lambdasCache.remove(key)
+                    // we clear the cached content lambda when disposed to not leak RecomposeScopes
+                    _content = null
                 }
             }
         }

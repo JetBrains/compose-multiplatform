@@ -1339,42 +1339,84 @@ class SubcomposeLayoutTest {
     fun reusableNodeIsKeptAsReusableAfterStateUpdate() {
         val layoutState = mutableStateOf(SubcomposeLayoutState(SubcomposeSlotReusePolicy(1)))
         val needChild = mutableStateOf(true)
-        var disposed = false
+        var coordinates: LayoutCoordinates? = null
 
         rule.setContent {
-            SubcomposeLayout(state = layoutState.value) {
-                if (needChild.value) {
+            SubcomposeLayout(state = layoutState.value) { constraints ->
+                val node = if (needChild.value) {
                     subcompose(Unit) {
-                        DisposableEffect(Unit) {
-                            onDispose {
-                                disposed = true
-                            }
-                        }
-                    }
+                        Box(Modifier.onGloballyPositioned { coordinates = it })
+                    }.first().measure(constraints)
+                } else {
+                    null
                 }
-                layout(0, 0) {}
+                layout(10, 10) {
+                    node?.place(0, 0)
+                }
             }
         }
 
-        rule.runOnIdle { needChild.value = false }
+        rule.runOnIdle {
+            assertThat(coordinates!!.isAttached).isTrue()
+            needChild.value = false
+        }
 
         rule.runOnIdle {
-            // the composition is still active in the reusable pool
-            assertThat(disposed).isFalse()
+            // the modifier is still attached
+            assertThat(coordinates!!.isAttached).isTrue()
             layoutState.value = SubcomposeLayoutState(SubcomposeSlotReusePolicy(1))
         }
 
-        rule.runOnIdle { needChild.value = false }
+        rule.runOnIdle {
+            // the modifier is still attached
+            assertThat(coordinates!!.isAttached).isTrue()
+        }
     }
 
     @Test
     fun passingSmallerMaxSlotsToRetainForReuse() {
         val layoutState = mutableStateOf(SubcomposeLayoutState(SubcomposeSlotReusePolicy(1)))
         val needChild = mutableStateOf(true)
+        var coordinates: LayoutCoordinates? = null
+
+        rule.setContent {
+            SubcomposeLayout(state = layoutState.value) { constraints ->
+                val node = if (needChild.value) {
+                    subcompose(Unit) {
+                        Box(Modifier.onGloballyPositioned { coordinates = it })
+                    }.first().measure(constraints)
+                } else {
+                    null
+                }
+                layout(10, 10) {
+                    node?.place(0, 0)
+                }
+            }
+        }
+
+        rule.runOnIdle { needChild.value = false }
+
+        rule.runOnIdle {
+            // the node  in the reusable pool is still attached
+            assertThat(coordinates!!.isAttached).isTrue()
+            layoutState.value = SubcomposeLayoutState(SubcomposeSlotReusePolicy(0))
+        }
+
+        rule.runOnIdle {
+            // detached as the new state has 0 as maxSlotsToRetainForReuse
+            assertThat(coordinates!!.isAttached).isFalse()
+        }
+    }
+
+    @Test
+    fun compositionKeptForReuseIsDisposed() {
+        val needChild = mutableStateOf(true)
         var disposed = false
 
         rule.setContent {
-            SubcomposeLayout(state = layoutState.value) {
+            SubcomposeLayout(
+                state = SubcomposeLayoutState(SubcomposeSlotReusePolicy(1))
+            ) {
                 if (needChild.value) {
                     subcompose(Unit) {
                         DisposableEffect(Unit) {
@@ -1384,21 +1426,65 @@ class SubcomposeLayoutTest {
                         }
                     }
                 }
-                layout(0, 0) {}
+                layout(10, 10) {}
             }
         }
 
         rule.runOnIdle { needChild.value = false }
 
         rule.runOnIdle {
-            // the composition is still active in the reusable pool
-            assertThat(disposed).isFalse()
-            layoutState.value = SubcomposeLayoutState(SubcomposeSlotReusePolicy(0))
+            // the composition in the reusable pool is disposed
+            assertThat(disposed).isTrue()
+        }
+    }
+
+    @Test
+    fun composedModifierOnReusableNodeIsDisposedButAttached() {
+        val layoutState = SubcomposeLayoutState(SubcomposeSlotReusePolicy(1))
+        val needChild = mutableStateOf(true)
+        var composed = false
+        var coordinates: LayoutCoordinates? = null
+
+        rule.setContent {
+            SubcomposeLayout(state = layoutState) { constraints ->
+                val node = if (needChild.value) {
+                    subcompose(Unit) {
+                        Box(Modifier.composed {
+                            DisposableEffect(Unit) {
+                                composed = true
+                                onDispose {
+                                    composed = false
+                                }
+                            }
+                            onGloballyPositioned {
+                                coordinates = it
+                            }
+                        })
+                    }.first().measure(constraints)
+                } else {
+                    null
+                }
+                layout(10, 10) {
+                    node?.place(0, 0)
+                }
+            }
         }
 
         rule.runOnIdle {
-            // disposed as the new state has 0 as maxSlotsToRetainForReuse
+            assertThat(composed).isTrue()
+            assertThat(coordinates!!.isAttached).isTrue()
+            needChild.value = false
+        }
+
+        rule.runOnIdle {
+            assertThat(composed).isFalse()
+            assertThat(coordinates!!.isAttached).isTrue()
             needChild.value = true
+        }
+
+        rule.runOnIdle {
+            assertThat(composed).isTrue()
+            assertThat(coordinates!!.isAttached).isTrue()
         }
     }
 
