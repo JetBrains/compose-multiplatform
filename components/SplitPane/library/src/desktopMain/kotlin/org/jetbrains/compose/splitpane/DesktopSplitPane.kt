@@ -1,5 +1,6 @@
 package org.jetbrains.compose.splitpane
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
@@ -24,10 +25,18 @@ internal actual fun SplitPane(
 ) {
     Layout(
         {
-            first()
-            splitter.measuredPart()
-            second()
-            splitter.handlePart()
+            Box {
+                first()
+            }
+            Box {
+                splitter.measuredPart()
+            }
+            Box {
+                second()
+            }
+            Box {
+                splitter.handlePart()
+            }
         },
         modifier,
     ) { measurables, constraints ->
