@@ -27,11 +27,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
 /**
+ * <a href="https://m3.material.io/components/dialogs/overview" class="external" target="_blank">Material Design basic dialog</a>.
+ *
+ * Dialogs provide important prompts in a user flow. They can require an action, communicate
+ * information, or help users accomplish a task.
+ *
  * ![Basic dialog image](https://developer.android.com/images/reference/androidx/compose/material3/basic-dialog.png)
- *
- * Material Design basic dialog.
- *
- * Dialogs interrupt users with urgent information, details, or actions.
  *
  * The dialog will position its buttons, typically [TextButton]s, based on the available space.
  * By default it will try to place them horizontally next to each other and fallback to horizontal

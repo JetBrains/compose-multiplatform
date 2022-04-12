@@ -60,10 +60,11 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collect
 
 /**
- * ![FAB image](https://developer.android.com/images/reference/androidx/compose/material3/fab.png)
+ * <a href="https://m3.material.io/components/floating-action-button/overview" class="external" target="_blank">Material Design floating action button</a>.
  *
- * A floating action button (FAB) represents the primary action of a screen. To learn more about the
- * FAB visit the [Material website](https://m3.material.io/components/floating-action-button).
+ * The FAB represents the most important action on a screen. It puts key actions within reach.
+ *
+ * ![FAB image](https://developer.android.com/images/reference/androidx/compose/material3/fab.png)
  *
  * FAB typically contains an icon, for a FAB with text and an icon, see
  * [ExtendedFloatingActionButton].
@@ -129,9 +130,11 @@ fun FloatingActionButton(
 }
 
 /**
- * ![Small FAB image](https://developer.android.com/images/reference/androidx/compose/material3/small-fab.png)
+ * <a href="https://m3.material.io/components/floating-action-button/overview" class="external" target="_blank">Material Design small floating action button</a>.
  *
- * A small floating action button.
+ * The FAB represents the most important action on a screen. It puts key actions within reach.
+ *
+ * ![Small FAB image](https://developer.android.com/images/reference/androidx/compose/material3/small-fab.png)
  *
  * @sample androidx.compose.material3.samples.SmallFloatingActionButtonSample
  *
@@ -177,9 +180,11 @@ fun SmallFloatingActionButton(
 }
 
 /**
- * ![Large FAB image](https://developer.android.com/images/reference/androidx/compose/material3/large-fab.png)
+ * <a href="https://m3.material.io/components/floating-action-button/overview" class="external" target="_blank">Material Design large floating action button</a>.
  *
- *  A large circular floating action button.
+ * The FAB represents the most important action on a screen. It puts key actions within reach.
+ *
+ * ![Large FAB image](https://developer.android.com/images/reference/androidx/compose/material3/large-fab.png)
  *
  * @sample androidx.compose.material3.samples.LargeFloatingActionButtonSample
  *
@@ -225,10 +230,12 @@ fun LargeFloatingActionButton(
 }
 
 /**
- * ![Extended FAB image](https://developer.android.com/images/reference/androidx/compose/material3/extended-fab.png)
+ * <a href="https://m3.material.io/components/extended-fab/overview" class="external" target="_blank">Material Design extended floating action button</a>.
  *
- * The extended FAB is wider than a regular FAB, and it includes a text label. To learn more about
- * the extended FAB visit the [Material website](https://m3.material.io/components/extended-fab).
+ * Extended FABs help people take primary actions. They're wider than FABs to accommodate a text
+ * label and larger target area.
+ *
+ * ![Extended FAB image](https://developer.android.com/images/reference/androidx/compose/material3/extended-fab.png)
  *
  * The other extended floating action button overload supports a text label and icon.
  *
@@ -278,13 +285,14 @@ fun ExtendedFloatingActionButton(
 }
 
 /**
+ * <a href="https://m3.material.io/components/extended-fab/overview" class="external" target="_blank">Material Design extended floating action button</a>.
+ *
+ * Extended FABs help people take primary actions. They're wider than FABs to accommodate a text
+ * label and larger target area.
+ *
  * ![Extended FAB image](https://developer.android.com/images/reference/androidx/compose/material3/extended-fab.png)
  *
- * The extended FAB is wider than a regular FAB, and it includes a text label and icon. To learn
- * more about the extended FAB visit the
- * [Material website](https://m3.material.io/components/extended-fab).
- *
- * The other extended floating action button overload are for FABs without an icon.
+ * The other extended floating action button overload is for FABs without an icon.
  *
  * @sample androidx.compose.material3.samples.ExtendedFloatingActionButtonSample
  * @sample androidx.compose.material3.samples.AnimatedExtendedFloatingActionButtonSample

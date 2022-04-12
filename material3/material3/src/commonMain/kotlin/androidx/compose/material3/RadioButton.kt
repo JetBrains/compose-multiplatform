@@ -48,6 +48,9 @@ import androidx.compose.ui.unit.dp
  * Material Design radio button.
  *
  * Radio buttons allow users to select one option from a set.
+ *
+ * ![Radio button image](https://developer.android.com/images/reference/androidx/compose/material3/radio-button.png)
+ *
  * @sample androidx.compose.material3.samples.RadioButtonSample
  *
  * [RadioButton]s can be combined together with [Text] in the desired layout (e.g. [Column] or

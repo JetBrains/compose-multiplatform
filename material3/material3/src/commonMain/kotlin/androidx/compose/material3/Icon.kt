@@ -41,6 +41,8 @@ import androidx.compose.ui.semantics.semantics
  * Icon component that draws [imageVector] using [tint], defaulting to [LocalContentColor]. For a
  * clickable icon, see [IconButton].
  *
+ * To learn more about icons, see [Material Design icons](https://m3.material.io/styles/icons/overview)
+ *
  * @param imageVector [ImageVector] to draw inside this Icon
  * @param contentDescription text used by accessibility services to describe what this icon
  * represents. This should always be provided unless this icon is used for decorative purposes, and
@@ -68,6 +70,8 @@ fun Icon(
 /**
  * Icon component that draws [bitmap] using [tint], defaulting to [LocalContentColor]. For a
  * clickable icon, see [IconButton].
+ *
+ * To learn more about icons, see [Material Design icons](https://m3.material.io/styles/icons/overview)
  *
  * @param bitmap [ImageBitmap] to draw inside this Icon
  * @param contentDescription text used by accessibility services to describe what this icon
@@ -97,6 +101,8 @@ fun Icon(
 /**
  * Icon component that draws a [painter] using [tint], defaulting to [LocalContentColor]. For a
  * clickable icon, see [IconButton].
+ *
+ * To learn more about icons, see [Material Design icons](https://m3.material.io/styles/icons/overview)
  *
  * @param painter [Painter] to draw inside this Icon
  * @param contentDescription text used by accessibility services to describe what this icon

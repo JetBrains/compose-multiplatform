@@ -41,6 +41,11 @@ import kotlin.math.ln
  * elements and surfaces from one another. There are two built-in baseline schemes,
  * [lightColorScheme] and a [darkColorScheme], that can be used as-is or customized.
  *
+ * The Material color system and custom schemes provide default values for color as a starting point
+ * for customization.
+ *
+ * To learn more about colors, see [Material Design colors](https://m3.material.io/styles/color/overview).
+ *
  * @property primary The primary color is the color displayed most frequently across your app’s
  * screens and components.
  * @property onPrimary Color used for text and icons displayed on top of the primary color.

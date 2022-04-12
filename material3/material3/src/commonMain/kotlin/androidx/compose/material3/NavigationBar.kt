@@ -56,11 +56,12 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
 /**
+ * <a href="https://m3.material.io/components/navigation-bar/overview" class="external" target="_blank">Material Design bottom navigation bar</a>.
+ *
+ * Navigation bars offer a persistent and convenient way to switch between primary destinations in
+ * an app.
+ *
  * ![Navigation bar image](https://developer.android.com/images/reference/androidx/compose/material3/navigation-bar.png)
- *
- * Material Design bottom navigation bar.
- *
- * A bottom navigation bar allows switching between primary destinations in an app.
  *
  * [NavigationBar] should contain three to five [NavigationBarItem]s, each representing a singular
  * destination.
@@ -106,6 +107,9 @@ fun NavigationBar(
 
 /**
  * Material Design navigation bar item.
+ *
+ * Navigation bars offer a persistent and convenient way to switch between primary destinations in
+ * an app.
  *
  * The recommended configuration for a [NavigationBarItem] depends on how many items there are
  * inside a [NavigationBar]:
