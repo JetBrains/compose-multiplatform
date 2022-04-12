@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -1709,7 +1710,7 @@ class ParagraphIntegrationTest {
                     density = defaultDensity,
                     fontFamilyResolver = resourceLoader,
                     // just have 10x font size to have a bitmap
-                    width = fontSizeInPx * 10
+                    constraints = Constraints(maxWidth = (fontSizeInPx * 10).ceilToInt())
                 )
 
                 paragraph.bitmap()
@@ -4034,7 +4035,7 @@ class ParagraphIntegrationTest {
 
             val paragraph = Paragraph(
                 paragraphIntrinsics = paragraphIntrinsics,
-                width = fontSizeInPx * text.length
+                constraints = Constraints(maxWidth = (fontSizeInPx * text.length).ceilToInt())
             )
 
             assertThat(paragraph.maxIntrinsicWidth).isEqualTo(paragraphIntrinsics.maxIntrinsicWidth)
@@ -4076,7 +4077,7 @@ class ParagraphIntegrationTest {
             ).merge(style),
             maxLines = maxLines,
             ellipsis = ellipsis,
-            width = width,
+            constraints = Constraints(maxWidth = width.ceilToInt()),
             density = density ?: defaultDensity,
             fontFamilyResolver = UncachedFontFamilyResolver(context)
         )

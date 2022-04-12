@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.em
@@ -1231,7 +1232,7 @@ class MultiParagraphIntegrationTest {
         val paragraph = MultiParagraph(
             annotatedString = text,
             style = TextStyle(textDirection = TextDirection.Rtl),
-            width = Float.MAX_VALUE,
+            constraints = Constraints(),
             density = defaultDensity,
             fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
@@ -1263,7 +1264,7 @@ class MultiParagraphIntegrationTest {
                 fontFamily = fontFamilyMeasureFont
             ),
             placeholders = placeholders,
-            width = Float.MAX_VALUE,
+            constraints = Constraints(),
             density = defaultDensity,
             fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
@@ -1294,7 +1295,7 @@ class MultiParagraphIntegrationTest {
                 fontFamily = fontFamilyMeasureFont
             ),
             placeholders = placeholders,
-            width = Float.MAX_VALUE,
+            constraints = Constraints(),
             density = defaultDensity,
             fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
@@ -1326,7 +1327,7 @@ class MultiParagraphIntegrationTest {
                 fontFamily = fontFamilyMeasureFont
             ),
             placeholders = placeholders,
-            width = Float.MAX_VALUE,
+            constraints = Constraints(),
             density = defaultDensity,
             fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
@@ -1368,7 +1369,7 @@ class MultiParagraphIntegrationTest {
                 fontFamily = fontFamilyMeasureFont
             ),
             placeholders = placeholders,
-            width = Float.MAX_VALUE,
+            constraints = Constraints(),
             density = defaultDensity,
             fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
@@ -1413,7 +1414,7 @@ class MultiParagraphIntegrationTest {
                 fontFamily = fontFamilyMeasureFont
             ),
             placeholders = placeholders,
-            width = Float.MAX_VALUE,
+            constraints = Constraints(),
             density = defaultDensity,
             fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
@@ -1469,7 +1470,7 @@ class MultiParagraphIntegrationTest {
                 fontSize = fontSize
             ).merge(style),
             maxLines = maxLines,
-            width = width,
+            constraints = Constraints(maxWidth = width.ceilToInt()),
             density = defaultDensity,
             fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
@@ -1491,7 +1492,7 @@ class MultiParagraphIntegrationTest {
                 localeList = localeList
             ).merge(style),
             maxLines = maxLines,
-            width = width,
+            constraints = Constraints(maxWidth = width.ceilToInt()),
             density = defaultDensity,
             fontFamilyResolver = UncachedFontFamilyResolver(context)
         )

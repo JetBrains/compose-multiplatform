@@ -294,7 +294,7 @@ class CursorAnchorInfoBuilderTest {
         val paragraph = MultiParagraph(
             annotatedString = input.text,
             style = input.style,
-            width = width,
+            constraints = Constraints(maxWidth = ceil(width).toInt()),
             density = input.density,
             fontFamilyResolver = fontFamilyResolver
         )

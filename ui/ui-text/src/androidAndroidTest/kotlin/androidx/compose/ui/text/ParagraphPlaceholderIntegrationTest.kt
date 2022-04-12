@@ -17,6 +17,7 @@
 package androidx.compose.ui.text
 
 import androidx.compose.ui.text.font.toFontFamily
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.em
@@ -521,7 +522,7 @@ class ParagraphPlaceholderIntegrationTest {
             placeholders = placeholders,
             maxLines = maxLines,
             ellipsis = ellipsis,
-            width = width,
+            constraints = Constraints(maxWidth = width.ceilToInt()),
             density = defaultDensity,
             fontFamilyResolver = UncachedFontFamilyResolver(context)
         )

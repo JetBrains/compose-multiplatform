@@ -74,7 +74,6 @@ internal class AndroidParagraphIntrinsics constructor(
     )
 
     init {
-
         val resolveTypeface: (FontFamily?, FontWeight, FontStyle, FontSynthesis) -> Typeface = {
                 fontFamily, fontWeight, fontStyle, fontSynthesis ->
             val result = fontFamilyResolver.resolve(
