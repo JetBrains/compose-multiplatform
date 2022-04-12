@@ -74,6 +74,7 @@ import androidx.compose.ui.semantics.setText
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.semantics.text
 import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.semantics.verticalScrollAxisRange
 import androidx.compose.ui.test.TestActivity
@@ -390,6 +391,16 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         }
         accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
         assertEquals("android.widget.ImageView", info.className)
+    }
+
+    @Test
+    fun nodeWithTextAndLayoutResult_className_textView() {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            text = AnnotatedString("")
+        }
+
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+        assertEquals("android.widget.TextView", info.className)
     }
 
     @Test

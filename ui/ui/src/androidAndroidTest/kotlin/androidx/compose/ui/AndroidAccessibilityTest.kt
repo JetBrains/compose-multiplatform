@@ -492,6 +492,19 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    fun testCreateAccessibilityNodeInfo_forText() {
+        val text = "Test"
+        container.setContent {
+            BasicText(text = text)
+        }
+
+        val textNode = rule.onNodeWithText(text).fetchSemanticsNode()
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(textNode.id)
+
+        assertThat(accessibilityNodeInfo?.className).isEqualTo("android.widget.TextView")
+    }
+
+    @Test
     fun testCreateAccessibilityNodeInfo_forFocusable_notFocused() {
         val tag = "node"
         container.setContent {
