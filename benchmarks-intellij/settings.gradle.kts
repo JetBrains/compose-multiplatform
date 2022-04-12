@@ -1,4 +1,4 @@
-rootProject.name = "ComposeDemoPlugin"
+rootProject.name = "ComposeBenchmarks"
 
 pluginManagement {
     plugins {

@@ -19,10 +19,6 @@ A plugin demonstrates Jetpack compose capabilities on IntelliJ Platform
                 text="Show Compose Demo...">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
-        <action id="com.jetbrains.compose.ComposeStressTestAction" class="com.jetbrains.compose.ComposeStressTestAction"
-                text="Compose Stress Test">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
-        </action>
     </actions>
     <extensions defaultExtensionNs="com.intellij">
         <codeInsight.lineMarkerProvider language="kotlin" implementationClass="com.jetbrains.compose.color.ColorLineMarkerProvider" />
