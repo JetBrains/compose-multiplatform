@@ -361,6 +361,24 @@ fun RangeSlider(
             }
         }
 
+        val onDrag = rememberUpdatedState<(Boolean, Float) -> Unit> { isStart, offset ->
+            val offsetRange = if (isStart) {
+                rawOffsetStart.value = (rawOffsetStart.value + offset)
+                rawOffsetEnd.value = scaleToOffset(values.endInclusive)
+                val offsetEnd = rawOffsetEnd.value
+                val offsetStart = rawOffsetStart.value.coerceIn(minPx, offsetEnd)
+                offsetStart..offsetEnd
+            } else {
+                rawOffsetEnd.value = (rawOffsetEnd.value + offset)
+                rawOffsetStart.value = scaleToOffset(values.start)
+                val offsetStart = rawOffsetStart.value
+                val offsetEnd = rawOffsetEnd.value.coerceIn(offsetStart, maxPx)
+                offsetStart..offsetEnd
+            }
+
+            onValueChangeState.value.invoke(scaleToUserValue(offsetRange))
+        }
+
         val pressDrag = Modifier.rangeSliderPressDragModifier(
             startInteractionSource,
             endInteractionSource,
@@ -371,21 +389,8 @@ fun RangeSlider(
             widthPx,
             valueRange,
             gestureEndAction,
-        ) { isStart, offset ->
-            val offsetRange = if (isStart) {
-                rawOffsetStart.value = (rawOffsetStart.value + offset)
-                val offsetEnd = rawOffsetEnd.value
-                val offsetStart = rawOffsetStart.value.coerceIn(minPx, offsetEnd)
-                offsetStart..offsetEnd
-            } else {
-                rawOffsetEnd.value = (rawOffsetEnd.value + offset)
-                val offsetStart = rawOffsetStart.value
-                val offsetEnd = rawOffsetEnd.value.coerceIn(offsetStart, maxPx)
-                offsetStart..offsetEnd
-            }
-
-            onValueChangeState.value.invoke(scaleToUserValue(offsetRange))
-        }
+            onDrag,
+        )
 
         // The positions of the thumbs are dependant on each other.
         val coercedStart = values.start.coerceIn(valueRange.start, values.endInclusive)
@@ -933,7 +938,7 @@ private fun Modifier.rangeSliderPressDragModifier(
     maxPx: Float,
     valueRange: ClosedFloatingPointRange<Float>,
     gestureEndAction: State<(Boolean) -> Unit>,
-    onDrag: (Boolean, Float) -> Unit,
+    onDrag: State<(Boolean, Float) -> Unit>,
 ): Modifier =
     if (enabled) {
         pointerInput(startInteractionSource, endInteractionSource, maxPx, isRtl, valueRange) {
@@ -978,7 +983,7 @@ private fun Modifier.rangeSliderPressDragModifier(
                         val finishInteraction = try {
                             val success = horizontalDrag(pointerId = event.id) {
                                 val deltaX = it.positionChange().x
-                                onDrag(draggingStart, if (isRtl) -deltaX else deltaX)
+                                onDrag.value.invoke(draggingStart, if (isRtl) -deltaX else deltaX)
                             }
                             if (success) {
                                 DragInteraction.Stop(interaction)
@@ -1008,7 +1013,7 @@ private class RangeSliderLogic(
     val endInteractionSource: MutableInteractionSource,
     val rawOffsetStart: State<Float>,
     val rawOffsetEnd: State<Float>,
-    val onDrag: (Boolean, Float) -> Unit,
+    val onDrag: State<(Boolean, Float) -> Unit>,
 ) {
     fun activeInteraction(draggingStart: Boolean): MutableInteractionSource =
         if (draggingStart) startInteractionSource else endInteractionSource
@@ -1025,7 +1030,7 @@ private class RangeSliderLogic(
         interaction: Interaction,
         scope: CoroutineScope
     ) {
-        onDrag(
+        onDrag.value.invoke(
             draggingStart,
             posX - if (draggingStart) rawOffsetStart.value else rawOffsetEnd.value
         )
