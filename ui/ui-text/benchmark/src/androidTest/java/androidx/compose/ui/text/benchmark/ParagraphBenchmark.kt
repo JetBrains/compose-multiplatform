@@ -29,10 +29,12 @@ import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.createFontFamilyResolver
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.sp
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
+import kotlin.math.ceil
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -95,7 +97,7 @@ class ParagraphBenchmark(
     ): Paragraph {
         return Paragraph(
             paragraphIntrinsics = paragraphIntrinsics(text, spanStyles),
-            width = width
+            constraints = Constraints(maxWidth = ceil(width).toInt())
         )
     }
 

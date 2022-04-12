@@ -23,6 +23,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 
 @Suppress("DEPRECATION")
@@ -51,7 +52,7 @@ internal expect fun ActualParagraph(
     placeholders: List<AnnotatedString.Range<Placeholder>>,
     maxLines: Int,
     ellipsis: Boolean,
-    width: Float,
+    constraints: Constraints,
     density: Density,
     fontFamilyResolver: FontFamily.Resolver
 ): Paragraph
@@ -61,7 +62,7 @@ internal expect fun ActualParagraph(
     paragraphIntrinsics: ParagraphIntrinsics,
     maxLines: Int,
     ellipsis: Boolean,
-    width: Float
+    constraints: Constraints
 ): Paragraph
 
 // TODO(b/157854677): remove after fixing.

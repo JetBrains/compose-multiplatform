@@ -85,7 +85,8 @@ internal fun TextLayoutResult.canReuse(
         // If width does not matter, we can result the same layout.
         return true
     }
-    return constraints.maxWidth == layoutInput.constraints.maxWidth
+    return constraints.maxWidth == layoutInput.constraints.maxWidth &&
+        constraints.maxHeight == layoutInput.constraints.maxHeight
 }
 
 /**

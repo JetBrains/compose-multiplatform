@@ -42,10 +42,12 @@ import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.android.style.LineHeightSpan
+import androidx.compose.ui.text.ceilToInt
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -1310,17 +1312,6 @@ AndroidParagraphTest {
         assertThat(paragraph.textLocale.toLanguageTag()).isEqualTo("ja")
     }
 
-    @Test
-    fun floatingWidth() {
-        val floatWidth = 1.3f
-        val paragraph = simpleParagraph(
-            text = "Hello, World",
-            width = floatWidth
-        )
-
-        assertThat(floatWidth).isEqualTo(paragraph.width)
-    }
-
     @OptIn(ExperimentalTextApi::class)
     @Test
     fun withIncludeFontPadding() {
@@ -1425,7 +1416,7 @@ AndroidParagraphTest {
             ).merge(style),
             maxLines = maxLines,
             ellipsis = ellipsis,
-            width = width,
+            constraints = Constraints(maxWidth = width.ceilToInt()),
             density = Density(density = 1f),
             fontFamilyResolver = fontFamilyResolver
         )
