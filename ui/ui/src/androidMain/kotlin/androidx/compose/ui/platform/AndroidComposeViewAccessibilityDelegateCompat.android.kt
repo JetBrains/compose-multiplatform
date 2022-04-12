@@ -422,7 +422,12 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 }
             }
         }
-        if (semanticsNode.isTextField) info.className = "android.widget.EditText"
+        if (semanticsNode.isTextField) {
+            info.className = "android.widget.EditText"
+        }
+        if (semanticsNode.config.contains(SemanticsProperties.Text)) {
+            info.className = "android.widget.TextView"
+        }
 
         info.packageName = view.context.packageName
 
