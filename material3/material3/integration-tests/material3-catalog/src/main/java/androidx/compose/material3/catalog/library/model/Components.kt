@@ -132,6 +132,18 @@ private val FloatingActionButtons = Component(
     examples = FloatingActionButtonsExamples,
 )
 
+private val IconButtons = Component(
+    id = nextId(),
+    name = "Icon buttons",
+    description = "Icon buttons allow users to take actions and make choices with a single tap.",
+    // No icon-button icon
+    tintIcon = true,
+    guidelinesUrl = "$ComponentGuidelinesUrl/icon-button",
+    docsUrl = "$PackageSummaryUrl#iconbutton",
+    sourceUrl = "$Material3SourceUrl/IconButton.kt",
+    examples = IconButtonExamples,
+)
+
 private val Menus = Component(
     id = nextId(),
     name = "Menus",
@@ -289,6 +301,7 @@ val Components = listOf(
     Dialogs,
     ExtendedFloatingActionButton,
     FloatingActionButtons,
+    IconButtons,
     Menus,
     NavigationBar,
     NavigationDrawer,
