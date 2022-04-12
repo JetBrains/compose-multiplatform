@@ -17,6 +17,7 @@
 package androidx.compose.ui.res
 
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.R
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -175,6 +176,7 @@ class StringResourcesTest {
         }
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     @Test
     fun pluralStringResource_withoutArguments() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -189,6 +191,7 @@ class StringResourcesTest {
         }
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     @Test
     fun pluralStringResource_withArguments() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
