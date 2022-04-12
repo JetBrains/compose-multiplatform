@@ -154,9 +154,7 @@ class GoogleFont(val name: String, val bestEffort: Boolean = true) {
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as Provider
+            if (other !is Provider) return false
 
             if (providerAuthority != other.providerAuthority) return false
             if (providerPackage != other.providerPackage) return false
@@ -199,19 +197,20 @@ internal data class GoogleFontImpl constructor(
     val bestEffort: Boolean
 ) : AndroidFont(FontLoadingStrategy.Async, GoogleFontTypefaceLoader) {
     fun toFontRequest(): FontRequest {
-        val query = "name=${name.encode()}&weight=${weight.weight}" +
+        // note: name is not encoded or quoted per spec
+        val query = "name=$name&weight=${weight.weight}" +
             "&italic=${style.toQueryParam()}&besteffort=${bestEffortQueryParam()}"
 
         val certs = fontProvider.certificates
-        if (certs != null) {
-            return FontRequest(
+        return if (certs != null) {
+            FontRequest(
                 fontProvider.providerAuthority,
                 fontProvider.providerPackage,
                 query,
                 certs
             )
         } else {
-            return FontRequest(
+            FontRequest(
                 fontProvider.providerAuthority,
                 fontProvider.providerPackage,
                 query,
@@ -238,6 +237,28 @@ internal data class GoogleFontImpl constructor(
     override fun toString(): String {
         return "Font(GoogleFont(\"$name\", bestEffort=$bestEffort), weight=$weight, " +
             "style=$style)"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is GoogleFontImpl) return false
+
+        if (name != other.name) return false
+        if (fontProvider != other.fontProvider) return false
+        if (weight != other.weight) return false
+        if (style != other.style) return false
+        if (bestEffort != other.bestEffort) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + fontProvider.hashCode()
+        result = 31 * result + weight.hashCode()
+        result = 31 * result + style.hashCode()
+        result = 31 * result + bestEffort.hashCode()
+        return result
     }
 }
 
