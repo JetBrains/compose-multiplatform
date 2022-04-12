@@ -224,6 +224,7 @@ package androidx.compose.runtime {
   }
 
   @androidx.compose.runtime.InternalComposeTracingApi public interface CompositionTracer {
+    method public boolean isTraceInProgress();
     method public void traceEventEnd();
     method public void traceEventStart(int key, int dirty1, int dirty2, String info);
   }
