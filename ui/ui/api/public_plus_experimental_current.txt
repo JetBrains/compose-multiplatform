@@ -2392,7 +2392,7 @@ package androidx.compose.ui.platform {
     ctor public AbstractComposeView(android.content.Context context, optional android.util.AttributeSet? attrs, optional int defStyleAttr);
     ctor public AbstractComposeView(android.content.Context context, optional android.util.AttributeSet? attrs);
     ctor public AbstractComposeView(android.content.Context context);
-    method @androidx.compose.runtime.Composable public abstract void Content();
+    method @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public abstract void Content();
     method public final void createComposition();
     method public final void disposeComposition();
     method public final boolean getHasComposition();
