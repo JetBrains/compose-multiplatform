@@ -62,6 +62,8 @@ import kotlin.math.max
  * Checkboxes allow users to select one or more items from a set. Checkboxes can turn an option on
  * or off.
  *
+ * ![Checkbox image](https://developer.android.com/images/reference/androidx/compose/material3/checkbox.png)
+ *
  * @sample androidx.compose.material3.samples.CheckboxSample
  *
  * @see [TriStateCheckbox] if you require support for an indeterminate state.
@@ -109,6 +111,8 @@ fun Checkbox(
  * is checked, all child checkboxes are checked. If a parent checkbox is unchecked, all child
  * checkboxes are unchecked. If some, but not all, child checkboxes are checked, the parent checkbox
  * becomes an indeterminate checkbox.
+ *
+ * ![Checkbox image](https://developer.android.com/images/reference/androidx/compose/material3/indeterminate-checkbox.png)
  *
  * @sample androidx.compose.material3.samples.TriStateCheckboxSample
  *

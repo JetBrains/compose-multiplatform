@@ -58,12 +58,14 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
 /**
+ * <a href="https://m3.material.io/components/navigation-rail/overview" class="external" target="_blank">Material Design bottom navigation rail</a>.
+ *
+ * Navigation rails provide access to primary destinations in apps when using tablet and desktop
+ * screens.
+ *
  * ![Navigation rail image](https://developer.android.com/images/reference/androidx/compose/material3/navigation-rail.png)
  *
- * Material Design navigation rail.
- *
- * [NavigationRail] is a side navigation component that allows movement between primary destinations
- * in an app. The navigation rail should be used to display three to seven app destinations and,
+ * The navigation rail should be used to display three to seven app destinations and,
  * optionally, a Floating Action Button or a logo header. Each destination is typically represented
  * by an icon and an optional text label.
  *
@@ -119,6 +121,9 @@ fun NavigationRail(
  * Material Design navigation rail item.
  *
  * A [NavigationRailItem] represents a destination within a [NavigationRail].
+ *
+ * Navigation rails provide access to primary destinations in apps when using tablet and desktop
+ * screens.
  *
  * The text label is always shown (if it exists) when selected. Showing text labels if not selected
  * is controlled by [alwaysShowLabel].

@@ -22,13 +22,17 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.material3.tokens.TypographyTokens
 
-// TODO(b/197880751): Update description after spec draft is available.
 /**
  * The Material Design type scale includes a range of contrasting styles that support the needs of
  * your product and its content.
  *
+ * Use typography to make writing legible and beautiful. Material's default type scale includes
+ * contrasting and flexible styles to support a wide range of use cases.
+ *
  * The type scale is a combination of thirteen styles that are supported by the type system. It
  * contains reusable categories of text, each with an intended application and meaning.
+ *
+ * To learn more about typography, see [Material Design typography](https://m3.material.io/styles/typography/overview).
  *
  * @property displayLarge displayLarge is the largest display text.
  * @property displayMedium displayMedium is the second largest display text.

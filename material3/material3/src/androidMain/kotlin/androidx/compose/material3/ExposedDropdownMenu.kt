@@ -65,10 +65,15 @@ import kotlinx.coroutines.coroutineScope
 /**
  * <a href="https://m3.material.io/components/menus/overview" class="external" target="_blank">Material Design Exposed Dropdown Menu</a>.
  *
+ * Menus display a list of choices on a temporary surface. They appear when users interact with a
+ * button, action, or other control.
+ *
  * Exposed dropdown menus display the currently selected item in a text field above the menu. In
  * some cases, it can accept and display user input (whether or not it’s listed as a menu choice).
  * If the text field input is used to filter results in the menu, the component is also known as
  * "autocomplete" or a "combobox".
+ *
+ * ![Exposed dropdown menu image](https://developer.android.com/images/reference/androidx/compose/material3/exposed-dropdown-menu.png)
  *
  * The [ExposedDropdownMenuBox] is expected to contain a [TextField] (or [OutlinedTextField]) and
  * [ExposedDropdownMenuBoxScope.ExposedDropdownMenu] as content.

@@ -227,12 +227,14 @@ fun rememberDrawerState(
 }
 
 /**
- * ![Navigation drawer image](https://developer.android.com/images/reference/androidx/compose/material3/navigation-drawer.png)
+ * <a href="https://m3.material.io/components/navigation-drawer/overview" class="external" target="_blank">Material Design navigation drawer</a>.
  *
- * Material Design navigation drawer.
+ * Navigation drawers provide ergonomic access to destinations in an app.
  *
  * Modal navigation drawers block interaction with the rest of an app’s content with a scrim.
  * They are elevated above most of the app’s UI and don’t affect the screen’s layout grid.
+ *
+ * ![Navigation drawer image](https://developer.android.com/images/reference/androidx/compose/material3/navigation-drawer.png)
  *
  * @sample androidx.compose.material3.samples.ModalNavigationDrawerSample
  *
@@ -371,12 +373,13 @@ fun NavigationDrawer(
     )
 }
 
-// TODO(b/218286829): Add spec image
 /**
- * Material Design navigation drawer.
+ * <a href="https://m3.material.io/components/navigation-drawer/overview" class="external" target="_blank">Material Design navigation drawer</a>.
  *
- * Standard navigation drawers provide access to drawer destinations and app content on desktop and
- * tablet screens. They’re often next to app content and affect the screen’s layout grid.
+ * Navigation drawers provide ergonomic access to destinations in an app. They’re often next to
+ * app content and affect the screen’s layout grid.
+ *
+ * ![Navigation drawer image](https://developer.android.com/images/reference/androidx/compose/material3/navigation-drawer.png)
  *
  * Dismissible standard drawers can be used for layouts that prioritize content (such as a
  * photo gallery) or for apps where users are unlikely to switch destinations often. They should
@@ -472,12 +475,13 @@ fun DismissibleNavigationDrawer(
     }
 }
 
-// TODO(b/218286829): Add spec image
 /**
- * Material Design navigation permanent drawer.
+ * <a href="https://m3.material.io/components/navigation-drawer/overview" class="external" target="_blank">Material Design navigation permanent drawer</a>.
  *
- * Standard navigation drawers provide access to drawer destinations and app content on desktop
- * and tablet screens. They’re often next to app content and affect the screen’s layout grid.
+ * Navigation drawers provide ergonomic access to destinations in an app. They’re often next to app
+ * content and affect the screen’s layout grid.
+ *
+ * ![Navigation drawer image](https://developer.android.com/images/reference/androidx/compose/material3/navigation-drawer.png)
  *
  * The permanent navigation drawer is always visible and usually used for frequently switching
  * destinations. On mobile screens, use [ModalNavigationDrawer] instead.

@@ -37,15 +37,17 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.unit.dp
 
-// TODO(b/197880751): Update spec link.
 /**
- * A BadgeBox is used to decorate [content] with a [badge] that can contain dynamic information,
- * such
- * as the presence of a new notification or a number of pending requests. Badges can be icon only
- * or contain short text.
+ * Material Design badge box.
+ *
+ * A badge represents dynamic information such as a number of pending requests in a navigation bar.
+ *
+ * Badges can be icon only or contain short text.
+ *
+ * ![Badge image](https://developer.android.com/images/reference/androidx/compose/material3/badge.png)
  *
  * A common use case is to display a badge with navigation bar items.
- * For more information, see [Navigation Bar](https://material.io/components/bottom-navigation#behavior)
+ * For more information, see [Navigation Bar](https://m3.material.io/components/navigation-bar/overview)
  *
  * A simple icon with badge example looks like:
  * @sample androidx.compose.material3.samples.NavigationBarItemWithBadge
@@ -116,8 +118,11 @@ fun BadgedBox(
 }
 
 /**
- * Badge is a component that can contain dynamic information, such as the presence of a new
- * notification or a number of pending requests. Badges can be icon only or contain short text.
+ * A badge represents dynamic information such as a number of pending requests in a navigation bar.
+ *
+ * Badges can be icon only or contain short text.
+
+ * ![Badge image](https://developer.android.com/images/reference/androidx/compose/material3/badge.png)
  *
  * See [BadgedBox] for a top level layout that will properly place the badge relative to content
  * such as text or an icon.
