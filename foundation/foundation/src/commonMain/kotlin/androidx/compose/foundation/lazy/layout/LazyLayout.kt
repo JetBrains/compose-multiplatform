@@ -104,7 +104,11 @@ private class LazyLayoutItemReusePolicy(
         factory.getContentType(slotId) == factory.getContentType(reusableSlotId)
 }
 
-private const val MaxItemsToRetainForReuse = 2
+/**
+ * We currently use the same number of items to reuse (recycle) items as RecyclerView does:
+ * 5 (RecycledViewPool.DEFAULT_MAX_SCRAP) + 2 (Recycler.DEFAULT_CACHE_SIZE)
+ */
+private const val MaxItemsToRetainForReuse = 7
 
 /**
  * Platform specific implementation of lazy layout items prefetching - precomposing next items in
