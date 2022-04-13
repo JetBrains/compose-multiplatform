@@ -18,7 +18,6 @@ package androidx.compose.foundation.gestures
 
 import androidx.compose.foundation.fastFold
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.unit.Density
@@ -28,7 +27,6 @@ import androidx.compose.ui.unit.dp
 @Composable
 internal actual fun platformScrollConfig(): ScrollConfig = AndroidConfig
 
-@OptIn(ExperimentalComposeUiApi::class)
 private object AndroidConfig : ScrollConfig {
     override fun Density.calculateMouseWheelScroll(event: PointerEvent, bounds: IntSize): Offset {
         // 64 dp value is taken from ViewConfiguration.java, replace with better solution
