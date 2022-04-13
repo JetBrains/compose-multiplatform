@@ -769,6 +769,9 @@ package androidx.compose.ui.text.font {
     property public final androidx.compose.ui.text.font.Typeface typeface;
   }
 
+  public final class PlatformTypefacesKt {
+  }
+
   public final class ResourceFont implements androidx.compose.ui.text.font.Font {
     method public androidx.compose.ui.text.font.ResourceFont copy(optional int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
     method public int getResId();

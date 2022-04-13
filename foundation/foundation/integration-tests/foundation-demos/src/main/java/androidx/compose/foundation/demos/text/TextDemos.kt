@@ -25,6 +25,7 @@ val TextDemos = DemoCategory(
         ComposableDemo("Static text") { TextDemo() },
         ComposableDemo("Typeface") { TypefaceDemo() },
         ComposableDemo("FontFamily fallback") { FontFamilyDemo() },
+        ComposableDemo("All system font families") { SystemFontFamilyDemo() },
         ComposableDemo("Text selection") { TextSelectionDemo() },
         ComposableDemo("Text selection sample") { TextSelectionSample() },
         ComposableDemo("Multi paragraph") { MultiParagraphDemo() },

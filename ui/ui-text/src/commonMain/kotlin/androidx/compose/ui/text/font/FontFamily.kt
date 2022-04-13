@@ -107,7 +107,7 @@ sealed class FontFamily(canLoadSynchronously: Boolean) {
          *
          * See [CSS sans-serif](https://www.w3.org/TR/css-fonts-3/#sans-serif)
          */
-        val SansSerif = GenericFontFamily("sans-serif")
+        val SansSerif = GenericFontFamily("sans-serif", "FontFamily.SansSerif")
 
         /**
          * The formal text style for scripts.
@@ -116,7 +116,7 @@ sealed class FontFamily(canLoadSynchronously: Boolean) {
          *
          * See [CSS serif](https://www.w3.org/TR/css-fonts-3/#serif)
          */
-        val Serif = GenericFontFamily("serif")
+        val Serif = GenericFontFamily("serif", "FontFamily.Serif")
 
         /**
          * Font family where glyphs have the same fixed width.
@@ -125,7 +125,7 @@ sealed class FontFamily(canLoadSynchronously: Boolean) {
          *
          * See [CSS monospace](https://www.w3.org/TR/css-fonts-3/#monospace)
          */
-        val Monospace = GenericFontFamily("monospace")
+        val Monospace = GenericFontFamily("monospace", "FontFamily.Monospace")
 
         /**
          * Cursive, hand-written like font family.
@@ -137,7 +137,7 @@ sealed class FontFamily(canLoadSynchronously: Boolean) {
          *
          * See [CSS cursive](https://www.w3.org/TR/css-fonts-3/#cursive)
          */
-        val Cursive = GenericFontFamily("cursive")
+        val Cursive = GenericFontFamily("cursive", "FontFamily.Cursive")
     }
 
     @Suppress("CanBePrimaryConstructorProperty") // for deprecation
@@ -205,13 +205,20 @@ class FontListFontFamily internal constructor(
  * @see FontFamily.Cursive
  */
 @Immutable
-class GenericFontFamily internal constructor(val name: String) : SystemFontFamily()
+class GenericFontFamily internal constructor(
+    val name: String,
+    private val fontFamilyName: String
+) : SystemFontFamily() {
+    override fun toString(): String = fontFamilyName
+}
 
 /**
  * Defines a default font family.
  */
 @Immutable
-internal class DefaultFontFamily internal constructor() : SystemFontFamily()
+internal class DefaultFontFamily internal constructor() : SystemFontFamily() {
+    override fun toString(): String = "FontFamily.Default"
+}
 
 /**
  * Defines a font family that is already loaded Typeface.
