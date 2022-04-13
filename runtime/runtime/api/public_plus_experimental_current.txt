@@ -135,6 +135,7 @@ package androidx.compose.runtime {
     method public boolean getDefaultsInvalid();
     method public boolean getInserting();
     method public androidx.compose.runtime.RecomposeScope? getRecomposeScope();
+    method public Object? getRecomposeScopeIdentity();
     method public boolean getSkipping();
     method @androidx.compose.runtime.InternalComposeApi public void insertMovableContent(androidx.compose.runtime.MovableContent<?> value, Object? parameter);
     method @androidx.compose.runtime.InternalComposeApi public void insertMovableContentReferences(java.util.List<kotlin.Pair<androidx.compose.runtime.MovableContentStateReference,androidx.compose.runtime.MovableContentStateReference>> references);
@@ -165,6 +166,7 @@ package androidx.compose.runtime {
     property public abstract boolean defaultsInvalid;
     property public abstract boolean inserting;
     property public abstract androidx.compose.runtime.RecomposeScope? recomposeScope;
+    property public abstract Object? recomposeScopeIdentity;
     property public abstract boolean skipping;
     field public static final androidx.compose.runtime.Composer.Companion Companion;
   }
@@ -293,11 +295,6 @@ package androidx.compose.runtime {
   }
 
   @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level.ERROR, message="This is internal API that may change frequently and without warning.") public @interface InternalComposeTracingApi {
-  }
-
-  @androidx.compose.runtime.InternalComposeApi public interface InternalRecomposeScope {
-    method public Object? getIdentity();
-    property public abstract Object? identity;
   }
 
   public interface MonotonicFrameClock extends kotlin.coroutines.CoroutineContext.Element {

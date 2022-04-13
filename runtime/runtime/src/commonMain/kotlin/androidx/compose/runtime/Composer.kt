@@ -423,6 +423,17 @@ sealed interface Composer {
     val recomposeScope: RecomposeScope?
 
     /**
+     * A Compose compiler plugin API. DO NOT call directly.
+     *
+     * Return an object that can be used to uniquely identity of the current recomposition scope.
+     * This identity will be the same even if the recompose scope instance changes.
+     *
+     * This is used internally by tooling track composable function invocations.
+     */
+    @ComposeCompilerApi
+    val recomposeScopeIdentity: Any?
+
+    /**
      * A Compose internal property. DO NOT call directly. Use [currentCompositeKeyHash] instead.
      *
      * This a hash value used to coordinate map externally stored state to the composition. For
@@ -3772,6 +3783,7 @@ internal class ComposerImpl(
     }
 
     override val recomposeScope: RecomposeScope? get() = currentRecomposeScope
+    override val recomposeScopeIdentity: Any? get() = currentRecomposeScope?.anchor
     override fun rememberedValue(): Any? = nextSlot()
     override fun updateRememberedValue(value: Any?) = updateValue(value)
     override fun recordUsed(scope: RecomposeScope) { (scope as? RecomposeScopeImpl)?.used = true }
