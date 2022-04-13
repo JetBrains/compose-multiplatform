@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -390,8 +391,10 @@ fun BottomAppBarWithFAB() {
             }
         },
         floatingActionButton = {
+            // TODO(b/228588827): Replace with Secondary FAB when available.
             FloatingActionButton(
                 onClick = { /* do something */ },
+                elevation = BottomAppBarDefaults.floatingActionButtonElevation()
             ) {
                 Icon(Icons.Filled.Add, "Localized description")
             }

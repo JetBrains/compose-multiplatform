@@ -694,12 +694,13 @@ class AppBarTest {
                     floatingActionButton = {
                     FloatingActionButton(
                         onClick = { /* do something */ },
+                        elevation = BottomAppBarDefaults.floatingActionButtonElevation()
                     ) {
                         Icon(Icons.Filled.Add, "Localized description")
                     }
                 })
             }
-            .assertHeightIsEqualTo(BottomAppBarTokens.FabContainerHeight)
+            .assertHeightIsEqualTo(BottomAppBarTokens.ContainerHeight)
             .assertWidthIsEqualTo(rule.rootWidth())
     }
 
@@ -744,6 +745,7 @@ class AppBarTest {
                     FloatingActionButton(
                         modifier = Modifier.testTag("FAB"),
                         onClick = { /* do something */ },
+                        elevation = BottomAppBarDefaults.floatingActionButtonElevation()
                     ) {
                         Icon(Icons.Filled.Add, "Localized description")
                     }
@@ -757,8 +759,8 @@ class AppBarTest {
         rule.onNodeWithTag("FAB")
             // FAB should be 16.dp from the end
             .assertLeftPositionInRootIsEqualTo(appBarBounds.width - 16.dp - fabBounds.width)
-            // FAB should be 16.dp from the top
-            .assertTopPositionInRootIsEqualTo(16.dp)
+            // FAB should be 12.dp from the top
+            .assertTopPositionInRootIsEqualTo(12.dp)
     }
 
     @OptIn(ExperimentalMaterial3Api::class)

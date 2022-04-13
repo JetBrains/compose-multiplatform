@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_75
+// VERSION: v0_91
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 internal object BottomAppBarTokens {
     val ContainerColor = ColorSchemeKeyTokens.Surface
     val ContainerElevation = ElevationTokens.Level2
-    val ContainerHeight = 64.0.dp
+    val ContainerHeight = 80.0.dp
     val ContainerShape = ShapeKeyTokens.CornerNone
-    val FabContainerHeight = 72.0.dp
+    val ContainerSurfaceTintLayerColor = ColorSchemeKeyTokens.SurfaceTint
 }
