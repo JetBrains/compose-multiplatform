@@ -20,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.foundation.fastFold
 import androidx.compose.foundation.DesktopPlatform
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.geometry.Offset
@@ -103,6 +102,5 @@ private val PointerEvent.shouldScrollByPage
     get() =
         (mouseEvent as? MouseWheelEvent)?.scrollType == MouseWheelEvent.WHEEL_BLOCK_SCROLL
 
-@OptIn(ExperimentalComposeUiApi::class)
 private val PointerEvent.totalScrollDelta
     get() = this.changes.fastFold(Offset.Zero) { acc, c -> acc + c.scrollDelta }
