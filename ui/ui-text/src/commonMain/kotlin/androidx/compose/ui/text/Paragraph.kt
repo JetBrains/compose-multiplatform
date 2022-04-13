@@ -17,6 +17,7 @@ package androidx.compose.ui.text
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -239,6 +240,23 @@ interface Paragraph {
         shadow: Shadow? = null,
         textDecoration: TextDecoration? = null
     )
+
+    /**
+     * Paint the paragraph to canvas, and also overrides some paint settings.
+     *
+     * If not overridden, this function @throws [UnsupportedOperationException].
+     */
+    @ExperimentalTextApi
+    fun paint(
+        canvas: Canvas,
+        brush: Brush,
+        shadow: Shadow? = null,
+        textDecoration: TextDecoration? = null
+    ) {
+        throw UnsupportedOperationException(
+            "Using brush for painting the paragraph is a separate functionality that " +
+                "is not supported on this platform")
+    }
 }
 
 /**

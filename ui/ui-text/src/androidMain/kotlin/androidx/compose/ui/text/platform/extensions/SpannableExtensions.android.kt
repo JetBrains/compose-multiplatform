@@ -28,8 +28,11 @@ import android.text.style.LocaleSpan
 import android.text.style.MetricAffectingSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.ScaleXSpan
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
@@ -56,6 +59,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intersect
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.intl.LocaleList
+import androidx.compose.ui.text.platform.style.ShaderBrushSpan
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.LineHeightBehavior
 import androidx.compose.ui.text.style.TextDecoration
@@ -212,6 +216,8 @@ private fun Spannable.setSpanStyle(
     setBaselineShift(style.baselineShift, start, end)
 
     setColor(style.color, start, end)
+
+    setBrush(style.brush, start, end)
 
     setTextDecoration(style.textDecoration, start, end)
 
@@ -473,6 +479,23 @@ internal fun Spannable.setColor(color: Color, start: Int, end: Int) {
 private fun Spannable.setBaselineShift(baselineShift: BaselineShift?, start: Int, end: Int) {
     baselineShift?.let {
         setSpan(BaselineShiftSpan(it.multiplier), start, end)
+    }
+}
+
+private fun Spannable.setBrush(
+    brush: Brush?,
+    start: Int,
+    end: Int
+) {
+    brush?.let {
+        when (brush) {
+            is SolidColor -> {
+                setColor(brush.value, start, end)
+            }
+            is ShaderBrush -> {
+                setSpan(ShaderBrushSpan(brush), start, end)
+            }
+        }
     }
 }
 

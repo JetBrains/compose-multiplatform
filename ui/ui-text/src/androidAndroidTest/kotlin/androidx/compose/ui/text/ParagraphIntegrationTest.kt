@@ -17,6 +17,7 @@ package androidx.compose.ui.text
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -24,6 +25,7 @@ import androidx.compose.ui.graphics.ImageBitmapConfig
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_KERN_FONT
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
@@ -3547,6 +3549,36 @@ class ParagraphIntegrationTest {
         }
     }
 
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testDefaultSpanStyle_setBrush() {
+        with(defaultDensity) {
+            val text = "abc"
+            // FontSize doesn't matter here, but it should be big enough for bitmap comparison.
+            val fontSize = 100.sp
+            val fontSizeInPx = fontSize.toPx()
+            val paragraphWidth = fontSizeInPx * text.length
+
+            val paragraphWithoutBrush = simpleParagraph(
+                text = text,
+                style = TextStyle(fontSize = fontSize),
+                width = paragraphWidth
+            )
+
+            val paragraphWithBrush = simpleParagraph(
+                text = text,
+                style = TextStyle(
+                    fontSize = fontSize,
+                    brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+                ),
+                width = paragraphWidth
+            )
+
+            assertThat(paragraphWithBrush.bitmap())
+                .isNotEqualToBitmap(paragraphWithoutBrush.bitmap())
+        }
+    }
+
     @Test
     fun testGetPathForRange_singleLine() {
         with(defaultDensity) {
@@ -4075,6 +4107,113 @@ class ParagraphIntegrationTest {
             text = "",
             width = -1f
         )
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testSolidBrushColorIsSameAsColor() {
+        with(defaultDensity) {
+            val text = "abc"
+            // FontSize doesn't matter here, but it should be big enough for bitmap comparison.
+            val fontSize = 100.sp
+            val fontSizeInPx = fontSize.toPx()
+            val paragraphWidth = fontSizeInPx * text.length
+
+            val paragraphWithColor = simpleParagraph(
+                text = text,
+                style = TextStyle(color = Color.Red, fontSize = fontSize),
+                width = paragraphWidth
+            )
+
+            val paragraphWithSolidColor = simpleParagraph(
+                text = text,
+                style = TextStyle(brush = SolidColor(Color.Red), fontSize = fontSize),
+                width = paragraphWidth
+            )
+
+            assertThat(paragraphWithColor.bitmap())
+                .isEqualToBitmap(paragraphWithSolidColor.bitmap())
+        }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testSpanBrush_overridesDefaultBrush() {
+        with(defaultDensity) {
+            val text = "abc"
+            // FontSize doesn't matter here, but it should be big enough for bitmap comparison.
+            val fontSize = 100.sp
+            val fontSizeInPx = fontSize.toPx()
+            val paragraphWidth = fontSizeInPx * text.length
+
+            val paragraph = simpleParagraph(
+                text = text,
+                style = TextStyle(
+                    fontSize = fontSize,
+                    brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+                ),
+                width = paragraphWidth
+            )
+
+            val paragraphWithSpan = simpleParagraph(
+                text = text,
+                style = TextStyle(
+                    fontSize = fontSize,
+                    brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+                ),
+                spanStyles = listOf(
+                    AnnotatedString.Range(
+                        item = SpanStyle(
+                            brush = Brush.linearGradient(listOf(Color.Yellow, Color.Green))
+                        ),
+                        start = 0,
+                        end = text.length
+                    )
+                ),
+                width = paragraphWidth
+            )
+
+            assertThat(paragraph.bitmap())
+                .isNotEqualToBitmap(paragraphWithSpan.bitmap())
+        }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testBrush_notEffectedBy_TextDirection() {
+        with(defaultDensity) {
+            val ltrText = "aaa"
+            val rtlText = "\u05D0\u05D0\u05D0"
+            // FontSize doesn't matter here, but it should be big enough for bitmap comparison.
+            val fontSize = 100.sp
+            val fontSizeInPx = fontSize.toPx()
+            val paragraphWidth = fontSizeInPx * ltrText.length
+
+            val ltrParagraph = simpleParagraph(
+                text = ltrText,
+                style = TextStyle(
+                    fontSize = fontSize,
+                    brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+                ),
+                width = paragraphWidth
+            )
+
+            val rtlParagraph = simpleParagraph(
+                text = rtlText,
+                style = TextStyle(
+                    fontSize = fontSize,
+                    brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+                ),
+                width = paragraphWidth
+            )
+
+            assertThat(ltrParagraph.bitmap())
+                .isNotEqualToBitmap(rtlParagraph.bitmap())
+
+            // Color on the same pixel should be the same since they used the same brush.
+            assertThat(ltrParagraph.bitmap().getPixel(50, 50))
+                .isEqualTo(rtlParagraph.bitmap().getPixel(50, 50))
+        }
     }
 
     private fun simpleParagraph(

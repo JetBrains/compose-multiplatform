@@ -16,8 +16,10 @@
 
 package androidx.compose.ui.text
 
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
@@ -68,6 +70,45 @@ class TextStyleLayoutAttributesTest {
             style.hasSameLayoutAffectingAttributes(
                 TextStyle(color = Color.Green)
             )
+        ).isTrue()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun returns_true_for_color_to_brush_change() {
+        val style = TextStyle(color = Color.Red)
+        assertThat(
+            style.hasSameLayoutAffectingAttributes(TextStyle(brush = SolidColor(Color.Green)))
+        ).isTrue()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun returns_true_for_brush_to_color_change() {
+        val style = TextStyle(brush = SolidColor(Color.Green))
+        assertThat(
+            style.hasSameLayoutAffectingAttributes(TextStyle(color = Color.Red))
+        ).isTrue()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun returns_true_for_brush_solid_color_change() {
+        val style = TextStyle(brush = SolidColor(Color.Red))
+        style.copy()
+        assertThat(
+            style.hasSameLayoutAffectingAttributes(TextStyle(brush = SolidColor(Color.Green)))
+        ).isTrue()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun returns_true_for_brush_shader_change() {
+        val style = TextStyle(brush = Brush.linearGradient(listOf(Color.Black, Color.White)))
+        assertThat(
+            style.hasSameLayoutAffectingAttributes(TextStyle(
+                brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+            ))
         ).isTrue()
     }
 
@@ -276,11 +317,12 @@ class TextStyleLayoutAttributesTest {
 
     @Test
     fun should_be_updated_when_a_new_attribute_is_added_to_TextStyle() {
-        // TextLayoutHelper TextStyle.caReuseLayout is very easy to forget to update when TextStyle
-        // changes. Adding this test to fail so that when a new attribute is added to TextStyle
-        // it will remind us that we need to update the function.
+        // TextLayoutHelper TextStyle.hasSameLayoutAffectingAttributes is very easy to forget
+        // to update when TextStyle changes. Adding this test to fail so that when a new attribute
+        // is added to TextStyle it will remind us that we need to update the function.
         val knownProperties = listOf(
             getProperty("color"),
+            getProperty("brush"),
             getProperty("shadow"),
             getProperty("textDecoration"),
             getProperty("fontSize"),
