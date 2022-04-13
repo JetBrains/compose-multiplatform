@@ -24,23 +24,24 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.window.layout.WindowMetricsCalculator
 
 /**
- * Calculates the window's [SizeClass] for this [Activity].
+ * Calculates the window's [WindowSizeClass] for the provided [activity].
  *
- * A new [SizeClass] will be returned whenever a configuration change causes the width or height of
- * the window to cross a breakpoint, such as when the device is rotated or the window is resized.
+ * A new [WindowSizeClass] will be returned whenever a configuration change causes the width or
+ * height of the window to cross a breakpoint, such as when the device is rotated or the window
+ * is resized.
  *
- * @sample androidx.compose.material3.windowsizeclass.samples.AndroidSizeClassSample
+ * @sample androidx.compose.material3.windowsizeclass.samples.AndroidWindowSizeClassSample
  */
 @ExperimentalMaterial3WindowSizeClassApi
 @Composable
-fun Activity.calculateSizeClass(): SizeClass {
+fun calculateWindowSizeClass(activity: Activity): WindowSizeClass {
     // Observe view configuration changes and recalculate the size class on each change. We can't
     // use Activity#onConfigurationChanged as this will sometimes fail to be called on different
     // API levels, hence why this function needs to be @Composable so we can observe the
     // ComposeView's configuration changes.
     LocalConfiguration.current
     val density = LocalDensity.current
-    val metrics = WindowMetricsCalculator.getOrCreate().computeCurrentWindowMetrics(this)
+    val metrics = WindowMetricsCalculator.getOrCreate().computeCurrentWindowMetrics(activity)
     val size = with(density) { metrics.bounds.toComposeRect().size.toDpSize() }
-    return SizeClass.calculateFromSize(size)
+    return WindowSizeClass.calculateFromSize(size)
 }

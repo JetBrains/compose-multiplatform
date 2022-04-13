@@ -21,26 +21,26 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.Sampled
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Sampled
-fun AndroidSizeClassSample() {
+fun AndroidWindowSizeClassSample() {
     class MyActivity : ComponentActivity() {
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             setContent {
-                // Calculate the size class for the activity's current window. If the window size
-                // changes, for example when the device is rotated, the value returned by
+                // Calculate the window size class for the activity's current window. If the window
+                // size changes, for example when the device is rotated, the value returned by
                 // calculateSizeClass will also change.
-                val sizeClass = calculateSizeClass()
-                // Perform logic on the size class to decide whether to show the top app bar.
-                val showTopAppBar = sizeClass.width != WidthSizeClass.Compact
+                val windowSizeClass = calculateWindowSizeClass(this)
+                // Perform logic on the window size class to decide whether to show the top app bar.
+                val showTopAppBar = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
 
-                // MyScreen knows nothing about window sizes, and performs logic based on a Boolean
-                // flag.
+                // MyScreen knows nothing about window size classes, and performs logic based on a
+                // Boolean flag.
                 MyScreen(showTopAppBar = showTopAppBar)
             }
         }
