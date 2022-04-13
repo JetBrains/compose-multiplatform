@@ -34,76 +34,76 @@ import org.junit.runner.RunWith
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
-class AndroidSizeClassTest {
+class AndroidWindowSizeClassTest {
 
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
     fun widthSizeClass_correctCalculation() {
-        var actualWidthSizeClass: WidthSizeClass? = null
+        var actualWindowWidthSizeClass: WindowWidthSizeClass? = null
         rule.setContent {
-            actualWidthSizeClass = rule.activity.calculateSizeClass().width
+            actualWindowWidthSizeClass = calculateWindowSizeClass(rule.activity).widthSizeClass
         }
 
         rule.runOnIdle {
-            assertThat(actualWidthSizeClass).isNotNull()
+            assertThat(actualWindowWidthSizeClass).isNotNull()
 
             val width = getWindowBounds().width()
-            val expectedWidthSizeClass = with(rule.density) {
-                WidthSizeClass.fromWidth(width.toDp())
+            val expectedWindowWidthSizeClass = with(rule.density) {
+                WindowWidthSizeClass.fromWidth(width.toDp())
             }
-            assertThat(expectedWidthSizeClass).isEqualTo(actualWidthSizeClass)
+            assertThat(expectedWindowWidthSizeClass).isEqualTo(actualWindowWidthSizeClass)
         }
     }
 
     @Test
     fun heightSizeClass_correctCalculation() {
-        var actualHeightSizeClass: HeightSizeClass? = null
+        var actualWindowHeightSizeClass: WindowHeightSizeClass? = null
         rule.setContent {
-            actualHeightSizeClass = rule.activity.calculateSizeClass().height
+            actualWindowHeightSizeClass = calculateWindowSizeClass(rule.activity).heightSizeClass
         }
 
         rule.runOnIdle {
-            assertThat(actualHeightSizeClass).isNotNull()
+            assertThat(actualWindowHeightSizeClass).isNotNull()
 
             val height = getWindowBounds().height()
-            val expectedHeightSizeClass = with(rule.density) {
-                HeightSizeClass.fromHeight(height.toDp())
+            val expectedWindowHeightSizeClass = with(rule.density) {
+                WindowHeightSizeClass.fromHeight(height.toDp())
             }
-            assertThat(expectedHeightSizeClass).isEqualTo(actualHeightSizeClass)
+            assertThat(expectedWindowHeightSizeClass).isEqualTo(actualWindowHeightSizeClass)
         }
     }
 
     @Test
     fun sizeClass_recalculated_onDensityUpdate() {
-        lateinit var actualSizeClass: SizeClass
+        lateinit var actualWindowSizeClass: WindowSizeClass
         var firstSize: DpSize? = null
         var secondSize: DpSize
         val density = mutableStateOf(Density(1f))
         rule.setContent {
             CompositionLocalProvider(LocalDensity provides density.value) {
-                actualSizeClass = rule.activity.calculateSizeClass()
+                actualWindowSizeClass = calculateWindowSizeClass(rule.activity)
             }
         }
 
         rule.runOnIdle {
-            val expectedSizeClass = with(density.value) {
+            val expectedWindowSizeClass = with(density.value) {
                 firstSize = getWindowDpSize()
-                SizeClass.calculateFromSize(firstSize!!)
+                WindowSizeClass.calculateFromSize(firstSize!!)
             }
-            assertThat(actualSizeClass).isEqualTo(expectedSizeClass)
+            assertThat(actualWindowSizeClass).isEqualTo(expectedWindowSizeClass)
         }
 
         // change density
         density.value = Density(10f)
 
         rule.runOnIdle {
-            val expectedSizeClass = with(density.value) {
+            val expectedWindowSizeClass = with(density.value) {
                 secondSize = getWindowDpSize()
-                SizeClass.calculateFromSize(secondSize)
+                WindowSizeClass.calculateFromSize(secondSize)
             }
-            assertThat(actualSizeClass).isEqualTo(expectedSizeClass)
+            assertThat(actualWindowSizeClass).isEqualTo(expectedWindowSizeClass)
 
             assertThat(firstSize!! / 10f).isEqualTo(secondSize)
         }
