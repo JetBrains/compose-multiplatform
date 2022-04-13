@@ -104,7 +104,7 @@ class GoogleFontTest {
     @Test
     fun GoogleFontImpl_fontRequest_containsName() {
         val font = Font(GoogleFont("Test Name"), TestProvider) as GoogleFontImpl
-        assertThat(font.toFontRequest().query).contains("name=Test+Name")
+        assertThat(font.toFontRequest().query).contains("name=Test Name")
     }
 
     @Test
