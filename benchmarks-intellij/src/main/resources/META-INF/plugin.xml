@@ -27,7 +27,6 @@ A plugin demonstrates Jetpack compose capabilities on IntelliJ Platform
     </extensions>
 
     <applicationListeners>
-        <!--        todo remove temp Listener -->
-        <listener class="com.jetbrains.compose.TodoTempLifeListener" topic="com.intellij.ide.AppLifecycleListener"/>
+        <listener class="com.jetbrains.compose.LifecycleListener" topic="com.intellij.ide.AppLifecycleListener"/>
     </applicationListeners>
 </idea-plugin>

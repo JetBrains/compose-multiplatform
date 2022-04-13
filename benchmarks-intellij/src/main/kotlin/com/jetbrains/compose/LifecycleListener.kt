@@ -14,10 +14,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
 
-class TodoTempLifeListener : com.intellij.ide.AppLifecycleListener {
+class LifecycleListener : com.intellij.ide.AppLifecycleListener {
 
     val swingScope = CoroutineScope(SupervisorJob() + Dispatchers.Swing)
 
