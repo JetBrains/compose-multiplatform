@@ -22,6 +22,7 @@ import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 
@@ -72,6 +73,7 @@ fun stringArrayResource(@ArrayRes id: Int): Array<String> {
  * @param count the count
  * @return the pluralized string data associated with the resource
  */
+@ExperimentalComposeUiApi
 @Composable
 @ReadOnlyComposable
 fun pluralStringResource(@PluralsRes id: Int, count: Int): String {
@@ -87,6 +89,7 @@ fun pluralStringResource(@PluralsRes id: Int, count: Int): String {
  * @param formatArgs arguments used in the format string
  * @return the pluralized string data associated with the resource
  */
+@ExperimentalComposeUiApi
 @Composable
 @ReadOnlyComposable
 fun pluralStringResource(@PluralsRes id: Int, count: Int, vararg formatArgs: Any): String {
