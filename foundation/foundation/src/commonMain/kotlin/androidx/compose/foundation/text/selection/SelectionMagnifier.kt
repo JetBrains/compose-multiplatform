@@ -28,7 +28,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
@@ -61,7 +60,6 @@ private val MagnifierSpringSpec = SpringSpec(visibilityThreshold = OffsetDisplac
  * The text magnifier follows horizontal dragging exactly, but is vertically clamped to the current
  * line, so when it changes lines we animate it.
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Suppress("ModifierInspectorInfo")
 internal fun Modifier.animatedSelectionMagnifier(
     magnifierCenter: () -> Offset,

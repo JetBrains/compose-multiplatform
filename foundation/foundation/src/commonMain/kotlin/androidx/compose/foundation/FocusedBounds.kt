@@ -17,7 +17,6 @@
 package androidx.compose.foundation
 
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -45,7 +44,6 @@ internal val ModifierLocalFocusedBoundsObserver =
  * Note that there may be some cases where the focused bounds change but the callback is _not_
  * invoked, but the last [LayoutCoordinates] will always return the most up-to-date bounds.
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @ExperimentalFoundationApi
 fun Modifier.onFocusedBoundsChanged(onPositioned: (LayoutCoordinates?) -> Unit): Modifier =
     composed(
@@ -57,7 +55,6 @@ fun Modifier.onFocusedBoundsChanged(onPositioned: (LayoutCoordinates?) -> Unit):
         remember(onPositioned) { FocusedBoundsObserverModifier(onPositioned) }
     }
 
-@OptIn(ExperimentalFoundationApi::class)
 private class FocusedBoundsObserverModifier(
     private val handler: (LayoutCoordinates?) -> Unit
 ) : ModifierLocalConsumer,
