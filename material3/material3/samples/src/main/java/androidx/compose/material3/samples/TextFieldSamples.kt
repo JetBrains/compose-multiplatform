@@ -48,6 +48,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -117,33 +118,43 @@ fun TextFieldWithPlaceholder() {
 @Sampled
 @Composable
 fun TextFieldWithErrorState() {
+    val errorMessage = "Email format is invalid"
     var text by rememberSaveable { mutableStateOf("") }
     var isError by rememberSaveable { mutableStateOf(false) }
 
     fun validate(text: String) {
-        isError = text.count() < 5
+        isError = !text.contains('@')
     }
 
-    TextField(
-        value = text,
-        onValueChange = {
-            text = it
-            isError = false
-        },
-        singleLine = true,
-        label = { Text(if (isError) "Email*" else "Email") },
-        isError = isError,
-        keyboardActions = KeyboardActions { validate(text) },
-        modifier = Modifier.semantics {
-            // Provide localized description of the error
-            if (isError) error("Email format is invalid.")
-        }
-    )
+    Column {
+        TextField(
+            value = text,
+            onValueChange = {
+                text = it
+                isError = false
+            },
+            singleLine = true,
+            label = { Text(if (isError) "Email*" else "Email") },
+            isError = isError,
+            keyboardActions = KeyboardActions { validate(text) },
+            modifier = Modifier.semantics {
+                // Provide localized description of the error
+                if (isError) error(errorMessage)
+            }
+        )
+        // Supporting text for error message.
+        Text(
+            text = errorMessage,
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(start = 16.dp, top = 4.dp).alpha(if (isError) 1f else 0f)
+        )
+    }
 }
 
 @Sampled
 @Composable
-fun TextFieldWithHelperMessage() {
+fun TextFieldWithSupportingText() {
     var text by rememberSaveable { mutableStateOf("") }
 
     Column {
@@ -153,10 +164,10 @@ fun TextFieldWithHelperMessage() {
             label = { Text("Label") }
         )
         Text(
-            text = "Helper message",
+            text = "Supporting text",
             color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(start = 16.dp)
+            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
         )
     }
 }

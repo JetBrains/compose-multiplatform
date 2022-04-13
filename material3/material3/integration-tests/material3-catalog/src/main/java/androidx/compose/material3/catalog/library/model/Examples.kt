@@ -96,10 +96,10 @@ import androidx.compose.material3.samples.TextArea
 import androidx.compose.material3.samples.TextButtonSample
 import androidx.compose.material3.samples.TextFieldSample
 import androidx.compose.material3.samples.TextFieldWithErrorState
-import androidx.compose.material3.samples.TextFieldWithHelperMessage
 import androidx.compose.material3.samples.TextFieldWithHideKeyboardOnImeAction
 import androidx.compose.material3.samples.TextFieldWithIcons
 import androidx.compose.material3.samples.TextFieldWithPlaceholder
+import androidx.compose.material3.samples.TextFieldWithSupportingText
 import androidx.compose.material3.samples.TextTabs
 import androidx.compose.material3.samples.TriStateCheckboxSample
 import androidx.compose.runtime.Composable
@@ -684,11 +684,11 @@ val TextFieldsExamples = listOf(
         TextFieldWithErrorState()
     },
     Example(
-        name = ::TextFieldWithHelperMessage.name,
+        name = ::TextFieldWithSupportingText.name,
         description = TextFieldsExampleDescription,
         sourceUrl = TextFieldsExampleSourceUrl
     ) {
-        TextFieldWithHelperMessage()
+        TextFieldWithSupportingText()
     },
     Example(
         name = ::PasswordTextField.name,

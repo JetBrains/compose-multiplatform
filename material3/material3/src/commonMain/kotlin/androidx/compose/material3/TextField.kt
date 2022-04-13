@@ -94,7 +94,7 @@ import kotlin.math.roundToInt
  *
  * Additionally, you may provide additional message at the bottom:
  *
- * @sample androidx.compose.material3.samples.TextFieldWithHelperMessage
+ * @sample androidx.compose.material3.samples.TextFieldWithSupportingText
  *
  * Password text field example:
  *
