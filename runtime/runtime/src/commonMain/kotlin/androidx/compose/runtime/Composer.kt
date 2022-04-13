@@ -1101,6 +1101,7 @@ fun sourceInformationMarkerStart(composer: Composer, key: Int, sourceInformation
 interface CompositionTracer {
     fun traceEventStart(key: Int, dirty1: Int, dirty2: Int, info: String): Unit
     fun traceEventEnd(): Unit
+    fun isTraceInProgress(): Boolean
 }
 
 @OptIn(InternalComposeTracingApi::class)
@@ -1113,7 +1114,7 @@ private var compositionTracer: CompositionTracer? = null
  */
 @OptIn(InternalComposeTracingApi::class)
 @ComposeCompilerApi
-fun isTraceInProgress(): Boolean = compositionTracer != null
+fun isTraceInProgress(): Boolean = compositionTracer.let { it != null && it.isTraceInProgress() }
 
 /**
  * Internal tracing API.
