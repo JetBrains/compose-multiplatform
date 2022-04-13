@@ -13,15 +13,7 @@ A plugin demonstrates Jetpack compose capabilities on IntelliJ Platform
     <depends>org.jetbrains.compose.intellij.platform</depends>
     <depends>org.jetbrains.kotlin</depends>
 
-    <actions>
-        <!-- Add your actions here -->
-        <action id="com.jetbrains.compose.ComposeDemoAction" class="com.jetbrains.compose.ComposeDemoAction"
-                text="Show Compose Demo...">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
-        </action>
-    </actions>
     <extensions defaultExtensionNs="com.intellij">
-        <codeInsight.lineMarkerProvider language="kotlin" implementationClass="com.jetbrains.compose.color.ColorLineMarkerProvider" />
         <toolWindow id="Compose" anchor="right" secondary="false" factoryClass="com.jetbrains.compose.panel.ComposeToolWindow"
                     icon="/icons/compose.svg"/>
     </extensions>
