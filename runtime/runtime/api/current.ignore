@@ -7,6 +7,8 @@ AddSealed: androidx.compose.runtime.ControlledComposition:
 
 AddedAbstractMethod: androidx.compose.runtime.Composer#deactivateToEndGroup(boolean):
     Added method androidx.compose.runtime.Composer.deactivateToEndGroup(boolean)
+AddedAbstractMethod: androidx.compose.runtime.Composer#getRecomposeScopeIdentity():
+    Added method androidx.compose.runtime.Composer.getRecomposeScopeIdentity()
 AddedAbstractMethod: androidx.compose.runtime.ControlledComposition#applyLateChanges():
     Added method androidx.compose.runtime.ControlledComposition.applyLateChanges()
 AddedAbstractMethod: androidx.compose.runtime.ControlledComposition#changesApplied():
