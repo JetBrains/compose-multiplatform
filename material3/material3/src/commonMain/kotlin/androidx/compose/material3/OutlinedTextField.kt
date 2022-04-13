@@ -64,13 +64,15 @@ import androidx.compose.ui.unit.offset
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-// TODO(221954765): Add links to docs and images.
 /**
- * Material Design outlined text field.
+ * <a href="https://m3.material.io/components/text-fields/overview" class="external" target="_blank">Material Design outlined text field</a>.
  *
+ * Text fields allow users to enter text into a UI. They typically appear in forms and dialogs.
  * Outlined text fields have less visual emphasis than filled text fields. When they appear in
  * places like forms, where many text fields are placed together, their reduced emphasis helps
  * simplify the layout.
+ *
+ * ![Outlined text field image](https://developer.android.com/images/reference/androidx/compose/material3/outlined-text-field.png)
  *
  * See example usage:
  * @sample androidx.compose.material3.samples.SimpleOutlinedTextFieldSample
@@ -207,13 +209,15 @@ fun OutlinedTextField(
     )
 }
 
-// TODO(221954765): Add links to docs and images.
 /**
- * Material Design outlined text field.
+ * <a href="https://m3.material.io/components/text-fields/overview" class="external" target="_blank">Material Design outlined text field</a>.
  *
+ * Text fields allow users to enter text into a UI. They typically appear in forms and dialogs.
  * Outlined text fields have less visual emphasis than filled text fields. When they appear in
  * places like forms, where many text fields are placed together, their reduced emphasis helps
  * simplify the layout.
+ *
+ * ![Outlined text field image](https://developer.android.com/images/reference/androidx/compose/material3/outlined-text-field.png)
  *
  * See example usage:
  * @sample androidx.compose.material3.samples.OutlinedTextFieldSample

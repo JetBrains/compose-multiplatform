@@ -29,11 +29,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-// TODO: Provide M3 divider image when asset is available.
+// TODO: Link to M3 spec when available.
 /**
  * <a href="https://material.io/components/dividers" class="external" target="_blank">Material Design divider</a>.
  *
  * A divider is a thin line that groups content in lists and layouts.
+ *
+ * ![Divider image](https://developer.android.com/images/reference/androidx/compose/material3/divider.png)
  *
  * @param color color of the divider line
  * @param thickness thickness of the divider line

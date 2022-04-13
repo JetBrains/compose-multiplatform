@@ -48,11 +48,13 @@ import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.max
 
-// TODO: Link to M3 spec and add image when available.
+// TODO: Link to M3 spec when available.
 /**
  * Determinate Material Design linear progress indicator.
  *
- * Progress indicators express an unspecified wait time or display the length of a process.
+ * Progress indicators express an unspecified wait time or display the duration of a process.
+ *
+ * ![Linear progress indicator image](https://developer.android.com/images/reference/androidx/compose/material3/linear-progress-indicator.png)
  *
  * By default there is no animation between [progress] values. You can use
  * [ProgressIndicatorDefaults.ProgressAnimationSpec] as the default recommended [AnimationSpec] when
@@ -85,11 +87,13 @@ fun LinearProgressIndicator(
     }
 }
 
-// TODO: Link to M3 spec and add image when available.
+// TODO: Link to M3 spec when available.
 /**
  * Indeterminate Material Design linear progress indicator.
  *
- * Progress indicators express an unspecified wait time or display the length of a process.
+ * Progress indicators express an unspecified wait time or display the duration of a process.
+ *
+ * ![Linear progress indicator image](https://developer.android.com/images/reference/androidx/compose/material3/linear-progress-indicator.png)
  *
  * @param modifier The modifier of the progress indicator.
  * @param color The color of the progress indicator.
@@ -200,11 +204,13 @@ private fun DrawScope.drawLinearIndicatorTrack(
     strokeWidth: Float
 ) = drawLinearIndicator(0f, 1f, color, strokeWidth)
 
-// TODO: Link to M3 spec and add image when available.
+// TODO: Link to M3 spec when available.
 /**
  * Determinate Material Design circular progress indicator.
  *
- * Progress indicators express an unspecified wait time or display the length of a process.
+ * Progress indicators express an unspecified wait time or display the duration of a process.
+ *
+ * ![Circular progress indicator image](https://developer.android.com/images/reference/androidx/compose/material3/circular-progress-indicator.png)
  *
  * By default there is no animation between [progress] values. You can use
  * [ProgressIndicatorDefaults.ProgressAnimationSpec] as the default recommended [AnimationSpec] when
@@ -240,11 +246,13 @@ fun CircularProgressIndicator(
     }
 }
 
-// TODO: Link to M3 spec and add image when available.
+// TODO: Link to M3 spec when available.
 /**
  * Indeterminate Material Design circular progress indicator.
  *
- * Progress indicators express an unspecified wait time or display the length of a process.
+ * Progress indicators express an unspecified wait time or display the duration of a process.
+ *
+ * ![Circular progress indicator image](https://developer.android.com/images/reference/androidx/compose/material3/circular-progress-indicator.png)
  *
  * @param modifier The modifier of the progress indicator.
  * @param color The color of the progress indicator.

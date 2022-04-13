@@ -55,10 +55,12 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collect
 
 /**
- * ![Filled button image](https://developer.android.com/images/reference/androidx/compose/material3/filled-button.png)
+ * <a href="https://m3.material.io/components/buttons/overview" class="external" target="_blank">Material Design button</a>.
  *
- * A default Material button, which is also known as a Filled button. Buttons contain actions for
- * your app.
+ * Buttons help people initiate actions, from sending an email, to sharing a document, to liking a
+ * post.
+ *
+ * ![Filled button image](https://developer.android.com/images/reference/androidx/compose/material3/filled-button.png)
  *
  * Filled buttons are high-emphasis buttons. Filled buttons have the most visual impact after the
  * [FloatingActionButton], and should be used for important, final actions that complete a flow,
@@ -146,9 +148,12 @@ fun Button(
 }
 
 /**
- * ![Elevated button image](https://developer.android.com/images/reference/androidx/compose/material3/elevated-button.png)
+ * <a href="https://m3.material.io/components/buttons/overview" class="external" target="_blank">Material Design elevated button</a>.
  *
- * A Material Elevated button. Buttons contain actions for your app.
+ * Buttons help people initiate actions, from sending an email, to sharing a document, to liking a
+ * post.
+ *
+ * ![Elevated button image](https://developer.android.com/images/reference/androidx/compose/material3/elevated-button.png)
  *
  * Elevated buttons are high-emphasis buttons that are essentially [FilledTonalButton]s with a
  * shadow. To prevent shadow creep, only use them when absolutely necessary, such as when the button
@@ -213,9 +218,12 @@ fun ElevatedButton(
     )
 
 /**
- * ![Filled tonal button image](https://developer.android.com/images/reference/androidx/compose/material3/filled-tonal-button.png)
+ * <a href="https://m3.material.io/components/buttons/overview" class="external" target="_blank">Material Design filled tonal button</a>.
  *
- * A Material Filled tonal button. Buttons contain actions for your app.
+ * Buttons help people initiate actions, from sending an email, to sharing a document, to liking a
+ * post.
+ *
+ * ![Filled tonal button image](https://developer.android.com/images/reference/androidx/compose/material3/filled-tonal-button.png)
  *
  * Filled tonal buttons are medium-emphasis buttons that is an alternative middle ground between
  * default [Button]s (filled) and [OutlinedButton]s. They can be used in contexts where
@@ -280,9 +288,12 @@ fun FilledTonalButton(
     )
 
 /**
- * ![Outlined button image](https://developer.android.com/images/reference/androidx/compose/material3/outlined-button.png)
+ * <a href="https://m3.material.io/components/buttons/overview" class="external" target="_blank">Material Design outlined button</a>.
  *
- * A Material Outlined button. Buttons contain actions for your app.
+ * Buttons help people initiate actions, from sending an email, to sharing a document, to liking a
+ * post.
+ *
+ * ![Outlined button image](https://developer.android.com/images/reference/androidx/compose/material3/outlined-button.png)
  *
  * Outlined buttons are medium-emphasis buttons. They contain actions that are important, but are
  * not the primary action in an app. Outlined buttons pair well with [Button]s to indicate an
@@ -346,9 +357,12 @@ fun OutlinedButton(
     )
 
 /**
- * ![Text button image](https://developer.android.com/images/reference/androidx/compose/material3/text-button.png)
+ * <a href="https://m3.material.io/components/buttons/overview" class="external" target="_blank">Material Design text button</a>.
  *
- * A Material Text button. Buttons contain actions for your app.
+ * Buttons help people initiate actions, from sending an email, to sharing a document, to liking a
+ * post.
+ *
+ * ![Text button image](https://developer.android.com/images/reference/androidx/compose/material3/text-button.png)
  *
  * Text buttons are typically used for less-pronounced actions, including those located in dialogs
  * and cards. In cards, text buttons help maintain an emphasis on card content. Text buttons are

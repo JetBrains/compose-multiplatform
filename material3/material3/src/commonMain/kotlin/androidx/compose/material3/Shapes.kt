@@ -30,6 +30,9 @@ import androidx.compose.ui.unit.dp
  * Material surfaces can be displayed in different shapes. Shapes direct attention, identify
  * components, communicate state, and express brand.
  *
+ * The shape scale defines the style of container corners, offering a range of roundedness from
+ * square to fully circular.
+ *
  * There are different sizes of shapes:
  * - Extra Small
  * - Small
@@ -40,10 +43,12 @@ import androidx.compose.ui.unit.dp
  * You can customize the shape system for all components in the [MaterialTheme] or you can do it
  * on a per component basis.
  *
- * Shape refers to the corners of a component. You can change the shape that a component has
- * by overriding the shape parameter for that component. For example, by default, buttons use the
- * shape style “full.” If your product requires a smaller amount of roundedness, you can override
- * the shape parameter with a different shape value like [MaterialTheme.shapes.small].
+ * You can change the shape that a component has by overriding the shape parameter for that
+ * component. For example, by default, buttons use the shape style “full.” If your product requires
+ * a smaller amount of roundedness, you can override the shape parameter with a different shape
+ * value like [MaterialTheme.shapes.small].
+ *
+ * To learn more about shapes, see [Material Design shapes](https://m3.material.io/styles/shape/overview).
  *
  * @param extraSmall A shape style with 4 same-sized corners whose size are bigger than
  * [Shapes.None] and smaller than [Shapes.small]. By default autocomplete menu, select menu,

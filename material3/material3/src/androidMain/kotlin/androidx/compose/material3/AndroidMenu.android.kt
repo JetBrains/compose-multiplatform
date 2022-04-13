@@ -35,8 +35,10 @@ import androidx.compose.ui.window.PopupProperties
 /**
  * <a href="https://m3.material.io/components/menus/overview" class="external" target="_blank">Material Design dropdown menu</a>.
  *
- * A dropdown menu is a compact way of displaying multiple choices. It appears upon interaction with
- * an element (such as an icon or button) or when users perform a specific action.
+ * Menus display a list of choices on a temporary surface. They appear when users interact with a
+ * button, action, or other control.
+ *
+ * ![Dropdown menu image](https://developer.android.com/images/reference/androidx/compose/material3/menu.png)
  *
  * A [DropdownMenu] behaves similarly to a [Popup], and will use the position of the parent layout
  * to position itself on screen. Commonly a [DropdownMenu] will be placed in a [Box] with a sibling
@@ -108,6 +110,10 @@ fun DropdownMenu(
 /**
  * <a href="https://m3.material.io/components/menus/overview" class="external" target="_blank">Material Design dropdown menu</a> item.
  *
+ * Menus display a list of choices on a temporary surface. They appear when users interact with a
+ * button, action, or other control.
+ *
+ * ![Dropdown menu image](https://developer.android.com/images/reference/androidx/compose/material3/menu.png)
  *
  * Example usage:
  * @sample androidx.compose.material3.samples.MenuSample

@@ -74,13 +74,13 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 
 /**
- * ![Small top app bar image](https://developer.android.com/images/reference/androidx/compose/material3/small-top-app-bar.png)
+ * <a href="https://m3.material.io/components/top-app-bar/overview" class="external" target="_blank">Material Design small top app bar</a>.
  *
- * Material Design small top app bar.
- *
- * The top app bar displays information and actions relating to the current screen.
+ * Top app bars display information and actions at the top of a screen.
  *
  * This SmallTopAppBar has slots for a title, navigation icon, and actions.
+ *
+ * ![Small top app bar image](https://developer.android.com/images/reference/androidx/compose/material3/small-top-app-bar.png)
  *
  * A simple top app bar looks like:
  * @sample androidx.compose.material3.samples.SimpleSmallTopAppBar
@@ -124,11 +124,13 @@ fun SmallTopAppBar(
 }
 
 /**
+ * <a href="https://m3.material.io/components/top-app-bar/overview" class="external" target="_blank">Material Design center-aligned small top app bar</a>.
+ *
+ * Top app bars display information and actions at the top of a screen.
+ *
+ * This small top app bar has a header title that is horizontally aligned to the center.
+ *
  * ![Center-aligned top app bar image](https://developer.android.com/images/reference/androidx/compose/material3/center-aligned-top-app-bar.png)
- *
- * Material Design small top app bar with a header title that is horizontally aligned to the center.
- *
- * The top app bar displays information and actions relating to the current screen.
  *
  * This CenterAlignedTopAppBar has slots for a title, navigation icon, and actions.
  *
@@ -172,11 +174,11 @@ fun CenterAlignedTopAppBar(
 }
 
 /**
+ * <a href="https://m3.material.io/components/top-app-bar/overview" class="external" target="_blank">Material Design medium top app bar</a>.
+ *
+ * Top app bars display information and actions at the top of a screen.
+ *
  * ![Medium top app bar image](https://developer.android.com/images/reference/androidx/compose/material3/medium-top-app-bar.png)
- *
- * Material Design medium top app bar.
- *
- * The top app bar displays information and actions relating to the current screen.
  *
  * This MediumTopAppBar has slots for a title, navigation icon, and actions. In its default expanded
  * state, the title is displayed in a second row under the navigation and actions.
@@ -226,11 +228,11 @@ fun MediumTopAppBar(
 }
 
 /**
+ * <a href="https://m3.material.io/components/top-app-bar/overview" class="external" target="_blank">Material Design large top app bar</a>.
+ *
+ * Top app bars display information and actions at the top of a screen.
+ *
  * ![Large top app bar image](https://developer.android.com/images/reference/androidx/compose/material3/large-top-app-bar.png)
- *
- * Material Design large top app bar.
- *
- * The top app bar displays information and actions relating to the current screen.
  *
  * This LargeTopAppBar has slots for a title, navigation icon, and actions. In its default expanded
  * state, the title is displayed in a second row under the navigation and actions.
@@ -279,9 +281,12 @@ fun LargeTopAppBar(
     )
 }
 
-// TODO(b/209583788): Add link to Material 3 bottom app bar spec article.
 /**
- * A bottom app bar displays navigation and key actions at the bottom of screens.
+ * <a href="https://m3.material.io/components/bottom-app-bar/overview" class="external" target="_blank">Material Design bottom app bar</a>.
+ *
+ * A bottom app bar displays navigation and key actions at the bottom of mobile screens.
+ *
+ * ![Bottom app bar image](https://developer.android.com/images/reference/androidx/compose/material3/bottom-app-bar.png)
  *
  * @sample androidx.compose.material3.samples.SimpleBottomAppBar
  *
@@ -344,9 +349,12 @@ fun BottomAppBar(
     }
 }
 
-// TODO(b/209583788): Add link to Material 3 bottom app bar spec article.
 /**
- * A bottom app bar displays navigation and key actions at the bottom of screens.
+ * <a href="https://m3.material.io/components/bottom-app-bar/overview" class="external" target="_blank">Material Design bottom app bar</a>.
+ *
+ * A bottom app bar displays navigation and key actions at the bottom of mobile screens.
+ *
+ * ![Bottom app bar image](https://developer.android.com/images/reference/androidx/compose/material3/bottom-app-bar.png)
  *
  * If you are interested in displaying a [FloatingActionButton], consider using another overload.
  *
