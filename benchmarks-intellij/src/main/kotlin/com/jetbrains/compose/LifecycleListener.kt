@@ -15,12 +15,12 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.jetbrains.compose.benchmark.BenchmarkToolWindow
 import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
-import org.jetbrains.kotlin.idea.caches.resolve.util.isInDumbMode
 import java.nio.file.Files
 import kotlin.random.Random
 
 private val ANCHORS = listOf(ToolWindowAnchor.LEFT, ToolWindowAnchor.BOTTOM, ToolWindowAnchor.RIGHT)
 private val SIDE_TOOLS = listOf(true, false)
+private val COUNT = ANCHORS.size * SIDE_TOOLS.size
 
 class LifecycleListener : com.intellij.ide.AppLifecycleListener {
 
@@ -72,7 +72,18 @@ class LifecycleListener : com.intellij.ide.AppLifecycleListener {
 }
 
 suspend fun stressTestToolWindows(toolWindows: List<ToolWindow>) {
+    val runtime = Runtime.getRuntime()
+    fun printLogs(message: String) {
+        runtime.gc()
+        val memory = runtime.totalMemory() - runtime.freeMemory()
+        val memoryStr = String.format("%.2f MB", memory / 1e6f)
+        println("-- $message --")
+        println("-- Used memory: $memoryStr")
+        println("-- ")
+    }
     while (true) {
+        val visiblePanelsCount = toolWindows.count { it.isVisible }
+        printLogs("$visiblePanelsCount panels")
         delay(500)
         toolWindows.forEach {
             if (Random.nextBoolean()) {
