@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package com.jetbrains.compose.panel
+package com.jetbrains.compose.benchmark
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.awt.ComposePanel
@@ -13,10 +13,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
-import com.jetbrains.compose.IntellijTheme
 import java.awt.Dimension
 
-class ComposeToolWindow : ToolWindowFactory, DumbAware {
+class BenchmarkToolWindow : ToolWindowFactory, DumbAware {
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         ApplicationManager.getApplication().invokeLater {
@@ -25,9 +24,7 @@ class ComposeToolWindow : ToolWindowFactory, DumbAware {
                     ComposePanel().apply {
                         size = Dimension(300, 300)
                         setContent {
-                            IntellijTheme(project) {
-                                CounterPanel(stateWithIdeLifecycle)
-                            }
+                            CounterPanel(stateWithIdeLifecycle)
                         }
                     },
                     "Compose tool window",

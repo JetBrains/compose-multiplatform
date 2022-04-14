@@ -14,8 +14,36 @@ A plugin demonstrates Jetpack compose capabilities on IntelliJ Platform
     <depends>org.jetbrains.kotlin</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="Compose" anchor="right" secondary="false" factoryClass="com.jetbrains.compose.panel.ComposeToolWindow"
-                    icon="/icons/compose.svg"/>
+        <toolWindow id="Compose0" anchor="right" secondary="true"
+                factoryClass="com.jetbrains.compose.benchmark.BenchmarkToolWindow" icon="/icons/compose.svg"/>
+        <toolWindow id="Compose1" anchor="right" secondary="true"
+                factoryClass="com.jetbrains.compose.benchmark.BenchmarkToolWindow" icon="/icons/compose.svg"/>
+        <toolWindow id="Compose2" anchor="right" secondary="true"
+                factoryClass="com.jetbrains.compose.benchmark.BenchmarkToolWindow" icon="/icons/compose.svg"/>
+        <toolWindow id="Compose3" anchor="right" secondary="true"
+                factoryClass="com.jetbrains.compose.benchmark.BenchmarkToolWindow" icon="/icons/compose.svg"/>
+        <toolWindow id="Compose4" anchor="right" secondary="true"
+                factoryClass="com.jetbrains.compose.benchmark.BenchmarkToolWindow" icon="/icons/compose.svg"/>
+        <toolWindow id="Compose5" anchor="left" secondary="true"
+                factoryClass="com.jetbrains.compose.benchmark.BenchmarkToolWindow" icon="/icons/compose.svg"/>
+        <toolWindow id="Compose6" anchor="left" secondary="true"
+                factoryClass="com.jetbrains.compose.benchmark.BenchmarkToolWindow" icon="/icons/compose.svg"/>
+        <toolWindow id="Compose7" anchor="left" secondary="true"
+                factoryClass="com.jetbrains.compose.benchmark.BenchmarkToolWindow" icon="/icons/compose.svg"/>
+        <toolWindow id="Compose8" anchor="left" secondary="true"
+                factoryClass="com.jetbrains.compose.benchmark.BenchmarkToolWindow" icon="/icons/compose.svg"/>
+        <toolWindow id="Compose9" anchor="left" secondary="true"
+                factoryClass="com.jetbrains.compose.benchmark.BenchmarkToolWindow" icon="/icons/compose.svg"/>
+<!--        <toolWindow id="Compose10" anchor="bottom" secondary="true"-->
+<!--                factoryClass="com.jetbrains.compose.benchmark.BenchmarkToolWindow" icon="/icons/compose.svg"/>-->
+<!--        <toolWindow id="Compose11" anchor="bottom" secondary="true"-->
+<!--                factoryClass="com.jetbrains.compose.benchmark.BenchmarkToolWindow" icon="/icons/compose.svg"/>-->
+<!--        <toolWindow id="Compose12" anchor="bottom" secondary="true"-->
+<!--                factoryClass="com.jetbrains.compose.benchmark.BenchmarkToolWindow" icon="/icons/compose.svg"/>-->
+<!--        <toolWindow id="Compose13" anchor="bottom" secondary="true"-->
+<!--                factoryClass="com.jetbrains.compose.benchmark.BenchmarkToolWindow" icon="/icons/compose.svg"/>-->
+<!--        <toolWindow id="Compose14" anchor="bottom" secondary="true"-->
+<!--                factoryClass="com.jetbrains.compose.benchmark.BenchmarkToolWindow" icon="/icons/compose.svg"/>-->
     </extensions>
 
     <applicationListeners>
