@@ -23,6 +23,7 @@ import java.nio.file.Files
 import javax.swing.Icon
 
 private val ANCHORS = listOf(ToolWindowAnchor.BOTTOM, ToolWindowAnchor.LEFT, ToolWindowAnchor.RIGHT)
+private val SIDE_TOOLS = listOf(true, false)
 
 class LifecycleListener : com.intellij.ide.AppLifecycleListener {
 
@@ -31,36 +32,27 @@ class LifecycleListener : com.intellij.ide.AppLifecycleListener {
     init {
         swingScope.launch {
             invokeLater {
-                val iconSize = 20
-                val icon = object : Icon {
-                    override fun paintIcon(c: Component?, g: Graphics?, x: Int, y: Int) {
-                        g?.color = java.awt.Color(0xff00ff)
-                        g?.fillRect(0, 0, iconSize, iconSize)
-                    }
-                    override fun getIconWidth(): Int = iconSize
-                    override fun getIconHeight(): Int = iconSize
-                }
-
                 val tempDir = Files.createTempDirectory("idea_project")
                 val emptyProject: Project = ProjectUtil.openOrImport(tempDir)
                 val toolWindowManager = ToolWindowManager.getInstance(emptyProject)
-                repeat(15) { index ->
-                    toolWindowManager.registerToolWindow(
-                        RegisterToolWindowTask(
-                            id = "ComposeBottom$index",
-                            anchor = ANCHORS.random(),
-                            component = null,
-                            sideTool = true,
-                            canCloseContent = true,
-                            canWorkInDumbMode = true,
-                            icon = icon,
-                            shouldBeAvailable = true,
-                            contentFactory = BenchmarkToolWindow(),
-                            stripeTitle = { "stripeTitle" }
+                val ids: MutableList<String> = mutableListOf()
+                for (anchor in ANCHORS) {
+                    for (sideTool in SIDE_TOOLS) {
+                        toolWindowManager.registerToolWindow(
+                            RegisterToolWindowTask(
+                                id = "Compose${ids.size}".also { ids.add(it) },
+                                anchor = anchor,
+                                component = null,
+                                sideTool = sideTool,
+                                canCloseContent = true,
+                                canWorkInDumbMode = true,
+                                icon = null,
+                                shouldBeAvailable = true,
+                                contentFactory = BenchmarkToolWindow(),
+                            )
                         )
-                    )
+                    }
                 }
-
             }
         }
     }
