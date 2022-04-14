@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusOrder
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.testTag
@@ -92,7 +92,8 @@ class DefaultKeyboardActionsTest(param: Param) {
                     onValueChange = {},
                     modifier = Modifier
                         .testTag(initialTextField)
-                        .focusOrder(textField2) { previous = textField1; next = textField3 }
+                        .focusRequester(textField2)
+                        .focusProperties { previous = textField1; next = textField3 }
                         .onFocusChanged { focusState2 = it.isFocused },
                     imeOptions = ImeOptions(imeAction = imeAction)
                 )
@@ -155,7 +156,8 @@ class DefaultKeyboardActionsTest(param: Param) {
                     onValueChange = {},
                     modifier = Modifier
                         .testTag(initialTextField)
-                        .focusOrder(textField2) { previous = textField1; next = textField3 }
+                        .focusRequester(textField2)
+                        .focusProperties { previous = textField1; next = textField3 }
                         .onFocusChanged { focusState2 = it.isFocused },
                     imeOptions = ImeOptions(imeAction = imeAction),
                     keyboardActions = KeyboardActions(
@@ -219,7 +221,8 @@ class DefaultKeyboardActionsTest(param: Param) {
                     onValueChange = {},
                     modifier = Modifier
                         .testTag(initialTextField)
-                        .focusOrder(textField1) { next = textField2 }
+                        .focusRequester(textField1)
+                        .focusProperties { next = textField2 }
                         .onFocusChanged { focusState1 = it.isFocused },
                     imeOptions = ImeOptions(imeAction = imeAction),
                     keyboardActions = KeyboardActions(

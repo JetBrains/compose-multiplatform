@@ -17,9 +17,6 @@
 package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.lazy.GridItemSpan
-import androidx.compose.foundation.lazy.LazyGridItemSpanScope
-import androidx.compose.foundation.lazy.LazyGridScope
 import androidx.compose.foundation.lazy.layout.MutableIntervalList
 import androidx.compose.runtime.Composable
 
@@ -33,13 +30,15 @@ internal class LazyGridScopeImpl : LazyGridScope {
     override fun item(
         key: Any?,
         span: (LazyGridItemSpanScope.() -> GridItemSpan)?,
-        content: @Composable () -> Unit
+        contentType: Any?,
+        content: @Composable LazyGridItemScope.() -> Unit
     ) {
         intervals.add(
             1,
             LazyGridIntervalContent(
                 key = key?.let { { key } },
                 span = span?.let { { span() } } ?: DefaultSpan,
+                type = { contentType },
                 content = { { content() } }
             )
         )
@@ -50,13 +49,15 @@ internal class LazyGridScopeImpl : LazyGridScope {
         count: Int,
         key: ((index: Int) -> Any)?,
         span: (LazyGridItemSpanScope.(Int) -> GridItemSpan)?,
-        itemContent: @Composable (index: Int) -> Unit
+        contentType: (index: Int) -> Any?,
+        itemContent: @Composable LazyGridItemScope.(index: Int) -> Unit
     ) {
         intervals.add(
             count,
             LazyGridIntervalContent(
                 key = key,
                 span = span ?: DefaultSpan,
+                type = contentType,
                 content = { { itemContent(it) } }
             )
         )
@@ -68,5 +69,6 @@ internal class LazyGridScopeImpl : LazyGridScope {
 internal class LazyGridIntervalContent(
     val key: ((index: Int) -> Any)?,
     val span: LazyGridItemSpanScope.(Int) -> GridItemSpan,
-    val content: (Int) -> (@Composable () -> Unit)
+    val type: ((index: Int) -> Any?),
+    val content: LazyGridItemScope.(Int) -> (@Composable () -> Unit)
 )

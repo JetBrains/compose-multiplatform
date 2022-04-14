@@ -88,7 +88,8 @@ fun createSampleVectorPainter(toggle: Boolean): Painter {
         defaultHeight = 24.dp,
         viewportWidth = 24f,
         viewportHeight = 24f,
-        name = "sample"
+        name = "sample",
+        autoMirror = true
     ) { _, _ ->
         val transition = updateTransition(targetState = toggle, label = "sample")
         val duration = 3000

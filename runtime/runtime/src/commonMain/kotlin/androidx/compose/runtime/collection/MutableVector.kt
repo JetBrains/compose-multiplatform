@@ -162,6 +162,7 @@ class MutableVector<T> @PublishedApi internal constructor(
             destination = content,
             destinationOffset = size
         )
+        size += elements.size
         return true
     }
 

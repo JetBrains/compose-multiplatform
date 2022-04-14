@@ -1,3 +1,165 @@
 // Baseline format: 1.0
-AddedAbstractMethod: androidx.compose.runtime.Composer#collectParameterInformation():
-    Added method androidx.compose.runtime.Composer.collectParameterInformation()
+AddSealed: androidx.compose.runtime.Composer:
+    Cannot add 'sealed' modifier to class androidx.compose.runtime.Composer: Incompatible change
+AddSealed: androidx.compose.runtime.ControlledComposition:
+    Cannot add 'sealed' modifier to class androidx.compose.runtime.ControlledComposition: Incompatible change
+
+
+AddedAbstractMethod: androidx.compose.runtime.Composer#deactivateToEndGroup(boolean):
+    Added method androidx.compose.runtime.Composer.deactivateToEndGroup(boolean)
+AddedAbstractMethod: androidx.compose.runtime.Composer#getRecomposeScopeIdentity():
+    Added method androidx.compose.runtime.Composer.getRecomposeScopeIdentity()
+AddedAbstractMethod: androidx.compose.runtime.ControlledComposition#applyLateChanges():
+    Added method androidx.compose.runtime.ControlledComposition.applyLateChanges()
+AddedAbstractMethod: androidx.compose.runtime.ControlledComposition#changesApplied():
+    Added method androidx.compose.runtime.ControlledComposition.changesApplied()
+AddedAbstractMethod: androidx.compose.runtime.ControlledComposition#delegateInvalidations(androidx.compose.runtime.ControlledComposition, int, kotlin.jvm.functions.Function0<? extends R>):
+    Added method androidx.compose.runtime.ControlledComposition.delegateInvalidations(androidx.compose.runtime.ControlledComposition,int,kotlin.jvm.functions.Function0<? extends R>)
+
+
+AddedFinal: androidx.compose.runtime.Composer#apply(V, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit>):
+    Method androidx.compose.runtime.Composer.apply has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#changed(Object):
+    Method androidx.compose.runtime.Composer.changed has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#changed(boolean):
+    Method androidx.compose.runtime.Composer.changed has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#changed(byte):
+    Method androidx.compose.runtime.Composer.changed has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#changed(char):
+    Method androidx.compose.runtime.Composer.changed has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#changed(double):
+    Method androidx.compose.runtime.Composer.changed has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#changed(float):
+    Method androidx.compose.runtime.Composer.changed has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#changed(int):
+    Method androidx.compose.runtime.Composer.changed has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#changed(long):
+    Method androidx.compose.runtime.Composer.changed has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#changed(short):
+    Method androidx.compose.runtime.Composer.changed has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#collectParameterInformation():
+    Method androidx.compose.runtime.Composer.collectParameterInformation has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#createNode(kotlin.jvm.functions.Function0<? extends T>):
+    Method androidx.compose.runtime.Composer.createNode has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#disableReusing():
+    Method androidx.compose.runtime.Composer.disableReusing has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#enableReusing():
+    Method androidx.compose.runtime.Composer.enableReusing has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#endDefaults():
+    Method androidx.compose.runtime.Composer.endDefaults has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#endMovableGroup():
+    Method androidx.compose.runtime.Composer.endMovableGroup has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#endNode():
+    Method androidx.compose.runtime.Composer.endNode has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#endReplaceableGroup():
+    Method androidx.compose.runtime.Composer.endReplaceableGroup has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#endRestartGroup():
+    Method androidx.compose.runtime.Composer.endRestartGroup has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#endReusableGroup():
+    Method androidx.compose.runtime.Composer.endReusableGroup has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#getApplier():
+    Method androidx.compose.runtime.Composer.getApplier has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#getApplyCoroutineContext():
+    Method androidx.compose.runtime.Composer.getApplyCoroutineContext has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#getComposition():
+    Method androidx.compose.runtime.Composer.getComposition has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#getCompositionData():
+    Method androidx.compose.runtime.Composer.getCompositionData has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#getCompoundKeyHash():
+    Method androidx.compose.runtime.Composer.getCompoundKeyHash has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#getDefaultsInvalid():
+    Method androidx.compose.runtime.Composer.getDefaultsInvalid has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#getInserting():
+    Method androidx.compose.runtime.Composer.getInserting has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#getRecomposeScope():
+    Method androidx.compose.runtime.Composer.getRecomposeScope has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#getSkipping():
+    Method androidx.compose.runtime.Composer.getSkipping has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#joinKey(Object, Object):
+    Method androidx.compose.runtime.Composer.joinKey has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#rememberedValue():
+    Method androidx.compose.runtime.Composer.rememberedValue has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#skipCurrentGroup():
+    Method androidx.compose.runtime.Composer.skipCurrentGroup has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#skipToGroupEnd():
+    Method androidx.compose.runtime.Composer.skipToGroupEnd has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#sourceInformation(String):
+    Method androidx.compose.runtime.Composer.sourceInformation has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#sourceInformationMarkerEnd():
+    Method androidx.compose.runtime.Composer.sourceInformationMarkerEnd has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#sourceInformationMarkerStart(int, String):
+    Method androidx.compose.runtime.Composer.sourceInformationMarkerStart has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#startDefaults():
+    Method androidx.compose.runtime.Composer.startDefaults has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#startMovableGroup(int, Object):
+    Method androidx.compose.runtime.Composer.startMovableGroup has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#startNode():
+    Method androidx.compose.runtime.Composer.startNode has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#startReplaceableGroup(int):
+    Method androidx.compose.runtime.Composer.startReplaceableGroup has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#startRestartGroup(int):
+    Method androidx.compose.runtime.Composer.startRestartGroup has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#startReusableGroup(int, Object):
+    Method androidx.compose.runtime.Composer.startReusableGroup has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#startReusableNode():
+    Method androidx.compose.runtime.Composer.startReusableNode has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#updateRememberedValue(Object):
+    Method androidx.compose.runtime.Composer.updateRememberedValue has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.Composer#useNode():
+    Method androidx.compose.runtime.Composer.useNode has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.ControlledComposition#applyChanges():
+    Method androidx.compose.runtime.ControlledComposition.applyChanges has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.ControlledComposition#composeContent(kotlin.jvm.functions.Function0<kotlin.Unit>):
+    Method androidx.compose.runtime.ControlledComposition.composeContent has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.ControlledComposition#getHasPendingChanges():
+    Method androidx.compose.runtime.ControlledComposition.getHasPendingChanges has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.ControlledComposition#invalidateAll():
+    Method androidx.compose.runtime.ControlledComposition.invalidateAll has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.ControlledComposition#isComposing():
+    Method androidx.compose.runtime.ControlledComposition.isComposing has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.ControlledComposition#observesAnyOf(java.util.Set<?>):
+    Method androidx.compose.runtime.ControlledComposition.observesAnyOf has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.ControlledComposition#prepareCompose(kotlin.jvm.functions.Function0<kotlin.Unit>):
+    Method androidx.compose.runtime.ControlledComposition.prepareCompose has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.ControlledComposition#recompose():
+    Method androidx.compose.runtime.ControlledComposition.recompose has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.ControlledComposition#recordModificationsOf(java.util.Set<?>):
+    Method androidx.compose.runtime.ControlledComposition.recordModificationsOf has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.ControlledComposition#recordReadOf(Object):
+    Method androidx.compose.runtime.ControlledComposition.recordReadOf has added 'final' qualifier
+AddedFinal: androidx.compose.runtime.ControlledComposition#recordWriteOf(Object):
+    Method androidx.compose.runtime.ControlledComposition.recordWriteOf has added 'final' qualifier
+
+
+ParameterNameChange: androidx.compose.runtime.AbstractApplier#setCurrent(T) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.runtime.AbstractApplier.setCurrent
+ParameterNameChange: androidx.compose.runtime.BroadcastFrameClock#withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R>, kotlin.coroutines.Continuation<? super R>) parameter #1:
+    Attempted to remove parameter name from parameter arg2 in androidx.compose.runtime.BroadcastFrameClock.withFrameNanos
+ParameterNameChange: androidx.compose.runtime.MonotonicFrameClock#withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R>, kotlin.coroutines.Continuation<? super R>) parameter #1:
+    Attempted to remove parameter name from parameter arg2 in androidx.compose.runtime.MonotonicFrameClock.withFrameNanos
+ParameterNameChange: androidx.compose.runtime.MonotonicFrameClockKt#withFrameMillis(androidx.compose.runtime.MonotonicFrameClock, kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R>, kotlin.coroutines.Continuation<? super R>) parameter #2:
+    Attempted to remove parameter name from parameter arg3 in androidx.compose.runtime.MonotonicFrameClockKt.withFrameMillis
+ParameterNameChange: androidx.compose.runtime.MonotonicFrameClockKt#withFrameMillis(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R>, kotlin.coroutines.Continuation<? super R>) parameter #1:
+    Attempted to remove parameter name from parameter arg2 in androidx.compose.runtime.MonotonicFrameClockKt.withFrameMillis
+ParameterNameChange: androidx.compose.runtime.MonotonicFrameClockKt#withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R>, kotlin.coroutines.Continuation<? super R>) parameter #1:
+    Attempted to remove parameter name from parameter arg2 in androidx.compose.runtime.MonotonicFrameClockKt.withFrameNanos
+ParameterNameChange: androidx.compose.runtime.MutableState#setValue(T) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.runtime.MutableState.setValue
+ParameterNameChange: androidx.compose.runtime.PausableMonotonicFrameClock#withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R>, kotlin.coroutines.Continuation<? super R>) parameter #1:
+    Attempted to remove parameter name from parameter arg2 in androidx.compose.runtime.PausableMonotonicFrameClock.withFrameNanos
+ParameterNameChange: androidx.compose.runtime.ProduceStateScope#awaitDispose(kotlin.jvm.functions.Function0<kotlin.Unit>, kotlin.coroutines.Continuation<?>) parameter #1:
+    Attempted to remove parameter name from parameter arg2 in androidx.compose.runtime.ProduceStateScope.awaitDispose
+ParameterNameChange: androidx.compose.runtime.Recomposer#awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit>) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.runtime.Recomposer.awaitIdle
+ParameterNameChange: androidx.compose.runtime.Recomposer#join(kotlin.coroutines.Continuation<? super kotlin.Unit>) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.runtime.Recomposer.join
+ParameterNameChange: androidx.compose.runtime.Recomposer#runRecomposeAndApplyChanges(kotlin.coroutines.Continuation<? super kotlin.Unit>) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.runtime.Recomposer.runRecomposeAndApplyChanges
+ParameterNameChange: androidx.compose.runtime.RecomposerKt#withRunningRecomposer(kotlin.jvm.functions.Function3<? super kotlinx.coroutines.CoroutineScope,? super androidx.compose.runtime.Recomposer,? super kotlin.coroutines.Continuation<? super R>,?>, kotlin.coroutines.Continuation<? super R>) parameter #1:
+    Attempted to remove parameter name from parameter arg2 in androidx.compose.runtime.RecomposerKt.withRunningRecomposer
+
+
+RemovedMethod: androidx.compose.runtime.SkippableUpdater#SkippableUpdater():
+    Removed constructor androidx.compose.runtime.SkippableUpdater()
+RemovedMethod: androidx.compose.runtime.Updater#Updater():
+    Removed constructor androidx.compose.runtime.Updater()

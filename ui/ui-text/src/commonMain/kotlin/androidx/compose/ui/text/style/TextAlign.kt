@@ -19,8 +19,8 @@ package androidx.compose.ui.text.style
  * Defines how to align text horizontally. `TextAlign` controls how text aligns in the space it
  * appears.
  */
-@Suppress("INLINE_CLASS_DEPRECATED")
-inline class TextAlign internal constructor(internal val value: Int) {
+@kotlin.jvm.JvmInline
+value class TextAlign internal constructor(internal val value: Int) {
 
     override fun toString(): String {
         return when (this) {

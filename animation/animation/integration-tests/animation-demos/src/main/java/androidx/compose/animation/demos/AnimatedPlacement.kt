@@ -133,9 +133,6 @@ class AnimatedPlacementModifier(val scope: CoroutineScope) : OnPlacedModifier, L
                 anim.animateTo(targetOffset, spring(stiffness = Spring.StiffnessMediumLow))
             }
         }
-        // Offset the child in the opposite direction to the targetOffset, and slowly catch
-        // up to zero offset via an animation to achieve an overall animated movement.
-        animatable?.let { it.value - targetOffset } ?: IntOffset.Zero
     }
 }
 

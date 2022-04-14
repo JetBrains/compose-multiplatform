@@ -21,6 +21,7 @@ import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.Handle
 import androidx.compose.foundation.text.TEST_FONT_FAMILY
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -60,7 +61,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.width
 import androidx.test.espresso.matcher.BoundedMatcher
@@ -86,16 +86,6 @@ import kotlin.math.roundToInt
 class SelectionContainerTest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
-
-    private val composeViewAbsolutePos: IntOffset get() {
-        // Get the view position on screen
-        val positionArray = IntArray(2)
-        view.getLocationOnScreen(positionArray)
-        return IntOffset(
-            positionArray[0],
-            positionArray[1]
-        )
-    }
 
     private lateinit var view: View
 
@@ -166,7 +156,7 @@ class SelectionContainerTest {
             // Long Press "m" in "Demo", and "Demo" should be selected.
             createSelectionContainer()
             val characterSize = fontSize.toPx()
-            val expectedLeftX = fontSize.toDp().times(textContent.indexOf('D')) - 25.dp
+            val expectedLeftX = fontSize.toDp().times(textContent.indexOf('D'))
             val expectedLeftY = fontSize.toDp()
             val expectedRightX = fontSize.toDp().times(textContent.indexOf('o') + 1)
             val expectedRightY = fontSize.toDp()
@@ -188,20 +178,14 @@ class SelectionContainerTest {
                     times(1)
                 ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
             }
-            rule.doubleSelectionHandleMatches(
-                0,
-                matchesPosition(
-                    composeViewAbsolutePos.x.toDp() + expectedRightX,
-                    composeViewAbsolutePos.y.toDp() + expectedRightY
-                )
-            )
-            rule.doubleSelectionHandleMatches(
-                1,
-                matchesPosition(
-                    composeViewAbsolutePos.x.toDp() + expectedLeftX,
-                    composeViewAbsolutePos.y.toDp() + expectedLeftY
-                )
-            )
+
+            // Check the position of the anchors of the selection handles. We don't need to compare
+            // to the absolute position since the semantics report selection relative to the
+            // container composable, not the screen.
+            rule.onNode(isSelectionHandle(Handle.SelectionStart))
+                .assertHandlePositionMatches(expectedLeftX, expectedLeftY)
+            rule.onNode(isSelectionHandle(Handle.SelectionEnd))
+                .assertHandlePositionMatches(expectedRightX, expectedRightY)
         }
     }
 
@@ -212,8 +196,7 @@ class SelectionContainerTest {
             // Long Press "m" in "Demo", and "Demo" should be selected.
             createSelectionContainer(isRtl = true)
             val characterSize = fontSize.toPx()
-            val expectedLeftX =
-                rule.rootWidth() - fontSize.toDp().times(textContent.length) - 25.dp
+            val expectedLeftX = rule.rootWidth() - fontSize.toDp().times(textContent.length)
             val expectedLeftY = fontSize.toDp()
             val expectedRightX = rule.rootWidth() - fontSize.toDp().times(" Demo Text".length)
             val expectedRightY = fontSize.toDp()
@@ -239,20 +222,14 @@ class SelectionContainerTest {
                     times(1)
                 ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
             }
-            rule.doubleSelectionHandleMatches(
-                0,
-                matchesPosition(
-                    composeViewAbsolutePos.x.toDp() + expectedRightX,
-                    composeViewAbsolutePos.y.toDp() + expectedRightY
-                )
-            )
-            rule.doubleSelectionHandleMatches(
-                1,
-                matchesPosition(
-                    composeViewAbsolutePos.x.toDp() + expectedLeftX,
-                    composeViewAbsolutePos.y.toDp() + expectedLeftY
-                )
-            )
+
+            // Check the position of the anchors of the selection handles. We don't need to compare
+            // to the absolute position since the semantics report selection relative to the
+            // container composable, not the screen.
+            rule.onNode(isSelectionHandle(Handle.SelectionStart))
+                .assertHandlePositionMatches(expectedLeftX, expectedLeftY)
+            rule.onNode(isSelectionHandle(Handle.SelectionEnd))
+                .assertHandlePositionMatches(expectedRightX, expectedRightY)
         }
     }
 

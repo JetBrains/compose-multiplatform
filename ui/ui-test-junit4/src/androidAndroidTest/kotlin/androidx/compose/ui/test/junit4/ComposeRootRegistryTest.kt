@@ -29,6 +29,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
+import org.junit.runners.model.Statement
 
 @LargeTest
 class ComposeRootRegistryTest {
@@ -38,7 +39,15 @@ class ComposeRootRegistryTest {
 
     @get:Rule
     val testRule: RuleChain = RuleChain
-        .outerRule { base, _ -> composeRootRegistry.getStatementFor(base) }
+        .outerRule { base, _ ->
+            object : Statement() {
+                override fun evaluate() {
+                    composeRootRegistry.withRegistry {
+                        base.evaluate()
+                    }
+                }
+            }
+        }
         .around(activityRule)
 
     private val onRegistrationChangedListener =

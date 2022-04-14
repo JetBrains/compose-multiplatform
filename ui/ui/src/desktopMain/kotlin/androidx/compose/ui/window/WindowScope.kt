@@ -16,12 +16,14 @@
 
 package androidx.compose.ui.window
 
+import androidx.compose.runtime.Stable
 import java.awt.Window
 
 /**
  * Receiver scope which is used by [androidx.compose.ui.window.Window] and
  * [androidx.compose.ui.window.Dialog].
  */
+@Stable
 interface WindowScope {
     /**
      * [Window] that was created inside [androidx.compose.ui.window.Window]

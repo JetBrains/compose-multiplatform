@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.util.UpdateEffect
+import androidx.compose.ui.util.makeDisplayable
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -73,19 +74,17 @@ fun <T : Window> AwtWindow(
 
     DisposableEffect(Unit) {
         windowRef.value = create()
-        // We should init a native window even if it is not yet visible.
-        // `pack` method makes window displayable, creates a native window, init graphic
-        // context, performs the first composition and runs effects
-        if (!currentVisible) {
-            window().pack()
-        }
         onDispose {
             dispose(window())
         }
     }
 
     UpdateEffect {
-        update(window())
+        val window = window()
+        update(window)
+        if (!window.isDisplayable) {
+            window.makeDisplayable()
+        }
     }
 
     val showJob = Ref<Job?>()

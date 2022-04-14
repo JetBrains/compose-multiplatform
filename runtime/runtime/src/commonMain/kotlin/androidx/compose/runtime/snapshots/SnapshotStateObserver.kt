@@ -68,12 +68,6 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
     private var applyUnsubscribe: ObserverHandle? = null
 
     /**
-     * `true` when an [observeReads] is in progress and [readObserver] is active and `false` when
-     * [readObserver] is no longer observing changes.
-     */
-    private var isObserving = false
-
-    /**
      * `true` when [withNoObservations] is called and read observations should no
      * longer be considered invalidations for the `onCommit` callback.
      */
@@ -115,16 +109,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
             }
         }
 
-        if (!isObserving) {
-            isObserving = true
-            try {
-                Snapshot.observe(readObserver, null, block)
-            } finally {
-                isObserving = false
-            }
-        } else {
-            block()
-        }
+        Snapshot.observe(readObserver, null, block)
 
         currentMap = oldMap
         applyMap.currentScope = oldScope
@@ -135,6 +120,13 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
      * Stops observing state object reads while executing [block]. State object reads may be
      * restarted by calling [observeReads] inside [block].
      */
+    @Deprecated(
+        "Replace with Snapshot.withoutReadObservation()",
+        ReplaceWith(
+            "Snapshot.withoutReadObservation(block)",
+            "androidx.compose.runtime.snapshots.Snapshot"
+        )
+    )
     fun withNoObservations(block: () -> Unit) {
         val oldPaused = isPaused
         isPaused = true

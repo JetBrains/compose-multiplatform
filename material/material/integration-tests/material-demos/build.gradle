@@ -28,3 +28,7 @@ androidx {
     inceptionYear = "2019"
     description = "This is a project for Material demos."
 }
+
+android {
+    namespace "androidx.compose.material.demos"
+}

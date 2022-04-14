@@ -15,7 +15,6 @@
  */
 
 
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
 plugins {
@@ -40,7 +39,11 @@ dependencies {
 androidx {
     name = "AndroidX Compose UI Core Material Icons Samples"
     type = LibraryType.SAMPLES
-    mavenGroup = LibraryGroups.Compose.MATERIAL
+    mavenGroup = LibraryGroups.COMPOSE_MATERIAL
     inceptionYear = "2019"
     description = "Contains the sample code for the Androidx Compose UI Core Material Icons"
+}
+
+android {
+    namespace "androidx.compose.material.icons.samples"
 }

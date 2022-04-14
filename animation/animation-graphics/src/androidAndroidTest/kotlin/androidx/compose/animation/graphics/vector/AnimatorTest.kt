@@ -21,8 +21,9 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.graphics.vector.PathNode
 import androidx.compose.ui.graphics.vector.VectorProperty
+import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -90,7 +91,7 @@ class AnimatorTest {
 
     @Test
     fun simpleFloatProperty() {
-        verifyAnimator(
+        verifyAnimatorIsLinear(
             objectAnimator(
                 "translateX",
                 1000,
@@ -104,7 +105,7 @@ class AnimatorTest {
 
     @Test
     fun keyframes() {
-        verifyAnimator(
+        verifyAnimatorIsLinear(
             objectAnimator(
                 "translateX",
                 1000,
@@ -121,7 +122,7 @@ class AnimatorTest {
 
     @Test
     fun sequentialAnimatorSet() {
-        verifyAnimator(
+        verifyAnimatorIsLinear(
             sequentialAnimatorSet(
                 "translateX",
                 0f,
@@ -133,7 +134,7 @@ class AnimatorTest {
 
     @Test
     fun offsetAnimators() {
-        verifyAnimator(
+        verifyAnimatorIsLinear(
             AnimatorSet(
                 animators = listOf(
                     objectAnimator(
@@ -159,8 +160,8 @@ class AnimatorTest {
         )
     }
 
-    @OptIn(InternalAnimationApi::class, ExperimentalComposeUiApi::class)
-    private fun verifyAnimator(a: Animator) {
+    @OptIn(InternalAnimationApi::class)
+    private fun verifyAnimatorIsLinear(a: Animator) {
         val isAtEnd = mutableStateOf(false)
         val config = StateVectorConfig()
         rule.setContent {
@@ -193,5 +194,120 @@ class AnimatorTest {
         assertThat(config.getOrDefault(VectorProperty.TranslateX, -1f))
             .isWithin(tolerance)
             .of(0f)
+    }
+
+    @OptIn(InternalAnimationApi::class)
+    @Test
+    fun pathData() {
+        val a = ObjectAnimator(
+            duration = 1000,
+            startDelay = 0,
+            repeatCount = 0,
+            repeatMode = RepeatMode.Restart,
+            listOf(
+                PropertyValuesHolderPath(
+                    propertyName = "pathData",
+                    listOf(
+                        Keyframe(
+                            fraction = 0f,
+                            value = addPathNodes("M 0 0 L 1000 0 L 1000 1000 L 0 1000 Z"),
+                            interpolator = LinearEasing
+                        ),
+                        Keyframe(
+                            fraction = 1f,
+                            value = addPathNodes("M 1000 0 L 1000 0 L 1000 1000 L 0 1000 Z"),
+                            interpolator = LinearEasing
+                        )
+                    )
+                )
+            )
+        )
+        val isAtEnd = mutableStateOf(false)
+        val config = StateVectorConfig()
+        rule.setContent {
+            val transition = updateTransition(isAtEnd.value, label = "pathData")
+            a.Configure(transition, config, 1000)
+            if (transition.isRunning) {
+                val timeMillis = transition.playTimeNanos / 1000f / 1000f
+                val pathData = config.getOrDefault(VectorProperty.PathData, emptyList())
+                assertThat((pathData[0] as PathNode.MoveTo).x)
+                    .isWithin(tolerance)
+                    .of(if (transition.targetState) timeMillis else 1000f - timeMillis)
+            }
+        }
+        assertThat(config.getOrDefault(VectorProperty.PathData, emptyList()))
+            .isEqualTo(addPathNodes("M 0 0 L 1000 0 L 1000 1000 L 0 1000 Z"))
+        // Start to end
+        rule.runOnIdle { isAtEnd.value = true }
+        rule.waitForIdle()
+        assertThat(config.getOrDefault(VectorProperty.PathData, emptyList()))
+            .isEqualTo(addPathNodes("M 1000 0 L 1000 0 L 1000 1000 L 0 1000 Z"))
+        // End to start
+        rule.runOnIdle { isAtEnd.value = false }
+        rule.waitForIdle()
+        assertThat(config.getOrDefault(VectorProperty.PathData, emptyList()))
+            .isEqualTo(addPathNodes("M 0 0 L 1000 0 L 1000 1000 L 0 1000 Z"))
+    }
+
+    @OptIn(InternalAnimationApi::class)
+    @Test
+    fun pathData_repeat() {
+        val a = ObjectAnimator(
+            duration = 1000,
+            startDelay = 0,
+            repeatCount = 2,
+            repeatMode = RepeatMode.Restart,
+            listOf(
+                PropertyValuesHolderPath(
+                    propertyName = "pathData",
+                    listOf(
+                        Keyframe(
+                            fraction = 0f,
+                            value = addPathNodes("M 0 0 L 1000 0 L 1000 1000 L 0 1000 Z"),
+                            interpolator = LinearEasing
+                        ),
+                        Keyframe(
+                            fraction = 1f,
+                            value = addPathNodes("M 1000 0 L 1000 0 L 1000 1000 L 0 1000 Z"),
+                            interpolator = LinearEasing
+                        )
+                    )
+                )
+            )
+        )
+        assertThat(a.totalDuration).isEqualTo(3000)
+        val isAtEnd = mutableStateOf(false)
+        val config = StateVectorConfig()
+        var hasRun = false
+        rule.setContent {
+            val transition = updateTransition(isAtEnd.value, label = "pathData")
+            a.Configure(transition, config, 3000)
+            if (transition.isRunning) {
+                val timeMillis = transition.playTimeNanos / 1000f / 1000f
+                if (timeMillis > 1000f) {
+                    hasRun = true
+                }
+                val value = timeMillis % 1000f
+                val pathData = config.getOrDefault(VectorProperty.PathData, emptyList())
+                if (value != 0f && value != 1000f) {
+                    assertThat((pathData[0] as PathNode.MoveTo).x)
+                        .isWithin(tolerance)
+                        .of(if (transition.targetState) value else 1000f - value)
+                }
+            }
+        }
+        assertThat(config.getOrDefault(VectorProperty.PathData, emptyList()))
+            .isEqualTo(addPathNodes("M 0 0 L 1000 0 L 1000 1000 L 0 1000 Z"))
+        // Start to end
+        rule.runOnIdle { isAtEnd.value = true }
+        rule.waitForIdle()
+        assertThat(config.getOrDefault(VectorProperty.PathData, emptyList()))
+            .isEqualTo(addPathNodes("M 1000 0 L 1000 0 L 1000 1000 L 0 1000 Z"))
+        assertThat(hasRun).isTrue()
+        // End to start
+        rule.runOnIdle { isAtEnd.value = false }
+        rule.waitForIdle()
+        assertThat(config.getOrDefault(VectorProperty.PathData, emptyList()))
+            .isEqualTo(addPathNodes("M 0 0 L 1000 0 L 1000 1000 L 0 1000 Z"))
     }
 }

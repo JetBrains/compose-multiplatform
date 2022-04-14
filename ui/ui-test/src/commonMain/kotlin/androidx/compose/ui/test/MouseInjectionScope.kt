@@ -65,25 +65,11 @@ private const val DefaultMouseGestureDurationMillis: Long = 300L
  * All events sent by these methods are batched together and sent as a whole after
  * [performMouseInput] has executed its code block.
  *
- * Example usage:
- * ```
- * onNodeWithTag("myWidget")
- *    .performMouseInput {
- *        click(center)
- *    }
+ * Example of performing a mouse click:
+ * @sample androidx.compose.ui.test.samples.mouseInputClick
  *
- * onNodeWithTag("myWidget")
- *    // Scroll down while the primary mouse button is down:
- *    .performMouseInput {
- *        down()
- *        repeat(6) {
- *            advanceEventTime()
- *            scroll(-1f)
- *        }
- *        advanceEventTime()
- *        up()
- *    }
- * ```
+ * Example of scrolling the mouse wheel while the mouse button is pressed:
+ * @sample androidx.compose.ui.test.samples.mouseInputScrollWhileDown
  *
  * @see InjectionScope
  */

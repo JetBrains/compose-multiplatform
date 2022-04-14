@@ -22,6 +22,7 @@ import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.RenderVectorGroup
+import androidx.compose.ui.graphics.vector.VectorComposable
 import androidx.compose.ui.graphics.vector.VectorConfig
 import androidx.compose.ui.graphics.vector.VectorGroup
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -51,7 +52,7 @@ fun rememberAnimatedVectorPainter(
 private fun rememberAnimatedVectorPainter(
     animatedImageVector: AnimatedImageVector,
     atEnd: Boolean,
-    render: @Composable (VectorGroup, Map<String, VectorConfig>) -> Unit
+    render: @Composable @VectorComposable (VectorGroup, Map<String, VectorConfig>) -> Unit
 ): Painter {
     return rememberVectorPainter(
         defaultWidth = animatedImageVector.imageVector.defaultWidth,
@@ -61,6 +62,7 @@ private fun rememberAnimatedVectorPainter(
         name = animatedImageVector.imageVector.name,
         tintColor = animatedImageVector.imageVector.tintColor,
         tintBlendMode = animatedImageVector.imageVector.tintBlendMode,
+        autoMirror = true
     ) { _, _ ->
         val transition = updateTransition(atEnd, label = animatedImageVector.imageVector.name)
         render(

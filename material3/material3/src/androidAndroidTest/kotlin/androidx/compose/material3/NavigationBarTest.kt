@@ -59,7 +59,7 @@ import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.compose.material3.tokens.NavigationBar as NavigationBarTokens
+import androidx.compose.material3.tokens.NavigationBarTokens
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)

@@ -15,7 +15,6 @@
  */
 
 
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
 plugins {
@@ -42,7 +41,11 @@ dependencies {
 androidx {
     name = "AndroidX Compose UI Animation Library Core Classes Samples"
     type = LibraryType.SAMPLES
-    mavenGroup = LibraryGroups.Compose.ANIMATION
+    mavenGroup = LibraryGroups.COMPOSE_ANIMATION
     inceptionYear = "2019"
     description = "Contains the sample code for the Androidx Compose UI Animation Core Classes"
+}
+
+android {
+    namespace "androidx.compose.animation.core.samples"
 }

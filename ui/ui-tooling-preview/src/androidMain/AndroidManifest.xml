@@ -15,7 +15,6 @@
   limitations under the License.
   -->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="androidx.compose.ui.tooling.preview">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
 </manifest>

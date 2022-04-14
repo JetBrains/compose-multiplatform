@@ -17,8 +17,19 @@
 package androidx.compose.ui.input.key
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusModifier
+import androidx.compose.ui.focus.ModifierLocalParentFocusModifier
 import androidx.compose.ui.focus.findActiveFocusNode
-import androidx.compose.ui.node.ModifiedKeyInputNode
+import androidx.compose.ui.focus.findLastKeyInputModifier
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.OnPlacedModifier
+import androidx.compose.ui.modifier.ModifierLocalConsumer
+import androidx.compose.ui.modifier.ModifierLocalProvider
+import androidx.compose.ui.modifier.ModifierLocalReadScope
+import androidx.compose.ui.modifier.ProvidableModifierLocal
+import androidx.compose.ui.modifier.modifierLocalOf
+import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.node.LayoutNodeWrapper
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.platform.inspectable
 
@@ -62,20 +73,62 @@ fun Modifier.onPreviewKeyEvent(onPreviewKeyEvent: (KeyEvent) -> Boolean): Modifi
     KeyInputModifier(onKeyEvent = null, onPreviewKeyEvent = onPreviewKeyEvent)
 }
 
+/**
+ * Used to build a tree of [KeyInputModifier]s. This contains the [KeyInputModifier] that is
+ * higher in the layout tree.
+ */
+internal val ModifierLocalKeyInput = modifierLocalOf<KeyInputModifier?> { null }
+
 internal class KeyInputModifier(
     val onKeyEvent: ((KeyEvent) -> Boolean)?,
     val onPreviewKeyEvent: ((KeyEvent) -> Boolean)?
-) : Modifier.Element {
-    lateinit var keyInputNode: ModifiedKeyInputNode
+) : ModifierLocalConsumer, ModifierLocalProvider<KeyInputModifier?>, OnPlacedModifier {
+    private var focusModifier: FocusModifier? = null
+    var parent: KeyInputModifier? = null
+        private set
+    var layoutNode: LayoutNode? = null
+        private set
+
+    override val key: ProvidableModifierLocal<KeyInputModifier?>
+        get() = ModifierLocalKeyInput
+    override val value: KeyInputModifier
+        get() = this
 
     fun processKeyInput(keyEvent: KeyEvent): Boolean {
-        val activeKeyInputNode = keyInputNode.findPreviousFocusWrapper()
+        val activeKeyInputModifier = focusModifier
             ?.findActiveFocusNode()
-            ?.findLastKeyInputWrapper()
+            ?.findLastKeyInputModifier()
             ?: error("KeyEvent can't be processed because this key input node is not active.")
-        return with(activeKeyInputNode) {
-            val consumed = propagatePreviewKeyEvent(keyEvent)
-            if (consumed) true else propagateKeyEvent(keyEvent)
-        }
+        val consumed = activeKeyInputModifier.propagatePreviewKeyEvent(keyEvent)
+        return if (consumed) true else activeKeyInputModifier.propagateKeyEvent(keyEvent)
+    }
+
+    override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) = with(scope) {
+        focusModifier?.keyInputChildren?.remove(this@KeyInputModifier)
+        focusModifier = ModifierLocalParentFocusModifier.current
+        focusModifier?.keyInputChildren?.add(this@KeyInputModifier)
+        parent = ModifierLocalKeyInput.current
+    }
+
+    fun propagatePreviewKeyEvent(keyEvent: KeyEvent): Boolean {
+        // We first propagate the preview key event to the parent.
+        val consumed = parent?.propagatePreviewKeyEvent(keyEvent)
+        if (consumed == true) return consumed
+
+        // If none of the parents consumed the event, we attempt to consume it.
+        return onPreviewKeyEvent?.invoke(keyEvent) ?: false
+    }
+
+    fun propagateKeyEvent(keyEvent: KeyEvent): Boolean {
+        // We attempt to consume the key event first.
+        val consumed = onKeyEvent?.invoke(keyEvent)
+        if (consumed == true) return consumed
+
+        // If the event is not consumed, we propagate it to the parent.
+        return parent?.propagateKeyEvent(keyEvent) ?: false
+    }
+
+    override fun onPlaced(coordinates: LayoutCoordinates) {
+        layoutNode = (coordinates as LayoutNodeWrapper).layoutNode
     }
 }

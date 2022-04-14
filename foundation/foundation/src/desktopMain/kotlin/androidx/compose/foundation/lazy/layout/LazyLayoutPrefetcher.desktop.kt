@@ -16,13 +16,14 @@
 
 package androidx.compose.foundation.lazy.layout
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.layout.SubcomposeLayoutState
 
+@ExperimentalFoundationApi
 @Composable
 internal actual fun LazyLayoutPrefetcher(
-    prefetchPolicy: LazyLayoutPrefetchPolicy,
-    state: LazyLayoutState,
+    prefetchState: LazyLayoutPrefetchState,
     itemContentFactory: LazyLayoutItemContentFactory,
     subcomposeLayoutState: SubcomposeLayoutState
 ) {

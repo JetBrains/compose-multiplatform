@@ -265,17 +265,17 @@ private fun Modifier.scroll(
         val overScrollController = rememberOverScrollController()
         val coroutineScope = rememberCoroutineScope()
         val semantics = Modifier.semantics {
+            val accessibilityScrollState = ScrollAxisRange(
+                value = { state.value.toFloat() },
+                maxValue = { state.maxValue.toFloat() },
+                reverseScrolling = reverseScrolling
+            )
+            if (isVertical) {
+                this.verticalScrollAxisRange = accessibilityScrollState
+            } else {
+                this.horizontalScrollAxisRange = accessibilityScrollState
+            }
             if (isScrollable) {
-                val accessibilityScrollState = ScrollAxisRange(
-                    value = { state.value.toFloat() },
-                    maxValue = { state.maxValue.toFloat() },
-                    reverseScrolling = reverseScrolling
-                )
-                if (isVertical) {
-                    this.verticalScrollAxisRange = accessibilityScrollState
-                } else {
-                    this.horizontalScrollAxisRange = accessibilityScrollState
-                }
                 // when b/156389287 is fixed, this should be proper scrollTo with reverse handling
                 scrollBy(
                     action = { x: Float, y: Float ->

@@ -1,5 +1,11 @@
 // Baseline format: 1.0
-InvalidNullConversion: androidx.compose.material.ButtonDefaults#elevation(float, float, float):
-    Attempted to remove @NonNull annotation from method androidx.compose.material.ButtonDefaults.elevation(float,float,float)
-InvalidNullConversion: androidx.compose.material.FloatingActionButtonDefaults#elevation(float, float):
-    Attempted to remove @NonNull annotation from method androidx.compose.material.FloatingActionButtonDefaults.elevation(float,float)
+ParameterNameChange: androidx.compose.material.DrawerState#close(kotlin.coroutines.Continuation<? super kotlin.Unit>) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.material.DrawerState.close
+ParameterNameChange: androidx.compose.material.DrawerState#open(kotlin.coroutines.Continuation<? super kotlin.Unit>) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.material.DrawerState.open
+ParameterNameChange: androidx.compose.material.SnackbarHostState#showSnackbar(String, String, androidx.compose.material.SnackbarDuration, kotlin.coroutines.Continuation<? super androidx.compose.material.SnackbarResult>) parameter #3:
+    Attempted to remove parameter name from parameter arg4 in androidx.compose.material.SnackbarHostState.showSnackbar
+
+
+RemovedMethod: androidx.compose.material.FabPosition#FabPosition():
+    Removed constructor androidx.compose.material.FabPosition()

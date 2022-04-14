@@ -52,8 +52,8 @@ fun InterceptEnterToSendMessageDemo() {
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
     var textFieldValue by remember { mutableStateOf(TextFieldValue("")) }
-    Scaffold(scaffoldState = scaffoldState) {
-        Column {
+    Scaffold(scaffoldState = scaffoldState) { innerPadding ->
+        Column(Modifier.padding(innerPadding)) {
             Text(
                 text = "Use a physical keyboard with this demo. As you enter text into this " +
                     "textfield, notice how the enter key is intercepted to show a snackbar." +

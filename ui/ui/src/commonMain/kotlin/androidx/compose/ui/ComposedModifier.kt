@@ -18,7 +18,13 @@ package androidx.compose.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composer
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.focus.FocusEventModifier
+import androidx.compose.ui.focus.FocusEventModifierLocal
+import androidx.compose.ui.focus.FocusRequesterModifier
+import androidx.compose.ui.focus.FocusRequesterModifierLocal
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.NoInspectorInfo
@@ -245,7 +251,16 @@ private class KeyedComposedModifierN(
  */
 @Suppress("ModifierFactoryExtensionFunction")
 fun Composer.materialize(modifier: Modifier): Modifier {
-    if (modifier.all { it !is ComposedModifier }) return modifier
+    if (modifier.all {
+            // onFocusEvent is implemented now with ModifierLocals and SideEffects, but
+            // FocusEventModifier needs to have composition to do the same. The following
+            // check for FocusEventModifier is only needed until the modifier is removed.
+            // The same is true for FocusRequesterModifier and focusTarget()
+            it !is ComposedModifier && it !is FocusEventModifier && it !is FocusRequesterModifier
+        }
+    ) {
+        return modifier
+    }
 
     // This is a fake composable function that invokes the compose runtime directly so that it
     // can call the element factory functions from the non-@Composable lambda of Modifier.foldIn.
@@ -262,10 +277,47 @@ fun Composer.materialize(modifier: Modifier): Modifier {
                 val factory = element.factory as Modifier.(Composer, Int) -> Modifier
                 val composedMod = factory(Modifier, this, 0)
                 materialize(composedMod)
-            } else element
+            } else {
+                // onFocusEvent is implemented now with ModifierLocals and SideEffects, but
+                // FocusEventModifier needs to have composition to do the same. The following
+                // check for FocusEventModifier is only needed until the modifier is removed.
+                var newElement: Modifier = element
+                if (element is FocusEventModifier) {
+                    @Suppress("UNCHECKED_CAST")
+                    val factory = WrapFocusEventModifier
+                        as (FocusEventModifier, Composer, Int) -> Modifier
+
+                    newElement = newElement.then(factory(element, this, 0))
+                }
+                // The same is true for FocusRequesterModifier and focusTarget()
+                if (element is FocusRequesterModifier) {
+                    @Suppress("UNCHECKED_CAST")
+                    val factory = WrapFocusRequesterModifier
+                        as (FocusRequesterModifier, Composer, Int) -> Modifier
+
+                    newElement = newElement.then(factory(element, this, 0))
+                }
+                newElement
+            }
         )
     }
 
     endReplaceableGroup()
     return result
+}
+
+private val WrapFocusEventModifier: @Composable (FocusEventModifier) -> Modifier = { mod ->
+    val modifier = remember(mod) {
+        FocusEventModifierLocal(mod::onFocusEvent)
+    }
+    SideEffect {
+        modifier.notifyIfNoFocusModifiers()
+    }
+    modifier
+}
+
+private val WrapFocusRequesterModifier: @Composable (FocusRequesterModifier) -> Modifier = { mod ->
+    remember(mod) {
+        FocusRequesterModifierLocal(mod.focusRequester)
+    }
 }

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
 plugins {
@@ -43,7 +42,11 @@ dependencies {
 androidx {
     name = "AndroidX Compose UI Foundational Component Samples"
     type = LibraryType.SAMPLES
-    mavenGroup = LibraryGroups.Compose.FOUNDATION
+    mavenGroup = LibraryGroups.COMPOSE_FOUNDATION
     inceptionYear = "2019"
     description = "Contains the sample code for the Androidx Compose UI Foundational Components"
+}
+
+android {
+    namespace "androidx.compose.foundation.samples"
 }

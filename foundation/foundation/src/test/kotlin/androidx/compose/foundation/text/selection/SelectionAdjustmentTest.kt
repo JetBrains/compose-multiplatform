@@ -1424,7 +1424,7 @@ class SelectionAdjustmentTest {
                 overflow = TextOverflow.Clip,
                 density = Density(1f, 1f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = mock(),
+                fontFamilyResolver = mock(),
                 constraints = mock()
             ),
             multiParagraph = multiParagraph,

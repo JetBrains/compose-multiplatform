@@ -1,3 +1,5 @@
 // Baseline format: 1.0
-ChangedSuperclass: androidx.compose.ui.test.junit4.android.ComposeNotIdleException:
-    Class androidx.compose.ui.test.junit4.android.ComposeNotIdleException superclass changed from java.lang.Throwable to java.lang.Exception
+ParameterNameChange: androidx.compose.ui.test.junit4.AndroidComposeTestRule#awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit>) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.test.junit4.AndroidComposeTestRule.awaitIdle
+ParameterNameChange: androidx.compose.ui.test.junit4.ComposeTestRule#awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit>) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.test.junit4.ComposeTestRule.awaitIdle

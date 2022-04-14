@@ -1,3 +1,97 @@
 // Baseline format: 1.0
-RemovedMethod: androidx.compose.ui.graphics.drawscope.DrawScope#offsetSize(long, long):
-    Removed method androidx.compose.ui.graphics.drawscope.DrawScope.offsetSize(long,long)
+ParameterNameChange: androidx.compose.ui.graphics.AndroidPaint#setAlpha(float) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.AndroidPaint.setAlpha
+ParameterNameChange: androidx.compose.ui.graphics.AndroidPaint#setAntiAlias(boolean) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.AndroidPaint.setAntiAlias
+ParameterNameChange: androidx.compose.ui.graphics.AndroidPaint#setBlendMode(int) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.AndroidPaint.setBlendMode
+ParameterNameChange: androidx.compose.ui.graphics.AndroidPaint#setColor(long) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.AndroidPaint.setColor
+ParameterNameChange: androidx.compose.ui.graphics.AndroidPaint#setColorFilter(androidx.compose.ui.graphics.ColorFilter) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.AndroidPaint.setColorFilter
+ParameterNameChange: androidx.compose.ui.graphics.AndroidPaint#setFilterQuality(int) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.AndroidPaint.setFilterQuality
+ParameterNameChange: androidx.compose.ui.graphics.AndroidPaint#setPathEffect(androidx.compose.ui.graphics.PathEffect) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.AndroidPaint.setPathEffect
+ParameterNameChange: androidx.compose.ui.graphics.AndroidPaint#setShader(android.graphics.Shader) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.AndroidPaint.setShader
+ParameterNameChange: androidx.compose.ui.graphics.AndroidPaint#setStrokeCap(int) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.AndroidPaint.setStrokeCap
+ParameterNameChange: androidx.compose.ui.graphics.AndroidPaint#setStrokeJoin(int) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.AndroidPaint.setStrokeJoin
+ParameterNameChange: androidx.compose.ui.graphics.AndroidPaint#setStrokeMiterLimit(float) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.AndroidPaint.setStrokeMiterLimit
+ParameterNameChange: androidx.compose.ui.graphics.AndroidPaint#setStrokeWidth(float) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.AndroidPaint.setStrokeWidth
+ParameterNameChange: androidx.compose.ui.graphics.AndroidPaint#setStyle(int) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.AndroidPaint.setStyle
+ParameterNameChange: androidx.compose.ui.graphics.AndroidPath#setFillType(int) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.AndroidPath.setFillType
+ParameterNameChange: androidx.compose.ui.graphics.Paint#setAlpha(float) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.Paint.setAlpha
+ParameterNameChange: androidx.compose.ui.graphics.Paint#setAntiAlias(boolean) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.Paint.setAntiAlias
+ParameterNameChange: androidx.compose.ui.graphics.Paint#setBlendMode(int) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.Paint.setBlendMode
+ParameterNameChange: androidx.compose.ui.graphics.Paint#setColor(long) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.Paint.setColor
+ParameterNameChange: androidx.compose.ui.graphics.Paint#setColorFilter(androidx.compose.ui.graphics.ColorFilter) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.Paint.setColorFilter
+ParameterNameChange: androidx.compose.ui.graphics.Paint#setFilterQuality(int) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.Paint.setFilterQuality
+ParameterNameChange: androidx.compose.ui.graphics.Paint#setPathEffect(androidx.compose.ui.graphics.PathEffect) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.Paint.setPathEffect
+ParameterNameChange: androidx.compose.ui.graphics.Paint#setShader(android.graphics.Shader) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.Paint.setShader
+ParameterNameChange: androidx.compose.ui.graphics.Paint#setStrokeCap(int) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.Paint.setStrokeCap
+ParameterNameChange: androidx.compose.ui.graphics.Paint#setStrokeJoin(int) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.Paint.setStrokeJoin
+ParameterNameChange: androidx.compose.ui.graphics.Paint#setStrokeMiterLimit(float) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.Paint.setStrokeMiterLimit
+ParameterNameChange: androidx.compose.ui.graphics.Paint#setStrokeWidth(float) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.Paint.setStrokeWidth
+ParameterNameChange: androidx.compose.ui.graphics.Paint#setStyle(int) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.Paint.setStyle
+ParameterNameChange: androidx.compose.ui.graphics.Path#setFillType(int) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.Path.setFillType
+ParameterNameChange: androidx.compose.ui.graphics.drawscope.DrawContext#setSize(long) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.graphics.drawscope.DrawContext.setSize
+
+
+RemovedMethod: androidx.compose.ui.graphics.BlendMode#BlendMode():
+    Removed constructor androidx.compose.ui.graphics.BlendMode()
+RemovedMethod: androidx.compose.ui.graphics.ClipOp#ClipOp():
+    Removed constructor androidx.compose.ui.graphics.ClipOp()
+RemovedMethod: androidx.compose.ui.graphics.Color#Color():
+    Removed constructor androidx.compose.ui.graphics.Color()
+RemovedMethod: androidx.compose.ui.graphics.ColorMatrix#ColorMatrix():
+    Removed constructor androidx.compose.ui.graphics.ColorMatrix()
+RemovedMethod: androidx.compose.ui.graphics.FilterQuality#FilterQuality():
+    Removed constructor androidx.compose.ui.graphics.FilterQuality()
+RemovedMethod: androidx.compose.ui.graphics.ImageBitmapConfig#ImageBitmapConfig():
+    Removed constructor androidx.compose.ui.graphics.ImageBitmapConfig()
+RemovedMethod: androidx.compose.ui.graphics.Matrix#Matrix():
+    Removed constructor androidx.compose.ui.graphics.Matrix()
+RemovedMethod: androidx.compose.ui.graphics.PaintingStyle#PaintingStyle():
+    Removed constructor androidx.compose.ui.graphics.PaintingStyle()
+RemovedMethod: androidx.compose.ui.graphics.PathFillType#PathFillType():
+    Removed constructor androidx.compose.ui.graphics.PathFillType()
+RemovedMethod: androidx.compose.ui.graphics.PathOperation#PathOperation():
+    Removed constructor androidx.compose.ui.graphics.PathOperation()
+RemovedMethod: androidx.compose.ui.graphics.PointMode#PointMode():
+    Removed constructor androidx.compose.ui.graphics.PointMode()
+RemovedMethod: androidx.compose.ui.graphics.StampedPathEffectStyle#StampedPathEffectStyle():
+    Removed constructor androidx.compose.ui.graphics.StampedPathEffectStyle()
+RemovedMethod: androidx.compose.ui.graphics.StrokeCap#StrokeCap():
+    Removed constructor androidx.compose.ui.graphics.StrokeCap()
+RemovedMethod: androidx.compose.ui.graphics.StrokeJoin#StrokeJoin():
+    Removed constructor androidx.compose.ui.graphics.StrokeJoin()
+RemovedMethod: androidx.compose.ui.graphics.TileMode#TileMode():
+    Removed constructor androidx.compose.ui.graphics.TileMode()
+RemovedMethod: androidx.compose.ui.graphics.VertexMode#VertexMode():
+    Removed constructor androidx.compose.ui.graphics.VertexMode()
+RemovedMethod: androidx.compose.ui.graphics.colorspace.ColorModel#ColorModel():
+    Removed constructor androidx.compose.ui.graphics.colorspace.ColorModel()
+RemovedMethod: androidx.compose.ui.graphics.colorspace.RenderIntent#RenderIntent():
+    Removed constructor androidx.compose.ui.graphics.colorspace.RenderIntent()

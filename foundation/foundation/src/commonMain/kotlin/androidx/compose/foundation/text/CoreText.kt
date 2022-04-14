@@ -55,7 +55,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -108,6 +108,14 @@ internal class TextController(val state: TextState) : RememberObserver {
                      * it will be zeroed out.
                      */
                     var dragTotalDistance = Offset.Zero
+
+                    override fun onDown(point: Offset) {
+                        // Not supported for long-press-drag.
+                    }
+
+                    override fun onUp() {
+                        // Nothing to do.
+                    }
 
                     override fun onStart(startPoint: Offset) {
                         state.layoutCoordinates?.let {
@@ -275,6 +283,21 @@ internal class TextController(val state: TextState) : RememberObserver {
         }
     }
 
+    /**
+     * Sets the [TextDelegate] in the [state]. If the text of the new delegate is different from
+     * the text of the current delegate, the [semanticsModifier] will be recreated. Note that
+     * changing the semantics modifier does not invalidate the composition, so callers of
+     * [setTextDelegate] are required to call [modifiers] again if they wish to use the updated
+     * semantics modifier.
+     */
+    fun setTextDelegate(textDelegate: TextDelegate) {
+        if (state.textDelegate === textDelegate) {
+            return
+        }
+        state.textDelegate = textDelegate
+        semanticsModifier = createSemanticsModifierFor(state.textDelegate.text)
+    }
+
     val measurePolicy = object : MeasurePolicy {
         override fun MeasureScope.measure(
             measurables: List<Measurable>,
@@ -337,8 +360,8 @@ internal class TextController(val state: TextState) : RememberObserver {
                     LastBaseline to layoutResult.lastBaseline.roundToInt()
                 )
             ) {
-                placeables.fastForEach { placeable ->
-                    placeable.first.placeRelative(placeable.second)
+                placeables.fastForEach { (placeable, position) ->
+                    placeable.place(position)
                 }
             }
         }
@@ -434,21 +457,33 @@ internal class TextController(val state: TextState) : RememberObserver {
             }
             state.previousGlobalPosition = newGlobalPosition
         }
-    }.semantics {
-        text = state.textDelegate.text
-        getTextLayoutResult {
-            if (state.layoutResult != null) {
-                it.add(state.layoutResult!!)
-                true
-            } else {
-                false
+    }
+
+    /*@VisibleForTesting*/
+    internal var semanticsModifier = createSemanticsModifierFor(state.textDelegate.text)
+        private set
+
+    @Suppress("ModifierFactoryExtensionFunction") // not intended for chaining
+    private fun createSemanticsModifierFor(text: AnnotatedString): Modifier {
+        return Modifier.semantics {
+            this.text = text
+            getTextLayoutResult {
+                if (state.layoutResult != null) {
+                    it.add(state.layoutResult!!)
+                    true
+                } else {
+                    false
+                }
             }
         }
     }
 
     private var selectionModifiers: Modifier = Modifier
 
-    val modifiers: Modifier get() = coreModifiers.then(selectionModifiers)
+    val modifiers: Modifier
+        get() = coreModifiers
+            .then(semanticsModifier)
+            .then(selectionModifiers)
 
     override fun onRemembered() {
         selectionRegistrar?.let { selectionRegistrar ->
@@ -475,6 +510,7 @@ internal class TextController(val state: TextState) : RememberObserver {
 @OptIn(InternalFoundationTextApi::class)
 /*@VisibleForTesting*/
 internal class TextState(
+    /** Should *NEVER* be set directly, only through [TextController.setTextDelegate] */
     var textDelegate: TextDelegate,
     /** The selectable Id assigned to the [selectable] */
     val selectableId: Long
@@ -487,7 +523,7 @@ internal class TextState(
     /** The last layout coordinates for the Text's layout, used by selection */
     var layoutCoordinates: LayoutCoordinates? = null
 
-    /** The latest TextLayoutResult calculated in the measure block */
+    /** The latest TextLayoutResult calculated in the measure block.*/
     var layoutResult: TextLayoutResult? = null
 
     /** The global position calculated during the last notifyPosition callback */
@@ -507,7 +543,7 @@ internal fun updateTextDelegate(
     text: AnnotatedString,
     style: TextStyle,
     density: Density,
-    resourceLoader: Font.ResourceLoader,
+    fontFamilyResolver: FontFamily.Resolver,
     softWrap: Boolean = true,
     overflow: TextOverflow = TextOverflow.Clip,
     maxLines: Int = Int.MAX_VALUE,
@@ -521,7 +557,8 @@ internal fun updateTextDelegate(
         current.overflow != overflow ||
         current.maxLines != maxLines ||
         current.density != density ||
-        current.placeholders != placeholders
+        current.placeholders != placeholders ||
+        current.fontFamilyResolver !== fontFamilyResolver
     ) {
         TextDelegate(
             text = text,
@@ -530,7 +567,7 @@ internal fun updateTextDelegate(
             overflow = overflow,
             maxLines = maxLines,
             density = density,
-            resourceLoader = resourceLoader,
+            fontFamilyResolver = fontFamilyResolver,
             placeholders = placeholders,
         )
     } else {
@@ -544,7 +581,7 @@ internal fun updateTextDelegate(
     text: String,
     style: TextStyle,
     density: Density,
-    resourceLoader: Font.ResourceLoader,
+    fontFamilyResolver: FontFamily.Resolver,
     softWrap: Boolean = true,
     overflow: TextOverflow = TextOverflow.Clip,
     maxLines: Int = Int.MAX_VALUE,
@@ -556,7 +593,8 @@ internal fun updateTextDelegate(
         current.softWrap != softWrap ||
         current.overflow != overflow ||
         current.maxLines != maxLines ||
-        current.density != density
+        current.density != density ||
+        current.fontFamilyResolver !== fontFamilyResolver
     ) {
         TextDelegate(
             text = AnnotatedString(text),
@@ -565,7 +603,7 @@ internal fun updateTextDelegate(
             overflow = overflow,
             maxLines = maxLines,
             density = density,
-            resourceLoader = resourceLoader,
+            fontFamilyResolver = fontFamilyResolver,
         )
     } else {
         current

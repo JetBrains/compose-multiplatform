@@ -20,6 +20,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.createFontFamilyResolver
+import androidx.compose.ui.text.font.toFontFamily
+import androidx.compose.ui.text.platform.SynchronizedObject
+import androidx.compose.ui.text.platform.createSynchronizedObject
+import androidx.compose.ui.text.platform.synchronized
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
@@ -30,7 +36,7 @@ import androidx.compose.ui.unit.LayoutDirection
 /**
  * The data class which holds the set of parameters of the text layout computation.
  */
-class TextLayoutInput(
+class TextLayoutInput private constructor(
     /**
      * The text used for computing text layout.
      */
@@ -79,8 +85,18 @@ class TextLayoutInput(
 
     /**
      * The font resource loader used for computing this text layout.
+     *
+     * This is no longer used.
+     *
+     * @see fontFamilyResolver
      */
-    val resourceLoader: Font.ResourceLoader,
+
+    @Suppress("DEPRECATION") resourceLoader: Font.ResourceLoader?,
+
+    /**
+     * The font resolver used for computing this text layout.
+     */
+    val fontFamilyResolver: FontFamily.Resolver,
 
     /**
      * The minimum width provided while calculating this text layout.
@@ -88,6 +104,84 @@ class TextLayoutInput(
     val constraints: Constraints
 ) {
 
+    private var _developerSuppliedResourceLoader = resourceLoader
+    @Deprecated("Replaced with FontFamily.Resolver",
+        replaceWith = ReplaceWith("fontFamilyResolver"),
+    )
+    @Suppress("DEPRECATION")
+    val resourceLoader: Font.ResourceLoader
+        get() {
+            return _developerSuppliedResourceLoader
+                ?: DeprecatedBridgeFontResourceLoader.from(fontFamilyResolver)
+        }
+
+    @Deprecated(
+        "Font.ResourceLoader is replaced with FontFamily.Resolver",
+        replaceWith = ReplaceWith("TextLayoutInput(text, style, placeholders, " +
+            "maxLines, softWrap, overflow, density, layoutDirection, fontFamilyResolver, " +
+            "constraints")
+    )
+    @Suppress("DEPRECATION")
+    constructor(
+        text: AnnotatedString,
+        style: TextStyle,
+        placeholders: List<AnnotatedString.Range<Placeholder>>,
+        maxLines: Int,
+        softWrap: Boolean,
+        overflow: TextOverflow,
+        density: Density,
+        layoutDirection: LayoutDirection,
+        resourceLoader: Font.ResourceLoader,
+        constraints: Constraints
+    ) : this(
+        text,
+        style,
+        placeholders,
+        maxLines,
+        softWrap,
+        overflow,
+        density,
+        layoutDirection,
+        resourceLoader,
+        createFontFamilyResolver(resourceLoader),
+        constraints
+    )
+
+    constructor(
+        text: AnnotatedString,
+        style: TextStyle,
+        placeholders: List<AnnotatedString.Range<Placeholder>>,
+        maxLines: Int,
+        softWrap: Boolean,
+        overflow: TextOverflow,
+        density: Density,
+        layoutDirection: LayoutDirection,
+        fontFamilyResolver: FontFamily.Resolver,
+        constraints: Constraints
+    ) : this(
+        text,
+        style,
+        placeholders,
+        maxLines,
+        softWrap,
+        overflow,
+        density,
+        layoutDirection,
+        @Suppress("DEPRECATION") null,
+        fontFamilyResolver,
+        constraints
+    )
+
+    @Deprecated("Font.ResourceLoader is deprecated",
+        replaceWith = ReplaceWith("TextLayoutInput(text, style, placeholders," +
+            " maxLines, softWrap, overFlow, density, layoutDirection, fontFamilyResolver, " +
+            "constraints)")
+    )
+    // Unfortunately, there's no way to deprecate and add a parameter to a copy chain such that the
+    // resolution is valid.
+    //
+    // However, as this was never intended to be a public function we will not replace it. There is
+    // no use case for calling this method directly.
     fun copy(
         text: AnnotatedString = this.text,
         style: TextStyle = this.style,
@@ -97,7 +191,7 @@ class TextLayoutInput(
         overflow: TextOverflow = this.overflow,
         density: Density = this.density,
         layoutDirection: LayoutDirection = this.layoutDirection,
-        resourceLoader: Font.ResourceLoader = this.resourceLoader,
+        @Suppress("DEPRECATION") resourceLoader: Font.ResourceLoader = this.resourceLoader,
         constraints: Constraints = this.constraints
     ): TextLayoutInput {
         return TextLayoutInput(
@@ -110,6 +204,7 @@ class TextLayoutInput(
             density = density,
             layoutDirection = layoutDirection,
             resourceLoader = resourceLoader,
+            fontFamilyResolver = fontFamilyResolver,
             constraints = constraints
         )
     }
@@ -126,7 +221,7 @@ class TextLayoutInput(
         if (overflow != other.overflow) return false
         if (density != other.density) return false
         if (layoutDirection != other.layoutDirection) return false
-        if (resourceLoader != other.resourceLoader) return false
+        if (fontFamilyResolver != other.fontFamilyResolver) return false
         if (constraints != other.constraints) return false
 
         return true
@@ -141,7 +236,7 @@ class TextLayoutInput(
         result = 31 * result + overflow.hashCode()
         result = 31 * result + density.hashCode()
         result = 31 * result + layoutDirection.hashCode()
-        result = 31 * result + resourceLoader.hashCode()
+        result = 31 * result + fontFamilyResolver.hashCode()
         result = 31 * result + constraints.hashCode()
         return result
     }
@@ -156,9 +251,53 @@ class TextLayoutInput(
             "overflow=$overflow, " +
             "density=$density, " +
             "layoutDirection=$layoutDirection, " +
-            "resourceLoader=$resourceLoader, " +
+            "fontFamilyResolver=$fontFamilyResolver, " +
             "constraints=$constraints" +
             ")"
+    }
+}
+
+@Suppress("DEPRECATION")
+private class DeprecatedBridgeFontResourceLoader private constructor(
+    private val fontFamilyResolver: FontFamily.Resolver
+) : Font.ResourceLoader {
+    @Deprecated(
+        "Replaced by FontFamily.Resolver, this method should not be called",
+        ReplaceWith("FontFamily.Resolver.resolve(font, )"),
+    )
+    override fun load(font: Font): Any {
+        return fontFamilyResolver.resolve(
+            font.toFontFamily(),
+            font.weight,
+            font.style
+        ).value
+    }
+
+    companion object {
+        // In normal usage will  be a map of size 1.
+        //
+        // To fill this map with a large number of entries an app must:
+        //
+        // 1. Repeatedly change FontFamily.Resolver
+        // 2. Call the deprecated method getFontResourceLoader on TextLayoutInput
+        //
+        // If this map is found to be large in profiling of an app, please modify your code to not
+        // call getFontResourceLoader, and evaluate if FontFamily.Resolver is being correctly cached
+        // (via e.g. remember)
+        var cache = mutableMapOf<FontFamily.Resolver, Font.ResourceLoader>()
+        val lock: SynchronizedObject = createSynchronizedObject()
+        fun from(fontFamilyResolver: FontFamily.Resolver): Font.ResourceLoader {
+            synchronized(lock) {
+                // the same resolver to return the same ResourceLoader
+                cache[fontFamilyResolver]?.let { return it }
+
+                val deprecatedBridgeFontResourceLoader = DeprecatedBridgeFontResourceLoader(
+                    fontFamilyResolver
+                )
+                cache[fontFamilyResolver] = deprecatedBridgeFontResourceLoader
+                return deprecatedBridgeFontResourceLoader
+            }
+        }
     }
 }
 
@@ -444,38 +583,3 @@ class TextLayoutResult constructor(
             ")"
     }
 }
-
-@Deprecated(
-    "Unused public function which was added for testing. The function does not do " +
-        "anything usable for Compose text APIs. The function is now deprecated and will be " +
-        "removed soon"
-)
-fun createTextLayoutResult(
-    layoutInput: TextLayoutInput =
-        TextLayoutInput(
-            text = AnnotatedString(""),
-            style = TextStyle(),
-            placeholders = emptyList(),
-            maxLines = 1,
-            softWrap = false,
-            overflow = TextOverflow.Clip,
-            density = Density(1f),
-            layoutDirection = LayoutDirection.Ltr,
-            resourceLoader = object : Font.ResourceLoader {
-                override fun load(font: Font): Any {
-                    return false
-                }
-            },
-            constraints = Constraints()
-        ),
-    multiParagraph: MultiParagraph = MultiParagraph(
-        annotatedString = layoutInput.text,
-        style = layoutInput.style,
-        width = 0f,
-        density = layoutInput.density,
-        resourceLoader = layoutInput.resourceLoader
-    ),
-    size: IntSize = IntSize.Zero
-): TextLayoutResult = TextLayoutResult(
-    layoutInput, multiParagraph, size
-)

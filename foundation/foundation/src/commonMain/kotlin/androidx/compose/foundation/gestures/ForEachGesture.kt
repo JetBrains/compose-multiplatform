@@ -43,9 +43,13 @@ suspend fun PointerInputScope.forEachGesture(block: suspend PointerInputScope.()
             // Wait for all pointers to be up. Gestures start when a finger goes down.
             awaitAllPointersUp()
         } catch (e: CancellationException) {
-            // The gesture was canceled. Wait for all fingers to be "up" before looping again.
             if (currentContext.isActive) {
+                // The current gesture was canceled. Wait for all fingers to be "up" before looping
+                // again.
                 awaitAllPointersUp()
+            } else {
+                // forEachGesture was cancelled externally. Rethrow the cancellation exception to
+                // propagate it upwards.
                 throw e
             }
         }

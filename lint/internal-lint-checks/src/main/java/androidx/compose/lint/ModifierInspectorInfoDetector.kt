@@ -501,14 +501,15 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
          */
         private inner class ModifierVisitor : UnexpectedVisitor({ wrongLambda(it) }) {
             override fun visitCallExpression(node: UCallExpression): Boolean {
-                val info = if (isInspectableModifier(node)) node.valueArguments.firstOrNull()
-                else node.valueArguments.lastOrNull()
-                if (isInspectorInfoLambdaType(info?.getExpressionType())) {
-                    info!!.accept(debugInspectorVisitor)
+                val info: UExpression? = node.valueArguments.firstOrNull {
+                    isInspectorInfoLambdaType(it.getExpressionType())
+                }
+                if (info != null) {
+                    info.accept(debugInspectorVisitor)
                     return true
                 }
                 if (isRememberFunctionCall(node)) {
-                    val lambda = info as? ULambdaExpression
+                    val lambda = node.valueArguments.singleOrNull() as? ULambdaExpression
                     val body = lambda?.body as? UBlockExpression
                     val ret = body?.expressions?.firstOrNull() as? UReturnExpression
                     val definition = ret?.returnExpression ?: return super.visitCallExpression(node)

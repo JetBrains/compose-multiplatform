@@ -277,7 +277,7 @@ internal class PointerInteropFilter : PointerInputModifier {
 
                 val changes = pointerEvent.changes
 
-                if (changes.fastAny { it.anyChangeConsumed() }) {
+                if (changes.fastAny { it.isConsumed }) {
                     // We should no longer dispatch to the Android View.
                     if (state === DispatchToViewState.Dispatching) {
                         // If we were dispatching, send ACTION_CANCEL.
@@ -312,7 +312,7 @@ internal class PointerInteropFilter : PointerInputModifier {
                     if (state === DispatchToViewState.Dispatching) {
                         // If the Android View claimed the event, consume all changes.
                         changes.fastForEach {
-                            it.consumeAllChanges()
+                            it.consume()
                         }
                         pointerEvent.internalPointerEvent?.suppressMovementConsumption =
                             !disallowIntercept

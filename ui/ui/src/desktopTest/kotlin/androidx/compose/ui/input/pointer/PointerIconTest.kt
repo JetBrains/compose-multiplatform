@@ -29,6 +29,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import java.awt.Cursor
 
 @RunWith(JUnit4::class)
 @OptIn(ExperimentalComposeUiApi::class)
@@ -63,6 +64,54 @@ class PointerIconTest {
             y = 5
         )
         assertThat(iconService.current).isEqualTo(PointerIconDefaults.Text)
+    }
+
+    @Test
+    fun commitsToComponent() {
+        window.setContent {
+            Box(
+                modifier = Modifier
+                    .size(30.dp, 30.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .pointerHoverIcon(PointerIconDefaults.Text)
+                        .size(10.dp, 10.dp)
+                )
+            }
+        }
+
+        window.onMouseMoved(
+            x = 5,
+            y = 5
+        )
+        assertThat(window.currentCursor.type).isEqualTo(Cursor.TEXT_CURSOR)
+    }
+
+    @Test
+    fun preservedIfSameEventDispatchedTwice() {
+        window.setContent {
+            Box(
+                modifier = Modifier
+                    .size(30.dp, 30.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .pointerHoverIcon(PointerIconDefaults.Text)
+                        .size(10.dp, 10.dp)
+                )
+            }
+        }
+
+        window.onMouseMoved(
+            x = 5,
+            y = 5
+        )
+        window.onMouseMoved(
+            x = 5,
+            y = 5
+        )
+        assertThat(window.currentCursor.type).isEqualTo(Cursor.TEXT_CURSOR)
     }
 
     @Test

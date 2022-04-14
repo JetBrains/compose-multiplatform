@@ -134,6 +134,24 @@ class ParentDataModifierTest {
         }
     }
 
+    @Test
+    fun parentDataOnPlaceable() {
+        runOnUiThread {
+            activity.setContent {
+                Layout({
+                    Layout(
+                        modifier = Modifier.layoutId("data"),
+                        content = {}
+                    ) { _, _ -> layout(0, 0) {} }
+                }) { measurables, constraints ->
+                    val placeable = measurables[0].measure(constraints)
+                    assertEquals("data", (placeable.parentData as? LayoutIdParentData)?.layoutId)
+                    layout(0, 0) { }
+                }
+            }
+        }
+    }
+
     // We only need this because IR compiler doesn't like converting lambdas to Runnables
     private fun runOnUiThread(block: () -> Unit) {
         val runnable: Runnable = object : Runnable {

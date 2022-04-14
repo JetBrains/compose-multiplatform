@@ -19,7 +19,6 @@ package androidx.compose.ui.input.pointer
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_SCROLL
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 
@@ -51,7 +50,6 @@ actual class PointerEvent internal actual constructor(
     actual var type: PointerEventType = calculatePointerEventType()
         internal set
 
-    @OptIn(ExperimentalComposeUiApi::class)
     private fun calculatePointerEventType(): PointerEventType {
         val motionEvent = motionEvent
         if (motionEvent != null) {

@@ -17,10 +17,14 @@
 package androidx.compose.foundation.lazy.list
 
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -28,6 +32,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth
@@ -110,6 +115,38 @@ class LazyListSlotsReuseTest {
             .assertExists()
             .assertIsNotDisplayed()
         rule.onNodeWithTag("2")
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun checkMaxItemsKeptForReuse() {
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyColumn(
+                Modifier.height(itemsSizeDp * (DefaultMaxItemsToRetain + 0.5f)),
+                state
+            ) {
+                items(100) {
+                    Spacer(Modifier.height(itemsSizeDp).fillParentMaxWidth().testTag("$it"))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollToItem(DefaultMaxItemsToRetain + 1)
+            }
+        }
+
+        repeat(DefaultMaxItemsToRetain) {
+            rule.onNodeWithTag("$it")
+                .assertExists()
+                .assertIsNotDisplayed()
+        }
+        rule.onNodeWithTag("$DefaultMaxItemsToRetain")
+            .assertDoesNotExist()
+        rule.onNodeWithTag("${DefaultMaxItemsToRetain + 1}")
             .assertIsDisplayed()
     }
 
@@ -325,4 +362,119 @@ class LazyListSlotsReuseTest {
             .assertExists()
             .assertIsNotDisplayed()
     }
+
+    @Test
+    fun differentContentTypes() {
+        lateinit var state: LazyListState
+        val visibleItemsCount = (DefaultMaxItemsToRetain + 1) * 2
+        val startOfType1 = DefaultMaxItemsToRetain + 1
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyColumn(
+                Modifier.height(itemsSizeDp * (visibleItemsCount - 0.5f)),
+                state
+            ) {
+                items(
+                    100,
+                    contentType = { if (it >= startOfType1) 1 else 0 }
+                ) {
+                    Spacer(Modifier.height(itemsSizeDp).fillMaxWidth().testTag("$it"))
+                }
+            }
+        }
+
+        for (i in 0 until visibleItemsCount) {
+            rule.onNodeWithTag("$i")
+                .assertIsDisplayed()
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollToItem(visibleItemsCount)
+            }
+        }
+
+        rule.onNodeWithTag("$visibleItemsCount")
+            .assertIsDisplayed()
+
+        // [DefaultMaxItemsToRetain] items of type 0 are left for reuse
+        for (i in 0 until DefaultMaxItemsToRetain) {
+            rule.onNodeWithTag("$i")
+                .assertExists()
+                .assertIsNotDisplayed()
+        }
+        rule.onNodeWithTag("$DefaultMaxItemsToRetain")
+            .assertDoesNotExist()
+
+        // and 7 items of type 1
+        for (i in startOfType1 until startOfType1 + DefaultMaxItemsToRetain) {
+            rule.onNodeWithTag("$i")
+                .assertExists()
+                .assertIsNotDisplayed()
+        }
+        rule.onNodeWithTag("${startOfType1 + DefaultMaxItemsToRetain}")
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun differentTypesFromDifferentItemCalls() {
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyColumn(
+                Modifier.height(itemsSizeDp * 2.5f),
+                state
+            ) {
+                val content = @Composable { tag: String ->
+                    Spacer(Modifier.height(itemsSizeDp).width(10.dp).testTag(tag))
+                }
+                item(contentType = "not-to-reuse-0") {
+                    content("0")
+                }
+                item(contentType = "reuse") {
+                    content("1")
+                }
+                items(
+                    List(100) { it + 2 },
+                    contentType = { if (it == 10) "reuse" else "not-to-reuse-$it" }) {
+                    content("$it")
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollToItem(2)
+                // now items 0 and 1 are put into reusables
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertExists()
+            .assertIsNotDisplayed()
+        rule.onNodeWithTag("1")
+            .assertExists()
+            .assertIsNotDisplayed()
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollToItem(9)
+                // item 10 should reuse slot 1
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertExists()
+            .assertIsNotDisplayed()
+        rule.onNodeWithTag("1")
+            .assertDoesNotExist()
+        rule.onNodeWithTag("9")
+            .assertIsDisplayed()
+        rule.onNodeWithTag("10")
+            .assertIsDisplayed()
+        rule.onNodeWithTag("11")
+            .assertIsDisplayed()
+    }
 }
+
+private val DefaultMaxItemsToRetain = 7

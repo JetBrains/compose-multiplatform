@@ -27,6 +27,7 @@ import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
@@ -48,6 +49,7 @@ import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.WindowInfo
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -494,7 +496,7 @@ class HitPathTrackerTest {
         val pif1 = PointerInputFilterMock(
             pointerEventHandler = { pointerEvent, _, _ ->
                 pointerEvent.changes.map {
-                    it.consumeDownChange()
+                    if (it.pressed != it.previousPressed) it.consume()
                     it
                 }
             }
@@ -508,7 +510,7 @@ class HitPathTrackerTest {
 
         PointerInputChangeSubject
             .assertThat(internalPointerEvent.changes.values.first())
-            .isStructurallyEqualTo(down(13).apply { consumeDownChange() })
+            .isStructurallyEqualTo(down(13).apply { if (pressed != previousPressed) consume() })
     }
 
     @Test
@@ -518,7 +520,7 @@ class HitPathTrackerTest {
             log = log,
             pointerEventHandler = { pointerEvent, _, _ ->
                 pointerEvent.changes.map {
-                    it.consumePositionChange()
+                    it.consume()
                 }
                 pointerEvent.changes
             }
@@ -528,7 +530,7 @@ class HitPathTrackerTest {
             log = log,
             pointerEventHandler = { pointerEvent, _, _ ->
                 pointerEvent.changes.map {
-                    it.consumePositionChange()
+                    it.consume()
                 }
                 pointerEvent.changes
             }
@@ -538,7 +540,7 @@ class HitPathTrackerTest {
             log = log,
             pointerEventHandler = { pointerEvent, _, _ ->
                 pointerEvent.changes.map {
-                    it.consumePositionChange()
+                    it.consume()
                 }
                 pointerEvent.changes
             }
@@ -547,7 +549,7 @@ class HitPathTrackerTest {
         hitPathTracker.addHitPath(PointerId(13), listOf(pif1, pif2, pif3))
         val actualChange = down(13).moveTo(10, 0f, 0f)
         val expectedChange = actualChange.deepCopy()
-        val consumedExpectedChange = actualChange.deepCopy().apply { consumePositionChange() }
+        val consumedExpectedChange = actualChange.deepCopy().apply { consume() }
 
         val internalPointerEvent = internalPointerEventOf(actualChange)
 
@@ -627,7 +629,7 @@ class HitPathTrackerTest {
             pointerEventHandler =
                 { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        it.consumePositionChange()
+                        if (it.positionChange() != Offset.Zero) it.consume()
                     }
                     pointerEvent.changes
                 }
@@ -637,7 +639,7 @@ class HitPathTrackerTest {
             pointerEventHandler =
                 { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        it.consumePositionChange()
+                        if (it.positionChange() != Offset.Zero) it.consume()
                     }
                     pointerEvent.changes
                 }
@@ -647,7 +649,7 @@ class HitPathTrackerTest {
             pointerEventHandler =
                 { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        it.consumeAllChanges()
+                        it.consume()
                     }
                     pointerEvent.changes
                 }
@@ -657,7 +659,7 @@ class HitPathTrackerTest {
             pointerEventHandler =
                 { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        it.consumeAllChanges()
+                        it.consume()
                     }
                     pointerEvent.changes
                 }
@@ -668,8 +670,8 @@ class HitPathTrackerTest {
         val actualEvent2 = down(5).moveTo(10, 0f, 30f)
         val expectedEvent1 = actualEvent1.deepCopy()
         val expectedEvent2 = actualEvent2.deepCopy()
-        val consumedExpectedEvent1 = expectedEvent1.deepCopy().apply { consumePositionChange() }
-        val consumedExpectedEvent2 = expectedEvent2.deepCopy().apply { consumePositionChange() }
+        val consumedExpectedEvent1 = expectedEvent1.deepCopy().apply { consume() }
+        val consumedExpectedEvent2 = expectedEvent2.deepCopy().apply { consume() }
 
         val internalPointerEvent = internalPointerEventOf(actualEvent1, actualEvent2)
 
@@ -776,7 +778,7 @@ class HitPathTrackerTest {
             pointerEventHandler =
                 { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        it.consumePositionChange()
+                        if (it.positionChange() != Offset.Zero) it.consume()
                     }
                     pointerEvent.changes
                 }
@@ -787,7 +789,7 @@ class HitPathTrackerTest {
             pointerEventHandler =
                 { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        it.consumePositionChange()
+                        if (it.positionChange() != Offset.Zero) it.consume()
                     }
                     pointerEvent.changes
                 }
@@ -798,7 +800,7 @@ class HitPathTrackerTest {
             pointerEventHandler =
                 { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        it.consumePositionChange()
+                        if (it.positionChange() != Offset.Zero) it.consume()
                     }
                     pointerEvent.changes
                 }
@@ -810,8 +812,8 @@ class HitPathTrackerTest {
         val actualEvent2 = down(5).moveTo(10, 0f, 30f)
         val expectedEvent1 = actualEvent1.deepCopy()
         val expectedEvent2 = actualEvent2.deepCopy()
-        val consumedEvent1 = expectedEvent1.deepCopy().apply { consumePositionChange() }
-        val consumedEvent2 = expectedEvent2.deepCopy().apply { consumePositionChange() }
+        val consumedEvent1 = expectedEvent1.deepCopy().apply { consume() }
+        val consumedEvent2 = expectedEvent2.deepCopy().apply { consume() }
 
         val internalPointerEvent = internalPointerEventOf(actualEvent1, actualEvent2)
 
@@ -884,7 +886,7 @@ class HitPathTrackerTest {
             pointerEventHandler =
                 { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        it.consumePositionChange()
+                        it.consume()
                     }
                     pointerEvent.changes
                 }
@@ -894,7 +896,7 @@ class HitPathTrackerTest {
             pointerEventHandler =
                 { pointerEvent, _, _ ->
                     pointerEvent.changes.map {
-                        it.consumePositionChange()
+                        it.consume()
                     }
                     pointerEvent.changes
                 }
@@ -906,8 +908,8 @@ class HitPathTrackerTest {
         val actualEvent2 = down(5).moveTo(10, 0f, 0f)
         val expectedEvent1 = actualEvent1.deepCopy()
         val expectedEvent2 = actualEvent2.deepCopy()
-        val consumedEvent1 = expectedEvent1.deepCopy().apply { consumePositionChange() }
-        val consumedEvent2 = expectedEvent2.deepCopy().apply { consumePositionChange() }
+        val consumedEvent1 = expectedEvent1.deepCopy().apply { consume() }
+        val consumedEvent2 = expectedEvent2.deepCopy().apply { consume() }
 
         val internalPointerEvent = internalPointerEventOf(actualEvent1, actualEvent2)
 
@@ -2947,16 +2949,19 @@ class HitPathTrackerTest {
         removalPass: PointerEventPass
     ) {
         val layoutCoordinates = LayoutCoordinatesStub(true)
+        lateinit var pifRef: PointerInputFilter
         val pif = PointerInputFilterMock(
             pointerEventHandler =
                 { pointerEvent, pass, _ ->
                     if (pass == removalPass) {
                         layoutCoordinates.isAttached = false
+                        pifRef.isAttached = false
                     }
                     pointerEvent.changes
                 },
             layoutCoordinates = layoutCoordinates
         )
+        pifRef = pif
         hitPathTracker.addHitPath(PointerId(13), listOf(pif))
 
         hitPathTracker.dispatchChanges(internalPointerEventOf(down(13)))
@@ -2998,19 +3003,20 @@ class HitPathTrackerTest {
     ) {
         val log = mutableListOf<LogEntry>()
         val childLayoutCoordinates = LayoutCoordinatesStub(true)
+        val childPif = PointerInputFilterMock(
+            log,
+            layoutCoordinates = childLayoutCoordinates
+        )
         val parentPif = PointerInputFilterMock(
             log,
             pointerEventHandler =
                 { pointerEvent, pass, _ ->
                     if (pass == removalPass) {
                         childLayoutCoordinates.isAttached = false
+                        childPif.isAttached = false
                     }
                     pointerEvent.changes
                 }
-        )
-        val childPif = PointerInputFilterMock(
-            log,
-            layoutCoordinates = childLayoutCoordinates
         )
         hitPathTracker.addHitPath(PointerId(13), listOf(parentPif, childPif))
 
@@ -3067,6 +3073,7 @@ class HitPathTrackerTest {
                 { pointerEvent, pass, _ ->
                     if (pass == removalPass) {
                         parentLayoutCoordinates.isAttached = false
+                        parentPif.isAttached = false
                     }
                     pointerEvent.changes
                 }
@@ -3614,20 +3621,38 @@ private class MockOwner(
         get() = TODO("Not yet implemented")
     override val windowInfo: WindowInfo
         get() = TODO("Not yet implemented")
+    @Deprecated(
+        "fontLoader is deprecated, use fontFamilyResolver",
+        replaceWith = ReplaceWith("fontFamilyResolver")
+    )
+    @Suppress("OverridingDeprecatedMember", "DEPRECATION")
     override val fontLoader: Font.ResourceLoader
+        get() = TODO("Not yet implemented")
+    override val fontFamilyResolver: FontFamily.Resolver
         get() = TODO("Not yet implemented")
     override val layoutDirection: LayoutDirection
         get() = LayoutDirection.Ltr
     override var showLayoutBounds: Boolean = false
     override val snapshotObserver = OwnerSnapshotObserver { it.invoke() }
-
-    override fun onRequestMeasure(layoutNode: LayoutNode) {
-        onRequestMeasureParams += layoutNode
-        layoutNode.layoutState = LayoutNode.LayoutState.NeedsRemeasure
+    override fun registerOnEndApplyChangesListener(listener: () -> Unit) {
+        TODO("Not yet implemented")
     }
 
-    override fun onRequestRelayout(layoutNode: LayoutNode) {
-        layoutNode.layoutState = LayoutNode.LayoutState.NeedsRelayout
+    override fun onEndApplyChanges() {
+        TODO("Not yet implemented")
+    }
+
+    override fun registerOnLayoutCompletedListener(listener: Owner.OnLayoutCompletedListener) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
+        onRequestMeasureParams += layoutNode
+        layoutNode.markMeasurePending()
+    }
+
+    override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) {
+        layoutNode.markLayoutPending()
     }
 
     override fun onAttach(node: LayoutNode) {
@@ -3647,6 +3672,9 @@ private class MockOwner(
     override fun requestFocus(): Boolean = false
 
     override fun measureAndLayout(sendPointerUpdate: Boolean) {
+    }
+
+    override fun measureAndLayout(layoutNode: LayoutNode, constraints: Constraints) {
     }
 
     override fun forceMeasureTheSubtree(layoutNode: LayoutNode) {
@@ -3672,6 +3700,8 @@ private class MockOwner(
                 shape: Shape,
                 clip: Boolean,
                 renderEffect: RenderEffect?,
+                ambientShadowColor: Color,
+                spotShadowColor: Color,
                 layoutDirection: LayoutDirection,
                 density: Density
             ) {

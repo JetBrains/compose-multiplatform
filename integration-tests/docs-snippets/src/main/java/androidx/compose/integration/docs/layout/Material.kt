@@ -22,6 +22,7 @@
 
 package androidx.compose.integration.docs.layout
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -137,6 +138,7 @@ private object MaterialSnippet4 {
     }
 }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 private object MaterialSnippet5 {
     @Composable
     fun MyTopAppBar() {
@@ -150,6 +152,7 @@ private object MaterialSnippet5 {
     }
 }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 private object MaterialSnippet6 {
     @Composable
     fun MyBottomAppBar() {
@@ -163,6 +166,7 @@ private object MaterialSnippet6 {
     }
 }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 private object MaterialSnippet7 {
     @Composable
     fun MyFAB() {
@@ -178,6 +182,7 @@ private object MaterialSnippet7 {
     }
 }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 private object MaterialSnippet8 {
     @Composable
     fun MyFAB() {
@@ -195,6 +200,7 @@ private object MaterialSnippet8 {
     }
 }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 private object MaterialSnippet9 {
     @Composable
     fun MyFAB() {
@@ -215,6 +221,7 @@ private object MaterialSnippet9 {
     }
 }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 private object MaterialSnippet10 {
     @Composable
     fun MyFAB() {
@@ -241,6 +248,7 @@ private object MaterialSnippet10 {
     }
 }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 private object MaterialSnippet11 {
     @Composable
     fun MySnackbar() {
@@ -265,6 +273,7 @@ private object MaterialSnippet11 {
     }
 }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 private object MaterialSnippet12 {
     @Composable
     fun MySnackbar() {
@@ -302,6 +311,7 @@ private object MaterialSnippet12 {
     }
 }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 private object MaterialSnippet13 {
     @Composable
     fun MyDrawer() {
@@ -317,6 +327,7 @@ private object MaterialSnippet13 {
     }
 }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 private object MaterialSnippet14 {
     @Composable
     fun MyDrawer() {
@@ -332,6 +343,7 @@ private object MaterialSnippet14 {
     }
 }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 private object MaterialSnippet15 {
     @Composable
     fun MyDrawer() {

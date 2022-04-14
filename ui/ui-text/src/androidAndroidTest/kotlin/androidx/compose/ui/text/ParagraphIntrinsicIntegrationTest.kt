@@ -211,7 +211,7 @@ class ParagraphIntrinsicIntegrationTest {
                 fontSize = fontSize
             ).merge(style),
             density = defaultDensity,
-            resourceLoader = TestFontResourceLoader(context)
+            fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
     }
 }

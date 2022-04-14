@@ -23,8 +23,8 @@ HSPLandroidx/compose/foundation/gestures/**;->**(**)**
 # Include everything inside of the interaction namespace
 HSPLandroidx/compose/foundation/interaction/*;->**(**)**
 #
-# Include everything inside of the lazy namespace
-HSPLandroidx/compose/foundation/lazy/*;->**(**)**
+# Include everything inside of the lazy namespaces
+HSPLandroidx/compose/foundation/lazy/**;->**(**)**
 #
 # common shape classes
 HSPLandroidx/compose/foundation/shape/CornerBasedShape;->**(**)**

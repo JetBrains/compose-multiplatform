@@ -34,3 +34,7 @@ dependencies {
     androidTestImplementation(libs.kotlinTestCommon)
     androidTestImplementation(libs.junit)
 }
+
+android {
+    namespace "androidx.compose.animation.core.benchmark"
+}

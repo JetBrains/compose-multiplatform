@@ -19,8 +19,8 @@ package androidx.compose.ui.text.input
 /**
  * Values representing the different available Keyboard Types.
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-inline class KeyboardType internal constructor(@Suppress("unused") private val value: Int) {
+@kotlin.jvm.JvmInline
+value class KeyboardType internal constructor(@Suppress("unused") private val value: Int) {
 
     override fun toString(): String {
         return when (this) {
@@ -32,6 +32,7 @@ inline class KeyboardType internal constructor(@Suppress("unused") private val v
             Email -> "Email"
             Password -> "Password"
             NumberPassword -> "NumberPassword"
+            Decimal -> "Decimal"
             else -> "Invalid"
         }
     }
@@ -48,7 +49,10 @@ inline class KeyboardType internal constructor(@Suppress("unused") private val v
         val Ascii: KeyboardType = KeyboardType(2)
 
         /**
-         * A keyboard type used to request an that is capable of inputting digits.
+         * A keyboard type used to request an IME that is capable of inputting digits. IME may
+         * provide inputs other than digits but it is not guaranteed.
+         *
+         * @see KeyboardType.Decimal
          */
         val Number: KeyboardType = KeyboardType(3)
 
@@ -68,7 +72,7 @@ inline class KeyboardType internal constructor(@Suppress("unused") private val v
         val Email: KeyboardType = KeyboardType(6)
 
         /**
-         * A keyboard type used to request an IME that is capable of inputting password
+         * A keyboard type used to request an IME that is capable of inputting password.
          */
         val Password: KeyboardType = KeyboardType(7)
 
@@ -76,5 +80,12 @@ inline class KeyboardType internal constructor(@Suppress("unused") private val v
          * A keyboard type used to request an IME that is capable of inputting number password.
          */
         val NumberPassword: KeyboardType = KeyboardType(8)
+
+        /**
+         * A keyboard type used to request an IME that is capable of inputting decimals.
+         * IME should explicitly provide a decimal separator as input, which is not assured by
+         * [KeyboardType.Number].
+         */
+        val Decimal: KeyboardType = KeyboardType(9)
     }
 }

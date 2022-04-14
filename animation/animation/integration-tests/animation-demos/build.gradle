@@ -22,3 +22,7 @@ dependencies {
     implementation(project(":compose:foundation:foundation"))
     implementation(project(":compose:material:material"))
 }
+
+android {
+    namespace "androidx.compose.animation.demos"
+}

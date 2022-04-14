@@ -16,15 +16,35 @@
 
 package androidx.compose.ui.layout
 
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.autofill.Autofill
+import androidx.compose.ui.autofill.AutofillTree
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.input.InputModeManager
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.pointer.PointerIconService
+import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.node.LayoutNodeDrawScope
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
+import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerSnapshotObserver
+import androidx.compose.ui.node.RootForTest
+import androidx.compose.ui.platform.AccessibilityManager
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.TextToolbar
+import androidx.compose.ui.platform.ViewConfiguration
+import androidx.compose.ui.platform.WindowInfo
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import com.google.common.truth.Truth
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.doAnswer
-import com.nhaarman.mockitokotlin2.mock
 import kotlin.math.max
 import kotlin.math.min
 
@@ -34,27 +54,7 @@ internal fun createDelegate(
     firstMeasureCompleted: Boolean = true
 ): MeasureAndLayoutDelegate {
     val delegate = MeasureAndLayoutDelegate(root)
-    root.attach(
-        mock {
-            on { measureIteration } doAnswer {
-                delegate.measureIteration
-            }
-            on { onRequestMeasure(any()) } doAnswer {
-                delegate.requestRemeasure(it.arguments[0] as LayoutNode)
-                Unit
-            }
-            on { measureAndLayout() } doAnswer {
-                delegate.measureAndLayout()
-                Unit
-            }
-            on { snapshotObserver } doAnswer {
-                OwnerSnapshotObserver { it.invoke() }
-            }
-            on { forceMeasureTheSubtree(any()) } doAnswer {
-                delegate.forceMeasureTheSubtree(it.arguments[0] as LayoutNode)
-            }
-        }
-    )
+    root.attach(FakeOwner(delegate))
     if (firstMeasureCompleted) {
         delegate.updateRootConstraints(
             defaultRootConstraints()
@@ -64,13 +64,114 @@ internal fun createDelegate(
     return delegate
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
+private class FakeOwner(
+    val delegate: MeasureAndLayoutDelegate
+) : Owner {
+    override val measureIteration: Long
+        get() = delegate.measureIteration
+
+    override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
+        delegate.requestRemeasure(layoutNode)
+    }
+
+    override fun measureAndLayout(sendPointerUpdate: Boolean) {
+        delegate.measureAndLayout()
+    }
+
+    override fun measureAndLayout(layoutNode: LayoutNode, constraints: Constraints) {
+        delegate.measureAndLayout(layoutNode, constraints)
+    }
+
+    override fun forceMeasureTheSubtree(layoutNode: LayoutNode) {
+        delegate.forceMeasureTheSubtree(layoutNode)
+    }
+
+    override val snapshotObserver: OwnerSnapshotObserver = OwnerSnapshotObserver { it.invoke() }
+    override fun registerOnEndApplyChangesListener(listener: () -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onEndApplyChanges() {
+        TODO("Not yet implemented")
+    }
+
+    override fun registerOnLayoutCompletedListener(listener: Owner.OnLayoutCompletedListener) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onLayoutChange(layoutNode: LayoutNode) {}
+
+    @OptIn(InternalCoreApi::class)
+    override var showLayoutBounds: Boolean = false
+
+    override fun onAttach(node: LayoutNode) {}
+    override fun onDetach(node: LayoutNode) {}
+
+    override val root: LayoutNode
+        get() = TODO("Not yet implemented")
+    override val sharedDrawScope: LayoutNodeDrawScope
+        get() = TODO("Not yet implemented")
+    override val rootForTest: RootForTest
+        get() = TODO("Not yet implemented")
+    override val hapticFeedBack: HapticFeedback
+        get() = TODO("Not yet implemented")
+    override val inputModeManager: InputModeManager
+        get() = TODO("Not yet implemented")
+    override val clipboardManager: ClipboardManager
+        get() = TODO("Not yet implemented")
+    override val accessibilityManager: AccessibilityManager
+        get() = TODO("Not yet implemented")
+    override val textToolbar: TextToolbar
+        get() = TODO("Not yet implemented")
+    override val density: Density
+        get() = TODO("Not yet implemented")
+    override val textInputService: TextInputService
+        get() = TODO("Not yet implemented")
+    override val pointerIconService: PointerIconService
+        get() = TODO("Not yet implemented")
+    override val focusManager: FocusManager
+        get() = TODO("Not yet implemented")
+    override val windowInfo: WindowInfo
+        get() = TODO("Not yet implemented")
+
+    @Deprecated(
+        "fontLoader is deprecated, use fontFamilyResolver",
+        replaceWith = ReplaceWith("fontFamilyResolver")
+    )
+    @Suppress("OverridingDeprecatedMember", "DEPRECATION")
+    override val fontLoader: Font.ResourceLoader
+        get() = TODO("Not yet implemented")
+    override val fontFamilyResolver: FontFamily.Resolver
+        get() = TODO("Not yet implemented")
+    override val layoutDirection: LayoutDirection
+        get() = TODO("Not yet implemented")
+    override val viewConfiguration: ViewConfiguration
+        get() = TODO("Not yet implemented")
+    override val autofillTree: AutofillTree
+        get() = TODO("Not yet implemented")
+    override val autofill: Autofill
+        get() = TODO("Not yet implemented")
+
+    override fun createLayer(drawBlock: (Canvas) -> Unit, invalidateParentLayer: () -> Unit) =
+        TODO("Not yet implemented")
+
+    override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) =
+        TODO("Not yet implemented")
+
+    override fun calculatePositionInWindow(localPosition: Offset) = TODO("Not yet implemented")
+    override fun calculateLocalPosition(positionInWindow: Offset) = TODO("Not yet implemented")
+    override fun requestFocus() = TODO("Not yet implemented")
+    override fun onSemanticsChange() = TODO("Not yet implemented")
+    override fun getFocusDirection(keyEvent: KeyEvent) = TODO("Not yet implemented")
+}
+
 internal fun defaultRootConstraints() = Constraints(maxWidth = 100, maxHeight = 100)
 
 internal fun assertNotRemeasured(node: LayoutNode, block: (LayoutNode) -> Unit) {
     val measuresCountBefore = node.measuresCount
     block(node)
     Truth.assertThat(node.measuresCount).isEqualTo(measuresCountBefore)
-    assertMeasuredAndLaidOut(node)
 }
 
 internal fun assertRemeasured(
@@ -99,19 +200,20 @@ internal fun assertNotRelaidOut(node: LayoutNode, block: (LayoutNode) -> Unit) {
     val layoutsCountBefore = node.layoutsCount
     block(node)
     Truth.assertThat(node.layoutsCount).isEqualTo(layoutsCountBefore)
-    assertMeasuredAndLaidOut(node)
 }
 
 internal fun assertMeasureRequired(node: LayoutNode) {
-    Truth.assertThat(node.layoutState).isEqualTo(LayoutNode.LayoutState.NeedsRemeasure)
+    Truth.assertThat(node.measurePending).isTrue()
 }
 
 internal fun assertMeasuredAndLaidOut(node: LayoutNode) {
-    Truth.assertThat(node.layoutState).isEqualTo(LayoutNode.LayoutState.Ready)
+    Truth.assertThat(node.layoutState).isEqualTo(LayoutNode.LayoutState.Idle)
+    Truth.assertThat(node.layoutPending).isFalse()
+    Truth.assertThat(node.measurePending).isFalse()
 }
 
 internal fun assertLayoutRequired(node: LayoutNode) {
-    Truth.assertThat(node.layoutState).isEqualTo(LayoutNode.LayoutState.NeedsRelayout)
+    Truth.assertThat(node.layoutPending).isTrue()
 }
 
 internal fun assertRemeasured(
@@ -217,6 +319,7 @@ internal abstract class SmartMeasurePolicy : LayoutNode.NoIntrinsicsMeasurePolic
     var measuredLayoutDirection: LayoutDirection? = null
         protected set
     var childrenLayoutDirection: LayoutDirection? = null
+
     // child size is used when null
     var size: Int? = null
     var shouldPlaceChildren = true

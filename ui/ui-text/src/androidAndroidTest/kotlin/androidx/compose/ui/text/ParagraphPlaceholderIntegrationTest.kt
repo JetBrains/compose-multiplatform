@@ -17,6 +17,7 @@
 package androidx.compose.ui.text
 
 import androidx.compose.ui.text.font.toFontFamily
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.em
@@ -47,7 +48,7 @@ class ParagraphPlaceholderIntegrationTest {
         val placeholderRects = paragraph.placeholderRects
         assertThat(placeholderRects.size).isEqualTo(1)
         // Height won't be increased. Notice: in fontFamilyMeasureFont lineHeight = 1.2 * fontSize
-        assertThat(paragraph.getLineHeight(0)).isEqualTo(fontSize * 1.2f)
+        assertThat(paragraph.getLineHeight(0)).isEqualTo(fontSize)
 
         val bound = placeholderRects[0]!!
         assertThat(bound.bottom).isEqualTo(paragraph.firstBaseline)
@@ -105,7 +106,7 @@ class ParagraphPlaceholderIntegrationTest {
         val placeholderRects = paragraph.placeholderRects
         assertThat(placeholderRects.size).isEqualTo(1)
 
-        assertThat(paragraph.getLineHeight(0)).isEqualTo(1.2f * fontSize)
+        assertThat(paragraph.getLineHeight(0)).isEqualTo(fontSize)
 
         val bound = placeholderRects[0]!!
         assertThat(bound.bottom).isEqualTo(paragraph.getLineBottom(0))
@@ -161,7 +162,7 @@ class ParagraphPlaceholderIntegrationTest {
         val placeholderRects = paragraph.placeholderRects
         assertThat(placeholderRects.size).isEqualTo(1)
 
-        assertThat(paragraph.getLineHeight(0)).isEqualTo(1.2f * fontSize)
+        assertThat(paragraph.getLineHeight(0)).isEqualTo(fontSize)
 
         val bound = placeholderRects[0]!!
         // TODO(haoyuchang): use getLineTop instead
@@ -219,7 +220,7 @@ class ParagraphPlaceholderIntegrationTest {
         val placeholderRects = paragraph.placeholderRects
         assertThat(placeholderRects.size).isEqualTo(1)
 
-        assertThat(paragraph.getLineHeight(0)).isEqualTo(fontSize * 1.2f)
+        assertThat(paragraph.getLineHeight(0)).isEqualTo(fontSize)
 
         val bound = placeholderRects[0]!!
         // TODO(haoyuchang): We need getLineTop(0).
@@ -288,7 +289,7 @@ class ParagraphPlaceholderIntegrationTest {
         val bound = placeholderRects[0]!!
         // TextTop aligns the inline element to top of the proceeding text.
         // In the measurement font, the top equals to fontSize pixels above baseline.
-        val expectedTop = paragraph.firstBaseline - fontSize
+        val expectedTop = paragraph.firstBaseline - fontSize * 0.8f
         assertThat(bound.top).isEqualTo(expectedTop)
         assertThat(bound.bottom).isEqualTo(expectedTop + height.value * fontSize)
         // There is one character to the left of this placeholder.
@@ -352,7 +353,7 @@ class ParagraphPlaceholderIntegrationTest {
         val bound = placeholderRects[0]!!
         // TextCenter aligns the inline element to center of the proceeding text.
         // In the measurement font, the center equals to fontSize * 0.3 pixels above baseline.
-        val expectedCenter = paragraph.firstBaseline - fontSize * 0.4f
+        val expectedCenter = paragraph.firstBaseline - fontSize * 0.3f
         assertThat(bound.top).isEqualTo(expectedCenter - height.value * fontSize / 2)
         assertThat(bound.bottom).isEqualTo(expectedCenter + height.value * fontSize / 2)
 
@@ -521,9 +522,9 @@ class ParagraphPlaceholderIntegrationTest {
             placeholders = placeholders,
             maxLines = maxLines,
             ellipsis = ellipsis,
-            width = width,
+            constraints = Constraints(maxWidth = width.ceilToInt()),
             density = defaultDensity,
-            resourceLoader = TestFontResourceLoader(context)
+            fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
     }
 }

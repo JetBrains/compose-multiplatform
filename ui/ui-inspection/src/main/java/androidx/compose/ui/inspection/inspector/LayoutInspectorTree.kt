@@ -17,7 +17,6 @@
 package androidx.compose.ui.inspection.inspector
 
 import android.view.View
-import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.ui.R
@@ -93,7 +92,6 @@ fun packageNameHash(packageName: String) =
 /**
  * Generator of a tree for the Layout Inspector.
  */
-@RequiresApi(29)
 class LayoutInspectorTree {
     @Suppress("MemberVisibilityCanBePrivate")
     var hideSystemNodes = true
@@ -432,6 +430,8 @@ class LayoutInspectorTree {
     private fun parse(group: Group, overrideBox: IntRect? = null): MutableInspectorNode {
         val node = newNode()
         node.id = parseId(group)
+        node.anchorHash = group.identity?.hashCode() ?: 0
+        node.key = group.key as? Int ?: 0
         node.name = group.name ?: ""
         parsePosition(group, node, overrideBox)
         parseLayoutInfo(group, node)

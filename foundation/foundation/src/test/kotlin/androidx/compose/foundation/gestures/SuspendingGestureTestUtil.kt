@@ -29,7 +29,6 @@ import androidx.compose.runtime.withRunningRecomposer
 import androidx.compose.testutils.TestViewConfiguration
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.ConsumedData
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
@@ -41,10 +40,11 @@ import androidx.compose.ui.materialize
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 
@@ -76,7 +76,7 @@ internal class SuspendingGestureTestUtil(
         check(!isExecuting) { "executeInComposition is not reentrant" }
         try {
             isExecuting = true
-            runBlockingTest {
+            runTest {
                 val frameClock = TestFrameClock()
 
                 withContext(frameClock) {
@@ -96,7 +96,9 @@ internal class SuspendingGestureTestUtil(
             compose(recomposer) {
                 CompositionLocalProvider(
                     LocalDensity provides Density(1f),
-                    LocalViewConfiguration provides TestViewConfiguration()
+                    LocalViewConfiguration provides TestViewConfiguration(
+                        minimumTouchTargetSize = DpSize.Zero
+                    )
                 ) {
                     pointerInputFilter = currentComposer
                         .materialize(Modifier.pointerInput(Unit, gestureDetector)) as
@@ -133,7 +135,7 @@ internal class SuspendingGestureTestUtil(
             previousUptimeMillis = lastTime,
             previousPosition = Offset(x, y),
             previousPressed = false,
-            ConsumedData()
+            isInitiallyConsumed = false
         )
         activePointers[change.id] = change
         invokeOverAllPasses(change, initial, main, final)
@@ -177,7 +179,7 @@ internal class SuspendingGestureTestUtil(
             uptimeMillis = lastTime,
             pressed = false,
             position = position,
-            consumed = ConsumedData()
+            isInitiallyConsumed = false
         )
         activePointers[change.id] = change
         invokeOverAllPasses(change, initial, main, final)
@@ -207,7 +209,7 @@ internal class SuspendingGestureTestUtil(
             uptimeMillis = lastTime,
             position = Offset(x, y),
             pressed = true,
-            consumed = ConsumedData()
+            isInitiallyConsumed = false
         )
         initial(change)
         activePointers[change.id] = change
@@ -249,6 +251,14 @@ internal class SuspendingGestureTestUtil(
     )
 
     /**
+     * Removes all pointers from the active pointers. This can simulate a faulty pointer stream
+     * for robustness testing.
+     */
+    fun clearPointerStream() {
+        activePointers.clear()
+    }
+
+    /**
      * Updates all changes so that all events are at the current time.
      */
     private fun updateCurrentTime() {
@@ -265,7 +275,7 @@ internal class SuspendingGestureTestUtil(
                         uptimeMillis = currentTime,
                         pressed = change.pressed,
                         position = change.position,
-                        consumed = ConsumedData()
+                        isInitiallyConsumed = false
                     )
                 )
             }

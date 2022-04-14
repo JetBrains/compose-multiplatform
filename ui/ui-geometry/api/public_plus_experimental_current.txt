@@ -1,15 +1,20 @@
 // Signature format: 4.0
 package androidx.compose.ui.geometry {
 
-  @androidx.compose.runtime.Immutable public final inline class CornerRadius {
-    ctor public CornerRadius();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class CornerRadius {
     method @androidx.compose.runtime.Stable public inline operator float component1();
     method @androidx.compose.runtime.Stable public inline operator float component2();
+    method public long copy(optional float x, optional float y);
     method @androidx.compose.runtime.Stable public operator long div(float operand);
+    method public float getX();
+    method public float getY();
     method @androidx.compose.runtime.Stable public operator long minus(long other);
     method @androidx.compose.runtime.Stable public operator long plus(long other);
     method @androidx.compose.runtime.Stable public operator long times(float operand);
     method @androidx.compose.runtime.Stable public operator long unaryMinus();
+    property public final float x;
+    property public final float y;
+    field public static final androidx.compose.ui.geometry.CornerRadius.Companion Companion;
   }
 
   public static final class CornerRadius.Companion {
@@ -38,10 +43,10 @@ package androidx.compose.ui.geometry {
     method @androidx.compose.runtime.Stable public void intersect(float left, float top, float right, float bottom);
     method public boolean isEmpty();
     method public void set(float left, float top, float right, float bottom);
-    method public void setBottom(float bottom);
-    method public void setLeft(float left);
-    method public void setRight(float right);
-    method public void setTop(float top);
+    method public void setBottom(float);
+    method public void setLeft(float);
+    method public void setRight(float);
+    method public void setTop(float);
     property public final float bottom;
     property public final inline float height;
     property public final boolean isEmpty;
@@ -56,19 +61,24 @@ package androidx.compose.ui.geometry {
     method public static androidx.compose.ui.geometry.Rect toRect(androidx.compose.ui.geometry.MutableRect);
   }
 
-  @androidx.compose.runtime.Immutable public final inline class Offset {
-    ctor public Offset();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class Offset {
     method @androidx.compose.runtime.Stable public operator float component1();
     method @androidx.compose.runtime.Stable public operator float component2();
+    method public long copy(optional float x, optional float y);
     method @androidx.compose.runtime.Stable public operator long div(float operand);
     method @androidx.compose.runtime.Stable public float getDistance();
     method @androidx.compose.runtime.Stable public float getDistanceSquared();
+    method public float getX();
+    method public float getY();
     method @androidx.compose.runtime.Stable public boolean isValid();
     method @androidx.compose.runtime.Stable public operator long minus(long other);
     method @androidx.compose.runtime.Stable public operator long plus(long other);
     method @androidx.compose.runtime.Stable public operator long rem(float operand);
     method @androidx.compose.runtime.Stable public operator long times(float operand);
     method @androidx.compose.runtime.Stable public operator long unaryMinus();
+    property public final float x;
+    property public final float y;
+    field public static final androidx.compose.ui.geometry.Offset.Companion Companion;
   }
 
   public static final class Offset.Companion {
@@ -223,13 +233,22 @@ package androidx.compose.ui.geometry {
     method public static androidx.compose.ui.geometry.RoundRect translate(androidx.compose.ui.geometry.RoundRect, long offset);
   }
 
-  @androidx.compose.runtime.Immutable public final inline class Size {
-    ctor public Size();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class Size {
     method @androidx.compose.runtime.Stable public inline operator float component1();
     method @androidx.compose.runtime.Stable public inline operator float component2();
+    method public long copy(optional float width, optional float height);
     method @androidx.compose.runtime.Stable public operator long div(float operand);
+    method public float getHeight();
+    method public float getMaxDimension();
+    method public float getMinDimension();
+    method public float getWidth();
     method @androidx.compose.runtime.Stable public boolean isEmpty();
     method @androidx.compose.runtime.Stable public operator long times(float operand);
+    property public final float height;
+    property public final float maxDimension;
+    property public final float minDimension;
+    property public final float width;
+    field public static final androidx.compose.ui.geometry.Size.Companion Companion;
   }
 
   public static final class Size.Companion {

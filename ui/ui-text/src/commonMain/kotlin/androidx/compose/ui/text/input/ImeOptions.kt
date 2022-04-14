@@ -27,10 +27,10 @@ import androidx.compose.runtime.Immutable
  * @param capitalization informs the IME whether to automatically capitalize characters,
  * words or sentences. Only applicable to only text based [KeyboardType]s such as
  * [KeyboardType.Text], [KeyboardType.Ascii]. It will not be applied to [KeyboardType]s such as
- * [KeyboardType.Number].
+ * [KeyboardType.Number] or [KeyboardType.Decimal].
  * @param autoCorrect informs the IME whether to enable auto correct. Only applicable to
  * text based [KeyboardType]s such as [KeyboardType.Email], [KeyboardType.Uri]. It will not be
- * applied to [KeyboardType]s such as [KeyboardType.Number]. Most of IME
+ * applied to [KeyboardType]s such as [KeyboardType.Number] or [KeyboardType.Decimal]. Most of IME
  * implementations ignore this value for [KeyboardType]s such as [KeyboardType.Text].
  * @param keyboardType The keyboard type to be used in this text field. Note that this input type
  * is honored by IME and shows corresponding keyboard but this is not guaranteed. For example,

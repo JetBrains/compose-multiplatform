@@ -46,6 +46,7 @@ class TextStyleResolveDefaultsTest {
     private val DefaultLineHeight = TextUnit.Unspecified
     private val DefaultColor = Color.Black
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
     fun test_default_values() {
         // We explicitly expect the default values since we do not want to change these values.
@@ -68,6 +69,7 @@ class TextStyleResolveDefaultsTest {
             assertThat(it.textDirection).isEqualTo(TextDirection.Ltr)
             assertThat(it.lineHeight).isEqualTo(DefaultLineHeight)
             assertThat(it.textIndent).isEqualTo(TextIndent.None)
+            assertThat(it.platformStyle).isNull()
         }
     }
     @Test

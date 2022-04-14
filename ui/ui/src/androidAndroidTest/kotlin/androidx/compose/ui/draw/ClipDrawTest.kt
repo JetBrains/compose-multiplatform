@@ -404,12 +404,12 @@ class ClipDrawTest {
                 topLeft = Offset(-100f, -100f),
                 size = Size(size.width + 200f, size.height + 200f)
             )
-            drawLatch.countDown()
         }
 
         val clip = Modifier.graphicsLayer {
             shape = model.value
             clip = true
+            drawLatch.countDown()
         }
 
         rule.runOnUiThreadIR {
@@ -540,12 +540,12 @@ fun Bitmap.assertTriangle(innerColor: Color, outerColor: Color) {
     // check bottom corners
     assertColor(outerColor, 0, last - 4)
     assertColor(innerColor, 4, last - 4)
-    assertColor(outerColor, last, last - 4)
-    assertColor(innerColor, last - 4, last)
+    assertColor(outerColor, last, last - 6)
+    assertColor(innerColor, last - 6, last)
     // check top center
     assertColor(outerColor, center - 4, 0)
     assertColor(outerColor, center + 4, 0)
-    assertColor(innerColor, center, 4)
+    assertColor(innerColor, center, 8)
 }
 
 fun Bitmap.assertInvertedTriangle(innerColor: Color, outerColor: Color) {
@@ -565,7 +565,7 @@ fun Bitmap.assertInvertedTriangle(innerColor: Color, outerColor: Color) {
     // check bottom center
     assertColor(outerColor, center - 4, last)
     assertColor(outerColor, center + 4, last)
-    assertColor(innerColor, center, last - 4)
+    assertColor(innerColor, center, last - 6)
 }
 
 fun Bitmap.assertColor(expectedColor: Color, x: Int, y: Int) {

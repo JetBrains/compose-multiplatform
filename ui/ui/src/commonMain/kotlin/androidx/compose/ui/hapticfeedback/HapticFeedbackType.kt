@@ -20,8 +20,8 @@ package androidx.compose.ui.hapticfeedback
  * Constants to be used to perform haptic feedback effects via
  * [HapticFeedback.performHapticFeedback].
  */
-@Suppress("INLINE_CLASS_DEPRECATED")
-inline class HapticFeedbackType(internal val value: Int) {
+@kotlin.jvm.JvmInline
+value class HapticFeedbackType(internal val value: Int) {
 
     override fun toString(): String {
         return when (this) {

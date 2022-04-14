@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// VERSION: v0_92
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -20,21 +21,21 @@ package androidx.compose.material3.tokens
 import androidx.compose.ui.unit.dp
 
 internal object SnackbarTokens {
-    val ActionFocusLabelTextColor = ColorSchemeKey.InversePrimary
-    val ActionFocusStateLayerColor = ColorSchemeKey.InversePrimary
-    val ActionHoverLabelTextColor = ColorSchemeKey.InversePrimary
-    val ActionHoverStateLayerColor = ColorSchemeKey.InversePrimary
-    val ActionLabelTextColor = ColorSchemeKey.InversePrimary
-    val ActionLabelTextFont = TypographyKey.LabelLarge
-    val ActionPressedLabelTextColor = ColorSchemeKey.InversePrimary
-    val ActionPressedStateLayerColor = ColorSchemeKey.InversePrimary
-    val ContainerColor = ColorSchemeKey.InverseSurface
-    val ContainerElevation = Elevation.Level3
-    val ContainerShape = ShapeTokens.Small
-    val IconColor = ColorSchemeKey.InverseOnSurface
+    val ActionFocusLabelTextColor = ColorSchemeKeyTokens.InversePrimary
+    val ActionHoverLabelTextColor = ColorSchemeKeyTokens.InversePrimary
+    val ActionLabelTextColor = ColorSchemeKeyTokens.InversePrimary
+    val ActionLabelTextFont = TypographyKeyTokens.LabelLarge
+    val ActionPressedLabelTextColor = ColorSchemeKeyTokens.InversePrimary
+    val ContainerColor = ColorSchemeKeyTokens.InverseSurface
+    val ContainerElevation = ElevationTokens.Level3
+    val ContainerShape = ShapeKeyTokens.CornerExtraSmall
+    val IconColor = ColorSchemeKeyTokens.InverseOnSurface
+    val FocusIconColor = ColorSchemeKeyTokens.InverseOnSurface
+    val HoverIconColor = ColorSchemeKeyTokens.InverseOnSurface
+    val PressedIconColor = ColorSchemeKeyTokens.InverseOnSurface
     val IconSize = 24.0.dp
-    val SupportingTextColor = ColorSchemeKey.InverseOnSurface
-    val SupportingTextFont = TypographyKey.BodyMedium
+    val SupportingTextColor = ColorSchemeKeyTokens.InverseOnSurface
+    val SupportingTextFont = TypographyKeyTokens.BodyMedium
     val SingleLineContainerHeight = 48.0.dp
     val TwoLinesContainerHeight = 68.0.dp
 }

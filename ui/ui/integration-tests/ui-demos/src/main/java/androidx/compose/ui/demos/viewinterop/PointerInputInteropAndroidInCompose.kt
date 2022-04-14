@@ -20,6 +20,7 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
@@ -27,7 +28,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -36,6 +39,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -45,10 +49,22 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.demos.R
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.ViewCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.VERTICAL
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalComposeUiApi::class)
 val AndroidInComposeDemos = DemoCategory(
@@ -68,6 +84,9 @@ val AndroidInComposeDemos = DemoCategory(
         },
         ComposableDemo("MotionEventPointerInputFilter") {
             PointerInteropFilterDemo()
+        },
+        ComposableDemo("Nested Scroll Interop Compose Parent With Android Child") {
+            NestedScrollInteropComposeParentWithAndroidChild()
         }
     )
 )
@@ -314,6 +333,81 @@ private fun PointerInteropFilterDemo() {
                 }
         ) {
             Text(motionEventString.value)
+        }
+    }
+}
+
+val ToolbarHeight = 48.dp
+
+@Composable
+private fun NestedScrollInteropComposeParentWithAndroidChild() {
+    val toolbarHeightPx = with(LocalDensity.current) { ToolbarHeight.roundToPx().toFloat() }
+    val toolbarOffsetHeightPx = remember { mutableStateOf(0f) }
+
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+
+                val delta = available.y
+                val newOffset = toolbarOffsetHeightPx.value + delta
+                toolbarOffsetHeightPx.value = newOffset.coerceIn(-toolbarHeightPx, 0f)
+                return Offset.Zero
+            }
+        }
+    }
+
+    Box(
+        Modifier
+            .fillMaxSize()
+            .nestedScroll(nestedScrollConnection)
+    ) {
+
+        TopAppBar(
+            modifier = Modifier
+                .height(ToolbarHeight)
+                .offset { IntOffset(x = 0, y = toolbarOffsetHeightPx.value.roundToInt()) },
+            title = { Text("toolbar offset is ${toolbarOffsetHeightPx.value}") }
+        )
+
+        AndroidView(
+            { context ->
+                LayoutInflater.from(context)
+                    .inflate(R.layout.android_in_compose_nested_scroll_interop, null).apply {
+                        with(findViewById<RecyclerView>(R.id.main_list)) {
+                            layoutManager = LinearLayoutManager(context, VERTICAL, false)
+                            adapter = NestedScrollInteropAdapter()
+                        }
+                    }.also {
+                        ViewCompat.setNestedScrollingEnabled(it, true)
+                    }
+            },
+            modifier = Modifier.padding(top = ToolbarHeight).fillMaxWidth(),
+        )
+    }
+}
+
+private class NestedScrollInteropAdapter :
+    Adapter<NestedScrollInteropAdapter.NestedScrollInteropViewHolder>() {
+    val items = (1..100).map { it.toString() }
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): NestedScrollInteropViewHolder {
+        return NestedScrollInteropViewHolder(
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.android_in_compose_nested_scroll_interop_list_item, parent, false)
+        )
+    }
+
+    override fun onBindViewHolder(holder: NestedScrollInteropViewHolder, position: Int) {
+        holder.bind(items[position])
+    }
+
+    override fun getItemCount(): Int = items.size
+
+    class NestedScrollInteropViewHolder(view: View) : ViewHolder(view) {
+        fun bind(item: String) {
+            itemView.findViewById<TextView>(R.id.list_item).text = item
         }
     }
 }

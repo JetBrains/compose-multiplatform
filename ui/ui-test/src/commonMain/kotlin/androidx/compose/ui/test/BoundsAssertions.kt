@@ -169,7 +169,7 @@ fun SemanticsNodeInteraction.getUnclippedBoundsInRoot(): DpRect {
  */
 fun SemanticsNodeInteraction.getBoundsInRoot(): DpRect {
     val node = fetchSemanticsNode("Failed to retrieve bounds of the node.")
-    return with(node.root!!.density) {
+    return with(node.layoutInfo.density) {
         node.boundsInRoot.let {
             DpRect(it.left.toDp(), it.top.toDp(), it.right.toDp(), it.bottom.toDp())
         }
@@ -195,7 +195,7 @@ private fun <R> SemanticsNodeInteraction.withDensity(
     operation: Density.(SemanticsNode) -> R
 ): R {
     val node = fetchSemanticsNode("Failed to retrieve density for the node.")
-    val density = node.root!!.density
+    val density = node.layoutInfo.density
     return operation.invoke(density, node)
 }
 
@@ -203,7 +203,7 @@ private fun SemanticsNodeInteraction.withUnclippedBoundsInRoot(
     assertion: (DpRect) -> Unit
 ): SemanticsNodeInteraction {
     val node = fetchSemanticsNode("Failed to retrieve bounds of the node.")
-    val bounds = with(node.root!!.density) {
+    val bounds = with(node.layoutInfo.density) {
         node.unclippedBoundsInRoot.let {
             DpRect(it.left.toDp(), it.top.toDp(), it.right.toDp(), it.bottom.toDp())
         }
@@ -216,7 +216,7 @@ private fun SemanticsNodeInteraction.withTouchBoundsInRoot(
     assertion: (DpRect) -> Unit
 ): SemanticsNodeInteraction {
     val node = fetchSemanticsNode("Failed to retrieve bounds of the node.")
-    val bounds = with(node.root!!.density) {
+    val bounds = with(node.layoutInfo.density) {
         node.touchBoundsInRoot.let {
             DpRect(it.left.toDp(), it.top.toDp(), it.right.toDp(), it.bottom.toDp())
         }

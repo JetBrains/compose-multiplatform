@@ -51,11 +51,11 @@ package androidx.compose.material {
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public final class BackdropScaffoldState extends androidx.compose.material.SwipeableState<androidx.compose.material.BackdropValue> {
     ctor public BackdropScaffoldState(androidx.compose.material.BackdropValue initialValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.BackdropValue,java.lang.Boolean> confirmStateChange, optional androidx.compose.material.SnackbarHostState snackbarHostState);
-    method public suspend Object? conceal(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? conceal(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public androidx.compose.material.SnackbarHostState getSnackbarHostState();
     method public boolean isConcealed();
     method public boolean isRevealed();
-    method public suspend Object? reveal(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? reveal(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public final boolean isConcealed;
     property public final boolean isRevealed;
     property public final androidx.compose.material.SnackbarHostState snackbarHostState;
@@ -78,12 +78,12 @@ package androidx.compose.material {
 
   @androidx.compose.material.ExperimentalMaterialApi public final class BottomDrawerState extends androidx.compose.material.SwipeableState<androidx.compose.material.BottomDrawerValue> {
     ctor public BottomDrawerState(androidx.compose.material.BottomDrawerValue initialValue, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomDrawerValue,java.lang.Boolean> confirmStateChange);
-    method public suspend Object? close(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? expand(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? close(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? expand(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public boolean isClosed();
     method public boolean isExpanded();
     method public boolean isOpen();
-    method public suspend Object? open(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? open(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public final boolean isClosed;
     property public final boolean isExpanded;
     property public final boolean isOpen;
@@ -137,8 +137,8 @@ package androidx.compose.material {
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public final class BottomSheetState extends androidx.compose.material.SwipeableState<androidx.compose.material.BottomSheetValue> {
     ctor public BottomSheetState(androidx.compose.material.BottomSheetValue initialValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomSheetValue,java.lang.Boolean> confirmStateChange);
-    method public suspend Object? collapse(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? expand(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? collapse(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? expand(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public boolean isCollapsed();
     method public boolean isExpanded();
     property public final boolean isCollapsed;
@@ -192,13 +192,14 @@ package androidx.compose.material {
 
   public final class ButtonKt {
     method @androidx.compose.runtime.Composable public static void Button(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material.ButtonElevation? elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.material.ButtonColors colors, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static void OutlinedButton(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material.ButtonElevation? elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.material.ButtonColors colors, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static void TextButton(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material.ButtonElevation? elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.material.ButtonColors colors, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void OutlinedButton(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material.ButtonElevation? elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.material.ButtonColors colors, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void TextButton(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material.ButtonElevation? elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.material.ButtonColors colors, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
   }
 
   public final class CardKt {
-    method @androidx.compose.runtime.Composable public static void Card(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.graphics.Shape shape, optional long backgroundColor, optional long contentColor, optional androidx.compose.foundation.BorderStroke? border, optional float elevation, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void Card(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.graphics.Shape shape, optional long backgroundColor, optional long contentColor, optional androidx.compose.foundation.BorderStroke? border, optional float elevation, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.foundation.Indication? indication, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void Card(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.graphics.Shape shape, optional long backgroundColor, optional long contentColor, optional androidx.compose.foundation.BorderStroke? border, optional float elevation, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void Card(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.ui.graphics.Shape shape, optional long backgroundColor, optional long contentColor, optional androidx.compose.foundation.BorderStroke? border, optional float elevation, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @Deprecated @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void Card(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.graphics.Shape shape, optional long backgroundColor, optional long contentColor, optional androidx.compose.foundation.BorderStroke? border, optional float elevation, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.foundation.Indication? indication, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
   @androidx.compose.runtime.Stable public interface CheckboxColors {
@@ -215,6 +216,38 @@ package androidx.compose.material {
   public final class CheckboxKt {
     method @androidx.compose.runtime.Composable public static void Checkbox(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit>? onCheckedChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material.CheckboxColors colors);
     method @androidx.compose.runtime.Composable public static void TriStateCheckbox(androidx.compose.ui.state.ToggleableState state, kotlin.jvm.functions.Function0<kotlin.Unit>? onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material.CheckboxColors colors);
+  }
+
+  @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface ChipColors {
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> backgroundColor(boolean enabled);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> contentColor(boolean enabled);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> leadingIconContentColor(boolean enabled);
+  }
+
+  @androidx.compose.material.ExperimentalMaterialApi public final class ChipDefaults {
+    method @androidx.compose.runtime.Composable public androidx.compose.material.ChipColors chipColors(optional long backgroundColor, optional long contentColor, optional long leadingIconContentColor, optional long disabledBackgroundColor, optional long disabledContentColor, optional long disabledLeadingIconContentColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material.SelectableChipColors filterChipColors(optional long backgroundColor, optional long contentColor, optional long leadingIconColor, optional long disabledBackgroundColor, optional long disabledContentColor, optional long disabledLeadingIconColor, optional long selectedBackgroundColor, optional long selectedContentColor, optional long selectedLeadingIconColor);
+    method public float getLeadingIconSize();
+    method public float getMinHeight();
+    method @androidx.compose.runtime.Composable public androidx.compose.foundation.BorderStroke getOutlinedBorder();
+    method public float getOutlinedBorderSize();
+    method public float getSelectedIconSize();
+    method @androidx.compose.runtime.Composable public androidx.compose.material.ChipColors outlinedChipColors(optional long backgroundColor, optional long contentColor, optional long leadingIconContentColor, optional long disabledBackgroundColor, optional long disabledContentColor, optional long disabledLeadingIconContentColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material.SelectableChipColors outlinedFilterChipColors(optional long backgroundColor, optional long contentColor, optional long leadingIconColor, optional long disabledBackgroundColor, optional long disabledContentColor, optional long disabledLeadingIconColor, optional long selectedBackgroundColor, optional long selectedContentColor, optional long selectedLeadingIconColor);
+    property public final float LeadingIconSize;
+    property public final float MinHeight;
+    property public final float OutlinedBorderSize;
+    property public final float SelectedIconSize;
+    property @androidx.compose.runtime.Composable public final androidx.compose.foundation.BorderStroke outlinedBorder;
+    field public static final float ContentOpacity = 0.87f;
+    field public static final androidx.compose.material.ChipDefaults INSTANCE;
+    field public static final float LeadingIconOpacity = 0.54f;
+    field public static final float OutlinedBorderOpacity = 0.12f;
+  }
+
+  public final class ChipKt {
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void Chip(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.material.ChipColors colors, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void FilterChip(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.material.SelectableChipColors colors, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? selectedIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
   }
 
   @androidx.compose.runtime.Stable public final class Colors {
@@ -283,10 +316,10 @@ package androidx.compose.material {
 
   @androidx.compose.material.ExperimentalMaterialApi public final class DismissState extends androidx.compose.material.SwipeableState<androidx.compose.material.DismissValue> {
     ctor public DismissState(androidx.compose.material.DismissValue initialValue, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.DismissValue,java.lang.Boolean> confirmStateChange);
-    method public suspend Object? dismiss(androidx.compose.material.DismissDirection direction, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? dismiss(androidx.compose.material.DismissDirection direction, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public androidx.compose.material.DismissDirection? getDismissDirection();
     method public boolean isDismissed(androidx.compose.material.DismissDirection direction);
-    method public suspend Object? reset(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? reset(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public final androidx.compose.material.DismissDirection? dismissDirection;
     field public static final androidx.compose.material.DismissState.Companion Companion;
   }
@@ -326,16 +359,16 @@ package androidx.compose.material {
 
   @androidx.compose.runtime.Stable public final class DrawerState {
     ctor public DrawerState(androidx.compose.material.DrawerValue initialValue, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.DrawerValue,java.lang.Boolean> confirmStateChange);
-    method @androidx.compose.material.ExperimentalMaterialApi public suspend Object? animateTo(androidx.compose.material.DrawerValue targetValue, androidx.compose.animation.core.AnimationSpec<java.lang.Float> anim, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? close(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method @androidx.compose.material.ExperimentalMaterialApi public suspend Object? animateTo(androidx.compose.material.DrawerValue targetValue, androidx.compose.animation.core.AnimationSpec<java.lang.Float> anim, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? close(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public androidx.compose.material.DrawerValue getCurrentValue();
     method @androidx.compose.material.ExperimentalMaterialApi public androidx.compose.runtime.State<java.lang.Float> getOffset();
     method @androidx.compose.material.ExperimentalMaterialApi public androidx.compose.material.DrawerValue getTargetValue();
     method public boolean isAnimationRunning();
     method public boolean isClosed();
     method public boolean isOpen();
-    method public suspend Object? open(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method @androidx.compose.material.ExperimentalMaterialApi public suspend Object? snapTo(androidx.compose.material.DrawerValue targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? open(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method @androidx.compose.material.ExperimentalMaterialApi public suspend Object? snapTo(androidx.compose.material.DrawerValue targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public final androidx.compose.material.DrawerValue currentValue;
     property public final boolean isAnimationRunning;
     property public final boolean isClosed;
@@ -387,8 +420,8 @@ package androidx.compose.material {
     method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void ExposedDropdownMenuBox(boolean expanded, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onExpandedChange, optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function1<? super androidx.compose.material.ExposedDropdownMenuBoxScope,kotlin.Unit> content);
   }
 
-  public final inline class FabPosition {
-    ctor public FabPosition();
+  @kotlin.jvm.JvmInline public final value class FabPosition {
+    field public static final androidx.compose.material.FabPosition.Companion Companion;
   }
 
   public static final class FabPosition.Companion {
@@ -431,8 +464,8 @@ package androidx.compose.material {
   }
 
   public final class IconKt {
-    method @androidx.compose.runtime.Composable public static void Icon(androidx.compose.ui.graphics.vector.ImageVector imageVector, String? contentDescription, optional androidx.compose.ui.Modifier modifier, optional long tint);
-    method @androidx.compose.runtime.Composable public static void Icon(androidx.compose.ui.graphics.ImageBitmap bitmap, String? contentDescription, optional androidx.compose.ui.Modifier modifier, optional long tint);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void Icon(androidx.compose.ui.graphics.vector.ImageVector imageVector, String? contentDescription, optional androidx.compose.ui.Modifier modifier, optional long tint);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void Icon(androidx.compose.ui.graphics.ImageBitmap bitmap, String? contentDescription, optional androidx.compose.ui.Modifier modifier, optional long tint);
     method @androidx.compose.runtime.Composable public static void Icon(androidx.compose.ui.graphics.painter.Painter painter, String? contentDescription, optional androidx.compose.ui.Modifier modifier, optional long tint);
   }
 
@@ -486,9 +519,9 @@ package androidx.compose.material {
   @androidx.compose.material.ExperimentalMaterialApi public final class ModalBottomSheetState extends androidx.compose.material.SwipeableState<androidx.compose.material.ModalBottomSheetValue> {
     ctor public ModalBottomSheetState(androidx.compose.material.ModalBottomSheetValue initialValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, boolean isSkipHalfExpanded, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.ModalBottomSheetValue,java.lang.Boolean> confirmStateChange);
     ctor public ModalBottomSheetState(androidx.compose.material.ModalBottomSheetValue initialValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.ModalBottomSheetValue,java.lang.Boolean> confirmStateChange);
-    method public suspend Object? hide(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? hide(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public boolean isVisible();
-    method public suspend Object? show(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? show(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public final boolean isVisible;
     field public static final androidx.compose.material.ModalBottomSheetState.Companion Companion;
   }
@@ -573,6 +606,12 @@ package androidx.compose.material {
     property public final androidx.compose.material.SnackbarHostState snackbarHostState;
   }
 
+  @androidx.compose.material.ExperimentalMaterialApi public interface SelectableChipColors {
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> backgroundColor(boolean enabled, boolean selected);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> contentColor(boolean enabled, boolean selected);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> leadingIconColor(boolean enabled, boolean selected);
+  }
+
   @androidx.compose.runtime.Immutable public final class Shapes {
     ctor public Shapes(optional androidx.compose.foundation.shape.CornerBasedShape small, optional androidx.compose.foundation.shape.CornerBasedShape medium, optional androidx.compose.foundation.shape.CornerBasedShape large);
     method public androidx.compose.material.Shapes copy(optional androidx.compose.foundation.shape.CornerBasedShape small, optional androidx.compose.foundation.shape.CornerBasedShape medium, optional androidx.compose.foundation.shape.CornerBasedShape large);
@@ -640,7 +679,7 @@ package androidx.compose.material {
   @androidx.compose.runtime.Stable public final class SnackbarHostState {
     ctor public SnackbarHostState();
     method public androidx.compose.material.SnackbarData? getCurrentSnackbarData();
-    method public suspend Object? showSnackbar(String message, optional String? actionLabel, optional androidx.compose.material.SnackbarDuration duration, optional kotlin.coroutines.Continuation<? super androidx.compose.material.SnackbarResult> p);
+    method public suspend Object? showSnackbar(String message, optional String? actionLabel, optional androidx.compose.material.SnackbarDuration duration, optional kotlin.coroutines.Continuation<? super androidx.compose.material.SnackbarResult>);
     property public final androidx.compose.material.SnackbarData? currentSnackbarData;
   }
 
@@ -659,7 +698,10 @@ package androidx.compose.material {
 
   public final class SurfaceKt {
     method @androidx.compose.runtime.Composable public static void Surface(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.graphics.Shape shape, optional long color, optional long contentColor, optional androidx.compose.foundation.BorderStroke? border, optional float elevation, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void Surface(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.graphics.Shape shape, optional long color, optional long contentColor, optional androidx.compose.foundation.BorderStroke? border, optional float elevation, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.foundation.Indication? indication, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void Surface(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.ui.graphics.Shape shape, optional long color, optional long contentColor, optional androidx.compose.foundation.BorderStroke? border, optional float elevation, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void Surface(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.ui.graphics.Shape shape, optional long color, optional long contentColor, optional androidx.compose.foundation.BorderStroke? border, optional float elevation, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void Surface(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onCheckedChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.ui.graphics.Shape shape, optional long color, optional long contentColor, optional androidx.compose.foundation.BorderStroke? border, optional float elevation, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @Deprecated @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void Surface(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.graphics.Shape shape, optional long color, optional long contentColor, optional androidx.compose.foundation.BorderStroke? border, optional float elevation, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.foundation.Indication? indication, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Immutable public final class SwipeProgress<T> {
@@ -695,7 +737,7 @@ package androidx.compose.material {
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public class SwipeableState<T> {
     ctor public SwipeableState(T? initialValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> confirmStateChange);
-    method @androidx.compose.material.ExperimentalMaterialApi public final suspend Object? animateTo(T? targetValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> anim, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method @androidx.compose.material.ExperimentalMaterialApi public final suspend Object? animateTo(T? targetValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> anim, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public final T! getCurrentValue();
     method public final float getDirection();
     method public final androidx.compose.runtime.State<java.lang.Float> getOffset();
@@ -704,8 +746,8 @@ package androidx.compose.material {
     method public final T! getTargetValue();
     method public final boolean isAnimationRunning();
     method public final float performDrag(float delta);
-    method public final suspend Object? performFling(float velocity, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method @androidx.compose.material.ExperimentalMaterialApi public final suspend Object? snapTo(T? targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public final suspend Object? performFling(float velocity, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method @androidx.compose.material.ExperimentalMaterialApi public final suspend Object? snapTo(T? targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public final T! currentValue;
     property public final float direction;
     property public final boolean isAnimationRunning;
@@ -764,8 +806,8 @@ package androidx.compose.material {
   }
 
   public final class TabRowKt {
-    method @androidx.compose.runtime.Composable public static void ScrollableTabRow(int selectedTabIndex, optional androidx.compose.ui.Modifier modifier, optional long backgroundColor, optional long contentColor, optional float edgePadding, optional kotlin.jvm.functions.Function1<? super java.util.List<androidx.compose.material.TabPosition>,kotlin.Unit> indicator, optional kotlin.jvm.functions.Function0<kotlin.Unit> divider, kotlin.jvm.functions.Function0<kotlin.Unit> tabs);
-    method @androidx.compose.runtime.Composable public static void TabRow(int selectedTabIndex, optional androidx.compose.ui.Modifier modifier, optional long backgroundColor, optional long contentColor, optional kotlin.jvm.functions.Function1<? super java.util.List<androidx.compose.material.TabPosition>,kotlin.Unit> indicator, optional kotlin.jvm.functions.Function0<kotlin.Unit> divider, kotlin.jvm.functions.Function0<kotlin.Unit> tabs);
+    method @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public static void ScrollableTabRow(int selectedTabIndex, optional androidx.compose.ui.Modifier modifier, optional long backgroundColor, optional long contentColor, optional float edgePadding, optional kotlin.jvm.functions.Function1<? super java.util.List<androidx.compose.material.TabPosition>,kotlin.Unit> indicator, optional kotlin.jvm.functions.Function0<kotlin.Unit> divider, kotlin.jvm.functions.Function0<kotlin.Unit> tabs);
+    method @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public static void TabRow(int selectedTabIndex, optional androidx.compose.ui.Modifier modifier, optional long backgroundColor, optional long contentColor, optional kotlin.jvm.functions.Function1<? super java.util.List<androidx.compose.material.TabPosition>,kotlin.Unit> indicator, optional kotlin.jvm.functions.Function0<kotlin.Unit> divider, kotlin.jvm.functions.Function0<kotlin.Unit> tabs);
   }
 
   @androidx.compose.runtime.Stable public interface TextFieldColors {
@@ -785,16 +827,34 @@ package androidx.compose.material {
   }
 
   public final class TextFieldDefaults {
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public void BorderStroke(boolean enabled, boolean isError, androidx.compose.foundation.interaction.InteractionSource interactionSource, androidx.compose.material.TextFieldColors colors, optional androidx.compose.ui.graphics.Shape shape, optional float focusedBorderThickness, optional float unfocusedBorderThickness);
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public void OutlinedTextFieldDecorationBox(String value, kotlin.jvm.functions.Function0<kotlin.Unit> innerTextField, boolean enabled, boolean singleLine, androidx.compose.ui.text.input.VisualTransformation visualTransformation, androidx.compose.foundation.interaction.InteractionSource interactionSource, optional boolean isError, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional androidx.compose.material.TextFieldColors colors, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional kotlin.jvm.functions.Function0<kotlin.Unit> border);
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public void TextFieldDecorationBox(String value, kotlin.jvm.functions.Function0<kotlin.Unit> innerTextField, boolean enabled, boolean singleLine, androidx.compose.ui.text.input.VisualTransformation visualTransformation, androidx.compose.foundation.interaction.InteractionSource interactionSource, optional boolean isError, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional androidx.compose.material.TextFieldColors colors, optional androidx.compose.foundation.layout.PaddingValues contentPadding);
+    method public float getFocusedBorderThickness();
     method public float getMinHeight();
     method public float getMinWidth();
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public androidx.compose.ui.graphics.Shape getOutlinedTextFieldShape();
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public androidx.compose.ui.graphics.Shape getTextFieldShape();
+    method public float getUnfocusedBorderThickness();
+    method @androidx.compose.material.ExperimentalMaterialApi public androidx.compose.ui.Modifier indicatorLine(androidx.compose.ui.Modifier, boolean enabled, boolean isError, androidx.compose.foundation.interaction.InteractionSource interactionSource, androidx.compose.material.TextFieldColors colors, optional float focusedIndicatorLineThickness, optional float unfocusedIndicatorLineThickness);
     method @androidx.compose.runtime.Composable public androidx.compose.material.TextFieldColors outlinedTextFieldColors(optional long textColor, optional long disabledTextColor, optional long backgroundColor, optional long cursorColor, optional long errorCursorColor, optional long focusedBorderColor, optional long unfocusedBorderColor, optional long disabledBorderColor, optional long errorBorderColor, optional long leadingIconColor, optional long disabledLeadingIconColor, optional long errorLeadingIconColor, optional long trailingIconColor, optional long disabledTrailingIconColor, optional long errorTrailingIconColor, optional long focusedLabelColor, optional long unfocusedLabelColor, optional long disabledLabelColor, optional long errorLabelColor, optional long placeholderColor, optional long disabledPlaceholderColor);
+    method @androidx.compose.material.ExperimentalMaterialApi public androidx.compose.foundation.layout.PaddingValues outlinedTextFieldPadding(optional float start, optional float top, optional float end, optional float bottom);
     method @androidx.compose.runtime.Composable public androidx.compose.material.TextFieldColors textFieldColors(optional long textColor, optional long disabledTextColor, optional long backgroundColor, optional long cursorColor, optional long errorCursorColor, optional long focusedIndicatorColor, optional long unfocusedIndicatorColor, optional long disabledIndicatorColor, optional long errorIndicatorColor, optional long leadingIconColor, optional long disabledLeadingIconColor, optional long errorLeadingIconColor, optional long trailingIconColor, optional long disabledTrailingIconColor, optional long errorTrailingIconColor, optional long focusedLabelColor, optional long unfocusedLabelColor, optional long disabledLabelColor, optional long errorLabelColor, optional long placeholderColor, optional long disabledPlaceholderColor);
+    method @androidx.compose.material.ExperimentalMaterialApi public androidx.compose.foundation.layout.PaddingValues textFieldWithLabelPadding(optional float start, optional float end, optional float top, optional float bottom);
+    method @androidx.compose.material.ExperimentalMaterialApi public androidx.compose.foundation.layout.PaddingValues textFieldWithoutLabelPadding(optional float start, optional float top, optional float end, optional float bottom);
+    property public final float FocusedBorderThickness;
     property public final float MinHeight;
     property public final float MinWidth;
+    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final androidx.compose.ui.graphics.Shape OutlinedTextFieldShape;
+    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final androidx.compose.ui.graphics.Shape TextFieldShape;
+    property public final float UnfocusedBorderThickness;
     field public static final float BackgroundOpacity = 0.12f;
     field public static final androidx.compose.material.TextFieldDefaults INSTANCE;
     field public static final float IconOpacity = 0.54f;
     field public static final float UnfocusedIndicatorLineOpacity = 0.42f;
+  }
+
+  public final class TextFieldDefaultsKt {
   }
 
   public final class TextFieldImplKt {

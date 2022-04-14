@@ -16,8 +16,7 @@
 
 package androidx.compose.ui.text.font
 
-import androidx.compose.ui.text.fastMinByOrNull
-import androidx.compose.ui.util.fastMaxBy
+import androidx.compose.ui.text.fastFilter
 
 /**
  * Given a [FontFamily], [FontWeight] and [FontStyle], matches the best font in the [FontFamily]
@@ -26,7 +25,7 @@ import androidx.compose.ui.util.fastMaxBy
  * For the case without font synthesis, applies the rules at
  * [CSS 4 Font Matching](https://www.w3.org/TR/css-fonts-4/#font-style-matching).
  */
-internal open class FontMatcher {
+internal class FontMatcher {
 
     /**
      * Given a [FontFamily], [FontWeight] and [FontStyle], matches the best font in the
@@ -35,63 +34,115 @@ internal open class FontMatcher {
      * best match will be returned. The rules for the best match are defined in
      * [CSS 4 Font Matching](https://www.w3.org/TR/css-fonts-4/#font-style-matching).
      *
+     * If no fonts match, an empty list is returned.
+     *
      * @param fontList iterable of fonts to choose the [Font] from
      * @param fontWeight desired [FontWeight]
      * @param fontStyle desired [FontStyle]
      */
-    open fun matchFont(
-        fontList: Iterable<Font>,
+    fun matchFont(
+        fontList: List<Font>,
         fontWeight: FontWeight,
         fontStyle: FontStyle
-    ): Font {
+    ): List<Font> {
         // check for exact match first
-        fontList.filter { it.weight == fontWeight && it.style == fontStyle }.let {
+        fontList.fastFilter { it.weight == fontWeight && it.style == fontStyle }.let {
             // TODO(b/130797349): IR compiler bug was here
             if (it.isNotEmpty()) {
-                return it[0]
+                return it
             }
         }
 
         // if no exact match, filter with style
-        val fonts = fontList.filter { it.style == fontStyle }.let {
-            if (it.isNotEmpty()) it else fontList
+        val fontsToSearch = fontList.fastFilter { it.style == fontStyle }.ifEmpty { fontList }
+
+        val result = when {
+            fontWeight < FontWeight.W400 -> {
+                // If the desired weight is less than 400
+                // - weights less than or equal to the desired weight are checked in descending order
+                // - followed by weights above the desired weight in ascending order
+
+                fontsToSearch.filterByClosestWeight(fontWeight, preferBelow = true)
+            }
+            fontWeight > FontWeight.W500 -> {
+                // If the desired weight is greater than 500
+                // - weights greater than or equal to the desired weight are checked in ascending order
+                // - followed by weights below the desired weight in descending order
+                fontsToSearch.filterByClosestWeight(fontWeight, preferBelow = false)
+            }
+            else -> {
+                // If the desired weight is inclusively between 400 and 500
+                // - weights greater than or equal to the target weight are checked in ascending order
+                // until 500 is hit and checked,
+                // - followed by weights less than the target weight in descending order,
+                // - followed by weights greater than 500
+                fontsToSearch
+                    .filterByClosestWeight(
+                        fontWeight,
+                        preferBelow = false,
+                        minSearchRange = null,
+                        maxSearchRange = FontWeight.W500
+                    )
+                    .ifEmpty {
+                        fontsToSearch.filterByClosestWeight(
+                            fontWeight,
+                            preferBelow = false,
+                            minSearchRange = FontWeight.W500,
+                            maxSearchRange = null
+                        )
+                    }
+            }
         }
 
-        val result = if (fontWeight < FontWeight.W400) {
-            // If the desired weight is less than 400
-            // - weights less than or equal to the desired weight are checked in descending order
-            // - followed by weights above the desired weight in ascending order
-            fonts.filter { it.weight <= fontWeight }.fastMaxBy { it.weight }
-                ?: fonts.filter { it.weight > fontWeight }.fastMinByOrNull { it.weight }
-        } else if (fontWeight > FontWeight.W500) {
-            // If the desired weight is greater than 500
-            // - weights greater than or equal to the desired weight are checked in ascending order
-            // - followed by weights below the desired weight in descending order
-            fonts.filter { it.weight >= fontWeight }.fastMinByOrNull { it.weight }
-                ?: fonts.filter { it.weight < fontWeight }.fastMaxBy { it.weight }
+        return result
+    }
+
+    @Suppress("NOTHING_TO_INLINE")
+    // @VisibleForTesting
+    internal inline fun List<Font>.filterByClosestWeight(
+        fontWeight: FontWeight,
+        preferBelow: Boolean,
+        minSearchRange: FontWeight? = null,
+        maxSearchRange: FontWeight? = null,
+    ): List<Font> {
+        var bestWeightAbove: FontWeight? = null
+        var bestWeightBelow: FontWeight? = null
+        for (index in indices) {
+            val font = get(index)
+            val possibleWeight = font.weight
+            if (minSearchRange != null && possibleWeight < minSearchRange) { continue }
+            if (maxSearchRange != null && possibleWeight > maxSearchRange) { continue }
+            if (possibleWeight < fontWeight) {
+                if (bestWeightBelow == null || possibleWeight > bestWeightBelow) {
+                    bestWeightBelow = possibleWeight
+                }
+            } else if (possibleWeight > fontWeight) {
+                if (bestWeightAbove == null || possibleWeight < bestWeightAbove) {
+                    bestWeightAbove = possibleWeight
+                }
+            } else {
+                // exact weight match, we can exit now
+                bestWeightAbove = possibleWeight
+                bestWeightBelow = possibleWeight
+                break
+            }
+        }
+        val bestWeight = if (preferBelow) {
+            bestWeightBelow ?: bestWeightAbove
         } else {
-            // If the desired weight is inclusively between 400 and 500
-            // - weights greater than or equal to the target weight are checked in ascending order
-            // until 500 is hit and checked,
-            // - followed by weights less than the target weight in descending order,
-            // - followed by weights greater than 500
-            fonts.filter { it.weight >= fontWeight && it.weight <= FontWeight.W500 }
-                .fastMinByOrNull { it.weight }
-                ?: fonts.filter { it.weight < fontWeight }.fastMaxBy { it.weight }
-                ?: fonts.filter { it.weight > FontWeight.W500 }.fastMinByOrNull { it.weight }
+            bestWeightAbove ?: bestWeightBelow
         }
-
-        return result ?: throw IllegalStateException("Cannot match any font")
+        return fastFilter { it.weight == bestWeight }
     }
 
     /**
      * @see matchFont
      */
-    open fun matchFont(
+    fun matchFont(
         fontFamily: FontFamily,
         fontWeight: FontWeight,
         fontStyle: FontStyle
-    ): Font {
+    ): List<Font> {
         if (fontFamily !is FontListFontFamily) throw IllegalArgumentException(
             "Only FontFamily instances that presents a list of Fonts can be used"
         )
@@ -104,11 +155,11 @@ internal open class FontMatcher {
      *
      * @see matchFont
      */
-    open fun matchFont(
+    fun matchFont(
         fontFamily: FontListFontFamily,
         fontWeight: FontWeight,
         fontStyle: FontStyle
-    ): Font {
+    ): List<Font> {
         return matchFont(fontFamily.fonts, fontWeight, fontStyle)
     }
 }

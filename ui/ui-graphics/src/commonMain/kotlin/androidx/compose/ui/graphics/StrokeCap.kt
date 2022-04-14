@@ -22,9 +22,9 @@ import androidx.compose.runtime.Immutable
  * Styles to use for line endings.
  * See [Paint.strokeCap].
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class StrokeCap internal constructor(@Suppress("unused") private val value: Int) {
+@kotlin.jvm.JvmInline
+value class StrokeCap internal constructor(@Suppress("unused") private val value: Int) {
     companion object {
         /**
          * Begin and end contours with a flat edge and no extension.

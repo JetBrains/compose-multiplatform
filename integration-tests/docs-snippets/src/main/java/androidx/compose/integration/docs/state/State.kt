@@ -192,13 +192,14 @@ private fun StateSnippets8() {
             val scaffoldState = rememberScaffoldState()
             val coroutineScope = rememberCoroutineScope()
 
-            Scaffold(scaffoldState = scaffoldState) {
+            Scaffold(scaffoldState = scaffoldState) { innerPadding ->
                 MyContent(
                     showSnackbar = { message ->
                         coroutineScope.launch {
                             scaffoldState.snackbarHostState.showSnackbar(message)
                         }
-                    }
+                    },
+                    modifier = Modifier.padding(innerPadding)
                 )
             }
         }
@@ -261,8 +262,12 @@ private fun StateSnippets10() {
                         )
                     }
                 }
-            ) {
-                NavHost(navController = myAppState.navController, "initial") { /* ... */ }
+            ) { innerPadding ->
+                NavHost(
+                    navController = myAppState.navController,
+                    startDestination = "initial",
+                    modifier = Modifier.padding(innerPadding)
+                ) { /* ... */ }
             }
         }
     }
@@ -286,7 +291,7 @@ private object binding {
 private fun MyTheme(content: @Composable () -> Unit) {}
 
 @Composable
-private fun MyContent(showSnackbar: (String) -> Unit) {}
+private fun MyContent(showSnackbar: (String) -> Unit, modifier: Modifier = Modifier) {}
 
 @Composable
 private fun BottomBar(tabs: Unit, navigateToRoute: (String) -> Unit) {}

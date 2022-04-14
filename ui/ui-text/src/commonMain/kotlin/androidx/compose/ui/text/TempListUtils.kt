@@ -146,6 +146,22 @@ internal inline fun <T> List<T>.fastFilterNot(predicate: (T) -> Boolean): List<T
 }
 
 /**
+ * Returns a list containing all elements that are not null
+ *
+ * **Do not use for collections that come from public APIs**, since they may not support random
+ * access in an efficient way, and this method may actually be a lot slower. Only use for
+ * collections that are created by code we control and are known to support random access.
+ */
+@OptIn(ExperimentalContracts::class)
+internal fun <T : Any> List<T?>.fastFilterNotNull(): List<T> {
+    val target = ArrayList<T>(size)
+    fastForEach {
+        if ((it) != null) target += (it)
+    }
+    return target
+}
+
+/**
  * Returns a list containing the first elements satisfying the given [predicate].
  *
  * **Do not use for collections that come from public APIs**, since they may not support random

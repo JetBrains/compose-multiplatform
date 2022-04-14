@@ -147,14 +147,8 @@ class TextInputSession(
         }
     }
 
-    /**
-     * Notify the focused rectangle to the system.
-     *
-     * If the session is not open, no action will be performed.
-     *
-     * @param rect the rectangle that describes the boundaries on the screen that requires focus
-     * @return false if this session expired and no action was performed
-     */
+    @Suppress("DeprecatedCallableAddReplaceWith", "DEPRECATION")
+    @Deprecated("This method should not be called, used BringIntoViewRequester instead.")
     fun notifyFocusedRect(rect: Rect): Boolean = ensureOpenSession {
         platformTextInputService.notifyFocusedRect(rect)
     }
@@ -261,10 +255,7 @@ interface PlatformTextInputService {
      */
     fun updateState(oldValue: TextFieldValue?, newValue: TextFieldValue)
 
-    /**
-     * Notify the focused rectangle to the system.
-     *
-     * @see TextInputSession.notifyFocusedRect
-     */
-    fun notifyFocusedRect(rect: Rect)
+    @Deprecated("This method should not be called, used BringIntoViewRequester instead.")
+    fun notifyFocusedRect(rect: Rect) {
+    }
 }

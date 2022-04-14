@@ -46,16 +46,6 @@ internal class OwnerSnapshotObserver(onChangedExecutor: (callback: () -> Unit) -
     }
 
     /**
-     * Observing the snapshot reads are temporary disabled during the [block] execution.
-     * For example if we are currently within the measure stage and we want some code block to
-     * be skipped from the observing we disable if before calling the block, execute block and
-     * then enable it again.
-     */
-    internal fun withNoSnapshotReadObservation(block: () -> Unit) {
-        observer.withNoObservations(block)
-    }
-
-    /**
      * Observe snapshot reads during layout of [node], executed in [block].
      */
     internal fun observeLayoutSnapshotReads(node: LayoutNode, block: () -> Unit) {

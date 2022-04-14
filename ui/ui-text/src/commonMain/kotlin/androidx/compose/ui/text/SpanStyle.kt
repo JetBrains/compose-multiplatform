@@ -35,6 +35,15 @@ import androidx.compose.ui.text.style.lerp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.unit.sp
+
+/** The default font size if none is specified. */
+private val DefaultFontSize = 14.sp
+private val DefaultLetterSpacing = 0.sp
+private val DefaultBackgroundColor = Color.Transparent
+// TODO(nona): Introduce TextUnit.Original for representing "do not change the original result".
+//  Need to distinguish from Inherit.
+private val DefaultColor = Color.Black
 
 /**
  * Styling configuration for a text span. This configuration only allows character level styling,
@@ -51,7 +60,7 @@ import androidx.compose.ui.unit.lerp
  * @param fontWeight The typeface thickness to use when painting the text (e.g., bold).
  * @param fontStyle The typeface variant to use when drawing the letters (e.g., italic).
  * @param fontSynthesis Whether to synthesize font weight and/or style when the requested weight or
- *  style cannot be found in the provided custom font family.
+ *  style cannot be found in the provided font family.
  * @param fontFamily The font family to be used when rendering the text.
  * @param fontFeatureSettings The advanced typography settings provided by font. The format is the
  *  same as the CSS font-feature-settings attribute:
@@ -63,13 +72,14 @@ import androidx.compose.ui.unit.lerp
  * @param background The background color for the text.
  * @param textDecoration The decorations to paint on the text (e.g., an underline).
  * @param shadow The shadow effect applied on the text.
+ * @param platformStyle Platform specific [SpanStyle] parameters.
  *
  * @see AnnotatedString
  * @see TextStyle
  * @see ParagraphStyle
  */
 @Immutable
-class SpanStyle(
+class SpanStyle @ExperimentalTextApi constructor(
     val color: Color = Color.Unspecified,
     val fontSize: TextUnit = TextUnit.Unspecified,
     val fontWeight: FontWeight? = null,
@@ -83,8 +93,77 @@ class SpanStyle(
     val localeList: LocaleList? = null,
     val background: Color = Color.Unspecified,
     val textDecoration: TextDecoration? = null,
-    val shadow: Shadow? = null
+    val shadow: Shadow? = null,
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalTextApi val platformStyle: PlatformSpanStyle? = null
 ) {
+
+    /**
+     * Styling configuration for a text span. This configuration only allows character level styling,
+     * in order to set paragraph level styling such as line height, or text alignment please see
+     * [ParagraphStyle].
+     *
+     * @sample androidx.compose.ui.text.samples.SpanStyleSample
+     *
+     * @sample androidx.compose.ui.text.samples.AnnotatedStringBuilderSample
+     *
+     * @param color The text color.
+     * @param fontSize The size of glyphs (in logical pixels) to use when painting the text. This
+     * may be [TextUnit.Unspecified] for inheriting from another [SpanStyle].
+     * @param fontWeight The typeface thickness to use when painting the text (e.g., bold).
+     * @param fontStyle The typeface variant to use when drawing the letters (e.g., italic).
+     * @param fontSynthesis Whether to synthesize font weight and/or style when the requested weight
+     * or style cannot be found in the provided font family.
+     * @param fontFamily The font family to be used when rendering the text.
+     * @param fontFeatureSettings The advanced typography settings provided by font. The format is
+     * the same as the CSS font-feature-settings attribute:
+     *  https://www.w3.org/TR/css-fonts-3/#font-feature-settings-prop
+     * @param letterSpacing The amount of space (in em) to add between each letter.
+     * @param baselineShift The amount by which the text is shifted up from the current baseline.
+     * @param textGeometricTransform The geometric transformation applied the text.
+     * @param localeList The locale list used to select region-specific glyphs.
+     * @param background The background color for the text.
+     * @param textDecoration The decorations to paint on the text (e.g., an underline).
+     * @param shadow The shadow effect applied on the text.
+     *
+     * @see AnnotatedString
+     * @see TextStyle
+     * @see ParagraphStyle
+     */
+    @OptIn(ExperimentalTextApi::class)
+    constructor(
+        color: Color = Color.Unspecified,
+        fontSize: TextUnit = TextUnit.Unspecified,
+        fontWeight: FontWeight? = null,
+        fontStyle: FontStyle? = null,
+        fontSynthesis: FontSynthesis? = null,
+        fontFamily: FontFamily? = null,
+        fontFeatureSettings: String? = null,
+        letterSpacing: TextUnit = TextUnit.Unspecified,
+        baselineShift: BaselineShift? = null,
+        textGeometricTransform: TextGeometricTransform? = null,
+        localeList: LocaleList? = null,
+        background: Color = Color.Unspecified,
+        textDecoration: TextDecoration? = null,
+        shadow: Shadow? = null
+    ) : this(
+        color = color,
+        fontSize = fontSize,
+        fontWeight = fontWeight,
+        fontStyle = fontStyle,
+        fontSynthesis = fontSynthesis,
+        fontFamily = fontFamily,
+        fontFeatureSettings = fontFeatureSettings,
+        letterSpacing = letterSpacing,
+        baselineShift = baselineShift,
+        textGeometricTransform = textGeometricTransform,
+        localeList = localeList,
+        background = background,
+        textDecoration = textDecoration,
+        shadow = shadow,
+        platformStyle = null
+    )
+
     /**
      * Returns a new span style that is a combination of this style and the given [other] style.
      *
@@ -94,6 +173,7 @@ class SpanStyle(
      *
      * If the given span style is null, returns this span style.
      */
+    @OptIn(ExperimentalTextApi::class)
     @Stable
     fun merge(other: SpanStyle? = null): SpanStyle {
         if (other == null) return this
@@ -116,8 +196,16 @@ class SpanStyle(
             localeList = other.localeList ?: this.localeList,
             background = other.background.takeOrElse { this.background },
             textDecoration = other.textDecoration ?: this.textDecoration,
-            shadow = other.shadow ?: this.shadow
+            shadow = other.shadow ?: this.shadow,
+            platformStyle = mergePlatformStyle(other.platformStyle)
         )
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    private fun mergePlatformStyle(other: PlatformSpanStyle?): PlatformSpanStyle? {
+        if (platformStyle == null) return other
+        if (other == null) return platformStyle
+        return platformStyle.merge(other)
     }
 
     /**
@@ -126,6 +214,7 @@ class SpanStyle(
     @Stable
     operator fun plus(other: SpanStyle): SpanStyle = this.merge(other)
 
+    @OptIn(ExperimentalTextApi::class)
     fun copy(
         color: Color = this.color,
         fontSize: TextUnit = this.fontSize,
@@ -156,10 +245,49 @@ class SpanStyle(
             localeList = localeList,
             background = background,
             textDecoration = textDecoration,
-            shadow = shadow
+            shadow = shadow,
+            platformStyle = platformStyle
         )
     }
 
+    @ExperimentalTextApi
+    fun copy(
+        color: Color = this.color,
+        fontSize: TextUnit = this.fontSize,
+        fontWeight: FontWeight? = this.fontWeight,
+        fontStyle: FontStyle? = this.fontStyle,
+        fontSynthesis: FontSynthesis? = this.fontSynthesis,
+        fontFamily: FontFamily? = this.fontFamily,
+        fontFeatureSettings: String? = this.fontFeatureSettings,
+        letterSpacing: TextUnit = this.letterSpacing,
+        baselineShift: BaselineShift? = this.baselineShift,
+        textGeometricTransform: TextGeometricTransform? = this.textGeometricTransform,
+        localeList: LocaleList? = this.localeList,
+        background: Color = this.background,
+        textDecoration: TextDecoration? = this.textDecoration,
+        shadow: Shadow? = this.shadow,
+        platformStyle: PlatformSpanStyle? = this.platformStyle
+    ): SpanStyle {
+        return SpanStyle(
+            color = color,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            fontStyle = fontStyle,
+            fontSynthesis = fontSynthesis,
+            fontFamily = fontFamily,
+            fontFeatureSettings = fontFeatureSettings,
+            letterSpacing = letterSpacing,
+            baselineShift = baselineShift,
+            textGeometricTransform = textGeometricTransform,
+            localeList = localeList,
+            background = background,
+            textDecoration = textDecoration,
+            shadow = shadow,
+            platformStyle = platformStyle
+        )
+    }
+
+    @OptIn(ExperimentalTextApi::class)
     override operator fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is SpanStyle) return false
@@ -178,10 +306,12 @@ class SpanStyle(
         if (background != other.background) return false
         if (textDecoration != other.textDecoration) return false
         if (shadow != other.shadow) return false
+        if (platformStyle != other.platformStyle) return false
 
         return true
     }
 
+    @OptIn(ExperimentalTextApi::class)
     override fun hashCode(): Int {
         var result = color.hashCode()
         result = 31 * result + fontSize.hashCode()
@@ -197,9 +327,11 @@ class SpanStyle(
         result = 31 * result + background.hashCode()
         result = 31 * result + (textDecoration?.hashCode() ?: 0)
         result = 31 * result + (shadow?.hashCode() ?: 0)
+        result = 31 * result + (platformStyle?.hashCode() ?: 0)
         return result
     }
 
+    @OptIn(ExperimentalTextApi::class)
     override fun toString(): String {
         return "SpanStyle(" +
             "color=$color, " +
@@ -215,7 +347,8 @@ class SpanStyle(
             "localeList=$localeList, " +
             "background=$background, " +
             "textDecoration=$textDecoration, " +
-            "shadow=$shadow" +
+            "shadow=$shadow, " +
+            "platformStyle=$platformStyle" +
             ")"
     }
 }
@@ -248,6 +381,7 @@ internal fun <T> lerpDiscrete(a: T, b: T, fraction: Float): T = if (fraction < 0
  * between [start] and [stop]. The interpolation can be extrapolated beyond 0.0 and
  * 1.0, so negative values and values greater than 1.0 are valid.
  */
+@OptIn(ExperimentalTextApi::class)
 fun lerp(start: SpanStyle, stop: SpanStyle, fraction: Float): SpanStyle {
     return SpanStyle(
         color = lerp(start.color, stop.color, fraction),
@@ -307,6 +441,42 @@ fun lerp(start: SpanStyle, stop: SpanStyle, fraction: Float): SpanStyle {
             start.shadow ?: Shadow(),
             stop.shadow ?: Shadow(),
             fraction
-        )
+        ),
+        platformStyle = lerpPlatformStyle(start.platformStyle, stop.platformStyle, fraction)
     )
 }
+
+@OptIn(ExperimentalTextApi::class)
+private fun lerpPlatformStyle(
+    start: PlatformSpanStyle?,
+    stop: PlatformSpanStyle?,
+    fraction: Float
+): PlatformSpanStyle? {
+    if (start == null && stop == null) return null
+    val startNonNull = start ?: PlatformSpanStyle.Default
+    val stopNonNull = stop ?: PlatformSpanStyle.Default
+    return startNonNull.lerp(stopNonNull, fraction)
+}
+
+@OptIn(ExperimentalTextApi::class)
+internal fun resolveSpanStyleDefaults(style: SpanStyle) = SpanStyle(
+    color = style.color.takeOrElse { DefaultColor },
+    fontSize = if (style.fontSize.isUnspecified) DefaultFontSize else style.fontSize,
+    fontWeight = style.fontWeight ?: FontWeight.Normal,
+    fontStyle = style.fontStyle ?: FontStyle.Normal,
+    fontSynthesis = style.fontSynthesis ?: FontSynthesis.All,
+    fontFamily = style.fontFamily ?: FontFamily.Default,
+    fontFeatureSettings = style.fontFeatureSettings ?: "",
+    letterSpacing = if (style.letterSpacing.isUnspecified) {
+        DefaultLetterSpacing
+    } else {
+        style.letterSpacing
+    },
+    baselineShift = style.baselineShift ?: BaselineShift.None,
+    textGeometricTransform = style.textGeometricTransform ?: TextGeometricTransform.None,
+    localeList = style.localeList ?: LocaleList.current,
+    background = style.background.takeOrElse { DefaultBackgroundColor },
+    textDecoration = style.textDecoration ?: TextDecoration.None,
+    shadow = style.shadow ?: Shadow.None,
+    platformStyle = style.platformStyle
+)

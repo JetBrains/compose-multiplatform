@@ -6,6 +6,7 @@ package androidx.compose.ui.test {
     method @Deprecated public static androidx.compose.ui.test.SemanticsNodeInteraction performGesture(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.GestureScope,kotlin.Unit> block);
     method @androidx.compose.ui.test.ExperimentalTestApi public static androidx.compose.ui.test.SemanticsNodeInteraction performMouseInput(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.MouseInjectionScope,kotlin.Unit> block);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performMultiModalInput(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.MultiModalInjectionScope,kotlin.Unit> block);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static androidx.compose.ui.test.SemanticsNodeInteraction performRotaryScrollInput(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.RotaryInjectionScope,kotlin.Unit> block);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performScrollTo(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performScrollToIndex(androidx.compose.ui.test.SemanticsNodeInteraction, int index);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performScrollToKey(androidx.compose.ui.test.SemanticsNodeInteraction, Object key);
@@ -81,6 +82,9 @@ package androidx.compose.ui.test {
   }
 
   public final class ErrorMessagesKt {
+  }
+
+  public final class Expect_jvmKt {
   }
 
   @kotlin.RequiresOptIn(message="This testing API is experimental and is likely to be changed or removed entirely") public @interface ExperimentalTestApi {
@@ -253,15 +257,16 @@ package androidx.compose.ui.test {
     method public void advanceTimeUntil(optional long timeoutMillis, kotlin.jvm.functions.Function0<java.lang.Boolean> condition);
     method public boolean getAutoAdvance();
     method public long getCurrentTime();
-    method public void setAutoAdvance(boolean autoAdvance);
+    method public void setAutoAdvance(boolean);
     property public abstract boolean autoAdvance;
     property public abstract long currentTime;
   }
 
-  @androidx.compose.ui.test.ExperimentalTestApi public final inline class MouseButton {
-    ctor public MouseButton();
+  @androidx.compose.ui.test.ExperimentalTestApi @kotlin.jvm.JvmInline public final value class MouseButton {
+    ctor public MouseButton(int buttonId);
     method public int getButtonId();
     property public final int buttonId;
+    field public static final androidx.compose.ui.test.MouseButton.Companion Companion;
   }
 
   @androidx.compose.ui.test.ExperimentalTestApi public static final class MouseButton.Companion {
@@ -303,6 +308,7 @@ package androidx.compose.ui.test {
 
   public sealed interface MultiModalInjectionScope extends androidx.compose.ui.test.InjectionScope {
     method @androidx.compose.ui.test.ExperimentalTestApi public void mouse(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.MouseInjectionScope,kotlin.Unit> block);
+    method @androidx.compose.ui.test.ExperimentalTestApi public void rotary(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.RotaryInjectionScope,kotlin.Unit> block);
     method public void touch(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.TouchInjectionScope,kotlin.Unit> block);
   }
 
@@ -313,10 +319,15 @@ package androidx.compose.ui.test {
     method public static String printToString(androidx.compose.ui.test.SemanticsNodeInteractionCollection, optional int maxDepth);
   }
 
-  @androidx.compose.ui.test.ExperimentalTestApi public final inline class ScrollWheel {
-    ctor public ScrollWheel();
+  @androidx.compose.ui.test.ExperimentalTestApi public interface RotaryInjectionScope extends androidx.compose.ui.test.InjectionScope {
+    method public void rotateToScrollHorizontally(float horizontalScrollPixels);
+    method public void rotateToScrollVertically(float verticalScrollPixels);
+  }
+
+  @androidx.compose.ui.test.ExperimentalTestApi @kotlin.jvm.JvmInline public final value class ScrollWheel {
     method public int getValue();
     property public final int value;
+    field public static final androidx.compose.ui.test.ScrollWheel.Companion Companion;
   }
 
   @androidx.compose.ui.test.ExperimentalTestApi public static final class ScrollWheel.Companion {
@@ -400,10 +411,10 @@ package androidx.compose.ui.test {
   }
 
   @kotlinx.coroutines.ExperimentalCoroutinesApi public final class TestMonotonicFrameClock implements androidx.compose.runtime.MonotonicFrameClock {
-    ctor public TestMonotonicFrameClock(kotlinx.coroutines.CoroutineScope coroutineScope, kotlinx.coroutines.test.DelayController delayController, optional long frameDelayNanos);
+    ctor public TestMonotonicFrameClock(kotlinx.coroutines.CoroutineScope coroutineScope, kotlinx.coroutines.test.TestCoroutineScheduler delayController, optional long frameDelayNanos);
     method public long getFrameDelayNanos();
     method public boolean getHasAwaiters();
-    method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R>);
     property public final long frameDelayNanos;
     property public final boolean hasAwaiters;
   }

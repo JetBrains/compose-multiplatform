@@ -45,7 +45,9 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.yield
 import org.junit.After
@@ -67,8 +69,13 @@ class SuspendingPointerInputFilterTest {
         isDebugInspectorInfoEnabled = false
     }
 
+    private fun runTestUnconfined(test: suspend TestScope.() -> Unit) =
+        runTest(UnconfinedTestDispatcher()) {
+            test()
+        }
+
     @Test
-    fun testAwaitSingleEvent(): Unit = runBlockingTest {
+    fun testAwaitSingleEvent(): Unit = runTestUnconfined {
         val filter = SuspendingPointerInputFilter(TestViewConfiguration())
 
         val result = CompletableDeferred<PointerEvent>()
@@ -97,7 +104,7 @@ class SuspendingPointerInputFilterTest {
     }
 
     @Test
-    fun testAwaitSeveralEvents(): Unit = runBlockingTest {
+    fun testAwaitSeveralEvents(): Unit = runTestUnconfined {
         val filter = SuspendingPointerInputFilter(TestViewConfiguration())
         val results = Channel<PointerEvent>(Channel.UNLIMITED)
         launch {
@@ -132,7 +139,7 @@ class SuspendingPointerInputFilterTest {
     }
 
     @Test
-    fun testSyntheticCancelEvent(): Unit = runBlockingTest {
+    fun testSyntheticCancelEvent(): Unit = runTestUnconfined {
         var currentEventAtEnd: PointerEvent? = null
         val filter = SuspendingPointerInputFilter(TestViewConfiguration())
         val results = Channel<PointerEvent>(Channel.UNLIMITED)
@@ -180,7 +187,7 @@ class SuspendingPointerInputFilterTest {
                         0,
                         Offset(6f, 6f),
                         true,
-                        consumed = ConsumedData(downChange = true)
+                        isInitiallyConsumed = true
                     ),
                     PointerInputChange(
                         PointerId(1),
@@ -190,7 +197,7 @@ class SuspendingPointerInputFilterTest {
                         0,
                         Offset(10f, 10f),
                         false,
-                        consumed = ConsumedData()
+                        isInitiallyConsumed = false
                     )
                 )
             )
@@ -219,7 +226,7 @@ class SuspendingPointerInputFilterTest {
     }
 
     @Test
-    fun testNoSyntheticCancelEventWhenPressIsFalse(): Unit = runBlockingTest {
+    fun testNoSyntheticCancelEventWhenPressIsFalse(): Unit = runTestUnconfined {
         var currentEventAtEnd: PointerEvent? = null
         val filter = SuspendingPointerInputFilter(TestViewConfiguration())
         val results = Channel<PointerEvent>(Channel.UNLIMITED)
@@ -287,7 +294,7 @@ class SuspendingPointerInputFilterTest {
     }
 
     @Test
-    fun testCancelledHandlerBlock() = runBlockingTest {
+    fun testCancelledHandlerBlock() = runTestUnconfined {
         val filter = SuspendingPointerInputFilter(TestViewConfiguration())
         val counter = TestCounter()
         val handler = launch {
@@ -361,7 +368,7 @@ class SuspendingPointerInputFilterTest {
     }
 
     @Test(expected = PointerEventTimeoutCancellationException::class)
-    fun testWithTimeout() = runBlockingTest {
+    fun testWithTimeout() = runTestUnconfined {
         val filter = SuspendingPointerInputFilter(TestViewConfiguration())
         filter.coroutineScope = this
         with(filter) {
@@ -374,7 +381,7 @@ class SuspendingPointerInputFilterTest {
     }
 
     @Test
-    fun testWithTimeoutOrNull() = runBlockingTest {
+    fun testWithTimeoutOrNull() = runTestUnconfined {
         val filter = SuspendingPointerInputFilter(TestViewConfiguration())
         filter.coroutineScope = this
         val result: PointerEvent? = with(filter) {
@@ -411,7 +418,7 @@ private class PointerInputChangeEmitter(id: Int = 0) {
             previousTime,
             previousPosition,
             previousPressed,
-            consumed = ConsumedData()
+            isInitiallyConsumed = false
         ).also {
             previousTime = time
             previousPosition = position

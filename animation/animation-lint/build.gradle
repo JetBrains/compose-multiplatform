@@ -16,7 +16,6 @@
 
 
 import androidx.build.BundleInsideHelper
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
 plugins {
@@ -42,7 +41,7 @@ dependencies {
 androidx {
     name = "Compose Animation Lint Checks"
     type = LibraryType.LINT
-    mavenGroup = LibraryGroups.Compose.ANIMATION
+    mavenGroup = LibraryGroups.COMPOSE_ANIMATION
     inceptionYear = "2021"
     description = "Compose Animation Lint Checks"
 }

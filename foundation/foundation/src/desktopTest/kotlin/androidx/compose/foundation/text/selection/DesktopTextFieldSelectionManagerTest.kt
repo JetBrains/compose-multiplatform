@@ -93,7 +93,7 @@ class DesktopTextFieldSelectionManagerTest {
                 overflow = TextOverflow.Ellipsis,
                 density = density,
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = mock(),
+                fontFamilyResolver = mock(),
                 constraints = Constraints()
             )
         )
@@ -114,7 +114,7 @@ class DesktopTextFieldSelectionManagerTest {
 
         whenever(layoutResultProxy.value).thenReturn(layoutResult)
 
-        state = TextFieldState(mock())
+        state = TextFieldState(mock(), mock())
         state.layoutResult = layoutResultProxy
         state.processor.reset(value, null)
         manager.state = state

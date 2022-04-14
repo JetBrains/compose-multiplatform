@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.test.R
 
 class FontTestData {
+    @OptIn(ExperimentalTextApi::class)
     companion object {
         // This sample font provides the following features:
         // 1. The width of most of visible characters equals to font size.
@@ -62,6 +63,12 @@ class FontTestData {
         )
 
         val FONT_200_ITALIC = Font(
+            resId = R.font.test_200_italic,
+            weight = FontWeight.W200,
+            style = FontStyle.Italic
+        )
+
+        val FONT_200_ITALIC_FALLBACK = Font(
             resId = R.font.test_200_italic,
             weight = FontWeight.W200,
             style = FontStyle.Italic

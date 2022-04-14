@@ -16,14 +16,36 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.foundation.text.Handle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.unit.dp
 
 internal val HandleWidth = 25.dp
 internal val HandleHeight = 25.dp
+
+/**
+ * [SelectionHandleInfo]s for the nodes representing selection handles. These nodes are in popup
+ * windows, and will respond to drag gestures.
+ */
+internal val SelectionHandleInfoKey =
+    SemanticsPropertyKey<SelectionHandleInfo>("SelectionHandleInfo")
+
+/**
+ * Information about a single selection handle popup.
+ *
+ * @param handle Which selection [Handle] this is about.
+ * @param position The position that the handle is anchored to relative to the selectable content.
+ * This position is not necessarily the position of the popup itself, it's the position that the
+ * handle "points" to (so e.g. top-middle for [Handle.Cursor]).
+ */
+internal data class SelectionHandleInfo(
+    val handle: Handle,
+    val position: Offset
+)
 
 @Composable
 internal expect fun SelectionHandle(

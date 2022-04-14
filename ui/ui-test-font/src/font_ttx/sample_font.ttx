@@ -44,7 +44,7 @@
 
   <hhea>
     <tableVersion value="0x00010000"/>
-    <ascent value="1000"/>
+    <ascent value="800"/>
     <descent value="-200"/>
     <lineGap value="0"/>
     <advanceWidthMax value="1000"/>
@@ -136,7 +136,7 @@
 
   <cmap>
     <tableVersion version="0"/>
-    <cmap_format_4 platformID="3" platEncID="10" language="0">
+    <cmap_format_12 platformID="3" platEncID="10" format="12" reserved="0" length="0" language="0" nGroups="0">
         <map code="0x0009" name="1em" /> <!-- TAB -->
         <map code="0x000A" name="linefeed" /> <!-- LINEFEED -->
         <map code="0x0020" name="space" /> <!-- SPACE -->
@@ -224,7 +224,13 @@
         <map code="0x05E9" name="1em_rtl"/>	<!-- ש Shin -->
         <map code="0x05EA" name="1em_rtl"/>	<!-- ת Tav -->
 
-    </cmap_format_4>
+        <map code="0x1d11e" name="1em"/><!-- MUSICAL SYMBOL G CLEF -->
+        <map code="0x1d11f" name="1em"/><!-- MUSICAL SYMBOL G CLEF OTTAVA ALTA -->
+        <map code="0x1f600" name="1em"/><!-- GRINNING FACE -->
+        <map code="0x1f603" name="1em"/><!-- Smiling Face With Open Mouth -->
+        <map code="0x1f604" name="1em"/><!-- Smiling Face with Open Mouth and Smiling Eyes -->
+        <map code="0x1f606" name="1em"/><!-- Smiling Face with Open Mouth and Tightly-Closed Eyes -->
+    </cmap_format_12>
   </cmap>
 
   <loca>

@@ -36,7 +36,6 @@ import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToUp
-import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.input.pointer.isOutOfBounds
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.debugInspectorInfo
@@ -133,12 +132,12 @@ internal suspend fun PointerInputScope.detectTapWithContext(
             awaitPointerEventScope {
 
                 val down = awaitEventFirstDown().also {
-                    it.changes.forEach { it.consumeDownChange() }
+                    it.changes.forEach { it.consume() }
                 }
 
                 val up = waitForFirstInboundUp()
                 if (up != null) {
-                    up.changes.forEach { it.consumeDownChange() }
+                    up.changes.forEach { it.consume() }
                     onTap?.invoke(down, up)
                 }
             }

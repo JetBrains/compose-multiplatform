@@ -47,9 +47,13 @@ private const val PLAIN_TEXT_LABEL = "plain text"
 /**
  * Android implementation for [ClipboardManager].
  */
-internal class AndroidClipboardManager(context: Context) : ClipboardManager {
-    private val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as
-        android.content.ClipboardManager
+internal class AndroidClipboardManager internal constructor(
+    private val clipboardManager: android.content.ClipboardManager
+) : ClipboardManager {
+
+    internal constructor(context: Context) : this(
+        context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+    )
 
     override fun setText(annotatedString: AnnotatedString) {
         clipboardManager.setPrimaryClip(
@@ -61,10 +65,13 @@ internal class AndroidClipboardManager(context: Context) : ClipboardManager {
     }
 
     override fun getText(): AnnotatedString? {
-        return if (clipboardManager.hasPrimaryClip()) {
-            clipboardManager.primaryClip!!.getItemAt(0).text.convertToAnnotatedString()
-        } else {
-            null
+        return clipboardManager.primaryClip?.let { primaryClip ->
+            if (primaryClip.itemCount > 0) {
+                // note: text may be null, ensure this is null-safe
+                primaryClip.getItemAt(0)?.text.convertToAnnotatedString()
+            } else {
+                null
+            }
         }
     }
 

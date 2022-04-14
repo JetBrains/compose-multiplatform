@@ -21,9 +21,11 @@
 
 package androidx.compose.integration.docs.sideeffects
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -73,6 +75,7 @@ import kotlin.random.Random
  * No action required if it's modified.
  */
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @ExperimentalMaterialApi
 private object SideEffectsSnippet1 {
     @Composable
@@ -112,8 +115,8 @@ private object SideEffectsSnippet2 {
         // Creates a CoroutineScope bound to the MoviesScreen's lifecycle
         val scope = rememberCoroutineScope()
 
-        Scaffold(scaffoldState = scaffoldState) {
-            Column {
+        Scaffold(scaffoldState = scaffoldState) { innerPadding ->
+            Column(Modifier.padding(innerPadding)) {
                 /* ... */
                 Button(
                     onClick = {
@@ -238,7 +241,7 @@ private object SideEffectsSnippet7 {
 
         // Calculate high priority tasks only when the todoTasks or highPriorityKeywords
         // change, not on every recomposition
-        val highPriorityTasks by remember {
+        val highPriorityTasks by remember(highPriorityKeywords) {
             derivedStateOf { todoTasks.filter { it.containsWord(highPriorityKeywords) } }
         }
 

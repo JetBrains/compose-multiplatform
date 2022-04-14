@@ -84,8 +84,8 @@ class Placeholder(
  * The settings used to specify how a placeholder is vertically aligned within a text line.
  * @see Placeholder
  */
-@Suppress("INLINE_CLASS_DEPRECATED")
-inline class PlaceholderVerticalAlign internal constructor(
+@kotlin.jvm.JvmInline
+value class PlaceholderVerticalAlign internal constructor(
     @Suppress("unused") private val value: Int
 ) {
 

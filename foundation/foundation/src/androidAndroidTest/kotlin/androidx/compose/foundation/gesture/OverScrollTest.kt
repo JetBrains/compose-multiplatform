@@ -22,6 +22,7 @@ import androidx.compose.foundation.gestures.OverScrollController
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.gestures.overScroll
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -237,6 +238,14 @@ class OverScrollTest {
         rule.runOnIdle {
             assertThat(controller.stopAnimationCallsCount).isEqualTo(2)
         }
+    }
+
+    @Test
+    fun modifierIsProducingEqualsModifiersForTheSameInput() {
+        val overScrollController = TestOverScrollController()
+        val first = Modifier.overScroll(overScrollController)
+        val second = Modifier.overScroll(overScrollController)
+        assertThat(first).isEqualTo(second)
     }
 
     class TestOverScrollController(

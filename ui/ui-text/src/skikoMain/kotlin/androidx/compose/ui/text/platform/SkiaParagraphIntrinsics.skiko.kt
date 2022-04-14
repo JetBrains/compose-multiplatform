@@ -20,7 +20,7 @@ import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Density
@@ -32,7 +32,7 @@ internal actual fun ActualParagraphIntrinsics(
     spanStyles: List<Range<SpanStyle>>,
     placeholders: List<Range<Placeholder>>,
     density: Density,
-    resourceLoader: Font.ResourceLoader
+    fontFamilyResolver: FontFamily.Resolver
 ): ParagraphIntrinsics =
     SkiaParagraphIntrinsics(
         text,
@@ -40,7 +40,7 @@ internal actual fun ActualParagraphIntrinsics(
         spanStyles,
         placeholders,
         density,
-        resourceLoader
+        fontFamilyResolver
     )
 
 internal class SkiaParagraphIntrinsics(
@@ -49,7 +49,7 @@ internal class SkiaParagraphIntrinsics(
     private val spanStyles: List<Range<SpanStyle>>,
     private val placeholders: List<Range<Placeholder>>,
     private val density: Density,
-    private val resourceLoader: Font.ResourceLoader
+    private val fontFamilyResolver: FontFamily.Resolver
 ) : ParagraphIntrinsics {
     val textDirection = resolveTextDirection(style.textDirection)
 
@@ -62,7 +62,7 @@ internal class SkiaParagraphIntrinsics(
     }
 
     private fun newLayouter() = ParagraphLayouter(
-        text, textDirection, style, spanStyles, placeholders, density, resourceLoader
+        text, textDirection, style, spanStyles, placeholders, density, fontFamilyResolver
     )
 
     override var minIntrinsicWidth = 0f

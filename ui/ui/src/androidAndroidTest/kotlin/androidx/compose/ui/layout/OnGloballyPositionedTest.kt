@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -51,6 +52,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
@@ -505,6 +507,7 @@ class OnGloballyPositionedTest {
         assertThat(childCoordinates!!.positionInParent().x).isEqualTo(thirdPaddingPx)
     }
 
+    @FlakyTest(bugId = 213889751)
     @Test
     fun globalCoordinatesAreInActivityCoordinates() {
         val padding = 30
@@ -794,6 +797,35 @@ class OnGloballyPositionedTest {
             Modifier.onGloballyPositioned(lambda1),
             Modifier.onGloballyPositioned(lambda2)
         )
+    }
+
+    @Test
+    fun forceRemeasureTriggersCallbacks() {
+        var coords: LayoutCoordinates? = null
+        var remeasurementObj: Remeasurement? = null
+        rule.setContent {
+            Box(
+                Modifier
+                    .then(object : RemeasurementModifier {
+                        override fun onRemeasurementAvailable(remeasurement: Remeasurement) {
+                            remeasurementObj = remeasurement
+                        }
+                    })
+                    .onGloballyPositioned {
+                        coords = it
+                    }
+                    .size(100.dp)
+            )
+        }
+
+        rule.runOnIdle {
+            assertNotNull(coords)
+            coords = null
+            assertNotNull(remeasurementObj)
+            remeasurementObj!!.forceRemeasure()
+
+            assertNotNull(coords)
+        }
     }
 }
 

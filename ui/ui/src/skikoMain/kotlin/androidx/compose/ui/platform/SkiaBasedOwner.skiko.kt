@@ -18,11 +18,14 @@
 
 package androidx.compose.ui.platform
 
+import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.DefaultPointerButtons
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.InternalComposeUiApi
+import androidx.compose.ui.PrimaryPressedPointerButtons
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.FocusDirection
@@ -67,6 +70,7 @@ import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.input.TextInputService
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.platform.FontLoader
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -84,6 +88,7 @@ private typealias Command = () -> Unit
 )
 internal class SkiaBasedOwner(
     private val platformInputService: PlatformInput,
+    private val component: PlatformComponent,
     density: Density = Density(1f, 1f),
     val isPopup: Boolean = false,
     val isFocusable: Boolean = true,
@@ -96,6 +101,8 @@ internal class SkiaBasedOwner(
         val intOffset = IntOffset(point.x.toInt(), point.y.toInt())
         return bounds.contains(intOffset)
     }
+
+    internal var accessibilityController: AccessibilityController? = null
 
     internal var bounds by mutableStateOf(IntRect.Zero)
 
@@ -183,6 +190,8 @@ internal class SkiaBasedOwner(
     private val pointerInputEventProcessor = PointerInputEventProcessor(root)
     private val measureAndLayoutDelegate = MeasureAndLayoutDelegate(root)
 
+    private val endApplyChangesListeners = mutableVectorOf<(() -> Unit)?>()
+
     init {
         snapshotObserver.startObserving()
         root.attach(this)
@@ -196,7 +205,13 @@ internal class SkiaBasedOwner(
 
     override val textInputService = TextInputService(platformInputService)
 
+    @Deprecated(
+        "fontLoader is deprecated, use fontFamilyResolver",
+        replaceWith = ReplaceWith("fontFamilyResolver")
+    )
     override val fontLoader = FontLoader()
+
+    override val fontFamilyResolver = createFontFamilyResolver()
 
     override val hapticFeedBack = DefaultHapticFeedback()
 
@@ -237,7 +252,6 @@ internal class SkiaBasedOwner(
     val needRender get() = needLayout || needDraw || needSendSyntheticEvents
     var onNeedRender: (() -> Unit)? = null
     var onDispatchCommand: ((Command) -> Unit)? = null
-    var containerCursor: PlatformComponentWithCursor? = null
 
     fun render(canvas: org.jetbrains.skia.Canvas) {
         needLayout = false
@@ -268,6 +282,9 @@ internal class SkiaBasedOwner(
         onNeedRender?.invoke()
     }
 
+    var contentSize = IntSize.Zero
+        private set
+
     override fun measureAndLayout(sendPointerUpdate: Boolean) {
         measureAndLayoutDelegate.updateRootConstraints(constraints)
         if (
@@ -278,20 +295,31 @@ internal class SkiaBasedOwner(
             requestDraw()
         }
         measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
+
+        // Don't use mainOwner.root.width here, as it strictly coerced by [constraints]
+        contentSize = IntSize(
+            root.children.maxOfOrNull { it.outerLayoutNodeWrapper.measuredWidth } ?: 0,
+            root.children.maxOfOrNull { it.outerLayoutNodeWrapper.measuredHeight } ?: 0,
+        )
+    }
+
+    override fun measureAndLayout(layoutNode: LayoutNode, constraints: Constraints) {
+        measureAndLayoutDelegate.measureAndLayout(layoutNode, constraints)
+        measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
     }
 
     override fun forceMeasureTheSubtree(layoutNode: LayoutNode) {
         measureAndLayoutDelegate.forceMeasureTheSubtree(layoutNode)
     }
 
-    override fun onRequestMeasure(layoutNode: LayoutNode) {
-        if (measureAndLayoutDelegate.requestRemeasure(layoutNode)) {
+    override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
+        if (measureAndLayoutDelegate.requestRemeasure(layoutNode, forceRequest)) {
             requestLayout()
         }
     }
 
-    override fun onRequestRelayout(layoutNode: LayoutNode) {
-        if (measureAndLayoutDelegate.requestRelayout(layoutNode)) {
+    override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) {
+        if (measureAndLayoutDelegate.requestRelayout(layoutNode, forceRequest)) {
             requestLayout()
         }
     }
@@ -309,9 +337,13 @@ internal class SkiaBasedOwner(
         onDestroy = { needClearObservations = true }
     )
 
-    override fun onSemanticsChange() = Unit
+    override fun onSemanticsChange() {
+        accessibilityController?.onSemanticsChange()
+    }
 
-    override fun onLayoutChange(layoutNode: LayoutNode) = Unit
+    override fun onLayoutChange(layoutNode: LayoutNode) {
+        accessibilityController?.onLayoutChange(layoutNode)
+    }
 
     override fun getFocusDirection(keyEvent: KeyEvent): FocusDirection? {
         return when (keyEvent.key) {
@@ -363,6 +395,8 @@ internal class SkiaBasedOwner(
                         PointerEventType.Move,
                         lastPointerEvent.uptime,
                         lastPointerEvent.pointers,
+                        lastPointerEvent.buttons,
+                        lastPointerEvent.keyboardModifiers,
                         lastPointerEvent.mouseEvent
                     )
                 )
@@ -387,25 +421,59 @@ internal class SkiaBasedOwner(
                     it.position.y in 0f..root.height.toFloat()
             }
         ).also {
-            setPointerIcon(containerCursor, desiredPointerIcon)
+            if (it.dispatchedToAPointerInputModifier) {
+                setPointerIcon(component, desiredPointerIcon)
+            }
         }
     }
 
     override fun processPointerInput(timeMillis: Long, pointers: List<TestPointerInputEventData>) {
+        val isPressed = pointers.any { it.down }
         processPointerInput(
             PointerInputEvent(
                 PointerEventType.Unknown,
                 timeMillis,
-                pointers.map { it.toPointerInputEventData() }
+                pointers.map { it.toPointerInputEventData() },
+                if (isPressed) PrimaryPressedPointerButtons else DefaultPointerButtons
             )
         )
+    }
+
+    override fun onEndApplyChanges() {
+        // Listeners can add more items to the list and we want to ensure that they
+        // are executed after being added, so loop until the list is empty
+        while (endApplyChangesListeners.isNotEmpty()) {
+            val size = endApplyChangesListeners.size
+            for (i in 0 until size) {
+                val listener = endApplyChangesListeners[i]
+                // null out the item so that if the listener is re-added then we execute it again.
+                endApplyChangesListeners[i] = null
+                listener?.invoke()
+            }
+            // Remove all the items that were visited. Removing items shifts all items after
+            // to the front of the list, so removing in a chunk is cheaper than removing one-by-one
+            endApplyChangesListeners.removeRange(0, size)
+        }
+    }
+
+    override fun registerOnEndApplyChangesListener(listener: () -> Unit) {
+        if (listener !in endApplyChangesListeners) {
+            endApplyChangesListeners += listener
+        }
+    }
+
+    override fun registerOnLayoutCompletedListener(listener: Owner.OnLayoutCompletedListener) {
+        measureAndLayoutDelegate.registerOnLayoutCompletedListener(listener)
+        requestLayout()
     }
 
     override val pointerIconService: PointerIconService =
         object : PointerIconService {
             override var current: PointerIcon
                 get() = desiredPointerIcon ?: PointerIconDefaults.Default
-                set(value) { desiredPointerIcon = value }
+                set(value) {
+                    desiredPointerIcon = value
+                }
         }
 }
 

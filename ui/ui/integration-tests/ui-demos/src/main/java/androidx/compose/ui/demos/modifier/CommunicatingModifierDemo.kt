@@ -64,10 +64,11 @@ fun CommunicatingModifierDemo() {
             }
     }
 
-    Scaffold(scaffoldState = scaffoldState) {
+    Scaffold(scaffoldState = scaffoldState) { innerPadding ->
         Column(
             Modifier
                 .background(Gray)
+                .padding(innerPadding)
                 .modifierLocalProvider(ModifierLocalColor) { "Gray" }
         ) {
             Text("Click the red box to read the parent's ModifierLocalColor")

@@ -15,7 +15,6 @@
  */
 
 
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
 plugins {
@@ -38,7 +37,11 @@ dependencies {
 androidx {
     name = "AndroidX Compose RxJava 2 Integration Samples"
     type = LibraryType.SAMPLES
-    mavenGroup = LibraryGroups.Compose.RUNTIME
+    mavenGroup = LibraryGroups.COMPOSE_RUNTIME
     inceptionYear = "2019"
     description = "Contains the sample code for the Androidx Compose RxJava 2 Integration System"
+}
+
+android {
+    namespace "androidx.compose.runtime.rxjava2.samples"
 }

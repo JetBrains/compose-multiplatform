@@ -23,15 +23,18 @@ import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.createFontFamilyResolver
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.sp
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
+import kotlin.math.ceil
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -54,13 +57,6 @@ class ParagraphBenchmark(
             arrayOf(TextType.PlainText),
             arrayOf(Alphabet.Latin, Alphabet.Cjk)
         )
-
-        // A fake resource loader required to construct Paragraph
-        val resourceLoader = object : Font.ResourceLoader {
-            override fun load(font: Font): Any {
-                return false
-            }
-        }
     }
 
     @get:Rule
@@ -101,7 +97,7 @@ class ParagraphBenchmark(
     ): Paragraph {
         return Paragraph(
             paragraphIntrinsics = paragraphIntrinsics(text, spanStyles),
-            width = width
+            constraints = Constraints(maxWidth = ceil(width).toInt())
         )
     }
 
@@ -115,6 +111,7 @@ class ParagraphBenchmark(
         )
     }
 
+    @OptIn(ExperimentalTextApi::class)
     private fun paragraphIntrinsics(
         text: String,
         spanStyles: List<AnnotatedString.Range<SpanStyle>>
@@ -123,7 +120,7 @@ class ParagraphBenchmark(
             text = text,
             density = Density(density = instrumentationContext.resources.displayMetrics.density),
             style = TextStyle(fontSize = fontSize),
-            resourceLoader = resourceLoader,
+            fontFamilyResolver = createFontFamilyResolver(instrumentationContext),
             spanStyles = spanStyles
         )
     }

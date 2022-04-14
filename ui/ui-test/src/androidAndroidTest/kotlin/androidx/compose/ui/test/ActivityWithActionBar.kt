@@ -18,6 +18,7 @@ package androidx.compose.ui.test
 
 import android.os.Bundle
 import android.view.Gravity
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
@@ -31,7 +32,7 @@ class ActivityWithActionBar : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val root = FrameLayout(this)
         composeHolder = ComposeView(this).apply {
-            layoutParams = FrameLayout.LayoutParams(100, 100).apply {
+            layoutParams = FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
                 gravity = Gravity.BOTTOM or Gravity.END
             }
             // Set background color for recognizability on screen / in screenshots

@@ -25,6 +25,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -197,6 +198,10 @@ suspend fun awaitApplication(
     }
 }
 
+/**
+ * Scope used by [application], [awaitApplication], [launchApplication]
+ */
+@Stable
 interface ApplicationScope {
     fun exitApplication()
 }

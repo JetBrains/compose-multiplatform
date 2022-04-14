@@ -19,6 +19,7 @@ package androidx.compose.material
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
@@ -52,6 +53,7 @@ import androidx.compose.ui.unit.dp
  *  tint is applied
  */
 @Composable
+@NonRestartableComposable
 fun Icon(
     imageVector: ImageVector,
     contentDescription: String?,
@@ -80,6 +82,7 @@ fun Icon(
  *  tint is applied
  */
 @Composable
+@NonRestartableComposable
 fun Icon(
     bitmap: ImageBitmap,
     contentDescription: String?,

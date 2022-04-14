@@ -39,6 +39,8 @@ internal interface DeviceRenderNode {
     var translationX: Float
     var translationY: Float
     var elevation: Float
+    var ambientShadowColor: Int
+    var spotShadowColor: Int
     var rotationZ: Float
     var rotationX: Float
     var rotationY: Float
@@ -96,6 +98,8 @@ internal data class DeviceRenderNodeData(
     var translationX: Float,
     var translationY: Float,
     var elevation: Float,
+    var ambientShadowColor: Int,
+    var spotShadowColor: Int,
     var rotationZ: Float,
     var rotationX: Float,
     var rotationY: Float,

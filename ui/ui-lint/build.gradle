@@ -15,7 +15,6 @@
  */
 
 import androidx.build.BundleInsideHelper
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
 plugins {
@@ -42,7 +41,7 @@ dependencies {
 androidx {
     name = "Compose UI Lint Checks"
     type = LibraryType.LINT
-    mavenGroup = LibraryGroups.Compose.UI
+    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2020"
     description = "Compose UI Lint Checks"
 }

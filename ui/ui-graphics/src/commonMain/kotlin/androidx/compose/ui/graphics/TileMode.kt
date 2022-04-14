@@ -33,9 +33,9 @@ import androidx.compose.runtime.Immutable
  * relative coordinates and can create a [Shader] representing the gradient
  * for a particular [Rect] on demand.
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class TileMode internal constructor(@Suppress("unused") private val value: Int) {
+@kotlin.jvm.JvmInline
+value class TileMode internal constructor(@Suppress("unused") private val value: Int) {
     companion object {
         /**
          * Edge is clamped to the final color.

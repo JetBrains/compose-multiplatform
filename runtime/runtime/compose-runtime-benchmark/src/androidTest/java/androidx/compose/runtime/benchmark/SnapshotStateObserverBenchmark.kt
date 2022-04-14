@@ -16,6 +16,7 @@
 
 package androidx.compose.runtime.benchmark
 
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import androidx.benchmark.junit4.measureRepeated
@@ -32,6 +33,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.random.Random
+import org.junit.Assume.assumeTrue
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -75,6 +77,7 @@ class SnapshotStateObserverBenchmark : ComposeBenchmarkBase() {
 
     @Test
     fun modelObservation() {
+        assumeTrue(Build.VERSION.SDK_INT != 29)
         runOnUiThread {
             benchmarkRule.measureRepeated {
                 runWithTimingDisabled {
@@ -90,6 +93,7 @@ class SnapshotStateObserverBenchmark : ComposeBenchmarkBase() {
 
     @Test
     fun nestedModelObservation() {
+        assumeTrue(Build.VERSION.SDK_INT != 29)
         runOnUiThread {
             val list = mutableListOf<Any>()
             repeat(10) {
@@ -113,6 +117,7 @@ class SnapshotStateObserverBenchmark : ComposeBenchmarkBase() {
 
     @Test
     fun modelClear() {
+        assumeTrue(Build.VERSION.SDK_INT != 29)
         runOnUiThread {
             val nodeSet = hashSetOf<Any>()
             nodeSet.addAll(nodes)
@@ -131,6 +136,7 @@ class SnapshotStateObserverBenchmark : ComposeBenchmarkBase() {
 
     @Test
     fun notifyChanges() {
+        assumeTrue(Build.VERSION.SDK_INT != 29)
         runOnUiThread {
             val states = mutableSetOf<Int>()
             repeat(50) {

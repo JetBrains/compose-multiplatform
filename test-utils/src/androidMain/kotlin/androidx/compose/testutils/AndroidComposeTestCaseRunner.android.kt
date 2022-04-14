@@ -40,7 +40,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
 /**
  * Factory method to provide implementation of [ComposeBenchmarkScope].
@@ -86,8 +86,11 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
 
     private var canvas: Canvas? = null
 
-    private val testCoroutineDispatcher = TestCoroutineDispatcher()
-    private val frameClock = TestMonotonicFrameClock(CoroutineScope(testCoroutineDispatcher))
+    private val testCoroutineDispatcher = UnconfinedTestDispatcher()
+    private val frameClock = TestMonotonicFrameClock(
+        coroutineScope = CoroutineScope(testCoroutineDispatcher),
+        delayController = testCoroutineDispatcher.scheduler
+    )
     private val recomposerApplyCoroutineScope = CoroutineScope(
         testCoroutineDispatcher + frameClock + Job()
     )
@@ -206,7 +209,8 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
     override fun recompose() {
         if (hasPendingChanges()) {
             didLastRecomposeHaveChanges = true
-            testCoroutineDispatcher.advanceTimeBy(frameClock.frameDelayMillis)
+            testCoroutineDispatcher.scheduler.advanceTimeBy(frameClock.frameDelayMillis)
+            testCoroutineDispatcher.scheduler.runCurrent()
         } else {
             didLastRecomposeHaveChanges = false
         }
@@ -241,7 +245,7 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
         rootView.removeAllViews()
 
         // Dispatcher will clean up the cancelled coroutines when it advances to them
-        testCoroutineDispatcher.advanceUntilIdle()
+        testCoroutineDispatcher.scheduler.advanceUntilIdle()
 
         // Important so we can set the content again.
         view = null

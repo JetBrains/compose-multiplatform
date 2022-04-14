@@ -65,9 +65,13 @@ fun AnimatedClockDemo() {
     val minutes = remember { mutableStateOf(calendar[Calendar.MINUTE]) }
     val hours = remember { mutableStateOf(calendar[Calendar.HOUR_OF_DAY]) }
     LaunchedEffect(key1 = Unit) {
+        // Start from 23:59:50 to give an impressive animation for all numbers
+        calendar.set(2020, 10, 10, 23, 59, 50)
+        val initialTime = calendar.timeInMillis
+        val firstFrameTime = withInfiniteAnimationFrameMillis { it }
         while (isActive) {
             withInfiniteAnimationFrameMillis {
-                calendar.timeInMillis = System.currentTimeMillis()
+                calendar.timeInMillis = it - firstFrameTime + initialTime
                 seconds.value = calendar[Calendar.SECOND]
                 minutes.value = calendar[Calendar.MINUTE]
                 hours.value = calendar[Calendar.HOUR_OF_DAY]

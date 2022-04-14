@@ -41,7 +41,7 @@ import androidx.compose.runtime.Stable
  * @see modifierLocalConsumer
  */
 @Stable
-sealed class ModifierLocal<T> private constructor(internal val defaultFactory: () -> T)
+sealed class ModifierLocal<T> constructor(internal val defaultFactory: () -> T)
 
 /**
  * [ProvidableModifierLocal]s are [ModifierLocal]s that can be used to provide values using a

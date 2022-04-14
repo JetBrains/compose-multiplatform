@@ -18,6 +18,7 @@ package androidx.compose.ui.text
 
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.ResolvedTextDirection
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -36,7 +37,7 @@ class ParagraphIntegrationTextDirectionTest {
     private lateinit var defaultLocale: Locale
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val defaultDensity = Density(density = 1f)
-    private val resourceLoader = TestFontResourceLoader(context)
+    private val resourceLoader = UncachedFontFamilyResolver(context)
     private val ltrLocaleList = LocaleList("en")
     private val rtlLocaleList = LocaleList("ar")
     private val rtlLocale = Locale("ar")
@@ -59,9 +60,9 @@ class ParagraphIntegrationTextDirectionTest {
         val paragraph = Paragraph(
             text = "",
             style = TextStyle(textDirection = null),
-            width = Float.MAX_VALUE,
+            constraints = Constraints(),
             density = defaultDensity,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = resourceLoader
         )
 
         assertThat(paragraph.getParagraphDirection(0)).isEqualTo(ResolvedTextDirection.Ltr)
@@ -74,9 +75,9 @@ class ParagraphIntegrationTextDirectionTest {
         val paragraph = Paragraph(
             text = "",
             style = TextStyle(textDirection = null),
-            width = Float.MAX_VALUE,
+            constraints = Constraints(),
             density = defaultDensity,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = resourceLoader
         )
 
         assertThat(paragraph.getParagraphDirection(0)).isEqualTo(ResolvedTextDirection.Rtl)
@@ -87,9 +88,9 @@ class ParagraphIntegrationTextDirectionTest {
         val paragraph = Paragraph(
             text = "",
             style = TextStyle(textDirection = null, localeList = ltrLocaleList),
-            width = Float.MAX_VALUE,
+            constraints = Constraints(),
             density = defaultDensity,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = resourceLoader
         )
 
         assertThat(paragraph.getParagraphDirection(0)).isEqualTo(ResolvedTextDirection.Ltr)
@@ -100,9 +101,9 @@ class ParagraphIntegrationTextDirectionTest {
         val paragraph = Paragraph(
             text = "",
             style = TextStyle(textDirection = null, localeList = rtlLocaleList),
-            width = Float.MAX_VALUE,
+            constraints = Constraints(),
             density = defaultDensity,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = resourceLoader
         )
 
         assertThat(paragraph.getParagraphDirection(0)).isEqualTo(ResolvedTextDirection.Rtl)

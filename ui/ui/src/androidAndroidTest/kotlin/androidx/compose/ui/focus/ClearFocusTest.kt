@@ -55,7 +55,7 @@ class ClearFocusTest(private val forced: Boolean) {
 
         // Act.
         val cleared = rule.runOnIdle {
-            modifier.focusNode.clearFocus(forced)
+            modifier.clearFocus(forced)
         }
 
         // Assert.
@@ -75,13 +75,13 @@ class ClearFocusTest(private val forced: Boolean) {
                 Box(Modifier.focusTarget(modifier))
             }
             SideEffect {
-                parent.focusedChild = modifier.focusNode
+                parent.focusedChild = modifier
             }
         }
 
         // Act.
         val cleared = rule.runOnIdle {
-            modifier.focusNode.clearFocus(forced)
+            modifier.clearFocus(forced)
         }
 
         // Assert.
@@ -101,7 +101,7 @@ class ClearFocusTest(private val forced: Boolean) {
 
         // Act.
         rule.runOnIdle {
-            modifier.focusNode.clearFocus(forced)
+            modifier.clearFocus(forced)
         }
     }
 
@@ -118,14 +118,14 @@ class ClearFocusTest(private val forced: Boolean) {
                 }
             }
             SideEffect {
-                parent.focusedChild = modifier.focusNode
-                modifier.focusedChild = child.focusNode
+                parent.focusedChild = modifier
+                modifier.focusedChild = child
             }
         }
 
         // Act.
         val cleared = rule.runOnIdle {
-            modifier.focusNode.clearFocus(forced)
+            modifier.clearFocus(forced)
         }
 
         // Assert.
@@ -152,15 +152,15 @@ class ClearFocusTest(private val forced: Boolean) {
                 }
             }
             SideEffect {
-                modifier.focusedChild = child.focusNode
-                child.focusedChild = grandchild.focusNode
-                grandchild.focusedChild = greatGrandchild.focusNode
+                modifier.focusedChild = child
+                child.focusedChild = grandchild
+                grandchild.focusedChild = greatGrandchild
             }
         }
 
         // Act.
         val cleared = rule.runOnIdle {
-            modifier.focusNode.clearFocus(forced)
+            modifier.clearFocus(forced)
         }
 
         // Assert.
@@ -186,7 +186,7 @@ class ClearFocusTest(private val forced: Boolean) {
 
         // Act.
         val cleared = rule.runOnIdle {
-            modifier.focusNode.clearFocus(forced)
+            modifier.clearFocus(forced)
         }
 
         // Assert.
@@ -214,13 +214,13 @@ class ClearFocusTest(private val forced: Boolean) {
                 Box(Modifier.focusTarget(modifier))
             }
             SideEffect {
-                parent.focusedChild = modifier.focusNode
+                parent.focusedChild = modifier
             }
         }
 
         // Act.
         val cleared = rule.runOnIdle {
-            modifier.focusNode.clearFocus(forced)
+            modifier.clearFocus(forced)
         }
 
         // Assert.
@@ -248,7 +248,7 @@ class ClearFocusTest(private val forced: Boolean) {
 
         // Act.
         val cleared = rule.runOnIdle {
-            modifier.focusNode.clearFocus(forced)
+            modifier.clearFocus(forced)
         }
 
         // Assert.
@@ -272,7 +272,7 @@ class ClearFocusTest(private val forced: Boolean) {
 
         // Act.
         val cleared = rule.runOnIdle {
-            modifier.focusNode.clearFocus(forced)
+            modifier.clearFocus(forced)
         }
 
         // Assert.
@@ -292,7 +292,7 @@ class ClearFocusTest(private val forced: Boolean) {
 
         // Act.
         rule.runOnIdle {
-            modifier.focusNode.clearFocus(forced)
+            modifier.clearFocus(forced)
         }
     }
 
@@ -313,14 +313,14 @@ class ClearFocusTest(private val forced: Boolean) {
                 }
             }
             SideEffect {
-                parent.focusedChild = modifier.focusNode
-                modifier.focusedChild = child.focusNode
+                parent.focusedChild = modifier
+                modifier.focusedChild = child
             }
         }
 
         // Act.
         val cleared = rule.runOnIdle {
-            modifier.focusNode.clearFocus(forced)
+            modifier.clearFocus(forced)
         }
 
         // Assert.
@@ -350,14 +350,14 @@ class ClearFocusTest(private val forced: Boolean) {
                 }
             }
             SideEffect {
-                parent.focusedChild = modifier.focusNode
-                modifier.focusedChild = child.focusNode
+                parent.focusedChild = modifier
+                modifier.focusedChild = child
             }
         }
 
         // Act.
         val cleared = rule.runOnIdle {
-            modifier.focusNode.clearFocus(forced)
+            modifier.clearFocus(forced)
         }
 
         // Assert.
@@ -393,16 +393,16 @@ class ClearFocusTest(private val forced: Boolean) {
                 }
             }
             SideEffect {
-                modifier.focusedChild = child.focusNode
-                child.focusedChild = grandchild.focusNode
-                grandchild.focusedChild = greatGrandchild.focusNode
-                greatGrandchild.focusedChild = greatGreatGrandchild.focusNode
+                modifier.focusedChild = child
+                child.focusedChild = grandchild
+                grandchild.focusedChild = greatGrandchild
+                greatGrandchild.focusedChild = greatGreatGrandchild
             }
         }
 
         // Act.
         val cleared = rule.runOnIdle {
-            modifier.focusNode.clearFocus(forced)
+            modifier.clearFocus(forced)
         }
 
         // Assert.

@@ -122,7 +122,7 @@ internal class LayoutNodeAlignmentLines(
                 position = wrapper.toParentPosition(position)
                 wrapper = wrapper.wrappedBy!!
                 if (wrapper == layoutNode.innerLayoutNodeWrapper) break
-                if (alignmentLine in wrapper.providedAlignmentLines) {
+                if (alignmentLine in wrapper.measureResult.alignmentLines) {
                     val newPosition = wrapper[alignmentLine]
                     position = Offset(newPosition.toFloat(), newPosition.toFloat())
                 }
@@ -157,7 +157,7 @@ internal class LayoutNodeAlignmentLines(
             // Add alignment lines on the modifier of the child.
             var wrapper = child.innerLayoutNodeWrapper.wrappedBy!!
             while (wrapper != layoutNode.innerLayoutNodeWrapper) {
-                wrapper.providedAlignmentLines.forEach { childLine ->
+                wrapper.measureResult.alignmentLines.keys.forEach { childLine ->
                     addAlignmentLine(childLine, wrapper[childLine], wrapper)
                 }
                 wrapper = wrapper.wrappedBy!!

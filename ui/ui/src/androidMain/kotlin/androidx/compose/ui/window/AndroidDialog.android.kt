@@ -57,7 +57,8 @@ import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMaxBy
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
-import androidx.savedstate.ViewTreeSavedStateRegistryOwner
+import androidx.savedstate.findViewTreeSavedStateRegistryOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import java.util.UUID
 import kotlin.math.roundToInt
 
@@ -78,7 +79,7 @@ class DialogProperties @ExperimentalComposeUiApi constructor(
     val dismissOnBackPress: Boolean = true,
     val dismissOnClickOutside: Boolean = true,
     val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalComposeUiApi
     val usePlatformDefaultWidth: Boolean = true
 ) {
@@ -119,6 +120,10 @@ class DialogProperties @ExperimentalComposeUiApi constructor(
 
 /**
  * Opens a dialog with the given content.
+ *
+ * A dialog is a small window that prompts the user to make a decision or enter
+ * additional information. A dialog does not fill the screen and is normally used
+ * for modal events that require users to take an action before they can proceed.
  *
  * The dialog is visible as long as it is part of the composition hierarchy.
  * In order to let the user dismiss the Dialog, the implementation of [onDismissRequest] should
@@ -320,9 +325,8 @@ private class DialogWrapper(
         setContentView(dialogLayout)
         ViewTreeLifecycleOwner.set(dialogLayout, ViewTreeLifecycleOwner.get(composeView))
         ViewTreeViewModelStoreOwner.set(dialogLayout, ViewTreeViewModelStoreOwner.get(composeView))
-        ViewTreeSavedStateRegistryOwner.set(
-            dialogLayout,
-            ViewTreeSavedStateRegistryOwner.get(composeView)
+        dialogLayout.setViewTreeSavedStateRegistryOwner(
+            composeView.findViewTreeSavedStateRegistryOwner()
         )
 
         // Initial setup

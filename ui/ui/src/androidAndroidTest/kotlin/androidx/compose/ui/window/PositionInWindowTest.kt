@@ -33,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.findAndroidComposeView
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -252,7 +251,7 @@ class PositionInWindowTest {
                                         val down = awaitFirstDown()
                                         var previous = down.position
                                         drag(down.id) {
-                                            it.consumeAllChanges()
+                                            it.consume()
                                             offset += it.position - previous
                                             previous = it.position
                                         }

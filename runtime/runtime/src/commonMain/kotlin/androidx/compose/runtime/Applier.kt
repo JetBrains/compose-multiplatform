@@ -243,3 +243,43 @@ abstract class AbstractApplier<T>(val root: T) : Applier<T> {
         }
     }
 }
+
+internal class OffsetApplier<N>(
+    private val applier: Applier<N>,
+    private val offset: Int
+) : Applier<N> {
+    private var nesting = 0
+    override val current: N get() = applier.current
+
+    override fun down(node: N) {
+        nesting++
+        applier.down(node)
+    }
+
+    override fun up() {
+        runtimeCheck(nesting > 0) { "OffsetApplier up called with no corresponding down" }
+        nesting--
+        applier.up()
+    }
+
+    override fun insertTopDown(index: Int, instance: N) {
+        applier.insertTopDown(index + if (nesting == 0) offset else 0, instance)
+    }
+
+    override fun insertBottomUp(index: Int, instance: N) {
+        applier.insertBottomUp(index + if (nesting == 0) offset else 0, instance)
+    }
+
+    override fun remove(index: Int, count: Int) {
+        applier.remove(index + if (nesting == 0) offset else 0, count)
+    }
+
+    override fun move(from: Int, to: Int, count: Int) {
+        val effectiveOffset = if (nesting == 0) offset else 0
+        applier.move(from + effectiveOffset, to + effectiveOffset, count)
+    }
+
+    override fun clear() {
+        runtimeCheck(false) { "Clear is not valid on OffsetApplier" }
+    }
+}

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
 plugins {
@@ -39,7 +38,11 @@ dependencies {
 androidx {
     name = "AndroidX Compose UI Simple Unit Classes Samples"
     type = LibraryType.SAMPLES
-    mavenGroup = LibraryGroups.Compose.UI
+    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2019"
     description = "Contains the sample code for the Androidx Compose UI Simple Unit Classes"
+}
+
+android {
+    namespace "androidx.compose.ui.unit.samples"
 }

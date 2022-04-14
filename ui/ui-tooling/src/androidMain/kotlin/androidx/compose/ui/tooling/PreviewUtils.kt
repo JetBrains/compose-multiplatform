@@ -75,6 +75,6 @@ internal fun getPreviewProviderParameters(
 }
 
 private fun Sequence<Any?>.toArray(size: Int): Array<Any?> {
-    val iter = iterator()
-    return Array(size) { iter.next() }
+    val iterator = iterator()
+    return Array(size) { iterator.next() }
 }

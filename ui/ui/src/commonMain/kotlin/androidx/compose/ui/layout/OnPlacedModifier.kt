@@ -17,7 +17,6 @@
 package androidx.compose.ui.layout
 
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
@@ -30,7 +29,6 @@ import androidx.compose.ui.platform.debugInspectorInfo
  *
  * @sample androidx.compose.ui.samples.OnPlaced
  */
-@ExperimentalComposeUiApi
 @Stable
 fun Modifier.onPlaced(
     onPlaced: (LayoutCoordinates) -> Unit
@@ -44,7 +42,6 @@ fun Modifier.onPlaced(
     )
 )
 
-@OptIn(ExperimentalComposeUiApi::class)
 private class OnPlacedModifierImpl(
     val callback: (LayoutCoordinates) -> Unit,
     inspectorInfo: InspectorInfo.() -> Unit
@@ -73,7 +70,6 @@ private class OnPlacedModifierImpl(
  *
  * @sample androidx.compose.ui.samples.OnPlaced
  */
-@ExperimentalComposeUiApi
 interface OnPlacedModifier : Modifier.Element {
     /**
      * [onPlaced] is called after parent [LayoutModifier] and parent layout gets placed and

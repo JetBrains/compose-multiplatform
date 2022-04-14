@@ -22,6 +22,7 @@
 
 package androidx.compose.integration.docs.layout
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -257,6 +258,7 @@ private object LayoutBasicsSnippet15 {
     }
 }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 private object LayoutBasicsSnippet16 {
     @Composable
     fun HomeScreen(/*...*/) {

@@ -76,7 +76,8 @@ private fun vectorShape(width: Dp, height: Dp): Painter =
     rememberVectorPainter(
         name = "vectorShape",
         defaultWidth = width,
-        defaultHeight = height
+        defaultHeight = height,
+        autoMirror = false
     ) { viewportWidth, viewportHeight ->
         Group(
             scaleX = 0.75f,

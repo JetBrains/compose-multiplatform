@@ -31,11 +31,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -48,7 +48,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collect
@@ -103,17 +102,15 @@ fun Button(
 ) {
     val contentColor by colors.contentColor(enabled)
     Surface(
+        onClick = onClick,
         modifier = modifier,
+        enabled = enabled,
         shape = shape,
         color = colors.backgroundColor(enabled).value,
         contentColor = contentColor.copy(alpha = 1f),
         border = border,
         elevation = elevation?.elevation(enabled, interactionSource)?.value ?: 0.dp,
-        onClick = onClick,
-        enabled = enabled,
-        role = Role.Button,
         interactionSource = interactionSource,
-        indication = rememberRipple()
     ) {
         CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
             ProvideTextStyle(
@@ -164,6 +161,7 @@ fun Button(
  * @param contentPadding The spacing values to apply internally between the container and the content
  */
 @Composable
+@NonRestartableComposable
 fun OutlinedButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -217,6 +215,7 @@ fun OutlinedButton(
  * @param contentPadding The spacing values to apply internally between the container and the content
  */
 @Composable
+@NonRestartableComposable
 fun TextButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,

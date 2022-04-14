@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.isSpecified
-import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.density
@@ -65,19 +64,22 @@ internal fun ComposeWindow.setPositionSafely(
 internal fun Window.setSizeSafely(size: DpSize) {
     val screenBounds by lazy { graphicsConfiguration.bounds }
 
-    val width = if (size.width.isSpecified) {
+    val isWidthSpecified = size.isSpecified && size.width.isSpecified
+    val isHeightSpecified = size.isSpecified && size.height.isSpecified
+
+    val width = if (isWidthSpecified) {
         size.width.value.roundToInt().coerceAtLeast(0)
     } else {
         screenBounds.width
     }
 
-    val height = if (size.height.isSpecified) {
+    val height = if (isHeightSpecified) {
         size.height.value.roundToInt().coerceAtLeast(0)
     } else {
         screenBounds.height
     }
 
-    if (size.width.isUnspecified || size.height.isUnspecified) {
+    if (!isWidthSpecified || !isHeightSpecified) {
         preferredSize = Dimension(width, height)
         pack()
         // if we set null, getPreferredSize will return the default inner size determined by
@@ -86,8 +88,8 @@ internal fun Window.setSizeSafely(size: DpSize) {
     }
 
     setSize(
-        if (size.width.isSpecified) width else preferredSize.width,
-        if (size.height.isSpecified) height else preferredSize.height,
+        if (isWidthSpecified) width else preferredSize.width,
+        if (isHeightSpecified) height else preferredSize.height,
     )
 }
 
@@ -153,4 +155,14 @@ private val iconSize = Size(32f, 32f)
 
 internal fun Window.setIcon(painter: Painter?) {
     setIconImage(painter?.toAwtImage(density, layoutDirection, iconSize))
+}
+
+internal fun Window.makeDisplayable() {
+    val oldPreferredSize = preferredSize
+    preferredSize = size
+    try {
+        pack()
+    } finally {
+        preferredSize = oldPreferredSize
+    }
 }

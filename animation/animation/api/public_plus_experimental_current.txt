@@ -22,8 +22,8 @@ package androidx.compose.animation {
     property public S! targetState;
   }
 
-  @androidx.compose.runtime.Immutable public static final inline class AnimatedContentScope.SlideDirection {
-    ctor public AnimatedContentScope.SlideDirection();
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public static final value class AnimatedContentScope.SlideDirection {
+    field public static final androidx.compose.animation.AnimatedContentScope.SlideDirection.Companion Companion;
   }
 
   public static final class AnimatedContentScope.SlideDirection.Companion {
@@ -72,7 +72,7 @@ package androidx.compose.animation {
     method public androidx.compose.animation.SizeTransform? getSizeTransform();
     method public androidx.compose.animation.EnterTransition getTargetContentEnter();
     method public float getTargetContentZIndex();
-    method public void setTargetContentZIndex(float targetContentZIndex);
+    method public void setTargetContentZIndex(float);
     property public final androidx.compose.animation.ExitTransition initialContentExit;
     property public final androidx.compose.animation.SizeTransform? sizeTransform;
     property public final androidx.compose.animation.EnterTransition targetContentEnter;

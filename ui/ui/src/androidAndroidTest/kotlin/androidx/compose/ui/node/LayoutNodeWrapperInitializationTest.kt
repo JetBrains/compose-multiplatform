@@ -55,7 +55,7 @@ class LayoutNodeWrapperInitializationTest {
 
         // Assert.
         rule.runOnIdle {
-            assertThat(focusModifier.focusNode).isNotNull()
+            assertThat(focusModifier).isNotNull()
         }
     }
 
@@ -71,7 +71,7 @@ class LayoutNodeWrapperInitializationTest {
 
         // Assert.
         rule.runOnIdle {
-            assertThat(keyInputModifier.keyInputNode).isNotNull()
+            assertThat(keyInputModifier.layoutNode).isNotNull()
         }
     }
 
@@ -125,7 +125,7 @@ class LayoutNodeWrapperInitializationTest {
         rule.runOnIdle { scope.invalidate() }
 
         // Assert.
-        rule.runOnIdle { assertThat(focusModifier.focusNode).isNotNull() }
+        rule.runOnIdle { assertThat(focusModifier).isNotNull() }
     }
 
     @Test
@@ -144,7 +144,7 @@ class LayoutNodeWrapperInitializationTest {
 
         // Assert.
         rule.runOnIdle {
-            assertThat(keyInputModifier.keyInputNode).isNotNull()
+            assertThat(keyInputModifier.layoutNode).isNotNull()
         }
     }
 

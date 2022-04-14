@@ -20,10 +20,12 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextPainter
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Constraints
@@ -42,7 +44,8 @@ import org.junit.runner.RunWith
 class TextFieldDelegateIntegrationTest {
     private val density = Density(density = 1f)
     private val context = InstrumentationRegistry.getInstrumentation().context
-    private val resourceLoader = TestFontResourceLoader(context)
+    @OptIn(ExperimentalTextApi::class)
+    private val fontFamilyResolver = createFontFamilyResolver(context)
     private val layoutDirection = LayoutDirection.Ltr
 
     @Test
@@ -52,7 +55,7 @@ class TextFieldDelegateIntegrationTest {
             style = TextStyle.Default,
             maxLines = 2,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
         val selection = TextRange(0, 1)
         val selectionColor = Color.Blue
@@ -85,7 +88,7 @@ class TextFieldDelegateIntegrationTest {
             style = TextStyle.Default,
             maxLines = 2,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
         val layoutResult = textDelegate.layout(Constraints.fixedWidth(1024), layoutDirection)
         val requestHeight = layoutResult.size.height / 2
@@ -106,7 +109,7 @@ class TextFieldDelegateIntegrationTest {
             style = TextStyle.Default,
             maxLines = 2,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
         val layoutResult = textDelegate.layout(Constraints.fixedWidth(1024), layoutDirection)
         val requestHeight = layoutResult.size.height * 2
@@ -126,7 +129,7 @@ class TextFieldDelegateIntegrationTest {
             text = AnnotatedString(""),
             style = TextStyle.Default,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
         val layoutResult = textDelegate.layout(Constraints.fixedWidth(1024), layoutDirection)
         val requestHeight = layoutResult.size.height * 2
@@ -146,7 +149,7 @@ class TextFieldDelegateIntegrationTest {
             text = AnnotatedString(""),
             style = TextStyle.Default,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
         val layoutResult = textDelegate.layout(Constraints.fixedWidth(1024), layoutDirection)
         val requestHeight = layoutResult.size.height / 2
@@ -169,7 +172,7 @@ class TextFieldDelegateIntegrationTest {
             text = text,
             style = TextStyle.Default,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
 
         val layoutResult = textDelegate.layout(Constraints(), layoutDirection)

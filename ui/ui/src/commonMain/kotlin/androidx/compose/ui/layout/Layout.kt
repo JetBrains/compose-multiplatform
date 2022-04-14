@@ -24,6 +24,7 @@ import androidx.compose.runtime.ReusableComposeNode
 import androidx.compose.runtime.SkippableUpdater
 import androidx.compose.runtime.currentComposer
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.UiComposable
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.ComposeUiNode
@@ -65,8 +66,9 @@ import androidx.compose.ui.util.fastMap
  * @see androidx.compose.foundation.layout.BoxWithConstraints
  */
 @Suppress("ComposableLambdaParameterPosition")
+@UiComposable
 @Composable inline fun Layout(
-    content: @Composable () -> Unit,
+    content: @Composable @UiComposable () -> Unit,
     modifier: Modifier = Modifier,
     measurePolicy: MeasurePolicy
 ) {
@@ -110,7 +112,9 @@ import androidx.compose.ui.util.fastMap
  * @see androidx.compose.foundation.layout.BoxWithConstraints
  */
 @Suppress("NOTHING_TO_INLINE")
-@Composable inline fun Layout(
+@Composable
+@UiComposable
+inline fun Layout(
     modifier: Modifier = Modifier,
     measurePolicy: MeasurePolicy
 ) {
@@ -132,11 +136,12 @@ import androidx.compose.ui.util.fastMap
 
 @Suppress("ComposableLambdaParameterPosition")
 @Composable
+@UiComposable
 @Deprecated(
     "This composable was deprecated. Please use the alternative Layout overloads instead."
 )
 internal fun Layout(
-    content: @Composable () -> Unit,
+    content: @Composable @UiComposable () -> Unit,
     minIntrinsicWidthMeasureBlock: IntrinsicMeasureBlock,
     minIntrinsicHeightMeasureBlock: IntrinsicMeasureBlock,
     maxIntrinsicWidthMeasureBlock: IntrinsicMeasureBlock,
@@ -226,13 +231,14 @@ internal fun materializerOf(
 
 @Suppress("ComposableLambdaParameterPosition")
 @Composable
+@UiComposable
 @Deprecated(
     "This API is unsafe for UI performance at scale - using it incorrectly will lead " +
         "to exponential performance issues. This API should be avoided whenever possible."
 )
 fun MultiMeasureLayout(
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
+    content: @Composable @UiComposable () -> Unit,
     measurePolicy: MeasurePolicy
 ) {
     val materialized = currentComposer.materialize(modifier)

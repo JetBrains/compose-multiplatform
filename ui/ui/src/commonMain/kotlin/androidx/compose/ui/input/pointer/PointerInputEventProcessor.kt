@@ -82,7 +82,8 @@ internal class PointerInputEventProcessor(val root: LayoutNode) {
         val anyMovementConsumed = if (internalPointerEvent.suppressMovementConsumption) {
             false
         } else {
-            internalPointerEvent.changes.values.any { it.consumed.positionChange }
+            internalPointerEvent.changes.values
+                .any { it.positionChangedIgnoreConsumed() && it.isConsumed }
         }
 
         return ProcessResult(dispatchedToSomething, anyMovementConsumed)
@@ -145,7 +146,7 @@ private class PointerInputChangeEventProducer {
                     previousTime,
                     previousPosition,
                     previousDown,
-                    ConsumedData(),
+                    false,
                     it.type,
                     it.historical,
                     it.scrollDelta
@@ -184,8 +185,8 @@ private class PointerInputChangeEventProducer {
  * The result of a call to [PointerInputEventProcessor.process].
  */
 // TODO(shepshpard): Not sure if storing these values in a int is most efficient overall.
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-internal inline class ProcessResult(private val value: Int) {
+@kotlin.jvm.JvmInline
+internal value class ProcessResult(private val value: Int) {
     val dispatchedToAPointerInputModifier
         get() = (value and 1) != 0
 

@@ -16,7 +16,10 @@
 
 package androidx.compose.ui.text.font
 
+import androidx.compose.ui.text.ExperimentalTextApi
+
 class FontTestData {
+    @OptIn(ExperimentalTextApi::class)
     companion object {
         private val resourceId = 1
 
@@ -38,6 +41,12 @@ class FontTestData {
             style = FontStyle.Italic
         )
 
+        val FONT_100_ITALIC_FALLBACK = Font(
+            resId = resourceId,
+            weight = FontWeight.W100,
+            style = FontStyle.Italic
+        )
+
         val FONT_200_REGULAR = Font(
             resId = resourceId,
             weight = FontWeight.W200,
@@ -50,7 +59,19 @@ class FontTestData {
             style = FontStyle.Italic
         )
 
+        val FONT_200_ITALIC_FALLBACK = Font(
+            resId = resourceId,
+            weight = FontWeight.W200,
+            style = FontStyle.Italic
+        )
+
         val FONT_300_REGULAR = Font(
+            resId = resourceId,
+            weight = FontWeight.W300,
+            style = FontStyle.Normal
+        )
+
+        val FONT_300_REGULAR_FALLBACK = Font(
             resId = resourceId,
             weight = FontWeight.W300,
             style = FontStyle.Normal
@@ -62,13 +83,31 @@ class FontTestData {
             style = FontStyle.Italic
         )
 
+        val FONT_300_ITALIC_FALLBACK = Font(
+            resId = resourceId,
+            weight = FontWeight.W300,
+            style = FontStyle.Italic
+        )
+
         val FONT_400_REGULAR = Font(
             resId = resourceId,
             weight = FontWeight.W400,
             style = FontStyle.Normal
         )
 
+        val FONT_400_REGULAR_FALLBACK = Font(
+            resId = resourceId,
+            weight = FontWeight.W400,
+            style = FontStyle.Normal
+        )
+
         val FONT_400_ITALIC = Font(
+            resId = resourceId,
+            weight = FontWeight.W400,
+            style = FontStyle.Italic
+        )
+
+        val FONT_400_ITALIC_FALLBACK = Font(
             resId = resourceId,
             weight = FontWeight.W400,
             style = FontStyle.Italic
@@ -86,13 +125,31 @@ class FontTestData {
             style = FontStyle.Italic
         )
 
+        val FONT_500_ITALIC_FALLBACK = Font(
+            resId = resourceId,
+            weight = FontWeight.W500,
+            style = FontStyle.Italic
+        )
+
         val FONT_600_REGULAR = Font(
             resId = resourceId,
             weight = FontWeight.W600,
             style = FontStyle.Normal
         )
 
+        val FONT_600_REGULAR_FALLBACK = Font(
+            resId = resourceId,
+            weight = FontWeight.W600,
+            style = FontStyle.Normal
+        )
+
         val FONT_600_ITALIC = Font(
+            resId = resourceId,
+            weight = FontWeight.W600,
+            style = FontStyle.Italic
+        )
+
+        val FONT_600_ITALIC_FALLBACK = Font(
             resId = resourceId,
             weight = FontWeight.W600,
             style = FontStyle.Italic
@@ -117,6 +174,12 @@ class FontTestData {
         )
 
         val FONT_800_ITALIC = Font(
+            resId = resourceId,
+            weight = FontWeight.W800,
+            style = FontStyle.Italic
+        )
+
+        val FONT_800_ITALIC_FALLBACK = Font(
             resId = resourceId,
             weight = FontWeight.W800,
             style = FontStyle.Italic

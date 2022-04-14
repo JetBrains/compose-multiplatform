@@ -59,30 +59,14 @@ import kotlin.math.roundToLong
  * all code you execute in between these blocks will be executed while imaginary fingers are
  * actively touching the screen.
  *
- * Example usage:
- * ```
- * onNodeWithTag("myWidget")
- *    .performTouchInput {
- *        click(center)
- *    }
+ * Example of performing a click:
+ * @sample androidx.compose.ui.test.samples.touchInputClick
  *
- * onNodeWithTag("myWidget")
- *    // Perform an L-shaped gesture
- *    .performTouchInput {
- *        down(topLeft)
- *        move(topLeft + percentOffset(0f, .1f))
- *        move(topLeft + percentOffset(0f, .2f))
- *        move(topLeft + percentOffset(0f, .3f))
- *        move(topLeft + percentOffset(0f, .4f))
- *        move(centerLeft)
- *        move(centerLeft + percentOffset(.1f, 0f))
- *        move(centerLeft + percentOffset(.2f, 0f))
- *        move(centerLeft + percentOffset(.3f, 0f))
- *        move(centerLeft + percentOffset(.4f, 0f))
- *        move(center)
- *        up()
- *    }
- * ```
+ * Example of performing a swipe up:
+ * @sample androidx.compose.ui.test.samples.touchInputSwipeUp
+ *
+ * Example of performing an L-shaped gesture:
+ * @sample androidx.compose.ui.test.samples.touchInputLShapedGesture
  *
  * @see InjectionScope
  */

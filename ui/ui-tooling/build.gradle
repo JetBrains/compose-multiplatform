@@ -15,7 +15,6 @@
  */
 
 import androidx.build.AndroidXComposePlugin
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
 plugins {
@@ -33,12 +32,13 @@ dependencies {
         implementation(libs.kotlinStdlib)
 
         api("androidx.annotation:annotation:1.1.0")
-        implementation("androidx.compose.animation:animation:1.1.0-rc01")
+        implementation("androidx.compose.animation:animation:1.1.1")
 
-        api("androidx.compose.runtime:runtime:1.1.0-rc01")
+        api("androidx.compose.runtime:runtime:1.1.1")
         api(project(":compose:ui:ui"))
         api(project(":compose:ui:ui-tooling-preview"))
         api(project(":compose:ui:ui-tooling-data"))
+        implementation(project(":savedstate:savedstate"))
         implementation("androidx.compose.material:material:1.0.0")
         implementation("androidx.activity:activity-compose:1.3.0")
 
@@ -63,10 +63,12 @@ dependencies {
 }
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
-        jvm("desktop")
+        desktop()
+    }
 
+    kotlin {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block above
@@ -81,6 +83,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
                 implementation(project(":compose:animation:animation"))
+                implementation(project(":savedstate:savedstate"))
 
                 api(project(":compose:ui:ui-tooling-data"))
                 implementation(project(":compose:material:material"))
@@ -90,9 +93,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 compileOnly(project(":compose:animation:animation-tooling-internal"))
                 compileOnly(libs.kotlinReflect)
             }
-
-            androidMain.dependsOn(jvmMain)
-            desktopMain.dependsOn(jvmMain)
 
             desktopMain.dependencies {
                 implementation(libs.kotlinStdlib)
@@ -130,8 +130,12 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Tooling"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.UI
+    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2019"
     description = "Compose tooling library. This library exposes information to our tools for better IDE support."
     legacyDisableKotlinStrictApiMode = true
+}
+
+android {
+    namespace "androidx.compose.ui.tooling"
 }

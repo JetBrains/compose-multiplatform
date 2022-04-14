@@ -65,8 +65,11 @@ dependencies {
 }
 
 if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
+    }
+
+    kotlin {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block above
@@ -92,6 +95,10 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.testRules)
             }
 
+            // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
+            //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
+            //  level dependencies block instead:
+            //  `dependencies { testImplementation(libs.robolectric) }`
             androidTest.dependencies {
                 implementation(libs.truth)
             }
@@ -110,4 +117,8 @@ androidx {
     publish = Publish.NONE
     inceptionYear = "2020"
     description = "Compose internal test utils."
+}
+
+android {
+    namespace "androidx.compose.testutils"
 }

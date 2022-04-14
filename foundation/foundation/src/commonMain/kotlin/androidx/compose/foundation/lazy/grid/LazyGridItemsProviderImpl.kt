@@ -17,13 +17,9 @@
 package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.lazy.GridItemSpan
-import androidx.compose.foundation.lazy.LazyGridItemSpanScope
-import androidx.compose.foundation.lazy.LazyGridScope
-import androidx.compose.foundation.lazy.LazyGridState
-import androidx.compose.foundation.lazy.getDefaultLazyKeyFor
 import androidx.compose.foundation.lazy.layout.IntervalHolder
 import androidx.compose.foundation.lazy.layout.IntervalList
+import androidx.compose.foundation.lazy.layout.getDefaultLazyLayoutKey
 import androidx.compose.foundation.lazy.layout.intervalForIndex
 import androidx.compose.foundation.lazy.layout.intervalIndexForItemIndex
 import androidx.compose.runtime.Composable
@@ -34,18 +30,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
-import kotlinx.coroutines.flow.collect
 
-@OptIn(ExperimentalFoundationApi::class)
+@ExperimentalFoundationApi
 @Composable
-internal fun rememberStateOfItemsProvider(
+internal fun rememberItemsProvider(
     state: LazyGridState,
-    content: LazyGridScope.() -> Unit
-): State<LazyGridItemsProvider> {
+    content: LazyGridScope.() -> Unit,
+    itemScope: LazyGridItemScope
+): LazyGridItemsProvider {
     val latestContent = rememberUpdatedState(content)
     val nearestItemsRangeState = remember(state) {
         mutableStateOf(
-            calculateNearestItemsRange(state.firstVisibleItemIndex)
+            calculateNearestItemsRange(state.firstVisibleItemIndexNonObservable.value)
         )
     }
     LaunchedEffect(nearestItemsRangeState) {
@@ -55,59 +51,90 @@ internal fun rememberStateOfItemsProvider(
             .collect { nearestItemsRangeState.value = it }
     }
     return remember(nearestItemsRangeState) {
-        derivedStateOf<LazyGridItemsProvider> {
-            val listScope = LazyGridScopeImpl().apply(latestContent.value)
-            LazyGridItemsProviderImpl(
-                listScope.intervals,
-                listScope.hasCustomSpans,
-                nearestItemsRangeState.value
-            )
-        }
+        LazyGridItemsProviderImpl(
+            derivedStateOf {
+                val listScope = LazyGridScopeImpl().apply(latestContent.value)
+                LazyGridItemsSnapshot(
+                    itemScope,
+                    listScope.intervals,
+                    listScope.hasCustomSpans,
+                    nearestItemsRangeState.value
+                )
+            }
+        )
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-internal class LazyGridItemsProviderImpl(
+@ExperimentalFoundationApi
+internal class LazyGridItemsSnapshot(
+    private val itemScope: LazyGridItemScope,
     private val intervals: IntervalList<LazyGridIntervalContent>,
-    override val hasCustomSpans: Boolean,
+    val hasCustomSpans: Boolean,
     nearestItemsRange: IntRange
-) : LazyGridItemsProvider {
+) {
     /**
      * Caches the last interval we binary searched for. We might not need to recalculate
      * for subsequent queries, as they tend to be localised.
      */
     private var lastInterval: IntervalHolder<LazyGridIntervalContent>? = null
 
-    override val itemsCount get() = intervals.totalSize
+    val itemsCount get() = intervals.totalSize
 
-    override fun getKey(index: Int): Any {
-        val interval = cachedIntervalForIndex(index)
+    fun getKey(index: Int): Any {
+        val interval = getIntervalForIndex(index)
         val localIntervalIndex = index - interval.startIndex
         val key = interval.content.key?.invoke(localIntervalIndex)
-        return key ?: getDefaultLazyKeyFor(index)
+        return key ?: getDefaultLazyLayoutKey(index)
     }
 
-    override fun LazyGridItemSpanScope.getSpan(index: Int): GridItemSpan {
-        val interval = cachedIntervalForIndex(index)
+    fun LazyGridItemSpanScope.getSpan(index: Int): GridItemSpan {
+        val interval = getIntervalForIndex(index)
         val localIntervalIndex = index - interval.startIndex
         return interval.content.span.invoke(this, localIntervalIndex)
     }
 
-    override fun getContent(index: Int): @Composable () -> Unit {
-        val interval = cachedIntervalForIndex(index)
+    fun getContent(index: Int): @Composable () -> Unit {
+        val interval = getIntervalForIndex(index)
         val localIntervalIndex = index - interval.startIndex
-        return interval.content.content.invoke(localIntervalIndex)
+        return interval.content.content.invoke(itemScope, localIntervalIndex)
     }
 
-    override val keyToIndexMap: Map<Any, Int> = generateKeyToIndexMap(nearestItemsRange, intervals)
+    val keyToIndexMap: Map<Any, Int> = generateKeyToIndexMap(nearestItemsRange, intervals)
 
-    private fun cachedIntervalForIndex(itemIndex: Int) = lastInterval.let {
+    fun getContentType(index: Int): Any? {
+        val interval = getIntervalForIndex(index)
+        val localIntervalIndex = index - interval.startIndex
+        return interval.content.type.invoke(localIntervalIndex)
+    }
+
+    private fun getIntervalForIndex(itemIndex: Int) = lastInterval.let {
         if (it != null && itemIndex in it.startIndex until it.startIndex + it.size) {
             it
         } else {
             intervals.intervalForIndex(itemIndex).also { lastInterval = it }
         }
     }
+}
+
+@ExperimentalFoundationApi
+internal class LazyGridItemsProviderImpl(
+    private val itemsSnapshot: State<LazyGridItemsSnapshot>
+) : LazyGridItemsProvider {
+
+    override val itemsCount get() = itemsSnapshot.value.itemsCount
+
+    override fun getKey(index: Int) = itemsSnapshot.value.getKey(index)
+
+    override fun LazyGridItemSpanScope.getSpan(index: Int): GridItemSpan =
+        with(itemsSnapshot.value) { getSpan(index) }
+
+    override val hasCustomSpans: Boolean get() = itemsSnapshot.value.hasCustomSpans
+
+    override fun getContent(index: Int) = itemsSnapshot.value.getContent(index)
+
+    override val keyToIndexMap: Map<Any, Int> get() = itemsSnapshot.value.keyToIndexMap
+
+    override fun getContentType(index: Int) = itemsSnapshot.value.getContentType(index)
 }
 
 /**

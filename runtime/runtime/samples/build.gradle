@@ -15,7 +15,6 @@
  */
 
 
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
 plugins {
@@ -40,7 +39,11 @@ dependencies {
 androidx {
     name = "AndroidX Compose Runtime Samples"
     type = LibraryType.SAMPLES
-    mavenGroup = LibraryGroups.Compose.RUNTIME
+    mavenGroup = LibraryGroups.COMPOSE_RUNTIME
     inceptionYear = "2019"
     description = "Contains the sample code for the Compose runtime"
+}
+
+android {
+    namespace "androidx.compose.runtime.samples"
 }

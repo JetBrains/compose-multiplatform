@@ -32,7 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TestFontResourceLoader
+import androidx.compose.ui.text.UncachedFontFamilyResolver
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -57,7 +57,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 class AndroidAccessibilitySpannableStringTest {
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val density = Density(context)
-    private val resourceLoader = TestFontResourceLoader(context)
+    private val resourceLoader = UncachedFontFamilyResolver(context)
 
     @Test
     fun toAccessibilitySpannableString_with_locale() {

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// VERSION: v0_92
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -20,11 +21,12 @@ package androidx.compose.material3.tokens
 import androidx.compose.ui.unit.dp
 
 internal object CircularProgressIndicatorTokens {
-    val ActiveIndicatorColor = ColorSchemeKey.Primary
+    val ActiveIndicatorColor = ColorSchemeKeyTokens.Primary
+    val ActiveShape = ShapeTokens.CornerNone
     val ActiveIndicatorWidth = 4.0.dp
-    val FourColorActiveIndicatorFourColor = ColorSchemeKey.TertiaryContainer
-    val FourColorActiveIndicatorOneColor = ColorSchemeKey.Primary
-    val FourColorActiveIndicatorThreeColor = ColorSchemeKey.Tertiary
-    val FourColorActiveIndicatorTwoColor = ColorSchemeKey.PrimaryContainer
+    val FourColorActiveIndicatorFourColor = ColorSchemeKeyTokens.TertiaryContainer
+    val FourColorActiveIndicatorOneColor = ColorSchemeKeyTokens.Primary
+    val FourColorActiveIndicatorThreeColor = ColorSchemeKeyTokens.Tertiary
+    val FourColorActiveIndicatorTwoColor = ColorSchemeKeyTokens.PrimaryContainer
     val Size = 48.0.dp
 }

@@ -57,7 +57,8 @@ import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.Rule
 import org.junit.Test
@@ -806,7 +807,7 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
     }
 
     private fun runBlockingAndAwaitIdle(block: suspend CoroutineScope.() -> Unit) {
-        runBlockingTest {
+        runTest {
             withContext(TestMonotonicFrameClock(this)) {
                 block()
                 advanceUntilIdle()

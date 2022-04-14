@@ -32,13 +32,17 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth.assertThat
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import kotlin.math.sqrt
 
+// TODO(demin): convert to ComposeScene instead of TestComposeWindow,
+//  after that we won't need `window.render`
 @OptIn(ExperimentalComposeUiApi::class)
 @RunWith(JUnit4::class)
+@Ignore // TODO(b/217238066) remove after migration to ImageComposeScene (it will be upstreamed from Compose MPP 1.0.0)
 class DesktopScrollableTest {
     private val density = 2f
 
@@ -60,7 +64,7 @@ class DesktopScrollableTest {
 
         window.setContent {
             CompositionLocalProvider(
-                LocalMouseScrollConfig provides MouseScrollableConfig.LinuxGnome
+                LocalScrollConfig provides LinuxGnomeConfig
             ) {
                 Box(
                     Modifier
@@ -78,6 +82,7 @@ class DesktopScrollableTest {
             y = 0,
             event = MouseScrollEvent(MouseScrollUnit.Line(3f), MouseScrollOrientation.Vertical)
         )
+        window.render()
 
         assertThat(context.offset).isWithin(0.1f).of(-3 * scrollLineLinux(20.dp))
 
@@ -86,6 +91,7 @@ class DesktopScrollableTest {
             y = 0,
             event = MouseScrollEvent(MouseScrollUnit.Line(3f), MouseScrollOrientation.Vertical)
         )
+        window.render()
 
         assertThat(context.offset).isWithin(0.1f).of(-6 * scrollLineLinux(20.dp))
     }
@@ -97,7 +103,7 @@ class DesktopScrollableTest {
 
         window.setContent {
             CompositionLocalProvider(
-                LocalMouseScrollConfig provides MouseScrollableConfig.WindowsWinUI
+                LocalScrollConfig provides WindowsWinUIConfig
             ) {
                 Box(
                     Modifier
@@ -115,6 +121,7 @@ class DesktopScrollableTest {
             y = 0,
             event = MouseScrollEvent(MouseScrollUnit.Line(-2f), MouseScrollOrientation.Vertical)
         )
+        window.render()
 
         assertThat(context.offset).isWithin(0.1f).of(2 * scrollLineWindows(20.dp))
 
@@ -123,6 +130,7 @@ class DesktopScrollableTest {
             y = 0,
             event = MouseScrollEvent(MouseScrollUnit.Line(4f), MouseScrollOrientation.Vertical)
         )
+        window.render()
 
         assertThat(context.offset).isWithin(0.1f).of(-2 * scrollLineWindows(20.dp))
     }
@@ -134,7 +142,7 @@ class DesktopScrollableTest {
 
         window.setContent {
             CompositionLocalProvider(
-                LocalMouseScrollConfig provides MouseScrollableConfig.WindowsWinUI
+                LocalScrollConfig provides WindowsWinUIConfig
             ) {
                 Box(
                     Modifier
@@ -152,6 +160,7 @@ class DesktopScrollableTest {
             y = 0,
             event = MouseScrollEvent(MouseScrollUnit.Page(1f), MouseScrollOrientation.Vertical)
         )
+        window.render()
 
         assertThat(context.offset).isWithin(0.1f).of(-scrollPage(20.dp))
     }
@@ -163,7 +172,7 @@ class DesktopScrollableTest {
 
         window.setContent {
             CompositionLocalProvider(
-                LocalMouseScrollConfig provides MouseScrollableConfig.MacOSCocoa
+                LocalScrollConfig provides MacOSCocoaConfig
             ) {
                 Box(
                     Modifier
@@ -179,10 +188,11 @@ class DesktopScrollableTest {
         window.onMouseScroll(
             x = 0,
             y = 0,
-            event = MouseScrollEvent(MouseScrollUnit.Line(-5.5f), MouseScrollOrientation.Vertical)
+            event = MouseScrollEvent(MouseScrollUnit.Line(-5f), MouseScrollOrientation.Vertical)
         )
+        window.render()
 
-        assertThat(context.offset).isWithin(0.1f).of(5.5f * scrollLineMacOs())
+        assertThat(context.offset).isWithin(0.1f).of(5f * scrollLineMacOs())
     }
 
     @Test
@@ -192,7 +202,7 @@ class DesktopScrollableTest {
 
         window.setContent {
             CompositionLocalProvider(
-                LocalMouseScrollConfig provides MouseScrollableConfig.LinuxGnome
+                LocalScrollConfig provides LinuxGnomeConfig
             ) {
                 Box(
                     Modifier
@@ -210,6 +220,7 @@ class DesktopScrollableTest {
             y = 0,
             event = MouseScrollEvent(MouseScrollUnit.Line(3f), MouseScrollOrientation.Horizontal)
         )
+        window.render()
 
         assertThat(column.offset).isEqualTo(0f)
     }

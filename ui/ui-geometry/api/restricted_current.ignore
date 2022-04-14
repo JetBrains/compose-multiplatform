@@ -1,0 +1,17 @@
+// Baseline format: 1.0
+ParameterNameChange: androidx.compose.ui.geometry.MutableRect#setBottom(float) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.geometry.MutableRect.setBottom
+ParameterNameChange: androidx.compose.ui.geometry.MutableRect#setLeft(float) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.geometry.MutableRect.setLeft
+ParameterNameChange: androidx.compose.ui.geometry.MutableRect#setRight(float) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.geometry.MutableRect.setRight
+ParameterNameChange: androidx.compose.ui.geometry.MutableRect#setTop(float) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.geometry.MutableRect.setTop
+
+
+RemovedMethod: androidx.compose.ui.geometry.CornerRadius#CornerRadius():
+    Removed constructor androidx.compose.ui.geometry.CornerRadius()
+RemovedMethod: androidx.compose.ui.geometry.Offset#Offset():
+    Removed constructor androidx.compose.ui.geometry.Offset()
+RemovedMethod: androidx.compose.ui.geometry.Size#Size():
+    Removed constructor androidx.compose.ui.geometry.Size()

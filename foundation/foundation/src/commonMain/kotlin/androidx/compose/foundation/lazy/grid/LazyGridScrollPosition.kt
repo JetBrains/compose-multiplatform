@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.lazy.grid
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.mutableStateOf
 
 /**
@@ -28,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
  * block as otherwise the extra remeasurement will be scheduled once we update the values in the
  * end of the measure block.
  */
+@OptIn(ExperimentalFoundationApi::class)
 internal class LazyGridScrollPosition(
     initialIndex: Int = 0,
     initialScrollOffset: Int = 0
@@ -53,15 +55,17 @@ internal class LazyGridScrollPosition(
      * Updates the current scroll position based on the results of the last measurement.
      */
     fun updateFromMeasureResult(measureResult: LazyGridMeasureResult) {
-        lastKnownFirstItemKey = measureResult.firstVisibleLine?.keys?.first()
+        lastKnownFirstItemKey = measureResult.firstVisibleLine?.items?.firstOrNull()?.key
         // we ignore the index and offset from measureResult until we get at least one
         // measurement with real items. otherwise the initial index and scroll passed to the
         // state would be lost and overridden with zeros.
         if (hadFirstNotEmptyLayout || measureResult.totalItemsCount > 0) {
             hadFirstNotEmptyLayout = true
+            val scrollOffset = measureResult.firstVisibleLineScrollOffset
+            check(scrollOffset >= 0f) { "scrollOffset should be non-negative ($scrollOffset)" }
             update(
-                ItemIndex(measureResult.firstVisibleLine?.firstItemIndex?.value ?: 0),
-                measureResult.firstVisibleLineScrollOffset
+                ItemIndex(measureResult.firstVisibleLine?.items?.firstOrNull()?.index?.value ?: 0),
+                scrollOffset
             )
         }
     }
@@ -71,7 +75,7 @@ internal class LazyGridScrollPosition(
      * composing the items during the next measure pass and will be updated by the real
      * position calculated during the measurement. This means that there is guarantee that
      * exactly this index and offset will be applied as it is possible that:
-     * a) there will no item at this index in reality
+     * a) there will be no item at this index in reality
      * b) item at this index will be smaller than the asked scrollOffset, which means we would
      * switch to the next item
      * c) there will be not enough items to fill the viewport after the requested index, so we
@@ -84,19 +88,18 @@ internal class LazyGridScrollPosition(
         lastKnownFirstItemKey = null
     }
 
-    // /**
-    //  * In addition to keeping the first visible item index we also store the key of this item.
-    //  * When the user provided custom keys for the items this mechanism allows us to detect when
-    //  * there were items added or removed before our current first visible item and keep this item
-    //  * as the first visible one even given that its index has been changed.
-    //  */
-    // fun updateScrollPositionIfTheFirstItemWasMoved(itemsProvider: LazyGridItemsProvider) {
-    //     update(findLazyGridIndexByKey(lastKnownFirstItemKey, index, itemsProvider), scrollOffset)
-    // }
+    /**
+     * In addition to keeping the first visible item index we also store the key of this item.
+     * When the user provided custom keys for the items this mechanism allows us to detect when
+     * there were items added or removed before our current first visible item and keep this item
+     * as the first visible one even given that its index has been changed.
+     */
+    fun updateScrollPositionIfTheFirstItemWasMoved(itemsProvider: LazyGridItemsProvider) {
+        update(findLazyGridIndexByKey(lastKnownFirstItemKey, index, itemsProvider), scrollOffset)
+    }
 
     private fun update(index: ItemIndex, scrollOffset: Int) {
         require(index.value >= 0f) { "Index should be non-negative (${index.value})" }
-        require(scrollOffset >= 0f) { "scrollOffset should be non-negative ($scrollOffset)" }
         if (index != this.index) {
             this.index = index
             indexState.value = index.value
@@ -107,32 +110,32 @@ internal class LazyGridScrollPosition(
         }
     }
 
-    // private companion object {
-    //     /**
-    //      * Finds a position of the item with the given key in the lists. This logic allows us to
-    //      * detect when there were items added or removed before our current first item.
-    //      */
-    //     private fun findLazyGridIndexByKey(
-    //         key: Any?,
-    //         lastKnownIndex: ItemIndex,
-    //         itemsProvider: LazyGridItemsProvider
-    //     ): ItemIndex {
-    //         if (key == null) {
-    //             // there were no real item during the previous measure
-    //             return lastKnownIndex
-    //         }
-    //         if (lastKnownIndex.value < itemsProvider.itemsCount &&
-    //             key == itemsProvider.getKey(lastKnownIndex.value)
-    //         ) {
-    //             // this item is still at the same index
-    //             return lastKnownIndex
-    //         }
-    //         val newIndex = itemsProvider.keyToIndexMap[key]
-    //         if (newIndex != null) {
-    //             return ItemIndex(newIndex)
-    //         }
-    //         // fallback to the previous index if we don't know the new index of the item
-    //         return lastKnownIndex
-    //     }
-    // }
+    private companion object {
+        /**
+         * Finds a position of the item with the given key in the grid. This logic allows us to
+         * detect when there were items added or removed before our current first item.
+         */
+        private fun findLazyGridIndexByKey(
+            key: Any?,
+            lastKnownIndex: ItemIndex,
+            itemsProvider: LazyGridItemsProvider
+        ): ItemIndex {
+            if (key == null) {
+                // there were no real item during the previous measure
+                return lastKnownIndex
+            }
+            if (lastKnownIndex.value < itemsProvider.itemsCount &&
+                key == itemsProvider.getKey(lastKnownIndex.value)
+            ) {
+                // this item is still at the same index
+                return lastKnownIndex
+            }
+            val newIndex = itemsProvider.keyToIndexMap[key]
+            if (newIndex != null) {
+                return ItemIndex(newIndex)
+            }
+            // fallback to the previous index if we don't know the new index of the item
+            return lastKnownIndex
+        }
+    }
 }

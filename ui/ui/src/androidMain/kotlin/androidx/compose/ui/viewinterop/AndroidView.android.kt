@@ -30,6 +30,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.UiComposable
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.Ref
@@ -61,6 +65,12 @@ import androidx.compose.ui.unit.LayoutDirection
  * assumption made by [View]s - keeping clipping disabled might lead to unexpected drawing behavior.
  * Note this deviates from Compose's practice of keeping clipping opt-in, disabled by default.
  *
+ * [AndroidView] has nested scroll interop capabilities if the containing view has nested scroll
+ * enabled. This means this Composable can dispatch scroll deltas if it is placed inside a
+ * container that participates in nested scroll. For more information on how to enable
+ * nested scroll interop:
+ * @sample androidx.compose.ui.samples.ViewInComposeNestedScrollInteropSample
+ *
  * @sample androidx.compose.ui.samples.AndroidViewSample
  *
  * @param factory The block creating the [View] to be composed.
@@ -68,16 +78,23 @@ import androidx.compose.ui.unit.LayoutDirection
  * @param update The callback to be invoked after the layout is inflated.
  */
 @Composable
+@UiComposable
 fun <T : View> AndroidView(
     factory: (Context) -> T,
     modifier: Modifier = Modifier,
     update: (T) -> Unit = NoOpUpdate
 ) {
     val context = LocalContext.current
+    // NoOp Connection required by nested scroll modifier. This is noOp because we don't want
+    // to influence nested scrolling with it and it is required by the modifier
+    val noOpConnection = remember { object : NestedScrollConnection {} }
+    // NestedScrollDispatcher that will be passed/used for nested scroll interop
+    val dispatcher = remember { NestedScrollDispatcher() }
+    val nestedScrollInteropModifier = Modifier.nestedScroll(noOpConnection, dispatcher)
     // Create a semantics node for accessibility. Semantics modifier is composed and need to be
     // materialized. So it can't be added in AndroidViewHolder when assigning modifier to layout
     // node, which is after the materialize call.
-    val modifierWithSemantics = modifier.semantics(true) {}
+    val modifierWithSemantics = modifier.then(nestedScrollInteropModifier).semantics(true) {}
     val materialized = currentComposer.materialize(modifierWithSemantics)
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
@@ -95,7 +112,7 @@ fun <T : View> AndroidView(
 
     ComposeNode<LayoutNode, UiApplier>(
         factory = {
-            val viewFactoryHolder = ViewFactoryHolder<T>(context, parentReference)
+            val viewFactoryHolder = ViewFactoryHolder<T>(context, parentReference, dispatcher)
             viewFactoryHolder.factory = factory
             @Suppress("UNCHECKED_CAST")
             val savedState = stateRegistry?.consumeRestored(stateKey) as? SparseArray<Parcelable>
@@ -142,8 +159,9 @@ val NoOpUpdate: View.() -> Unit = {}
 
 internal class ViewFactoryHolder<T : View>(
     context: Context,
-    parentContext: CompositionContext? = null
-) : AndroidViewHolder(context, parentContext), ViewRootForInspector {
+    parentContext: CompositionContext? = null,
+    dispatcher: NestedScrollDispatcher = NestedScrollDispatcher()
+) : AndroidViewHolder(context, parentContext, dispatcher), ViewRootForInspector {
 
     internal var typedView: T? = null
 

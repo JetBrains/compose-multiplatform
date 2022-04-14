@@ -14,6 +14,9 @@ package androidx.compose.animation.graphics.res {
 
 package androidx.compose.animation.graphics.vector {
 
+  public final class AnimatorAnimationSpecsKt {
+  }
+
   public final class AnimatorKt {
   }
 

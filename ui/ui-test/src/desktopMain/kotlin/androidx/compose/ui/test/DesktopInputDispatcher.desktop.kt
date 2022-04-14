@@ -99,6 +99,14 @@ internal class DesktopInputDispatcher(
         TODO("Not yet implemented")
     }
 
+    override fun RotaryInputState.enqueueRotaryScrollHorizontally(horizontalScrollPixels: Float) {
+        TODO("Not yet implemented")
+    }
+
+    override fun RotaryInputState.enqueueRotaryScrollVertically(verticalScrollPixels: Float) {
+        TODO("Not yet implemented")
+    }
+
     private fun enqueueEvent(event: List<TestPointerInputEventData>) {
         batchedEvents.add(event)
     }

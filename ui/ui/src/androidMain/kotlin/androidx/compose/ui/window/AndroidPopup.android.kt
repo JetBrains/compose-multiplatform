@@ -52,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
+import androidx.compose.ui.UiComposable
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -74,7 +75,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastMap
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
-import androidx.savedstate.ViewTreeSavedStateRegistryOwner
+import androidx.savedstate.findViewTreeSavedStateRegistryOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.isActive
 import org.jetbrains.annotations.TestOnly
@@ -111,7 +113,7 @@ class PopupProperties @ExperimentalComposeUiApi constructor(
     val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
     val excludeFromSystemGesture: Boolean = true,
     val clippingEnabled: Boolean = true,
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalComposeUiApi
     val usePlatformDefaultWidth: Boolean = false
 ) {
@@ -165,6 +167,10 @@ class PopupProperties @ExperimentalComposeUiApi constructor(
 
 /**
  * Opens a popup with the given content.
+ *
+ * A popup is a floating container that appears on top of the current activity.
+ * It is especially useful for non-modal UI surfaces that remain hidden until they
+ * are needed, for example floating menus like Cut/Copy/Paste.
  *
  * The popup is positioned relative to its parent, using the [alignment] and [offset].
  * The popup is visible as long as it is part of the composition hierarchy.
@@ -415,7 +421,7 @@ internal class PopupLayout(
         id = android.R.id.content
         ViewTreeLifecycleOwner.set(this, ViewTreeLifecycleOwner.get(composeView))
         ViewTreeViewModelStoreOwner.set(this, ViewTreeViewModelStoreOwner.get(composeView))
-        ViewTreeSavedStateRegistryOwner.set(this, ViewTreeSavedStateRegistryOwner.get(composeView))
+        setViewTreeSavedStateRegistryOwner(composeView.findViewTreeSavedStateRegistryOwner())
         // Set unique id for AbstractComposeView. This allows state restoration for the state
         // defined inside the Popup via rememberSaveable()
         setTag(R.id.compose_view_saveable_id_tag, "Popup:$popupId")
@@ -454,6 +460,7 @@ internal class PopupLayout(
     }
 
     @Composable
+    @UiComposable
     override fun Content() {
         content()
     }

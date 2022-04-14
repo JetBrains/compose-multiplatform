@@ -21,6 +21,7 @@ import org.jetbrains.skiko.ClipComponent
 import org.jetbrains.skiko.GraphicsApi
 import java.awt.Color
 import java.awt.Component
+import java.awt.Dimension
 import javax.swing.JLayeredPane
 import javax.swing.SwingUtilities.isEventDispatchThread
 
@@ -47,7 +48,9 @@ class ComposePanel : JLayeredPane() {
         super.setBounds(x, y, width, height)
     }
 
-    override fun getPreferredSize() = layer?.component?.preferredSize
+    override fun getPreferredSize(): Dimension? {
+        return if (isPreferredSizeSet) super.getPreferredSize() else layer?.component?.preferredSize
+    }
 
     /**
      * Sets Compose content of the ComposePanel.

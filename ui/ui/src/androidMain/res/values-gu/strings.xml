@@ -31,4 +31,6 @@
     <string name="close_sheet" msgid="7573152094250666567">"શીટ બંધ કરો"</string>
     <string name="default_error_message" msgid="8038256446254964252">"અમાન્ય ઇનપુટ"</string>
     <string name="default_popup_window_title" msgid="6312721426453364202">"પૉપ-અપ વિન્ડો"</string>
+    <string name="range_start" msgid="7097486360902471446">"રેંજની શરૂઆત"</string>
+    <string name="range_end" msgid="5941395253238309765">"રેંજની સમાપ્તિ"</string>
 </resources>

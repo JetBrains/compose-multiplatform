@@ -48,6 +48,9 @@ import androidx.compose.ui.unit.dp
  * Material Design radio button.
  *
  * Radio buttons allow users to select one option from a set.
+ *
+ * ![Radio button image](https://developer.android.com/images/reference/androidx/compose/material3/radio-button.png)
+ *
  * @sample androidx.compose.material3.samples.RadioButtonSample
  *
  * [RadioButton]s can be combined together with [Text] in the desired layout (e.g. [Column] or
@@ -67,6 +70,7 @@ import androidx.compose.ui.unit.dp
  * @param colors [RadioButtonColors] that will be used to resolve the color used for this
  * RadioButton in different states. See [RadioButtonDefaults.colors].
  */
+@ExperimentalMaterial3Api
 @Composable
 fun RadioButton(
     selected: Boolean,
@@ -160,16 +164,14 @@ object RadioButtonDefaults {
      */
     @Composable
     fun colors(
-        selectedColor: Color =
-            MaterialTheme.colorScheme.fromToken(RadioButtonTokens.SelectedIconColor),
-        unselectedColor: Color =
-            MaterialTheme.colorScheme.fromToken(RadioButtonTokens.UnselectedIconColor),
-        disabledSelectedColor: Color =
-            MaterialTheme.colorScheme.fromToken(RadioButtonTokens.DisabledSelectedIconColor)
-                .copy(alpha = RadioButtonTokens.DisabledSelectedIconOpacity),
-        disabledUnselectedColor: Color =
-            MaterialTheme.colorScheme.fromToken(RadioButtonTokens.DisabledUnselectedIconColor)
-                .copy(alpha = RadioButtonTokens.DisabledUnselectedIconOpacity)
+        selectedColor: Color = RadioButtonTokens.SelectedIconColor.toColor(),
+        unselectedColor: Color = RadioButtonTokens.UnselectedIconColor.toColor(),
+        disabledSelectedColor: Color = RadioButtonTokens.DisabledSelectedIconColor
+            .toColor()
+            .copy(alpha = RadioButtonTokens.DisabledSelectedIconOpacity),
+        disabledUnselectedColor: Color = RadioButtonTokens.DisabledUnselectedIconColor
+            .toColor()
+            .copy(alpha = RadioButtonTokens.DisabledUnselectedIconOpacity)
     ): RadioButtonColors {
         return remember(
             selectedColor,

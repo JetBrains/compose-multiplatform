@@ -221,6 +221,12 @@ internal class RecomposeScopeImpl(
     }
 
     /**
+     * Returns true if the scope is observing derived state which might make this scope
+     * conditionally invalidated.
+     */
+    val isConditional: Boolean get() = trackedDependencies != null
+
+    /**
      * Determine if the scope should be considered invalid.
      *
      * @param instances The set of objects reported as invalidating this scope.

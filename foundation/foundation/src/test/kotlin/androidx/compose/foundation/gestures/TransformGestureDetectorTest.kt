@@ -17,8 +17,6 @@
 package androidx.compose.foundation.gestures
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.positionChangeConsumed
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -77,17 +75,17 @@ class TransformGestureDetectorTest(val panZoomLock: Boolean) {
     @Test
     fun singleFingerPan() = util.executeInComposition {
         val down = down(5f, 5f)
-        assertFalse(down.consumed.downChange)
+        assertFalse(down.isConsumed)
 
         assertFalse(panned)
 
         val move1 = down.moveBy(Offset(12.7f, 12.7f))
-        assertFalse(move1.positionChangeConsumed())
+        assertFalse(move1.isConsumed)
 
         assertFalse(panned)
 
         val move2 = move1.moveBy(Offset(0.1f, 0.1f))
-        assertTrue(move2.positionChangeConsumed())
+        assertTrue(move2.isConsumed)
 
         assertEquals(17.7f, centroid.x, 0.1f)
         assertEquals(17.7f, centroid.y, 0.1f)
@@ -99,11 +97,11 @@ class TransformGestureDetectorTest(val panZoomLock: Boolean) {
 
         panAmount = Offset.Zero
         val move3 = move2.moveBy(Offset(1f, 0f))
-        assertTrue(move3.positionChangeConsumed())
+        assertTrue(move3.isConsumed)
 
         assertEquals(Offset(1f, 0f), panAmount)
 
-        move3.up().also { assertFalse(it.consumed.downChange) }
+        move3.up().also { assertFalse(it.isConsumed) }
 
         assertFalse(rotated)
         assertFalse(zoomed)
@@ -115,19 +113,19 @@ class TransformGestureDetectorTest(val panZoomLock: Boolean) {
     @Test
     fun multiFingerPanZoom() = util.executeInComposition {
         val downA = down(5f, 5f)
-        assertFalse(downA.consumed.downChange)
+        assertFalse(downA.isConsumed)
 
         val downB = down(25f, 25f)
-        assertFalse(downB.consumed.downChange)
+        assertFalse(downB.isConsumed)
 
         assertFalse(panned)
 
         val moveA1 = downA.moveBy(Offset(12.8f, 12.8f))
-        assertFalse(moveA1.positionChangeConsumed())
+        assertFalse(moveA1.isConsumed)
 
         val moveB1 = downB.moveBy(Offset(12.8f, 12.8f))
         // Now we've averaged enough movement
-        assertTrue(moveB1.positionChangeConsumed())
+        assertTrue(moveB1.isConsumed)
 
         assertEquals((5f + 25f + 12.8f) / 2f, centroid.x, 0.1f)
         assertEquals((5f + 25f + 12.8f) / 2f, centroid.y, 0.1f)
@@ -148,16 +146,16 @@ class TransformGestureDetectorTest(val panZoomLock: Boolean) {
     @Test
     fun zoom2Pointer() = util.executeInComposition {
         val downA = down(5f, 5f)
-        assertFalse(downA.consumed.downChange)
+        assertFalse(downA.isConsumed)
 
         val downB = down(25f, 5f)
-        assertFalse(downB.consumed.downChange)
+        assertFalse(downB.isConsumed)
 
         val moveB1 = downB.moveBy(Offset(35.95f, 0f))
-        assertFalse(moveB1.positionChangeConsumed())
+        assertFalse(moveB1.isConsumed)
 
         val moveB2 = moveB1.moveBy(Offset(0.1f, 0f))
-        assertTrue(moveB2.positionChangeConsumed())
+        assertTrue(moveB2.isConsumed)
 
         assertTrue(panned)
         assertTrue(zoomed)
@@ -171,10 +169,10 @@ class TransformGestureDetectorTest(val panZoomLock: Boolean) {
         panAmount = Offset.Zero
 
         val moveA1 = downA.moveBy(Offset(-1f, 0f))
-        assertTrue(moveA1.positionChangeConsumed())
+        assertTrue(moveA1.isConsumed)
 
         val moveB3 = moveB2.moveBy(Offset(1f, 0f))
-        assertTrue(moveB3.positionChangeConsumed())
+        assertTrue(moveB3.isConsumed)
 
         assertEquals(0f, panAmount.x, 0.01f)
         assertEquals(0f, panAmount.y, 0.01f)
@@ -328,7 +326,7 @@ class TransformGestureDetectorTest(val panZoomLock: Boolean) {
     @Test
     fun touchSlopCancel() = util.executeInComposition {
         down(5f, 5f)
-            .moveBy(Offset(50f, 0f)) { consumeAllChanges() }
+            .moveBy(Offset(50f, 0f)) { consume() }
             .up()
 
         assertFalse(panned)
@@ -343,7 +341,7 @@ class TransformGestureDetectorTest(val panZoomLock: Boolean) {
     fun afterTouchSlopCancel() = util.executeInComposition {
         down(5f, 5f)
             .moveBy(Offset(50f, 0f))
-            .moveBy(Offset(50f, 0f)) { consumeAllChanges() }
+            .moveBy(Offset(50f, 0f)) { consume() }
             .up()
 
         assertTrue(panned)

@@ -57,9 +57,9 @@ import androidx.compose.runtime.Immutable
  *  * [Paint.blendMode], which uses [BlendMode] to define the compositing
  *    strategy.
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class BlendMode internal constructor(@Suppress("unused") private val value: Int) {
+@kotlin.jvm.JvmInline
+value class BlendMode internal constructor(@Suppress("unused") private val value: Int) {
 
     companion object {
 

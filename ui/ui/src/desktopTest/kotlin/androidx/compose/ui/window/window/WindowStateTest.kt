@@ -769,6 +769,33 @@ class WindowStateTest {
         exitApplication()
     }
 
+    @Test
+    fun `start invisible undecorated window`() = runApplicationTest {
+        val receivedNumbers = mutableListOf<Int>()
+
+        val sendChannel = Channel<Int>(Channel.UNLIMITED)
+
+        launchApplication {
+            Window(onCloseRequest = ::exitApplication, visible = false, undecorated = true) {
+                LaunchedEffect(Unit) {
+                    sendChannel.consumeEach {
+                        receivedNumbers.add(it)
+                    }
+                }
+            }
+        }
+
+        sendChannel.send(1)
+        awaitIdle()
+        assertThat(receivedNumbers).isEqualTo(listOf(1))
+
+        sendChannel.send(2)
+        awaitIdle()
+        assertThat(receivedNumbers).isEqualTo(listOf(1, 2))
+
+        exitApplication()
+    }
+
     private val Window.contentSize
         get() = Dimension(
             size.width - insets.left - insets.right,

@@ -60,6 +60,8 @@ dependencies {
 afterEvaluate {
     tasks.withType(Test) { t ->
         t.dependsOn(":compose:compiler:compiler:embeddedPlugin")
+
+        maxHeapSize("1024m")
     }
 }
 
@@ -70,11 +72,12 @@ android {
     lintOptions {
         disable("SyntheticAccessor")
     }
+    namespace "androidx.compose.runtime.tests"
 }
 
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
-        freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn"]
+        freeCompilerArgs += ["-opt-in=kotlin.RequiresOptIn"]
     }
 }
 

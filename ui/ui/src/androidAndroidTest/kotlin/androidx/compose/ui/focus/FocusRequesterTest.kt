@@ -19,6 +19,9 @@ package androidx.compose.ui.focus
 import android.view.View
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
@@ -231,6 +234,83 @@ class FocusRequesterTest {
                         .onFocusChanged { focusState1 = it }
                         .focusTarget()
                 )
+                Box(
+                    modifier = Modifier
+                        .onFocusChanged { focusState2 = it }
+                        .focusTarget()
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            // Act.
+            focusRequester.requestFocus()
+
+            // Assert.
+            assertThat(focusState1.isFocused).isTrue()
+            assertThat(focusState2.isFocused).isFalse()
+        }
+    }
+
+    // The order in which the children are added to the hierarchy should not change the order
+    // in which focus should be resolved.
+    @Test
+    fun requestFocus_firstFocusableChildIsFocused_afterChange() {
+        // Arrange.
+        lateinit var focusState1: FocusState
+        lateinit var focusState2: FocusState
+        val focusRequester = FocusRequester()
+        var showBox1 by mutableStateOf(false)
+        rule.setFocusableContent {
+            Column(
+                modifier = Modifier.focusRequester(focusRequester)
+            ) {
+                if (showBox1) {
+                    Box(
+                        modifier = Modifier
+                            .onFocusChanged { focusState1 = it }
+                            .focusTarget()
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .onFocusChanged { focusState2 = it }
+                        .focusTarget()
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            showBox1 = true
+        }
+
+        rule.runOnIdle {
+            // Act.
+            focusRequester.requestFocus()
+
+            // Assert.
+            assertThat(focusState1.isFocused).isTrue()
+            assertThat(focusState2.isFocused).isFalse()
+        }
+    }
+
+    @Test
+    fun requestFocus_firstFocusableChildIsFocused_differentDepths() {
+        // Arrange.
+        lateinit var focusState1: FocusState
+        lateinit var focusState2: FocusState
+        val focusRequester = FocusRequester()
+        rule.setFocusableContent {
+            Column(
+                modifier = Modifier.focusRequester(focusRequester)
+            ) {
+                Box {
+                    Box(
+                        modifier = Modifier
+                            .onFocusChanged { focusState1 = it }
+                            .focusTarget()
+                    )
+                }
                 Box(
                     modifier = Modifier
                         .onFocusChanged { focusState2 = it }

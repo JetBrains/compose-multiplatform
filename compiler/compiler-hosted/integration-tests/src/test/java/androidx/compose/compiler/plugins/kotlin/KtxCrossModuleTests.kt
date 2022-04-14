@@ -929,6 +929,96 @@ class KtxCrossModuleTests : AbstractCodegenTest() {
         )
     }
 
+    @Test
+    fun testAnnotationInferenceAcrossModules() = ensureSetup {
+        compile(
+            mapOf(
+                "Base" to mapOf(
+                    "base/Library.kt" to """
+                    package base
+
+                    import androidx.compose.runtime.*
+
+                    @Composable
+                    @ComposableTarget("UI")
+                    fun Text(text: String) { }
+
+                    @Composable
+                    @ComposableTarget("UI")
+                    fun Row(content: @Composable @ComposableTarget("UI") () -> Unit) {
+                      content()
+                    }
+                    """
+                ),
+                "Client" to mapOf(
+                    "client/Library.kt" to """
+                    package client
+
+                    import androidx.compose.runtime.*
+                    import base.*
+
+                    @Composable
+                    fun Labeled(text: String, content: @Composable () -> Unit) {
+                      Text(text)
+                      Row { content() }
+                    }
+                    """
+                ),
+                "Main" to mapOf(
+                    "Main.kt" to """
+                    package main
+
+                    import androidx.compose.runtime.*
+                    import client.*
+
+                    @Composable
+                    fun Main() {
+                      Labeled("test") { }
+                    }
+                    """
+                )
+            )
+        ) {
+            assert(it.contains("[UI[UI]]", false)) {
+                "Layered composable didn't store the inferred composable target"
+            }
+        }
+    }
+
+    /**
+     * Test for b/221280935
+     */
+    @Test
+    fun testOverriddenSymbolParentsInDefaultParameters() = ensureSetup {
+        compile(
+            mapOf(
+                "Base" to mapOf(
+                    "base/Base.kt" to """
+                    package base
+
+                    import androidx.compose.runtime.Composable
+
+                    open class Base {
+                      fun f(block: (@Composable () -> Unit)? = null) {}
+                    }
+                    """
+                ),
+                "Main" to mapOf(
+                    "Main.kt" to """
+                    package main
+
+                    import androidx.compose.runtime.Composable
+                    import base.Base
+
+                    class Child : Base() {
+                      init { f {} }
+                    }
+                    """
+                )
+            )
+        )
+    }
+
     fun compile(
         modules: Map<String, Map<String, String>>,
         dumpClasses: Boolean = false,

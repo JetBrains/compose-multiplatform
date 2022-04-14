@@ -97,6 +97,7 @@ internal actual class PlatformInput actual constructor(val component: PlatformCo
         }
     }
 
+    @Deprecated("This method should not be called, used BringIntoViewRequester instead.")
     override fun notifyFocusedRect(rect: Rect) {
         currentInput?.let { input ->
             input.focusedRect = rect

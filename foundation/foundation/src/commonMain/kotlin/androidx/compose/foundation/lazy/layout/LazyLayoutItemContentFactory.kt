@@ -16,25 +16,15 @@
 
 package androidx.compose.foundation.lazy.layout
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.SaveableStateHolder
-import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
-
-@Composable
-internal fun rememberItemContentFactory(state: LazyLayoutState): LazyLayoutItemContentFactory {
-    val saveableStateHolder = rememberSaveableStateHolder()
-    val itemsProvider = state.itemsProvider
-    return remember(itemsProvider) {
-        LazyLayoutItemContentFactory(saveableStateHolder, itemsProvider)
-    }
-}
 
 /**
  * This class:
@@ -45,9 +35,10 @@ internal fun rememberItemContentFactory(state: LazyLayoutState): LazyLayoutItemC
  * 3) Adds state restoration on top of the composable returned by [itemsProvider] with help of
  * [saveableStateHolder].
  */
+@ExperimentalFoundationApi
 internal class LazyLayoutItemContentFactory(
     private val saveableStateHolder: SaveableStateHolder,
-    private val itemsProvider: () -> LazyLayoutItemsProvider,
+    val itemsProvider: () -> LazyLayoutItemsProvider,
 ) {
     /** Contains the cached lambdas produced by the [itemsProvider]. */
     private val lambdasCache = mutableMapOf<Any, CachedItemContent>()
@@ -71,14 +62,34 @@ internal class LazyLayoutItemContentFactory(
     }
 
     /**
+     * Returns the content type for the item with the given key. It is used to improve the item
+     * compositions reusing efficiency.
+     **/
+    fun getContentType(key: Any?): Any? {
+        val cachedContent = lambdasCache[key]
+        return if (cachedContent != null) {
+            cachedContent.type
+        } else {
+            val itemProvider = itemsProvider()
+            val index = itemProvider.keyToIndexMap[key]
+            if (index != null) {
+                itemProvider.getContentType(index)
+            } else {
+                null
+            }
+        }
+    }
+
+    /**
      * Return cached item content lambda or creates a new lambda and puts it in the cache.
      */
     fun getContent(index: Int, key: Any): @Composable () -> Unit {
-        val cachedContent = lambdasCache[key]
-        return if (cachedContent != null && cachedContent.lastKnownIndex == index) {
-            cachedContent.content
+        val cached = lambdasCache[key]
+        val type = itemsProvider().getContentType(index)
+        return if (cached != null && cached.lastKnownIndex == index && cached.type == type) {
+            cached.content
         } else {
-            val newContent = CachedItemContent(index, key)
+            val newContent = CachedItemContent(index, key, type)
             lambdasCache[key] = newContent
             newContent.content
         }
@@ -86,12 +97,17 @@ internal class LazyLayoutItemContentFactory(
 
     private inner class CachedItemContent(
         initialIndex: Int,
-        val key: Any
+        val key: Any,
+        val type: Any?
     ) {
         var lastKnownIndex by mutableStateOf(initialIndex)
             private set
 
-        val content: @Composable () -> Unit = @Composable {
+        private var _content: (@Composable () -> Unit)? = null
+        val content: (@Composable () -> Unit)
+            get() = _content ?: createContentLambda().also { _content = it }
+
+        private fun createContentLambda() = @Composable {
             val itemsProvider = itemsProvider()
             val index = itemsProvider.keyToIndexMap[key]?.also {
                 lastKnownIndex = it
@@ -105,7 +121,8 @@ internal class LazyLayoutItemContentFactory(
             }
             DisposableEffect(key) {
                 onDispose {
-                    lambdasCache.remove(key)
+                    // we clear the cached content lambda when disposed to not leak RecomposeScopes
+                    _content = null
                 }
             }
         }

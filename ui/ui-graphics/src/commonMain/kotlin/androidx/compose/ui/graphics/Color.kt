@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress("EXPERIMENTAL_API_USAGE", "EXPERIMENTAL_UNSIGNED_LITERALS")
 
 package androidx.compose.ui.graphics
 
@@ -112,8 +111,8 @@ import kotlin.math.min
  * [color spaces][ColorSpaces] for the exact ranges.
  */
 @Immutable
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-inline class Color(val value: ULong) {
+@kotlin.jvm.JvmInline
+value class Color(val value: ULong) {
     /**
      * Returns this color's color space.
      *
@@ -330,7 +329,6 @@ inline class Color(val value: ULong) {
          * @param value The strength of the color, where 0 is black.
          * @param colorSpace The RGB color space used to calculate the Color from the HSV values.
          */
-        @ExperimentalGraphicsApi
         fun hsv(
             hue: Float,
             saturation: Float,
@@ -363,7 +361,6 @@ inline class Color(val value: ULong) {
          * white.
          * @param colorSpace The RGB color space used to calculate the Color from the HSL values.
          */
-        @ExperimentalGraphicsApi
         fun hsl(
             hue: Float,
             saturation: Float,
@@ -515,7 +512,8 @@ fun Color(
 /**
  * Linear interpolate between two [Colors][Color], [start] and [stop] with [fraction] fraction
  * between the two. The [ColorSpace] of the result is always the [ColorSpace][Color.colorSpace]
- * of [stop]. [fraction] should be between 0 and 1, inclusive.
+ * of [stop]. [fraction] should be between 0 and 1, inclusive. Interpolation is done
+ * in the [ColorSpaces.Oklab] color space.
  */
 @Stable
 fun lerp(start: Color, stop: Color, /*@FloatRange(from = 0.0, to = 1.0)*/ fraction: Float): Color {

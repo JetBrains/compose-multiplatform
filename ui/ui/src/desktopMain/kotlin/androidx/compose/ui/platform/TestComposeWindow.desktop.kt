@@ -32,6 +32,7 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
@@ -43,6 +44,11 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sign
+
+@PublishedApi
+internal val EmptyDispatcher = object : CoroutineDispatcher() {
+    override fun dispatch(context: CoroutineContext, block: Runnable) = Unit
+}
 
 /**
  * A virtual window for testing purposes.
@@ -75,16 +81,22 @@ class TestComposeWindow(
 
     private fun onFrame() {
         canvas.clear(Color.Transparent.toArgb())
+        scene.flushEffects()
         scene.render(canvas, nanoTime())
     }
 
+    internal val component = DummyPlatformComponent
     private val scene = ComposeScene(
         coroutineScope.coroutineContext,
+        component,
         density,
         invalidate = frameDispatcher::scheduleFrame
     ).apply {
         constraints = Constraints(maxWidth = width, maxHeight = height)
     }
+
+    val currentCursor
+        get() = component.componentCursor
 
     /**
      * All currently registered [RootForTest]s
@@ -96,7 +108,7 @@ class TestComposeWindow(
      * Clear-up all acquired resources and stop all pending work
      */
     fun dispose() {
-        scene.dispose()
+        scene.close()
         coroutineScope.cancel()
     }
 
@@ -111,6 +123,7 @@ class TestComposeWindow(
     fun setContent(content: @Composable () -> Unit) {
         scene.constraints = Constraints(maxWidth = width, maxHeight = height)
         scene.setContent(content = content)
+        scene.flushEffects()
         scene.render(canvas, nanoTime = nanoTime())
     }
 

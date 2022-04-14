@@ -16,6 +16,7 @@
 
 package androidx.compose.material3
 
+import androidx.compose.material3.tokens.DialogTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,11 +27,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
 /**
+ * <a href="https://m3.material.io/components/dialogs/overview" class="external" target="_blank">Material Design basic dialog</a>.
+ *
+ * Dialogs provide important prompts in a user flow. They can require an action, communicate
+ * information, or help users accomplish a task.
+ *
  * ![Basic dialog image](https://developer.android.com/images/reference/androidx/compose/material3/basic-dialog.png)
- *
- * Material Design basic dialog.
- *
- * Dialogs interrupt users with urgent information, details, or actions.
  *
  * The dialog will position its buttons, typically [TextButton]s, based on the available space.
  * By default it will try to place them horizontally next to each other and fallback to horizontal
@@ -75,21 +77,12 @@ fun AlertDialog(
     icon: @Composable (() -> Unit)? = null,
     title: @Composable (() -> Unit)? = null,
     text: @Composable (() -> Unit)? = null,
-    shape: Shape = androidx.compose.material3.tokens.Dialog.ContainerShape,
-    containerColor: Color =
-        MaterialTheme.colorScheme.fromToken(
-            androidx.compose.material3.tokens.Dialog.ContainerColor
-        ),
-    tonalElevation: Dp = androidx.compose.material3.tokens.Dialog.ContainerElevation,
-    iconContentColor: Color = MaterialTheme.colorScheme.fromToken(
-        androidx.compose.material3.tokens.Dialog.WithIconIconColor
-    ),
-    titleContentColor: Color = MaterialTheme.colorScheme.fromToken(
-        androidx.compose.material3.tokens.Dialog.SubheadColor
-    ),
-    textContentColor: Color = MaterialTheme.colorScheme.fromToken(
-        androidx.compose.material3.tokens.Dialog.SupportingTextColor
-    ),
+    shape: Shape = DialogTokens.ContainerShape.toShape(),
+    containerColor: Color = DialogTokens.ContainerColor.toColor(),
+    tonalElevation: Dp = DialogTokens.ContainerElevation,
+    iconContentColor: Color = DialogTokens.IconColor.toColor(),
+    titleContentColor: Color = DialogTokens.SubheadColor.toColor(),
+    textContentColor: Color = DialogTokens.SupportingTextColor.toColor(),
     properties: DialogProperties = DialogProperties()
 ) {
     Dialog(
@@ -117,9 +110,7 @@ fun AlertDialog(
             // most cases, TextButtons should be used for dismiss and confirm buttons.
             // TextButtons will not consume this provided content color value, and will used their
             // own defined or default colors.
-            buttonContentColor = MaterialTheme.colorScheme.fromToken(
-                androidx.compose.material3.tokens.Dialog.ActionLabelTextColor
-            ),
+            buttonContentColor = DialogTokens.ActionLabelTextColor.toColor(),
             iconContentColor = iconContentColor,
             titleContentColor = titleContentColor,
             textContentColor = textContentColor,

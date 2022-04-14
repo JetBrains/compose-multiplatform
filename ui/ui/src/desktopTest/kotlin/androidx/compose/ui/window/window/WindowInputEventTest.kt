@@ -20,7 +20,6 @@ package androidx.compose.ui.window.window
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -34,12 +33,12 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.mouse.MouseScrollEvent
-import androidx.compose.ui.input.mouse.MouseScrollUnit
-import androidx.compose.ui.input.mouse.mouseScrollFilter
+import androidx.compose.ui.input.pointer.AwaitPointerEventScope
+import androidx.compose.ui.input.pointer.PointerButtons
 import androidx.compose.ui.input.pointer.PointerEvent
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.sendKeyEvent
 import androidx.compose.ui.sendMouseEvent
 import androidx.compose.ui.sendMouseWheelEvent
@@ -51,6 +50,7 @@ import androidx.compose.ui.window.rememberWindowState
 import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
+import java.awt.Toolkit
 import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
 import java.awt.event.MouseWheelEvent
@@ -266,11 +266,13 @@ class WindowInputEventTest {
                 window = this.window
 
                 Box(
-                    Modifier.fillMaxSize().pointerMoveFilter(
-                        onMove = { onMoves.add(it); false },
-                        onEnter = { onEnters++; false },
-                        onExit = { onExits++; false }
-                    )
+                    Modifier
+                        .fillMaxSize()
+                        .onPointerEvent(PointerEventType.Move) {
+                            onMoves.add(it.changes.first().position)
+                        }
+                        .onPointerEvent(PointerEventType.Enter) { onEnters++ }
+                        .onPointerEvent(PointerEventType.Exit) { onExits++ }
                 )
             }
         }
@@ -317,7 +319,7 @@ class WindowInputEventTest {
     fun `catch mouse scroll`() = runApplicationTest {
         lateinit var window: ComposeWindow
 
-        val events = mutableListOf<MouseScrollEvent>()
+        val deltas = mutableListOf<Offset>()
 
         launchApplication {
             Window(
@@ -327,40 +329,269 @@ class WindowInputEventTest {
                 window = this.window
 
                 Box(
-                    Modifier.fillMaxSize().mouseScrollFilter { event, _ ->
-                        events.add(event)
-                        false
-                    }
+                    Modifier
+                        .fillMaxSize()
+                        .onPointerEvent(PointerEventType.Scroll) {
+                            deltas.add(it.changes.first().scrollDelta)
+                        }
                 )
             }
         }
 
         awaitIdle()
-        assertThat(events.size).isEqualTo(0)
+        assertThat(deltas.size).isEqualTo(0)
 
         window.sendMouseWheelEvent(
             MouseEvent.MOUSE_WHEEL,
             x = 100,
             y = 50,
             scrollType = MouseWheelEvent.WHEEL_UNIT_SCROLL,
-            scrollAmount = 3
+            wheelRotation = 1
         )
         awaitIdle()
-        assertThat(events.size).isEqualTo(1)
-        assertThat(events.last().delta).isEqualTo(MouseScrollUnit.Line(3f))
+        assertThat(deltas.size).isEqualTo(1)
+        assertThat(deltas.last()).isEqualTo(Offset(0f, 1f))
 
         window.sendMouseWheelEvent(
             MouseEvent.MOUSE_WHEEL,
             x = 100,
             y = 50,
             scrollType = MouseWheelEvent.WHEEL_UNIT_SCROLL,
-            scrollAmount = 4
+            wheelRotation = -1
         )
         awaitIdle()
-        assertThat(events.size).isEqualTo(2)
-        assertThat(events.last().delta).isEqualTo(MouseScrollUnit.Line(4f))
+        assertThat(deltas.size).isEqualTo(2)
+        assertThat(deltas.last()).isEqualTo(Offset(0f, -1f))
 
         exitApplication()
+    }
+
+    @Test
+    fun `catch multiple scroll events in one frame`() = runApplicationTest {
+        lateinit var window: ComposeWindow
+
+        val deltas = mutableListOf<Offset>()
+
+        launchApplication {
+            Window(
+                onCloseRequest = ::exitApplication,
+                state = rememberWindowState(width = 200.dp, height = 100.dp)
+            ) {
+                window = this.window
+
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .onPointerEvent(PointerEventType.Scroll) {
+                            deltas.add(it.changes.first().scrollDelta)
+                        }
+                )
+            }
+        }
+
+        awaitIdle()
+        assertThat(deltas.size).isEqualTo(0)
+
+        val eventCount = 500
+
+        repeat(eventCount) {
+            window.sendMouseWheelEvent(
+                MouseEvent.MOUSE_WHEEL,
+                x = 100,
+                y = 50,
+                scrollType = MouseWheelEvent.WHEEL_UNIT_SCROLL,
+                wheelRotation = 1
+            )
+        }
+        awaitIdle()
+        assertThat(deltas.size).isEqualTo(eventCount)
+        assertThat(deltas.all { it == Offset(0f, 1f) }).isTrue()
+
+        exitApplication()
+    }
+
+    @Test
+    fun `catch only the first scroll event in one frame`() = runApplicationTest {
+        lateinit var window: ComposeWindow
+
+        val deltas = mutableListOf<Offset>()
+
+        launchApplication {
+            Window(
+                onCloseRequest = ::exitApplication,
+                state = rememberWindowState(width = 200.dp, height = 100.dp)
+            ) {
+                window = this.window
+
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .onFirstPointerEvent(PointerEventType.Scroll) {
+                            deltas.add(it.changes.first().scrollDelta)
+                        }
+                )
+            }
+        }
+
+        awaitIdle()
+        assertThat(deltas.size).isEqualTo(0)
+
+        val eventCount = 500
+
+        repeat(eventCount) {
+            window.sendMouseWheelEvent(
+                MouseEvent.MOUSE_WHEEL,
+                x = 100,
+                y = 50,
+                scrollType = MouseWheelEvent.WHEEL_UNIT_SCROLL,
+                wheelRotation = 1
+            )
+        }
+        awaitIdle()
+        assertThat(deltas.size).isEqualTo(1)
+        assertThat(deltas.first()).isEqualTo(Offset(0f, 1f))
+
+        exitApplication()
+    }
+
+    @Test(timeout = 5000)
+    fun `receive buttons and modifiers`() = runApplicationTest {
+        lateinit var window: ComposeWindow
+
+        val receivedButtons = mutableListOf<PointerButtons>()
+        val receivedKeyboardModifiers = mutableListOf<PointerKeyboardModifiers>()
+
+        launchApplication {
+            Window(
+                onCloseRequest = ::exitApplication,
+                state = rememberWindowState(width = 200.dp, height = 100.dp)
+            ) {
+                window = this.window
+
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .onPointerEvent(PointerEventType.Press) {
+                            receivedButtons.add(it.buttons)
+                            receivedKeyboardModifiers.add(it.keyboardModifiers)
+                        }
+                        .onPointerEvent(PointerEventType.Scroll) {
+                            receivedButtons.add(it.buttons)
+                            receivedKeyboardModifiers.add(it.keyboardModifiers)
+                        }
+                )
+            }
+        }
+
+        awaitIdle()
+
+        window.sendMouseEvent(
+            MouseEvent.MOUSE_PRESSED,
+            x = 100,
+            y = 50,
+            modifiers = MouseEvent.SHIFT_DOWN_MASK or MouseEvent.CTRL_DOWN_MASK or
+                MouseEvent.BUTTON1_DOWN_MASK or MouseEvent.BUTTON3_DOWN_MASK
+        )
+
+        awaitIdle()
+        assertThat(receivedButtons.size).isEqualTo(1)
+        assertThat(receivedButtons.last()).isEqualTo(
+            PointerButtons(
+                isPrimaryPressed = true,
+                isSecondaryPressed = true,
+            )
+        )
+        assertThat(receivedKeyboardModifiers.size).isEqualTo(1)
+        assertThat(receivedKeyboardModifiers.last()).isEqualTo(
+            PointerKeyboardModifiers(
+                isCtrlPressed = true,
+                isShiftPressed = true,
+                isCapsLockOn = getLockingKeyStateSafe(KeyEvent.VK_CAPS_LOCK),
+                isScrollLockOn = getLockingKeyStateSafe(KeyEvent.VK_SCROLL_LOCK),
+                isNumLockOn = getLockingKeyStateSafe(KeyEvent.VK_NUM_LOCK),
+            )
+        )
+
+        window.sendMouseWheelEvent(
+            MouseEvent.MOUSE_WHEEL,
+            x = 100,
+            y = 50,
+            scrollType = MouseWheelEvent.WHEEL_UNIT_SCROLL,
+            wheelRotation = 1,
+            modifiers = MouseEvent.SHIFT_DOWN_MASK or MouseEvent.CTRL_DOWN_MASK or
+                MouseEvent.BUTTON1_DOWN_MASK or MouseEvent.BUTTON3_DOWN_MASK
+        )
+
+        awaitIdle()
+        assertThat(receivedButtons.size).isEqualTo(2)
+        assertThat(receivedButtons.last()).isEqualTo(
+            PointerButtons(
+                isPrimaryPressed = true,
+                isSecondaryPressed = true,
+            )
+        )
+        assertThat(receivedKeyboardModifiers.size).isEqualTo(2)
+        assertThat(receivedKeyboardModifiers.last()).isEqualTo(
+            PointerKeyboardModifiers(
+                isCtrlPressed = true,
+                isShiftPressed = true,
+                isCapsLockOn = getLockingKeyStateSafe(KeyEvent.VK_CAPS_LOCK),
+                isScrollLockOn = getLockingKeyStateSafe(KeyEvent.VK_SCROLL_LOCK),
+                isNumLockOn = getLockingKeyStateSafe(KeyEvent.VK_NUM_LOCK),
+            )
+        )
+
+        exitApplication()
+    }
+
+    private fun getLockingKeyStateSafe(
+        mask: Int
+    ): Boolean = try {
+        Toolkit.getDefaultToolkit().getLockingKeyState(mask)
+    } catch (_: Exception) {
+        false
+    }
+
+    private fun Modifier.onPointerEvent(
+        eventType: PointerEventType,
+        onEvent: AwaitPointerEventScope.(event: PointerEvent) -> Unit
+    ) = pointerInput(eventType, onEvent) {
+        awaitPointerEventScope {
+            while (true) {
+                val event = awaitPointerEvent()
+                if (event.type == eventType) {
+                    onEvent(event)
+                }
+            }
+        }
+    }
+
+    /**
+     * Handle only the first received event and drop all the others that are received
+     * in a single frame
+     */
+    private fun Modifier.onFirstPointerEvent(
+        eventType: PointerEventType,
+        onEvent: AwaitPointerEventScope.(event: PointerEvent) -> Unit
+    ) = pointerInput(eventType, onEvent) {
+        while (true) {
+            awaitPointerEventScope {
+                val event = awaitEvent(eventType)
+                onEvent(event)
+            }
+        }
+    }
+
+    private suspend fun AwaitPointerEventScope.awaitEvent(
+        eventType: PointerEventType
+    ): PointerEvent {
+        var event: PointerEvent
+        do {
+            event = awaitPointerEvent()
+        } while (
+            event.type != eventType
+        )
+        return event
     }
 
     private val PointerEvent.pressed get() = changes.first().pressed

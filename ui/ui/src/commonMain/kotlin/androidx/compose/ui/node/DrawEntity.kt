@@ -21,22 +21,13 @@ import androidx.compose.ui.draw.DrawCacheModifier
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.toSize
 
 internal class DrawEntity(
-    val layoutNodeWrapper: LayoutNodeWrapper,
-    val modifier: DrawModifier
-) : OwnerScope {
-    private val layoutNode: LayoutNode
-        get() = layoutNodeWrapper.layoutNode
-
-    private val size: IntSize
-        get() = layoutNodeWrapper.size
-
-    var next: DrawEntity? = null
-
+    layoutNodeWrapper: LayoutNodeWrapper,
+    modifier: DrawModifier
+) : LayoutNodeEntity<DrawEntity, DrawModifier>(layoutNodeWrapper, modifier), OwnerScope {
     private var cacheDrawModifier: DrawCacheModifier? = updateCacheDrawModifier()
 
     private val buildCacheParams: BuildDrawCacheParams = object : BuildDrawCacheParams {
@@ -79,15 +70,14 @@ internal class DrawEntity(
         }
     }
 
-    fun onInitialize() {
+    override fun onAttach() {
         cacheDrawModifier = updateCacheDrawModifier()
         invalidateCache = true
-        next?.onInitialize()
+        super.onAttach()
     }
 
-    fun onMeasureResultChanged(width: Int, height: Int) {
+    fun onMeasureResultChanged() {
         invalidateCache = true
-        next?.onMeasureResultChanged(width, height)
     }
 
     // This is not thread safe

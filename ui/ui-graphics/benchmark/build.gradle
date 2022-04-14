@@ -34,3 +34,7 @@ dependencies {
     androidTestImplementation project(":benchmark:benchmark-junit4")
     androidTestImplementation(libs.testRules)
 }
+
+android {
+    namespace "androidx.compose.ui.graphics.benchmark"
+}

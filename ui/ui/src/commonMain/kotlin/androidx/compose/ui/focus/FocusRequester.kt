@@ -19,7 +19,6 @@ package androidx.compose.ui.focus
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.node.ModifiedFocusRequesterNode
 
 private const val focusRequesterNotInitialized = """
    FocusRequester is not initialized. Here are some possible fixes:
@@ -41,7 +40,8 @@ private const val focusRequesterNotInitialized = """
  */
 class FocusRequester {
 
-    internal val focusRequesterNodes: MutableVector<ModifiedFocusRequesterNode> = mutableVectorOf()
+    internal val focusRequesterModifierLocals: MutableVector<FocusRequesterModifierLocal> =
+        mutableVectorOf()
 
     /**
      * Use this function to request focus. If the system grants focus to a component associated
@@ -51,8 +51,8 @@ class FocusRequester {
      * @sample androidx.compose.ui.samples.RequestFocusSample
      */
     fun requestFocus() {
-        check(focusRequesterNodes.isNotEmpty()) { focusRequesterNotInitialized }
-        focusRequesterNodes.forEach { it.findFocusNode()?.requestFocus() }
+        check(focusRequesterModifierLocals.isNotEmpty()) { focusRequesterNotInitialized }
+        focusRequesterModifierLocals.forEach { it.findFocusNode()?.requestFocus() }
     }
 
     /**
@@ -71,9 +71,9 @@ class FocusRequester {
      * @sample androidx.compose.ui.samples.CaptureFocusSample
      */
     fun captureFocus(): Boolean {
-        check(focusRequesterNodes.isNotEmpty()) { focusRequesterNotInitialized }
+        check(focusRequesterModifierLocals.isNotEmpty()) { focusRequesterNotInitialized }
         var success = false
-        focusRequesterNodes.forEach {
+        focusRequesterModifierLocals.forEach {
             it.findFocusNode()?.apply {
                 if (captureFocus()) {
                     success = true
@@ -98,9 +98,9 @@ class FocusRequester {
      * @sample androidx.compose.ui.samples.CaptureFocusSample
      */
     fun freeFocus(): Boolean {
-        check(focusRequesterNodes.isNotEmpty()) { focusRequesterNotInitialized }
+        check(focusRequesterModifierLocals.isNotEmpty()) { focusRequesterNotInitialized }
         var success = false
-        focusRequesterNodes.forEach {
+        focusRequesterModifierLocals.forEach {
             it.findFocusNode()?.apply {
                 if (freeFocus()) {
                     success = true
@@ -112,9 +112,9 @@ class FocusRequester {
 
     companion object {
         /**
-         * Default [focusRequester], which when used in [Modifier.focusOrder][focusOrder] implies
-         * that we want to use the default system focus order, that is based on the position of the
-         * items on the screen.
+         * Default [focusRequester], which when used in [Modifier.focusProperties][focusProperties]
+         * implies that we want to use the default system focus order, that is based on the
+         * position of the items on the screen.
          */
         val Default = FocusRequester()
 

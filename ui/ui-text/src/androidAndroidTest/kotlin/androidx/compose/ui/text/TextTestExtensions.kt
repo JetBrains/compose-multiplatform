@@ -18,10 +18,17 @@ package androidx.compose.ui.text
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Typeface
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.ResourceFont
-import androidx.core.content.res.ResourcesCompat
+import androidx.compose.ui.text.font.AndroidFontLoader
+import androidx.compose.ui.text.font.AsyncTypefaceCache
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontFamilyResolverImpl
+import androidx.compose.ui.text.font.FontListFontFamilyTypefaceAdapter
+import androidx.compose.ui.text.font.PlatformFontLoader
+import androidx.compose.ui.text.font.PlatformFontFamilyTypefaceAdapter
+import androidx.compose.ui.text.font.TypefaceRequestCache
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.text.font.AndroidFontResolveInterceptor
+import androidx.compose.ui.text.font.PlatformResolveInterceptor
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
@@ -35,13 +42,99 @@ fun Paragraph.bitmap(): Bitmap {
     return bitmap
 }
 
-class TestFontResourceLoader(val context: Context) : Font.ResourceLoader {
-    override fun load(font: Font): Typeface {
-        return when (font) {
-            is ResourceFont -> ResourcesCompat.getFont(context, font.resId)!!
-            else -> throw IllegalArgumentException("Unknown font type: ${font.javaClass.name}")
-        }
+@OptIn(ExperimentalTextApi::class)
+internal fun UncachedFontFamilyResolver(
+    context: Context
+): FontFamily.Resolver = UncachedFontFamilyResolver(
+    AndroidFontLoader(context),
+    AndroidFontResolveInterceptor(context)
+)
+
+@OptIn(ExperimentalTextApi::class)
+internal fun UncachedFontFamilyResolver(
+    platformFontLoader: PlatformFontLoader,
+    platformResolveInterceptor: PlatformResolveInterceptor
+): FontFamily.Resolver = FontFamilyResolverImpl(
+    platformFontLoader,
+    platformResolveInterceptor,
+    TypefaceRequestCache(),
+    FontListFontFamilyTypefaceAdapter(AsyncTypefaceCache()),
+    PlatformFontFamilyTypefaceAdapter()
+)
+
+fun Float.toIntPx(): Int = ceil(this).roundToInt()
+
+internal fun FloatArray.asRectArray(): Array<Rect> {
+    return Array((size) / 4) { index ->
+        Rect(
+            this[4 * index],
+            this[4 * index + 1],
+            this[4 * index + 2],
+            this[4 * index + 3]
+        )
     }
 }
 
-fun Float.toIntPx(): Int = ceil(this).roundToInt()
+internal fun getLtrCharacterBoundariesForTestFont(
+    text: String,
+    fontSize: Float,
+    // assumes that the test font is used and fontSize is equal to default line height
+    lineHeight: Float = fontSize,
+    initialTop: Float = 0f
+): Array<Rect> {
+    var top = initialTop
+    var left = 0f
+    return text.indices.map { index ->
+        // if \n, no position update, same as before
+        val right = if (text[index] == '\n') left else left + fontSize
+        val bottom = top + lineHeight
+        Rect(
+            left = left,
+            top = top,
+            right = right,
+            bottom = bottom
+        ).also {
+            if (text[index] == '\n') {
+                // left resets to line start
+                left = 0f
+                // top will go to next line
+                top = bottom
+            } else {
+                // else move to right with one char
+                left = right
+            }
+        }
+    }.toTypedArray()
+}
+
+internal fun getRtlCharacterBoundariesForTestFont(
+    text: String,
+    width: Float,
+    fontSize: Float,
+    lineHeight: Float = fontSize
+): Array<Rect> {
+    var top = 0f
+    var right = width
+    return text.indices.map { index ->
+        // if \n, position doesn't update, same as before (right)
+        // else left is 1 char left
+        val left = if (text[index] == '\n') right else right - fontSize
+        val bottom = top + lineHeight
+        Rect(
+            left = left,
+            top = top,
+            right = right,
+            bottom = bottom
+        ).also {
+            if (text[index] == '\n') {
+                // right resets to line start
+                right = width
+                // top will go to next line
+                top = bottom
+            } else {
+                // else move to left with one char
+                right = left
+            }
+        }
+    }.toTypedArray()
+}

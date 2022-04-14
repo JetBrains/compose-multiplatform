@@ -38,3 +38,7 @@ dependencies {
     implementation(project(":compose:ui:ui-text:ui-text-samples"))
     implementation(project(":paging:paging-compose:integration-tests:paging-demos"))
 }
+
+android {
+    namespace "androidx.compose.foundation.demos"
+}

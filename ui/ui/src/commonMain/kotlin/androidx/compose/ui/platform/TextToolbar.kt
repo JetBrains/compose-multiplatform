@@ -18,7 +18,6 @@ package androidx.compose.ui.platform
 
 import androidx.compose.ui.geometry.Rect
 
-internal typealias ActionCallback = () -> Unit
 /**
  * Interface for text-related toolbar.
  */
@@ -34,10 +33,10 @@ interface TextToolbar {
      */
     fun showMenu(
         rect: Rect,
-        onCopyRequested: ActionCallback? = null,
-        onPasteRequested: ActionCallback? = null,
-        onCutRequested: ActionCallback? = null,
-        onSelectAllRequested: ActionCallback? = null
+        onCopyRequested: (() -> Unit)? = null,
+        onPasteRequested: (() -> Unit)? = null,
+        onCutRequested: (() -> Unit)? = null,
+        onSelectAllRequested: (() -> Unit)? = null
     )
 
     /**

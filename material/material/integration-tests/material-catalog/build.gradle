@@ -29,11 +29,11 @@ dependencies {
     implementation(libs.kotlinStdlib)
     implementation project(":core:core")
     implementation project(":compose:runtime:runtime")
+    implementation project(":compose:foundation:foundation-layout")
     implementation project(":compose:ui:ui")
     implementation project(":compose:material:material")
     implementation project(":compose:material:material:material-samples")
     implementation project(":navigation:navigation-compose")
-    implementation "com.google.accompanist:accompanist-insets:0.18.0"
 }
 
 androidx {
@@ -41,4 +41,8 @@ androidx {
     publish = Publish.NONE
     inceptionYear = "2021"
     description = "This is a project for the Compose Material Catalog."
+}
+
+android {
+    namespace "androidx.compose.material.catalog.library"
 }

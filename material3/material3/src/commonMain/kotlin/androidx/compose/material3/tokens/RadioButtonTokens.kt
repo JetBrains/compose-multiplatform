@@ -13,32 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// VERSION: v0_92
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
 
 import androidx.compose.ui.unit.dp
 
-// TODO(sgibly): Rename ColorSchemeKey to ColorSchemeKeyTokens.
 internal object RadioButtonTokens {
-    val DisabledSelectedIconColor = ColorSchemeKey.OnSurface
+    val DisabledSelectedIconColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledSelectedIconOpacity = 0.38f
-    val DisabledUnselectedIconColor = ColorSchemeKey.OnSurface
+    val DisabledUnselectedIconColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledUnselectedIconOpacity = 0.38f
     val IconSize = 20.0.dp
-    val SelectedFocusIconColor = ColorSchemeKey.Primary
-    val SelectedFocusStateLayerColor = ColorSchemeKey.Primary
-    val SelectedHoverIconColor = ColorSchemeKey.Primary
-    val SelectedHoverStateLayerColor = ColorSchemeKey.Primary
-    val SelectedIconColor = ColorSchemeKey.Primary
-    val SelectedPressedIconColor = ColorSchemeKey.Primary
-    val SelectedPressedStateLayerColor = ColorSchemeKey.OnSurface
-    val StateLayerSize = 48.0.dp
-    val UnselectedFocusIconColor = ColorSchemeKey.OnSurface
-    val UnselectedFocusStateLayerColor = ColorSchemeKey.OnSurface
-    val UnselectedHoverIconColor = ColorSchemeKey.OnSurface
-    val UnselectedHoverStateLayerColor = ColorSchemeKey.OnSurface
-    val UnselectedIconColor = ColorSchemeKey.OnSurface
-    val UnselectedPressedIconColor = ColorSchemeKey.OnSurface
-    val UnselectedPressedStateLayerColor = ColorSchemeKey.Primary
+    val SelectedFocusIconColor = ColorSchemeKeyTokens.Primary
+    val SelectedHoverIconColor = ColorSchemeKeyTokens.Primary
+    val SelectedIconColor = ColorSchemeKeyTokens.Primary
+    val SelectedPressedIconColor = ColorSchemeKeyTokens.Primary
+    val StateLayerSize = 40.0.dp
+    val UnselectedFocusIconColor = ColorSchemeKeyTokens.OnSurface
+    val UnselectedHoverIconColor = ColorSchemeKeyTokens.OnSurface
+    val UnselectedIconColor = ColorSchemeKeyTokens.OnSurface
+    val UnselectedPressedIconColor = ColorSchemeKeyTokens.OnSurface
 }

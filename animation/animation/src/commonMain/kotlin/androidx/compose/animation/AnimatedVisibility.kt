@@ -624,7 +624,7 @@ interface AnimatedVisibilityScope {
      * [transition] allows custom enter/exit animations to be specified. It will run simultaneously
      * with the built-in enter/exit transitions specified in [AnimatedVisibility].
      */
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalAnimationApi
     @ExperimentalAnimationApi
     val transition: Transition<EnterExitState>

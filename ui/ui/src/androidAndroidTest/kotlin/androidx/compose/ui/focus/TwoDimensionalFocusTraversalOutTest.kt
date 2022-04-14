@@ -105,7 +105,7 @@ class TwoDimensionalFocusTraversalOutTest {
      *     |____________________|
      */
     @Test
-    fun focusOut_doesNotfocusOnDeactivatedParent() {
+    fun focusOut_doesNotFocusOnDeactivatedParent() {
         // Arrange.
         val parent = mutableStateOf(false)
         rule.setContentForTest {
@@ -271,6 +271,39 @@ class TwoDimensionalFocusTraversalOutTest {
      */
     @Test
     fun focusRight_focusesOnNonDeactivatedSiblingOfParent() {
+        // Arrange.
+        val (parent, deactivated, nextItem) = List(3) { mutableStateOf(false) }
+        rule.setContentForTest {
+            FocusableBox(parent, 0, 0, 30, 30) {
+                FocusableBox(focusedItem, 10, 10, 10, 10, initialFocus)
+            }
+            FocusableBox(deactivated, 40, 10, 10, 10, deactivated = true)
+            FocusableBox(nextItem, 60, 10, 10, 10)
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Right) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
+            assertThat(focusedItem.value).isFalse()
+            assertThat(parent.value).isFalse()
+            assertThat(deactivated.value).isFalse()
+            assertThat(nextItem.value).isTrue()
+        }
+    }
+
+    /**
+     *      _____________________
+     *     |  parent            |
+     *     |   _______________  |   ___________________________________________
+     *     |  | focusedItem  |  |  | deactivatedItem & nextItem (overlapping) |
+     *     |  |______________|  |  |__________________________________________|
+     *     |____________________|
+     */
+    @Test
+    fun focusRight_focusesOnNonDeactivatedSiblingOfParent_withOverlappingDeactivatedItem() {
         // Arrange.
         val (parent, deactivated, nextItem) = List(3) { mutableStateOf(false) }
         rule.setContentForTest {

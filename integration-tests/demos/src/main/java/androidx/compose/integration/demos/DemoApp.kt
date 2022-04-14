@@ -36,6 +36,7 @@ import androidx.compose.integration.demos.common.Demo
 import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.integration.demos.common.FragmentDemo
 import androidx.compose.integration.demos.common.allLaunchableDemos
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
@@ -52,6 +53,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -141,7 +143,15 @@ fun Material2LegacyTheme(content: @Composable () -> Unit) {
         } else {
             androidx.compose.material.lightColors()
         }
-    androidx.compose.material.MaterialTheme(colors = material2Colors, content = content)
+    androidx.compose.material.MaterialTheme(
+        colors = material2Colors,
+        content = {
+            CompositionLocalProvider(
+                LocalContentColor provides androidx.compose.material.MaterialTheme.colors.onSurface,
+                content = content
+            )
+        }
+    )
 }
 
 @Composable

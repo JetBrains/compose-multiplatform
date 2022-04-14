@@ -20,7 +20,6 @@ import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.platform.ActionCallback
 
 internal const val MENU_ITEM_COPY = 0
 internal const val MENU_ITEM_PASTE = 1
@@ -29,10 +28,10 @@ internal const val MENU_ITEM_SELECT_ALL = 3
 
 internal class TextActionModeCallback(
     var rect: Rect = Rect.Zero,
-    var onCopyRequested: ActionCallback? = null,
-    var onPasteRequested: ActionCallback? = null,
-    var onCutRequested: ActionCallback? = null,
-    var onSelectAllRequested: ActionCallback? = null
+    var onCopyRequested: (() -> Unit)? = null,
+    var onPasteRequested: (() -> Unit)? = null,
+    var onCutRequested: (() -> Unit)? = null,
+    var onSelectAllRequested: (() -> Unit)? = null
 ) {
     fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
         requireNotNull(menu)

@@ -16,12 +16,19 @@
 
 package androidx.compose.ui.text.platform
 
+import android.graphics.Typeface
 import android.text.SpannableString
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.DefaultIncludeFontPadding
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.android.InternalPlatformTextApi
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontSynthesis
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.platform.extensions.setLineHeight
 import androidx.compose.ui.text.platform.extensions.setPlaceholders
 import androidx.compose.ui.text.platform.extensions.setSpanStyles
@@ -38,7 +45,7 @@ internal fun createCharSequence(
     spanStyles: List<AnnotatedString.Range<SpanStyle>>,
     placeholders: List<AnnotatedString.Range<Placeholder>>,
     density: Density,
-    typefaceAdapter: TypefaceAdapter
+    resolveTypeface: (FontFamily?, FontWeight, FontStyle, FontSynthesis) -> Typeface,
 ): CharSequence {
     if (spanStyles.isEmpty() &&
         placeholders.isEmpty() &&
@@ -50,13 +57,32 @@ internal fun createCharSequence(
 
     val spannableString = SpannableString(text)
 
-    spannableString.setLineHeight(contextTextStyle.lineHeight, contextFontSize, density)
+    // includeFontPadding "true" did not apply the line height to first line in the
+    // latest android versions. disable line height for the first line if includeFontPadding is
+    // false.
+    spannableString.setLineHeight(
+        lineHeight = contextTextStyle.lineHeight,
+        contextFontSize = contextFontSize,
+        density = density,
+        applyToFirstLine = contextTextStyle.isIncludeFontPaddingEnabled()
+    )
 
     spannableString.setTextIndent(contextTextStyle.textIndent, contextFontSize, density)
 
-    spannableString.setSpanStyles(contextTextStyle, spanStyles, density, typefaceAdapter)
+    spannableString.setSpanStyles(
+        contextTextStyle,
+        spanStyles,
+        density,
+        resolveTypeface
+    )
 
     spannableString.setPlaceholders(placeholders, density)
 
     return spannableString
+}
+
+@OptIn(ExperimentalTextApi::class)
+@Suppress("DEPRECATION")
+internal fun TextStyle.isIncludeFontPaddingEnabled(): Boolean {
+    return platformStyle?.paragraphStyle?.includeFontPadding ?: DefaultIncludeFontPadding
 }

@@ -20,8 +20,8 @@ package androidx.compose.ui.text.input
  * Signals the keyboard what type of action should be displayed. It is not guaranteed if
  * the keyboard will show the requested action.
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-inline class ImeAction internal constructor(@Suppress("unused") private val value: Int) {
+@kotlin.jvm.JvmInline
+value class ImeAction internal constructor(@Suppress("unused") private val value: Int) {
 
     override fun toString(): String {
         return when (this) {

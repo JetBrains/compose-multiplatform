@@ -80,6 +80,21 @@ class EditingBuffer(
     internal fun hasComposition(): Boolean = compositionStart != NOWHERE
 
     /**
+     * Returns the composition information as TextRange. Returns null if no
+     * composition is set.
+     */
+    internal val composition: TextRange?
+        get() = if (hasComposition()) {
+            TextRange(compositionStart, compositionEnd)
+        } else null
+
+    /**
+     * Returns the selection information as TextRange
+     */
+    internal val selection: TextRange
+        get() = TextRange(selectionStart, selectionEnd)
+
+    /**
      * Helper accessor for cursor offset
      */
     /*VisibleForTesting*/

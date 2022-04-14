@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-@file:Suppress(
-    "NOTHING_TO_INLINE",
-    "INLINE_CLASS_DEPRECATED",
-    "EXPERIMENTAL_FEATURE_WARNING"
-)
+@file:Suppress("NOTHING_TO_INLINE")
 
 package androidx.compose.ui.unit
 
@@ -39,7 +35,8 @@ fun IntSize(width: Int, height: Int): IntSize = IntSize(packInts(width, height))
  * A two-dimensional size class used for measuring in [Int] pixels.
  */
 @Immutable
-inline class IntSize internal constructor(@PublishedApi internal val packedValue: Long) {
+@kotlin.jvm.JvmInline
+value class IntSize internal constructor(@PublishedApi internal val packedValue: Long) {
 
     /**
      * The horizontal aspect of the size in [Int] pixels.

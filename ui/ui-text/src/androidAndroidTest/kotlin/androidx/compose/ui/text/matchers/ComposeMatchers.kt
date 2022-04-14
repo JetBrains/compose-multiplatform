@@ -18,6 +18,8 @@ package androidx.compose.ui.text.matchers
 
 import android.graphics.Bitmap
 import android.graphics.Typeface
+import androidx.compose.ui.text.font.TypefaceResult
+import androidx.compose.ui.geometry.Rect
 import com.google.common.truth.IntegerSubject
 import com.google.common.truth.Truth.assertAbout
 
@@ -29,8 +31,20 @@ internal fun assertThat(typeface: Typeface?): TypefaceSubject {
     return assertAbout(TypefaceSubject.SUBJECT_FACTORY).that(typeface)!!
 }
 
+internal fun assertThat(array: Array<Rect>?): RectArraySubject {
+    return assertAbout(RectArraySubject.SUBJECT_FACTORY).that(array)!!
+}
+
+internal fun assertThat(rect: Rect?): RectSubject {
+    return assertAbout(RectSubject.SUBJECT_FACTORY).that(rect)!!
+}
+
 internal fun assertThat(charSequence: CharSequence?): CharSequenceSubject {
     return assertAbout(CharSequenceSubject.SUBJECT_FACTORY).that(charSequence)!!
+}
+
+internal fun assertThat(typefaceResult: TypefaceResult?): TypefaceResultSubject {
+    return assertAbout(TypefaceResultSubject.SUBJECT_FACTORY).that(typefaceResult)!!
 }
 
 internal fun IntegerSubject.isZero() {

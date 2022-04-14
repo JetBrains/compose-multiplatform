@@ -39,8 +39,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
-import androidx.compose.ui.input.pointer.consumeAllChanges
-import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
@@ -310,7 +308,7 @@ private suspend fun AwaitPointerEventScope.awaitDownAndSlop(
     return if (!canDrag.value.invoke(initialDown)) {
         null
     } else if (startDragImmediately.value.invoke()) {
-        initialDown.consumeAllChanges()
+        initialDown.consume()
         velocityTracker.addPointerInputChange(initialDown)
         // since we start immediately we don't wait for slop and the initial delta is 0
         initialDown to 0f
@@ -320,7 +318,7 @@ private suspend fun AwaitPointerEventScope.awaitDownAndSlop(
         var initialDelta = 0f
         val postPointerSlop = { event: PointerInputChange, offset: Float ->
             velocityTracker.addPointerInputChange(event)
-            event.consumePositionChange()
+            event.consume()
             initialDelta = offset
         }
         val afterSlopResult = if (orientation == Orientation.Vertical) {
@@ -357,7 +355,7 @@ private suspend fun AwaitPointerEventScope.awaitDrag(
     val dragTick: (PointerInputChange) -> Unit = { event ->
         velocityTracker.addPointerInputChange(event)
         val delta = event.positionChange().toFloat(orientation)
-        event.consumePositionChange()
+        event.consume()
         channel.trySend(
             DragDelta(
                 if (reverseDirection) delta * -1 else delta,

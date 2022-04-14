@@ -121,9 +121,6 @@ class RememberDetectorTest : LintDetectorTest() {
             Stubs.Composable,
             Stubs.Remember
         )
-            // TODO: incorrect missing import warning, because androidx.compose.runtime.remember
-            //  resolves to multiple functions. Remove when this is fixed in a future Lint version
-            .allowCompilationErrors()
             .run()
             .expect(
                 """
@@ -245,9 +242,6 @@ src/androidx/compose/runtime/foo/FooState.kt:69: Error: remember calls must not 
             Stubs.Composable,
             Stubs.Remember
         )
-            // TODO: incorrect missing import warning, because androidx.compose.runtime.remember
-            //  resolves to multiple functions. Remove when this is fixed in a future Lint version
-            .allowCompilationErrors()
             .run()
             .expect(
                 """
@@ -359,9 +353,6 @@ src/androidx/compose/runtime/foo/FooState.kt:69: Error: remember calls must not 
             Stubs.Composable,
             Stubs.Remember
         )
-            // TODO: incorrect missing import warning, because androidx.compose.runtime.remember
-            //  resolves to multiple functions. Remove when this is fixed in a future Lint version
-            .allowCompilationErrors()
             .run()
             .expectClean()
     }
