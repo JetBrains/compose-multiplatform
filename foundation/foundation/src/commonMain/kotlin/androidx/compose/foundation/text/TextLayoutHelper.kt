@@ -17,7 +17,6 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -65,7 +64,7 @@ internal fun TextLayoutResult.canReuse(
     }
     if (!(
         layoutInput.text == text &&
-            layoutInput.style.canReuseLayout(style) &&
+            layoutInput.style.hasSameLayoutAffectingAttributes(style) &&
             layoutInput.placeholders == placeholders &&
             layoutInput.maxLines == maxLines &&
             layoutInput.softWrap == softWrap &&
@@ -87,30 +86,4 @@ internal fun TextLayoutResult.canReuse(
     }
     return constraints.maxWidth == layoutInput.constraints.maxWidth &&
         constraints.maxHeight == layoutInput.constraints.maxHeight
-}
-
-/**
- * Returns true if text layout created with this TextStyle can be reused for the [other] TextStyle.
- *
- * The only parameters that do not require a layout change are color, textDecoration and shadow
- * since they are set on the paint directly in TextPainter.
- */
-@OptIn(ExperimentalTextApi::class)
-internal fun TextStyle.canReuseLayout(other: TextStyle): Boolean {
-    return (this === other) || (fontSize == other.fontSize &&
-        fontWeight == other.fontWeight &&
-        fontStyle == other.fontStyle &&
-        fontSynthesis == other.fontSynthesis &&
-        fontFamily == other.fontFamily &&
-        fontFeatureSettings == other.fontFeatureSettings &&
-        letterSpacing == other.letterSpacing &&
-        baselineShift == other.baselineShift &&
-        textGeometricTransform == other.textGeometricTransform &&
-        localeList == other.localeList &&
-        background == other.background &&
-        textAlign == other.textAlign &&
-        textDirection == other.textDirection &&
-        lineHeight == other.lineHeight &&
-        textIndent == other.textIndent &&
-        platformStyle == other.platformStyle)
 }

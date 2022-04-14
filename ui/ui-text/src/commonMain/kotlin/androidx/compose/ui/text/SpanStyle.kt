@@ -287,12 +287,16 @@ class SpanStyle @ExperimentalTextApi constructor(
         )
     }
 
-    @OptIn(ExperimentalTextApi::class)
     override operator fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is SpanStyle) return false
+        return hasSameLayoutAffectingAttributes(other) &&
+            hasSameNonLayoutAttributes(other)
+    }
 
-        if (color != other.color) return false
+    @OptIn(ExperimentalTextApi::class)
+    internal fun hasSameLayoutAffectingAttributes(other: SpanStyle): Boolean {
+        if (this === other) return true
         if (fontSize != other.fontSize) return false
         if (fontWeight != other.fontWeight) return false
         if (fontStyle != other.fontStyle) return false
@@ -304,10 +308,14 @@ class SpanStyle @ExperimentalTextApi constructor(
         if (textGeometricTransform != other.textGeometricTransform) return false
         if (localeList != other.localeList) return false
         if (background != other.background) return false
+        if (platformStyle != other.platformStyle) return false
+        return true
+    }
+
+    private fun hasSameNonLayoutAttributes(other: SpanStyle): Boolean {
+        if (color != other.color) return false
         if (textDecoration != other.textDecoration) return false
         if (shadow != other.shadow) return false
-        if (platformStyle != other.platformStyle) return false
-
         return true
     }
 
