@@ -19,7 +19,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.OnGloballyPositionedModifier
+import androidx.compose.ui.layout.OnPlacedModifier
 import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.modifier.modifierLocalOf
@@ -69,7 +69,7 @@ internal fun interface BringIntoViewParent {
 internal abstract class BringIntoViewChildModifier(
     private val defaultParent: BringIntoViewParent
 ) : ModifierLocalConsumer,
-    OnGloballyPositionedModifier {
+    OnPlacedModifier {
 
     private var localParent: BringIntoViewParent? = null
 
@@ -87,7 +87,7 @@ internal abstract class BringIntoViewChildModifier(
         }
     }
 
-    override fun onGloballyPositioned(coordinates: LayoutCoordinates) {
+    override fun onPlaced(coordinates: LayoutCoordinates) {
         layoutCoordinates = coordinates
     }
 }
