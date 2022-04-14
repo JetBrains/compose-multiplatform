@@ -36,7 +36,7 @@ object NativeApiTasks {
     ) {
         val artifactNames = project.extensions.getByType(
             LibraryExtension::class.java
-        ).prefab.names.toList()
+        ).prefab.map { it.name }
 
         // Generates API files from source in the build directory
         val generateNativeApi = project.tasks.register(

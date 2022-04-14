@@ -84,6 +84,12 @@ abstract class GenerateNativeApiTask : DefaultTask() {
         val workQueue = workerExecutor.processIsolation()
         artifactNames.get().forEach { moduleName ->
             val module = prefabDir.resolve("modules/$moduleName/libs")
+            if (!module.exists()) {
+                throw GradleException(
+                    "Expected prefab directory to include path $module, but it does not exist. " +
+                    "Check value of 'prefab.$moduleName.name' configuration in build.gradle."
+                )
+            }
             module.listFiles().forEach { archDir ->
                 val artifacts = archDir.listFiles().filter {
                     // skip abi.json
@@ -143,7 +149,10 @@ abstract class AbiDwWorkAction @Inject constructor(private val execOperations: E
                 tempFile.toString(),
                 "--output",
                 parameters.outputFilePath,
-                "--abort-on-untyped-symbols"
+                "--abort-on-untyped-symbols",
+                "--eliminate-duplicates",
+                "--sort",
+                "--prune-unreachable"
             )
         }
     }
