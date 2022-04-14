@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.tokens.SliderTokens
-import androidx.compose.material3.tokens.SwitchTokens
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -400,7 +399,7 @@ class SliderTest {
                 expected = calculateFraction(left, right, centerX - 100 + slop)
             }
         rule.runOnIdle {
-            Truth.assertThat(state.value).isWithin(0.001f).of(expected)
+            Truth.assertThat(state.value).isWithin(0.002f).of(expected)
         }
     }
 
@@ -431,18 +430,16 @@ class SliderTest {
                 expected = calculateFraction(left, right, centerX - 50)
             }
         rule.runOnIdle {
-            Truth.assertThat(state.value).isWithin(0.001f).of(expected)
+            Truth.assertThat(state.value).isWithin(0.002f).of(expected)
         }
     }
 
-
     private fun calculateFraction(left: Float, right: Float, pos: Float) = with(rule.density) {
-        val offset = (SwitchTokens.HandleWidth / 2).toPx()
+        val offset = (ThumbWidth / 2).toPx()
         val start = left + offset
         val end = right - offset
         ((pos - start) / (end - start)).coerceIn(0f, 1f)
     }
-
 
     @Test
     fun slider_sizes() {

@@ -90,6 +90,7 @@ import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
@@ -100,14 +101,14 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 /**
- * <a href="https://material.io/components/sliders" class="external" target="_blank">Material Design slider</a>.
+ * Material Design slider
  *
  * Sliders allow users to make selections from a range of values.
  *
  * Sliders reflect a range of values along a bar, from which users may select a single value.
  * They are ideal for adjusting settings such as volume, brightness, or applying image filters.
  *
- * ![Sliders image](https://developer.android.com/images/reference/androidx/compose/material/sliders.png)
+ * ![Sliders image](https://developer.android.com/images/reference/androidx/compose/material3/sliders.png)
  *
  * Use continuous sliders to allow users to make meaningful selections that don’t
  * require a specific value:
@@ -139,6 +140,7 @@ import kotlinx.coroutines.launch
  * @param colors [SliderColors] that will be used to determine the color of the Slider parts in
  * different state. See [SliderDefaults.colors] to customize.
  */
+// TODO(b/229979132): Add m.io link
 @Composable
 fun Slider(
     value: Float,
@@ -249,7 +251,7 @@ fun Slider(
 }
 
 /**
- * <a href="https://material.io/components/sliders" class="external" target="_blank">Material Design slider</a>.
+ * Material Design Range slider
  *
  * Range Sliders expand upon [Slider] using the same concepts but allow the user to select 2 values.
  *
@@ -306,7 +308,7 @@ fun RangeSlider(
     BoxWithConstraints(
         modifier = modifier
             .minimumTouchTargetSize()
-            .requiredSizeIn(minWidth = ThumbRadius * 4, minHeight = ThumbRadius * 2)
+            .requiredSizeIn(minWidth = ThumbWidth * 2, minHeight = ThumbHeight * 2)
     ) {
         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
         val widthPx = constraints.maxWidth.toFloat()
@@ -314,8 +316,8 @@ fun RangeSlider(
         val minPx: Float
 
         with(LocalDensity.current) {
-            maxPx = widthPx - ThumbRadius.toPx()
-            minPx = ThumbRadius.toPx()
+            maxPx = widthPx - ThumbWidth.toPx() / 2
+            minPx = ThumbWidth.toPx() / 2
         }
 
         fun scaleToUserValue(offset: ClosedFloatingPointRange<Float>) =
@@ -450,20 +452,16 @@ private fun RangeSliderImpl(
     startThumbSemantics: Modifier,
     endThumbSemantics: Modifier
 ) {
-
     val startContentDescription = getString(Strings.SliderRangeStart)
     val endContentDescription = getString(Strings.SliderRangeEnd)
     Box(modifier.then(DefaultSliderConstraints)) {
         val trackStrokeWidth: Float
-        val thumbPx: Float
         val widthDp: Dp
         with(LocalDensity.current) {
             trackStrokeWidth = TrackHeight.toPx()
-            thumbPx = ThumbRadius.toPx()
             widthDp = width.toDp()
         }
 
-        val thumbSize = ThumbRadius * 2
         val offsetStart = widthDp * positionFractionStart
         val offsetEnd = widthDp * positionFractionEnd
         Track(
@@ -473,7 +471,7 @@ private fun RangeSliderImpl(
             positionFractionStart,
             positionFractionEnd,
             tickFractions,
-            thumbPx,
+            ThumbWidth,
             trackStrokeWidth
         )
 
@@ -486,7 +484,7 @@ private fun RangeSliderImpl(
             startInteractionSource,
             colors,
             enabled,
-            thumbSize
+            ThumbSize
         )
         SliderThumb(
             Modifier
@@ -497,7 +495,7 @@ private fun RangeSliderImpl(
             endInteractionSource,
             colors,
             enabled,
-            thumbSize
+            ThumbSize
         )
     }
 }
@@ -631,17 +629,13 @@ private fun SliderImpl(
 ) {
     Box(modifier.then(DefaultSliderConstraints)) {
         val trackStrokeWidth: Float
-        val thumbPx: Float
         val widthDp: Dp
         with(LocalDensity.current) {
             trackStrokeWidth = SliderTokens.ActiveTrackHeight.toPx()
-            thumbPx = (SliderTokens.HandleWidth / 2).toPx()
             widthDp = width.toDp()
         }
 
-        val thumbWidth = SliderTokens.HandleWidth
         val offset = widthDp * positionFraction
-
         Track(
             Modifier.fillMaxSize(),
             colors,
@@ -649,10 +643,10 @@ private fun SliderImpl(
             0f,
             positionFraction,
             tickFractions,
-            thumbPx,
+            ThumbWidth,
             trackStrokeWidth
         )
-        SliderThumb(Modifier, offset, interactionSource, colors, enabled, thumbWidth)
+        SliderThumb(Modifier, offset, interactionSource, colors, enabled, ThumbSize)
     }
 }
 
@@ -663,7 +657,7 @@ private fun BoxScope.SliderThumb(
     interactionSource: MutableInteractionSource,
     colors: SliderColors,
     enabled: Boolean,
-    thumbSize: Dp
+    thumbSize: DpSize
 ) {
     Box(Modifier.padding(start = offset).align(Alignment.CenterStart)) {
         val interactions = remember { mutableStateListOf<Interaction>() }
@@ -688,7 +682,7 @@ private fun BoxScope.SliderThumb(
         val shape = SliderTokens.HandleShape.toShape()
         Spacer(
             modifier
-                .size(thumbSize, thumbSize)
+                .size(thumbSize)
                 .indication(
                     interactionSource = interactionSource,
                     indication = rememberRipple(
@@ -711,17 +705,20 @@ private fun Track(
     positionFractionStart: Float,
     positionFractionEnd: Float,
     tickFractions: List<Float>,
-    thumbPx: Float,
+    thumbWidth: Dp,
     trackStrokeWidth: Float
 ) {
+    val thumbRadiusPx = with(LocalDensity.current) {
+        thumbWidth.toPx() / 2
+    }
     val inactiveTrackColor = colors.trackColor(enabled, active = false)
     val activeTrackColor = colors.trackColor(enabled, active = true)
     val inactiveTickColor = colors.tickColor(enabled, active = false)
     val activeTickColor = colors.tickColor(enabled, active = true)
     Canvas(modifier) {
         val isRtl = layoutDirection == LayoutDirection.Rtl
-        val sliderLeft = Offset(thumbPx, center.y)
-        val sliderRight = Offset(size.width - thumbPx, center.y)
+        val sliderLeft = Offset(thumbRadiusPx, center.y)
+        val sliderRight = Offset(size.width - thumbRadiusPx, center.y)
         val sliderStart = if (isRtl) sliderRight else sliderLeft
         val sliderEnd = if (isRtl) sliderLeft else sliderRight
         drawLine(
@@ -1120,8 +1117,9 @@ private class DefaultSliderColors(
 }
 
 // Internal to be referred to in tests
-internal val ThumbRadius = 10.dp
-internal val ThumbRippleMargin = 4.dp
+internal val ThumbWidth = SliderTokens.HandleWidth
+private val ThumbHeight = SliderTokens.HandleHeight
+private val ThumbSize = DpSize(ThumbWidth, ThumbHeight)
 private val ThumbDefaultElevation = 1.dp
 private val ThumbPressedElevation = 6.dp
 
