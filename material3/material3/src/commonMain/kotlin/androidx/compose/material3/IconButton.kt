@@ -85,10 +85,7 @@ fun IconButton(
         modifier
             .minimumTouchTargetSize()
             .size(IconButtonTokens.StateLayerSize)
-            .background(
-                color = colors.containerColor(enabled).value,
-                IconButtonTokens.StateLayerShape.toShape()
-            )
+            .background(color = colors.containerColor(enabled).value)
             .clickable(
                 onClick = onClick,
                 enabled = enabled,
@@ -150,10 +147,7 @@ fun IconToggleButton(
         modifier
             .minimumTouchTargetSize()
             .size(IconButtonTokens.StateLayerSize)
-            .background(
-                color = colors.containerColor(enabled, checked).value,
-                IconButtonTokens.StateLayerShape.toShape()
-            )
+            .background(color = colors.containerColor(enabled, checked).value)
             .toggleable(
                 value = checked,
                 onValueChange = onCheckedChange,
@@ -482,7 +476,7 @@ fun OutlinedIconButton(
 }
 
 /**
- * <a href="https://m3.material.io/components/icon-button/overview" class="external" target="_blank">Material Design oultined icon toggle button</a>.
+ * <a href="https://m3.material.io/components/icon-button/overview" class="external" target="_blank">Material Design outlined icon toggle button</a>.
  *
  * Icon buttons help people take supplementary actions with a single tap. They’re used when a
  * compact button is required, such as in a toolbar or image list.
@@ -621,10 +615,10 @@ object IconButtonDefaults {
     @Composable
     fun iconButtonColors(
         containerColor: Color = Color.Transparent,
-        contentColor: Color = IconButtonTokens.UnselectedIconColor.toColor(),
+        contentColor: Color = LocalContentColor.current,
         disabledContainerColor: Color = Color.Transparent,
-        disabledContentColor: Color = IconButtonTokens.DisabledIconColor.toColor()
-            .copy(alpha = IconButtonTokens.DisabledIconOpacity)
+        disabledContentColor: Color =
+            contentColor.copy(alpha = IconButtonTokens.DisabledIconOpacity)
     ): IconButtonColors =
         DefaultIconButtonColors(
             containerColor = containerColor,
@@ -647,10 +641,10 @@ object IconButtonDefaults {
     @Composable
     fun iconToggleButtonColors(
         containerColor: Color = Color.Transparent,
-        contentColor: Color = IconButtonTokens.UnselectedIconColor.toColor(),
+        contentColor: Color = LocalContentColor.current,
         disabledContainerColor: Color = Color.Transparent,
-        disabledContentColor: Color = IconButtonTokens.DisabledIconColor.toColor()
-            .copy(alpha = IconButtonTokens.DisabledIconOpacity),
+        disabledContentColor: Color =
+            contentColor.copy(alpha = IconButtonTokens.DisabledIconOpacity),
         checkedContainerColor: Color = Color.Transparent,
         checkedContentColor: Color = IconButtonTokens.SelectedIconColor.toColor()
     ): IconToggleButtonColors =
@@ -789,10 +783,10 @@ object IconButtonDefaults {
     @Composable
     fun outlinedIconButtonColors(
         containerColor: Color = Color.Transparent,
-        contentColor: Color = OutlinedIconButtonTokens.UnselectedColor.toColor(),
+        contentColor: Color = LocalContentColor.current,
         disabledContainerColor: Color = Color.Transparent,
-        disabledContentColor: Color = OutlinedIconButtonTokens.DisabledColor.toColor()
-            .copy(alpha = OutlinedIconButtonTokens.DisabledOpacity)
+        disabledContentColor: Color =
+            contentColor.copy(alpha = OutlinedIconButtonTokens.DisabledOpacity)
     ): IconButtonColors =
         DefaultIconButtonColors(
             containerColor = containerColor,
@@ -815,10 +809,10 @@ object IconButtonDefaults {
     @Composable
     fun outlinedIconToggleButtonColors(
         containerColor: Color = Color.Transparent,
-        contentColor: Color = OutlinedIconButtonTokens.UnselectedColor.toColor(),
+        contentColor: Color = LocalContentColor.current,
         disabledContainerColor: Color = Color.Transparent,
-        disabledContentColor: Color = OutlinedIconButtonTokens.DisabledColor.toColor()
-            .copy(alpha = OutlinedIconButtonTokens.DisabledOpacity),
+        disabledContentColor: Color =
+            contentColor.copy(alpha = OutlinedIconButtonTokens.DisabledOpacity),
         checkedContainerColor: Color =
             OutlinedIconButtonTokens.SelectedContainerColor.toColor(),
         checkedContentColor: Color = contentColorFor(checkedContainerColor)
@@ -855,9 +849,9 @@ object IconButtonDefaults {
     @Composable
     fun outlinedIconButtonBorder(enabled: Boolean): BorderStroke {
         val color: Color = if (enabled) {
-            OutlinedIconButtonTokens.UnselectedOutlineColor.toColor()
+            LocalContentColor.current
         } else {
-            OutlinedIconButtonTokens.DisabledOutlineColor.toColor()
+            LocalContentColor.current
                 .copy(alpha = OutlinedIconButtonTokens.DisabledOutlineOpacity)
         }
         return remember(color) {
