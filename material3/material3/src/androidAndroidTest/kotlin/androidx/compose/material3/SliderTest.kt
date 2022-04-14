@@ -24,8 +24,11 @@ import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.tokens.SliderTokens
 import androidx.compose.material3.tokens.SwitchTokens
 import androidx.compose.runtime.CompositionLocalProvider
@@ -35,6 +38,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.boundsInParent
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.testTag
@@ -47,6 +54,7 @@ import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertRangeInfoEquals
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.click
+import androidx.compose.ui.test.isFocusable
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performSemanticsAction
@@ -592,5 +600,459 @@ class SliderTest {
         rule.runOnIdle {
             Truth.assertThat(changedFlag).isTrue()
         }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun rangeSlider_dragThumb() {
+        val state = mutableStateOf(0f..1f)
+        var slop = 0f
+
+        rule.setMaterialContent(lightColorScheme()) {
+            slop = LocalViewConfiguration.current.touchSlop
+            RangeSlider(
+                modifier = Modifier.testTag(tag),
+                values = state.value,
+                onValueChange = { state.value = it }
+            )
+        }
+
+        rule.runOnUiThread {
+            Truth.assertThat(state.value).isEqualTo(0f..1f)
+        }
+
+        var expected = 0f
+
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                down(center)
+                moveBy(Offset(slop, 0f))
+                moveBy(Offset(100f, 0f))
+                expected = calculateFraction(left, right, centerX + 100)
+            }
+        rule.runOnIdle {
+            Truth.assertThat(state.value.start).isEqualTo(0f)
+            Truth.assertThat(state.value.endInclusive).isWithin(0.001f).of(expected)
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun rangeSlider_drag_out_of_bounds() {
+        val state = mutableStateOf(0f..1f)
+        var slop = 0f
+
+        rule.setMaterialContent(lightColorScheme()) {
+            slop = LocalViewConfiguration.current.touchSlop
+            RangeSlider(
+                modifier = Modifier.testTag(tag),
+                values = state.value,
+                onValueChange = { state.value = it }
+            )
+        }
+
+        rule.runOnUiThread {
+            Truth.assertThat(state.value).isEqualTo(0f..1f)
+        }
+
+        var expected = 0f
+
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                down(center)
+                moveBy(Offset(slop, 0f))
+                moveBy(Offset(width.toFloat(), 0f))
+                moveBy(Offset(-width.toFloat(), 0f))
+                moveBy(Offset(-width.toFloat(), 0f))
+                moveBy(Offset(width.toFloat() + 100f, 0f))
+                up()
+                expected = calculateFraction(left, right, centerX + 100)
+            }
+        rule.runOnIdle {
+            Truth.assertThat(state.value.start).isEqualTo(0f)
+            Truth.assertThat(state.value.endInclusive).isWithin(0.001f).of(expected)
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun rangeSlider_drag_overlap_thumbs() {
+        val state = mutableStateOf(0.5f..1f)
+        var slop = 0f
+
+        rule.setMaterialContent(lightColorScheme()) {
+            slop = LocalViewConfiguration.current.touchSlop
+            RangeSlider(
+                modifier = Modifier.testTag(tag),
+                values = state.value,
+                onValueChange = { state.value = it }
+            )
+        }
+
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                down(centerRight)
+                moveBy(Offset(-slop, 0f))
+                moveBy(Offset(-width.toFloat(), 0f))
+                up()
+            }
+        rule.runOnIdle {
+            Truth.assertThat(state.value).isEqualTo(0.5f..0.5f)
+        }
+
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                down(center)
+                moveBy(Offset(-slop, 0f))
+                moveBy(Offset(-width.toFloat(), 0f))
+                up()
+            }
+        rule.runOnIdle {
+            Truth.assertThat(state.value).isEqualTo(0.0f..0.5f)
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun rangeSlider_tap() {
+        val state = mutableStateOf(0f..1f)
+
+        rule.setMaterialContent(lightColorScheme()) {
+            RangeSlider(
+                modifier = Modifier.testTag(tag),
+                values = state.value,
+                onValueChange = { state.value = it }
+            )
+        }
+
+        rule.runOnUiThread {
+            Truth.assertThat(state.value).isEqualTo(0f..1f)
+        }
+
+        var expected = 0f
+
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                down(Offset(centerX + 50, centerY))
+                up()
+                expected = calculateFraction(left, right, centerX + 50)
+            }
+        rule.runOnIdle {
+            Truth.assertThat(state.value.endInclusive).isWithin(0.001f).of(expected)
+            Truth.assertThat(state.value.start).isEqualTo(0f)
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun rangeSlider_tap_rangeChange() {
+        val state = mutableStateOf(0f..25f)
+        val rangeEnd = mutableStateOf(.25f)
+
+        rule.setMaterialContent(lightColorScheme()) {
+            RangeSlider(
+                modifier = Modifier.testTag(tag),
+                values = state.value,
+                onValueChange = { state.value = it },
+                valueRange = 0f..rangeEnd.value
+            )
+        }
+        // change to 1 since [calculateFraction] coerces between 0..1
+        rule.runOnUiThread {
+            rangeEnd.value = 1f
+        }
+
+        var expected = 0f
+
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                down(Offset(centerX + 50, centerY))
+                up()
+                expected = calculateFraction(left, right, centerX + 50)
+            }
+
+        rule.runOnIdle {
+            Truth.assertThat(state.value.endInclusive).isWithin(0.001f).of(expected)
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun rangeSlider_drag_rtl() {
+        val state = mutableStateOf(0f..1f)
+        var slop = 0f
+
+        rule.setMaterialContent(lightColorScheme()) {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                slop = LocalViewConfiguration.current.touchSlop
+                RangeSlider(
+                    modifier = Modifier.testTag(tag),
+                    values = state.value,
+                    onValueChange = { state.value = it }
+                )
+            }
+        }
+
+        rule.runOnUiThread {
+            Truth.assertThat(state.value).isEqualTo(0f..1f)
+        }
+
+        var expected = 0f
+
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                down(center)
+                moveBy(Offset(slop, 0f))
+                moveBy(Offset(100f, 0f))
+                up()
+                // subtract here as we're in rtl and going in the opposite direction
+                expected = calculateFraction(left, right, centerX - 100)
+            }
+        rule.runOnIdle {
+            Truth.assertThat(state.value.start).isEqualTo(0f)
+            Truth.assertThat(state.value.endInclusive).isWithin(0.001f).of(expected)
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun rangeSlider_drag_out_of_bounds_rtl() {
+        val state = mutableStateOf(0f..1f)
+        var slop = 0f
+
+        rule.setMaterialContent(lightColorScheme()) {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                slop = LocalViewConfiguration.current.touchSlop
+                RangeSlider(
+                    modifier = Modifier.testTag(tag),
+                    values = state.value,
+                    onValueChange = { state.value = it }
+                )
+            }
+        }
+
+        rule.runOnUiThread {
+            Truth.assertThat(state.value).isEqualTo(0f..1f)
+        }
+
+        var expected = 0f
+
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                down(center)
+                moveBy(Offset(slop, 0f))
+                moveBy(Offset(width.toFloat(), 0f))
+                moveBy(Offset(-width.toFloat(), 0f))
+                moveBy(Offset(-width.toFloat(), 0f))
+                moveBy(Offset(width.toFloat() + 100f, 0f))
+                up()
+                // subtract here as we're in rtl and going in the opposite direction
+                expected = calculateFraction(left, right, centerX - 100)
+            }
+        rule.runOnIdle {
+            Truth.assertThat(state.value.start).isEqualTo(0f)
+            Truth.assertThat(state.value.endInclusive).isWithin(0.001f).of(expected)
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun rangeSlider_closeThumbs_dragRight() {
+        val state = mutableStateOf(0.5f..0.5f)
+        var slop = 0f
+
+        rule.setMaterialContent(lightColorScheme()) {
+            slop = LocalViewConfiguration.current.touchSlop
+            RangeSlider(
+                modifier = Modifier.testTag(tag),
+                values = state.value,
+                onValueChange = { state.value = it }
+            )
+        }
+
+        rule.runOnUiThread {
+            Truth.assertThat(state.value).isEqualTo(0.5f..0.5f)
+        }
+
+        var expected = 0f
+
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                down(center)
+                moveBy(Offset(slop, 0f))
+                moveBy(Offset(100f, 0f))
+                up()
+                // subtract here as we're in rtl and going in the opposite direction
+                expected = calculateFraction(left, right, centerX + 100)
+            }
+        rule.runOnIdle {
+            Truth.assertThat(state.value.start).isEqualTo(0.5f)
+            Truth.assertThat(state.value.endInclusive).isWithin(0.001f).of(expected)
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun rangeSlider_closeThumbs_dragLeft() {
+        val state = mutableStateOf(0.5f..0.5f)
+        var slop = 0f
+
+        rule.setMaterialContent(lightColorScheme()) {
+            slop = LocalViewConfiguration.current.touchSlop
+            RangeSlider(
+                modifier = Modifier.testTag(tag),
+                values = state.value,
+                onValueChange = { state.value = it }
+            )
+        }
+
+        rule.runOnUiThread {
+            Truth.assertThat(state.value).isEqualTo(0.5f..0.5f)
+        }
+
+        var expected = 0f
+
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                down(center)
+                moveBy(Offset(-slop - 1, 0f))
+                moveBy(Offset(-100f, 0f))
+                up()
+                // subtract here as we're in rtl and going in the opposite direction
+                expected = calculateFraction(left, right, centerX - 100)
+            }
+        rule.runOnIdle {
+            Truth.assertThat(state.value.start).isWithin(0.001f).of(expected)
+            Truth.assertThat(state.value.endInclusive).isEqualTo(0.5f)
+        }
+    }
+
+    /**
+     * Regression test for bug: 210289161 where RangeSlider was ignoring some modifiers like weight.
+     */
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun rangeSlider_weightModifier() {
+        var sliderBounds = Rect(0f, 0f, 0f, 0f)
+        rule.setMaterialContent(lightColorScheme()) {
+            with(LocalDensity.current) {
+                Row(Modifier.width(500.toDp())) {
+                    Spacer(Modifier.requiredSize(100.toDp()))
+                    RangeSlider(
+                        values = 0f..0.5f,
+                        onValueChange = {},
+                        modifier = Modifier.testTag(tag).weight(1f).onGloballyPositioned {
+                            sliderBounds = it.boundsInParent()
+                        }
+                    )
+                    Spacer(Modifier.requiredSize(100.toDp()))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            Truth.assertThat(sliderBounds.left).isEqualTo(100)
+            Truth.assertThat(sliderBounds.right).isEqualTo(400)
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun rangeSlider_semantics_continuous() {
+        val state = mutableStateOf(0f..1f)
+
+        rule.setMaterialContent(lightColorScheme()) {
+            RangeSlider(
+                modifier = Modifier.testTag(tag), values = state.value,
+                onValueChange = { state.value = it }
+            )
+        }
+
+        rule.onAllNodes(isFocusable(), true)[0]
+            .assertRangeInfoEquals(ProgressBarRangeInfo(0f, 0f..1f, 0))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.SetProgress))
+
+        rule.onAllNodes(isFocusable(), true)[1]
+            .assertRangeInfoEquals(ProgressBarRangeInfo(1f, 0f..1f, 0))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.SetProgress))
+
+        rule.runOnUiThread {
+            state.value = 0.5f..0.75f
+        }
+
+        rule.onAllNodes(isFocusable(), true)[0].assertRangeInfoEquals(
+            ProgressBarRangeInfo(
+                0.5f,
+                0f..0.75f,
+                0
+            )
+        )
+
+        rule.onAllNodes(isFocusable(), true)[1].assertRangeInfoEquals(
+            ProgressBarRangeInfo(
+                0.75f,
+                0.5f..1f,
+                0
+            )
+        )
+
+        rule.onAllNodes(isFocusable(), true)[0]
+            .performSemanticsAction(SemanticsActions.SetProgress) { it(0.6f) }
+
+        rule.onAllNodes(isFocusable(), true)[1]
+            .performSemanticsAction(SemanticsActions.SetProgress) { it(0.8f) }
+
+        rule.onAllNodes(isFocusable(), true)[0]
+            .assertRangeInfoEquals(ProgressBarRangeInfo(0.6f, 0f..0.8f, 0))
+
+        rule.onAllNodes(isFocusable(), true)[1]
+            .assertRangeInfoEquals(ProgressBarRangeInfo(0.8f, 0.6f..1f, 0))
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun rangeSlider_semantics_stepped() {
+        val state = mutableStateOf(0f..20f)
+        // Slider with [0,5,10,15,20] possible values
+        rule.setMaterialContent(lightColorScheme()) {
+            RangeSlider(
+                modifier = Modifier.testTag(tag), values = state.value,
+                steps = 3,
+                valueRange = 0f..20f,
+                onValueChange = { state.value = it },
+            )
+        }
+
+        rule.runOnUiThread {
+            state.value = 5f..10f
+        }
+
+        rule.onAllNodes(isFocusable(), true)[0].assertRangeInfoEquals(
+            ProgressBarRangeInfo(
+                5f,
+                0f..10f,
+                3
+            )
+        )
+
+        rule.onAllNodes(isFocusable(), true)[1].assertRangeInfoEquals(
+            ProgressBarRangeInfo(
+                10f,
+                5f..20f,
+                3,
+            )
+        )
+
+        rule.onAllNodes(isFocusable(), true)[0]
+            .performSemanticsAction(SemanticsActions.SetProgress) { it(10f) }
+
+        rule.onAllNodes(isFocusable(), true)[1]
+            .performSemanticsAction(SemanticsActions.SetProgress) { it(15f) }
+
+        rule.onAllNodes(isFocusable(), true)[0]
+            .assertRangeInfoEquals(ProgressBarRangeInfo(10f, 0f..15f, 3))
+
+        rule.onAllNodes(isFocusable(), true)[1]
+            .assertRangeInfoEquals(ProgressBarRangeInfo(15f, 10f..20f, 3))
     }
 }

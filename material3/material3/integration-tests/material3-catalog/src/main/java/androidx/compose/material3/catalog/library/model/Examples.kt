@@ -85,6 +85,7 @@ import androidx.compose.material3.samples.PermanentNavigationDrawerSample
 import androidx.compose.material3.samples.PinnedSmallTopAppBar
 import androidx.compose.material3.samples.RadioButtonSample
 import androidx.compose.material3.samples.RadioGroupSample
+import androidx.compose.material3.samples.RangeSliderSample
 import androidx.compose.material3.samples.ScaffoldWithCoroutinesSnackbar
 import androidx.compose.material3.samples.ScaffoldWithCustomSnackbar
 import androidx.compose.material3.samples.ScaffoldWithIndefiniteSnackbar
@@ -98,6 +99,7 @@ import androidx.compose.material3.samples.SimpleSmallTopAppBar
 import androidx.compose.material3.samples.SimpleTextFieldSample
 import androidx.compose.material3.samples.SliderSample
 import androidx.compose.material3.samples.SmallFloatingActionButtonSample
+import androidx.compose.material3.samples.StepRangeSliderSample
 import androidx.compose.material3.samples.StepsSliderSample
 import androidx.compose.material3.samples.SuggestionChipSample
 import androidx.compose.material3.samples.SwitchSample
@@ -601,6 +603,20 @@ val SlidersExamples = listOf(
         sourceUrl = SlidersExampleSourceUrl
     ) {
         StepsSliderSample()
+    },
+    Example(
+        name = ::RangeSliderSample.name,
+        description = SlidersExampleDescription,
+        sourceUrl = SlidersExampleSourceUrl
+    ) {
+        RangeSliderSample()
+    },
+    Example(
+        name = ::StepRangeSliderSample.name,
+        description = SlidersExampleDescription,
+        sourceUrl = SlidersExampleSourceUrl
+    ) {
+        StepRangeSliderSample()
     },
 )
 
