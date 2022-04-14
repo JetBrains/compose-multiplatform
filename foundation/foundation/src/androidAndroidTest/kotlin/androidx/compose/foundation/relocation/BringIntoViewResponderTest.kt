@@ -21,7 +21,6 @@ import androidx.compose.foundation.TestActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -41,7 +40,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @SmallTest
 @RunWith(AndroidJUnit4::class)
 class BringIntoViewResponderTest {
@@ -49,13 +48,13 @@ class BringIntoViewResponderTest {
     @get:Rule
     val rule = createAndroidComposeRule<TestActivity>()
 
-    fun Float.toDp(): Dp = with(rule.density) { this@toDp.toDp() }
+    private fun Float.toDp(): Dp = with(rule.density) { this@toDp.toDp() }
 
     @Test
     fun zeroSizedItem_zeroSizedParent_bringIntoView() {
         // Arrange.
         val bringIntoViewRequester = BringIntoViewRequester()
-        lateinit var requestedRect: Rect
+        var requestedRect: Rect? = null
         rule.setContent {
             Box(
                 Modifier
@@ -65,7 +64,9 @@ class BringIntoViewResponderTest {
         }
 
         // Act.
-        runBlocking { bringIntoViewRequester.bringIntoView() }
+        runBlocking {
+            bringIntoViewRequester.bringIntoView()
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -131,8 +132,8 @@ class BringIntoViewResponderTest {
                 Modifier
                     .size(1f.toDp())
                     .fakeScrollable { requestedRect = it }
-                    .size(20f.toDp(), 10f.toDp())
                     .bringIntoViewRequester(bringIntoViewRequester)
+                    .size(20f.toDp(), 10f.toDp())
             )
         }
 
