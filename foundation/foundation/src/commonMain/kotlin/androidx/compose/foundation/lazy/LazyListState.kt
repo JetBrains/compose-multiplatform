@@ -202,8 +202,8 @@ class LazyListState constructor(
      * The [Remeasurement] object associated with our layout. It allows us to remeasure
      * synchronously during scroll.
      */
-    private var remeasurement: Remeasurement? = null
-
+    internal var remeasurement: Remeasurement? = null
+        private set
     /**
      * The modifier which provides [remeasurement].
      */
