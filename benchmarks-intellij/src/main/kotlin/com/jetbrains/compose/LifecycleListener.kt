@@ -9,38 +9,38 @@ import com.intellij.ide.impl.ProjectUtil
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.RegisterToolWindowTask
+import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
 import com.jetbrains.compose.benchmark.BenchmarkToolWindow
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
-import java.awt.Component
-import java.awt.Graphics
+import org.jetbrains.kotlin.idea.caches.resolve.util.isInDumbMode
 import java.nio.file.Files
-import javax.swing.Icon
+import kotlin.random.Random
 
-private val ANCHORS = listOf(ToolWindowAnchor.BOTTOM, ToolWindowAnchor.LEFT, ToolWindowAnchor.RIGHT)
+private val ANCHORS = listOf(ToolWindowAnchor.LEFT, ToolWindowAnchor.BOTTOM, ToolWindowAnchor.RIGHT)
 private val SIDE_TOOLS = listOf(true, false)
 
 class LifecycleListener : com.intellij.ide.AppLifecycleListener {
 
-    val swingScope = CoroutineScope(SupervisorJob() + Dispatchers.Swing)
+    private val swingScope = CoroutineScope(SupervisorJob() + Dispatchers.Swing)
+    private lateinit var tempProject: Project
+    private val toolWindowIds: MutableList<String> = mutableListOf()
 
     init {
         swingScope.launch {
             invokeLater {
                 val tempDir = Files.createTempDirectory("idea_project")
-                val emptyProject: Project = ProjectUtil.openOrImport(tempDir)
-                val toolWindowManager = ToolWindowManager.getInstance(emptyProject)
-                val ids: MutableList<String> = mutableListOf()
+                tempProject = ProjectUtil.openOrImport(tempDir)
+                val toolWindowManager = ToolWindowManager.getInstance(tempProject)
                 for (anchor in ANCHORS) {
                     for (sideTool in SIDE_TOOLS) {
-                        toolWindowManager.registerToolWindow(
+                        val id = "Compose${toolWindowIds.size}"
+                        toolWindowIds.add(id)
+                        val toolWindow: ToolWindow = toolWindowManager.registerToolWindow(
                             RegisterToolWindowTask(
-                                id = "Compose${ids.size}".also { ids.add(it) },
+                                id = id,
                                 anchor = anchor,
                                 component = null,
                                 sideTool = sideTool,
@@ -54,7 +54,36 @@ class LifecycleListener : com.intellij.ide.AppLifecycleListener {
                     }
                 }
             }
+            while (true) {
+                try {
+                    delay(500)
+                    val toolWindowManager = ToolWindowManager.getInstance(tempProject)
+                    val toolWindows = toolWindowIds.map {
+                        toolWindowManager.getToolWindow(it)
+                    }.filterNotNull()
+                    stressTestToolWindows(toolWindows)
+                } catch (t: Throwable) {
+                    // do nothing
+                }
+            }
         }
     }
 
+}
+
+suspend fun stressTestToolWindows(toolWindows: List<ToolWindow>) {
+    while (true) {
+        delay(500)
+        toolWindows.forEach {
+            if (Random.nextBoolean()) {
+                if (it.isVisible.not()) {
+                    it.show()
+                }
+            } else {
+                if (it.isVisible) {
+                    it.hide()
+                }
+            }
+        }
+    }
 }
