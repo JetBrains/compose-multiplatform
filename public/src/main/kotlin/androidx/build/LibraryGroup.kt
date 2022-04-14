@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package androidx.build.dependencies
+package androidx.build
 
-lateinit var guavaVersion: String
-val GUAVA_VERSION get() = guavaVersion
+/**
+ * This object contains the library group, as well as whether libraries
+ * in this group are all required to have the same development version.
+ */
+data class LibraryGroup(
+    val group: String = "unspecified",
+    val atomicGroupVersion: Version?,
+) : java.io.Serializable {
 
-lateinit var kspVersion: String
-val KSP_VERSION get() = kspVersion
+    // Denotes if the LibraryGroup is atomic
+    val requireSameVersion = (atomicGroupVersion != null)
 
-lateinit var kotlinVersion: String
-val KOTLIN_VERSION get() = kotlinVersion
-lateinit var kotlinNativeVersion: String
-val KOTLIN_NATIVE_VERSION get() = kotlinNativeVersion
-val KOTLIN_STDLIB get() = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-
-lateinit var agpVersion: String
-val AGP_LATEST get() = "com.android.tools.build:gradle:$agpVersion"
+    companion object {
+        private const val serialVersionUID = 345435634564L
+    }
+}

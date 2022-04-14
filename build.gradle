@@ -33,10 +33,9 @@ allprojects {
             jvmTarget = "11"
             freeCompilerArgs += [
                     "-Werror",
-                    "-Xskip-runtime-version-check",
                     "-Xskip-metadata-version-check",
                     // Allow `@OptIn` and `@UseExperimental`
-                    "-Xopt-in=kotlin.RequiresOptIn",
+                    "-opt-in=kotlin.RequiresOptIn",
                     // Issue where sam conversion in gradle's kts file causes task-out-of-date
                     // Details: KT-46445 and https://github.com/gradle/gradle/issues/17052
                     "-Xsam-conversions=class"

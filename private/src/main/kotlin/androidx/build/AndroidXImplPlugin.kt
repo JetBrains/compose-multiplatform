@@ -37,6 +37,8 @@ import androidx.build.studio.StudioTask
 import androidx.build.testConfiguration.addAppApkToTestConfigGeneration
 import androidx.build.testConfiguration.addToTestZips
 import androidx.build.testConfiguration.configureTestConfigGeneration
+import com.android.build.api.dsl.ManagedVirtualDevice
+import com.android.build.api.dsl.TestOptions
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.HasAndroidTest
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
@@ -80,6 +82,8 @@ import java.io.File
 import java.time.Duration
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
+import org.gradle.kotlin.dsl.KotlinClosure1
+import org.gradle.kotlin.dsl.register
 
 /**
  * A plugin which enables all of the Gradle customizations for AndroidX.
@@ -113,12 +117,40 @@ class AndroidXImplPlugin : Plugin<Project> {
 
         project.configureTaskTimeouts()
         project.configureMavenArtifactUpload(extension)
-        project.configureExportAtomicLibraryGroupsToText()
         project.configureExternalDependencyLicenseCheck()
         project.configureProjectStructureValidation(extension)
         project.configureProjectVersionValidation(extension)
+        project.registerProjectOrArtifact()
 
         project.configurations.create("samples")
+    }
+
+    private fun Project.registerProjectOrArtifact() {
+        // Add a method for each sub project where they can declare an optional
+        // dependency on a project or its latest snapshot artifact.
+        if (!StudioType.isPlayground(this)) {
+            // In AndroidX build, this is always enforced to the project
+            extra.set(
+                PROJECT_OR_ARTIFACT_EXT_NAME,
+                KotlinClosure1<String, Project>(
+                    function = {
+                        // this refers to the first parameter of the closure.
+                        project(this)
+                    }
+                )
+            )
+        } else {
+            // In Playground builds, they are converted to the latest SNAPSHOT artifact if the
+            // project is not included in that playground.
+            extra.set(
+                PROJECT_OR_ARTIFACT_EXT_NAME,
+                KotlinClosure1<String, Any>(
+                    function = {
+                        AndroidXPlaygroundRootImplPlugin.projectOrArtifact(rootProject, this)
+                    }
+                )
+            )
+        }
     }
 
     /**
@@ -138,7 +170,7 @@ class AndroidXImplPlugin : Plugin<Project> {
         AffectedModuleDetector.configureTaskGuard(task)
 
         // Robolectric 1.7 increased heap size requirements, see b/207169653.
-        task.maxHeapSize = "2g"
+        task.maxHeapSize = "3g"
 
         val xmlReportDestDir = project.getHostTestResultDirectory()
         val archiveName = "${project.path.asFilenamePrefix()}_${task.name}.zip"
@@ -197,7 +229,7 @@ class AndroidXImplPlugin : Plugin<Project> {
                 }
                 val ignoreFailuresProperty = project.providers.gradleProperty(
                     TEST_FAILURES_DO_NOT_FAIL_TEST_TASK
-                ).forUseAtConfigurationTime()
+                )
                 if (ignoreFailuresProperty.isPresent) {
                     task.ignoreFailures = true
                 }
@@ -393,17 +425,6 @@ class AndroidXImplPlugin : Plugin<Project> {
         project.addToProjectMap(extension)
     }
 
-    private fun Project.configureExportAtomicLibraryGroupsToText() {
-        project.tasks.register(
-            "exportAtomicLibraryGroupsToText",
-            ExportAtomicLibraryGroupsToTextTask::class.java
-        ) { task ->
-            task.libraryGroupFile = project.file("${project.getSupportRootFolder()}" +
-                "/buildSrc/public/src/main/kotlin/androidx/build/LibraryGroups.kt")
-            task.textOutputFile = project.file("${project.buildDir}/lint/atomic-library-groups.txt")
-        }
-    }
-
     private fun Project.configureProjectStructureValidation(
         extension: AndroidXExtension
     ) {
@@ -427,6 +448,25 @@ class AndroidXImplPlugin : Plugin<Project> {
         }
     }
 
+    @Suppress("UnstableApiUsage") // Usage of ManagedVirtualDevice
+    private fun TestOptions.configureVirtualDevices() {
+        managedDevices.devices.register<ManagedVirtualDevice>("pixel2api29") {
+            device = "Pixel 2"
+            apiLevel = 29
+            systemImageSource = "aosp"
+        }
+        managedDevices.devices.register<ManagedVirtualDevice>("pixel2api30") {
+            device = "Pixel 2"
+            apiLevel = 30
+            systemImageSource = "aosp"
+        }
+        managedDevices.devices.register<ManagedVirtualDevice>("pixel2api31") {
+            device = "Pixel 2"
+            apiLevel = 31
+            systemImageSource = "aosp"
+        }
+    }
+
     private fun BaseExtension.configureAndroidBaseOptions(
         project: Project,
         androidXExtension: AndroidXExtension
@@ -446,6 +486,7 @@ class AndroidXImplPlugin : Plugin<Project> {
 
         testOptions.animationsDisabled = true
         testOptions.unitTests.isReturnDefaultValues = true
+        testOptions.configureVirtualDevices()
 
         // Include resources in Robolectric tests as a workaround for b/184641296 and
         // ensure the build directory exists as a workaround for b/187970292.
@@ -550,6 +591,7 @@ class AndroidXImplPlugin : Plugin<Project> {
             // Skip copying AndroidTest apks if they have no source code (no tests to run).
             if (!testApk || project.hasAndroidTestSourceCode()) {
                 addToTestZips(project, packageTask)
+                project.addToApkHashDump(packageTask)
             }
         }
         project.tasks.withType(ListingFileRedirectTask::class.java).forEach {
@@ -661,6 +703,7 @@ class AndroidXImplPlugin : Plugin<Project> {
     }
 
     companion object {
+        const val APK_HASH_DUMP = "apkHashDump"
         const val BUILD_TEST_APKS_TASK = "buildTestApks"
         const val CHECK_RELEASE_READY_TASK = "checkReleaseReady"
         const val CREATE_LIBRARY_BUILD_INFO_FILES_TASK = "createLibraryBuildInfoFiles"
@@ -782,7 +825,6 @@ private fun Project.configureJavaCompilationWarnings(task: KotlinCompile) {
         task.kotlinOptions.allWarningsAsErrors = true
     }
     task.kotlinOptions.freeCompilerArgs += listOf(
-        "-Xskip-runtime-version-check",
         "-Xskip-metadata-version-check"
     )
 }
@@ -914,7 +956,7 @@ fun Project.validateProjectStructure(groupId: String) {
 fun AndroidXExtension.validateMavenVersion() {
     val mavenGroup = mavenGroup
     val mavenVersion = mavenVersion
-    val forcedVersion = mavenGroup?.forcedVersion
+    val forcedVersion = mavenGroup?.atomicGroupVersion
     if (forcedVersion != null && forcedVersion == mavenVersion) {
         throw GradleException(
             """
@@ -929,3 +971,5 @@ fun AndroidXExtension.validateMavenVersion() {
         )
     }
 }
+
+const val PROJECT_OR_ARTIFACT_EXT_NAME = "projectOrArtifact"

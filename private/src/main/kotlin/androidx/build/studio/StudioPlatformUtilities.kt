@@ -79,7 +79,12 @@ sealed class StudioPlatformUtilities(val projectRoot: File, val studioInstallati
         val osName = if (System.getProperty("os.name").lowercase(Locale.ROOT).contains("linux")) {
             "linux"
         } else {
-            "mac"
+            // Only works when using native version of JDK, otherwise it will fallback to x86_64
+            if (System.getProperty("os.arch") == "aarch64") {
+                "mac_arm"
+            } else {
+                "mac"
+            }
         }
 
         fun get(projectRoot: File, studioInstallationDir: File): StudioPlatformUtilities {

@@ -63,7 +63,7 @@ abstract class UpdateNativeApi : DefaultTask() {
     @TaskAction
     fun exec() {
         if (getOperatingSystem() != OperatingSystem.LINUX) {
-            project.logger.warn(
+            logger.warn(
                 "Native API checking is currently not supported on non-linux devices"
             )
             return

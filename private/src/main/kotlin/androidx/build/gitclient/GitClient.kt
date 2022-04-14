@@ -18,9 +18,11 @@ package androidx.build.gitclient
 
 import androidx.build.releasenotes.getBuganizerLink
 import androidx.build.releasenotes.getChangeIdAOSPLink
-import org.gradle.api.logging.Logger
 import java.io.File
-import java.util.concurrent.TimeUnit
+import org.gradle.api.GradleException
+import org.gradle.api.Project
+import org.gradle.api.provider.Provider
+import org.gradle.api.logging.Logger
 
 interface GitClient {
     fun findChangedFilesSince(
@@ -49,199 +51,41 @@ interface GitClient {
          */
         fun executeAndParse(command: String): List<String>
     }
-}
-/**
- * A simple git client that uses system process commands to communicate with the git setup in the
- * given working directory.
- */
-class GitClientImpl(
-    /**
-     * The root location for git
-     */
-    private val workingDir: File,
-    private val logger: Logger?,
-    private val commandRunner: GitClient.CommandRunner = RealCommandRunner(
-        workingDir = workingDir,
-        logger = logger
-    )
-) : GitClient {
-
-    private val gitRoot: File = findGitDirInParentFilepath(workingDir) ?: workingDir
-
-    /**
-     * Finds changed file paths since the given sha
-     */
-    override fun findChangedFilesSince(
-        sha: String,
-        top: String,
-        includeUncommitted: Boolean
-    ): List<String> {
-        // use this if we don't want local changes
-        return commandRunner.executeAndParse(
-            if (includeUncommitted) {
-                "$CHANGED_FILES_CMD_PREFIX HEAD..$sha"
-            } else {
-                "$CHANGED_FILES_CMD_PREFIX $top $sha"
-            }
-        )
-    }
-
-    /**
-     * checks the history to find the first merge CL.
-     */
-    override fun findPreviousSubmittedChange(): String? {
-        return commandRunner.executeAndParse(PREVIOUS_SUBMITTED_CMD)
-            .firstOrNull()
-            ?.split(" ")
-            ?.firstOrNull()
-    }
-
-    private fun findGitDirInParentFilepath(filepath: File): File? {
-        var curDirectory: File = filepath
-        while (curDirectory.path != "/") {
-            if (File("$curDirectory/.git").exists()) {
-                return curDirectory
-            }
-            curDirectory = curDirectory.parentFile
-        }
-        return null
-    }
-
-    private fun parseCommitLogString(
-        commitLogString: String,
-        commitStartDelimiter: String,
-        commitSHADelimiter: String,
-        subjectDelimiter: String,
-        authorEmailDelimiter: String,
-        localProjectDir: String
-    ): List<Commit> {
-        // Split commits string out into individual commits (note: this removes the deliminter)
-        val gitLogStringList: List<String>? = commitLogString.split(commitStartDelimiter)
-        var commitLog: MutableList<Commit> = mutableListOf()
-        gitLogStringList?.filter { gitCommit ->
-            gitCommit.trim() != ""
-        }?.forEach { gitCommit ->
-            commitLog.add(
-                Commit(
-                    gitCommit,
-                    localProjectDir,
-                    commitSHADelimiter = commitSHADelimiter,
-                    subjectDelimiter = subjectDelimiter,
-                    authorEmailDelimiter = authorEmailDelimiter
-                )
-            )
-        }
-        return commitLog.toList()
-    }
-
-    /**
-     * Converts a diff log command into a [List<Commit>]
-     *
-     * @param gitCommitRange the [GitCommitRange] that defines the parameters of the git log command
-     * @param keepMerges boolean for whether or not to add merges to the return [List<Commit>].
-     * @param fullProjectDir a [File] object that represents the full project directory.
-     */
-    override fun getGitLog(
-        gitCommitRange: GitCommitRange,
-        keepMerges: Boolean,
-        fullProjectDir: File
-    ): List<Commit> {
-        val commitStartDelimiter: String = "_CommitStart"
-        val commitSHADelimiter: String = "_CommitSHA:"
-        val subjectDelimiter: String = "_Subject:"
-        val authorEmailDelimiter: String = "_Author:"
-        val dateDelimiter: String = "_Date:"
-        val bodyDelimiter: String = "_Body:"
-        val localProjectDir: String = fullProjectDir.relativeTo(gitRoot).toString()
-        val relativeProjectDir: String = fullProjectDir.relativeTo(workingDir).toString()
-
-        var gitLogOptions: String =
-            "--pretty=format:$commitStartDelimiter%n" +
-                "$commitSHADelimiter%H%n" +
-                "$authorEmailDelimiter%ae%n" +
-                "$dateDelimiter%ad%n" +
-                "$subjectDelimiter%s%n" +
-                "$bodyDelimiter%b" +
-                if (!keepMerges) {
-                    " --no-merges"
-                } else {
-                    ""
-                }
-        var gitLogCmd: String
-        if (gitCommitRange.fromExclusive != "") {
-            gitLogCmd = "$GIT_LOG_CMD_PREFIX $gitLogOptions " +
-                "${gitCommitRange.fromExclusive}..${gitCommitRange.untilInclusive}" +
-                " -- ./$relativeProjectDir"
-        } else {
-            gitLogCmd = "$GIT_LOG_CMD_PREFIX $gitLogOptions ${gitCommitRange.untilInclusive} -n " +
-                "${gitCommitRange.n} -- ./$relativeProjectDir"
-        }
-        val gitLogString: String = commandRunner.execute(gitLogCmd)
-        val commits = parseCommitLogString(
-            gitLogString,
-            commitStartDelimiter,
-            commitSHADelimiter,
-            subjectDelimiter,
-            authorEmailDelimiter,
-            localProjectDir
-        )
-        if (commits.isEmpty()) {
-            // Probably an error; log this
-            logger?.warn(
-                "No git commits found! Ran this command: '" +
-                    gitLogCmd + "' and received this output: '" + gitLogString + "'"
-            )
-        }
-        return commits
-    }
-
-    private class RealCommandRunner(
-        private val workingDir: File,
-        private val logger: Logger?
-    ) : GitClient.CommandRunner {
-        override fun execute(command: String): String {
-            val parts = command.split("\\s".toRegex())
-            logger?.info("running command $command in $workingDir")
-            val proc = ProcessBuilder(*parts.toTypedArray())
-                .directory(workingDir)
-                .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                .redirectError(ProcessBuilder.Redirect.PIPE)
-                .start()
-
-            // Read output, waiting for process to finish, as needed
-            val stdout = proc
-                .inputStream
-                .bufferedReader()
-                .readText()
-            val stderr = proc
-                .errorStream
-                .bufferedReader()
-                .readText()
-            val message = stdout + stderr
-            // wait potentially a little bit longer in case Git was waiting for us to
-            // read its response before it exited
-            proc.waitFor(10, TimeUnit.SECONDS)
-            logger?.info("Response: $message")
-            check(proc.exitValue() == 0) {
-                "Nonzero exit value running git command. Response: $message"
-            }
-            return stdout
-        }
-        override fun executeAndParse(command: String): List<String> {
-            val response = execute(command)
-                .split(System.lineSeparator())
-                .filterNot {
-                    it.isEmpty()
-                }
-            return response
-        }
-    }
 
     companion object {
-        const val PREVIOUS_SUBMITTED_CMD =
-            "git log -1 --merges --oneline --invert-grep --author=android-build-server"
-        const val CHANGED_FILES_CMD_PREFIX = "git diff --name-only"
-        const val GIT_LOG_CMD_PREFIX = "git log --name-only"
+        fun getChangeInfoPath(project: Project): Provider<String> {
+            return project.providers.environmentVariable("CHANGE_INFO").orElse("")
+        }
+        fun getManifestPath(project: Project): Provider<String> {
+            return project.providers.environmentVariable("MANIFEST").orElse("")
+        }
+        fun create(
+            rootProjectDir: File,
+            logger: Logger,
+            changeInfoPath: String,
+            manifestPath: String
+        ): GitClient {
+            if (changeInfoPath != "") {
+                if (manifestPath == "") {
+                    throw GradleException("Setting CHANGE_INFO requires also setting MANIFEST")
+                }
+                val changeInfoFile = File(changeInfoPath)
+                val manifestFile = File(manifestPath)
+                if (!changeInfoFile.exists()) {
+                    throw GradleException("changeinfo file $changeInfoFile does not exist")
+                }
+                if (!manifestFile.exists()) {
+                    throw GradleException("manifest $manifestFile does not exist")
+                }
+                val changeInfoText = changeInfoFile.readText()
+                val manifestText = manifestFile.readText()
+                logger.info("Using ChangeInfoGitClient with change info path $changeInfoPath, " +
+                    "manifest $manifestPath")
+                return ChangeInfoGitClient(changeInfoText, manifestText)
+            }
+            logger.info("UsingGitRunnerGitClient")
+            return GitRunnerGitClient(rootProjectDir, logger)
+        }
     }
 }
 
@@ -277,7 +121,7 @@ data class GitCommitRange(
 /**
  * Class implementation of a git commit.  It uses the input delimiters to parse the commit
  *
- * @property gitCommit a string representation of a git commit
+ * @property formattedCommitText a string representation of a git commit
  * @property projectDir the project directory for which to parse file paths from a commit
  * @property commitSHADelimiter the term to use to search for the commit SHA
  * @property subjectDelimiter the term to use to search for the subject (aka commit summary)
@@ -286,7 +130,7 @@ data class GitCommitRange(
  * @property authorEmailDelimiter the term to use to search for the author email
  */
 data class Commit(
-    val gitCommit: String,
+    val formattedCommitText: String,
     val projectDir: String,
     private val commitSHADelimiter: String = "_CommitSHA:",
     private val subjectDelimiter: String = "_Subject:",
@@ -306,7 +150,7 @@ data class Commit(
     )
 
     init {
-        val listedCommit: List<String> = gitCommit.split('\n')
+        val listedCommit: List<String> = formattedCommitText.split('\n')
         listedCommit.filter { line -> line.trim() != "" }.forEach { line ->
             processCommitLine(line)
         }
@@ -340,7 +184,7 @@ data class Commit(
         }
         releaseNoteDelimiters.forEach { delimiter ->
             if (delimiter in line) {
-                getReleaseNotesFromGitLine(line, gitCommit)
+                getReleaseNotesFromGitLine(line, formattedCommitText)
                 return
             }
         }
@@ -426,7 +270,7 @@ data class Commit(
      *                  the commit cannot be explained in one line"
      * `release notes: "This is a one-line release note.  The quotes can be used this way too"`
      */
-    private fun getReleaseNotesFromGitLine(line: String, gitCommit: String) {
+    private fun getReleaseNotesFromGitLine(line: String, formattedCommitText: String) {
         /* Account for the use of quotes in a release note line
          * No quotes in the Release Note line means it's a one-line release note
          * If there are quotes, assume it's a multi-line release note
@@ -441,21 +285,22 @@ data class Commit(
             releaseNoteDelimiters.forEach { delimiter ->
                 if (delimiter in line) {
                     // Find the starting quote of the release notes quote block
-                    var releaseNoteStartIndex = gitCommit.lastIndexOf(delimiter) + delimiter.length
-                    releaseNoteStartIndex = gitCommit.indexOf('"', releaseNoteStartIndex)
+                    var releaseNoteStartIndex = formattedCommitText.lastIndexOf(delimiter)
+                    + delimiter.length
+                    releaseNoteStartIndex = formattedCommitText.indexOf('"', releaseNoteStartIndex)
                     // Move to the character after the first quote
-                    if (gitCommit[releaseNoteStartIndex] == '"') {
+                    if (formattedCommitText[releaseNoteStartIndex] == '"') {
                         releaseNoteStartIndex++
                     }
                     // Find the ending quote of the release notes quote block
                     var releaseNoteEndIndex = releaseNoteStartIndex + 1
-                    releaseNoteEndIndex = gitCommit.indexOf('"', releaseNoteEndIndex)
+                    releaseNoteEndIndex = formattedCommitText.indexOf('"', releaseNoteEndIndex)
                     // If there is no closing quote, just use the first line
                     if (releaseNoteEndIndex < 0) {
                         getOneLineReleaseNotesFromGitLine(line)
                         return
                     }
-                    releaseNote = gitCommit.substring(
+                    releaseNote = formattedCommitText.substring(
                         startIndex = releaseNoteStartIndex,
                         endIndex = releaseNoteEndIndex
                     ).trim()

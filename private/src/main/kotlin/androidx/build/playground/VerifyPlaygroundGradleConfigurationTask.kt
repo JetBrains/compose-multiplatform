@@ -101,7 +101,7 @@ abstract class VerifyPlaygroundGradleConfigurationTask : DefaultTask() {
         // properties in the future if necessary.
         playgroundProperties.forEach {
             val rootValue = rootProperties[it.key]
-            if (rootValue != it.value) {
+            if (rootValue != it.value && it.key != "org.gradle.jvmargs") {
                 throw GradleException(
                     """
                     ${it.key} is defined as ${it.value} in playground properties but

@@ -18,6 +18,9 @@ package androidx.build
 
 import androidx.build.Multiplatform.Companion.isMultiplatformEnabled
 import com.android.build.gradle.LibraryPlugin
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
+import com.google.gson.stream.JsonWriter
 import groovy.util.Node
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -34,6 +37,12 @@ import org.gradle.kotlin.dsl.findByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
 import java.io.File
+import java.io.StringWriter
+import org.dom4j.DocumentFactory
+import org.dom4j.DocumentHelper
+import org.dom4j.Element
+import org.dom4j.io.XMLWriter
+import org.gradle.api.publish.maven.tasks.GenerateMavenPom
 
 fun Project.configureMavenArtifactUpload(extension: AndroidXExtension) {
     apply(mapOf("plugin" to "maven-publish"))
@@ -112,6 +121,30 @@ private fun Project.configureComponent(
         // Register it as part of release so that we create a Zip file for it
         Release.register(this, extension)
 
+        // Workarounds for https://github.com/gradle/gradle/issues/20011
+        project.tasks.withType(GenerateModuleMetadata::class.java).configureEach { task ->
+            task.doLast {
+                val metadataFile = task.outputFile.asFile.get()
+                val metadata = metadataFile.readText()
+                val sortedMetadata = sortGradleMetadataDependencies(metadata)
+
+                if (metadata != sortedMetadata) {
+                    metadataFile.writeText(sortedMetadata)
+                }
+            }
+        }
+        project.tasks.withType(GenerateMavenPom::class.java).configureEach { task ->
+            task.doLast {
+                val pomFile = task.destination
+                val pom = pomFile.readText()
+                val sortedPom = sortPomDependencies(pom)
+
+                if (pom != sortedPom) {
+                    pomFile.writeText(sortedPom)
+                }
+            }
+        }
+
         // Workaround for https://github.com/gradle/gradle/issues/11717
         project.tasks.withType(GenerateModuleMetadata::class.java).configureEach { task ->
             task.doLast {
@@ -130,6 +163,70 @@ private fun Project.configureComponent(
             configureMultiplatformPublication()
         }
     }
+}
+
+/**
+ * Looks for a dependencies XML element within [pom] and sorts its contents.
+ */
+fun sortPomDependencies(pom: String): String {
+    // Workaround for using the default namespace in dom4j.
+    val namespaceUris = mapOf("ns" to "http://maven.apache.org/POM/4.0.0")
+    DocumentFactory.getInstance().xPathNamespaceURIs = namespaceUris
+    val document = DocumentHelper.parseText(pom)
+
+    // For each <dependencies> element, sort the contained elements in-place.
+    document.rootElement
+        .selectNodes("ns:dependencies")
+        .filterIsInstance<Element>()
+        .forEach { element ->
+            val deps = element.elements()
+            val sortedDeps = deps.toSortedSet(compareBy { it.stringValue }).toList()
+
+            // Content contains formatting nodes, so to avoid modifying those we replace
+            // each element with the sorted element from its respective index. Note this
+            // will not move adjacent elements, so any comments would remain in their
+            // original order.
+            element.content().replaceAll {
+                val index = deps.indexOf(it)
+                if (index >= 0) {
+                    sortedDeps[index]
+                } else {
+                    it
+                }
+            }
+        }
+
+    // Write to string. Note that this does not preserve the original indent level, but it
+    // does preserve line breaks -- not that any of this matters for client XML parsing.
+    val stringWriter = StringWriter()
+    XMLWriter(stringWriter).apply {
+        setIndentLevel(2)
+        write(document)
+        close()
+    }
+
+    return stringWriter.toString()
+}
+
+/**
+ * Looks for a dependencies JSON element within [metadata] and sorts its contents.
+ */
+fun sortGradleMetadataDependencies(metadata: String): String {
+    val gson = GsonBuilder().create()
+    val jsonObj = gson.fromJson(metadata, JsonObject::class.java)!!
+    jsonObj.getAsJsonArray("variants").forEach { entry ->
+        (entry as? JsonObject)?.getAsJsonArray("dependencies")?.let { jsonArray ->
+            val sortedSet = jsonArray.toSortedSet(compareBy { it.toString() })
+            jsonArray.removeAll { true }
+            sortedSet.forEach { element -> jsonArray.add(element) }
+        }
+    }
+
+    val stringWriter = StringWriter()
+    val jsonWriter = JsonWriter(stringWriter)
+    jsonWriter.setIndent("  ")
+    gson.toJson(jsonObj, jsonWriter)
+    return stringWriter.toString()
 }
 
 private fun Project.isMultiplatformPublicationEnabled(): Boolean {
@@ -155,7 +252,11 @@ private fun Project.validateCoordinatesAndGetGroup(extension: AndroidXExtension)
     val mavenGroup = extension.mavenGroup
         ?: throw Exception("You must specify mavenGroup for $name project")
     val strippedGroupId = mavenGroup.group.substringAfterLast(".")
-    if (mavenGroup.group.startsWith("androidx") && !name.startsWith(strippedGroupId)) {
+    if (
+        !extension.bypassCoordinateValidation &&
+        mavenGroup.group.startsWith("androidx") &&
+        !name.startsWith(strippedGroupId)
+    ) {
         throw Exception("Your artifactId must start with '$strippedGroupId'. (currently is $name)")
     }
     return mavenGroup

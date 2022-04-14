@@ -31,7 +31,7 @@ import org.gradle.kotlin.dsl.setProperty
 
 /**
  * Task for verifying the androidx dependency-stability-suffix rule
- * (A library is only as stable as its lease stable dependency)
+ * (A library is only as stable as its least stable dependency)
  */
 abstract class VerifyDependencyVersionsTask : DefaultTask() {
 
@@ -193,6 +193,8 @@ private fun shouldVerifyConfiguration(configuration: Configuration): Boolean {
 
     // Don't check any configurations that directly bundle the dependencies with the output
     if (name == "bundleInside") return false
+    if (name == "embedThemesDebug") return false
+    if (name == "embedThemesRelease") return false
 
     // Don't check any compile-only configurations
     if (name.startsWith("compile")) return false

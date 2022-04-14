@@ -107,13 +107,6 @@ val taskNamesKnownToDuplicateOutputs = setOf(
     "kotlinSourcesJar",
     "releaseSourcesJar",
     "sourceJarRelease",
-    // Can remove "lint" after AGP 7.1.0-alpha05.
-    "lint",
-    "lintReport",
-    "lintFix",
-    // Can remove "lintVital" after AGP 7.1.0-alpha05.
-    "lintVital",
-    "lintVitalReport",
     "sourceJar",
     // MPP plugin has issues with modules using withJava() clause, see b/158747039.
     "processTestResources",
@@ -126,7 +119,50 @@ val taskNamesKnownToDuplicateOutputs = setOf(
     "generateDebugProtos",
     "generateReleaseProtos",
     // Release APKs
-    "copyReleaseApk"
+    "copyReleaseApk",
+    // To-be removed when we can use updateLintBaselineDebug
+    "replaceLintBaseline",
+    "updateLintBaselineDebug",
+    // b/224564238
+    "updateLintBaselineWithExpandProjectionDebug",
+    "updateLintBaselineWithExpandProjectionRelease",
+    "updateLintBaselineWithNullAwareTypeConverterDebug",
+    "updateLintBaselineWithNullAwareTypeConverterRelease",
+    "updateLintBaselineWithoutExpandProjectionDebug",
+    "updateLintBaselineWithoutExpandProjectionRelease",
+    "updateLintBaselineWithoutNullAwareTypeConverterDebug",
+    "updateLintBaselineWithoutNullAwareTypeConverterRelease",
+    // b/223733695
+    "pixel2api31DebugAndroidTest",
+    "pixel2api31ReleaseAndroidTest",
+    "pixel2api31WithExpandProjectionDebugAndroidTest",
+    "pixel2api31WithNullAwareTypeConverterDebugAndroidTest",
+    "pixel2api31WithoutExpandProjectionDebugAndroidTest",
+    "pixel2api31WithKaptDebugAndroidTest",
+    "pixel2api31WithKspDebugAndroidTest",
+    "pixel2api31TargetSdk29DebugAndroidTest",
+    "pixel2api31TargetSdk30DebugAndroidTest",
+    "pixel2api31TargetSdkLatestDebugAndroidTest",
+    "pixel2api30DebugAndroidTest",
+    "pixel2api30ReleaseAndroidTest",
+    "pixel2api30WithExpandProjectionDebugAndroidTest",
+    "pixel2api30WithNullAwareTypeConverterDebugAndroidTest",
+    "pixel2api30WithoutExpandProjectionDebugAndroidTest",
+    "pixel2api30WithKaptDebugAndroidTest",
+    "pixel2api30WithKspDebugAndroidTest",
+    "pixel2api30TargetSdk29DebugAndroidTest",
+    "pixel2api30TargetSdk30DebugAndroidTest",
+    "pixel2api30TargetSdkLatestDebugAndroidTest",
+    "pixel2api29DebugAndroidTest",
+    "pixel2api29ReleaseAndroidTest",
+    "pixel2api29WithExpandProjectionDebugAndroidTest",
+    "pixel2api29WithNullAwareTypeConverterDebugAndroidTest",
+    "pixel2api29WithoutExpandProjectionDebugAndroidTest",
+    "pixel2api29WithKaptDebugAndroidTest",
+    "pixel2api29WithKspDebugAndroidTest",
+    "pixel2api29TargetSdk29DebugAndroidTest",
+    "pixel2api29TargetSdk30DebugAndroidTest",
+    "pixel2api29TargetSdkLatestDebugAndroidTest",
 )
 
 fun shouldValidateTaskOutput(task: Task): Boolean {

@@ -29,9 +29,13 @@ import androidx.build.getBuildId
 import androidx.build.getCheckoutRoot
 import androidx.build.getDistributionDirectory
 import androidx.build.getKeystore
+import androidx.build.getLibraryByName
 import com.android.build.api.attributes.BuildTypeAttr
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
+import java.io.File
+import java.io.FileNotFoundException
+import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -61,9 +65,6 @@ import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.dokka.gradle.DokkaAndroidTask
 import org.jetbrains.dokka.gradle.PackageOptions
-import java.io.File
-import java.io.FileNotFoundException
-import javax.inject.Inject
 
 /**
  * Plugin that allows to build documentation for a given set of prebuilt and tip of tree projects.
@@ -337,12 +338,11 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
         val generatedDocsDir = project.file("${project.buildDir}/dackkaDocs")
 
         val dackkaConfiguration = project.configurations.create("dackka").apply {
-            dependencies.add(project.dependencies.create(DACKKA_DEPENDENCY))
+            dependencies.add(project.dependencies.create(project.getLibraryByName("dackka")))
         }
 
         val dackkaTask = project.tasks.register("dackkaDocs", DackkaTask::class.java) { task ->
             task.apply {
-                dependsOn(dackkaConfiguration)
                 dependsOn(unzipDocsTask)
                 dependsOn(unzipSamplesTask)
 
@@ -568,6 +568,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
         project.tasks.whenTaskAdded { task ->
             if (task is Test || task.name.startsWith("assemble") ||
                 task.name == "lint" ||
+                task.name == "lintAnalyzeDebug" ||
                 task.name == "transformDexArchiveWithExternalLibsDexMergerForPublicDebug" ||
                 task.name == "transformResourcesWithMergeJavaResForPublicDebug" ||
                 task.name == "checkPublicDebugDuplicateClasses"
@@ -641,7 +642,6 @@ abstract class SourcesVariantRule : ComponentMetadataRule {
     }
 }
 
-private const val DACKKA_DEPENDENCY = "com.google.devsite:dackka:0.0.14"
 private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
 
 // List of packages to exclude from both Java and Kotlin refdoc generation

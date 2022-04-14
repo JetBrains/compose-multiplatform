@@ -189,6 +189,8 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     // We should be able to remove these entries when b/160392650 is fixed
     "lint",
     "lintAnalyzeDebug",
+    "lintBundledDebug",
+    "lintUnbundledDebug",
     "lintDebug",
     "lintVitalDebug",
     "lintWithExpandProjectionDebug",
@@ -199,6 +201,28 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     "lintTargetSdk29Debug",
     "lintTargetSdk30Debug",
     "lintTargetSdkLatestDebug",
+
+    // b/223287425
+    "lintReportWithKaptDebug",
+    "lintAnalyzeWithKaptDebug",
+    "lintReportWithKspDebug",
+    "lintAnalyzeWithKspDebug",
+    "lintReportTargetSdk29Debug",
+    "lintAnalyzeTargetSdk29Debug",
+    "lintReportBundledDebug",
+    "lintAnalyzeBundledDebug",
+    "lintReportUnbundledDebug",
+    "lintAnalyzeUnbundledDebug",
+    "lintReportTargetSdk30Debug",
+    "lintAnalyzeTargetSdk30Debug",
+    "lintReportTargetSdkLatestDebug",
+    "lintAnalyzeTargetSdkLatestDebug",
+    "lintReportWithNullAwareTypeConverterDebug",
+    "lintAnalyzeWithNullAwareTypeConverterDebug",
+    "lintReportWithoutExpandProjectionDebug",
+    "lintAnalyzeWithoutExpandProjectionDebug",
+    "lintReportWithExpandProjectionDebug",
+    "lintAnalyzeWithExpandProjectionDebug",
 
     // We know that these tasks are never up to date due to maven-metadata.xml changing
     // https://github.com/gradle/gradle/issues/11203
@@ -245,10 +269,7 @@ abstract class TaskUpToDateValidator :
     companion object {
         // Tells whether to create a TaskUpToDateValidator listener
         private fun shouldEnable(project: Project): Boolean {
-            // forUseAtConfigurationTime() is deprecated in Gradle 7.4, but we still use 7.3
-            @Suppress("DEPRECATION")
-            return project.providers.gradleProperty(ENABLE_FLAG_NAME)
-                .forUseAtConfigurationTime().isPresent
+            return project.providers.gradleProperty(ENABLE_FLAG_NAME).isPresent
         }
 
         private fun isAllowedToRerunTask(taskPath: String): Boolean {
