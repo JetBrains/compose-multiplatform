@@ -16,15 +16,18 @@
 
 package androidx.compose.material3
 
-import android.view.ViewConfiguration
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.tokens.SliderTokens
+import androidx.compose.material3.tokens.SwitchTokens
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -207,6 +210,41 @@ class SliderTest {
     }
 
     @Test
+    fun slider_drag_out_of_bounds() {
+        val state = mutableStateOf(0f)
+        var slop = 0f
+
+        rule.setMaterialContent(lightColorScheme()) {
+            slop = LocalViewConfiguration.current.touchSlop
+            Slider(
+                modifier = Modifier.testTag(tag),
+                value = state.value,
+                onValueChange = { state.value = it }
+            )
+        }
+
+        rule.runOnUiThread {
+            Truth.assertThat(state.value).isEqualTo(0f)
+        }
+
+        var expected = 0f
+
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                down(center)
+                moveBy(Offset(width.toFloat(), 0f))
+                moveBy(Offset(-width.toFloat(), 0f))
+                moveBy(Offset(-width.toFloat(), 0f))
+                moveBy(Offset(width.toFloat() + 100f, 0f))
+                up()
+                expected = calculateFraction(left, right, centerX + 100 - slop)
+            }
+        rule.runOnIdle {
+            Truth.assertThat(state.value).isWithin(0.001f).of(expected)
+        }
+    }
+
+    @Test
     fun slider_tap() {
         val state = mutableStateOf(0f)
 
@@ -236,14 +274,24 @@ class SliderTest {
     }
 
     /**
-     * Guarantee slider doesn't move while we wait to see if the gesture is scrolling.
+     * Guarantee slider doesn't move as we scroll, tapping still works
      */
     @Test
-    fun slider_tap_scrollableContainer() {
-        rule.mainClock.autoAdvance = false
+    fun slider_scrollableContainer() {
         val state = mutableStateOf(0f)
+        val offset = mutableStateOf(0f)
+
         rule.setContent {
-            Box(Modifier.verticalScroll(rememberScrollState())) {
+            Column(
+                modifier = Modifier
+                    .height(2000.dp)
+                    .scrollable(
+                        orientation = Orientation.Vertical,
+                        state = rememberScrollableState { delta ->
+                            offset.value += delta
+                            delta
+                        })
+            ) {
                 Slider(
                     modifier = Modifier.testTag(tag),
                     value = state.value,
@@ -252,18 +300,30 @@ class SliderTest {
             }
         }
 
-        var expected = 0f
-        rule.onNodeWithTag(tag)
+        rule.runOnIdle {
+            Truth.assertThat(offset.value).isEqualTo(0f)
+        }
+
+        // Just scroll
+        rule.onNodeWithTag(tag, useUnmergedTree = true)
             .performTouchInput {
-                down(Offset(centerX + 50, centerY))
-                expected = calculateFraction(left, right, centerX + 50)
+                down(Offset(centerX, centerY))
+                moveBy(Offset(0f, 500f))
+                up()
             }
 
         rule.runOnIdle {
+            Truth.assertThat(offset.value).isGreaterThan(0f)
             Truth.assertThat(state.value).isEqualTo(0f)
         }
 
-        rule.mainClock.advanceTimeBy(ViewConfiguration.getTapTimeout().toLong())
+        // Tap
+        var expected = 0f
+        rule.onNodeWithTag(tag, useUnmergedTree = true)
+            .performTouchInput {
+                click(Offset(centerX, centerY))
+                expected = calculateFraction(left, right, centerX)
+            }
 
         rule.runOnIdle {
             Truth.assertThat(state.value).isWithin(0.001f).of(expected)
@@ -367,39 +427,14 @@ class SliderTest {
         }
     }
 
-    @Test
-    fun rangeSlider_tap_rtl() {
-        val state = mutableStateOf(0f)
 
-        rule.setMaterialContent(lightColorScheme()) {
-            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                Slider(
-                    modifier = Modifier.testTag(tag),
-                    value = state.value,
-                    onValueChange = { state.value = it }
-                )
-            }
-        }
-
-        rule.runOnUiThread {
-            Truth.assertThat(state.value).isEqualTo(0f)
-        }
-
-        var expected = 0f
-
-        rule.onNodeWithTag(tag)
-            .performTouchInput {
-                down(Offset(centerX + 50, centerY))
-                up()
-                expected = calculateFraction(left, right, centerX - 50)
-            }
-        rule.runOnIdle {
-            Truth.assertThat(state.value).isWithin(0.001f).of(expected)
-        }
+    private fun calculateFraction(left: Float, right: Float, pos: Float) = with(rule.density) {
+        val offset = (SwitchTokens.HandleWidth / 2).toPx()
+        val start = left + offset
+        val end = right - offset
+        ((pos - start) / (end - start)).coerceIn(0f, 1f)
     }
 
-    private fun calculateFraction(a: Float, b: Float, pos: Float) =
-        ((pos - a) / (b - a)).coerceIn(0f, 1f)
 
     @Test
     fun slider_sizes() {
@@ -513,11 +548,14 @@ class SliderTest {
         }
 
         rule.onNodeWithTag(tag)
-            .performTouchInput { down(center) }
+            .performTouchInput {
+                down(center)
+                moveBy(Offset(100f, 0f))
+            }
 
         rule.runOnIdle {
             Truth.assertThat(interactions).hasSize(1)
-            Truth.assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            Truth.assertThat(interactions.first()).isInstanceOf(DragInteraction.Start::class.java)
         }
 
         // Dispose
@@ -527,9 +565,9 @@ class SliderTest {
 
         rule.runOnIdle {
             Truth.assertThat(interactions).hasSize(2)
-            Truth.assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
-            Truth.assertThat(interactions[1]).isInstanceOf(PressInteraction.Cancel::class.java)
-            Truth.assertThat((interactions[1] as PressInteraction.Cancel).press)
+            Truth.assertThat(interactions.first()).isInstanceOf(DragInteraction.Start::class.java)
+            Truth.assertThat(interactions[1]).isInstanceOf(DragInteraction.Cancel::class.java)
+            Truth.assertThat((interactions[1] as DragInteraction.Cancel).start)
                 .isEqualTo(interactions[0])
         }
     }
