@@ -13,6 +13,7 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
 import com.jetbrains.compose.benchmark.BenchmarkToolWindow
+import com.jetbrains.compose.benchmark.PerformanceInfoDialog
 import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import java.nio.file.Files
@@ -21,6 +22,7 @@ import kotlin.random.Random
 private val ANCHORS = listOf(ToolWindowAnchor.LEFT, ToolWindowAnchor.BOTTOM, ToolWindowAnchor.RIGHT)
 private val SIDE_TOOLS = listOf(true, false)
 private val COUNT = ANCHORS.size * SIDE_TOOLS.size
+private val performanceInfoDialog = PerformanceInfoDialog()
 
 class LifecycleListener : com.intellij.ide.AppLifecycleListener {
 
@@ -53,6 +55,7 @@ class LifecycleListener : com.intellij.ide.AppLifecycleListener {
                         )
                     }
                 }
+                performanceInfoDialog.show()
             }
             while (true) {
                 try {
@@ -68,7 +71,6 @@ class LifecycleListener : com.intellij.ide.AppLifecycleListener {
             }
         }
     }
-
 }
 
 suspend fun stressTestToolWindows(toolWindows: List<ToolWindow>) {
@@ -80,8 +82,13 @@ suspend fun stressTestToolWindows(toolWindows: List<ToolWindow>) {
         println("-- $message --")
         println("-- Used memory: $memoryStr")
         println("-- ")
+        performanceInfoDialog.setText(
+            """
+            |-- Used memory: $memoryStr
+            """.trimMargin()
+        )
     }
-    while (true) {
+    while (performanceInfoDialog.isPaused().not()) {
         val visiblePanelsCount = toolWindows.count { it.isVisible }
         printLogs("$visiblePanelsCount panels")
         delay(500)
