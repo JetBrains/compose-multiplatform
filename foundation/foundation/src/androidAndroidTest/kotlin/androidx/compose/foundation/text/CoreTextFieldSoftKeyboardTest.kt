@@ -90,6 +90,7 @@ class CoreTextFieldSoftKeyboardTest {
         keyboardHelper.waitForKeyboardVisibility(visible = true)
     }
 
+    @FlakyTest(bugId = 229247491)
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
     @Test
     fun keyboardHiddenWhenFocusIsLost() {
