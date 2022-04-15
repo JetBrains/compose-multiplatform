@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.relocation
 
+import androidx.compose.foundation.AtomicReference
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -129,6 +130,17 @@ private class BringIntoViewResponderModifier(
         get() = this
 
     /**
+     * While a [bringChildIntoView] is executing, this stores the [Rect], in local coordinates, of
+     * the request. It's used to determine how to handle new requests that come in before the
+     * current request has finished. If the existing request will also satisfy the new request, e.g.
+     * by being for a rectangle that completely contains the new request, then the new request is
+     * ignored.
+     */
+    // TODO(b/216790855) This is a temporary fix, there are additional edge cases that this can't
+    //  handle. See the comments on aosp/2065910 for more information.
+    private val requestInProgress = AtomicReference<Rect?>(null)
+
+    /**
      * Responds to a child's request by first converting [rect] into this node's [LayoutCoordinates]
      * and then, concurrently, calling the [responder] and the [parent] to handle the request.
      */
@@ -136,20 +148,50 @@ private class BringIntoViewResponderModifier(
         val layoutCoordinates = layoutCoordinates ?: return
         if (!childCoordinates.isAttached) return
         val localRect = layoutCoordinates.localRectOf(childCoordinates, rect)
-        val parentRect = responder.calculateRectForParent(localRect)
 
-        // For the item to be visible, if needs to be in the viewport of all its ancestors.
-        // Note: For now we run both of these concurrently, but in the future we could make this
-        // configurable. (The child relocation could be executed before the parent, or parent
-        // before the child).
-        coroutineScope {
-            // Bring the requested Child into this parent's view.
-            launch {
-                responder.bringChildIntoView(localRect)
+        val requestToInterrupt = requestInProgress.get()?.also {
+            if (it.completelyOverlaps(localRect)) {
+                // There is already a request in progress that will satisfy this request, so we
+                // don't need to do anything.
+                return
             }
-
-            parent.bringChildIntoView(parentRect, layoutCoordinates)
         }
+
+        if (!tryInterruptingRequest(requestToInterrupt, localRect)) {
+            // We're racing with another request, and that request won the race. Let it finish.
+            return
+        }
+
+        try {
+            val parentRect = responder.calculateRectForParent(localRect)
+
+            // For the item to be visible, if needs to be in the viewport of all its ancestors.
+            // Note: For now we run both of these concurrently, but in the future we could make this
+            // configurable. (The child relocation could be executed before the parent, or parent
+            // before the child).
+            coroutineScope {
+                // Bring the requested Child into this parent's view.
+                launch {
+                    responder.bringChildIntoView(localRect)
+                }
+
+                parent.bringChildIntoView(parentRect, layoutCoordinates)
+            }
+        } finally {
+            // Clear out the local request only if we weren't interruptedø by a newer request.
+            requestInProgress.compareAndSet(localRect, null)
+        }
+    }
+
+    /**
+     * Tries to interrupt an in-progress request by atomically setting the [requestInProgress]
+     * to [newRequest] if it is equal to [requestToInterrupt] or null. Returns true if successful.
+     */
+    private fun tryInterruptingRequest(requestToInterrupt: Rect?, newRequest: Rect): Boolean {
+        // Check if we lost a race against another request about to start…
+        return requestInProgress.compareAndSet(requestToInterrupt, newRequest) ||
+            // …or against a request that just finished.
+            requestInProgress.compareAndSet(null, newRequest)
     }
 }
 
@@ -165,4 +207,14 @@ private fun LayoutCoordinates.localRectOf(
 
     // Translate the rect to this parent's local coordinates.
     return rect.translate(localRect.topLeft)
+}
+
+/**
+ * Returns true if [other] is fully contained inside this [Rect], using inclusive bound checks.
+ */
+private fun Rect.completelyOverlaps(other: Rect): Boolean {
+    return left <= other.left &&
+        top <= other.top &&
+        right >= other.right &&
+        bottom >= other.bottom
 }
