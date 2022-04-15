@@ -13,7 +13,6 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
 import com.jetbrains.compose.benchmark.BenchmarkToolWindow
-import com.jetbrains.compose.benchmark.PerformanceInfoDialog
 import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import java.nio.file.Files
@@ -22,7 +21,6 @@ import kotlin.random.Random
 private val ANCHORS = listOf(ToolWindowAnchor.LEFT, ToolWindowAnchor.BOTTOM, ToolWindowAnchor.RIGHT)
 private val SIDE_TOOLS = listOf(true, false)
 private val COUNT = ANCHORS.size * SIDE_TOOLS.size
-private val performanceInfoDialog = PerformanceInfoDialog()
 
 class LifecycleListener : com.intellij.ide.AppLifecycleListener {
 
@@ -55,15 +53,15 @@ class LifecycleListener : com.intellij.ide.AppLifecycleListener {
                         )
                     }
                 }
-                performanceInfoDialog.show()
+                performanceDialog.show()
             }
             while (true) {
                 try {
                     delay(500)
                     val toolWindowManager = ToolWindowManager.getInstance(tempProject)
-                    val toolWindows = toolWindowIds.map {
+                    val toolWindows = toolWindowIds.mapNotNull {
                         toolWindowManager.getToolWindow(it)
-                    }.filterNotNull()
+                    }
                     stressTestToolWindows(toolWindows)
                 } catch (t: Throwable) {
                     // do nothing
@@ -74,24 +72,11 @@ class LifecycleListener : com.intellij.ide.AppLifecycleListener {
 }
 
 suspend fun stressTestToolWindows(toolWindows: List<ToolWindow>) {
-    val runtime = Runtime.getRuntime()
-    fun printLogs(message: String) {
-        runtime.gc()
-        val memory = runtime.totalMemory() - runtime.freeMemory()
-        val memoryStr = String.format("%.2f MB", memory / 1e6f)
-        println("-- $message --")
-        println("-- Used memory: $memoryStr")
-        println("-- ")
-        performanceInfoDialog.setText(
-            """
-            |-- Used memory: $memoryStr
-            """.trimMargin()
-        )
-    }
-    while (performanceInfoDialog.isPaused().not()) {
+    while (performanceDialog.isPaused().not()) {
         val visiblePanelsCount = toolWindows.count { it.isVisible }
-        printLogs("$visiblePanelsCount panels")
-        delay(500)
+        delay(200)
+        doMeasure("$visiblePanelsCount panels")
+        delay(200)
         toolWindows.forEach {
             if (Random.nextBoolean()) {
                 if (it.isVisible.not()) {
