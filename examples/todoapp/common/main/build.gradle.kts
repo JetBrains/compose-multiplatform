@@ -6,16 +6,6 @@ plugins {
 }
 
 kotlin {
-    val iosTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinNativeTarget =
-        when {
-            isIphoneSimulatorBuild() -> ::iosSimulatorArm64
-            isIphoneOsBuild() -> ::iosArm64
-            else -> ::iosX64
-        }
-
-    iosTarget("ios") {
-    }
-
     sourceSets {
         named("commonMain") {
             dependencies {
@@ -38,6 +28,9 @@ kotlin {
     }
 
     targets.getByName<KotlinNativeTarget>("iosX64").compilations.forEach {
+        it.kotlinOptions.freeCompilerArgs += arrayOf("-linker-options", "-lsqlite3")
+    }
+    targets.getByName<KotlinNativeTarget>("iosArm64").compilations.forEach {
         it.kotlinOptions.freeCompilerArgs += arrayOf("-linker-options", "-lsqlite3")
     }
 }

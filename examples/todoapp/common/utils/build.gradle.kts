@@ -6,16 +6,6 @@ plugins {
 }
 
 kotlin {
-    val iosTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinNativeTarget =
-        when {
-            isIphoneSimulatorBuild() -> ::iosSimulatorArm64
-            isIphoneOsBuild() -> ::iosArm64
-            else -> ::iosX64
-        }
-
-    iosTarget("ios") {
-    }
-
     sourceSets {
         named("commonMain") {
             dependencies {

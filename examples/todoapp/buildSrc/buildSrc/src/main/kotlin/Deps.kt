@@ -12,7 +12,11 @@ fun initDeps(project: Project) {
 object Deps {
     object JetBrains {
         object Kotlin {
-            private val VERSION get() = properties["kotlin.version"]
+            //todo remove, when updated to new Compose with support Kotlin 1.6.20 or newer
+            private val XCODE_WORKAROUND_KOTLIN_VERSION = "1.6.20"
+            private val workaroundIsBuildWithXcode = System.getenv("XCODE_VERSION_ACTUAL") != null
+
+            private val VERSION get() = if (workaroundIsBuildWithXcode) XCODE_WORKAROUND_KOTLIN_VERSION else properties["kotlin.version"]
             val gradlePlugin get() = "org.jetbrains.kotlin:kotlin-gradle-plugin:$VERSION"
             val testCommon get() = "org.jetbrains.kotlin:kotlin-test-common:$VERSION"
             val testJunit get() = "org.jetbrains.kotlin:kotlin-test-junit:$VERSION"
