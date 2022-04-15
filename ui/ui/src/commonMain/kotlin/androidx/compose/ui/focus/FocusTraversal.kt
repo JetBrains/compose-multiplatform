@@ -226,6 +226,13 @@ internal fun FocusModifier.findLastKeyInputModifier(): KeyInputModifier? {
 }
 
 /**
+ * Whether this node should be considered when searching for the next item during a traversal.
+ */
+internal val FocusModifier.isEligibleForFocusSearch: Boolean
+    get() = layoutNodeWrapper?.layoutNode?.isPlaced == true &&
+            layoutNodeWrapper?.layoutNode?.isAttached == true
+
+/**
  * Returns [one] if it comes after [two] in the modifier chain or [two] if it comes after [one].
  */
 @Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
