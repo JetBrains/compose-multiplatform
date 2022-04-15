@@ -64,7 +64,7 @@ class PlatformSpanStyleTest {
         val style = PlatformSpanStyle()
         val otherStyle = PlatformSpanStyle()
 
-        assertThat(style.lerp(stop = otherStyle, 0.5f)).isSameInstanceAs(style)
+        assertThat(lerp(start = style, stop = otherStyle, 0.5f)).isSameInstanceAs(style)
     }
 
     @Test

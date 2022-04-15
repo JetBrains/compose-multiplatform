@@ -49,8 +49,6 @@ expect class PlatformParagraphStyle {
     }
 
     fun merge(other: PlatformParagraphStyle?): PlatformParagraphStyle
-
-    fun lerp(stop: PlatformParagraphStyle, fraction: Float): PlatformParagraphStyle
 }
 
 /**
@@ -63,6 +61,44 @@ expect class PlatformSpanStyle {
     }
 
     fun merge(other: PlatformSpanStyle?): PlatformSpanStyle
-
-    fun lerp(stop: PlatformSpanStyle, fraction: Float): PlatformSpanStyle
 }
+
+/**
+ * Interpolate between two PlatformParagraphStyle's.
+ *
+ * This will not work well if the styles don't set the same fields.
+ *
+ * The [fraction] argument represents position on the timeline, with 0.0 meaning
+ * that the interpolation has not started, returning [start] (or something
+ * equivalent to [start]), 1.0 meaning that the interpolation has finished,
+ * returning [stop] (or something equivalent to [stop]), and values in between
+ * meaning that the interpolation is at the relevant point on the timeline
+ * between [start] and [stop]. The interpolation can be extrapolated beyond 0.0 and
+ * 1.0, so negative values and values greater than 1.0 are valid.
+ */
+@ExperimentalTextApi
+expect fun lerp(
+    start: PlatformParagraphStyle,
+    stop: PlatformParagraphStyle,
+    fraction: Float
+): PlatformParagraphStyle
+
+/**
+ * Interpolate between two PlatformSpanStyle's.
+ *
+ * This will not work well if the styles don't set the same fields.
+ *
+ * The [fraction] argument represents position on the timeline, with 0.0 meaning
+ * that the interpolation has not started, returning [start] (or something
+ * equivalent to [start]), 1.0 meaning that the interpolation has finished,
+ * returning [stop] (or something equivalent to [stop]), and values in between
+ * meaning that the interpolation is at the relevant point on the timeline
+ * between [start] and [stop]. The interpolation can be extrapolated beyond 0.0 and
+ * 1.0, so negative values and values greater than 1.0 are valid.
+ */
+@ExperimentalTextApi
+expect fun lerp(
+    start: PlatformSpanStyle,
+    stop: PlatformSpanStyle,
+    fraction: Float
+): PlatformSpanStyle
