@@ -145,16 +145,6 @@ actual class PlatformParagraphStyle {
         // right now it is not needed to create a copy
         return other
     }
-
-    actual fun lerp(stop: PlatformParagraphStyle, fraction: Float): PlatformParagraphStyle {
-        return PlatformParagraphStyle(
-            includeFontPadding = lerpDiscrete(
-                includeFontPadding,
-                stop.includeFontPadding,
-                fraction
-            )
-        )
-    }
 }
 
 /**
@@ -167,10 +157,6 @@ actual class PlatformSpanStyle {
     }
 
     actual fun merge(other: PlatformSpanStyle?): PlatformSpanStyle {
-        return this
-    }
-
-    actual fun lerp(stop: PlatformSpanStyle, fraction: Float): PlatformSpanStyle {
         return this
     }
 
@@ -188,4 +174,57 @@ actual class PlatformSpanStyle {
     override fun toString(): String {
         return "PlatformSpanStyle()"
     }
+}
+
+/**
+ * Interpolate between two PlatformParagraphStyle's.
+ *
+ * This will not work well if the styles don't set the same fields.
+ *
+ * The [fraction] argument represents position on the timeline, with 0.0 meaning
+ * that the interpolation has not started, returning [start] (or something
+ * equivalent to [start]), 1.0 meaning that the interpolation has finished,
+ * returning [stop] (or something equivalent to [stop]), and values in between
+ * meaning that the interpolation is at the relevant point on the timeline
+ * between [start] and [stop]. The interpolation can be extrapolated beyond 0.0 and
+ * 1.0, so negative values and values greater than 1.0 are valid.
+ */
+@Suppress("DEPRECATION")
+@ExperimentalTextApi
+actual fun lerp(
+    start: PlatformParagraphStyle,
+    stop: PlatformParagraphStyle,
+    fraction: Float
+): PlatformParagraphStyle {
+    if (start.includeFontPadding == stop.includeFontPadding) return start
+
+    return PlatformParagraphStyle(
+        includeFontPadding = lerpDiscrete(
+            start.includeFontPadding,
+            stop.includeFontPadding,
+            fraction
+        )
+    )
+}
+
+/**
+ * Interpolate between two PlatformSpanStyle's.
+ *
+ * This will not work well if the styles don't set the same fields.
+ *
+ * The [fraction] argument represents position on the timeline, with 0.0 meaning
+ * that the interpolation has not started, returning [start] (or something
+ * equivalent to [start]), 1.0 meaning that the interpolation has finished,
+ * returning [stop] (or something equivalent to [stop]), and values in between
+ * meaning that the interpolation is at the relevant point on the timeline
+ * between [start] and [stop]. The interpolation can be extrapolated beyond 0.0 and
+ * 1.0, so negative values and values greater than 1.0 are valid.
+ */
+@ExperimentalTextApi
+actual fun lerp(
+    start: PlatformSpanStyle,
+    stop: PlatformSpanStyle,
+    fraction: Float
+): PlatformSpanStyle {
+    return start
 }

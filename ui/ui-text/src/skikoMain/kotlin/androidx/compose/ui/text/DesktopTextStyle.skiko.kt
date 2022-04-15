@@ -64,10 +64,6 @@ actual class PlatformParagraphStyle {
         return this
     }
 
-    actual fun lerp(stop: PlatformParagraphStyle, fraction: Float): PlatformParagraphStyle {
-        return this
-    }
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is PlatformParagraphStyle) return false
@@ -92,10 +88,6 @@ actual class PlatformSpanStyle {
         return this
     }
 
-    actual fun lerp(stop: PlatformSpanStyle, fraction: Float): PlatformSpanStyle {
-        return this
-    }
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is PlatformSpanStyle) return false
@@ -106,4 +98,47 @@ actual class PlatformSpanStyle {
     override fun hashCode(): Int {
         return super.hashCode()
     }
+}
+
+/**
+ * Interpolate between two PlatformParagraphStyle's.
+ *
+ * This will not work well if the styles don't set the same fields.
+ *
+ * The [fraction] argument represents position on the timeline, with 0.0 meaning
+ * that the interpolation has not started, returning [start] (or something
+ * equivalent to [start]), 1.0 meaning that the interpolation has finished,
+ * returning [stop] (or something equivalent to [stop]), and values in between
+ * meaning that the interpolation is at the relevant point on the timeline
+ * between [start] and [stop]. The interpolation can be extrapolated beyond 0.0 and
+ * 1.0, so negative values and values greater than 1.0 are valid.
+ */
+actual fun lerp(
+    start: PlatformParagraphStyle,
+    stop: PlatformParagraphStyle,
+    fraction: Float
+): PlatformParagraphStyle {
+    return start
+}
+
+/**
+ * Interpolate between two PlatformSpanStyle's.
+ *
+ * This will not work well if the styles don't set the same fields.
+ *
+ * The [fraction] argument represents position on the timeline, with 0.0 meaning
+ * that the interpolation has not started, returning [start] (or something
+ * equivalent to [start]), 1.0 meaning that the interpolation has finished,
+ * returning [stop] (or something equivalent to [stop]), and values in between
+ * meaning that the interpolation is at the relevant point on the timeline
+ * between [start] and [stop]. The interpolation can be extrapolated beyond 0.0 and
+ * 1.0, so negative values and values greater than 1.0 are valid.
+ */
+@ExperimentalTextApi
+actual fun lerp(
+    start: PlatformSpanStyle,
+    stop: PlatformSpanStyle,
+    fraction: Float
+): PlatformSpanStyle {
+    return start
 }

@@ -455,7 +455,7 @@ private fun lerpPlatformStyle(
     if (start == null && stop == null) return null
     val startNonNull = start ?: PlatformSpanStyle.Default
     val stopNonNull = stop ?: PlatformSpanStyle.Default
-    return startNonNull.lerp(stopNonNull, fraction)
+    return lerp(startNonNull, stopNonNull, fraction)
 }
 
 @OptIn(ExperimentalTextApi::class)
