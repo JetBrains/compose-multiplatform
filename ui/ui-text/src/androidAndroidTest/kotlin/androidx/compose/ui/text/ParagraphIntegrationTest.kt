@@ -2708,6 +2708,7 @@ class ParagraphIntegrationTest {
         }
     }
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
     fun lineHeight_IsNotAppliedToFirstLine() {
         val text = "abcdefgh"
@@ -2716,9 +2717,14 @@ class ParagraphIntegrationTest {
         val layoutWidth = text.length * fontSize / 4
         val lineHeight = 2f
 
+        @Suppress("DEPRECATION")
         val paragraph = simpleParagraph(
             text = text,
-            style = TextStyle(fontSize = fontSize.sp, lineHeight = lineHeight.em),
+            style = TextStyle(
+                fontSize = fontSize.sp,
+                lineHeight = lineHeight.em,
+                platformStyle = PlatformTextStyle(includeFontPadding = false)
+            ),
             width = layoutWidth
         )
 

@@ -175,11 +175,19 @@ class ParagraphFillBoundingBoxesTest {
         ).isEqualToWithTolerance(ltrCharacterBoundariesForTestFont(text))
     }
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
     fun multiLineCharacterLineHeight() {
         val lineHeight = fontSize * 2
         val text = "a\na\na"
-        val paragraph = Paragraph(text, style = TextStyle(lineHeight = lineHeight))
+        @Suppress("DEPRECATION")
+        val paragraph = Paragraph(
+            text,
+            style = TextStyle(
+                lineHeight = lineHeight,
+                platformStyle = PlatformTextStyle(includeFontPadding = false)
+            )
+        )
 
         // first line no line height
         val firstLineEnd = text.indexOf("\n") + 1
