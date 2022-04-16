@@ -50,6 +50,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.LineHeightBehavior
+import androidx.compose.ui.text.style.LineHeightTrim
 import androidx.compose.ui.text.style.LineVerticalAlignment
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
@@ -74,10 +75,9 @@ fun TextLineHeightDemo() {
         var lineHeightEnabled = remember { mutableStateOf(false) }
         val lineHeightBehaviorEnabled = remember { mutableStateOf(false) }
         var lineVerticalAlignment = remember {
-            mutableStateOf(LineVerticalAlignment.Proportional)
+            mutableStateOf(LineHeightBehavior.Default.alignment)
         }
-        val trimFirstLineTop = remember { mutableStateOf(false) }
-        val trimLastLineBottom = remember { mutableStateOf(false) }
+        var lineHeightTrim = remember { mutableStateOf(LineHeightBehavior.Default.trim) }
         val includeFontPadding = remember { mutableStateOf(false) }
         val applyMaxLines = remember { mutableStateOf(false) }
         val ellipsize = remember { mutableStateOf(false) }
@@ -91,8 +91,7 @@ fun TextLineHeightDemo() {
             FontPaddingAndMaxLinesConfiguration(includeFontPadding, applyMaxLines, ellipsize)
             LineHeightBehaviorConfiguration(
                 lineHeightBehaviorEnabled,
-                trimFirstLineTop,
-                trimLastLineBottom,
+                lineHeightTrim,
                 lineVerticalAlignment
             )
             Spacer(Modifier.padding(16.dp))
@@ -103,8 +102,7 @@ fun TextLineHeightDemo() {
                 if (lineHeightBehaviorEnabled.value) {
                     LineHeightBehavior(
                         alignment = lineVerticalAlignment.value,
-                        trimFirstLineTop = trimFirstLineTop.value,
-                        trimLastLineBottom = trimLastLineBottom.value
+                        trim = lineHeightTrim.value
                     )
                 } else null,
                 includeFontPadding.value,
@@ -173,6 +171,110 @@ private fun LineHeightConfiguration(
     }
 }
 
+@OptIn(ExperimentalTextApi::class)
+@Composable
+private fun LineHeightBehaviorConfiguration(
+    lineHeightBehaviorEnabled: MutableState<Boolean>,
+    lineHeightTrim: MutableState<LineHeightTrim>,
+    lineVerticalAlignment: MutableState<LineVerticalAlignment>
+) {
+    Column(Modifier.horizontalScroll(rememberScrollState())) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(
+                checked = lineHeightBehaviorEnabled.value,
+                onCheckedChange = { lineHeightBehaviorEnabled.value = it }
+            )
+            Text("LineHeightBehavior", style = HintStyle)
+        }
+        Column(Modifier.padding(horizontal = 16.dp)) {
+            LineHeightTrimOptions(lineHeightTrim, lineHeightBehaviorEnabled.value)
+            LineHeightAlignmentOptions(lineVerticalAlignment, lineHeightBehaviorEnabled.value)
+        }
+    }
+}
+
+@OptIn(ExperimentalTextApi::class)
+@Composable
+private fun LineHeightAlignmentOptions(
+    lineVerticalAlignment: MutableState<LineVerticalAlignment>,
+    enabled: Boolean
+) {
+    val options = listOf(
+        LineVerticalAlignment.Proportional,
+        LineVerticalAlignment.Top,
+        LineVerticalAlignment.Center,
+        LineVerticalAlignment.Bottom
+    )
+
+    Row(
+        modifier = Modifier.selectableGroup(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = "alignment:", style = HintStyle)
+        options.forEach { option ->
+            Row(
+                Modifier
+                    .height(56.dp)
+                    .selectable(
+                        selected = (option == lineVerticalAlignment.value),
+                        onClick = { lineVerticalAlignment.value = option },
+                        role = Role.RadioButton,
+                        enabled = enabled
+                    ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = (option == lineVerticalAlignment.value),
+                    onClick = null,
+                    enabled = enabled
+                )
+                Text(text = option.toString().split(".")[1], style = HintStyle)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalTextApi::class)
+@Composable
+private fun LineHeightTrimOptions(
+    lineHeightTrim: MutableState<LineHeightTrim>,
+    enabled: Boolean
+) {
+    val options = listOf(
+        LineHeightTrim.Both,
+        LineHeightTrim.None,
+        LineHeightTrim.FirstLineTop,
+        LineHeightTrim.LastLineBottom
+    )
+
+    Row(
+        modifier = Modifier.selectableGroup(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = "trim:", style = HintStyle)
+        options.forEach { option ->
+            Row(
+                Modifier
+                    .height(56.dp)
+                    .selectable(
+                        selected = (option == lineHeightTrim.value),
+                        onClick = { lineHeightTrim.value = option },
+                        role = Role.RadioButton,
+                        enabled = enabled
+                    ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = (option == lineHeightTrim.value),
+                    onClick = null,
+                    enabled = enabled
+                )
+                Text(text = option.toString().split(".")[1], style = HintStyle)
+            }
+        }
+    }
+}
+
 @Composable
 private fun StringConfiguration(
     useSizeSpan: MutableState<Boolean>,
@@ -223,81 +325,6 @@ private fun FontPaddingAndMaxLinesConfiguration(
                 onCheckedChange = { ellipsize.value = it }
             )
             Text("ellipsize", style = HintStyle)
-        }
-    }
-}
-
-@OptIn(ExperimentalTextApi::class)
-@Composable
-private fun LineHeightBehaviorConfiguration(
-    lineHeightBehaviorEnabled: MutableState<Boolean>,
-    trimFirstLineTop: MutableState<Boolean>,
-    trimLastLineBottom: MutableState<Boolean>,
-    lineVerticalAlignment: MutableState<LineVerticalAlignment>
-) {
-    Column {
-        Column(Modifier.horizontalScroll(rememberScrollState())) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(
-                    checked = lineHeightBehaviorEnabled.value,
-                    onCheckedChange = { lineHeightBehaviorEnabled.value = it }
-                )
-                Text("LineHeightBehavior", style = HintStyle)
-                Checkbox(
-                    checked = trimFirstLineTop.value,
-                    onCheckedChange = { trimFirstLineTop.value = it },
-                    enabled = lineHeightBehaviorEnabled.value
-                )
-                Text("TrimFirstLineTop", style = HintStyle)
-                Spacer(Modifier.padding(8.dp))
-                Checkbox(
-                    checked = trimLastLineBottom.value,
-                    onCheckedChange = { trimLastLineBottom.value = it },
-                    enabled = lineHeightBehaviorEnabled.value
-                )
-                Text("TrimLastLineBottom", style = HintStyle)
-            }
-        }
-
-        Column(Modifier.horizontalScroll(rememberScrollState())) {
-            LineHeightDistributionOptions(lineVerticalAlignment, lineHeightBehaviorEnabled.value)
-        }
-    }
-}
-
-@OptIn(ExperimentalTextApi::class)
-@Composable
-private fun LineHeightDistributionOptions(
-    lineVerticalAlignment: MutableState<LineVerticalAlignment>,
-    enabled: Boolean
-) {
-    val options = listOf(
-        LineVerticalAlignment.Proportional,
-        LineVerticalAlignment.Top,
-        LineVerticalAlignment.Center,
-        LineVerticalAlignment.Bottom
-    )
-
-    Row(Modifier.selectableGroup()) {
-        options.forEach { option ->
-            Row(
-                Modifier
-                    .height(56.dp)
-                    .selectable(
-                        selected = (option == lineVerticalAlignment.value),
-                        onClick = { lineVerticalAlignment.value = option },
-                        role = Role.RadioButton,
-                        enabled = enabled
-                    ),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = (option == lineVerticalAlignment.value),
-                    onClick = null,
-                    enabled = enabled
-                )
-                Text(text = option.toString().split(".")[1], style = HintStyle)
-            }
         }
     }
 }

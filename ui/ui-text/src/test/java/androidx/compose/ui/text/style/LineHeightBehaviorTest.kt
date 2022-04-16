@@ -38,23 +38,12 @@ class LineHeightBehaviorTest {
     }
 
     @Test
-    fun equals_returns_false_for_different_applyToFirstTop() {
+    fun equals_returns_false_for_different_trim() {
         val lineHeightBehavior = LineHeightBehavior(
-            trimFirstLineTop = false
+            trim = LineHeightTrim.None
         )
         val otherLineHeightBehavior = LineHeightBehavior(
-            trimFirstLineTop = true
-        )
-        assertThat(lineHeightBehavior.equals(otherLineHeightBehavior)).isFalse()
-    }
-
-    @Test
-    fun equals_returns_false_for_different_applyToLastBottom() {
-        val lineHeightBehavior = LineHeightBehavior(
-            trimLastLineBottom = false
-        )
-        val otherLineHeightBehavior = LineHeightBehavior(
-            trimLastLineBottom = true
+            trim = LineHeightTrim.Both
         )
         assertThat(lineHeightBehavior.equals(otherLineHeightBehavior)).isFalse()
     }
@@ -63,13 +52,11 @@ class LineHeightBehaviorTest {
     fun equals_returns_true_for_same_attributes() {
         val lineHeightBehavior = LineHeightBehavior(
             alignment = LineVerticalAlignment.Center,
-            trimLastLineBottom = false,
-            trimFirstLineTop = false
+            trim = LineHeightTrim.FirstLineTop
         )
         val otherLineHeightBehavior = LineHeightBehavior(
             alignment = LineVerticalAlignment.Center,
-            trimLastLineBottom = false,
-            trimFirstLineTop = false
+            trim = LineHeightTrim.FirstLineTop
         )
         assertThat(lineHeightBehavior.equals(otherLineHeightBehavior)).isTrue()
     }
@@ -86,23 +73,12 @@ class LineHeightBehaviorTest {
     }
 
     @Test
-    fun hashCode_is_different_for_different_applyToFirstTop() {
+    fun hashCode_is_different_for_different_trim() {
         val lineHeightBehavior = LineHeightBehavior(
-            trimFirstLineTop = false
+            trim = LineHeightTrim.None
         )
         val otherLineHeightBehavior = LineHeightBehavior(
-            trimFirstLineTop = true
-        )
-        assertThat(lineHeightBehavior.hashCode()).isNotEqualTo(otherLineHeightBehavior.hashCode())
-    }
-
-    @Test
-    fun hashCode_is_different_for_different_applyToLastBottom() {
-        val lineHeightBehavior = LineHeightBehavior(
-            trimLastLineBottom = false
-        )
-        val otherLineHeightBehavior = LineHeightBehavior(
-            trimLastLineBottom = true
+            trim = LineHeightTrim.Both
         )
         assertThat(lineHeightBehavior.hashCode()).isNotEqualTo(otherLineHeightBehavior.hashCode())
     }
@@ -111,13 +87,11 @@ class LineHeightBehaviorTest {
     fun hashCode_is_same_for_same_attributes() {
         val lineHeightBehavior = LineHeightBehavior(
             alignment = LineVerticalAlignment.Center,
-            trimLastLineBottom = false,
-            trimFirstLineTop = false
+            trim = LineHeightTrim.Both
         )
         val otherLineHeightBehavior = LineHeightBehavior(
             alignment = LineVerticalAlignment.Center,
-            trimLastLineBottom = false,
-            trimFirstLineTop = false
+            trim = LineHeightTrim.Both
         )
         assertThat(lineHeightBehavior.hashCode()).isEqualTo(otherLineHeightBehavior.hashCode())
     }

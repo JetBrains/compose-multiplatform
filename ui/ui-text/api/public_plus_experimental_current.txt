@@ -1281,19 +1281,32 @@ package androidx.compose.ui.text.style {
   }
 
   @androidx.compose.ui.text.ExperimentalTextApi public final class LineHeightBehavior {
-    ctor public LineHeightBehavior(optional int alignment, optional boolean trimFirstLineTop, optional boolean trimLastLineBottom);
+    ctor public LineHeightBehavior(optional int alignment, optional int trim);
     method public int getAlignment();
-    method public boolean getTrimFirstLineTop();
-    method public boolean getTrimLastLineBottom();
+    method public int getTrim();
     property public final int alignment;
-    property public final boolean trimFirstLineTop;
-    property public final boolean trimLastLineBottom;
+    property public final int trim;
     field public static final androidx.compose.ui.text.style.LineHeightBehavior.Companion Companion;
   }
 
   public static final class LineHeightBehavior.Companion {
     method public androidx.compose.ui.text.style.LineHeightBehavior getDefault();
     property public final androidx.compose.ui.text.style.LineHeightBehavior Default;
+  }
+
+  @androidx.compose.ui.text.ExperimentalTextApi @kotlin.jvm.JvmInline public final value class LineHeightTrim {
+    field public static final androidx.compose.ui.text.style.LineHeightTrim.Companion Companion;
+  }
+
+  public static final class LineHeightTrim.Companion {
+    method public int getBoth();
+    method public int getFirstLineTop();
+    method public int getLastLineBottom();
+    method public int getNone();
+    property public final int Both;
+    property public final int FirstLineTop;
+    property public final int LastLineBottom;
+    property public final int None;
   }
 
   @androidx.compose.ui.text.ExperimentalTextApi @kotlin.jvm.JvmInline public final value class LineVerticalAlignment {
