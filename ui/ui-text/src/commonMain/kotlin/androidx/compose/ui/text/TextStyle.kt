@@ -485,6 +485,25 @@ internal constructor(
         return true
     }
 
+    /**
+     * Returns true if text layout affecting attributes between this TextStyle and other are the
+     * same.
+     *
+     * The attributes that do not require a layout change are color, textDecoration and shadow.
+     *
+     * Majority of attributes change text layout, and examples are line height, font properties,
+     * font size, locale etc.
+     *
+     * This function can be used to identify if a new text layout is required for a given TextStyle.
+     *
+     * @param other The TextStyle to compare to.
+     */
+    @OptIn(ExperimentalTextApi::class)
+    fun hasSameLayoutAffectingAttributes(other: TextStyle): Boolean {
+        return (this === other) || (paragraphStyle == other.paragraphStyle &&
+            spanStyle.hasSameLayoutAffectingAttributes(other.spanStyle))
+    }
+
     @OptIn(ExperimentalTextApi::class)
     override fun hashCode(): Int {
         var result = spanStyle.hashCode()
