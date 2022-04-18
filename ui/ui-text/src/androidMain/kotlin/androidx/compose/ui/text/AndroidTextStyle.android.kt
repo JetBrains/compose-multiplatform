@@ -18,7 +18,7 @@
 
 package androidx.compose.ui.text
 
-internal const val DefaultIncludeFontPadding = false
+internal const val DefaultIncludeFontPadding = true
 
 /**
  * Provides Android specific [TextStyle] configuration options for styling and compatibility.
