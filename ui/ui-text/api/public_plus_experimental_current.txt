@@ -5,6 +5,8 @@ package androidx.compose.ui.text {
   }
 
   public final class AndroidTextStyle_androidKt {
+    method @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.PlatformParagraphStyle lerp(androidx.compose.ui.text.PlatformParagraphStyle start, androidx.compose.ui.text.PlatformParagraphStyle stop, float fraction);
+    method @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.PlatformSpanStyle lerp(androidx.compose.ui.text.PlatformSpanStyle start, androidx.compose.ui.text.PlatformSpanStyle stop, float fraction);
   }
 
   @androidx.compose.runtime.Immutable public final class AnnotatedString implements java.lang.CharSequence {
@@ -285,7 +287,6 @@ package androidx.compose.ui.text {
   @androidx.compose.ui.text.ExperimentalTextApi public final class PlatformParagraphStyle {
     ctor @Deprecated public PlatformParagraphStyle(optional boolean includeFontPadding);
     method @Deprecated public boolean getIncludeFontPadding();
-    method public androidx.compose.ui.text.PlatformParagraphStyle lerp(androidx.compose.ui.text.PlatformParagraphStyle stop, float fraction);
     method public androidx.compose.ui.text.PlatformParagraphStyle merge(androidx.compose.ui.text.PlatformParagraphStyle? other);
     property @Deprecated public final boolean includeFontPadding;
     field public static final androidx.compose.ui.text.PlatformParagraphStyle.Companion Companion;
@@ -298,7 +299,6 @@ package androidx.compose.ui.text {
 
   @androidx.compose.ui.text.ExperimentalTextApi public final class PlatformSpanStyle {
     ctor public PlatformSpanStyle();
-    method public androidx.compose.ui.text.PlatformSpanStyle lerp(androidx.compose.ui.text.PlatformSpanStyle stop, float fraction);
     method public androidx.compose.ui.text.PlatformSpanStyle merge(androidx.compose.ui.text.PlatformSpanStyle? other);
     field public static final androidx.compose.ui.text.PlatformSpanStyle.Companion Companion;
   }
