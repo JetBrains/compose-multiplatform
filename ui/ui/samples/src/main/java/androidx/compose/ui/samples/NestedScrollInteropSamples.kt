@@ -57,23 +57,21 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalComposeUiApi::class)
 @Sampled
 @Composable
-fun ComposeInCooperatingViewNestedScrollInteropSample(composeView: ComposeView) {
-    with(composeView) {
-        val nestedSrollInterop = rememberNestedScrollInteropConnection(this)
-        // Add the nested scroll connection to your top level @Composable element
-        // using the nestedScroll modifier.
-        LazyColumn(modifier = Modifier.nestedScroll(nestedSrollInterop)) {
-            items(20) { item ->
-                Box(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .height(56.dp)
-                        .fillMaxWidth()
-                        .background(Color.Gray),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(item.toString())
-                }
+fun ComposeInCooperatingViewNestedScrollInteropSample() {
+    val nestedSrollInterop = rememberNestedScrollInteropConnection()
+    // Add the nested scroll connection to your top level @Composable element
+    // using the nestedScroll modifier.
+    LazyColumn(modifier = Modifier.nestedScroll(nestedSrollInterop)) {
+        items(20) { item ->
+            Box(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .height(56.dp)
+                    .fillMaxWidth()
+                    .background(Color.Gray),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(item.toString())
             }
         }
     }
@@ -148,7 +146,7 @@ private fun AndroidViewWithCompose(context: Context): View {
         .inflate(R.layout.three_fold_nested_scroll_interop, null).apply {
             with(findViewById<ComposeView>(R.id.compose_view)) {
                 // Compose
-                setContent { LazyColumnWithNestedScrollInteropEnabled(this) }
+                setContent { LazyColumnWithNestedScrollInteropEnabled() }
             }
         }.also {
             ViewCompat.setNestedScrollingEnabled(it, true)
@@ -157,10 +155,10 @@ private fun AndroidViewWithCompose(context: Context): View {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun LazyColumnWithNestedScrollInteropEnabled(composeView: ComposeView) {
+private fun LazyColumnWithNestedScrollInteropEnabled() {
     LazyColumn(
         modifier = Modifier.nestedScroll(
-            rememberNestedScrollInteropConnection(composeView)
+            rememberNestedScrollInteropConnection()
         ),
         contentPadding = PaddingValues(top = ToolbarHeight)
     ) {

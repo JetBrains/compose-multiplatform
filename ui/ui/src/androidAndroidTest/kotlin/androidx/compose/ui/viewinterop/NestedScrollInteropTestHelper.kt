@@ -283,7 +283,7 @@ internal fun NestedScrollDeepNested(
                 with(findViewById<ComposeView>(R.id.compose_view)) {
                     setContent {
                         Box(modifier = outerModifier) {
-                            ComposeInViewWithNestedScrollInterop(this@with)
+                            ComposeInViewWithNestedScrollInterop()
                         }
                     }
                 }
@@ -295,9 +295,9 @@ internal fun NestedScrollDeepNested(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-internal fun ComposeInViewWithNestedScrollInterop(composeView: ComposeView) {
+internal fun ComposeInViewWithNestedScrollInterop() {
     LazyColumn(
-        modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection(composeView))
+        modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())
             .testTag(MainTestList)
     ) {
         items(200) { item ->
@@ -365,7 +365,7 @@ internal fun ActivityScenario<*>.createActivityWithComposeContent(
         with(activity.findViewById<ComposeView>(R.id.compose_view)) {
             setContent {
                 val nestedScrollInterop = if (enableInterop) modifier.nestedScroll(
-                    rememberNestedScrollInteropConnection(this)
+                    rememberNestedScrollInteropConnection()
                 ) else modifier
                 Box(nestedScrollInterop) {
                     content()
