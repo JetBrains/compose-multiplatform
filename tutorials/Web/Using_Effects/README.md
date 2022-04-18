@@ -167,7 +167,7 @@ fun main() {
                 Text("Show/hide text rendered by 3rd party library")
             }
 
-            CheckboxInput(checked = false) {
+            CheckboxInput(checked = showUncontrolledElements) {
                 id("checkbox")
                 onInput {
                     showUncontrolledElements = it.value
