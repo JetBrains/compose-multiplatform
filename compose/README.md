@@ -22,7 +22,7 @@ git config --global submodule.recurse true
 
 ## Developing in IDE
 1. Download Android Studio from [the official site](https://developer.android.com/studio/archive) (it is mandatory to use the version, written [here](https://github.com/JetBrains/androidx/blob/jb-main/gradle/libs.versions.toml#L11)). As an alternative you can use IDEA, which is compatible with [this AGP version](https://github.com/JetBrains/androidx/blob/jb-main/gradle/libs.versions.toml#L5), or you can disable Android plugin in IDEA plugins, to develop non-Android targets.
-2. Set environment variables:
+2. Set environment variables (in the global script, or in the terminal, before starting IDE also from this terminal):
 ```
 export ALLOW_PUBLIC_REPOS=1
 export JAVA_TOOLS_JAR=$PWD/external/tools.jar
