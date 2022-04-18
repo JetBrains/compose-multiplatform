@@ -23,6 +23,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.LineVerticalAlignment
+import androidx.compose.ui.text.style.LineHeightBehavior
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDirection
@@ -30,8 +32,8 @@ import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.assertWithMessage
 import kotlin.reflect.KProperty1
 import kotlin.reflect.KType
 import kotlin.reflect.full.memberProperties
@@ -253,6 +255,25 @@ class TextStyleLayoutAttributesTest {
         ).isFalse()
     }
 
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun returns_false_for_lineHeightBehavior_change() {
+        val style = TextStyle(
+            lineHeightBehavior = LineHeightBehavior(
+                alignment = LineVerticalAlignment.Center
+            )
+        )
+        assertThat(
+            style.hasSameLayoutAffectingAttributes(
+                TextStyle(
+                    lineHeightBehavior = LineHeightBehavior(
+                        alignment = LineVerticalAlignment.Bottom
+                    )
+                )
+            )
+        ).isFalse()
+    }
+
     @Test
     fun should_be_updated_when_a_new_attribute_is_added_to_TextStyle() {
         // TextLayoutHelper TextStyle.caReuseLayout is very easy to forget to update when TextStyle
@@ -282,14 +303,15 @@ class TextStyleLayoutAttributesTest {
             // paragraph style attributes is tested in:
             // ui-text/../androidx/compose/ui/text/TextSpanParagraphStyleTest.kt
             getProperty("paragraphStyle"),
-            getProperty("spanStyle")
+            getProperty("spanStyle"),
+            getProperty("lineHeightBehavior")
         )
 
         val textStyleProperties = TextStyle::class.memberProperties.map { Property(it) }
 
-        Truth.assertWithMessage(
-            "New property is added to TextStyle, TextStyle.canReuseLayout should be " +
-                "updated accordingly"
+        assertWithMessage(
+            "New property is added to TextStyle, TextStyle.hasSameLayoutAffectingAttributes " +
+                "should be updated accordingly"
         ).that(knownProperties).containsAtLeastElementsIn(textStyleProperties)
     }
 

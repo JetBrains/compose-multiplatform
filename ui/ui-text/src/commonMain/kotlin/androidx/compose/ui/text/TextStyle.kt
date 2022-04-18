@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.LineHeightBehavior
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDirection
@@ -52,7 +53,7 @@ internal constructor(
     internal val spanStyle: SpanStyle,
     internal val paragraphStyle: ParagraphStyle,
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
-    @get:ExperimentalTextApi val platformStyle: PlatformTextStyle? = null
+    @get:ExperimentalTextApi val platformStyle: PlatformTextStyle? = null,
 ) {
     @OptIn(ExperimentalTextApi::class)
     internal constructor(
@@ -97,6 +98,9 @@ internal constructor(
      * @param lineHeight Line height for the [Paragraph] in [TextUnit] unit, e.g. SP or EM.
      * @param textIndent The indentation of the paragraph.
      * @param platformStyle Platform specific [TextStyle] parameters.
+     * @param lineHeightBehavior the configuration for line height such as vertical alignment of the
+     * line, whether to apply additional space as a result of line height to top of first line top
+     * and bottom of last line. The configuration is applied only when a [lineHeight] is defined.
      */
     @ExperimentalTextApi
     constructor(
@@ -118,7 +122,8 @@ internal constructor(
         textDirection: TextDirection? = null,
         lineHeight: TextUnit = TextUnit.Unspecified,
         textIndent: TextIndent? = null,
-        platformStyle: PlatformTextStyle? = null
+        platformStyle: PlatformTextStyle? = null,
+        lineHeightBehavior: LineHeightBehavior? = null
     ) : this(
         SpanStyle(
             color = color,
@@ -142,7 +147,8 @@ internal constructor(
             textDirection = textDirection,
             lineHeight = lineHeight,
             textIndent = textIndent,
-            platformStyle = platformStyle?.paragraphStyle
+            platformStyle = platformStyle?.paragraphStyle,
+            lineHeightBehavior = lineHeightBehavior
         ),
         platformStyle = platformStyle
     )
@@ -216,7 +222,8 @@ internal constructor(
         textDirection = textDirection,
         lineHeight = lineHeight,
         textIndent = textIndent,
-        platformStyle = null
+        platformStyle = null,
+        lineHeightBehavior = null
     )
 
     @Stable
@@ -327,7 +334,8 @@ internal constructor(
             textDirection = textDirection,
             lineHeight = lineHeight,
             textIndent = textIndent,
-            platformStyle = this.platformStyle
+            platformStyle = this.platformStyle,
+            lineHeightBehavior = this.lineHeightBehavior
         )
     }
 
@@ -351,7 +359,8 @@ internal constructor(
         textDirection: TextDirection? = this.paragraphStyle.textDirection,
         lineHeight: TextUnit = this.paragraphStyle.lineHeight,
         textIndent: TextIndent? = this.paragraphStyle.textIndent,
-        platformStyle: PlatformTextStyle? = this.platformStyle
+        platformStyle: PlatformTextStyle? = this.platformStyle,
+        lineHeightBehavior: LineHeightBehavior? = this.paragraphStyle.lineHeightBehavior
     ): TextStyle {
         return TextStyle(
             color = color,
@@ -372,7 +381,8 @@ internal constructor(
             textDirection = textDirection,
             lineHeight = lineHeight,
             textIndent = textIndent,
-            platformStyle = platformStyle
+            platformStyle = platformStyle,
+            lineHeightBehavior = lineHeightBehavior
         )
     }
 
@@ -473,6 +483,17 @@ internal constructor(
      */
     val textIndent: TextIndent? get() = this.paragraphStyle.textIndent
 
+    /**
+     * The configuration for line height such as vertical alignment of the line, whether to apply
+     * additional space as a result of line height to top of first line top and bottom of last line.
+     *
+     * The configuration is applied only when a [lineHeight] is defined.
+     */
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @ExperimentalTextApi
+    @get:ExperimentalTextApi
+    val lineHeightBehavior: LineHeightBehavior? get() = this.paragraphStyle.lineHeightBehavior
+
     @OptIn(ExperimentalTextApi::class)
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -533,6 +554,7 @@ internal constructor(
             "lineHeight=$lineHeight, " +
             "textIndent=$textIndent, " +
             "platformStyle=$platformStyle" +
+            "lineHeightBehavior=$lineHeightBehavior" +
             ")"
     }
 

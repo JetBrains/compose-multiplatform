@@ -31,6 +31,7 @@ val TextDemos = DemoCategory(
         ComposableDemo("Multi paragraph") { MultiParagraphDemo() },
         ComposableDemo("IncludeFontPadding & Clip") { TextFontPaddingDemo() },
         ComposableDemo("Layout Reuse") { TextReuseLayoutDemo() },
+        ComposableDemo("Line Height Behavior") { TextLineHeightDemo() },
         ComposableDemo("Interactive text") { InteractiveTextDemo() },
         DemoCategory(
             "Input fields",
