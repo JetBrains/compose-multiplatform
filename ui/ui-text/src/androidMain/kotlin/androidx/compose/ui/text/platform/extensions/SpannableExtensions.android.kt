@@ -141,18 +141,15 @@ internal fun Spannable.setLineHeight(
 internal fun Spannable.setLineHeight(
     lineHeight: TextUnit,
     contextFontSize: Float,
-    density: Density,
-    applyToFirstLine: Boolean
+    density: Density
 ) {
     val resolvedLineHeight = resolveLineHeightInPx(lineHeight, contextFontSize, density)
     if (!resolvedLineHeight.isNaN()) {
         setSpan(
-            span = LineHeightSpan(
-                lineHeight = resolvedLineHeight,
-                applyToFirstLine = applyToFirstLine
-            ),
+            span = LineHeightSpan(lineHeight = resolvedLineHeight),
             start = 0,
-            end = length)
+            end = length
+        )
     }
 }
 

@@ -34,6 +34,8 @@ import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import androidx.compose.ui.text.matchers.assertThat
+import androidx.compose.ui.text.style.LineHeightBehavior
+import androidx.compose.ui.text.style.LineVerticalAlignment
 import androidx.compose.ui.unit.Constraints
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -177,42 +179,67 @@ class ParagraphFillBoundingBoxesTest {
 
     @OptIn(ExperimentalTextApi::class)
     @Test
+    fun singleCharacterLineHeight_includeFontPaddingIsFalse() {
+        val lineHeight = fontSize * 2
+        val lineHeightInPx = with(defaultDensity) { lineHeight.toPx() }
+        val text = "a"
+        val paragraph = Paragraph(
+            text,
+            style = TextStyle(
+                lineHeight = lineHeight,
+                platformStyle = @Suppress("DEPRECATION") PlatformTextStyle(
+                    includeFontPadding = false
+                ),
+                lineHeightBehavior = LineHeightBehavior(
+                    alignment = LineVerticalAlignment.Proportional,
+                    trimFirstLineTop = false,
+                    trimLastLineBottom = false
+                )
+            ),
+        )
+
+        assertThat(
+            paragraph.getBoundingBoxes(TextRange(0, text.length))
+        ).isEqualToWithTolerance(
+            ltrCharacterBoundariesForTestFont(
+                text = text,
+                fontSizeInPx = fontSizeInPx,
+                lineHeightInPx = lineHeightInPx
+            )
+        )
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
     fun multiLineCharacterLineHeight() {
         val lineHeight = fontSize * 2
+        val lineHeightInPx = with(defaultDensity) { lineHeight.toPx() }
         val text = "a\na\na"
         @Suppress("DEPRECATION")
         val paragraph = Paragraph(
             text,
             style = TextStyle(
                 lineHeight = lineHeight,
-                platformStyle = PlatformTextStyle(includeFontPadding = false)
+                lineHeightBehavior = LineHeightBehavior(
+                    alignment = LineVerticalAlignment.Proportional,
+                    trimFirstLineTop = false,
+                    trimLastLineBottom = false
+                ),
+                platformStyle = @Suppress("DEPRECATION") PlatformTextStyle(
+                    includeFontPadding = false
+                )
             )
         )
 
-        // first line no line height
-        val firstLineEnd = text.indexOf("\n") + 1
         assertThat(
-            paragraph.getBoundingBoxes(TextRange(0, firstLineEnd))
+            paragraph.getBoundingBoxes(TextRange(0, text.length))
         ).isEqualToWithTolerance(
             ltrCharacterBoundariesForTestFont(
-                text = text.substring(IntRange(0, firstLineEnd - 1)),
+                text = text,
                 fontSizeInPx = fontSizeInPx,
-                lineHeightInPx = fontSizeInPx
+                lineHeightInPx = lineHeightInPx
             )
         )
-
-        // second and third lines have line height applied
-        val lineHeightInPx = with(defaultDensity) { lineHeight.toPx() }
-        val expectedBounds = ltrCharacterBoundariesForTestFont(
-            text = text.substring(startIndex = firstLineEnd),
-            fontSizeInPx = fontSizeInPx,
-            lineHeightInPx = lineHeightInPx,
-            initialTop = fontSizeInPx
-        )
-
-        assertThat(
-            paragraph.getBoundingBoxes(TextRange(firstLineEnd, text.length))
-        ).isEqualToWithTolerance(expectedBounds)
     }
 
     @Test
