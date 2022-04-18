@@ -37,7 +37,7 @@ import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.isUnspecified
 
-@OptIn(InternalPlatformTextApi::class)
+@OptIn(InternalPlatformTextApi::class, ExperimentalTextApi::class)
 internal fun createCharSequence(
     text: String,
     contextFontSize: Float,
@@ -57,15 +57,24 @@ internal fun createCharSequence(
 
     val spannableString = SpannableString(text)
 
-    // includeFontPadding "true" did not apply the line height to first line in the
-    // latest android versions. disable line height for the first line if includeFontPadding is
-    // false.
-    spannableString.setLineHeight(
-        lineHeight = contextTextStyle.lineHeight,
-        contextFontSize = contextFontSize,
-        density = density,
-        applyToFirstLine = contextTextStyle.isIncludeFontPaddingEnabled()
-    )
+    contextTextStyle.lineHeightBehavior?.let { lineHeightBehavior ->
+        spannableString.setLineHeight(
+            lineHeight = contextTextStyle.lineHeight,
+            lineHeightBehavior = lineHeightBehavior,
+            contextFontSize = contextFontSize,
+            density = density,
+        )
+    } ?: run {
+        // includeFontPadding "true" did not apply the line height to first line in the
+        // latest android versions. disable line height for the first line if includeFontPadding is
+        // false.
+        spannableString.setLineHeight(
+            lineHeight = contextTextStyle.lineHeight,
+            contextFontSize = contextFontSize,
+            density = density,
+            applyToFirstLine = contextTextStyle.isIncludeFontPaddingEnabled()
+        )
+    }
 
     spannableString.setTextIndent(contextTextStyle.textIndent, contextFontSize, density)
 

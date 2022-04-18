@@ -146,13 +146,13 @@ internal class AndroidParagraph(
         get() = paragraphIntrinsics.minIntrinsicWidth
 
     override val firstBaseline: Float
-        get() = layout.getLineBaseline(0)
+        get() = getLineBaseline(0)
 
     override val lastBaseline: Float
         get() = if (maxLines < lineCount) {
-            layout.getLineBaseline(maxLines - 1)
+            getLineBaseline(maxLines - 1)
         } else {
-            layout.getLineBaseline(lineCount - 1)
+            getLineBaseline(lineCount - 1)
         }
 
     override val didExceedMaxLines: Boolean
@@ -326,6 +326,12 @@ internal class AndroidParagraph(
     override fun getLineRight(lineIndex: Int): Float = layout.getLineRight(lineIndex)
 
     override fun getLineTop(lineIndex: Int): Float = layout.getLineTop(lineIndex)
+
+    internal fun getLineAscent(lineIndex: Int): Float = layout.getLineAscent(lineIndex)
+
+    internal fun getLineBaseline(lineIndex: Int): Float = layout.getLineBaseline(lineIndex)
+
+    internal fun getLineDescent(lineIndex: Int): Float = layout.getLineDescent(lineIndex)
 
     override fun getLineBottom(lineIndex: Int): Float = layout.getLineBottom(lineIndex)
 
