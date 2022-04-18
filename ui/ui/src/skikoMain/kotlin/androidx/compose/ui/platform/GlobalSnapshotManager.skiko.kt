@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.platform
 
+import androidx.compose.util.SynchronizedObject
+
 /**
  * Platform-specific mechanism for starting a monitor of global snapshot state writes
  * in order to schedule the periodic dispatch of snapshot apply notifications.
@@ -28,5 +30,6 @@ package androidx.compose.ui.platform
  * may establish different policies for these notifications.
  */
 internal expect object GlobalSnapshotManager {
+    internal val sync: SynchronizedObject
     fun ensureStarted()
 }

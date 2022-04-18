@@ -29,7 +29,7 @@ import kotlin.native.Platform as NativePlatform
 import kotlin.native.OsFamily as NativeOsFamily
 
 
-internal val GenericFontFamiliesMapping by lazy {
+internal actual val GenericFontFamiliesMapping by lazy {
     when (Platform.Current) {
         Platform.Windows ->
             mapOf(
@@ -76,6 +76,7 @@ internal actual fun loadFromTypefacesCache(font: Font): SkTypeface {
     }
     return when (font) {
         is LoadedFont -> SkTypeface.makeFromData(Data.makeFromBytes(font.data))
+        else -> throw IllegalArgumentException("Unsupported font type: $font")
     }
 }
 

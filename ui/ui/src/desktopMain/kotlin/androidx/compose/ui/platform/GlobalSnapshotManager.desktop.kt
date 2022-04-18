@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * may establish different policies for these notifications.
  */
 internal actual object GlobalSnapshotManager {
-    internal val sync = createSynchronizedObject()
+    internal actual val sync = createSynchronizedObject()
     private val started = AtomicBoolean(false)
 
     actual fun ensureStarted() {

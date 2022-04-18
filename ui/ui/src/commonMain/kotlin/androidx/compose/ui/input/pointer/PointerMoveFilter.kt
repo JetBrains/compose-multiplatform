@@ -31,32 +31,32 @@ import androidx.compose.ui.unit.IntSize
  *  @param onEnter The callback invoked when pointer enters the component
  *  @param onExit The callback invoked when pointer leaves the component
  */
-fun Modifier.pointerMoveFilter(
-    onMove: (position: Offset) -> Boolean = { false },
-    onExit: () -> Boolean = { false },
-    onEnter: () -> Boolean = { false },
-): Modifier = composed {
-    val filter = remember(::PointerMoveEventFilter)
-    filter.onEnterHandler = onEnter
-    filter.onExitHandler = onExit
-    filter.onMoveHandler = onMove
-    MovePointerInputModifierImpl(filter)
-}
-
-internal class PointerMoveEventFilter : PointerInputFilter() {
-    lateinit var onEnterHandler: () -> Boolean
-    lateinit var onExitHandler: () -> Boolean
-    lateinit var onMoveHandler: (position: Offset) -> Boolean
-
-    override fun onPointerEvent(
-        pointerEvent: PointerEvent,
-        pass: PointerEventPass,
-        bounds: IntSize
-    ) = Unit
-
-    override fun onCancel() = Unit
-}
-
-private data class MovePointerInputModifierImpl(
-    override val pointerInputFilter: PointerInputFilter
-) : PointerInputModifier
+//fun Modifier.pointerMoveFilter(
+//    onMove: (position: Offset) -> Boolean = { false },
+//    onExit: () -> Boolean = { false },
+//    onEnter: () -> Boolean = { false },
+//): Modifier = composed {
+//    val filter = remember(::PointerMoveEventFilter)
+//    filter.onEnterHandler = onEnter
+//    filter.onExitHandler = onExit
+//    filter.onMoveHandler = onMove
+//    MovePointerInputModifierImpl(filter)
+//}
+//
+//internal class PointerMoveEventFilter : PointerInputFilter() {
+//    lateinit var onEnterHandler: () -> Boolean
+//    lateinit var onExitHandler: () -> Boolean
+//    lateinit var onMoveHandler: (position: Offset) -> Boolean
+//
+//    override fun onPointerEvent(
+//        pointerEvent: PointerEvent,
+//        pass: PointerEventPass,
+//        bounds: IntSize
+//    ) = Unit
+//
+//    override fun onCancel() = Unit
+//}
+//
+//private data class MovePointerInputModifierImpl(
+//    override val pointerInputFilter: PointerInputFilter
+//) : PointerInputModifier

@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.Typeface
 import androidx.compose.ui.text.font.createFontFamilyResolver
 
 expect sealed class PlatformFont : Font {
+    constructor()
     abstract val identity: String
     internal val cacheKey: String
 }
@@ -213,5 +214,6 @@ internal class FontCache {
         }
 }
 
+internal expect val GenericFontFamiliesMapping: Map<String, List<String>>
 internal expect val typefacesCache: Cache<String, SkTypeface>
 internal expect fun loadFromTypefacesCache(font: Font): SkTypeface

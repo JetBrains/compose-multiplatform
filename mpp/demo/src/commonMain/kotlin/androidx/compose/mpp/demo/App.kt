@@ -26,7 +26,6 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalUriHandler
 
@@ -47,20 +46,7 @@ fun myContent() {
                 .width(100.dp).height(100.dp)
                 .clickable {
                     println("Red box: clicked")
-                }.pointerMoveFilter(
-                    onMove = {
-                        println("Red box: onMove")
-                        true
-                    },
-                    onEnter = {
-                        println("Red box: onEnter")
-                        true
-                    },
-                    onExit = {
-                        println("Red box: onExit")
-                        true
-                    }
-                )
+                }
         ) {
             Box(
                 modifier = Modifier
@@ -70,20 +56,6 @@ fun myContent() {
                     .clickable {
                         println("Small box: clicked")
                     }
-                    .pointerMoveFilter(
-                        onMove = {
-                            println("Small box: onMove")
-                            true
-                        },
-                        onEnter = {
-                            println("Small box: onEnter")
-                            true
-                        },
-                        onExit = {
-                            println("Small box: onExit")
-                            true
-                        }
-                    )
             )
         }
         Spacer(

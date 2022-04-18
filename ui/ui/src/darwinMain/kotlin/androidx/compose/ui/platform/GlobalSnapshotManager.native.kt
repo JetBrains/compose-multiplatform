@@ -37,7 +37,7 @@ import org.jetbrains.skiko.SkikoDispatchers
  * may establish different policies for these notifications.
  */
 internal actual object GlobalSnapshotManager {
-    internal val sync = createSynchronizedObject()
+    internal actual val sync = createSynchronizedObject()
     private val started = AtomicInt(0)
 
     actual fun ensureStarted() {

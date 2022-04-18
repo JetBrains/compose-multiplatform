@@ -39,11 +39,12 @@ import org.jetbrains.skiko.SkikoTouchEventKind
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.platform.WindowInfoImpl
+import androidx.compose.ui.createSkiaLayer
 
 internal class ComposeLayer {
     private var isDisposed = false
 
-    internal val layer = SkiaLayer()
+    internal val layer = createSkiaLayer()
 
     inner class ComponentImpl : SkikoView, PlatformComponent {
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {

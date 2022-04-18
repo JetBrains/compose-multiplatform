@@ -64,6 +64,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.skia.Canvas
 import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.Volatile
+import org.jetbrains.skiko.SkiaLayer
 
 internal val LocalComposeScene = staticCompositionLocalOf<ComposeScene> {
     error("CompositionLocal LocalComposeScene not provided")
@@ -601,3 +602,5 @@ internal expect fun makeAccessibilityController(
 ): AccessibilityController
 
 internal expect fun currentMillis(): Long
+
+internal expect fun createSkiaLayer(): SkiaLayer
