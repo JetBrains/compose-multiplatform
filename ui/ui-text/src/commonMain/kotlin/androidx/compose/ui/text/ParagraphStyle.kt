@@ -48,6 +48,7 @@ private val DefaultLineHeight = TextUnit.Unspecified
  * @param lineHeightBehavior the configuration for line height such as vertical alignment of the
  * line, whether to apply additional space as a result of line height to top of first line top and
  * bottom of last line. The configuration is applied only when a [lineHeight] is defined.
+ * When null, [LineHeightBehavior.Default] is used.
  *
  * @see Paragraph
  * @see AnnotatedString

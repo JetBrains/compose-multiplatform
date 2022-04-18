@@ -29,6 +29,7 @@ import androidx.compose.ui.text.FontTestData.Companion.BASIC_KERN_FONT
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
 import androidx.compose.ui.text.FontTestData.Companion.FONT_100_REGULAR
 import androidx.compose.ui.text.FontTestData.Companion.FONT_200_REGULAR
+import androidx.compose.ui.text.android.style.lineHeight
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.matchers.assertThat
@@ -49,6 +50,7 @@ import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 import org.junit.Test
@@ -2710,7 +2712,7 @@ class ParagraphIntegrationTest {
 
     @OptIn(ExperimentalTextApi::class)
     @Test
-    fun lineHeight_IsNotAppliedToFirstLine() {
+    fun lineHeight_InEm_when_includeFontPadding_is_false() {
         val text = "abcdefgh"
         val fontSize = 20f
         // Make the layout 4 lines
@@ -2726,10 +2728,19 @@ class ParagraphIntegrationTest {
                 platformStyle = PlatformTextStyle(includeFontPadding = false)
             ),
             width = layoutWidth
-        )
+        ) as AndroidParagraph
+
+        val fontMetrics = paragraph.paragraphIntrinsics.textPaint.fontMetricsInt
+        val ascentToLineHeightRatio = abs(fontMetrics.ascent.toFloat()) / fontMetrics.lineHeight()
+        val extraLineHeight = (lineHeight * fontSize) - fontSize
+        val ascentExtra = extraLineHeight * ascentToLineHeightRatio
+        val descentExtra = extraLineHeight - ascentExtra
 
         assertThat(paragraph.lineCount).isEqualTo(4)
-        assertThat(paragraph.getLineHeight(0)).isEqualTo(fontSize)
+        assertThat(paragraph.getLineHeight(0)).isEqualTo(fontSize + descentExtra)
+        assertThat(paragraph.getLineHeight(1)).isEqualTo(fontSize * lineHeight)
+        assertThat(paragraph.getLineHeight(2)).isEqualTo(fontSize * lineHeight)
+        assertThat(paragraph.getLineHeight(3)).isEqualTo(fontSize + ascentExtra)
     }
 
     @Suppress("DEPRECATION")

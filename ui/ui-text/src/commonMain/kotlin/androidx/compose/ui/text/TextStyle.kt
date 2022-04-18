@@ -101,6 +101,7 @@ internal constructor(
      * @param lineHeightBehavior the configuration for line height such as vertical alignment of the
      * line, whether to apply additional space as a result of line height to top of first line top
      * and bottom of last line. The configuration is applied only when a [lineHeight] is defined.
+     * When null, [LineHeightBehavior.Default] is used.
      */
     @ExperimentalTextApi
     constructor(
@@ -488,6 +489,8 @@ internal constructor(
      * additional space as a result of line height to top of first line top and bottom of last line.
      *
      * The configuration is applied only when a [lineHeight] is defined.
+     *
+     * When null, [LineHeightBehavior.Default] is used.
      */
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @ExperimentalTextApi

@@ -33,6 +33,7 @@ import androidx.compose.ui.text.platform.extensions.setLineHeight
 import androidx.compose.ui.text.platform.extensions.setPlaceholders
 import androidx.compose.ui.text.platform.extensions.setSpanStyles
 import androidx.compose.ui.text.platform.extensions.setTextIndent
+import androidx.compose.ui.text.style.LineHeightBehavior
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.isUnspecified
@@ -57,22 +58,22 @@ internal fun createCharSequence(
 
     val spannableString = SpannableString(text)
 
-    contextTextStyle.lineHeightBehavior?.let { lineHeightBehavior ->
+    if (contextTextStyle.isIncludeFontPaddingEnabled() &&
+        contextTextStyle.lineHeightBehavior == null
+    ) {
+        // keep the existing line height behavior for includeFontPadding=true
+        spannableString.setLineHeight(
+            lineHeight = contextTextStyle.lineHeight,
+            contextFontSize = contextFontSize,
+            density = density
+        )
+    } else {
+        val lineHeightBehavior = contextTextStyle.lineHeightBehavior ?: LineHeightBehavior.Default
         spannableString.setLineHeight(
             lineHeight = contextTextStyle.lineHeight,
             lineHeightBehavior = lineHeightBehavior,
             contextFontSize = contextFontSize,
             density = density,
-        )
-    } ?: run {
-        // includeFontPadding "true" did not apply the line height to first line in the
-        // latest android versions. disable line height for the first line if includeFontPadding is
-        // false.
-        spannableString.setLineHeight(
-            lineHeight = contextTextStyle.lineHeight,
-            contextFontSize = contextFontSize,
-            density = density,
-            applyToFirstLine = contextTextStyle.isIncludeFontPaddingEnabled()
         )
     }
 
