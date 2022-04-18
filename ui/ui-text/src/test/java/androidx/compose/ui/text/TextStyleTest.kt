@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.lerp
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.LineHeightBehavior
+import androidx.compose.ui.text.style.LineHeightTrim
 import androidx.compose.ui.text.style.LineVerticalAlignment
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -1079,8 +1080,7 @@ class TextStyleTest {
         val textIndent = TextIndent(firstLine = 20.sp, restLine = 40.sp)
         val lineHeightBehavior = LineHeightBehavior(
             alignment = LineVerticalAlignment.Center,
-            trimFirstLineTop = false,
-            trimLastLineBottom = false
+            trim = LineHeightTrim.None
         )
 
         val style = TextStyle(

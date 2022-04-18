@@ -21,6 +21,7 @@ import androidx.compose.ui.text.android.style.lineHeight
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.platform.AndroidParagraph
 import androidx.compose.ui.text.style.LineHeightBehavior
+import androidx.compose.ui.text.style.LineHeightTrim
 import androidx.compose.ui.text.style.LineVerticalAlignment
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -49,10 +50,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     /* single line even */
 
     @Test
-    fun singleLine_even_trimFirstLineTop_false_trimLastLineBottom_false() {
+    fun singleLine_even_trim_None() {
         val paragraph = singleLineParagraph(
-            trimFirstLineTop = false,
-            trimLastLineBottom = false,
+            lineHeightTrim = LineHeightTrim.None,
             distribution = LineVerticalAlignment.Center
         )
 
@@ -69,10 +69,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun singleLine_even_trimFirstLineTop_false_trimLastLineBottom_true() {
+    fun singleLine_even_trim_LastLineBottom() {
         val paragraph = singleLineParagraph(
-            trimFirstLineTop = false,
-            trimLastLineBottom = true,
+            lineHeightTrim = LineHeightTrim.LastLineBottom,
             distribution = LineVerticalAlignment.Center
         )
 
@@ -89,10 +88,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun singleLine_even_trimFirstLineTop_true_trimLastLineBottom_false() {
+    fun singleLine_even_trim_FirstLineTop() {
         val paragraph = singleLineParagraph(
-            trimFirstLineTop = true,
-            trimLastLineBottom = false,
+            lineHeightTrim = LineHeightTrim.FirstLineTop,
             distribution = LineVerticalAlignment.Center
         )
 
@@ -109,10 +107,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun singleLine_even_trimFirstLineTop_true_trimLastLineBottom_true() {
+    fun singleLine_even_trim_Both() {
         val paragraph = singleLineParagraph(
-            trimFirstLineTop = true,
-            trimLastLineBottom = true,
+            lineHeightTrim = LineHeightTrim.Both,
             distribution = LineVerticalAlignment.Center
         )
 
@@ -130,10 +127,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     /* single line top */
 
     @Test
-    fun singleLine_top_trimFirstLineTop_false_trimLastLineBottom_false() {
+    fun singleLine_top_trim_None() {
         val paragraph = singleLineParagraph(
-            trimFirstLineTop = false,
-            trimLastLineBottom = false,
+            lineHeightTrim = LineHeightTrim.None,
             distribution = LineVerticalAlignment.Top
         )
 
@@ -150,10 +146,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun singleLine_top_trimFirstLineTop_false_trimLastLineBottom_true() {
+    fun singleLine_top_trim_LastLineBottom() {
         val paragraph = singleLineParagraph(
-            trimFirstLineTop = false,
-            trimLastLineBottom = true,
+            lineHeightTrim = LineHeightTrim.LastLineBottom,
             distribution = LineVerticalAlignment.Top
         )
 
@@ -168,10 +163,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun singleLine_top_trimFirstLineTop_true_trimLastLineBottom_false() {
+    fun singleLine_top_trim_FirstLineTop() {
         val paragraph = singleLineParagraph(
-            trimFirstLineTop = true,
-            trimLastLineBottom = false,
+            lineHeightTrim = LineHeightTrim.FirstLineTop,
             distribution = LineVerticalAlignment.Top
         )
 
@@ -188,10 +182,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun singleLine_top_trimFirstLineTop_true_trimLastLineBottom_true() {
+    fun singleLine_top_trim_Both() {
         val paragraph = singleLineParagraph(
-            trimFirstLineTop = true,
-            trimLastLineBottom = true,
+            lineHeightTrim = LineHeightTrim.Both,
             distribution = LineVerticalAlignment.Top
         )
 
@@ -209,10 +202,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     /* single line bottom */
 
     @Test
-    fun singleLine_bottom_trimFirstLineTop_false_trimLastLineBottom_false() {
+    fun singleLine_bottom_trim_None() {
         val paragraph = singleLineParagraph(
-            trimFirstLineTop = false,
-            trimLastLineBottom = false,
+            lineHeightTrim = LineHeightTrim.None,
             distribution = LineVerticalAlignment.Bottom
         )
 
@@ -229,10 +221,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun singleLine_bottom_trimFirstLineTop_false_trimLastLineBottom_true() {
+    fun singleLine_bottom_trim_LastLineBottom() {
         val paragraph = singleLineParagraph(
-            trimFirstLineTop = false,
-            trimLastLineBottom = true,
+            lineHeightTrim = LineHeightTrim.LastLineBottom,
             distribution = LineVerticalAlignment.Bottom
         )
 
@@ -247,10 +238,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun singleLine_bottom_trimFirstLineTop_true_trimLastLineBottom_false() {
+    fun singleLine_bottom_trim_FirstLineTop() {
         val paragraph = singleLineParagraph(
-            trimFirstLineTop = true,
-            trimLastLineBottom = false,
+            lineHeightTrim = LineHeightTrim.FirstLineTop,
             distribution = LineVerticalAlignment.Bottom
         )
 
@@ -267,10 +257,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun singleLine_bottom_trimFirstLineTop_true_trimLastLineBottom_true() {
+    fun singleLine_bottom_trim_Both() {
         val paragraph = singleLineParagraph(
-            trimFirstLineTop = true,
-            trimLastLineBottom = true,
+            lineHeightTrim = LineHeightTrim.Both,
             distribution = LineVerticalAlignment.Bottom
         )
 
@@ -288,10 +277,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     /* single line proportional */
 
     @Test
-    fun singleLine_proportional_trimFirstLineTop_false_trimLastLineBottom_false() {
+    fun singleLine_proportional_trim_None() {
         val paragraph = singleLineParagraph(
-            trimFirstLineTop = false,
-            trimLastLineBottom = false,
+            lineHeightTrim = LineHeightTrim.None,
             distribution = LineVerticalAlignment.Proportional
         )
 
@@ -309,10 +297,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun singleLine_proportional_trimFirstLineTop_false_trimLastLineBottom_true() {
+    fun singleLine_proportional_trim_LastLineBottom() {
         val paragraph = singleLineParagraph(
-            trimFirstLineTop = false,
-            trimLastLineBottom = true,
+            lineHeightTrim = LineHeightTrim.LastLineBottom,
             distribution = LineVerticalAlignment.Proportional
         )
 
@@ -330,10 +317,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun singleLine_proportional_trimFirstLineTop_true_trimLastLineBottom_false() {
+    fun singleLine_proportional_trim_FirstLineTop() {
         val paragraph = singleLineParagraph(
-            trimFirstLineTop = true,
-            trimLastLineBottom = false,
+            lineHeightTrim = LineHeightTrim.FirstLineTop,
             distribution = LineVerticalAlignment.Proportional
         )
 
@@ -351,10 +337,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun singleLine_proportional_trimFirstLineTop_true_trimLastLineBottom_true() {
+    fun singleLine_proportional_trim_Both() {
         val paragraph = singleLineParagraph(
-            trimFirstLineTop = true,
-            trimLastLineBottom = true,
+            lineHeightTrim = LineHeightTrim.Both,
             distribution = LineVerticalAlignment.Proportional
         )
 
@@ -372,10 +357,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     /* multi line even */
 
     @Test
-    fun multiLine_even_trimFirstLineTop_false_trimLastLineBottom_false() {
+    fun multiLine_even_trim_None() {
         val paragraph = multiLineParagraph(
-            trimFirstLineTop = false,
-            trimLastLineBottom = false,
+            lineHeightTrim = LineHeightTrim.None,
             distribution = LineVerticalAlignment.Center
         )
 
@@ -397,10 +381,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun multiLine_even_trimFirstLineTop_false_trimLastLineBottom_true() {
+    fun multiLine_even_trim_LastLineBottom() {
         val paragraph = multiLineParagraph(
-            trimFirstLineTop = false,
-            trimLastLineBottom = true,
+            lineHeightTrim = LineHeightTrim.LastLineBottom,
             distribution = LineVerticalAlignment.Center
         )
 
@@ -428,10 +411,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun multiLine_even_trimFirstLineTop_true_trimLastLineBottom_false() {
+    fun multiLine_even_trim_FirstLineTop() {
         val paragraph = multiLineParagraph(
-            trimFirstLineTop = true,
-            trimLastLineBottom = false,
+            lineHeightTrim = LineHeightTrim.FirstLineTop,
             distribution = LineVerticalAlignment.Center
         )
 
@@ -459,10 +441,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun multiLine_even_trimFirstLineTop_true_trimLastLineBottom_true() {
+    fun multiLine_even_trim_Both() {
         val paragraph = multiLineParagraph(
-            trimFirstLineTop = true,
-            trimLastLineBottom = true,
+            lineHeightTrim = LineHeightTrim.Both,
             distribution = LineVerticalAlignment.Center
         )
 
@@ -492,10 +473,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     /* multi line top */
 
     @Test
-    fun multiLine_top_trimFirstLineTop_false_trimLastLineBottom_false() {
+    fun multiLine_top_trim_None() {
         val paragraph = multiLineParagraph(
-            trimFirstLineTop = false,
-            trimLastLineBottom = false,
+            lineHeightTrim = LineHeightTrim.None,
             distribution = LineVerticalAlignment.Top
         )
 
@@ -523,10 +503,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun multiLine_top_trimFirstLineTop_false_trimLastLineBottom_true() {
+    fun multiLine_top_trim_LastLineBottom() {
         val paragraph = multiLineParagraph(
-            trimFirstLineTop = false,
-            trimLastLineBottom = true,
+            lineHeightTrim = LineHeightTrim.LastLineBottom,
             distribution = LineVerticalAlignment.Top
         )
 
@@ -554,10 +533,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun multiLine_top_trimFirstLineTop_true_trimLastLineBottom_false() {
+    fun multiLine_top_trim_FirstLineTop() {
         val paragraph = multiLineParagraph(
-            trimFirstLineTop = true,
-            trimLastLineBottom = false,
+            lineHeightTrim = LineHeightTrim.FirstLineTop,
             distribution = LineVerticalAlignment.Top
         )
 
@@ -585,10 +563,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun multiLine_top_trimFirstLineTop_true_trimLastLineBottom_true() {
+    fun multiLine_top_trim_Both() {
         val paragraph = multiLineParagraph(
-            trimFirstLineTop = true,
-            trimLastLineBottom = true,
+            lineHeightTrim = LineHeightTrim.Both,
             distribution = LineVerticalAlignment.Top
         )
 
@@ -618,10 +595,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     /* multi line bottom */
 
     @Test
-    fun multiLine_bottom_trimFirstLineTop_false_trimLastLineBottom_false() {
+    fun multiLine_bottom_trim_None() {
         val paragraph = multiLineParagraph(
-            trimFirstLineTop = false,
-            trimLastLineBottom = false,
+            lineHeightTrim = LineHeightTrim.None,
             distribution = LineVerticalAlignment.Bottom
         )
 
@@ -649,10 +625,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun multiLine_bottom_trimFirstLineTop_false_trimLastLineBottom_true() {
+    fun multiLine_bottom_trim_LastLineBottom() {
         val paragraph = multiLineParagraph(
-            trimFirstLineTop = false,
-            trimLastLineBottom = true,
+            lineHeightTrim = LineHeightTrim.LastLineBottom,
             distribution = LineVerticalAlignment.Bottom
         )
 
@@ -680,10 +655,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun multiLine_bottom_trimFirstLineTop_true_trimLastLineBottom_false() {
+    fun multiLine_bottom_trim_FirstLineTop() {
         val paragraph = multiLineParagraph(
-            trimFirstLineTop = true,
-            trimLastLineBottom = false,
+            lineHeightTrim = LineHeightTrim.FirstLineTop,
             distribution = LineVerticalAlignment.Bottom
         )
 
@@ -711,10 +685,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun multiLine_bottom_trimFirstLineTop_true_trimLastLineBottom_true() {
+    fun multiLine_bottom_trim_Both() {
         val paragraph = multiLineParagraph(
-            trimFirstLineTop = true,
-            trimLastLineBottom = true,
+            lineHeightTrim = LineHeightTrim.Both,
             distribution = LineVerticalAlignment.Bottom
         )
 
@@ -744,10 +717,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     /* multi line proportional */
 
     @Test
-    fun multiLine_proportional_trimFirstLineTop_false_trimLastLineBottom_false() {
+    fun multiLine_proportional_trim_None() {
         val paragraph = multiLineParagraph(
-            trimFirstLineTop = false,
-            trimLastLineBottom = false,
+            lineHeightTrim = LineHeightTrim.None,
             distribution = LineVerticalAlignment.Proportional
         )
 
@@ -776,10 +748,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun multiLine_proportional_trimFirstLineTop_false_trimLastLineBottom_true() {
+    fun multiLine_proportional_trim_LastLineBottom() {
         val paragraph = multiLineParagraph(
-            trimFirstLineTop = false,
-            trimLastLineBottom = true,
+            lineHeightTrim = LineHeightTrim.LastLineBottom,
             distribution = LineVerticalAlignment.Proportional
         )
 
@@ -808,10 +779,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun multiLine_proportional_trimFirstLineTop_true_trimLastLineBottom_false() {
+    fun multiLine_proportional_trim_FirstLineTop() {
         val paragraph = multiLineParagraph(
-            trimFirstLineTop = true,
-            trimLastLineBottom = false,
+            lineHeightTrim = LineHeightTrim.FirstLineTop,
             distribution = LineVerticalAlignment.Proportional
         )
 
@@ -840,10 +810,9 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     @Test
-    fun multiLine_proportional_trimFirstLineTop_true_trimLastLineBottom_true() {
+    fun multiLine_proportional_trim_Both() {
         val paragraph = multiLineParagraph(
-            trimFirstLineTop = true,
-            trimLastLineBottom = true,
+            lineHeightTrim = LineHeightTrim.Both,
             distribution = LineVerticalAlignment.Proportional
         )
 
@@ -872,15 +841,13 @@ class ParagraphIntegrationLineHeightBehaviorTest {
     }
 
     private fun singleLineParagraph(
-        trimFirstLineTop: Boolean,
-        trimLastLineBottom: Boolean,
+        lineHeightTrim: LineHeightTrim,
         distribution: LineVerticalAlignment,
     ): AndroidParagraph {
         val text = "AAA"
         val textStyle = TextStyle(
             lineHeightBehavior = LineHeightBehavior(
-                trimFirstLineTop = trimFirstLineTop,
-                trimLastLineBottom = trimLastLineBottom,
+                trim = lineHeightTrim,
                 alignment = distribution
             )
         )
@@ -898,17 +865,16 @@ class ParagraphIntegrationLineHeightBehaviorTest {
 
     @Suppress("DEPRECATION")
     private fun multiLineParagraph(
-        trimFirstLineTop: Boolean,
-        trimLastLineBottom: Boolean,
+        lineHeightTrim: LineHeightTrim,
         distribution: LineVerticalAlignment,
     ): AndroidParagraph {
         val lineCount = 3
         val word = "AAA"
         val text = "AAA".repeat(lineCount)
+
         val textStyle = TextStyle(
             lineHeightBehavior = LineHeightBehavior(
-                trimFirstLineTop = trimFirstLineTop,
-                trimLastLineBottom = trimLastLineBottom,
+                trim = lineHeightTrim,
                 alignment = distribution
             ),
             platformStyle = @Suppress("DEPRECATION") PlatformTextStyle(

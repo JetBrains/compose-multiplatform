@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.text.style
 
+import androidx.compose.ui.text.PlatformParagraphStyle
 import androidx.compose.ui.text.ExperimentalTextApi
 
 /**
@@ -25,34 +26,29 @@ import androidx.compose.ui.text.ExperimentalTextApi
  *
  * The configuration is applied only when a line height is defined on the text.
  *
- * [trimFirstLineTop] and [trimLastLineBottom] features are available only when includeFontPadding
- * is false.
+ * [trim] feature is available only when [PlatformParagraphStyle.includeFontPadding] is false.
+ *
+ * Please check [LineHeightTrim] and [LineVerticalAlignment] for more description.
  *
  * @param alignment defines how to align the line in the space provided by the line height.
- * @param trimFirstLineTop When true, the space that would be added to the top of the first line
- * as a result of the line height is not added. Single line text is both the first and last line.
- * This feature is available only when includeFontPadding is false.
- * @param trimLastLineBottom When true, the space that would be added to the bottom of the last line
- * as a result of the line height is not added.  Single line text is both the first and last line.
- * This feature is available only when includeFontPadding is false.
+ * @param trim defines whether the space that would be added to the top of first line, and
+ * bottom of the last line should be trimmed or not. This feature is available only when
+ * [PlatformParagraphStyle.includeFontPadding] is false.
  */
 @ExperimentalTextApi
 class LineHeightBehavior(
     val alignment: LineVerticalAlignment = LineVerticalAlignment.Proportional,
-    val trimFirstLineTop: Boolean = false,
-    val trimLastLineBottom: Boolean = false,
+    val trim: LineHeightTrim = LineHeightTrim.Both
 ) {
     companion object {
         /**
          * The default configuration for LineHeightBehavior:
          * - alignment = LineVerticalAlignment.Proportional
-         * - trimFirstLineTop = true
-         * - trimLastLineBottom = true
+         * - trim = LineHeightTrim.Both
          */
         val Default = LineHeightBehavior(
             alignment = LineVerticalAlignment.Proportional,
-            trimFirstLineTop = true,
-            trimLastLineBottom = true
+            trim = LineHeightTrim.Both
         )
     }
 
@@ -61,24 +57,21 @@ class LineHeightBehavior(
         if (other !is LineHeightBehavior) return false
 
         if (alignment != other.alignment) return false
-        if (trimFirstLineTop != other.trimFirstLineTop) return false
-        if (trimLastLineBottom != other.trimLastLineBottom) return false
+        if (trim != other.trim) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = alignment.hashCode()
-        result = 31 * result + trimFirstLineTop.hashCode()
-        result = 31 * result + trimLastLineBottom.hashCode()
+        result = 31 * result + trim.hashCode()
         return result
     }
 
     override fun toString(): String {
         return "LineHeightBehavior(" +
-            "distribution=$alignment, " +
-            "applyToFirstTop=$trimFirstLineTop, " +
-            "applyToLastBottom=$trimLastLineBottom" +
+            "alignment=$alignment, " +
+            "trim=$trim" +
             ")"
     }
 }
@@ -113,12 +106,40 @@ value class LineVerticalAlignment private constructor(internal val topPercentage
          * line height value is smaller than the actual line height, the line will still be aligned
          * to the top, therefore the required difference will be subtracted from the bottom of the
          * line.
+         *
+         * For example, when line height is 3.em, the lines are aligned to the top of 3.em
+         * height:
+         * <pre>
+         * +--------+
+         * | Line1  |
+         * |        |
+         * |        |
+         * |--------|
+         * | Line2  |
+         * |        |
+         * |        |
+         * +--------+
+         * </pre>
          */
         val Top = LineVerticalAlignment(topPercentage = 0)
 
         /**
          * Align the line to the center of the space reserved for the line. This configuration
          * distributes additional space evenly between top and bottom of the line.
+         *
+         * For example, when line height is 3.em, the lines are aligned to the center of 3.em
+         * height:
+         * <pre>
+         * +--------+
+         * |        |
+         * | Line1  |
+         * |        |
+         * |--------|
+         * |        |
+         * | Line2  |
+         * |        |
+         * +--------+
+         * </pre>
          */
         val Center = LineVerticalAlignment(topPercentage = 50)
 
@@ -136,7 +157,136 @@ value class LineVerticalAlignment private constructor(internal val topPercentage
          * provided line height value is smaller than the actual line height, the line will still
          * be aligned to the bottom, therefore the required difference will be subtracted from the
          * top of the line.
+         *
+         * For example, when line height is 3.em, the lines are aligned to the bottom of 3.em
+         * height:
+         * <pre>
+         * +--------+
+         * |        |
+         * |        |
+         * | Line1  |
+         * |--------|
+         * |        |
+         * |        |
+         * | Line2  |
+         * +--------+
+         * </pre>
          */
         val Bottom = LineVerticalAlignment(topPercentage = 100)
+    }
+}
+
+/**
+ * Defines whether the space that would be added to the top of first line, and bottom of the
+ * last line should be trimmed or not. This feature is available only when
+ * [PlatformParagraphStyle.includeFontPadding] is false.
+ */
+@kotlin.jvm.JvmInline
+@ExperimentalTextApi
+value class LineHeightTrim private constructor(private val value: Int) {
+
+    override fun toString(): String {
+        return when (value) {
+            FirstLineTop.value -> "LineHeightTrim.FirstLineTop"
+            LastLineBottom.value -> "LineHeightTrim.LastLineBottom"
+            Both.value -> "LineHeightTrim.Both"
+            None.value -> "LineHeightTrim.None"
+            else -> "Invalid"
+        }
+    }
+
+    companion object {
+        private const val FlagTrimTop = 0x00000001
+        private const val FlagTrimBottom = 0x00000010
+
+        /**
+         * Trim the space that would be added to the top of the first line as a result of the
+         * line height. Single line text is both the first and last line. This feature is
+         * available only when [PlatformParagraphStyle.includeFontPadding] is false.
+         *
+         * For example, when line height is 3.em, and [LineVerticalAlignment] is
+         * [LineVerticalAlignment.Center], the first line has 2.em height and the height from
+         * first line baseline to second line baseline is still 3.em:
+         * <pre>
+         * +--------+
+         * | Line1  |
+         * |        |
+         * |--------|
+         * |        |
+         * | Line2  |
+         * |        |
+         * +--------+
+         * </pre>
+         */
+        val FirstLineTop = LineHeightTrim(FlagTrimTop)
+
+        /**
+         * Trim the space that would be added to the bottom of the last line as a result of the
+         * line height. Single line text is both the first and last line. This feature is
+         * available only when [PlatformParagraphStyle.includeFontPadding] is false.
+         *
+         * For example, when line height is 3.em, and [LineVerticalAlignment] is
+         * [LineVerticalAlignment.Center], the last line has 2.em height and the height from
+         * first line baseline to second line baseline is still 3.em:
+         * <pre>
+         * +--------+
+         * |        |
+         * | Line1  |
+         * |        |
+         * |--------|
+         * |        |
+         * | Line2  |
+         * +--------+
+         * </pre>
+         */
+        val LastLineBottom = LineHeightTrim(FlagTrimBottom)
+
+        /**
+         * Trim the space that would be added to the top of the first line and bottom of the last
+         * line as a result of the line height. This feature is available only when
+         * [PlatformParagraphStyle.includeFontPadding] is false.
+         *
+         * For example, when line height is 3.em, and [LineVerticalAlignment] is
+         * [LineVerticalAlignment.Center], the first and last line has 2.em height and the height
+         * from first line baseline to second line baseline is still 3.em:
+         * <pre>
+         * +--------+
+         * | Line1  |
+         * |        |
+         * |--------|
+         * |        |
+         * | Line2  |
+         * +--------+
+         * </pre>
+         */
+        val Both = LineHeightTrim(FlagTrimTop or FlagTrimBottom)
+
+        /**
+         * Do not trim first line top or last line bottom.
+         *
+         * For example, when line height is 3.em, and [LineVerticalAlignment] is
+         * [LineVerticalAlignment.Center], the first line height, last line height and the height
+         * from first line baseline to second line baseline are 3.em:
+         * <pre>
+         * +--------+
+         * |        |
+         * | Line1  |
+         * |        |
+         * |--------|
+         * |        |
+         * | Line2  |
+         * |        |
+         * +--------+
+         * </pre>
+         */
+        val None = LineHeightTrim(0)
+    }
+
+    internal fun isTrimFirstLineTop(): Boolean {
+        return value and FlagTrimTop > 0
+    }
+
+    internal fun isTrimLastLineBottom(): Boolean {
+        return value and FlagTrimBottom > 0
     }
 }
