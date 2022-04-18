@@ -171,6 +171,7 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Remove workaround -Pkotlin.version=1.6.20, when newer version of Compose released */
 /* Begin PBXShellScriptBuildPhase section */
 		1F00F39D25759BB300CFAF97 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -187,7 +188,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd $SRCROOT/..\n./gradlew :common:root:embedAndSignAppleFrameworkForXcode\n";
+			shellScript = "cd $SRCROOT/..\n./gradlew :common:root:embedAndSignAppleFrameworkForXcode -Pkotlin.version=1.6.20\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
