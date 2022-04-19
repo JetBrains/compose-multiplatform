@@ -23,8 +23,5 @@ internal class NetworkLoader(private val imageUrl: String) : AnimatedImageLoader
 
 private suspend fun loadNetworkResource(imageUrl: String): ByteArray = withContext(Dispatchers.IO) {
     val url = URL(imageUrl)
-    val connection = url.openConnection() as HttpURLConnection
-    connection.connect()
-
-    connection.inputStream.readAllBytes()
+    url.readBytes()
 }
