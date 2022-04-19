@@ -884,22 +884,12 @@ class ParameterFactoryTest {
         )
         validate(create("style", style)) {
             parameter("style", ParameterType.String, TextStyle::class.java.simpleName) {
-                parameter("background", ParameterType.String, "Unspecified")
-                parameter("color", ParameterType.Color, Color.Red.toArgb(), index = 2)
-                parameter("fontSize", ParameterType.String, "Unspecified", index = 5)
-                parameter("letterSpacing", ParameterType.String, "Unspecified", index = 9)
-                parameter("lineHeight", ParameterType.String, "Unspecified", index = 10)
-                parameter("paragraphStyle", ParameterType.String, "ParagraphStyle", index = 13) {
-                    parameter("lineHeight", ParameterType.String, "Unspecified", index = 0)
-                }
-                parameter("spanStyle", ParameterType.String, "SpanStyle", index = 16) {
-                    parameter("background", ParameterType.String, "Unspecified")
-                    parameter("color", ParameterType.Color, Color.Red.toArgb(), index = 2)
-                    parameter("fontSize", ParameterType.String, "Unspecified", index = 5)
-                    parameter("letterSpacing", ParameterType.String, "Unspecified", index = 9)
-                    parameter("textDecoration", ParameterType.String, "Underline", index = 13)
-                }
-                parameter("textDecoration", ParameterType.String, "Underline", index = 18)
+                parameter("color", ParameterType.Color, Color.Red.toArgb())
+                parameter("fontSize", ParameterType.String, "Unspecified", index = 1)
+                parameter("letterSpacing", ParameterType.String, "Unspecified", index = 7)
+                parameter("background", ParameterType.String, "Unspecified", index = 11)
+                parameter("textDecoration", ParameterType.String, "Underline", index = 12)
+                parameter("lineHeight", ParameterType.String, "Unspecified", index = 15)
             }
         }
     }
