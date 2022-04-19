@@ -311,3 +311,12 @@ fun main() = application {
 ```
 
 <img alt="Tray icon" src="tray_icon.png" height="479" />
+
+## Loading image resources in commonMain
+Currently, Compose Multiplatform doesn't support loading resources from commonMain sourceSet. You can track this feature [here](https://github.com/JetBrains/compose-jb/issues/1255).
+
+Until then, there is a workaround for loading resources from `commonMain/resources` folder:
+[build.gradle](https://github.com/JetBrains/compose-jb/blob/dc0335b210f5e0b3bb02325dc690e4e39f9fe1f4/examples/widgets-gallery/common/build.gradle.kts#L52)
+[commonMain](https://github.com/JetBrains/compose-jb/blob/dc0335b210f5e0b3bb02325dc690e4e39f9fe1f4/examples/widgets-gallery/common/src/commonMain/kotlin/org/jetbrains/compose/demo/widgets/platform/Resources.kt#L7)
+[desktopMain](https://github.com/JetBrains/compose-jb/blob/dc0335b210f5e0b3bb02325dc690e4e39f9fe1f4/examples/widgets-gallery/common/src/desktopMain/kotlin/org/jetbrains/compose/demo/widgets/platform/Resources.kt)
+[androidMain](https://github.com/JetBrains/compose-jb/blob/dc0335b210f5e0b3bb02325dc690e4e39f9fe1f4/examples/widgets-gallery/common/src/androidMain/kotlin/org/jetbrains/compose/demo/widgets/platform/Resources.kt)
