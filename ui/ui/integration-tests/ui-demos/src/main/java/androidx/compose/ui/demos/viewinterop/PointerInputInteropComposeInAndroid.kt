@@ -43,7 +43,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -55,17 +54,14 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.demos.R
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
@@ -103,10 +99,6 @@ val ComposeInAndroidDemos = DemoCategory(
         ActivityDemo(
             "Compose in Android dialog dismisses dialog during dispatch",
             ComposeInAndroidDialogDismissDialogDuringDispatch::class
-        ),
-        ActivityDemo(
-            "Compose scroll in Android Coordinator Layout",
-            ComposeInAndroidCoordinatorLayout::class
         )
     )
 )
@@ -416,34 +408,6 @@ open class ComposeInAndroidDialogDismissDialogDuringDispatch : FragmentActivity(
         // Create and show the dialog.
         val newFragment: DialogFragment = MyDialogFragment.newInstance()
         newFragment.show(supportFragmentManager.beginTransaction(), "dialog")
-    }
-}
-
-@ExperimentalComposeUiApi
-open class ComposeInAndroidCoordinatorLayout : ComponentActivity() {
-    @SuppressLint("SetTextI18n")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.compose_in_android_coordinator_layout)
-        findViewById<ComposeView>(R.id.compose_view).apply {
-            setContent {
-                val nestedScrollInterop = rememberNestedScrollInteropConnection(this)
-                LazyColumn(modifier = Modifier.nestedScroll(nestedScrollInterop)) {
-                    items(20) { item ->
-                        Box(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .height(56.dp)
-                                .fillMaxWidth()
-                                .background(Color.Gray),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(item.toString())
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 

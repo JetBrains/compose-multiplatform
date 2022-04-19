@@ -27,6 +27,7 @@ dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 
     implementation(libs.kotlinStdlib)
+    implementation(libs.material)
     implementation("androidx.core:core:1.5.0")
 
     compileOnly(project(":annotation:annotation-sampled"))
