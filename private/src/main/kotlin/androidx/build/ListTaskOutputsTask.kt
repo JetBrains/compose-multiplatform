@@ -16,6 +16,7 @@
 
 package androidx.build
 
+import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -24,7 +25,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import java.io.File
 
 /**
  * Finds the outputs of every task and saves this mapping into a file
@@ -120,18 +120,6 @@ val taskNamesKnownToDuplicateOutputs = setOf(
     "generateReleaseProtos",
     // Release APKs
     "copyReleaseApk",
-    // To-be removed when we can use updateLintBaselineDebug
-    "replaceLintBaseline",
-    "updateLintBaselineDebug",
-    // b/224564238
-    "updateLintBaselineWithExpandProjectionDebug",
-    "updateLintBaselineWithExpandProjectionRelease",
-    "updateLintBaselineWithNullAwareTypeConverterDebug",
-    "updateLintBaselineWithNullAwareTypeConverterRelease",
-    "updateLintBaselineWithoutExpandProjectionDebug",
-    "updateLintBaselineWithoutExpandProjectionRelease",
-    "updateLintBaselineWithoutNullAwareTypeConverterDebug",
-    "updateLintBaselineWithoutNullAwareTypeConverterRelease",
     // b/223733695
     "pixel2api31DebugAndroidTest",
     "pixel2api31ReleaseAndroidTest",
@@ -165,11 +153,17 @@ val taskNamesKnownToDuplicateOutputs = setOf(
     "pixel2api29TargetSdkLatestDebugAndroidTest",
 )
 
+val taskTypesKnownToDuplicateOutputs = setOf(
+    // b/224564238
+    "com.android.build.gradle.internal.lint.AndroidLintTask_Decorated"
+)
+
 fun shouldValidateTaskOutput(task: Task): Boolean {
     if (!task.enabled) {
         return false
     }
-    return !taskNamesKnownToDuplicateOutputs.contains(task.name)
+    return !taskNamesKnownToDuplicateOutputs.contains(task.name) &&
+        !taskTypesKnownToDuplicateOutputs.contains(task::class.qualifiedName)
 }
 
 // For this project and all subprojects, collects all tasks and creates a map keyed by their output files

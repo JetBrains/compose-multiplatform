@@ -186,49 +186,19 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     // Flakily not up-to-date, b/176120659
     "doclavaDocs",
 
-    // We should be able to remove these entries when b/160392650 is fixed
-    "lint",
-    "lintAnalyzeDebug",
-    "lintBundledDebug",
-    "lintUnbundledDebug",
-    "lintDebug",
-    "lintVitalDebug",
-    "lintWithExpandProjectionDebug",
-    "lintWithoutExpandProjectionDebug",
-    "lintWithNullAwareTypeConverterDebug",
-    "lintWithKaptDebug",
-    "lintWithKspDebug",
-    "lintTargetSdk29Debug",
-    "lintTargetSdk30Debug",
-    "lintTargetSdkLatestDebug",
-
-    // b/223287425
-    "lintReportWithKaptDebug",
-    "lintAnalyzeWithKaptDebug",
-    "lintReportWithKspDebug",
-    "lintAnalyzeWithKspDebug",
-    "lintReportTargetSdk29Debug",
-    "lintAnalyzeTargetSdk29Debug",
-    "lintReportBundledDebug",
-    "lintAnalyzeBundledDebug",
-    "lintReportUnbundledDebug",
-    "lintAnalyzeUnbundledDebug",
-    "lintReportTargetSdk30Debug",
-    "lintAnalyzeTargetSdk30Debug",
-    "lintReportTargetSdkLatestDebug",
-    "lintAnalyzeTargetSdkLatestDebug",
-    "lintReportWithNullAwareTypeConverterDebug",
-    "lintAnalyzeWithNullAwareTypeConverterDebug",
-    "lintReportWithoutExpandProjectionDebug",
-    "lintAnalyzeWithoutExpandProjectionDebug",
-    "lintReportWithExpandProjectionDebug",
-    "lintAnalyzeWithExpandProjectionDebug",
-
     // We know that these tasks are never up to date due to maven-metadata.xml changing
     // https://github.com/gradle/gradle/issues/11203
     "partiallyDejetifyArchive",
     "stripArchiveForPartialDejetification",
     "createArchive"
+)
+
+val DONT_TRY_RERUNNING_TASK_TYPES = setOf(
+    "com.android.build.gradle.internal.lint.AndroidLintTextOutputTask_Decorated",
+    // lint report tasks
+    "com.android.build.gradle.internal.lint.AndroidLintTask_Decorated",
+    // lint analysis tasks b/223287425
+    "com.android.build.gradle.internal.lint.AndroidLintAnalysisTask_Decorated",
 )
 
 @Suppress("UnstableApiUsage") // usage of BuildService that's incubating
@@ -289,7 +259,8 @@ abstract class TaskUpToDateValidator :
         private fun shouldTryRerunningTask(task: Task): Boolean {
             return !(
                 DONT_TRY_RERUNNING_TASKS.contains(task.name) ||
-                    DONT_TRY_RERUNNING_TASKS.contains(task.path)
+                    DONT_TRY_RERUNNING_TASKS.contains(task.path) ||
+                    DONT_TRY_RERUNNING_TASK_TYPES.contains(task::class.qualifiedName)
                 )
         }
 
