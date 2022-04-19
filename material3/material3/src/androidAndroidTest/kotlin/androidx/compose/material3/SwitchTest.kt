@@ -40,12 +40,14 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertHasNoClickAction
+import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertTouchHeightIsEqualTo
 import androidx.compose.ui.test.assertTouchWidthIsEqualTo
+import androidx.compose.ui.test.assertWidthIsAtLeast
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.isFocusable
@@ -336,17 +338,11 @@ class SwitchTest {
             }
         }.run {
             if (clickable && minimumTouchTarget) {
-                assertIsSquareWithSize(48.dp)
+                assertWidthIsAtLeast(48.dp)
+                assertHeightIsAtLeast(48.dp)
             } else {
-                // The padding should be 2 DP, but we round to pixels when determining layout
-                val paddingInPixels = 2.dp.roundToPx()
-
-                // Convert back to DP so that we have an exact DP value to work with. We don't
-                // want to multiply the error by two (one for each padding), so we get the exact
-                // padding based on the expected pixels consumed by the padding.
-                val paddingInDp = paddingInPixels.toDp()
-                assertWidthIsEqualTo(SwitchTokens.TrackWidth + paddingInDp * 2)
-                assertHeightIsEqualTo(SwitchTokens.HandleHeight + paddingInDp * 2)
+                assertWidthIsEqualTo(SwitchTokens.TrackWidth)
+                assertHeightIsEqualTo(SwitchTokens.TrackHeight)
             }
         }
     }
