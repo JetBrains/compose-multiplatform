@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.demo.widgets.platform.Res
-import org.jetbrains.compose.demo.widgets.platform.imageResource
+import org.jetbrains.compose.demo.widgets.platform.painterResource
 import org.jetbrains.compose.demo.widgets.ui.utils.SubtitleText
 
 @Composable
@@ -85,7 +85,7 @@ private fun CustomImageChip(
     ) {
         Row(modifier = Modifier) {
             Image(
-                imageResource(imageId),
+                painterResource(imageId),
                 contentDescription = null,
                 modifier = Modifier.padding(8.dp).requiredSize(20.dp).clip(CircleShape)
             )

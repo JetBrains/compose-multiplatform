@@ -16,8 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.demo.widgets.platform.Res
-import org.jetbrains.compose.demo.widgets.platform.imageResource
-import org.jetbrains.compose.demo.widgets.platform.vectorResource
+import org.jetbrains.compose.demo.widgets.platform.painterResource
 import org.jetbrains.compose.demo.widgets.theme.twitterColor
 import org.jetbrains.compose.demo.widgets.ui.utils.SubtitleText
 import org.jetbrains.compose.demo.widgets.ui.utils.TitleText
@@ -52,12 +51,12 @@ private fun TopAppBarsDemo() {
         elevation = 8.dp,
         navigationIcon = {
             IconButton(onClick = {}) {
-                Icon(vectorResource(Res.drawable.ic_instagram), contentDescription = "Instagram")
+                Icon(painterResource(Res.drawable.ic_instagram), contentDescription = "Instagram")
             }
         },
         actions = {
             IconButton(onClick = {}) {
-                Icon(vectorResource(Res.drawable.ic_send), contentDescription = "Send")
+                Icon(painterResource(Res.drawable.ic_send), contentDescription = "Send")
             }
         }
     )
@@ -67,7 +66,7 @@ private fun TopAppBarsDemo() {
     TopAppBar(
         title = {
             Icon(
-                vectorResource(Res.drawable.ic_twitter),
+                painterResource(Res.drawable.ic_twitter),
                 contentDescription = "Twitter",
                 tint = twitterColor,
                 modifier = Modifier.fillMaxWidth()
@@ -78,7 +77,7 @@ private fun TopAppBarsDemo() {
         elevation = 8.dp,
         navigationIcon = {
             Image(
-                imageResource(Res.drawable.p6),
+                painterResource(Res.drawable.p6),
                 contentDescription = "",
                 modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
                     .requiredSize(32.dp).clip(CircleShape)

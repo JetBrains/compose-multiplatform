@@ -4,21 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import org.jetbrains.compose.demo.widgets.platform.R
 
 @Composable
-actual fun imageResource(res: String): Painter {
+actual fun painterResource(res: String): Painter {
     val id = drawableId(res)
-    return painterResource(id)
-}
-
-@Composable
-actual fun vectorResource(res: String): Painter {
-    val id = drawableId(res)
-    return painterResource(id)
+    return androidx.compose.ui.res.painterResource(id)
 }
 
 // TODO: improve resource loading

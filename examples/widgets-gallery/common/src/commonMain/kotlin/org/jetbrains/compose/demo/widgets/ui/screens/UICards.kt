@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.demo.widgets.data.DemoDataProvider
 import org.jetbrains.compose.demo.widgets.platform.Res
-import org.jetbrains.compose.demo.widgets.platform.imageResource
+import org.jetbrains.compose.demo.widgets.platform.painterResource
 import org.jetbrains.compose.demo.widgets.theme.typography
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -53,7 +53,7 @@ fun UICards() {
     ) {
         Row {
             Image(
-                imageResource(Res.drawable.p3),
+                painterResource(Res.drawable.p3),
                 contentDescription = null,
                 modifier = Modifier.requiredSize(60.dp)
             )
@@ -77,7 +77,7 @@ fun UICards() {
     Divider(modifier = Modifier.padding(4.dp))
     ListItem(text = { Text(item.title) }, secondaryText = { Text(item.subtitle) }, icon = {
         Image(
-            imageResource(Res.drawable.p3),
+            painterResource(Res.drawable.p3),
             contentDescription = null
         )
     })
@@ -86,7 +86,7 @@ fun UICards() {
     ListItem(
         text = { Text(item.title) },
         secondaryText = { Text(item.subtitle) },
-        icon = { Image(imageResource(Res.drawable.p1), contentDescription = null) },
+        icon = { Image(painterResource(Res.drawable.p1), contentDescription = null) },
         overlineText = { Text("Overline text") },
         singleLineSecondaryText = false
     )
@@ -94,7 +94,7 @@ fun UICards() {
     ListItem(
         text = { Text(item.title) },
         secondaryText = { Text(item.subtitle) },
-        icon = { Image(imageResource(Res.drawable.p2), contentDescription = null) },
+        icon = { Image(painterResource(Res.drawable.p2), contentDescription = null) },
         trailing = { Icon(Icons.Default.ShoppingCart, contentDescription = null) },
         singleLineSecondaryText = false
     )
