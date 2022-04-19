@@ -18,7 +18,12 @@ package androidx.compose.material3
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -264,6 +269,50 @@ class SwitchScreenshotTest {
         rule.waitForIdle()
 
         assertToggeableAgainstGolden("switch_focus")
+    }
+
+    @Test
+    fun switchTest_checked_icon() {
+        rule.setMaterialContent(lightColorScheme()) {
+            val icon: @Composable () -> Unit = {
+                Icon(
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = null,
+                    modifier = Modifier.size(SwitchDefaults.IconSize),
+                )
+            }
+            Box(wrapperModifier) {
+                Switch(
+                    checked = true,
+                    onCheckedChange = { },
+                    thumbContent = icon
+                )
+            }
+        }
+
+        assertToggeableAgainstGolden("switch_checked_icon")
+    }
+
+    @Test
+    fun switchTest_unchecked_icon() {
+        rule.setMaterialContent(lightColorScheme()) {
+            val icon: @Composable () -> Unit = {
+                Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = null,
+                    modifier = Modifier.size(SwitchDefaults.IconSize),
+                )
+            }
+            Box(wrapperModifier) {
+                Switch(
+                    checked = false,
+                    onCheckedChange = { },
+                    thumbContent = icon
+                )
+            }
+        }
+
+        assertToggeableAgainstGolden("switch_unchecked_icon")
     }
 
     private fun assertToggeableAgainstGolden(goldenName: String) {
