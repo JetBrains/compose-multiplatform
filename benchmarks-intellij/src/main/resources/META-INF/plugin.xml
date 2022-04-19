@@ -1,0 +1,19 @@
+<idea-plugin>
+    <id>com.jetbrains.ComposeDemoPlugin</id>
+    <name>Jetpack Compose for Desktop Demo</name>
+    <vendor email="support@jetbrains.com" url="http://www.jetbrains.com">JetBrains</vendor>
+
+    <description><![CDATA[
+A plugin demonstrates Jetpack compose capabilities on IntelliJ Platform
+    ]]></description>
+
+    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.compose.intellij.platform</depends>
+    <depends>org.jetbrains.kotlin</depends>
+
+    <applicationListeners>
+        <listener class="com.jetbrains.compose.LifecycleListener" topic="com.intellij.ide.AppLifecycleListener"/>
+    </applicationListeners>
+</idea-plugin>
