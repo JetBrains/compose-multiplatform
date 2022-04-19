@@ -101,7 +101,7 @@ fun TextFieldInScrollableColumn() {
     Column(
         Modifier.verticalScroll(rememberScrollState())
     ) {
-        repeat(100) { index ->
+        repeat(50) { index ->
             DemoTextField(index)
         }
     }
@@ -110,7 +110,7 @@ fun TextFieldInScrollableColumn() {
 @Composable
 fun TextFieldInLazyColumn() {
     LazyColumn {
-        items(100) { index ->
+        items(50) { index ->
             DemoTextField(index)
         }
     }
