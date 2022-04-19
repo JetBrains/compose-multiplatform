@@ -20,7 +20,7 @@ package androidx.compose.runtime.lint
 
 import androidx.compose.lint.Names
 import androidx.compose.lint.isInPackageName
-import androidx.compose.lint.invokedInComposableBodyAndNotRemembered
+import androidx.compose.lint.isNotRemembered
 import com.android.tools.lint.detector.api.Category
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Implementation
@@ -47,7 +47,7 @@ class UnrememberedMutableStateDetector : Detector(), SourceCodeScanner {
     override fun visitMethodCall(context: JavaContext, node: UCallExpression, method: PsiMethod) {
         if (!method.isInPackageName(Names.Runtime.PackageName)) return
 
-        if (node.invokedInComposableBodyAndNotRemembered()) {
+        if (node.isNotRemembered()) {
             context.report(
                 UnrememberedMutableState,
                 node,
