@@ -5,11 +5,13 @@
 
 set -euo pipefail
 
-if [ -z "$@" ]; then
-echo "Specify Compose version. For example: ./validateExamples.sh 1.0.0"
+if [ "$#" -ne 2 ]; then
+echo "Specify Compose and Kotlin version. For example: ./validateExamples.sh 1.1.1 1.6.10"
 exit 1
 fi
-COMPOSE_VERSION=$@
+COMPOSE_VERSION=$1
+KOTLIN_VERSION=$2
+
 
 runGradle() {
     pushd $1
