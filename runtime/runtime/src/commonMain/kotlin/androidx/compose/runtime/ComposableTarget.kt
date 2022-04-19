@@ -54,8 +54,11 @@ package androidx.compose.runtime
  * inferred by the compiler. This can be an arbitrary string value but is expected to be a fully
  * qualified name of a class that is marked with [ComposableTargetMarker].
  */
+
 @Retention(AnnotationRetention.BINARY)
 @Target(
+    AnnotationTarget.FILE,
+    AnnotationTarget.CLASS,
     AnnotationTarget.FUNCTION,
     AnnotationTarget.PROPERTY_GETTER,
     AnnotationTarget.TYPE,

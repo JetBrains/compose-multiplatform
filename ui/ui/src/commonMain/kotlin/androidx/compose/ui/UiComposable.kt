@@ -29,6 +29,7 @@ import androidx.compose.runtime.ComposableTargetMarker
 @Retention(AnnotationRetention.BINARY)
 @ComposableTargetMarker(description = "UI Composable")
 @Target(
+    AnnotationTarget.FILE,
     AnnotationTarget.FUNCTION,
     AnnotationTarget.PROPERTY_GETTER,
     AnnotationTarget.TYPE,
