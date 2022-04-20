@@ -895,6 +895,17 @@ package androidx.compose.runtime.snapshots {
     field public static final androidx.compose.runtime.snapshots.SnapshotApplyResult.Success INSTANCE;
   }
 
+  @androidx.compose.runtime.ExperimentalComposeApi public interface SnapshotContextElement extends kotlin.coroutines.CoroutineContext.Element {
+    field public static final androidx.compose.runtime.snapshots.SnapshotContextElement.Key Key;
+  }
+
+  public static final class SnapshotContextElement.Key implements kotlin.coroutines.CoroutineContext.Key<androidx.compose.runtime.snapshots.SnapshotContextElement> {
+  }
+
+  public final class SnapshotContextElementKt {
+    method @androidx.compose.runtime.ExperimentalComposeApi public static androidx.compose.runtime.snapshots.SnapshotContextElement asContextElement(androidx.compose.runtime.snapshots.Snapshot);
+  }
+
   public final class SnapshotDoubleIndexHeapKt {
   }
 
