@@ -3,7 +3,7 @@
 // logger is needed only to log cases when `browser.id` is not in browserResults
 const logger = require('../../../build/js/node_modules/karma/lib/logger')
 
-const kotlinReporterModule = require("../../../build/js/packages_imported/kotlin-test-js-runner/1.6.10/karma-kotlin-reporter");
+const kotlinReporterModule = require("../../../build/js/packages_imported/kotlin-test-js-runner/1.6.21/karma-kotlin-reporter");
 
 const KotlinReporter = kotlinReporterModule['reporter:karma-kotlin-reporter'][1];
 

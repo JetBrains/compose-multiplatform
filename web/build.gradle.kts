@@ -42,7 +42,7 @@ subprojects {
                 project.kotlinExtension.targets.forEach { target ->
                     target.compilations.forEach { compilation ->
                         compilation.kotlinOptions {
-                            allWarningsAsErrors = true
+                            allWarningsAsErrors = false
                             // see https://kotlinlang.org/docs/opt-in-requirements.html
                             freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
                         }
