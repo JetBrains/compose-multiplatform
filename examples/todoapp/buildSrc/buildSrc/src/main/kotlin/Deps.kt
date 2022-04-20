@@ -69,7 +69,7 @@ object Deps {
 
     object Badoo {
         object Reaktive {
-            private const val VERSION = "1.1.22"
+            private const val VERSION = "1.2.1"
             const val reaktive = "com.badoo.reaktive:reaktive:$VERSION"
             const val reaktiveTesting = "com.badoo.reaktive:reaktive-testing:$VERSION"
             const val utils = "com.badoo.reaktive:utils:$VERSION"
@@ -79,7 +79,7 @@ object Deps {
 
     object Squareup {
         object SQLDelight {
-            private const val VERSION = "1.5.0"
+            private const val VERSION = "1.5.3"
 
             const val gradlePlugin = "com.squareup.sqldelight:gradle-plugin:$VERSION"
             const val androidDriver = "com.squareup.sqldelight:android-driver:$VERSION"

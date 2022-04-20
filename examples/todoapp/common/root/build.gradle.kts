@@ -10,7 +10,7 @@ kotlin {
     ios {
         binaries {
             framework {
-                baseName = "Todo"
+                baseName = "KotlinCommon"
                 linkerOpts.add("-lsqlite3")
                 export(project(":common:database"))
                 export(project(":common:main"))
