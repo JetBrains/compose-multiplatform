@@ -46,9 +46,9 @@ sealed interface BringIntoViewRequester {
     /**
      * Bring this item into bounds by making all the scrollable parents scroll appropriately.
      *
-     * If this method is called while a previous request is still being satisfied, the new request
-     * will be ignored since the newer-requested rectangle is completely contained inside the
-     * earlier-requested rectangle.
+     * This method will not return until this request is satisfied or a newer request interrupts it.
+     * If this call is interrupted by a newer call, this method will throw a
+     * [CancellationException][kotlinx.coroutines.CancellationException].
      *
      * @param rect The rectangle (In local coordinates) that should be brought into view. If you
      * don't specify the coordinates, the coordinates of the
