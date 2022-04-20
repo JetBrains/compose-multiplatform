@@ -121,10 +121,10 @@ internal fun NestedScrollInteropComposeParentWithAndroidChild() {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun LazyColumnWithNestedScrollInteropEnabled(composeView: ComposeView) {
+private fun LazyColumnWithNestedScrollInteropEnabled() {
     LazyColumn(
         modifier = Modifier.nestedScroll(
-            rememberNestedScrollInteropConnection(composeView)
+            rememberNestedScrollInteropConnection()
         ),
         contentPadding = PaddingValues(top = ToolbarHeight)
     ) {
@@ -152,7 +152,7 @@ internal fun ComposeViewComposeNestedInterop() {
         LayoutInflater.from(context)
             .inflate(R.layout.three_fold_nested_scroll_interop, null).apply {
                 with(findViewById<ComposeView>(R.id.compose_view)) {
-                    setContent { LazyColumnWithNestedScrollInteropEnabled(this) }
+                    setContent { LazyColumnWithNestedScrollInteropEnabled() }
                 }
             }.also {
                 ViewCompat.setNestedScrollingEnabled(it, true)
@@ -197,7 +197,7 @@ internal class ComposeInAndroidCoordinatorLayout : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.compose_in_android_coordinator_layout)
         findViewById<ComposeView>(R.id.compose_view).apply {
-            setContent { LazyColumnWithNestedScrollInteropEnabled(this) }
+            setContent { LazyColumnWithNestedScrollInteropEnabled() }
         }
     }
 }
@@ -210,7 +210,7 @@ internal class ViewComposeViewNestedScrollInteropDemo : ComponentActivity() {
         setContentView(R.layout.compose_in_android_coordinator_layout)
         findViewById<ComposeView>(R.id.compose_view).apply {
             setContent {
-                val nestedScrollInterop = rememberNestedScrollInteropConnection(this)
+                val nestedScrollInterop = rememberNestedScrollInteropConnection()
                 Box(modifier = Modifier.nestedScroll(nestedScrollInterop)) {
                     AndroidView({ context ->
                         AndroidViewWithNestedScrollEnabled(context)
