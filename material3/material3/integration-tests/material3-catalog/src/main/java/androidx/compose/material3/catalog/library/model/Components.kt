@@ -93,6 +93,19 @@ private val Checkboxes = Component(
     examples = CheckboxesExamples
 )
 
+private val Chips = Component(
+    id = nextId(),
+    name = "Chips",
+    description = "Chips allow users to enter information, make selections, filter content, or" +
+        " trigger actions.",
+    // No chip icon
+    tintIcon = true,
+    guidelinesUrl = "$ComponentGuidelinesUrl/chips",
+    docsUrl = "$DocsUrl#chips",
+    sourceUrl = "$Material3SourceUrl/Chip.kt",
+    examples = ChipsExamples
+)
+
 private val Dialogs = Component(
     id = nextId(),
     name = "Dialogs",
@@ -298,6 +311,7 @@ val Components = listOf(
     Buttons,
     Card,
     Checkboxes,
+    Chips,
     Dialogs,
     ExtendedFloatingActionButton,
     FloatingActionButtons,
