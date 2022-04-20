@@ -17,14 +17,18 @@
 package androidx.compose.runtime.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.snapshots.asContextElement
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 @Suppress("UNREACHABLE_CODE", "CanBeVal", "UNUSED_VARIABLE")
 @Sampled
@@ -55,5 +59,34 @@ fun snapshotFlowSample() {
     Snapshot.withMutableSnapshot {
         greeting = "Ahoy"
         person = "Sean"
+    }
+}
+
+@Suppress("RedundantSuspendModifier", "UNUSED_PARAMETER")
+private suspend fun doSomethingSuspending(param: Any?): Any? = null
+
+@Suppress("ClassName")
+private object someObject {
+    var stateA by mutableStateOf(0)
+    var stateB by mutableStateOf(0)
+}
+
+@Suppress("unused")
+@OptIn(ExperimentalComposeApi::class)
+@Sampled
+fun snapshotAsContextElementSample() {
+    runBlocking {
+        val snapshot = Snapshot.takeSnapshot()
+        try {
+            withContext(snapshot.asContextElement()) {
+                // Data observed by separately reading stateA and stateB are consistent with
+                // the snapshot context element across suspensions
+                doSomethingSuspending(someObject.stateA)
+                doSomethingSuspending(someObject.stateB)
+            }
+        } finally {
+            // Snapshot must be disposed after it will not be used again
+            snapshot.dispose()
+        }
     }
 }

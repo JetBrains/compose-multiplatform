@@ -862,6 +862,9 @@ package androidx.compose.runtime.snapshots {
     field public static final androidx.compose.runtime.snapshots.SnapshotApplyResult.Success INSTANCE;
   }
 
+  public final class SnapshotContextElementKt {
+  }
+
   public final class SnapshotDoubleIndexHeapKt {
   }
 
