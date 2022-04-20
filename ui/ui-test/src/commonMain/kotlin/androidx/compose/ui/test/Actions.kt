@@ -275,6 +275,14 @@ fun SemanticsNodeInteraction.performScrollToNode(
  * execution of [block] or injection of the events, all (subsequent) events are dropped and the
  * error is thrown here.
  *
+ * Due to the batching of events, all events in a block are sent together and no recomposition will
+ * take place in between events. Additionally all events will be generated before any of the events
+ * take effect. This means that the screen coordinates of all events are resolved before any of
+ * the events can cause the position of the node being injected into to change. This has certain
+ * advantages, for example, in the cases of nested scrolling or dragging an element around, it
+ * prevents the injection of events into a moving target since all events are enqueued before any
+ * of them has taken effect.
+ *
  * Example of performing a click:
  * @sample androidx.compose.ui.test.samples.gestureClick
  *
@@ -317,6 +325,14 @@ fun SemanticsNodeInteraction.performGesture(
  * complete. This method blocks while the events are injected. If an error occurs during
  * execution of [block] or injection of the events, all (subsequent) events are dropped and the
  * error is thrown here.
+ *
+ * Due to the batching of events, all events in a block are sent together and no recomposition will
+ * take place in between events. Additionally all events will be generated before any of the events
+ * take effect. This means that the screen coordinates of all events are resolved before any of
+ * the events can cause the position of the node being injected into to change. This has certain
+ * advantages, for example, in the cases of nested scrolling or dragging an element around, it
+ * prevents the injection of events into a moving target since all events are enqueued before any
+ * of them has taken effect.
  *
  * Example of performing a swipe up:
  * @sample androidx.compose.ui.test.samples.touchInputSwipeUp
@@ -364,6 +380,14 @@ fun SemanticsNodeInteraction.performTouchInput(
  * execution of [block] or injection of the events, all (subsequent) events are dropped and the
  * error is thrown here.
  *
+ * Due to the batching of events, all events in a block are sent together and no recomposition will
+ * take place in between events. Additionally all events will be generated before any of the events
+ * take effect. This means that the screen coordinates of all events are resolved before any of
+ * the events can cause the position of the node being injected into to change. This has certain
+ * advantages, for example, in the cases of nested scrolling or dragging an element around, it
+ * prevents the injection of events into a moving target since all events are enqueued before any
+ * of them has taken effect.
+ *
  * Example of performing a mouse click:
  * @sample androidx.compose.ui.test.samples.mouseInputClick
  *
@@ -410,6 +434,14 @@ fun SemanticsNodeInteraction.performMouseInput(
  * complete. This method blocks while the events are injected. If an error occurs during
  * execution of [block] or injection of the events, all (subsequent) events are dropped and the
  * error is thrown here.
+ *
+ * Due to the batching of events, all events in a block are sent together and no recomposition will
+ * take place in between events. Additionally all events will be generated before any of the events
+ * take effect. This means that the screen coordinates of all events are resolved before any of
+ * the events can cause the position of the node being injected into to change. This has certain
+ * advantages, for example, in the cases of nested scrolling or dragging an element around, it
+ * prevents the injection of events into a moving target since all events are enqueued before any
+ * of them has taken effect.
  *
  * @param block A lambda with [MultiModalInjectionScope] as receiver that describes the gesture
  * by sending all multi modal events.

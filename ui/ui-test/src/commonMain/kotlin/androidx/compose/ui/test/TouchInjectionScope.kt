@@ -57,7 +57,13 @@ import kotlin.math.roundToLong
  * [performTouchInput] has executed its code block. Because gestures don't have to be defined all
  * in the same [performTouchInput] block, keep in mind that while the gesture is not complete,
  * all code you execute in between these blocks will be executed while imaginary fingers are
- * actively touching the screen.
+ * actively touching the screen. The events sent as part of the same batch will not be interrupted
+ * by recomposition, however, if a gesture spans multiple [performTouchInput] blocks it is
+ * important to remember that recomposition, layout and drawing could take place during the
+ * gesture, which may lead to events being injected into a moving target. As pointer positions are
+ * manipulated in the current node's local coordinate system, this could lead to issues caused by
+ * the fact that part of the gesture will take effect before the rest of the events have been
+ * enqueued.
  *
  * Example of performing a click:
  * @sample androidx.compose.ui.test.samples.touchInputClick
