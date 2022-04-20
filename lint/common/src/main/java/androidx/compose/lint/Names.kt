@@ -28,9 +28,6 @@ object Names {
     object AnimationCore {
         val PackageName = Package("androidx.compose.animation.core")
     }
-    object Material {
-        val PackageName = Package("androidx.compose.material")
-    }
     object Runtime {
         val PackageName = Package("androidx.compose.runtime")
 
