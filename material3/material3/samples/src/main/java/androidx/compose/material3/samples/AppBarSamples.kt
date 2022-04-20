@@ -32,7 +32,6 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
@@ -405,12 +404,10 @@ fun BottomAppBarWithFAB() {
             }
         },
         floatingActionButton = {
-            // TODO(b/228588827): Replace with Secondary FAB when available.
-            FloatingActionButton(
+            BottomAppBarDefaults.FloatingActionButton(
                 onClick = { /* do something */ },
-                elevation = BottomAppBarDefaults.floatingActionButtonElevation()
             ) {
-                Icon(Icons.Filled.Add, "Localized description")
+                Icon(Icons.Filled.Add, contentDescription = "Localized description")
             }
         }
     )
