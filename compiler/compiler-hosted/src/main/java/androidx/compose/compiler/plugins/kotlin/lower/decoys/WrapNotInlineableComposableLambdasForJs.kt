@@ -46,7 +46,6 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrValueParameterSymbol
-import org.jetbrains.kotlin.ir.symbols.IrValueSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
@@ -128,36 +127,34 @@ class WrapNotInlineableComposableLambdasForJs(
         return call
     }
 
-
     private fun wrapComposableLambdasInCall(call: IrCall): IrCall {
         val owner = call.symbol.owner
         val args = call.valueArgumentsCount
 
         val mappedArguments = generateSequence(0) { it + 1 }.take(args).map {
             val expr = call.getValueArgument(it)
-            if (expr is IrGetValue && expr.symbol is IrValueParameterSymbol) {
-                val valueParameter = expr.symbol.owner as IrValueParameter
 
-                val isComposable =
-                    valueParameter.type.annotations.hasAnnotation(ComposeFqNames.Composable)
-                val isNoInline =
-                    valueParameter.isNoinline
+            return@map when {
+                // order of conditions matters
+                expr == null -> expr
+                !expr.type.isFunction() -> expr
+                !expr.type.annotations.hasAnnotation(ComposeFqNames.Composable) -> expr
+                expr is IrCall -> wrapLambdaArgument(expr)
+                expr !is IrGetValue -> expr
+                expr.symbol is IrValueParameterSymbol -> {
+                    val valueParameter = expr.symbol.owner as IrValueParameter
+                    val cantBeInlined = valueParameter.isNoinline
+                        || (valueParameter.parent as? IrSimpleFunction) == null
                         || (valueParameter.parent as? IrSimpleFunction)?.isInline == false
-                val sameParamIsNoInline = owner.valueParameters[it].isNoinline
+                    val sameParamIsNoInline = owner.valueParameters[it].isNoinline
 
-                // We don't wrap arguments which are nonComposable or inlineable
-                val shouldWrapArgument = valueParameter.type.isFunction()
-                    && isComposable
-                    && isNoInline
-                    && !sameParamIsNoInline
-
-                if (shouldWrapArgument) {
-                    wrapLambdaArgument(valueParameter, expr)
-                } else {
-                    expr
+                    if (cantBeInlined && !sameParamIsNoInline) {
+                        wrapLambdaArgument(expr)
+                    } else {
+                        expr
+                    }
                 }
-            } else {
-                expr
+                else -> wrapLambdaArgument(expr)
             }
         }.toList()
 
@@ -183,10 +180,9 @@ class WrapNotInlineableComposableLambdasForJs(
     }
 
     private fun wrapLambdaArgument(
-        valueParameter: IrValueParameter,
         argument: IrExpression
     ): IrExpression {
-        val lambdaType = valueParameter.type as IrSimpleType
+        val lambdaType = argument.type as IrSimpleType
 
         val funExpr = IrFunctionExpressionImpl(
             startOffset = SYNTHETIC_OFFSET,
@@ -239,7 +235,7 @@ class WrapNotInlineableComposableLambdasForJs(
             body = DeclarationIrBuilder(context, symbol).irBlockBody {
                 +createInvokeForComposableLambda(
                     lambdaType = lambdaType,
-                    dispatchReceiverSymbol = valueParameter.symbol,
+                    dispatchReceiver = argument,
                     extensionReceiverParameterSymbol = extensionReceiverParameter?.symbol,
                     valueParameters = valueParameters,
                     arity = valueParameters.size + if (lambdaType.isExtensionFunctionType) 1 else 0
@@ -252,7 +248,7 @@ class WrapNotInlineableComposableLambdasForJs(
 
     private fun createInvokeForComposableLambda(
         lambdaType: IrSimpleType,
-        dispatchReceiverSymbol: IrValueSymbol,
+        dispatchReceiver: IrExpression,
         extensionReceiverParameterSymbol: IrValueParameterSymbol?,
         valueParameters: List<IrValueParameter>,
         arity: Int
@@ -268,11 +264,7 @@ class WrapNotInlineableComposableLambdasForJs(
             typeArgumentsCount = 0,
             valueArgumentsCount = arity
         ).apply {
-            dispatchReceiver = IrGetValueImpl(
-                startOffset = SYNTHETIC_OFFSET,
-                endOffset = SYNTHETIC_OFFSET,
-                symbol = dispatchReceiverSymbol
-            )
+            this.dispatchReceiver = dispatchReceiver
 
             var pix = 0
             if (extensionReceiverParameterSymbol != null) {
