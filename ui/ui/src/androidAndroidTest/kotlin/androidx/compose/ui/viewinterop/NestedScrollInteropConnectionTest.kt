@@ -368,7 +368,10 @@ private fun TestListWithNestedScroll(items: List<String>, modifier: Modifier = M
 @Composable
 private fun TestItem(item: String) {
     Box(
-        modifier = Modifier.padding(16.dp).height(56.dp).fillMaxWidth()
+        modifier = Modifier
+            .padding(16.dp)
+            .height(56.dp)
+            .fillMaxWidth()
             .testTag(item), contentAlignment = Alignment.Center
     ) {
         BasicText(item)

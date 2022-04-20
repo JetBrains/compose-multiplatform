@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.platform
 
+import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -40,7 +41,7 @@ import kotlin.math.floor
  * deltas from dispatching children on the Compose side.
  */
 internal class NestedScrollInteropConnection(
-    private val view: ComposeView
+    private val view: View
 ) : NestedScrollConnection {
 
     private val nestedScrollChildHelper = NestedScrollingChildHelper(view).apply {
@@ -225,13 +226,12 @@ private val Offset.scrollAxes: Int
  * Learn how to enable nested scroll interop:
  * @sample androidx.compose.ui.samples.ComposeInCooperatingViewNestedScrollInteropSample
  *
- * @param view The [ComposeView] that hosts the [Composable] during Compose in View interop.
- *
  */
 @ExperimentalComposeUiApi
 @Composable
-fun rememberNestedScrollInteropConnection(
-    view: ComposeView
-): NestedScrollConnection = remember(view) {
-    NestedScrollInteropConnection(view)
+fun rememberNestedScrollInteropConnection(): NestedScrollConnection {
+    val composeView = LocalView.current
+    return remember(composeView) {
+        NestedScrollInteropConnection(composeView)
+    }
 }
