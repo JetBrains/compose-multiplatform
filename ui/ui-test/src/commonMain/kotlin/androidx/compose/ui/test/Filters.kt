@@ -466,11 +466,13 @@ fun hasAnySibling(matcher: SemanticsMatcher): SemanticsMatcher {
  * Returns whether the node has at least one ancestor that satisfies the given matcher.
  *
  * Example: For the following tree
+ * ```
  * |-X
  * |-A
  *   |-B
  *     |-C1
  *     |-C2
+ * ```
  * In case of C1, we would check the matcher against A and B
  */
 fun hasAnyAncestor(matcher: SemanticsMatcher): SemanticsMatcher {
@@ -485,11 +487,13 @@ fun hasAnyAncestor(matcher: SemanticsMatcher): SemanticsMatcher {
  * Returns whether the node has at least one descendant that satisfies the given matcher.
  *
  * Example: For the following tree
+ * ```
  * |-X
  * |-A
  *   |-B
  *     |-C1
  *     |-C2
+ * ```
  * In case of A, we would check the matcher against B,C1 and C2
  */
 fun hasAnyDescendant(matcher: SemanticsMatcher): SemanticsMatcher {
