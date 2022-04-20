@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+
 plugins {
     id("multiplatform-setup")
     id("android-setup")
@@ -11,6 +13,16 @@ sqldelight {
 }
 
 kotlin {
+    val iosTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinNativeTarget =
+        when {
+            isIphoneSimulatorBuild() -> ::iosSimulatorArm64
+            isIphoneOsBuild() -> ::iosArm64
+            else -> ::iosX64
+        }
+
+    iosTarget("ios") {
+    }
+
     sourceSets {
         commonMain {
             dependencies {
