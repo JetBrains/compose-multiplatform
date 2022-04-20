@@ -5,9 +5,15 @@
 
 package org.jetbrains.compose.desktop.ide.preview
 
+import com.intellij.ide.lightEdit.LightEdit
 import com.intellij.openapi.externalSystem.model.Key
 import com.intellij.openapi.externalSystem.model.project.AbstractNamedData
+import com.intellij.openapi.project.Project
 import java.lang.reflect.Modifier
+
+// todo: filter only Compose projects
+internal fun isPreviewCompatible(project: Project): Boolean =
+    !LightEdit.owns(project)
 
 internal val kotlinTargetDataKey: Key<out AbstractNamedData> = run {
     val kotlinTargetDataClass = try {

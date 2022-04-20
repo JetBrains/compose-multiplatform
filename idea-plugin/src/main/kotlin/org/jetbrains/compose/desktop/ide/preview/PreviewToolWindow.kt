@@ -14,10 +14,8 @@ import org.jetbrains.compose.desktop.ide.preview.ui.PreviewPanel
 import java.awt.BorderLayout
 
 class PreviewToolWindow : ToolWindowFactory, DumbAware {
-    override fun isApplicable(project: Project): Boolean {
-        // todo: filter only Compose projects
-        return true
-    }
+    override fun isApplicable(project: Project): Boolean =
+        isPreviewCompatible(project)
 
     override fun init(toolWindow: ToolWindow) {
         toolWindow.setIcon(PreviewIcons.COMPOSE)

@@ -45,9 +45,11 @@ class PreviewFloatingToolbarProvider : AbstractFloatingToolbarProvider(PREVIEW_E
         editor: Editor,
         parentDisposable: Disposable
     ) {
-        val project = editor.project ?: return
-        val listener = PreviewEditorToolbarVisibilityUpdater(component, project, editor)
-        editor.caretModel.addCaretListener(listener, parentDisposable)
+        val project = editor.project
+        if (project != null && isPreviewCompatible(project)) {
+            val listener = PreviewEditorToolbarVisibilityUpdater(component, project, editor)
+            editor.caretModel.addCaretListener(listener, parentDisposable)
+        }
     }
 }
 
