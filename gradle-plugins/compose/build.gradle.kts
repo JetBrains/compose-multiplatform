@@ -112,20 +112,34 @@ val checkJar by tasks.registering {
     doLast {
         val file = jar.get().archiveFile.get().asFile
         ZipFile(file).use { zip ->
-            val nonJbComposeClasses = zip.entries().asIterator().asSequence().filter {
-                !it.isDirectory
-                        && it.name.endsWith(".class")
-                        && !it.name.startsWith("org/jetbrains/compose")
-            }.toList()
-            if (nonJbComposeClasses.any()) {
-                error(buildString {
-                    appendLine("Some classes from $file are not from 'org.jetbrains.compose' package:")
-                    for (entry in nonJbComposeClasses) {
-                        appendLine("  * ${entry.name}")
-                    }
-                })
-            }
+            checkJarContainsExpectedPackages(zip)
         }
+    }
+}
+
+// we want to avoid accidentally including unexpected jars/packages, e.g kotlin-stdlib etc
+fun checkJarContainsExpectedPackages(jar: ZipFile) {
+    val expectedPackages = arrayOf(
+        "org/jetbrains/compose",
+        "kotlinx/serialization"
+    )
+    val unexpectedClasses = arrayListOf<String>()
+
+    for (entry in jar.entries()) {
+        if (entry.isDirectory || !entry.name.endsWith(".class")) continue
+
+        if (expectedPackages.none { prefix -> entry.name.startsWith(prefix) }) {
+            unexpectedClasses.add(entry.name)
+        }
+    }
+
+    if (unexpectedClasses.any()) {
+        error(buildString {
+            appendLine("Some classes from ${jar.name} are not from 'org.jetbrains.compose' package:")
+            unexpectedClasses.forEach {
+                appendLine("  * $it")
+            }
+        })
     }
 }
 
