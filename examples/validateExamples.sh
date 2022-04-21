@@ -15,7 +15,7 @@ KOTLIN_VERSION=$2
 
 runGradle() {
     pushd $1
-    ./gradlew $2 -Pcompose.version=$COMPOSE_VERSION
+    ./gradlew $2 -Pcompose.version=$COMPOSE_VERSION -Pkotlin.version=$KOTLIN_VERSION
     popd
 }
 
