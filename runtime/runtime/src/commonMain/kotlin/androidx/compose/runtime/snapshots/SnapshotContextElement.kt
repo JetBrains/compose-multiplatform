@@ -52,9 +52,9 @@ private class SnapshotContextElementImpl(
         get() = SnapshotContextElement
 
     override fun updateThreadContext(context: CoroutineContext): Snapshot? =
-        snapshot.makeCurrent()
+        snapshot.unsafeEnter()
 
     override fun restoreThreadContext(context: CoroutineContext, oldState: Snapshot?) {
-        snapshot.restoreCurrent(oldState)
+        snapshot.unsafeLeave(oldState)
     }
 }

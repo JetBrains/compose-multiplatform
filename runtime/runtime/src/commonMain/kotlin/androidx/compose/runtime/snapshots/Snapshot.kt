@@ -21,6 +21,7 @@ package androidx.compose.runtime.snapshots
 import androidx.compose.runtime.AtomicReference
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisallowComposableCalls
+import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.SnapshotThreadLocal
 import androidx.compose.runtime.synchronized
@@ -104,7 +105,7 @@ sealed class Snapshot(
      * or a nested call to [enter] is called. When [block] returns, the previous current snapshot
      * is restored if there was one.
      *
-     * All changes to state object inside [block] are isolated to this snapshot and are not
+     * All changes to state objects inside [block] are isolated to this snapshot and are not
      * visible to other snapshot or as global state. If this is a [readOnly] snapshot, any
      * changes to state objects will throw an [IllegalStateException].
      *
@@ -135,6 +136,40 @@ sealed class Snapshot(
     @PublishedApi
     internal open fun restoreCurrent(snapshot: Snapshot?) {
         threadSnapshot.set(snapshot)
+    }
+
+    /**
+     * Enter the snapshot, returning the previous [Snapshot] for leaving this snapshot later
+     * using [unsafeLeave]. Prefer [enter] or [asContextElement] instead of using [unsafeEnter]
+     * directly to prevent mismatched [unsafeEnter]/[unsafeLeave] calls.
+     *
+     * After returning all state objects have the value associated with this snapshot.
+     * The value of [currentSnapshot] will be this snapshot until [unsafeLeave] is called
+     * with the returned [Snapshot] or another call to [unsafeEnter] or [enter]
+     * is made.
+     *
+     * All changes to state objects until another snapshot is entered or this snapshot is left
+     * are isolated to this snapshot and are not visible to other snapshot or as global state.
+     * If this is a [readOnly] snapshot, any changes to state objects will throw an
+     * [IllegalStateException].
+     *
+     * For a [MutableSnapshot], changes made to a snapshot can be applied
+     * atomically to the global state (or to its parent snapshot if it is a nested snapshot) by
+     * calling [MutableSnapshot.apply].
+     */
+    @ExperimentalComposeApi
+    fun unsafeEnter(): Snapshot? = makeCurrent()
+
+    /**
+     * Leave the snapshot, restoring the [oldSnapshot] before returning.
+     * See [unsafeEnter].
+     */
+    @ExperimentalComposeApi
+    fun unsafeLeave(oldSnapshot: Snapshot?) {
+        check(threadSnapshot.get() === this) {
+            "Cannot leave snapshot; $this is not the current snapshot"
+        }
+        restoreCurrent(oldSnapshot)
     }
 
     internal var disposed = false
