@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
@@ -50,11 +49,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -109,7 +107,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun AssistChip(
     onClick: () -> Unit,
-    label: @Composable RowScope.() -> Unit,
+    label: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     leadingIcon: @Composable (() -> Unit)? = null,
@@ -152,7 +150,7 @@ fun AssistChip(
  * calendar event from the home screen. Assist chips function as though the user asked an assistant
  * to complete the action. They should appear dynamically and contextually in a UI.
  *
- * ![Assist chip image](https://developer.android.com/images/reference/androidx/compose/material3/assist-chip.png)
+ * ![Assist chip image](https://developer.android.com/images/reference/androidx/compose/material3/elevated-assist-chip.png)
  *
  * This assist chip is applied with an elevated style. If you want a flat style, use the
  * [AssistChip].
@@ -188,7 +186,7 @@ fun AssistChip(
 @Composable
 fun ElevatedAssistChip(
     onClick: () -> Unit,
-    label: @Composable RowScope.() -> Unit,
+    label: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     leadingIcon: @Composable (() -> Unit)? = null,
@@ -276,7 +274,7 @@ fun ElevatedAssistChip(
 fun FilterChip(
     selected: Boolean,
     onClick: () -> Unit,
-    label: @Composable RowScope.() -> Unit,
+    label: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     leadingIcon: @Composable (() -> Unit)? = null,
@@ -315,7 +313,7 @@ fun FilterChip(
  * Filter chips use tags or descriptive words to filter content. They can be a good alternative to
  * toggle buttons or checkboxes.
  *
- * ![Filter chip image](https://developer.android.com/images/reference/androidx/compose/material3/filter-chip.png)
+ * ![Filter chip image](https://developer.android.com/images/reference/androidx/compose/material3/elevated-filter-chip.png)
  *
  * This filter chip is applied with an elevated style. If you want a flat style, use the
  * [FilterChip].
@@ -358,7 +356,7 @@ fun FilterChip(
 fun ElevatedFilterChip(
     selected: Boolean,
     onClick: () -> Unit,
-    label: @Composable RowScope.() -> Unit,
+    label: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     leadingIcon: @Composable (() -> Unit)? = null,
@@ -442,7 +440,7 @@ fun ElevatedFilterChip(
 @Composable
 fun InputChip(
     onClick: () -> Unit,
-    label: @Composable RowScope.() -> Unit,
+    label: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     leadingIcon: @Composable (() -> Unit)? = null,
@@ -459,11 +457,14 @@ fun InputChip(
     var shapedAvatar: @Composable (() -> Unit)? = null
     if (avatar != null) {
         val avatarOpacity = if (enabled) 1f else InputChipTokens.DisabledAvatarOpacity
+        val avatarShape = InputChipTokens.AvatarShape.toShape()
         shapedAvatar = @Composable {
             Box(
-                modifier = Modifier
-                    .alpha(avatarOpacity)
-                    .clip(InputChipTokens.AvatarShape.toShape()),
+                modifier = Modifier.graphicsLayer {
+                    this.alpha = avatarOpacity
+                    this.shape = avatarShape
+                    this.clip = true
+                },
                 contentAlignment = Alignment.Center
             ) {
                 avatar()
@@ -542,7 +543,7 @@ fun InputChip(
 @Composable
 fun SuggestionChip(
     onClick: () -> Unit,
-    label: @Composable RowScope.() -> Unit,
+    label: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     icon: @Composable (() -> Unit)? = null,
@@ -583,7 +584,7 @@ fun SuggestionChip(
  * Suggestion chips help narrow a user's intent by presenting dynamically generated suggestions,
  * such as possible responses or search filters.
  *
- * ![Suggestion chip image](https://developer.android.com/images/reference/androidx/compose/material3/suggestion-chip.png)
+ * ![Suggestion chip image](https://developer.android.com/images/reference/androidx/compose/material3/elevated-suggestion-chip.png)
  *
  * This suggestion chip is applied with an elevated style. If you want a flat style, use the
  * [SuggestionChip].
@@ -620,7 +621,7 @@ fun SuggestionChip(
 @Composable
 fun ElevatedSuggestionChip(
     onClick: () -> Unit,
-    label: @Composable RowScope.() -> Unit,
+    label: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     icon: @Composable (() -> Unit)? = null,
@@ -662,8 +663,8 @@ interface ChipElevation {
      * [interactionSource]. This should typically be the same value as the [shadowElevation].
      *
      * Tonal elevation is used to apply a color shift to the surface to give the it higher emphasis.
-     * When surface's color is [ColorScheme.surface], a higher the elevation will result
-     * in a darker color in light theme and lighter color in dark theme.
+     * When surface's color is [ColorScheme.surface], a higher elevation will result in a darker
+     * color in light theme and lighter color in dark theme.
      *
      * See [shadowElevation] which controls the elevation of the shadow drawn around the Chip.
      *
@@ -699,8 +700,8 @@ interface SelectableChipElevation {
      * [interactionSource]. This should typically be the same value as the [shadowElevation].
      *
      * Tonal elevation is used to apply a color shift to the surface to give the it higher emphasis.
-     * When surface's color is [ColorScheme.surface], a higher the elevation will result
-     * in a darker color in light theme and lighter color in dark theme.
+     * When surface's color is [ColorScheme.surface], a higher elevation will result in a darker
+     * color in light theme and lighter color in dark theme.
      *
      * See [shadowElevation] which controls the elevation of the shadow drawn around the Chip.
      *
@@ -854,7 +855,7 @@ interface SelectableChipBorder {
      * @param selected whether the chip is selected
      */
     @Composable
-    fun borderStroke(enabled: Boolean, selected: Boolean): State<BorderStroke>
+    fun borderStroke(enabled: Boolean, selected: Boolean): State<BorderStroke?>
 }
 
 /**
@@ -1615,7 +1616,7 @@ private fun Chip(
     modifier: Modifier,
     onClick: () -> Unit,
     enabled: Boolean,
-    label: @Composable RowScope.() -> Unit,
+    label: @Composable () -> Unit,
     labelTextStyle: TextStyle,
     labelColor: Color,
     leadingIcon: @Composable (() -> Unit)?,
@@ -1665,7 +1666,7 @@ private fun SelectableChip(
     modifier: Modifier,
     onClick: () -> Unit,
     enabled: Boolean,
-    label: @Composable RowScope.() -> Unit,
+    label: @Composable () -> Unit,
     labelTextStyle: TextStyle,
     leadingIcon: @Composable (() -> Unit)?,
     trailingIcon: @Composable (() -> Unit)?,
@@ -1709,7 +1710,7 @@ private fun SelectableChip(
 
 @Composable
 private fun ChipContent(
-    label: @Composable (RowScope.() -> Unit),
+    label: @Composable () -> Unit,
     labelTextStyle: TextStyle,
     labelColor: Color,
     leadingIcon: @Composable (() -> Unit)?,
@@ -2158,7 +2159,7 @@ private class DefaultSelectableChipBorder(
     private val selectedBorderWidth: Dp
 ) : SelectableChipBorder {
     @Composable
-    override fun borderStroke(enabled: Boolean, selected: Boolean): State<BorderStroke> {
+    override fun borderStroke(enabled: Boolean, selected: Boolean): State<BorderStroke?> {
         val color = if (enabled) {
             if (selected) selectedBorderColor else borderColor
         } else {
