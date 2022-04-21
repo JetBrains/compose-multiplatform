@@ -23,6 +23,7 @@ import androidx.compose.ui.inspection.rules.sendCommand
 import androidx.compose.ui.inspection.testdata.DialogTestActivity
 import androidx.compose.ui.inspection.util.GetComposablesCommand
 import androidx.compose.ui.inspection.util.toMap
+import androidx.compose.ui.unit.IntRect
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
@@ -69,10 +70,12 @@ class DialogTest {
         map {
             val node = MutableInspectorNode()
             node.name = strings[it.name] ?: ""
-            node.left = it.bounds.layout.x
-            node.top = it.bounds.layout.y
-            node.width = it.bounds.layout.w
-            node.height = it.bounds.layout.h
+            node.box = IntRect(
+                it.bounds.layout.x,
+                it.bounds.layout.y,
+                it.bounds.layout.x + it.bounds.layout.w,
+                it.bounds.layout.y + it.bounds.layout.h
+            )
             node.children.addAll(it.childrenList.convert(strings))
             node.build()
         }

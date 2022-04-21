@@ -196,6 +196,7 @@ class LayoutInspectorTreeTest {
         val view = findAndroidComposeView()
         view.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
         val builder = LayoutInspectorTree()
+        builder.includeAllParameters = true
         val nodes = builder.convert(view)
         dumpNodes(nodes, view, builder)
 
@@ -422,6 +423,7 @@ class LayoutInspectorTreeTest {
         val view = findAndroidComposeView()
         view.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
         val builder = LayoutInspectorTree()
+        builder.includeAllParameters = true
         val node = builder.convert(view)
             .flatMap { flatten(it) }
             .firstOrNull { it.name == "BasicText" }
@@ -525,6 +527,7 @@ class LayoutInspectorTreeTest {
         val composeViews = findAllAndroidComposeViews()
         val appView = composeViews[0]
         val dialogView = composeViews[1]
+        assertThat(composeViews).hasSize(2)
         appView.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
         dialogView.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
 
@@ -654,6 +657,7 @@ class LayoutInspectorTreeTest {
         val nodes = builder.convert(composeView)
         dumpNodes(nodes, composeView, builder)
         val androidView = nodes.flatMap { flatten(it) }.single { it.name == "AndroidView" }
+        assertThat(androidView.viewId).isEqualTo(0)
 
         validate(listOf(androidView), builder) {
             node(
@@ -825,6 +829,7 @@ class LayoutInspectorTreeTest {
         val androidComposeView = findAndroidComposeView()
         androidComposeView.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
         val builder = LayoutInspectorTree()
+        builder.includeAllParameters = true
         val tree1 = builder.convert(androidComposeView)
         val first = tree1.flatMap { flatten(it) }.single { it.name == "First" }
         val hash = packageNameHash(this.javaClass.name.substringBeforeLast('.'))
@@ -856,11 +861,6 @@ class LayoutInspectorTreeTest {
         }
     }
 
-    @Composable
-    fun InlineParameters(size: Dp, fontSize: TextUnit) {
-        Text("$size $fontSize")
-    }
-
     @Test
     fun testInlineParameterTypes() {
         val slotTableRecord = CompositionDataRecord.create()
@@ -874,6 +874,7 @@ class LayoutInspectorTreeTest {
         androidComposeView.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
         val builder = LayoutInspectorTree()
         builder.hideSystemNodes = false
+        builder.includeAllParameters = true
         val inlineParameters = builder.convert(androidComposeView)
             .flatMap { flatten(it) }
             .first { it.name == "InlineParameters" }
@@ -881,6 +882,7 @@ class LayoutInspectorTreeTest {
         assertThat(inlineParameters.parameters[0].value?.javaClass).isEqualTo(Dp::class.java)
         assertThat(inlineParameters.parameters[1].name).isEqualTo("fontSize")
         assertThat(inlineParameters.parameters[1].value?.javaClass).isEqualTo(TextUnit::class.java)
+        assertThat(inlineParameters.parameters).hasSize(2)
     }
 
     @Suppress("SameParameterValue")
@@ -1192,4 +1194,9 @@ internal fun Inspectable(
         LocalInspectionTables provides store,
         content = content
     )
+}
+
+@Composable
+fun InlineParameters(size: Dp, fontSize: TextUnit) {
+    Text("$size $fontSize")
 }
