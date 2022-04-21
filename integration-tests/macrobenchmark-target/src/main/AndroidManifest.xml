@@ -95,5 +95,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".LazyVerticalGridActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.compose.integration.macrobenchmark.target.LAZY_VERTICAL_GRID_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>
