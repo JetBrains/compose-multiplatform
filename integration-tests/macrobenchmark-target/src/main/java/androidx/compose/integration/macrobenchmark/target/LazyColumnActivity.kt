@@ -42,12 +42,13 @@ class LazyColumnActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val itemCount = intent.getIntExtra(EXTRA_ITEM_COUNT, 3000)
+        val entries = List(itemCount) { Entry("Item $it") }
 
         setContent {
             LazyColumn(
                 modifier = Modifier.fillMaxWidth().semantics { contentDescription = "IamLazy" }
             ) {
-                items(List(itemCount) { Entry("Item $it") }) {
+                items(entries) {
                     ListRow(it)
                 }
             }
