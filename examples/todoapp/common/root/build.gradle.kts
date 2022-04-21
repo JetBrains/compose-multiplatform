@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-
 plugins {
     id("multiplatform-setup")
     id("android-setup")
@@ -7,10 +5,10 @@ plugins {
 }
 
 kotlin {
-    ios {
+    iosWorkaroundSupportArm64Simulator {
         binaries {
             framework {
-                baseName = "KotlinCommon"
+                baseName = "Todo"
                 linkerOpts.add("-lsqlite3")
                 export(project(":common:database"))
                 export(project(":common:main"))

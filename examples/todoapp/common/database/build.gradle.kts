@@ -11,6 +11,8 @@ sqldelight {
 }
 
 kotlin {
+    iosWorkaroundSupportArm64Simulator {}
+
     sourceSets {
         commonMain {
             dependencies {

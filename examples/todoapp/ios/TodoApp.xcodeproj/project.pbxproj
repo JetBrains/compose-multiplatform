@@ -29,7 +29,7 @@
 		1F00F390257599DA00CFAF97 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1F00F393257599DA00CFAF97 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		1F00F395257599DA00CFAF97 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1F00F3A325759FEC00CFAF97 /* KotlinCommon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = KotlinCommon.framework; path = "../common/root/build/xcode-frameworks/KotlinCommon.framework"; sourceTree = "<group>"; };
+		1F00F3A325759FEC00CFAF97 /* Todo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Todo.framework; path = "../common/root/build/xcode-frameworks/Todo.framework"; sourceTree = "<group>"; };
 		1F00F3A72575A16400CFAF97 /* ObservableValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableValue.swift; sourceTree = "<group>"; };
 		1F00F3A92575A71000CFAF97 /* MutableStateBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableStateBuilder.swift; sourceTree = "<group>"; };
 		1F00F3AB2575AA4500CFAF97 /* ListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListView.swift; sourceTree = "<group>"; };
@@ -101,7 +101,7 @@
 		1F00F3A225759FEC00CFAF97 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				1F00F3A325759FEC00CFAF97 /* KotlinCommon.framework */,
+				1F00F3A325759FEC00CFAF97 /* Todo.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -171,7 +171,6 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* TODO Remove workaround -Pkotlin.version=1.6.20, when newer version of Compose released */
 /* Begin PBXShellScriptBuildPhase section */
 		1F00F39D25759BB300CFAF97 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -188,7 +187,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd $SRCROOT/..\n./gradlew :common:root:embedAndSignAppleFrameworkForXcode -Pkotlin.version=1.6.20\n";
+			shellScript = "cd $SRCROOT/..\n./gradlew :common:root:embedAndSignAppleFrameworkForXcode";
 		};
 /* End PBXShellScriptBuildPhase section */
 
