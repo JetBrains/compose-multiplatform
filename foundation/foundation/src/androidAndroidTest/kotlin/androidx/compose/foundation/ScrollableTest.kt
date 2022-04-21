@@ -363,7 +363,7 @@ class ScrollableTest {
             )
         }
         rule.onNodeWithTag(scrollableBoxTag).performMouseInput {
-            this.scroll(100f, ScrollWheel.Vertical)
+            this.scroll(-100f, ScrollWheel.Vertical)
         }
 
         val lastTotal = rule.runOnIdle {
@@ -371,14 +371,14 @@ class ScrollableTest {
             total
         }
         rule.onNodeWithTag(scrollableBoxTag).performMouseInput {
-            this.scroll(100f, ScrollWheel.Horizontal)
+            this.scroll(-100f, ScrollWheel.Horizontal)
         }
 
         rule.runOnIdle {
             assertThat(total).isEqualTo(lastTotal)
         }
         rule.onNodeWithTag(scrollableBoxTag).performMouseInput {
-            this.scroll(-100f, ScrollWheel.Vertical)
+            this.scroll(100f, ScrollWheel.Vertical)
         }
         rule.runOnIdle {
             assertThat(total).isLessThan(0.01f)
@@ -454,7 +454,7 @@ class ScrollableTest {
             )
         }
         rule.onNodeWithTag(scrollableBoxTag).performMouseInput {
-            this.scroll(100f, ScrollWheel.Vertical)
+            this.scroll(-100f, ScrollWheel.Vertical)
         }
 
         val lastTotal = rule.runOnIdle {
@@ -463,14 +463,14 @@ class ScrollableTest {
         }
 
         rule.onNodeWithTag(scrollableBoxTag).performMouseInput {
-            this.scroll(100f, ScrollWheel.Horizontal)
+            this.scroll(-100f, ScrollWheel.Horizontal)
         }
 
         rule.runOnIdle {
             assertThat(total).isEqualTo(lastTotal)
         }
         rule.onNodeWithTag(scrollableBoxTag).performMouseInput {
-            this.scroll(-100f, ScrollWheel.Vertical)
+            this.scroll(100f, ScrollWheel.Vertical)
         }
         rule.runOnIdle {
             assertThat(total).isLessThan(0.01f)
