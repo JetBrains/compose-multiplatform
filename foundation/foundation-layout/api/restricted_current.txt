@@ -222,6 +222,9 @@ package androidx.compose.foundation.layout {
   public static final class WindowInsets.Companion {
   }
 
+  public final class WindowInsetsConnection_androidKt {
+  }
+
   public final class WindowInsetsKt {
     method public static androidx.compose.foundation.layout.WindowInsets WindowInsets(optional int left, optional int top, optional int right, optional int bottom);
     method public static androidx.compose.foundation.layout.WindowInsets WindowInsets(optional float left, optional float top, optional float right, optional float bottom);

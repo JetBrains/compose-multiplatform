@@ -129,7 +129,8 @@ internal class InsetsPaddingModifier(
         val horizontal = left + right
         val vertical = top + bottom
 
-        val placeable = measurable.measure(constraints.offset(-horizontal, -vertical))
+        val childConstraints = constraints.offset(-horizontal, -vertical)
+        val placeable = measurable.measure(childConstraints)
 
         val width = constraints.constrainWidth(placeable.width + horizontal)
         val height = constraints.constrainHeight(placeable.height + vertical)

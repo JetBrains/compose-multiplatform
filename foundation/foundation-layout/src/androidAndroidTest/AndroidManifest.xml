@@ -19,5 +19,9 @@
         <activity
             android:name="androidx.compose.foundation.layout.TestActivity"
             android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen" />
+        <activity
+            android:name="androidx.compose.foundation.layout.WindowInsetsActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen" />
     </application>
 </manifest>
