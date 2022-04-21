@@ -176,6 +176,7 @@ tasks.withType<Test>().configureEach {
 
     dependsOn(":publishToMavenLocal")
     systemProperty("compose.plugin.version", BuildProperties.deployVersion(project))
+    systemProperty("kotlin.version", project.property("kotlin.version").toString())
 }
 
 task("printAllAndroidxReplacements") {
