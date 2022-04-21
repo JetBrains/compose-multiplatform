@@ -79,14 +79,16 @@ private class LazyListBeyondBoundsModifierLocal(
         block: BeyondBoundsScope.() -> T?
     ): T? {
         // We use a new interval each time because this function is re-entrant.
-        var interval =
-            beyondBoundsInfo.addInterval(state.firstVisibleItemIndex, state.lastVisibleItemIndex)
+        var interval = beyondBoundsInfo.addInterval(
+            state.firstVisibleItemIndex,
+            state.layoutInfo.visibleItemsInfo.last().index
+        )
 
         var found: T? = null
         while (found == null && interval.hasMoreContent(direction)) {
 
             // Add one extra beyond bounds item.
-            interval = createNextInterval(interval, direction).also {
+            interval = addNextInterval(interval, direction).also {
                 beyondBoundsInfo.removeInterval(interval)
             }
             state.remeasurement?.forceRemeasure()
@@ -106,7 +108,7 @@ private class LazyListBeyondBoundsModifierLocal(
         return found
     }
 
-    private fun createNextInterval(
+    private fun addNextInterval(
         currentInterval: Interval,
         direction: BeyondBoundsLayout.LayoutDirection
     ): Interval {
@@ -154,10 +156,3 @@ private class LazyListBeyondBoundsModifierLocal(
 private fun unsupportedDirection(): Nothing = error(
     "Lazy list does not support beyond bounds layout for the specified direction"
 )
-
-private val LazyListState.lastVisibleItemIndex: Int
-    get() = if (visibleItemsCount == 0) {
-        firstVisibleItemIndexNonObservable.value
-    } else {
-        firstVisibleItemIndexNonObservable.value + visibleItemsCount - 1
-    }
