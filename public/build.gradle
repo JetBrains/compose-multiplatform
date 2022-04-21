@@ -1,5 +1,3 @@
-apply plugin: "java-gradle-plugin"
-
 apply from: "../shared.gradle"
 
 sourceSets {

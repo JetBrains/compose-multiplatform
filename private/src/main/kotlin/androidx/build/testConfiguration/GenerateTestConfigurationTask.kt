@@ -24,11 +24,14 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
@@ -38,10 +41,12 @@ import java.io.File
  * format that gets zipped alongside the APKs to be tested.
  * This config gets ingested by Tradefed.
  */
+@CacheableTask
 abstract class GenerateTestConfigurationTask : DefaultTask() {
 
     @get:InputFiles
     @get:Optional
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val appFolder: DirectoryProperty
 
     @get:Internal
@@ -52,6 +57,7 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
     abstract val appProjectPath: Property<String>
 
     @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val testFolder: DirectoryProperty
 
     @get:Internal

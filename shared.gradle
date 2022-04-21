@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 apply plugin: "kotlin"
 apply from: "../kotlin-dsl-dependency.gradle"
+apply plugin: "java-gradle-plugin"
 
 buildscript {
     project.ext.supportRootFolder = project.projectDir.getParentFile().getParentFile()
@@ -138,4 +139,8 @@ loadConfigurationQuicklyInto(configurations.cacheableRuntimeOnly, configurations
 project.tasks.withType(Jar) { task ->
     task.reproducibleFileOrder = true
     task.preserveFileTimestamps = false
+}
+
+validatePlugins {
+    enableStricterValidation = true
 }

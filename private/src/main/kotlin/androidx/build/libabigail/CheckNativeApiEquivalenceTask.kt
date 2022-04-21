@@ -23,13 +23,17 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import java.io.File
 
 /**
  * Checks that the native API files in the build folder are exactly the same as the checked in
  * native API files.
  */
+@DisableCachingByDefault(because = "Doesn't benefit from caching")
 abstract class CheckNativeApiEquivalenceTask : DefaultTask() {
     /**
      * Api file (in the build dir) to check
@@ -46,7 +50,7 @@ abstract class CheckNativeApiEquivalenceTask : DefaultTask() {
     @get:Internal
     abstract val artifactNames: ListProperty<String>
 
-    @InputFiles
+    @[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
     fun getTaskInputs(): List<File> {
         return getLocationsForArtifacts(
             builtApi.get(),

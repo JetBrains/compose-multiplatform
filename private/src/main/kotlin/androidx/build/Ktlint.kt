@@ -92,6 +92,7 @@ fun Project.configureKtlint() {
     }
 }
 
+@CacheableTask
 abstract class BaseKtlintTask : DefaultTask() {
     @get:Inject
     abstract val execOperations: ExecOperations
@@ -206,6 +207,7 @@ abstract class KtlintFormatTask : BaseKtlintTask() {
     }
 }
 
+@CacheableTask
 abstract class KtlintCheckFileTask : DefaultTask() {
     init {
         description = "Check Kotlin code style."

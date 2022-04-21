@@ -31,13 +31,17 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.work.DisableCachingByDefault
 
+@DisableCachingByDefault(because = "Simply generates a small file and doesn't benefit from caching")
 abstract class SdkResourceGenerator : DefaultTask() {
     @get:Input
     lateinit var tipOfTreeMavenRepoRelativePath: String
 
-    @get:InputFile
+    @get:[InputFile PathSensitive(PathSensitivity.NONE)]
     abstract val debugKeystore: RegularFileProperty
 
     @get:Input

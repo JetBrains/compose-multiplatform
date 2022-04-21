@@ -18,6 +18,7 @@ package androidx.build
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 
 /**
  * Validates that all properties of the project can be computed successfully.
@@ -25,6 +26,7 @@ import org.gradle.api.tasks.TaskAction
  * Gradle itself, but does not output them to stdout.
  * In practice, this should ensure that Android Studio sync is able to succeed
  */
+@DisableCachingByDefault(because = "Too many inputs to be feasible to cache, and also runs quickly")
 abstract class ValidatePropertiesTask : DefaultTask() {
     @TaskAction
     fun exec() {
