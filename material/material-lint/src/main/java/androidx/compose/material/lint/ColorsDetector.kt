@@ -19,8 +19,8 @@
 package androidx.compose.material.lint
 
 import androidx.compose.lint.Name
-import androidx.compose.lint.Names
 import androidx.compose.lint.isInPackageName
+import androidx.compose.material.lint.MaterialNames.Material
 import com.android.tools.lint.client.api.UElementHandler
 import com.android.tools.lint.detector.api.Category
 import com.android.tools.lint.detector.api.Detector
@@ -55,7 +55,7 @@ class ColorsDetector : Detector(), SourceCodeScanner {
     override fun createUastHandler(context: JavaContext) = object : UElementHandler() {
         override fun visitCallExpression(node: UCallExpression) {
             val method = node.resolve() ?: return
-            if (!method.isInPackageName(Names.Material.PackageName)) return
+            if (!method.isInPackageName(Material.PackageName)) return
 
             if (node.isConstructorCall()) {
                 if (method.containingClass?.name != Colors.shortName) return
@@ -229,6 +229,6 @@ private val OnColorMap = mapOf(
     "error" to "onError"
 )
 
-private val LightColors = Name(Names.Material.PackageName, "lightColors")
-private val DarkColors = Name(Names.Material.PackageName, "darkColors")
-private val Colors = Name(Names.Material.PackageName, "Colors")
+private val LightColors = Name(Material.PackageName, "lightColors")
+private val DarkColors = Name(Material.PackageName, "darkColors")
+private val Colors = Name(Material.PackageName, "Colors")
