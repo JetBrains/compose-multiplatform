@@ -33,6 +33,7 @@ import androidx.compose.ui.inspection.inspector.ParameterType.DimensionDp
 import androidx.compose.ui.platform.InspectableModifier
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontListFontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -423,6 +424,14 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             return createReferenceToExistingValue(name, value, parentValue, existing)
         }
 
+        private fun create(
+            name: String,
+            value: Any?,
+            parentValue: Any?,
+            specifiedIndex: Int = 0
+        ): NodeParameter? =
+            create(name, value, parentValue)?.apply { index = specifiedIndex }
+
         private fun createFromSimpleValue(name: String, value: Any?): NodeParameter? {
             if (value == null) {
                 return null
@@ -474,6 +483,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             value.javaClass.isArray -> createFromArray(name, value, startIndex, maxElements)
             value is Offset -> createFromOffset(name, value)
             value is Shadow -> createFromShadow(name, value)
+            value is TextStyle -> createFromTextStyle(name, value)
             else -> createFromKotlinReflection(name, value)
         }
 
@@ -488,6 +498,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             value.javaClass.isArray -> findFromArray(value, index)
             value is Offset -> findFromOffset(value, index)
             value is Shadow -> findFromShadow(value, index)
+            value is TextStyle -> findFromTextStyle(value, index)
             else -> findFromKotlinReflection(value, index)
         }
 
@@ -911,6 +922,58 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             }
             return Pair("blurRadius", with(density) { value.blurRadius.toDp() })
         }
+
+        // Temporary handling of TextStyle: remove when TextStyle implements InspectableValue
+        // Hide: paragraphStyle, spanStyle, platformStyle, lineHeightBehavior
+        private fun createFromTextStyle(name: String, value: TextStyle): NodeParameter? {
+            val parameter =
+                NodeParameter(name, ParameterType.String, TextStyle::class.java.simpleName)
+            val elements = parameter.elements
+            create("color", value.color, value)?.let { elements.add(it) }
+            create("fontSize", value.fontSize, value, 1)?.let { elements.add(it) }
+            create("fontWeight", value.fontWeight, value, 2)?.let { elements.add(it) }
+            create("fontStyle", value.fontStyle, value, 3)?.let { elements.add(it) }
+            create("fontSynthesis", value.fontSynthesis, value, 4)?.let { elements.add(it) }
+            create("fontFamily", value.fontFamily, value, 5)?.let { elements.add(it) }
+            create("fontFeatureSettings", value.fontFeatureSettings, value, 6)?.let {
+                elements.add(it)
+            }
+            create("letterSpacing", value.letterSpacing, value, 7)?.let { elements.add(it) }
+            create("baselineShift", value.baselineShift, value, 8)?.let { elements.add(it) }
+            create("textGeometricTransform", value.textGeometricTransform, value, 9)?.let {
+                elements.add(it)
+            }
+            create("localeList", value.localeList, value, 10)?.let { elements.add(it) }
+            create("background", value.background, value, 11)?.let { elements.add(it) }
+            create("textDecoration", value.textDecoration, value, 12)?.let { elements.add(it) }
+            create("shadow", value.shadow, value, 13)?.let { elements.add(it) }
+            create("textDirection", value.textDirection, value, 14)?.let { elements.add(it) }
+            create("lineHeight", value.lineHeight, value, 15)?.let { elements.add(it) }
+            create("textIndent", value.textIndent, value, 16)?.let { elements.add(it) }
+            return parameter
+        }
+
+        private fun findFromTextStyle(value: TextStyle, index: Int): Pair<String, Any?>? =
+            when (index) {
+                0 -> Pair("color", value.color)
+                1 -> Pair("fontSize", value.fontSize)
+                2 -> Pair("fontWeight", value.fontWeight)
+                3 -> Pair("fontStyle", value.fontStyle)
+                4 -> Pair("fontSynthesis", value.fontSynthesis)
+                5 -> Pair("fontFamily", value.fontFamily)
+                6 -> Pair("fontFeatureSettings", value.fontFeatureSettings)
+                7 -> Pair("letterSpacing", value.letterSpacing)
+                8 -> Pair("baselineShift", value.baselineShift)
+                9 -> Pair("textGeometricTransform", value.textGeometricTransform)
+                10 -> Pair("localeList", value.localeList)
+                11 -> Pair("background", value.background)
+                12 -> Pair("textDecoration", value.textDecoration)
+                13 -> Pair("shadow", value.shadow)
+                14 -> Pair("textDirection", value.textDirection)
+                15 -> Pair("lineHeight", value.lineHeight)
+                16 -> Pair("textIndent", value.textIndent)
+                else -> null
+            }
 
         @Suppress("DEPRECATION")
         private fun createFromTextUnit(name: String, value: TextUnit): NodeParameter =
