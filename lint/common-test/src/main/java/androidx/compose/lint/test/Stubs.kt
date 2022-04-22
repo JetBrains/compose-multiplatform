@@ -348,6 +348,37 @@ object Stubs {
         """
     )
 
+    val PaddingValues: TestFile = compiledStub(
+        filename = "Padding.kt",
+        filepath = "androidx/compose/foundation/layout",
+        checksum = 0xeedd3f96,
+        """
+
+            package androidx.compose.foundation.layout
+
+            import androidx.compose.ui.Modifier
+
+            interface PaddingValues
+
+        """,
+        """
+        META-INF/main.kotlin_module:
+        H4sIAAAAAAAAAGNgYGBmYGBgBGI2BijgUueSTMxLKcrPTKnQS87PLcgvTtXL
+        TSxJLcpMzBHiCk5OTEvLz0nxLuHi5WJOy88XYgtJLS7xLlFi0GIAACJwI+tQ
+        AAAA
+        """,
+        """
+        androidx/compose/foundation/layout/PaddingValues.class:
+        H4sIAAAAAAAAAJVOTUvDQBB9s9Gkxq9ULdQ/YdrizZMXIVBRFHrJaZtsyzbp
+        rnQ3pd76uzxIz/4ocVL9A87Amzfz4L35+v74BHCLHmEgTbmyutykhV2+WafS
+        mW1MKb22Jq3lu218+izLUpv5RNaNchGIkCzkWrJs5unTdKEKHyEgdMeV9bU2
+        6aPyki3kHUEs1wFnUQthCyBQxfeNbrcBs3JI6O22nVj0RSwSZrP+bjsSA2rF
+        EWE0/u+THMw58d/tpvK8vNpmVagHXSvC9UtjvF6qiXZ6Wqt7Y6zfu7mQM3GA
+        3xK43OMFrngO2fKQO8wRZIgydDIcIWaK4wwnOM1BDmc4zyEcEofuD692uKBp
+        AQAA
+        """
+    )
+
     val Remember: TestFile = compiledStub(
         filename = "Remember.kt",
         filepath = "androidx/compose/runtime",

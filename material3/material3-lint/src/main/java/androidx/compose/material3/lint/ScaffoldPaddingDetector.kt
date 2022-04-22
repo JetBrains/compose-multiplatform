@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.compose.material.lint
+package androidx.compose.material3.lint
 
 import androidx.compose.lint.Name
 import androidx.compose.lint.findUnreferencedParameters
 import androidx.compose.lint.isInPackageName
-import androidx.compose.material.lint.MaterialNames.Material
+import androidx.compose.material3.lint.Material3Names.Material3
 import com.android.tools.lint.detector.api.Category
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Implementation
@@ -44,7 +44,7 @@ class ScaffoldPaddingDetector : Detector(), SourceCodeScanner {
     override fun getApplicableMethodNames(): List<String> = listOf(Scaffold.shortName)
 
     override fun visitMethodCall(context: JavaContext, node: UCallExpression, method: PsiMethod) {
-        if (method.isInPackageName(Material.PackageName)) {
+        if (method.isInPackageName(Material3.PackageName)) {
             val contentArgument = computeKotlinArgumentMapping(node, method)
                 .orEmpty()
                 .filter { (_, parameter) ->
@@ -60,7 +60,7 @@ class ScaffoldPaddingDetector : Detector(), SourceCodeScanner {
                     ?: context.getLocation(contentArgument)
                 val name = unreferencedParameter.name
                 context.report(
-                    UnusedMaterialScaffoldPaddingParameter,
+                    UnusedMaterial3ScaffoldPaddingParameter,
                     node,
                     location,
                     "Content padding parameter $name is not used"
@@ -70,8 +70,8 @@ class ScaffoldPaddingDetector : Detector(), SourceCodeScanner {
     }
 
     companion object {
-        val UnusedMaterialScaffoldPaddingParameter = Issue.create(
-            "UnusedMaterialScaffoldPaddingParameter",
+        val UnusedMaterial3ScaffoldPaddingParameter = Issue.create(
+            "UnusedMaterial3ScaffoldPaddingParameter",
             "Scaffold content should use the padding provided as a lambda parameter",
             "The `content` lambda in Scaffold has a padding parameter " +
                 "which will include any inner padding for the content due to app bars. If this " +
@@ -86,4 +86,4 @@ class ScaffoldPaddingDetector : Detector(), SourceCodeScanner {
     }
 }
 
-private val Scaffold = Name(Material.PackageName, "Scaffold")
+private val Scaffold = Name(Material3.PackageName, "Scaffold")

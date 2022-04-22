@@ -16,7 +16,7 @@
 
 @file:Suppress("UnstableApiUsage")
 
-package androidx.compose.material.lint
+package androidx.compose.material3.lint
 
 import androidx.compose.lint.test.Stubs
 import androidx.compose.lint.test.compiledStub
@@ -37,15 +37,15 @@ class ScaffoldPaddingDetectorTest : LintDetectorTest() {
     override fun getDetector(): Detector = ScaffoldPaddingDetector()
 
     override fun getIssues(): MutableList<Issue> =
-        mutableListOf(ScaffoldPaddingDetector.UnusedMaterialScaffoldPaddingParameter)
+        mutableListOf(ScaffoldPaddingDetector.UnusedMaterial3ScaffoldPaddingParameter)
 
     // Simplified Scaffold.kt stubs
     private val ScaffoldStub = compiledStub(
         filename = "Scaffold.kt",
-        filepath = "androidx/compose/material",
-        checksum = 0x2dde3750,
+        filepath = "androidx/compose/material3",
+        checksum = 0xfee46355,
         """
-            package androidx.compose.material
+            package androidx.compose.material3
 
             import androidx.compose.foundation.layout.PaddingValues
             import androidx.compose.runtime.Composable
@@ -62,72 +62,72 @@ class ScaffoldPaddingDetectorTest : LintDetectorTest() {
         """,
         """
         META-INF/main.kotlin_module:
-        H4sIAAAAAAAAAGNgYGBmYGBgBGI2BijgUueSTMxLKcrPTKnQS87PLcgvTtXL
-        TSxJLcpMzBHiCk5OTEvLz0nxLuHi5WJOy88XYgtJLS7xLlFi0GIAACJwI+tQ
-        AAAA
+        H4sIAAAAAAAAAGNgYGBmYGBgBGI2Bijg0uCSSsxLKcrPTKnQS87PLcgvTtXL
+        TSxJLcpMzDEW4gpOTkxLy89J8S7h4uViTsvPF2ILSS0u8S5RYtBiAACpks1u
+        UQAAAA==
         """,
         """
-        androidx/compose/material/ScaffoldKt＄Scaffold＄1.class:
-        H4sIAAAAAAAAAKVU604TQRT+Zlt6xxZEuYj3qi0o2+LdNiSEQNxQMLHYxPBr
-        2t3C0N1Z091t8B8P4RP4BKKJJJoY4k8fynhmaQ2GiBo32bMn53zfmXOb/fb9
-        0xcA9/CEQefS7LrC3NVbrvPK9Szd4b7VFdzW6y3ebru2uernB2q+HAdjWK11
-        XN8WUt/pObqQhJeEr3GnafLKcV87kC1fuNLTV/paqTrwv5DCryxUGKZ+HyyO
-        KMOl0wPGEWOIVQWFW2CIFIoNhmjBKDYySCCVwhDSZPC3hcdQrv1juZReTMie
-        27EYxgrF2g7vcd3mckt/1tyxWn4lgyySKWgYYUgfqyyOswwJY72+sbi+tMww
-        /EvZGZzD+STGME6gassOk1f5hqGmlPtMkrRphpEBcc3yucl9TilpTi9CA2RK
-        xJQAA+soJULOXaG0EmlmmWH6cC+ROtxLaTmNPrnDvSmtxJ6mvr6NaQlNYeYp
-        8SqXrnztuIFHLaRg+b9pUxy3GXI/e2VabR7YPsObwskuB0Jfc03RFlb3Twvy
-        n/5yxTg5JbUMc9Cp0kG6cx3KNLrkmjTY0Zrb4naDU31N29pQgiFbE9JaD5ym
-        1e1bMoaUVnfJ5p5n0S5ll2XLdj0ht2gy267JkKyLLcn9oEvgVN0Nui1rRSjm
-        5PNA+sKxGsITFGpRStfnYdoo0ZSHqON0rzCpxk6ji9JLq0CWedLyhGBq0DOR
-        A2T2w2HfJZk5smI45IyoPewzZkMMvQqs0T1XMGVIHyOyI2JukYi5PnFe7ZE6
-        fOYjRt9j4t0p/ET/4ASlPTh4nNDqSX+G9vIAFz7g4n5oGMJ9kimCHQEm8CCs
-        8w7V/zA8JIJH4beMx+Gvia49sS5vImLgioGrBq7hukHNuGHgJm5tgnkooEh+
-        DzMeZj1kfwB7t1DT1wQAAA==
+        androidx/compose/material3/ScaffoldKt＄Scaffold＄1.class:
+        H4sIAAAAAAAAAKVU604TQRT+Zlt62RZbEOUi3kFbULYt3ktICIG4oWBisYnh
+        17S7haG7s6a7bfAfD+ET+ASiiSSaGOJPH8p4ZmkNhogaN9mzJ+d835lzm/32
+        /dMXAPfwhKHApdX2hLVnNDz3lefbhssDuy24M29UG7zZ9BxrLZjqq1PFOBjD
+        WqXlBY6Qxm7XNYQkguSOUeFu3eLlk75mRzYC4UnfWO1phYW+/4UUQXmxzDDx
+        +2BxRBmunB0wjhhDbEFQuEWGSC5fY4jmzHwtjQR0HQNIkSHYET5DqfKv9VJ+
+        MSG7XstmGMnlK7u8yw2Hy23jWX3XbgTlNDJI6tAwxJA6UVoc5xkS5kZ1c2lj
+        eYVh8Je607iAi0mMYJRACw0nzF4lHIaaUO5zSdImGYb6xHU74BYPOKWkud0I
+        jZApEVMCDKyllAg594TSCqRZRYbJo/2EfrSva1mNPtmj/QmtwJ7qX9/GtISm
+        MCVKfIFLT752vY5PPaRg03/VpzjuMGR/Nsuym7zjBAxvcqf73BHGumeJprDb
+        f1qR//QXy+bpMal1mINBpfbTnWtRptFlz6LJDle8BndqnAqsO/amEgyZipD2
+        Rset2+2eJW1KabeXHe77Nm1TZkU2HM8XcptGs+NZDMmq2JY86LQJrFe9Trth
+        rwrFHH/ekYFw7ZrwBYVaktILeJg2CjTmAWo53SyMq7nT7KL00i6QpUTaFCGY
+        mvRM5BDpg3Da8yTTx1YMhpwhtYg9xmyIoVeBNbrqCqYMqRNEdkzMLhEx2yOW
+        1CKpw2c+Yvg9xt6dwU/0Dk5Q2v2DRwmtntRnaC8PcekDLh+EhgHcJ6kT7Bgw
+        hgdhnXep/ofhIRE8Cr9FPA7/TnTxiXV1CxET10xcN3EDN01qxrSJW7i9BeYj
+        hzz5fcz4mPWR+QHL6C/y2gQAAA==
         """,
         """
-        androidx/compose/material/ScaffoldKt＄Scaffold＄2.class:
-        H4sIAAAAAAAAAKVU604TQRT+Zlt6WYotiHIR71VbULatd9uQECJxQ8HEYhPD
-        r2l3C0O3s6a72+A/HsIn8AlEE0k0McSfPpTxzNIqhogaN9mzJ+d835lzm/36
-        7eNnAHfwiMHg0uq6wtoxmm7npevZRof7dldwx6g1eavlOtaKnx2o2VIcjGGl
-        2nZ9R0hju9cxhCS8JHyVdxoWLx/1tQLZ9IUrPWO5rxUqA/9zKfzyQplh+vfB
-        4ogyXDg5YBwxhlhFULgFhkguX2eI5sx8PYUEdB1DGCaDvyU8hmL1H8ul9GJC
-        9ty2zTCey1e3eY8bDpebxtPGtt30yymkkdShYZRh+EhlcZxmSJhrtfXFtaXH
-        DCO/lJ3CGZxNYhwTBKo0nTB5lW8Yalq5TyVJm2EYHRBXbZ9b3OeUktbpRWiA
-        TImYEmBgbaVEyLkjlFYgzSoyzBzsJvSDXV3LaPTJHOxOawX2RP/yJqYlNIUp
-        UeIVLl35quMGHrWQgmX/pk1x3GTI/OiVZbd44PgMr3PHuxwIY9W1REvY3T8t
-        yH/6i2Xz+JTUMszDoEoH6c63KdPokmvRYMeqbpM7dU71NRx7XQmGdFVIey3o
-        NOxu35IypbS7Sw73PJt2Kf1YNh3XE3KTJrPlWgzJmtiU3A+6BNZrbtBt2stC
-        MaeeBdIXHbsuPEGhFqV0fR6mjQJNeYg6TvcKU2rsNLoovbQKZCmRliUEU4Oe
-        jewjtRcO+zbJ1KEVIyFnVO1hnzEXYuhVYI3uuYKxkPKTyA6JmUUiZvrEktoj
-        dfjsB4y9w+TbE/iJ/sEJSntw8ASh1TP8CdqLfZx7j/N7oWEId0nqBDsETOJe
-        WOctqv9+eEgED8JvEQ/DXxNde2Jd3EDExCUTl01cwVWTmnHNxHXc2ADzkEOe
-        /B5mPcx5SH8Hm6I3JNcEAAA=
+        androidx/compose/material3/ScaffoldKt＄Scaffold＄2.class:
+        H4sIAAAAAAAAAKVUbU/TUBR+bjf2xnADUV7Ed9ANlI7h+wgJIRAbBiYOlxg+
+        3bUdXNbemrVd8Bs/wl/gLxBNNNHEED/6o4znlk0xRNTYpKcn5zzPueft9uu3
+        j58B3MEjhhKXVtsT1p5ueu4Lz7d1lwd2W3BnXq+ZvNn0HGstmOypk+UkGMNa
+        teUFjpD6bsfVhSSC5I5e5W7D4pXjvmYozUB40tdXu1ppoed/JkVQWawwjP8+
+        WBJxhkunB0wiwZBYEBRukSFWKNYZ4gWjWM8ihUwGfegnQ7AjfIZy9V/rpfwS
+        Qna8ls0wXChWd3mH6w6X2/qTxq5tBpUsckhnoGGQof9YaUmcZUgZG7XNpY3l
+        FYaBX+rO4hzOpzGMEQItmE6UvUo4CjWu3GfSpE0wDPaI63bALR5wSklzOzEa
+        IVMioQQYWEspMXLuCaWVSLPmGCYO91OZw/2Mltfokz/cH9dK7HHmy+uEltIU
+        pkyJL3DpyZeuF/rUQwo29Vd9SuIWQ/5Hsyy7yUMnYHhVONnnUOjrniWawm7/
+        aUX+0z9XMU6OSa3DLHQqtZfubIsyjS97Fk12qOqZ3KlzKrDh2JtKMOSqQtob
+        oduw211L1pDSbi873Pdt2qbcijQdzxdym0az41kM6ZrYljwI2wTO1Lywbdqr
+        QjHHnoYyEK5dF76gUEtSegGP0kaJxtxHLaebhTE1d5pdnF7aBbKUSZskBFOT
+        no59QPYgmvY8yeyRFQMRZ1AtYpcxE2HoVWCNrrqCsYjyk8iOiPklIua7xLJa
+        JHX49HsMvcXom1P4qe7BKUq7d/AIodXT/wna8w+48A4XDyJDH+6SzBDsCDCK
+        e1Gdt6n++9EhMTyIvnN4GP2d6OIT6/IWYgauGLhq4BquG9SMKQM3cHMLzEcB
+        RfL7mPYx4yP3HfQNQiHaBAAA
         """,
         """
-        androidx/compose/material/ScaffoldKt.class:
-        H4sIAAAAAAAAAMVVS3PbVBT+rl+SFSd1lThN3BJK49I0jyo25elQSE3Titim
-        g9tssrqWZaNYusrokSkbJgx/gQ1b/gGsOiwYD0v+BX+E6ZFshzTupGTKDAvd
-        e173nO+ce+7Rn3//9juAu2gwlLjoeK7VeaYZrnPo+qbm8MD0LG5rLYN3u67d
-        2Q0kMIb8AT/ims1FT/uqfWAaJE0yyGMrhu9X6hPOQktruB2ra5letd53A9sS
-        2sGRo3VDYQSWK3xtZ0RtvqG+XL29x/DXm2HYGuufCiuo3vtvzctbG5Pgum4o
-        OjxSU2m/dcNAe8w7HUv09rgdmn71TIQox5uTXrxQBJZjarWY523brDIs112v
-        px2YQdvjFuHgQrgBH2JqukEztG2ykp1RbWQoDEunMrAENYKgRtBF4JEDy/Al
-        5BgKxjem0R95eMw97phkyHBrpX62RaqnJK3ISY8yyGEGlxRMI8+QCdzD+5xi
-        qwzZthsErhOzcwyS4RIAEciYJ1znXyvD9dd1z2tNymSSH3dzqWN2eWgHDD/+
-        z12tTxY1aoJr54GS8BaVM2oGLsgJw/k5lE4sqzm8jetZLOEdBu3fjIbSScXK
-        EpapnfRm68l2s/aAoTwZ9HwHFP0m3s2ihFsvd+Ir6ibh9oURViSsXRxWJYa1
-        kcU67uSQRkZBApsMl8c31zADTk+YU/8knKMkTVYWLZloAQPrR0SClM+siKKj
-        iU6Z4YfB8Q1lcKwk8ol4WzjZ4k9OjOni0/zguJjYZBVZJmOikpVZolLFaTWl
-        knwz/cfPmYSciaXShPRKXi7OxjJlpMkONY+kCEqFRSjVcTanX8yEMHojlYsP
-        MYapcTnv9OlNpWpux2S4VLeE2Qydtuk9iWZWFNA1uL3H6TKIHwmzLasneBB6
-        RF/9ejjpdHFk+Rapt/8ZavQzO6s9mU4vmU23Am70G/xwFCCnC2F6NZv7vklq
-        peWGnmHuWJFuceRybyIcytQHqeiOaV+MGoO4GnF8JF9cVaee4/KaOkvrulqg
-        dUO9Qusv8ZEvoh6hyi/QOHxA9OrwEBSSIKZU+lhMzdGXiKl5FJHETuxBwsOR
-        D5n2R5E+RUw2brszaz6Lq7hGdITQoVAZ2iuFVOq7n6D8ihsDLO0WUukhtzLA
-        ar2QkoacRlxjdW194znKQ+g6rWkkZ6an4yyWCAkoiETYZ2gvYIpCZbGMHGWV
-        Jbxfkl6lg6U4swV6SsN9N3Z3H3Xa6wSuQm7f20dSx10d7+v4AB/q+Agf6/gE
-        1X0wH1v4dB9TPtI+7vlQfCz4UH185kP2Medj3sfnPrZfADvMWafjCAAA
+        androidx/compose/material3/ScaffoldKt.class:
+        H4sIAAAAAAAAAMVUS3PbVBT+ru1YkmOnrhKniVtCaRya5lHZbnk6FFLTtCK2
+        6eA2m6yuZdkolq8yemTKhgnDX2DDln8Aqw4LxsOSf8EfYXok2yGNOwm0zLDQ
+        Pc97zneOzj1//PXrbwDuos6wwkXbdaz2M81w+oeOZ2p97puuxe07WtPgnY5j
+        t3d9CYwhe8CPuGZz0dW+bB2YBmnjDPLYi+G71dpEtMDS6k7b6limW6n1HN+2
+        hHZw1Nc6gTB8yxGetjPiim9oL1Vu7TH8+WYYtsb2p8LyK/f+W/fS1uYkuI4T
+        iDYPzdTab5zA1x7zdtsS3T1uB6ZXOZMhrHFlMoobCN/qm1o1knnLNisMyzXH
+        7WoHpt9yuUU4uBCOz4eYGo7fCGybvOT+qDcyUgxLpyqwBE2C4LamC9+lAJbh
+        SUgz5IyvTaM3ivCYu7xvkiPDzdXa2RGpnNI0wyBdqiCNGVxKIYMsQ9J3Du9z
+        yq0yKC3H951+JM4xSIZDAIQvY55wnf9bGa5fND0XupTIJTue5kLb7PDA9hl+
+        +J+nWp9sajgE184DJeEtamc4DFxQEIbzayiceFbSeBvXFSzhHYbiP9oNhZOW
+        lSQs0zzpjeaT7Ub1AUN5MusFESj/Ct5VUMDNl2fxFZ2TcOvfYyxLWH8NYOUI
+        2KaCDdxOYwrJFGIoMlwe/7266XN6xpxmKNY/itN6ZeGRDA8wsF7IxMj4zAo5
+        uhprlxi+HxzfSA2OU7FsLCILJyT65NiYzz/NDo7zsSIryzI5ExcvzxKXyGfU
+        hEr64tTvPyVjcjLSShPaK1k5PxvpUiOLMrQ8kkIoZRaiVMfVnH41E8rwnbyi
+        gRctMobpcTtv9+hdJapO22S4VLOE2Qj6LdN9Eu6tMKFjcHuP098geaRUmlZX
+        cD9wib/61XDb6eLI8iwyb/+92BgKZ60nG+olt0zT50avzg9HCdK6EKZbtbnn
+        mWRONZ3ANcwdK7QtjkLuTaRDieYgEf5joovhYJBUJYmP9Itr6vRzXF5XZ+nc
+        UHN0bqpX6Pw5uvJ5OCPU+QVaiQ+IXxteQoo0iDiVPhZxc/TFIm4eecSxE0WQ
+        8HAUQyb6KLQnSFCisTtzZhVcxTXiQ4R9SpUkWs4lEt/+iNQvuDHA0m4uMTWU
+        VgdYq+US0lDSSKqvrW9sPkdpCF2ncwrxmUwmqmKJkICSSIR9hmgO05RKwTLS
+        VJVCeL8gu0oXC1FlC/SUhnQ3CncfNaI1AlemsHf2EddxV8d7Ot7HBzo+xEc6
+        PkZlH8zDFj7Zx7SHKQ/3PKQ8LHhQPXzqQfYw52Hew2cetl8ABZTb8egIAAA=
         """
     )
 
@@ -138,7 +138,7 @@ class ScaffoldPaddingDetectorTest : LintDetectorTest() {
                 """
                 package foo
 
-                import androidx.compose.material.*
+                import androidx.compose.material3.*
                 import androidx.compose.runtime.*
                 import androidx.compose.ui.*
 
@@ -161,22 +161,22 @@ class ScaffoldPaddingDetectorTest : LintDetectorTest() {
             .run()
             .expect(
                 """
-src/foo/test.kt:10: Error: Content padding parameter it is not used [UnusedMaterialScaffoldPaddingParameter]
+src/foo/test.kt:10: Error: Content padding parameter it is not used [UnusedMaterial3ScaffoldPaddingParameter]
                     Scaffold { /**/ }
                              ~~~~~~~~
-src/foo/test.kt:11: Error: Content padding parameter it is not used [UnusedMaterialScaffoldPaddingParameter]
+src/foo/test.kt:11: Error: Content padding parameter it is not used [UnusedMaterial3ScaffoldPaddingParameter]
                     Scaffold(Modifier) { /**/ }
                                        ~~~~~~~~
-src/foo/test.kt:12: Error: Content padding parameter it is not used [UnusedMaterialScaffoldPaddingParameter]
+src/foo/test.kt:12: Error: Content padding parameter it is not used [UnusedMaterial3ScaffoldPaddingParameter]
                     Scaffold(Modifier, topBar = {}, bottomBar = {}) { /**/ }
                                                                     ~~~~~~~~
-src/foo/test.kt:13: Error: Content padding parameter it is not used [UnusedMaterialScaffoldPaddingParameter]
+src/foo/test.kt:13: Error: Content padding parameter it is not used [UnusedMaterial3ScaffoldPaddingParameter]
                     Scaffold(Modifier, topBar = {}, bottomBar = {}, content = { /**/ })
                                                                               ~~~~~~~~
-src/foo/test.kt:14: Error: Content padding parameter _ is not used [UnusedMaterialScaffoldPaddingParameter]
+src/foo/test.kt:14: Error: Content padding parameter _ is not used [UnusedMaterial3ScaffoldPaddingParameter]
                     Scaffold(Modifier, topBar = {}, bottomBar = {}) { _ -> /**/ }
                                                                       ~
-src/foo/test.kt:15: Error: Content padding parameter innerPadding is not used [UnusedMaterialScaffoldPaddingParameter]
+src/foo/test.kt:15: Error: Content padding parameter innerPadding is not used [UnusedMaterial3ScaffoldPaddingParameter]
                     Scaffold(Modifier, topBar = {}, bottomBar = {}) { innerPadding -> /**/ }
                                                                       ~~~~~~~~~~~~
 6 errors, 0 warnings
@@ -191,7 +191,7 @@ src/foo/test.kt:15: Error: Content padding parameter innerPadding is not used [U
                 """
                 package foo
 
-                import androidx.compose.material.*
+                import androidx.compose.material3.*
                 import androidx.compose.runtime.*
                 import androidx.compose.ui.*
 
@@ -228,10 +228,10 @@ src/foo/test.kt:15: Error: Content padding parameter innerPadding is not used [U
             .run()
             .expect(
                 """
-src/foo/test.kt:12: Error: Content padding parameter it is not used [UnusedMaterialScaffoldPaddingParameter]
+src/foo/test.kt:12: Error: Content padding parameter it is not used [UnusedMaterial3ScaffoldPaddingParameter]
                     Scaffold {
                              ^
-src/foo/test.kt:21: Error: Content padding parameter innerPadding is not used [UnusedMaterialScaffoldPaddingParameter]
+src/foo/test.kt:21: Error: Content padding parameter innerPadding is not used [UnusedMaterial3ScaffoldPaddingParameter]
                     Scaffold(Modifier, topBar = {}, bottomBar = {}) { innerPadding ->
                                                                       ~~~~~~~~~~~~
 2 errors, 0 warnings
@@ -246,7 +246,7 @@ src/foo/test.kt:21: Error: Content padding parameter innerPadding is not used [U
                 """
                 package foo
 
-                import androidx.compose.material.*
+                import androidx.compose.material3.*
                 import androidx.compose.runtime.*
                 import androidx.compose.ui.*
 
