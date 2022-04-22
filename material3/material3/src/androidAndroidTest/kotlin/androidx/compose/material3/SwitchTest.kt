@@ -19,9 +19,12 @@ package androidx.compose.material3
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.tokens.SwitchTokens
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,6 +48,7 @@ import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTouchHeightIsEqualTo
 import androidx.compose.ui.test.assertTouchWidthIsEqualTo
 import androidx.compose.ui.test.assertWidthIsAtLeast
@@ -263,6 +267,33 @@ class SwitchTest {
             clickable = false,
             minimumTouchTarget = false
         )
+    }
+
+    @Test
+    fun switch_stateChange_movesThumb() {
+        var checked by mutableStateOf(false)
+        rule.setMaterialContent(lightColorScheme()) {
+            val spacer = @Composable { Spacer(Modifier.size(16.dp).testTag("spacer")) }
+            Switch(
+                modifier = Modifier.testTag(defaultSwitchTag),
+                checked = checked,
+                thumbContent = spacer,
+                onCheckedChange = { checked = it },
+            )
+        }
+
+        rule.onNodeWithTag("spacer", useUnmergedTree = true)
+            .assertLeftPositionInRootIsEqualTo(8.dp)
+
+        rule.runOnIdle { checked = true }
+
+        rule.onNodeWithTag("spacer", useUnmergedTree = true)
+            .assertLeftPositionInRootIsEqualTo(28.dp)
+
+        rule.runOnIdle { checked = false }
+
+        rule.onNodeWithTag("spacer", useUnmergedTree = true)
+            .assertLeftPositionInRootIsEqualTo(8.dp)
     }
 
     // regression test for b/191375128
