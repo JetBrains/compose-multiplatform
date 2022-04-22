@@ -104,6 +104,9 @@ class LayoutInspectorTree {
     var hideSystemNodes = true
     var includeNodesOutsizeOfWindow = true
     var includeAllParameters = true
+    private var searchingForAnchorId = false
+    private var includeParametersForAnchorHash = 0
+    private var foundNode: InspectorNode? = null
     private var windowSize = emptySize
     private val inlineClassConverter = InlineClassConverter()
     private val parameterFactory = ParameterFactory(inlineClassConverter)
@@ -138,6 +141,21 @@ class LayoutInspectorTree {
         val result = convert(tables, view)
         clear()
         return result
+    }
+
+    fun findParameters(view: View, anchorHash: Int): InspectorNode? {
+        windowSize = IntSize(view.width, view.height)
+        parameterFactory.density = Density(view.context)
+        @Suppress("UNCHECKED_CAST")
+        val tables = view.getTag(R.id.inspection_slot_table_set) as?
+            Set<CompositionData>
+            ?: return null
+        clear()
+        searchingForAnchorId = true
+        includeParametersForAnchorHash = anchorHash
+        val node = tables.firstNotNullOfOrNull { findParameters(it) }
+        clear()
+        return node
     }
 
     /**
@@ -237,6 +255,9 @@ class LayoutInspectorTree {
         semanticsMap.clear()
         stitched.clear()
         subCompositions.clear()
+        searchingForAnchorId = false
+        includeParametersForAnchorHash = 0
+        foundNode = null
     }
 
     private fun convert(tables: Set<CompositionData>, view: View): List<InspectorNode> {
@@ -354,6 +375,11 @@ class LayoutInspectorTree {
         return if (belongsToView(fakeParent.layoutNodes, view)) fakeParent else null
     }
 
+    private fun findParameters(table: CompositionData): InspectorNode? {
+        table.asLazyTree(::convert, contextCache) ?: return null
+        return foundNode
+    }
+
     private fun convert(
         group: CompositionGroup,
         context: SourceContext,
@@ -435,15 +461,23 @@ class LayoutInspectorTree {
         if (unwantedName(node.name) || (node.box == emptyBox && !subCompositions.capturing)) {
             return markUnwanted(group, context, node)
         }
-        parseCallLocation(node, context.location)
-        if (isHiddenSystemNode(node)) {
-            return markUnwanted(group, context, node)
+        if (!searchingForAnchorId) {
+            parseCallLocation(node, context.location)
+            if (isHiddenSystemNode(node)) {
+                return markUnwanted(group, context, node)
+            }
         }
         val hash = group.identity?.hashCode()
         node.anchorHash = hash ?: 0
         node.id = syntheticId(hash)
-        if (includeAllParameters) {
+        if (includeAllParameters ||
+            (searchingForAnchorId && includeParametersForAnchorHash == hash)
+        ) {
             addParameters(context, node)
+            if (searchingForAnchorId && includeParametersForAnchorHash == hash) {
+                foundNode = buildAndRelease(node)
+                return newNode()
+            }
         }
         return node
     }
@@ -499,9 +533,13 @@ class LayoutInspectorTree {
             }
         }
 
-        node.layoutNodes.add(layoutInfo)
         node.box = box.emptyCheck()
         node.bounds = bounds
+        if (searchingForAnchorId) {
+            return node
+        }
+
+        node.layoutNodes.add(layoutInfo)
         val modifierInfo = layoutInfo.getModifierInfo()
         node.unmergedSemantics.addAll(
             modifierInfo.asSequence()

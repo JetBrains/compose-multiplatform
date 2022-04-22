@@ -423,14 +423,22 @@ class LayoutInspectorTreeTest {
         val view = findAndroidComposeView()
         view.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
         val builder = LayoutInspectorTree()
-        builder.includeAllParameters = true
+        builder.includeAllParameters = false
         val node = builder.convert(view)
             .flatMap { flatten(it) }
             .firstOrNull { it.name == "BasicText" }
 
         assertThat(node).isNotNull()
+        assertThat(node?.parameters).isEmpty()
 
-        assertThat(node?.parameters).isNotEmpty()
+        // Get parameters for the Spacer after getting the tree without parameters:
+        val paramsNode = builder.findParameters(view, node!!.anchorHash)!!
+        val params = builder.convertParameters(
+            ROOT_ID, paramsNode, ParameterKind.Normal, MAX_RECURSIONS, MAX_ITERABLE_SIZE
+        )
+        assertThat(params).isNotEmpty()
+        val text = params.find { it.name == "text" }
+        assertThat(text?.value).isEqualTo("Some text")
     }
 
     @FlakyTest(bugId = 218332968)
