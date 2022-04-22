@@ -69,8 +69,7 @@ import androidx.compose.ui.unit.dp
  * Alternatively, use Accompanist's [Flow Layouts](https://google.github.io/accompanist/flowlayout/)
  * to wrap chips to a new line.
  *
- * @param onClick called when the chip is clicked. If null, then this chip will be considered
- * read-only unless something else handles its input events and updates its state.
+ * @param onClick called when the chip is clicked.
  * @param modifier Modifier to be applied to the chip
  * @param enabled When disabled, chip will not respond to user input. It will also appear visually
  * disabled and disabled to accessibility services.
