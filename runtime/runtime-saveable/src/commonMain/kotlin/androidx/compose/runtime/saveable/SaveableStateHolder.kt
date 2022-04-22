@@ -97,10 +97,10 @@ private class SaveableStateHolderImpl(
         }
     }
 
-    private fun saveAll(): MutableMap<Any, Map<String, List<Any?>>> {
+    private fun saveAll(): MutableMap<Any, Map<String, List<Any?>>>? {
         val map = savedStates.toMutableMap()
         registryHolders.values.forEach { it.saveTo(map) }
-        return map
+        return map.ifEmpty { null }
     }
 
     override fun removeState(key: Any) {
@@ -122,7 +122,12 @@ private class SaveableStateHolderImpl(
 
         fun saveTo(map: MutableMap<Any, Map<String, List<Any?>>>) {
             if (shouldSave) {
-                map[key] = registry.performSave()
+                val savedData = registry.performSave()
+                if (savedData.isEmpty()) {
+                    map -= key
+                } else {
+                    map[key] = savedData
+                }
             }
         }
     }
