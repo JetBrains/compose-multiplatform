@@ -139,7 +139,9 @@ private object LibrariesSnippet6 {
             navigation(startDestination = innerStartRoute, route = "Parent") {
                 // ...
                 composable("exampleWithRoute") { backStackEntry ->
-                    val parentEntry = remember { navController.getBackStackEntry("Parent") }
+                    val parentEntry = remember(backStackEntry) {
+                        navController.getBackStackEntry("Parent")
+                    }
                     val parentViewModel = hiltViewModel<ParentViewModel>(parentEntry)
                     ExampleWithRouteScreen(parentViewModel)
                 }
