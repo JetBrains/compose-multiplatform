@@ -105,8 +105,9 @@ private fun calcFrameDuration(frame: AnimationFrameInfo): Int {
 private fun getAnimatedImageLoaderByPath(path: String): AnimatedImageLoader {
     return if (isNetworkPath(path)) {
         NetworkAnimatedImageLoader(path)
-    } else
+    } else {
         LocalAnimatedImageLoader(path)
+    }
 }
 
 private fun isNetworkPath(path: String): Boolean {
