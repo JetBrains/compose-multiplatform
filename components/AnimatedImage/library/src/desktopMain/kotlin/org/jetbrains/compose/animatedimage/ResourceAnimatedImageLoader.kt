@@ -4,8 +4,8 @@ import androidx.compose.ui.res.useResource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class ResourceLoader(private val resourcePath: String) : AnimatedImageLoader {
-    override suspend fun loadBytes(): ByteArray = withContext(Dispatchers.IO) {
+internal class ResourceAnimatedImageLoader(private val resourcePath: String) : AnimatedImageLoader() {
+    override suspend fun generateByteArray(): ByteArray = withContext(Dispatchers.IO) {
         return@withContext useResource(resourcePath) { it.readAllBytes() }
     }
 }

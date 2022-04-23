@@ -2,16 +2,16 @@ package org.jetbrains.compose.animatedimage
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.FileInputStream
+import java.net.URL
 
-class LocalLoader(private val imageUrl: String) : AnimatedImageLoader {
+internal class NetworkAnimatedImageLoader(private val imageUrl: String) : AnimatedImageLoader() {
     var cachedBytes: ByteArray? = null
 
-    override suspend fun loadBytes(): ByteArray = withContext(Dispatchers.IO) {
+    override suspend fun generateByteArray(): ByteArray = withContext(Dispatchers.IO) {
         var bytesArray: ByteArray? = cachedBytes
 
         if (bytesArray == null) {
-            bytesArray = FileInputStream(imageUrl).readAllBytes() ?: byteArrayOf()
+            bytesArray = URL(imageUrl).readBytes()
 
             cachedBytes = bytesArray
         }

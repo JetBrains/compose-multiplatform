@@ -1,104 +1,93 @@
 package org.jetbrains.compose.animatedimage
 
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asComposeImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import org.jetbrains.skia.AnimationFrameInfo
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Codec
-import org.jetbrains.skia.Data
+import java.net.MalformedURLException
+import java.net.URL
 
 private const val DEFAULT_FRAME_DURATION = 50
 
-@Composable
-actual fun AnimatedImage(
-    loader: AnimatedImageLoader,
-    contentDescription: String?,
-    contentModifier: Modifier,
-    imageModifier: Modifier,
-    alignment: Alignment,
-    contentScale: ContentScale,
-    alpha: Float,
-    colorFilter: ColorFilter?,
-    filterQuality: FilterQuality,
-    placeHolder: @Composable BoxScope.() -> Unit
-) {
-    val codec = remember(loader) { mutableStateOf<Codec?>(null) }
-    val codecValue = codec.value
+actual class AnimatedImage(val codec: Codec)
 
-    LaunchedEffect(loader) {
-        val bytes = loader.loadBytes()
-        val data = Data.makeFromBytes(bytes)
-        codec.value = Codec.makeFromData(data)
+actual suspend fun loadAnimatedImage(path: String): AnimatedImage {
+    val loader = getAnimatedImageLoaderByPath(path)
+    return loader.loadAnimatedImage()
+}
+
+actual suspend fun loadResourceAnimatedImage(path: String): AnimatedImage {
+    val loader = ResourceAnimatedImageLoader(path)
+    return loader.loadAnimatedImage()
+}
+
+@Composable
+actual fun asyncAnimatedImageLoaderState(path: String): AnimatedImageLoaderState {
+    val fileAnimatedImageLoader = remember(path) { getAnimatedImageLoaderByPath(path) }
+
+    return asyncAnimatedImageLoaderState(fileAnimatedImageLoader)
+}
+
+@Composable
+actual fun asyncResourceAnimatedImageLoaderState(path: String): AnimatedImageLoaderState {
+    val resourceAnimatedImageLoader = remember(path) { ResourceAnimatedImageLoader(path) }
+
+    return asyncAnimatedImageLoaderState(resourceAnimatedImageLoader)
+}
+
+@Composable
+actual fun asyncAnimatedImageLoaderState(animatedImageLoader: AnimatedImageLoader): AnimatedImageLoaderState {
+    val asyncAnimatedImageState = remember(animatedImageLoader) {
+        mutableStateOf<AnimatedImageLoaderState>(AnimatedImageLoaderState.Loading)
     }
 
-    Box(contentModifier) {
-        if (codecValue == null) {
-            placeHolder()
-        } else {
-            val transition = rememberInfiniteTransition()
-            val frameIndex by transition.animateValue(
-                initialValue = 0,
-                targetValue = codecValue.frameCount - 1,
-                Int.VectorConverter,
-                animationSpec = infiniteRepeatable(
-                    animation = keyframes {
-                        durationMillis = 0
-                        for ((index, frame) in codecValue.framesInfo.withIndex()) {
-                            index at durationMillis
-                            val frameDuration = calcFrameDuration(frame)
-
-                            durationMillis += frameDuration
-                        }
-                    }
-                )
-            )
-
-            val bitmap = remember(codec) { Bitmap().apply { allocPixels(codecValue.imageInfo) } }
-
-            codecValue.readPixels(bitmap, frameIndex)
-
-            Image(
-                bitmap = bitmap.asComposeImageBitmap(),
-                modifier = imageModifier,
-                contentDescription = contentDescription,
-                alignment = alignment,
-                contentScale = contentScale,
-                alpha = alpha,
-                colorFilter = colorFilter,
-                filterQuality = filterQuality,
-            )
+    LaunchedEffect(animatedImageLoader) {
+        try {
+            val animatedImage = animatedImageLoader.loadAnimatedImage()
+            asyncAnimatedImageState.value = AnimatedImageLoaderState.Success(animatedImage)
+        } catch (ex: Exception) {
+            asyncAnimatedImageState.value = AnimatedImageLoaderState.Error(ex)
         }
     }
+
+    return asyncAnimatedImageState.value
 }
 
 @Composable
-actual fun rememberAnimatedImage(url: String): AnimatedImageLoader {
-    return remember {
-        if (url.startsWith("http://") || url.startsWith("https://")) {
-            NetworkLoader(url)
-        } else
-            LocalLoader(url)
+fun animatedImage(animatedImage: AnimatedImage): ImageBitmap {
+    val codec = animatedImage.codec
+
+    val transition = rememberInfiniteTransition()
+    val frameIndex by transition.animateValue(
+        initialValue = 0,
+        targetValue = codec.frameCount - 1,
+        Int.VectorConverter,
+        animationSpec = infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = 0
+                for ((index, frame) in codec.framesInfo.withIndex()) {
+                    index at durationMillis
+                    val frameDuration = calcFrameDuration(frame)
+
+                    durationMillis += frameDuration
+                }
+            }
+        )
+    )
+
+    val bitmap = remember(codec) { Bitmap().apply { allocPixels(codec.imageInfo) } }
+
+    remember(bitmap, frameIndex) {
+        codec.readPixels(bitmap, frameIndex)
     }
+
+    return bitmap.asComposeImageBitmap()
 }
 
-@Composable
-fun rememberResourceAnimatedImage(resourcePath: String): AnimatedImageLoader {
-    return remember {
-        ResourceLoader(resourcePath)
-    }
-}
-
-
-fun calcFrameDuration(frame: AnimationFrameInfo): Int {
+private fun calcFrameDuration(frame: AnimationFrameInfo): Int {
     var frameDuration = frame.duration
 
     // If the frame does not contain information about a duration, set a reasonable constant duration
@@ -107,4 +96,24 @@ fun calcFrameDuration(frame: AnimationFrameInfo): Int {
     }
 
     return frameDuration
+}
+
+/**
+ * Depending on the [path], provide a specific implementation of [AnimatedImageLoader]
+ * @return [NetworkAnimatedImageLoader] if it is a network URL, [LocalAnimatedImageLoader] otherwise
+ */
+private fun getAnimatedImageLoaderByPath(path: String): AnimatedImageLoader {
+    return if (isNetworkPath(path)) {
+        NetworkAnimatedImageLoader(path)
+    } else
+        LocalAnimatedImageLoader(path)
+}
+
+private fun isNetworkPath(path: String): Boolean {
+    return try {
+        URL(path)
+        true
+    } catch (e: MalformedURLException) {
+        false
+    }
 }
