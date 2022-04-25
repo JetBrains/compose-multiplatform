@@ -2967,8 +2967,6 @@ package androidx.compose.ui.semantics {
   }
 
   public final class SemanticsProperties_androidKt {
-    method public static boolean getTestTagsAsResourceId(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method public static void setTestTagsAsResourceId(androidx.compose.ui.semantics.SemanticsPropertyReceiver, boolean);
   }
 
   public final class SemanticsPropertyKey<T> {

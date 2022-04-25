@@ -3058,8 +3058,8 @@ package androidx.compose.ui.semantics {
   }
 
   @androidx.compose.ui.ExperimentalComposeUiApi public final class SemanticsPropertiesAndroid {
-    method public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> getTestTagsAsResourceId();
-    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> TestTagsAsResourceId;
+    method @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> getTestTagsAsResourceId();
+    property @androidx.compose.ui.ExperimentalComposeUiApi public final androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> TestTagsAsResourceId;
     field public static final androidx.compose.ui.semantics.SemanticsPropertiesAndroid INSTANCE;
   }
 
@@ -3129,8 +3129,8 @@ package androidx.compose.ui.semantics {
   }
 
   public final class SemanticsProperties_androidKt {
-    method public static boolean getTestTagsAsResourceId(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
-    method public static void setTestTagsAsResourceId(androidx.compose.ui.semantics.SemanticsPropertyReceiver, boolean);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static boolean getTestTagsAsResourceId(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static void setTestTagsAsResourceId(androidx.compose.ui.semantics.SemanticsPropertyReceiver, boolean);
   }
 
   public final class SemanticsPropertyKey<T> {
