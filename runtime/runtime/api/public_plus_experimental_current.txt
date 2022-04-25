@@ -845,6 +845,8 @@ package androidx.compose.runtime.snapshots {
     method public abstract androidx.compose.runtime.snapshots.Snapshot getRoot();
     method public abstract boolean hasPendingChanges();
     method public abstract androidx.compose.runtime.snapshots.Snapshot takeNestedSnapshot(optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver);
+    method @androidx.compose.runtime.ExperimentalComposeApi public final androidx.compose.runtime.snapshots.Snapshot? unsafeEnter();
+    method @androidx.compose.runtime.ExperimentalComposeApi public final void unsafeLeave(androidx.compose.runtime.snapshots.Snapshot? oldSnapshot);
     property public int id;
     property public abstract boolean readOnly;
     property public abstract androidx.compose.runtime.snapshots.Snapshot root;
