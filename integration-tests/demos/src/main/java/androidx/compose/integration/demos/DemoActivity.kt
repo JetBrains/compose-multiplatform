@@ -56,6 +56,7 @@ import androidx.lifecycle.LifecycleEventObserver
 /**
  * Main [Activity] containing all Compose related demos.
  */
+@Suppress("DEPRECATION")
 class DemoActivity : FragmentActivity() {
     lateinit var hostView: View
     lateinit var focusManager: FocusManager
