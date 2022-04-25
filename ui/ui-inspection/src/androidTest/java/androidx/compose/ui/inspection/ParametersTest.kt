@@ -21,7 +21,9 @@ import androidx.compose.ui.inspection.rules.sendCommand
 import androidx.compose.ui.inspection.testdata.ParametersTestActivity
 import androidx.compose.ui.inspection.util.GetComposablesCommand
 import androidx.compose.ui.inspection.util.GetParameterDetailsCommand
+import androidx.compose.ui.inspection.util.GetParametersByAnchorHashCommand
 import androidx.compose.ui.inspection.util.GetParametersCommand
+import androidx.compose.ui.inspection.util.GetUpdateSettingsCommand
 import androidx.compose.ui.inspection.util.flatten
 import androidx.compose.ui.inspection.util.toMap
 import androidx.test.filters.LargeTest
@@ -112,13 +114,29 @@ class ParametersTest {
     }
 
     @Test
-    fun intArray(): Unit = runBlocking {
+    fun testIntArrayWithoutDelayedExtraction() = intArray(useDelayedParameterExtraction = false)
+
+    @Test
+    fun testIntArrayWithDelayedExtraction() = intArray(useDelayedParameterExtraction = true)
+
+    private fun intArray(useDelayedParameterExtraction: Boolean): Unit = runBlocking {
+        if (useDelayedParameterExtraction) {
+            val updated = rule.inspectorTester.sendCommand(
+                GetUpdateSettingsCommand(delayParameterExtractions = true)
+            ).updateSettingsResponse
+            assertThat(updated.canDelayParameterExtractions).isTrue()
+        }
+
         val tester = rule.inspectorTester
         val nodes = tester.sendCommand(GetComposablesCommand(rule.rootId)).getComposablesResponse
 
         val function = nodes.filter("FunctionWithIntArray").single()
-        val params = tester.sendCommand(GetParametersCommand(rule.rootId, function.id))
-            .getParametersResponse
+        val paramResponse = if (useDelayedParameterExtraction) {
+            tester.sendCommand(GetParametersByAnchorHashCommand(rule.rootId, function.anchorHash))
+        } else {
+            tester.sendCommand(GetParametersCommand(rule.rootId, function.id))
+        }
+        val params = paramResponse.getParametersResponse
 
         val intArray = params.find("intArray")
         var strings = params.stringsList
@@ -131,18 +149,26 @@ class ParametersTest {
         checkIntParam(strings, intArray.elementsList[3], "[3]", 13, 3)
         checkIntParam(strings, intArray.elementsList[4], "[4]", 14, 4)
 
+        val reference = intArray.reference.toBuilder()
+        // Remove the id/anchor we should NOT use for lookup of the node
+        if (useDelayedParameterExtraction) {
+            reference.clearComposableId()
+        } else {
+            reference.clearAnchorHash()
+        }
+
         val expanded =
             tester.sendCommand(
                 GetParameterDetailsCommand(
                     rule.rootId,
-                    intArray.reference,
+                    reference.build(),
                     startIndex = 5,
                     maxElements = 5
                 )
             ).getParameterDetailsResponse
         val intArray2 = expanded.parameter
         strings = expanded.stringsList
-        checkStringParam(strings, intArray, "intArray", "IntArray[8]", 0)
+        checkStringParam(strings, intArray2, "intArray", "IntArray[8]", 0)
         assertThat(intArray2.elementsCount).isEqualTo(3)
         checkIntParam(strings, intArray2.elementsList[0], "[5]", 15, 5)
         checkIntParam(strings, intArray2.elementsList[1], "[6]", 16, 6)
@@ -192,6 +218,59 @@ class ParametersTest {
         assertThat(strings.toMap()[second.int32Value]).isEqualTo("four")
         assertThat(strings.toMap()[third.int32Value]).isEqualTo("five")
         assertThat(text.elementsList.size).isEqualTo(3)
+    }
+
+    @Test
+    fun delayedExtraction(): Unit = runBlocking {
+        val updated = rule.inspectorTester.sendCommand(
+            GetUpdateSettingsCommand(delayParameterExtractions = true)
+        ).updateSettingsResponse
+        assertThat(updated.canDelayParameterExtractions).isTrue()
+
+        val composables = rule.inspectorTester.sendCommand(GetComposablesCommand(rule.rootId))
+            .getComposablesResponse
+        var strings = composables.stringsList.toMap()
+        var column = composables.filter("Column").first()
+        var text = column.childrenList.single { strings[it.name] == "Text" }
+
+        var paramsById = rule.inspectorTester.sendCommand(
+            GetParametersCommand(rule.rootId, text.id)
+        ).getParametersResponse
+        // We are using delayed parameter extractions so the cache does not have parameters
+        // (The code should look for an anchor but the anchor is not specified.)
+        assertThat(paramsById.parameterGroup.parameterList).isEmpty()
+
+        // But looking up by anchor will find the parameters
+        var paramsByAnchor = rule.inspectorTester.sendCommand(
+            GetParametersByAnchorHashCommand(rule.rootId, text.anchorHash)
+        ).getParametersResponse
+        strings = paramsByAnchor.stringsList.toMap()
+        assertThat(paramsByAnchor.parameterGroup.parameterList).isNotEmpty()
+        var textValue = paramsByAnchor.find("text")
+        assertThat(strings[textValue.int32Value]).isEqualTo("four")
+
+        val snapshot = rule.inspectorTester.sendCommand(
+            GetComposablesCommand(rule.rootId, extractAllParameters = true)
+        ).getComposablesResponse
+        strings = snapshot.stringsList.toMap()
+        column = snapshot.filter("Column").first()
+        text = column.childrenList.single { strings[it.name] == "Text" }
+
+        paramsById = rule.inspectorTester.sendCommand(
+            GetParametersCommand(rule.rootId, text.id)
+        ).getParametersResponse
+        // Even when using delayed parameter extractions, use the cache if it contains all params:
+        strings = paramsById.stringsList.toMap()
+        assertThat(paramsById.parameterGroup.parameterList).isNotEmpty()
+        textValue = paramsById.find("text")
+        assertThat(strings[textValue.int32Value]).isEqualTo("four")
+
+        // Looking up by anchor should not find parameters
+        // (The code should use the cached values but the id is not specified.)
+        paramsByAnchor = rule.inspectorTester.sendCommand(
+            GetParametersByAnchorHashCommand(rule.rootId, text.anchorHash)
+        ).getParametersResponse
+        assertThat(paramsByAnchor.parameterGroup.parameterList).isEmpty()
     }
 }
 

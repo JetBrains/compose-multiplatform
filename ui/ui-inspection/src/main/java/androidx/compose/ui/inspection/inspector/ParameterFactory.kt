@@ -123,6 +123,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
     fun create(
         rootId: Long,
         nodeId: Long,
+        anchorHash: Int,
         name: String,
         value: Any?,
         kind: ParameterKind,
@@ -136,6 +137,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
                 creator.create(
                     rootId,
                     nodeId,
+                    anchorHash,
                     name,
                     value,
                     kind,
@@ -154,6 +156,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
      *
      * @param rootId is the root id of the specified [nodeId].
      * @param nodeId is the [InspectorNode.id] of the node the parameter belongs to.
+     * @param anchorHash is the [InspectorNode.anchorHash] of the node the parameter belongs to.
      * @param name is the name of the [reference].parameterIndex'th parameter of the node.
      * @param value is the value of the [reference].parameterIndex'th parameter of the node.
      * @param startIndex is the index of the 1st wanted element of a List/Array.
@@ -164,6 +167,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
     fun expand(
         rootId: Long,
         nodeId: Long,
+        anchorHash: Int,
         name: String,
         value: Any?,
         reference: NodeParameterReference,
@@ -178,6 +182,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
                 creator.expand(
                     rootId,
                     nodeId,
+                    anchorHash,
                     name,
                     value,
                     reference,
@@ -320,6 +325,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
     private inner class ParameterCreator {
         private var rootId = 0L
         private var nodeId = 0L
+        private var anchorHash = 0
         private var kind: ParameterKind = ParameterKind.Normal
         private var parameterIndex = 0
         private var maxRecursions = 0
@@ -334,6 +340,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
         fun create(
             rootId: Long,
             nodeId: Long,
+            anchorHash: Int,
             name: String,
             value: Any?,
             kind: ParameterKind,
@@ -342,7 +349,10 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             maxInitialIterableSize: Int
         ): NodeParameter =
             try {
-                setup(rootId, nodeId, kind, parameterIndex, maxRecursions, maxInitialIterableSize)
+                setup(
+                    rootId, nodeId, anchorHash, kind, parameterIndex, maxRecursions,
+                    maxInitialIterableSize
+                )
                 create(name, value, null) ?: createEmptyParameter(name)
             } finally {
                 setup()
@@ -351,6 +361,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
         fun expand(
             rootId: Long,
             nodeId: Long,
+            anchorHash: Int,
             name: String,
             value: Any?,
             reference: NodeParameterReference,
@@ -360,7 +371,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             maxInitialIterableSize: Int
         ): NodeParameter? {
             setup(
-                rootId, nodeId, reference.kind, reference.parameterIndex,
+                rootId, nodeId, anchorHash, reference.kind, reference.parameterIndex,
                 maxRecursions, maxInitialIterableSize
             )
             var parent: Pair<String, Any?>? = null
@@ -391,6 +402,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
         private fun setup(
             newRootId: Long = 0,
             newNodeId: Long = 0,
+            newAnchorHash: Int = 0,
             newKind: ParameterKind = ParameterKind.Normal,
             newParameterIndex: Int = 0,
             maxRecursions: Int = 0,
@@ -398,6 +410,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
         ) {
             rootId = newRootId
             nodeId = newNodeId
+            anchorHash = newAnchorHash
             kind = newKind
             parameterIndex = newParameterIndex
             this.maxRecursions = maxRecursions
@@ -606,7 +619,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
         }
 
         private fun valueIndexToReference(): NodeParameterReference =
-            NodeParameterReference(nodeId, kind, parameterIndex, valueIndex)
+            NodeParameterReference(nodeId, anchorHash, kind, parameterIndex, valueIndex)
 
         private fun createEmptyParameter(name: String): NodeParameter =
             NodeParameter(name, ParameterType.String, "")

@@ -193,6 +193,7 @@ class LayoutInspectorTree {
             parameterFactory.create(
                 rootId,
                 node.id,
+                node.anchorHash,
                 parameter.name,
                 parameter.value,
                 kind,
@@ -225,6 +226,7 @@ class LayoutInspectorTree {
         return parameterFactory.expand(
             rootId,
             node.id,
+            node.anchorHash,
             parameter.name,
             parameter.value,
             reference,
