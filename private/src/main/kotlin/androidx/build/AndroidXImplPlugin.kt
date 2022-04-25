@@ -319,7 +319,7 @@ class AndroidXImplPlugin : Plugin<Project> {
         }
     }
 
-    @Suppress("UnstableApiUsage") // AGP DSL APIs
+    @Suppress("UnstableApiUsage", "DEPRECATION") // AGP DSL APIs
     private fun configureWithLibraryPlugin(
         project: Project,
         androidXExtension: AndroidXExtension
@@ -327,6 +327,20 @@ class AndroidXImplPlugin : Plugin<Project> {
         val libraryExtension = project.extensions.getByType<LibraryExtension>().apply {
             configureAndroidBaseOptions(project, androidXExtension)
             configureAndroidLibraryOptions(project, androidXExtension)
+
+            // Make sure the main Kotlin source set doesn't contain anything under src/main/kotlin.
+            val mainKotlinSrcDir = (sourceSets.findByName("main")?.kotlin
+                as com.android.build.gradle.api.AndroidSourceDirectorySet)
+                .srcDirs
+                .filter { it.name == "kotlin" }
+                .getOrNull(0)
+            if (mainKotlinSrcDir?.isDirectory == true) {
+                throw GradleException(
+                    "Invalid project structure! AndroidX does not support \"kotlin\" as a " +
+                        "top-level source directory for libraries, use \"java\" instead: " +
+                        mainKotlinSrcDir.path
+                )
+            }
         }
 
         project.extensions.getByType<com.android.build.api.dsl.LibraryExtension>().apply {
