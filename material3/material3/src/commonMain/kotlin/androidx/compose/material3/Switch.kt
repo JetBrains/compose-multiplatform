@@ -37,6 +37,7 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.tokens.SwitchTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
@@ -111,23 +112,34 @@ fun Switch(
         { value -> if (value) maxBound else minBound }
     }
 
-    val offset = remember { Animatable(valueToOffset(checked)) }
+    val targetValue = valueToOffset(checked)
+    val offset = remember { Animatable(targetValue) }
+    val scope = rememberCoroutineScope()
+
     SideEffect {
         // min bound might have changed if the icon is only rendered in checked state.
         offset.updateBounds(lowerBound = minBound)
     }
 
-    val scope = rememberCoroutineScope()
+    DisposableEffect(checked) {
+        if (offset.targetValue != targetValue) {
+            scope.launch {
+                offset.animateTo(targetValue)
+            }
+        }
+        onDispose { }
+    }
+
     // TODO: Add Swipeable modifier b/223797571
     val toggleableModifier =
         if (onCheckedChange != null) {
             Modifier.toggleable(
                 value = checked,
                 onValueChange = { value: Boolean ->
+                    onCheckedChange(value)
                     scope.launch {
                         offset.animateTo(valueToOffset(value), AnimationSpec)
                     }
-                    onCheckedChange(value)
                 },
                 enabled = enabled,
                 role = Role.Switch,
