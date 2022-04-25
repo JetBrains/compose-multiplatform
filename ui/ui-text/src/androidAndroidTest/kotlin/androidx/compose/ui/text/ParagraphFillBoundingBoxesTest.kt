@@ -34,9 +34,9 @@ import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import androidx.compose.ui.text.matchers.assertThat
-import androidx.compose.ui.text.style.LineHeightBehavior
-import androidx.compose.ui.text.style.LineHeightTrim
-import androidx.compose.ui.text.style.LineVerticalAlignment
+import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.style.LineHeightStyle.Trim
+import androidx.compose.ui.text.style.LineHeightStyle.Alignment
 import androidx.compose.ui.unit.Constraints
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -191,9 +191,9 @@ class ParagraphFillBoundingBoxesTest {
                 platformStyle = @Suppress("DEPRECATION") PlatformTextStyle(
                     includeFontPadding = false
                 ),
-                lineHeightBehavior = LineHeightBehavior(
-                    alignment = LineVerticalAlignment.Proportional,
-                    trim = LineHeightTrim.None
+                lineHeightStyle = LineHeightStyle(
+                    alignment = Alignment.Proportional,
+                    trim = Trim.None
                 )
             ),
         )
@@ -220,9 +220,9 @@ class ParagraphFillBoundingBoxesTest {
             text,
             style = TextStyle(
                 lineHeight = lineHeight,
-                lineHeightBehavior = LineHeightBehavior(
-                    alignment = LineVerticalAlignment.Proportional,
-                    trim = LineHeightTrim.None
+                lineHeightStyle = LineHeightStyle(
+                    alignment = Alignment.Proportional,
+                    trim = Trim.None
                 ),
                 platformStyle = @Suppress("DEPRECATION") PlatformTextStyle(
                     includeFontPadding = false
