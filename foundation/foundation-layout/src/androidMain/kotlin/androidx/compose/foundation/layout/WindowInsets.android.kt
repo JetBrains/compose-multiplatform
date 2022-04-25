@@ -375,7 +375,7 @@ val WindowInsets.Companion.isTappableElementVisible: Boolean
  * The insets for various values in the current window.
  */
 @OptIn(ExperimentalLayoutApi::class)
-internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat?) {
+internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat?, view: View) {
     val captionBar =
         systemInsets(insets, WindowInsetsCompat.Type.captionBar(), "captionBar")
     val displayCutout =
@@ -431,7 +431,8 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
     /**
      * `true` unless the `ComposeView` [ComposeView.consumeWindowInsets] is set to `false`.
      */
-    var consumes = true
+    val consumes = (view.parent as? View)?.getTag(R.id.consume_window_insets_tag)
+        as? Boolean ?: true
 
     /**
      * The number of accesses to [WindowInsetsHolder]. When this reaches
@@ -549,8 +550,6 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
 
             DisposableEffect(insets) {
                 insets.incrementAccessors(view)
-                insets.consumes = (view.parent as? View)?.getTag(R.id.consume_window_insets_tag)
-                    as? Boolean ?: true
                 onDispose {
                     insets.decrementAccessors(view)
                 }
@@ -570,7 +569,7 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
                     } else {
                         null
                     }
-                    WindowInsetsHolder(insets)
+                    WindowInsetsHolder(insets, view)
                 }
             }
         }
@@ -614,7 +613,9 @@ private object RootWindowInsetsApi23 {
 
 private class InsetsListener(
     val composeInsets: WindowInsetsHolder,
-) : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP), OnApplyWindowInsetsListener {
+) : OnApplyWindowInsetsListener, WindowInsetsAnimationCompat.Callback(
+    if (composeInsets.consumes) DISPATCH_MODE_STOP else DISPATCH_MODE_CONTINUE_ON_SUBTREE
+) {
     /**
      * When [android.view.WindowInsetsController.controlWindowInsetsAnimation] is called,
      * the [onApplyWindowInsets] is called after [onPrepare] with the target size. We
