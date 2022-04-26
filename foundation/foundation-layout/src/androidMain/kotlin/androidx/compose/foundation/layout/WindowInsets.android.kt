@@ -19,6 +19,7 @@ package androidx.compose.foundation.layout
 import androidx.core.graphics.Insets as AndroidXInsets
 import android.os.Build
 import android.view.View
+import android.view.View.OnAttachStateChangeListener
 import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
@@ -453,6 +454,11 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
             // add listeners
             ViewCompat.setOnApplyWindowInsetsListener(view, insetsListener)
 
+            if (view.isAttachedToWindow) {
+                view.requestApplyInsets()
+            }
+            view.addOnAttachStateChangeListener(insetsListener)
+
             // We don't need animation callbacks on earlier versions, so don't bother adding
             // the listener. ViewCompat calls the animation callbacks superfluously.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -473,6 +479,7 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
             // remove listeners
             ViewCompat.setOnApplyWindowInsetsListener(view, null)
             ViewCompat.setWindowInsetsAnimationCallback(view, null)
+            view.removeOnAttachStateChangeListener(insetsListener)
         }
     }
 
@@ -616,9 +623,9 @@ private object RootWindowInsetsApi23 {
 
 private class InsetsListener(
     val composeInsets: WindowInsetsHolder,
-) : Runnable, OnApplyWindowInsetsListener, WindowInsetsAnimationCompat.Callback(
+) : WindowInsetsAnimationCompat.Callback(
     if (composeInsets.consumes) DISPATCH_MODE_STOP else DISPATCH_MODE_CONTINUE_ON_SUBTREE
-) {
+), Runnable, OnApplyWindowInsetsListener, OnAttachStateChangeListener {
     /**
      * When [android.view.WindowInsetsController.controlWindowInsetsAnimation] is called,
      * the [onApplyWindowInsets] is called after [onPrepare] with the target size. We
@@ -696,5 +703,12 @@ private class InsetsListener(
                 savedInsets = null
             }
         }
+    }
+
+    override fun onViewAttachedToWindow(view: View) {
+        view.requestApplyInsets()
+    }
+
+    override fun onViewDetachedFromWindow(v: View) {
     }
 }
