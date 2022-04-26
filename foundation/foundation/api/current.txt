@@ -426,7 +426,7 @@ package androidx.compose.foundation.lazy {
   public final class LazyListItemPlacementAnimatorKt {
   }
 
-  public final class LazyListItemsProviderImplKt {
+  public final class LazyListItemProviderImplKt {
   }
 
   public final class LazyListKt {
@@ -558,6 +558,9 @@ package androidx.compose.foundation.lazy.grid {
   public final class LazyGridItemPlacementAnimatorKt {
   }
 
+  public final class LazyGridItemProviderImplKt {
+  }
+
   @androidx.compose.foundation.lazy.grid.LazyGridScopeMarker @androidx.compose.runtime.Stable public sealed interface LazyGridItemScope {
   }
 
@@ -566,9 +569,6 @@ package androidx.compose.foundation.lazy.grid {
     method public int getMaxLineSpan();
     property public abstract int maxCurrentLineSpan;
     property public abstract int maxLineSpan;
-  }
-
-  public final class LazyGridItemsProviderImplKt {
   }
 
   public final class LazyGridKt {

@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 @Suppress("ComposableModifierFactory", "ModifierInspectorInfo")
 @Composable
 internal fun Modifier.lazyGridSemantics(
-    itemsProvider: LazyGridItemsProvider,
+    itemProvider: LazyGridItemProvider,
     state: LazyGridState,
     coroutineScope: CoroutineScope,
     isVertical: Boolean,
@@ -46,16 +46,16 @@ internal fun Modifier.lazyGridSemantics(
     userScrollEnabled: Boolean
 ) = this.then(
     remember(
-        itemsProvider,
+        itemProvider,
         state,
         isVertical,
         reverseScrolling,
         userScrollEnabled
     ) {
         val indexForKeyMapping: (Any) -> Int = { needle ->
-            val key = itemsProvider::getKey
+            val key = itemProvider::getKey
             var result = -1
-            for (index in 0 until itemsProvider.itemCount) {
+            for (index in 0 until itemProvider.itemCount) {
                 if (key(index) == needle) {
                     result = index
                     break
@@ -76,7 +76,7 @@ internal fun Modifier.lazyGridSemantics(
                 if (state.canScrollForward) {
                     // If we can scroll further, we don't know the end yet,
                     // but it's upper bounded by #items + 1
-                    itemsProvider.itemCount + 1f
+                    itemProvider.itemCount + 1f
                 } else {
                     // If we can't scroll further, the current value is the max
                     state.firstVisibleItemIndex + state.firstVisibleItemScrollOffset / 100_000f

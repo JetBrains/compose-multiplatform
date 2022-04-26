@@ -157,8 +157,8 @@ internal class LazyLayoutPrefetcher(
         var scheduleForNextFrame = false
         while (prefetchRequests.isNotEmpty() && !scheduleForNextFrame) {
             val request = prefetchRequests[0]
-            val itemsProvider = itemContentFactory.itemsProvider()
-            if (request.canceled || request.index !in 0 until itemsProvider.itemCount) {
+            val itemProvider = itemContentFactory.itemProvider()
+            if (request.canceled || request.index !in 0 until itemProvider.itemCount) {
                 prefetchRequests.removeAt(0)
             } else if (request.precomposeHandle == null) {
                 trace("compose:lazylist:prefetch:compose") {
@@ -166,7 +166,7 @@ internal class LazyLayoutPrefetcher(
                     // check if there is enough time left in this frame. otherwise, we schedule
                     // a next frame callback in which we will post the message in the handler again.
                     if (enoughTimeLeft(beforeTimeNs, nextFrameNs, averagePrecomposeTimeNs)) {
-                        val key = itemsProvider.getKey(request.index)
+                        val key = itemProvider.getKey(request.index)
                         val content = itemContentFactory.getContent(request.index, key)
                         request.precomposeHandle = subcomposeLayoutState.precompose(key, content)
                         averagePrecomposeTimeNs = calculateAverageTime(

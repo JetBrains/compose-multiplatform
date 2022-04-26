@@ -33,11 +33,11 @@ import androidx.compose.runtime.snapshotFlow
 
 @ExperimentalFoundationApi
 @Composable
-internal fun rememberItemsProvider(
+internal fun rememberItemProvider(
     state: LazyGridState,
     content: LazyGridScope.() -> Unit,
     itemScope: LazyGridItemScope
-): LazyGridItemsProvider {
+): LazyGridItemProvider {
     val latestContent = rememberUpdatedState(content)
     val nearestItemsRangeState = remember(state) {
         mutableStateOf(
@@ -51,7 +51,7 @@ internal fun rememberItemsProvider(
             .collect { nearestItemsRangeState.value = it }
     }
     return remember(nearestItemsRangeState) {
-        LazyGridItemsProviderImpl(
+        LazyGridItemProviderImpl(
             derivedStateOf {
                 val listScope = LazyGridScopeImpl().apply(latestContent.value)
                 LazyGridItemsSnapshot(
@@ -117,9 +117,9 @@ internal class LazyGridItemsSnapshot(
 }
 
 @ExperimentalFoundationApi
-internal class LazyGridItemsProviderImpl(
+internal class LazyGridItemProviderImpl(
     private val itemsSnapshot: State<LazyGridItemsSnapshot>
-) : LazyGridItemsProvider {
+) : LazyGridItemProvider {
 
     override val itemCount get() = itemsSnapshot.value.itemsCount
 

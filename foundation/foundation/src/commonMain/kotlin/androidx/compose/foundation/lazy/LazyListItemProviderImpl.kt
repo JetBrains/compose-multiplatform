@@ -34,11 +34,11 @@ import androidx.compose.ui.node.Ref
 
 @ExperimentalFoundationApi
 @Composable
-internal fun rememberItemsProvider(
+internal fun rememberItemProvider(
     state: LazyListState,
     content: LazyListScope.() -> Unit,
     itemScope: Ref<LazyItemScopeImpl>
-): LazyListItemsProvider {
+): LazyListItemProvider {
     val latestContent = rememberUpdatedState(content)
     val nearestItemsRangeState = remember(state) {
         mutableStateOf(
@@ -52,7 +52,7 @@ internal fun rememberItemsProvider(
             .collect { nearestItemsRangeState.value = it }
     }
     return remember(nearestItemsRangeState) {
-        LazyListItemsProviderImpl(
+        LazyListItemProviderImpl(
             derivedStateOf {
                 val listScope = LazyListScopeImpl().apply(latestContent.value)
                 LazyListItemsSnapshot(
@@ -112,9 +112,9 @@ internal class LazyListItemsSnapshot(
 }
 
 @ExperimentalFoundationApi
-internal class LazyListItemsProviderImpl(
+internal class LazyListItemProviderImpl(
     private val itemsSnapshot: State<LazyListItemsSnapshot>
-) : LazyListItemsProvider {
+) : LazyListItemProvider {
 
     override val headerIndexes: List<Int> get() = itemsSnapshot.value.headerIndexes
 

@@ -26,7 +26,7 @@ import androidx.compose.runtime.Stable
  */
 @Stable
 @ExperimentalFoundationApi
-interface LazyLayoutItemsProvider {
+interface LazyLayoutItemProvider {
 
     /** The total number of items in the lazy layout (visible or not). */
     val itemCount: Int

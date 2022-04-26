@@ -377,8 +377,8 @@ class LazyListState constructor(
      * items added or removed before our current first visible item and keep this item
      * as the first visible one even given that its index has been changed.
      */
-    internal fun updateScrollPositionIfTheFirstItemWasMoved(itemsProvider: LazyListItemsProvider) {
-        scrollPosition.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
+    internal fun updateScrollPositionIfTheFirstItemWasMoved(itemProvider: LazyListItemProvider) {
+        scrollPosition.updateScrollPositionIfTheFirstItemWasMoved(itemProvider)
     }
 
     companion object {
