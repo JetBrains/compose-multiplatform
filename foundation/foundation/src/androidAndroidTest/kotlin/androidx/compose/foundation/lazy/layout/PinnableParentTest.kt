@@ -71,7 +71,7 @@ class PinnableParentTest {
     }
 
     private class TestPinnableParent : PinnableParent {
-        override fun pinBeyondBoundsItems(): PinnedItemsHandle {
+        override fun pinItems(): PinnedItemsHandle {
             TODO("Not yet implemented")
         }
     }
