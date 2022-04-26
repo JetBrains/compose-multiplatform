@@ -37,10 +37,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.MeasureResult
-import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrainHeight
@@ -77,9 +75,7 @@ internal fun LazyList(
 ) {
     val overScrollController = rememberOverScrollController()
 
-    val itemScope: Ref<LazyItemScopeImpl> = remember { Ref() }
-
-    val itemProvider = rememberItemProvider(state, content, itemScope)
+    val itemProvider = rememberItemProvider(state, content)
 
     val scope = rememberCoroutineScope()
     val placementAnimator = remember(state, isVertical) {
@@ -89,7 +85,6 @@ internal fun LazyList(
 
     val measurePolicy = rememberLazyListMeasurePolicy(
         itemProvider,
-        itemScope,
         state,
         overScrollController,
         contentPadding,
@@ -158,8 +153,6 @@ private fun ScrollPositionUpdater(
 private fun rememberLazyListMeasurePolicy(
     /** Items provider of the list. */
     itemProvider: LazyListItemProvider,
-    /** Value holder for the item scope used to compose items. */
-    itemScope: Ref<LazyItemScopeImpl>,
     /** The state of the list. */
     state: LazyListState,
     /** The overscroll controller. */
@@ -218,8 +211,9 @@ private fun rememberLazyListMeasurePolicy(
         // Update the state's cached Density
         state.density = this
 
-        // this will update the scope object if the constrains have been changed
-        itemScope.update(this, contentConstraints)
+        // this will update the scope used by the item composables
+        itemProvider.itemScope.maxWidth = contentConstraints.maxWidth.toDp()
+        itemProvider.itemScope.maxHeight = contentConstraints.maxHeight.toDp()
 
         val spaceBetweenItemsDp = if (isVertical) {
             requireNotNull(verticalArrangement).spacing
@@ -300,13 +294,6 @@ private fun rememberLazyListMeasurePolicy(
                 totalVerticalPadding
             )
         }
-    }
-}
-
-private fun Ref<LazyItemScopeImpl>.update(density: Density, constraints: Constraints) {
-    val value = value
-    if (value == null || value.density != density || value.constraints != constraints) {
-        this.value = LazyItemScopeImpl(density, constraints)
     }
 }
 

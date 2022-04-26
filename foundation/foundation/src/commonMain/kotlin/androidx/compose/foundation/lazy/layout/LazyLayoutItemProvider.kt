@@ -28,16 +28,21 @@ import androidx.compose.runtime.Stable
 @ExperimentalFoundationApi
 interface LazyLayoutItemProvider {
 
-    /** The total number of items in the lazy layout (visible or not). */
+    /**
+     * The total number of items in the lazy layout (visible or not).
+     */
     val itemCount: Int
 
-    /** Returns the content lambda for the given index and scope object */
-    fun getContent(index: Int): @Composable () -> Unit
+    /**
+     * The item for the given [index].
+     */
+    @Composable
+    fun Item(index: Int)
 
     /**
      * Returns the content type for the item on this index. It is used to improve the item
      * compositions reusing efficiency.
-     **/
+     */
     fun getContentType(index: Int): Any?
 
     /**
@@ -50,7 +55,7 @@ interface LazyLayoutItemProvider {
     /**
      * Contains the mapping between the key and the index. It could contain not all the items of
      * the list as an optimization.
-     **/
+     */
     val keyToIndexMap: Map<Any, Int>
 }
 

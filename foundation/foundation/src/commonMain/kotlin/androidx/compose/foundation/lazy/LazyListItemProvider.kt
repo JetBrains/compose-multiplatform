@@ -23,4 +23,6 @@ import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
 internal interface LazyListItemProvider : LazyLayoutItemProvider {
     /** The list of indexes of the sticky header items */
     val headerIndexes: List<Int>
+    /** The scope used by the item content lambdas */
+    val itemScope: LazyItemScopeImpl
 }

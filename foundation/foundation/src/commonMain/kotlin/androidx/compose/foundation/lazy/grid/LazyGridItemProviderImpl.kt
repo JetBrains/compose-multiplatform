@@ -36,7 +36,6 @@ import androidx.compose.runtime.snapshotFlow
 internal fun rememberItemProvider(
     state: LazyGridState,
     content: LazyGridScope.() -> Unit,
-    itemScope: LazyGridItemScope
 ): LazyGridItemProvider {
     val latestContent = rememberUpdatedState(content)
     val nearestItemsRangeState = remember(state) {
@@ -55,7 +54,6 @@ internal fun rememberItemProvider(
             derivedStateOf {
                 val listScope = LazyGridScopeImpl().apply(latestContent.value)
                 LazyGridItemsSnapshot(
-                    itemScope,
                     listScope.intervals,
                     listScope.hasCustomSpans,
                     nearestItemsRangeState.value
@@ -67,7 +65,6 @@ internal fun rememberItemProvider(
 
 @ExperimentalFoundationApi
 internal class LazyGridItemsSnapshot(
-    private val itemScope: LazyGridItemScope,
     private val intervals: IntervalList<LazyGridIntervalContent>,
     val hasCustomSpans: Boolean,
     nearestItemsRange: IntRange
@@ -93,10 +90,11 @@ internal class LazyGridItemsSnapshot(
         return interval.content.span.invoke(this, localIntervalIndex)
     }
 
-    fun getContent(index: Int): @Composable () -> Unit {
+    @Composable
+    fun Item(index: Int) {
         val interval = getIntervalForIndex(index)
         val localIntervalIndex = index - interval.startIndex
-        return interval.content.content.invoke(itemScope, localIntervalIndex)
+        interval.content.item.invoke(LazyGridItemScopeImpl, localIntervalIndex)
     }
 
     val keyToIndexMap: Map<Any, Int> = generateKeyToIndexMap(nearestItemsRange, intervals)
@@ -130,7 +128,10 @@ internal class LazyGridItemProviderImpl(
 
     override val hasCustomSpans: Boolean get() = itemsSnapshot.value.hasCustomSpans
 
-    override fun getContent(index: Int) = itemsSnapshot.value.getContent(index)
+    @Composable
+    override fun Item(index: Int) {
+        itemsSnapshot.value.Item(index)
+    }
 
     override val keyToIndexMap: Map<Any, Int> get() = itemsSnapshot.value.keyToIndexMap
 

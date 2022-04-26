@@ -115,8 +115,9 @@ internal class LazyLayoutItemContentFactory(
             if (index < itemProvider.itemCount) {
                 val key = itemProvider.getKey(index)
                 if (key == this.key) {
-                    val content = itemProvider.getContent(index)
-                    saveableStateHolder.SaveableStateProvider(key, content)
+                    saveableStateHolder.SaveableStateProvider(key) {
+                        itemProvider.Item(index)
+                    }
                 }
             }
             DisposableEffect(key) {

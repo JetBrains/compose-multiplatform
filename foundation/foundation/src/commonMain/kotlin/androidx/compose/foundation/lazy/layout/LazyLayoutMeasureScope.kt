@@ -49,7 +49,7 @@ sealed interface LazyLayoutMeasureScope : MeasureScope {
      *
      * @param index the item index. Should be no larger that [LazyLayoutItemProvider.itemCount].
      * @param constraints [Constraints] to measure the children emitted into an item content
-     * composable specified via [LazyLayoutItemProvider.getContent].
+     * composable specified via [LazyLayoutItemProvider.Item].
      *
      * @return Array of [Placeable]s. Note that if you emitted multiple children into the item
      * composable you will receive multiple placeables, each of them will be measured with
