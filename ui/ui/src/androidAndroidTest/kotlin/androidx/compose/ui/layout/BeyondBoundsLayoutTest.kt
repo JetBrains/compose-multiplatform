@@ -19,7 +19,9 @@ package androidx.compose.ui.layout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.BeyondBoundsLayoutDirection.Companion.After
+import androidx.compose.ui.layout.BeyondBoundsLayout.BeyondBoundsScope
+import androidx.compose.ui.layout.BeyondBoundsLayout.LayoutDirection
+import androidx.compose.ui.layout.BeyondBoundsLayout.LayoutDirection.Companion.After
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.modifier.modifierLocalProvider
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -58,7 +60,7 @@ class BeyondBoundsLayoutTest {
 
         // Act.
         val returnValue = rule.runOnIdle {
-            parent!!.searchBeyondBounds(After) {
+            parent!!.layout(After) {
                 blockInvoked = true
                 OperationResult
             }
@@ -87,7 +89,7 @@ class BeyondBoundsLayoutTest {
         // Act.
         val returnValue = rule.runOnIdle {
             assertThat(parent).isNotNull()
-            parent?.searchBeyondBounds<Int>(After) {
+            parent?.layout<Int>(After) {
                 blockInvokeCount++
                 // Always return null, to continue searching and indicate that
                 // we didn't find the item we were looking for.
@@ -119,7 +121,7 @@ class BeyondBoundsLayoutTest {
         // Act.
         val returnValue = rule.runOnIdle {
             assertThat(parent).isNotNull()
-            parent?.searchBeyondBounds(After) {
+            parent?.layout(After) {
                 val returnValue = if (hasMoreContent) null else OperationResult
                 callMap[++iterationCount] = returnValue
                 returnValue
@@ -156,7 +158,7 @@ class BeyondBoundsLayoutTest {
         // Act.
         val returnValue = rule.runOnIdle {
             assertThat(parent).isNotNull()
-            parent?.searchBeyondBounds(After) {
+            parent?.layout(After) {
                 // After the first item was added, we were able to perform our operation.
                 OperationResult
             }
@@ -184,7 +186,7 @@ class BeyondBoundsLayoutTest {
         val returnValue = rule.runOnIdle {
             assertThat(parent).isNotNull()
             var iterationCount = 0
-            parent?.searchBeyondBounds(After) {
+            parent?.layout(After) {
                 if (iterationCount++ < 3) null else OperationResult
             }
         }
@@ -214,12 +216,12 @@ class BeyondBoundsLayoutTest {
         // Act.
         rule.runOnIdle {
             assertThat(parent).isNotNull()
-            returnValue1 = parent?.searchBeyondBounds<Int>(After) {
+            returnValue1 = parent?.layout<Int>(After) {
                 block1InvokeCount++
                 // Always return null, to indicate that we didn't find the item we were looking for.
                 null
             }
-            returnValue2 = parent?.searchBeyondBounds<Int>(After) {
+            returnValue2 = parent?.layout<Int>(After) {
                 block2InvokeCount++
                 // Always return null, to indicate that we didn't find the item we were looking for.
                 null
@@ -255,13 +257,13 @@ class BeyondBoundsLayoutTest {
         // Act.
         rule.runOnIdle {
             assertThat(parent).isNotNull()
-            returnValue1 = parent?.searchBeyondBounds<Int>(direction) {
+            returnValue1 = parent?.layout<Int>(direction) {
                 block1InvokeCount++
 
                 if (!hasMoreContent) {
                     // Re-entrant call.
                     returnValue2 =
-                        parent?.searchBeyondBounds<Int>(direction) {
+                        parent?.layout<Int>(direction) {
                             block2InvokeCount++
                             // Always return null, to indicate that we didn't find the item we were looking for.
                             null
@@ -283,9 +285,9 @@ class BeyondBoundsLayoutTest {
     private fun Modifier.parentWithoutNonVisibleItems(): Modifier {
         return this.modifierLocalProvider(ModifierLocalBeyondBoundsLayout) {
             object : BeyondBoundsLayout {
-                override fun <T> searchBeyondBounds(
-                    direction: BeyondBoundsLayoutDirection,
-                    block: BeyondBoundsLayoutScope.() -> T?
+                override fun <T> layout(
+                    direction: LayoutDirection,
+                    block: BeyondBoundsScope.() -> T?
                 ): T? = null
             }
         }
@@ -294,20 +296,23 @@ class BeyondBoundsLayoutTest {
     private fun Modifier.parentWithFiveNonVisibleItems(): Modifier {
         return this.modifierLocalProvider(ModifierLocalBeyondBoundsLayout) {
             object : BeyondBoundsLayout {
-                override fun <T> searchBeyondBounds(
-                    direction: BeyondBoundsLayoutDirection,
-                    block: BeyondBoundsLayoutScope.() -> T?
+                override fun <T> layout(
+                    direction: LayoutDirection,
+                    block: BeyondBoundsScope.() -> T?
                 ): T? {
                     var count = 5
                     var result: T? = null
                     while (count-- > 0 && result == null) {
-                        result = block.invoke(BeyondBoundsScope(hasMoreContent = count > 0))
+                        result = block.invoke(
+                            object : BeyondBoundsScope {
+                                override val hasMoreContent: Boolean
+                                    get() = count > 0
+                            }
+                        )
                     }
                     return result
                 }
             }
         }
     }
-
-    private class BeyondBoundsScope(override val hasMoreContent: Boolean) : BeyondBoundsLayoutScope
 }

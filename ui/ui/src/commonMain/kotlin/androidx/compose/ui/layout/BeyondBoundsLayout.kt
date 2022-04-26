@@ -33,14 +33,14 @@ val ModifierLocalBeyondBoundsLayout: ProvidableModifierLocal<BeyondBoundsLayout?
  * A [BeyondBoundsLayout] instance can be obtained by consuming the
  * [BeyondBoundsLayout modifier local][ModifierLocalBeyondBoundsLayout].
  * It can be used to send a request to layout more items in a particular
- * [direction][BeyondBoundsLayoutDirection]. This can be useful when composition or layout
- * is determined lazily, as with a LazyColumn. The request is received by any parent up
- * the hierarchy that provides this modifier local.
+ * [direction][LayoutDirection]. This can be useful when composition or layout is determined lazily,
+ * as with a LazyColumn. The request is received by any parent up the hierarchy that provides this
+ * modifier local.
  */
 interface BeyondBoundsLayout {
     /**
      * Send a request to layout more items in the specified
-     * [direction][BeyondBoundsLayoutDirection]. The request is received by a parent up the
+     * [direction][LayoutDirection]. The request is received by a parent up the
      * hierarchy. The parent adds one item at a time and calls [block] after each item is added.
      * The parent continues adding new items as long as [block] returns null. Once you have all
      * the items you need, you can perform some operation and return a non-null value. Returning
@@ -54,70 +54,70 @@ interface BeyondBoundsLayout {
      * may be disposed. Therefore you have to perform any custom logic within the [block] and return
      * the value you need.
      */
-    fun <T> searchBeyondBounds(
-        direction: BeyondBoundsLayoutDirection,
-        block: BeyondBoundsLayoutScope.() -> T?
+    fun <T> layout(
+        direction: LayoutDirection,
+        block: BeyondBoundsScope.() -> T?
     ): T?
-}
 
-/**
- * The scope used in [BeyondBoundsLayout.searchBeyondBounds].
- */
-interface BeyondBoundsLayoutScope {
     /**
-     * Whether we have more content to lay out in the specified direction.
+     * The scope used in [BeyondBoundsLayout.layout].
      */
-    val hasMoreContent: Boolean
-}
-
-/**
- * The direction (from the visible bounds) that a [BeyondBoundsLayout] is requesting more
- * items to be laid.
- */
-@JvmInline
-value class BeyondBoundsLayoutDirection internal constructor(
-    @Suppress("unused") private val value: Int
-) {
-    companion object {
+    interface BeyondBoundsScope {
         /**
-         * Direction used in [BeyondBoundsLayout.searchBeyondBounds] to request the layout of
-         * extra items before the current bounds.
+         * Whether we have more content to lay out in the specified direction.
          */
-        val Before = BeyondBoundsLayoutDirection(1)
-        /**
-         * Direction used in [BeyondBoundsLayout.searchBeyondBounds] to request the layout of
-         * extra items after the current bounds.
-         */
-        val After = BeyondBoundsLayoutDirection(2)
-        /**
-         * Direction used in [BeyondBoundsLayout.searchBeyondBounds] to request the layout of
-         * extra items to the left of the current bounds.
-         */
-        val Left = BeyondBoundsLayoutDirection(3)
-        /**
-         * Direction used in [BeyondBoundsLayout.searchBeyondBounds] to request the layout of
-         * extra items to the right of the current bounds.
-         */
-        val Right = BeyondBoundsLayoutDirection(4)
-        /**
-         * Direction used in [BeyondBoundsLayout.searchBeyondBounds] to request the layout of
-         * extra items above the current bounds.
-         */
-        val Above = BeyondBoundsLayoutDirection(5)
-        /**
-         * Direction used in [BeyondBoundsLayout.searchBeyondBounds] to request the layout of
-         * extra items below the current bounds.
-         */
-        val Below = BeyondBoundsLayoutDirection(6)
+        val hasMoreContent: Boolean
     }
 
-    override fun toString(): String = when (this) {
-        Before -> "Before"
-        After -> "After"
-        Left -> "Left"
-        Right -> "Right"
-        Above -> "Above"
-        Below -> "Below"
-        else -> "invalid BeyondBoundsLayoutDirection"
+    /**
+     * The direction (from the visible bounds) that a [BeyondBoundsLayout] is requesting more items
+     * to be laid.
+     */
+    @JvmInline
+    value class LayoutDirection internal constructor(
+        @Suppress("unused") private val value: Int
+    ) {
+        companion object {
+            /**
+             * Direction used in [BeyondBoundsLayout.layout] to request the layout of extra items
+             * before the current bounds.
+             */
+            val Before = LayoutDirection(1)
+            /**
+             * Direction used in [BeyondBoundsLayout.layout] to request the layout of extra items
+             * after the current bounds.
+             */
+            val After = LayoutDirection(2)
+            /**
+             * Direction used in [BeyondBoundsLayout.layout] to request the layout of extra items
+             * to the left of the current bounds.
+             */
+            val Left = LayoutDirection(3)
+            /**
+             * Direction used in [BeyondBoundsLayout.layout] to request the layout of extra items
+             * to the right of the current bounds.
+             */
+            val Right = LayoutDirection(4)
+            /**
+             * Direction used in [BeyondBoundsLayout.layout] to request the layout of extra items
+             * above the current bounds.
+             */
+            val Above = LayoutDirection(5)
+            /**
+             * Direction used in [BeyondBoundsLayout.layout] to request the layout of extra items
+             * below the current bounds.
+             */
+            val Below = LayoutDirection(6)
+        }
+
+        override fun toString(): String = when (this) {
+            Before -> "Before"
+            After -> "After"
+            Left -> "Left"
+            Right -> "Right"
+            Above -> "Above"
+            Below -> "Below"
+            else -> "invalid LayoutDirection"
+        }
     }
 }
