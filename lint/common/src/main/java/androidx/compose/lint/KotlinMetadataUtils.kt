@@ -115,7 +115,7 @@ private fun PsiAnnotation.toHeader(): KotlinClassHeader {
  * signature.
  */
 private fun KmDeclarationContainer.findKmFunctionForPsiMethod(method: PsiMethod): KmFunction? {
-    // Strip any mangled part of the name in case of inline classes
+    // Strip any mangled part of the name in case of value / inline classes
     val expectedName = method.name.substringBefore("-")
     val expectedSignature = ClassUtil.getAsmMethodSignature(method)
     // Since Kotlin 1.6 PSI updates, in some cases what used to be `void` return types are converted
