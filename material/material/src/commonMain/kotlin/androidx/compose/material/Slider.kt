@@ -894,6 +894,7 @@ private fun Modifier.sliderTapModifier(
                                 dragBy(0f)
                             }
                         }
+                        gestureEndAction.value.invoke(0f)
                     }
                 )
             }
