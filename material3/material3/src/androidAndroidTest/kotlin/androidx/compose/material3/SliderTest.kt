@@ -533,4 +533,26 @@ class SliderTest {
                 .isEqualTo(interactions[0])
         }
     }
+
+    @Test
+    fun slider_onValueChangedFinish_afterTap() {
+        var changedFlag = false
+        rule.setContent {
+            Slider(
+                modifier = Modifier.testTag(tag),
+                value = 0.0f,
+                onValueChangeFinished = { changedFlag = true },
+                onValueChange = {}
+            )
+        }
+
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                click(center)
+            }
+
+        rule.runOnIdle {
+            Truth.assertThat(changedFlag).isTrue()
+        }
+    }
 }
