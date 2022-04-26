@@ -152,7 +152,7 @@ class LazyLayoutTest {
             LazyLayout(itemsProvider) {
                 val constraints = Constraints.fixed(100, 100)
                 val items = mutableListOf<Placeable>()
-                repeat(itemsProvider.itemsCount) { index ->
+                repeat(itemsProvider.itemCount) { index ->
                     items.addAll(measure(index, constraints))
                 }
                 layout(100, 100) {
@@ -178,8 +178,8 @@ class LazyLayoutTest {
 
     @Test
     fun stateBasedItemsProvider() {
-        var itemsCount by mutableStateOf(1)
-        val itemsProvider = itemProvider({ itemsCount }) { index ->
+        var itemCount by mutableStateOf(1)
+        val itemsProvider = itemProvider({ itemCount }) { index ->
             { Box(Modifier.fillMaxSize().testTag("$index")) }
         }
 
@@ -187,7 +187,7 @@ class LazyLayoutTest {
             LazyLayout(itemsProvider) {
                 val constraints = Constraints.fixed(100, 100)
                 val items = mutableListOf<Placeable>()
-                repeat(itemsProvider.itemsCount) { index ->
+                repeat(itemsProvider.itemCount) { index ->
                     items.addAll(measure(index, constraints))
                 }
                 layout(100, 100) {
@@ -202,7 +202,7 @@ class LazyLayoutTest {
         rule.onNodeWithTag("1").assertDoesNotExist()
 
         rule.runOnIdle {
-            itemsCount = 2
+            itemCount = 2
         }
 
         rule.onNodeWithTag("0").assertIsDisplayed()
@@ -382,7 +382,7 @@ class LazyLayoutTest {
     }
 
     private fun itemProvider(
-        itemsCount: () -> Int,
+        itemCount: () -> Int,
         content: (Int) -> @Composable () -> Unit
     ): LazyLayoutItemsProvider {
         return object : LazyLayoutItemsProvider {
@@ -390,8 +390,8 @@ class LazyLayoutTest {
                 return content(index)
             }
 
-            override val itemsCount: Int
-                get() = itemsCount()
+            override val itemCount: Int
+                get() = itemCount()
 
             override fun getKey(index: Int) = index
             override val keyToIndexMap: Map<Any, Int> = emptyMap()

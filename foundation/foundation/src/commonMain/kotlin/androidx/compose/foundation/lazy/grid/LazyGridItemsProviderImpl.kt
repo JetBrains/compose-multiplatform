@@ -121,7 +121,7 @@ internal class LazyGridItemsProviderImpl(
     private val itemsSnapshot: State<LazyGridItemsSnapshot>
 ) : LazyGridItemsProvider {
 
-    override val itemsCount get() = itemsSnapshot.value.itemsCount
+    override val itemCount get() = itemsSnapshot.value.itemsCount
 
     override fun getKey(index: Int) = itemsSnapshot.value.getKey(index)
 

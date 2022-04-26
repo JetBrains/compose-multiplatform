@@ -124,7 +124,7 @@ internal class LazyGridScrollPosition(
                 // there were no real item during the previous measure
                 return lastKnownIndex
             }
-            if (lastKnownIndex.value < itemsProvider.itemsCount &&
+            if (lastKnownIndex.value < itemsProvider.itemCount &&
                 key == itemsProvider.getKey(lastKnownIndex.value)
             ) {
                 // this item is still at the same index

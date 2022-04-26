@@ -118,7 +118,7 @@ internal class LazyListItemsProviderImpl(
 
     override val headerIndexes: List<Int> get() = itemsSnapshot.value.headerIndexes
 
-    override val itemsCount get() = itemsSnapshot.value.itemsCount
+    override val itemCount get() = itemsSnapshot.value.itemsCount
 
     override fun getKey(index: Int) = itemsSnapshot.value.getKey(index)
 

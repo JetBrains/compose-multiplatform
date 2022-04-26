@@ -154,7 +154,7 @@ private fun ScrollPositionUpdater(
     itemsProvider: LazyGridItemsProvider,
     state: LazyGridState
 ) {
-    if (itemsProvider.itemsCount > 0) {
+    if (itemsProvider.itemCount > 0) {
         state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
     }
 }
@@ -238,7 +238,7 @@ private fun rememberLazyGridMeasurePolicy(
         }
         val spaceBetweenSlots = spaceBetweenSlotsDp.roundToPx()
 
-        val itemsCount = itemsProvider.itemsCount
+        val itemsCount = itemsProvider.itemCount
 
         val measuredItemProvider = LazyMeasuredItemProvider(
             itemsProvider,

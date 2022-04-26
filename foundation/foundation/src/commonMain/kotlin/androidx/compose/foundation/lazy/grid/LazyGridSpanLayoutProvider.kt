@@ -60,7 +60,7 @@ internal class LazyGridSpanLayoutProvider(private val itemsProvider: LazyGridIte
             List(currentSlotsPerLine) { GridItemSpan(1) }.also { previousDefaultSpans = it }
         }
 
-    val totalSize get() = itemsProvider.itemsCount
+    val totalSize get() = itemsProvider.itemCount
 
     /** The number of slots on one grid line e.g. the number of columns of a vertical grid. */
     var slotsPerLine = 0

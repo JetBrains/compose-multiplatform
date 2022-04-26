@@ -158,7 +158,7 @@ internal class LazyLayoutPrefetcher(
         while (prefetchRequests.isNotEmpty() && !scheduleForNextFrame) {
             val request = prefetchRequests[0]
             val itemsProvider = itemContentFactory.itemsProvider()
-            if (request.canceled || request.index !in 0 until itemsProvider.itemsCount) {
+            if (request.canceled || request.index !in 0 until itemsProvider.itemCount) {
                 prefetchRequests.removeAt(0)
             } else if (request.precomposeHandle == null) {
                 trace("compose:lazylist:prefetch:compose") {

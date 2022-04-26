@@ -148,7 +148,7 @@ private fun ScrollPositionUpdater(
     itemsProvider: LazyListItemsProvider,
     state: LazyListState
 ) {
-    if (itemsProvider.itemsCount > 0) {
+    if (itemsProvider.itemCount > 0) {
         state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
     }
 }
@@ -228,7 +228,7 @@ private fun rememberLazyListMeasurePolicy(
         }
         val spaceBetweenItems = spaceBetweenItemsDp.roundToPx()
 
-        val itemsCount = itemsProvider.itemsCount
+        val itemsCount = itemsProvider.itemCount
 
         val itemProvider = LazyMeasuredItemProvider(
             contentConstraints,

@@ -718,10 +718,10 @@ package androidx.compose.foundation.lazy.layout {
   @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public interface LazyLayoutItemsProvider {
     method public kotlin.jvm.functions.Function0<kotlin.Unit> getContent(int index);
     method public Object? getContentType(int index);
-    method public int getItemsCount();
+    method public int getItemCount();
     method public Object getKey(int index);
     method public java.util.Map<java.lang.Object,java.lang.Integer> getKeyToIndexMap();
-    property public abstract int itemsCount;
+    property public abstract int itemCount;
     property public abstract java.util.Map<java.lang.Object,java.lang.Integer> keyToIndexMap;
   }
 

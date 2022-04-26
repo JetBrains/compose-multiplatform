@@ -47,7 +47,7 @@ sealed interface LazyLayoutMeasureScope : MeasureScope {
     /**
      * Subcompose and measure the item of lazy layout.
      *
-     * @param index the item index. Should be no larger that [LazyLayoutItemsProvider.itemsCount].
+     * @param index the item index. Should be no larger that [LazyLayoutItemsProvider.itemCount].
      * @param constraints [Constraints] to measure the children emitted into an item content
      * composable specified via [LazyLayoutItemsProvider.getContent].
      *

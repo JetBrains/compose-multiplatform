@@ -112,7 +112,7 @@ internal class LazyLayoutItemContentFactory(
             val index = itemsProvider.keyToIndexMap[key]?.also {
                 lastKnownIndex = it
             } ?: lastKnownIndex
-            if (index < itemsProvider.itemsCount) {
+            if (index < itemsProvider.itemCount) {
                 val key = itemsProvider.getKey(index)
                 if (key == this.key) {
                     val content = itemsProvider.getContent(index)
