@@ -54,8 +54,10 @@ internal class FocusEventModifierLocal(
     private var parent: FocusEventModifierLocal? = null
     private val children = mutableVectorOf<FocusEventModifierLocal>()
 
-    // This is the list of modifiers that contribute to the focus event's state.
-    // When there are multiple, all FocusModifier states must be considered when notifying an event.
+    /**
+     * This is the list of modifiers that contribute to the focus event's state.
+     * When there are multiple, all FocusModifier states must be considered when notifying an event.
+     */
     private val focusModifiers = mutableVectorOf<FocusModifier>()
 
     override val key: ProvidableModifierLocal<FocusEventModifierLocal?>
