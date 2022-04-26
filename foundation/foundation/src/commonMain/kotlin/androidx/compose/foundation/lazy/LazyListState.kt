@@ -32,11 +32,16 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.OnGloballyPositionedModifier
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlin.math.abs
 
 /**
@@ -213,6 +218,12 @@ class LazyListState constructor(
         }
     }
 
+    /**
+     * Provides a modifier which allows to delay some interactions (e.g. scroll)
+     * until layout is ready.
+     */
+    internal val awaitLayoutModifier = AwaitFirstLayoutModifier()
+
     internal var placementAnimator by mutableStateOf<LazyListItemPlacementAnimator?>(null)
 
     /**
@@ -234,7 +245,7 @@ class LazyListState constructor(
         index: Int,
         scrollOffset: Int = 0
     ) {
-        return scrollableState.scroll {
+        scroll {
             snapToItemIndexInternal(index, scrollOffset)
         }
     }
@@ -257,7 +268,10 @@ class LazyListState constructor(
     override suspend fun scroll(
         scrollPriority: MutatePriority,
         block: suspend ScrollScope.() -> Unit
-    ): Unit = scrollableState.scroll(scrollPriority, block)
+    ) {
+        awaitLayoutModifier.waitForFirstLayout()
+        scrollableState.scroll(scrollPriority, block)
+    }
 
     override fun dispatchRawDelta(delta: Float): Float =
         scrollableState.dispatchRawDelta(delta)
@@ -407,4 +421,25 @@ private object EmptyLazyListLayoutInfo : LazyListLayoutInfo {
     override val reverseLayout = false
     override val beforeContentPadding = 0
     override val afterContentPadding = 0
+}
+
+internal class AwaitFirstLayoutModifier : OnGloballyPositionedModifier {
+    private var wasPositioned = false
+    private var continuation: Continuation<Unit>? = null
+
+    suspend fun waitForFirstLayout() {
+        if (!wasPositioned) {
+            val oldContinuation = continuation
+            suspendCoroutine<Unit> { continuation = it }
+            oldContinuation?.resume(Unit)
+        }
+    }
+
+    override fun onGloballyPositioned(coordinates: LayoutCoordinates) {
+        if (!wasPositioned) {
+            wasPositioned = true
+            continuation?.resume(Unit)
+            continuation = null
+        }
+    }
 }

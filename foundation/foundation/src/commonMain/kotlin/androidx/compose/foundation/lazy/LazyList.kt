@@ -102,6 +102,7 @@ internal fun LazyList(
     LazyLayout(
         modifier = modifier
             .then(state.remeasurementModifier)
+            .then(state.awaitLayoutModifier)
             .lazyListSemantics(
                 itemProvider = itemProvider,
                 state = state,
