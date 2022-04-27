@@ -94,8 +94,8 @@ internal class LazyListScrollPosition(
      * as the first visible one even given that its index has been changed.
      */
     @ExperimentalFoundationApi
-    fun updateScrollPositionIfTheFirstItemWasMoved(itemsProvider: LazyListItemsProvider) {
-        update(findLazyListIndexByKey(lastKnownFirstItemKey, index, itemsProvider), scrollOffset)
+    fun updateScrollPositionIfTheFirstItemWasMoved(itemProvider: LazyListItemProvider) {
+        update(findLazyListIndexByKey(lastKnownFirstItemKey, index, itemProvider), scrollOffset)
     }
 
     private fun update(index: DataIndex, scrollOffset: Int) {
@@ -119,19 +119,19 @@ internal class LazyListScrollPosition(
         private fun findLazyListIndexByKey(
             key: Any?,
             lastKnownIndex: DataIndex,
-            itemsProvider: LazyListItemsProvider
+            itemProvider: LazyListItemProvider
         ): DataIndex {
             if (key == null) {
                 // there were no real item during the previous measure
                 return lastKnownIndex
             }
-            if (lastKnownIndex.value < itemsProvider.itemsCount &&
-                key == itemsProvider.getKey(lastKnownIndex.value)
+            if (lastKnownIndex.value < itemProvider.itemCount &&
+                key == itemProvider.getKey(lastKnownIndex.value)
             ) {
                 // this item is still at the same index
                 return lastKnownIndex
             }
-            val newIndex = itemsProvider.keyToIndexMap[key]
+            val newIndex = itemProvider.keyToIndexMap[key]
             if (newIndex != null) {
                 return DataIndex(newIndex)
             }

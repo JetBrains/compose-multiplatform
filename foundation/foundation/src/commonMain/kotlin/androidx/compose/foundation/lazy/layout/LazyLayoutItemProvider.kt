@@ -26,10 +26,10 @@ import androidx.compose.runtime.Stable
  */
 @Stable
 @ExperimentalFoundationApi
-interface LazyLayoutItemsProvider {
+interface LazyLayoutItemProvider {
 
     /** The total number of items in the lazy layout (visible or not). */
-    val itemsCount: Int
+    val itemCount: Int
 
     /** Returns the content lambda for the given index and scope object */
     fun getContent(index: Int): @Composable () -> Unit

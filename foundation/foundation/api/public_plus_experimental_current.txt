@@ -488,7 +488,7 @@ package androidx.compose.foundation.lazy {
   public final class LazyListItemPlacementAnimatorKt {
   }
 
-  public final class LazyListItemsProviderImplKt {
+  public final class LazyListItemProviderImplKt {
   }
 
   public final class LazyListKt {
@@ -621,6 +621,9 @@ package androidx.compose.foundation.lazy.grid {
   public final class LazyGridItemPlacementAnimatorKt {
   }
 
+  public final class LazyGridItemProviderImplKt {
+  }
+
   @androidx.compose.foundation.lazy.grid.LazyGridScopeMarker @androidx.compose.runtime.Stable public sealed interface LazyGridItemScope {
     method @androidx.compose.foundation.ExperimentalFoundationApi public androidx.compose.ui.Modifier animateItemPlacement(androidx.compose.ui.Modifier, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec);
   }
@@ -630,9 +633,6 @@ package androidx.compose.foundation.lazy.grid {
     method public int getMaxLineSpan();
     property public abstract int maxCurrentLineSpan;
     property public abstract int maxLineSpan;
-  }
-
-  public final class LazyGridItemsProviderImplKt {
   }
 
   public final class LazyGridKt {
@@ -715,18 +715,18 @@ package androidx.compose.foundation.lazy.layout {
   public final class IntervalListKt {
   }
 
-  @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public interface LazyLayoutItemsProvider {
+  @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public interface LazyLayoutItemProvider {
     method public kotlin.jvm.functions.Function0<kotlin.Unit> getContent(int index);
     method public Object? getContentType(int index);
-    method public int getItemsCount();
+    method public int getItemCount();
     method public Object getKey(int index);
     method public java.util.Map<java.lang.Object,java.lang.Integer> getKeyToIndexMap();
-    property public abstract int itemsCount;
+    property public abstract int itemCount;
     property public abstract java.util.Map<java.lang.Object,java.lang.Integer> keyToIndexMap;
   }
 
   public final class LazyLayoutKt {
-    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static void LazyLayout(androidx.compose.foundation.lazy.layout.LazyLayoutItemsProvider itemsProvider, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState? prefetchState, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measurePolicy);
+    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static void LazyLayout(androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider itemProvider, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState? prefetchState, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measurePolicy);
   }
 
   @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public sealed interface LazyLayoutMeasureScope extends androidx.compose.ui.layout.MeasureScope {
