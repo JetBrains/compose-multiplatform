@@ -44,7 +44,7 @@ import androidx.compose.ui.text.android.style.BaselineShiftSpan
 import androidx.compose.ui.text.android.style.FontFeatureSpan
 import androidx.compose.ui.text.android.style.LetterSpacingSpanEm
 import androidx.compose.ui.text.android.style.LetterSpacingSpanPx
-import androidx.compose.ui.text.android.style.LineHeightBehaviorSpan
+import androidx.compose.ui.text.android.style.LineHeightStyleSpan
 import androidx.compose.ui.text.android.style.LineHeightSpan
 import androidx.compose.ui.text.android.style.ShadowSpan
 import androidx.compose.ui.text.android.style.SkewXSpan
@@ -61,7 +61,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.platform.style.ShaderBrushSpan
 import androidx.compose.ui.text.style.BaselineShift
-import androidx.compose.ui.text.style.LineHeightBehavior
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
@@ -122,18 +122,18 @@ internal fun Spannable.setLineHeight(
     lineHeight: TextUnit,
     contextFontSize: Float,
     density: Density,
-    lineHeightBehavior: LineHeightBehavior
+    lineHeightStyle: LineHeightStyle
 ) {
     val resolvedLineHeight = resolveLineHeightInPx(lineHeight, contextFontSize, density)
     if (!resolvedLineHeight.isNaN()) {
         setSpan(
-            span = LineHeightBehaviorSpan(
+            span = LineHeightStyleSpan(
                 lineHeight = resolvedLineHeight,
                 startIndex = 0,
                 endIndex = length,
-                trimFirstLineTop = lineHeightBehavior.trim.isTrimFirstLineTop(),
-                trimLastLineBottom = lineHeightBehavior.trim.isTrimLastLineBottom(),
-                topPercentage = lineHeightBehavior.alignment.topPercentage
+                trimFirstLineTop = lineHeightStyle.trim.isTrimFirstLineTop(),
+                trimLastLineBottom = lineHeightStyle.trim.isTrimLastLineBottom(),
+                topPercentage = lineHeightStyle.alignment.topPercentage
             ),
             start = 0,
             end = length

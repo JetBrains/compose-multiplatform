@@ -49,9 +49,8 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.LineHeightBehavior
-import androidx.compose.ui.text.style.LineHeightTrim
-import androidx.compose.ui.text.style.LineVerticalAlignment
+import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.style.LineHeightStyle.Trim
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -73,11 +72,11 @@ fun TextLineHeightDemo() {
         var lineHeightSp = remember { mutableStateOf(60f) }
         var lineHeightEm = remember { mutableStateOf(1f) }
         var lineHeightEnabled = remember { mutableStateOf(false) }
-        val lineHeightBehaviorEnabled = remember { mutableStateOf(false) }
-        var lineVerticalAlignment = remember {
-            mutableStateOf(LineHeightBehavior.Default.alignment)
+        val lineHeightStyleEnabled = remember { mutableStateOf(false) }
+        var lineHeightAlignment = remember {
+            mutableStateOf(LineHeightStyle.Default.alignment)
         }
-        var lineHeightTrim = remember { mutableStateOf(LineHeightBehavior.Default.trim) }
+        var lineHeightTrim = remember { mutableStateOf(LineHeightStyle.Default.trim) }
         val includeFontPadding = remember { mutableStateOf(false) }
         val applyMaxLines = remember { mutableStateOf(false) }
         val ellipsize = remember { mutableStateOf(false) }
@@ -89,19 +88,19 @@ fun TextLineHeightDemo() {
             LineHeightConfiguration(lineHeightSp, lineHeightEm, lineHeightEnabled)
             StringConfiguration(useSizedSpan, singleLine, useTallScript)
             FontPaddingAndMaxLinesConfiguration(includeFontPadding, applyMaxLines, ellipsize)
-            LineHeightBehaviorConfiguration(
-                lineHeightBehaviorEnabled,
+            LineHeightStyleConfiguration(
+                lineHeightStyleEnabled,
                 lineHeightTrim,
-                lineVerticalAlignment
+                lineHeightAlignment
             )
             Spacer(Modifier.padding(16.dp))
             TextWithLineHeight(
                 lineHeightEnabled.value,
                 lineHeightSp.value,
                 lineHeightEm.value,
-                if (lineHeightBehaviorEnabled.value) {
-                    LineHeightBehavior(
-                        alignment = lineVerticalAlignment.value,
+                if (lineHeightStyleEnabled.value) {
+                    LineHeightStyle(
+                        alignment = lineHeightAlignment.value,
                         trim = lineHeightTrim.value
                     )
                 } else null,
@@ -173,22 +172,22 @@ private fun LineHeightConfiguration(
 
 @OptIn(ExperimentalTextApi::class)
 @Composable
-private fun LineHeightBehaviorConfiguration(
-    lineHeightBehaviorEnabled: MutableState<Boolean>,
-    lineHeightTrim: MutableState<LineHeightTrim>,
-    lineVerticalAlignment: MutableState<LineVerticalAlignment>
+private fun LineHeightStyleConfiguration(
+    lineHeightStyleEnabled: MutableState<Boolean>,
+    lineHeightTrim: MutableState<Trim>,
+    lineHeightAlignment: MutableState<LineHeightStyle.Alignment>
 ) {
     Column(Modifier.horizontalScroll(rememberScrollState())) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Checkbox(
-                checked = lineHeightBehaviorEnabled.value,
-                onCheckedChange = { lineHeightBehaviorEnabled.value = it }
+                checked = lineHeightStyleEnabled.value,
+                onCheckedChange = { lineHeightStyleEnabled.value = it }
             )
-            Text("LineHeightBehavior", style = HintStyle)
+            Text("LineHeightStyle", style = HintStyle)
         }
         Column(Modifier.padding(horizontal = 16.dp)) {
-            LineHeightTrimOptions(lineHeightTrim, lineHeightBehaviorEnabled.value)
-            LineHeightAlignmentOptions(lineVerticalAlignment, lineHeightBehaviorEnabled.value)
+            LineHeightTrimOptions(lineHeightTrim, lineHeightStyleEnabled.value)
+            LineHeightAlignmentOptions(lineHeightAlignment, lineHeightStyleEnabled.value)
         }
     }
 }
@@ -196,14 +195,14 @@ private fun LineHeightBehaviorConfiguration(
 @OptIn(ExperimentalTextApi::class)
 @Composable
 private fun LineHeightAlignmentOptions(
-    lineVerticalAlignment: MutableState<LineVerticalAlignment>,
+    lineHeightAlignment: MutableState<LineHeightStyle.Alignment>,
     enabled: Boolean
 ) {
     val options = listOf(
-        LineVerticalAlignment.Proportional,
-        LineVerticalAlignment.Top,
-        LineVerticalAlignment.Center,
-        LineVerticalAlignment.Bottom
+        LineHeightStyle.Alignment.Proportional,
+        LineHeightStyle.Alignment.Top,
+        LineHeightStyle.Alignment.Center,
+        LineHeightStyle.Alignment.Bottom
     )
 
     Row(
@@ -216,15 +215,15 @@ private fun LineHeightAlignmentOptions(
                 Modifier
                     .height(56.dp)
                     .selectable(
-                        selected = (option == lineVerticalAlignment.value),
-                        onClick = { lineVerticalAlignment.value = option },
+                        selected = (option == lineHeightAlignment.value),
+                        onClick = { lineHeightAlignment.value = option },
                         role = Role.RadioButton,
                         enabled = enabled
                     ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
-                    selected = (option == lineVerticalAlignment.value),
+                    selected = (option == lineHeightAlignment.value),
                     onClick = null,
                     enabled = enabled
                 )
@@ -237,14 +236,14 @@ private fun LineHeightAlignmentOptions(
 @OptIn(ExperimentalTextApi::class)
 @Composable
 private fun LineHeightTrimOptions(
-    lineHeightTrim: MutableState<LineHeightTrim>,
+    lineHeightTrim: MutableState<Trim>,
     enabled: Boolean
 ) {
     val options = listOf(
-        LineHeightTrim.Both,
-        LineHeightTrim.None,
-        LineHeightTrim.FirstLineTop,
-        LineHeightTrim.LastLineBottom
+        Trim.Both,
+        Trim.None,
+        Trim.FirstLineTop,
+        Trim.LastLineBottom
     )
 
     Row(
@@ -367,7 +366,7 @@ private fun TextWithLineHeight(
     lineHeightEnabled: Boolean,
     lineHeightSp: Float,
     lineHeightEm: Float,
-    lineHeightBehavior: LineHeightBehavior?,
+    lineHeightStyle: LineHeightStyle?,
     includeFontPadding: Boolean,
     applyMaxLines: Boolean,
     ellipsize: Boolean,
@@ -410,7 +409,7 @@ private fun TextWithLineHeight(
     val style = TextStyle(
         fontSize = FontSize,
         color = TextMetricColors.Default.text,
-        lineHeightBehavior = lineHeightBehavior,
+        lineHeightStyle = lineHeightStyle,
         lineHeight = if (lineHeightEnabled) {
             if (lineHeightSp > 0) lineHeightSp.sp else lineHeightEm.em
         } else {

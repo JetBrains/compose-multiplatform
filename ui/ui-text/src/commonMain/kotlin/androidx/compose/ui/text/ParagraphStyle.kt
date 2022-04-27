@@ -18,7 +18,7 @@ package androidx.compose.ui.text
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.text.style.LineHeightBehavior
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextIndent
@@ -45,10 +45,10 @@ private val DefaultLineHeight = TextUnit.Unspecified
  * @param lineHeight Line height for the [Paragraph] in [TextUnit] unit, e.g. SP or EM.
  * @param textIndent The indentation of the paragraph.
  * @param platformStyle Platform specific [ParagraphStyle] parameters.
- * @param lineHeightBehavior the configuration for line height such as vertical alignment of the
+ * @param lineHeightStyle the configuration for line height such as vertical alignment of the
  * line, whether to apply additional space as a result of line height to top of first line top and
  * bottom of last line. The configuration is applied only when a [lineHeight] is defined.
- * When null, [LineHeightBehavior.Default] is used.
+ * When null, [LineHeightStyle.Default] is used.
  *
  * @see Paragraph
  * @see AnnotatedString
@@ -64,7 +64,7 @@ class ParagraphStyle @ExperimentalTextApi constructor(
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalTextApi val platformStyle: PlatformParagraphStyle? = null,
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
-    @get:ExperimentalTextApi val lineHeightBehavior: LineHeightBehavior? = null
+    @get:ExperimentalTextApi val lineHeightStyle: LineHeightStyle? = null
 ) {
 
     /**
@@ -100,7 +100,7 @@ class ParagraphStyle @ExperimentalTextApi constructor(
         lineHeight = lineHeight,
         textIndent = textIndent,
         platformStyle = null,
-        lineHeightBehavior = null
+        lineHeightStyle = null
     )
 
     init {
@@ -133,7 +133,7 @@ class ParagraphStyle @ExperimentalTextApi constructor(
             textAlign = other.textAlign ?: this.textAlign,
             textDirection = other.textDirection ?: this.textDirection,
             platformStyle = mergePlatformStyle(other.platformStyle),
-            lineHeightBehavior = other.lineHeightBehavior ?: this.lineHeightBehavior
+            lineHeightStyle = other.lineHeightStyle ?: this.lineHeightStyle
         )
     }
 
@@ -163,7 +163,7 @@ class ParagraphStyle @ExperimentalTextApi constructor(
             lineHeight = lineHeight,
             textIndent = textIndent,
             platformStyle = this.platformStyle,
-            lineHeightBehavior = this.lineHeightBehavior
+            lineHeightStyle = this.lineHeightStyle
         )
     }
 
@@ -174,7 +174,7 @@ class ParagraphStyle @ExperimentalTextApi constructor(
         lineHeight: TextUnit = this.lineHeight,
         textIndent: TextIndent? = this.textIndent,
         platformStyle: PlatformParagraphStyle? = this.platformStyle,
-        lineHeightBehavior: LineHeightBehavior? = this.lineHeightBehavior
+        lineHeightStyle: LineHeightStyle? = this.lineHeightStyle
     ): ParagraphStyle {
         return ParagraphStyle(
             textAlign = textAlign,
@@ -182,7 +182,7 @@ class ParagraphStyle @ExperimentalTextApi constructor(
             lineHeight = lineHeight,
             textIndent = textIndent,
             platformStyle = platformStyle,
-            lineHeightBehavior = lineHeightBehavior
+            lineHeightStyle = lineHeightStyle
         )
     }
 
@@ -196,7 +196,7 @@ class ParagraphStyle @ExperimentalTextApi constructor(
         if (lineHeight != other.lineHeight) return false
         if (textIndent != other.textIndent) return false
         if (platformStyle != other.platformStyle) return false
-        if (lineHeightBehavior != other.lineHeightBehavior) return false
+        if (lineHeightStyle != other.lineHeightStyle) return false
 
         return true
     }
@@ -208,7 +208,7 @@ class ParagraphStyle @ExperimentalTextApi constructor(
         result = 31 * result + lineHeight.hashCode()
         result = 31 * result + (textIndent?.hashCode() ?: 0)
         result = 31 * result + (platformStyle?.hashCode() ?: 0)
-        result = 31 * result + (lineHeightBehavior?.hashCode() ?: 0)
+        result = 31 * result + (lineHeightStyle?.hashCode() ?: 0)
         return result
     }
 
@@ -220,7 +220,7 @@ class ParagraphStyle @ExperimentalTextApi constructor(
             "lineHeight=$lineHeight, " +
             "textIndent=$textIndent, " +
             "platformStyle=$platformStyle, " +
-            "lineHeightBehavior=$lineHeightBehavior" +
+            "lineHeightStyle=$lineHeightStyle" +
             ")"
     }
 }
@@ -255,9 +255,9 @@ fun lerp(start: ParagraphStyle, stop: ParagraphStyle, fraction: Float): Paragrap
             fraction
         ),
         platformStyle = lerpPlatformStyle(start.platformStyle, stop.platformStyle, fraction),
-        lineHeightBehavior = lerpDiscrete(
-            start.lineHeightBehavior,
-            stop.lineHeightBehavior,
+        lineHeightStyle = lerpDiscrete(
+            start.lineHeightStyle,
+            stop.lineHeightStyle,
             fraction
         )
     )
@@ -285,5 +285,5 @@ internal fun resolveParagraphStyleDefaults(
     lineHeight = if (style.lineHeight.isUnspecified) DefaultLineHeight else style.lineHeight,
     textIndent = style.textIndent ?: TextIndent.None,
     platformStyle = style.platformStyle,
-    lineHeightBehavior = style.lineHeightBehavior
+    lineHeightStyle = style.lineHeightStyle
 )

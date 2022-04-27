@@ -25,8 +25,9 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
-import androidx.compose.ui.text.style.LineVerticalAlignment
-import androidx.compose.ui.text.style.LineHeightBehavior
+import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.style.LineHeightStyle.Trim
+import androidx.compose.ui.text.style.LineHeightStyle.Alignment
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDirection
@@ -298,17 +299,19 @@ class TextStyleLayoutAttributesTest {
 
     @OptIn(ExperimentalTextApi::class)
     @Test
-    fun returns_false_for_lineHeightBehavior_change() {
+    fun returns_false_for_lineHeightStyle_change() {
         val style = TextStyle(
-            lineHeightBehavior = LineHeightBehavior(
-                alignment = LineVerticalAlignment.Center
+            lineHeightStyle = LineHeightStyle(
+                alignment = Alignment.Center,
+                trim = Trim.None
             )
         )
         assertThat(
             style.hasSameLayoutAffectingAttributes(
                 TextStyle(
-                    lineHeightBehavior = LineHeightBehavior(
-                        alignment = LineVerticalAlignment.Bottom
+                    lineHeightStyle = LineHeightStyle(
+                        alignment = Alignment.Bottom,
+                        trim = Trim.Both
                     )
                 )
             )
@@ -346,7 +349,7 @@ class TextStyleLayoutAttributesTest {
             // ui-text/../androidx/compose/ui/text/TextSpanParagraphStyleTest.kt
             getProperty("paragraphStyle"),
             getProperty("spanStyle"),
-            getProperty("lineHeightBehavior")
+            getProperty("lineHeightStyle")
         )
 
         val textStyleProperties = TextStyle::class.memberProperties.map { Property(it) }

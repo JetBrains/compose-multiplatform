@@ -537,7 +537,7 @@ package androidx.compose.ui.text.android {
 
 package androidx.compose.ui.text.android.style {
 
-  public final class LineHeightBehaviorSpanKt {
+  public final class LineHeightStyleSpanKt {
   }
 
   public final class PlaceholderSpanKt {

@@ -924,7 +924,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
         }
 
         // Temporary handling of TextStyle: remove when TextStyle implements InspectableValue
-        // Hide: paragraphStyle, spanStyle, platformStyle, lineHeightBehavior
+        // Hide: paragraphStyle, spanStyle, platformStyle, lineHeightStyle
         private fun createFromTextStyle(name: String, value: TextStyle): NodeParameter? {
             val parameter =
                 NodeParameter(name, ParameterType.String, TextStyle::class.java.simpleName)
