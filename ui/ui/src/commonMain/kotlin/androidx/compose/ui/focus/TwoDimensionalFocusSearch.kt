@@ -134,10 +134,12 @@ private fun MutableVector<FocusModifier>.findBestCandidate(
 
     var searchResult: FocusModifier? = null
     forEach { candidateNode ->
-        val candidateRect = candidateNode.focusRect()
-        if (isBetterCandidate(candidateRect, bestCandidate, focusRect, direction)) {
-            bestCandidate = candidateRect
-            searchResult = candidateNode
+        if (candidateNode.isEligibleForFocusSearch) {
+            val candidateRect = candidateNode.focusRect()
+            if (isBetterCandidate(candidateRect, bestCandidate, focusRect, direction)) {
+                bestCandidate = candidateRect
+                searchResult = candidateNode
+            }
         }
     }
     return searchResult

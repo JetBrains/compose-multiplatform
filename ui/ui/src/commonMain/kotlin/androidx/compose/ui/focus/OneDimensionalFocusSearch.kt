@@ -98,10 +98,10 @@ private fun FocusModifier.searchChildren(
 
     when (direction) {
         Next -> children.forEachItemAfter(focusedItem) { child ->
-            if (child.forwardFocusSearch(onFound)) return true
+            if (child.isEligibleForFocusSearch && child.forwardFocusSearch(onFound)) return true
         }
         Previous -> children.forEachItemBefore(focusedItem) { child ->
-            if (child.backwardFocusSearch(onFound)) return true
+            if (child.isEligibleForFocusSearch && child.backwardFocusSearch(onFound)) return true
         }
         else -> error(InvalidFocusDirection)
     }
