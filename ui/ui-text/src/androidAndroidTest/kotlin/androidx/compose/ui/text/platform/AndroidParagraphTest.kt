@@ -982,6 +982,139 @@ AndroidParagraphTest {
     }
 
     @Test
+    fun testEllipsis_withLimitedHeightFitAllLines_doesNotEllipsis() {
+        with(defaultDensity) {
+            val text = "This is a text"
+            val fontSize = 30.sp
+            val paragraph = simpleParagraph(
+                text = text,
+                ellipsis = true,
+                style = TextStyle(
+                    fontFamily = basicFontFamily,
+                    fontSize = fontSize
+                ),
+                width = 4 * fontSize.toPx(),
+                height = 6 * fontSize.toPx(),
+            )
+
+            for (i in 0 until paragraph.lineCount) {
+                assertThat(paragraph.isEllipsisApplied(i)).isFalse()
+            }
+        }
+    }
+
+    @Test
+    fun testEllipsis_withLimitedHeight_doesEllipsis() {
+        with(defaultDensity) {
+            val text = "This is a text"
+            val fontSize = 30.sp
+            val paragraph = simpleParagraph(
+                text = text,
+                ellipsis = true,
+                style = TextStyle(
+                    fontFamily = basicFontFamily,
+                    fontSize = fontSize
+                ),
+                width = 4 * fontSize.toPx(),
+                height = 2.2f * fontSize.toPx(), // fits 2 lines
+            )
+
+            assertThat(paragraph.lineCount).isEqualTo(2)
+            assertThat(paragraph.isEllipsisApplied(paragraph.lineCount - 1)).isTrue()
+        }
+    }
+
+    @Test
+    fun testEllipsis_withLimitedHeight_ellipsisFalse_doesNotEllipsis() {
+        with(defaultDensity) {
+            val text = "This is a text"
+            val fontSize = 30.sp
+            val paragraph = simpleParagraph(
+                text = text,
+                ellipsis = false,
+                style = TextStyle(
+                    fontFamily = basicFontFamily,
+                    fontSize = fontSize
+                ),
+                width = 4 * fontSize.toPx(),
+                height = 2.2f * fontSize.toPx(), // fits 2 lines
+            )
+
+            for (i in 0 until paragraph.lineCount) {
+                assertThat(paragraph.isEllipsisApplied(i)).isFalse()
+            }
+        }
+    }
+
+    @Test
+    fun testEllipsis_withMaxLinesMoreThanTextLines_andLimitedHeight_doesEllipsis() {
+        with(defaultDensity) {
+            val text = "This is a text"
+            val fontSize = 30.sp
+            val paragraph = simpleParagraph(
+                text = text,
+                ellipsis = true,
+                style = TextStyle(
+                    fontFamily = basicFontFamily,
+                    fontSize = fontSize
+                ),
+                width = 4 * fontSize.toPx(),
+                height = 2.2f * fontSize.toPx(), // fits 2 lines
+                maxLines = 5
+            )
+
+            assertThat(paragraph.lineCount).isEqualTo(2)
+            assertThat(paragraph.isEllipsisApplied(paragraph.lineCount - 1)).isTrue()
+        }
+    }
+
+    @Test
+    fun testEllipsis_withMaxLines_andLimitedHeight_doesEllipsis() {
+        with(defaultDensity) {
+            val text = "This is a text"
+            val fontSize = 30.sp
+            val paragraph = simpleParagraph(
+                text = text,
+                ellipsis = true,
+                style = TextStyle(
+                    fontFamily = basicFontFamily,
+                    fontSize = fontSize
+                ),
+                width = 4 * fontSize.toPx(),
+                height = 4 * fontSize.toPx(),
+                maxLines = 2
+            )
+
+            assertThat(paragraph.lineCount).isEqualTo(2)
+            assertThat(paragraph.isEllipsisApplied(paragraph.lineCount - 1)).isTrue()
+        }
+    }
+
+    @Test
+    fun testEllipsis_withSpans_withLimitedHeight_doesEllipsis() {
+        with(defaultDensity) {
+            val text = "This is a text"
+            val fontSize = 30.sp
+            val paragraph = simpleParagraph(
+                text = text,
+                spanStyles = listOf(
+                    AnnotatedString.Range(SpanStyle(fontSize = fontSize * 2), 0, 2)
+                ),
+                ellipsis = true,
+                style = TextStyle(
+                    fontFamily = basicFontFamily,
+                    fontSize = fontSize
+                ),
+                width = 4 * fontSize.toPx(),
+                height = 2.2f * fontSize.toPx() // fits 2 lines
+            )
+
+            assertThat(paragraph.lineCount).isEqualTo(1)
+            assertThat(paragraph.isEllipsisApplied(paragraph.lineCount - 1)).isTrue()
+        }
+    }
+
+    @Test
     fun testSpanStyle_fontSize_appliedOnTextPaint() {
         with(defaultDensity) {
             val fontSize = 100.sp
@@ -1423,6 +1556,7 @@ AndroidParagraphTest {
         ellipsis: Boolean = false,
         maxLines: Int = Int.MAX_VALUE,
         width: Float,
+        height: Float = Float.POSITIVE_INFINITY,
         style: TextStyle? = null,
         fontFamilyResolver: FontFamily.Resolver = UncachedFontFamilyResolver(context)
     ): AndroidParagraph {
@@ -1436,7 +1570,10 @@ AndroidParagraphTest {
             ).merge(style),
             maxLines = maxLines,
             ellipsis = ellipsis,
-            constraints = Constraints(maxWidth = width.ceilToInt()),
+            constraints = Constraints(
+                maxWidth = width.ceilToInt(),
+                maxHeight = height.ceilToInt()
+            ),
             density = Density(density = 1f),
             fontFamilyResolver = fontFamilyResolver
         )
