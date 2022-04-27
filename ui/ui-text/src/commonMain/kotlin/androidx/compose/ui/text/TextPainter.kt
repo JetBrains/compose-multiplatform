@@ -29,6 +29,7 @@ object TextPainter {
      * @param canvas a canvas to be drawn
      * @param textLayoutResult a result of text layout
      */
+    @OptIn(ExperimentalTextApi::class)
     fun paint(canvas: Canvas, textLayoutResult: TextLayoutResult) {
         val needClipping = textLayoutResult.hasVisualOverflow &&
             textLayoutResult.layoutInput.overflow == TextOverflow.Clip
@@ -40,12 +41,22 @@ object TextPainter {
             canvas.clipRect(bounds)
         }
         try {
-            textLayoutResult.multiParagraph.paint(
-                canvas,
-                textLayoutResult.layoutInput.style.color,
-                textLayoutResult.layoutInput.style.shadow,
-                textLayoutResult.layoutInput.style.textDecoration
-            )
+            val brush = textLayoutResult.layoutInput.style.brush
+            if (brush != null) {
+                textLayoutResult.multiParagraph.paint(
+                    canvas,
+                    brush,
+                    textLayoutResult.layoutInput.style.shadow,
+                    textLayoutResult.layoutInput.style.textDecoration
+                )
+            } else {
+                textLayoutResult.multiParagraph.paint(
+                    canvas,
+                    textLayoutResult.layoutInput.style.color,
+                    textLayoutResult.layoutInput.style.shadow,
+                    textLayoutResult.layoutInput.style.textDecoration
+                )
+            }
         } finally {
             if (needClipping) {
                 canvas.restore()

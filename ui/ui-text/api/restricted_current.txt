@@ -1260,6 +1260,9 @@ package androidx.compose.ui.text.style {
     property public final int Rtl;
   }
 
+  public final class TextDrawStyleKt {
+  }
+
   @androidx.compose.runtime.Immutable public final class TextGeometricTransform {
     ctor public TextGeometricTransform(optional float scaleX, optional float skewX);
     method public androidx.compose.ui.text.style.TextGeometricTransform copy(optional float scaleX, optional float skewX);

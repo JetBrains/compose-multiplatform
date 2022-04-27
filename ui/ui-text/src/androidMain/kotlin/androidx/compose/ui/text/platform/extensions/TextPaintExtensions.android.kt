@@ -18,6 +18,7 @@ package androidx.compose.ui.text.platform.extensions
 
 import android.graphics.Typeface
 import android.os.Build
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
@@ -89,8 +90,13 @@ internal fun AndroidTextPaint.applySpanStyle(
         textSkewX += style.textGeometricTransform.skewX
     }
 
-    // these parameters are also updated by the Paragraph.draw
+    // these parameters are also updated by the Paragraph.paint
+
     setColor(style.color)
+    // setBrush draws the text with given Brush. ShaderBrush requires Size to
+    // create a Shader. However, Size is unavailable at this stage of the layout.
+    // Paragraph.paint will receive a proper Size after layout is completed.
+    setBrush(style.brush, Size.Unspecified)
     setShadow(style.shadow)
     setTextDecoration(style.textDecoration)
 
