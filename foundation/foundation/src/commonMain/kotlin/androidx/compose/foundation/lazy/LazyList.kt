@@ -112,6 +112,7 @@ internal fun LazyList(
             )
             .clipScrollableContainer(isVertical)
             .lazyListBeyondBoundsModifier(state, beyondBoundsInfo, reverseLayout)
+            .lazyListPinningModifier(state, beyondBoundsInfo)
             .scrollable(
                 orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
                 reverseDirection = run {
@@ -178,6 +179,7 @@ private fun rememberLazyListMeasurePolicy(
     placementAnimator: LazyListItemPlacementAnimator
 ) = remember<LazyLayoutMeasureScope.(Constraints) -> MeasureResult>(
     state,
+    beyondBoundsInfo,
     overScrollController,
     contentPadding,
     reverseLayout,

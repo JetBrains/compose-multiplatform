@@ -492,7 +492,7 @@ internal class LayoutNodeSubcompositionsState(
                 val nodeState = nodeToNodeState[node]!!
                 val slotId = nodeState.slotId
                 if (reusableSlotIdsSet.contains(slotId)) {
-                    root.foldedChildren[i].measuredByParent = UsageByParent.NotUsed
+                    node.measuredByParent = UsageByParent.NotUsed
                     reusableCount++
                     nodeState.active = false
                 } else {
