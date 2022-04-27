@@ -47,9 +47,9 @@ sealed interface LazyLayoutMeasureScope : MeasureScope {
     /**
      * Subcompose and measure the item of lazy layout.
      *
-     * @param index the item index. Should be no larger that [LazyLayoutItemsProvider.itemsCount].
+     * @param index the item index. Should be no larger that [LazyLayoutItemProvider.itemCount].
      * @param constraints [Constraints] to measure the children emitted into an item content
-     * composable specified via [LazyLayoutItemsProvider.getContent].
+     * composable specified via [LazyLayoutItemProvider.getContent].
      *
      * @return Array of [Placeable]s. Note that if you emitted multiple children into the item
      * composable you will receive multiple placeables, each of them will be measured with
@@ -113,7 +113,7 @@ internal class LazyLayoutMeasureScopeImpl internal constructor(
         return if (cachedPlaceable != null) {
             cachedPlaceable
         } else {
-            val key = itemContentFactory.itemsProvider().getKey(index)
+            val key = itemContentFactory.itemProvider().getKey(index)
             val itemContent = itemContentFactory.getContent(index, key)
             val measurables = subcomposeMeasureScope.subcompose(key, itemContent)
             Array(measurables.size) { i ->
