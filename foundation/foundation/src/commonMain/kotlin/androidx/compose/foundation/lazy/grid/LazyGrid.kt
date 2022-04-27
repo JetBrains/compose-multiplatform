@@ -78,9 +78,7 @@ internal fun LazyGrid(
 ) {
     val overScrollController = rememberOverScrollController()
 
-    val itemScope = remember { LazyGridItemScopeImpl() }
-
-    val itemProvider = rememberItemProvider(state, content, itemScope)
+    val itemProvider = rememberItemProvider(state, content)
 
     val spanLayoutProvider = remember(itemProvider) {
         derivedStateOf { LazyGridSpanLayoutProvider(itemProvider) }
