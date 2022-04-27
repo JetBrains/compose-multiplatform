@@ -159,12 +159,7 @@ internal class ComposeViewAdapter : FrameLayout {
      * composition, we save it and throw it during onLayout, this allows Studio to catch it and
      * display it to the user.
      */
-    private var delayedException: Throwable? = null
-
-    /**
-     * A lock to take to access delayedException.
-     */
-    private val delayExceptionLock = Any()
+    private val delayedException = ThreadSafeException()
 
     /**
      * The [Composable] to be rendered in the preview. It is initialized when this adapter
@@ -284,13 +279,9 @@ internal class ComposeViewAdapter : FrameLayout {
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
 
-        synchronized(delayExceptionLock) {
-            delayedException?.let { exception ->
-                // There was a pending exception. Throw it here since Studio will catch it and show
-                // it to the user.
-                throw exception
-            }
-        }
+        // If there was a pending exception then throw it here since Studio will catch it and show
+        // it to the user.
+        delayedException.throwIfPresent()
 
         processViewInfos()
         if (composableName.isNotEmpty()) {
@@ -608,9 +599,7 @@ internal class ComposeViewAdapter : FrameLayout {
                         while (exception is ReflectiveOperationException) {
                             exception = exception.cause ?: break
                         }
-                        synchronized(delayExceptionLock) {
-                            delayedException = exception
-                        }
+                        delayedException.set(exception)
                         throw t
                     }
                 }
