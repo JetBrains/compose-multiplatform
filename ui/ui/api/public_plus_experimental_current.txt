@@ -2511,6 +2511,9 @@ package androidx.compose.ui.platform {
   public static final class InfiniteAnimationPolicy.Key implements kotlin.coroutines.CoroutineContext.Key<androidx.compose.ui.platform.InfiniteAnimationPolicy> {
   }
 
+  public final class InfiniteAnimationPolicyKt {
+  }
+
   public final class InspectableModifier extends androidx.compose.ui.platform.InspectorValueInfo implements androidx.compose.ui.Modifier.Element {
     ctor public InspectableModifier(kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> inspectorInfo);
     method public androidx.compose.ui.platform.InspectableModifier.End getEnd();
