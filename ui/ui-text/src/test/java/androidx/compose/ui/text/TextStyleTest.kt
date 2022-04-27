@@ -29,9 +29,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.lerp
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
-import androidx.compose.ui.text.style.LineHeightBehavior
-import androidx.compose.ui.text.style.LineHeightTrim
-import androidx.compose.ui.text.style.LineVerticalAlignment
+import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.style.LineHeightStyle.Trim
+import androidx.compose.ui.text.style.LineHeightStyle.Alignment
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDirection
@@ -1274,9 +1274,9 @@ class TextStyleTest {
         val textDirection = TextDirection.Rtl
         val lineHeight = 100.sp
         val textIndent = TextIndent(firstLine = 20.sp, restLine = 40.sp)
-        val lineHeightBehavior = LineHeightBehavior(
-            alignment = LineVerticalAlignment.Center,
-            trim = LineHeightTrim.None
+        val lineHeightStyle = LineHeightStyle(
+            alignment = Alignment.Center,
+            trim = Trim.None
         )
 
         val style = TextStyle(
@@ -1284,7 +1284,7 @@ class TextStyleTest {
             textDirection = textDirection,
             lineHeight = lineHeight,
             textIndent = textIndent,
-            lineHeightBehavior = lineHeightBehavior
+            lineHeightStyle = lineHeightStyle
         )
 
         assertThat(style.toParagraphStyle()).isEqualTo(
@@ -1293,7 +1293,7 @@ class TextStyleTest {
                 textDirection = textDirection,
                 lineHeight = lineHeight,
                 textIndent = textIndent,
-                lineHeightBehavior = lineHeightBehavior
+                lineHeightStyle = lineHeightStyle
             )
         )
     }
@@ -1305,64 +1305,64 @@ class TextStyleTest {
 
     @OptIn(ExperimentalTextApi::class)
     @Test
-    fun `lineHeightBehavior lerp with null lineHeightBehaviors has null lineHeightBehavior`() {
-        val style = TextStyle(lineHeightBehavior = null)
-        val otherStyle = TextStyle(lineHeightBehavior = null)
+    fun `lineHeightStyle lerp with null lineHeightStyles has null lineHeightStyle`() {
+        val style = TextStyle(lineHeightStyle = null)
+        val otherStyle = TextStyle(lineHeightStyle = null)
 
         val lerpedStyle = lerp(start = style, stop = otherStyle, fraction = 0.5f)
 
-        assertThat(lerpedStyle.lineHeightBehavior).isNull()
+        assertThat(lerpedStyle.lineHeightStyle).isNull()
     }
 
     @OptIn(ExperimentalTextApi::class)
     @Test
-    fun `lineHeightBehavior lerp with non-null start, null end, closer to start has non-null`() {
-        val style = TextStyle(lineHeightBehavior = LineHeightBehavior.Default)
-        val otherStyle = TextStyle(lineHeightBehavior = null)
+    fun `lineHeightStyle lerp with non-null start, null end, closer to start has non-null`() {
+        val style = TextStyle(lineHeightStyle = LineHeightStyle.Default)
+        val otherStyle = TextStyle(lineHeightStyle = null)
 
         val lerpedStyle = lerp(start = style, stop = otherStyle, fraction = 0.4f)
 
-        assertThat(lerpedStyle.lineHeightBehavior).isSameInstanceAs(style.lineHeightBehavior)
+        assertThat(lerpedStyle.lineHeightStyle).isSameInstanceAs(style.lineHeightStyle)
     }
 
     @OptIn(ExperimentalTextApi::class)
     @Test
-    fun `lineHeightBehavior lerp with non-null start, null end, closer to end has null`() {
-        val style = TextStyle(lineHeightBehavior = LineHeightBehavior.Default)
-        val otherStyle = TextStyle(lineHeightBehavior = null)
+    fun `lineHeightStyle lerp with non-null start, null end, closer to end has null`() {
+        val style = TextStyle(lineHeightStyle = LineHeightStyle.Default)
+        val otherStyle = TextStyle(lineHeightStyle = null)
 
         val lerpedStyle = lerp(start = style, stop = otherStyle, fraction = 0.6f)
 
-        assertThat(lerpedStyle.lineHeightBehavior).isNull()
+        assertThat(lerpedStyle.lineHeightStyle).isNull()
     }
 
     @OptIn(ExperimentalTextApi::class)
     @Test
-    fun `lineHeightBehavior lerp with null start, non-null end, closer to start has null`() {
-        val style = TextStyle(lineHeightBehavior = null)
-        val otherStyle = TextStyle(lineHeightBehavior = LineHeightBehavior.Default)
+    fun `lineHeightStyle lerp with null start, non-null end, closer to start has null`() {
+        val style = TextStyle(lineHeightStyle = null)
+        val otherStyle = TextStyle(lineHeightStyle = LineHeightStyle.Default)
 
         val lerpedStyle = lerp(start = style, stop = otherStyle, fraction = 0.4f)
 
-        assertThat(lerpedStyle.lineHeightBehavior).isNull()
+        assertThat(lerpedStyle.lineHeightStyle).isNull()
     }
 
     @OptIn(ExperimentalTextApi::class)
     @Test
-    fun `lineHeightBehavior lerp with null start, non-null end, closer to end has non-null`() {
-        val style = TextStyle(lineHeightBehavior = null)
-        val otherStyle = TextStyle(lineHeightBehavior = LineHeightBehavior.Default)
+    fun `lineHeightStyle lerp with null start, non-null end, closer to end has non-null`() {
+        val style = TextStyle(lineHeightStyle = null)
+        val otherStyle = TextStyle(lineHeightStyle = LineHeightStyle.Default)
 
         val lerpedStyle = lerp(start = style, stop = otherStyle, fraction = 0.6f)
 
-        assertThat(lerpedStyle.lineHeightBehavior).isSameInstanceAs(otherStyle.lineHeightBehavior)
+        assertThat(lerpedStyle.lineHeightStyle).isSameInstanceAs(otherStyle.lineHeightStyle)
     }
 
     @OptIn(ExperimentalTextApi::class)
     @Test
     fun `equals return false for different line height behavior`() {
-        val style = TextStyle(lineHeightBehavior = null)
-        val otherStyle = TextStyle(lineHeightBehavior = LineHeightBehavior.Default)
+        val style = TextStyle(lineHeightStyle = null)
+        val otherStyle = TextStyle(lineHeightStyle = LineHeightStyle.Default)
 
         assertThat(style == otherStyle).isFalse()
     }
@@ -1370,16 +1370,8 @@ class TextStyleTest {
     @OptIn(ExperimentalTextApi::class)
     @Test
     fun `equals return true for same line height behavior`() {
-        val style = TextStyle(
-            lineHeightBehavior = LineHeightBehavior(
-                alignment = LineVerticalAlignment.Center
-            )
-        )
-        val otherStyle = TextStyle(
-            lineHeightBehavior = LineHeightBehavior(
-                alignment = LineVerticalAlignment.Center
-            )
-        )
+        val style = TextStyle(lineHeightStyle = LineHeightStyle.Default)
+        val otherStyle = TextStyle(lineHeightStyle = LineHeightStyle.Default)
 
         assertThat(style == otherStyle).isTrue()
     }
@@ -1387,16 +1379,8 @@ class TextStyleTest {
     @OptIn(ExperimentalTextApi::class)
     @Test
     fun `hashCode is same for same line height behavior`() {
-        val style = TextStyle(
-            lineHeightBehavior = LineHeightBehavior(
-                alignment = LineVerticalAlignment.Center
-            )
-        )
-        val otherStyle = TextStyle(
-            lineHeightBehavior = LineHeightBehavior(
-                alignment = LineVerticalAlignment.Center
-            )
-        )
+        val style = TextStyle(lineHeightStyle = LineHeightStyle.Default)
+        val otherStyle = TextStyle(lineHeightStyle = LineHeightStyle.Default)
 
         assertThat(style.hashCode()).isEqualTo(otherStyle.hashCode())
     }
@@ -1405,13 +1389,15 @@ class TextStyleTest {
     @Test
     fun `hashCode is different for different line height behavior`() {
         val style = TextStyle(
-            lineHeightBehavior = LineHeightBehavior(
-                alignment = LineVerticalAlignment.Bottom
+            lineHeightStyle = LineHeightStyle(
+                alignment = Alignment.Bottom,
+                trim = Trim.None
             )
         )
         val otherStyle = TextStyle(
-            lineHeightBehavior = LineHeightBehavior(
-                alignment = LineVerticalAlignment.Center
+            lineHeightStyle = LineHeightStyle(
+                alignment = Alignment.Center,
+                trim = Trim.Both
             )
         )
 
@@ -1420,91 +1406,96 @@ class TextStyleTest {
 
     @OptIn(ExperimentalTextApi::class)
     @Test
-    fun `copy with lineHeightBehavior returns new lineHeightBehavior`() {
+    fun `copy with lineHeightStyle returns new lineHeightStyle`() {
         val style = TextStyle(
-            lineHeightBehavior = LineHeightBehavior(
-                alignment = LineVerticalAlignment.Bottom
+            lineHeightStyle = LineHeightStyle(
+                alignment = Alignment.Bottom,
+                trim = Trim.None
             )
         )
-        val newLineHeightBehavior = LineHeightBehavior(
-            alignment = LineVerticalAlignment.Center
+        val newLineHeightStyle = LineHeightStyle(
+            alignment = Alignment.Center,
+            trim = Trim.Both
         )
-        val newStyle = style.copy(lineHeightBehavior = newLineHeightBehavior)
+        val newStyle = style.copy(lineHeightStyle = newLineHeightStyle)
 
-        assertThat(newStyle.lineHeightBehavior).isEqualTo(newLineHeightBehavior)
+        assertThat(newStyle.lineHeightStyle).isEqualTo(newLineHeightStyle)
     }
 
     @OptIn(ExperimentalTextApi::class)
     @Test
-    fun `copy without lineHeightBehavior uses existing lineHeightBehavior`() {
+    fun `copy without lineHeightStyle uses existing lineHeightStyle`() {
         val style = TextStyle(
-            lineHeightBehavior = LineHeightBehavior(
-                alignment = LineVerticalAlignment.Bottom
+            lineHeightStyle = LineHeightStyle(
+                alignment = Alignment.Bottom,
+                trim = Trim.None
             )
         )
         val newStyle = style.copy()
 
-        assertThat(newStyle.lineHeightBehavior).isEqualTo(style.lineHeightBehavior)
+        assertThat(newStyle.lineHeightStyle).isEqualTo(style.lineHeightStyle)
     }
 
     @OptIn(ExperimentalTextApi::class)
     @Test
-    fun `merge with null lineHeightBehavior uses other's lineHeightBehavior`() {
-        val style = TextStyle(lineHeightBehavior = null)
-        val otherStyle = TextStyle(lineHeightBehavior = LineHeightBehavior.Default)
+    fun `merge with null lineHeightStyle uses other's lineHeightStyle`() {
+        val style = TextStyle(lineHeightStyle = null)
+        val otherStyle = TextStyle(lineHeightStyle = LineHeightStyle.Default)
 
         val newStyle = style.merge(otherStyle)
 
-        assertThat(newStyle.lineHeightBehavior).isEqualTo(otherStyle.lineHeightBehavior)
+        assertThat(newStyle.lineHeightStyle).isEqualTo(otherStyle.lineHeightStyle)
     }
 
     @OptIn(ExperimentalTextApi::class)
     @Test
-    fun `merge with non-null lineHeightBehavior, returns original`() {
-        val style = TextStyle(lineHeightBehavior = LineHeightBehavior.Default)
-        val otherStyle = TextStyle(lineHeightBehavior = null)
+    fun `merge with non-null lineHeightStyle, returns original`() {
+        val style = TextStyle(lineHeightStyle = LineHeightStyle.Default)
+        val otherStyle = TextStyle(lineHeightStyle = null)
 
         val newStyle = style.merge(otherStyle)
 
-        assertThat(newStyle.lineHeightBehavior).isEqualTo(style.lineHeightBehavior)
+        assertThat(newStyle.lineHeightStyle).isEqualTo(style.lineHeightStyle)
     }
 
     @OptIn(ExperimentalTextApi::class)
     @Test
-    fun `merge with both null lineHeightBehavior returns null`() {
-        val style = TextStyle(lineHeightBehavior = null)
-        val otherStyle = TextStyle(lineHeightBehavior = null)
+    fun `merge with both null lineHeightStyle returns null`() {
+        val style = TextStyle(lineHeightStyle = null)
+        val otherStyle = TextStyle(lineHeightStyle = null)
 
         val newStyle = style.merge(otherStyle)
 
-        assertThat(newStyle.lineHeightBehavior).isNull()
+        assertThat(newStyle.lineHeightStyle).isNull()
     }
 
     @OptIn(ExperimentalTextApi::class)
     @Test
-    fun `merge with both non-null lineHeightBehavior returns other's lineHeightBehavior`() {
+    fun `merge with both non-null lineHeightStyle returns other's lineHeightStyle`() {
         val style = TextStyle(
-            lineHeightBehavior = LineHeightBehavior(
-                alignment = LineVerticalAlignment.Center
+            lineHeightStyle = LineHeightStyle(
+                alignment = Alignment.Center,
+                trim = Trim.None
             )
         )
         val otherStyle = TextStyle(
-            lineHeightBehavior = LineHeightBehavior(
-                alignment = LineVerticalAlignment.Bottom
+            lineHeightStyle = LineHeightStyle(
+                alignment = Alignment.Bottom,
+                trim = Trim.Both
             )
         )
 
         val newStyle = style.merge(otherStyle)
 
-        assertThat(newStyle.lineHeightBehavior).isEqualTo(otherStyle.lineHeightBehavior)
+        assertThat(newStyle.lineHeightStyle).isEqualTo(otherStyle.lineHeightStyle)
     }
 
     @OptIn(ExperimentalTextApi::class)
     @Test
-    fun `constructor without lineHeightBehavior sets lineHeightBehavior to null`() {
+    fun `constructor without lineHeightStyle sets lineHeightStyle to null`() {
         val style = TextStyle(textAlign = TextAlign.Start)
 
-        assertThat(style.lineHeightBehavior).isNull()
+        assertThat(style.lineHeightStyle).isNull()
     }
 
     @Test

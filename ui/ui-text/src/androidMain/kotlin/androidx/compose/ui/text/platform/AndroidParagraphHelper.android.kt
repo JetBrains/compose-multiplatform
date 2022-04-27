@@ -33,7 +33,7 @@ import androidx.compose.ui.text.platform.extensions.setLineHeight
 import androidx.compose.ui.text.platform.extensions.setPlaceholders
 import androidx.compose.ui.text.platform.extensions.setSpanStyles
 import androidx.compose.ui.text.platform.extensions.setTextIndent
-import androidx.compose.ui.text.style.LineHeightBehavior
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.isUnspecified
@@ -59,7 +59,7 @@ internal fun createCharSequence(
     val spannableString = SpannableString(text)
 
     if (contextTextStyle.isIncludeFontPaddingEnabled() &&
-        contextTextStyle.lineHeightBehavior == null
+        contextTextStyle.lineHeightStyle == null
     ) {
         // keep the existing line height behavior for includeFontPadding=true
         spannableString.setLineHeight(
@@ -68,10 +68,10 @@ internal fun createCharSequence(
             density = density
         )
     } else {
-        val lineHeightBehavior = contextTextStyle.lineHeightBehavior ?: LineHeightBehavior.Default
+        val lineHeightStyle = contextTextStyle.lineHeightStyle ?: LineHeightStyle.Default
         spannableString.setLineHeight(
             lineHeight = contextTextStyle.lineHeight,
-            lineHeightBehavior = lineHeightBehavior,
+            lineHeightStyle = lineHeightStyle,
             contextFontSize = contextFontSize,
             density = density,
         )
