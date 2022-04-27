@@ -40,7 +40,7 @@ internal class LazyListScopeImpl : LazyListScope {
             LazyListIntervalContent(
                 key = key,
                 type = contentType,
-                content = { index -> @Composable { itemContent(index) } }
+                item = itemContent
             )
         )
     }
@@ -51,7 +51,7 @@ internal class LazyListScopeImpl : LazyListScope {
             LazyListIntervalContent(
                 key = if (key != null) { _: Int -> key } else null,
                 type = { contentType },
-                content = { @Composable { content() } }
+                item = { content() }
             )
         )
     }
@@ -74,5 +74,5 @@ internal class LazyListScopeImpl : LazyListScope {
 internal class LazyListIntervalContent(
     val key: ((index: Int) -> Any)?,
     val type: ((index: Int) -> Any?),
-    val content: LazyItemScope.(index: Int) -> @Composable () -> Unit
+    val item: @Composable LazyItemScope.(index: Int) -> Unit
 )

@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 
 @OptIn(ExperimentalFoundationApi::class)
-internal class LazyGridItemScopeImpl : LazyGridItemScope {
+internal object LazyGridItemScopeImpl : LazyGridItemScope {
     @ExperimentalFoundationApi
     override fun Modifier.animateItemPlacement(animationSpec: FiniteAnimationSpec<IntOffset>) =
         this.then(AnimateItemPlacementModifier(animationSpec, debugInspectorInfo {
