@@ -564,6 +564,17 @@ internal class LayoutNode(
      */
     internal var measuredByParent: UsageByParent = UsageByParent.NotUsed
 
+    /**
+     * Remembers how the node was measured using intrinsics by an ancestor.
+     */
+    internal var intrinsicsUsageByParent: UsageByParent = UsageByParent.NotUsed
+
+    /**
+     * We must cache a previous value of [intrinsicsUsageByParent] because measurement
+     * is sometimes skipped. When it is skipped, the subtree must be restored to this value.
+     */
+    private var previousIntrinsicsUsageByParent: UsageByParent = UsageByParent.NotUsed
+
     @Deprecated("Temporary API to support ConstraintLayout prototyping.")
     internal var canMultiMeasure: Boolean = false
 
@@ -780,6 +791,11 @@ internal class LayoutNode(
     internal var needsOnPositionedDispatch = false
 
     internal fun place(x: Int, y: Int) {
+        if (intrinsicsUsageByParent == UsageByParent.NotUsed) {
+            // This LayoutNode may have asked children for intrinsics. If so, we should
+            // clear the intrinsics usage for everything that was requested previously.
+            clearSubtreePlacementIntrinsicsUsage()
+        }
         Placeable.PlacementScope.executeWithRtlMirroringValues(
             outerMeasurablePlaceable.measuredWidth,
             layoutDirection
@@ -792,6 +808,11 @@ internal class LayoutNode(
      * Place this layout node again on the same position it was placed last time
      */
     internal fun replace() {
+        if (intrinsicsUsageByParent == UsageByParent.NotUsed) {
+            // This LayoutNode may have asked children for intrinsics. If so, we should
+            // clear the intrinsics usage for everything that was requested previously.
+            clearSubtreePlacementIntrinsicsUsage()
+        }
         try {
             relayoutWithoutParentInProgress = true
             outerMeasurablePlaceable.replace()
@@ -1087,9 +1108,10 @@ internal class LayoutNode(
      * Used to request a new measurement + layout pass from the owner.
      */
     internal fun requestRemeasure(forceRequest: Boolean = false) {
-        val owner = owner ?: return
         if (!ignoreRemeasureRequests && !isVirtual) {
+            val owner = owner ?: return
             owner.onRequestMeasure(this, forceRequest)
+            outerMeasurablePlaceable.invalidateIntrinsicsParent(forceRequest)
         }
     }
 
@@ -1328,6 +1350,11 @@ internal class LayoutNode(
 
     // Delegation from Measurable to measurableAndPlaceable
     override fun measure(constraints: Constraints): Placeable {
+        if (intrinsicsUsageByParent == UsageByParent.NotUsed) {
+            // This LayoutNode may have asked children for intrinsics. If so, we should
+            // clear the intrinsics usage for everything that was requested previously.
+            clearSubtreeIntrinsicsUsage()
+        }
         return outerMeasurablePlaceable.measure(constraints)
     }
 
@@ -1338,6 +1365,11 @@ internal class LayoutNode(
         constraints: Constraints? = outerMeasurablePlaceable.lastConstraints
     ): Boolean {
         return if (constraints != null) {
+            if (intrinsicsUsageByParent == UsageByParent.NotUsed) {
+                // This LayoutNode may have asked children for intrinsics. If so, we should
+                // clear the intrinsics usage for everything that was requested previously.
+                clearSubtreeIntrinsicsUsage()
+            }
             val sizeChanged = outerMeasurablePlaceable.remeasure(constraints)
             sizeChanged
         } else {
@@ -1470,6 +1502,63 @@ internal class LayoutNode(
             }
         }
         return true
+    }
+
+    /**
+     * Walks the subtree and clears all [intrinsicsUsageByParent] that this
+     * LayoutNode's measurement used intrinsics on.
+     *
+     * The layout that asks for intrinsics of its children is the node to call this to request
+     * all of its subtree to be cleared.
+     *
+     * We can't do clearing as part of measure() because the child's measure()
+     * call is normally done after the intrinsics is requested and we don't want
+     * to clear the usage at that point.
+     */
+    private fun clearSubtreeIntrinsicsUsage() {
+        // save the usage in case we short-circuit the measure call
+        previousIntrinsicsUsageByParent = intrinsicsUsageByParent
+        intrinsicsUsageByParent = UsageByParent.NotUsed
+        _children.forEach {
+            if (it.intrinsicsUsageByParent != UsageByParent.NotUsed) {
+                it.clearSubtreeIntrinsicsUsage()
+            }
+        }
+    }
+
+    /**
+     * Walks the subtree and clears all [intrinsicsUsageByParent] that this
+     * LayoutNode's layout block used intrinsics on.
+     *
+     * The layout that asks for intrinsics of its children is the node to call this to request
+     * all of its subtree to be cleared.
+     *
+     * We can't do clearing as part of measure() because the child's measure()
+     * call is normally done after the intrinsics is requested and we don't want
+     * to clear the usage at that point.
+     */
+    private fun clearSubtreePlacementIntrinsicsUsage() {
+        // save the usage in case we short-circuit the measure call
+        previousIntrinsicsUsageByParent = intrinsicsUsageByParent
+        intrinsicsUsageByParent = UsageByParent.NotUsed
+        _children.forEach {
+            if (it.intrinsicsUsageByParent == UsageByParent.InLayoutBlock) {
+                it.clearSubtreePlacementIntrinsicsUsage()
+            }
+        }
+    }
+
+    /**
+     * For a subtree that skips measurement, this resets the [intrinsicsUsageByParent]
+     * to what it was prior to [clearSubtreeIntrinsicsUsage].
+     */
+    internal fun resetSubtreeIntrinsicsUsage() {
+        _children.forEach {
+            it.intrinsicsUsageByParent = it.previousIntrinsicsUsageByParent
+            if (it.intrinsicsUsageByParent != UsageByParent.NotUsed) {
+                it.resetSubtreeIntrinsicsUsage()
+            }
+        }
     }
 
     /**
