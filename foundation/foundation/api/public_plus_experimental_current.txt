@@ -521,6 +521,9 @@ package androidx.compose.foundation.lazy {
   public final class LazyListMeasureKt {
   }
 
+  public final class LazyListPinningModifierKt {
+  }
+
   @androidx.compose.foundation.lazy.LazyScopeMarker public interface LazyListScope {
     method public default void item(optional Object? key, optional Object? contentType, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,kotlin.Unit> content);
     method @Deprecated public void item(optional Object? key, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,? extends kotlin.Unit> content);
