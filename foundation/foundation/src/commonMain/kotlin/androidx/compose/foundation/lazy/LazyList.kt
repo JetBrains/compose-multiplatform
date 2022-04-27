@@ -74,9 +74,8 @@ internal fun LazyList(
     content: LazyListScope.() -> Unit
 ) {
     val overScrollController = rememberOverScrollController()
-
     val itemProvider = rememberItemProvider(state, content)
-
+    val beyondBoundsInfo = remember { LazyListBeyondBoundsInfo() }
     val scope = rememberCoroutineScope()
     val placementAnimator = remember(state, isVertical) {
         LazyListItemPlacementAnimator(scope, isVertical)
@@ -86,6 +85,7 @@ internal fun LazyList(
     val measurePolicy = rememberLazyListMeasurePolicy(
         itemProvider,
         state,
+        beyondBoundsInfo,
         overScrollController,
         contentPadding,
         reverseLayout,
@@ -111,6 +111,7 @@ internal fun LazyList(
                 userScrollEnabled = userScrollEnabled
             )
             .clipScrollableContainer(isVertical)
+            .lazyListBeyondBoundsModifier(state, beyondBoundsInfo, reverseLayout)
             .scrollable(
                 orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
                 reverseDirection = run {
@@ -155,6 +156,8 @@ private fun rememberLazyListMeasurePolicy(
     itemProvider: LazyListItemProvider,
     /** The state of the list. */
     state: LazyListState,
+    /** Keeps track of the number of items we measure and place that are beyond visible bounds. */
+    beyondBoundsInfo: LazyListBeyondBoundsInfo,
     /** The overscroll controller. */
     overScrollController: OverScrollController,
     /** The inner padding to be added for the whole content(nor for each individual item) */
@@ -276,6 +279,7 @@ private fun rememberLazyListMeasurePolicy(
             density = this,
             layoutDirection = layoutDirection,
             placementAnimator = placementAnimator,
+            beyondBoundsInfo = beyondBoundsInfo,
             layout = { width, height, placement ->
                 layout(
                     containerConstraints.constrainWidth(width + totalHorizontalPadding),
