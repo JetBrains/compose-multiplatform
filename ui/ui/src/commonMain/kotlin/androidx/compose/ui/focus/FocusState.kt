@@ -55,26 +55,30 @@ interface FocusState {
     val isCaptured: Boolean
 }
 
-// Different states of the focus system. These are the states used by the Focus Nodes.
+/** Different states of the focus system. These are the states used by the Focus Nodes. */
 internal enum class FocusStateImpl : FocusState {
-    // The focusable component is currently active (i.e. it receives key events).
+    /** The focusable component is currently active (i.e. it receives key events). */
     Active,
 
-    // One of the descendants of the focusable component is Active.
+    /** One of the descendants of the focusable component is Active. */
     ActiveParent,
 
-    // The focusable component is currently active (has focus), and is in a state where
-    // it does not want to give up focus. (Eg. a text field with an invalid phone number).
+    /**
+     * The focusable component is currently active (has focus), and is in a state where
+     * it does not want to give up focus. (Eg. a text field with an invalid phone number).
+     */
     Captured,
 
-    // The focusable component is not currently focusable. (eg. A disabled button).
+    /** The focusable component is not currently focusable. (eg. A disabled button). */
     Deactivated,
 
-    // One of the descendants of this deactivated component is Active.
+    /** One of the descendants of this deactivated component is Active. */
     DeactivatedParent,
 
-    // The focusable component does not receive any key events. (ie it is not active, nor are any
-    // of its descendants active).
+    /**
+     * The focusable component does not receive any key events. (ie it is not active, nor are any
+     * of its descendants active).
+     */
     Inactive;
 
     override val isFocused: Boolean
