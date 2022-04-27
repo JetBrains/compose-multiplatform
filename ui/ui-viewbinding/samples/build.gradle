@@ -57,11 +57,3 @@ android {
     }
     namespace "androidx.compose.ui.viewbinding.samples"
 }
-
-// Workaround for https://github.com/gradle/gradle/issues/19882
-configurations.all {
-    resolutionStrategy.dependencySubstitution {
-        substitute(module("androidx.lifecycle:lifecycle-common-java8:")).
-                using project(":lifecycle:lifecycle-common-java8")
-    }
-}
