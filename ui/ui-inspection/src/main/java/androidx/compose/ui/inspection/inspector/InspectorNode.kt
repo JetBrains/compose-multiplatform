@@ -17,8 +17,12 @@
 package androidx.compose.ui.inspection.inspector
 
 import androidx.compose.ui.layout.LayoutInfo
+import androidx.compose.ui.unit.IntRect
 
 internal const val UNDEFINED_ID = 0L
+
+internal val emptyBox = IntRect(0, 0, 0, 0)
+internal val outsideBox = IntRect(Int.MAX_VALUE, Int.MIN_VALUE, Int.MAX_VALUE, Int.MIN_VALUE)
 
 /**
  * Node representing a Composable for the Layout Inspector.
@@ -82,24 +86,9 @@ class InspectorNode internal constructor(
     val length: Int,
 
     /**
-     * Left side of the Composable in pixels.
+     * The bounding box of the Composable.
      */
-    val left: Int,
-
-    /**
-     * Top of the Composable in pixels.
-     */
-    val top: Int,
-
-    /**
-     * Width of the Composable in pixels.
-     */
-    val width: Int,
-
-    /**
-     * Width of the Composable in pixels.
-     */
-    val height: Int,
+    internal val box: IntRect,
 
     /**
      * The 4 corners of the polygon after transformations of the original rectangle.
@@ -131,6 +120,30 @@ class InspectorNode internal constructor(
      */
     val children: List<InspectorNode>
 ) {
+    /**
+     * Left side of the Composable in pixels.
+     */
+    val left: Int
+      get() = box.left
+
+    /**
+     * Top of the Composable in pixels.
+     */
+    val top: Int
+      get() = box.top
+
+    /**
+     * Width of the Composable in pixels.
+     */
+    val width: Int
+      get() = box.width
+
+    /**
+     * Width of the Composable in pixels.
+     */
+    val height: Int
+      get() = box.height
+
     fun parametersByKind(kind: ParameterKind): List<RawParameter> = when (kind) {
         ParameterKind.Normal -> parameters
         ParameterKind.MergedSemantics -> mergedSemantics
@@ -147,7 +160,13 @@ data class QuadBounds(
     val y2: Int,
     val x3: Int,
     val y3: Int,
-)
+) {
+    val xMin: Int get() = sequenceOf(x0, x1, x2, x3).minOrNull()!!
+    val xMax: Int get() = sequenceOf(x0, x1, x2, x3).maxOrNull()!!
+    val yMin: Int get() = sequenceOf(y0, y1, y2, y3).minOrNull()!!
+    val yMax: Int get() = sequenceOf(y0, y1, y2, y3).maxOrNull()!!
+    val outerBox: IntRect get() = IntRect(xMin, yMin, xMax, yMax)
+}
 
 /**
  * Parameter definition with a raw value reference.
@@ -170,14 +189,12 @@ internal class MutableInspectorNode {
     var lineNumber = 0
     var offset = 0
     var length = 0
-    var left = 0
-    var top = 0
-    var width = 0
-    var height = 0
+    var box: IntRect = emptyBox
     var bounds: QuadBounds? = null
     val parameters = mutableListOf<RawParameter>()
     var viewId = UNDEFINED_ID
     val children = mutableListOf<InspectorNode>()
+    var outerBox: IntRect = outsideBox
 
     fun reset() {
         markUnwanted()
@@ -185,14 +202,12 @@ internal class MutableInspectorNode {
         key = 0
         anchorHash = 0
         viewId = UNDEFINED_ID
-        left = 0
-        top = 0
-        width = 0
-        height = 0
         layoutNodes.clear()
         mergedSemantics.clear()
         unmergedSemantics.clear()
+        box = emptyBox
         bounds = null
+        outerBox = outsideBox
         children.clear()
     }
 
@@ -215,10 +230,7 @@ internal class MutableInspectorNode {
         lineNumber = node.lineNumber
         offset = node.offset
         length = node.length
-        left = node.left
-        top = node.top
-        width = node.width
-        height = node.height
+        box = node.box
         bounds = node.bounds
         mergedSemantics.addAll(node.mergedSemantics)
         unmergedSemantics.addAll(node.unmergedSemantics)
@@ -229,7 +241,7 @@ internal class MutableInspectorNode {
     fun build(withSemantics: Boolean = true): InspectorNode =
         InspectorNode(
             id, key, anchorHash, name, fileName, packageHash, lineNumber, offset, length,
-            left, top, width, height, bounds, parameters.toList(), viewId,
+            box, bounds, parameters.toList(), viewId,
             if (withSemantics) mergedSemantics.toList() else emptyList(),
             if (withSemantics) unmergedSemantics.toList() else emptyList(),
             children.toList()
