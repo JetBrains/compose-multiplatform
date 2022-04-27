@@ -46,7 +46,7 @@ switch (cacheSetting) {
             settings.buildCache {
                 remote(GcpBuildCache) {
                     projectId = "androidx-ge"
-                    bucketName = "androidx-gradle-build-cache"
+                    bucketName = "androidx-gradle-remote-cache"
                     push = (BUILD_NUMBER != null && !BUILD_NUMBER.startsWith("P"))
                 }
             }
