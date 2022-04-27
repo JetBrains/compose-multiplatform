@@ -64,6 +64,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.ViewRootForInspector
+import androidx.compose.ui.platform.withInfiniteAnimationFrameNanos
 import androidx.compose.ui.semantics.popup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
@@ -77,11 +78,10 @@ import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.savedstate.findViewTreeSavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import kotlinx.coroutines.android.awaitFrame
-import kotlinx.coroutines.isActive
-import org.jetbrains.annotations.TestOnly
 import java.util.UUID
 import kotlin.math.roundToInt
+import kotlinx.coroutines.isActive
+import org.jetbrains.annotations.TestOnly
 
 /**
  * Properties used to customize the behavior of a [Popup].
@@ -300,7 +300,7 @@ fun Popup(
     // and only do the other position calculations in that case.
     LaunchedEffect(popupLayout) {
         while (isActive) {
-            awaitFrame()
+            withInfiniteAnimationFrameNanos {}
             popupLayout.pollForLocationOnScreenChange()
         }
     }
