@@ -356,7 +356,7 @@ class TextFieldDecorationBoxTest {
                         interactionSource = interactionSource,
                         singleLine = singleLine,
                         border = {
-                            TextFieldDefaults.BorderStroke(
+                            TextFieldDefaults.BorderBox(
                                 enabled = true,
                                 isError = false,
                                 colors = colors,

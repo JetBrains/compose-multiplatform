@@ -195,7 +195,7 @@ fun OutlinedTextField(
                 interactionSource = interactionSource,
                 colors = colors,
                 border = {
-                    TextFieldDefaults.BorderStroke(
+                    TextFieldDefaults.BorderBox(
                         enabled,
                         isError,
                         interactionSource,
@@ -339,7 +339,7 @@ fun OutlinedTextField(
                 interactionSource = interactionSource,
                 colors = colors,
                 border = {
-                    TextFieldDefaults.BorderStroke(
+                    TextFieldDefaults.BorderBox(
                         enabled,
                         isError,
                         interactionSource,

@@ -436,7 +436,7 @@ fun CustomOutlinedTextFieldBasedOnDecorationBox() {
                 ),
                 // update border thickness and shape
                 border = {
-                    TextFieldDefaults.BorderStroke(
+                    TextFieldDefaults.BorderBox(
                         enabled = enabled,
                         isError = false,
                         colors = colors,
