@@ -1894,14 +1894,19 @@ package androidx.compose.ui.layout {
   }
 
   public interface BeyondBoundsLayout {
-    method public <T> T? searchBeyondBounds(int direction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.BeyondBoundsLayoutScope,? extends T> block);
+    method public <T> T? layout(int direction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.BeyondBoundsLayout.BeyondBoundsScope,? extends T> block);
   }
 
-  @kotlin.jvm.JvmInline public final value class BeyondBoundsLayoutDirection {
-    field public static final androidx.compose.ui.layout.BeyondBoundsLayoutDirection.Companion Companion;
+  public static interface BeyondBoundsLayout.BeyondBoundsScope {
+    method public boolean getHasMoreContent();
+    property public abstract boolean hasMoreContent;
   }
 
-  public static final class BeyondBoundsLayoutDirection.Companion {
+  @kotlin.jvm.JvmInline public static final value class BeyondBoundsLayout.LayoutDirection {
+    field public static final androidx.compose.ui.layout.BeyondBoundsLayout.LayoutDirection.Companion Companion;
+  }
+
+  public static final class BeyondBoundsLayout.LayoutDirection.Companion {
     method public int getAbove();
     method public int getAfter();
     method public int getBefore();
@@ -1919,11 +1924,6 @@ package androidx.compose.ui.layout {
   public final class BeyondBoundsLayoutKt {
     method public static androidx.compose.ui.modifier.ProvidableModifierLocal<androidx.compose.ui.layout.BeyondBoundsLayout> getModifierLocalBeyondBoundsLayout();
     property public static final androidx.compose.ui.modifier.ProvidableModifierLocal<androidx.compose.ui.layout.BeyondBoundsLayout> ModifierLocalBeyondBoundsLayout;
-  }
-
-  public interface BeyondBoundsLayoutScope {
-    method public boolean getHasMoreContent();
-    property public abstract boolean hasMoreContent;
   }
 
   @androidx.compose.runtime.Stable public interface ContentScale {
