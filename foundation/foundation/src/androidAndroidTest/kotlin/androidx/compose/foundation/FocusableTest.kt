@@ -352,7 +352,7 @@ class FocusableTest {
     private fun Modifier.pinnableParent(onPin: () -> PinnedItemsHandle): Modifier {
         return modifierLocalProvider(ModifierLocalPinnableParent) {
             object : PinnableParent {
-                override fun pinBeyondBoundsItems(): PinnedItemsHandle {
+                override fun pinItems(): PinnedItemsHandle {
                     return onPin()
                 }
             }
