@@ -758,7 +758,7 @@ package androidx.compose.foundation.lazy.layout {
   }
 
   @androidx.compose.foundation.ExperimentalFoundationApi public interface PinnableParent {
-    method public androidx.compose.foundation.lazy.layout.PinnableParent.PinnedItemsHandle pinBeyondBoundsItems();
+    method public androidx.compose.foundation.lazy.layout.PinnableParent.PinnedItemsHandle pinItems();
   }
 
   @androidx.compose.foundation.ExperimentalFoundationApi public static interface PinnableParent.PinnedItemsHandle {

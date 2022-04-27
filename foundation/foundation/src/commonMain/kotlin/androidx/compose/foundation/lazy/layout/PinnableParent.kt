@@ -35,7 +35,7 @@ val ModifierLocalPinnableParent = modifierLocalOf<PinnableParent?> { null }
 
 /**
  * Parent modifiers that implement this interface should retain its current children when it
- * receives a call to [pinBeyondBoundsItems] and return a [PinnedItemsHandle]. It should hold on to
+ * receives a call to [pinItems] and return a [PinnedItemsHandle]. It should hold on to
  * thesechildren until it receives a call to [PinnedItemsHandle.unpin].
  */
 @ExperimentalFoundationApi
@@ -43,10 +43,10 @@ interface PinnableParent {
     /**
      * Pin the currently composed items.
      */
-    fun pinBeyondBoundsItems(): PinnedItemsHandle
+    fun pinItems(): PinnedItemsHandle
 
     /**
-     * This is an object returned by [PinnableParent.pinBeyondBoundsItems] when it pins its
+     * This is an object returned by [PinnableParent.pinItems] when it pins its
      * currently composed items. It provides an [unpin] function to release the pinned children.
      */
     @ExperimentalFoundationApi

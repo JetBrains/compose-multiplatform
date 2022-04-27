@@ -145,7 +145,7 @@ fun Modifier.focusable(
                     // synchronously and suspend after the items are pinned.
                     scope.launch(start = CoroutineStart.UNDISPATCHED) {
                         try {
-                            pinnedItemsHandle = pinnableParent?.pinBeyondBoundsItems()
+                            pinnedItemsHandle = pinnableParent?.pinItems()
                             bringIntoViewRequester.bringIntoView()
                         } finally {
                             pinnedItemsHandle?.unpin()
