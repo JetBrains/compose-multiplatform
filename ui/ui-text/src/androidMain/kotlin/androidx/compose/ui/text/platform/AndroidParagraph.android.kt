@@ -21,6 +21,8 @@ import android.text.TextUtils
 import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -50,11 +52,13 @@ import androidx.compose.ui.text.android.style.PlaceholderSpan
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.createFontFamilyResolver
+import androidx.compose.ui.text.platform.style.ShaderBrushSpan
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Density
 import java.util.Locale as JavaLocale
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.ceilToInt
 import androidx.compose.ui.unit.Constraints
 
@@ -131,6 +135,10 @@ internal class AndroidParagraph(
             includePadding = style.isIncludeFontPaddingEnabled(),
             fallbackLineSpacing = true
         )
+
+        layout.getShaderBrushSpans().forEach { shaderBrushSpan ->
+            shaderBrushSpan.size = Size(width, height)
+        }
     }
 
     override val width: Float
@@ -379,15 +387,50 @@ internal class AndroidParagraph(
     internal fun isEllipsisApplied(lineIndex: Int): Boolean =
         layout.isEllipsisApplied(lineIndex)
 
+    private fun TextLayout.getShaderBrushSpans(): Array<ShaderBrushSpan> {
+        if (text !is Spanned) return emptyArray()
+        val brushSpans = (text as Spanned).getSpans(
+            0, text.length, ShaderBrushSpan::class.java
+        )
+        if (brushSpans.isEmpty()) return emptyArray()
+        return brushSpans
+    }
+
     override fun paint(
         canvas: Canvas,
         color: Color,
         shadow: Shadow?,
         textDecoration: TextDecoration?
     ) {
-        textPaint.setColor(color)
-        textPaint.setShadow(shadow)
-        textPaint.setTextDecoration(textDecoration)
+        with(textPaint) {
+            setColor(color)
+            setShadow(shadow)
+            setTextDecoration(textDecoration)
+        }
+
+        val nativeCanvas = canvas.nativeCanvas
+        if (didExceedMaxLines) {
+            nativeCanvas.save()
+            nativeCanvas.clipRect(0f, 0f, width, height)
+        }
+        layout.paint(nativeCanvas)
+        if (didExceedMaxLines) {
+            nativeCanvas.restore()
+        }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    override fun paint(
+        canvas: Canvas,
+        brush: Brush,
+        shadow: Shadow?,
+        textDecoration: TextDecoration?
+    ) {
+        with(textPaint) {
+            setBrush(brush, Size(width, height))
+            setShadow(shadow)
+            setTextDecoration(textDecoration)
+        }
 
         val nativeCanvas = canvas.nativeCanvas
         if (didExceedMaxLines) {

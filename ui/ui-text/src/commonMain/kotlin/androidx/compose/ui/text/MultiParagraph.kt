@@ -18,6 +18,7 @@ package androidx.compose.ui.text
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -386,6 +387,22 @@ class MultiParagraph(
         canvas.save()
         paragraphInfoList.fastForEach {
             it.paragraph.paint(canvas, color, shadow, decoration)
+            canvas.translate(0f, it.paragraph.height)
+        }
+        canvas.restore()
+    }
+
+    /** Paint the paragraphs to canvas. */
+    @ExperimentalTextApi
+    fun paint(
+        canvas: Canvas,
+        brush: Brush,
+        shadow: Shadow? = null,
+        decoration: TextDecoration? = null
+    ) {
+        canvas.save()
+        paragraphInfoList.fastForEach {
+            it.paragraph.paint(canvas, brush, shadow, decoration)
             canvas.translate(0f, it.paragraph.height)
         }
         canvas.restore()

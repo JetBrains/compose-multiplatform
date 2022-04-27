@@ -23,6 +23,7 @@ val TextDemos = DemoCategory(
     "Text",
     listOf(
         ComposableDemo("Static text") { TextDemo() },
+        ComposableDemo("Brush") { TextBrushDemo() },
         ComposableDemo("Typeface") { TypefaceDemo() },
         ComposableDemo("FontFamily fallback") { FontFamilyDemo() },
         ComposableDemo("All system font families") { SystemFontFamilyDemo() },

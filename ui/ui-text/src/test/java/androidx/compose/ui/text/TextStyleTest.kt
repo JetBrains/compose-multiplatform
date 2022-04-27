@@ -17,8 +17,10 @@
 package androidx.compose.ui.text
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -53,6 +55,7 @@ class TextStyleTest {
     fun `constructor with default values`() {
         val style = TextStyle()
 
+        assertThat(style.brush).isNull()
         assertThat(style.color).isEqualTo(Color.Unspecified)
         assertThat(style.fontSize.isUnspecified).isTrue()
         assertThat(style.fontWeight).isNull()
@@ -63,6 +66,77 @@ class TextStyleTest {
         assertThat(style.textDecoration).isNull()
         assertThat(style.fontFamily).isNull()
         assertThat(style.platformStyle).isNull()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `constructor with customized brush`() {
+        val brush = Brush.linearGradient(colors = listOf(Color.Blue, Color.Red))
+
+        val style = TextStyle(brush = brush)
+
+        assertThat(style.brush).isEqualTo(brush)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `constructor with gradient brush has unspecified color`() {
+        val brush = Brush.linearGradient(colors = listOf(Color.Blue, Color.Red))
+
+        val style = TextStyle(brush = brush)
+
+        assertThat(style.color).isEqualTo(Color.Unspecified)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `constructor with SolidColor converts to regular color`() {
+        val brush = SolidColor(Color.Red)
+
+        val style = TextStyle(brush = brush)
+
+        assertThat(style.color).isEqualTo(Color.Red)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `empty copy with existing brush should not remove brush`() {
+        val brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+
+        val style = TextStyle(brush = brush)
+
+        assertThat(style.copy().brush).isEqualTo(brush)
+    }
+
+    @Test
+    fun `empty copy with existing color should not remove color`() {
+        val style = TextStyle(color = Color.Red)
+
+        assertThat(style.copy().color).isEqualTo(Color.Red)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `brush copy with existing color should remove color`() {
+        val style = TextStyle(color = Color.Red)
+        val brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+
+        with(style.copy(brush = brush)) {
+            assertThat(this.color).isEqualTo(Color.Unspecified)
+            assertThat(this.brush).isEqualTo(brush)
+        }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `color copy with existing brush should remove brush`() {
+        val brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+        val style = TextStyle(brush = brush)
+
+        with(style.copy(color = Color.Red)) {
+            assertThat(this.color).isEqualTo(Color.Red)
+            assertThat(this.brush).isNull()
+        }
     }
 
     @Test
@@ -513,6 +587,34 @@ class TextStyleTest {
         val mergedStyle = style.merge(otherStyle)
 
         assertThat(mergedStyle.platformStyle).isNull()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge with brush has other brush and no color`() {
+        val brush = Brush.linearGradient(listOf(Color.Blue, Color.Red))
+
+        val style = TextStyle(color = Color.Red)
+        val otherStyle = TextStyle(brush = brush)
+
+        val mergedStyle = style.merge(otherStyle)
+
+        assertThat(mergedStyle.color).isEqualTo(Color.Unspecified)
+        assertThat(mergedStyle.brush).isEqualTo(brush)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge with unspecified brush has original brush`() {
+        val brush = Brush.linearGradient(listOf(Color.Blue, Color.Red))
+
+        val style = TextStyle(brush = brush)
+        val otherStyle = TextStyle()
+
+        val mergedStyle = style.merge(otherStyle)
+
+        assertThat(mergedStyle.color).isEqualTo(Color.Unspecified)
+        assertThat(mergedStyle.brush).isEqualTo(brush)
     }
 
     @Test
@@ -1017,6 +1119,45 @@ class TextStyleTest {
         assertThat(newStyle.platformStyle).isEqualTo(style.platformStyle)
     }
 
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp brush with a specified, b specified and t is smaller than half`() {
+        val brush = Brush.linearGradient(listOf(Color.Blue, Color.Red))
+        val style1 = TextStyle(brush = brush)
+        val style2 = TextStyle(color = Color.Red)
+
+        val newStyle = lerp(start = style1, stop = style2, fraction = 0.4f)
+
+        assertThat(newStyle.brush).isEqualTo(brush)
+        assertThat(newStyle.color).isEqualTo(Color.Unspecified)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp brush with a specified, b specified and t is larger than half`() {
+        val brush = Brush.linearGradient(listOf(Color.Blue, Color.Red))
+        val style1 = TextStyle(brush = brush)
+        val style2 = TextStyle(color = Color.Red)
+
+        val newStyle = lerp(start = style1, stop = style2, fraction = 0.6f)
+
+        assertThat(newStyle.brush).isEqualTo(null)
+        assertThat(newStyle.color).isEqualTo(Color.Red)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp brush with a specified, b not specified and t is larger than half`() {
+        val brush = Brush.linearGradient(listOf(Color.Blue, Color.Red))
+        val style1 = TextStyle(brush = brush)
+        val style2 = TextStyle()
+
+        val newStyle = lerp(start = style1, stop = style2, fraction = 0.6f)
+
+        assertThat(newStyle.brush).isNull()
+        assertThat(newStyle.color).isEqualTo(Color.Unspecified)
+    }
+
     @Test
     fun `toSpanStyle return attributes with correct values`() {
         val color = Color.Red
@@ -1054,6 +1195,61 @@ class TextStyleTest {
         assertThat(style.toSpanStyle()).isEqualTo(
             SpanStyle(
                 color = color,
+                fontSize = fontSize,
+                fontWeight = fontWeight,
+                fontStyle = fontStyle,
+                fontSynthesis = fontSynthesis,
+                fontFamily = fontFamily,
+                fontFeatureSettings = fontFeatureSettings,
+                letterSpacing = letterSpacing,
+                baselineShift = baselineShift,
+                textGeometricTransform = textGeometricTransform,
+                localeList = localeList,
+                background = background,
+                textDecoration = decoration,
+                shadow = shadow
+            )
+        )
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `toSpanStyle return attributes with correct values for brush`() {
+        val brush = Brush.linearGradient(listOf(Color.Blue, Color.Red))
+        val fontSize = 56.sp
+        val fontWeight = FontWeight.Bold
+        val fontStyle = FontStyle.Italic
+        val fontSynthesis = FontSynthesis.All
+        val fontFamily = FontFamily.Default
+        val fontFeatureSettings = "font feature settings"
+        val letterSpacing = 0.2.sp
+        val baselineShift = BaselineShift.Subscript
+        val textGeometricTransform = TextGeometricTransform(scaleX = 0.5f, skewX = 0.6f)
+        val localeList = LocaleList("tr-TR")
+        val background = Color.Yellow
+        val decoration = TextDecoration.Underline
+        val shadow = Shadow(color = Color.Green, offset = Offset(2f, 4f))
+
+        val style = TextStyle(
+            brush = brush,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            fontStyle = fontStyle,
+            fontSynthesis = fontSynthesis,
+            fontFamily = fontFamily,
+            fontFeatureSettings = fontFeatureSettings,
+            letterSpacing = letterSpacing,
+            baselineShift = baselineShift,
+            textGeometricTransform = textGeometricTransform,
+            localeList = localeList,
+            background = background,
+            textDecoration = decoration,
+            shadow = shadow
+        )
+
+        assertThat(style.toSpanStyle()).isEqualTo(
+            SpanStyle(
+                brush = brush,
                 fontSize = fontSize,
                 fontWeight = fontWeight,
                 fontStyle = fontStyle,

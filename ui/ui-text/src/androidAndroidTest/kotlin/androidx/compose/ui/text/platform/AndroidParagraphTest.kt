@@ -11,13 +11,17 @@ import android.text.style.LocaleSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.ScaleXSpan
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.UncachedFontFamilyResolver
@@ -30,6 +34,7 @@ import androidx.compose.ui.text.android.style.LetterSpacingSpanPx
 import androidx.compose.ui.text.android.style.ShadowSpan
 import androidx.compose.ui.text.android.style.SkewXSpan
 import androidx.compose.ui.text.android.style.TextDecorationSpan
+import androidx.compose.ui.text.ceilToInt
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -38,9 +43,8 @@ import androidx.compose.ui.text.font.testutils.BlockingFauxFont
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.matchers.assertThat
+import androidx.compose.ui.text.platform.style.ShaderBrushSpan
 import androidx.compose.ui.text.style.BaselineShift
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.ceilToInt
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
@@ -55,10 +59,10 @@ import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import org.junit.Test
-import org.junit.runner.RunWith
 import kotlin.math.ceil
 import kotlin.math.roundToInt
+import org.junit.Test
+import org.junit.runner.RunWith
 
 @OptIn(InternalPlatformTextApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -151,6 +155,80 @@ AndroidParagraphTest {
         assertThat(paragraph.charSequence).hasSpan(ForegroundColorSpan::class, 0, text.length)
         assertThat(paragraph.charSequence).hasSpan(ForegroundColorSpan::class, 0, "abc".length)
         assertThat(paragraph.charSequence).hasSpanOnTop(ForegroundColorSpan::class, 0, "abc".length)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testAnnotatedString_setBrushOnWholeText() {
+        val text = "abcde"
+        val brush = Brush.linearGradient(listOf(Color.Black, Color.White))
+        val spanStyle = SpanStyle(brush = brush)
+
+        val paragraph = simpleParagraph(
+            text = text,
+            spanStyles = listOf(AnnotatedString.Range(spanStyle, 0, text.length)),
+            width = 100.0f
+        )
+
+        assertThat(paragraph.charSequence).hasSpan(ShaderBrushSpan::class, 0, text.length) {
+            it.shaderBrush == brush
+        }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testAnnotatedString_setSolidColorBrushOnWholeText() {
+        val text = "abcde"
+        val brush = SolidColor(Color.Red)
+        val spanStyle = SpanStyle(brush = brush)
+
+        val paragraph = simpleParagraph(
+            text = text,
+            spanStyles = listOf(AnnotatedString.Range(spanStyle, 0, text.length)),
+            width = 100.0f
+        )
+
+        assertThat(paragraph.charSequence).hasSpan(ForegroundColorSpan::class, 0, text.length)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testAnnotatedString_setBrushOnPartOfText() {
+        val text = "abcde"
+        val brush = Brush.linearGradient(listOf(Color.Black, Color.White))
+        val spanStyle = SpanStyle(brush = brush)
+
+        val paragraph = simpleParagraph(
+            text = text,
+            spanStyles = listOf(AnnotatedString.Range(spanStyle, 0, "abc".length)),
+            width = 100.0f
+        )
+
+        assertThat(paragraph.charSequence).hasSpan(ShaderBrushSpan::class, 0, "abc".length) {
+            it.shaderBrush == brush
+        }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testAnnotatedString_brushSpanReceivesSize() {
+        with(defaultDensity) {
+            val text = "abcde"
+            val brush = Brush.linearGradient(listOf(Color.Black, Color.White))
+            val spanStyle = SpanStyle(brush = brush)
+            val fontSize = 10.sp
+
+            val paragraph = simpleParagraph(
+                text = text,
+                spanStyles = listOf(AnnotatedString.Range(spanStyle, 0, "abc".length)),
+                width = 100.0f,
+                style = TextStyle(fontSize = fontSize, fontFamily = basicFontFamily)
+            )
+
+            assertThat(paragraph.charSequence).hasSpan(ShaderBrushSpan::class, 0, "abc".length) {
+                it.size == Size(100.0f, fontSize.toPx())
+            }
+        }
     }
 
     @Test
