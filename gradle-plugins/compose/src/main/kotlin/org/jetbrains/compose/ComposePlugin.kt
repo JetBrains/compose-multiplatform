@@ -196,6 +196,9 @@ class ComposePlugin : Plugin<Project> {
     object DesktopComponentsDependencies {
         @ExperimentalComposeLibrary
         val splitPane = composeDependency("org.jetbrains.compose.components:components-splitpane")
+
+        @ExperimentalComposeLibrary
+        val animatedImage = composeDependency("org.jetbrains.compose.components:components-animatedimage")
     }
 
     object WebDependencies {

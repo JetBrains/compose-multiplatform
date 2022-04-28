@@ -25,41 +25,7 @@ actual suspend fun loadResourceAnimatedImage(path: String): AnimatedImage {
 }
 
 @Composable
-actual fun asyncAnimatedImageLoaderState(path: String): AnimatedImageLoaderState {
-    val fileAnimatedImageLoader = remember(path) { getAnimatedImageLoaderByPath(path) }
-
-    return asyncAnimatedImageLoaderState(fileAnimatedImageLoader)
-}
-
-@Composable
-actual fun asyncResourceAnimatedImageLoaderState(path: String): AnimatedImageLoaderState {
-    val resourceAnimatedImageLoader = remember(path) { ResourceAnimatedImageLoader(path) }
-
-    return asyncAnimatedImageLoaderState(resourceAnimatedImageLoader)
-}
-
-@Composable
-actual fun asyncAnimatedImageLoaderState(animatedImageLoader: AnimatedImageLoader): AnimatedImageLoaderState {
-    val asyncAnimatedImageState = remember(animatedImageLoader) {
-        mutableStateOf<AnimatedImageLoaderState>(AnimatedImageLoaderState.Loading)
-    }
-
-    LaunchedEffect(animatedImageLoader) {
-        try {
-            val animatedImage = animatedImageLoader.loadAnimatedImage()
-            asyncAnimatedImageState.value = AnimatedImageLoaderState.Success(animatedImage)
-        } catch (ex: Exception) {
-            asyncAnimatedImageState.value = AnimatedImageLoaderState.Error(ex)
-        }
-    }
-
-    return asyncAnimatedImageState.value
-}
-
-@Composable
-fun animatedImage(animatedImage: AnimatedImage): ImageBitmap {
-    val codec = animatedImage.codec
-
+actual fun AnimatedImage.animate(): ImageBitmap {
     val transition = rememberInfiniteTransition()
     val frameIndex by transition.animateValue(
         initialValue = 0,

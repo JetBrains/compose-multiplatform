@@ -15,8 +15,6 @@ kotlin {
             dependencies {
                 api(compose.runtime)
                 api(compose.foundation)
-                api(project(":resources:library"))
-
             }
         }
         named("desktopMain") {}
@@ -30,6 +28,6 @@ tasks.withType<KotlinCompile>().configureEach {
 
 configureMavenPublication(
     groupId = "org.jetbrains.compose.components",
-    artifactId = "components-animatedimage",
-    name = "AnimatedImage for Compose JB"
+    artifactId = "components-resources",
+    name = "Resources for Compose JB"
 )
