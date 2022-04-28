@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.test.junit4
 
-import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.snap
@@ -34,18 +33,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.test.ComposeUiTest
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
-import androidx.test.espresso.Espresso.onIdle
+import androidx.compose.ui.test.runComposeUiTest
+import androidx.test.espresso.Espresso
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
+import java.util.concurrent.Executors
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import org.junit.Rule
 import org.junit.Test
-import java.util.concurrent.Executors
 
 @LargeTest
+@OptIn(ExperimentalTestApi::class)
 class ComposeIdlingResourceTest {
     companion object {
         private const val nonIdleDuration = 1000L
@@ -57,18 +59,15 @@ class ComposeIdlingResourceTest {
     private var animationRunning = false
     private val recordedAnimatedValues = mutableListOf<Float>()
 
-    @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>()
-
     /**
-     * High level test to only verify that [ComposeTestRule.runOnIdle] awaits animations.
+     * High level test to only verify that [ComposeUiTest.runOnIdle] awaits animations.
      */
     @Test
-    fun testRunOnIdle() {
+    fun testRunOnIdle() = runComposeUiTest {
         val animationState = mutableStateOf(AnimationStates.From)
-        rule.setContent { Ui(animationState) }
+        setContent { Ui(animationState) }
 
-        rule.runOnIdle {
+        runOnIdle {
             // Kick off the animation
             animationRunning = true
             animationState.value = AnimationStates.To
@@ -77,21 +76,21 @@ class ComposeIdlingResourceTest {
         // Verify that animation is kicked off
         assertThat(animationRunning).isTrue()
         // Wait until it is finished
-        rule.runOnIdle {
+        runOnIdle {
             // Verify it was finished
             assertThat(animationRunning).isFalse()
         }
     }
 
     /**
-     * High level test to only verify that [onIdle] awaits animations.
+     * High level test to only verify that [Espresso.onIdle] awaits animations.
      */
     @Test
-    fun testAnimationIdle_simple() {
+    fun testAnimationIdle_simple() = runComposeUiTest {
         val animationState = mutableStateOf(AnimationStates.From)
-        rule.setContent { Ui(animationState) }
+        setContent { Ui(animationState) }
 
-        rule.runOnIdle {
+        runOnIdle {
             // Kick off the animation
             animationRunning = true
             animationState.value = AnimationStates.To
@@ -100,13 +99,13 @@ class ComposeIdlingResourceTest {
         // Verify that animation is kicked off
         assertThat(animationRunning).isTrue()
         // Wait until it is finished
-        onIdle()
+        Espresso.onIdle()
         // Verify it was finished
         assertThat(animationRunning).isFalse()
     }
 
     @Test
-    fun testIdlingResourcesAreQueried() {
+    fun testIdlingResourcesAreQueried() = runComposeUiTest {
         val idlingResource = object : IdlingResource {
             var readCount = MutableStateFlow(0)
 
@@ -128,11 +127,11 @@ class ComposeIdlingResourceTest {
             }
         }
 
-        rule.registerIdlingResource(idlingResource)
+        registerIdlingResource(idlingResource)
         Executors.newSingleThreadExecutor().execute(idlingResource.delayedTransitionToIdle())
 
         val startReadCount = idlingResource.readCount.value
-        rule.waitForIdle()
+        waitForIdle()
         val endReadCount = idlingResource.readCount.value
 
         assertThat(idlingResource.isIdleNow).isTrue()

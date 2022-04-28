@@ -28,17 +28,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.runAndroidComposeUiTest
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -57,11 +58,8 @@ fun MutableState<ToggleableState>.toggle() {
  */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalTestApi::class)
 class MultipleComposeRootsTest {
-
-    @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>()
-
     /**
      * In this setup we have the following configuration:
      *
@@ -76,8 +74,9 @@ class MultipleComposeRootsTest {
      * testing APIs.
      */
     @Test
-    fun twoHierarchiesSharingTheSameModel() {
-        rule.activityRule.scenario.onActivity { activity ->
+    fun twoHierarchiesSharingTheSameModel() = runAndroidComposeUiTest<ComponentActivity> {
+        runOnUiThread {
+            val activity = activity!!
             val state1 = mutableStateOf(value = ToggleableState.Off)
             val state2 = mutableStateOf(value = ToggleableState.On)
 
@@ -142,21 +141,21 @@ class MultipleComposeRootsTest {
         Espresso.onView(withText("Compose 1")).check(matches(isDisplayed()))
         Espresso.onView(withText("Compose 2")).check(matches(isDisplayed()))
 
-        rule.onNodeWithTag("checkbox1")
+        onNodeWithTag("checkbox1")
             .performClick()
             .assertIsOn()
 
-        rule.onNodeWithTag("checkbox2")
+        onNodeWithTag("checkbox2")
             .assertIsOff()
 
         Espresso.onView(withText("Compose 1 - On")).check(matches(isDisplayed()))
         Espresso.onView(withText("Compose 2 - Off")).check(matches(isDisplayed()))
 
-        rule.onNodeWithTag("checkbox2")
+        onNodeWithTag("checkbox2")
             .performClick()
             .assertIsOn()
 
-        rule.onNodeWithTag("checkbox1")
+        onNodeWithTag("checkbox1")
             .assertIsOff()
 
         Espresso.onView(withText("Compose 1 - Off")).check(matches(isDisplayed()))

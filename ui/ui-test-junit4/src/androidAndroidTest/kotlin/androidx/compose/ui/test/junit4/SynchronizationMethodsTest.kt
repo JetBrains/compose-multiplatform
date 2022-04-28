@@ -19,7 +19,8 @@ package androidx.compose.ui.test.junit4
 import androidx.activity.ComponentActivity
 import androidx.compose.testutils.expectError
 import androidx.compose.ui.platform.ViewRootForTest
-import androidx.compose.ui.test.AndroidComposeTest
+import androidx.compose.ui.test.AndroidComposeUiTestEnvironment
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.hasTestTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -36,12 +37,14 @@ import org.junit.runners.model.Statement
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalTestApi::class)
 class SynchronizationMethodsTest {
 
-    private val test = AndroidComposeTest<ComponentActivity> {
+    private val environment = AndroidComposeUiTestEnvironment<ComponentActivity> {
         throw NotImplementedError("This test shouldn't use the Activity")
     }
-    private val composeRootRegistry = test.composeRootRegistry
+    private val composeRootRegistry = environment.composeRootRegistry
+    private val test = environment.test
 
     @get:Rule
     val registryRule: TestRule = TestRule { base, _ ->

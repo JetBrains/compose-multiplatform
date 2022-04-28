@@ -20,12 +20,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Density
 
 /**
- * A test environment that allows you to test and control composables and applications using
- * Compose. Most of the functionality in this interface provides some form of test synchronization:
- * the test will block until the app or composable is idle, to ensure the tests are deterministic.
+ * Sets up the test environment, runs the given [test][block] and then tears down the test
+ * environment. Use the methods on [ComposeUiTest] in the test to find Compose content and make
+ * assertions on it. If you need access to platform specific elements (such as the Activity on
+ * Android), use one of the platform specific variants of this method, e.g.
+ * [runAndroidComposeUiTest] on Android.
+ *
+ * Implementations of this method will launch a Compose host (such as an Activity on Android)
+ * for you. If your test needs to launch its own host, use a platform specific variant that
+ * doesn't launch anything for you (if available), e.g. [runComposeUiTestWithoutActivity] on
+ * Android. Always make sure that the Compose content is set during execution of the
+ * [test lambda][block] so the test framework is aware of the content. Whether you need to
+ * launch the host from within the test lambda as well depends on the platform.
+ *
+ * Keeping a reference to the [ComposeUiTest] outside of this function is an error.
+ */
+@ExperimentalTestApi
+expect fun runComposeUiTest(block: ComposeUiTest.() -> Unit)
+
+/**
+ * A test environment that allows you to test and control composables, either in isolation or in
+ * applications. Most of the functionality in this interface provides some form of test
+ * synchronization: the test will block until the app or composable is idle, to ensure the tests
+ * are deterministic.
  *
  * For example, if you would perform a click on the center of the screen while a button is
- * animation from left to right over the screen, without synchronization the test would sometimes
+ * animating from left to right over the screen, without synchronization the test would sometimes
  * click when the button is in the middle of the screen (button is clicked), and sometimes when
  * the button is past the middle of the screen (button is not clicked). With synchronization, the
  * app would not be idle until the animation is over, so the test will always click when the
@@ -35,18 +55,20 @@ import androidx.compose.ui.unit.Density
  * and manually advance the clock by the time necessary to position the button in the middle of
  * the screen.
  *
- * Compared to [ComposeTest], [ProvidedComposeContentTest] does not offer a `setContent` method.
- * Instead, users are expected to set up their own Compose host and content after having obtained
- * an instance of [ProvidedComposeContentTest], such as starting an Activity that sets the Compose
- * content in its onCreate method on Android.
+ * To test a composable in isolation, use [setContent] to set the composable in a host. On Android,
+ * a host will mostly be an Activity. When using [runComposeUiTest] or any of its platform specific
+ * friends, the host will be started for you automatically, unless otherwise specified. To test an
+ * application, use the platform specific variant of [runComposeUiTest] that launches the app.
  *
- * An instance of [ProvidedComposeContentTest] can be obtained by calling
- * [withProvidedComposeContentTest], the argument to which will have it as the receiver scope.
- * Check the documentation for your platform to find out if it offers a convenience method that
- * sets up a Compose host of your choosing.
+ * An instance of [ComposeUiTest] can be obtained through [runComposeUiTest] or any of its
+ * platform specific variants, the argument to which will have it as the receiver scope.
  */
-// Keep internal while the shape of this API hasn't yet been decided
-internal interface ProvidedComposeContentTest : SemanticsNodeInteractionsProvider {
+// Use an `expect sealed interface` with an actual copy for each platform to allow implementations
+// per platform. Each platform is considered a separate compilation unit, which means that when
+// just using `sealed interface` in commonMain, it would not be allowed to implement the interface
+// in platform specific code.
+@ExperimentalTestApi
+expect sealed interface ComposeUiTest : SemanticsNodeInteractionsProvider {
     /**
      * Current device screen's density. Note that it is technically possible for a Compose
      * hierarchy to define a different density for a certain subtree. Try to use
@@ -144,24 +166,13 @@ internal interface ProvidedComposeContentTest : SemanticsNodeInteractionsProvide
      * Unregisters an [IdlingResource] from this test.
      */
     fun unregisterIdlingResource(idlingResource: IdlingResource)
-}
 
-/**
- * A test environment that allows you to set content without the necessity to provide a host for
- * the content. The host, such as an Activity on Android, will be created by the method through
- * which you obtain an instance of a [ComposeTest]. It will not be accessible though, as it will
- * differ from platform to platform. See [ProvidedComposeContentTest] for all other functionality.
- *
- * An instance of [ComposeTest] can be obtained by calling [withComposeTest], the argument to
- * which will have it as the receiver scope.
- */
-// Keep internal while the shape of this API hasn't yet been decided
-internal interface ComposeTest : ProvidedComposeContentTest {
     /**
      * Sets the given [composable] as the content to be tested. This should be called exactly
      * once per test.
      *
-     * @throws IllegalStateException if called more than once per test.
+     * @throws IllegalStateException if called more than once per test, or if the implementation
+     * doesn't have access to a host to set content in.
      */
     fun setContent(composable: @Composable () -> Unit)
 }

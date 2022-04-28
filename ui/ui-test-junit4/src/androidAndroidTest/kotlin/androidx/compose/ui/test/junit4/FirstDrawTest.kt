@@ -24,48 +24,49 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.test.ComposeUiTest
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.runAndroidComposeUiTest
+import androidx.compose.ui.test.runComposeUiTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
-import org.junit.Rule
 import org.junit.Test
 
 @MediumTest
+@OptIn(ExperimentalTestApi::class)
 class FirstDrawTest {
-
-    @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>()
 
     /**
      * Tests that the compose tree has been drawn at least once when
-     * [ComposeContentTestRule.setContent] finishes.
+     * [ComposeUiTest.setContent] finishes.
      */
     @LargeTest
     @Test
-    fun waitsForFirstDraw_withoutOnIdle() {
+    fun waitsForFirstDraw_withoutOnIdle() = runComposeUiTest {
         var drawn = false
-        rule.setContent {
+        setContent {
             Canvas(Modifier.fillMaxSize()) {
                 drawn = true
             }
         }
-        // rule.waitForIdle() shouldn't be necessary
+        // waitForIdle() shouldn't be necessary
         assertThat(drawn).isTrue()
     }
 
     /**
-     * Tests that [ComposeTestRule.waitForIdle] doesn't timeout when the compose tree is
+     * Tests that [ComposeUiTest.waitForIdle] doesn't timeout when the compose tree is
      * completely off-screen and will hence not be drawn.
      */
     @Test
-    fun waitsForOutOfBoundsComposeView() {
+    fun waitsForOutOfBoundsComposeView() = runAndroidComposeUiTest<ComponentActivity> {
         var drawn = false
 
-        rule.activityRule.scenario.onActivity { activity ->
+        runOnUiThread {
             // Set the compose content in a FrameLayout that is completely placed out of the
             // screen, and set clipToPadding to make sure the content won't be drawn.
 
-            val root = object : FrameLayout(activity) {
+            val root = object : FrameLayout(activity!!) {
                 override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
                     // Place our child out of bounds
                     getChildAt(0).layout(-200, 0, -100, 100)
@@ -76,12 +77,12 @@ class FirstDrawTest {
                 clipToPadding = true
             }
 
-            val outOfBoundsView = ComposeView(activity).apply {
+            val outOfBoundsView = ComposeView(activity!!).apply {
                 layoutParams = ViewGroup.MarginLayoutParams(100, 100)
             }
 
             root.addView(outOfBoundsView)
-            activity.setContentView(root)
+            activity!!.setContentView(root)
             outOfBoundsView.setContent {
                 // If you see this box when running the test, the test is setup incorrectly
                 Canvas(Modifier.fillMaxSize()) {
@@ -92,7 +93,7 @@ class FirstDrawTest {
         }
 
         // onIdle shouldn't timeout
-        rule.waitForIdle()
+        waitForIdle()
         // The compose view was off-screen, so it hasn't drawn yet
         assertThat(drawn).isFalse()
     }

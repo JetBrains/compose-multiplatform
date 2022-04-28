@@ -92,11 +92,11 @@ internal fun runEspressoOnIdle() {
         Espresso.onIdle()
     } catch (e: Throwable) {
 
-        // Happens on the global time out, usually when global idling time out is less
-        // or equal to dynamic idling time out or when the timeout is not due to individual
-        // idling resource. This does not necessary mean that it can't be due to idling
-        // resource being busy. So we try to check if it failed due to compose being busy and
-        // add some extra information to the developer.
+        // Happens on the global time out, usually when the global timeout (the master policy)
+        // is less than or equal to the idling resource timeout or when the timeout is not due to
+        // an individual idling resource. This does not necessarily mean that it can't be due to
+        // an idling resource being busy. So we try to check if it failed due to compose being busy
+        // and add some extra information to the developer.
         val appNotIdleMaybe = tryToFindCause<AppNotIdleException>(e)
         if (appNotIdleMaybe != null) {
             rethrowWithMoreInfo(appNotIdleMaybe, wasGlobalTimeout = true)

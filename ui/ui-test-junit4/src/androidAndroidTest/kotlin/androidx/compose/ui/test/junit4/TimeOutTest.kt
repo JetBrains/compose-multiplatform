@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.test.junit4
 
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -24,10 +23,10 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.testutils.expectError
-import androidx.compose.ui.test.AndroidComposeTest
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.android.ComposeNotIdleException
 import androidx.compose.ui.test.onNodeWithText
-import androidx.test.core.app.ActivityScenario
+import androidx.compose.ui.test.runComposeUiTest
 import androidx.test.espresso.AppNotIdleException
 import androidx.test.espresso.IdlingPolicies
 import androidx.test.espresso.IdlingPolicy
@@ -43,25 +42,16 @@ import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalTestApi::class)
 class TimeOutTest {
-
-    private fun withComposeTest(block: AndroidComposeTest<ComponentActivity>.() -> Unit) {
-        ActivityScenario.launch(ComponentActivity::class.java).let {
-            AndroidComposeTest {
-                var activity: ComponentActivity? = null
-                it.onActivity { activity = it }
-                requireNotNull(activity) { "Activity did not reach resumed state" }
-            }
-        }.runTest(block)
-    }
 
     private var idlingResourcePolicy: IdlingPolicy? = null
     private var masterPolicy: IdlingPolicy? = null
 
-    private val expectedIdlingResourceTimeOut =
+    private val idlingResourceTimeOut =
         "Idling resource timed out: possibly due to compose being busy\\..*" +
             "\\[busy\\] ComposeIdlingResource is busy due to .*pending recompositions.*\\..*"
-    private val expectedGlobalTimeOut =
+    private val globalTimeOut =
         "Global time out: possibly due to compose being busy\\..*" +
             "\\[busy\\] ComposeIdlingResource is busy due to .*pending recompositions.*\\..*"
 
@@ -83,7 +73,7 @@ class TimeOutTest {
     }
 
     @Composable
-    fun InfiniteRecompositionCase() {
+    private fun InfiniteRecompositionCase() {
         Box {
             val infiniteCounter = remember { mutableStateOf(0) }
             Text("Hello ${infiniteCounter.value}")
@@ -93,30 +83,30 @@ class TimeOutTest {
         }
     }
 
-    @Test(timeout = 5000)
-    fun infiniteRecompositions_resourceTimeout() = withComposeTest {
+    @Test(timeout = 10_000)
+    fun infiniteRecompositions_resourceTimeout() = runComposeUiTest {
         IdlingPolicies.setIdlingResourceTimeout(300, TimeUnit.MILLISECONDS)
 
-        expectError<ComposeNotIdleException>(expectedMessage = expectedIdlingResourceTimeOut) {
+        expectError<ComposeNotIdleException>(expectedMessage = idlingResourceTimeOut) {
             setContent {
                 InfiniteRecompositionCase()
             }
         }
     }
 
-    @Test(timeout = 5000)
-    fun infiniteRecompositions_masterTimeout() = withComposeTest {
+    @Test(timeout = 10_000)
+    fun infiniteRecompositions_masterTimeout() = runComposeUiTest {
         IdlingPolicies.setMasterPolicyTimeout(300, TimeUnit.MILLISECONDS)
 
-        expectError<ComposeNotIdleException>(expectedMessage = expectedGlobalTimeOut) {
+        expectError<ComposeNotIdleException>(expectedMessage = globalTimeOut) {
             setContent {
                 InfiniteRecompositionCase()
             }
         }
     }
 
-    @Test(timeout = 5000)
-    fun delayInfiniteTrigger() = withComposeTest {
+    @Test(timeout = 10_000)
+    fun delayInfiniteTrigger() = runComposeUiTest {
         // This test checks that we properly time out on infinite recompositions that happen later
         // down the road (not right during setContent).
         val count = mutableStateOf(0)
@@ -132,13 +122,13 @@ class TimeOutTest {
         count.value++ // Start infinite re-compositions
 
         IdlingPolicies.setMasterPolicyTimeout(300, TimeUnit.MILLISECONDS)
-        expectError<ComposeNotIdleException>(expectedMessage = expectedGlobalTimeOut) {
+        expectError<ComposeNotIdleException>(expectedMessage = globalTimeOut) {
             onNodeWithText("Hello").assertExists()
         }
     }
 
     @Test(timeout = 10_000)
-    fun emptyComposition_masterTimeout_fromIndependentIdlingResource() = withComposeTest {
+    fun emptyComposition_masterTimeout_fromIndependentIdlingResource() = runComposeUiTest {
         // This test checks that if we fail to sync on some unrelated idling resource we don't
         // override the vanilla errors from Espresso.
 
@@ -151,7 +141,7 @@ class TimeOutTest {
     }
 
     @Test(timeout = 10_000)
-    fun checkIdlingResource_causesTimeout() = withComposeTest {
+    fun checkIdlingResource_causesTimeout() = runComposeUiTest {
         // Block idleness with an IdlingResource
         registerIdlingResource(
             object : androidx.compose.ui.test.IdlingResource {
@@ -174,13 +164,13 @@ class TimeOutTest {
      * setContent, the composition is disposed and won't keep running in the background.
      * This verifies that our tests run in isolation.
      */
-    @Test(timeout = 5000)
+    @Test(timeout = 10_000)
     fun timeout_testIsolation_check() {
         IdlingPolicies.setMasterPolicyTimeout(300, TimeUnit.MILLISECONDS)
 
         // Test 1: set an infinite composition and expect it to crash
         expectError<ComposeNotIdleException> {
-            withComposeTest {
+            runComposeUiTest {
                 setContent {
                     InfiniteRecompositionCase()
                 }
@@ -188,7 +178,7 @@ class TimeOutTest {
         }
 
         // Test 2: normal composition, should not time out
-        withComposeTest {
+        runComposeUiTest {
             setContent {
                 Text("Hello")
             }

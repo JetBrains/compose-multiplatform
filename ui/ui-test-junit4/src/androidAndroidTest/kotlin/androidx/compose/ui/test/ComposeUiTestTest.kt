@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.test.junit4
+package androidx.compose.ui.test
 
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollState
@@ -43,46 +44,35 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.testutils.WithTouchSlop
-import androidx.compose.testutils.expectError
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
-import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTouchInput
-import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.unit.dp
-import androidx.test.espresso.AppNotIdleException
 import androidx.test.espresso.IdlingPolicies
 import androidx.test.espresso.IdlingPolicy
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
-import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 
+@LargeTest
 @RunWith(AndroidJUnit4::class)
-@Config(minSdk = 21)
 @OptIn(ExperimentalTestApi::class)
-class RobolectricComposeTest {
-    private var masterTimeout: IdlingPolicy? = null
+class ComposeUiTestTest {
+
+    private var idlingPolicy: IdlingPolicy? = null
 
     @Before
     fun setup() {
-        masterTimeout = IdlingPolicies.getMasterIdlingPolicy()
+        idlingPolicy = IdlingPolicies.getMasterIdlingPolicy()
     }
 
     @After
     fun tearDown() {
-        masterTimeout?.let {
+        idlingPolicy?.let {
             IdlingPolicies.setMasterPolicyTimeout(it.idleTimeout, it.idleTimeoutUnit)
         }
     }
@@ -106,7 +96,6 @@ class RobolectricComposeTest {
     fun testStateChange() = runComposeUiTest {
         val clicks = mutableStateOf(0)
         setContent { ClickCounter(clicks) }
-        onNodeWithText("Click me").assertExists()
 
         clicks.value++
         onNodeWithText("Click count", substring = true).assertTextEquals("Click count: 1")
@@ -122,7 +111,6 @@ class RobolectricComposeTest {
     @Test
     fun testInputInjection() = runComposeUiTest {
         setContent { ClickCounter() }
-        onNodeWithText("Click me").assertExists()
 
         onNodeWithText("Click me").performClick()
         onNodeWithText("Click count", substring = true).assertTextEquals("Click count: 1")
@@ -148,39 +136,6 @@ class RobolectricComposeTest {
         onNodeWithTag("box").assertLeftPositionInRootIsEqualTo(0.dp)
         target = 100f
         onNodeWithTag("box").assertLeftPositionInRootIsEqualTo(100.dp)
-    }
-
-    /**
-     * Check that we catch a potential infinite composition loop caused by a measure lambda that
-     * triggers itself.
-     */
-    @Test(timeout = 10000)
-    fun testTimeout() = runComposeUiTest {
-        IdlingPolicies.setMasterPolicyTimeout(2, TimeUnit.SECONDS)
-        expectError<AppNotIdleException>(
-            expectedMessage = "Compose did not get idle after [0-9]* attempts in 2 SECONDS\\..*"
-        ) {
-            setContent {
-                var x by remember { mutableStateOf(0) }
-                Box(Modifier.requiredSize(100.dp)) {
-                    Layout({ Box(Modifier.size(10.dp)) }) { measurables, constraints ->
-                        val placeables = measurables.map { it.measure(constraints) }
-
-                        // read x, so we need to relayout when x changes
-                        val offset = if (x >= 0) 0 else -1
-                        val width = offset + placeables.maxOf { it.width }
-                        val height = offset + placeables.maxOf { it.height }
-
-                        // woops, we're always changing x during layout!
-                        x = if (x == 0) 1 else 0
-
-                        layout(width, height) {
-                            placeables.forEach { it.place(0, 0) }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -256,5 +211,10 @@ class RobolectricComposeTest {
             }
             return 0f
         }
+    }
+
+    @Test
+    fun getActivityTest() = runAndroidComposeUiTest<ComponentActivity> {
+        assertThat(activity).isNotNull()
     }
 }

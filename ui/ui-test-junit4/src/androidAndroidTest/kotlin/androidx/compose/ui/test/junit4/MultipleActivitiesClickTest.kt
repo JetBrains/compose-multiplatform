@@ -25,36 +25,35 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.ComposeUiTest
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.runAndroidComposeUiTest
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
 import com.google.common.truth.Truth.assertThat
-import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalTestApi::class)
 class MultipleActivitiesClickTest {
 
-    @get:Rule
-    val rule = createAndroidComposeRule<Activity1>()
-
     @Test
-    fun test() {
-        lateinit var activity1: Activity1
-        rule.activityRule.scenario.onActivity { activity1 = it }
+    fun test() = runAndroidComposeUiTest<Activity1> {
+        val activity1 = activity!!
 
         activity1.startNewActivity()
-        rule.waitUntil {
-            rule.onAllNodesWithTag("activity2").isNotEmpty()
+        waitUntil {
+            onAllNodesWithTag("activity2").isNotEmpty()
         }
 
-        rule.onNodeWithTag("activity2").performTouchInput { click() }
+        onNodeWithTag("activity2").performTouchInput { click() }
         val activity2 = getCurrentActivity() as Activity2
 
-        rule.runOnIdle {
+        runOnIdle {
             assertThat(activity1.clickCounter).isEqualTo(0)
             assertThat(activity2.clickCounter).isEqualTo(1)
         }
@@ -67,9 +66,9 @@ class MultipleActivitiesClickTest {
     // In general this method to retrieve the current activity may fail, because the presence of
     // an ActivityLifecycleMonitorRegistry is dependent on the instrumentation used. The
     // instrumentation we use in our test setup supports this though, so it is safe to do here.
-    private fun getCurrentActivity(): Activity {
+    private fun ComposeUiTest.getCurrentActivity(): Activity {
         var currentActivity: Activity? = null
-        rule.runOnUiThread {
+        runOnUiThread {
             currentActivity = ActivityLifecycleMonitorRegistry.getInstance()
                 .getActivitiesInStage(Stage.RESUMED).first()
         }

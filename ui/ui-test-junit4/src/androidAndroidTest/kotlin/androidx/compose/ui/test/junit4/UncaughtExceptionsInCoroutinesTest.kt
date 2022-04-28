@@ -19,20 +19,20 @@ package androidx.compose.ui.test.junit4
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.testutils.expectError
+import androidx.compose.ui.test.ComposeUiTest
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.runComposeUiTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalTestApi::class)
 class UncaughtExceptionsInCoroutinesTest {
 
     private class TestException : Exception()
-
-    @get:Rule
-    val rule = createComposeRule()
 
     // Run the test twice so we can verify if a failed test took down the test suite:
     // - Results have 1 failed test:
@@ -41,21 +41,21 @@ class UncaughtExceptionsInCoroutinesTest {
     //   exception handler is installed correctly, but verifying thrown error is wrong
 
     @Test
-    fun test1() {
+    fun test1() = runComposeUiTest {
         expectError<TestException> {
             throwInLaunchedEffect()
         }
     }
 
     @Test
-    fun test2() {
+    fun test2() = runComposeUiTest {
         expectError<TestException> {
             throwInLaunchedEffect()
         }
     }
 
-    private fun throwInLaunchedEffect() {
-        rule.setContent {
+    private fun ComposeUiTest.throwInLaunchedEffect() {
+        setContent {
             LaunchedEffect(Unit) {
                 withFrameNanos {}
                 throw TestException()

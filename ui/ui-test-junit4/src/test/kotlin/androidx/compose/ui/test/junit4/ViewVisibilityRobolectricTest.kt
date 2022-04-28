@@ -25,36 +25,38 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.test.AndroidComposeUiTest
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.runAndroidComposeUiTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(minSdk = 21)
+@OptIn(ExperimentalTestApi::class)
 class ViewVisibilityRobolectricTest {
-    @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>()
 
-    private fun setupComposeView(visibility: Int) {
-        rule.activityRule.scenario.onActivity {
-            val composeView = ComposeView(it)
+    private fun AndroidComposeUiTest<*>.setupComposeView(visibility: Int) {
+        runOnUiThread {
+            val activity = activity!!
+            val composeView = ComposeView(activity)
             composeView.layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
             composeView.visibility = visibility
             composeView.setContent {
                 Text("Hello")
             }
-            it.setContentView(composeView)
+            activity.setContentView(composeView)
         }
     }
 
-    private fun setupHostView(visibility: Int) {
-        rule.activityRule.scenario.onActivity {
-            it.setContent {
+    private fun AndroidComposeUiTest<*>.setupHostView(visibility: Int) {
+        runOnUiThread {
+            activity!!.setContent {
                 val hostView = LocalView.current
                 SideEffect {
                     hostView.visibility = visibility
@@ -65,49 +67,49 @@ class ViewVisibilityRobolectricTest {
     }
 
     @Test
-    fun composeView_gone() {
+    fun composeView_gone() = runAndroidComposeUiTest<ComponentActivity> {
         setupComposeView(View.GONE)
-        rule.onNodeWithText("Hello")
+        onNodeWithText("Hello")
             .assertExists()
             .assertIsNotDisplayed()
     }
 
     @Test
-    fun composeView_invisible() {
+    fun composeView_invisible() = runAndroidComposeUiTest<ComponentActivity> {
         setupComposeView(View.INVISIBLE)
-        rule.onNodeWithText("Hello")
+        onNodeWithText("Hello")
             .assertExists()
             .assertIsNotDisplayed()
     }
 
     @Test
-    fun composeView_visible() {
+    fun composeView_visible() = runAndroidComposeUiTest<ComponentActivity> {
         setupComposeView(View.VISIBLE)
-        rule.onNodeWithText("Hello")
+        onNodeWithText("Hello")
             .assertExists()
             .assertIsDisplayed()
     }
 
     @Test
-    fun hostView_gone() {
+    fun hostView_gone() = runAndroidComposeUiTest<ComponentActivity> {
         setupHostView(View.GONE)
-        rule.onNodeWithText("Hello")
+        onNodeWithText("Hello")
             .assertExists()
             .assertIsNotDisplayed()
     }
 
     @Test
-    fun hostView_invisible() {
+    fun hostView_invisible() = runAndroidComposeUiTest<ComponentActivity> {
         setupHostView(View.INVISIBLE)
-        rule.onNodeWithText("Hello")
+        onNodeWithText("Hello")
             .assertExists()
             .assertIsNotDisplayed()
     }
 
     @Test
-    fun hostView_visible() {
+    fun hostView_visible() = runAndroidComposeUiTest<ComponentActivity> {
         setupHostView(View.VISIBLE)
-        rule.onNodeWithText("Hello")
+        onNodeWithText("Hello")
             .assertExists()
             .assertIsDisplayed()
     }
