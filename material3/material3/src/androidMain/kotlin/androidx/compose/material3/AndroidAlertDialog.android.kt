@@ -44,28 +44,29 @@ import androidx.compose.ui.window.DialogProperties
  * Usage with a "Hero" icon:
  * @sample androidx.compose.material3.samples.AlertDialogWithIconSample
  *
- * @param onDismissRequest Executes when the user tries to dismiss the Dialog by clicking outside
+ * @param onDismissRequest called when the user tries to dismiss the Dialog by clicking outside
  * or pressing the back button. This is not called when the dismiss button is clicked.
- * @param confirmButton A button which is meant to confirm a proposed action, thus resolving
- * what triggered the dialog. The dialog does not set up any events for this button so they need
- * to be set up by the caller.
- * @param modifier Modifier to be applied to the layout of the dialog.
- * @param dismissButton A button which is meant to dismiss the dialog. The dialog does not set up
- * any events for this button so they need to be set up by the caller.
- * @param icon An optional icon that will appear above the [title] or above the [text], in case a
+ * @param confirmButton button which is meant to confirm a proposed action, thus resolving what
+ * triggered the dialog. The dialog does not set up any events for this button so they need to be
+ * set up by the caller.
+ * @param modifier the [Modifier] to be applied to this dialog
+ * @param dismissButton button which is meant to dismiss the dialog. The dialog does not set up any
+ * events for this button so they need to be set up by the caller.
+ * @param icon optional icon that will appear above the [title] or above the [text], in case a
  * title was not provided.
- * @param title The title of the Dialog which should specify the purpose of the Dialog. The title
- * is not mandatory, because there may be sufficient information inside the [text].
- * @param text The text which presents the details regarding the Dialog's purpose.
- * @param shape Defines the Dialog's shape
- * @param containerColor The container color of the dialog.
- * @param tonalElevation When [containerColor] is [ColorScheme.surface], a higher tonal elevation
- * value will result in a darker dialog color in light theme and lighter color in dark theme.
- * See also [Surface].
- * @param iconContentColor The content color used for the icon.
- * @param titleContentColor The content color used for the title.
- * @param textContentColor The content color used for the text.
- * @param properties Typically platform specific properties to further configure the dialog.
+ * @param title title which should specify the purpose of the dialog. The title is not mandatory,
+ * because there may be sufficient information inside the [text].
+ * @param text text which presents the details regarding the dialog's purpose.
+ * @param shape defines the shape of this dialog's container
+ * @param containerColor the color used for the background of this dialog. Use [Color.Transparent]
+ * to have no color.
+ * @param tonalElevation when [containerColor] is [ColorScheme.surface], a translucent primary color
+ * overlay is applied on top of the container. A higher tonal elevation value will result in a
+ * darker color in light theme and lighter color in dark theme. See also: [Surface].
+ * @param iconContentColor the content color used for the icon.
+ * @param titleContentColor the content color used for the title.
+ * @param textContentColor the content color used for the text.
+ * @param properties typically platform specific properties to further configure the dialog.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

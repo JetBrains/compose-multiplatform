@@ -72,22 +72,21 @@ import kotlinx.coroutines.launch
  *
  * @sample androidx.compose.material3.samples.SwitchWithThumbIconSample
  *
- * @param checked whether or not this component is checked
- * @param onCheckedChange callback to be invoked when Switch is being clicked,
- * therefore the change of checked state is requested.  If null, then this is passive
- * and relies entirely on a higher-level component to control the "checked" state.
- * @param modifier Modifier to be applied to the switch layout
+ * @param checked whether or not this switch is checked
+ * @param onCheckedChange called when this switch is clicked. If `null`, then this switch will not
+ * be interactable, unless something else handles its input events and updates its state.
+ * @param modifier the [Modifier] to be applied to this switch
  * @param thumbContent content that will be drawn inside the thumb, expected to measure
  * [SwitchDefaults.IconSize]
- * @param enabled whether the component is enabled or grayed out
- * @param interactionSource the [MutableInteractionSource] representing the stream of
- * [Interaction]s for this Switch. You can create and pass in your own remembered
- * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
- * appearance / behavior of this Switch in different [Interaction]s.
- * @param colors [SwitchColors] that will be used to determine the color of the thumb, track,
- * and border in different states. See [SwitchDefaults.colors].
+ * @param enabled controls the enabled state of this switch. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this switch. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this switch in different states.
+ * @param colors [SwitchColors] that will be used to resolve the colors used for this switch in
+ * different states. See [SwitchDefaults.colors].
  */
-// TODO: b/223858692 add m.io documentation
 @Composable
 @Suppress("ComposableLambdaParameterNaming", "ComposableLambdaParameterPosition")
 fun Switch(

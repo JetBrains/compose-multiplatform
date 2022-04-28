@@ -120,25 +120,26 @@ import kotlinx.coroutines.launch
  *
  * @sample androidx.compose.material3.samples.StepsSliderSample
  *
- * @param value current value of the Slider. If outside of [valueRange] provided, value will be
+ * @param value current value of the slider. If outside of [valueRange] provided, value will be
  * coerced to this range.
- * @param onValueChange lambda in which value should be updated
- * @param modifier modifiers for the Slider layout
- * @param enabled whether or not component is enabled and can be interacted with or not
- * @param valueRange range of values that Slider value can take. Passed [value] will be coerced to
- * this range
- * @param steps if greater than 0, specifies the amounts of discrete values, evenly distributed
- * between across the whole value range. If 0, slider will behave as a continuous slider and allow
- * to choose any value from the range specified. Must not be negative.
- * @param onValueChangeFinished lambda to be invoked when value change has ended. This callback
- * shouldn't be used to update the slider value (use [onValueChange] for that), but rather to
- * know when the user has completed selecting a new value by ending a drag or a click.
- * @param interactionSource the [MutableInteractionSource] representing the stream of
- * [Interaction]s for this Slider. You can create and pass in your own remembered
- * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
- * appearance / behavior of this Slider in different [Interaction]s.
- * @param colors [SliderColors] that will be used to determine the color of the Slider parts in
- * different state. See [SliderDefaults.colors] to customize.
+ * @param onValueChange callback in which value should be updated
+ * @param modifier the [Modifier] to be applied to this slider
+ * @param enabled controls the enabled state of this slider. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
+ * @param valueRange range of values that this slider can take. The passed [value] will be coerced
+ * to this range.
+ * @param steps if greater than 0, specifies the amount of discrete allowable values, evenly
+ * distributed across the whole value range. If 0, the slider will behave continuously and allow any
+ * value from the range specified. Must not be negative.
+ * @param onValueChangeFinished called when value change has ended. This should not be used to
+ * update the slider value (use [onValueChange] instead), but rather to know when the user has
+ * completed selecting a new value by ending a drag or a click.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this slider. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this slider in different states.
+ * @param colors [SliderColors] that will be used to resolve the colors used for this slider in
+ * different states. See [SliderDefaults.colors].
  */
 // TODO(b/229979132): Add m.io link
 @Composable
@@ -511,7 +512,7 @@ object SliderDefaults {
      *
      * For the name references below the words "active" and "inactive" are used. Active part of
      * the slider is filled with progress, so if slider's progress is 30% out of 100%, left (or
-     * right in RTL) 30% of the track will be active, the rest is not active.
+     * right in RTL) 30% of the track will be active, while the rest is inactive.
      *
      * @param thumbColor thumb color when enabled
      * @param disabledThumbColor thumb colors when disabled
@@ -583,7 +584,7 @@ object SliderDefaults {
 interface SliderColors {
 
     /**
-     * Represents the color used for the sliders's thumb, depending on [enabled].
+     * Represents the color used for the slider's thumb, depending on [enabled].
      *
      * @param enabled whether the [Slider] is enabled or not
      */
@@ -591,10 +592,10 @@ interface SliderColors {
     fun thumbColor(enabled: Boolean): State<Color>
 
     /**
-     * Represents the color used for the sliders's track, depending on [enabled] and [active].
+     * Represents the color used for the slider's track, depending on [enabled] and [active].
      *
      * Active part is filled with progress, so if sliders progress is 30% out of 100%, left (or
-     * right in RTL) 30% of the track will be active, the rest is not active.
+     * right in RTL) 30% of the track will be active, while the rest is inactive.
      *
      * @param enabled whether the [Slider] is enabled or not
      * @param active whether the part of the track is active of not
@@ -603,7 +604,7 @@ interface SliderColors {
     fun trackColor(enabled: Boolean, active: Boolean): State<Color>
 
     /**
-     * Represents the color used for the sliders's tick which is the dot separating steps, if
+     * Represents the color used for the slider's tick which is the dot separating steps, if
      * they are set on the slider, depending on [enabled] and [active].
      *
      * Active tick is the tick that is in the part of the track filled with progress, so if
