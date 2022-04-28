@@ -86,7 +86,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Popup
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
@@ -431,7 +430,6 @@ class LayoutInspectorTreeTest {
         assertThat(node?.parameters).isNotEmpty()
     }
 
-    @FlakyTest(bugId = 218332968)
     @Test
     fun testTextId() {
         val slotTableRecord = CompositionDataRecord.create()
@@ -751,7 +749,6 @@ class LayoutInspectorTreeTest {
     }
     // WARNING: End formatted section
 
-    @FlakyTest(bugId = 217610030)
     @Test
     fun testLineNumbers() {
         // WARNING: The formatting of the lines below here affect test results.
