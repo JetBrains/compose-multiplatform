@@ -86,7 +86,7 @@ class MaterialTextSelectionColorsScreenshotTest {
             .isEqualTo(darkPrimary.copy(alpha = 0.375f))
     }
 
-    @FlakyTest(bugId = 191141357)
+    @FlakyTest(bugId = 230475771)
     @Test
     fun text_lightThemeSelectionColors() {
         rule.setContent {
