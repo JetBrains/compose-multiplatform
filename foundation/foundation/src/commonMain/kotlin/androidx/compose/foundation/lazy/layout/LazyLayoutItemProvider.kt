@@ -41,22 +41,23 @@ interface LazyLayoutItemProvider {
 
     /**
      * Returns the content type for the item on this index. It is used to improve the item
-     * compositions reusing efficiency.
+     * compositions reusing efficiency. Note that null is a valid type and items of such
+     * type will be considered compatible.
      */
-    fun getContentType(index: Int): Any?
+    fun getContentType(index: Int): Any? = null
 
     /**
      * Returns the key for the item on this index.
      *
      * @see getDefaultLazyLayoutKey which you can use if the user didn't provide a key.
      */
-    fun getKey(index: Int): Any
+    fun getKey(index: Int): Any = getDefaultLazyLayoutKey(index)
 
     /**
      * Contains the mapping between the key and the index. It could contain not all the items of
-     * the list as an optimization.
+     * the list as an optimization or be empty if user didn't provide a custom key-index mapping.
      */
-    val keyToIndexMap: Map<Any, Int>
+    val keyToIndexMap: Map<Any, Int> get() = emptyMap()
 }
 
 /**
