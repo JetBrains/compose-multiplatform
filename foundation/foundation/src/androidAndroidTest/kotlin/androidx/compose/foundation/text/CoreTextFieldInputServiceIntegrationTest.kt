@@ -19,6 +19,9 @@ package androidx.compose.foundation.text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
@@ -236,6 +239,31 @@ class CoreTextFieldInputServiceIntegrationTest {
 
         // Assert.
         rule.runOnIdle { assertThat(platformTextInputService.keyboardShown).isTrue() }
+    }
+
+    @Test
+    fun keyboardHiddenWhenFieldRemovedFromComposition() {
+        // Arrange.
+        val focusRequester = FocusRequester()
+        var composeField by mutableStateOf(true)
+        setContent {
+            if (composeField) {
+                CoreTextField(
+                    value = TextFieldValue("Hello"),
+                    onValueChange = {},
+                    modifier = Modifier.focusRequester(focusRequester)
+                )
+            }
+        }
+        // Request focus and wait for keyboard.
+        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle { assertThat(platformTextInputService.keyboardShown).isTrue() }
+
+        // Act.
+        composeField = false
+
+        // Assert.
+        rule.runOnIdle { assertThat(platformTextInputService.keyboardShown).isFalse() }
     }
 
     private fun setContent(content: @Composable () -> Unit) {

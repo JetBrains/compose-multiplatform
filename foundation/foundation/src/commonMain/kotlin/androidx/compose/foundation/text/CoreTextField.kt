@@ -307,6 +307,16 @@ internal fun CoreTextField(
         if (!it.isFocused) manager.deselect()
     }
 
+    // Workaround for b/230536793. We don't get an explicit focus blur event when the text field is
+    // removed from the composition entirely.
+    DisposableEffect(state) {
+        onDispose {
+            if (state.hasFocus) {
+                onBlur(state)
+            }
+        }
+    }
+
     val pointerModifier = if (isInTouchMode) {
         val selectionModifier =
             Modifier.longPressDragGestureFilter(manager.touchSelectionObserver, enabled)
@@ -805,7 +815,6 @@ private fun tapToFocus(
     }
 }
 
-@OptIn(InternalFoundationTextApi::class, ExperimentalFoundationApi::class)
 private fun notifyTextInputServiceOnFocusChange(
     textInputService: TextInputService,
     state: TextFieldState,
@@ -822,11 +831,15 @@ private fun notifyTextInputServiceOnFocusChange(
             state.onImeActionPerformed
         )
     } else {
-        state.inputSession?.let { session ->
-            TextFieldDelegate.onBlur(session, state.processor, state.onValueChange)
-        }
-        state.inputSession = null
+        onBlur(state)
     }
+}
+
+private fun onBlur(state: TextFieldState) {
+    state.inputSession?.let { session ->
+        TextFieldDelegate.onBlur(session, state.processor, state.onValueChange)
+    }
+    state.inputSession = null
 }
 
 /**
