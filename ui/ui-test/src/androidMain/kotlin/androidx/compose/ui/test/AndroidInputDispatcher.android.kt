@@ -174,7 +174,9 @@ internal class AndroidInputDispatcher(
     override fun MouseInputState.enqueueScroll(delta: Float, scrollWheel: ScrollWheel) {
         enqueueMouseEvent(
             ACTION_SCROLL,
-            delta,
+            // We invert vertical scrolling to align with another platforms.
+            // Vertical scrolling on desktop/web have opposite sign.
+            if (scrollWheel == ScrollWheel.Vertical) -delta else delta,
             when (scrollWheel) {
                 ScrollWheel.Horizontal -> MotionEvent.AXIS_HSCROLL
                 ScrollWheel.Vertical -> MotionEvent.AXIS_VSCROLL

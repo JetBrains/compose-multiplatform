@@ -483,8 +483,8 @@ internal abstract class InputDispatcher(
 
     /**
      * Generates a scroll event on [scrollWheel] by [delta]. Negative values correspond to
-     * rotating the scroll wheel leftward or downward, positive values correspond to rotating the
-     * scroll wheel rightward or upward.
+     * rotating the scroll wheel leftward or upward, positive values correspond to rotating the
+     * scroll wheel rightward or downward.
      */
     // TODO(fresen): verify the sign of the horizontal scroll axis (is left negative or positive?)
     @OptIn(ExperimentalTestApi::class)

@@ -473,7 +473,7 @@ class MouseEventsTest : InputDispatcherTest() {
 
     @Test
     fun scroll_vertically() {
-        scrollTest(ScrollWheel.Vertical) { Pair(AXIS_VSCROLL, it) }
+        scrollTest(ScrollWheel.Vertical) { Pair(AXIS_VSCROLL, -it) }
     }
 
     @Test
@@ -727,7 +727,7 @@ class MouseEventsTest : InputDispatcherTest() {
         events.removeFirst(3).let { (enterEvent, hoverEvent, scrollEvent) ->
             enterEvent.verifyMouseEvent(ACTION_HOVER_ENTER, t, Offset.Zero, 0)
             hoverEvent.verifyMouseEvent(ACTION_HOVER_MOVE, t, Offset.Zero, 0)
-            scrollEvent.verifyMouseEvent(ACTION_SCROLL, t, Offset.Zero, 0, Pair(AXIS_VSCROLL, 1f))
+            scrollEvent.verifyMouseEvent(ACTION_SCROLL, t, Offset.Zero, 0, Pair(AXIS_VSCROLL, -1f))
         }
     }
 
