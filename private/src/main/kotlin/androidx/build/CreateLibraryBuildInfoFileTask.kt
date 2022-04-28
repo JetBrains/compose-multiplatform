@@ -26,12 +26,12 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.work.DisableCachingByDefault
 import java.io.File
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 
@@ -40,7 +40,7 @@ import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
  * version of public androidx dependencies and release checklist of the library for consumption
  * by the Jetpack Release Service (JetPad).
  */
-@CacheableTask
+@DisableCachingByDefault(because = "uses git sha as input")
 abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
     init {
         group = "Help"
