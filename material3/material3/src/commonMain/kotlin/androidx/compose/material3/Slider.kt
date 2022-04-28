@@ -892,8 +892,8 @@ private fun Modifier.sliderTapModifier(
                                 // just trigger animation, press offset will be applied
                                 dragBy(0f)
                             }
+                            gestureEndAction.value.invoke(0f)
                         }
-                        gestureEndAction.value.invoke(0f)
                     }
                 )
             }
