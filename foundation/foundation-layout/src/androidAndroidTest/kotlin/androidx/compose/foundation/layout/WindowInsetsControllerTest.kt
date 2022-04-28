@@ -16,12 +16,9 @@
 
 package androidx.compose.foundation.layout
 
-import android.content.Context
 import android.graphics.Insets
 import android.os.Build
 import android.os.SystemClock
-import android.view.View
-import android.view.inputmethod.InputMethodManager
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.text.BasicTextField
@@ -70,7 +67,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -648,7 +644,6 @@ class WindowInsetsControllerTest {
      * On some devices, the animation can begin and then end immediately without the value being
      * set to the final state in onProgress().
      */
-    @Ignore("b/230781717")
     @Test
     fun quickAnimation() {
         var imeBottom by mutableStateOf(0)
@@ -673,27 +668,33 @@ class WindowInsetsControllerTest {
             }
         }
 
-        rule.runOnIdle {
-            // Force the keyboard to show up
-            val imm =
-                rule.activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            val content = rule.activity.findViewById<View>(android.R.id.content)
-            @Suppress("DEPRECATION")
-            imm.showSoftInput(content, InputMethodManager.SHOW_FORCED)
-        }
-
         rule.onNodeWithTag("textField").assertIsFocused()
+
+        rule.runOnIdle {
+            rule.activity.window.decorView.windowInsetsController?.show(
+                android.view.WindowInsets.Type.ime()
+            )
+        }
 
         // We don't know when the IME will show up, so we should keep checking for it.
         val endWaitImeShow = SystemClock.uptimeMillis() + 1000
         while (imeBottom == 0 && SystemClock.uptimeMillis() < endWaitImeShow) {
             Thread.sleep(10)
         }
+
         rule.runOnIdle {
             assertThat(imeBottom).isNotEqualTo(0)
         }
 
+        // wait for IME to finish showing
+        do {
+            val lastBottom = imeBottom
+            rule.waitForIdle()
+        } while (lastBottom != imeBottom)
+
         showDialog = true
+
+        rule.waitForIdle() // wait for showDialog
 
         // We don't know when the IME will go away, so we should keep checking for it.
         val endWaitImeHide = SystemClock.uptimeMillis() + 1000
