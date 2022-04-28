@@ -59,17 +59,16 @@ import androidx.compose.ui.unit.dp
  *
  * 3) Background: Surface fills the shape specified by [shape] with the [color]. If [color] is
  * [ColorScheme.surface] a color overlay will be applied. The color of the overlay depends on the
- * [tonalElevation] of this Surface, and the [LocalAbsoluteTonalElevation] set by any
- * parent surfaces. This ensures that a Surface never appears to have a lower elevation overlay than
- * its ancestors, by summing the elevation of all previous Surfaces.
+ * [tonalElevation] of this Surface, and the [LocalAbsoluteTonalElevation] set by any parent
+ * surfaces. This ensures that a Surface never appears to have a lower elevation overlay than its
+ * ancestors, by summing the elevation of all previous Surfaces.
  *
  * 4) Content color: Surface uses [contentColor] to specify a preferred color for the content of
  * this surface - this is used by the [Text] and [Icon] components as a default color.
  *
  * If no [contentColor] is set, this surface will try and match its background color to a color
  * defined in the theme [ColorScheme], and return the corresponding content color. For example, if
- * the
- * [color] of this surface is [ColorScheme.surface], [contentColor] will be set to
+ * the [color] of this surface is [ColorScheme.surface], [contentColor] will be set to
  * [ColorScheme.onSurface]. If [color] is not part of the theme palette, [contentColor] will keep
  * the same value set above this Surface.
  *

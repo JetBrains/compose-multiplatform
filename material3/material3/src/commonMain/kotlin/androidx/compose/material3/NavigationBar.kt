@@ -72,16 +72,16 @@ import kotlin.math.roundToInt
  * See [NavigationBarItem] for configuration specific to each item, and not the overall
  * [NavigationBar] component.
  *
- * @param modifier optional [Modifier] for this NavigationBar
- * @param containerColor the container color for this NavigationBar
- * @param contentColor the preferred content color provided by this NavigationBar to its children.
- * Defaults to either the matching content color for [containerColor], or if [containerColor] is not
- * a color from the theme, this will keep the same value set above this NavigationBar.
- * @param tonalElevation When [containerColor] is [ColorScheme.surface], a higher tonal elevation
- * value will result in a darker color in light theme and lighter color in dark theme. See also:
- * [Surface].
- * @param content destinations inside this NavigationBar. This should contain multiple
- * [NavigationBarItem]s
+ * @param modifier the [Modifier] to be applied to this navigation bar
+ * @param containerColor the color used for the background of this navigation bar. Use
+ * [Color.Transparent] to have no color.
+ * @param contentColor the preferred color for content inside this navigation bar. Defaults to
+ * either the matching content color for [containerColor], or to the current [LocalContentColor] if
+ * [containerColor] is not a color from the theme.
+ * @param tonalElevation when [containerColor] is [ColorScheme.surface], a translucent primary color
+ * overlay is applied on top of the container. A higher tonal elevation value will result in a
+ * darker color in light theme and lighter color in dark theme. See also: [Surface].
+ * @param content the content of this navigation bar, typically 3-5 [NavigationBarItem]s
  */
 @Composable
 fun NavigationBar(
@@ -124,19 +124,20 @@ fun NavigationBar(
  * labels if not selected is controlled by [alwaysShowLabel].
  *
  * @param selected whether this item is selected
- * @param onClick the callback to be invoked when this item is selected
- * @param icon icon for this item, typically this will be an [Icon]
- * @param modifier optional [Modifier] for this item
- * @param enabled controls the enabled state of this item. When `false`, this item will not be
- * clickable and will appear disabled to accessibility services.
+ * @param onClick called when this item is clicked
+ * @param icon icon for this item, typically an [Icon]
+ * @param modifier the [Modifier] to be applied to this item
+ * @param enabled controls the enabled state of this item. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
  * @param label optional text label for this item
- * @param alwaysShowLabel whether to always show the label for this item. If false, the label will
+ * @param alwaysShowLabel whether to always show the label for this item. If `false`, the label will
  * only be shown when this item is selected.
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this NavigationBarItem. You can create and pass in your own remembered
- * [MutableInteractionSource] if you want to observe [Interaction]s and customize the appearance /
- * behavior of this NavigationBarItem in different [Interaction]s.
- * @param colors the various colors used in elements of this item
+ * for this item. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this item in different states.
+ * @param colors [NavigationBarItemColors] that will be used to resolve the colors used for this
+ * item in different states. See [NavigationBarItemDefaults.colors].
  */
 @Composable
 fun RowScope.NavigationBarItem(
@@ -349,8 +350,8 @@ private fun NavigationBarItemBaselineLayout(
                 measurables
                     .first { it.layoutId == LabelLayoutIdTag }
                     .measure(
-                        // Measure with loose constraints for height as we don't want the label to take up more
-                        // space than it needs
+                        // Measure with loose constraints for height as we don't want the label to
+                        // take up more space than it needs
                         constraints.copy(minHeight = 0)
                     )
             }

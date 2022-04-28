@@ -305,6 +305,31 @@ object TextFieldDefaults {
     /**
      * Creates a [TextFieldColors] that represents the default input text, container, and content
      * (including label, placeholder, leading and trailing icons) colors used in a [TextField].
+     *
+     * @param textColor the color used for the input text of this text field
+     * @param disabledTextColor the color used for the input text of this text field when disabled
+     * @param containerColor the container color for this text field
+     * @param cursorColor the cursor color for this text field
+     * @param errorCursorColor the cursor color for this text field when in error state
+     * @param focusedIndicatorColor the indicator color for this text field when focused
+     * @param unfocusedIndicatorColor the indicator color for this text field when not focused
+     * @param disabledIndicatorColor the indicator color for this text field when disabled
+     * @param errorIndicatorColor the indicator color for this text field when in error state
+     * @param focusedLeadingIconColor the leading icon color for this text field when focused
+     * @param unfocusedLeadingIconColor the leading icon color for this text field when not focused
+     * @param disabledLeadingIconColor the leading icon color for this text field when disabled
+     * @param errorLeadingIconColor the leading icon color for this text field when in error state
+     * @param focusedTrailingIconColor the trailing icon color for this text field when focused
+     * @param unfocusedTrailingIconColor the trailing icon color for this text field when not
+     * focused
+     * @param disabledTrailingIconColor the trailing icon color for this text field when disabled
+     * @param errorTrailingIconColor the trailing icon color for this text field when in error state
+     * @param focusedLabelColor the label color for this text field when focused
+     * @param unfocusedLabelColor the label color for this text field when not focused
+     * @param disabledLabelColor the label color for this text field when disabled
+     * @param errorLabelColor the label color for this text field when in error state
+     * @param placeholderColor the placeholder color for this text field
+     * @param disabledPlaceholderColor the placeholder color for this text field when disabled
      */
     @Composable
     fun textFieldColors(
@@ -368,6 +393,30 @@ object TextFieldDefaults {
      * Creates a [TextFieldColors] that represents the default input text, container, and content
      * (including label, placeholder, leading and trailing icons) colors used in an
      * [OutlinedTextField].
+     *
+     * @param textColor the color used for the input text of this text field
+     * @param disabledTextColor the color used for the input text of this text field when disabled
+     * @param containerColor the container color for this text field
+     * @param cursorColor the cursor color for this text field
+     * @param errorCursorColor the cursor color for this text field when in error state
+     * @param focusedBorderColor the border color for this text field when focused
+     * @param unfocusedBorderColor the border color for this text field when not focused
+     * @param disabledBorderColor the border color for this text field when disabled
+     * @param errorBorderColor the border color for this text field when in error state
+     * @param focusedLeadingIconColor the leading icon color for this text field when focused
+     * @param unfocusedLeadingIconColor the leading icon color for this text field when not focused
+     * @param disabledLeadingIconColor the leading icon color for this text field when disabled
+     * @param errorLeadingIconColor the leading icon color for this text field when in error state
+     * @param focusedTrailingIconColor the trailing icon color for this text field when focused
+     * @param unfocusedTrailingIconColor the trailing icon color for this text field when not focused
+     * @param disabledTrailingIconColor the trailing icon color for this text field when disabled
+     * @param errorTrailingIconColor the trailing icon color for this text field when in error state
+     * @param focusedLabelColor the label color for this text field when focused
+     * @param unfocusedLabelColor the label color for this text field when not focused
+     * @param disabledLabelColor the label color for this text field when disabled
+     * @param errorLabelColor the label color for this text field when in error state
+     * @param placeholderColor the placeholder color for this text field
+     * @param disabledPlaceholderColor the placeholder color for this text field when disabled
      */
     @Composable
     fun outlinedTextFieldColors(
@@ -445,35 +494,34 @@ object TextFieldDefaults {
      * @param innerTextField input text field that this decoration box wraps. You will pass here a
      * framework-controlled composable parameter "innerTextField" from the decorationBox lambda of
      * the [BasicTextField]
-     * @param enabled controls the enabled state of the [TextField]. When `false`, visually
-     * text field will appear in the disabled UI state. You must also pass the same value to the
-     * [BasicTextField] for it to adjust the behavior accordingly making the text field
-     * non-editable, non-focusable and non-selectable
+     * @param enabled controls the enabled state of the text field. When `false`, this component
+     * will not respond to user input, and it will appear visually disabled and disabled to
+     * accessibility services. You must also pass the same value to the [BasicTextField] for it to
+     * adjust the behavior accordingly.
      * @param singleLine indicates if this is a single line or multi line text field. You must pass
-     * the same value as to [BasicTextField]
+     * the same value as to [BasicTextField].
      * @param visualTransformation transforms the visual representation of the input [value]. You
-     * must pass the same value as to [BasicTextField]
-     * @param interactionSource this is a read-only [InteractionSource] representing the stream of
-     * [Interaction]s for this text field. You first create and pass in your own remembered
-     * [MutableInteractionSource] to the [BasicTextField] for it to dispatch events. And then pass
-     * the same instance to this decoration box for it to observe [Interaction]s and customize the
-     * appearance / behavior in different [Interaction]s
+     * must pass the same value as to [BasicTextField].
+     * @param interactionSource the read-only [InteractionSource] representing the stream of
+     * [Interaction]s for this text field. You must first create and pass in your own `remember`ed
+     * [MutableInteractionSource] instance to the [BasicTextField] for it to dispatch events. And
+     * then pass the same instance to this decoration box to observe [Interaction]s and customize
+     * the appearance / behavior of this text field in different states.
      * @param isError indicates if the text field's current value is in error state. If set to
      * true, the label, bottom indicator and trailing icon by default will be displayed in error
-     * color
+     * color.
      * @param label the optional label to be displayed inside the text field container. The default
      * text style for internal [Text] is [Typography.bodySmall] when the text field is in focus and
-     * [Typography.bodyLarge] when the text field is not in focus
+     * [Typography.bodyLarge] when the text field is not in focus.
      * @param placeholder the optional placeholder to be displayed when the text field is in focus
      * and the input text is empty. The default text style for internal [Text] is
-     * [Typography.bodyLarge]
+     * [Typography.bodyLarge].
      * @param leadingIcon the optional leading icon to be displayed at the beginning of the text
      * field container
      * @param trailingIcon the optional trailing icon to be displayed at the end of the text field
      * container
-     * @param colors [TextFieldColors] that will be used to resolve color of the text and content
-     * (including label, placeholder, leading and trailing icons, bottom indicator) for this text
-     * field in different states. See [TextFieldDefaults.textFieldColors]
+     * @param colors [TextFieldColors] that will be used to resolve the colors used for this text
+     * field in different states. See [TextFieldDefaults.textFieldColors].
      * @param contentPadding the spacing values to apply internally between the internals of text
      * field and the decoration box container. You can use it to implement dense text fields or
      * simply to control horizontal padding. See [TextFieldDefaults.textFieldWithLabelPadding] and
@@ -541,41 +589,40 @@ object TextFieldDefaults {
      * @param innerTextField input text field that this decoration box wraps. You will pass here a
      * framework-controlled composable parameter "innerTextField" from the decorationBox lambda of
      * the [BasicTextField]
-     * @param enabled controls the enabled state of the [OutlinedTextField]. When `false`, visually
-     * text field will appear in the disabled UI state. You must also pass the same value to the
-     * [BasicTextField] for it to adjust the behavior accordingly making the text field
-     * non-editable, non-focusable and non-selectable
+     * @param enabled controls the enabled state of the text field. When `false`, this component
+     * will not respond to user input, and it will appear visually disabled and disabled to
+     * accessibility services. You must also pass the same value to the [BasicTextField] for it to
+     * adjust the behavior accordingly.
      * @param singleLine indicates if this is a single line or multi line text field. You must pass
-     * the same value as to [BasicTextField]
+     * the same value as to [BasicTextField].
      * @param visualTransformation transforms the visual representation of the input [value]. You
-     * must pass the same value as to [BasicTextField]
-     * @param interactionSource this is a read-only [InteractionSource] representing the stream of
-     * [Interaction]s for this text field. You first create and pass in your own remembered
-     * [MutableInteractionSource] to the [BasicTextField] for it to dispatch events. And then pass
-     * the same instance to this decoration box for it to observe [Interaction]s and customize the
-     * appearance / behavior in different [Interaction]s.
+     * must pass the same value as to [BasicTextField].
+     * @param interactionSource the read-only [InteractionSource] representing the stream of
+     * [Interaction]s for this text field. You must first create and pass in your own `remember`ed
+     * [MutableInteractionSource] instance to the [BasicTextField] for it to dispatch events. And
+     * then pass the same instance to this decoration box to observe [Interaction]s and customize
+     * the appearance / behavior of this text field in different states.
      * @param isError indicates if the text field's current value is in error state. If set to
      * true, the label, bottom indicator and trailing icon by default will be displayed in error
-     * color
+     * color.
      * @param label the optional label to be displayed inside the text field container. The default
      * text style for internal [Text] is [Typography.bodySmall] when the text field is in focus and
-     * [Typography.bodyLarge] when the text field is not in focus
+     * [Typography.bodyLarge] when the text field is not in focus.
      * @param placeholder the optional placeholder to be displayed when the text field is in focus
      * and the input text is empty. The default text style for internal [Text] is
-     * [Typography.bodyLarge]
+     * [Typography.bodyLarge].
      * @param leadingIcon the optional leading icon to be displayed at the beginning of the text
      * field container
      * @param trailingIcon the optional trailing icon to be displayed at the end of the text field
      * container
-     * @param colors [TextFieldColors] that will be used to resolve color of the text and content
-     * (including label, placeholder, leading and trailing icons, border) for this text field in
-     * different states. See [TextFieldDefaults.outlinedTextFieldColors]
+     * @param colors [TextFieldColors] that will be used to resolve the colors used for this text
+     * field in different states. See [TextFieldDefaults.outlinedTextFieldColors].
      * @param border the border to be drawn around the text field. The cutout to fit the [label]
      * will be automatically added by the framework. Note that by default the color of the border
      * comes from the [colors].
      * @param contentPadding the spacing values to apply internally between the internals of text
      * field and the decoration box container. You can use it to implement dense text fields or
-     * simply to control horizontal padding. See [TextFieldDefaults.outlinedTextFieldPadding]
+     * simply to control horizontal padding. See [TextFieldDefaults.outlinedTextFieldPadding].
      */
     @Composable
     @ExperimentalMaterial3Api

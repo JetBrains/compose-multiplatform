@@ -79,29 +79,28 @@ import androidx.compose.ui.unit.dp
  * Example of a flat AssistChip:
  * @sample androidx.compose.material3.samples.AssistChipSample
  *
- * @param onClick Called when the chip is clicked. If null, then this chip will be considered
- * read-only unless something else handles its input events and updates its state.
- * @param label A text label for this chip
- * @param modifier Modifier to be applied to the chip
- * @param enabled When disabled, chip will not respond to user input. It will also appear visually
- * disabled and disabled to accessibility services.
- * @param leadingIcon Optional icon at the start of the chip, preceding the [label] text.
- * @param trailingIcon Optional icon at the end of the chip.
- * @param interactionSource The [MutableInteractionSource] represents the stream of [Interaction]s
- * for this chip. You can create and pass in your own remembered [MutableInteractionSource] if you
- * want to observe [Interaction]s and customize the appearance / behavior of this chip in
- * different [Interaction]s
- * @param elevation [ChipElevation] used to resolve the elevation for this chip. The resolved value
- * controls the size of the shadow below the chip, as well as its tonal elevation. When
- * chip's container color is [ColorScheme.surface], a higher tonal elevation value will result in a
- * darker chip color in light theme and lighter color in dark theme. See also [Surface] and
+ * @param onClick called when this chip is clicked. If `null`, then this chip will not be
+ * interactable, unless something else handles its input events and updates its state.
+ * @param label text label for this chip
+ * @param modifier the [Modifier] to be applied to this chip
+ * @param enabled controls the enabled state of this chip. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
+ * @param leadingIcon optional icon at the start of the chip, preceding the [label] text
+ * @param trailingIcon optional icon at the end of the chip
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param elevation [ChipElevation] used to resolve the elevation for this chip in different states.
+ * This controls the size of the shadow below the chip. Additionally, when the container color is
+ * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See
  * [AssistChipDefaults.assistChipElevation].
- * @param shape Defines the chip's shape as well its shadow. A shadow is only displayed if the
- * [elevation] is resolved to be greater than zero.
- * @param border [ChipBorder] that will be used to resolve the border to draw around the chip. Pass
- * `null` here for no border. See [AssistChipDefaults.assistChipBorder].
- * @param colors [ChipColors] that will be used to resolve the container and content color for this
- * chip in different states. See [AssistChipDefaults.assistChipColors].
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param border the border to draw around the container of this chip. Pass `null` for no border.
+ * See [AssistChipDefaults.assistChipBorder].
+ * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
+ * different states. See [AssistChipDefaults.assistChipColors].
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -158,29 +157,27 @@ fun AssistChip(
  * Example of an elevated AssistChip with a trailing icon:
  * @sample androidx.compose.material3.samples.ElevatedAssistChipSample
  *
- * @param onClick Called when the chip is clicked. If null, then this chip will be considered
- * read-only unless something else handles its input events and updates its state.
- * @param label A text label for this chip
- * @param modifier Modifier to be applied to the chip
- * @param enabled When disabled, chip will not respond to user input. It will also appear visually
- * disabled and disabled to accessibility services.
- * @param leadingIcon Optional icon at the start of the chip, preceding the [label] text.
- * @param trailingIcon Optional icon at the end of the chip.
- * @param interactionSource The [MutableInteractionSource] represents the stream of [Interaction]s
- * for this chip. You can create and pass in your own remembered [MutableInteractionSource] if you
- * want to observe [Interaction]s and customize the appearance / behavior of this chip in
- * different [Interaction]s
- * @param elevation [ChipElevation] used to resolve the elevation for this chip. The resolved value
- * controls the size of the shadow below the chip, as well as its tonal elevation. When
- * chip's container color is [ColorScheme.surface], a higher tonal elevation value will result in a
- * darker chip color in light theme and lighter color in dark theme. See also [Surface] and
+ * @param onClick called when this chip is clicked. If `null`, then this chip will not be
+ * interactable, unless something else handles its input events and updates its state.
+ * @param label text label for this chip
+ * @param modifier the [Modifier] to be applied to this chip
+ * @param enabled controls the enabled state of this chip. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
+ * @param leadingIcon optional icon at the start of the chip, preceding the [label] text
+ * @param trailingIcon optional icon at the end of the chip
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param elevation [ChipElevation] used to resolve the elevation for this chip in different states.
+ * This controls the size of the shadow below the chip. Additionally, when the container color is
+ * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See
  * [AssistChipDefaults.elevatedAssistChipElevation].
- * @param shape Defines the chip's shape as well its shadow. A shadow is only displayed if the
- * [elevation] is resolved to be greater than zero.
- * @param border [ChipBorder] that will be used to resolve the border to draw around the chip. Pass
- * `null` here for no border.
- * @param colors [ChipColors] that will be used to resolve the container and content color for this
- * chip in different states. See [AssistChipDefaults.elevatedAssistChipColors].
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param border the border to draw around the container of this chip
+ * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
+ * different states. See [AssistChipDefaults.elevatedAssistChipColors].
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -242,32 +239,31 @@ fun ElevatedAssistChip(
  * Example of a FilterChip with both a leading icon and a selected icon:
  * @sample androidx.compose.material3.samples.FilterChipWithLeadingIconSample
  *
- * @param selected Whether the chip is selected
- * @param onClick Called when the chip is clicked. If null, then this chip will be considered
- * read-only unless something else handles its input events and updates its state.
- * @param label A text label for this chip
- * @param modifier Modifier to be applied to the chip
- * @param enabled When disabled, chip will not respond to user input. It will also appear visually
- * disabled and disabled to accessibility services.
- * @param leadingIcon Optional icon at the start of the chip, preceding the [label] text.
- * @param selectedIcon Optional icon at the start of the chip, preceding the [label] text, that will
- * de displayed when the chip is selected, instead of any given [leadingIcon].
- * @param trailingIcon Optional icon at the end of the chip.
- * @param interactionSource The [MutableInteractionSource] represents the stream of [Interaction]s
- * for this chip. You can create and pass in your own remembered [MutableInteractionSource] if you
- * want to observe [Interaction]s and customize the appearance / behavior of this chip in
- * different [Interaction]s
- * @param elevation [SelectableChipElevation] used to resolve the elevation for this chip. The
- * resolved value controls the size of the shadow below the chip, as well as its tonal elevation.
- * When chip's container color is [ColorScheme.surface], a higher tonal elevation value will result
- * in a darker chip color in light theme and lighter color in dark theme. See also [Surface] and
- * [FilterChipDefaults.filterChipElevation].
- * @param shape Defines the chip's shape as well its shadow. A shadow is only displayed if the
- * [elevation] is resolved to be greater than zero.
- * @param border [SelectableChipBorder] that will be used to resolve the border to draw around the
- * chip. Pass `null` here for no border. See [FilterChipDefaults.filterChipBorder].
- * @param colors [SelectableChipColors] that will be used to resolve the container and content color
- * for this chip in different states. See [FilterChipDefaults.filterChipColors].
+ * @param selected whether this chip is selected or not
+ * @param onClick called when this chip is clicked. If `null`, then this chip will not be
+ * interactable, unless something else handles its input events and updates its state.
+ * @param label text label for this chip
+ * @param modifier the [Modifier] to be applied to this chip
+ * @param enabled controls the enabled state of this chip. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
+ * @param leadingIcon optional icon at the start of the chip, preceding the [label] text
+ * @param selectedIcon optional icon at the start of the chip, preceding the [label] text, which is
+ * displayed when the chip is selected, instead of any given [leadingIcon]
+ * @param trailingIcon optional icon at the end of the chip
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param elevation [SelectableChipElevation] used to resolve the elevation for this chip in
+ * different states. This controls the size of the shadow below the chip. Additionally, when the
+ * container color is [ColorScheme.surface], this controls the amount of primary color applied as an
+ * overlay. See [FilterChipDefaults.filterChipElevation].
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param border the border to draw around the container of this chip. Pass `null` for no border.
+ * See [FilterChipDefaults.filterChipBorder].
+ * @param colors [SelectableChipColors] that will be used to resolve the colors used for this chip
+ * in different states. See [FilterChipDefaults.filterChipColors].
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -324,32 +320,31 @@ fun FilterChip(
  * Example of an elevated FilterChip with a trailing icon:
  * @sample androidx.compose.material3.samples.ElevatedFilterChipSample
  *
- * @param selected Whether the chip is selected
- * @param onClick Called when the chip is clicked. If null, then this chip will be considered
- * read-only unless something else handles its input events and updates its state.
- * @param label A text label for this chip
- * @param modifier Modifier to be applied to the chip
- * @param enabled When disabled, chip will not respond to user input. It will also appear visually
- * disabled and disabled to accessibility services.
- * @param leadingIcon Optional icon at the start of the chip, preceding the [label] text.
- * @param selectedIcon Optional icon at the start of the chip, preceding the [label] text, that will
- * de displayed when the chip is selected, instead of any given [leadingIcon].
- * @param trailingIcon Optional icon at the end of the chip.
- * @param interactionSource The [MutableInteractionSource] represents the stream of [Interaction]s
- * for this chip. You can create and pass in your own remembered [MutableInteractionSource] if you
- * want to observe [Interaction]s and customize the appearance / behavior of this chip in
- * different [Interaction]s
- * @param elevation [SelectableChipElevation] used to resolve the elevation for this chip. The
- * resolved value controls the size of the shadow below the chip, as well as its tonal elevation.
- * When chip's container color is [ColorScheme.surface], a higher tonal elevation value will result
- * in a darker chip color in light theme and lighter color in dark theme. See also [Surface] and
- * [FilterChipDefaults.elevatedFilterChipElevation].
- * @param shape Defines the chip's shape as well its shadow. A shadow is only displayed if the
- * [elevation] is resolved to be greater than zero.
- * @param border [SelectableChipBorder] that will be used to resolve the border to draw around the
- * chip. Pass `null` here for no border.
- * @param colors [SelectableChipColors] that will be used to resolve the container and content color
- * for this chip in different states. See [FilterChipDefaults.elevatedFilterChipColors].
+ * @param selected whether this chip is selected or not
+ * @param onClick called when this chip is clicked. If `null`, then this chip will not be
+ * interactable, unless something else handles its input events and updates its state.
+ * @param label text label for this chip
+ * @param modifier the [Modifier] to be applied to this chip
+ * @param enabled controls the enabled state of this chip. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
+ * @param leadingIcon optional icon at the start of the chip, preceding the [label] text
+ * @param selectedIcon optional icon at the start of the chip, preceding the [label] text, which is
+ * displayed when the chip is selected, instead of any given [leadingIcon]
+ * @param trailingIcon optional icon at the end of the chip
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param elevation [SelectableChipElevation] used to resolve the elevation for this chip in
+ * different states. This controls the size of the shadow below the chip. Additionally, when the
+ * container color is [ColorScheme.surface], this controls the amount of primary color applied as an
+ * overlay. See [FilterChipDefaults.filterChipElevation].
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param border the border to draw around the container of this chip. Pass `null` for no border.
+ * See [FilterChipDefaults.filterChipBorder].
+ * @param colors [SelectableChipColors] that will be used to resolve the colors used for this chip
+ * in different states. See [FilterChipDefaults.elevatedFilterChipColors].
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -411,30 +406,29 @@ fun ElevatedFilterChip(
  * Alternatively, use Accompanist's [Flow Layouts](https://google.github.io/accompanist/flowlayout/)
  * to wrap chips to a new line.
  *
- * @param onClick Called when the chip is clicked. If null, then this chip will be considered
- * read-only unless something else handles its input events and updates its state.
- * @param label A text label for this chip
- * @param modifier Modifier to be applied to the chip
- * @param enabled When disabled, chip will not respond to user input. It will also appear visually
- * disabled and disabled to accessibility services.
- * @param leadingIcon Optional icon at the start of the chip, preceding the [label] text.
- * @param avatar Optional avatar at the start of the chip, preceding the [label] text.
- * @param trailingIcon Optional icon at the end of the chip.
- * @param interactionSource The [MutableInteractionSource] represents the stream of [Interaction]s
- * for this chip. You can create and pass in your own remembered [MutableInteractionSource] if you
- * want to observe [Interaction]s and customize the appearance / behavior of this chip in
- * different [Interaction]s
- * @param elevation [ChipElevation] used to resolve the elevation for this chip. The resolved value
- * controls the size of the shadow below the chip, as well as its tonal elevation. When
- * chip's container color is [ColorScheme.surface], a higher tonal elevation value will result in a
- * darker chip color in light theme and lighter color in dark theme. See also [Surface] and
+ * @param onClick called when this chip is clicked. If `null`, then this chip will not be
+ * interactable, unless something else handles its input events and updates its state.
+ * @param label text label for this chip
+ * @param modifier the [Modifier] to be applied to this chip
+ * @param enabled controls the enabled state of this chip. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
+ * @param leadingIcon optional icon at the start of the chip, preceding the [label] text
+ * @param avatar optional avatar at the start of the chip, preceding the [label] text
+ * @param trailingIcon optional icon at the end of the chip
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param elevation [ChipElevation] used to resolve the elevation for this chip in different states.
+ * This controls the size of the shadow below the chip. Additionally, when the container color is
+ * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See
  * [InputChipDefaults.inputChipElevation].
- * @param shape Defines the chip's shape as well its shadow. A shadow is only displayed if the
- * [elevation] is resolved to be greater than zero.
- * @param border [ChipBorder] that will be used to resolve the border to draw around the chip. Pass
- * `null` here for no border. See [InputChipDefaults.inputChipBorder]
- * @param colors [ChipColors] that will be used to resolve the container and content color for this
- * chip in different states. See [InputChipDefaults.inputChipColors].
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param border the border to draw around the container of this chip. Pass `null` for no border.
+ * See [InputChipDefaults.inputChipBorder].
+ * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
+ * different states. See [InputChipDefaults.inputChipColors].
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -516,28 +510,27 @@ fun InputChip(
  * Example of a flat SuggestionChip with a trailing icon:
  * @sample androidx.compose.material3.samples.SuggestionChipSample
  *
- * @param onClick Called when the chip is clicked. If null, then this chip will be considered
- * read-only unless something else handles its input events and updates its state.
- * @param label A text label for this chip
- * @param modifier Modifier to be applied to the chip
- * @param enabled When disabled, chip will not respond to user input. It will also appear visually
- * disabled and disabled to accessibility services.
- * @param icon Optional icon at the start of the chip, preceding the [label] text.
- * @param interactionSource The [MutableInteractionSource] represents the stream of [Interaction]s
- * for this chip. You can create and pass in your own remembered [MutableInteractionSource] if you
- * want to observe [Interaction]s and customize the appearance / behavior of this chip in
- * different [Interaction]s
- * @param elevation [ChipElevation] used to resolve the elevation for this chip. The resolved value
- * controls the size of the shadow below the chip, as well as its tonal elevation. When
- * chip's container color is [ColorScheme.surface], a higher tonal elevation value will result in a
- * darker chip color in light theme and lighter color in dark theme. See also [Surface] and
+ * @param onClick called when this chip is clicked. If `null`, then this chip will not be
+ * interactable, unless something else handles its input events and updates its state.
+ * @param label text label for this chip
+ * @param modifier the [Modifier] to be applied to this chip
+ * @param enabled controls the enabled state of this chip. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
+ * @param icon optional icon at the start of the chip, preceding the [label] text
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param elevation [ChipElevation] used to resolve the elevation for this chip in different states.
+ * This controls the size of the shadow below the chip. Additionally, when the container color is
+ * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See
  * [SuggestionChipDefaults.suggestionChipElevation].
- * @param shape Defines the chip's shape as well its shadow. A shadow is only displayed if the
- * [elevation] is resolved to be greater than zero.
- * @param border [ChipBorder] that will be used to resolve the border to draw around the chip. Pass
- * `null` here for no border. See [SuggestionChipDefaults.suggestionChipBorder].
- * @param colors [ChipColors] that will be used to resolve the container and content color for this
- * chip in different states. See [SuggestionChipDefaults.suggestionChipColors].
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param border the border to draw around the container of this chip. Pass `null` for no border.
+ * See [SuggestionChipDefaults.suggestionChipBorder].
+ * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
+ * different states. See [SuggestionChipDefaults.suggestionChipColors].
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -592,30 +585,26 @@ fun SuggestionChip(
  * Example of an elevated SuggestionChip with a trailing icon:
  * @sample androidx.compose.material3.samples.ElevatedSuggestionChipSample
  *
- * @param onClick Called when the chip is clicked. If null, then this chip will be considered
- * read-only unless something else handles its input events and updates its state.
- * @param label A text label for this chip
- * @param modifier Modifier to be applied to the chip
- * @param enabled When disabled, chip will not respond to user input. It will also appear visually
- * disabled and disabled to accessibility services.
- * @param icon Optional icon at the start of the chip, preceding the [label] text.
- * @param interactionSource The [MutableInteractionSource] represents the stream of [Interaction]s
- * for this chip. You can create and pass in your own remembered [MutableInteractionSource] if you
- * want to observe [Interaction]s and customize the appearance / behavior of this chip in
- * different [Interaction]s
- * @param elevation [ChipElevation] used to resolve the elevation for this chip. The resolved value
- * controls the size of the shadow below the chip, as well as its tonal elevation. When
- * chip's container color is [ColorScheme.surface], a higher tonal elevation value will result in a
- * darker chip color in light theme and lighter color in dark theme. See also [Surface],
- * [SuggestionChipDefaults.suggestionChipElevation], and
- * [SuggestionChipDefaults.elevatedSuggestionChipElevation].
- * @param shape Defines the chip's shape as well its shadow. A shadow is only displayed if the
- * [elevation] is resolved to be greater than zero.
- * @param border [ChipBorder] that will be used to resolve the border to draw around the chip. Pass
- * `null` here for no border. See [SuggestionChipDefaults.suggestionChipBorder].
- * @param colors [ChipColors] that will be used to resolve the container and content color for this
- * chip in different states. See [SuggestionChipDefaults.suggestionChipColors] and
- * [SuggestionChipDefaults.elevatedSuggestionChipColors].
+ * @param onClick called when this chip is clicked. If `null`, then this chip will not be
+ * interactable, unless something else handles its input events and updates its state.
+ * @param label text label for this chip
+ * @param modifier the [Modifier] to be applied to this chip
+ * @param enabled controls the enabled state of this chip. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
+ * @param icon optional icon at the start of the chip, preceding the [label] text
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param elevation [ChipElevation] used to resolve the elevation for this chip in different states.
+ * This controls the size of the shadow below the chip. Additionally, when the container color is
+ * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See
+ * [Surface] and [SuggestionChipDefaults.elevatedSuggestionChipElevation].
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param border the border to draw around the container of this chip
+ * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
+ * different states. See [SuggestionChipDefaults.elevatedSuggestionChipColors].
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -659,14 +648,14 @@ fun ElevatedSuggestionChip(
 @ExperimentalMaterial3Api
 interface ChipElevation {
     /**
-     * Represents the tonal elevation used in a chip, depending on [enabled] and
+     * Represents the tonal elevation used in a chip, depending on its [enabled] state and
      * [interactionSource]. This should typically be the same value as the [shadowElevation].
      *
      * Tonal elevation is used to apply a color shift to the surface to give the it higher emphasis.
      * When surface's color is [ColorScheme.surface], a higher elevation will result in a darker
      * color in light theme and lighter color in dark theme.
      *
-     * See [shadowElevation] which controls the elevation of the shadow drawn around the Chip.
+     * See [shadowElevation] which controls the elevation of the shadow drawn around the chip.
      *
      * @param enabled whether the chip is enabled
      * @param interactionSource the [InteractionSource] for this chip
@@ -675,10 +664,10 @@ interface ChipElevation {
     fun tonalElevation(enabled: Boolean, interactionSource: InteractionSource): State<Dp>
 
     /**
-     * Represents the shadow elevation used in a chip, depending on [enabled] and
+     * Represents the shadow elevation used in a chip, depending on its [enabled] state and
      * [interactionSource]. This should typically be the same value as the [tonalElevation].
      *
-     * Shadow elevation is used to apply a shadow around the surface to give it higher emphasis.
+     * Shadow elevation is used to apply a shadow around the chip to give it higher emphasis.
      *
      * See [tonalElevation] which controls the elevation with a color shift to the surface.
      *
@@ -746,7 +735,7 @@ interface SelectableChipElevation {
 @ExperimentalMaterial3Api
 interface ChipColors {
     /**
-     * Represents the container  color for this chip, depending on [enabled].
+     * Represents the container color for this chip, depending on [enabled].
      *
      * @param enabled whether the chip is enabled
      */
@@ -779,7 +768,7 @@ interface ChipColors {
 }
 
 /**
- * Represents the container  and content colors used in a selectable chip in different states.
+ * Represents the container and content colors used in a selectable chip in different states.
  *
  * See [FilterChipDefaults.filterChipColors] and [FilterChipDefaults.elevatedFilterChipColors] for
  * the default colors used in [FilterChip].
@@ -788,7 +777,7 @@ interface ChipColors {
 @ExperimentalMaterial3Api
 interface SelectableChipColors {
     /**
-     * Represents the container  color for this chip, depending on [enabled] and [selected].
+     * Represents the container color for this chip, depending on [enabled] and [selected].
      *
      * @param enabled whether the chip is enabled
      * @param selected whether the chip is selected
@@ -846,7 +835,6 @@ interface ChipBorder {
 @Stable
 @ExperimentalMaterial3Api
 interface SelectableChipBorder {
-
     /**
      * Represents the [BorderStroke] stroke used for this chip, depending on [enabled] and
      * [selected].
@@ -1203,7 +1191,7 @@ object FilterChipDefaults {
 
     /**
      * Creates a [SelectableChipColors] that represents the default container and content colors
-     * used in a elevated [FilterChip].
+     * used in an elevated [FilterChip].
      *
      * @param containerColor the container color of this chip when enabled
      * @param labelColor the label color of this chip when enabled

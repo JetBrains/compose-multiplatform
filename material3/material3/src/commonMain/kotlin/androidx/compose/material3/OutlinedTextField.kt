@@ -84,14 +84,14 @@ import kotlin.math.roundToInt
  * @param value the input text to be shown in the text field
  * @param onValueChange the callback that is triggered when the input service updates the text. An
  * updated text comes as a parameter of the callback
- * @param modifier a [Modifier] for this text field
- * @param enabled controls the enabled state of the [OutlinedTextField]. When `false`, the text
- * field will be neither editable nor focusable, the input of the text field will not be selectable,
- * visually text field will appear in the disabled UI state
- * @param readOnly controls the editable state of the [OutlinedTextField]. When `true`, the text
- * field can not be modified, however, a user can focus it and copy text from it. Read-only text
- * fields are usually used to display pre-filled forms that user can not edit
- * @param textStyle the style to be applied to the input text. Defaults to [LocalTextStyle]
+ * @param modifier the [Modifier] to be applied to this text field
+ * @param enabled controls the enabled state of this text field. When `false`, this component will
+ * not respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
+ * @param readOnly controls the editable state of the text field. When `true`, the text field cannot
+ * be modified. However, a user can focus it and copy text from it. Read-only text fields are
+ * usually used to display pre-filled forms that a user cannot edit.
+ * @param textStyle the style to be applied to the input text. Defaults to [LocalTextStyle].
  * @param label the optional label to be displayed inside the text field container. The default
  * text style for internal [Text] is [Typography.bodySmall] when the text field is in focus and
  * [Typography.bodyLarge] when the text field is not in focus
@@ -106,28 +106,25 @@ import kotlin.math.roundToInt
  * @param visualTransformation transforms the visual representation of the input [value]
  * For example, you can use
  * [PasswordVisualTransformation][androidx.compose.ui.text.input.PasswordVisualTransformation] to
- * create a password text field. By default no visual transformation is applied
+ * create a password text field. By default, no visual transformation is applied.
  * @param keyboardOptions software keyboard options that contains configuration such as
  * [KeyboardType] and [ImeAction]
  * @param keyboardActions when the input service emits an IME action, the corresponding callback
  * is called. Note that this IME action may be different from what you specified in
  * [KeyboardOptions.imeAction]
- * @param singleLine when set to true, this text field becomes a single horizontally scrolling
- * text field instead of wrapping onto multiple lines. The keyboard will be informed to not show
- * the return key as the [ImeAction]. Note that [maxLines] parameter will be ignored as the
- * maxLines attribute will be automatically set to 1
+ * @param singleLine when `true`, this text field becomes a single horizontally scrolling text field
+ * instead of wrapping onto multiple lines. The keyboard will be informed to not show the return key
+ * as the [ImeAction]. Note that [maxLines] parameter will be ignored as the maxLines attribute will
+ * be automatically set to 1.
  * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
  * equal or greater than 1. Note that this parameter will be ignored and instead maxLines will be
- * set to 1 if [singleLine] is set to true
- * [KeyboardOptions.imeAction] field.
- * @param interactionSource the [MutableInteractionSource] representing the stream of
- * [Interaction]s for this OutlinedTextField. You can create and pass in your own remembered
- * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
- * appearance / behavior of this OutlinedTextField in different [Interaction]s.
- * @param shape the shape of the text field's border
- * @param colors [TextFieldColors] that will be used to resolve color of the text and content
- * (including label, placeholder, leading and trailing icons, border) for this text field in
- * different states. See [TextFieldDefaults.outlinedTextFieldColors]
+ * set to 1 if [singleLine] is set to true.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this text field. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this text field in different states.
+ * @param shape defines the shape of this text field's border
+ * @param colors [TextFieldColors] that will be used to resolve the colors used for this text field
+ * in different states. See [TextFieldDefaults.outlinedTextFieldColors].
  */
 @Composable
 fun OutlinedTextField(
@@ -229,14 +226,14 @@ fun OutlinedTextField(
  * @param value the input [TextFieldValue] to be shown in the text field
  * @param onValueChange the callback that is triggered when the input service updates values in
  * [TextFieldValue]. An updated [TextFieldValue] comes as a parameter of the callback
- * @param modifier a [Modifier] for this text field
- * @param enabled controls the enabled state of the [OutlinedTextField]. When `false`, the text
- * field will be neither editable nor focusable, the input of the text field will not be selectable,
- * visually text field will appear in the disabled UI state
- * @param readOnly controls the editable state of the [OutlinedTextField]. When `true`, the text
- * field can not be modified, however, a user can focus it and copy text from it. Read-only text
- * fields are usually used to display pre-filled forms that user can not edit
- * @param textStyle the style to be applied to the input text. Defaults to [LocalTextStyle]
+ * @param modifier the [Modifier] to be applied to this text field
+ * @param enabled controls the enabled state of this text field. When `false`, this component will
+ * not respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
+ * @param readOnly controls the editable state of the text field. When `true`, the text field cannot
+ * be modified. However, a user can focus it and copy text from it. Read-only text fields are
+ * usually used to display pre-filled forms that a user cannot edit.
+ * @param textStyle the style to be applied to the input text. Defaults to [LocalTextStyle].
  * @param label the optional label to be displayed inside the text field container. The default
  * text style for internal [Text] is [Typography.bodySmall] when the text field is in focus and
  * [Typography.bodyLarge] when the text field is not in focus
@@ -251,27 +248,25 @@ fun OutlinedTextField(
  * @param visualTransformation transforms the visual representation of the input [value]
  * For example, you can use
  * [PasswordVisualTransformation][androidx.compose.ui.text.input.PasswordVisualTransformation] to
- * create a password text field. By default no visual transformation is applied
+ * create a password text field. By default, no visual transformation is applied.
  * @param keyboardOptions software keyboard options that contains configuration such as
  * [KeyboardType] and [ImeAction]
  * @param keyboardActions when the input service emits an IME action, the corresponding callback
  * is called. Note that this IME action may be different from what you specified in
  * [KeyboardOptions.imeAction]
- * @param singleLine when set to true, this text field becomes a single horizontally scrolling
- * text field instead of wrapping onto multiple lines. The keyboard will be informed to not show
- * the return key as the [ImeAction]. Note that [maxLines] parameter will be ignored as the
- * maxLines attribute will be automatically set to 1
+ * @param singleLine when `true`, this text field becomes a single horizontally scrolling text field
+ * instead of wrapping onto multiple lines. The keyboard will be informed to not show the return key
+ * as the [ImeAction]. Note that [maxLines] parameter will be ignored as the maxLines attribute will
+ * be automatically set to 1.
  * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
  * equal or greater than 1. Note that this parameter will be ignored and instead maxLines will be
- * set to 1 if [singleLine] is set to true
- * @param interactionSource the [MutableInteractionSource] representing the stream of
- * [Interaction]s for this OutlinedTextField. You can create and pass in your own remembered
- * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
- * appearance / behavior of this OutlinedTextField in different [Interaction]s.
- * @param shape the shape of the text field's border
- * @param colors [TextFieldColors] that will be used to resolve color of the text and content
- * (including label, placeholder, leading and trailing icons, border) for this text field in
- * different states. See [TextFieldDefaults.outlinedTextFieldColors]
+ * set to 1 if [singleLine] is set to true.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this text field. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this text field in different states.
+ * @param shape defines the shape of this text field's border
+ * @param colors [TextFieldColors] that will be used to resolve the colors used for this text field
+ * in different states. See [TextFieldDefaults.outlinedTextFieldColors].
  */
 @Composable
 fun OutlinedTextField(
@@ -647,8 +642,7 @@ private class OutlinedTextFieldMeasurePolicy(
 }
 
 /**
- * Calculate the width of the [OutlinedTextField] given all elements that should be
- * placed inside
+ * Calculate the width of the [OutlinedTextField] given all elements that should be placed inside.
  */
 private fun calculateWidth(
     leadingPlaceableWidth: Int,
@@ -669,8 +663,7 @@ private fun calculateWidth(
 }
 
 /**
- * Calculate the height of the [OutlinedTextField] given all elements that should be
- * placed inside
+ * Calculate the height of the [OutlinedTextField] given all elements that should be placed inside.
  */
 private fun calculateHeight(
     leadingPlaceableHeight: Int,

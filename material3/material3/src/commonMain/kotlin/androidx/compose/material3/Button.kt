@@ -79,24 +79,25 @@ import kotlinx.coroutines.flow.collect
  *
  * The default text style for internal [Text] components will be set to [Typography.labelLarge].
  *
- * @param onClick Will be called when the user clicks the button.
- * @param modifier Modifier to be applied to the button.
- * @param enabled Controls the enabled state of the button. When `false`, this button will not be
- * clickable.
+ * @param onClick called when this button is clicked
+ * @param modifier the [Modifier] to be applied to this button
+ * @param enabled controls the enabled state of this button. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this Button. You can create and pass in your own remembered [MutableInteractionSource] if you
- * want to observe [Interaction]s and customize the appearance / behavior of this Button in
- * different [Interaction]s.
+ * for this button. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this button in different states.
  * @param elevation [ButtonElevation] used to resolve the elevation for this button in different
- * states. This controls the size of the shadow below the button. When the container color is
- * [ColorScheme.surface], a higher elevation (surface blended with more primary) will result in a
- * darker surface color in light theme and lighter color in dark theme.
- * @param shape Defines the button's shape as well as its shadow.
- * @param border Border to draw around the button. Pass `null` here for no border.
- * @param colors [ButtonColors] that will be used to resolve the container and content color for
- * this button in different states. See [ButtonDefaults.buttonColors].
- * @param contentPadding The spacing values to apply internally between the container and the
- * content.
+ * states. This controls the size of the shadow below the button. Additionally, when the container
+ * color is [ColorScheme.surface], this controls the amount of primary color applied as an overlay.
+ * See [ButtonElevation.shadowElevation] and [ButtonElevation.tonalElevation].
+ * @param shape defines the shape of this button's container, border (when [border] is not null),
+ * and shadow (when using [elevation])
+ * @param border the border to draw around the container of this button
+ * @param colors [ButtonColors] that will be used to resolve the colors for this button in different
+ * states. See [ButtonDefaults.buttonColors].
+ * @param contentPadding the spacing values to apply internally between the container and the
+ * content
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -171,25 +172,25 @@ fun Button(
  *
  * The default text style for internal [Text] components will be set to [Typography.labelLarge].
  *
- * @param onClick Will be called when the user clicks the button.
- * @param modifier Modifier to be applied to the button.
- * @param enabled Controls the enabled state of the button. When `false`, this button will not be
- * clickable.
+ * @param onClick called when this button is clicked
+ * @param modifier the [Modifier] to be applied to this button
+ * @param enabled controls the enabled state of this button. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this Button. You can create and pass in your own remembered [MutableInteractionSource] if you
- * want to observe [Interaction]s and customize the appearance / behavior of this Button in
- * different [Interaction]s.
+ * for this button. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this button in different states.
  * @param elevation [ButtonElevation] used to resolve the elevation for this button in different
- * states. This controls the size of the shadow below the button. When the container color is
- * [ColorScheme.surface], a higher elevation (surface blended with more primary) will result in a
- * darker surface color in light theme and lighter color in dark theme.
- * [ButtonDefaults.elevatedButtonElevation].
- * @param shape Defines the button's shape as well as its shadow.
- * @param border Border to draw around the button. Pass `null` here for no border.
- * @param colors [ButtonColors] that will be used to resolve the container and content color for
- * this button in different states. See [ButtonDefaults.elevatedButtonColors].
- * @param contentPadding The spacing values to apply internally between the container and the
- * content.
+ * states. This controls the size of the shadow below the button. Additionally, when the container
+ * color is [ColorScheme.surface], this controls the amount of primary color applied as an overlay.
+ * See [ButtonDefaults.elevatedButtonElevation].
+ * @param shape defines the shape of this button's container, border (when [border] is not null),
+ * and shadow (when using [elevation])
+ * @param border the border to draw around the container of this button
+ * @param colors [ButtonColors] that will be used to resolve the colors for this button in different
+ * states. See [ButtonDefaults.elevatedButtonColors].
+ * @param contentPadding the spacing values to apply internally between the container and the
+ * content
  */
 @Composable
 fun ElevatedButton(
@@ -242,24 +243,24 @@ fun ElevatedButton(
  *
  * The default text style for internal [Text] components will be set to [Typography.labelLarge].
  *
- * @param onClick Will be called when the user clicks the button.
- * @param modifier Modifier to be applied to the button.
- * @param enabled Controls the enabled state of the button. When `false`, this button will not be
- * clickable.
+ * @param onClick called when this button is clicked
+ * @param modifier the [Modifier] to be applied to this button
+ * @param enabled controls the enabled state of this button. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this Button. You can create and pass in your own remembered [MutableInteractionSource] if you
- * want to observe [Interaction]s and customize the appearance / behavior of this Button in
- * different [Interaction]s.
+ * for this button. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this button in different states.
  * @param elevation [ButtonElevation] used to resolve the elevation for this button in different
- * states. This controls the size of the shadow below the button. When the container color is
- * [ColorScheme.surface], a higher elevation (surface blended with more primary) will result in a
- * darker surface color in light theme and lighter color in dark theme.
- * @param shape Defines the button's shape as well as its shadow.
- * @param border Border to draw around the button. Pass `null` here for no border.
- * @param colors [ButtonColors] that will be used to resolve the container and content color for
- * this button in different states. See [ButtonDefaults.elevatedButtonColors].
- * @param contentPadding The spacing values to apply internally between the container and the
- * content.
+ * states. This controls the size of the shadow below the button. Additionally, when the container
+ * color is [ColorScheme.surface], this controls the amount of primary color applied as an overlay.
+ * @param shape defines the shape of this button's container, border (when [border] is not null),
+ * and shadow (when using [elevation])
+ * @param border the border to draw around the container of this button
+ * @param colors [ButtonColors] that will be used to resolve the colors for this button in different
+ * states. See [ButtonDefaults.filledTonalButtonColors].
+ * @param contentPadding the spacing values to apply internally between the container and the
+ * content
  */
 @Composable
 fun FilledTonalButton(
@@ -311,24 +312,24 @@ fun FilledTonalButton(
  *
  * The default text style for internal [Text] components will be set to [Typography.labelLarge].
  *
- * @param onClick Will be called when the user clicks the button.
- * @param modifier Modifier to be applied to the button.
- * @param enabled Controls the enabled state of the button. When `false`, this button will not be
- * clickable.
+ * @param onClick called when this button is clicked
+ * @param modifier the [Modifier] to be applied to this button
+ * @param enabled controls the enabled state of this button. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this Button. You can create and pass in your own remembered [MutableInteractionSource] if you
- * want to observe [Interaction]s and customize the appearance / behavior of this Button in
- * different [Interaction]s.
+ * for this button. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this button in different states.
  * @param elevation [ButtonElevation] used to resolve the elevation for this button in different
- * states. This controls the size of the shadow below the button. When the container color is
- * [ColorScheme.surface], a higher elevation (surface blended with more primary) will result in a
- * darker surface color in light theme and lighter color in dark theme.
- * @param shape Defines the button's shape as well as its shadow.
- * @param border Border to draw around the button. Pass `null` here for no border.
- * @param colors [ButtonColors] that will be used to resolve the container and content color for
- * this button in different states. See [ButtonDefaults.elevatedButtonColors].
- * @param contentPadding The spacing values to apply internally between the container and the
- * content.
+ * states. This controls the size of the shadow below the button. Additionally, when the container
+ * color is [ColorScheme.surface], this controls the amount of primary color applied as an overlay.
+ * @param shape defines the shape of this button's container, border (when [border] is not null),
+ * and shadow (when using [elevation]).
+ * @param border the border to draw around the container of this button. Pass `null` for no border.
+ * @param colors [ButtonColors] that will be used to resolve the colors for this button in different
+ * states. See [ButtonDefaults.outlinedButtonColors].
+ * @param contentPadding the spacing values to apply internally between the container and the
+ * content
  */
 @Composable
 fun OutlinedButton(
@@ -380,27 +381,26 @@ fun OutlinedButton(
  *
  * The default text style for internal [Text] components will be set to [Typography.labelLarge].
  *
- * @param onClick Will be called when the user clicks the button.
- * @param modifier Modifier to be applied to the button.
- * @param enabled Controls the enabled state of the button. When `false`, this button will not be
- * clickable.
+ * @param onClick called when this button is clicked
+ * @param modifier the [Modifier] to be applied to this button
+ * @param enabled controls the enabled state of this button. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this Button. You can create and pass in your own remembered [MutableInteractionSource] if you
- * want to observe [Interaction]s and customize the appearance / behavior of this Button in
- * different [Interaction]s.
+ * for this button. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this button in different states.
  * @param elevation [ButtonElevation] used to resolve the elevation for this button in different
- * states. This controls the size of the shadow below the button. When the container color is
- * [ColorScheme.surface], a higher elevation (surface blended with more primary) will result in a
- * darker surface color in light theme and lighter color in dark theme. A TextButton typically has
- * no elevation, and the default value is `null`. See [ElevatedButton] for a button with elevation.
- * @param shape Defines the button's shape. A TextButton typically has no elevation or shadow, but
- * if a non-zero or non-null elevation is passed in, then the shape also defines the bounds of the
- * shadow.
- * @param border Border to draw around the button.
- * @param colors [ButtonColors] that will be used to resolve the container and content color for
- * this button in different states. See [ButtonDefaults.textButtonColors].
- * @param contentPadding The spacing values to apply internally between the container and the
- * content.
+ * states. This controls the size of the shadow below the button. Additionally, when the container
+ * color is [ColorScheme.surface], this controls the amount of primary color applied as an overlay.
+ * A TextButton typically has no elevation, and the default value is `null`. See [ElevatedButton]
+ * for a button with elevation.
+ * @param shape defines the shape of this button's container, border (when [border] is not null),
+ * and shadow (when using [elevation])
+ * @param border the border to draw around the container of this button
+ * @param colors [ButtonColors] that will be used to resolve the colors for this button in different
+ * states. See [ButtonDefaults.textButtonColors].
+ * @param contentPadding the spacing values to apply internally between the container and the
+ * content
  */
 @Composable
 fun TextButton(
@@ -764,34 +764,32 @@ object ButtonDefaults {
 @Stable
 interface ButtonElevation {
     /**
-     * Represents the tonal elevation used in a button, depending on [enabled] and
+     * Represents the tonal elevation used in a button, depending on its [enabled] state and
      * [interactionSource]. This should typically be the same value as the [shadowElevation].
      *
      * Tonal elevation is used to apply a color shift to the surface to give the it higher emphasis.
-     * When surface's color is [ColorScheme.surface], a higher the elevation will result
-     * in a darker color in light theme and lighter color in dark theme.
+     * When surface's color is [ColorScheme.surface], a higher elevation will result in a darker
+     * color in light theme and lighter color in dark theme.
      *
-     * See [shadowElevation] which controls the elevation of the shadow drawn around the FAB.
+     * See [shadowElevation] which controls the elevation of the shadow drawn around the button.
      *
      * @param enabled whether the button is enabled
      * @param interactionSource the [InteractionSource] for this button
      */
-    // TODO(b/202954622): Align docs with [FloatingActionButtonElevation].
     @Composable
     fun tonalElevation(enabled: Boolean, interactionSource: InteractionSource): State<Dp>
 
     /**
-     * Represents the shadow elevation used in a button, depending on [enabled] and
+     * Represents the shadow elevation used in a button, depending on its [enabled] state and
      * [interactionSource]. This should typically be the same value as the [tonalElevation].
      *
-     * Shadow elevation is used to apply a shadow around the surface to give it higher emphasis.
+     * Shadow elevation is used to apply a shadow around the button to give it higher emphasis.
      *
      * See [tonalElevation] which controls the elevation with a color shift to the surface.
      *
      * @param enabled whether the button is enabled
      * @param interactionSource the [InteractionSource] for this button
      */
-    // TODO(b/202954622): Align docs with [FloatingActionButtonElevation].
     @Composable
     fun shadowElevation(enabled: Boolean, interactionSource: InteractionSource): State<Dp>
 }
