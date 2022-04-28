@@ -21,7 +21,7 @@ package androidx.compose.integration.docs.testing
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.integration.docs.testing.TestingSemanticsSnippets1.PickedDateKey
+import androidx.compose.integration.docs.testing.CreateSemanticsPropertySnippet.PickedDateKey
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -82,11 +82,12 @@ import android.view.KeyEvent.KEYCODE_A as KeyCodeA
  * No action required if it's modified.
  */
 
-@Composable private fun TestingSnippet1() {
+@Composable
+private fun ButtonSnippet() {
     MyButton(modifier = Modifier.semantics { contentDescription = "Like button" })
 }
 
-private object TestingSnippet3 {
+private object ComposeTestRuleSnippet {
     // file: app/src/androidTest/kotlin/com/package/MyComposeTest.kt
 
     class MyComposeTest {
@@ -95,8 +96,7 @@ private object TestingSnippet3 {
         val composeTestRule = createAndroidComposeRule<MyActivity>()
         // createComposeRule() if you don't need access to the activityTestRule
 
-        @Test
-        fun MyTest() {
+        @Test fun myTest() {
             // Start the app
             composeTestRule.setContent {
                 MyAppTheme {
@@ -111,21 +111,25 @@ private object TestingSnippet3 {
     }
 }
 
-@Composable private fun TestingSnippets4() {
+@Composable
+private fun SelectNodesSnippets() {
     // single node
     // It's API, see line below.
     // onNode(<<SemanticsMatcher>>, useUnmergedTree = false): SemanticsNodeInteraction
-    composeTestRule.onNode(hasText("Button")) // Equivalent to onNodeWithText("Button")
+    composeTestRule
+        .onNode(hasText("Button")) // Equivalent to onNodeWithText("Button")
 
     // multiple nodes
     // It's API, see line below.
     // onAllNodes(<<SemanticsMatcher>>): SemanticsNodeInteractionCollection
 
     // Example
-    composeTestRule.onAllNodes(hasText("Button")) // Equivalent to onAllNodesWithText("Button")
+    composeTestRule
+        .onAllNodes(hasText("Button")) // Equivalent to onAllNodesWithText("Button")
 }
 
-@Composable private fun TestingSnippets5() {
+@Composable
+private fun MergeTextSnippet() {
     MyButton {
         Text("Hello")
         Text("World")
@@ -136,29 +140,38 @@ private object TestingSnippet3 {
     composeTestRule.onRoot(useUnmergedTree = true).printToLog("TAG")
 }
 
-@Composable private fun TestingSnippets6() {
+@Composable
+private fun UseUnmergedTreeSnippet() {
     composeTestRule.onNodeWithText("World", useUnmergedTree = true).assertIsDisplayed()
 }
 
 // assertions
 
-@Composable private fun TestingSnippets7() {
+@Composable
+private fun CheckAssertionsOneNodeSnippet() {
     // Single matcher:
     composeTestRule.onNode(matcher).assert(hasText("Button")) // hasText is a SemanticsMatcher
+
     // Multiple matchers can use and / or
-    composeTestRule.onNode(matcher).assert(hasText("Button") or hasText("Button2"))
+    composeTestRule.onNode(matcher)
+        .assert(hasText("Button") or hasText("Button2"))
 }
 
-@Composable private fun TestingSnippets8() {
+@Composable
+private fun CheckAssertionsMultipleNodesSnippet() {
     // Check number of matched nodes
-    composeTestRule.onAllNodesWithContentDescription("Beatle").assertCountEquals(4)
+    composeTestRule
+        .onAllNodesWithContentDescription("Beatle").assertCountEquals(4)
     // At least one matches
-    composeTestRule.onAllNodesWithContentDescription("Beatle").assertAny(hasTestTag("Drummer"))
+    composeTestRule
+        .onAllNodesWithContentDescription("Beatle").assertAny(hasTestTag("Drummer"))
     // All of them match
-    composeTestRule.onAllNodesWithContentDescription("Beatle").assertAll(hasClickAction())
+    composeTestRule
+        .onAllNodesWithContentDescription("Beatle").assertAll(hasClickAction())
 }
 
-@Composable private fun SemanticsNodeInteraction.TestingSnippets9() {
+@Composable
+private fun SemanticsNodeInteraction.PerformClickEtc() {
     val listOfActions = listOf(
         // start snippet
         performClick(),
@@ -169,7 +182,8 @@ private object TestingSnippet3 {
     )
 }
 
-@Composable private fun TestingSnippets10() {
+@Composable
+private fun HierarchicalApiSnippets() {
     // It's API, look for changes below.
     val matcher = SemanticsMatcher("test", { true })
     hasParent(matcher)
@@ -178,12 +192,14 @@ private object TestingSnippet3 {
     hasAnyDescendant(matcher)
 }
 
-@Composable private fun TestingSnippets11() {
+@Composable
+private fun AssertIsDisplayedSnippet() {
     composeTestRule.onNode(hasParent(hasText("Button")))
         .assertIsDisplayed()
 }
 
-@Composable private fun TestingSnippets12() {
+@Composable
+private fun SelectorsSnippet() {
     composeTestRule.onNode(hasTestTag("Players"))
         .onChildren()
         .filter(hasClickAction())
@@ -192,9 +208,8 @@ private object TestingSnippet3 {
         .assert(hasText("John"))
 }
 
-private object TestingSyncSnippets1 {
-    @Test
-    fun counterTest() {
+private object SyncSnippet {
+    @Test fun counterTest() {
         val myCounter = mutableStateOf(0) // State that can cause recompositions
         var lastSeenValue = 0 // Used to track recompositions
         composeTestRule.setContent {
@@ -211,19 +226,19 @@ private object TestingSyncSnippets1 {
     }
 }
 
-private fun TestingSyncSnippets2And3() {
+private fun TestClockAdvanceSnippets() {
     composeTestRule.mainClock.autoAdvance = false
 
     composeTestRule.mainClock.advanceTimeByFrame()
     composeTestRule.mainClock.advanceTimeBy(milliseconds)
 }
 
-private fun TestingSyncSnippets4() {
+private fun IdlingResourceSnippet() {
     composeTestRule.registerIdlingResource(idlingResource)
     composeTestRule.unregisterIdlingResource(idlingResource)
 }
 
-private fun TestingSyncSnippets5() {
+private fun ManualSyncSnippet() {
     composeTestRule.mainClock.autoAdvance = true // default
     composeTestRule.waitForIdle() // Advances the clock until Compose is idle
 
@@ -231,27 +246,26 @@ private fun TestingSyncSnippets5() {
     composeTestRule.waitForIdle() // Only waits for Idling Resources to become idle
 }
 
-private fun TestingSyncSnippets6and7() {
+private fun AdvanceWaitSnippets() {
     composeTestRule.mainClock.advanceTimeUntil(timeoutMs) { condition }
 
     composeTestRule.waitUntil(timeoutMs) { condition }
 }
 
-private object TestingSemanticsSnippets1 {
+private object CreateSemanticsPropertySnippet {
     // Creates a Semantics property of type boolean
     val PickedDateKey = SemanticsPropertyKey<Long>("PickedDate")
     var SemanticsPropertyReceiver.pickedDate by PickedDateKey
 }
 
-private fun TestingSemanticsSnippets2() {
+private fun UseSemanticsPropertySnippet() {
     composeTestRule
         .onNode(SemanticsMatcher.expectValue(PickedDateKey, 1445378400)) // 2015-10-21
         .assertExists()
 }
 
-private object TestingSemanticsSnippet3 {
-    @Test
-    fun androidViewInteropTest() {
+private object InteropTestSnippet {
+    @Test fun androidViewInteropTest() {
         // Check the initial state of a TextView that depends on a Compose state:
         Espresso.onView(withText("Hello Views")).check(matches(isDisplayed()))
         // Click on the Compose button that changes the state
@@ -277,8 +291,7 @@ private object TestingSnippets13 {
             }
         }
 
-        @Test
-        fun changeTheme_scrollIsPersisted() {
+        @Test fun changeTheme_scrollIsPersisted() {
             composeTestRule.onNodeWithContentDescription("Continue").performClick()
 
             // Set theme to dark
