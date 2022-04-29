@@ -15,8 +15,38 @@ sealed class LoadState<T> {
 
 @Composable
 fun <T> load(load: suspend () -> T): LoadState<T> {
-    var state: LoadState<T> by remember(load) { mutableStateOf(LoadState.Loading()) }
-    LaunchedEffect(load) {
+    return load(Unit, load)
+}
+
+@Composable
+fun <T: Any> loadOrNull(load: suspend () -> T): T? {
+    return loadOrNull(Unit, load)
+}
+
+@Composable
+fun <T> load(key1: Any?, load: suspend () -> T): LoadState<T> {
+    return load(key1, Unit, load)
+}
+
+@Composable
+fun <T: Any> loadOrNull(key1: Any?, load: suspend () -> T): T? {
+    return loadOrNull(key1, Unit, load)
+}
+
+@Composable
+fun <T> load(key1: Any?, key2: Any?, load: suspend () -> T): LoadState<T> {
+    return load(key1, key2, Unit, load)
+}
+
+@Composable
+fun <T: Any> loadOrNull(key1: Any?, key2: Any?, load: suspend () -> T): T? {
+    return loadOrNull(key1, key2, Unit, load)
+}
+
+@Composable
+fun <T> load(key1: Any?, key2: Any?, key3: Any?, load: suspend () -> T): LoadState<T> {
+    var state: LoadState<T> by remember(key1, key2, key3) { mutableStateOf(LoadState.Loading()) }
+    LaunchedEffect(key1, key2, key3) {
         state = try {
             LoadState.Success(load())
         } catch (e: Exception) {
@@ -27,7 +57,7 @@ fun <T> load(load: suspend () -> T): LoadState<T> {
 }
 
 @Composable
-fun <T: Any> loadOrNull(load: suspend () -> T): T? {
-    val state = load(load)
+fun <T: Any> loadOrNull(key1: Any?, key2: Any?, key3: Any?, load: suspend () -> T): T? {
+    val state = load(key1, key2, key3, load)
     return (state as? LoadState.Success<T>)?.value
 }
