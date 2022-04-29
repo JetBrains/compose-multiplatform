@@ -8,6 +8,8 @@ pluginManagement {
     }
 
     resolutionStrategy {
+        val kotlinVersion = extra["kotlin.version"] as String
+        println("KotlinVersion=[$kotlinVersion]")
         eachPlugin {
             if (requested.id.id == "org.jetbrains.compose") {
                 val useVersion = if (extra.has("COMPOSE_CORE_VERSION")) {
@@ -17,6 +19,8 @@ pluginManagement {
                 }
                 println("COMPOSE_INTEGRATION_VERSION=[$useVersion]")
                 useVersion(useVersion)
+            } else if (requested.id.id.startsWith("org.jetbrains.kotlin")) {
+                useVersion(kotlinVersion)
             }
         }
     }

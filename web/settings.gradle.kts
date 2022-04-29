@@ -43,8 +43,6 @@ pluginManagement {
         eachPlugin {
             if (requested.id.id == "org.jetbrains.compose") {
                 useModule("org.jetbrains.compose:org.jetbrains.compose.gradle.plugin:$COMPOSE_CORE_VERSION")
-            } else if (requested.id.id == "org.jetbrains.kotlin.multiplatform") {
-                useModule("org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin:1.6.21")
             }
         }
     }

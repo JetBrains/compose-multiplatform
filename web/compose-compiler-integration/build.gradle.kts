@@ -56,11 +56,13 @@ fun build(
     directory: File,
     failureExpected: Boolean = false,
     composeVersion: String,
+    kotlinVersion: String,
     vararg buildCmd: String = arrayOf("build", "jsNodeRun")
 ) {
     val isWin = System.getProperty("os.name").startsWith("Win")
     val arguments = buildCmd.toMutableList().also {
         it.add("-PCOMPOSE_CORE_VERSION=$composeVersion")
+        it.add("-Pkotlin.version=$kotlinVersion")
     }.toTypedArray()
 
     val procBuilder = if (isWin) {
@@ -121,7 +123,8 @@ fun runCasesInDirectory(
     dir: File,
     filterPath: String,
     expectCompilationError: Boolean,
-    composeVersion: String
+    composeVersion: String,
+    kotlinVersion: String
 ): RunChecksResult {
     return dir.listFiles()!!.filter { it.absolutePath.contains(filterPath) }.mapIndexed { _, file ->
         println("Running check for ${file.name}, expectCompilationError = $expectCompilationError, composeVersion = $composeVersion")
@@ -160,7 +163,8 @@ fun runCasesInDirectory(
                 caseName = caseName,
                 directory = tmpDir,
                 failureExpected = expectCompilationError,
-                composeVersion = composeVersion
+                composeVersion = composeVersion,
+                kotlinVersion = kotlinVersion
             )
         }.exceptionOrNull()
 
@@ -173,13 +177,15 @@ tasks.register("checkComposeCases") {
     doLast {
         val filterCases = project.findProperty("FILTER_CASES")?.toString() ?: ""
         val composeVersion = project.findProperty("COMPOSE_CORE_VERSION")?.toString() ?: "0.0.0-SNASPHOT"
+        val kotlinVersion = kotlin.coreLibrariesVersion
 
         val expectedFailingCasesDir = File("${projectDir.absolutePath}/testcases/failing")
         val expectedFailingResult = runCasesInDirectory(
             dir = expectedFailingCasesDir,
             expectCompilationError = true,
             filterPath = filterCases,
-            composeVersion = composeVersion
+            composeVersion = composeVersion,
+            kotlinVersion = kotlinVersion
         )
 
         val passingCasesDir = File("${projectDir.absolutePath}/testcases/passing")
@@ -187,7 +193,8 @@ tasks.register("checkComposeCases") {
             dir = passingCasesDir,
             expectCompilationError = false,
             filterPath = filterCases,
-            composeVersion = composeVersion
+            composeVersion = composeVersion,
+            kotlinVersion = kotlinVersion
         )
 
         expectedFailingResult.printResults()
