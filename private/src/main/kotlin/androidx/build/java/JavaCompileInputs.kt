@@ -23,6 +23,7 @@ import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.SourceSet
 import org.gradle.kotlin.dsl.get
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 
@@ -77,11 +78,13 @@ data class JavaCompileInputs(
                 KotlinPlatformType.jvm
             )
             val sourceCollection = jvmTarget.sourceFiles(
-                compilationName = "main"
+                compilationName = KotlinCompilation.MAIN_COMPILATION_NAME
             )
+
             return JavaCompileInputs(
                 sourcePaths = project.files(sourceCollection),
-                dependencyClasspath = jvmTarget.compilations["main"].compileDependencyFiles,
+                dependencyClasspath = jvmTarget
+                    .compilations[KotlinCompilation.MAIN_COMPILATION_NAME].compileDependencyFiles,
                 bootClasspath = project.getAndroidJar()
             )
         }
