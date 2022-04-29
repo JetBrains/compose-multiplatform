@@ -25,6 +25,7 @@ dependencies {
 
 // Write kotlin.version into a file, so it can be read by karma-test-runner patch (see test-utils/conf)
 File(projectDir.resolve("build"), "kotlin.version").apply {
+    this.parentFile.mkdirs()
     val kotlinVersion = extra["kotlin.version"].toString()
     println("Writing kotlin.version=$kotlinVersion into $absolutePath")
     createNewFile()
