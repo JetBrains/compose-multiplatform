@@ -46,6 +46,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.DocsType
+import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.DuplicatesStrategy
@@ -265,6 +266,10 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
                 it.attribute(
                     DocsType.DOCS_TYPE_ATTRIBUTE,
                     project.objects.named<DocsType>(DocsType.SOURCES)
+                )
+                it.attribute(
+                    LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
+                    project.objects.named<LibraryElements>(LibraryElements.JAR)
                 )
             }
         }
@@ -568,6 +573,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
         project.tasks.whenTaskAdded { task ->
             if (task is Test || task.name.startsWith("assemble") ||
                 task.name == "lint" ||
+                task.name == "lintDebug" ||
                 task.name == "lintAnalyzeDebug" ||
                 task.name == "transformDexArchiveWithExternalLibsDexMergerForPublicDebug" ||
                 task.name == "transformResourcesWithMergeJavaResForPublicDebug" ||
