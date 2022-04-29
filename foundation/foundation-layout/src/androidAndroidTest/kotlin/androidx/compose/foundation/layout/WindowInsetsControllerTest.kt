@@ -70,6 +70,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -647,6 +648,7 @@ class WindowInsetsControllerTest {
      * On some devices, the animation can begin and then end immediately without the value being
      * set to the final state in onProgress().
      */
+    @Ignore("b/230781717")
     @Test
     fun quickAnimation() {
         var imeBottom by mutableStateOf(0)
