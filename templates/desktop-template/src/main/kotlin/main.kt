@@ -1,31 +1,30 @@
-import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
+import androidx.compose.runtime.*
+import kotlinx.coroutines.*
 
-@Composable
-@Preview
-fun App() {
-    var text by remember { mutableStateOf("Hello, World!") }
+fun main() {
+    runBlocking(UIDispatcher) {
+        val container = ComposeContainer()
 
-    MaterialTheme {
-        Button(onClick = {
-            text = "Hello, Desktop!"
-        }) {
-            Text(text)
+        launch {
+            while (true) {
+                println("=== CURRENT UI:")
+                container.render()
+                delay(1000)
+            }
         }
-    }
-}
 
-fun main() = application {
-    Window(onCloseRequest = ::exitApplication) {
-        App()
+        container.setContent {
+            var text1 by remember { mutableStateOf("text1") }
+            var text2 by remember { mutableStateOf("text2") }
+            ComposeExternalTextField(text1, onChange = { text1 = it })
+            ComposeExternalTextField(text2, onChange = { text2 = it })
+
+            LaunchedEffect(Unit) {
+                while (true) {
+                    text1 = "text1 " + System.currentTimeMillis()
+                    delay(100)
+                }
+            }
+        }
     }
 }
