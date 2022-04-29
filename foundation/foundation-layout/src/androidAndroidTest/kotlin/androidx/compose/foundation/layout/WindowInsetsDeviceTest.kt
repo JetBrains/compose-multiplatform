@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
@@ -46,6 +47,7 @@ class WindowInsetsDeviceTest {
     val rule = createAndroidComposeRule<WindowInsetsActivity>()
 
     @OptIn(ExperimentalLayoutApi::class)
+    @FlakyTest(bugId = 230844979)
     @Test
     fun disableConsumeDisablesAnimationConsumption() {
         var imeInset1 = 0
