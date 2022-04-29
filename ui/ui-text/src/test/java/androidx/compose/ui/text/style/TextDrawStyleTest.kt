@@ -100,7 +100,7 @@ class TextDrawStyleTest {
         assertThat(current.merge(other2).brush).isEqualTo(defaultBrush)
     }
 
-    // TODO(halilibo): Update when Brush is stable.
+    // TODO(b/230787077): Update when Brush is stable.
     @Test
     fun `merging brush with color returns brush`() {
         val current = TextDrawStyle.from(defaultBrush)

@@ -43,7 +43,7 @@ internal interface TextDrawStyle {
         // This control prevents Color or Unspecified TextDrawStyle to override an existing Brush.
         // It is a temporary measure to prevent Material Text composables to remove given Brush
         // from a TextStyle.
-        // TODO(halilibo): Just return other.takeOrElse { this } when Brush is stable.
+        // TODO(b/230787077): Just return other.takeOrElse { this } when Brush is stable.
         return when {
             other.brush != null -> other
             brush != null -> this
