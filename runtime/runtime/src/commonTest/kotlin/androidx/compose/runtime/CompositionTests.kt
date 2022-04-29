@@ -42,11 +42,6 @@ import androidx.compose.runtime.mock.revalidate
 import androidx.compose.runtime.mock.skip
 import androidx.compose.runtime.mock.validate
 import androidx.compose.runtime.snapshots.Snapshot
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runTest
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -54,6 +49,11 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runTest
 
 @Composable
 fun Container(content: @Composable () -> Unit) = content()
@@ -3182,6 +3182,36 @@ class CompositionTests {
             compose {
                 currentComposer.createNode { null }
             }
+        }
+    }
+
+    @Test
+    fun textWithElvis() = compositionTest {
+        compose {
+            val value: String? = null
+            value?.let { Text("Bye!") } ?: Text("Hello!")
+        }
+
+        validate {
+            Text("Hello!")
+        }
+    }
+
+    @Test
+    fun textWithIfNotNull() = compositionTest {
+        val condition = false
+        compose {
+            val result = if (condition) {
+                Text("Bye!")
+            } else null
+
+            if (result == null) {
+                Text("Hello!")
+            }
+        }
+
+        validate {
+            Text("Hello!")
         }
     }
 }
