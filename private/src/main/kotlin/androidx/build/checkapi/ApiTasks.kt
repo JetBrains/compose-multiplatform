@@ -21,12 +21,10 @@ import androidx.build.LibraryType
 import androidx.build.Release
 import androidx.build.RunApiTasks
 import androidx.build.Version
-import androidx.build.getAndroidJar
 import androidx.build.isWriteVersionedApiFilesEnabled
 import androidx.build.java.JavaCompileInputs
 import androidx.build.libabigail.NativeApiTasks
 import androidx.build.metalava.MetalavaTasks
-import androidx.build.multiplatformExtension
 import androidx.build.resources.ResourceTasks
 import androidx.build.version
 import com.android.build.gradle.LibraryExtension
@@ -174,7 +172,7 @@ fun Project.configureProjectForApiTasks(
                     .processManifestProvider.get() as ProcessLibraryManifest
             }
             is KmpApiTaskConfig -> {
-                javaInputs = project.jvmCompileInputsFromKmpProject()
+                javaInputs = JavaCompileInputs.fromKmpJvmTarget(project)
                 processManifest = null
             }
             is JavaApiTaskConfig -> {
@@ -207,35 +205,4 @@ fun Project.configureProjectForApiTasks(
             )
         }
     }
-}
-
-/**
- * Despite the return type, this returns a [JavaCompileInputs] wrapping Kotlin + Java JVM source
- * sets and compile classpath dependencies.
- */
-fun Project.jvmCompileInputsFromKmpProject(): JavaCompileInputs {
-    if (multiplatformExtension == null) {
-        throw GradleException("Expected KMP project but got ${project.name}")
-    }
-
-    val javaExtension = extensions.getByType<JavaPluginExtension>()
-    val mainSourceSet = javaExtension.sourceSets.getByName("main")
-    val dependencyClasspath = mainSourceSet.compileClasspath
-    val mainSourcePaths = project.files(
-        provider { mainSourceSet.allSource.srcDirs }
-    )
-
-    val kotlinSourceSets = multiplatformExtension!!.sourceSets
-        .filter { it.name.contains("main", ignoreCase = true) }
-    val kotlinSourcePaths = files(
-        provider {
-            kotlinSourceSets.flatMap { it.kotlin.sourceDirectories }
-        }
-    )
-
-    return JavaCompileInputs(
-        sourcePaths = mainSourcePaths + kotlinSourcePaths,
-        dependencyClasspath = dependencyClasspath,
-        project.getAndroidJar()
-    )
 }
