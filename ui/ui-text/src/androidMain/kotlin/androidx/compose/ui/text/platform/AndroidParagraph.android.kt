@@ -21,6 +21,8 @@ import android.text.TextUtils
 import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -50,11 +52,13 @@ import androidx.compose.ui.text.android.style.PlaceholderSpan
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.createFontFamilyResolver
+import androidx.compose.ui.text.platform.style.ShaderBrushSpan
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Density
 import java.util.Locale as JavaLocale
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.ceilToInt
 import androidx.compose.ui.unit.Constraints
 
@@ -117,20 +121,34 @@ internal class AndroidParagraph(
             null
         }
 
-        layout = TextLayout(
-            charSequence = paragraphIntrinsics.charSequence,
-            width = width,
-            textPaint = textPaint,
-            ellipsize = ellipsize,
+        val firstLayout = constructTextLayout(
             alignment = alignment,
-            textDirectionHeuristic = paragraphIntrinsics.textDirectionHeuristic,
-            lineSpacingMultiplier = DEFAULT_LINESPACING_MULTIPLIER,
-            maxLines = maxLines,
             justificationMode = justificationMode,
-            layoutIntrinsics = paragraphIntrinsics.layoutIntrinsics,
-            includePadding = style.isIncludeFontPaddingEnabled(),
-            fallbackLineSpacing = true
+            ellipsize = ellipsize,
+            maxLines = maxLines
         )
+
+        // Ellipsize if there's not enough vertical space to fit all lines
+        if (ellipsis && firstLayout.height > constraints.maxHeight && maxLines > 1) {
+            val calculatedMaxLines =
+                firstLayout.numberOfLinesThatFitMaxHeight(constraints.maxHeight)
+            layout = if (calculatedMaxLines > 0 && calculatedMaxLines != maxLines) {
+                constructTextLayout(
+                    alignment = alignment,
+                    justificationMode = justificationMode,
+                    ellipsize = ellipsize,
+                    maxLines = calculatedMaxLines
+                )
+            } else {
+                firstLayout
+            }
+        } else {
+            layout = firstLayout
+        }
+
+        layout.getShaderBrushSpans().forEach { shaderBrushSpan ->
+            shaderBrushSpan.size = Size(width, height)
+        }
     }
 
     override val width: Float
@@ -146,13 +164,13 @@ internal class AndroidParagraph(
         get() = paragraphIntrinsics.minIntrinsicWidth
 
     override val firstBaseline: Float
-        get() = layout.getLineBaseline(0)
+        get() = getLineBaseline(0)
 
     override val lastBaseline: Float
         get() = if (maxLines < lineCount) {
-            layout.getLineBaseline(maxLines - 1)
+            getLineBaseline(maxLines - 1)
         } else {
-            layout.getLineBaseline(lineCount - 1)
+            getLineBaseline(lineCount - 1)
         }
 
     override val didExceedMaxLines: Boolean
@@ -327,6 +345,12 @@ internal class AndroidParagraph(
 
     override fun getLineTop(lineIndex: Int): Float = layout.getLineTop(lineIndex)
 
+    internal fun getLineAscent(lineIndex: Int): Float = layout.getLineAscent(lineIndex)
+
+    internal fun getLineBaseline(lineIndex: Int): Float = layout.getLineBaseline(lineIndex)
+
+    internal fun getLineDescent(lineIndex: Int): Float = layout.getLineDescent(lineIndex)
+
     override fun getLineBottom(lineIndex: Int): Float = layout.getLineBottom(lineIndex)
 
     override fun getLineHeight(lineIndex: Int): Float = layout.getLineHeight(lineIndex)
@@ -373,15 +397,26 @@ internal class AndroidParagraph(
     internal fun isEllipsisApplied(lineIndex: Int): Boolean =
         layout.isEllipsisApplied(lineIndex)
 
+    private fun TextLayout.getShaderBrushSpans(): Array<ShaderBrushSpan> {
+        if (text !is Spanned) return emptyArray()
+        val brushSpans = (text as Spanned).getSpans(
+            0, text.length, ShaderBrushSpan::class.java
+        )
+        if (brushSpans.isEmpty()) return emptyArray()
+        return brushSpans
+    }
+
     override fun paint(
         canvas: Canvas,
         color: Color,
         shadow: Shadow?,
         textDecoration: TextDecoration?
     ) {
-        textPaint.setColor(color)
-        textPaint.setShadow(shadow)
-        textPaint.setTextDecoration(textDecoration)
+        with(textPaint) {
+            setColor(color)
+            setShadow(shadow)
+            setTextDecoration(textDecoration)
+        }
 
         val nativeCanvas = canvas.nativeCanvas
         if (didExceedMaxLines) {
@@ -393,6 +428,51 @@ internal class AndroidParagraph(
             nativeCanvas.restore()
         }
     }
+
+    @OptIn(ExperimentalTextApi::class)
+    override fun paint(
+        canvas: Canvas,
+        brush: Brush,
+        shadow: Shadow?,
+        textDecoration: TextDecoration?
+    ) {
+        with(textPaint) {
+            setBrush(brush, Size(width, height))
+            setShadow(shadow)
+            setTextDecoration(textDecoration)
+        }
+
+        val nativeCanvas = canvas.nativeCanvas
+        if (didExceedMaxLines) {
+            nativeCanvas.save()
+            nativeCanvas.clipRect(0f, 0f, width, height)
+        }
+        layout.paint(nativeCanvas)
+        if (didExceedMaxLines) {
+            nativeCanvas.restore()
+        }
+    }
+
+    private fun constructTextLayout(
+        alignment: Int,
+        justificationMode: Int,
+        ellipsize: TextUtils.TruncateAt?,
+        maxLines: Int
+    ) =
+        TextLayout(
+            charSequence = paragraphIntrinsics.charSequence,
+            width = width,
+            textPaint = textPaint,
+            ellipsize = ellipsize,
+            alignment = alignment,
+            textDirectionHeuristic = paragraphIntrinsics.textDirectionHeuristic,
+            lineSpacingMultiplier = DEFAULT_LINESPACING_MULTIPLIER,
+            maxLines = maxLines,
+            justificationMode = justificationMode,
+            layoutIntrinsics = paragraphIntrinsics.layoutIntrinsics,
+            includePadding = paragraphIntrinsics.style.isIncludeFontPaddingEnabled(),
+            fallbackLineSpacing = true
+        )
 }
 
 /**
@@ -408,11 +488,21 @@ private fun toLayoutAlign(align: TextAlign?): Int = when (align) {
     else -> DEFAULT_ALIGNMENT
 }
 
+@OptIn(InternalPlatformTextApi::class)
+private fun TextLayout.numberOfLinesThatFitMaxHeight(maxHeight: Int): Int {
+    for (lineIndex in 0 until lineCount) {
+        if (getLineBottom(lineIndex) > maxHeight) return lineIndex
+    }
+    return lineCount
+}
+
 @Suppress("DEPRECATION")
 @Deprecated(
     "Font.ResourceLoader is deprecated, instead pass FontFamily.Resolver",
-    replaceWith = ReplaceWith("ActualParagraph(text, style, spanStyles, placeholders, " +
-        "maxLines, ellipsis, width, density, fontFamilyResolver)"),
+    replaceWith = ReplaceWith(
+        "ActualParagraph(text, style, spanStyles, placeholders, " +
+            "maxLines, ellipsis, width, density, fontFamilyResolver)"
+    ),
 )
 internal actual fun ActualParagraph(
     text: String,
@@ -435,7 +525,7 @@ internal actual fun ActualParagraph(
     ),
     maxLines,
     ellipsis,
-   Constraints(maxWidth = width.ceilToInt())
+    Constraints(maxWidth = width.ceilToInt())
 )
 
 internal actual fun ActualParagraph(

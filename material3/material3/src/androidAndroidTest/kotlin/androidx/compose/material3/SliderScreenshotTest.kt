@@ -89,6 +89,28 @@ class SliderScreenshotTest {
     }
 
     @Test
+    fun sliderTest_middle_dark() {
+        rule.setMaterialContent(darkColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                var position by remember { mutableStateOf(0.5f) }
+                Slider(position, { position = it })
+            }
+        }
+        assertSliderAgainstGolden("slider_middle_dark")
+    }
+
+    @Test
+    fun sliderTest_middle_dark_disabled() {
+        rule.setMaterialContent(darkColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                var position by remember { mutableStateOf(0.5f) }
+                Slider(position, enabled = false, onValueChange = { position = it })
+            }
+        }
+        assertSliderAgainstGolden("slider_middle_dark_disabled")
+    }
+
+    @Test
     fun sliderTest_end() {
         rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
@@ -108,6 +130,17 @@ class SliderScreenshotTest {
             }
         }
         assertSliderAgainstGolden("slider_middle_steps")
+    }
+
+    @Test
+    fun sliderTest_middle_steps_dark() {
+        rule.setMaterialContent(darkColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                var position by remember { mutableStateOf(0.5f) }
+                Slider(position, { position = it }, steps = 5)
+            }
+        }
+        assertSliderAgainstGolden("slider_middle_steps_dark")
     }
 
     @Test
@@ -167,6 +200,105 @@ class SliderScreenshotTest {
             }
         }
         assertSliderAgainstGolden("slider_customColors_disabled")
+    }
+
+    @Test
+    @ExperimentalMaterial3Api
+    fun rangeSliderTest_middle_steps_disabled() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                var position by remember { mutableStateOf(0.5f..1f) }
+                RangeSlider(position, { position = it }, steps = 5, enabled = false)
+            }
+        }
+        assertSliderAgainstGolden("rangeSlider_middle_steps_disabled")
+    }
+
+    @Test
+    @ExperimentalMaterial3Api
+    fun rangeSliderTest_middle_steps_enabled() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                var position by remember { mutableStateOf(0.5f..1f) }
+                RangeSlider(position, { position = it }, steps = 5)
+            }
+        }
+        assertSliderAgainstGolden("rangeSlider_middle_steps_enabled")
+    }
+
+    @Test
+    @ExperimentalMaterial3Api
+    fun rangeSliderTest_middle_steps_dark_enabled() {
+        rule.setMaterialContent(darkColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                var position by remember { mutableStateOf(0.5f..1f) }
+                RangeSlider(position, { position = it }, steps = 5)
+            }
+        }
+        assertSliderAgainstGolden("rangeSlider_middle_steps_dark_enabled")
+    }
+
+    @Test
+    @ExperimentalMaterial3Api
+    fun rangeSliderTest_middle_steps_dark_disabled() {
+        rule.setMaterialContent(darkColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                var position by remember { mutableStateOf(0.5f..1f) }
+                RangeSlider(
+                    position,
+                    enabled = false,
+                    onValueChange = { position = it },
+                    steps = 5)
+            }
+        }
+        assertSliderAgainstGolden("rangeSlider_middle_steps_dark_disabled")
+    }
+
+    @Test
+    @ExperimentalMaterial3Api
+    fun rangeSliderTest_overlapingThumbs() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                var position by remember { mutableStateOf(0.5f..0.51f) }
+                RangeSlider(position, { position = it })
+            }
+        }
+        assertSliderAgainstGolden("rangeSlider_overlapingThumbs")
+    }
+
+    @Test
+    @ExperimentalMaterial3Api
+    fun rangeSliderTest_fullRange() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                var position by remember { mutableStateOf(0f..1f) }
+                RangeSlider(position, { position = it })
+            }
+        }
+        assertSliderAgainstGolden("rangeSlider_fullRange")
+    }
+
+    @Test
+    @ExperimentalMaterial3Api
+    fun rangeSliderTest_steps_customColors() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                var position by remember { mutableStateOf(30f..70f) }
+                RangeSlider(
+                    values = position,
+                    valueRange = 0f..100f,
+                    onValueChange = { position = it }, steps = 9,
+                    colors = SliderDefaults.colors(
+                        thumbColor = Color.Blue,
+                        activeTrackColor = Color.Red,
+                        inactiveTrackColor = Color.Yellow,
+                        activeTickColor = Color.Magenta,
+                        inactiveTickColor = Color.Cyan
+                    )
+                )
+            }
+        }
+        assertSliderAgainstGolden("rangeSlider_steps_customColors")
     }
 
     private fun assertSliderAgainstGolden(goldenName: String) {

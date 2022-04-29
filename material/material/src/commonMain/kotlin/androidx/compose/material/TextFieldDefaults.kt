@@ -186,6 +186,7 @@ interface TextFieldColorsWithIcons : TextFieldColors {
 /**
  * Contains the default values used by [TextField] and [OutlinedTextField].
  */
+@Immutable
 object TextFieldDefaults {
     /**
      * The default min width applied for a [TextField] and [OutlinedTextField].
@@ -305,7 +306,7 @@ object TextFieldDefaults {
      */
     @ExperimentalMaterialApi
     @Composable
-    fun BorderStroke(
+    fun BorderBox(
         enabled: Boolean,
         isError: Boolean,
         interactionSource: InteractionSource,
@@ -645,7 +646,7 @@ object TextFieldDefaults {
         colors: TextFieldColors = outlinedTextFieldColors(),
         contentPadding: PaddingValues = outlinedTextFieldPadding(),
         border: @Composable () -> Unit = {
-            BorderStroke(enabled, isError, interactionSource, colors)
+            BorderBox(enabled, isError, interactionSource, colors)
         }
     ) {
         CommonDecorationBox(

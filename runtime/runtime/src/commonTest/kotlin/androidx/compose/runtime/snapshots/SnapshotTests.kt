@@ -18,6 +18,7 @@
 
 package androidx.compose.runtime.snapshots
 
+import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -27,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.referentialEqualityPolicy
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.Snapshot.Companion.current
 import androidx.compose.runtime.snapshots.Snapshot.Companion.openSnapshotCount
 import androidx.compose.runtime.snapshots.Snapshot.Companion.takeMutableSnapshot
 import androidx.compose.runtime.snapshots.Snapshot.Companion.takeSnapshot
@@ -37,6 +39,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
+import kotlin.test.assertNotSame
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
@@ -897,6 +901,39 @@ class SnapshotTests {
         assertEquals(v, 1)
         readable1.dispose()
         mutable1.dispose()
+    }
+
+    @OptIn(ExperimentalComposeApi::class)
+    @Test
+    fun testUnsafeSnapshotEnterAndLeave() {
+        val snapshot = takeSnapshot()
+        try {
+            val oldSnapshot = snapshot.unsafeEnter()
+            try {
+                assertSame(snapshot, current, "expected taken snapshot to be current")
+            } finally {
+                snapshot.unsafeLeave(oldSnapshot)
+            }
+            assertNotSame(snapshot, current, "expected taken snapshot not to be current")
+        } finally {
+            snapshot.dispose()
+        }
+    }
+
+    @OptIn(ExperimentalComposeApi::class)
+    @Test
+    fun testUnsafeSnapshotLeaveThrowsIfNotCurrent() {
+        val snapshot = takeSnapshot()
+        try {
+            try {
+                snapshot.unsafeLeave(null)
+                fail("unsafeLeave should have thrown")
+            } catch (ise: IllegalStateException) {
+                // expected
+            }
+        } finally {
+            snapshot.dispose()
+        }
     }
 
     private var count = 0

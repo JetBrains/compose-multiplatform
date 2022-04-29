@@ -16,12 +16,24 @@
 
 package androidx.compose.ui.text.platform
 
+import android.graphics.Typeface
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.platform.extensions.flattenFontStylesAndApply
+import androidx.compose.ui.text.platform.extensions.setSpanStyles
+import androidx.compose.ui.text.platform.style.ShaderBrushSpan
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
@@ -418,6 +430,89 @@ class SpannableExtensionsTest {
                 eq(12)
             )
             verifyNoMoreInteractions()
+        }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun shaderBrush_shouldAdd_shaderBrushSpan_whenApplied() {
+        val text = "abcde abcde"
+        val brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+        val spanStyle = SpanStyle(brush = brush)
+        val spannable = SpannableStringBuilder().apply { append(text) }
+        spannable.setSpanStyles(
+            contextTextStyle = TextStyle(),
+            spanStyles = listOf(AnnotatedString.Range(spanStyle, 0, text.length)),
+            density = Density(1f, 1f),
+            resolveTypeface = { _, _, _, _ -> Typeface.DEFAULT }
+        )
+
+        assertThat(spannable).hasSpan(ShaderBrushSpan::class, 0, text.length) {
+            it.shaderBrush == brush
+        }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun solidColorBrush_shouldAdd_ForegroundColorSpan_whenApplied() {
+        val text = "abcde abcde"
+        val spanStyle = SpanStyle(brush = SolidColor(Color.Red))
+        val spannable = SpannableStringBuilder().apply { append(text) }
+        spannable.setSpanStyles(
+            contextTextStyle = TextStyle(),
+            spanStyles = listOf(AnnotatedString.Range(spanStyle, 0, text.length)),
+            density = Density(1f, 1f),
+            resolveTypeface = { _, _, _, _ -> Typeface.DEFAULT }
+        )
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun whenColorAndShaderBrushSpansCollide_bothShouldApply() {
+        val text = "abcde abcde"
+        val brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+        val brushStyle = SpanStyle(brush = brush)
+        val colorStyle = SpanStyle(color = Color.Red)
+        val spannable = SpannableStringBuilder().apply { append(text) }
+        spannable.setSpanStyles(
+            contextTextStyle = TextStyle(),
+            spanStyles = listOf(
+                AnnotatedString.Range(brushStyle, 0, text.length),
+                AnnotatedString.Range(colorStyle, 0, text.length)
+            ),
+            density = Density(1f, 1f),
+            resolveTypeface = { _, _, _, _ -> Typeface.DEFAULT }
+        )
+
+        assertThat(spannable).hasSpan(ShaderBrushSpan::class, 0, text.length) {
+            it.shaderBrush == brush
+        }
+        assertThat(spannable).hasSpan(ForegroundColorSpan::class, 0, text.length)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun whenColorAndSolidColorBrushSpansCollide_bothShouldApply() {
+        val text = "abcde abcde"
+        val brush = SolidColor(Color.Blue)
+        val brushStyle = SpanStyle(brush = brush)
+        val colorStyle = SpanStyle(color = Color.Red)
+        val spannable = SpannableStringBuilder().apply { append(text) }
+        spannable.setSpanStyles(
+            contextTextStyle = TextStyle(),
+            spanStyles = listOf(
+                AnnotatedString.Range(brushStyle, 0, text.length),
+                AnnotatedString.Range(colorStyle, 0, text.length)
+            ),
+            density = Density(1f, 1f),
+            resolveTypeface = { _, _, _, _ -> Typeface.DEFAULT }
+        )
+
+        assertThat(spannable).hasSpan(ForegroundColorSpan::class, 0, text.length) {
+            it.foregroundColor == Color.Blue.toArgb()
+        }
+        assertThat(spannable).hasSpan(ForegroundColorSpan::class, 0, text.length) {
+            it.foregroundColor == Color.Red.toArgb()
         }
     }
 }

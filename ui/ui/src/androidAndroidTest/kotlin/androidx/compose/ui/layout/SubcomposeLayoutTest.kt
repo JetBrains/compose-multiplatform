@@ -54,6 +54,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
@@ -1901,6 +1902,101 @@ class SubcomposeLayoutTest {
             exists = /*prefetch*/ listOf(0),
             doesNotExist = /*disposed*/ listOf(1)
         )
+    }
+
+    @Test
+    fun reusingWithNestedSubcomposeLayoutInside() {
+        val slotState = mutableStateOf(0)
+
+        rule.setContent {
+            SubcomposeLayout(
+                remember { SubcomposeLayoutState(SubcomposeSlotReusePolicy(1)) }
+            ) { constraints ->
+                val slot = slotState.value
+                val child = subcompose(slot) {
+                    ReusableContent(slot) {
+                        Box {
+                            SubcomposeLayout(Modifier.testTag("$slot")) { constraints ->
+                                val placeable = subcompose(0) {
+                                    Box(modifier = Modifier.size(10.dp))
+                                }.first().measure(constraints)
+                                layout(placeable.width, placeable.height) {
+                                    placeable.place(0, 0)
+                                }
+                            }
+                        }
+                    }
+                }.first().measure(constraints)
+                layout(child.width, child.height) {
+                    child.place(0, 0)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            slotState.value = 1
+        }
+
+        rule.runOnIdle {
+            slotState.value = 2
+        }
+
+        rule.onNodeWithTag("2").assertIsDisplayed()
+        rule.onNodeWithTag("1").assertIsNotDisplayed()
+        rule.onNodeWithTag("0").assertDoesNotExist()
+    }
+
+    @Test
+    fun disposingPrecomposedItemInTheNestedSubcomposeLayout() {
+        var needSlot by mutableStateOf(true)
+        val state = SubcomposeLayoutState(SubcomposeSlotReusePolicy(1))
+
+        rule.setContent {
+            SubcomposeLayout(
+                remember { SubcomposeLayoutState(SubcomposeSlotReusePolicy(1)) }
+            ) { constraints ->
+                val child = if (needSlot) {
+                    subcompose(0) {
+                        Box {
+                            SubcomposeLayout(state = state, Modifier.testTag("0")) { constraints ->
+                                if (needSlot) {
+                                    val placeable = subcompose(0) {
+                                        Box(modifier = Modifier.size(10.dp))
+                                    }.first().measure(constraints)
+                                    layout(placeable.width, placeable.height) {
+                                        placeable.place(0, 0)
+                                    }
+                                } else {
+                                    layout(100, 100) { }
+                                }
+                            }
+                        }
+                    }.first().measure(constraints)
+                } else {
+                    null
+                }
+                layout(100, 100) {
+                    child?.place(0, 0)
+                }
+            }
+        }
+
+        val handle = rule.runOnIdle {
+            state.precompose(1) {
+                Box(modifier = Modifier.size(10.dp).testTag("1"))
+            }
+        }
+
+        rule.runOnIdle {
+            needSlot = false
+        }
+
+        rule.runOnIdle {
+            handle.dispose()
+        }
+
+        rule.onNodeWithTag("1").assertDoesNotExist()
+        rule.onNodeWithTag("0").assertIsNotDisplayed()
     }
 
     private fun composeItems(

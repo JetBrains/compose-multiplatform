@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.Constraints
  */
 @OptIn(ExperimentalFoundationApi::class)
 internal class LazyMeasuredItemProvider @ExperimentalFoundationApi constructor(
-    private val itemsProvider: LazyGridItemsProvider,
+    private val itemProvider: LazyGridItemProvider,
     private val measureScope: LazyLayoutMeasureScope,
     private val defaultMainAxisSpacing: Int,
     private val measuredItemFactory: MeasuredItemFactory
@@ -40,7 +40,7 @@ internal class LazyMeasuredItemProvider @ExperimentalFoundationApi constructor(
         mainAxisSpacing: Int = defaultMainAxisSpacing,
         constraints: Constraints
     ): LazyMeasuredItem {
-        val key = itemsProvider.getKey(index.value)
+        val key = itemProvider.getKey(index.value)
         val placeables = measureScope.measure(index.value, constraints)
         val crossAxisSize = if (constraints.hasFixedWidth) {
             constraints.minWidth
@@ -61,7 +61,7 @@ internal class LazyMeasuredItemProvider @ExperimentalFoundationApi constructor(
      * Contains the mapping between the key and the index. It could contain not all the items of
      * the list as an optimization.
      **/
-    val keyToIndexMap: Map<Any, Int> get() = itemsProvider.keyToIndexMap
+    val keyToIndexMap: Map<Any, Int> get() = itemProvider.keyToIndexMap
 }
 
 // This interface allows to avoid autoboxing on index param

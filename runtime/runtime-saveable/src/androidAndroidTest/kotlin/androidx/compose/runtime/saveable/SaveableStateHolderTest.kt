@@ -18,6 +18,7 @@ package androidx.compose.runtime.saveable
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -289,6 +290,29 @@ class SaveableStateHolderTest {
 
         rule.runOnIdle {
             assertThat(firstPageState!!.value).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun saveNothingWhenNoRememberSaveableIsUsedInternally() {
+        var showFirstPage by mutableStateOf(true)
+        val registry = SaveableStateRegistry(null) { true }
+
+        rule.setContent {
+            CompositionLocalProvider(LocalSaveableStateRegistry provides registry) {
+                val holder = rememberSaveableStateHolder()
+                holder.SaveableStateProvider(showFirstPage) {
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            showFirstPage = false
+        }
+
+        rule.runOnIdle {
+            val savedData = registry.performSave()
+            assertThat(savedData).isEqualTo(emptyMap<String, List<Any?>>())
         }
     }
 

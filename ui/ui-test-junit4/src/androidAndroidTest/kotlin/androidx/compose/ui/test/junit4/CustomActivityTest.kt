@@ -24,10 +24,11 @@ import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.testutils.expectError
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.runAndroidComposeUiTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -53,6 +54,7 @@ class CustomActivity : ComponentActivity() {
  */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalTestApi::class)
 class CustomActivityTest {
     private companion object {
         const val ContentAlreadySetError = "androidx\\.compose\\.ui\\.test\\.junit4\\." +
@@ -62,18 +64,15 @@ class CustomActivityTest {
             "is done after the ComposeTestRule has run"
     }
 
-    @get:Rule
-    val rule = createAndroidComposeRule<CustomActivity>()
-
     @Test
-    fun launchCustomActivity() {
-        rule.onNodeWithText("Hello").assertExists()
+    fun launchCustomActivity() = runAndroidComposeUiTest<CustomActivity> {
+        onNodeWithText("Hello").assertExists()
     }
 
     @Test
-    fun setContentOnActivityWithContent() {
+    fun setContentOnActivityWithContent() = runAndroidComposeUiTest<CustomActivity> {
         expectError<IllegalStateException>(expectedMessage = ContentAlreadySetError) {
-            rule.setContent { Text("Hello") }
+            setContent { Text("Hello") }
         }
     }
 }

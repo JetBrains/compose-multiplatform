@@ -22,6 +22,7 @@ import androidx.compose.ui.inspection.util.asIntArray
  * A reference to a parameter to a [NodeParameter]
  *
  * @param nodeId is the id of the node the parameter belongs to
+ * @param anchorHash is the anchor hash of the node the parameter belongs to
  * @param kind is this a reference to a normal, merged, or unmerged semantic parameter.
  * @param parameterIndex index into [InspectorNode.parameters], [InspectorNode.mergedSemantics],
  *        or [InspectorNode.unMergedSemantics]
@@ -29,21 +30,23 @@ import androidx.compose.ui.inspection.util.asIntArray
  */
 class NodeParameterReference(
     val nodeId: Long,
+    val anchorHash: Int,
     val kind: ParameterKind,
     val parameterIndex: Int,
     val indices: IntArray
 ) {
     constructor (
         nodeId: Long,
+        anchorHash: Int,
         kind: ParameterKind,
         parameterIndex: Int,
         indices: List<Int>
-    ) : this(nodeId, kind, parameterIndex, indices.asIntArray())
+    ) : this(nodeId, anchorHash, kind, parameterIndex, indices.asIntArray())
 
     // For testing:
     override fun toString(): String {
         val suffix = if (indices.isNotEmpty()) ", ${indices.joinToString()}" else ""
-        return "[$nodeId, $kind, $parameterIndex$suffix]"
+        return "[$nodeId, $anchorHash, $kind, $parameterIndex$suffix]"
     }
 }
 

@@ -17,9 +17,9 @@
 package androidx.compose.material.lint
 
 import androidx.compose.lint.Name
-import androidx.compose.lint.Names
 import androidx.compose.lint.findUnreferencedParameters
 import androidx.compose.lint.isInPackageName
+import androidx.compose.material.lint.MaterialNames.Material
 import com.android.tools.lint.detector.api.Category
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Implementation
@@ -44,7 +44,7 @@ class ScaffoldPaddingDetector : Detector(), SourceCodeScanner {
     override fun getApplicableMethodNames(): List<String> = listOf(Scaffold.shortName)
 
     override fun visitMethodCall(context: JavaContext, node: UCallExpression, method: PsiMethod) {
-        if (method.isInPackageName(Names.Material.PackageName)) {
+        if (method.isInPackageName(Material.PackageName)) {
             val contentArgument = computeKotlinArgumentMapping(node, method)
                 .orEmpty()
                 .filter { (_, parameter) ->
@@ -86,4 +86,4 @@ class ScaffoldPaddingDetector : Detector(), SourceCodeScanner {
     }
 }
 
-private val Scaffold = Name(Names.Material.PackageName, "Scaffold")
+private val Scaffold = Name(Material.PackageName, "Scaffold")

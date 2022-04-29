@@ -456,6 +456,7 @@ package androidx.compose.ui.text {
     method public androidx.compose.ui.text.style.TextDirection? getTextDirection();
     method public androidx.compose.ui.text.style.TextGeometricTransform? getTextGeometricTransform();
     method public androidx.compose.ui.text.style.TextIndent? getTextIndent();
+    method public boolean hasSameLayoutAffectingAttributes(androidx.compose.ui.text.TextStyle other);
     method @androidx.compose.runtime.Stable public androidx.compose.ui.text.TextStyle merge(optional androidx.compose.ui.text.TextStyle? other);
     method @androidx.compose.runtime.Stable public androidx.compose.ui.text.TextStyle merge(androidx.compose.ui.text.SpanStyle other);
     method @androidx.compose.runtime.Stable public androidx.compose.ui.text.TextStyle merge(androidx.compose.ui.text.ParagraphStyle other);
@@ -535,6 +536,9 @@ package androidx.compose.ui.text.android {
 }
 
 package androidx.compose.ui.text.android.style {
+
+  public final class LineHeightStyleSpanKt {
+  }
 
   public final class PlaceholderSpanKt {
   }
@@ -1254,6 +1258,9 @@ package androidx.compose.ui.text.style {
     property public final int ContentOrRtl;
     property public final int Ltr;
     property public final int Rtl;
+  }
+
+  public final class TextDrawStyleKt {
   }
 
   @androidx.compose.runtime.Immutable public final class TextGeometricTransform {

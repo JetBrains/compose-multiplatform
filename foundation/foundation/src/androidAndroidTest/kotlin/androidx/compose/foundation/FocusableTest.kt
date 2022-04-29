@@ -21,6 +21,8 @@ import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.relocation.BringIntoViewResponder
+import androidx.compose.foundation.relocation.bringIntoViewResponder
 import androidx.compose.foundation.lazy.layout.ModifierLocalPinnableParent
 import androidx.compose.foundation.lazy.layout.PinnableParent
 import androidx.compose.foundation.lazy.layout.PinnableParent.PinnedItemsHandle
@@ -33,6 +35,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.modifier.modifierLocalProvider
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -57,6 +62,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class FocusableTest {
@@ -77,7 +83,7 @@ class FocusableTest {
     }
 
     @Test
-    fun focusableTest_defaultSemantics() {
+    fun focusable_defaultSemantics() {
         rule.setContent {
             Box {
                 BasicText(
@@ -93,7 +99,7 @@ class FocusableTest {
     }
 
     @Test
-    fun focusableTest_disabledSemantics() {
+    fun focusable_disabledSemantics() {
         rule.setContent {
             Box {
                 BasicText(
@@ -107,9 +113,8 @@ class FocusableTest {
             .assert(isNotFocusable())
     }
 
-    @ExperimentalComposeUiApi
     @Test
-    fun focusableTest_focusAcquire() {
+    fun focusable_focusAcquire() {
         val (focusRequester, otherFocusRequester) = FocusRequester.createRefs()
         rule.setContent {
             Box {
@@ -147,9 +152,8 @@ class FocusableTest {
             .assertIsNotFocused()
     }
 
-    @ExperimentalComposeUiApi
     @Test
-    fun focusableTest_interactionSource() {
+    fun focusable_interactionSource() {
         val interactionSource = MutableInteractionSource()
         val (focusRequester, otherFocusRequester) = FocusRequester.createRefs()
 
@@ -208,7 +212,7 @@ class FocusableTest {
     }
 
     @Test
-    fun focusableTest_interactionSource_resetWhenDisposed() {
+    fun focusable_interactionSource_resetWhenDisposed() {
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         var emitFocusableText by mutableStateOf(true)
@@ -298,16 +302,48 @@ class FocusableTest {
     }
 
     @Test
-    fun focusableText_testInspectorValue() {
+    fun focusable_inspectorValue() {
+        val modifier = Modifier.focusable() as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("focusable")
+        assertThat(modifier.valueOverride).isNull()
+        assertThat(modifier.inspectableElements.map { it.name }.asIterable())
+            .containsExactly(
+                "enabled",
+                "interactionSource"
+            )
+    }
+
+    @Test
+    fun focusable_requestsBringIntoView_whenFocused() {
+        val requestedRects = mutableListOf<Rect>()
+        val bringIntoViewResponder = object : BringIntoViewResponder {
+            override fun calculateRectForParent(localRect: Rect): Rect = localRect
+            override suspend fun bringChildIntoView(localRect: Rect) {
+                requestedRects += localRect
+            }
+        }
+        val focusRequester = FocusRequester()
+
         rule.setContent {
-            val modifier = Modifier.focusable() as InspectableValue
-            assertThat(modifier.nameFallback).isEqualTo("focusable")
-            assertThat(modifier.valueOverride).isNull()
-            assertThat(modifier.inspectableElements.map { it.name }.asIterable())
-                .containsExactly(
-                    "enabled",
-                    "interactionSource"
+            with(rule.density) {
+                Box(
+                    Modifier
+                        .bringIntoViewResponder(bringIntoViewResponder)
+                        .focusRequester(focusRequester)
+                        .focusable()
+                        // Needs a non-zero size.
+                        .size(1f.toDp())
                 )
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(requestedRects).isEmpty()
+            focusRequester.requestFocus()
+        }
+
+        rule.runOnIdle {
+            assertThat(requestedRects).containsExactly(Rect(Offset.Zero, Size(1f, 1f)))
         }
     }
 
@@ -316,7 +352,7 @@ class FocusableTest {
     private fun Modifier.pinnableParent(onPin: () -> PinnedItemsHandle): Modifier {
         return modifierLocalProvider(ModifierLocalPinnableParent) {
             object : PinnableParent {
-                override fun pinBeyondBoundsItems(): PinnedItemsHandle {
+                override fun pinItems(): PinnedItemsHandle {
                     return onPin()
                 }
             }

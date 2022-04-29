@@ -32,7 +32,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -59,7 +58,6 @@ val DarkDefaultContextMenuRepresentation = DefaultContextMenuRepresentation(
     itemHoverColor = Color.White.copy(alpha = 0.04f)
 )
 
-@OptIn(ExperimentalComposeUiApi::class)
 class DefaultContextMenuRepresentation(
     private val backgroundColor: Color,
     private val textColor: Color,

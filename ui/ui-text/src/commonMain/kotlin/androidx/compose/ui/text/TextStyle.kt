@@ -18,6 +18,7 @@ package androidx.compose.ui.text
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.FontFamily
@@ -26,9 +27,11 @@ import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.text.style.TextDrawStyle
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.LayoutDirection
@@ -52,7 +55,7 @@ internal constructor(
     internal val spanStyle: SpanStyle,
     internal val paragraphStyle: ParagraphStyle,
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
-    @get:ExperimentalTextApi val platformStyle: PlatformTextStyle? = null
+    @get:ExperimentalTextApi val platformStyle: PlatformTextStyle? = null,
 ) {
     @OptIn(ExperimentalTextApi::class)
     internal constructor(
@@ -65,86 +68,6 @@ internal constructor(
             spanStyle.platformStyle,
             paragraphStyle.platformStyle
         )
-    )
-
-    /**
-     * Styling configuration for a `Text`.
-     *
-     * @sample androidx.compose.ui.text.samples.TextStyleSample
-     *
-     * @param color The text color.
-     * @param fontSize The size of glyphs to use when painting the text. This
-     * may be [TextUnit.Unspecified] for inheriting from another [TextStyle].
-     * @param fontWeight The typeface thickness to use when painting the text (e.g., bold).
-     * @param fontStyle The typeface variant to use when drawing the letters (e.g., italic).
-     * @param fontSynthesis Whether to synthesize font weight and/or style when the requested weight
-     * or style cannot be found in the provided font family.
-     * @param fontFamily The font family to be used when rendering the text.
-     * @param fontFeatureSettings The advanced typography settings provided by font. The format is
-     * the same as the CSS font-feature-settings attribute:
-     * https://www.w3.org/TR/css-fonts-3/#font-feature-settings-prop
-     * @param letterSpacing The amount of space to add between each letter.
-     * @param baselineShift The amount by which the text is shifted up from the current baseline.
-     * @param textGeometricTransform The geometric transformation applied the text.
-     * @param localeList The locale list used to select region-specific glyphs.
-     * @param background The background color for the text.
-     * @param textDecoration The decorations to paint on the text (e.g., an underline).
-     * @param shadow The shadow effect applied on the text.
-     * @param textAlign The alignment of the text within the lines of the paragraph.
-     * @param textDirection The algorithm to be used to resolve the final text and paragraph
-     * direction: Left To Right or Right To Left. If no value is provided the system will use the
-     * [LayoutDirection] as the primary signal.
-     * @param lineHeight Line height for the [Paragraph] in [TextUnit] unit, e.g. SP or EM.
-     * @param textIndent The indentation of the paragraph.
-     * @param platformStyle Platform specific [TextStyle] parameters.
-     */
-    @ExperimentalTextApi
-    constructor(
-        color: Color = Color.Unspecified,
-        fontSize: TextUnit = TextUnit.Unspecified,
-        fontWeight: FontWeight? = null,
-        fontStyle: FontStyle? = null,
-        fontSynthesis: FontSynthesis? = null,
-        fontFamily: FontFamily? = null,
-        fontFeatureSettings: String? = null,
-        letterSpacing: TextUnit = TextUnit.Unspecified,
-        baselineShift: BaselineShift? = null,
-        textGeometricTransform: TextGeometricTransform? = null,
-        localeList: LocaleList? = null,
-        background: Color = Color.Unspecified,
-        textDecoration: TextDecoration? = null,
-        shadow: Shadow? = null,
-        textAlign: TextAlign? = null,
-        textDirection: TextDirection? = null,
-        lineHeight: TextUnit = TextUnit.Unspecified,
-        textIndent: TextIndent? = null,
-        platformStyle: PlatformTextStyle? = null
-    ) : this(
-        SpanStyle(
-            color = color,
-            fontSize = fontSize,
-            fontWeight = fontWeight,
-            fontStyle = fontStyle,
-            fontSynthesis = fontSynthesis,
-            fontFamily = fontFamily,
-            fontFeatureSettings = fontFeatureSettings,
-            letterSpacing = letterSpacing,
-            baselineShift = baselineShift,
-            textGeometricTransform = textGeometricTransform,
-            localeList = localeList,
-            background = background,
-            textDecoration = textDecoration,
-            shadow = shadow,
-            platformStyle = platformStyle?.spanStyle
-        ),
-        ParagraphStyle(
-            textAlign = textAlign,
-            textDirection = textDirection,
-            lineHeight = lineHeight,
-            textIndent = textIndent,
-            platformStyle = platformStyle?.paragraphStyle
-        ),
-        platformStyle = platformStyle
     )
 
     /**
@@ -198,25 +121,205 @@ internal constructor(
         lineHeight: TextUnit = TextUnit.Unspecified,
         textIndent: TextIndent? = null
     ) : this(
-        color = color,
-        fontSize = fontSize,
-        fontWeight = fontWeight,
-        fontStyle = fontStyle,
-        fontSynthesis = fontSynthesis,
-        fontFamily = fontFamily,
-        fontFeatureSettings = fontFeatureSettings,
-        letterSpacing = letterSpacing,
-        baselineShift = baselineShift,
-        textGeometricTransform = textGeometricTransform,
-        localeList = localeList,
-        background = background,
-        textDecoration = textDecoration,
-        shadow = shadow,
-        textAlign = textAlign,
-        textDirection = textDirection,
-        lineHeight = lineHeight,
-        textIndent = textIndent,
+        SpanStyle(
+            color = color,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            fontStyle = fontStyle,
+            fontSynthesis = fontSynthesis,
+            fontFamily = fontFamily,
+            fontFeatureSettings = fontFeatureSettings,
+            letterSpacing = letterSpacing,
+            baselineShift = baselineShift,
+            textGeometricTransform = textGeometricTransform,
+            localeList = localeList,
+            background = background,
+            textDecoration = textDecoration,
+            shadow = shadow,
+            platformStyle = null
+        ),
+        ParagraphStyle(
+            textAlign = textAlign,
+            textDirection = textDirection,
+            lineHeight = lineHeight,
+            textIndent = textIndent,
+            platformStyle = null,
+            lineHeightStyle = null
+        ),
         platformStyle = null
+    )
+
+    /**
+     * Styling configuration for a `Text`.
+     *
+     * @sample androidx.compose.ui.text.samples.TextStyleSample
+     *
+     * @param color The text color.
+     * @param fontSize The size of glyphs to use when painting the text. This
+     * may be [TextUnit.Unspecified] for inheriting from another [TextStyle].
+     * @param fontWeight The typeface thickness to use when painting the text (e.g., bold).
+     * @param fontStyle The typeface variant to use when drawing the letters (e.g., italic).
+     * @param fontSynthesis Whether to synthesize font weight and/or style when the requested weight
+     * or style cannot be found in the provided font family.
+     * @param fontFamily The font family to be used when rendering the text.
+     * @param fontFeatureSettings The advanced typography settings provided by font. The format is
+     * the same as the CSS font-feature-settings attribute:
+     * https://www.w3.org/TR/css-fonts-3/#font-feature-settings-prop
+     * @param letterSpacing The amount of space to add between each letter.
+     * @param baselineShift The amount by which the text is shifted up from the current baseline.
+     * @param textGeometricTransform The geometric transformation applied the text.
+     * @param localeList The locale list used to select region-specific glyphs.
+     * @param background The background color for the text.
+     * @param textDecoration The decorations to paint on the text (e.g., an underline).
+     * @param shadow The shadow effect applied on the text.
+     * @param textAlign The alignment of the text within the lines of the paragraph.
+     * @param textDirection The algorithm to be used to resolve the final text and paragraph
+     * direction: Left To Right or Right To Left. If no value is provided the system will use the
+     * [LayoutDirection] as the primary signal.
+     * @param lineHeight Line height for the [Paragraph] in [TextUnit] unit, e.g. SP or EM.
+     * @param textIndent The indentation of the paragraph.
+     * @param platformStyle Platform specific [TextStyle] parameters.
+     * @param lineHeightStyle the configuration for line height such as vertical alignment of the
+     * line, whether to apply additional space as a result of line height to top of first line top
+     * and bottom of last line. The configuration is applied only when a [lineHeight] is defined.
+     * When null, [LineHeightStyle.Default] is used.
+     */
+    @ExperimentalTextApi
+    constructor(
+        color: Color = Color.Unspecified,
+        fontSize: TextUnit = TextUnit.Unspecified,
+        fontWeight: FontWeight? = null,
+        fontStyle: FontStyle? = null,
+        fontSynthesis: FontSynthesis? = null,
+        fontFamily: FontFamily? = null,
+        fontFeatureSettings: String? = null,
+        letterSpacing: TextUnit = TextUnit.Unspecified,
+        baselineShift: BaselineShift? = null,
+        textGeometricTransform: TextGeometricTransform? = null,
+        localeList: LocaleList? = null,
+        background: Color = Color.Unspecified,
+        textDecoration: TextDecoration? = null,
+        shadow: Shadow? = null,
+        textAlign: TextAlign? = null,
+        textDirection: TextDirection? = null,
+        lineHeight: TextUnit = TextUnit.Unspecified,
+        textIndent: TextIndent? = null,
+        platformStyle: PlatformTextStyle? = null,
+        lineHeightStyle: LineHeightStyle? = null
+    ) : this(
+        SpanStyle(
+            color = color,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            fontStyle = fontStyle,
+            fontSynthesis = fontSynthesis,
+            fontFamily = fontFamily,
+            fontFeatureSettings = fontFeatureSettings,
+            letterSpacing = letterSpacing,
+            baselineShift = baselineShift,
+            textGeometricTransform = textGeometricTransform,
+            localeList = localeList,
+            background = background,
+            textDecoration = textDecoration,
+            shadow = shadow,
+            platformStyle = platformStyle?.spanStyle
+        ),
+        ParagraphStyle(
+            textAlign = textAlign,
+            textDirection = textDirection,
+            lineHeight = lineHeight,
+            textIndent = textIndent,
+            platformStyle = platformStyle?.paragraphStyle,
+            lineHeightStyle = lineHeightStyle
+        ),
+        platformStyle = platformStyle
+    )
+
+    /**
+     * Styling configuration for a `Text`.
+     *
+     * @sample androidx.compose.ui.text.samples.TextStyleSample
+     *
+     * @param brush The brush to use when painting the text. If brush is given as null, it will be
+     * treated as unspecified. It is equivalent to calling the alternative color constructor with
+     * [Color.Unspecified]
+     * @param fontSize The size of glyphs to use when painting the text. This
+     * may be [TextUnit.Unspecified] for inheriting from another [TextStyle].
+     * @param fontWeight The typeface thickness to use when painting the text (e.g., bold).
+     * @param fontStyle The typeface variant to use when drawing the letters (e.g., italic).
+     * @param fontSynthesis Whether to synthesize font weight and/or style when the requested weight
+     * or style cannot be found in the provided font family.
+     * @param fontFamily The font family to be used when rendering the text.
+     * @param fontFeatureSettings The advanced typography settings provided by font. The format is
+     * the same as the CSS font-feature-settings attribute:
+     * https://www.w3.org/TR/css-fonts-3/#font-feature-settings-prop
+     * @param letterSpacing The amount of space to add between each letter.
+     * @param baselineShift The amount by which the text is shifted up from the current baseline.
+     * @param textGeometricTransform The geometric transformation applied the text.
+     * @param localeList The locale list used to select region-specific glyphs.
+     * @param background The background color for the text.
+     * @param textDecoration The decorations to paint on the text (e.g., an underline).
+     * @param shadow The shadow effect applied on the text.
+     * @param textAlign The alignment of the text within the lines of the paragraph.
+     * @param textDirection The algorithm to be used to resolve the final text and paragraph
+     * direction: Left To Right or Right To Left. If no value is provided the system will use the
+     * [LayoutDirection] as the primary signal.
+     * @param lineHeight Line height for the [Paragraph] in [TextUnit] unit, e.g. SP or EM.
+     * @param textIndent The indentation of the paragraph.
+     * @param platformStyle Platform specific [TextStyle] parameters.
+     * @param lineHeightStyle the configuration for line height such as vertical alignment of the
+     * line, whether to apply additional space as a result of line height to top of first line top
+     * and bottom of last line. The configuration is applied only when a [lineHeight] is defined.
+     */
+    @ExperimentalTextApi
+    constructor(
+        brush: Brush?,
+        fontSize: TextUnit = TextUnit.Unspecified,
+        fontWeight: FontWeight? = null,
+        fontStyle: FontStyle? = null,
+        fontSynthesis: FontSynthesis? = null,
+        fontFamily: FontFamily? = null,
+        fontFeatureSettings: String? = null,
+        letterSpacing: TextUnit = TextUnit.Unspecified,
+        baselineShift: BaselineShift? = null,
+        textGeometricTransform: TextGeometricTransform? = null,
+        localeList: LocaleList? = null,
+        background: Color = Color.Unspecified,
+        textDecoration: TextDecoration? = null,
+        shadow: Shadow? = null,
+        textAlign: TextAlign? = null,
+        textDirection: TextDirection? = null,
+        lineHeight: TextUnit = TextUnit.Unspecified,
+        textIndent: TextIndent? = null,
+        platformStyle: PlatformTextStyle? = null,
+        lineHeightStyle: LineHeightStyle? = null
+    ) : this(
+        SpanStyle(
+            brush = brush,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            fontStyle = fontStyle,
+            fontSynthesis = fontSynthesis,
+            fontFamily = fontFamily,
+            fontFeatureSettings = fontFeatureSettings,
+            letterSpacing = letterSpacing,
+            baselineShift = baselineShift,
+            textGeometricTransform = textGeometricTransform,
+            localeList = localeList,
+            background = background,
+            textDecoration = textDecoration,
+            shadow = shadow,
+            platformStyle = platformStyle?.spanStyle
+        ),
+        ParagraphStyle(
+            textAlign = textAlign,
+            textDirection = textDirection,
+            lineHeight = lineHeight,
+            textIndent = textIndent,
+            platformStyle = platformStyle?.paragraphStyle,
+            lineHeightStyle = lineHeightStyle
+        ),
+        platformStyle = platformStyle
     )
 
     @Stable
@@ -309,24 +412,35 @@ internal constructor(
         textIndent: TextIndent? = this.paragraphStyle.textIndent
     ): TextStyle {
         return TextStyle(
-            color = color,
-            fontSize = fontSize,
-            fontWeight = fontWeight,
-            fontStyle = fontStyle,
-            fontSynthesis = fontSynthesis,
-            fontFamily = fontFamily,
-            fontFeatureSettings = fontFeatureSettings,
-            letterSpacing = letterSpacing,
-            baselineShift = baselineShift,
-            textGeometricTransform = textGeometricTransform,
-            localeList = localeList,
-            background = background,
-            textDecoration = textDecoration,
-            shadow = shadow,
-            textAlign = textAlign,
-            textDirection = textDirection,
-            lineHeight = lineHeight,
-            textIndent = textIndent,
+            spanStyle = SpanStyle(
+                textDrawStyle = if (color == this.spanStyle.color) {
+                    spanStyle.textDrawStyle
+                } else {
+                    TextDrawStyle.from(color)
+                },
+                fontSize = fontSize,
+                fontWeight = fontWeight,
+                fontStyle = fontStyle,
+                fontSynthesis = fontSynthesis,
+                fontFamily = fontFamily,
+                fontFeatureSettings = fontFeatureSettings,
+                letterSpacing = letterSpacing,
+                baselineShift = baselineShift,
+                textGeometricTransform = textGeometricTransform,
+                localeList = localeList,
+                background = background,
+                textDecoration = textDecoration,
+                shadow = shadow,
+                platformStyle = this.spanStyle.platformStyle
+            ),
+            paragraphStyle = ParagraphStyle(
+                textAlign = textAlign,
+                textDirection = textDirection,
+                lineHeight = lineHeight,
+                textIndent = textIndent,
+                platformStyle = this.paragraphStyle.platformStyle,
+                lineHeightStyle = this.lineHeightStyle
+            ),
             platformStyle = this.platformStyle
         )
     }
@@ -351,30 +465,102 @@ internal constructor(
         textDirection: TextDirection? = this.paragraphStyle.textDirection,
         lineHeight: TextUnit = this.paragraphStyle.lineHeight,
         textIndent: TextIndent? = this.paragraphStyle.textIndent,
-        platformStyle: PlatformTextStyle? = this.platformStyle
+        platformStyle: PlatformTextStyle? = this.platformStyle,
+        lineHeightStyle: LineHeightStyle? = this.paragraphStyle.lineHeightStyle
     ): TextStyle {
         return TextStyle(
-            color = color,
-            fontSize = fontSize,
-            fontWeight = fontWeight,
-            fontStyle = fontStyle,
-            fontSynthesis = fontSynthesis,
-            fontFamily = fontFamily,
-            fontFeatureSettings = fontFeatureSettings,
-            letterSpacing = letterSpacing,
-            baselineShift = baselineShift,
-            textGeometricTransform = textGeometricTransform,
-            localeList = localeList,
-            background = background,
-            textDecoration = textDecoration,
-            shadow = shadow,
-            textAlign = textAlign,
-            textDirection = textDirection,
-            lineHeight = lineHeight,
-            textIndent = textIndent,
+            spanStyle = SpanStyle(
+                textDrawStyle = if (color == this.spanStyle.color) {
+                    spanStyle.textDrawStyle
+                } else {
+                    TextDrawStyle.from(color)
+                },
+                fontSize = fontSize,
+                fontWeight = fontWeight,
+                fontStyle = fontStyle,
+                fontSynthesis = fontSynthesis,
+                fontFamily = fontFamily,
+                fontFeatureSettings = fontFeatureSettings,
+                letterSpacing = letterSpacing,
+                baselineShift = baselineShift,
+                textGeometricTransform = textGeometricTransform,
+                localeList = localeList,
+                background = background,
+                textDecoration = textDecoration,
+                shadow = shadow,
+                platformStyle = platformStyle?.spanStyle
+            ),
+            paragraphStyle = ParagraphStyle(
+                textAlign = textAlign,
+                textDirection = textDirection,
+                lineHeight = lineHeight,
+                textIndent = textIndent,
+                platformStyle = platformStyle?.paragraphStyle,
+                lineHeightStyle = lineHeightStyle
+            ),
             platformStyle = platformStyle
         )
     }
+
+    @ExperimentalTextApi
+    fun copy(
+        brush: Brush?,
+        fontSize: TextUnit = this.spanStyle.fontSize,
+        fontWeight: FontWeight? = this.spanStyle.fontWeight,
+        fontStyle: FontStyle? = this.spanStyle.fontStyle,
+        fontSynthesis: FontSynthesis? = this.spanStyle.fontSynthesis,
+        fontFamily: FontFamily? = this.spanStyle.fontFamily,
+        fontFeatureSettings: String? = this.spanStyle.fontFeatureSettings,
+        letterSpacing: TextUnit = this.spanStyle.letterSpacing,
+        baselineShift: BaselineShift? = this.spanStyle.baselineShift,
+        textGeometricTransform: TextGeometricTransform? = this.spanStyle.textGeometricTransform,
+        localeList: LocaleList? = this.spanStyle.localeList,
+        background: Color = this.spanStyle.background,
+        textDecoration: TextDecoration? = this.spanStyle.textDecoration,
+        shadow: Shadow? = this.spanStyle.shadow,
+        textAlign: TextAlign? = this.paragraphStyle.textAlign,
+        textDirection: TextDirection? = this.paragraphStyle.textDirection,
+        lineHeight: TextUnit = this.paragraphStyle.lineHeight,
+        textIndent: TextIndent? = this.paragraphStyle.textIndent,
+        platformStyle: PlatformTextStyle? = this.platformStyle,
+        lineHeightStyle: LineHeightStyle? = this.paragraphStyle.lineHeightStyle
+    ): TextStyle {
+        return TextStyle(
+            spanStyle = SpanStyle(
+                brush = brush,
+                fontSize = fontSize,
+                fontWeight = fontWeight,
+                fontStyle = fontStyle,
+                fontSynthesis = fontSynthesis,
+                fontFamily = fontFamily,
+                fontFeatureSettings = fontFeatureSettings,
+                letterSpacing = letterSpacing,
+                baselineShift = baselineShift,
+                textGeometricTransform = textGeometricTransform,
+                localeList = localeList,
+                background = background,
+                textDecoration = textDecoration,
+                shadow = shadow,
+                platformStyle = platformStyle?.spanStyle
+            ),
+            paragraphStyle = ParagraphStyle(
+                textAlign = textAlign,
+                textDirection = textDirection,
+                lineHeight = lineHeight,
+                textIndent = textIndent,
+                platformStyle = platformStyle?.paragraphStyle,
+                lineHeightStyle = lineHeightStyle
+            ),
+            platformStyle = platformStyle
+        )
+    }
+
+    /**
+     * The brush to use when drawing text. If not null, overrides [color].
+     */
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalTextApi
+    val brush: Brush? get() = this.spanStyle.brush
 
     /**
      * The text color.
@@ -473,6 +659,19 @@ internal constructor(
      */
     val textIndent: TextIndent? get() = this.paragraphStyle.textIndent
 
+    /**
+     * The configuration for line height such as vertical alignment of the line, whether to apply
+     * additional space as a result of line height to top of first line top and bottom of last line.
+     *
+     * The configuration is applied only when a [lineHeight] is defined.
+     *
+     * When null, [LineHeightStyle.Default] is used.
+     */
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @ExperimentalTextApi
+    @get:ExperimentalTextApi
+    val lineHeightStyle: LineHeightStyle? get() = this.paragraphStyle.lineHeightStyle
+
     @OptIn(ExperimentalTextApi::class)
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -483,6 +682,25 @@ internal constructor(
         if (platformStyle != other.platformStyle) return false
 
         return true
+    }
+
+    /**
+     * Returns true if text layout affecting attributes between this TextStyle and other are the
+     * same.
+     *
+     * The attributes that do not require a layout change are color, textDecoration and shadow.
+     *
+     * Majority of attributes change text layout, and examples are line height, font properties,
+     * font size, locale etc.
+     *
+     * This function can be used to identify if a new text layout is required for a given TextStyle.
+     *
+     * @param other The TextStyle to compare to.
+     */
+    @OptIn(ExperimentalTextApi::class)
+    fun hasSameLayoutAffectingAttributes(other: TextStyle): Boolean {
+        return (this === other) || (paragraphStyle == other.paragraphStyle &&
+            spanStyle.hasSameLayoutAffectingAttributes(other.spanStyle))
     }
 
     @OptIn(ExperimentalTextApi::class)
@@ -497,6 +715,7 @@ internal constructor(
     override fun toString(): String {
         return "TextStyle(" +
             "color=$color, " +
+            "brush=$brush, " +
             "fontSize=$fontSize, " +
             "fontWeight=$fontWeight, " +
             "fontStyle=$fontStyle, " +
@@ -514,6 +733,7 @@ internal constructor(
             "lineHeight=$lineHeight, " +
             "textIndent=$textIndent, " +
             "platformStyle=$platformStyle" +
+            "lineHeightStyle=$lineHeightStyle" +
             ")"
     }
 

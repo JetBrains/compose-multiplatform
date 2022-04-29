@@ -62,12 +62,12 @@ import kotlin.math.max
  *
  * @sample androidx.compose.material3.samples.LinearProgressIndicatorSample
  *
- * @param progress The progress of this progress indicator, where 0.0 represents no progress and 1.0
+ * @param progress the progress of this progress indicator, where 0.0 represents no progress and 1.0
  * represents full progress. Values outside of this range are coerced into the range.
- * @param modifier The modifier of the progress indicator.
- * @param color The color of the progress indicator.
- * @param trackColor The color of the track behind the indicator, visible when the progress has not
- * reached the area of the overall indicator yet.
+ * @param modifier the [Modifier] to be applied to this progress indicator
+ * @param color color of this progress indicator
+ * @param trackColor color of the track behind the indicator, visible when the progress has not
+ * reached the area of the overall indicator yet
  */
 @Composable
 fun LinearProgressIndicator(
@@ -95,10 +95,10 @@ fun LinearProgressIndicator(
  *
  * ![Linear progress indicator image](https://developer.android.com/images/reference/androidx/compose/material3/linear-progress-indicator.png)
  *
- * @param modifier The modifier of the progress indicator.
- * @param color The color of the progress indicator.
- * @param trackColor The color of the track behind the indicator, visible when the progress has not
- * reached the area of the overall indicator yet.
+ * @param modifier the [Modifier] to be applied to this progress indicator
+ * @param color color of this progress indicator
+ * @param trackColor color of the track behind the indicator, visible when the progress has not
+ * reached the area of the overall indicator yet
  */
 @Composable
 fun LinearProgressIndicator(
@@ -218,11 +218,11 @@ private fun DrawScope.drawLinearIndicatorTrack(
  *
  * @sample androidx.compose.material3.samples.CircularProgressIndicatorSample
  *
- * @param progress The progress of this progress indicator, where 0.0 represents no progress and 1.0
+ * @param progress the progress of this progress indicator, where 0.0 represents no progress and 1.0
  * represents full progress. Values outside of this range are coerced into the range.
- * @param modifier The modifier of the progress indicator.
- * @param color The color of the progress indicator.
- * @param strokeWidth The stroke width for the progress indicator.
+ * @param modifier the [Modifier] to be applied to this progress indicator
+ * @param color color of this progress indicator
+ * @param strokeWidth stroke width of this progress indicator
  */
 @Composable
 fun CircularProgressIndicator(
@@ -254,9 +254,9 @@ fun CircularProgressIndicator(
  *
  * ![Circular progress indicator image](https://developer.android.com/images/reference/androidx/compose/material3/circular-progress-indicator.png)
  *
- * @param modifier The modifier of the progress indicator.
- * @param color The color of the progress indicator.
- * @param strokeWidth The stroke width for the progress indicator.
+ * @param modifier the [Modifier] to be applied to this progress indicator
+ * @param color color of this progress indicator
+ * @param strokeWidth stroke width of this progress indicator
  */
 @Composable
 fun CircularProgressIndicator(

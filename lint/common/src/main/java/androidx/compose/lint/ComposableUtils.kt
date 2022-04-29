@@ -45,21 +45,44 @@ import org.jetbrains.uast.toUElement
 import org.jetbrains.uast.withContainingElements
 
 /**
- * Returns whether this [UCallExpression] is invoked within the body of a Composable function or
- * lambda, and is not `remember`ed.
- *
- * This searches parent declarations until we find a lambda expression or a function, and looks
- * to see if these are Composable. If they are Composable, this function returns whether or not
- * this call expression is inside the block of a `remember` call.
+ * Returns whether this [UCallExpression] is directly invoked within the body of a Composable
+ * function or lambda without being `remember`ed.
  */
-fun UCallExpression.invokedInComposableBodyAndNotRemembered(): Boolean {
+fun UCallExpression.isNotRemembered(): Boolean = isNotRememberedWithKeys()
+
+/**
+ * Returns whether this [UCallExpression] is directly invoked within the body of a Composable
+ * function or lambda without being `remember`ed, or whether it is invoked inside a `remember call
+ * without the provided [keys][keyClassNames].
+ * - Returns true if this [UCallExpression] is directly invoked inside a Composable function or
+ * lambda without being `remember`ed
+ * - Returns true if this [UCallExpression] is invoked inside a call to `remember`, but without all
+ * of the provided [keys][keyClassNames] being used as key parameters to `remember`
+ * - Returns false if this [UCallExpression] is correctly `remember`ed with the provided
+ * [keys][keyClassNames], or is not called inside a `remember` block, and is not called inside a
+ * Composable function or lambda
+ *
+ * @param keyClassNames [Name]s representing the expected classes that should be used as a key
+ * parameter to the `remember` call
+ */
+fun UCallExpression.isNotRememberedWithKeys(vararg keyClassNames: Name): Boolean {
     val visitor = ComposableBodyVisitor(this)
-    if (!visitor.isComposable()) return false
-    return visitor.parentUElements().none {
-        (it as? UCallExpression)?.let { element ->
-            element.methodName == Names.Runtime.Remember.shortName &&
-                element.resolve()?.isInPackageName(Names.Runtime.PackageName) == true
-        } == true
+    // The nearest method or lambda expression that contains this call expression
+    val boundaryElement = visitor.parentUElements().last()
+    // Check if the nearest lambda expression is actually a call to remember
+    val rememberCall: UCallExpression? = (boundaryElement.uastParent as? UCallExpression)?.takeIf {
+        it.methodName == Names.Runtime.Remember.shortName &&
+            it.resolve()?.isInPackageName(Names.Runtime.PackageName) == true
+    }
+    return if (rememberCall == null) {
+        visitor.isComposable()
+    } else {
+        val parameterTypes = rememberCall.valueArguments.mapNotNull {
+            it.getExpressionType()?.canonicalText
+        }
+        !keyClassNames.all {
+            parameterTypes.contains(it.javaFqn)
+        }
     }
 }
 

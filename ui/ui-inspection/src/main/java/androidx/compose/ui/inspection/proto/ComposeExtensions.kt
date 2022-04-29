@@ -95,6 +95,8 @@ private fun InspectorNode.toComposableNodeImpl(
         children.forEach { child ->
             addChildren(child.toComposableNodeImpl(stringTable, windowPos, recompositionHandler))
         }
+
+        anchorHash = inspectorNode.anchorHash
     }
 }
 
@@ -241,6 +243,7 @@ fun NodeParameterReference.convert(): ParameterReference {
     return ParameterReference.newBuilder().apply {
         kind = reference.kind.convert()
         composableId = reference.nodeId
+        anchorHash = reference.anchorHash
         parameterIndex = reference.parameterIndex
         addAllCompositeIndex(reference.indices.asIterable())
     }.build()

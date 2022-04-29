@@ -23,25 +23,24 @@ import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import androidx.compose.material.Text
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.runComposeUiTestWithoutActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalTestApi::class)
 class ComposeInFragmentTest {
-    @get:Rule
-    val rule = createEmptyComposeRule()
-
     @Test
-    fun test() {
+    fun test() = runComposeUiTestWithoutActivity {
         launchFragmentInContainer<CustomFragment>()
-        rule.onNodeWithText("Hello Compose").assertExists()
+        onNodeWithText("Hello Compose").assertExists()
     }
 
     class CustomFragment : Fragment() {

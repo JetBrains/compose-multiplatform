@@ -400,6 +400,7 @@ internal class SkiaParagraph(
         }
     }
 
+    // TODO(b/229518449): Implement an alternative to paint function that takes a brush.
     override fun paint(
         canvas: Canvas,
         color: Color,

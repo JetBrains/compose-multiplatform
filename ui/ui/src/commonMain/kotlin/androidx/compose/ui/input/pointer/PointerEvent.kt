@@ -556,12 +556,12 @@ class PointerInputChange(
     }
 
     /**
-     * Make a deep copy of the [PointerInputChange]
+     * Make a shallow copy of the [PointerInputChange]
      *
      * **NOTE:** Due to the need of the inner contract of the [PointerInputChange], this method
-     * performs deep copy of the [PointerInputChange]. Any [consume] call between any of the copies
-     * will consume any other copy automatically. Therefore, copy with the new [isConsumed] is
-     * not possible. Consider creating a new [PointerInputChange]
+     * performs a shallow copy of the [PointerInputChange]. Any [consume] call between any of the
+     * copies will consume any other copy automatically. Therefore, copy with the new [isConsumed]
+     * is not possible. Consider creating a new [PointerInputChange]
      */
     @Suppress("DEPRECATION")
     fun copy(
@@ -593,7 +593,8 @@ class PointerInputChange(
     @Suppress("DEPRECATION")
     @Deprecated(
         "Partial consumption has been deprecated. Use copy() instead without `consumed` " +
-            "parameter to create a deep copy or a constructor to create a new PointerInputChange",
+            "parameter to create a shallow copy or a constructor to create a new " +
+            "PointerInputChange",
         replaceWith = ReplaceWith(
             "copy(id, currentTime, currentPosition, currentPressed, previousTime, " +
                 "previousPosition, previousPressed, type, scrollDelta)"
@@ -627,12 +628,12 @@ class PointerInputChange(
     }
 
     /**
-     * Make a deep copy of the [PointerInputChange]
+     * Make a shallow copy of the [PointerInputChange]
      *
      * **NOTE:** Due to the need of the inner contract of the [PointerInputChange], this method
-     * performs deep copy of the [PointerInputChange]. Any [consume] call between any of the copies
-     * will consume any other copy automatically. Therefore, copy with the new [isConsumed] is
-     * not possible. Consider creating a new [PointerInputChange].
+     * performs a shallow copy of the [PointerInputChange]. Any [consume] call between any of the
+     * copies will consume any other copy automatically. Therefore, copy with the new [isConsumed]
+     * is not possible. Consider creating a new [PointerInputChange].
      */
     @ExperimentalComposeUiApi
     @Suppress("DEPRECATION")

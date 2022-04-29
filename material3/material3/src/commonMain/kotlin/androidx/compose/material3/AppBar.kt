@@ -91,11 +91,11 @@ import kotlin.math.roundToInt
  *
  * @param title the title to be displayed in the top app bar
  * @param modifier the [Modifier] to be applied to this top app bar
- * @param navigationIcon The navigation icon displayed at the start of the top app bar. This should
+ * @param navigationIcon the navigation icon displayed at the start of the top app bar. This should
  * typically be an [IconButton] or [IconToggleButton].
  * @param actions the actions displayed at the end of the top app bar. This should typically be
  * [IconButton]s. The default layout here is a [Row], so icons inside will be placed horizontally.
- * @param colors a [TopAppBarColors] that will be used to resolve the colors used for this top app
+ * @param colors [TopAppBarColors] that will be used to resolve the colors used for this top app
  * bar in different states. See [TopAppBarDefaults.smallTopAppBarColors].
  * @param scrollBehavior a [TopAppBarScrollBehavior] which holds various offset values that will be
  * applied by this top app bar to set up its height and colors. A scroll behavior is designed to
@@ -140,11 +140,11 @@ fun SmallTopAppBar(
  *
  * @param title the title to be displayed in the top app bar
  * @param modifier the [Modifier] to be applied to this top app bar
- * @param navigationIcon The navigation icon displayed at the start of the top app bar. This should
+ * @param navigationIcon the navigation icon displayed at the start of the top app bar. This should
  * typically be an [IconButton] or [IconToggleButton].
  * @param actions the actions displayed at the end of the top app bar. This should typically be
  * [IconButton]s. The default layout here is a [Row], so icons inside will be placed horizontally.
- * @param colors a [TopAppBarColors] that will be used to resolve the colors used for this top app
+ * @param colors [TopAppBarColors] that will be used to resolve the colors used for this top app
  * bar in different states. See [TopAppBarDefaults.centerAlignedTopAppBarColors].
  * @param scrollBehavior a [TopAppBarScrollBehavior] which holds various offset values that will be
  * applied by this top app bar to set up its height and colors. A scroll behavior is designed to
@@ -195,7 +195,7 @@ fun CenterAlignedTopAppBar(
  * typically be an [IconButton] or [IconToggleButton].
  * @param actions the actions displayed at the end of the top app bar. This should typically be
  * [IconButton]s. The default layout here is a [Row], so icons inside will be placed horizontally.
- * @param colors a [TopAppBarColors] that will be used to resolve the colors used for this top app
+ * @param colors [TopAppBarColors] that will be used to resolve the colors used for this top app
  * bar in different states. See [TopAppBarDefaults.mediumTopAppBarColors].
  * @param scrollBehavior a [TopAppBarScrollBehavior] which holds various offset values that will be
  * applied by this top app bar to set up its height and colors. A scroll behavior is designed to
@@ -244,12 +244,12 @@ fun MediumTopAppBar(
  * @param title the title to be displayed in the top app bar. This title will be used in the app
  * bar's expanded and collapsed states, although in its collapsed state it will be composed with a
  * smaller sized [TextStyle]
- * @param modifier The [Modifier] to be applied to this top app bar
- * @param navigationIcon The navigation icon displayed at the start of the top app bar. This should
+ * @param modifier the [Modifier] to be applied to this top app bar
+ * @param navigationIcon the navigation icon displayed at the start of the top app bar. This should
  * typically be an [IconButton] or [IconToggleButton].
- * @param actions The actions displayed at the end of the top app bar. This should typically be
+ * @param actions the actions displayed at the end of the top app bar. This should typically be
  * [IconButton]s. The default layout here is a [Row], so icons inside will be placed horizontally.
- * @param colors a [TopAppBarColors] that will be used to resolve the colors used for this top app
+ * @param colors [TopAppBarColors] that will be used to resolve the colors used for this top app
  * bar in different states. See [TopAppBarDefaults.largeTopAppBarColors].
  * @param scrollBehavior a [TopAppBarScrollBehavior] which holds various offset values that will be
  * applied by this top app bar to set up its height and colors. A scroll behavior is designed to
@@ -298,16 +298,16 @@ fun LargeTopAppBar(
  *
  * @param icons the icon content of this BottomAppBar. The default layout here is a [Row],
  * so content inside will be placed horizontally.
- * @param modifier The [Modifier] to be applied to this BottomAppBar
+ * @param modifier the [Modifier] to be applied to this BottomAppBar
  * @param floatingActionButton optional floating action button at the end of this BottomAppBar
- * @param containerColor The container color for the BottomAppBar. Use [Color.Transparent] to
- * have no color.
- * @param contentColor The preferred content color provided by this BottomAppBar to its children.
- * Defaults to either the matching content color for [containerColor], or if [containerColor] is
- * not a color from the theme, this will keep the same value set above this BottomAppBar.
- * @param tonalElevation When [containerColor] is [ColorScheme.surface], a higher tonal elevation
- * value will result in a darker color in light theme and lighter color in dark theme. See also:
- * [Surface].
+ * @param containerColor the color used for the background of this BottomAppBar. Use
+ * [Color.Transparent] to have no color.
+ * @param contentColor the preferred color for content inside this BottomAppBar. Defaults to either
+ * the matching content color for [containerColor], or to the current [LocalContentColor] if
+ * [containerColor] is not a color from the theme.
+ * @param tonalElevation when [containerColor] is [ColorScheme.surface], a translucent primary color
+ * overlay is applied on top of the container. A higher tonal elevation value will result in a
+ * darker color in light theme and lighter color in dark theme. See also: [Surface].
  * @param contentPadding the padding applied to the content of this BottomAppBar
  */
 @Composable
@@ -351,13 +351,15 @@ fun BottomAppBar(
  *
  * Also see [NavigationBar].
  *
- * @param modifier The [Modifier] to be applied to this BottomAppBar
- * @param containerColor The background color for the BottomAppBar. Use [Color.Transparent] to
- * have no color.
- * @param contentColor The preferred content color provided by this BottomAppBar to its children.
- * Defaults to either the matching content color for [containerColor], or if [containerColor] is
- * not a color from the theme, this will keep the same value set above this BottomAppBar.
- * @param tonalElevation the elevation of this BottomAppBar.
+ * @param modifier the [Modifier] to be applied to this BottomAppBar
+ * @param containerColor the color used for the background of this BottomAppBar. Use
+ * [Color.Transparent] to have no color.
+ * @param contentColor the preferred color for content inside this BottomAppBar. Defaults to either
+ * the matching content color for [containerColor], or to the current [LocalContentColor] if
+ * [containerColor] is not a color from the theme.
+ * @param tonalElevation when [containerColor] is [ColorScheme.surface], a translucent primary color
+ * overlay is applied on top of the container. A higher tonal elevation value will result in a
+ * darker color in light theme and lighter color in dark theme. See also: [Surface].
  * @param contentPadding the padding applied to the content of this BottomAppBar
  * @param content the content of this BottomAppBar. The default layout here is a [Row],
  * so content inside will be placed horizontally.
@@ -412,9 +414,8 @@ interface TopAppBarScrollBehavior {
      *
      * A scrollFraction is a value between `0.0` to `1.0` that provides a percentage of the app
      * bar scroll position when the content is scrolled. `0.0` represents an expanded app bar,
-     * while `1.0`
-     * represents a collapsed one (e.g. the app bar is scrolled to its target offset). Note that
-     * this value will be updated on scroll even if the [offset] is pinned to a specific
+     * while `1.0` represents a collapsed one (e.g. the app bar is scrolled to its target offset).
+     * Note that this value will be updated on scroll even if the [offset] is pinned to a specific
      * value (see [TopAppBarDefaults.pinnedScrollBehavior]). In this case a value of 1.0 represents
      * that the scroll value has exceeded the height of the pinned app bar, as if the app bar was
      * collapsing.

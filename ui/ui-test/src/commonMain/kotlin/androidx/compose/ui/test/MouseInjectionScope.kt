@@ -217,8 +217,8 @@ interface MouseInjectionScope : InjectionScope {
     /**
      * Sends a scroll event with the given [delta] on the given [scrollWheel]. The event will be
      * sent at the current event time. Negative [delta] values correspond to rotating the scroll
-     * wheel leftward or downward, positive values correspond to rotating the scroll wheel
-     * rightward or upward.
+     * wheel leftward or upward, positive values correspond to rotating the scroll wheel
+     * rightward or downward.
      *
      * @param delta The amount of scroll
      * @param scrollWheel Which scroll wheel to rotate. Can be either [ScrollWheel.Vertical] (the

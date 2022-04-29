@@ -34,6 +34,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlin.math.roundToInt
 
 @OptIn(InternalFoundationTextApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -158,6 +159,29 @@ class TextDelegateIntegrationTest {
 
         assertThat(layoutResult.lineCount).isEqualTo(1)
         assertThat(layoutResult.isLineEllipsized(0)).isTrue()
+    }
+
+    @Test
+    fun TextLayoutResult_layoutWithLimitedHeight_withEllipsis() {
+        val fontSize = 20f
+        val text = AnnotatedString(text = "Hello World! Hello World! Hello World! Hello World!")
+        val textDelegate = TextDelegate(
+            text = text,
+            style = TextStyle(fontSize = fontSize.sp),
+            overflow = TextOverflow.Ellipsis,
+            density = density,
+            fontFamilyResolver = fontFamilyResolver
+        )
+        textDelegate.layoutIntrinsics(LayoutDirection.Ltr)
+
+        val constraints = Constraints(
+            maxWidth = textDelegate.maxIntrinsicWidth / 4,
+            maxHeight = (fontSize * 2.7).roundToInt() // fully fits at most 2 lines
+        )
+        val layoutResult = textDelegate.layout(constraints, LayoutDirection.Ltr)
+
+        assertThat(layoutResult.lineCount).isEqualTo(2)
+        assertThat(layoutResult.isLineEllipsized(1)).isTrue()
     }
 }
 

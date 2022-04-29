@@ -94,8 +94,8 @@ internal class LazyGridScrollPosition(
      * there were items added or removed before our current first visible item and keep this item
      * as the first visible one even given that its index has been changed.
      */
-    fun updateScrollPositionIfTheFirstItemWasMoved(itemsProvider: LazyGridItemsProvider) {
-        update(findLazyGridIndexByKey(lastKnownFirstItemKey, index, itemsProvider), scrollOffset)
+    fun updateScrollPositionIfTheFirstItemWasMoved(itemProvider: LazyGridItemProvider) {
+        update(findLazyGridIndexByKey(lastKnownFirstItemKey, index, itemProvider), scrollOffset)
     }
 
     private fun update(index: ItemIndex, scrollOffset: Int) {
@@ -118,19 +118,19 @@ internal class LazyGridScrollPosition(
         private fun findLazyGridIndexByKey(
             key: Any?,
             lastKnownIndex: ItemIndex,
-            itemsProvider: LazyGridItemsProvider
+            itemProvider: LazyGridItemProvider
         ): ItemIndex {
             if (key == null) {
                 // there were no real item during the previous measure
                 return lastKnownIndex
             }
-            if (lastKnownIndex.value < itemsProvider.itemsCount &&
-                key == itemsProvider.getKey(lastKnownIndex.value)
+            if (lastKnownIndex.value < itemProvider.itemCount &&
+                key == itemProvider.getKey(lastKnownIndex.value)
             ) {
                 // this item is still at the same index
                 return lastKnownIndex
             }
-            val newIndex = itemsProvider.keyToIndexMap[key]
+            val newIndex = itemProvider.keyToIndexMap[key]
             if (newIndex != null) {
                 return ItemIndex(newIndex)
             }

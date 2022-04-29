@@ -18,6 +18,8 @@ package androidx.compose.material3.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,6 +53,45 @@ fun StepsSliderSample() {
                 // viewModel.updateSelectedSliderValue(sliderPosition)
             },
             steps = 4
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Sampled
+@Composable
+fun RangeSliderSample() {
+    var sliderPosition by remember { mutableStateOf(0f..100f) }
+    Column {
+        Text(text = sliderPosition.toString())
+        RangeSlider(
+            values = sliderPosition,
+            onValueChange = { sliderPosition = it },
+            valueRange = 0f..100f,
+            onValueChangeFinished = {
+                // launch some business logic update with the state you hold
+                // viewModel.updateSelectedSliderValue(sliderPosition)
+            },
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Sampled
+@Composable
+fun StepRangeSliderSample() {
+    var sliderPosition by remember { mutableStateOf(0f..100f) }
+    Column {
+        Text(text = sliderPosition.toString())
+        RangeSlider(
+            steps = 5,
+            values = sliderPosition,
+            onValueChange = { sliderPosition = it },
+            valueRange = 0f..100f,
+            onValueChangeFinished = {
+                // launch some business logic update with the state you hold
+                // viewModel.updateSelectedSliderValue(sliderPosition)
+            },
         )
     }
 }

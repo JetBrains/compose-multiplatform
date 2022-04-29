@@ -33,7 +33,9 @@ import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.key.ModifierLocalKeyInput
 import androidx.compose.ui.input.rotary.ModifierLocalRotaryScrollParent
 import androidx.compose.ui.input.rotary.RotaryScrollEvent
+import androidx.compose.ui.layout.BeyondBoundsLayout
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.layout.OnPlacedModifier
 import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalProvider
@@ -81,6 +83,7 @@ internal class FocusModifier(
     @OptIn(ExperimentalComposeUiApi::class)
     private var rotaryScrollParent: FocusAwareInputModifier<RotaryScrollEvent>? = null
     lateinit var modifierLocalReadScope: ModifierLocalReadScope
+    var beyondBoundsLayoutParent: BeyondBoundsLayout? = null
     var focusPropertiesModifier: FocusPropertiesModifier? = null
     val focusProperties: FocusProperties = FocusPropertiesImpl()
     var focusRequester: FocusRequesterModifierLocal? = null
@@ -104,39 +107,40 @@ internal class FocusModifier(
         modifierLocalReadScope = scope
 
         with(scope) {
-            val newParent = ModifierLocalParentFocusModifier.current
-            if (newParent != parent) {
-                if (newParent == null) {
-                    when (focusState) {
-                        Active, Captured -> layoutNodeWrapper?.layoutNode?.owner
-                            ?.focusManager?.clearFocus(force = true)
-                        ActiveParent, DeactivatedParent, Deactivated, Inactive -> { } // do nothing
+            parent = ModifierLocalParentFocusModifier.current.also { newParent ->
+                if (newParent != parent) {
+                    if (newParent == null) {
+                        when (focusState) {
+                            Active, Captured -> layoutNodeWrapper?.layoutNode?.owner
+                                ?.focusManager?.clearFocus(force = true)
+                            ActiveParent, DeactivatedParent, Deactivated, Inactive -> {
+                                // do nothing.
+                            }
+                        }
                     }
+                    parent?.children?.remove(this@FocusModifier)
+                    newParent?.children?.add(this@FocusModifier)
                 }
-                parent?.children?.remove(this@FocusModifier)
-                parent = newParent
-                newParent?.children?.add(this@FocusModifier)
             }
-            val newFocusEventListener = ModifierLocalFocusEvent.current
-            if (newFocusEventListener != focusEventListener) {
-                focusEventListener?.removeFocusModifier(this@FocusModifier)
-                newFocusEventListener?.addFocusModifier(this@FocusModifier)
-                focusEventListener = newFocusEventListener
+            focusEventListener = ModifierLocalFocusEvent.current.also { newFocusEventListener ->
+                if (newFocusEventListener != focusEventListener) {
+                    focusEventListener?.removeFocusModifier(this@FocusModifier)
+                    newFocusEventListener?.addFocusModifier(this@FocusModifier)
+                }
             }
-            val newFocusRequester = ModifierLocalFocusRequester.current
-            if (newFocusRequester != focusRequester) {
-                focusRequester?.removeFocusModifier(this@FocusModifier)
-                newFocusRequester?.addFocusModifier(this@FocusModifier)
-                focusRequester = newFocusRequester
+            focusRequester = ModifierLocalFocusRequester.current.also { newFocusRequester ->
+                if (newFocusRequester != focusRequester) {
+                    focusRequester?.removeFocusModifier(this@FocusModifier)
+                    newFocusRequester?.addFocusModifier(this@FocusModifier)
+                }
             }
             @OptIn(ExperimentalComposeUiApi::class)
             rotaryScrollParent = ModifierLocalRotaryScrollParent.current
-
+            beyondBoundsLayoutParent = ModifierLocalBeyondBoundsLayout.current
             keyInputModifier = ModifierLocalKeyInput.current
-
-            // Update the focus node with the current focus properties.
             focusPropertiesModifier = ModifierLocalFocusProperties.current
 
+            // Update the focus node with the current focus properties.
             refreshFocusProperties()
         }
     }

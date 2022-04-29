@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_92
+// VERSION: v0_93
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -21,7 +21,7 @@ package androidx.compose.material3.tokens
 import androidx.compose.ui.unit.dp
 
 internal object OutlinedIconButtonTokens {
-    val ContainerShape = ShapeTokens.CornerFull
+    val ContainerShape = ShapeKeyTokens.CornerFull
     val ContainerSize = 40.0.dp
     val DisabledColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledOpacity = 0.38f

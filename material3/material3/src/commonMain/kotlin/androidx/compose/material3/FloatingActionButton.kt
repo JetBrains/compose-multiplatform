@@ -71,20 +71,22 @@ import kotlinx.coroutines.flow.collect
  *
  * @sample androidx.compose.material3.samples.FloatingActionButtonSample
  *
- * @param onClick callback invoked when this FAB is clicked
- * @param modifier [Modifier] to be applied to this FAB.
- * @param interactionSource the [MutableInteractionSource] representing the stream of
- * [Interaction]s for this FAB. You can create and pass in your own remembered
- * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
- * appearance / behavior of this FAB in different [Interaction]s.
- * @param shape The [Shape] of this FAB
- * @param containerColor The container color. Use [Color.Transparent] to have no color
- * @param contentColor The preferred content color for content inside this FAB
- * @param elevation [FloatingActionButtonElevation] used to resolve the elevation for this FAB
- * in different states. This controls the size of the shadow below the FAB. When [containerColor]
- * is [ColorScheme.surface], a higher elevation (surface blended with more primary) will result in
- * a darker surface color in light theme and lighter color in dark theme.
- * @param content the content of this FAB - this is typically an [Icon].
+ * @param onClick called when this FAB is clicked
+ * @param modifier the [Modifier] to be applied to this FAB
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this FAB. You can create and pass in your own `remember`ed instance to observe [Interaction]s
+ * and customize the appearance / behavior of this FAB in different states.
+ * @param shape defines the shape of this FAB's container and shadow (when using [elevation])
+ * @param containerColor the color used for the background of this FAB. Use [Color.Transparent] to
+ * have no color.
+ * @param contentColor the preferred color for content inside this FAB. Defaults to either the
+ * matching content color for [containerColor], or to the current [LocalContentColor] if
+ * [containerColor] is not a color from the theme.
+ * @param elevation [FloatingActionButtonElevation] used to resolve the elevation for this FAB in
+ * different states. This controls the size of the shadow below the FAB. Additionally, when the
+ * container color is [ColorScheme.surface], this controls the amount of primary color applied as an
+ * overlay. See also: [Surface].
+ * @param content the content of this FAB, typically an [Icon]
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -138,20 +140,22 @@ fun FloatingActionButton(
  *
  * @sample androidx.compose.material3.samples.SmallFloatingActionButtonSample
  *
- * @param onClick callback invoked when this FAB is clicked
- * @param modifier [Modifier] to be applied to this FAB.
- * @param interactionSource the [MutableInteractionSource] representing the stream of
- * [Interaction]s for this FAB. You can create and pass in your own remembered
- * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
- * appearance / behavior of this FAB in different [Interaction]s.
- * @param shape The [Shape] of this FAB
- * @param containerColor The container color. Use [Color.Transparent] to have no color
- * @param contentColor The preferred content color for content inside this FAB
- * @param elevation [FloatingActionButtonElevation] used to resolve the elevation for this FAB
- * in different states. This controls the size of the shadow below the FAB. When [containerColor]
- * is [ColorScheme.surface], a higher elevation (surface blended with more primary) will result in
- * a darker surface color in light theme and lighter color in dark theme.
- * @param content the content of this FAB - this is typically an [Icon].
+ * @param onClick called when this FAB is clicked
+ * @param modifier the [Modifier] to be applied to this FAB
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this FAB. You can create and pass in your own `remember`ed instance to observe [Interaction]s
+ * and customize the appearance / behavior of this FAB in different states.
+ * @param shape defines the shape of this FAB's container and shadow (when using [elevation])
+ * @param containerColor the color used for the background of this FAB. Use [Color.Transparent] to
+ * have no color.
+ * @param contentColor the preferred color for content inside this FAB. Defaults to either the
+ * matching content color for [containerColor], or to the current [LocalContentColor] if
+ * [containerColor] is not a color from the theme.
+ * @param elevation [FloatingActionButtonElevation] used to resolve the elevation for this FAB in
+ * different states. This controls the size of the shadow below the FAB. Additionally, when the
+ * container color is [ColorScheme.surface], this controls the amount of primary color applied as an
+ * overlay. See also: [Surface].
+ * @param content the content of this FAB, typically an [Icon]
  */
 @Composable
 fun SmallFloatingActionButton(
@@ -188,20 +192,22 @@ fun SmallFloatingActionButton(
  *
  * @sample androidx.compose.material3.samples.LargeFloatingActionButtonSample
  *
- * @param onClick callback invoked when this FAB is clicked
- * @param modifier [Modifier] to be applied to this FAB.
- * @param interactionSource the [MutableInteractionSource] representing the stream of
- * [Interaction]s for this FAB. You can create and pass in your own remembered
- * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
- * appearance / behavior of this FAB in different [Interaction]s.
- * @param shape The [Shape] of this FAB
- * @param containerColor The container color. Use [Color.Transparent] to have no color
- * @param contentColor The preferred content color for content inside this FAB
- * @param elevation [FloatingActionButtonElevation] used to resolve the elevation for this FAB
- * in different states. This controls the size of the shadow below the FAB. When [containerColor]
- * is [ColorScheme.surface], a higher elevation (surface blended with more primary) will result in
- * a darker surface color in light theme and lighter color in dark theme.
- * @param content the content of this FAB - this is typically an [Icon].
+ * @param onClick called when this FAB is clicked
+ * @param modifier the [Modifier] to be applied to this FAB
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this FAB. You can create and pass in your own `remember`ed instance to observe [Interaction]s
+ * and customize the appearance / behavior of this FAB in different states.
+ * @param shape defines the shape of this FAB's container and shadow (when using [elevation])
+ * @param containerColor the color used for the background of this FAB. Use [Color.Transparent] to
+ * have no color.
+ * @param contentColor the preferred color for content inside this FAB. Defaults to either the
+ * matching content color for [containerColor], or to the current [LocalContentColor] if
+ * [containerColor] is not a color from the theme.
+ * @param elevation [FloatingActionButtonElevation] used to resolve the elevation for this FAB in
+ * different states. This controls the size of the shadow below the FAB. Additionally, when the
+ * container color is [ColorScheme.surface], this controls the amount of primary color applied as an
+ * overlay. See also: [Surface].
+ * @param content the content of this FAB, typically an [Icon]
  */
 @Composable
 fun LargeFloatingActionButton(
@@ -241,20 +247,22 @@ fun LargeFloatingActionButton(
  *
  * @sample androidx.compose.material3.samples.ExtendedFloatingActionButtonTextSample
  *
- * @param onClick callback invoked when this FAB is clicked
- * @param modifier [Modifier] to be applied to this FAB
- * @param interactionSource the [MutableInteractionSource] representing the stream of
- * [Interaction]s for this FAB. You can create and pass in your own remembered
- * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
- * appearance / behavior of this FAB in different [Interaction]s.
- * @param shape The [Shape] of this FAB
- * @param containerColor The container color. Use [Color.Transparent] to have no color
- * @param contentColor The preferred content color for content inside this FAB
- * @param elevation [FloatingActionButtonElevation] used to resolve the elevation for this FAB
- * in different states. This controls the size of the shadow below the FAB. When [containerColor]
- * is [ColorScheme.surface], a higher elevation (surface blended with more primary) will result in
- * a darker surface color in light theme and lighter color in dark theme.
- * @param content the content of this FAB - this is typically an [Text] label.
+ * @param onClick called when this FAB is clicked
+ * @param modifier the [Modifier] to be applied to this FAB
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this FAB. You can create and pass in your own `remember`ed instance to observe [Interaction]s
+ * and customize the appearance / behavior of this FAB in different states.
+ * @param shape defines the shape of this FAB's container and shadow (when using [elevation])
+ * @param containerColor the color used for the background of this FAB. Use [Color.Transparent] to
+ * have no color.
+ * @param contentColor the preferred color for content inside this FAB. Defaults to either the
+ * matching content color for [containerColor], or to the current [LocalContentColor] if
+ * [containerColor] is not a color from the theme.
+ * @param elevation [FloatingActionButtonElevation] used to resolve the elevation for this FAB in
+ * different states. This controls the size of the shadow below the FAB. Additionally, when the
+ * container color is [ColorScheme.surface], this controls the amount of primary color applied as an
+ * overlay. See also: [Surface].
+ * @param content the content of this FAB, typically a [Text] label
  */
 @Composable
 fun ExtendedFloatingActionButton(
@@ -297,25 +305,25 @@ fun ExtendedFloatingActionButton(
  * @sample androidx.compose.material3.samples.ExtendedFloatingActionButtonSample
  * @sample androidx.compose.material3.samples.AnimatedExtendedFloatingActionButtonSample
  *
- * @param text Text label displayed inside this FAB
- * @param icon Optional icon for this FAB, typically this will be a
- * [Icon].
- * @param onClick callback invoked when this FAB is clicked
- * @param modifier [Modifier] to be applied to this FAB
- * @param expanded The FAB will animate between expanded state and collapsed state. In an expanded
- * state the FAB will show both the [icon] and [text] parameters. In a collapsed state the FAB will
- * show only the [icon] parameter.
- * @param interactionSource the [MutableInteractionSource] representing the stream of
- * [Interaction]s for this FAB. You can create and pass in your own remembered
- * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
- * appearance / behavior of this FAB in different [Interaction]s.
- * @param shape The [Shape] of this FAB
- * @param containerColor The container color. Use [Color.Transparent] to have no color
- * @param contentColor The preferred content color for content inside this FAB
- * @param elevation [FloatingActionButtonElevation] used to resolve the elevation for this FAB
- * in different states. This controls the size of the shadow below the FAB. When [containerColor]
- * is [ColorScheme.surface], a higher elevation (surface blended with more primary) will result in
- * a darker surface color in light theme and lighter color in dark theme.
+ * @param text label displayed inside this FAB
+ * @param icon optional icon for this FAB, typically an [Icon]
+ * @param onClick called when this FAB is clicked
+ * @param modifier the [Modifier] to be applied to this FAB
+ * @param expanded controls the expansion state of this FAB. In an expanded state, the FAB will show
+ * both the [icon] and [text]. In a collapsed state, the FAB will show only the [icon].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this FAB. You can create and pass in your own `remember`ed instance to observe [Interaction]s
+ * and customize the appearance / behavior of this FAB in different states.
+ * @param shape defines the shape of this FAB's container and shadow (when using [elevation])
+ * @param containerColor the color used for the background of this FAB. Use [Color.Transparent] to
+ * have no color.
+ * @param contentColor the preferred color for content inside this FAB. Defaults to either the
+ * matching content color for [containerColor], or to the current [LocalContentColor] if
+ * [containerColor] is not a color from the theme.
+ * @param elevation [FloatingActionButtonElevation] used to resolve the elevation for this FAB in
+ * different states. This controls the size of the shadow below the FAB. Additionally, when the
+ * container color is [ColorScheme.surface], this controls the amount of primary color applied as an
+ * overlay. See also: [Surface].
  */
 @Composable
 fun ExtendedFloatingActionButton(
@@ -376,8 +384,8 @@ interface FloatingActionButtonElevation {
      * [interactionSource]. This should typically be the same value as the [shadowElevation].
      *
      * Tonal elevation is used to apply a color shift to the surface to give the it higher emphasis.
-     * When surface's color is [ColorScheme.surface], a higher the elevation will result
-     * in a darker color in light theme and lighter color in dark theme.
+     * When surface's color is [ColorScheme.surface], a higher the elevation will result in a darker
+     * color in light theme and lighter color in dark theme.
      *
      * See [shadowElevation] which controls the elevation of the shadow drawn around the FAB.
      *
@@ -390,7 +398,7 @@ interface FloatingActionButtonElevation {
      * Represents the shadow elevation used in a floating action button, depending on
      * [interactionSource]. This should typically be the same value as the [tonalElevation].
      *
-     * Shadow elevation is used to apply a shadow around the surface to give it higher emphasis.
+     * Shadow elevation is used to apply a shadow around the FAB to give it higher emphasis.
      *
      * See [tonalElevation] which controls the elevation with a color shift to the surface.
      *

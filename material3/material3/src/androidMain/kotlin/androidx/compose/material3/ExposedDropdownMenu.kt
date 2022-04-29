@@ -84,11 +84,12 @@ import kotlinx.coroutines.coroutineScope
  * An example of editable Exposed Dropdown Menu:
  * @sample androidx.compose.material3.samples.EditableExposedDropdownMenuSample
  *
- * @param expanded Whether the dropdown menu is expanded or not.
- * @param onExpandedChange Executes when the user clicks on the ExposedDropdownMenuBox and the
- * expansion state changes.
- * @param modifier The modifier to apply to this layout.
- * @param content The content to be displayed inside ExposedDropdownMenuBox.
+ * @param expanded whether the menu is expanded or not
+ * @param onExpandedChange called when the exposed dropdown menu is clicked and the expansion state
+ * changes.
+ * @param modifier the [Modifier] to be applied to this exposed dropdown menu
+ * @param content the content of this exposed dropdown menu, typically a [TextField] and a
+ * [ExposedDropdownMenuBoxScope.ExposedDropdownMenu]
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -203,33 +204,28 @@ private class OnGlobalLayoutListener(
 @ExperimentalMaterial3Api
 interface ExposedDropdownMenuBoxScope {
     /**
-     * Modifier which should be applied to an [ExposedDropdownMenu]
-     * placed inside the scope. It's responsible for
-     * setting the width of the [ExposedDropdownMenu], which
-     * will match the width of the [TextField]
-     * (if [matchTextFieldWidth] is set to true).
-     * Also it'll change the height of [ExposedDropdownMenu], so
-     * it'll take the largest possible height to not overlap
-     * the [TextField] and the software keyboard.
+     * Modifier which should be applied to an [ExposedDropdownMenu] placed inside the scope. It's
+     * responsible for setting the width of the [ExposedDropdownMenu], which will match the width of
+     * the [TextField] (if [matchTextFieldWidth] is set to true). It will also change the height of
+     * [ExposedDropdownMenu], so it'll take the largest possible height to not overlap the
+     * [TextField] and the software keyboard.
      *
-     * @param matchTextFieldWidth Whether menu should match
-     * the width of the text field to which it's attached.
-     * If set to true the width will match the width
-     * of the text field.
+     * @param matchTextFieldWidth whether the menu should match the width of the text field to which
+     * it's attached. If set to `true`, the width will match the width of the text field.
      */
     fun Modifier.exposedDropdownSize(
         matchTextFieldWidth: Boolean = true
     ): Modifier
 
     /**
-     * Popup which contains content for Exposed Dropdown Menu.
-     * Should be used inside the content of [ExposedDropdownMenuBox].
+     * Popup which contains content for Exposed Dropdown Menu. Should be used inside the content of
+     * [ExposedDropdownMenuBox].
      *
-     * @param expanded Whether the menu is currently open and visible to the user
-     * @param onDismissRequest Called when the user requests to dismiss the menu, such as by
+     * @param expanded whether the menu is expanded
+     * @param onDismissRequest called when the user requests to dismiss the menu, such as by
      * tapping outside the menu's bounds
-     * @param modifier The modifier to apply to this layout
-     * @param content The content of the [ExposedDropdownMenu]
+     * @param modifier the [Modifier] to be applied to this menu
+     * @param content the content of the menu
      */
     @Composable
     fun ExposedDropdownMenu(
@@ -283,9 +279,9 @@ object ExposedDropdownMenuDefaults {
     /**
      * Default trailing icon for Exposed Dropdown Menu.
      *
-     * @param expanded Whether [ExposedDropdownMenuBoxScope.ExposedDropdownMenu]
-     * is expanded or not. Affects the appearance of the icon.
-     * @param onIconClick Called when the icon was clicked.
+     * @param expanded whether [ExposedDropdownMenuBoxScope.ExposedDropdownMenu] is expanded or not.
+     * Affects the appearance of the icon.
+     * @param onIconClick called when the icon is clicked
      */
     @ExperimentalMaterial3Api
     @Composable
@@ -313,48 +309,33 @@ object ExposedDropdownMenuDefaults {
 
     /**
      * Creates a [TextFieldColors] that represents the default input text, container, and content
-     * (including label, placeholder, leading and trailing icons) colors used in a [TextField].
+     * (including label, placeholder, leading and trailing icons) colors used in a [TextField]
+     * within an [ExposedDropdownMenuBox].
      *
-     * @param textColor Represents the color used for the input text of this text field.
-     * @param disabledTextColor Represents the color used for the input text of this text field when
-     * it's disabled.
-     * @param containerColor Represents the container color for this text field.
-     * @param cursorColor Represents the cursor color for this text field.
-     * @param errorCursorColor Represents the cursor color for this text field when it's in error
-     * state.
-     * @param focusedIndicatorColor Represents the indicator color for this text field when it's
-     * focused.
-     * @param unfocusedIndicatorColor Represents the indicator color for this text field when it's
-     * not focused.
-     * @param disabledIndicatorColor Represents the indicator color for this text field when it's
-     * disabled.
-     * @param errorIndicatorColor Represents the indicator color for this text field when it's in
-     * error state.
-     * @param focusedLeadingIconColor Represents the leading icon color for this text field when
-     * it's focused.
-     * @param unfocusedLeadingIconColor Represents the leading icon color for this text field when
-     * it's not focused.
-     * @param disabledLeadingIconColor Represents the leading icon color for this text field when
-     * it's disabled.
-     * @param errorLeadingIconColor Represents the leading icon color for this text field when it's
-     * in error state.
-     * @param focusedTrailingIconColor Represents the trailing icon color for this text field when
-     * it's focused.
-     * @param unfocusedTrailingIconColor Represents the trailing icon color for this text field when
-     * it's not focused.
-     * @param disabledTrailingIconColor Represents the trailing icon color for this text field when
-     * it's disabled.
-     * @param errorTrailingIconColor Represents the trailing icon color for this text field when
-     * it's in error state.
-     * @param focusedLabelColor Represents the label color for this text field when it's focused.
-     * @param unfocusedLabelColor Represents the label color for this text field when it's not
-     * focused.
-     * @param disabledLabelColor Represents the label color for this text field when it's disabled.
-     * @param errorLabelColor Represents the label color for this text field when it's in error
-     * state.
-     * @param placeholderColor Represents the placeholder color for this text field.
-     * @param disabledPlaceholderColor Represents the placeholder color for this text field when
-     * it's disabled.
+     * @param textColor the color used for the input text of this text field
+     * @param disabledTextColor the color used for the input text of this text field when disabled
+     * @param containerColor the container color for this text field
+     * @param cursorColor the cursor color for this text field
+     * @param errorCursorColor the cursor color for this text field when in error state
+     * @param focusedIndicatorColor the indicator color for this text field when focused
+     * @param unfocusedIndicatorColor the indicator color for this text field when not focused
+     * @param disabledIndicatorColor the indicator color for this text field when disabled
+     * @param errorIndicatorColor the indicator color for this text field when in error state
+     * @param focusedLeadingIconColor the leading icon color for this text field when focused
+     * @param unfocusedLeadingIconColor the leading icon color for this text field when not focused
+     * @param disabledLeadingIconColor the leading icon color for this text field when disabled
+     * @param errorLeadingIconColor the leading icon color for this text field when in error state
+     * @param focusedTrailingIconColor the trailing icon color for this text field when focused
+     * @param unfocusedTrailingIconColor the trailing icon color for this text field when not
+     * focused
+     * @param disabledTrailingIconColor the trailing icon color for this text field when disabled
+     * @param errorTrailingIconColor the trailing icon color for this text field when in error state
+     * @param focusedLabelColor the label color for this text field when focused
+     * @param unfocusedLabelColor the label color for this text field when not focused
+     * @param disabledLabelColor the label color for this text field when disabled
+     * @param errorLabelColor the label color for this text field when in error state
+     * @param placeholderColor the placeholder color for this text field
+     * @param disabledPlaceholderColor the placeholder color for this text field when disabled
      */
     @Composable
     fun textFieldColors(
@@ -429,47 +410,31 @@ object ExposedDropdownMenuDefaults {
     /**
      * Creates a [TextFieldColors] that represents the default input text, container, and content
      * (including label, placeholder, leading and trailing icons) colors used in an
-     * [OutlinedTextField].
+     * [OutlinedTextField] within an [ExposedDropdownMenuBox].
      *
-     * @param textColor Represents the color used for the input text of this text field.
-     * @param disabledTextColor Represents the color used for the input text of this text field when
-     * it's disabled.
-     * @param containerColor Represents the container color for this text field.
-     * @param cursorColor Represents the cursor color for this text field.
-     * @param errorCursorColor Represents the cursor color for this text field when it's in error
-     * state.
-     * @param focusedBorderColor Represents the border color for this text field when it's focused.
-     * @param unfocusedBorderColor Represents the border color for this text field when it's not
-     * focused.
-     * @param disabledBorderColor Represents the border color for this text field when it's
-     * disabled.
-     * @param errorBorderColor Represents the border color for this text field when it's in error
-     * state.
-     * @param focusedLeadingIconColor Represents the leading icon color for this text field when
-     * it's focused.
-     * @param unfocusedLeadingIconColor Represents the leading icon color for this text field when
-     * it's not focused.
-     * @param disabledLeadingIconColor Represents the leading icon color for this text field when
-     * it's disabled.
-     * @param errorLeadingIconColor Represents the leading icon color for this text field when it's
-     * in error state.
-     * @param focusedTrailingIconColor Represents the trailing icon color for this text field when
-     * it's focused.
-     * @param unfocusedTrailingIconColor Represents the trailing icon color for this text field when
-     * it's not focused.
-     * @param disabledTrailingIconColor Represents the trailing icon color for this text field when
-     * it's disabled.
-     * @param errorTrailingIconColor Represents the trailing icon color for this text field when
-     * it's in error state.
-     * @param focusedLabelColor Represents the label color for this text field when it's focused.
-     * @param unfocusedLabelColor Represents the label color for this text field when it's not
-     * focused.
-     * @param disabledLabelColor Represents the label color for this text field when it's disabled.
-     * @param errorLabelColor Represents the label color for this text field when it's in error
-     * state.
-     * @param placeholderColor Represents the placeholder color for this text field.
-     * @param disabledPlaceholderColor Represents the placeholder color for this text field when
-     * it's disabled.
+     * @param textColor the color used for the input text of this text field
+     * @param disabledTextColor the color used for the input text of this text field when disabled
+     * @param containerColor the container color for this text field
+     * @param cursorColor the cursor color for this text field
+     * @param errorCursorColor the cursor color for this text field when in error state
+     * @param focusedBorderColor the border color for this text field when focused
+     * @param unfocusedBorderColor the border color for this text field when not focused
+     * @param disabledBorderColor the border color for this text field when disabled
+     * @param errorBorderColor the border color for this text field when in error state
+     * @param focusedLeadingIconColor the leading icon color for this text field when focused
+     * @param unfocusedLeadingIconColor the leading icon color for this text field when not focused
+     * @param disabledLeadingIconColor the leading icon color for this text field when disabled
+     * @param errorLeadingIconColor the leading icon color for this text field when in error state
+     * @param focusedTrailingIconColor the trailing icon color for this text field when focused
+     * @param unfocusedTrailingIconColor the trailing icon color for this text field when not focused
+     * @param disabledTrailingIconColor the trailing icon color for this text field when disabled
+     * @param errorTrailingIconColor the trailing icon color for this text field when in error state
+     * @param focusedLabelColor the label color for this text field when focused
+     * @param unfocusedLabelColor the label color for this text field when not focused
+     * @param disabledLabelColor the label color for this text field when disabled
+     * @param errorLabelColor the label color for this text field when in error state
+     * @param placeholderColor the placeholder color for this text field
+     * @param disabledPlaceholderColor the placeholder color for this text field when disabled
      */
     @Composable
     fun outlinedTextFieldColors(

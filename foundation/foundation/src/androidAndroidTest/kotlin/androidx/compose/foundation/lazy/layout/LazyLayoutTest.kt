@@ -68,12 +68,12 @@ class LazyLayoutTest {
                 override fun placeChildren() {}
             }
         }
-        val itemsProvider = itemProvider({ 0 }) { { } }
+        val itemProvider = itemProvider({ 0 }) { }
 
         rule.setContent {
             counter.value // just to trigger recomposition
             LazyLayout(
-                itemsProvider = itemsProvider,
+                itemProvider = itemProvider,
                 measurePolicy = policy,
                 // this will return a new object everytime causing LazyLayout recomposition
                 // without causing remeasure
@@ -93,11 +93,11 @@ class LazyLayoutTest {
 
     @Test
     fun measureAndPlaceTwoItems() {
-        val itemsProvider = itemProvider({ 2 }) { index ->
-            { Box(Modifier.fillMaxSize().testTag("$index")) }
+        val itemProvider = itemProvider({ 2 }) { index ->
+            Box(Modifier.fillMaxSize().testTag("$index"))
         }
         rule.setContent {
-            LazyLayout(itemsProvider) {
+            LazyLayout(itemProvider) {
                 val item1 = measure(0, Constraints.fixed(50, 50))[0]
                 val item2 = measure(1, Constraints.fixed(20, 20))[0]
                 layout(100, 100) {
@@ -117,15 +117,13 @@ class LazyLayoutTest {
 
     @Test
     fun measureAndPlaceMultipleLayoutsInOneItem() {
-        val itemsProvider = itemProvider({ 1 }) { index ->
-            {
-                Box(Modifier.fillMaxSize().testTag("${index}x0"))
-                Box(Modifier.fillMaxSize().testTag("${index}x1"))
-            }
+        val itemProvider = itemProvider({ 1 }) { index ->
+            Box(Modifier.fillMaxSize().testTag("${index}x0"))
+            Box(Modifier.fillMaxSize().testTag("${index}x1"))
         }
 
         rule.setContent {
-            LazyLayout(itemsProvider) {
+            LazyLayout(itemProvider) {
                 val items = measure(0, Constraints.fixed(50, 50))
                 layout(100, 100) {
                     items[0].place(0, 0)
@@ -143,16 +141,16 @@ class LazyLayoutTest {
     }
 
     @Test
-    fun updatingItemsProvider() {
-        var itemsProvider by mutableStateOf(itemProvider({ 1 }) { index ->
-            { Box(Modifier.fillMaxSize().testTag("$index")) }
+    fun updatingitemProvider() {
+        var itemProvider by mutableStateOf(itemProvider({ 1 }) { index ->
+            Box(Modifier.fillMaxSize().testTag("$index"))
         })
 
         rule.setContent {
-            LazyLayout(itemsProvider) {
+            LazyLayout(itemProvider) {
                 val constraints = Constraints.fixed(100, 100)
                 val items = mutableListOf<Placeable>()
-                repeat(itemsProvider.itemsCount) { index ->
+                repeat(itemProvider.itemCount) { index ->
                     items.addAll(measure(index, constraints))
                 }
                 layout(100, 100) {
@@ -167,8 +165,8 @@ class LazyLayoutTest {
         rule.onNodeWithTag("1").assertDoesNotExist()
 
         rule.runOnIdle {
-            itemsProvider = itemProvider({ 2 }) { index ->
-                { Box(Modifier.fillMaxSize().testTag("$index")) }
+            itemProvider = itemProvider({ 2 }) { index ->
+                Box(Modifier.fillMaxSize().testTag("$index"))
             }
         }
 
@@ -177,17 +175,17 @@ class LazyLayoutTest {
     }
 
     @Test
-    fun stateBasedItemsProvider() {
-        var itemsCount by mutableStateOf(1)
-        val itemsProvider = itemProvider({ itemsCount }) { index ->
-            { Box(Modifier.fillMaxSize().testTag("$index")) }
+    fun stateBaseditemProvider() {
+        var itemCount by mutableStateOf(1)
+        val itemProvider = itemProvider({ itemCount }) { index ->
+            Box(Modifier.fillMaxSize().testTag("$index"))
         }
 
         rule.setContent {
-            LazyLayout(itemsProvider) {
+            LazyLayout(itemProvider) {
                 val constraints = Constraints.fixed(100, 100)
                 val items = mutableListOf<Placeable>()
-                repeat(itemsProvider.itemsCount) { index ->
+                repeat(itemProvider.itemCount) { index ->
                     items.addAll(measure(index, constraints))
                 }
                 layout(100, 100) {
@@ -202,7 +200,7 @@ class LazyLayoutTest {
         rule.onNodeWithTag("1").assertDoesNotExist()
 
         rule.runOnIdle {
-            itemsCount = 2
+            itemCount = 2
         }
 
         rule.onNodeWithTag("0").assertIsDisplayed()
@@ -229,13 +227,13 @@ class LazyLayoutTest {
                 placeable.place(0, 0)
             }
         }
-        val itemsProvider = itemProvider({ 1 }) { index ->
-            { Box(Modifier.fillMaxSize().testTag("$index").then(modifier)) }
+        val itemProvider = itemProvider({ 1 }) { index ->
+            Box(Modifier.fillMaxSize().testTag("$index").then(modifier))
         }
         var needToCompose by mutableStateOf(false)
         val prefetchState = LazyLayoutPrefetchState()
         rule.setContent {
-            LazyLayout(itemsProvider, prefetchState = prefetchState) {
+            LazyLayout(itemProvider, prefetchState = prefetchState) {
                 val item = if (needToCompose) {
                     measure(0, constraints)[0]
                 } else null
@@ -270,20 +268,18 @@ class LazyLayoutTest {
     @Test
     fun cancelPrefetchedItem() {
         var composed = false
-        val itemsProvider = itemProvider({ 1 }) {
-            {
-                Box(Modifier.fillMaxSize())
-                DisposableEffect(Unit) {
-                    composed = true
-                    onDispose {
-                        composed = false
-                    }
+        val itemProvider = itemProvider({ 1 }) {
+            Box(Modifier.fillMaxSize())
+            DisposableEffect(Unit) {
+                composed = true
+                onDispose {
+                    composed = false
                 }
             }
         }
         val prefetchState = LazyLayoutPrefetchState()
         rule.setContent {
-            LazyLayout(itemsProvider, prefetchState = prefetchState) {
+            LazyLayout(itemProvider, prefetchState = prefetchState) {
                 layout(100, 100) {}
             }
         }
@@ -307,19 +303,17 @@ class LazyLayoutTest {
     fun keptForReuseItemIsDisposedWhenCanceled() {
         val needChild = mutableStateOf(true)
         var composed = true
-        val itemsProvider = itemProvider({ 1 }) {
-            {
-                DisposableEffect(Unit) {
-                    composed = true
-                    onDispose {
-                        composed = false
-                    }
+        val itemProvider = itemProvider({ 1 }) {
+            DisposableEffect(Unit) {
+                composed = true
+                onDispose {
+                    composed = false
                 }
             }
         }
 
         rule.setContent {
-            LazyLayout(itemsProvider) { constraints ->
+            LazyLayout(itemProvider) { constraints ->
                 if (needChild.value) {
                     measure(0, constraints)
                 }
@@ -348,12 +342,12 @@ class LazyLayoutTest {
                 placeable.place(0, 0)
             }
         }.fillMaxSize()
-        val itemsProvider = itemProvider({ 2 }) {
-            { Box(modifier) }
+        val itemProvider = itemProvider({ 2 }) {
+            Box(modifier)
         }
 
         rule.setContent {
-            LazyLayout(itemsProvider) { constraints ->
+            LazyLayout(itemProvider) { constraints ->
                 val node = if (indexToCompose != null) {
                     measure(indexToCompose!!, constraints).first()
                 } else {
@@ -382,20 +376,16 @@ class LazyLayoutTest {
     }
 
     private fun itemProvider(
-        itemsCount: () -> Int,
-        content: (Int) -> @Composable () -> Unit
-    ): LazyLayoutItemsProvider {
-        return object : LazyLayoutItemsProvider {
-            override fun getContent(index: Int): @Composable () -> Unit {
-                return content(index)
+        itemCount: () -> Int,
+        itemContent: @Composable (Int) -> Unit
+    ): LazyLayoutItemProvider {
+        return object : LazyLayoutItemProvider {
+            @Composable
+            override fun Item(index: Int) {
+                itemContent(index)
             }
 
-            override val itemsCount: Int
-                get() = itemsCount()
-
-            override fun getKey(index: Int) = index
-            override val keyToIndexMap: Map<Any, Int> = emptyMap()
-            override fun getContentType(index: Int): Any? = null
+            override val itemCount: Int get() = itemCount()
         }
     }
 }

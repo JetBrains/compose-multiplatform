@@ -22,6 +22,19 @@ package androidx.compose.material3 {
     method @androidx.compose.runtime.Composable public static void SmallTopAppBar(kotlin.jvm.functions.Function0<kotlin.Unit> title, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit> navigationIcon, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> actions, optional androidx.compose.material3.TopAppBarColors colors, optional androidx.compose.material3.TopAppBarScrollBehavior? scrollBehavior);
   }
 
+  @androidx.compose.material3.ExperimentalMaterial3Api public final class AssistChipDefaults {
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipBorder assistChipBorder(optional long borderColor, optional long disabledBorderColor, optional float borderWidth);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipColors assistChipColors(optional long containerColor, optional long labelColor, optional long leadingIconContentColor, optional long trailingIconContentColor, optional long disabledContainerColor, optional long disabledLabelColor, optional long disabledLeadingIconContentColor, optional long disabledTrailingIconContentColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipElevation assistChipElevation(optional float defaultElevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation, optional float draggedElevation, optional float disabledElevation);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipColors elevatedAssistChipColors(optional long containerColor, optional long labelColor, optional long leadingIconContentColor, optional long trailingIconContentColor, optional long disabledContainerColor, optional long disabledLabelColor, optional long disabledLeadingIconContentColor, optional long disabledTrailingIconContentColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipElevation elevatedAssistChipElevation(optional float defaultElevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation, optional float draggedElevation, optional float disabledElevation);
+    method public float getHeight();
+    method public float getIconSize();
+    property public final float Height;
+    property public final float IconSize;
+    field public static final androidx.compose.material3.AssistChipDefaults INSTANCE;
+  }
+
   public final class BadgeKt {
     method @androidx.compose.runtime.Composable public static void Badge(optional androidx.compose.ui.Modifier modifier, optional long containerColor, optional long contentColor, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit>? content);
     method @androidx.compose.runtime.Composable public static void BadgedBox(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.BoxScope,kotlin.Unit> badge, optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.BoxScope,kotlin.Unit> content);
@@ -122,6 +135,32 @@ package androidx.compose.material3 {
   public final class CheckboxKt {
     method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void Checkbox(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit>? onCheckedChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material3.CheckboxColors colors);
     method @androidx.compose.runtime.Composable public static void TriStateCheckbox(androidx.compose.ui.state.ToggleableState state, kotlin.jvm.functions.Function0<kotlin.Unit>? onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material3.CheckboxColors colors);
+  }
+
+  @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Stable public interface ChipBorder {
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.foundation.BorderStroke> borderStroke(boolean enabled);
+  }
+
+  @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Stable public interface ChipColors {
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> containerColor(boolean enabled);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> labelColor(boolean enabled);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> leadingIconContentColor(boolean enabled);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> trailingIconContentColor(boolean enabled);
+  }
+
+  @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Stable public interface ChipElevation {
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.unit.Dp> shadowElevation(boolean enabled, androidx.compose.foundation.interaction.InteractionSource interactionSource);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.unit.Dp> tonalElevation(boolean enabled, androidx.compose.foundation.interaction.InteractionSource interactionSource);
+  }
+
+  public final class ChipKt {
+    method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void AssistChip(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> label, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material3.ChipElevation? elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.ChipBorder? border, optional androidx.compose.material3.ChipColors colors);
+    method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void ElevatedAssistChip(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> label, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material3.ChipElevation? elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.ChipBorder? border, optional androidx.compose.material3.ChipColors colors);
+    method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void ElevatedFilterChip(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> label, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? selectedIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material3.SelectableChipElevation? elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.SelectableChipBorder? border, optional androidx.compose.material3.SelectableChipColors colors);
+    method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void ElevatedSuggestionChip(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> label, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional kotlin.jvm.functions.Function0<kotlin.Unit>? icon, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material3.ChipElevation? elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.ChipBorder? border, optional androidx.compose.material3.ChipColors colors);
+    method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void FilterChip(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> label, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? selectedIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material3.SelectableChipElevation? elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.SelectableChipBorder? border, optional androidx.compose.material3.SelectableChipColors colors);
+    method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void InputChip(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> label, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? avatar, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material3.ChipElevation? elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.ChipBorder? border, optional androidx.compose.material3.ChipColors colors);
+    method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void SuggestionChip(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> label, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional kotlin.jvm.functions.Function0<kotlin.Unit>? icon, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material3.ChipElevation? elevation, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.ChipBorder? border, optional androidx.compose.material3.ChipColors colors);
   }
 
   @androidx.compose.runtime.Stable public final class ColorScheme {
@@ -282,6 +321,19 @@ package androidx.compose.material3 {
     property public final int End;
   }
 
+  @androidx.compose.material3.ExperimentalMaterial3Api public final class FilterChipDefaults {
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.SelectableChipColors elevatedFilterChipColors(optional long containerColor, optional long labelColor, optional long iconColor, optional long disabledContainerColor, optional long disabledLabelColor, optional long disabledLeadingIconColor, optional long disabledTrailingIconColor, optional long selectedContainerColor, optional long selectedLabelColor, optional long selectedLeadingIconColor, optional long selectedTrailingIconColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.SelectableChipElevation elevatedFilterChipElevation(optional float defaultElevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation, optional float draggedElevation, optional float disabledElevation);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.SelectableChipBorder filterChipBorder(optional long borderColor, optional long selectedBorderColor, optional long disabledBorderColor, optional long disabledSelectedBorderColor, optional float borderWidth, optional float selectedBorderWidth);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.SelectableChipColors filterChipColors(optional long containerColor, optional long labelColor, optional long iconColor, optional long disabledContainerColor, optional long disabledLabelColor, optional long disabledLeadingIconColor, optional long disabledTrailingIconColor, optional long selectedContainerColor, optional long selectedLabelColor, optional long selectedLeadingIconColor, optional long selectedTrailingIconColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.SelectableChipElevation filterChipElevation(optional float defaultElevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation, optional float draggedElevation, optional float disabledElevation);
+    method public float getHeight();
+    method public float getIconSize();
+    property public final float Height;
+    property public final float IconSize;
+    field public static final androidx.compose.material3.FilterChipDefaults INSTANCE;
+  }
+
   public final class FloatingActionButtonDefaults {
     method @androidx.compose.runtime.Composable public androidx.compose.material3.FloatingActionButtonElevation elevation(optional float defaultElevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation);
     method public float getLargeIconSize();
@@ -313,6 +365,8 @@ package androidx.compose.material3 {
     method @androidx.compose.runtime.Composable public androidx.compose.material3.IconToggleButtonColors filledIconToggleButtonColors(optional long containerColor, optional long contentColor, optional long disabledContainerColor, optional long disabledContentColor, optional long checkedContainerColor, optional long checkedContentColor);
     method @androidx.compose.runtime.Composable public androidx.compose.material3.IconButtonColors filledTonalIconButtonColors(optional long containerColor, optional long contentColor, optional long disabledContainerColor, optional long disabledContentColor);
     method @androidx.compose.runtime.Composable public androidx.compose.material3.IconToggleButtonColors filledTonalIconToggleButtonColors(optional long containerColor, optional long contentColor, optional long disabledContainerColor, optional long disabledContentColor, optional long checkedContainerColor, optional long checkedContentColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.IconButtonColors iconButtonColors(optional long containerColor, optional long contentColor, optional long disabledContainerColor, optional long disabledContentColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.IconToggleButtonColors iconToggleButtonColors(optional long containerColor, optional long contentColor, optional long disabledContainerColor, optional long disabledContentColor, optional long checkedContainerColor, optional long checkedContentColor);
     method @androidx.compose.runtime.Composable public androidx.compose.foundation.BorderStroke outlinedIconButtonBorder(boolean enabled);
     method @androidx.compose.runtime.Composable public androidx.compose.material3.IconButtonColors outlinedIconButtonColors(optional long containerColor, optional long contentColor, optional long disabledContainerColor, optional long disabledContentColor);
     method @androidx.compose.runtime.Composable public androidx.compose.foundation.BorderStroke? outlinedIconToggleButtonBorder(boolean enabled, boolean checked);
@@ -325,8 +379,8 @@ package androidx.compose.material3 {
     method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void FilledIconToggleButton(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onCheckedChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.IconToggleButtonColors colors, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void FilledTonalIconButton(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.IconButtonColors colors, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void FilledTonalIconToggleButton(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onCheckedChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.IconToggleButtonColors colors, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static void IconButton(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static void IconToggleButton(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onCheckedChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void IconButton(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material3.IconButtonColors colors, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void IconToggleButton(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onCheckedChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material3.IconToggleButtonColors colors, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void OutlinedIconButton(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.material3.IconButtonColors colors, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void OutlinedIconToggleButton(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit> onCheckedChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.material3.IconToggleButtonColors colors, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
@@ -340,6 +394,19 @@ package androidx.compose.material3 {
   @androidx.compose.runtime.Stable public interface IconToggleButtonColors {
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> containerColor(boolean enabled, boolean checked);
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> contentColor(boolean enabled, boolean checked);
+  }
+
+  @androidx.compose.material3.ExperimentalMaterial3Api public final class InputChipDefaults {
+    method public float getAvatarSize();
+    method public float getHeight();
+    method public float getIconSize();
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipBorder inputChipBorder(optional long borderColor, optional long disabledBorderColor, optional float borderWidth);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipColors inputChipColors(optional long containerColor, optional long labelColor, optional long leadingIconContentColor, optional long trailingIconContentColor, optional long disabledContainerColor, optional long disabledLabelColor, optional long disabledLeadingIconContentColor, optional long disabledTrailingIconContentColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipElevation inputChipElevation(optional float defaultElevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation, optional float draggedElevation, optional float disabledElevation);
+    property public final float AvatarSize;
+    property public final float Height;
+    property public final float IconSize;
+    field public static final androidx.compose.material3.InputChipDefaults INSTANCE;
   }
 
   public final class MaterialTheme {
@@ -465,6 +532,22 @@ package androidx.compose.material3 {
     method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void Scaffold(optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit> topBar, optional kotlin.jvm.functions.Function0<kotlin.Unit> bottomBar, optional kotlin.jvm.functions.Function0<kotlin.Unit> snackbarHost, optional kotlin.jvm.functions.Function0<kotlin.Unit> floatingActionButton, optional int floatingActionButtonPosition, optional long containerColor, optional long contentColor, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.PaddingValues,kotlin.Unit> content);
   }
 
+  @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Stable public interface SelectableChipBorder {
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.foundation.BorderStroke> borderStroke(boolean enabled, boolean selected);
+  }
+
+  @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Stable public interface SelectableChipColors {
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> containerColor(boolean enabled, boolean selected);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> labelColor(boolean enabled, boolean selected);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> leadingIconContentColor(boolean enabled, boolean selected);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> trailingIconContentColor(boolean enabled, boolean selected);
+  }
+
+  @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Stable public interface SelectableChipElevation {
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.unit.Dp> shadowElevation(boolean enabled, boolean selected, androidx.compose.foundation.interaction.InteractionSource interactionSource);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.unit.Dp> tonalElevation(boolean enabled, boolean selected, androidx.compose.foundation.interaction.InteractionSource interactionSource);
+  }
+
   @androidx.compose.runtime.Immutable public final class Shapes {
     ctor public Shapes(optional androidx.compose.foundation.shape.CornerBasedShape extraSmall, optional androidx.compose.foundation.shape.CornerBasedShape small, optional androidx.compose.foundation.shape.CornerBasedShape medium, optional androidx.compose.foundation.shape.CornerBasedShape large, optional androidx.compose.foundation.shape.CornerBasedShape extraLarge);
     method public androidx.compose.material3.Shapes copy(optional androidx.compose.foundation.shape.CornerBasedShape extraSmall, optional androidx.compose.foundation.shape.CornerBasedShape small, optional androidx.compose.foundation.shape.CornerBasedShape medium, optional androidx.compose.foundation.shape.CornerBasedShape large, optional androidx.compose.foundation.shape.CornerBasedShape extraLarge);
@@ -503,6 +586,7 @@ package androidx.compose.material3 {
   }
 
   public final class SliderKt {
+    method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void RangeSlider(kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> values, kotlin.jvm.functions.Function1<? super kotlin.ranges.ClosedFloatingPointRange<java.lang.Float>,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange, optional int steps, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onValueChangeFinished, optional androidx.compose.material3.SliderColors colors);
     method @androidx.compose.runtime.Composable public static void Slider(float value, kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange, optional int steps, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onValueChangeFinished, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material3.SliderColors colors);
   }
 
@@ -555,6 +639,19 @@ package androidx.compose.material3 {
   public final class Strings_androidKt {
   }
 
+  @androidx.compose.material3.ExperimentalMaterial3Api public final class SuggestionChipDefaults {
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipColors elevatedSuggestionChipColors(optional long containerColor, optional long labelColor, optional long iconContentColor, optional long disabledContainerColor, optional long disabledLabelColor, optional long disabledIconContentColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipElevation elevatedSuggestionChipElevation(optional float defaultElevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation, optional float draggedElevation, optional float disabledElevation);
+    method public float getHeight();
+    method public float getIconSize();
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipBorder suggestionChipBorder(optional long borderColor, optional long disabledBorderColor, optional float borderWidth);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipColors suggestionChipColors(optional long containerColor, optional long labelColor, optional long iconContentColor, optional long disabledContainerColor, optional long disabledLabelColor, optional long disabledIconContentColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipElevation suggestionChipElevation(optional float defaultElevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation, optional float draggedElevation, optional float disabledElevation);
+    property public final float Height;
+    property public final float IconSize;
+    field public static final androidx.compose.material3.SuggestionChipDefaults INSTANCE;
+  }
+
   public final class SurfaceKt {
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void Surface(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.graphics.Shape shape, optional long color, optional long contentColor, optional float tonalElevation, optional float shadowElevation, optional androidx.compose.foundation.BorderStroke? border, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void Surface(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.ui.graphics.Shape shape, optional long color, optional long contentColor, optional float tonalElevation, optional float shadowElevation, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, kotlin.jvm.functions.Function0<kotlin.Unit> content);
@@ -568,17 +665,21 @@ package androidx.compose.material3 {
   }
 
   @androidx.compose.runtime.Stable public interface SwitchColors {
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> borderColor(boolean enabled, boolean checked);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> iconColor(boolean enabled, boolean checked);
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> thumbColor(boolean enabled, boolean checked);
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> trackColor(boolean enabled, boolean checked);
   }
 
   public final class SwitchDefaults {
-    method @androidx.compose.runtime.Composable public androidx.compose.material3.SwitchColors colors(optional long checkedThumbColor, optional long checkedTrackColor, optional long uncheckedThumbColor, optional long uncheckedTrackColor, optional long disabledCheckedThumbColor, optional long disabledCheckedTrackColor, optional long disabledUncheckedThumbColor, optional long disabledUncheckedTrackColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.SwitchColors colors(optional long checkedThumbColor, optional long checkedTrackColor, optional long checkedBorderColor, optional long checkedIconColor, optional long uncheckedThumbColor, optional long uncheckedTrackColor, optional long uncheckedBorderColor, optional long uncheckedIconColor, optional long disabledCheckedThumbColor, optional long disabledCheckedTrackColor, optional long disabledCheckedBorderColor, optional long disabledCheckedIconColor, optional long disabledUncheckedThumbColor, optional long disabledUncheckedTrackColor, optional long disabledUncheckedBorderColor, optional long disabledUncheckedIconColor);
+    method public float getIconSize();
+    property public final float IconSize;
     field public static final androidx.compose.material3.SwitchDefaults INSTANCE;
   }
 
   public final class SwitchKt {
-    method @androidx.compose.runtime.Composable public static void Switch(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit>? onCheckedChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material3.SwitchColors colors);
+    method @androidx.compose.runtime.Composable public static void Switch(boolean checked, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit>? onCheckedChange, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit>? thumbContent, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material3.SwitchColors colors);
   }
 
   public final class TabKt {
@@ -619,8 +720,8 @@ package androidx.compose.material3 {
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> trailingIconColor(boolean enabled, boolean isError, androidx.compose.foundation.interaction.InteractionSource interactionSource);
   }
 
-  public final class TextFieldDefaults {
-    method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public void BorderStroke(boolean enabled, boolean isError, androidx.compose.foundation.interaction.InteractionSource interactionSource, androidx.compose.material3.TextFieldColors colors, optional androidx.compose.ui.graphics.Shape shape, optional float focusedBorderThickness, optional float unfocusedBorderThickness);
+  @androidx.compose.runtime.Immutable public final class TextFieldDefaults {
+    method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public void BorderBox(boolean enabled, boolean isError, androidx.compose.foundation.interaction.InteractionSource interactionSource, androidx.compose.material3.TextFieldColors colors, optional androidx.compose.ui.graphics.Shape shape, optional float focusedBorderThickness, optional float unfocusedBorderThickness);
     method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public void OutlinedTextFieldDecorationBox(String value, kotlin.jvm.functions.Function0<kotlin.Unit> innerTextField, boolean enabled, boolean singleLine, androidx.compose.ui.text.input.VisualTransformation visualTransformation, androidx.compose.foundation.interaction.InteractionSource interactionSource, optional boolean isError, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional androidx.compose.material3.TextFieldColors colors, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional kotlin.jvm.functions.Function0<kotlin.Unit> border);
     method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public void TextFieldDecorationBox(String value, kotlin.jvm.functions.Function0<kotlin.Unit> innerTextField, boolean enabled, boolean singleLine, androidx.compose.ui.text.input.VisualTransformation visualTransformation, androidx.compose.foundation.interaction.InteractionSource interactionSource, optional boolean isError, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional androidx.compose.material3.TextFieldColors colors, optional androidx.compose.foundation.layout.PaddingValues contentPadding);
     method public float getFocusedBorderThickness();

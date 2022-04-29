@@ -399,8 +399,8 @@ class LazyGridState constructor(
      * items added or removed before our current first visible item and keep this item
      * as the first visible one even given that its index has been changed.
      */
-    internal fun updateScrollPositionIfTheFirstItemWasMoved(itemsProvider: LazyGridItemsProvider) {
-        scrollPosition.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
+    internal fun updateScrollPositionIfTheFirstItemWasMoved(itemProvider: LazyGridItemProvider) {
+        scrollPosition.updateScrollPositionIfTheFirstItemWasMoved(itemProvider)
     }
 
     companion object {

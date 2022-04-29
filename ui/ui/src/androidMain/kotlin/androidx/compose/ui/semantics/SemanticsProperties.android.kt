@@ -23,6 +23,8 @@ object SemanticsPropertiesAndroid {
     /**
      * @see SemanticsPropertyReceiver.testTagsAsResourceId
      */
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalComposeUiApi
     @ExperimentalComposeUiApi
     val TestTagsAsResourceId = SemanticsPropertyKey<Boolean>(
         name = "TestTagsAsResourceId",
@@ -45,6 +47,9 @@ object SemanticsPropertiesAndroid {
  * This property applies to a semantics subtree. For example, if it's set to true on the root semantics
  * node of the app (and no child nodes set it back to false), then every testTag will be mapped.
  */
+@Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+@get:ExperimentalComposeUiApi
+@set:ExperimentalComposeUiApi
 @ExperimentalComposeUiApi
 var SemanticsPropertyReceiver.testTagsAsResourceId by
     SemanticsPropertiesAndroid.TestTagsAsResourceId

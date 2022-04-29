@@ -61,7 +61,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun TextTabs() {
     var state by remember { mutableStateOf(0) }
-    val titles = listOf("TAB 1", "TAB 2", "TAB 3 WITH LOTS OF TEXT")
+    val titles = listOf("Tab 1", "Tab 2", "Tab 3 with lots of text")
     Column {
         TabRow(selectedTabIndex = state) {
             titles.forEachIndexed { index, title ->
@@ -106,9 +106,9 @@ fun IconTabs() {
 fun TextAndIconTabs() {
     var state by remember { mutableStateOf(0) }
     val titlesAndIcons = listOf(
-        "TAB 1" to Icons.Filled.Favorite,
-        "TAB 2" to Icons.Filled.Favorite,
-        "TAB 3 WITH LOTS OF TEXT" to Icons.Filled.Favorite
+        "Tab 1" to Icons.Filled.Favorite,
+        "Tab 2" to Icons.Filled.Favorite,
+        "Tab 3 with lots of text" to Icons.Filled.Favorite
     )
     Column {
         TabRow(selectedTabIndex = state) {
@@ -133,9 +133,9 @@ fun TextAndIconTabs() {
 fun LeadingIconTabs() {
     var state by remember { mutableStateOf(0) }
     val titlesAndIcons = listOf(
-        "TAB" to Icons.Filled.Favorite,
-        "TAB & ICON" to Icons.Filled.Favorite,
-        "TAB 3 WITH LOTS OF TEXT" to Icons.Filled.Favorite
+        "Tab" to Icons.Filled.Favorite,
+        "Tab & icon" to Icons.Filled.Favorite,
+        "Tab 3 with lots of text" to Icons.Filled.Favorite
     )
     Column {
         TabRow(selectedTabIndex = state) {
@@ -160,16 +160,16 @@ fun LeadingIconTabs() {
 fun ScrollingTextTabs() {
     var state by remember { mutableStateOf(0) }
     val titles = listOf(
-        "TAB 1",
-        "TAB 2",
-        "TAB 3 WITH LOTS OF TEXT",
-        "TAB 4",
-        "TAB 5",
-        "TAB 6 WITH LOTS OF TEXT",
-        "TAB 7",
-        "TAB 8",
-        "TAB 9 WITH LOTS OF TEXT",
-        "TAB 10"
+        "Tab 1",
+        "Tab 2",
+        "Tab 3 with lots of text",
+        "Tab 4",
+        "Tab 5",
+        "Tab 6 with lots of text",
+        "Tab 7",
+        "Tab 8",
+        "Tab 9 with lots of text",
+        "Tab 10"
     )
     Column {
         ScrollableTabRow(selectedTabIndex = state) {
@@ -193,7 +193,7 @@ fun ScrollingTextTabs() {
 @Composable
 fun FancyTabs() {
     var state by remember { mutableStateOf(0) }
-    val titles = listOf("TAB 1", "TAB 2", "TAB 3")
+    val titles = listOf("Tab 1", "Tab 2", "Tab 3")
     Column {
         TabRow(selectedTabIndex = state) {
             titles.forEachIndexed { index, title ->
@@ -212,7 +212,7 @@ fun FancyTabs() {
 @Composable
 fun FancyIndicatorTabs() {
     var state by remember { mutableStateOf(0) }
-    val titles = listOf("TAB 1", "TAB 2", "TAB 3")
+    val titles = listOf("Tab 1", "Tab 2", "Tab 3")
 
     // Reuse the default offset animation modifier, but use our own indicator
     val indicator = @Composable { tabPositions: List<TabPosition> ->
@@ -244,7 +244,7 @@ fun FancyIndicatorTabs() {
 @Composable
 fun FancyIndicatorContainerTabs() {
     var state by remember { mutableStateOf(0) }
-    val titles = listOf("TAB 1", "TAB 2", "TAB 3")
+    val titles = listOf("Tab 1", "Tab 2", "Tab 3")
 
     val indicator = @Composable { tabPositions: List<TabPosition> ->
         FancyAnimatedIndicator(tabPositions = tabPositions, selectedTabIndex = state)
@@ -275,16 +275,16 @@ fun FancyIndicatorContainerTabs() {
 fun ScrollingFancyIndicatorContainerTabs() {
     var state by remember { mutableStateOf(0) }
     val titles = listOf(
-        "TAB 1",
-        "TAB 2",
-        "TAB 3 WITH LOTS OF TEXT",
-        "TAB 4",
-        "TAB 5",
-        "TAB 6 WITH LOTS OF TEXT",
-        "TAB 7",
-        "TAB 8",
-        "TAB 9 WITH LOTS OF TEXT",
-        "TAB 10"
+        "Tab 1",
+        "Tab 2",
+        "Tab 3 with lots of text",
+        "Tab 4",
+        "Tab 5",
+        "Tab 6 with lots of text",
+        "Tab 7",
+        "Tab 8",
+        "Tab 9 with lots of text",
+        "Tab 10"
     )
     val indicator = @Composable { tabPositions: List<TabPosition> ->
         FancyAnimatedIndicator(tabPositions = tabPositions, selectedTabIndex = state)

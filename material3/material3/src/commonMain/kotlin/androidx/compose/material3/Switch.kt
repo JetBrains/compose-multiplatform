@@ -18,25 +18,28 @@ package androidx.compose.material3
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.tokens.SwitchTokens
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -45,67 +48,97 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
 /**
- * Material Design switch toggles the state of a single item on or off.
+ * <a href="https://m3.material.io/components/switch" class="external" target="_blank">Material Design Switch</a>.
+ *
+ * Switches toggle the state of a single item on or off.
+ *
+ * ![Switch image](https://developer.android.com/images/reference/androidx/compose/material3/switch.png)
  *
  * @sample androidx.compose.material3.samples.SwitchSample
  *
- * @param checked whether or not this component is checked
- * @param onCheckedChange callback to be invoked when Switch is being clicked,
- * therefore the change of checked state is requested.  If null, then this is passive
- * and relies entirely on a higher-level component to control the "checked" state.
- * @param modifier Modifier to be applied to the switch layout
- * @param enabled whether the component is enabled or grayed out
- * @param interactionSource the [MutableInteractionSource] representing the stream of
- * [Interaction]s for this Switch. You can create and pass in your own remembered
- * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
- * appearance / behavior of this Switch in different [Interaction]s.
- * @param colors [SwitchColors] that will be used to determine the color of the thumb and track
- * in different states. See [SwitchDefaults.colors].
+ * Switch can be used with a custom icon via [thumbContent] parameter
+ *
+ * @sample androidx.compose.material3.samples.SwitchWithThumbIconSample
+ *
+ * @param checked whether or not this switch is checked
+ * @param onCheckedChange called when this switch is clicked. If `null`, then this switch will not
+ * be interactable, unless something else handles its input events and updates its state.
+ * @param modifier the [Modifier] to be applied to this switch
+ * @param thumbContent content that will be drawn inside the thumb, expected to measure
+ * [SwitchDefaults.IconSize]
+ * @param enabled controls the enabled state of this switch. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this switch. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this switch in different states.
+ * @param colors [SwitchColors] that will be used to resolve the colors used for this switch in
+ * different states. See [SwitchDefaults.colors].
  */
-// TODO: b/223858692 add m.io documentation
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
+@Suppress("ComposableLambdaParameterNaming", "ComposableLambdaParameterPosition")
 fun Switch(
     checked: Boolean,
     onCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier = Modifier,
+    thumbContent: (@Composable () -> Unit)? = null,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    colors: SwitchColors = SwitchDefaults.colors()
+    colors: SwitchColors = SwitchDefaults.colors(),
 ) {
-    val minBound = 0f
+    val uncheckedThumbDiameter = if (thumbContent == null) {
+        UncheckedThumbDiameter
+    } else {
+        ThumbDiameter
+    }
+
+    val thumbPaddingStart = (SwitchHeight - uncheckedThumbDiameter) / 2
+    val minBound = with(LocalDensity.current) { thumbPaddingStart.toPx() }
     val maxBound = with(LocalDensity.current) { ThumbPathLength.toPx() }
     val valueToOffset = remember<(Boolean) -> Float>(minBound, maxBound) {
         { value -> if (value) maxBound else minBound }
     }
 
-    val offset = remember { Animatable(valueToOffset(checked)) }
+    val targetValue = valueToOffset(checked)
+    val offset = remember { Animatable(targetValue) }
     val scope = rememberCoroutineScope()
+
+    SideEffect {
+        // min bound might have changed if the icon is only rendered in checked state.
+        offset.updateBounds(lowerBound = minBound)
+    }
+
+    DisposableEffect(checked) {
+        if (offset.targetValue != targetValue) {
+            scope.launch {
+                offset.animateTo(targetValue)
+            }
+        }
+        onDispose { }
+    }
+
     // TODO: Add Swipeable modifier b/223797571
     val toggleableModifier =
         if (onCheckedChange != null) {
             Modifier.toggleable(
                 value = checked,
                 onValueChange = { value: Boolean ->
+                    onCheckedChange(value)
                     scope.launch {
                         offset.animateTo(valueToOffset(value), AnimationSpec)
                     }
-                    onCheckedChange(value)
                 },
                 enabled = enabled,
                 role = Role.Switch,
@@ -123,7 +156,6 @@ fun Switch(
             )
             .then(toggleableModifier)
             .wrapContentSize(Alignment.Center)
-            .padding(DefaultSwitchPadding)
             .requiredSize(SwitchWidth, SwitchHeight)
     ) {
         SwitchImpl(
@@ -132,7 +164,11 @@ fun Switch(
             colors = colors,
             thumbValue = offset.asState(),
             interactionSource = interactionSource,
-            handleShape = SwitchTokens.HandleShape.toShape()
+            thumbShape = SwitchTokens.HandleShape.toShape(),
+            uncheckedThumbDiameter = uncheckedThumbDiameter,
+            minBound = thumbPaddingStart,
+            maxBound = ThumbPathLength,
+            thumbContent = thumbContent,
         )
     }
 }
@@ -163,63 +199,108 @@ interface SwitchColors {
      */
     @Composable
     fun trackColor(enabled: Boolean, checked: Boolean): State<Color>
+
+    /**
+     * Represents the color used for the switch's border, depending on [enabled] and [checked].
+     *
+     * @param enabled whether the [Switch] is enabled or not
+     * @param checked whether the [Switch] is checked or not
+     */
+    @Composable
+    fun borderColor(enabled: Boolean, checked: Boolean): State<Color>
+
+    /**
+     * Represents the content color passed to the icon if used
+     *
+     * @param enabled whether the [Switch] is enabled or not
+     * @param checked whether the [Switch] is checked or not
+     */
+    @Composable
+    fun iconColor(enabled: Boolean, checked: Boolean): State<Color>
 }
 
 @Composable
+@Suppress("ComposableLambdaParameterNaming", "ComposableLambdaParameterPosition")
 private fun BoxScope.SwitchImpl(
     checked: Boolean,
     enabled: Boolean,
     colors: SwitchColors,
     thumbValue: State<Float>,
+    thumbContent: (@Composable () -> Unit)?,
     interactionSource: InteractionSource,
-    handleShape: Shape,
+    thumbShape: Shape,
+    uncheckedThumbDiameter: Dp,
+    minBound: Dp,
+    maxBound: Dp,
 ) {
-    val elevation = if (enabled) ThumbDefaultElevation else ThumbDisabledElevation
     val trackColor by colors.trackColor(enabled, checked)
-    Canvas(Modifier.align(Alignment.Center).fillMaxSize()) {
-        drawTrack(trackColor, TrackWidth.toPx(), TrackStrokeWidth.toPx())
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val thumbValueDp = with(LocalDensity.current) { thumbValue.value.toDp() }
+    val thumbSizeDp = if (isPressed) {
+        SwitchTokens.PressedHandleWidth
+    } else {
+        uncheckedThumbDiameter + (ThumbDiameter - uncheckedThumbDiameter) *
+            ((thumbValueDp - minBound) / (maxBound - minBound))
     }
-    val thumbColor by colors.thumbColor(enabled, checked)
-    val resolvedThumbColor = thumbColor
-    Spacer(
-        Modifier
-            .align(Alignment.CenterStart)
-            .offset { IntOffset(thumbValue.value.roundToInt(), 0) }
-            .indication(
-                interactionSource = interactionSource,
-                indication = rememberRipple(bounded = false, radius = ThumbRippleRadius)
-            )
-            .requiredSize(ThumbDiameter)
-            .shadow(elevation, handleShape, clip = false)
-            .background(resolvedThumbColor, handleShape)
-    )
+
+    val thumbOffset = if (isPressed) {
+        with(LocalDensity.current) {
+            if (checked) {
+                ThumbPathLength - SwitchTokens.TrackOutlineWidth
+            } else {
+                SwitchTokens.TrackOutlineWidth
+            }.toPx()
+        }
+    } else {
+        thumbValue.value
+    }
+
+    val trackShape = SwitchTokens.TrackShape.toShape()
+    val modifier = Modifier.align(Alignment.Center)
+        .width(SwitchWidth)
+        .height(SwitchHeight)
+        .border(
+            SwitchTokens.TrackOutlineWidth,
+            colors.borderColor(enabled, checked).value,
+            trackShape
+        )
+        .background(trackColor, trackShape)
+
+    Box(modifier) {
+        val thumbColor by colors.thumbColor(enabled, checked)
+        val resolvedThumbColor = thumbColor
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .offset { IntOffset(thumbOffset.roundToInt(), 0) }
+                .indication(
+                    interactionSource = interactionSource,
+                    indication = rememberRipple(bounded = false, SwitchTokens.StateLayerSize / 2)
+                )
+                .requiredSize(thumbSizeDp)
+                .background(resolvedThumbColor, thumbShape),
+            contentAlignment = Alignment.Center
+        ) {
+            if (thumbContent != null) {
+                val iconColor = colors.iconColor(enabled, checked)
+                CompositionLocalProvider(
+                    LocalContentColor provides iconColor.value,
+                    content = thumbContent
+                )
+            }
+        }
+    }
 }
 
-private fun DrawScope.drawTrack(trackColor: Color, trackWidth: Float, strokeWidth: Float) {
-    val strokeRadius = strokeWidth / 2
-    drawLine(
-        trackColor,
-        Offset(strokeRadius, center.y),
-        Offset(trackWidth - strokeRadius, center.y),
-        strokeWidth,
-        StrokeCap.Round
-    )
-}
-
-internal val TrackWidth = SwitchTokens.TrackWidth
-internal val TrackStrokeWidth = SwitchTokens.TrackHeight
-internal val ThumbDiameter = SwitchTokens.HandleWidth
-
-private val ThumbRippleRadius = SwitchTokens.StateLayerSize / 2
-
-private val DefaultSwitchPadding = 2.dp
-private val SwitchWidth = TrackWidth
-private val SwitchHeight = ThumbDiameter
-private val ThumbPathLength = TrackWidth - ThumbDiameter
+internal val ThumbDiameter = SwitchTokens.SelectedHandleWidth
+internal val UncheckedThumbDiameter = SwitchTokens.UnselectedHandleWidth
+private val SwitchWidth = SwitchTokens.TrackWidth
+private val SwitchHeight = SwitchTokens.TrackHeight
+private val ThumbPadding = (SwitchHeight - ThumbDiameter) / 2
+private val ThumbPathLength = (SwitchWidth - ThumbDiameter) - ThumbPadding
 
 private val AnimationSpec = TweenSpec<Float>(durationMillis = 100)
-private val ThumbDefaultElevation = SwitchTokens.HandleElevation
-private val ThumbDisabledElevation = SwitchTokens.DisabledHandleElevation
 
 /**
  * Contains the default values used by [Switch]
@@ -231,43 +312,77 @@ object SwitchDefaults {
      *
      * @param checkedThumbColor the color used for the thumb when enabled and checked
      * @param checkedTrackColor the color used for the track when enabled and checked
-     * [disabledCheckedTrackColor]
+     * @param checkedBorderColor the color used for the border when enabled and checked
+     * @param checkedIconColor the color used for the icon when enabled and checked
      * @param uncheckedThumbColor the color used for the thumb when enabled and unchecked
      * @param uncheckedTrackColor the color used for the track when enabled and unchecked
-     * [disabledUncheckedTrackColor]
+     * @param uncheckedBorderColor the color used for the border when enabled and unchecked
+     * @param uncheckedIconColor the color used for the icon when enabled and unchecked
      * @param disabledCheckedThumbColor the color used for the thumb when disabled and checked
      * @param disabledCheckedTrackColor the color used for the track when disabled and checked
+     * @param disabledCheckedBorderColor the color used for the border when disabled and checked
+     * @param disabledCheckedIconColor the color used for the icon when disabled and checked
      * @param disabledUncheckedThumbColor the color used for the thumb when disabled and unchecked
      * @param disabledUncheckedTrackColor the color used for the track when disabled and unchecked
+     * @param disabledUncheckedBorderColor the color used for the border when disabled and unchecked
+     * @param disabledUncheckedIconColor the color used for the icon when disabled and unchecked
      */
     @Composable
     fun colors(
         checkedThumbColor: Color = SwitchTokens.SelectedHandleColor.toColor(),
         checkedTrackColor: Color = SwitchTokens.SelectedTrackColor.toColor(),
+        checkedBorderColor: Color = Color.Transparent,
+        checkedIconColor: Color = SwitchTokens.SelectedIconColor.toColor(),
         uncheckedThumbColor: Color = SwitchTokens.UnselectedHandleColor.toColor(),
         uncheckedTrackColor: Color = SwitchTokens.UnselectedTrackColor.toColor(),
+        uncheckedBorderColor: Color = SwitchTokens.UnselectedFocusTrackOutlineColor.toColor(),
+        uncheckedIconColor: Color = SwitchTokens.UnselectedIconColor.toColor(),
         disabledCheckedThumbColor: Color = checkedThumbColor
-            .copy(alpha = SwitchTokens.DisabledHandleOpacity)
+            .copy(alpha = SwitchTokens.DisabledSelectedHandleOpacity)
             .compositeOver(MaterialTheme.colorScheme.surface),
         disabledCheckedTrackColor: Color = checkedTrackColor
             .copy(alpha = SwitchTokens.DisabledTrackOpacity)
             .compositeOver(MaterialTheme.colorScheme.surface),
+        disabledCheckedBorderColor: Color = Color.Transparent,
+        disabledCheckedIconColor: Color = SwitchTokens.DisabledSelectedIconColor.toColor()
+            .copy(alpha = SwitchTokens.DisabledSelectedIconOpacity)
+            .compositeOver(MaterialTheme.colorScheme.surface),
         disabledUncheckedThumbColor: Color = uncheckedThumbColor
-            .copy(alpha = SwitchTokens.DisabledHandleOpacity)
+            .copy(alpha = SwitchTokens.DisabledSelectedHandleOpacity)
             .compositeOver(MaterialTheme.colorScheme.surface),
         disabledUncheckedTrackColor: Color = uncheckedTrackColor
             .copy(alpha = SwitchTokens.DisabledTrackOpacity)
-            .compositeOver(MaterialTheme.colorScheme.surface)
+            .compositeOver(MaterialTheme.colorScheme.surface),
+        disabledUncheckedBorderColor: Color =
+            SwitchTokens.DisabledUnselectedTrackOutlineColor.toColor()
+                .copy(alpha = SwitchTokens.DisabledTrackOpacity)
+                .compositeOver(MaterialTheme.colorScheme.surface),
+        disabledUncheckedIconColor: Color = SwitchTokens.DisabledUnselectedIconColor.toColor()
+            .copy(alpha = SwitchTokens.DisabledUnselectedIconOpacity)
+            .compositeOver(MaterialTheme.colorScheme.surface),
     ): SwitchColors = DefaultSwitchColors(
         checkedThumbColor = checkedThumbColor,
         checkedTrackColor = checkedTrackColor,
+        checkedBorderColor = checkedBorderColor,
+        checkedIconColor = checkedIconColor,
         uncheckedThumbColor = uncheckedThumbColor,
         uncheckedTrackColor = uncheckedTrackColor,
+        uncheckedBorderColor = uncheckedBorderColor,
+        uncheckedIconColor = uncheckedIconColor,
         disabledCheckedThumbColor = disabledCheckedThumbColor,
         disabledCheckedTrackColor = disabledCheckedTrackColor,
+        disabledCheckedBorderColor = disabledCheckedBorderColor,
+        disabledCheckedIconColor = disabledCheckedIconColor,
         disabledUncheckedThumbColor = disabledUncheckedThumbColor,
-        disabledUncheckedTrackColor = disabledUncheckedTrackColor
+        disabledUncheckedTrackColor = disabledUncheckedTrackColor,
+        disabledUncheckedBorderColor = disabledUncheckedBorderColor,
+        disabledUncheckedIconColor = disabledUncheckedIconColor
     )
+
+    /**
+     * Icon size to use for `thumbContent`
+     */
+    val IconSize = 16.dp
 }
 
 /**
@@ -277,12 +392,20 @@ object SwitchDefaults {
 private class DefaultSwitchColors(
     private val checkedThumbColor: Color,
     private val checkedTrackColor: Color,
+    private val checkedBorderColor: Color,
+    private val checkedIconColor: Color,
     private val uncheckedThumbColor: Color,
     private val uncheckedTrackColor: Color,
+    private val uncheckedBorderColor: Color,
+    private val uncheckedIconColor: Color,
     private val disabledCheckedThumbColor: Color,
     private val disabledCheckedTrackColor: Color,
+    private val disabledCheckedBorderColor: Color,
+    private val disabledCheckedIconColor: Color,
     private val disabledUncheckedThumbColor: Color,
-    private val disabledUncheckedTrackColor: Color
+    private val disabledUncheckedTrackColor: Color,
+    private val disabledUncheckedBorderColor: Color,
+    private val disabledUncheckedIconColor: Color
 ) : SwitchColors {
     @Composable
     override fun thumbColor(enabled: Boolean, checked: Boolean): State<Color> {
@@ -306,6 +429,28 @@ private class DefaultSwitchColors(
         )
     }
 
+    @Composable
+    override fun borderColor(enabled: Boolean, checked: Boolean): State<Color> {
+        return rememberUpdatedState(
+            if (enabled) {
+                if (checked) checkedBorderColor else uncheckedBorderColor
+            } else {
+                if (checked) disabledCheckedBorderColor else disabledUncheckedBorderColor
+            }
+        )
+    }
+
+    @Composable
+    override fun iconColor(enabled: Boolean, checked: Boolean): State<Color> {
+        return rememberUpdatedState(
+            if (enabled) {
+                if (checked) checkedIconColor else uncheckedIconColor
+            } else {
+                if (checked) disabledCheckedIconColor else disabledUncheckedIconColor
+            }
+        )
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
@@ -314,12 +459,20 @@ private class DefaultSwitchColors(
 
         if (checkedThumbColor != other.checkedThumbColor) return false
         if (checkedTrackColor != other.checkedTrackColor) return false
+        if (checkedBorderColor != other.checkedBorderColor) return false
+        if (checkedIconColor != other.checkedIconColor) return false
         if (uncheckedThumbColor != other.uncheckedThumbColor) return false
         if (uncheckedTrackColor != other.uncheckedTrackColor) return false
+        if (uncheckedBorderColor != other.uncheckedBorderColor) return false
+        if (uncheckedIconColor != other.uncheckedIconColor) return false
         if (disabledCheckedThumbColor != other.disabledCheckedThumbColor) return false
         if (disabledCheckedTrackColor != other.disabledCheckedTrackColor) return false
+        if (disabledCheckedBorderColor != other.disabledCheckedBorderColor) return false
+        if (disabledCheckedIconColor != other.disabledCheckedIconColor) return false
         if (disabledUncheckedThumbColor != other.disabledUncheckedThumbColor) return false
         if (disabledUncheckedTrackColor != other.disabledUncheckedTrackColor) return false
+        if (disabledUncheckedBorderColor != other.disabledUncheckedBorderColor) return false
+        if (disabledUncheckedIconColor != other.disabledUncheckedIconColor) return false
 
         return true
     }
@@ -327,12 +480,20 @@ private class DefaultSwitchColors(
     override fun hashCode(): Int {
         var result = checkedThumbColor.hashCode()
         result = 31 * result + checkedTrackColor.hashCode()
+        result = 31 * result + checkedBorderColor.hashCode()
+        result = 31 * result + checkedIconColor.hashCode()
         result = 31 * result + uncheckedThumbColor.hashCode()
         result = 31 * result + uncheckedTrackColor.hashCode()
+        result = 31 * result + uncheckedBorderColor.hashCode()
+        result = 31 * result + uncheckedIconColor.hashCode()
         result = 31 * result + disabledCheckedThumbColor.hashCode()
         result = 31 * result + disabledCheckedTrackColor.hashCode()
+        result = 31 * result + disabledCheckedBorderColor.hashCode()
+        result = 31 * result + disabledCheckedIconColor.hashCode()
         result = 31 * result + disabledUncheckedThumbColor.hashCode()
         result = 31 * result + disabledUncheckedTrackColor.hashCode()
+        result = 31 * result + disabledUncheckedBorderColor.hashCode()
+        result = 31 * result + disabledUncheckedIconColor.hashCode()
         return result
     }
 }

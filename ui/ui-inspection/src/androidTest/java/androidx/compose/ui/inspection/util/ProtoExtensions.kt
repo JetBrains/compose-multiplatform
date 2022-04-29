@@ -40,6 +40,18 @@ fun GetParametersCommand(
     }.build()
 }.build()
 
+fun GetParametersByAnchorHashCommand(
+    rootViewId: Long,
+    anchorHash: Int,
+    skipSystemComposables: Boolean = true
+): Command = Command.newBuilder().apply {
+    getParametersCommand = GetParametersCommand.newBuilder().apply {
+        this.rootViewId = rootViewId
+        this.anchorHash = anchorHash
+        this.skipSystemComposables = skipSystemComposables
+    }.build()
+}.build()
+
 fun GetAllParametersCommand(
     rootViewId: Long,
     skipSystemComposables: Boolean = true
@@ -73,10 +85,16 @@ fun GetParameterDetailsCommand(
 fun GetComposablesCommand(
     rootViewId: Long,
     skipSystemComposables: Boolean = true,
-    generation: Int = 1
+    generation: Int = 1,
+    extractAllParameters: Boolean = false
 ): Command =
     Command.newBuilder().apply {
-        getComposablesCommand = GetComposablesCommand.newBuilder()
+        getComposablesCommand = GetComposablesCommand.newBuilder().apply {
+            this.rootViewId = rootViewId
+            this.skipSystemComposables = skipSystemComposables
+            this.generation = generation
+            this.extractAllParameters = extractAllParameters
+        }
             .setRootViewId(rootViewId)
             .setSkipSystemComposables(skipSystemComposables)
             .setGeneration(generation)
@@ -84,14 +102,16 @@ fun GetComposablesCommand(
     }.build()
 
 fun GetUpdateSettingsCommand(
-    includeRecomposeCounts: Boolean,
-    keepRecomposeCounts: Boolean = false
+    includeRecomposeCounts: Boolean = false,
+    keepRecomposeCounts: Boolean = false,
+    delayParameterExtractions: Boolean = false
 ): Command =
     Command.newBuilder().apply {
-        updateSettingsCommand = UpdateSettingsCommand.newBuilder()
-            .setIncludeRecomposeCounts(includeRecomposeCounts)
-            .setKeepRecomposeCounts(keepRecomposeCounts)
-            .build()
+        updateSettingsCommand = UpdateSettingsCommand.newBuilder().apply {
+            this.includeRecomposeCounts = includeRecomposeCounts
+            this.keepRecomposeCounts = keepRecomposeCounts
+            this.delayParameterExtractions = delayParameterExtractions
+        }.build()
     }.build()
 
 fun ComposableNode.flatten(): List<ComposableNode> =

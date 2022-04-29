@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.Constraints
  * A layout that only composes and lays out currently needed items. Can be used to build
  * efficient scrollable layouts.
  *
- * @param itemsProvider provides all the needed info about the items which could be used to
+ * @param itemProvider provides all the needed info about the items which could be used to
  * compose and measure items as part of [measurePolicy].
  * @param modifier to apply on the layout
  * @param prefetchState allows to schedule items for prefetching
@@ -41,16 +41,16 @@ import androidx.compose.ui.unit.Constraints
 @ExperimentalFoundationApi
 @Composable
 fun LazyLayout(
-    itemsProvider: LazyLayoutItemsProvider,
+    itemProvider: LazyLayoutItemProvider,
     modifier: Modifier = Modifier,
     prefetchState: LazyLayoutPrefetchState? = null,
     measurePolicy: LazyLayoutMeasureScope.(Constraints) -> MeasureResult
 ) {
-    val currentItemsProvider = rememberUpdatedState(itemsProvider)
+    val currentItemProvider = rememberUpdatedState(itemProvider)
 
     val saveableStateHolder = rememberSaveableStateHolder()
     val itemContentFactory = remember {
-        LazyLayoutItemContentFactory(saveableStateHolder) { currentItemsProvider.value }
+        LazyLayoutItemContentFactory(saveableStateHolder) { currentItemProvider.value }
     }
     val subcomposeLayoutState = remember {
         SubcomposeLayoutState(LazyLayoutItemReusePolicy(itemContentFactory))

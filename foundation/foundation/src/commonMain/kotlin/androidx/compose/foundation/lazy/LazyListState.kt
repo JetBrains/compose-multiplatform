@@ -154,11 +154,6 @@ class LazyListState constructor(
     internal val firstVisibleItemScrollOffsetNonObservable: Int get() = scrollPosition.scrollOffset
 
     /**
-     * Non-observable property with the count of items being visible during the last measure pass.
-     */
-    internal var visibleItemsCount = 0
-
-    /**
      * Needed for [animateScrollToItem].  Updated on every measure.
      */
     internal var density: Density = Density(1f, 1f)
@@ -202,8 +197,8 @@ class LazyListState constructor(
      * The [Remeasurement] object associated with our layout. It allows us to remeasure
      * synchronously during scroll.
      */
-    private var remeasurement: Remeasurement? = null
-
+    internal var remeasurement: Remeasurement? = null
+        private set
     /**
      * The modifier which provides [remeasurement].
      */
@@ -360,7 +355,6 @@ class LazyListState constructor(
      *  Updates the state with the new calculated scroll position and consumed scroll.
      */
     internal fun applyMeasureResult(result: LazyListMeasureResult) {
-        visibleItemsCount = result.visibleItemsInfo.size
         scrollPosition.updateFromMeasureResult(result)
         scrollToBeConsumed -= result.consumedScroll
         layoutInfoState.value = result
@@ -377,8 +371,8 @@ class LazyListState constructor(
      * items added or removed before our current first visible item and keep this item
      * as the first visible one even given that its index has been changed.
      */
-    internal fun updateScrollPositionIfTheFirstItemWasMoved(itemsProvider: LazyListItemsProvider) {
-        scrollPosition.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
+    internal fun updateScrollPositionIfTheFirstItemWasMoved(itemProvider: LazyListItemProvider) {
+        scrollPosition.updateScrollPositionIfTheFirstItemWasMoved(itemProvider)
     }
 
     companion object {

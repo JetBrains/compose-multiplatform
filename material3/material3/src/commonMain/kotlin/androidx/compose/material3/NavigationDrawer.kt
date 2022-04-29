@@ -238,17 +238,19 @@ fun rememberDrawerState(
  *
  * @sample androidx.compose.material3.samples.ModalNavigationDrawerSample
  *
- * @param drawerContent composable that represents content inside the drawer
- * @param modifier optional modifier for the drawer
+ * @param drawerContent content inside this drawer
+ * @param modifier the [Modifier] to be applied to this drawer
  * @param drawerState state of the drawer
- * @param gesturesEnabled whether or not drawer can be interacted by gestures
- * @param drawerShape shape of the drawer container
- * @param drawerTonalElevation Affects the alpha of the color overlay applied on the container color
- * of the drawer container.
- * @param drawerContainerColor container color to be used for the drawer container
- * @param drawerContentColor color of the content to use inside the drawer container. Defaults to
- * either the matching content color for [drawerContainerColor], or, if it is not a color from
- * the theme, this will keep the same value set above this Surface.
+ * @param gesturesEnabled whether or not the drawer can be interacted by gestures
+ * @param drawerShape defines the shape of this drawer's container
+ * @param drawerTonalElevation when [drawerContainerColor] is [ColorScheme.surface], a translucent
+ * primary color overlay is applied on top of the container. A higher tonal elevation value will
+ * result in a darker color in light theme and lighter color in dark theme. See also: [Surface].
+ * @param drawerContainerColor the color used for the background of this drawer. Use
+ * [Color.Transparent] to have no color.
+ * @param drawerContentColor the preferred color for content inside this drawer. Defaults to either
+ * the matching content color for [drawerContainerColor], or to the current [LocalContentColor] if
+ * [drawerContainerColor] is not a color from the theme.
  * @param scrimColor color of the scrim that obscures content when the drawer is open
  * @param content content of the rest of the UI
  */
@@ -387,17 +389,19 @@ fun NavigationDrawer(
  *
  * @sample androidx.compose.material3.samples.DismissibleNavigationDrawerSample
  *
- * @param drawerContent composable that represents content inside the drawer
- * @param modifier optional modifier for the drawer
+ * @param drawerContent content inside this drawer
+ * @param modifier the [Modifier] to be applied to this drawer
  * @param drawerState state of the drawer
- * @param gesturesEnabled whether or not drawer can be interacted by gestures
- * @param drawerShape shape of the drawer container
- * @param drawerTonalElevation Affects the alpha of the color overlay applied on the container color
- * of the drawer container.
- * @param drawerContainerColor container color to be used for the drawer container
- * @param drawerContentColor color of the content to use inside the drawer container. Defaults to
- * either the matching content color for [drawerContainerColor], or, if it is not a color from
- * the theme, this will keep the same value set above this Surface.
+ * @param gesturesEnabled whether or not the drawer can be interacted by gestures
+ * @param drawerShape defines the shape of this drawer's container
+ * @param drawerTonalElevation when [drawerContainerColor] is [ColorScheme.surface], a translucent
+ * primary color overlay is applied on top of the container. A higher tonal elevation value will
+ * result in a darker color in light theme and lighter color in dark theme. See also: [Surface].
+ * @param drawerContainerColor the color used for the background of this drawer. Use
+ * [Color.Transparent] to have no color.
+ * @param drawerContentColor the preferred color for content inside this drawer. Defaults to either
+ * the matching content color for [drawerContainerColor], or to the current [LocalContentColor] if
+ * [drawerContainerColor] is not a color from the theme.
  * @param content content of the rest of the UI
  */
 @Composable
@@ -488,15 +492,17 @@ fun DismissibleNavigationDrawer(
  *
  * @sample androidx.compose.material3.samples.PermanentNavigationDrawerSample
  *
- * @param drawerContent composable that represents content inside the drawer
- * @param modifier optional modifier for the drawer
- * @param drawerShape shape of the drawer container
- * @param drawerTonalElevation Affects the alpha of the color overlay applied on the container color
- * of the drawer container.
- * @param drawerContainerColor container color to be used for the drawer container
- * @param drawerContentColor color of the content to use inside the drawer container. Defaults to
- * either the matching content color for [drawerContainerColor], or, if it is not a color from
- * the theme, this will keep the same value set above this Surface.
+ * @param drawerContent content inside this drawer
+ * @param modifier the [Modifier] to be applied to this drawer
+ * @param drawerShape defines the shape of this drawer's container
+ * @param drawerTonalElevation when [drawerContainerColor] is [ColorScheme.surface], a translucent
+ * primary color overlay is applied on top of the container. A higher tonal elevation value will
+ * result in a darker color in light theme and lighter color in dark theme. See also: [Surface].
+ * @param drawerContainerColor the color used for the background of this drawer. Use
+ * [Color.Transparent] to have no color.
+ * @param drawerContentColor the preferred color for content inside this drawer. Defaults to either
+ * the matching content color for [drawerContainerColor], or to the current [LocalContentColor] if
+ * [drawerContainerColor] is not a color from the theme.
  * @param content content of the rest of the UI
  */
 @ExperimentalMaterial3Api
@@ -539,20 +545,20 @@ fun PermanentNavigationDrawer(
 object DrawerDefaults {
 
     /**
-     * Default Elevation for drawer container in the [ModalNavigationDrawer] as specified in
-     * material specs
+     * Default Elevation for drawer container in the [ModalNavigationDrawer] as specified in the
+     * Material specification.
      */
     val ModalDrawerElevation = NavigationDrawerTokens.ModalContainerElevation
 
     /**
-     * Default Elevation for drawer container in the [PermanentNavigationDrawer] as specified in
-     * material specs
+     * Default Elevation for drawer container in the [PermanentNavigationDrawer] as specified in the
+     * Material specification.
      */
     val PermanentDrawerElevation = NavigationDrawerTokens.StandardContainerElevation
 
     /**
      * Default Elevation for drawer container in the [DismissibleNavigationDrawer] as specified in
-     * material specs
+     * the Material specification.
      */
     val DismissibleDrawerElevation = NavigationDrawerTokens.StandardContainerElevation
 
@@ -571,15 +577,15 @@ object DrawerDefaults {
  *
  * @param label text label for this item
  * @param selected whether this item is selected
- * @param onClick the callback to be invoked when this item is clicked
- * @param modifier optional [Modifier] for this item
+ * @param onClick called when this item is clicked
+ * @param modifier the [Modifier] to be applied to this item
  * @param icon optional icon for this item, typically an [Icon]
  * @param badge optional badge to show on this item from the end side
- * @param colors the various colors used in elements of this item
+ * @param colors [NavigationDrawerItemColors] that will be used to resolve the colors used for this
+ * item in different states. See [NavigationDrawerItemDefaults.colors].
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this item. You can create and pass in your own remembered [MutableInteractionSource] if
- * you want to observe [Interaction]s and customize the appearance / behavior of this item in
- * different [Interaction]s.
+ * for this item. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this item in different states.
  */
 @Composable
 @ExperimentalMaterial3Api
@@ -630,7 +636,6 @@ fun NavigationDrawerItem(
 @Stable
 @ExperimentalMaterial3Api
 interface NavigationDrawerItemColors {
-
     /**
      * Represents the icon color for this item, depending on whether it is [selected].
      *
@@ -667,7 +672,6 @@ interface NavigationDrawerItemColors {
 /** Defaults used in [NavigationDrawerItem]. */
 @ExperimentalMaterial3Api
 object NavigationDrawerItemDefaults {
-
     /**
      * Creates a [NavigationDrawerItemColors] with the provided colors according to the Material
      * specification.
@@ -706,7 +710,8 @@ object NavigationDrawerItemDefaults {
     )
 
     /**
-     * Default external padding for a [NavigationDrawerItem] according to material spec.
+     * Default external padding for a [NavigationDrawerItem] according to the Material
+     * specification.
      */
     val ItemPadding = PaddingValues(horizontal = 12.dp)
 }

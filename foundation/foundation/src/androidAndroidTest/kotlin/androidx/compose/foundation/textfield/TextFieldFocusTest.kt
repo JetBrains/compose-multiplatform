@@ -16,9 +16,16 @@
 
 package androidx.compose.foundation.textfield
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.CoreTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,12 +33,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
@@ -133,6 +144,58 @@ class TextFieldFocusTest {
         enabled.value = true
         rule.runOnIdle {
             assertThat(focused).isFalse()
+        }
+    }
+
+    @Test
+    fun wholeDecorationBox_isBroughtIntoView_whenFocused() {
+        var outerCoordinates: LayoutCoordinates? = null
+        var innerCoordinates: LayoutCoordinates? = null
+        val focusRequester = FocusRequester()
+        rule.setContent {
+            Column(
+                Modifier
+                    .height(100.dp)
+                    .onPlaced { outerCoordinates = it }
+                    .verticalScroll(rememberScrollState())
+            ) {
+                // Place the text field way out of the viewport.
+                Spacer(Modifier.height(10000.dp))
+                CoreTextField(
+                    value = TextFieldValue(),
+                    onValueChange = {},
+                    modifier = Modifier
+                        .focusRequester(focusRequester)
+                        .onPlaced { innerCoordinates = it },
+                    decorationBox = { innerTextField ->
+                        Box(Modifier.padding(20.dp)) {
+                            innerTextField()
+                        }
+                    }
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            // Text field should start completely clipped.
+            assertThat(
+                outerCoordinates!!.localBoundingBoxOf(
+                    innerCoordinates!!,
+                    clipBounds = true
+                ).size
+            ).isEqualTo(Size.Zero)
+
+            focusRequester.requestFocus()
+        }
+
+        rule.runOnIdle {
+            // Text field should be completely visible.
+            assertThat(
+                outerCoordinates!!.localBoundingBoxOf(
+                    innerCoordinates!!,
+                    clipBounds = true
+                ).size
+            ).isEqualTo(innerCoordinates!!.size.toSize())
         }
     }
 }

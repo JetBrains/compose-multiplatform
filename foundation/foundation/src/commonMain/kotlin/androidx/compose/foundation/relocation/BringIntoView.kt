@@ -19,7 +19,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.OnGloballyPositionedModifier
+import androidx.compose.ui.layout.OnPlacedModifier
 import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.modifier.modifierLocalOf
@@ -35,7 +35,6 @@ internal val ModifierLocalBringIntoViewParent = modifierLocalOf<BringIntoViewPar
  * [ModifierLocalBringIntoViewParent]s above a [BringIntoViewChildModifier]. The value returned by
  * this function should be passed to the [BringIntoViewChildModifier] constructor.
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal expect fun rememberDefaultBringIntoViewParent(): BringIntoViewParent
 
@@ -47,6 +46,9 @@ internal fun interface BringIntoViewParent {
     /**
      * Scrolls this node's content so that [rect] will be in visible bounds. Must ensure that the
      * request is propagated up to the parent node.
+     *
+     * This method will not return until this request has been satisfied or interrupted by a
+     * newer request.
      *
      * @param rect The rectangle to bring into view, relative to [childCoordinates].
      * @param childCoordinates The [LayoutCoordinates] of the child node making the request. This
@@ -65,11 +67,10 @@ internal fun interface BringIntoViewParent {
  * [ModifierLocalBringIntoViewParent] available to read. This parent should always be obtained by
  * calling [rememberDefaultBringIntoViewParent] to support platform-specific integration.
  */
-@OptIn(ExperimentalFoundationApi::class)
 internal abstract class BringIntoViewChildModifier(
     private val defaultParent: BringIntoViewParent
 ) : ModifierLocalConsumer,
-    OnGloballyPositionedModifier {
+    OnPlacedModifier {
 
     private var localParent: BringIntoViewParent? = null
 
@@ -87,7 +88,7 @@ internal abstract class BringIntoViewChildModifier(
         }
     }
 
-    override fun onGloballyPositioned(coordinates: LayoutCoordinates) {
+    override fun onPlaced(coordinates: LayoutCoordinates) {
         layoutCoordinates = coordinates
     }
 }

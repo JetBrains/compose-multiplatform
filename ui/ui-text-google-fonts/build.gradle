@@ -30,7 +30,7 @@ dependencies {
 
     implementation(project(":compose:runtime:runtime"))
     implementation(project(":compose:ui:ui-text"))
-    implementation(project(":core:core"))
+    implementation("androidx.core:core:1.8.0-beta01")
 
     androidTestImplementation(project(":compose:ui:ui-test-junit4"))
     androidTestImplementation(libs.testCore)

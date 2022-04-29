@@ -23,6 +23,8 @@ val TextDemos = DemoCategory(
     "Text",
     listOf(
         ComposableDemo("Static text") { TextDemo() },
+        ComposableDemo("Brush") { TextBrushDemo() },
+        ComposableDemo("Ellipsize") { EllipsizeDemo() },
         ComposableDemo("Typeface") { TypefaceDemo() },
         ComposableDemo("FontFamily fallback") { FontFamilyDemo() },
         ComposableDemo("All system font families") { SystemFontFamilyDemo() },
@@ -31,6 +33,7 @@ val TextDemos = DemoCategory(
         ComposableDemo("Multi paragraph") { MultiParagraphDemo() },
         ComposableDemo("IncludeFontPadding & Clip") { TextFontPaddingDemo() },
         ComposableDemo("Layout Reuse") { TextReuseLayoutDemo() },
+        ComposableDemo("Line Height Behavior") { TextLineHeightDemo() },
         ComposableDemo("Interactive text") { InteractiveTextDemo() },
         DemoCategory(
             "Input fields",

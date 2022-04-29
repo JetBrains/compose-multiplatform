@@ -28,11 +28,15 @@ import android.text.style.LocaleSpan
 import android.text.style.MetricAffectingSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.ScaleXSpan
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.android.InternalPlatformTextApi
@@ -40,6 +44,7 @@ import androidx.compose.ui.text.android.style.BaselineShiftSpan
 import androidx.compose.ui.text.android.style.FontFeatureSpan
 import androidx.compose.ui.text.android.style.LetterSpacingSpanEm
 import androidx.compose.ui.text.android.style.LetterSpacingSpanPx
+import androidx.compose.ui.text.android.style.LineHeightStyleSpan
 import androidx.compose.ui.text.android.style.LineHeightSpan
 import androidx.compose.ui.text.android.style.ShadowSpan
 import androidx.compose.ui.text.android.style.SkewXSpan
@@ -54,7 +59,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intersect
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.intl.LocaleList
+import androidx.compose.ui.text.platform.style.ShaderBrushSpan
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
@@ -110,31 +117,55 @@ internal fun Spannable.setTextIndent(
     }
 }
 
-@OptIn(InternalPlatformTextApi::class)
-@Suppress("DEPRECATION")
+@OptIn(InternalPlatformTextApi::class, ExperimentalTextApi::class)
 internal fun Spannable.setLineHeight(
     lineHeight: TextUnit,
     contextFontSize: Float,
     density: Density,
-    applyToFirstLine: Boolean
+    lineHeightStyle: LineHeightStyle
 ) {
-    when (lineHeight.type) {
-        TextUnitType.Sp -> with(density) {
-            setSpan(
-                LineHeightSpan(lineHeight.toPx(), applyToFirstLine),
-                0,
-                length
-            )
-        }
-        TextUnitType.Em -> {
-            setSpan(
-                LineHeightSpan(lineHeight.value * contextFontSize, applyToFirstLine),
-                0,
-                length
-            )
-        }
-        else -> {
-        } // Do nothing
+    val resolvedLineHeight = resolveLineHeightInPx(lineHeight, contextFontSize, density)
+    if (!resolvedLineHeight.isNaN()) {
+        setSpan(
+            span = LineHeightStyleSpan(
+                lineHeight = resolvedLineHeight,
+                startIndex = 0,
+                endIndex = length,
+                trimFirstLineTop = lineHeightStyle.trim.isTrimFirstLineTop(),
+                trimLastLineBottom = lineHeightStyle.trim.isTrimLastLineBottom(),
+                topPercentage = lineHeightStyle.alignment.topPercentage
+            ),
+            start = 0,
+            end = length
+        )
+    }
+}
+
+@OptIn(InternalPlatformTextApi::class)
+internal fun Spannable.setLineHeight(
+    lineHeight: TextUnit,
+    contextFontSize: Float,
+    density: Density
+) {
+    val resolvedLineHeight = resolveLineHeightInPx(lineHeight, contextFontSize, density)
+    if (!resolvedLineHeight.isNaN()) {
+        setSpan(
+            span = LineHeightSpan(lineHeight = resolvedLineHeight),
+            start = 0,
+            end = length
+        )
+    }
+}
+
+private fun resolveLineHeightInPx(
+    lineHeight: TextUnit,
+    contextFontSize: Float,
+    density: Density
+): Float {
+    return when (lineHeight.type) {
+        TextUnitType.Sp -> with(density) { lineHeight.toPx() }
+        TextUnitType.Em -> lineHeight.value * contextFontSize
+        else -> Float.NaN
     }
 }
 
@@ -185,6 +216,8 @@ private fun Spannable.setSpanStyle(
     setBaselineShift(style.baselineShift, start, end)
 
     setColor(style.color, start, end)
+
+    setBrush(style.brush, start, end)
 
     setTextDecoration(style.textDecoration, start, end)
 
@@ -446,6 +479,23 @@ internal fun Spannable.setColor(color: Color, start: Int, end: Int) {
 private fun Spannable.setBaselineShift(baselineShift: BaselineShift?, start: Int, end: Int) {
     baselineShift?.let {
         setSpan(BaselineShiftSpan(it.multiplier), start, end)
+    }
+}
+
+private fun Spannable.setBrush(
+    brush: Brush?,
+    start: Int,
+    end: Int
+) {
+    brush?.let {
+        when (brush) {
+            is SolidColor -> {
+                setColor(brush.value, start, end)
+            }
+            is ShaderBrush -> {
+                setSpan(ShaderBrushSpan(brush), start, end)
+            }
+        }
     }
 }
 

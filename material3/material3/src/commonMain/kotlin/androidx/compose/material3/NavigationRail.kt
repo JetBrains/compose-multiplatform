@@ -65,9 +65,9 @@ import kotlin.math.roundToInt
  *
  * ![Navigation rail image](https://developer.android.com/images/reference/androidx/compose/material3/navigation-rail.png)
  *
- * The navigation rail should be used to display three to seven app destinations and,
- * optionally, a Floating Action Button or a logo header. Each destination is typically represented
- * by an icon and an optional text label.
+ * The navigation rail should be used to display three to seven app destinations and, optionally, a
+ * [FloatingActionButton] or a logo header. Each destination is typically represented by an icon and
+ * an optional text label.
  *
  * [NavigationRail] should contain multiple [NavigationRailItem]s, each representing a singular
  * destination.
@@ -78,14 +78,14 @@ import kotlin.math.roundToInt
  * See [NavigationRailItem] for configuration specific to each item, and not the overall
  * NavigationRail component.
  *
- * @param modifier optional [Modifier] for this NavigationRail
- * @param containerColor the container color for this NavigationRail
- * @param contentColor the preferred content color provided by this NavigationRail to its children.
- * Defaults to either the matching content color for [containerColor], or if [containerColor] is not
- * a color from the theme, this will keep the same value set above this NavigationRail
- * @param header optional header that may hold a Floating Action Button or a logo
- * @param content destinations inside this NavigationRail. This should contain multiple
- * [NavigationRailItem]s
+ * @param modifier the [Modifier] to be applied to this navigation rail
+ * @param containerColor the color used for the background of this navigation rail. Use
+ * [Color.Transparent] to have no color.
+ * @param contentColor the preferred color for content inside this navigation rail. Defaults to
+ * either the matching content color for [containerColor], or to the current [LocalContentColor] if
+ * [containerColor] is not a color from the theme.
+ * @param header optional header that may hold a [FloatingActionButton] or a logo
+ * @param content the content of this navigation rail, typically 3-7 [NavigationRailItem]s
  */
 @Composable
 fun NavigationRail(
@@ -129,19 +129,20 @@ fun NavigationRail(
  * is controlled by [alwaysShowLabel].
  *
  * @param selected whether this item is selected
- * @param onClick the callback to be invoked when this item is selected
+ * @param onClick called when this item is clicked
  * @param icon icon for this item, typically an [Icon]
- * @param modifier optional [Modifier] for this item
- * @param enabled controls the enabled state of this item. When false, this item will not be
- * clickable and will appear disabled to accessibility services
+ * @param modifier the [Modifier] to be applied to this item
+ * @param enabled controls the enabled state of this item. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
  * @param label optional text label for this item
  * @param alwaysShowLabel whether to always show the label for this item. If false, the label will
  * only be shown when this item is selected.
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this NavigationRailItem. You can create and pass in your own remembered
- * [MutableInteractionSource] if you want to observe [Interaction]s and customize the appearance /
- * behavior of this NavigationRailItem in different [Interaction]s.
- * @param colors the various colors used in elements of this item
+ * for this item. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this item in different states.
+ * @param colors [NavigationRailItemColors] that will be used to resolve the colors used for this
+ * item in different states. See [NavigationRailItemDefaults.colors].
  */
 @Composable
 fun NavigationRailItem(

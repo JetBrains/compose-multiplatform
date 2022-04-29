@@ -79,10 +79,7 @@ internal class LazyMeasuredItem @ExperimentalFoundationApi constructor(
     }
 
     /**
-     * Calculates positions for the inner placeables at [offset] main axis position. [layoutWidth]
-     * and [layoutHeight] should be provided to not place placeables which are ended up outside of
-     * the viewport (for example one item consist of 2 placeables, and the first one is not going
-     * to be visible, so we don't place it as an optimization, but place the second one).
+     * Calculates positions for the inner placeables at [offset] main axis position.
      * If [reverseOrder] is true the inner placeables would be placed in the inverted order.
      */
     fun position(
@@ -179,17 +176,14 @@ internal class LazyListPositionedItem(
             } else {
                 getOffset(index)
             }
-            if (offset.mainAxis > minOffset && offset.mainAxis < maxOffset) {
-                if (isVertical) {
-                    placeable.placeWithLayer(offset + visualOffset)
-                } else {
-                    placeable.placeRelativeWithLayer(offset + visualOffset)
-                }
+            if (isVertical) {
+                placeable.placeWithLayer(offset + visualOffset)
+            } else {
+                placeable.placeRelativeWithLayer(offset + visualOffset)
             }
         }
     }
 
-    private val IntOffset.mainAxis get() = if (isVertical) y else x
     private val Placeable.mainAxisSize get() = if (isVertical) height else width
 }
 

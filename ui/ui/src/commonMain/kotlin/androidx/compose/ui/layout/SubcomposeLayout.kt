@@ -199,6 +199,7 @@ class SubcomposeLayoutState(
             subcompositionsState ?: LayoutNodeSubcompositionsState(this, slotReusePolicy).also {
                 subcompositionsState = it
             }
+        state.makeSureStateIsConsistent()
         state.slotReusePolicy = slotReusePolicy
     }
     internal val setCompositionContext:
@@ -491,7 +492,7 @@ internal class LayoutNodeSubcompositionsState(
                 val nodeState = nodeToNodeState[node]!!
                 val slotId = nodeState.slotId
                 if (reusableSlotIdsSet.contains(slotId)) {
-                    root.foldedChildren[i].measuredByParent = UsageByParent.NotUsed
+                    node.measuredByParent = UsageByParent.NotUsed
                     reusableCount++
                     nodeState.active = false
                 } else {
@@ -510,11 +511,19 @@ internal class LayoutNodeSubcompositionsState(
         makeSureStateIsConsistent()
     }
 
-    private fun makeSureStateIsConsistent() {
+    fun makeSureStateIsConsistent() {
         require(nodeToNodeState.size == root.foldedChildren.size) {
             "Inconsistency between the count of nodes tracked by the state (${nodeToNodeState
                 .size}) and the children count on the SubcomposeLayout (${root.foldedChildren
                 .size}). Are you trying to use the state of the disposed SubcomposeLayout?"
+        }
+        require(root.foldedChildren.size - reusableCount - precomposedCount >= 0) {
+            "Incorrect state. Total children ${root.foldedChildren.size}. Reusable children " +
+                "$reusableCount. Precomposed children $precomposedCount"
+        }
+        require(precomposeMap.size == precomposedCount) {
+            "Incorrect state. Precomposed children $precomposedCount. Map size " +
+                "${precomposeMap.size}"
         }
     }
 
@@ -628,6 +637,7 @@ internal class LayoutNodeSubcompositionsState(
         }
         return object : PrecomposedSlotHandle {
             override fun dispose() {
+                makeSureStateIsConsistent()
                 val node = precomposeMap.remove(slotId)
                 if (node != null) {
                     check(precomposedCount > 0)
@@ -689,11 +699,18 @@ internal class LayoutNodeSubcompositionsState(
         root.ignoreRemeasureRequests(block)
 
     fun disposeCurrentNodes() {
-        nodeToNodeState.values.forEach {
-            it.composition?.dispose()
+        root.ignoreRemeasureRequests {
+            nodeToNodeState.values.forEach {
+                it.composition?.dispose()
+            }
+            root.removeAll()
         }
         nodeToNodeState.clear()
         slotIdToNode.clear()
+        precomposedCount = 0
+        reusableCount = 0
+        precomposeMap.clear()
+        makeSureStateIsConsistent()
     }
 
     private class NodeState(

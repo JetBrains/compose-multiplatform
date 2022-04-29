@@ -104,6 +104,9 @@ internal class OuterMeasurablePlaceable(
             // trigger extra remeasure request on our node. we do it now in order to report the
             // final measured size to our parent without doing extra pass later.
             owner.forceMeasureTheSubtree(layoutNode)
+
+            // Restore the intrinsics usage for the sub-tree
+            layoutNode.resetSubtreeIntrinsicsUsage()
         }
         return false
     }
@@ -200,6 +203,42 @@ internal class OuterMeasurablePlaceable(
         // remeasurements, but it makes sure such component states are using the correct final
         // constraints/sizes.
         layoutNode.requestRemeasure()
+
+        // Mark the intrinsics size has been used by the parent if it hasn't already been marked.
+        val parent = layoutNode.parent
+        if (parent != null &&
+            layoutNode.intrinsicsUsageByParent == LayoutNode.UsageByParent.NotUsed
+        ) {
+            layoutNode.intrinsicsUsageByParent = when (parent.layoutState) {
+                LayoutState.Measuring -> LayoutNode.UsageByParent.InMeasureBlock
+                LayoutState.LayingOut -> LayoutNode.UsageByParent.InLayoutBlock
+                // Called from parent's intrinsic measurement
+                else -> parent.intrinsicsUsageByParent
+            }
+        }
+    }
+
+    /**
+     * If this was used in an intrinsics measurement, find the parent that used it and
+     * invalidate either the measure block or layout block.
+     */
+    fun invalidateIntrinsicsParent(forceRequest: Boolean) {
+        val parent = layoutNode.parent
+        val intrinsicsUsageByParent = layoutNode.intrinsicsUsageByParent
+        if (parent != null && intrinsicsUsageByParent != LayoutNode.UsageByParent.NotUsed) {
+            // find measuring parent
+            var intrinsicsUsingParent: LayoutNode = parent
+            while (intrinsicsUsingParent.intrinsicsUsageByParent == intrinsicsUsageByParent) {
+                intrinsicsUsingParent = intrinsicsUsingParent.parent ?: break
+            }
+            when (intrinsicsUsageByParent) {
+                LayoutNode.UsageByParent.InMeasureBlock ->
+                    intrinsicsUsingParent.requestRemeasure(forceRequest)
+                LayoutNode.UsageByParent.InLayoutBlock ->
+                    intrinsicsUsingParent.requestRelayout(forceRequest)
+                else -> error("Intrinsics isn't used by the parent")
+            }
+        }
     }
 
     /**

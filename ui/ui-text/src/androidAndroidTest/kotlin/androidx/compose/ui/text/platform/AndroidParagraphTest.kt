@@ -2,7 +2,6 @@ package androidx.compose.ui.text.platform
 
 import android.graphics.Paint
 import android.graphics.Typeface
-import android.text.Spanned
 import android.text.TextPaint
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.BackgroundColorSpan
@@ -12,13 +11,17 @@ import android.text.style.LocaleSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.ScaleXSpan
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.UncachedFontFamilyResolver
@@ -31,6 +34,7 @@ import androidx.compose.ui.text.android.style.LetterSpacingSpanPx
 import androidx.compose.ui.text.android.style.ShadowSpan
 import androidx.compose.ui.text.android.style.SkewXSpan
 import androidx.compose.ui.text.android.style.TextDecorationSpan
+import androidx.compose.ui.text.ceilToInt
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -39,10 +43,8 @@ import androidx.compose.ui.text.font.testutils.BlockingFauxFont
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.matchers.assertThat
+import androidx.compose.ui.text.platform.style.ShaderBrushSpan
 import androidx.compose.ui.text.style.BaselineShift
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.android.style.LineHeightSpan
-import androidx.compose.ui.text.ceilToInt
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
@@ -57,10 +59,10 @@ import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import org.junit.Test
-import org.junit.runner.RunWith
 import kotlin.math.ceil
 import kotlin.math.roundToInt
+import org.junit.Test
+import org.junit.runner.RunWith
 
 @OptIn(InternalPlatformTextApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -153,6 +155,80 @@ AndroidParagraphTest {
         assertThat(paragraph.charSequence).hasSpan(ForegroundColorSpan::class, 0, text.length)
         assertThat(paragraph.charSequence).hasSpan(ForegroundColorSpan::class, 0, "abc".length)
         assertThat(paragraph.charSequence).hasSpanOnTop(ForegroundColorSpan::class, 0, "abc".length)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testAnnotatedString_setBrushOnWholeText() {
+        val text = "abcde"
+        val brush = Brush.linearGradient(listOf(Color.Black, Color.White))
+        val spanStyle = SpanStyle(brush = brush)
+
+        val paragraph = simpleParagraph(
+            text = text,
+            spanStyles = listOf(AnnotatedString.Range(spanStyle, 0, text.length)),
+            width = 100.0f
+        )
+
+        assertThat(paragraph.charSequence).hasSpan(ShaderBrushSpan::class, 0, text.length) {
+            it.shaderBrush == brush
+        }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testAnnotatedString_setSolidColorBrushOnWholeText() {
+        val text = "abcde"
+        val brush = SolidColor(Color.Red)
+        val spanStyle = SpanStyle(brush = brush)
+
+        val paragraph = simpleParagraph(
+            text = text,
+            spanStyles = listOf(AnnotatedString.Range(spanStyle, 0, text.length)),
+            width = 100.0f
+        )
+
+        assertThat(paragraph.charSequence).hasSpan(ForegroundColorSpan::class, 0, text.length)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testAnnotatedString_setBrushOnPartOfText() {
+        val text = "abcde"
+        val brush = Brush.linearGradient(listOf(Color.Black, Color.White))
+        val spanStyle = SpanStyle(brush = brush)
+
+        val paragraph = simpleParagraph(
+            text = text,
+            spanStyles = listOf(AnnotatedString.Range(spanStyle, 0, "abc".length)),
+            width = 100.0f
+        )
+
+        assertThat(paragraph.charSequence).hasSpan(ShaderBrushSpan::class, 0, "abc".length) {
+            it.shaderBrush == brush
+        }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testAnnotatedString_brushSpanReceivesSize() {
+        with(defaultDensity) {
+            val text = "abcde"
+            val brush = Brush.linearGradient(listOf(Color.Black, Color.White))
+            val spanStyle = SpanStyle(brush = brush)
+            val fontSize = 10.sp
+
+            val paragraph = simpleParagraph(
+                text = text,
+                spanStyles = listOf(AnnotatedString.Range(spanStyle, 0, "abc".length)),
+                width = 100.0f,
+                style = TextStyle(fontSize = fontSize, fontFamily = basicFontFamily)
+            )
+
+            assertThat(paragraph.charSequence).hasSpan(ShaderBrushSpan::class, 0, "abc".length) {
+                it.size == Size(100.0f, fontSize.toPx())
+            }
+        }
     }
 
     @Test
@@ -906,6 +982,139 @@ AndroidParagraphTest {
     }
 
     @Test
+    fun testEllipsis_withLimitedHeightFitAllLines_doesNotEllipsis() {
+        with(defaultDensity) {
+            val text = "This is a text"
+            val fontSize = 30.sp
+            val paragraph = simpleParagraph(
+                text = text,
+                ellipsis = true,
+                style = TextStyle(
+                    fontFamily = basicFontFamily,
+                    fontSize = fontSize
+                ),
+                width = 4 * fontSize.toPx(),
+                height = 6 * fontSize.toPx(),
+            )
+
+            for (i in 0 until paragraph.lineCount) {
+                assertThat(paragraph.isEllipsisApplied(i)).isFalse()
+            }
+        }
+    }
+
+    @Test
+    fun testEllipsis_withLimitedHeight_doesEllipsis() {
+        with(defaultDensity) {
+            val text = "This is a text"
+            val fontSize = 30.sp
+            val paragraph = simpleParagraph(
+                text = text,
+                ellipsis = true,
+                style = TextStyle(
+                    fontFamily = basicFontFamily,
+                    fontSize = fontSize
+                ),
+                width = 4 * fontSize.toPx(),
+                height = 2.2f * fontSize.toPx(), // fits 2 lines
+            )
+
+            assertThat(paragraph.lineCount).isEqualTo(2)
+            assertThat(paragraph.isEllipsisApplied(paragraph.lineCount - 1)).isTrue()
+        }
+    }
+
+    @Test
+    fun testEllipsis_withLimitedHeight_ellipsisFalse_doesNotEllipsis() {
+        with(defaultDensity) {
+            val text = "This is a text"
+            val fontSize = 30.sp
+            val paragraph = simpleParagraph(
+                text = text,
+                ellipsis = false,
+                style = TextStyle(
+                    fontFamily = basicFontFamily,
+                    fontSize = fontSize
+                ),
+                width = 4 * fontSize.toPx(),
+                height = 2.2f * fontSize.toPx(), // fits 2 lines
+            )
+
+            for (i in 0 until paragraph.lineCount) {
+                assertThat(paragraph.isEllipsisApplied(i)).isFalse()
+            }
+        }
+    }
+
+    @Test
+    fun testEllipsis_withMaxLinesMoreThanTextLines_andLimitedHeight_doesEllipsis() {
+        with(defaultDensity) {
+            val text = "This is a text"
+            val fontSize = 30.sp
+            val paragraph = simpleParagraph(
+                text = text,
+                ellipsis = true,
+                style = TextStyle(
+                    fontFamily = basicFontFamily,
+                    fontSize = fontSize
+                ),
+                width = 4 * fontSize.toPx(),
+                height = 2.2f * fontSize.toPx(), // fits 2 lines
+                maxLines = 5
+            )
+
+            assertThat(paragraph.lineCount).isEqualTo(2)
+            assertThat(paragraph.isEllipsisApplied(paragraph.lineCount - 1)).isTrue()
+        }
+    }
+
+    @Test
+    fun testEllipsis_withMaxLines_andLimitedHeight_doesEllipsis() {
+        with(defaultDensity) {
+            val text = "This is a text"
+            val fontSize = 30.sp
+            val paragraph = simpleParagraph(
+                text = text,
+                ellipsis = true,
+                style = TextStyle(
+                    fontFamily = basicFontFamily,
+                    fontSize = fontSize
+                ),
+                width = 4 * fontSize.toPx(),
+                height = 4 * fontSize.toPx(),
+                maxLines = 2
+            )
+
+            assertThat(paragraph.lineCount).isEqualTo(2)
+            assertThat(paragraph.isEllipsisApplied(paragraph.lineCount - 1)).isTrue()
+        }
+    }
+
+    @Test
+    fun testEllipsis_withSpans_withLimitedHeight_doesEllipsis() {
+        with(defaultDensity) {
+            val text = "This is a text"
+            val fontSize = 30.sp
+            val paragraph = simpleParagraph(
+                text = text,
+                spanStyles = listOf(
+                    AnnotatedString.Range(SpanStyle(fontSize = fontSize * 2), 0, 2)
+                ),
+                ellipsis = true,
+                style = TextStyle(
+                    fontFamily = basicFontFamily,
+                    fontSize = fontSize
+                ),
+                width = 4 * fontSize.toPx(),
+                height = 2.2f * fontSize.toPx() // fits 2 lines
+            )
+
+            assertThat(paragraph.lineCount).isEqualTo(1)
+            assertThat(paragraph.isEllipsisApplied(paragraph.lineCount - 1)).isTrue()
+        }
+    }
+
+    @Test
     fun testSpanStyle_fontSize_appliedOnTextPaint() {
         with(defaultDensity) {
             val fontSize = 100.sp
@@ -1339,62 +1548,6 @@ AndroidParagraphTest {
         assertThat(paragraphPaddingTrue.height).isNotEqualTo(paragraphPaddingFalse.height)
     }
 
-    @OptIn(ExperimentalTextApi::class)
-    @Test
-    fun line_height_span_applyToFirstLine_is_true_when_includeFontPadding_is_true() {
-        val text = "ABC"
-
-        @Suppress("DEPRECATION")
-        val style = TextStyle(
-            fontSize = 20.sp,
-            lineHeight = 25.sp,
-            platformStyle = PlatformTextStyle(includeFontPadding = true)
-        )
-
-        val paragraph = simpleParagraph(
-            text = text,
-            style = style,
-            width = Float.MAX_VALUE
-        )
-
-        assertThat(paragraph.charSequence).isInstanceOf(Spanned::class.java)
-
-        val spanned = paragraph.charSequence as Spanned
-        val lineHeightSpans = spanned.getSpans(0, spanned.length, LineHeightSpan::class.java)
-
-        assertThat(lineHeightSpans).isNotNull()
-        assertThat(lineHeightSpans).hasLength(1)
-        assertThat(lineHeightSpans[0].applyToFirstLine).isTrue()
-    }
-
-    @OptIn(ExperimentalTextApi::class)
-    @Test
-    fun line_height_span_applyToFirstLine_is_false_when_includeFontPadding_is_false() {
-        val text = "ABC"
-
-        @Suppress("DEPRECATION")
-        val style = TextStyle(
-            fontSize = 20.sp,
-            lineHeight = 25.sp,
-            platformStyle = PlatformTextStyle(includeFontPadding = false)
-        )
-
-        val paragraph = simpleParagraph(
-            text = text,
-            style = style,
-            width = Float.MAX_VALUE
-        )
-
-        assertThat(paragraph.charSequence).isInstanceOf(Spanned::class.java)
-
-        val spanned = paragraph.charSequence as Spanned
-        val lineHeightSpans = spanned.getSpans(0, spanned.length, LineHeightSpan::class.java)
-
-        assertThat(lineHeightSpans).isNotNull()
-        assertThat(lineHeightSpans).hasLength(1)
-        assertThat(lineHeightSpans[0].applyToFirstLine).isFalse()
-    }
-
     private fun simpleParagraph(
         text: String = "",
         spanStyles: List<AnnotatedString.Range<SpanStyle>> = listOf(),
@@ -1403,6 +1556,7 @@ AndroidParagraphTest {
         ellipsis: Boolean = false,
         maxLines: Int = Int.MAX_VALUE,
         width: Float,
+        height: Float = Float.POSITIVE_INFINITY,
         style: TextStyle? = null,
         fontFamilyResolver: FontFamily.Resolver = UncachedFontFamilyResolver(context)
     ): AndroidParagraph {
@@ -1416,7 +1570,10 @@ AndroidParagraphTest {
             ).merge(style),
             maxLines = maxLines,
             ellipsis = ellipsis,
-            constraints = Constraints(maxWidth = width.ceilToInt()),
+            constraints = Constraints(
+                maxWidth = width.ceilToInt(),
+                maxHeight = height.ceilToInt()
+            ),
             density = Density(density = 1f),
             fontFamilyResolver = fontFamilyResolver
         )
