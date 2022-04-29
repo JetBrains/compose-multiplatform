@@ -23,6 +23,7 @@ import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.lazy.AwaitFirstLayoutModifier
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -223,6 +224,12 @@ class LazyGridState constructor(
     }
 
     /**
+     * Provides a modifier which allows to delay some interactions (e.g. scroll)
+     * until layout is ready.
+     */
+    internal val awaitLayoutModifier = AwaitFirstLayoutModifier()
+
+    /**
      * Finds items on a line and their measurement constraints. Used for prefetching.
      */
     internal var prefetchInfoRetriever: (line: LineIndex) -> List<Pair<Int, Constraints>> =
@@ -244,7 +251,7 @@ class LazyGridState constructor(
         index: Int,
         scrollOffset: Int = 0
     ) {
-        return scrollableState.scroll {
+        scroll {
             snapToItemIndexInternal(index, scrollOffset)
         }
     }
@@ -267,7 +274,10 @@ class LazyGridState constructor(
     override suspend fun scroll(
         scrollPriority: MutatePriority,
         block: suspend ScrollScope.() -> Unit
-    ): Unit = scrollableState.scroll(scrollPriority, block)
+    ) {
+        awaitLayoutModifier.waitForFirstLayout()
+        scrollableState.scroll(scrollPriority, block)
+    }
 
     override fun dispatchRawDelta(delta: Float): Float =
         scrollableState.dispatchRawDelta(delta)

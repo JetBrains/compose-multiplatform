@@ -111,6 +111,7 @@ internal fun LazyGrid(
     LazyLayout(
         modifier = modifier
             .then(state.remeasurementModifier)
+            .then(state.awaitLayoutModifier)
             .lazyGridSemantics(
                 itemProvider = itemProvider,
                 state = state,
