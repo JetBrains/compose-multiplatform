@@ -15,3 +15,6 @@ pluginManagement {
 
 include(":SplitPane:library")
 include(":SplitPane:demo")
+include(":AnimatedImage:library")
+include("AnimatedImage:demo")
+include("resources:library")
