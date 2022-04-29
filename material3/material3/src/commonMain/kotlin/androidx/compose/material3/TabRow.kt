@@ -106,22 +106,21 @@ import kotlinx.coroutines.launch
  * @sample androidx.compose.material3.samples.FancyIndicatorContainerTabs
  *
  * @param selectedTabIndex the index of the currently selected tab
- * @param modifier optional [Modifier] for this TabRow
- * @param containerColor The color of the container for the TabRow. Use [Color.Transparent] to have
- * no color.
- * @param contentColor The preferred content color provided by this TabRow to its children.
- * Defaults to either the matching content color for [containerColor], or if [containerColor] is
- * not a color from the theme, this will keep the same value set above this TabRow.
+ * @param modifier the [Modifier] to be applied to this tab row
+ * @param containerColor the color used for the background of this tab row. Use [Color.Transparent]
+ * to have no color.
+ * @param contentColor the preferred color for content inside this tab row. Defaults to either the
+ * matching content color for [containerColor], or to the current [LocalContentColor] if
+ * [containerColor] is not a color from the theme.
  * @param indicator the indicator that represents which tab is currently selected. By default this
- * will be a [TabRowDefaults.Indicator], using a [TabRowDefaults.tabIndicatorOffset]
- * modifier to animate its position. Note that this indicator will be forced to fill up the
- * entire TabRow, so you should use [TabRowDefaults.tabIndicatorOffset] or similar to
- * animate the actual drawn indicator inside this space, and provide an offset from the start.
- * @param divider the divider displayed at the bottom of the TabRow. This provides a layer of
- * separation between the TabRow and the content displayed underneath.
- * @param tabs the tabs inside this TabRow. Typically this will be multiple [Tab]s. Each element
- * inside this lambda will be measured and placed evenly across the TabRow, each taking up equal
- * space.
+ * will be a [TabRowDefaults.Indicator], using a [TabRowDefaults.tabIndicatorOffset] modifier to
+ * animate its position. Note that this indicator will be forced to fill up the entire tab row, so
+ * you should use [TabRowDefaults.tabIndicatorOffset] or similar to animate the actual drawn
+ * indicator inside this space, and provide an offset from the start.
+ * @param divider the divider displayed at the bottom of the tab row. This provides a layer of
+ * separation between the tab row and the content displayed underneath.
+ * @param tabs the tabs inside this tab row. Typically this will be multiple [Tab]s. Each element
+ * inside this lambda will be measured and placed evenly across the row, each taking up equal space.
  */
 @Composable
 fun TabRow(
@@ -194,26 +193,24 @@ fun TabRow(
  * scrolling, and evenly places its tabs, see [TabRow].
  *
  * @param selectedTabIndex the index of the currently selected tab
- * @param modifier optional [Modifier] for this ScrollableTabRow
- * @param containerColor The background color for the ScrollableTabRow. Use [Color.Transparent] to
- * have no color.
- * @param contentColor The preferred content color provided by this ScrollableTabRow to its
- * children. Defaults to either the matching content color for [containerColor], or if
- * [containerColor] is not a color from the theme, this will keep the same value set above this
- * ScrollableTabRow.
- * @param edgePadding the padding between the starting and ending edge of ScrollableTabRow, and
- * the tabs inside the ScrollableTabRow. This padding helps inform the user that this tab row can
- * be scrolled, unlike a [TabRow].
+ * @param modifier the [Modifier] to be applied to this tab row
+ * @param containerColor the color used for the background of this tab row. Use [Color.Transparent]
+ * to have no color.
+ * @param contentColor the preferred color for content inside this tab row. Defaults to either the
+ * matching content color for [containerColor], or to the current [LocalContentColor] if
+ * [containerColor] is not a color from the theme.
+ * @param edgePadding the padding between the starting and ending edge of the scrollable tab row,
+ * and the tabs inside the row. This padding helps inform the user that this tab row can be
+ * scrolled, unlike a [TabRow].
  * @param indicator the indicator that represents which tab is currently selected. By default this
- * will be a [TabRowDefaults.Indicator], using a [TabRowDefaults.tabIndicatorOffset]
- * modifier to animate its position. Note that this indicator will be forced to fill up the
- * entire ScrollableTabRow, so you should use [TabRowDefaults.tabIndicatorOffset] or similar to
- * animate the actual drawn indicator inside this space, and provide an offset from the start.
- * @param divider the divider displayed at the bottom of the ScrollableTabRow. This provides a layer
- * of separation between the ScrollableTabRow and the content displayed underneath.
- * @param tabs the tabs inside this ScrollableTabRow. Typically this will be multiple [Tab]s. Each
- * element inside this lambda will be measured and placed evenly across the TabRow, each taking
- * up equal space.
+ * will be a [TabRowDefaults.Indicator], using a [TabRowDefaults.tabIndicatorOffset] modifier to
+ * animate its position. Note that this indicator will be forced to fill up the entire tab row, so
+ * you should use [TabRowDefaults.tabIndicatorOffset] or similar to animate the actual drawn
+ * indicator inside this space, and provide an offset from the start.
+ * @param divider the divider displayed at the bottom of the tab row. This provides a layer of
+ * separation between the tab row and the content displayed underneath.
+ * @param tabs the tabs inside this tab row. Typically this will be multiple [Tab]s. Each element
+ * inside this lambda will be measured and placed evenly across the row, each taking up equal space.
  */
 @Composable
 fun ScrollableTabRow(

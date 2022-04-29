@@ -63,15 +63,16 @@ import kotlinx.coroutines.flow.collect
  * Card sample:
  * @sample androidx.compose.material3.samples.CardSample
  *
- * @param modifier Modifier to be applied to the layout of the card.
- * @param shape Defines the card's shape.
- * @param border [BorderStroke] to draw on top of the card.
- * @param elevation [CardElevation] used to resolve the elevation for this card. The resolved value
- * control the size of the shadow below the card, as well as its tonal elevation. When the container
- * color is [ColorScheme.surface], a higher tonal elevation value will result in a darker
- * card color in light theme and lighter color in dark theme. See also [Surface].
- * @param colors [CardColors] that will be used to resolve the container and content color for
- * this card. See [CardDefaults.cardColors].
+ * @param modifier the [Modifier] to be applied to this card
+ * @param shape defines the shape of this card's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param border the border to draw around the container of this card
+ * @param elevation [CardElevation] used to resolve the elevation for this card in different states.
+ * This controls the size of the shadow below the card. Additionally, when the container color is
+ * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See also:
+ * [Surface].
+ * @param colors [CardColors] that will be used to resolve the colors used for this card in
+ * different states. See [CardDefaults.cardColors].
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -110,23 +111,23 @@ fun Card(
  * Clickable card sample:
  * @sample androidx.compose.material3.samples.ClickableCardSample
  *
- * @param onClick Callback to be called when the card is clicked
- * @param modifier Modifier to be applied to the layout of the card.
- * @param enabled Controls the enabled state of the card. When `false`, this card will not
- * be clickable and the card will resolve its [elevation] and [colors] accordingly.
- * @param interactionSource the [MutableInteractionSource] representing the stream of
- * [Interaction]s for this Card. You can create and pass in your own remembered
- * [MutableInteractionSource] to observe [Interaction]s that will customize the appearance
- * / behavior of this card in different states.
- * @param shape Defines the card's shape.
- * @param border [BorderStroke] to draw on top of the card.
- * @param elevation [CardElevation] used to resolve the elevation for this card when the
- * [interactionSource] emits its states. The resolved values control the size of the shadow below
- * the card, as well as its tonal elevation. When the container color is [ColorScheme.surface], a
- * higher tonal elevation value will result in a darker card color in light theme and lighter color
- * in dark theme. See also [Surface].
- * @param colors [CardColors] that will be used to resolve the container and content color for
- * this card in different states. See [CardDefaults.cardColors].
+ * @param onClick called when this card is clicked
+ * @param modifier the [Modifier] to be applied to this card
+ * @param enabled controls the enabled state of this card. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this card. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this card in different states.
+ * @param shape defines the shape of this card's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param border the border to draw around the container of this card
+ * @param elevation [CardElevation] used to resolve the elevation for this card in different states.
+ * This controls the size of the shadow below the card. Additionally, when the container color is
+ * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See also:
+ * [Surface].
+ * @param colors [CardColors] that will be used to resolve the color(s) used for this card in
+ * different states. See [CardDefaults.cardColors].
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -172,14 +173,14 @@ fun Card(
  * Elevated card sample:
  * @sample androidx.compose.material3.samples.ElevatedCardSample
  *
- * @param modifier Modifier to be applied to the layout of the card.
- * @param shape Defines the card's shape.
- * @param elevation [CardElevation] used to resolve the elevation for this card. The resolved value
- * control the size of the shadow below the card, as well as its tonal elevation. When the container
- * color is [ColorScheme.surface], a higher tonal elevation value will result in a darker
- * card color in light theme and lighter color in dark theme. See also [Surface].
- * @param colors [CardColors] that will be used to resolve the container and content color for
- * this card. See [CardDefaults.elevatedCardElevation].
+ * @param modifier the [Modifier] to be applied to this card
+ * @param shape defines the shape of this card's container and shadow (when using [elevation])
+ * @param elevation [CardElevation] used to resolve the elevation for this card in different states.
+ * This controls the size of the shadow below the card. Additionally, when the container color is
+ * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See also:
+ * [Surface].
+ * @param colors [CardColors] that will be used to resolve the color(s) used for this card in
+ * different states. See [CardDefaults.elevatedCardElevation].
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -212,22 +213,21 @@ fun ElevatedCard(
  * Clickable elevated card sample:
  * @sample androidx.compose.material3.samples.ClickableElevatedCardSample
  *
- * @param onClick Callback to be called when the card is clicked
- * @param modifier Modifier to be applied to the layout of the card.
- * @param enabled Controls the enabled state of the card. When `false`, this card will not
- * be clickable and the card will resolve its [elevation] and [colors] accordingly.
- * @param interactionSource the [MutableInteractionSource] representing the stream of
- * [Interaction]s for this card. You can create and pass in your own remembered
- * [MutableInteractionSource] to observe [Interaction]s that will customize the appearance
- * / behavior of this card in different states.
- * @param shape Defines the card's shape.
- * @param elevation [CardElevation] used to resolve the elevation for this card when the
- * [interactionSource] emits its states. The resolved values control the size of the shadow below
- * the card, as well as its tonal elevation. When the container color is [ColorScheme.surface], a
- * higher tonal elevation value will result in a darker card color in light theme and lighter color
- * in dark theme. See also [Surface].
- * @param colors [CardColors] that will be used to resolve the container and content color for
- * this card. See [CardDefaults.elevatedCardColors].
+ * @param onClick called when this card is clicked
+ * @param modifier the [Modifier] to be applied to this card
+ * @param enabled controls the enabled state of this card. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this card. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this card in different states.
+ * @param shape defines the shape of this card's container and shadow (when using [elevation])
+ * @param elevation [CardElevation] used to resolve the elevation for this card in different states.
+ * This controls the size of the shadow below the card. Additionally, when the container color is
+ * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See also:
+ * [Surface].
+ * @param colors [CardColors] that will be used to resolve the color(s) used for this card in
+ * different states. See [CardDefaults.elevatedCardElevation].
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -266,15 +266,16 @@ fun ElevatedCard(
  * Outlined card sample:
  * @sample androidx.compose.material3.samples.OutlinedCardSample
  *
- * @param modifier Modifier to be applied to the layout of the card.
- * @param shape Defines the card's shape.
- * @param border [BorderStroke] to draw on top of the card.
- * @param elevation [CardElevation] used to resolve the elevation for this card. The resolved value
- * control the size of the shadow below the card, as well as its tonal elevation. When the container
- * color is [ColorScheme.surface], a higher tonal elevation value will result in a darker
- * card color in light theme and lighter color in dark theme. See also [Surface].
- * @param colors [CardColors] that will be used to resolve the container and content color for
- * this card. See [CardDefaults.outlinedCardColors].
+ * @param modifier the [Modifier] to be applied to this card
+ * @param shape defines the shape of this card's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param border the border to draw around the container of this card
+ * @param elevation [CardElevation] used to resolve the elevation for this card in different states.
+ * This controls the size of the shadow below the card. Additionally, when the container color is
+ * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See also:
+ * [Surface].
+ * @param colors [CardColors] that will be used to resolve the color(s) used for this card in
+ * different states. See [CardDefaults.outlinedCardColors].
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -307,23 +308,23 @@ fun OutlinedCard(
  * Clickable outlined card sample:
  * @sample androidx.compose.material3.samples.ClickableOutlinedCardSample
  *
- * @param onClick Callback to be called when the card is clicked
- * @param modifier Modifier to be applied to the layout of the card.
- * @param enabled Controls the enabled state of the card. When `false`, this card will not
- * be clickable and the card will resolve its [elevation] and [colors] accordingly.
- * @param interactionSource the [MutableInteractionSource] representing the stream of
- * [Interaction]s for this card. You can create and pass in your own remembered
- * [MutableInteractionSource] to observe [Interaction]s that will customize the appearance
- * / behavior of this card in different states.
- * @param shape Defines the card's shape.
- * @param border [BorderStroke] to draw on top of the card.
- * @param elevation [CardElevation] used to resolve the elevation for this card when the
- * [interactionSource] emits its states. The resolved values control the size of the shadow below
- * the card, as well as its tonal elevation. When the container is [ColorScheme.surface], a
- * higher tonal elevation value will result in a darker card color in light theme and lighter color
- * in dark theme. See also [Surface].
- * @param colors [CardColors] that will be used to resolve the container and content color for
- * this card in different states. See [CardDefaults.outlinedCardColors].
+ * @param onClick called when this card is clicked
+ * @param modifier the [Modifier] to be applied to this card
+ * @param enabled controls the enabled state of this card. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this card. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this card in different states.
+ * @param shape defines the shape of this card's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param border the border to draw around the container of this card
+ * @param elevation [CardElevation] used to resolve the elevation for this card in different states.
+ * This controls the size of the shadow below the card. Additionally, when the container color is
+ * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See also:
+ * [Surface].
+ * @param colors [CardColors] that will be used to resolve the color(s) used for this card in
+ * different states. See [CardDefaults.outlinedCardColors].
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -360,13 +361,13 @@ fun OutlinedCard(
 interface CardElevation {
     /**
      * Represents the tonal elevation used in a card, depending on its [enabled] state and
-     * [interactionSource].
+     * [interactionSource]. This should typically be the same value as the [shadowElevation].
      *
      * Tonal elevation is used to apply a color shift to the surface to give the it higher emphasis.
+     * When surface's color is [ColorScheme.surface], a higher elevation will result in a darker
+     * color in light theme and lighter color in dark theme.
      *
-     * For all Material cards with elevation, this returns the same value as [shadowElevation].
-     *
-     * - See [shadowElevation] for an elevation that draws a shadow around the card's bounds.
+     * See [shadowElevation] which controls the elevation of the shadow drawn around the card.
      *
      * @param enabled whether the card is enabled
      * @param interactionSource the [InteractionSource] for this card
@@ -375,14 +376,12 @@ interface CardElevation {
     fun tonalElevation(enabled: Boolean, interactionSource: InteractionSource?): State<Dp>
 
     /**
-     * Represents the shadow elevation used in a card, depending on on its [enabled] state and
-     * [interactionSource].
+     * Represents the shadow elevation used in a card, depending on its [enabled] state and
+     * [interactionSource]. This should typically be the same value as the [tonalElevation].
      *
-     * Shadow elevation is used to apply a drop shadow around the card to give it higher emphasis.
+     * Shadow elevation is used to apply a shadow around the card to give it higher emphasis.
      *
-     * For all Material cards with elevation, this returns the same value as [tonalElevation].
-     *
-     * - See [tonalElevation] for an elevation that applies a color shift to the surface.
+     * See [tonalElevation] which controls the elevation with a color shift to the surface.
      *
      * @param enabled whether the card is enabled
      * @param interactionSource the [InteractionSource] for this card

@@ -72,16 +72,16 @@ import kotlin.math.max
  * that is not opinionated about its content.
  *
  * @param selected whether this tab is selected or not
- * @param onClick the callback to be invoked when this tab is selected
- * @param modifier optional [Modifier] for this tab
- * @param enabled controls the enabled state of this tab. When `false`, this tab will not
- * be clickable and will appear disabled to accessibility services.
+ * @param onClick called when this tab is clicked
+ * @param modifier the [Modifier] to be applied to this tab
+ * @param enabled controls the enabled state of this tab. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
  * @param text the text label displayed in this tab
  * @param icon the icon displayed in this tab
- * @param interactionSource the [MutableInteractionSource] representing the stream of
- * [Interaction]s for this Tab. You can create and pass in your own remembered
- * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
- * appearance / behavior of this Tab in different [Interaction]s.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this tab. You can create and pass in your own `remember`ed instance to observe [Interaction]s
+ * and customize the appearance / behavior of this tab in different states.
  * @param selectedContentColor the color for the content of this tab when selected, and the color
  * of the ripple.
  * @param unselectedContentColor the color for the content of this tab when not selected
@@ -135,16 +135,16 @@ fun Tab(
  * example usage.
  *
  * @param selected whether this tab is selected or not
- * @param onClick the callback to be invoked when this tab is selected
+ * @param onClick called when this tab is clicked
  * @param text the text label displayed in this tab
  * @param icon the icon displayed in this tab
- * @param modifier optional [Modifier] for this tab
- * @param enabled controls the enabled state of this tab. When `false`, this tab will not
- * be clickable and will appear disabled to accessibility services.
- * @param interactionSource the [MutableInteractionSource] representing the different [Interaction]s
- * present on this tab. You can create and pass in your own remembered [MutableInteractionSource] if
- * you want to read the [Interaction] and customize the appearance / behavior of this tab
- * in different [Interaction]s.
+ * @param modifier the [Modifier] to be applied to this tab
+ * @param enabled controls the enabled state of this tab. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this tab. You can create and pass in your own `remember`ed instance to observe [Interaction]s
+ * and customize the appearance / behavior of this tab in different states.
  * @param selectedContentColor the color for the content of this tab when selected, and the color
  * of the ripple.
  * @param unselectedContentColor the color for the content of this tab when not selected
@@ -209,14 +209,14 @@ fun LeadingIconTab(
  * @sample androidx.compose.material3.samples.FancyTab
  *
  * @param selected whether this tab is selected or not
- * @param onClick the callback to be invoked when this tab is selected
- * @param modifier optional [Modifier] for this tab
- * @param enabled controls the enabled state of this tab. When `false`, this tab will not
- * be clickable and will appear disabled to accessibility services.
- * @param interactionSource the [MutableInteractionSource] representing the stream of
- * [Interaction]s for this Tab. You can create and pass in your own remembered
- * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
- * appearance / behavior of this Tab in different [Interaction]s.
+ * @param onClick called when this tab is clicked
+ * @param modifier the [Modifier] to be applied to this tab
+ * @param enabled controls the enabled state of this tab. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this tab. You can create and pass in your own `remember`ed instance to observe [Interaction]s
+ * and customize the appearance / behavior of this tab in different states.
  * @param selectedContentColor the color for the content of this tab when selected, and the color
  * of the ripple.
  * @param unselectedContentColor the color for the content of this tab when not selected

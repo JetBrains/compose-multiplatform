@@ -68,23 +68,23 @@ import kotlin.math.min
  * of the [SnackbarHost] to the [Scaffold]:
  * @sample androidx.compose.material3.samples.ScaffoldWithCustomSnackbar
  *
- * @param modifier modifiers for the Snackbar layout
+ * @param modifier the [Modifier] to be applied to this snackbar
  * @param action action / button component to add as an action to the snackbar. Consider using
  * [ColorScheme.inversePrimary] as the color for the action, if you do not have a predefined color
  * you wish to use instead.
  * @param dismissAction action / button component to add as an additional close affordance action
  * when a snackbar is non self-dismissive. Consider using [ColorScheme.inverseOnSurface] as the
  * color for the action, if you do not have a predefined color you wish to use instead.
- * @param actionOnNewLine whether or not action should be put on the separate line. Recommended
- * for action with long action text
- * @param shape defines the Snackbar's shape (as well as its shadow when using `shadowElevation`)
- * @param containerColor background color of the Snackbar
- * @param contentColor the preferred color for content inside this Snackbar. Also see
- * [LocalContentColor] which is used by [Text] and [Icon] by default.
+ * @param actionOnNewLine whether or not action should be put on a separate line. Recommended for
+ * action with long action text.
+ * @param shape defines the shape of this snackbar's container
+ * @param containerColor the color used for the background of this snackbar. Use [Color.Transparent]
+ * to have no color.
+ * @param contentColor the preferred color for content inside this snackbar
  * @param actionContentColor the preferred content color for the optional [action] inside this
- * Snackbar
+ * snackbar
  * @param dismissActionContentColor the preferred content color for the optional [dismissAction]
- * inside this Snackbar
+ * inside this snackbar
  * @param content content to show information about a process that an app has performed or will
  * perform
  */
@@ -178,18 +178,18 @@ fun Snackbar(
  * @sample androidx.compose.material3.samples.ScaffoldWithIndefiniteSnackbar
  *
  * @param snackbarData data about the current snackbar showing via [SnackbarHostState]
- * @param modifier modifiers for the Snackbar layout
- * @param actionOnNewLine whether or not the Snackbar's action should be put on the separate line
- * (recommended for action with long action text)
- * @param shape defines the Snackbar's shape (as well as its shadow when using `shadowElevation`)
- * @param containerColor background color of the Snackbar
- * @param contentColor the preferred color for content inside this Snackbar. Also see
- * [LocalContentColor] which is used by [Text] and [Icon] by default.
- * @param actionColor color of the Snackbar's action
+ * @param modifier the [Modifier] to be applied to this snackbar
+ * @param actionOnNewLine whether or not action should be put on a separate line. Recommended for
+ * action with long action text.
+ * @param shape defines the shape of this snackbar's container
+ * @param containerColor the color used for the background of this snackbar. Use [Color.Transparent]
+ * to have no color.
+ * @param contentColor the preferred color for content inside this snackbar
+ * @param actionColor the color of the snackbar's action
  * @param actionContentColor the preferred content color for the optional action inside this
- * Snackbar. See [SnackbarVisuals.actionLabel].
+ * snackbar. See [SnackbarVisuals.actionLabel].
  * @param dismissActionContentColor the preferred content color for the optional dismiss action
- * inside this Snackbar. See [SnackbarVisuals.withDismissAction].
+ * inside this snackbar. See [SnackbarVisuals.withDismissAction].
  */
 @Composable
 fun Snackbar(
