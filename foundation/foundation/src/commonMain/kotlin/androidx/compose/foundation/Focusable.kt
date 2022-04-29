@@ -74,7 +74,6 @@ fun Modifier.focusable(
     val scope = rememberCoroutineScope()
     val focusedInteraction = remember { mutableStateOf<FocusInteraction.Focus?>(null) }
     var pinnableParent by remember { mutableStateOf<PinnableParent?>(null) }
-    var pinnedItemsHandle by remember { mutableStateOf<PinnableParent.PinnedItemsHandle?>(null) }
     var isFocused by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
 
@@ -110,11 +109,6 @@ fun Modifier.focusable(
         }
         onDispose { }
     }
-    DisposableEffect(Unit) {
-        onDispose {
-            pinnedItemsHandle?.unpin()
-        }
-    }
 
     if (enabled) {
         val focusedChildModifier = if (isFocused) {
@@ -144,12 +138,12 @@ fun Modifier.focusable(
                     // We use CoroutineStart.UNDISPATCHED because we want to pin the items
                     // synchronously and suspend after the items are pinned.
                     scope.launch(start = CoroutineStart.UNDISPATCHED) {
+                        var pinnedItemsHandle: PinnableParent.PinnedItemsHandle? = null
                         try {
                             pinnedItemsHandle = pinnableParent?.pinItems()
                             bringIntoViewRequester.bringIntoView()
                         } finally {
                             pinnedItemsHandle?.unpin()
-                            pinnedItemsHandle = null
                         }
                     }
                     scope.launch {
