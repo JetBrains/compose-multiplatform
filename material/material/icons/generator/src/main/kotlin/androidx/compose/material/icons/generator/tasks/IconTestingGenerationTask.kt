@@ -17,9 +17,10 @@
 package androidx.compose.material.icons.generator.tasks
 
 import androidx.compose.material.icons.generator.IconTestingManifestGenerator
-import org.gradle.api.Project
-import org.gradle.api.tasks.OutputDirectory
 import java.io.File
+import org.gradle.api.Project
+import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.OutputDirectory
 
 /**
  * Task responsible for generating files related to testing.
@@ -29,6 +30,7 @@ import java.io.File
  *
  * - Flattens all the source drawables into a drawable folder that will be used in comparison tests.
  */
+@CacheableTask
 open class IconTestingGenerationTask : IconGenerationTask() {
     /**
      * Directory to generate the flattened drawables used for testing to.
