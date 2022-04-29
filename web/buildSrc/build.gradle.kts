@@ -10,7 +10,7 @@ repositories {
 }
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.6.21"
+    id("org.jetbrains.kotlin.jvm")
 }
 
 
@@ -20,5 +20,13 @@ java {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin")
+}
+
+// Write kotlin.version into a file, so it can be read by karma-test-runner patch (see test-utils/conf)
+File(projectDir.resolve("build"), "kotlin.version").apply {
+    val kotlinVersion = extra["kotlin.version"].toString()
+    println("Writing kotlin.version=$kotlinVersion into $absolutePath")
+    createNewFile()
+    writeText(kotlinVersion)
 }
