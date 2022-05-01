@@ -163,9 +163,6 @@ compose.experimental {
                 //Usage: ./gradlew iosDeployIPadDebug
                 device = IOSDevices.IPAD_MINI_6th_Gen
             }
-            connectedDevice("Device") {
-                //Usage: ./gradlew iosDeployDeviceRelease
-            }
         }
     }
 }

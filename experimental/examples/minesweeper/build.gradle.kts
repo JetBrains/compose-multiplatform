@@ -16,7 +16,7 @@ buildscript {
 
 plugins {
     kotlin("multiplatform") version "1.6.10"
-    id("org.jetbrains.compose") version "1.2.0-alpha01-dev620"
+    id("org.jetbrains.compose") version "1.2.0-alpha01-dev675"
 }
 
 version = "1.0-SNAPSHOT"
@@ -164,9 +164,9 @@ compose.experimental {
                 //Usage: ./gradlew iosDeployIPadDebug
                 device = IOSDevices.IPAD_MINI_6th_Gen
             }
-            connectedDevice("Device") {
+//            connectedDevice("Device") { //todo lazy init (compose.ios.teamId=*** in local.properties)
                 //Usage: ./gradlew iosDeployDeviceRelease
-            }
+//            }
         }
     }
 }
