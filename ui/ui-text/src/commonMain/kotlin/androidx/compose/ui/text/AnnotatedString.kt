@@ -222,6 +222,7 @@ class AnnotatedString internal constructor(
     @Immutable
     data class Range<T>(val item: T, val start: Int, val end: Int, val tag: String) {
         constructor(item: T, start: Int, end: Int) : this(item, start, end, "")
+
         init {
             require(start <= end) { "Reversed range is not supported" }
         }
@@ -233,9 +234,14 @@ class AnnotatedString internal constructor(
      *
      * @sample androidx.compose.ui.text.samples.AnnotatedStringBuilderSample
      *
+     * This class implements [Appendable] and can be used with other APIs that don't know about
+     * [AnnotatedString]s:
+     *
+     * @sample androidx.compose.ui.text.samples.AnnotatedStringBuilderAppendableSample
+     *
      * @param capacity initial capacity for the internal char buffer
      */
-    class Builder(capacity: Int = 16) {
+    class Builder(capacity: Int = 16) : Appendable {
 
         private data class MutableRange<T>(
             val item: T,
@@ -289,13 +295,65 @@ class AnnotatedString internal constructor(
             this.text.append(text)
         }
 
+        @Deprecated(
+            message = "Replaced by the append(Char) method that returns an Appendable. " +
+                "This method must be kept around for binary compatibility.",
+            level = DeprecationLevel.HIDDEN
+        )
+        @Suppress("FunctionName", "unused")
+        // Set the JvmName to preserve compatibility with bytecode that expects a void return type.
+        @JvmName("append")
+        fun deprecated_append_returning_void(char: Char) {
+            append(char)
+        }
+
         /**
-         * Appends the given [Char] to this [Builder].
+         * Appends [text] to this [Builder] if non-null, and returns this [Builder].
          *
-         * @param char the Char to append
+         * If [text] is an [AnnotatedString], all spans and annotations will be copied over as well.
+         * No other subtypes of [CharSequence] will be treated specially. For example, any
+         * platform-specific types, such as `SpannedString` on Android, will only have their text
+         * copied and any other information held in the sequence, such as Android `Span`s, will be
+         * dropped.
          */
-        fun append(char: Char) {
+        @Suppress("BuilderSetStyle")
+        override fun append(text: CharSequence?): Builder {
+            if (text is AnnotatedString) {
+                append(text)
+            } else {
+                this.text.append(text)
+            }
+            return this
+        }
+
+        /**
+         * Appends the range of [text] between [start] (inclusive) and [end] (exclusive) to this
+         * [Builder] if non-null, and returns this [Builder].
+         *
+         * If [text] is an [AnnotatedString], all spans and annotations from [text] between
+         * [start] and [end] will be copied over as well.
+         * No other subtypes of [CharSequence] will be treated specially. For example, any
+         * platform-specific types, such as `SpannedString` on Android, will only have their text
+         * copied and any other information held in the sequence, such as Android `Span`s, will be
+         * dropped.
+         *
+         * @param start The index of the first character in [text] to copy over (inclusive).
+         * @param end The index after the last character in [text] to copy over (exclusive).
+         */
+        @Suppress("BuilderSetStyle")
+        override fun append(text: CharSequence?, start: Int, end: Int): Builder {
+            if (text is AnnotatedString) {
+                append(text, start, end)
+            } else {
+                this.text.append(text, start, end)
+            }
+            return this
+        }
+
+        // Kdoc comes from interface method.
+        override fun append(char: Char): Builder {
             this.text.append(char)
+            return this
         }
 
         /**
@@ -317,6 +375,38 @@ class AnnotatedString internal constructor(
             text.annotations.fastForEach {
                 annotations.add(
                     MutableRange(it.item, start + it.start, start + it.end, it.tag)
+                )
+            }
+        }
+
+        /**
+         * Appends the range of [text] between [start] (inclusive) and [end] (exclusive) to this
+         * [Builder]. All spans and annotations from [text] between [start] and [end] will be copied
+         * over as well.
+         *
+         * @param start The index of the first character in [text] to copy over (inclusive).
+         * @param end The index after the last character in [text] to copy over (exclusive).
+         */
+        @Suppress("BuilderSetStyle")
+        fun append(text: AnnotatedString, start: Int, end: Int) {
+            val insertionStart = this.text.length
+            this.text.append(text.text, start, end)
+            // offset every style with insertionStart and add to the builder
+            text.getLocalSpanStyles(start, end).fastForEach {
+                addStyle(it.item, insertionStart + it.start, insertionStart + it.end)
+            }
+            text.getLocalParagraphStyles(start, end).fastForEach {
+                addStyle(it.item, insertionStart + it.start, insertionStart + it.end)
+            }
+
+            text.getLocalAnnotations(start, end).fastForEach {
+                annotations.add(
+                    MutableRange(
+                        it.item,
+                        insertionStart + it.start,
+                        insertionStart + it.end,
+                        it.tag
+                    )
                 )
             }
         }
@@ -575,7 +665,7 @@ internal fun AnnotatedString.normalizedParagraphStyles(
  * @param end The end index of the paragraph range, exclusive
  * @return The list of converted [SpanStyle]s in the given paragraph range
  */
-private fun AnnotatedString.getLocalStyles(
+private fun AnnotatedString.getLocalSpanStyles(
     start: Int,
     end: Int
 ): List<Range<SpanStyle>> {
@@ -595,6 +685,59 @@ private fun AnnotatedString.getLocalStyles(
 }
 
 /**
+ * Helper function used to find the [ParagraphStyle]s in the given range and also convert the range
+ * of those styles to the local range.
+ *
+ * @param start The start index of the range, inclusive
+ * @param end The end index of the range, exclusive
+ */
+private fun AnnotatedString.getLocalParagraphStyles(
+    start: Int,
+    end: Int
+): List<Range<ParagraphStyle>> {
+    if (start == end) return listOf()
+    // If the given range covers the whole AnnotatedString, return SpanStyles without conversion.
+    if (start == 0 && end >= this.text.length) {
+        return paragraphStyles
+    }
+    return paragraphStyles.fastFilter { intersect(start, end, it.start, it.end) }
+        .fastMap {
+            Range(
+                it.item,
+                it.start.coerceIn(start, end) - start,
+                it.end.coerceIn(start, end) - start
+            )
+        }
+}
+
+/**
+ * Helper function used to find the annotations in the given range and also convert the range
+ * of those annotations to the local range.
+ *
+ * @param start The start index of the range, inclusive
+ * @param end The end index of the range, exclusive
+ */
+private fun AnnotatedString.getLocalAnnotations(
+    start: Int,
+    end: Int
+): List<Range<out Any>> {
+    if (start == end) return listOf()
+    // If the given range covers the whole AnnotatedString, return SpanStyles without conversion.
+    if (start == 0 && end >= this.text.length) {
+        return annotations
+    }
+    return annotations.fastFilter { intersect(start, end, it.start, it.end) }
+        .fastMap {
+            Range(
+                tag = it.tag,
+                item = it.item,
+                start = it.start.coerceIn(start, end) - start,
+                end = it.end.coerceIn(start, end) - start
+            )
+        }
+}
+
+/**
  * Helper function used to return another AnnotatedString that is a substring from [start] to
  * [end]. This will ignore the [ParagraphStyle]s and the resulting [AnnotatedString] will have no
  * [ParagraphStyle]s.
@@ -609,7 +752,7 @@ private fun AnnotatedString.substringWithoutParagraphStyles(
 ): AnnotatedString {
     return AnnotatedString(
         text = if (start != end) text.substring(start, end) else "",
-        spanStyles = getLocalStyles(start, end)
+        spanStyles = getLocalSpanStyles(start, end)
     )
 }
 
