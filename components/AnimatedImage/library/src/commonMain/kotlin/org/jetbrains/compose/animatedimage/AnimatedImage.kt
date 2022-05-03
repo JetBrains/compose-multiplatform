@@ -19,7 +19,7 @@ expect suspend fun loadResourceAnimatedImage(path: String): AnimatedImage
 
 /**
  * Animates an [AnimatedImage] by returning an [ImageBitmap] for each frame of the image.
- * The parent will be with the recomposed with each new frame that has been rendered.
+ * The caller will be with the recomposed with each new frame that has been rendered.
  */
 expect fun AnimatedImage.animate(): ImageBitmap
 
