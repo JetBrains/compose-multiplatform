@@ -18,7 +18,8 @@ package androidx.compose.desktop.ui.tooling.preview.runtime
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentComposer
-import androidx.compose.ui.tooling.CommonPreviewUtils.invokeComposableViaReflection
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.tooling.ComposableInvoker.invokeComposable
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.launchApplication
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -29,6 +30,7 @@ internal class PreviewRunner {
         private var previewComposition: @Composable () -> Unit = {}
 
         @JvmStatic
+        @OptIn(ExperimentalComposeUiApi::class)
         fun main(args: Array<String>) {
             val previewFqName = args[0]
             val className = previewFqName.substringBeforeLast(".")
@@ -38,7 +40,7 @@ internal class PreviewRunner {
                 // We need to delay the reflection instantiation of the class until we are in the
                 // composable to ensure all the right initialization has happened and the Composable
                 // class loads correctly.
-                invokeComposableViaReflection(
+                invokeComposable(
                     className,
                     methodName,
                     currentComposer
