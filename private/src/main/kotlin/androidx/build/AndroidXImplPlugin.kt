@@ -173,7 +173,7 @@ class AndroidXImplPlugin : Plugin<Project> {
         task.maxHeapSize = "3g"
 
         val xmlReportDestDir = project.getHostTestResultDirectory()
-        val archiveName = "${project.path.asFilenamePrefix()}_${task.name}.zip"
+        val archiveName = "${project.path}:${task.name}.zip"
         if (project.isDisplayTestOutput()) {
             // Enable tracing to see results in command line
             task.testLogging.apply {
