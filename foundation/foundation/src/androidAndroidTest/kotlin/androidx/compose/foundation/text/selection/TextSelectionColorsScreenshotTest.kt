@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
-import androidx.test.filters.Suppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
 import org.junit.Rule
 import org.junit.Test
@@ -107,7 +106,6 @@ class TextSelectionColorsScreenshotTest {
             .assertAgainstGolden(screenshotRule, "text_customSelectionColors")
     }
 
-    @Suppress // crashes when creating actuals on local b/228583901
     @Test
     fun textField_defaultSelectionColors() {
         rule.setContent {
@@ -128,7 +126,6 @@ class TextSelectionColorsScreenshotTest {
             .assertAgainstGolden(screenshotRule, "textField_defaultSelectionColors")
     }
 
-    @Suppress // crashes when creating actuals on local b/228583901
     @Test
     fun textField_customSelectionColors() {
         rule.setContent {
