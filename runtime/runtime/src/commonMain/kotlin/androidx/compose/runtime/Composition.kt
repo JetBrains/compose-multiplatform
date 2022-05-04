@@ -382,6 +382,11 @@ internal class CompositionImpl(
     private val observations = IdentityScopeMap<RecomposeScopeImpl>()
 
     /**
+     * Used for testing. Returns the objects that are observed
+     */
+    internal val observedObjects get() = observations.values.filterNotNull()
+
+    /**
      * A set of scopes that were invalidated conditionally (that is they were invalidated by a
      * [derivedStateOf] object) by a call from [recordModificationsOf]. They need to be held in the
      * [observations] map until invalidations are drained for composition as a later call to
