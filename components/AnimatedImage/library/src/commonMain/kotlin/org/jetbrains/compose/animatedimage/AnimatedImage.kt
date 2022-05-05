@@ -9,7 +9,7 @@ expect class AnimatedImage
 
 /**
  * Loads an [AnimatedImage] from a given path.
- * The path can be loaded from different sources depending on the platform (only desktop currently):
+ * The image can be loaded from different sources depending on the platform (only desktop currently):
  * Desktop: From the network if it's a valid URL, from the local storage otherwise.
  */
 expect suspend fun loadAnimatedImage(path: String): AnimatedImage
