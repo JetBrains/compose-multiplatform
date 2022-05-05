@@ -226,8 +226,8 @@ private fun Modifier.mouseWheelScroll(
     scrollingLogicState: State<ScrollingLogic>,
     mouseWheelScrollConfig: ScrollConfig,
 ) = pointerInput(scrollingLogicState, mouseWheelScrollConfig) {
-    while (true) {
-        awaitPointerEventScope {
+    awaitPointerEventScope {
+        while (true) {
             val event = awaitScrollEvent()
             if (event.changes.fastAll { !it.isConsumed }) {
                 with(mouseWheelScrollConfig) {
