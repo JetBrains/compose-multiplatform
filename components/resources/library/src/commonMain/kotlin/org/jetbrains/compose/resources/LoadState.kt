@@ -18,7 +18,7 @@ sealed class LoadState<T> {
 
 
 /**
- * Load a block of code with the operation progress and result of [T] wrapped around a [LoadState].
+ * Load an item with type [T] asynchronously, and notify the caller about the load state.
  * Whenever the load state changes (for example it succeeds or fails), the caller will be recomposed with the new state.
  * The load will be cancelled when the [load] leaves the composition.
  */
@@ -28,7 +28,7 @@ fun <T> load(load: suspend () -> T): LoadState<T> {
 }
 
 /**
- * Load a block of code with the result being [T] or null in case the former is not available.
+ * Load an item with type [T] asynchronously. Returns null while loading or if the load has failed.
  * Whenever the result changes, the caller will be recomposed with the new value.
  * The load will be cancelled when the [loadOrNull] leaves the composition.
  */
@@ -39,7 +39,7 @@ fun <T: Any> loadOrNull(load: suspend () -> T): T? {
 
 
 /**
- * Load a block of code with the operation progress and result of [T] wrapped around a [LoadState].
+ * Load an item with type [T] asynchronously, and notify the caller about the load state.
  * Whenever the load state changes (for example it succeeds or fails), the caller will be recomposed with the new state.
  * The load will be cancelled and re-launched when [load] is recomposed with a different [key1].
  * The load will be cancelled when the [load] leaves the composition.
@@ -50,7 +50,7 @@ fun <T> load(key1: Any?, load: suspend () -> T): LoadState<T> {
 }
 
 /**
- * Load a block of code with the result being [T] or null in case the former is not available.
+ * Load an item with type [T] asynchronously. Returns null while loading or if the load has failed.
  * Whenever the result changes, the caller will be recomposed with the new value.
  * The load will be cancelled and re-launched when [loadOrNull] is recomposed with a different [key1].
  * The load will be cancelled when the [loadOrNull] leaves the composition.
@@ -61,7 +61,7 @@ fun <T: Any> loadOrNull(key1: Any?, load: suspend () -> T): T? {
 }
 
 /**
- * Load a block of code with the operation progress and result of [T] wrapped around a [LoadState].
+ * Load an item with type [T] asynchronously, and notify the caller about the load state.
  * Whenever the load state changes (for example it succeeds or fails), the caller will be recomposed with the new state.
  * The load will be cancelled and re-launched when [load] is recomposed with a different [key1] or [key2].
  * The load will be cancelled when the [load] leaves the composition.
@@ -72,7 +72,7 @@ fun <T> load(key1: Any?, key2: Any?, load: suspend () -> T): LoadState<T> {
 }
 
 /**
- * Load a block of code with the result being [T] or null in case the former is not available.
+ * Load an item with type [T] asynchronously. Returns null while loading or if the load has failed.
  * Whenever the result changes, the caller will be recomposed with the new value.
  * The load will be cancelled and re-launched when [loadOrNull] is recomposed with a different [key1] or [key2].
  * The load will be cancelled when the [loadOrNull] leaves the composition.
@@ -83,7 +83,7 @@ fun <T: Any> loadOrNull(key1: Any?, key2: Any?, load: suspend () -> T): T? {
 }
 
 /**
- * Load a block of code with the operation progress and result of [T] wrapped around a [LoadState].
+ * Load an item with type [T] asynchronously, and notify the caller about the load state.
  * Whenever the load state changes (for example it succeeds or fails), the caller will be recomposed with the new state.
  * The load will be cancelled and re-launched when [load] is recomposed with a different [key1], [key2] or [key3].
  * The load will be cancelled when the [load] leaves the composition.
@@ -102,7 +102,7 @@ fun <T> load(key1: Any?, key2: Any?, key3: Any?, load: suspend () -> T): LoadSta
 }
 
 /**
- * Load a block of code with the result being [T] or null in case the former is not available.
+ * Load an item with type [T] asynchronously. Returns null while loading or if the load has failed..
  * Whenever the result changes, the caller will be recomposed with the new value.
  * The load will be cancelled and re-launched when [loadOrNull] is recomposed with a different [key1], [key2] or [key3].
  * The load will be cancelled when the [loadOrNull] leaves the composition.
