@@ -52,6 +52,7 @@ import com.android.build.gradle.TestPlugin
 import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.internal.tasks.AnalyticsRecordingTask
 import com.android.build.gradle.internal.tasks.ListingFileRedirectTask
+import com.android.build.gradle.tasks.BundleAar
 import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
@@ -79,9 +80,14 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.attribute.FileTime
 import java.time.Duration
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
+import org.apache.tools.zip.ZipEntry
+import org.apache.tools.zip.ZipFile
+import org.apache.tools.zip.ZipOutputStream
 import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.register
 
@@ -343,6 +349,26 @@ class AndroidXImplPlugin : Plugin<Project> {
             }
         }
 
+        // Remove the android:targetSdkVersion element from the manifest used for AARs.
+        project.tasks.withType(BundleAar::class.java).configureEach { task ->
+            task.doLast {
+                val aar = task.archiveFile.get().asFile
+                val tempDir = Files.createTempDirectory("${task.name}Unzip").toFile()
+                tempDir.deleteOnExit()
+
+                ZipFile(aar).use { aarFile ->
+                    aarFile.unzipTo(tempDir)
+                }
+                aar.delete()
+
+                val manifestFile = File(tempDir, "AndroidManifest.xml")
+                manifestFile.writeText(removeTargetSdkVersion(manifestFile.readText()))
+
+                tempDir.zipTo(aar)
+                tempDir.deleteRecursively()
+            }
+        }
+
         project.extensions.getByType<com.android.build.api.dsl.LibraryExtension>().apply {
             publishing {
                 singleVariant(DEFAULT_PUBLISH_CONFIG)
@@ -390,6 +416,54 @@ class AndroidXImplPlugin : Plugin<Project> {
         )
 
         project.addToProjectMap(androidXExtension)
+    }
+
+    private fun ZipFile.unzipTo(tempDir: File) {
+        entries.iterator().forEach { entry ->
+            if (entry.isDirectory) {
+                File(tempDir, entry.name).mkdirs()
+            } else {
+                val file = File(tempDir, entry.name)
+                file.parentFile.mkdirs()
+                getInputStream(entry).use { stream ->
+                    file.writeBytes(stream.readBytes())
+                }
+            }
+        }
+    }
+
+    private fun File.zipTo(outZip: File) {
+        ZipOutputStream(outZip.outputStream()).use { stream ->
+            listFiles()!!.forEach { file ->
+                stream.addFileRecursive(null, file)
+            }
+        }
+    }
+
+    private fun ZipOutputStream.addFileRecursive(parentPath: String?, file: File) {
+        val entryPath = if (parentPath != null) "$parentPath/${file.name}" else file.name
+        val entry = ZipEntry(file, entryPath)
+
+        // Reset creation time of entry to make it deterministic.
+        entry.time = 0
+        entry.creationTime = FileTime.fromMillis(0)
+
+        if (file.isFile) {
+            putNextEntry(entry)
+            file.inputStream().use { stream ->
+                stream.copyTo(this)
+            }
+            closeEntry()
+        } else if (file.isDirectory) {
+            val listFiles = file.listFiles()
+            if (!listFiles.isNullOrEmpty()) {
+                putNextEntry(entry)
+                closeEntry()
+                listFiles.forEach { containedFile ->
+                    addFileRecursive(entryPath, containedFile)
+                }
+            }
+        }
     }
 
     private fun configureWithJavaPlugin(project: Project, extension: AndroidXExtension) {
@@ -985,5 +1059,13 @@ fun AndroidXExtension.validateMavenVersion() {
         )
     }
 }
+
+/**
+ * Removes the android:targetSdkVersion element from the [manifest].
+ */
+fun removeTargetSdkVersion(manifest: String): String = manifest.replace(
+    "\\s*android:targetSdkVersion=\".+?\"".toRegex(),
+    ""
+)
 
 const val PROJECT_OR_ARTIFACT_EXT_NAME = "projectOrArtifact"
