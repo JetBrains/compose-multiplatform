@@ -17,11 +17,16 @@
 package androidx.compose.ui.tooling
 
 import androidx.compose.runtime.Composer
+import androidx.compose.ui.ExperimentalComposeUiApi
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 import kotlin.math.ceil
 
-internal object CommonPreviewUtils {
+/**
+ * A utility object to invoke composable function by its name and containing class.
+ */
+@ExperimentalComposeUiApi
+object ComposableInvoker {
 
     /**
      * Returns true if the [methodTypes] and [actualTypes] are compatible. This means that every
@@ -168,11 +173,12 @@ internal object CommonPreviewUtils {
     }
 
     /**
-     * Invokes the given [methodName] belonging to the given [className] via reflection. The
-     * [methodName] is expected to be a Composable function.
+     * Invokes the given [methodName] belonging to the given [className]. The [methodName] is
+     * expected to be a Composable function.
      * This method [args] will be forwarded to the Composable function.
      */
-    internal fun invokeComposableViaReflection(
+    @ExperimentalComposeUiApi
+    fun invokeComposable(
         className: String,
         methodName: String,
         composer: Composer,
