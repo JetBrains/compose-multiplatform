@@ -41,6 +41,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
@@ -48,7 +49,7 @@ import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.platform.LocalFontLoader
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.text.font.createFontFamilyResolver
-import androidx.compose.ui.tooling.CommonPreviewUtils.invokeComposableViaReflection
+import androidx.compose.ui.tooling.ComposableInvoker.invokeComposable
 import androidx.compose.ui.tooling.animation.PreviewAnimationClock
 import androidx.compose.ui.tooling.data.Group
 import androidx.compose.ui.tooling.data.SourceLocation
@@ -552,6 +553,7 @@ internal class ComposeViewAdapter : FrameLayout {
      * @param onCommit callback invoked after every commit of the preview composable.
      * @param onDraw callback invoked after every draw of the adapter. Only for test use.
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     @VisibleForTesting
     internal fun init(
         className: String,
@@ -585,7 +587,7 @@ internal class ComposeViewAdapter : FrameLayout {
                 // class loads correctly.
                 val composable = {
                     try {
-                        invokeComposableViaReflection(
+                        invokeComposable(
                             className,
                             methodName,
                             composer,
