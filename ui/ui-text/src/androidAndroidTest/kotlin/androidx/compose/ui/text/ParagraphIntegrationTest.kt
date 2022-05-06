@@ -3779,7 +3779,7 @@ class ParagraphIntegrationTest {
             val actualPath = paragraph.getPathForRange(1, text.length - 1)
 
             val expectedPath = Path()
-            expectedPath.addRect(Rect(fontSizeInPx, 0f, 2 * fontSizeInPx, fontSizeInPx))
+            expectedPath.addRect(Rect(fontSizeInPx, 0f, fontSizeInPx, fontSizeInPx))
 
             val diff = Path.combine(PathOperation.Difference, expectedPath, actualPath).getBounds()
             assertThat(diff).isEqualTo(Rect.Zero)
