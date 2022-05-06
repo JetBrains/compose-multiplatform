@@ -1420,6 +1420,30 @@ class MultiParagraphIntegrationTest {
         )
     }
 
+    @Test(expected = IllegalArgumentException::class)
+    fun setMinWidthConstraints_notSupported() {
+        val minWidthConstraints = Constraints(minWidth = 100)
+        MultiParagraph(
+            annotatedString = AnnotatedString(""),
+            style = TextStyle(),
+            constraints = minWidthConstraints,
+            density = defaultDensity,
+            fontFamilyResolver = UncachedFontFamilyResolver(context)
+        )
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun setMinHeightConstraints_notSupported() {
+        val minHeightConstraints = Constraints(minHeight = 100)
+        MultiParagraph(
+            annotatedString = AnnotatedString(""),
+            style = TextStyle(),
+            constraints = minHeightConstraints,
+            density = defaultDensity,
+            fontFamilyResolver = UncachedFontFamilyResolver(context)
+        )
+    }
+
     /**
      * Helper function which creates an AnnotatedString where each input string becomes a paragraph.
      */
