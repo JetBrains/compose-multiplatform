@@ -41,7 +41,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusManager
@@ -556,16 +555,13 @@ internal fun CoreTextField(
                             measurables: List<Measurable>,
                             constraints: Constraints
                         ): MeasureResult {
-                            val prevResult = Snapshot.withoutReadObservation {
-                                state.layoutResult?.value
-                            }
                             val (width, height, result) = TextFieldDelegate.layout(
                                 state.textDelegate,
                                 constraints,
                                 layoutDirection,
-                                prevResult
+                                state.layoutResult?.value
                             )
-                            if (prevResult != result) {
+                            if (state.layoutResult?.value != result) {
                                 state.layoutResult = TextLayoutResultProxy(result)
                                 onTextLayout(result)
                             }
@@ -705,7 +701,7 @@ internal class TextFieldState(
      * position using the [TextFieldValue.selection] value which corresponds to the text directly,
      * and therefore does not require the translation.
      */
-    var layoutResult: TextLayoutResultProxy? by mutableStateOf(null)
+    var layoutResult: TextLayoutResultProxy? = null
 
     /**
      * The gesture detector state, to indicate whether current state is selection, cursor
