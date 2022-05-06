@@ -57,7 +57,7 @@ class CheckboxesInRowsTestCase(
     }
 
     @Composable
-    override fun ContentWrappers(content: () -> Unit) {
+    override fun ContentWrappers(content: @Composable () -> Unit) {
         MaterialTheme {
             Surface {
                 content()
