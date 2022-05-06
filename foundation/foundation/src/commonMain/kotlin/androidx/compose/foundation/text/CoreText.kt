@@ -28,10 +28,6 @@ import androidx.compose.foundation.text.selection.mouseSelectionDetector
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -310,18 +306,15 @@ internal class TextController(val state: TextState) : RememberObserver {
             // NOTE(text-perf-review): current implementation of layout means that layoutResult
             // will _never_ be the same instance. We should try and fast path case where
             // everything is the same and return same instance in that case.
-            val prevLayout = Snapshot.withoutReadObservation {
-                state.layoutResult
-            }
             val layoutResult = state.textDelegate.layout(
                 constraints,
                 layoutDirection,
-                prevLayout
+                state.layoutResult
             )
-            if (prevLayout != layoutResult) {
+            if (state.layoutResult != layoutResult) {
                 state.onTextLayout(layoutResult)
 
-                prevLayout?.let { prevLayoutResult ->
+                state.layoutResult?.let { prevLayoutResult ->
                     // If the input text of this CoreText has changed, notify the SelectionContainer.
                     if (prevLayoutResult.layoutInput.text != layoutResult.layoutInput.text) {
                         selectionRegistrar?.notifySelectableChange(state.selectableId)
@@ -346,6 +339,7 @@ internal class TextController(val state: TextState) : RememberObserver {
                     )
                 }
             }
+
             return layout(
                 layoutResult.size.width,
                 layoutResult.size.height,
@@ -530,7 +524,7 @@ internal class TextState(
     var layoutCoordinates: LayoutCoordinates? = null
 
     /** The latest TextLayoutResult calculated in the measure block.*/
-    var layoutResult: TextLayoutResult? by mutableStateOf(null)
+    var layoutResult: TextLayoutResult? = null
 
     /** The global position calculated during the last notifyPosition callback */
     var previousGlobalPosition: Offset = Offset.Zero
