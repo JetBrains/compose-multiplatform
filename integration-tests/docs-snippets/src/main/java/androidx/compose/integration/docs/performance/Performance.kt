@@ -161,15 +161,15 @@ private object DeferredReadPreOptimization {
         Box(Modifier.fillMaxSize()) { // Recomposition Scope Start
             val scroll = rememberScrollState(0)
             // ...
-            Title(snack) { scroll.value }
+            Title(snack, scroll.value)
             // ...
         } // Recomposition Scope End
     }
 
     @Composable
-    private fun Title(snack: Snack, scrollProvider: () -> Int) {
+    private fun Title(snack: Snack, scroll: Int) {
         // ...
-        val offset = with(LocalDensity.current) { scrollProvider().toDp() }
+        val offset = with(LocalDensity.current) { scroll.toDp() }
 
         Column(
             modifier = Modifier
