@@ -19,6 +19,8 @@ package androidx.compose.animation.graphics.vector
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.vector.PathNode
@@ -309,5 +311,45 @@ class AnimatorTest {
         rule.waitForIdle()
         assertThat(config.getOrDefault(VectorProperty.PathData, emptyList()))
             .isEqualTo(addPathNodes("M 0 0 L 1000 0 L 1000 1000 L 0 1000 Z"))
+    }
+
+    @Test
+    fun startDelay() {
+        val a = objectAnimator(
+            propertyName = "trimPathEnd",
+            duration = 400,
+            keyframes = listOf(
+                Keyframe(fraction = 0f, value = 0f, interpolator = LinearEasing),
+                Keyframe(fraction = 1f, value = 1f, interpolator = LinearEasing),
+            ),
+            startDelay = 100
+        )
+        val isAtEnd = mutableStateOf(false)
+        val config = StateVectorConfig()
+        rule.setContent {
+            val transition = updateTransition(isAtEnd.value, label = "startDelay")
+            val control = transition.animateFloat(
+                label = "control",
+                transitionSpec = {
+                    if (targetState) {
+                        tween(durationMillis = 400, delayMillis = 100, easing = LinearEasing)
+                    } else {
+                        tween(durationMillis = 400, easing = LinearEasing)
+                    }
+                }
+            ) { if (it) 1f else 0f }
+            a.Configure(transition, config, 500)
+            if (transition.isRunning) {
+                val trimPathEnd = config.getOrDefault(VectorProperty.TrimPathEnd, -1f)
+                assertThat(trimPathEnd).isWithin(tolerance).of(control.value)
+            }
+        }
+        assertThat(config.getOrDefault(VectorProperty.TrimPathEnd, -1f)).isEqualTo(0f)
+        rule.runOnIdle { isAtEnd.value = true }
+        rule.waitForIdle()
+        assertThat(config.getOrDefault(VectorProperty.TrimPathEnd, -1f)).isEqualTo(1f)
+        rule.runOnIdle { isAtEnd.value = false }
+        rule.waitForIdle()
+        assertThat(config.getOrDefault(VectorProperty.TrimPathEnd, -1f)).isEqualTo(0f)
     }
 }

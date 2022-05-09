@@ -113,9 +113,9 @@ private class VectorizedCombinedSpec<V : AnimationVector>(
 ) : VectorizedFiniteAnimationSpec<V> {
 
     private fun chooseAnimation(playTimeNanos: Long): Pair<Long, VectorizedFiniteAnimationSpec<V>> {
-        return animations.last { (timeNanos, _) ->
+        return animations.lastOrNull { (timeNanos, _) ->
             timeNanos <= playTimeNanos
-        }
+        } ?: animations.first()
     }
 
     override fun getValueFromNanos(
