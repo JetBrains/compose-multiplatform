@@ -18,6 +18,7 @@ package androidx.compose.foundation.lazy.grid
 
 import android.os.Build
 import androidx.compose.foundation.AutoTestFrameClock
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
@@ -1120,6 +1121,48 @@ class LazyGridTest(
 
         rule.onNodeWithTag("10")
             .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun changedLinesRemeasuredCorrectly() {
+        var flag by mutableStateOf(false)
+        rule.setContent {
+            LazyGrid(cells = GridCells.Fixed(2), modifier = Modifier.axisSize(60.dp, 100.dp)) {
+                item(
+                    span = { GridItemSpan(maxLineSpan) }
+                ) {
+                    Box(Modifier.mainAxisSize(32.dp).background(Color.Red))
+                }
+
+                if (flag) {
+                    item {
+                        Box(Modifier.mainAxisSize(32.dp).background(Color.Blue))
+                    }
+
+                    item {
+                        Box(Modifier.mainAxisSize(32.dp).background(Color.Yellow).testTag("target"))
+                    }
+                } else {
+                    item(
+                        span = { GridItemSpan(maxLineSpan) }
+                    ) {
+                        Box(Modifier.mainAxisSize(32.dp).background(Color.Blue))
+                    }
+
+                    item(
+                        span = { GridItemSpan(maxLineSpan) }
+                    ) {
+                        Box(Modifier.mainAxisSize(32.dp).background(Color.Yellow).testTag("target"))
+                    }
+                }
+            }
+        }
+
+        flag = true
+        rule.onNodeWithTag("target")
+            .assertCrossAxisSizeIsEqualTo(30.dp)
+            .assertMainAxisStartPositionInRootIsEqualTo(32.dp)
+            .assertCrossAxisStartPositionInRootIsEqualTo(30.dp)
     }
 }
 
