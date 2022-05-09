@@ -34,8 +34,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import org.junit.Assert
 import kotlin.math.roundToInt
+import org.junit.Assert
 
 /**
  * A helper function to run asserts on [Bitmap].
@@ -197,11 +197,11 @@ fun ImageBitmap.assertShape(
             val point = Offset(x.toFloat(), y.toFloat())
             if (!backgroundPath.contains(
                     pixelFartherFromCenter(
-                            point,
-                            sizeX,
-                            sizeY,
-                            shapeOverlapPixelCount
-                        )
+                        point,
+                        sizeX,
+                        sizeY,
+                        shapeOverlapPixelCount
+                    )
                 )
             ) {
                 continue
