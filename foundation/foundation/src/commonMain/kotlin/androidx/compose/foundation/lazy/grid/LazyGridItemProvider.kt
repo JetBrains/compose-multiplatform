@@ -21,9 +21,5 @@ import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
 
 @ExperimentalFoundationApi
 internal interface LazyGridItemProvider : LazyLayoutItemProvider {
-    /** Returns the span for the given [index] */
-    fun LazyGridItemSpanScope.getSpan(index: Int): GridItemSpan
-
-    /** Whether the grid has custom spans. Otherwise, it means all items are 1x1 */
-    val hasCustomSpans: Boolean
+    val spanLayoutProvider: LazyGridSpanLayoutProvider
 }
