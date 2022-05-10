@@ -1,0 +1,103 @@
+// Signature format: 4.0
+package androidx.compose.ui.tooling.data {
+
+  @androidx.compose.ui.tooling.data.UiToolingDataApi public final class CallGroup extends androidx.compose.ui.tooling.data.Group {
+    ctor public CallGroup(Object? key, String? name, androidx.compose.ui.unit.IntRect box, androidx.compose.ui.tooling.data.SourceLocation? location, Object? identity, java.util.List<androidx.compose.ui.tooling.data.ParameterInformation> parameters, java.util.Collection<?> data, java.util.Collection<? extends androidx.compose.ui.tooling.data.Group> children);
+    property public java.util.List<androidx.compose.ui.tooling.data.ParameterInformation> parameters;
+  }
+
+  @androidx.compose.ui.tooling.data.UiToolingDataApi public abstract sealed class Group {
+    method public final androidx.compose.ui.unit.IntRect getBox();
+    method public final java.util.Collection<androidx.compose.ui.tooling.data.Group> getChildren();
+    method public final java.util.Collection<java.lang.Object> getData();
+    method public final Object? getIdentity();
+    method public final Object? getKey();
+    method public final androidx.compose.ui.tooling.data.SourceLocation? getLocation();
+    method public java.util.List<androidx.compose.ui.layout.ModifierInfo> getModifierInfo();
+    method public final String? getName();
+    method public java.util.List<androidx.compose.ui.tooling.data.ParameterInformation> getParameters();
+    property public final androidx.compose.ui.unit.IntRect box;
+    property public final java.util.Collection<androidx.compose.ui.tooling.data.Group> children;
+    property public final java.util.Collection<java.lang.Object> data;
+    property public final Object? identity;
+    property public final Object? key;
+    property public final androidx.compose.ui.tooling.data.SourceLocation? location;
+    property public java.util.List<androidx.compose.ui.layout.ModifierInfo> modifierInfo;
+    property public final String? name;
+    property public java.util.List<androidx.compose.ui.tooling.data.ParameterInformation> parameters;
+  }
+
+  @androidx.compose.ui.tooling.data.UiToolingDataApi public final class JoinedKey {
+    ctor public JoinedKey(Object? left, Object? right);
+    method public Object? component1();
+    method public Object? component2();
+    method public androidx.compose.ui.tooling.data.JoinedKey copy(Object? left, Object? right);
+    method public Object? getLeft();
+    method public Object? getRight();
+    property public final Object? left;
+    property public final Object? right;
+  }
+
+  @androidx.compose.ui.tooling.data.UiToolingDataApi public final class NodeGroup extends androidx.compose.ui.tooling.data.Group {
+    ctor public NodeGroup(Object? key, Object node, androidx.compose.ui.unit.IntRect box, java.util.Collection<?> data, java.util.List<androidx.compose.ui.layout.ModifierInfo> modifierInfo, java.util.Collection<? extends androidx.compose.ui.tooling.data.Group> children);
+    method public Object getNode();
+    property public java.util.List<androidx.compose.ui.layout.ModifierInfo> modifierInfo;
+    property public final Object node;
+  }
+
+  @androidx.compose.ui.tooling.data.UiToolingDataApi public final class ParameterInformation {
+    ctor public ParameterInformation(String name, Object? value, boolean fromDefault, boolean static, boolean compared, String? inlineClass, boolean stable);
+    method public String component1();
+    method public Object? component2();
+    method public boolean component3();
+    method public boolean component4();
+    method public boolean component5();
+    method public String? component6();
+    method public boolean component7();
+    method public androidx.compose.ui.tooling.data.ParameterInformation copy(String name, Object? value, boolean fromDefault, boolean static, boolean compared, String? inlineClass, boolean stable);
+    method public boolean getCompared();
+    method public boolean getFromDefault();
+    method public String? getInlineClass();
+    method public String getName();
+    method public boolean getStable();
+    method public boolean getStatic();
+    method public Object? getValue();
+    property public final boolean compared;
+    property public final boolean fromDefault;
+    property public final String? inlineClass;
+    property public final String name;
+    property public final boolean stable;
+    property public final boolean static;
+    property public final Object? value;
+  }
+
+  public final class SlotTreeKt {
+    method @androidx.compose.ui.tooling.data.UiToolingDataApi public static androidx.compose.ui.tooling.data.Group asTree(androidx.compose.runtime.tooling.CompositionData);
+    method @androidx.compose.ui.tooling.data.UiToolingDataApi public static String? getPosition(androidx.compose.ui.tooling.data.Group);
+  }
+
+  @androidx.compose.ui.tooling.data.UiToolingDataApi public final class SourceLocation {
+    ctor public SourceLocation(int lineNumber, int offset, int length, String? sourceFile, int packageHash);
+    method public int component1();
+    method public int component2();
+    method public int component3();
+    method public String? component4();
+    method public int component5();
+    method public androidx.compose.ui.tooling.data.SourceLocation copy(int lineNumber, int offset, int length, String? sourceFile, int packageHash);
+    method public int getLength();
+    method public int getLineNumber();
+    method public int getOffset();
+    method public int getPackageHash();
+    method public String? getSourceFile();
+    property public final int length;
+    property public final int lineNumber;
+    property public final int offset;
+    property public final int packageHash;
+    property public final String? sourceFile;
+  }
+
+  @kotlin.RequiresOptIn(message="This API is for tooling only and is likely to change in the future.") public @interface UiToolingDataApi {
+  }
+
+}
+
