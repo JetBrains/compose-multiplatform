@@ -95,6 +95,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
@@ -177,8 +179,8 @@ fun Slider(
         val thumbRadius = ThumbDiameter / 2
 
         with(LocalDensity.current) {
-            maxPx = widthPx - thumbRadius.toPx()
-            minPx = thumbRadius.toPx()
+            maxPx = max(widthPx - thumbRadius.toPx(), 0f)
+            minPx = min(thumbRadius.toPx(), maxPx)
         }
 
         fun scaleToUserValue(offset: Float) =
