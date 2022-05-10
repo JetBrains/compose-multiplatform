@@ -104,6 +104,10 @@ internal class AndroidParagraph(
     private val layout: TextLayout
 
     init {
+        require(constraints.minHeight == 0 && constraints.minWidth == 0) {
+            "Setting Constraints.minWidth and Constraints.minHeight is not supported, " +
+                "these should be the default zero values instead."
+        }
         require(maxLines >= 1) { "maxLines should be greater than 0" }
 
         val style = paragraphIntrinsics.style

@@ -370,9 +370,8 @@ fun Paragraph(
  * @param text the text to be laid out
  * @param style the [TextStyle] to be applied to the whole text
  * @param constraints how wide and tall the text is allowed to be. [Constraints.maxWidth]
- * will define the width of the Paragraph. Other components of the [Constraints] object are no-op
- * but will allow additional functionality in the future, e.g. ellipsis based on the limited
- * [Constraints.maxHeight].
+ * will define the width of the Paragraph. [Constraints.maxHeight] helps defining the number of
+ * lines that fit with ellipsis is true. Minimum components of the [Constraints] object are no-op.
  * @param density density of the device
  * @param fontFamilyResolver [FontFamily.Resolver] to be used to load the font given in [SpanStyle]s
  * @param spanStyles [SpanStyle]s to be applied to parts of text
@@ -441,9 +440,8 @@ fun Paragraph(
  *
  * @param paragraphIntrinsics [ParagraphIntrinsics] instance
  * @param constraints how wide and tall the text is allowed to be. [Constraints.maxWidth]
- * will define the width of the Paragraph. Other components of the [Constraints] object are no-op
- * but will allow additional functionality in the future, e.g. ellipsis based on the limited
- * [Constraints.maxHeight]
+ * will define the width of the Paragraph. [Constraints.maxHeight] helps defining the number of
+ * lines that fit with ellipsis is true. Minimum components of the [Constraints] object are no-op.
  * @param maxLines the maximum number of lines that the text can have
  * @param ellipsis whether to ellipsize text, applied only when [maxLines] is set
  */

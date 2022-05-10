@@ -1548,6 +1548,38 @@ AndroidParagraphTest {
         assertThat(paragraphPaddingTrue.height).isNotEqualTo(paragraphPaddingFalse.height)
     }
 
+    @Test(expected = IllegalArgumentException::class)
+    fun setMinWidthConstraints_notSupported() {
+        val minWidthConstraints = Constraints(minWidth = 100)
+        AndroidParagraph(
+            text = "",
+            style = TextStyle(),
+            spanStyles = listOf(),
+            placeholders = listOf(),
+            maxLines = Int.MAX_VALUE,
+            ellipsis = true,
+            constraints = minWidthConstraints,
+            fontFamilyResolver = UncachedFontFamilyResolver(context),
+            density = defaultDensity,
+        )
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun setMinHeightConstraints_notSupported() {
+        val minHeightConstraints = Constraints(minHeight = 100)
+        AndroidParagraph(
+            text = "",
+            style = TextStyle(),
+            spanStyles = listOf(),
+            placeholders = listOf(),
+            maxLines = Int.MAX_VALUE,
+            ellipsis = true,
+            constraints = minHeightConstraints,
+            fontFamilyResolver = UncachedFontFamilyResolver(context),
+            density = defaultDensity,
+        )
+    }
+
     private fun simpleParagraph(
         text: String = "",
         spanStyles: List<AnnotatedString.Range<SpanStyle>> = listOf(),
