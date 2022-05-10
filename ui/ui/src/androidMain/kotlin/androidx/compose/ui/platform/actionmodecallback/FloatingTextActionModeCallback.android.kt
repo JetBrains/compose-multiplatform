@@ -36,7 +36,7 @@ internal class FloatingTextActionModeCallback(
     }
 
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        return callback.onPrepareActionMode()
+        return callback.onPrepareActionMode(mode, menu)
     }
 
     override fun onDestroyActionMode(mode: ActionMode?) {
