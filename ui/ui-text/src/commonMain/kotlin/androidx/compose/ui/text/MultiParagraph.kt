@@ -324,7 +324,7 @@ class MultiParagraph(
                 Constraints(
                     maxWidth = constraints.maxWidth,
                     maxHeight = if (constraints.hasBoundedHeight) {
-                        constraints.maxHeight - currentHeight.ceilToInt()
+                        (constraints.maxHeight - currentHeight.ceilToInt()).coerceAtLeast(0)
                     } else {
                         constraints.maxHeight
                     }
