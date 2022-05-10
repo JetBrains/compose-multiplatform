@@ -1444,6 +1444,33 @@ class MultiParagraphIntegrationTest {
         )
     }
 
+    @Test
+    fun multiParagraphConstruction_doesNotThrow_ifNotAllParagraghsFitVertically() {
+        with(defaultDensity) {
+            val fontSize = 20.sp
+            val constraints = Constraints(
+                maxWidth = 10 * fontSize.roundToPx(),
+                maxHeight = fontSize.roundToPx() / 2
+            )
+            val text = buildAnnotatedString {
+                withStyle(ParagraphStyle(textAlign = TextAlign.Center)) {
+                    append("Lorem")
+                }
+                withStyle(ParagraphStyle()) {
+                    append("Ipsum")
+                }
+            }
+
+            MultiParagraph(
+                annotatedString = text,
+                style = TextStyle(fontSize = fontSize, fontFamily = fontFamilyMeasureFont),
+                constraints = constraints,
+                density = this,
+                fontFamilyResolver = UncachedFontFamilyResolver(context)
+            )
+        }
+    }
+
     /**
      * Helper function which creates an AnnotatedString where each input string becomes a paragraph.
      */
