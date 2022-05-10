@@ -494,7 +494,6 @@ class AndroidXImplPlugin : Plugin<Project> {
         buildToolsVersion = BUILD_TOOLS_VERSION
         defaultConfig.targetSdk = TARGET_SDK_VERSION
         ndkVersion = SupportConfig.NDK_VERSION
-        ndkPath = project.getNdkPath().absolutePath
 
         defaultConfig.testInstrumentationRunner = INSTRUMENTATION_RUNNER
 
