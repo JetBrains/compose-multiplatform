@@ -2477,9 +2477,9 @@ package androidx.compose.ui.platform {
     field public static final androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnDetachedFromWindow INSTANCE;
   }
 
-  public static final class ViewCompositionStrategy.DisposeOnDetachedFromWindowIfNotInPoolingContainer implements androidx.compose.ui.platform.ViewCompositionStrategy {
+  public static final class ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool implements androidx.compose.ui.platform.ViewCompositionStrategy {
     method public kotlin.jvm.functions.Function0<kotlin.Unit> installFor(androidx.compose.ui.platform.AbstractComposeView view);
-    field public static final androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnDetachedFromWindowIfNotInPoolingContainer INSTANCE;
+    field public static final androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool INSTANCE;
   }
 
   public static final class ViewCompositionStrategy.DisposeOnLifecycleDestroyed implements androidx.compose.ui.platform.ViewCompositionStrategy {
