@@ -60,14 +60,14 @@ interface ViewCompositionStrategy {
         /**
          * The default strategy for [AbstractComposeView] and [ComposeView].
          *
-         * Currently, this is [DisposeOnDetachedFromWindowIfNotInPoolingContainer], though this
+         * Currently, this is [DisposeOnDetachedFromWindowOrReleasedFromPool], though this
          * implementation detail may change.
          */
         // WARNING: the implementation of the default strategy is installed with a reference to
         // `this` on a not-fully-constructed object in AbstractComposeView.
         // Be careful not to do anything that would break that.
         val Default: ViewCompositionStrategy
-            get() = DisposeOnDetachedFromWindowIfNotInPoolingContainer
+            get() = DisposeOnDetachedFromWindowOrReleasedFromPool
     }
 
     /**
@@ -80,7 +80,7 @@ interface ViewCompositionStrategy {
     // WARNING: the implementation of the default strategy is installed with a reference to
     // `this` on a not-fully-constructed object in AbstractComposeView.
     // Be careful not to do anything that would break that.
-    object DisposeOnDetachedFromWindowIfNotInPoolingContainer : ViewCompositionStrategy {
+    object DisposeOnDetachedFromWindowOrReleasedFromPool : ViewCompositionStrategy {
         override fun installFor(view: AbstractComposeView): () -> Unit {
             val listener = object : View.OnAttachStateChangeListener {
                 override fun onViewAttachedToWindow(v: View) {}
