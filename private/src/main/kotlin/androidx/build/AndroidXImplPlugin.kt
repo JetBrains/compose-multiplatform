@@ -84,6 +84,8 @@ import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.register
+import org.jetbrains.kotlin.gradle.targets.native.KotlinNativeHostTestRun
+import org.jetbrains.kotlin.gradle.testing.KotlinTaskTestRun
 
 /**
  * A plugin which enables all of the Gradle customizations for AndroidX.
@@ -276,6 +278,7 @@ class AndroidXImplPlugin : Plugin<Project> {
             project.extensions.findByType<LibraryExtension>()?.apply {
                 configureAndroidLibraryWithMultiplatformPluginOptions()
             }
+            project.configureKmpBuildOnServer()
         }
     }
 
@@ -650,6 +653,31 @@ class AndroidXImplPlugin : Plugin<Project> {
         sourceSets.findByName("main")!!.manifest.srcFile("src/androidMain/AndroidManifest.xml")
         sourceSets.findByName("androidTest")!!
             .manifest.srcFile("src/androidAndroidTest/AndroidManifest.xml")
+    }
+
+    private fun Project.configureKmpBuildOnServer() {
+        val kmpExtension = checkNotNull(
+            project.extensions.findByType<KotlinMultiplatformExtension>()
+        ) {
+            """
+            Project ${project.path} applies kotlin multiplatform plugin but we cannot find the
+            KotlinMultiplatformExtension.
+            """.trimIndent()
+        }
+        // Add all "configured" native tests to the buildOnServer task.
+        // Note that we don't check if platform is enabled in flags because it wouldn't be
+        // configured in the first place if the target is not enabled
+        kmpExtension.testableTargets.all { kotlinTarget ->
+            kotlinTarget.testRuns.all { kotlinTestRun ->
+                // Need to check for both KotlinNativeHostTest (to ensure it runs on host, not on
+                // an emulator or simulator) and also KotlinTaskTestRun to ensure it has a task.
+                // Unfortunately, there is no parent interface/class that covers both cases.
+                if (kotlinTestRun is KotlinNativeHostTestRun &&
+                    kotlinTestRun is KotlinTaskTestRun<*, *>) {
+                    project.addToBuildOnServer(kotlinTestRun.executionTask)
+                }
+            }
+        }
     }
 
     private fun AppExtension.configureAndroidApplicationOptions(project: Project) {
