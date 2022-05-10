@@ -43,7 +43,7 @@ package androidx.compose.ui.test {
 
   @androidx.compose.ui.test.ExperimentalTestApi public final class StateRestorationTester {
     ctor public StateRestorationTester(androidx.compose.ui.test.ComposeUiTest composeTest);
-    method public void emulateSavedInstanceStateRestore();
+    method public void emulateSaveAndRestore();
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
   }
 
