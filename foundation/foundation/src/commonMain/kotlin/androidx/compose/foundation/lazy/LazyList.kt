@@ -280,7 +280,6 @@ private fun rememberLazyListMeasurePolicy(
             horizontalArrangement = horizontalArrangement,
             reverseLayout = reverseLayout,
             density = this,
-            layoutDirection = layoutDirection,
             placementAnimator = placementAnimator,
             beyondBoundsInfo = beyondBoundsInfo,
             layout = { width, height, placement ->

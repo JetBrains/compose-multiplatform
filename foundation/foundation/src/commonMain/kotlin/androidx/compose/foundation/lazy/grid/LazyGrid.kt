@@ -330,7 +330,6 @@ private fun rememberLazyGridMeasurePolicy(
             horizontalArrangement = horizontalArrangement,
             reverseLayout = reverseLayout,
             density = this,
-            layoutDirection = layoutDirection,
             placementAnimator = placementAnimator,
             layout = { width, height, placement ->
                 layout(

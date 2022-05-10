@@ -1069,6 +1069,38 @@ class LazyGridTest(
     }
 
     @Test
+    fun laysOutRtlCorrectlyWithLargerContainer() {
+        val mainAxisSize = with(rule.density) { 250.toDp() }
+        val crossAxisSize = with(rule.density) { 110.toDp() }
+        val itemSize = with(rule.density) { 50.toDp() }
+
+        rule.setContent {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                LazyGrid(cells = 2, modifier = Modifier.axisSize(crossAxisSize, mainAxisSize)) {
+                    items(4) { index ->
+                        val label = (index + 1).toString()
+                        BasicText(label, Modifier.size(itemSize).testTag(label))
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1").apply {
+            if (vertical) {
+                // 2 1
+                // 4 3
+                assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+                assertCrossAxisStartPositionInRootIsEqualTo(crossAxisSize / 2)
+            } else {
+                // 3 1
+                // 4 2
+                assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
+                assertMainAxisStartPositionInRootIsEqualTo(mainAxisSize - itemSize)
+            }
+        }
+    }
+
+    @Test
     fun scrollDuringMeasure() {
         rule.setContent {
             BoxWithConstraints {

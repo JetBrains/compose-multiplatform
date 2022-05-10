@@ -17,6 +17,7 @@
 package androidx.compose.foundation.lazy.list
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
@@ -25,6 +26,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -145,5 +147,27 @@ class LazyRowTest {
             assertThat(state.firstVisibleItemIndex).isEqualTo(1)
             assertThat(state.firstVisibleItemScrollOffset).isGreaterThan(0)
         }
+    }
+
+   @Test
+   fun laysOutRtlCorrectlyWithLargerRow() {
+       val rowWidth = with(rule.density) { 300.toDp() }
+       val rowHeight = with(rule.density) { 100.toDp() }
+       val itemSize = with(rule.density) { 50.toDp() }
+       rule.setContent {
+           Column {
+               CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                   LazyRow(modifier = Modifier.size(width = rowWidth, height = rowHeight)) {
+                       items(3) { index ->
+                           val label = index.toString()
+                           BasicText(label, Modifier.size(itemSize).testTag(label))
+                       }
+                   }
+               }
+           }
+       }
+
+       rule.onNodeWithTag("0")
+           .assertPositionInRootIsEqualTo(rowWidth - itemSize, 0.dp)
     }
 }
