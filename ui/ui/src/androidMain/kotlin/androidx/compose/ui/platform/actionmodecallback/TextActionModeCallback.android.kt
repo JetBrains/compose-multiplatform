@@ -27,6 +27,7 @@ internal const val MENU_ITEM_CUT = 2
 internal const val MENU_ITEM_SELECT_ALL = 3
 
 internal class TextActionModeCallback(
+    val onActionModeDestroy: () -> Unit,
     var rect: Rect = Rect.Zero,
     var onCopyRequested: (() -> Unit)? = null,
     var onPasteRequested: (() -> Unit)? = null,
@@ -75,5 +76,7 @@ internal class TextActionModeCallback(
         return true
     }
 
-    fun onDestroyActionMode() {}
+    fun onDestroyActionMode() {
+        onActionModeDestroy()
+    }
 }
