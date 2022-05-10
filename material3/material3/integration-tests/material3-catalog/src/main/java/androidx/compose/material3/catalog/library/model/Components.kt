@@ -30,7 +30,7 @@ data class Component(
     val description: String,
     @DrawableRes
     val icon: Int = R.drawable.ic_component,
-    val tintIcon: Boolean = false,
+    val tintIcon: Boolean = true,
     val guidelinesUrl: String,
     val docsUrl: String,
     val sourceUrl: String,
@@ -48,7 +48,6 @@ private val BottomAppBars = Component(
     description = "A bottom app bar displays navigation and key actions at the bottom of mobile " +
         "screens.",
     // No bottom app bar icon
-    tintIcon = true,
     guidelinesUrl = "$ComponentGuidelinesUrl/bottom-app-bars",
     docsUrl = "$DocsUrl#bottomappbar",
     sourceUrl = "$Material3SourceUrl/AppBar.kt",
@@ -61,7 +60,6 @@ private val Buttons = Component(
     description = "Buttons help people initiate actions, from sending an email, to sharing a " +
         "document, to liking a post.",
     // No buttons icon
-    tintIcon = true,
     guidelinesUrl = "$ComponentGuidelinesUrl/buttons",
     docsUrl = "$PackageSummaryUrl#button",
     sourceUrl = "$Material3SourceUrl/Button.kt",
@@ -73,7 +71,6 @@ private val Card = Component(
     name = "Card",
     description = "Cards contain content and actions that relate information about a subject.",
     // No card icon
-    tintIcon = true,
     guidelinesUrl = "$StyleGuidelinesUrl/cards",
     docsUrl = "$PackageSummaryUrl#card",
     sourceUrl = "$Material3SourceUrl/Card.kt",
@@ -86,7 +83,6 @@ private val Checkboxes = Component(
     description = "Checkboxes allow the user to select one or more items from a set or turn an " +
         "option on or off.",
     // No checkbox icon
-    tintIcon = true,
     guidelinesUrl = "$ComponentGuidelinesUrl/checkboxes",
     docsUrl = "$DocsUrl#checkbox",
     sourceUrl = "$Material3SourceUrl/Checkbox.kt",
@@ -99,7 +95,6 @@ private val Chips = Component(
     description = "Chips allow users to enter information, make selections, filter content, or" +
         " trigger actions.",
     // No chip icon
-    tintIcon = true,
     guidelinesUrl = "$ComponentGuidelinesUrl/chips",
     docsUrl = "$DocsUrl#chips",
     sourceUrl = "$Material3SourceUrl/Chip.kt",
@@ -112,7 +107,6 @@ private val Dialogs = Component(
     description = "Dialogs provide important prompts in a user flow. They can require an action, " +
         "communicate information, or help users accomplish a task.",
     // No dialogs icon
-    tintIcon = true,
     guidelinesUrl = "$ComponentGuidelinesUrl/dialogs",
     docsUrl = "$PackageSummaryUrl#alertdialog",
     sourceUrl = "$Material3SourceUrl/AlertDialog.kt",
@@ -125,7 +119,6 @@ private val ExtendedFloatingActionButton = Component(
     description = "Extended FABs help people take primary actions. They're wider than FABs to " +
         "accommodate a text label and larger target area.",
     // No extended FAB icon
-    tintIcon = true,
     guidelinesUrl = "$ComponentGuidelinesUrl/extended-fab",
     docsUrl = "$PackageSummaryUrl#extendedfloatingactionbutton",
     sourceUrl = "$Material3SourceUrl/FloatingActionButton.kt",
@@ -138,7 +131,6 @@ private val FloatingActionButtons = Component(
     description = "The FAB represents the most important action on a screen. It puts key actions " +
         "within reach.",
     // No FABs icon
-    tintIcon = true,
     guidelinesUrl = "$ComponentGuidelinesUrl/floating-action-button",
     docsUrl = "$PackageSummaryUrl#floatingactionbutton",
     sourceUrl = "$Material3SourceUrl/FloatingActionButton.kt",
@@ -150,7 +142,6 @@ private val IconButtons = Component(
     name = "Icon buttons",
     description = "Icon buttons allow users to take actions and make choices with a single tap.",
     // No icon-button icon
-    tintIcon = true,
     guidelinesUrl = "$ComponentGuidelinesUrl/icon-button",
     docsUrl = "$PackageSummaryUrl#iconbutton",
     sourceUrl = "$Material3SourceUrl/IconButton.kt",
@@ -162,7 +153,6 @@ private val Menus = Component(
     name = "Menus",
     description = "Menus display a list of choices on temporary surfaces.",
     // No menu icon
-    tintIcon = true,
     guidelinesUrl = "$ComponentGuidelinesUrl/menus",
     docsUrl = "$PackageSummaryUrl#dropdownmenu",
     sourceUrl = "$Material3SourceUrl/Menu.kt",
@@ -175,7 +165,6 @@ private val NavigationBar = Component(
     description = "Navigation bars offer a persistent and convenient way to switch between " +
         "primary destinations in an app.",
     // No navigation bar icon
-    tintIcon = true,
     guidelinesUrl = "$ComponentGuidelinesUrl/navigation-bar",
     docsUrl = "$PackageSummaryUrl#navigationbar",
     sourceUrl = "$Material3SourceUrl/NavigationBar.kt",
@@ -187,7 +176,6 @@ private val NavigationDrawer = Component(
     name = "Navigation drawer",
     description = "Navigation drawers provide ergonomic access to destinations in an app.",
     // No navigation drawer icon
-    tintIcon = true,
     guidelinesUrl = "$ComponentGuidelinesUrl/navigation-drawer",
     docsUrl = "$PackageSummaryUrl#navigationdrawer",
     sourceUrl = "$Material3SourceUrl/NavigationDrawer.kt",
@@ -200,7 +188,6 @@ private val NavigationRail = Component(
     description = "Navigation rails provide access to primary destinations in apps when using " +
         "tablet and desktop screens.",
     // No navigation rail icon
-    tintIcon = true,
     guidelinesUrl = "$ComponentGuidelinesUrl/navigation-rail",
     docsUrl = "$PackageSummaryUrl#navigationrail",
     sourceUrl = "$Material3SourceUrl/NavigationRail.kt",
@@ -213,7 +200,6 @@ private val ProgressIndicators = Component(
     description = "Progress indicators express an unspecified wait time or display the length of " +
         "a process.",
     // No progress indicator icon
-    tintIcon = true,
     guidelinesUrl = "$ComponentGuidelinesUrl/progress-indicators",
     docsUrl = "$DocsUrl#circularprogressindicator",
     sourceUrl = "$Material3SourceUrl/ProgressIndicator.kt",
@@ -225,7 +211,6 @@ private val RadioButtons = Component(
     name = "Radio buttons",
     description = "Radio buttons allow the user to select one option from a set.",
     // No radio-button icon
-    tintIcon = true,
     guidelinesUrl = "$ComponentGuidelinesUrl/radio-buttons",
     docsUrl = "$DocsUrl#radiobutton",
     sourceUrl = "$Material3SourceUrl/RadioButton.kt",
@@ -237,7 +222,6 @@ private val Sliders = Component(
     name = "Sliders",
     description = "Sliders allow users to make selections from a range of values.",
     // No slider icon
-    tintIcon = true,
     guidelinesUrl = "", // No guidelines yet
     docsUrl = "", // No docs yet
     sourceUrl = "$Material3SourceUrl/Slider.kt",
@@ -250,7 +234,6 @@ private val Snackbars = Component(
     description = "Snackbars provide brief messages about app processes at the bottom of the " +
         "screen.",
     // No snackbar icon
-    tintIcon = true,
     guidelinesUrl = "$ComponentGuidelinesUrl/snackbars",
     docsUrl = "$DocsUrl#snackbar",
     sourceUrl = "$Material3SourceUrl/Snackbar.kt",
@@ -263,7 +246,6 @@ private val Switches = Component(
     description = "Switches toggle the state of a single setting on or off.",
     // No switch icon
     // No guidelines yet
-    tintIcon = true,
     guidelinesUrl = "",
     docsUrl = "",
     sourceUrl = "$Material3SourceUrl/Switch.kt",
@@ -298,7 +280,6 @@ private val TopAppBar = Component(
     name = "Top app bar",
     description = "Top app bars display information and actions at the top of a screen.",
     // No top app bar icon
-    tintIcon = true,
     guidelinesUrl = "$ComponentGuidelinesUrl/top-app-bar",
     docsUrl = "$PackageSummaryUrl#smalltopappbar",
     sourceUrl = "$Material3SourceUrl/AppBar.kt",
