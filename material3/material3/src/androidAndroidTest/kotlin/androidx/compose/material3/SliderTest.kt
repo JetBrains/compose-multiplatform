@@ -599,6 +599,16 @@ class SliderTest {
         }
     }
 
+    @Test
+    fun slider_zero_width() {
+        rule.setMaterialContentForSizeAssertions(
+            parentMaxHeight = 0.dp,
+            parentMaxWidth = 0.dp
+        ) { Slider(value = 1f, onValueChange = {}) }
+            .assertHeightIsEqualTo(0.dp)
+            .assertWidthIsEqualTo(0.dp)
+    }
+
     @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun rangeSlider_dragThumb() {
