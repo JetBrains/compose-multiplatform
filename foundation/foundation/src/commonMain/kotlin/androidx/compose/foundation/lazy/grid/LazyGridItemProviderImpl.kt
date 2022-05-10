@@ -77,6 +77,8 @@ internal class LazyGridItemsSnapshot(
 
     val itemsCount get() = intervals.totalSize
 
+    val spanLayoutProvider = LazyGridSpanLayoutProvider(this)
+
     fun getKey(index: Int): Any {
         val interval = getIntervalForIndex(index)
         val localIntervalIndex = index - interval.startIndex
@@ -118,15 +120,9 @@ internal class LazyGridItemsSnapshot(
 internal class LazyGridItemProviderImpl(
     private val itemsSnapshot: State<LazyGridItemsSnapshot>
 ) : LazyGridItemProvider {
-
     override val itemCount get() = itemsSnapshot.value.itemsCount
 
     override fun getKey(index: Int) = itemsSnapshot.value.getKey(index)
-
-    override fun LazyGridItemSpanScope.getSpan(index: Int): GridItemSpan =
-        with(itemsSnapshot.value) { getSpan(index) }
-
-    override val hasCustomSpans: Boolean get() = itemsSnapshot.value.hasCustomSpans
 
     @Composable
     override fun Item(index: Int) {
@@ -136,6 +132,9 @@ internal class LazyGridItemProviderImpl(
     override val keyToIndexMap: Map<Any, Int> get() = itemsSnapshot.value.keyToIndexMap
 
     override fun getContentType(index: Int) = itemsSnapshot.value.getContentType(index)
+
+    override val spanLayoutProvider: LazyGridSpanLayoutProvider
+        get() = itemsSnapshot.value.spanLayoutProvider
 }
 
 /**

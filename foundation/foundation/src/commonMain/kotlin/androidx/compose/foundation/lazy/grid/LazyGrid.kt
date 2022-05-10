@@ -32,8 +32,6 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.lazy.layout.LazyLayout
 import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -80,10 +78,6 @@ internal fun LazyGrid(
 
     val itemProvider = rememberItemProvider(state, content)
 
-    val spanLayoutProvider = remember(itemProvider) {
-        derivedStateOf { LazyGridSpanLayoutProvider(itemProvider) }
-    }
-
     val scope = rememberCoroutineScope()
     val placementAnimator = remember(state, isVertical) {
         LazyGridItemPlacementAnimator(scope, isVertical)
@@ -94,7 +88,6 @@ internal fun LazyGrid(
         itemProvider,
         state,
         overScrollController,
-        spanLayoutProvider,
         slotSizesSums,
         contentPadding,
         reverseLayout,
@@ -167,8 +160,6 @@ private fun rememberLazyGridMeasurePolicy(
     state: LazyGridState,
     /** The overscroll controller. */
     overScrollController: OverScrollController,
-    /** Cache based provider for spans. */
-    stateOfSpanLayoutProvider: State<LazyGridSpanLayoutProvider>,
     /** Prefix sums of cross axis sizes of slots of the grid. */
     slotSizesSums: Density.(Constraints) -> List<Int>,
     /** The inner padding to be added for the whole content(nor for each individual item) */
@@ -216,7 +207,7 @@ private fun rememberLazyGridMeasurePolicy(
 
         state.updateScrollPositionIfTheFirstItemWasMoved(itemProvider)
 
-        val spanLayoutProvider = stateOfSpanLayoutProvider.value
+        val spanLayoutProvider = itemProvider.spanLayoutProvider
         val resolvedSlotSizesSums = slotSizesSums(constraints)
         spanLayoutProvider.slotsPerLine = resolvedSlotSizesSums.size
 
