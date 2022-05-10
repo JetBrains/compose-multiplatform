@@ -1,0 +1,37 @@
+// Signature format: 4.0
+package androidx.compose.animation.graphics.res {
+
+  public final class AnimatedVectorPainterResources_androidKt {
+  }
+
+  public final class AnimatedVectorResources_androidKt {
+  }
+
+  public final class AnimatorResources_androidKt {
+  }
+
+}
+
+package androidx.compose.animation.graphics.vector {
+
+  public final class AnimatorAnimationSpecsKt {
+  }
+
+  public final class AnimatorKt {
+  }
+
+}
+
+package androidx.compose.animation.graphics.vector.compat {
+
+  public final class XmlAnimatedVectorParser_androidKt {
+  }
+
+  public final class XmlAnimatorParser_androidKt {
+  }
+
+  public final class XmlPullParserUtils_androidKt {
+  }
+
+}
+
