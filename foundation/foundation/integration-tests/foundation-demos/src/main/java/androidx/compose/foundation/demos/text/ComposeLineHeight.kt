@@ -227,7 +227,7 @@ private fun LineHeightAlignmentOptions(
                     onClick = null,
                     enabled = enabled
                 )
-                Text(text = option.toString().split(".")[1], style = HintStyle)
+                Text(text = option.toString().split(".").last(), style = HintStyle)
             }
         }
     }
@@ -268,7 +268,7 @@ private fun LineHeightTrimOptions(
                     onClick = null,
                     enabled = enabled
                 )
-                Text(text = option.toString().split(".")[1], style = HintStyle)
+                Text(text = option.toString().split(".").last(), style = HintStyle)
             }
         }
     }
