@@ -31,7 +31,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
@@ -47,7 +46,6 @@ class WindowInsetsDeviceTest {
     val rule = createAndroidComposeRule<WindowInsetsActivity>()
 
     @OptIn(ExperimentalLayoutApi::class)
-    @FlakyTest(bugId = 230844979)
     @Test
     fun disableConsumeDisablesAnimationConsumption() {
         var imeInset1 = 0
@@ -92,12 +90,21 @@ class WindowInsetsDeviceTest {
             )
         }
 
+        rule.waitForIdle()
+
         // We don't have any way to know when the animation controller is applied, so just
         // loop until the value changes.
 
         val endTime = SystemClock.uptimeMillis() + 1000L
+        var iteration = 0
         while (imeInset1 == 0 && SystemClock.uptimeMillis() < endTime) {
             rule.runOnIdle {
+                if (iteration % 5 == 0) {
+                    // Cuttlefish doesn't consistently show the IME when requested, so
+                    // we must poke it. This will poke it every 5 iterations to ensure that
+                    // if we miss it once then it will get it on another pass.
+                    pokeIME()
+                }
                 dispatcher.dispatchPostScroll(
                     Offset.Zero,
                     Offset(0f, -10f),
@@ -106,11 +113,19 @@ class WindowInsetsDeviceTest {
                 Snapshot.sendApplyNotifications()
             }
             Thread.sleep(50)
+            iteration++
         }
 
         rule.runOnIdle {
             assertThat(imeInset1).isGreaterThan(0)
             assertThat(imeInset2).isEqualTo(imeInset1)
         }
+    }
+
+    private fun pokeIME() {
+        // This appears to be necessary for cuttlefish devices to show the keyboard
+        val controller = rule.activity.window.insetsController
+        controller?.show(android.view.WindowInsets.Type.ime())
+        controller?.hide(android.view.WindowInsets.Type.ime())
     }
 }
