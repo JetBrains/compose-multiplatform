@@ -54,7 +54,6 @@ internal fun measureLazyGrid(
     horizontalArrangement: Arrangement.Horizontal?,
     reverseLayout: Boolean,
     density: Density,
-    layoutDirection: LayoutDirection,
     placementAnimator: LazyGridItemPlacementAnimator,
     layout: (Int, Int, Placeable.PlacementScope.() -> Unit) -> MeasureResult
 ): LazyGridMeasureResult {
@@ -231,8 +230,7 @@ internal fun measureLazyGrid(
             verticalArrangement = verticalArrangement,
             horizontalArrangement = horizontalArrangement,
             reverseLayout = reverseLayout,
-            density = density,
-            layoutDirection = layoutDirection
+            density = density
         )
 
         placementAnimator.onMeasured(
@@ -280,7 +278,6 @@ private fun calculateItemsOffsets(
     horizontalArrangement: Arrangement.Horizontal?,
     reverseLayout: Boolean,
     density: Density,
-    layoutDirection: LayoutDirection
 ): MutableList<LazyGridPositionedItem> {
     val mainAxisLayoutSize = if (isVertical) layoutHeight else layoutWidth
     val hasSpareSpace = finalMainAxisOffset < min(mainAxisLayoutSize, maxOffset)
@@ -303,7 +300,8 @@ private fun calculateItemsOffsets(
             }
         } else {
             with(requireNotNull(horizontalArrangement)) {
-                density.arrange(mainAxisLayoutSize, sizes, layoutDirection, offsets)
+                // Enforces Ltr layout direction as it is mirrored with placeRelative later.
+                density.arrange(mainAxisLayoutSize, sizes, LayoutDirection.Ltr, offsets)
             }
         }
         offsets.forEachIndexed { index, absoluteOffset ->

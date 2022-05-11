@@ -587,12 +587,7 @@ class LazyArrangementsTest {
 
             outPositions.forEachIndexed { index, position ->
                 val realIndex = if (reverseLayout) if (index == 0) 1 else 0 else index
-                val size = if (realIndex == 0) itemSize else smallerItemSize
-                val expectedPosition = if (layoutDirection == LayoutDirection.Ltr) {
-                    position.toDp()
-                } else {
-                    containerSize - position.toDp() - size
-                }
+                val expectedPosition = position.toDp()
                 rule.onNodeWithTag("$realIndex")
                     .assertLeftPositionInRootIsEqualTo(expectedPosition)
             }
