@@ -16,9 +16,11 @@
 
 // Ignore lint warnings in documentation snippets
 @file:Suppress("unused", "UNUSED_PARAMETER", "UNUSED_VARIABLE", "UNUSED_ANONYMOUS_PARAMETER")
+@file:SuppressLint("FrequentlyChangedStateReadInComposition")
 
 package androidx.compose.integration.docs.performance
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

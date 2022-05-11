@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:SuppressLint("FrequentlyChangedStateReadInComposition")
 
 package androidx.compose.foundation.demos
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.core.AnimationConstants
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.animateTo
