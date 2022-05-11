@@ -119,8 +119,8 @@ class SwipeWithVelocityTest(private val config: TestConfig) {
                 assertThat(recordedDurationMillis).isEqualTo(config.durationMillis)
 
                 // Check velocity
-                // Swipe goes from left to right, so vx = velocity and vy = 0
-                assertThat(recordedVelocity.x).isWithin(.1f).of(config.velocity)
+                // Swipe goes from left to right, so vx = velocity (within 5%) and vy = 0
+                assertThat(recordedVelocity.x).isWithin(0.05f * config.velocity).of(config.velocity)
                 assertThat(recordedVelocity.y).isWithin(.1f).of(0f)
             }
         }

@@ -25,6 +25,7 @@ import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
 class VelocityTrackerTest {
+    val TOLERANCE = 0.1f
 
     // TODO(shepshapard): This test needs to be broken up into smaller tests
     // that make edge cases clearer.  Right now its just a bunch of inputs and outputs
@@ -33,19 +34,19 @@ class VelocityTrackerTest {
     fun calculateVelocity_returnsExpectedValues() {
 
         val expected = listOf(
-            Pair(219.59280094228163f, 1304.701682306001f),
-            Pair(355.71046950050845f, 967.2112857054104f),
-            Pair(12.657970884022308f, -36.90447839251946f),
-            Pair(714.1399654786744f, -2561.534447931869f),
-            Pair(-19.668121066218564f, -2910.105747052462f),
-            Pair(646.8690114934209f, 2976.977762577527f),
-            Pair(396.6988447819592f, 2106.225572911095f),
-            Pair(298.31594440044495f, -3660.8315955215294f),
-            Pair(-1.7334232785165882f, -3288.13174127454f),
-            Pair(384.6361280392334f, -2645.6612524779835f),
-            Pair(176.37900397918557f, 2711.2542876273264f),
-            Pair(396.9328560260098f, 4280.651578291764f),
-            Pair(-71.51939428321249f, 3716.7385187526947f)
+            Pair(117.7f, 799f),
+            Pair(214.5f, 855.8f),
+            Pair(-50.5f, 182.2f),
+            Pair(628.5f, -2127.9f),
+            Pair(123.4f, -2970.8f),
+            Pair(537.3f, 2236.1f),
+            Pair(450.8f, 1786.9f),
+            Pair(430.9f, -2648.1f),
+            Pair(253.3f, -2723.7f),
+            Pair(285.7f, -2929.3f),
+            Pair(322.6f, 2369.8f),
+            Pair(1023.1f, 4477.2f),
+            Pair(629.8f, 3802.5f)
         )
 
         val tracker = VelocityTracker()
@@ -62,6 +63,127 @@ class VelocityTrackerTest {
     }
 
     @Test
+    fun calculateVelocity_threePoints() {
+        // Same coordinate is reported 2 times in a row
+        // It is difficult to determine the correct answer here, but at least the direction
+        // of the reported velocity should be positive.
+        val tracker = VelocityTracker()
+        tracker.addPosition(0, Offset(273f, 0f))
+        tracker.addPosition(12, Offset(293f, 0f))
+        tracker.addPosition(14, Offset(293f, 0f))
+        tracker.addPosition(15, Offset(293f, 0f))
+        val velocity = tracker.calculateVelocity()
+        assertThat(velocity.x).isWithin(TOLERANCE).of(1666.7f)
+    }
+
+    @Test
+    fun calculateVelocity_threePoints2() {
+        val tracker = VelocityTracker()
+        tracker.addPosition(0, Offset(0f, 0f))
+        tracker.addPosition(25, Offset(25f, 0f))
+        tracker.addPosition(50, Offset(50f, 0f))
+        tracker.addPosition(100, Offset(100f, 0f))
+        val velocity = tracker.calculateVelocity()
+        assertThat(velocity.x).isWithin(TOLERANCE).of(1000f)
+    }
+
+    @Test
+    fun calculateVelocity_linearMotion() {
+        // Fixed velocity at 5 points per 10 milliseconds
+        val tracker = VelocityTracker()
+        tracker.addPosition(0, Offset(0f, 0f))
+        tracker.addPosition(10, Offset(5f, 0f))
+        tracker.addPosition(20, Offset(10f, 0f))
+        val velocity = tracker.calculateVelocity()
+        assertThat(velocity.x).isWithin(TOLERANCE).of(500f)
+    }
+
+    @Test
+    fun calculateVelocity_linearHalfMotion() {
+        // Stay still for 50 ms, and then move 100 points in the final 50 ms
+        // The final line is sloped at 2 pixels / ms
+        // This can be visualized as 2 lines: flat line (50ms), and line with slope of 2 px/ms
+        val tracker = VelocityTracker()
+        tracker.addPosition(0, Offset(0f, 0f))
+        tracker.addPosition(10, Offset(0f, 0f))
+        tracker.addPosition(20, Offset(0f, 0f))
+        tracker.addPosition(30, Offset(0f, 0f))
+        tracker.addPosition(40, Offset(0f, 0f))
+        tracker.addPosition(50, Offset(0f, 0f))
+        tracker.addPosition(60, Offset(20f, 0f))
+        tracker.addPosition(70, Offset(40f, 0f))
+        tracker.addPosition(80, Offset(60f, 0f))
+        tracker.addPosition(90, Offset(80f, 0f))
+        tracker.addPosition(100, Offset(100f, 0f))
+        val velocity = tracker.calculateVelocity()
+        assertThat(velocity.x).isWithin(TOLERANCE).of(2000f)
+    }
+
+    @Test
+    fun calculateVelocity_linearHalfMotionSampled() {
+        // Same test as above, but sampled much less frequently. The resulting velocity is higher
+        // than the previous test, because the path looks significantly different now if you
+        // were to just plot these points.
+        val tracker = VelocityTracker()
+        tracker.addPosition(0, Offset(0f, 0f))
+        tracker.addPosition(30, Offset(0f, 0f))
+        tracker.addPosition(40, Offset(0f, 0f))
+        tracker.addPosition(70, Offset(40f, 0f))
+        tracker.addPosition(100, Offset(100f, 0f))
+        val velocity = tracker.calculateVelocity()
+        assertThat(velocity.x).isWithin(TOLERANCE).of(2108.2f)
+    }
+
+    @Test
+    fun calculateVelocity_linearMotionFollowedByFlatLine() {
+        // Fixed velocity at first, but flat line afterwards
+        val tracker = VelocityTracker()
+        tracker.addPosition(0, Offset(0f, 0f))
+        tracker.addPosition(10, Offset(10f, 0f))
+        tracker.addPosition(20, Offset(20f, 0f))
+        tracker.addPosition(30, Offset(30f, 0f))
+        tracker.addPosition(40, Offset(40f, 0f))
+        tracker.addPosition(50, Offset(50f, 0f))
+        tracker.addPosition(60, Offset(50f, 0f))
+        tracker.addPosition(70, Offset(50f, 0f))
+        tracker.addPosition(80, Offset(50f, 0f))
+        tracker.addPosition(90, Offset(50f, 0f))
+        tracker.addPosition(100, Offset(50f, 0f))
+        val velocity = tracker.calculateVelocity()
+        assertThat(velocity.x).isWithin(TOLERANCE).of(0f)
+    }
+
+    @Test
+    fun calculateVelocity_linearMotionFollowedByFlatLineWithoutIntermediatePoints() {
+        // Fixed velocity at first, but flat line afterwards
+        val tracker = VelocityTracker()
+        tracker.addPosition(0, Offset(0f, 0f))
+        tracker.addPosition(50, Offset(50f, 0f))
+        tracker.addPosition(100, Offset(50f, 0f))
+        val velocity = tracker.calculateVelocity()
+        assertThat(velocity.x).isWithin(TOLERANCE).of(0f)
+    }
+
+    @Test
+    fun calculateVelocity_SwordfishFlingDown() {
+        // Recording of a fling on Swordfish that could cause a fling in the wrong direction
+        val tracker = VelocityTracker()
+        tracker.addPosition(0, Offset(271f, 96f))
+        tracker.addPosition(16, Offset(269.786346f, 106.922775f))
+        tracker.addPosition(35, Offset(267.983063f, 156.660034f))
+        tracker.addPosition(52, Offset(262.638397f, 220.339081f))
+        tracker.addPosition(68, Offset(266.138824f, 331.581116f))
+        tracker.addPosition(85, Offset(274.79245f, 428.113159f))
+        tracker.addPosition(96, Offset(274.79245f, 428.113159f))
+
+        val velocity = tracker.calculateVelocity()
+        // X velocity doesn't matter much here because it's a vertical motion, but it should have a
+        // small magnitude compared to the Y velocity
+        assertThat(velocity.x).isWithin(TOLERANCE).of(586f)
+        assertThat(velocity.y).isWithin(TOLERANCE).of(5819.6f)
+    }
+
+    @Test
     fun calculateVelocity_gapOf40MillisecondsInPositions_positionsAfterGapIgnored() {
         val tracker = VelocityTracker()
         interruptedVelocityEventData.forEach {
@@ -70,8 +192,8 @@ class VelocityTrackerTest {
             } else {
                 checkVelocity(
                     tracker.calculateVelocity(),
-                    649.48932102748f,
-                    3890.30505589076f
+                    633.4f,
+                    3802.149f
                 )
                 tracker.resetTracking()
             }
