@@ -137,8 +137,8 @@ class SendSwipeVelocityTest(private val config: TestConfig) {
                 assertThat(recordedDurationMillis).isEqualTo(duration)
 
                 // Check velocity
-                assertThat(recordedVelocity.x).isWithin(.1f).of(expectedXVelocity)
-                assertThat(recordedVelocity.y).isWithin(.1f).of(expectedYVelocity)
+                assertThat(recordedVelocity.x).isWithin(1f).of(expectedXVelocity)
+                assertThat(recordedVelocity.y).isWithin(1f).of(expectedYVelocity)
             }
         }
     }

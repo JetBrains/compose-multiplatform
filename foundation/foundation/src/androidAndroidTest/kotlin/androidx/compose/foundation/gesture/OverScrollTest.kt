@@ -210,6 +210,8 @@ class OverScrollTest {
             assertThat(controller.stopAnimationCallsCount).isEqualTo(0)
         }
 
+        // This actually produces a velocity of 100,000 (500 px moved in 5 ms), but we are
+        // relying on the compatibility behaviour that 2 points produce a zero velocity.
         rule.onNodeWithTag(boxTag).performTouchInput {
             down(center)
             moveBy(Offset(500f, 0f))
