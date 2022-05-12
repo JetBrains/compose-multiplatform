@@ -316,6 +316,78 @@ class SpannableExtensionsTest {
     }
 
     @Test
+    fun flattenStylesAndApply_allEmptyRanges_notApplied() {
+        val contextSpanStyle = SpanStyle(fontWeight = FontWeight(400))
+        val spanStyle1 = SpanStyle(fontWeight = FontWeight(100))
+        val spanStyle2 = SpanStyle(fontWeight = FontWeight(200))
+        val spanStyle3 = SpanStyle(fontWeight = FontWeight(300))
+
+        val spanStyles = listOf(
+            AnnotatedString.Range(spanStyle1, 2, 2),
+            AnnotatedString.Range(spanStyle2, 4, 4),
+            AnnotatedString.Range(spanStyle3, 0, 0),
+        )
+        val block = mock<(SpanStyle, Int, Int) -> Unit>()
+        flattenFontStylesAndApply(
+            contextFontSpanStyle = contextSpanStyle,
+            spanStyles = spanStyles,
+            block = block
+        )
+        inOrder(block) {
+            verify(block).invoke(contextSpanStyle, 0, 2)
+            verify(block).invoke(contextSpanStyle, 2, 4)
+            verifyNoMoreInteractions()
+        }
+    }
+
+    @Test
+    fun flattenStylesAndApply_emptySpanRange_shouldNotApply() {
+        val spanStyle1 = SpanStyle(fontWeight = FontWeight(100))
+        val spanStyle2 = SpanStyle(fontStyle = FontStyle.Italic)
+        val spanStyle3 = SpanStyle(fontWeight = FontWeight(200))
+
+        val spanStyles = listOf(
+            AnnotatedString.Range(spanStyle3, 4, 10),
+            AnnotatedString.Range(spanStyle2, 1, 7),
+            AnnotatedString.Range(spanStyle1, 3, 3)
+        )
+        val block = mock<(SpanStyle, Int, Int) -> Unit>()
+        flattenFontStylesAndApply(
+            contextFontSpanStyle = null,
+            spanStyles = spanStyles,
+            block = block
+        )
+        inOrder(block) {
+            verify(block).invoke(spanStyle2, 1, 3)
+            verify(block).invoke(spanStyle2, 3, 4)
+            verify(block).invoke(spanStyle3.merge(spanStyle2), 4, 7)
+            verify(block).invoke(spanStyle3, 7, 10)
+            verifyNoMoreInteractions()
+        }
+    }
+
+    @Test
+    fun flattenStylesAndApply_emptySpanRangeBeginning_shouldNotApply() {
+        val spanStyle1 = SpanStyle(fontWeight = FontWeight(100))
+        val spanStyle2 = SpanStyle(fontStyle = FontStyle.Italic)
+
+        val spanStyles = listOf(
+            AnnotatedString.Range(spanStyle1, 0, 0),
+            AnnotatedString.Range(spanStyle2, 0, 7)
+        )
+        val block = mock<(SpanStyle, Int, Int) -> Unit>()
+        flattenFontStylesAndApply(
+            contextFontSpanStyle = null,
+            spanStyles = spanStyles,
+            block = block
+        )
+        inOrder(block) {
+            verify(block).invoke(spanStyle2, 0, 7)
+            verifyNoMoreInteractions()
+        }
+    }
+
+    @Test
     fun flattenStylesAndApply_withContextSpanStyle_inheritContext() {
         val color = Color.Red
         val fontStyle = FontStyle.Italic
