@@ -19,6 +19,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
+import androidx.core.view.WindowCompat
 import java.util.concurrent.CountDownLatch
 
 class WindowInsetsActivity : ComponentActivity() {
@@ -26,7 +27,7 @@ class WindowInsetsActivity : ComponentActivity() {
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
-        window.setDecorFitsSystemWindows(false)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
         createdLatch.countDown()
     }
