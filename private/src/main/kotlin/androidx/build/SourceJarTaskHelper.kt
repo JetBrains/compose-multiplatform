@@ -89,7 +89,12 @@ fun Project.configureSourceJarForJava() {
         task.duplicatesStrategy = DuplicatesStrategy.FAIL
 
         extensions.findByType(JavaPluginExtension::class.java)?.let { extension ->
-            task.from(extension.sourceSets.getByName("main").allSource.srcDirs)
+            // Since KotlinPlugin applies JavaPlugin, it's possible for JavaPlugin to exist, but
+            // not to have "main".  Eventually, we should stop expecting to grab sourceSets by name
+            // (b/235828421)
+            extension.sourceSets.findByName("main")?.let {
+                task.from(it.allSource.srcDirs)
+            }
         }
 
         extensions.findByType(KotlinMultiplatformExtension::class.java)?.let { extension ->
