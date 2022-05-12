@@ -27,15 +27,16 @@ import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.android.build.gradle.internal.lint.AndroidLintTask
 import com.android.build.gradle.internal.lint.LintModelWriterTask
 import com.android.build.gradle.internal.lint.VariantInputs
+import java.io.File
 import kotlin.reflect.KFunction
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.tasks.ClasspathNormalizer
-import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.plugins.ExtraPropertiesExtension
+import org.gradle.api.tasks.ClasspathNormalizer
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.withType
@@ -45,7 +46,6 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.io.File
 
 const val composeSourceOption =
     "plugin:androidx.compose.compiler.plugins.kotlin:sourceInformation=true"
@@ -156,6 +156,7 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
                     error.add("ModifierParameter")
                     error.add("MutableCollectionMutableState")
                     error.add("UnnecessaryComposedModifier")
+                    error.add("FrequentlyChangedStateReadInComposition")
 
                     // Paths we want to enable ListIterator checks for - for higher level
                     // libraries it won't have a noticeable performance impact, and we don't want
