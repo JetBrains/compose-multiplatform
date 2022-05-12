@@ -173,6 +173,9 @@ internal class TextFieldSelectionManager(
             // being controlled by the drag.
             draggingHandle = Handle.SelectionEnd
 
+            // ensuring that current action mode (selection toolbar) is invalidated
+            hideSelectionToolbar()
+
             // Long Press at the blank area, the cursor should show up at the end of the line.
             if (state?.layoutResult?.isPositionOnText(startPoint) != true) {
                 state?.layoutResult?.let { layoutResult ->
@@ -585,17 +588,13 @@ internal class TextFieldSelectionManager(
 
     /*@VisibleForTesting*/
     internal fun selectAll() {
-        setHandleState(HandleState.None)
-
         val newValue = createTextFieldValue(
             annotatedString = value.annotatedString,
             selection = TextRange(0, value.text.length)
         )
         onValueChange(newValue)
         oldValue = oldValue.copy(selection = newValue.selection)
-        hideSelectionToolbar()
         state?.showFloatingToolbar = true
-        showSelectionToolbar()
     }
 
     internal fun getHandlePosition(isStartHandle: Boolean): Offset {
@@ -648,9 +647,7 @@ internal class TextFieldSelectionManager(
             }
         } else null
 
-        val selectAll: (() -> Unit)? = if (value.selection.length != value.text.length &&
-            oldValue.selection.length != oldValue.text.length
-        ) {
+        val selectAll: (() -> Unit)? = if (value.selection.length != value.text.length) {
             {
                 selectAll()
             }
