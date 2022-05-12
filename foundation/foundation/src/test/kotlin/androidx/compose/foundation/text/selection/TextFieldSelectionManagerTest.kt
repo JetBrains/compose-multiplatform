@@ -472,13 +472,6 @@ class TextFieldSelectionManagerTest {
         manager.selectAll()
 
         assertThat(value.selection).isEqualTo(TextRange(0, text.length))
-        verify(textToolbar, times(1)).showMenu(
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            isNull()
-        )
     }
 
     @Test
@@ -491,14 +484,6 @@ class TextFieldSelectionManagerTest {
         manager.selectAll()
 
         assertThat(value.selection).isEqualTo(TextRange(0, text.length))
-
-        verify(textToolbar, times(1)).showMenu(
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            anyOrNull(),
-            isNull()
-        )
     }
 
     @Test

@@ -31,7 +31,11 @@ import androidx.compose.ui.platform.actionmodecallback.TextActionModeCallback
  */
 internal class AndroidTextToolbar(private val view: View) : TextToolbar {
     private var actionMode: ActionMode? = null
-    private val textActionModeCallback: TextActionModeCallback = TextActionModeCallback()
+    private val textActionModeCallback: TextActionModeCallback = TextActionModeCallback(
+        onActionModeDestroy = {
+            actionMode = null
+        }
+    )
     override var status: TextToolbarStatus = TextToolbarStatus.Hidden
         private set
 
