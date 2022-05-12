@@ -66,7 +66,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.shadow
@@ -776,7 +775,6 @@ private fun snapValueToTick(
         ?: current
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 private suspend fun AwaitPointerEventScope.awaitSlop(
     id: PointerId,
     type: PointerType
