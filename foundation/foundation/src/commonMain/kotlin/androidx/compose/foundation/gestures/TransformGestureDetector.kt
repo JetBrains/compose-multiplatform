@@ -24,7 +24,6 @@ import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastSumBy
-import kotlin.contracts.ExperimentalContracts
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -236,7 +235,6 @@ fun PointerEvent.calculateCentroidSize(useCurrent: Boolean = true): Float {
  * Example Usage:
  * @sample androidx.compose.foundation.samples.CalculateCentroidSize
  */
-@OptIn(ExperimentalContracts::class)
 fun PointerEvent.calculateCentroid(
     useCurrent: Boolean = true
 ): Offset {
