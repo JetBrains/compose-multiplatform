@@ -52,6 +52,8 @@ switch (cacheSetting) {
             }
         }
         break
+    case "false":
+        break
     default:
         def uplinkLinux = new File("/usr/bin/uplink-helper")
         def uplinkMac = new File("/usr/local/bin/uplink-helper")
