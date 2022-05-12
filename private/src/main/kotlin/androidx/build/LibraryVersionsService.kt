@@ -58,7 +58,7 @@ abstract class LibraryVersionsService : BuildService<LibraryVersionsService.Para
 
     val libraryGroups: Map<String, LibraryGroup> by lazy {
         val groups = parsedTomlFile.getTable("groups")
-            ?: throw GradleException("Library versions toml file is missing [group] table")
+            ?: throw GradleException("Library versions toml file is missing [groups] table")
         groups.keySet().associateWith { name ->
             val groupDefinition = groups.getTable(name)!!
             val groupName = groupDefinition.getString("group")!!
