@@ -34,7 +34,6 @@ import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
@@ -478,7 +477,6 @@ class PointerInteropFilterAndroidViewHookupTest {
         assertThat(captureRequestDisallow.disallowIntercept).isFalse()
     }
 
-    @FlakyTest(bugId = 206967867)
     @Test
     fun disallowTriggeredWhenMovementInClickChildAfterRequestDisallow() {
         var clicked = false

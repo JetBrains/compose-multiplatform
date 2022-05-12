@@ -18,15 +18,19 @@ package androidx.compose.foundation.lazy.grid
 
 import android.os.Build
 import androidx.compose.foundation.AutoTestFrameClock
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.list.TestTouchSlop
 import androidx.compose.foundation.lazy.list.setContentWithTestViewConfiguration
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -1063,6 +1067,134 @@ class LazyGridTest(
         rule.runOnIdle {
             assertThat(state.numMeasurePasses).isEqualTo(1)
         }
+    }
+
+    @Test
+    fun laysOutRtlCorrectlyWithLargerContainer() {
+        val mainAxisSize = with(rule.density) { 250.toDp() }
+        val crossAxisSize = with(rule.density) { 110.toDp() }
+        val itemSize = with(rule.density) { 50.toDp() }
+
+        rule.setContent {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                LazyGrid(cells = 2, modifier = Modifier.axisSize(crossAxisSize, mainAxisSize)) {
+                    items(4) { index ->
+                        val label = (index + 1).toString()
+                        BasicText(label, Modifier.size(itemSize).testTag(label))
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1").apply {
+            if (vertical) {
+                // 2 1
+                // 4 3
+                assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+                assertCrossAxisStartPositionInRootIsEqualTo(crossAxisSize / 2)
+            } else {
+                // 3 1
+                // 4 2
+                assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
+                assertMainAxisStartPositionInRootIsEqualTo(mainAxisSize - itemSize)
+            }
+        }
+    }
+
+    @Test
+    fun scrollDuringMeasure() {
+        rule.setContent {
+            BoxWithConstraints {
+                val state = rememberLazyGridState()
+                LazyGrid(
+                    cells = 2,
+                    state = state,
+                    modifier = Modifier.axisSize(40.dp, 100.dp)
+                ) {
+                    items(20) {
+                        val tag = it.toString()
+                        BasicText(
+                            text = tag,
+                            modifier = Modifier.axisSize(20.dp, 20.dp).testTag(tag)
+                        )
+                    }
+                }
+                LaunchedEffect(state) {
+                    state.scrollToItem(10)
+                }
+            }
+        }
+
+        rule.onNodeWithTag("10")
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun scrollInLaunchedEffect() {
+        rule.setContent {
+            val state = rememberLazyGridState()
+            LazyGrid(
+                cells = 2,
+                state = state,
+                modifier = Modifier.axisSize(40.dp, 100.dp)
+            ) {
+                items(20) {
+                    val tag = it.toString()
+                    BasicText(
+                        text = tag,
+                        modifier = Modifier.axisSize(20.dp, 20.dp).testTag(tag)
+                    )
+                }
+            }
+            LaunchedEffect(state) {
+                state.scrollToItem(10)
+            }
+        }
+
+        rule.onNodeWithTag("10")
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun changedLinesRemeasuredCorrectly() {
+        var flag by mutableStateOf(false)
+        rule.setContent {
+            LazyGrid(cells = GridCells.Fixed(2), modifier = Modifier.axisSize(60.dp, 100.dp)) {
+                item(
+                    span = { GridItemSpan(maxLineSpan) }
+                ) {
+                    Box(Modifier.mainAxisSize(32.dp).background(Color.Red))
+                }
+
+                if (flag) {
+                    item {
+                        Box(Modifier.mainAxisSize(32.dp).background(Color.Blue))
+                    }
+
+                    item {
+                        Box(Modifier.mainAxisSize(32.dp).background(Color.Yellow).testTag("target"))
+                    }
+                } else {
+                    item(
+                        span = { GridItemSpan(maxLineSpan) }
+                    ) {
+                        Box(Modifier.mainAxisSize(32.dp).background(Color.Blue))
+                    }
+
+                    item(
+                        span = { GridItemSpan(maxLineSpan) }
+                    ) {
+                        Box(Modifier.mainAxisSize(32.dp).background(Color.Yellow).testTag("target"))
+                    }
+                }
+            }
+        }
+
+        flag = true
+        rule.onNodeWithTag("target")
+            .assertCrossAxisSizeIsEqualTo(30.dp)
+            .assertMainAxisStartPositionInRootIsEqualTo(32.dp)
+            .assertCrossAxisStartPositionInRootIsEqualTo(30.dp)
     }
 }
 

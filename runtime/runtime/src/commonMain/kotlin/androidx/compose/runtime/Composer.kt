@@ -1052,7 +1052,7 @@ sealed interface Composer {
  * [remember] when it determines these optimizations are safe.
  */
 @ComposeCompilerApi
-inline fun <T> Composer.cache(invalid: Boolean, block: () -> T): T {
+inline fun <T> Composer.cache(invalid: Boolean, block: @DisallowComposableCalls () -> T): T {
     @Suppress("UNCHECKED_CAST")
     return rememberedValue().let {
         if (invalid || it === Composer.Empty) {
@@ -1206,6 +1206,7 @@ internal class ComposerImpl(
     private var reusingGroup = -1
     private var childrenComposing: Int = 0
     private var snapshot = currentSnapshot()
+    private var compositionToken: Int = 0
 
     private val invalidateStack = Stack<RecomposeScopeImpl>()
 
@@ -2700,7 +2701,7 @@ internal class ComposerImpl(
             val scope = RecomposeScopeImpl(composition as CompositionImpl)
             invalidateStack.push(scope)
             updateValue(scope)
-            scope.start(snapshot.id)
+            scope.start(compositionToken)
         } else {
             val invalidation = invalidations.removeLocation(reader.parent)
             val slot = reader.next()
@@ -2713,7 +2714,7 @@ internal class ComposerImpl(
             } else slot as RecomposeScopeImpl
             scope.requiresRecompose = invalidation != null
             invalidateStack.push(scope)
-            scope.start(snapshot.id)
+            scope.start(compositionToken)
         }
     }
 
@@ -2731,7 +2732,7 @@ internal class ComposerImpl(
         val scope = if (invalidateStack.isNotEmpty()) invalidateStack.pop()
         else null
         scope?.requiresRecompose = false
-        scope?.end(snapshot.id)?.let {
+        scope?.end(compositionToken)?.let {
             record { _, _, _ -> it(composition) }
         }
         val result = if (scope != null &&
@@ -3150,6 +3151,7 @@ internal class ComposerImpl(
         runtimeCheck(!isComposing) { "Reentrant composition is not supported" }
         trace("Compose:recompose") {
             snapshot = currentSnapshot()
+            compositionToken = snapshot.id
             providerUpdates.clear()
             invalidationsRequested.forEach { scope, set ->
                 val location = scope.anchor?.location ?: return

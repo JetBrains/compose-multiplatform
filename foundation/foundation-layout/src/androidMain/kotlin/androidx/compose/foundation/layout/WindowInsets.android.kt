@@ -18,8 +18,8 @@ package androidx.compose.foundation.layout
 
 import androidx.core.graphics.Insets as AndroidXInsets
 import android.os.Build
-import android.os.SystemClock
 import android.view.View
+import android.view.View.OnAttachStateChangeListener
 import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
@@ -454,6 +454,11 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
             // add listeners
             ViewCompat.setOnApplyWindowInsetsListener(view, insetsListener)
 
+            if (view.isAttachedToWindow) {
+                view.requestApplyInsets()
+            }
+            view.addOnAttachStateChangeListener(insetsListener)
+
             // We don't need animation callbacks on earlier versions, so don't bother adding
             // the listener. ViewCompat calls the animation callbacks superfluously.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -474,6 +479,7 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
             // remove listeners
             ViewCompat.setOnApplyWindowInsetsListener(view, null)
             ViewCompat.setWindowInsetsAnimationCallback(view, null)
+            view.removeOnAttachStateChangeListener(insetsListener)
         }
     }
 
@@ -617,9 +623,9 @@ private object RootWindowInsetsApi23 {
 
 private class InsetsListener(
     val composeInsets: WindowInsetsHolder,
-) : OnApplyWindowInsetsListener, WindowInsetsAnimationCompat.Callback(
+) : WindowInsetsAnimationCompat.Callback(
     if (composeInsets.consumes) DISPATCH_MODE_STOP else DISPATCH_MODE_CONTINUE_ON_SUBTREE
-) {
+), Runnable, OnApplyWindowInsetsListener, OnAttachStateChangeListener {
     /**
      * When [android.view.WindowInsetsController.controlWindowInsetsAnimation] is called,
      * the [onApplyWindowInsets] is called after [onPrepare] with the target size. We
@@ -627,23 +633,15 @@ private class InsetsListener(
      * so we must ignore those calls. However, the animation may be canceled before it
      * progresses. On R, it won't make any callbacks, so we have to figure out whether
      * the [onApplyWindowInsets] is from a canceled animation or if it is from the
-     * controlled animation. We just have to guess that if we don't receive an [onStart]
-     * before a certain time that the animation has been canceled, and to treat the
-     * [onApplyWindowInsets] as a real call. [prepareGiveUpTime] has the time that we
-     * give up waiting for the [onStart] or [onEnd].
+     * controlled animation. When [prepared] is `true` on R, we post a callback to
+     * set the [onApplyWindowInsets] insets value.
      */
-    var prepareGiveUpTime = 0L
+    var prepared = false
 
-    /**
-     * `true` if the [onStart] has been called, so we know that we're part of an animation
-     * and [onApplyWindowInsets] calls should be ignored.
-     */
-    var started = false
-
-    var animationInsets: WindowInsetsCompat? = null
+    var savedInsets: WindowInsetsCompat? = null
 
     override fun onPrepare(animation: WindowInsetsAnimationCompat) {
-        prepareGiveUpTime = SystemClock.uptimeMillis() + AnimationCanceledMillis
+        prepared = true
         super.onPrepare(animation)
     }
 
@@ -651,7 +649,7 @@ private class InsetsListener(
         animation: WindowInsetsAnimationCompat,
         bounds: WindowInsetsAnimationCompat.BoundsCompat
     ): WindowInsetsAnimationCompat.BoundsCompat {
-        started = true
+        prepared = false
         return super.onStart(animation, bounds)
     }
 
@@ -659,47 +657,58 @@ private class InsetsListener(
         insets: WindowInsetsCompat,
         runningAnimations: MutableList<WindowInsetsAnimationCompat>
     ): WindowInsetsCompat {
-        prepareGiveUpTime = 0L
         composeInsets.update(insets)
         return if (composeInsets.consumes) WindowInsetsCompat.CONSUMED else insets
     }
 
     override fun onEnd(animation: WindowInsetsAnimationCompat) {
-        started = false
-        prepareGiveUpTime = 0L
-        val insets = animationInsets
+        prepared = false
+        val insets = savedInsets
         if (animation.durationMillis != 0L && insets != null) {
             composeInsets.update(insets, animation.typeMask)
         }
-        animationInsets = null
+        savedInsets = null
         super.onEnd(animation)
     }
 
     override fun onApplyWindowInsets(view: View, insets: WindowInsetsCompat): WindowInsetsCompat {
-        val prepareGiveUpTime = prepareGiveUpTime
-        this.prepareGiveUpTime = 0L
+        if (prepared) {
+            savedInsets = insets
 
-        // There may be no callback on R if the animation is canceled after onPrepare(),
-        // so we won't know if the onPrepare() was canceled or if the
-        // So we must allow onApplyWindowInsets() to run if it isn't directly after the
-        // onPrepare().
-        val preparing = prepareGiveUpTime != 0L &&
-            (Build.VERSION.SDK_INT > Build.VERSION_CODES.R ||
-                prepareGiveUpTime > SystemClock.uptimeMillis())
-        if (started || preparing) {
-            animationInsets = insets
-            // Just ignore this one. It came from the onPrepare.
+            // There may be no callback on R if the animation is canceled after onPrepare(),
+            // so we won't know if the onPrepare() was canceled or if this is an
+            // onApplyWindowInsets() after the cancelation. We'll just post the value
+            // and if it is still preparing then we just use the value.
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
+                view.post(this)
+            }
             return insets
         }
         composeInsets.update(insets)
         return if (composeInsets.consumes) WindowInsetsCompat.CONSUMED else insets
     }
 
-    companion object {
-        // If an [onApplyWindowInsets] is received this number of milliseconds after
-        // [onPrepare] and the animation hasn't started, then it is assumed that the
-        // animation was canceled before starting. On R and earlier, we don't get any
-        // signal about cancellation.
-        const val AnimationCanceledMillis = 100L
+    /**
+     * On [R], we don't receive the [onEnd] call when an animation is canceled, so we post
+     * the value received in [onApplyWindowInsets] immediately after [onPrepare]. If [onProgress]
+     * or [onEnd] is received before the runnable executes then the value won't be used. Otherwise,
+     * the [onApplyWindowInsets] value will be used. It may have a janky frame, but it is the best
+     * we can do.
+     */
+    override fun run() {
+        if (prepared) {
+            prepared = false
+            savedInsets?.let {
+                composeInsets.update(it)
+                savedInsets = null
+            }
+        }
+    }
+
+    override fun onViewAttachedToWindow(view: View) {
+        view.requestApplyInsets()
+    }
+
+    override fun onViewDetachedFromWindow(v: View) {
     }
 }

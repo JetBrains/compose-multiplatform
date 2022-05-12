@@ -42,7 +42,7 @@ fun compositionTest(block: suspend CompositionTestScope.() -> Unit) = runTest {
         // Create a test scope for the test using the test scope passed in by runTest
         val scope = object : CompositionTestScope, CoroutineScope by this@runTest {
             var composed = false
-            var composition: Composition? = null
+            override var composition: Composition? = null
 
             override lateinit var root: View
 
@@ -126,6 +126,11 @@ interface CompositionTestScope : CoroutineScope {
      * The last validator used.
      */
     var validator: (MockViewValidator.() -> Unit)?
+
+    /**
+     * Access to the composition created for the call to [compose]
+     */
+    val composition: Composition?
 }
 
 /**

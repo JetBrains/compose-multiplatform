@@ -40,9 +40,9 @@ import kotlin.math.max
  *
  * @param intrinsics previously calculated text intrinsics
  * @param constraints how wide and tall the text is allowed to be. [Constraints.maxWidth]
- * will define the width of the Paragraph. Other components of the [Constraints] object are no-op
- * but will allow additional functionality in the future, e.g. ellipsis based on the limited
- * [Constraints.maxHeight]
+ * will define the width of the MultiParagraph. [Constraints.maxHeight] helps defining the
+ * number of lines that fit with ellipsis is true. Minimum components of the [Constraints]
+ * object are no-op.
  * @param maxLines the maximum number of lines that the text can have
  * @param ellipsis whether to ellipsize text, applied only when [maxLines] is set
  */
@@ -188,9 +188,9 @@ class MultiParagraph(
      * @param annotatedString the text to be laid out
      * @param style the [TextStyle] to be applied to the whole text
      * @param constraints how wide and tall the text is allowed to be. [Constraints.maxWidth]
-     * will define the width of the Paragraph. Other components of the [Constraints] object are no-op
-     * but will allow additional functionality in the future, e.g. ellipsis based on the limited
-     * [Constraints.maxHeight]
+     * will define the width of the MultiParagraph. [Constraints.maxHeight] helps defining the
+     * number of lines that fit with ellipsis is true. Minimum components of the [Constraints]
+     * object are no-op.
      * @param density density of the device
      * @param fontFamilyResolver to be used to load the font given in [SpanStyle]s
      * @param placeholders a list of [Placeholder]s that specify ranges of text which will be
@@ -305,6 +305,11 @@ class MultiParagraph(
     internal val paragraphInfoList: List<ParagraphInfo>
 
     init {
+        require(constraints.minWidth == 0 && constraints.minHeight == 0) {
+            "Setting Constraints.minWidth and Constraints.minHeight is not supported, " +
+                "these should be the default zero values instead."
+        }
+
         var currentHeight = 0f
         var currentLineCount = 0
         var didExceedMaxLines = false
@@ -319,7 +324,7 @@ class MultiParagraph(
                 Constraints(
                     maxWidth = constraints.maxWidth,
                     maxHeight = if (constraints.hasBoundedHeight) {
-                        constraints.maxHeight - currentHeight.ceilToInt()
+                        (constraints.maxHeight - currentHeight.ceilToInt()).coerceAtLeast(0)
                     } else {
                         constraints.maxHeight
                     }

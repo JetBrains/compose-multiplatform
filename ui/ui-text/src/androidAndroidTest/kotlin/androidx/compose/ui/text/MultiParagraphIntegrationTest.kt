@@ -1420,6 +1420,57 @@ class MultiParagraphIntegrationTest {
         )
     }
 
+    @Test(expected = IllegalArgumentException::class)
+    fun setMinWidthConstraints_notSupported() {
+        val minWidthConstraints = Constraints(minWidth = 100)
+        MultiParagraph(
+            annotatedString = AnnotatedString(""),
+            style = TextStyle(),
+            constraints = minWidthConstraints,
+            density = defaultDensity,
+            fontFamilyResolver = UncachedFontFamilyResolver(context)
+        )
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun setMinHeightConstraints_notSupported() {
+        val minHeightConstraints = Constraints(minHeight = 100)
+        MultiParagraph(
+            annotatedString = AnnotatedString(""),
+            style = TextStyle(),
+            constraints = minHeightConstraints,
+            density = defaultDensity,
+            fontFamilyResolver = UncachedFontFamilyResolver(context)
+        )
+    }
+
+    @Test
+    fun multiParagraphConstruction_doesNotThrow_ifNotAllParagraghsFitVertically() {
+        with(defaultDensity) {
+            val fontSize = 20.sp
+            val constraints = Constraints(
+                maxWidth = 10 * fontSize.roundToPx(),
+                maxHeight = fontSize.roundToPx() / 2
+            )
+            val text = buildAnnotatedString {
+                withStyle(ParagraphStyle(textAlign = TextAlign.Center)) {
+                    append("Lorem")
+                }
+                withStyle(ParagraphStyle()) {
+                    append("Ipsum")
+                }
+            }
+
+            MultiParagraph(
+                annotatedString = text,
+                style = TextStyle(fontSize = fontSize, fontFamily = fontFamilyMeasureFont),
+                constraints = constraints,
+                density = this,
+                fontFamilyResolver = UncachedFontFamilyResolver(context)
+            )
+        }
+    }
+
     /**
      * Helper function which creates an AnnotatedString where each input string becomes a paragraph.
      */

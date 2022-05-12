@@ -21,6 +21,7 @@ import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,6 +38,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -69,8 +71,8 @@ import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.swipeWithVelocity
@@ -84,11 +86,11 @@ import com.google.common.collect.Range
 import com.google.common.truth.IntegerSubject
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
+import java.util.concurrent.CountDownLatch
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import java.util.concurrent.CountDownLatch
 
 @LargeTest
 @RunWith(Parameterized::class)
@@ -1766,6 +1768,58 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
         rule.onNodeWithTag(LazyListTag)
             .captureToImage()
             .assertPixels { Color.Green }
+    }
+
+    @Test
+    fun scrollDuringMeasure() {
+        rule.setContent {
+            BoxWithConstraints {
+                val state = rememberLazyListState()
+                LazyColumnOrRow(
+                    state = state,
+                    modifier = Modifier.mainAxisSize(100.dp).fillMaxCrossAxis()
+                ) {
+                    items(20) {
+                        val tag = it.toString()
+                        BasicText(
+                            text = tag,
+                            modifier = Modifier.mainAxisSize(30.dp).fillMaxCrossAxis().testTag(tag)
+                        )
+                    }
+                }
+                LaunchedEffect(state) {
+                    state.scrollToItem(10)
+                }
+            }
+        }
+
+        rule.onNodeWithTag("10")
+            .assertStartPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun scrollInLaunchedEffect() {
+        rule.setContent {
+            val state = rememberLazyListState()
+            LazyColumnOrRow(
+                state = state,
+                modifier = Modifier.mainAxisSize(100.dp).fillMaxCrossAxis()
+            ) {
+                items(20) {
+                    val tag = it.toString()
+                    BasicText(
+                        text = tag,
+                        modifier = Modifier.mainAxisSize(30.dp).fillMaxCrossAxis().testTag(tag)
+                    )
+                }
+            }
+            LaunchedEffect(state) {
+                state.scrollToItem(10)
+            }
+        }
+
+        rule.onNodeWithTag("10")
+            .assertStartPositionInRootIsEqualTo(0.dp)
     }
 
     // ********************* END OF TESTS *********************

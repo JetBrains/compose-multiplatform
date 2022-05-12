@@ -93,6 +93,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
@@ -169,8 +171,8 @@ fun Slider(
         val minPx: Float
 
         with(LocalDensity.current) {
-            maxPx = widthPx - ThumbRadius.toPx()
-            minPx = ThumbRadius.toPx()
+            maxPx = max(widthPx - ThumbRadius.toPx(), 0f)
+            minPx = min(ThumbRadius.toPx(), maxPx)
         }
 
         fun scaleToUserValue(offset: Float) =

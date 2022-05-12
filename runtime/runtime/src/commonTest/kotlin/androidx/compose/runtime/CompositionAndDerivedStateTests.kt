@@ -354,6 +354,37 @@ class CompositionAndDerivedStateTests {
         advance()
         revalidate()
     }
+
+    @Test
+    fun changingTheDerivedStateInstanceShouldRelease() = compositionTest {
+        var reload by mutableStateOf(0)
+
+        compose {
+            val items = remember(reload) {
+                derivedStateOf {
+                    List(10) { it }
+                }
+            }
+
+            Text("List of size ${items.value.size}")
+        }
+
+        validate {
+            Text("List of size 10")
+        }
+
+        repeat(10) {
+            reload++
+            advance()
+        }
+
+        revalidate()
+
+        // Validate there are only 2 observed objectt which should be `reload` and the last
+        // created derivedStateOf instance
+        val observed = (composition as? CompositionImpl)?.observedObjects ?: emptyList()
+        assertEquals(2, observed.count())
+    }
 }
 
 @Composable

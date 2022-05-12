@@ -28,8 +28,8 @@ package androidx.compose.ui.text.font
  *  It is possible to fake an increase of [FontWeight] but not a decrease. It is possible to fake
  *  a regular font slanted, but not vice versa.
  *
- *  `FontSynthesis` works the same way as the [CSS font-synthesis](https://www.w3
- *  .org/TR/css-fonts-4/#font-synthesis) property.
+ *  `FontSynthesis` works the same way as the
+ *  [CSS font-synthesis](https://www.w3.org/TR/css-fonts-4/#font-synthesis) property.
  *
  *  @sample androidx.compose.ui.text.samples.FontFamilySynthesisSample
  **/

@@ -45,13 +45,13 @@ import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.input.pointer.util.addPointerInputChange
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Velocity
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.math.sign
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.isActive
-import kotlin.coroutines.cancellation.CancellationException
-import kotlin.math.sign
 
 /**
  * State of [draggable]. Allows for a granular control of how deltas are consumed by the user as
@@ -259,38 +259,44 @@ internal fun Modifier.draggable(
     Modifier.pointerInput(orientation, enabled, reverseDirection) {
         if (!enabled) return@pointerInput
         coroutineScope {
-            forEachGesture {
+            try {
                 awaitPointerEventScope {
-                    val velocityTracker = VelocityTracker()
-                    awaitDownAndSlop(
-                        canDragState,
-                        startImmediatelyState,
-                        velocityTracker,
-                        orientation
-                    )?.let {
-                        var isDragSuccessful = false
-                        try {
-                            isDragSuccessful = awaitDrag(
-                                it,
-                                velocityTracker,
-                                channel,
-                                reverseDirection,
-                                orientation
-                            )
-                        } catch (cancellation: CancellationException) {
-                            isDragSuccessful = false
-                            if (!isActive) throw cancellation
-                        } finally {
-                            val event = if (isDragSuccessful) {
-                                val velocity =
-                                    velocityTracker.calculateVelocity().toFloat(orientation)
-                                DragStopped(velocity * if (reverseDirection) -1 else 1)
-                            } else {
-                                DragCancelled
+                    while (isActive) {
+                        val velocityTracker = VelocityTracker()
+                        awaitDownAndSlop(
+                            canDragState,
+                            startImmediatelyState,
+                            velocityTracker,
+                            orientation
+                        )?.let {
+                            var isDragSuccessful = false
+                            try {
+                                isDragSuccessful = awaitDrag(
+                                    it,
+                                    velocityTracker,
+                                    channel,
+                                    reverseDirection,
+                                    orientation
+                                )
+                            } catch (cancellation: CancellationException) {
+                                isDragSuccessful = false
+                                if (!isActive) throw cancellation
+                            } finally {
+                                val event = if (isDragSuccessful) {
+                                    val velocity =
+                                        velocityTracker.calculateVelocity().toFloat(orientation)
+                                    DragStopped(velocity * if (reverseDirection) -1 else 1)
+                                } else {
+                                    DragCancelled
+                                }
+                                channel.trySend(event)
                             }
-                            channel.trySend(event)
                         }
                     }
+                }
+            } catch (exception: CancellationException) {
+                if (!isActive) {
+                    throw exception
                 }
             }
         }

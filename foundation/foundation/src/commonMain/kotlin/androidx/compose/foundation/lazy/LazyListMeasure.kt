@@ -51,7 +51,6 @@ internal fun measureLazyList(
     horizontalArrangement: Arrangement.Horizontal?,
     reverseLayout: Boolean,
     density: Density,
-    layoutDirection: LayoutDirection,
     placementAnimator: LazyListItemPlacementAnimator,
     beyondBoundsInfo: LazyListBeyondBoundsInfo,
     layout: (Int, Int, Placeable.PlacementScope.() -> Unit) -> MeasureResult
@@ -264,7 +263,6 @@ internal fun measureLazyList(
             horizontalArrangement = horizontalArrangement,
             reverseLayout = reverseLayout,
             density = density,
-            layoutDirection = layoutDirection
         )
 
         val headerItem = if (headerIndexes.isNotEmpty()) {
@@ -334,7 +332,6 @@ private fun calculateItemsOffsets(
     horizontalArrangement: Arrangement.Horizontal?,
     reverseLayout: Boolean,
     density: Density,
-    layoutDirection: LayoutDirection
 ): MutableList<LazyListPositionedItem> {
     val mainAxisLayoutSize = if (isVertical) layoutHeight else layoutWidth
     val hasSpareSpace = finalMainAxisOffset < minOf(mainAxisLayoutSize, maxOffset)
@@ -359,7 +356,8 @@ private fun calculateItemsOffsets(
             }
         } else {
             with(requireNotNull(horizontalArrangement)) {
-                density.arrange(mainAxisLayoutSize, sizes, layoutDirection, offsets)
+                // Enforces Ltr layout direction as it is mirrored with placeRelative later.
+                density.arrange(mainAxisLayoutSize, sizes, LayoutDirection.Ltr, offsets)
             }
         }
         offsets.forEachIndexed { index, absoluteOffset ->

@@ -102,6 +102,7 @@ internal fun LazyList(
     LazyLayout(
         modifier = modifier
             .then(state.remeasurementModifier)
+            .then(state.awaitLayoutModifier)
             .lazyListSemantics(
                 itemProvider = itemProvider,
                 state = state,
@@ -279,7 +280,6 @@ private fun rememberLazyListMeasurePolicy(
             horizontalArrangement = horizontalArrangement,
             reverseLayout = reverseLayout,
             density = this,
-            layoutDirection = layoutDirection,
             placementAnimator = placementAnimator,
             beyondBoundsInfo = beyondBoundsInfo,
             layout = { width, height, placement ->

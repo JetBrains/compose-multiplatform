@@ -17,11 +17,14 @@
 package androidx.compose.ui.test
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import kotlin.math.atan2
 import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.floor
+import kotlin.math.abs
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToLong
 import kotlin.math.sin
@@ -69,21 +72,28 @@ internal class VelocityPathFinder(
      * 1. Flat line:
      * This happens when start == end and requires that the requested velocity is 0.
      *
-     * 2. Flat line followed by a parabola:
-     * This happens when there is a parabola that satisfies `f(t_d) = start`, `f'(t_d) = 0`,
-     * `f'(T) = velocity` and `t_d >= 0`. The gesture will wait at the start location until t_d
-     * and then follow that parabola till `f(T) = end`.
+     * 2. A line followed by another line:
+     * This happens when T <= HorizonMilliseconds.
+     * The first line is from t = 0, x = start until t = d, x = x_d.
+     * The second line is from t = d, x = x_d until t = T, x = end.
+     * The parameters d and x_d are found numerically.
      *
-     * 3. Parabola that starts with `f'(0) > 0`:
-     * If there is a parabola that satisfies `f(t_d) = start`, `f'(t_d) = 0`, `f'(T) = velocity`,
-     * but `t_d < 0`; or if `velocity = 0` (in which case the previously mentioned parabola
-     * doesn't exist); we can't follow that parabola because we'd have to start following it in
-     * the past (`t_d < 0`). Instead, it can be shown that in this case we can always create a
-     * parabola that satisfies `f(0) = start`, `f(T) = end` and `f'(T) = velocity`. This parabola
-     * will have `f'(0) > 0`.
+     * 3. Three lines
+     * This happens when T > HorizonMilliseconds.
+     * The first line is from t = 0, x = start until t = T - HorizonMilliseconds, x = x_horizon
+     * The second line is from t = T - HorizonMilliseconds until t = d, x = x_d
+     * The third line is from t = d, x = x_d until t = T, x = end
+     * The parameter x_horizon is computed by taking the final velocity and calculating back.
+     * The parameters d and x_d are found numerically.
      *
-     * In the calculations below, instead of calculating t_d, we calculate `d = T - t_d`, and
-     * immediately cap it to T.
+     * The 'impulse' implementation of VelocityTracker can be reverse-engineered to a closed-form
+     * solution, but it is numerically complex. It would also result in (likely) a non-integer 'd'
+     * value. As a result, during the gesture sampling, the curve will not be followed closely
+     * during the injection. This will cause the final computed velocity to be different from the
+     * target velocity.
+     * Therefore, we aim to sample the motion at the 'eventPeriod' steps, to closely approximate
+     * the final injected path, and vary the parameters to find the ones that are closest to the
+     * desired velocity. This method should work for any implementation of the VelocityTracker.
      *
      * @param velocity The desired velocity in the x or y direction at the end position
      */
@@ -94,41 +104,97 @@ internal class VelocityPathFinder(
         val T = durationMillis
         val start = value.invoke(startPosition)
         val end = value.invoke(endPosition)
-        // `d = T - t_d` in scenario 2 (see documentation above)
-        // `d = T` in scenario 1 and 3 (see documentation above)
-        val d = if (start == end) {
-            T.toDouble()
-        } else {
-            min(T.toDouble(), 2 / velocity * (end - start))
-        }
-        val a = (start + velocity * d - end) / (d * d)
 
-        require(d >= min(T, HorizonMilliseconds)) {
-            val requestedDistance = (endPosition - startPosition).getDistance()
-            // 1) Decrease duration to d
-            val suggestedDuration = d
-            // 2) Decrease velocity to 2/100 * (end - start) -> should work for vectors too
-            val suggestedVelocity = (2f / min(T, HorizonMilliseconds)) * requestedDistance * 1000
-            // 3) Increase distance to 100/2 * velocity
-            val suggestedDistance = (min(T, HorizonMilliseconds) / 2f) * endVelocity / 1000
-            "Unable to generate a swipe gesture between $startPosition and $endPosition with " +
-                "duration $durationMillis that ends with velocity of $endVelocity px/s, without " +
-                "going outside of the range [start..end]. " +
-                "Suggested fixes: " +
-                "1. set duration to $suggestedDuration or lower; " +
-                "2. set velocity to $suggestedVelocity px/s or lower; or " +
-                "3. increase the distance between the start and end to $suggestedDistance or " +
-                "higher"
+        if (start == end) {
+            require(abs(velocity) < 0.1) {
+                "Can't have matching positions, but nonzero velocity"
+            }
+            return { _ -> start }
         }
 
-        val threshold = T - d
-        return { t: Long ->
-            when {
-                t < threshold -> start
-                // `f(t) = a*(t-T)^2 + b*(t-T) + c`
-                else -> a * (t - T) * (t - T) + velocity * (t - T) + end
-            }.toFloat()
+        if (abs(velocity) < Double.MIN_VALUE) {
+            // Some tests, like ScrollableTest, assume that the pointer doesn't move during the
+            // entire gesture, not just during the last 'HorizonMilliseconds', so jump to 'end'
+            // right away
+            return { t: Long ->
+                when {
+                    t == 0L -> start
+                    else -> end
+                }
+            }
         }
+
+        // Special handling for small velocity. We multiply by velocity to find the position rather
+        // than divide by velocity to calculate time.
+        if (abs(velocity) < 0.1) {
+            // Same as the condition below. Must start the movement earlier than HorizonMilliseconds
+            val suggestedDuration = HorizonMilliseconds
+            require(T >= suggestedDuration) {
+                "Unable to generate a swipe gesture between $start and $end with " +
+                    "duration $durationMillis that ends with velocity of $velocity px/s, without " +
+                    "going outside of the range [start..end]. " +
+                    "Suggested fixes: " +
+                    "1. set duration to $suggestedDuration or higher; "
+            }
+            val positionAtHorizonStart = (end - velocity * HorizonMilliseconds).toFloat()
+            return { t: Long ->
+                when {
+                    // t == 0 condition is needed in case T <= HorizonMilliseconds
+                    t == 0L -> start
+                    t < (T - HorizonMilliseconds) ->
+                        start + (positionAtHorizonStart - start) / (T - HorizonMilliseconds) * t
+                    else ->
+                        end - (T - t) * velocity.toFloat()
+                }
+            }
+        }
+
+        if (T <= HorizonMilliseconds) {
+            val result = searchPath(start, end, T, velocity.toFloat() * 1000)
+            if (result != null) {
+                val (d, x) = result
+                return { t: Long ->
+                    computePosition(start, end, T, d, x, t)
+                }
+            }
+        }
+
+        if (T > HorizonMilliseconds) {
+            // Best case: just need to gradually move up to the correct place
+            val xHorizon = (end - HorizonMilliseconds * velocity).toFloat()
+            if (min(start, end) < xHorizon && xHorizon < max(start, end)) {
+                // Then it's within the start and end positions, so we are OK
+                return { t: Long ->
+                    when {
+                        t < T - HorizonMilliseconds ->
+                            start + (xHorizon - start) / (T - HorizonMilliseconds) * t
+                        else ->
+                            xHorizon + (end - xHorizon) / (HorizonMilliseconds) *
+                                (t - (T - HorizonMilliseconds))
+                    }
+                }
+            }
+            // Move the 'start' coordinate to a time of 'T-HorizonMilliseconds'. Therefore, we will
+            // have 3 lines - flat line until 'T-HorizonMilliseconds', and then two lines as in
+            // previous solutions.
+            val result = searchPath(start, end, HorizonMilliseconds, velocity.toFloat() * 1000)
+            if (result != null) {
+                val (d, x) = result
+                return { t: Long ->
+                    when {
+                        t < T - HorizonMilliseconds -> start
+                        else ->
+                            computePosition(start, end, HorizonMilliseconds, d, x,
+                                t - (T - HorizonMilliseconds))
+                    }
+                }
+            }
+        }
+
+        throw IllegalArgumentException(
+            "Could not find a path for start=$start end=$end velocity=$velocity T=$T." +
+            "Try setting velocity=${(end - start) / T} or T=${(end - start) / velocity}." +
+            "Typically, T should be $HorizonMilliseconds ms or longer.")
     }
 
     companion object {
@@ -173,7 +239,7 @@ internal class VelocityPathFinder(
             // d <= HorizonMilliseconds, so we have to pick `T = d`. But, when d is very small,
             // this leads to a duration too short to even get a velocity.
             // Check and throw if this is the case.
-            val minimumDuration = ceil(2.5f * eventPeriodMillis).roundToLong()
+            val minimumDuration = ceil(3.5f * eventPeriodMillis).roundToLong()
             require(floor(d).roundToLong() >= minimumDuration) {
                 // Nope. This won't work.
                 val suggestedVelocity = (2f / minimumDuration) * distance * 1000
@@ -188,5 +254,64 @@ internal class VelocityPathFinder(
             }
             return floor(d).roundToLong()
         }
+    }
+
+    /**
+     * Compute the position at time t when the path is piecewise defined as 2 lines:
+     * one from (0, start) -> (d, x)
+     * and another from (d, x) -> (T, end)
+     */
+    private fun computePosition(start: Float, end: Float, T: Long, d: Long, x: Float, t: Long):
+        Float {
+        require(t in 0L..T) {
+            "You must provide 0 <= t <= $T, but received t=$t instead"
+        }
+        if (t < d) {
+            return start + (x - start) / d * t
+        }
+        return end - (end - x) / (T - d) * (T - t)
+    }
+
+    /**
+     * Inject a 2-line path into VelocityTracker and find the resulting velocity.
+     */
+    private fun calculateVelocityFullPath(start: Float, end: Float, T: Long, d: Long, x: Float):
+        Float {
+        val vt = VelocityTracker()
+
+        vt.addPosition(0, Offset(start, 0f))
+        var t = eventPeriodMillis
+        while (t < T) {
+            val position = computePosition(start, end, T, d, x, t)
+            vt.addPosition(t, Offset(position, 0f))
+            t += eventPeriodMillis
+        }
+        vt.addPosition(T, Offset(end, 0f))
+
+        return vt.calculateVelocity().x
+    }
+
+    private data class FittingResult(val d: Long, val x: Float)
+
+    /**
+     * Numerically find a path that best provides a motion that results in the velocity of
+     * targetVelocity.
+     */
+    private fun searchPath(start: Float, end: Float, T: Long, targetVelocity: Float):
+        FittingResult? {
+        val TOLERANCE = 1f
+        val step = (max(end, start) - min(end, start)) / 1000
+        for (d in 1 until T) {
+            var x = min(start, end)
+            while (x < max(start, end)) {
+                val velocity = calculateVelocityFullPath(start, end, T, d, x)
+                val diff = abs(targetVelocity - velocity)
+                if (diff < TOLERANCE) {
+                    return FittingResult(d, x)
+                }
+                x += step
+            }
+        }
+        return null
     }
 }
