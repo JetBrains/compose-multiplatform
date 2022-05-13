@@ -50,6 +50,7 @@ import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.TestExtension
 import com.android.build.gradle.TestPlugin
 import com.android.build.gradle.TestedExtension
+import com.android.build.gradle.internal.lint.AndroidLintTask
 import com.android.build.gradle.internal.tasks.AnalyticsRecordingTask
 import com.android.build.gradle.internal.tasks.ListingFileRedirectTask
 import com.android.build.gradle.tasks.BundleAar
@@ -349,6 +350,17 @@ class AndroidXImplPlugin : Plugin<Project> {
                         "top-level source directory for libraries, use \"java\" instead: " +
                         mainKotlinSrcDir.path
                 )
+            }
+        }
+
+        // Remove the lint and column attributes from generated lint baseline XML.
+        project.tasks.withType(AndroidLintTask::class.java).configureEach { task ->
+            if (task.name.startsWith("updateLintBaseline")) {
+                task.doLast {
+                    task.outputs.files.find { it.name == "lint-baseline.xml" }?.let { file ->
+                        file.writeText(removeLineAndColumnAttributes(file.readText()))
+                    }
+                }
             }
         }
 
@@ -1092,6 +1104,14 @@ fun AndroidXExtension.validateMavenVersion() {
  */
 fun removeTargetSdkVersion(manifest: String): String = manifest.replace(
     "\\s*android:targetSdkVersion=\".+?\"".toRegex(),
+    ""
+)
+
+/**
+ * Removes the line and column attributes from the [baseline].
+ */
+fun removeLineAndColumnAttributes(baseline: String): String = baseline.replace(
+    "\\s*(line|column)=\"\\d+?\"".toRegex(),
     ""
 )
 
