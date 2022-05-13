@@ -1,26 +1,42 @@
 # Baseline profile rules for androidx.compose.material
 # =============================================
+
+HSPLandroidx/compose/material/CardKt;->**(**)**
 HSPLandroidx/compose/material/Colors;->**(**)**
+HSPLandroidx/compose/material/ColorsKt**->**(**)**
+HSPLandroidx/compose/material/CheckDrawingCache;->**(**)**
+HSPLandroidx/compose/material/CheckboxDefaults;->**(**)**
+HSPLandroidx/compose/material/DefaultCheckboxColors;->**(**)**
+HSPLandroidx/compose/material/CheckboxKt**->**(**)**
 HSPLandroidx/compose/material/ButtonKt**->**(**)**
 HSPLandroidx/compose/material/AppBarKt**->**(**)**
-HPLandroidx/compose/material/ProgressIndicatorKt;->**(**)**
-HPLandroidx/compose/material/IconKt;->**(**)**
-HSPLandroidx/compose/material/ContentAlpha;->**(**)**
+HSPLandroidx/compose/material/ProgressIndicatorKt;->**(**)**
+HSPLandroidx/compose/material/IconKt;->**(**)**
+HSPLandroidx/compose/material/ContentAlpha**->**(**)**
+HSPLandroidx/compose/material/ContentColorKt**->**(**)**
 HSPLandroidx/compose/material/ComposableSingletons$**->**(**)**
+HSPLandroidx/compose/material/DefaultElevationOverlay;->**(**)**
+HSPLandroidx/compose/material/ElevationOverlayKt**->**(**)**
 HSPLandroidx/compose/material/DrawerKt;->**(**)**
 HSPLandroidx/compose/material/DrawerState;->**(**)**
 HSPLandroidx/compose/material/FadeInFadeOutState;->**(**)**
 HSPLandroidx/compose/material/FabPosition;->**(**)**
 HSPLandroidx/compose/material/FloatingActionButtonKt**->**(**)**
 HSPLandroidx/compose/material/MaterialTheme;->**(**)**
+HSPLandroidx/compose/material/MinimumTouchTargetModifier;->**(**)**
 HSPLandroidx/compose/material/MaterialTextSelectionColorsKt;->**(**)**
 HSPLandroidx/compose/material/MaterialRippleTheme;->**(**)**
 HSPLandroidx/compose/material/ScaffoldKt**->**(**)**
+HSPLandroidx/compose/material/Shapes**->**(**)**
 HSPLandroidx/compose/material/SnackbarHostKt**->**(**)**
 HSPLandroidx/compose/material/SurfaceKt**->**(**)**
 HSPLandroidx/compose/material/SwipeableKt**->**(**)**
 HSPLandroidx/compose/material/SwipeableState**->**(**)**
+HSPLandroidx/compose/material/SwitchDefaults;->**(**)**
 HSPLandroidx/compose/material/TextKt**->**(**)**
+HSPLandroidx/compose/material/TouchTargetKt**->**(**)**
 HSPLandroidx/compose/material/Typography;->**(**)**
-# Prioritize only the top level classes for material. (Notably, this ignores icons)
+
+# Prioritize only the top level classes for material. Notably, this ignores icons
+
 Landroidx/compose/material/*;
