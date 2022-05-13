@@ -64,49 +64,49 @@ import androidx.compose.ui.unit.sp
  * No action required if it's modified.
  */
 
-private object TextSnippet1 {
+private object SimpleTextSnippet {
     @Composable
     fun SimpleText() {
         Text("Hello World")
     }
 }
 
-private object TextSnippet2 {
+private object StringResourceSnippet {
     @Composable
     fun StringResourceText() {
         Text(stringResource(R.string.hello_world))
     }
 }
 
-private object TextSnippet3 {
+private object TextColorSnippet {
     @Composable
     fun BlueText() {
         Text("Hello World", color = Color.Blue)
     }
 }
 
-private object TextSnippet4 {
+private object TextSizeSnippet {
     @Composable
     fun BigText() {
         Text("Hello World", fontSize = 30.sp)
     }
 }
 
-private object TextSnippet5 {
+private object TextItalicSnippet {
     @Composable
     fun ItalicText() {
         Text("Hello World", fontStyle = FontStyle.Italic)
     }
 }
 
-private object TextSnippet6 {
+private object TextBoldSnippet {
     @Composable
     fun BoldText() {
         Text("Hello World", fontWeight = FontWeight.Bold)
     }
 }
 
-private object TextSnippet7 {
+private object TextAlignmentSnippet {
     @Preview(showBackground = true)
     @Composable
     fun CenterText() {
@@ -117,7 +117,7 @@ private object TextSnippet7 {
     }
 }
 
-private object TextSnippet8 {
+private object TextMultipleFontsSnippet {
     @Composable
     fun DifferentFonts() {
         Column {
@@ -128,7 +128,7 @@ private object TextSnippet8 {
 }
 
 @Composable
-private fun TextSnippet9() {
+private fun TextDefineFontFamilySnippet() {
     val firaSansFamily = FontFamily(
         Font(R.font.firasans_light, FontWeight.Light),
         Font(R.font.firasans_regular, FontWeight.Normal),
@@ -140,7 +140,7 @@ private fun TextSnippet9() {
 
 /* NOTE:
  * Snippet in docs page simplifies the arguments, using "..." for everything before
- * the font values. If code in TextSnippet10 changes, make the corresponding change
+ * the font values. If code in TextFontWeightSnippet changes, make the corresponding change
  * to this code, which is in the doc:
 Column {
     Text(..., fontFamily = firaSansFamily, fontWeight = FontWeight.Light)
@@ -155,7 +155,7 @@ Column {
  *
  */
 @Composable
-private fun TextSnippet10() {
+private fun TextFontWeightSnippet() {
     Column {
         Text(text = "test", fontFamily = firaSansFamily, fontWeight = FontWeight.Light)
         Text(text = "test", fontFamily = firaSansFamily, fontWeight = FontWeight.Normal)
@@ -168,7 +168,7 @@ private fun TextSnippet10() {
     }
 }
 
-private object TextSnippet11 {
+private object TextMultipleStylesSnippet {
     @Composable
     fun MultipleStylesInText() {
         Text(
@@ -187,7 +187,7 @@ private object TextSnippet11 {
     }
 }
 
-private object TextSnippet12 {
+private object TextParagraphStyleSnippet {
     @Composable
     fun ParagraphStyle() {
         Text(
@@ -211,21 +211,21 @@ private object TextSnippet12 {
     }
 }
 
-private object TextSnippet13 {
+private object TextMaxLinesSnippet {
     @Composable
     fun LongText() {
         Text("hello ".repeat(50), maxLines = 2)
     }
 }
 
-private object TextSnippet14 {
+private object TextOverflowSnippet {
     @Composable
     fun OverflowedText() {
         Text("Hello Compose ".repeat(50), maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
 }
 
-private object TextSnippet15 {
+private object TextSelectableSnippet {
     @Composable
     fun SelectableText() {
         SelectionContainer {
@@ -234,7 +234,7 @@ private object TextSnippet15 {
     }
 }
 
-private object TextSnippet16 {
+private object TextPartiallySelectableSnippet {
     @Composable
     fun PartiallySelectableText() {
         SelectionContainer {
@@ -253,7 +253,7 @@ private object TextSnippet16 {
     }
 }
 
-private object TextSnippet17 {
+private object TextClickableSnippet {
     @Composable
     fun SimpleClickableText() {
         ClickableText(
@@ -265,7 +265,7 @@ private object TextSnippet17 {
     }
 }
 
-private object TextSnippet18 {
+private object TextClickableAnnotatedSnippet {
     @Composable
     fun AnnotatedClickableText() {
         val annotatedText = buildAnnotatedString {
@@ -307,7 +307,7 @@ private object TextSnippet18 {
     }
 }
 
-private object TextSnippet19 {
+private object TextTextFieldSnippet {
     @Composable
     fun SimpleFilledTextFieldSample() {
         var text by remember { mutableStateOf("Hello") }
@@ -320,7 +320,7 @@ private object TextSnippet19 {
     }
 }
 
-private object TextSnippet20 {
+private object TextOutlinedTextFieldSnippet {
     @Composable
     fun SimpleOutlinedTextFieldSample() {
         var text by remember { mutableStateOf("") }
@@ -333,7 +333,7 @@ private object TextSnippet20 {
     }
 }
 
-private object TextSnippet21 {
+private object TextStylingTextFieldSnippet {
     @Composable
     fun StyledTextField() {
         var value by remember { mutableStateOf("Hello\nWorld\nInvisible") }
@@ -349,7 +349,7 @@ private object TextSnippet21 {
     }
 }
 
-private object TextSnippet22 {
+private object TextFormattingTextFieldSnippet {
     @Composable
     fun PasswordTextField() {
         var password by rememberSaveable { mutableStateOf("") }
@@ -360,6 +360,19 @@ private object TextSnippet22 {
             label = { Text("Enter password") },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        )
+    }
+}
+
+private object TextCleanInputSnippet {
+    @Composable
+    fun NoLeadingZeroes() {
+        var input by rememberSaveable { mutableStateOf("") }
+        TextField(
+            value = input,
+            onValueChange = { newText ->
+                input = newText.trimStart { it == '0' }
+            }
         )
     }
 }
