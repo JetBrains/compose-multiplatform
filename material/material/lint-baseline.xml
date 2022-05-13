@@ -7,9 +7,7 @@
         errorLine1="            .captureToImage()"
         errorLine2="             ~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/material/BadgeTest.kt"
-            line="124"
-            column="14"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/material/BadgeTest.kt"/>
     </issue>
 
 </issues>
