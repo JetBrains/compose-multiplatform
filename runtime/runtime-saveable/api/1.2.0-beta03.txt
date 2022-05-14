@@ -1,0 +1,58 @@
+// Signature format: 4.0
+package androidx.compose.runtime.saveable {
+
+  public final class ListSaverKt {
+    method public static <Original, Saveable> androidx.compose.runtime.saveable.Saver<Original,java.lang.Object> listSaver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.saveable.SaverScope,? super Original,? extends java.util.List<? extends Saveable>> save, kotlin.jvm.functions.Function1<? super java.util.List<? extends Saveable>,? extends Original> restore);
+  }
+
+  public final class MapSaverKt {
+    method public static <T> androidx.compose.runtime.saveable.Saver<T,java.lang.Object> mapSaver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.saveable.SaverScope,? super T,? extends java.util.Map<java.lang.String,?>> save, kotlin.jvm.functions.Function1<? super java.util.Map<java.lang.String,?>,? extends T> restore);
+  }
+
+  public final class RememberSaveableKt {
+    method @androidx.compose.runtime.Composable public static <T> T rememberSaveable(Object![]? inputs, optional androidx.compose.runtime.saveable.Saver<T,?> saver, optional String? key, kotlin.jvm.functions.Function0<? extends T> init);
+    method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.MutableState<T> rememberSaveable(Object![]? inputs, androidx.compose.runtime.saveable.Saver<T,?> stateSaver, optional String? key, kotlin.jvm.functions.Function0<? extends androidx.compose.runtime.MutableState<T>> init);
+  }
+
+  public interface SaveableStateHolder {
+    method @androidx.compose.runtime.Composable public void SaveableStateProvider(Object key, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method public void removeState(Object key);
+  }
+
+  public final class SaveableStateHolderKt {
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.saveable.SaveableStateHolder rememberSaveableStateHolder();
+  }
+
+  public interface SaveableStateRegistry {
+    method public boolean canBeSaved(Object value);
+    method public Object? consumeRestored(String key);
+    method public java.util.Map<java.lang.String,java.util.List<java.lang.Object>> performSave();
+    method public androidx.compose.runtime.saveable.SaveableStateRegistry.Entry registerProvider(String key, kotlin.jvm.functions.Function0<?> valueProvider);
+  }
+
+  public static interface SaveableStateRegistry.Entry {
+    method public void unregister();
+  }
+
+  public final class SaveableStateRegistryKt {
+    method public static androidx.compose.runtime.saveable.SaveableStateRegistry SaveableStateRegistry(java.util.Map<java.lang.String,? extends java.util.List<?>>? restoredValues, kotlin.jvm.functions.Function1<java.lang.Object,java.lang.Boolean> canBeSaved);
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.runtime.saveable.SaveableStateRegistry> getLocalSaveableStateRegistry();
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.runtime.saveable.SaveableStateRegistry> LocalSaveableStateRegistry;
+  }
+
+  public interface Saver<Original, Saveable> {
+    method public Original? restore(Saveable value);
+    method public Saveable? save(androidx.compose.runtime.saveable.SaverScope, Original? value);
+  }
+
+  public final class SaverKt {
+    method public static <Original, Saveable> androidx.compose.runtime.saveable.Saver<Original,Saveable> Saver(kotlin.jvm.functions.Function2<? super androidx.compose.runtime.saveable.SaverScope,? super Original,? extends Saveable> save, kotlin.jvm.functions.Function1<? super Saveable,? extends Original> restore);
+    method public static <T> androidx.compose.runtime.saveable.Saver<T,java.lang.Object> autoSaver();
+  }
+
+  public fun interface SaverScope {
+    method public boolean canBeSaved(Object value);
+  }
+
+}
+
