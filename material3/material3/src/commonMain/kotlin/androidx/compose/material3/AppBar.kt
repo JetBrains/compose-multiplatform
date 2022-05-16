@@ -66,6 +66,7 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
@@ -1002,16 +1003,22 @@ private fun TopAppBarLayout(
         modifier = modifier
     ) { measurables, constraints ->
         val navigationIconPlaceable =
-            measurables.first { it.layoutId == "navigationIcon" }.measure(constraints)
+            measurables.first { it.layoutId == "navigationIcon" }
+                .measure(constraints.copy(minWidth = 0))
         val actionIconsPlaceable =
-            measurables.first { it.layoutId == "actionIcons" }.measure(constraints)
+            measurables.first { it.layoutId == "actionIcons" }
+                .measure(constraints.copy(minWidth = 0))
 
-        val maxTitleWidth =
-            constraints.maxWidth - navigationIconPlaceable.width - actionIconsPlaceable.width
+        val maxTitleWidth = if (constraints.maxWidth == Constraints.Infinity) {
+            constraints.maxWidth
+        } else {
+            (constraints.maxWidth - navigationIconPlaceable.width - actionIconsPlaceable.width)
+                .coerceAtLeast(0)
+        }
         val titlePlaceable =
-            measurables
-                .first { it.layoutId == "title" }
-                .measure(constraints.copy(maxWidth = maxTitleWidth))
+            measurables.first { it.layoutId == "title" }
+                .measure(constraints.copy(minWidth = 0, maxWidth = maxTitleWidth))
+
         // Locate the title's baseline.
         val titleBaseline =
             if (titlePlaceable[LastBaseline] != AlignmentLine.Unspecified) {

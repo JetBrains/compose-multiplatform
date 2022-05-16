@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
@@ -62,6 +63,7 @@ import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
@@ -341,6 +343,29 @@ class AppBarTest {
         }
         assertThat(textStyle).isNotNull()
         assertThat(textStyle).isEqualTo(expectedTextStyle)
+    }
+
+    @Test
+    fun centerAlignedTopAppBar_measureWithNonZeroMinWidth() {
+        var appBarSize = IntSize.Zero
+        rule.setMaterialContent(lightColorScheme()) {
+            CenterAlignedTopAppBar(
+                modifier = Modifier.layout { measurable, constraints ->
+                    val placeable = measurable.measure(
+                        constraints.copy(minWidth = constraints.maxWidth)
+                    )
+                    appBarSize = IntSize(placeable.width, placeable.height)
+                    layout(placeable.width, placeable.height) {
+                        placeable.place(0, 0)
+                    }
+                },
+                title = {
+                    Text("Title")
+                }
+            )
+        }
+
+        assertThat(appBarSize).isNotEqualTo(IntSize.Zero)
     }
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
