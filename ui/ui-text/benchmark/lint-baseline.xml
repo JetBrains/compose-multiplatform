@@ -7,9 +7,7 @@
         errorLine1="            val freeCaches = Canvas::class.java.getDeclaredMethod(&quot;freeTextLayoutCaches&quot;)"
         errorLine2="                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/androidx/compose/ui/text/benchmark/TextBenchmarkTestRule.kt"
-            line="79"
-            column="30"/>
+            file="src/main/java/androidx/compose/ui/text/benchmark/TextBenchmarkTestRule.kt"/>
     </issue>
 
     <issue
@@ -18,9 +16,7 @@
         errorLine1="            freeCaches.invoke(null)"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/androidx/compose/ui/text/benchmark/TextBenchmarkTestRule.kt"
-            line="81"
-            column="13"/>
+            file="src/main/java/androidx/compose/ui/text/benchmark/TextBenchmarkTestRule.kt"/>
     </issue>
 
 </issues>

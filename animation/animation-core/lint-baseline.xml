@@ -7,9 +7,7 @@
         errorLine1="        testCases.parallelStream().forEach {"
         errorLine2="                  ~~~~~~~~~~~~~~">
         <location
-            file="src/test/java/androidx/compose/animation/core/SpringEstimationTest.kt"
-            line="54"
-            column="19"/>
+            file="src/test/java/androidx/compose/animation/core/SpringEstimationTest.kt"/>
     </issue>
 
     <issue
@@ -18,9 +16,7 @@
         errorLine1="        testCases.parallelStream().forEach {"
         errorLine2="                                   ~~~~~~~">
         <location
-            file="src/test/java/androidx/compose/animation/core/SpringEstimationTest.kt"
-            line="54"
-            column="36"/>
+            file="src/test/java/androidx/compose/animation/core/SpringEstimationTest.kt"/>
     </issue>
 
 </issues>
