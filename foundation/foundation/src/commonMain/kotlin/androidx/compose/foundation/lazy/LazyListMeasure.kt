@@ -207,7 +207,9 @@ internal fun measureLazyList(
         if (beforeContentPadding > 0) {
             for (i in visibleItems.indices) {
                 val size = visibleItems[i].sizeWithSpacings
-                if (size <= currentFirstItemScrollOffset && i != visibleItems.lastIndex) {
+                if (currentFirstItemScrollOffset != 0 && size <= currentFirstItemScrollOffset &&
+                    i != visibleItems.lastIndex
+                ) {
                     currentFirstItemScrollOffset -= size
                     firstItem = visibleItems[i + 1]
                 } else {

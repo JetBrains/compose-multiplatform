@@ -41,6 +41,9 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
@@ -55,6 +58,7 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -883,6 +887,82 @@ class LazyGridTest(
         rule.onNodeWithTag("5").assertIsDisplayed()
         rule.onNodeWithTag("6").assertDoesNotExist()
         rule.onNodeWithTag("7").assertDoesNotExist()
+    }
+
+    @Test
+    fun withZeroSizedFirstItem() {
+        var scrollConsumedAccumulator = Offset.Zero
+        val collectingDataConnection = object : NestedScrollConnection {
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                scrollConsumedAccumulator += consumed
+                return Offset.Zero
+            }
+        }
+
+        rule.setContent {
+            val state = rememberLazyGridState()
+            LazyGrid(
+                cells = 1,
+                state = state,
+                modifier = Modifier
+                    .testTag("mainList")
+                    .nestedScroll(connection = collectingDataConnection),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(all = 10.dp)
+            ) {
+                item {
+                    Spacer(modifier = Modifier.size(size = 0.dp))
+                }
+                items((0..8).map { it.toString() }) {
+                    Box(Modifier.testTag(it)) {
+                        BasicText(text = it.toString())
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("mainList").performTouchInput {
+            swipeDown()
+        }
+
+        rule.runOnIdle {
+            assertThat(scrollConsumedAccumulator).isEqualTo(Offset.Zero)
+        }
+    }
+
+    @Test
+    fun withZeroSizedFirstItem_shouldKeepItemOnSizeChange() {
+        val firstItemSize = mutableStateOf(0.dp)
+
+        rule.setContent {
+            val state = rememberLazyGridState()
+            LazyGrid(
+                cells = 1,
+                state = state,
+                modifier = Modifier
+                    .testTag("mainList"),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(all = 10.dp)
+            ) {
+                item {
+                    Spacer(modifier = Modifier
+                        .testTag("firstItem")
+                        .size(size = firstItemSize.value)
+                        .background(Color.Black))
+                }
+                items((0..8).map { it.toString() }) {
+                    Box(Modifier.testTag(it)) {
+                        BasicText(text = it.toString())
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("firstItem").assertIsNotDisplayed()
+        firstItemSize.value = 20.dp
+        rule.onNodeWithTag("firstItem").assertIsDisplayed()
     }
 
     @Test

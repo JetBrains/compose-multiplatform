@@ -199,7 +199,8 @@ internal fun measureLazyGrid(
         if (beforeContentPadding > 0) {
             for (i in visibleLines.indices) {
                 val size = visibleLines[i].mainAxisSizeWithSpacings
-                if (size <= currentFirstLineScrollOffset && i != visibleLines.lastIndex) {
+                if (currentFirstLineScrollOffset != 0 && size <= currentFirstLineScrollOffset &&
+                    i != visibleLines.lastIndex) {
                     currentFirstLineScrollOffset -= size
                     firstLine = visibleLines[i + 1]
                 } else {
