@@ -16,16 +16,21 @@
 
 package androidx.compose.integration.demos
 
-import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.integration.demos.DemoSettingsActivity.SettingsFragment
-import androidx.preference.CheckBoxPreference
+import androidx.compose.integration.demos.settings.DecorFitsSystemWindowsSetting
+import androidx.compose.integration.demos.settings.DynamicThemeSetting
+import androidx.compose.integration.demos.settings.SoftInputModeSetting
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceManager
 import androidx.preference.plusAssign
+
+private val allSettings = listOf(
+    DynamicThemeSetting,
+    SoftInputModeSetting,
+    DecorFitsSystemWindowsSetting,
+)
 
 /**
  * Shell [AppCompatActivity] around [SettingsFragment], as we need a FragmentActivity subclass
@@ -50,22 +55,11 @@ class DemoSettingsActivity : AppCompatActivity() {
                 screen += this
             }
 
-            general += CheckBoxPreference(context).apply {
-                title = "Dynamic theming (android S+)"
-                isEnabled = IsDynamicThemingAvailable
-                key = IsDynamicThemeOnKey
-                setDefaultValue(isDynamicThemeSettingOn(context))
+            allSettings.forEach {
+                general += it.createPreference(context)
             }
+
             preferenceScreen = screen
         }
     }
 }
-
-internal fun isDynamicThemeSettingOn(context: Context): Boolean {
-    return PreferenceManager
-        .getDefaultSharedPreferences(context)
-        .getBoolean(IsDynamicThemeOnKey, IsDynamicThemingAvailable)
-}
-
-private const val IsDynamicThemeOnKey = "material3_isDynamicThemeOn"
-internal val IsDynamicThemingAvailable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S

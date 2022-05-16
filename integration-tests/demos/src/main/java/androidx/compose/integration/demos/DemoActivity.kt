@@ -27,17 +27,20 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.integration.demos.common.ActivityDemo
 import androidx.compose.integration.demos.common.Demo
 import androidx.compose.integration.demos.common.DemoCategory
+import androidx.compose.integration.demos.settings.DecorFitsSystemWindowsEffect
+import androidx.compose.integration.demos.settings.DecorFitsSystemWindowsSetting
+import androidx.compose.integration.demos.settings.DynamicThemeSetting
+import androidx.compose.integration.demos.settings.SoftInputModeEffect
+import androidx.compose.integration.demos.settings.SoftInputModeSetting
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -50,8 +53,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 
 /**
  * Main [Activity] containing all Compose related demos.
@@ -77,19 +78,11 @@ class DemoActivity : FragmentActivity() {
             ) {
                 Navigator(AllDemosCategory, onBackPressedDispatcher, activityStarter)
             }
-            val isDynamicThemeOn = remember { mutableStateOf(IsDynamicThemingAvailable) }
-            DisposableEffect(lifecycle) {
-                val obs = LifecycleEventObserver { _, event ->
-                    if (event == Lifecycle.Event.ON_RESUME) {
-                        isDynamicThemeOn.value = isDynamicThemeSettingOn(applicationContext)
-                    }
-                }
-                lifecycle.addObserver(obs)
-                onDispose {
-                    lifecycle.removeObserver(obs)
-                }
-            }
-            DemoTheme(isDynamicThemeOn.value, window) {
+
+            SoftInputModeEffect(SoftInputModeSetting.asState().value, window)
+            DecorFitsSystemWindowsEffect(DecorFitsSystemWindowsSetting.asState().value, window)
+
+            DemoTheme(DynamicThemeSetting.asState().value, window) {
                 val filteringMode = rememberSaveable(
                     saver = FilterMode.Saver(onBackPressedDispatcher)
                 ) {
