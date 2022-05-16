@@ -4,6 +4,7 @@ package androidx.compose.ui.test {
   public final class ActionsKt {
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performClick(androidx.compose.ui.test.SemanticsNodeInteraction);
     method @Deprecated public static androidx.compose.ui.test.SemanticsNodeInteraction performGesture(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.GestureScope,kotlin.Unit> block);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static androidx.compose.ui.test.SemanticsNodeInteraction performKeyInput(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.KeyInjectionScope,kotlin.Unit> block);
     method @androidx.compose.ui.test.ExperimentalTestApi public static androidx.compose.ui.test.SemanticsNodeInteraction performMouseInput(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.MouseInjectionScope,kotlin.Unit> block);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performMultiModalInput(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.MultiModalInjectionScope,kotlin.Unit> block);
     method @androidx.compose.ui.test.ExperimentalTestApi public static androidx.compose.ui.test.SemanticsNodeInteraction performRotaryScrollInput(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.RotaryInjectionScope,kotlin.Unit> block);
@@ -247,6 +248,19 @@ package androidx.compose.ui.test {
   @kotlin.RequiresOptIn(message="This is internal API for Compose modules that may change frequently and without warning.") public @interface InternalTestApi {
   }
 
+  @androidx.compose.ui.test.ExperimentalTestApi public interface KeyInjectionScope extends androidx.compose.ui.test.InjectionScope {
+    method public default long getDefaultPressDuration();
+    method public boolean isKeyDown(long key);
+    method public void keyDown(long key);
+    method public void keyUp(long key);
+    property public default long defaultPressDuration;
+  }
+
+  public final class KeyInjectionScopeKt {
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void pressKey(androidx.compose.ui.test.KeyInjectionScope, long key, optional long pressDuration);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void pressKeys(androidx.compose.ui.test.KeyInjectionScope, java.util.List<androidx.compose.ui.input.key.Key> keys, optional long pressDuration, optional long interPressDuration);
+  }
+
   public final class KeyInputHelpersKt {
     method public static boolean performKeyPress(androidx.compose.ui.test.SemanticsNodeInteraction, android.view.KeyEvent keyEvent);
   }
@@ -307,6 +321,7 @@ package androidx.compose.ui.test {
   }
 
   public sealed interface MultiModalInjectionScope extends androidx.compose.ui.test.InjectionScope {
+    method @androidx.compose.ui.test.ExperimentalTestApi public void key(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.KeyInjectionScope,kotlin.Unit> block);
     method @androidx.compose.ui.test.ExperimentalTestApi public void mouse(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.MouseInjectionScope,kotlin.Unit> block);
     method @androidx.compose.ui.test.ExperimentalTestApi public void rotary(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.RotaryInjectionScope,kotlin.Unit> block);
     method public void touch(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.TouchInjectionScope,kotlin.Unit> block);

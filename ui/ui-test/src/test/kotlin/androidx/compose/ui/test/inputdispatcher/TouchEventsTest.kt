@@ -38,7 +38,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
 /**
- * Tests if [AndroidInputDispatcher.enqueueTouchDown] works
+ * Tests if [AndroidInputDispatcher.enqueueTouchDown] and friends work.
  */
 @RunWith(AndroidJUnit4::class)
 @Config(minSdk = RobolectricMinSdk)

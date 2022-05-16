@@ -19,6 +19,7 @@
 package androidx.compose.ui.test
 
 import androidx.compose.ui.InternalComposeUiApi
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.TestPointerInputEventData
 import androidx.compose.ui.geometry.Offset
@@ -98,6 +99,12 @@ internal class DesktopInputDispatcher(
     override fun MouseInputState.enqueueScroll(delta: Float, scrollWheel: ScrollWheel) {
         TODO("Not yet implemented")
     }
+
+    // TODO(b/233199964): Implement key injection for desktop
+    override fun KeyInputState.enqueueDown(key: Key) = TODO("Not yet implemented")
+
+    // TODO(b/233199964): Implement key injection for desktop
+    override fun KeyInputState.enqueueUp(key: Key) = TODO("Not yet implemented")
 
     override fun RotaryInputState.enqueueRotaryScrollHorizontally(horizontalScrollPixels: Float) {
         TODO("Not yet implemented")

@@ -235,6 +235,9 @@ package androidx.compose.ui.test {
     property public default int width;
   }
 
+  public final class KeyInjectionScopeKt {
+  }
+
   public final class KeyInputHelpersKt {
     method public static boolean performKeyPress(androidx.compose.ui.test.SemanticsNodeInteraction, android.view.KeyEvent keyEvent);
   }

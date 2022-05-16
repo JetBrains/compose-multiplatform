@@ -28,7 +28,7 @@ import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.MainTestClock
 import androidx.compose.ui.test.TestOwner
 import androidx.compose.ui.test.createTestContext
-import androidx.compose.ui.test.util.MotionEventRecorder
+import androidx.compose.ui.test.util.InputEventRecorder
 import androidx.compose.ui.test.util.assertNoTouchGestureInProgress
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
@@ -39,7 +39,7 @@ import org.junit.After
 @OptIn(InternalTestApi::class)
 open class InputDispatcherTest {
 
-    internal val recorder = MotionEventRecorder()
+    internal val recorder = InputEventRecorder()
 
     private val testOwner: TestOwner = mock {
         val testClock: MainTestClock = mock()
