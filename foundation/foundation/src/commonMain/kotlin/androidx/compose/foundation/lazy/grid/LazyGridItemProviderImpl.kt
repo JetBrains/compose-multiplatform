@@ -30,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.snapshots.Snapshot
 
 @ExperimentalFoundationApi
 @Composable
@@ -38,9 +39,14 @@ internal fun rememberItemProvider(
     content: LazyGridScope.() -> Unit,
 ): LazyGridItemProvider {
     val latestContent = rememberUpdatedState(content)
+    // mutableState + LaunchedEffect below are used instead of derivedStateOf to ensure that update
+    // of derivedState in return expr will only happen after the state value has been changed.
     val nearestItemsRangeState = remember(state) {
         mutableStateOf(
-            calculateNearestItemsRange(state.firstVisibleItemIndexNonObservable.value)
+            Snapshot.withoutReadObservation {
+                // State read is observed in composition, causing it to recompose 1 additional time.
+                calculateNearestItemsRange(state.firstVisibleItemIndex)
+            }
         )
     }
     LaunchedEffect(nearestItemsRangeState) {
@@ -49,6 +55,7 @@ internal fun rememberItemProvider(
             // recreated when the state is updated with a new range.
             .collect { nearestItemsRangeState.value = it }
     }
+
     return remember(nearestItemsRangeState) {
         LazyGridItemProviderImpl(
             derivedStateOf {

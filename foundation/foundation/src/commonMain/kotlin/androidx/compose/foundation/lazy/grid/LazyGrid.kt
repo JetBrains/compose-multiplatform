@@ -34,6 +34,7 @@ import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.MeasureResult
@@ -293,16 +294,19 @@ private fun rememberLazyGridMeasurePolicy(
 
         val firstVisibleLineIndex: LineIndex
         val firstVisibleLineScrollOffset: Int
-        if (state.firstVisibleItemIndexNonObservable.value < itemsCount || itemsCount <= 0) {
-            firstVisibleLineIndex = spanLayoutProvider.getLineIndexOfItem(
-                state.firstVisibleItemIndexNonObservable.value
-            )
-            firstVisibleLineScrollOffset = state.firstVisibleItemScrollOffsetNonObservable
-        } else {
-            // the data set has been updated and now we have less items that we were
-            // scrolled to before
-            firstVisibleLineIndex = spanLayoutProvider.getLineIndexOfItem(itemsCount - 1)
-            firstVisibleLineScrollOffset = 0
+
+        Snapshot.withoutReadObservation {
+            if (state.firstVisibleItemIndex < itemsCount || itemsCount <= 0) {
+                firstVisibleLineIndex = spanLayoutProvider.getLineIndexOfItem(
+                    state.firstVisibleItemIndex
+                )
+                firstVisibleLineScrollOffset = state.firstVisibleItemScrollOffset
+            } else {
+                // the data set has been updated and now we have less items that we were
+                // scrolled to before
+                firstVisibleLineIndex = spanLayoutProvider.getLineIndexOfItem(itemsCount - 1)
+                firstVisibleLineScrollOffset = 0
+            }
         }
         measureLazyGrid(
             itemsCount = itemsCount,

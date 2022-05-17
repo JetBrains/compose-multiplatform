@@ -102,7 +102,7 @@ class LazyListState constructor(
      * derived state in order to only have recompositions when the derived value changes:
      * @sample androidx.compose.foundation.samples.UsingListScrollPositionInCompositionSample
      */
-    val firstVisibleItemIndex: Int get() = scrollPosition.observableIndex
+    val firstVisibleItemIndex: Int get() = scrollPosition.index.value
 
     /**
      * The scroll offset of the first visible item. Scrolling forward is positive - i.e., the
@@ -112,7 +112,7 @@ class LazyListState constructor(
      * be recomposed on every scroll causing potential performance issues.
      * @see firstVisibleItemIndex for samples with the recommended usage patterns.
      */
-    val firstVisibleItemScrollOffset: Int get() = scrollPosition.observableScrollOffset
+    val firstVisibleItemScrollOffset: Int get() = scrollPosition.scrollOffset
 
     /** Backing state for [layoutInfo] */
     private val layoutInfoState = mutableStateOf<LazyListLayoutInfo>(EmptyLazyListLayoutInfo)
@@ -147,16 +147,6 @@ class LazyListState constructor(
      */
     internal var scrollToBeConsumed = 0f
         private set
-
-    /**
-     * The same as [firstVisibleItemIndex] but the read will not trigger remeasure.
-     */
-    internal val firstVisibleItemIndexNonObservable: DataIndex get() = scrollPosition.index
-
-    /**
-     * The same as [firstVisibleItemScrollOffset] but the read will not trigger remeasure.
-     */
-    internal val firstVisibleItemScrollOffsetNonObservable: Int get() = scrollPosition.scrollOffset
 
     /**
      * Needed for [animateScrollToItem].  Updated on every measure.

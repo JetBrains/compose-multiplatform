@@ -100,13 +100,13 @@ class LazyGridState constructor(
      * derived state in order to only have recompositions when the derived value changes:
      * @sample androidx.compose.foundation.samples.UsingGridScrollPositionInCompositionSample
      */
-    val firstVisibleItemIndex: Int get() = scrollPosition.observableIndex
+    val firstVisibleItemIndex: Int get() = scrollPosition.index.value
 
     /**
      * The scroll offset of the first visible item. Scrolling forward is positive - i.e., the
      * amount that the item is offset backwards
      */
-    val firstVisibleItemScrollOffset: Int get() = scrollPosition.observableScrollOffset
+    val firstVisibleItemScrollOffset: Int get() = scrollPosition.scrollOffset
 
     /** Backing state for [layoutInfo] */
     private val layoutInfoState = mutableStateOf<LazyGridLayoutInfo>(EmptyLazyGridLayoutInfo)
@@ -141,21 +141,6 @@ class LazyGridState constructor(
      */
     internal var scrollToBeConsumed = 0f
         private set
-
-    /**
-     * The same as [firstVisibleItemIndex] but the read will not trigger remeasure.
-     */
-    internal val firstVisibleItemIndexNonObservable: ItemIndex get() = scrollPosition.index
-
-    /**
-     * The same as [firstVisibleItemScrollOffset] but the read will not trigger remeasure.
-     */
-    internal val firstVisibleItemScrollOffsetNonObservable: Int get() = scrollPosition.scrollOffset
-
-    /**
-     * Non-observable property with the count of items being visible during the last measure pass.
-     */
-    internal var visibleItemsCount = 0
 
     /**
      * Needed for [animateScrollToItem]. Updated on every measure.
@@ -392,7 +377,6 @@ class LazyGridState constructor(
      *  Updates the state with the new calculated scroll position and consumed scroll.
      */
     internal fun applyMeasureResult(result: LazyGridMeasureResult) {
-        visibleItemsCount = result.visibleItemsInfo.size
         scrollPosition.updateFromMeasureResult(result)
         scrollToBeConsumed -= result.consumedScroll
         layoutInfoState.value = result
