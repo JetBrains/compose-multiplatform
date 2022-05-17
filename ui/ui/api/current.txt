@@ -2559,13 +2559,6 @@ package androidx.compose.ui.platform.accessibility {
 
 }
 
-package androidx.compose.ui.platform.actionmodecallback {
-
-  public final class TextActionModeCallback_androidKt {
-  }
-
-}
-
 package androidx.compose.ui.res {
 
   public final class ColorResources_androidKt {
