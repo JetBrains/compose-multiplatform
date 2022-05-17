@@ -197,3 +197,5 @@ RemovedMethod: androidx.compose.ui.semantics.LiveRegionMode#LiveRegionMode():
     Removed constructor androidx.compose.ui.semantics.LiveRegionMode()
 RemovedMethod: androidx.compose.ui.semantics.Role#Role():
     Removed constructor androidx.compose.ui.semantics.Role()
+RemovedPackage: androidx.compose.ui.platform.actionmodecallback:
+    Removed package androidx.compose.ui.platform.actionmodecallback
