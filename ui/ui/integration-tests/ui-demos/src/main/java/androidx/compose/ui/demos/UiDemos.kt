@@ -35,6 +35,7 @@ import androidx.compose.ui.demos.focus.OneDimensionalFocusSearchDemo
 import androidx.compose.ui.demos.focus.ReuseFocusRequesterDemo
 import androidx.compose.ui.demos.focus.ScrollableLazyRowFocusDemo
 import androidx.compose.ui.demos.focus.ScrollableRowFocusDemo
+import androidx.compose.ui.demos.focus.LazyListChildFocusDemos
 import androidx.compose.ui.demos.focus.TwoDimensionalFocusSearchDemo
 import androidx.compose.ui.demos.gestures.ButtonMetaStateDemo
 import androidx.compose.ui.demos.gestures.DetectTapGesturesDemo
@@ -142,6 +143,7 @@ private val FocusDemos = DemoCategory(
         ComposableDemo("Capture/Free Focus") { CaptureFocusDemo() },
         ComposableDemo("Focus In Scrollable Row") { ScrollableRowFocusDemo() },
         ComposableDemo("Focus in Lazy Row") { ScrollableLazyRowFocusDemo() },
+        ComposableDemo("LazyList Child Focusability") { LazyListChildFocusDemos() },
         ComposableDemo("Focus In Adjacent Scrollable Rows") { AdjacentScrollablesFocusDemo() },
         ComposableDemo("Clickable in LazyColumn") { ClickableInLazyColumnDemo() },
         ComposableDemo("Conditional Focusability") { ConditionalFocusabilityDemo() }

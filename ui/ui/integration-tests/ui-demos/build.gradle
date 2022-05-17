@@ -21,6 +21,7 @@ dependencies {
     implementation(project(":compose:runtime:runtime-livedata"))
     implementation(project(":compose:ui:ui"))
     implementation(project(":compose:ui:ui-text"))
+    implementation(project(":compose:ui:ui-tooling-preview"))
     implementation(project(":compose:ui:ui-viewbinding"))
 
     implementation("androidx.fragment:fragment-ktx:1.2.5")
@@ -28,6 +29,8 @@ dependencies {
     implementation(project(":customview:customview-poolingcontainer"))
     implementation("androidx.viewpager2:viewpager2:1.0.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
+
+    debugImplementation(project(":compose:ui:ui-tooling"))
 }
 
 android {
