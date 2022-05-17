@@ -16,15 +16,15 @@
 
 package androidx.compose.animation.demos
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.samples.AnimateIncrementDecrementSample
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 
-@OptIn(ExperimentalAnimationApi::class)
+@Preview
 @Composable
 fun AnimateIncrementDecrementDemo() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
