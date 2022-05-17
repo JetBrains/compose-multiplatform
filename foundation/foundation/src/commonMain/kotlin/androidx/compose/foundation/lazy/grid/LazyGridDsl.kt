@@ -47,9 +47,11 @@ import androidx.compose.ui.unit.dp
  * @param modifier the modifier to apply to this layout
  * @param state the state object to be used to control or observe the list's state
  * @param contentPadding specify a padding around the whole content
- * @param reverseLayout reverse the direction of scrolling and layout, when `true` items will be
- * composed from the end to the start and [LazyGridState.firstVisibleItemIndex] == 0 will mean
- * the first item is located at the end.
+ * @param reverseLayout reverse the direction of scrolling and layout. When `true`, items will be
+ * laid out in the reverse order  and [LazyGridState.firstVisibleItemIndex] == 0 means
+ * that grid is scrolled to the bottom. Note that [reverseLayout] does not change the behavior of
+ * [verticalArrangement],
+ * e.g. with [Arrangement.Top] (top) 123### (bottom) becomes (top) 321### (bottom).
  * @param verticalArrangement The vertical arrangement of the layout's children
  * @param horizontalArrangement The horizontal arrangement of the layout's children
  * @param flingBehavior logic describing fling behavior
@@ -100,9 +102,10 @@ fun LazyVerticalGrid(
  * @param modifier the modifier to apply to this layout
  * @param state the state object to be used to control or observe the list's state
  * @param contentPadding specify a padding around the whole content
- * @param reverseLayout reverse the direction of scrolling and layout, when `true` items will be
- * composed from the end to the start and [LazyGridState.firstVisibleItemIndex] == 0 will mean
- * the first item is located at the end.
+ * @param reverseLayout reverse the direction of scrolling and layout. When `true`, items are
+ * laid out in the reverse order and [LazyGridState.firstVisibleItemIndex] == 0 means
+ * that grid is scrolled to the end. Note that [reverseLayout] does not change the behavior of
+ * [horizontalArrangement], e.g. with [Arrangement.Start] [123###] becomes [321###].
  * @param verticalArrangement The vertical arrangement of the layout's children
  * @param horizontalArrangement The horizontal arrangement of the layout's children
  * @param flingBehavior logic describing fling behavior
