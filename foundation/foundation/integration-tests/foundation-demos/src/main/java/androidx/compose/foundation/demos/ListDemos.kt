@@ -82,6 +82,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -119,6 +120,7 @@ val LazyListDemos = listOf(
     PagingDemos
 )
 
+@Preview
 @Composable
 private fun LazyColumnDemo() {
     LazyColumn {
@@ -141,6 +143,7 @@ private fun LazyColumnDemo() {
     }
 }
 
+@Preview
 @Composable
 private fun ListAddRemoveItemsDemo() {
     var numItems by remember { mutableStateOf(0) }
@@ -160,6 +163,7 @@ private fun ListAddRemoveItemsDemo() {
     }
 }
 
+@Preview
 @Composable
 private fun ListHoistedStateDemo() {
     val state = rememberLazyListState()
@@ -266,6 +270,7 @@ private fun ListHoistedStateDemo() {
     }
 }
 
+@Preview
 @Composable
 private fun LazyRowItemsDemo() {
     LazyRow {

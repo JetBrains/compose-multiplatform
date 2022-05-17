@@ -28,8 +28,10 @@ import androidx.compose.foundation.samples.TransformableSample
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+@Preview
 @Composable
 fun HighLevelGesturesDemo() {
     Column(Modifier.verticalScroll(rememberScrollState())) {

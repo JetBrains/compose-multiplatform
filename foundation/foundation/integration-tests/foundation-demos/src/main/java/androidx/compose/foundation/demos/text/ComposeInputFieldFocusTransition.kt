@@ -34,8 +34,10 @@ import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 
+@Preview
 @Composable
 fun TextFieldFocusTransition() {
     val focusRequesters = remember { List(6) { FocusRequester() } }

@@ -21,7 +21,9 @@ import androidx.compose.foundation.samples.FocusGroupSample
 import androidx.compose.foundation.samples.FocusableFocusGroupSample
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 
+@Preview
 @Composable
 fun FocusGroupDemo() {
     Column {
