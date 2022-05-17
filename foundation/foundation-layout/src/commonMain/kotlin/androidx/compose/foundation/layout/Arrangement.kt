@@ -299,6 +299,9 @@ object Arrangement {
      * the main axis. The spacing will be subtracted from the available space that the children
      * can occupy. The [space] can be negative, in which case children will overlap.
      *
+     * To change alignment of the spaced children horizontally or vertically, use [spacedBy]
+     * overloads with `alignment` parameter.
+     *
      * @param space The space between adjacent children.
      */
     @Stable
