@@ -20,97 +20,116 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.test.AndroidComposeUiTest
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
-import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.runAndroidComposeUiTest
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
+import org.junit.runners.Parameterized.Parameters
 
 @MediumTest
-@RunWith(AndroidJUnit4::class)
+@RunWith(Parameterized::class)
 @OptIn(ExperimentalTestApi::class)
-class ViewVisibilityTest {
-
-    private fun AndroidComposeUiTest<*>.setupComposeView(visibility: Int) {
-        runOnUiThread {
-            val activity = activity!!
-            val composeView = ComposeView(activity)
-            composeView.layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-            composeView.visibility = visibility
-            composeView.setContent {
-                Text("Hello")
-            }
-            activity.setContentView(composeView)
-        }
+class ViewVisibilityTest(private val visibility: Int) {
+    companion object {
+        @JvmStatic
+        @Parameters(name = "visibility={0}")
+        fun params() = listOf(
+            View.VISIBLE,
+            View.INVISIBLE,
+            View.GONE
+        )
     }
 
-    private fun AndroidComposeUiTest<*>.setupHostView(visibility: Int) {
-        runOnUiThread {
-            activity!!.setContent {
+    private var offset by mutableStateOf(0)
+
+    private fun toggleState() {
+        offset = 10
+    }
+
+    @Test
+    fun noTimeout_hostView_visibility() {
+        runComposeUiTest {
+            setContent {
                 val hostView = LocalView.current
                 SideEffect {
                     hostView.visibility = visibility
                 }
-                Text("Hello")
+                TestContent()
             }
+
+            val expectDisplayed = visibility == View.VISIBLE
+            checkUi(expectDisplayed)
+            toggleState()
+            checkUi(expectDisplayed)
         }
     }
 
     @Test
-    fun composeView_gone() = runAndroidComposeUiTest<ComponentActivity> {
-        setupComposeView(View.GONE)
-        onNodeWithText("Hello")
-            .assertExists()
-            .assertIsNotDisplayed()
+    fun noTimeout_composeView_visibility() {
+        runAndroidComposeUiTest<ComponentActivity> {
+            runOnUiThread {
+                val activity = activity!!
+                val composeView = ComposeView(activity)
+                composeView.layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+                composeView.visibility = visibility
+                composeView.setContent {
+                    TestContent()
+                }
+                activity.setContentView(composeView)
+            }
+
+            val expectDisplayed = visibility == View.VISIBLE
+            checkUi(expectDisplayed)
+            toggleState()
+            checkUi(expectDisplayed)
+        }
     }
 
-    @Test
-    fun composeView_invisible() = runAndroidComposeUiTest<ComponentActivity> {
-        setupComposeView(View.INVISIBLE)
-        onNodeWithText("Hello")
-            .assertExists()
-            .assertIsNotDisplayed()
+    @Composable
+    private fun TestContent() {
+        // Read state in layout and not in measure, so a state change will trigger layout, but
+        // not measure. Because measure is not affected, the containing View doesn't need to be
+        // remeasured and Compose will do its measure/layout pass in the draw pass, meaning the
+        // View will be invalidated but no layout will be requested.
+        Layout({
+            Box(Modifier.size(10.dp))
+        }, Modifier.fillMaxSize().testTag("box")) { measurables, constraints ->
+            val placeable = measurables.first().measure(constraints)
+            layout(constraints.maxWidth, constraints.maxHeight) {
+                placeable.place(offset, 0)
+            }
+        }
     }
 
-    @Test
-    fun composeView_visible() = runAndroidComposeUiTest<ComponentActivity> {
-        setupComposeView(View.VISIBLE)
-        onNodeWithText("Hello")
-            .assertExists()
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun hostView_gone() = runAndroidComposeUiTest<ComponentActivity> {
-        setupHostView(View.GONE)
-        onNodeWithText("Hello")
-            .assertExists()
-            .assertIsNotDisplayed()
-    }
-
-    @Test
-    fun hostView_invisible() = runAndroidComposeUiTest<ComponentActivity> {
-        setupHostView(View.INVISIBLE)
-        onNodeWithText("Hello")
-            .assertExists()
-            .assertIsNotDisplayed()
-    }
-
-    @Test
-    fun hostView_visible() = runAndroidComposeUiTest<ComponentActivity> {
-        setupHostView(View.VISIBLE)
-        onNodeWithText("Hello")
-            .assertExists()
-            .assertIsDisplayed()
+    private fun SemanticsNodeInteractionsProvider.checkUi(expectDisplayed: Boolean) {
+        // It should always exist
+        onNodeWithTag("box").assertExists()
+        // But only be displayed in tests where visibility = View.VISIBLE
+        if (expectDisplayed) {
+            onNodeWithTag("box").assertIsDisplayed()
+        } else {
+            onNodeWithTag("box").assertIsNotDisplayed()
+        }
     }
 }
