@@ -33,6 +33,7 @@ import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
@@ -264,14 +265,21 @@ private fun rememberLazyListMeasurePolicy(
             containerConstraints.maxWidth - totalHorizontalPadding
         }
 
+        val firstVisibleItemIndex: DataIndex
+        val firstVisibleScrollOffset: Int
+        Snapshot.withoutReadObservation {
+            firstVisibleItemIndex = DataIndex(state.firstVisibleItemIndex)
+            firstVisibleScrollOffset = state.firstVisibleItemScrollOffset
+        }
+
         measureLazyList(
             itemsCount = itemsCount,
             itemProvider = measuredItemProvider,
             mainAxisAvailableSize = mainAxisAvailableSize,
             beforeContentPadding = beforeContentPadding,
             afterContentPadding = afterContentPadding,
-            firstVisibleItemIndex = state.firstVisibleItemIndexNonObservable,
-            firstVisibleItemScrollOffset = state.firstVisibleItemScrollOffsetNonObservable,
+            firstVisibleItemIndex = firstVisibleItemIndex,
+            firstVisibleItemScrollOffset = firstVisibleScrollOffset,
             scrollToBeConsumed = state.scrollToBeConsumed,
             constraints = contentConstraints,
             isVertical = isVertical,

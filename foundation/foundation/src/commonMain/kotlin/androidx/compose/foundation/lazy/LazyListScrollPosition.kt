@@ -17,33 +17,23 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.Snapshot
 
 /**
  * Contains the current scroll position represented by the first visible item index and the first
  * visible item scroll offset.
- *
- * Allows reading the values without recording the state read: [index] and [scrollOffset].
- * And with recording the state read which makes such reads observable: [observableIndex] and
- * [observableScrollOffset]. It is important to not record the state read inside the measure
- * block as otherwise the extra remeasurement will be scheduled once we update the values in the
- * end of the measure block.
  */
 internal class LazyListScrollPosition(
     initialIndex: Int = 0,
     initialScrollOffset: Int = 0
 ) {
-    var index = DataIndex(initialIndex)
+    var index by mutableStateOf(DataIndex(initialIndex))
+
+    var scrollOffset by mutableStateOf(initialScrollOffset)
         private set
-
-    var scrollOffset = initialScrollOffset
-        private set
-
-    private val indexState = mutableStateOf(index.value)
-    val observableIndex get() = indexState.value
-
-    private val scrollOffsetState = mutableStateOf(scrollOffset)
-    val observableScrollOffset get() = scrollOffsetState.value
 
     private var hadFirstNotEmptyLayout = false
 
@@ -62,10 +52,13 @@ internal class LazyListScrollPosition(
             hadFirstNotEmptyLayout = true
             val scrollOffset = measureResult.firstVisibleItemScrollOffset
             check(scrollOffset >= 0f) { "scrollOffset should be non-negative ($scrollOffset)" }
-            update(
-                DataIndex(measureResult.firstVisibleItem?.index ?: 0),
-                scrollOffset
-            )
+
+            Snapshot.withoutReadObservation {
+                update(
+                    DataIndex(measureResult.firstVisibleItem?.index ?: 0),
+                    scrollOffset
+                )
+            }
         }
     }
 
@@ -95,18 +88,18 @@ internal class LazyListScrollPosition(
      */
     @ExperimentalFoundationApi
     fun updateScrollPositionIfTheFirstItemWasMoved(itemProvider: LazyListItemProvider) {
-        update(findLazyListIndexByKey(lastKnownFirstItemKey, index, itemProvider), scrollOffset)
+        Snapshot.withoutReadObservation {
+            update(findLazyListIndexByKey(lastKnownFirstItemKey, index, itemProvider), scrollOffset)
+        }
     }
 
     private fun update(index: DataIndex, scrollOffset: Int) {
         require(index.value >= 0f) { "Index should be non-negative (${index.value})" }
         if (index != this.index) {
             this.index = index
-            indexState.value = index.value
         }
         if (scrollOffset != this.scrollOffset) {
             this.scrollOffset = scrollOffset
-            scrollOffsetState.value = scrollOffset
         }
     }
 

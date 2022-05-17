@@ -102,7 +102,7 @@ class LazyListState constructor(
      * derived state in order to only have recompositions when the derived value changes:
      * @sample androidx.compose.foundation.samples.UsingListScrollPositionInCompositionSample
      */
-    val firstVisibleItemIndex: Int get() = scrollPosition.observableIndex
+    val firstVisibleItemIndex: Int get() = scrollPosition.index.value
 
     /**
      * The scroll offset of the first visible item. Scrolling forward is positive - i.e., the
@@ -112,7 +112,7 @@ class LazyListState constructor(
      * be recomposed on every scroll causing potential performance issues.
      * @see firstVisibleItemIndex for samples with the recommended usage patterns.
      */
-    val firstVisibleItemScrollOffset: Int get() = scrollPosition.observableScrollOffset
+    val firstVisibleItemScrollOffset: Int get() = scrollPosition.scrollOffset
 
     /** Backing state for [layoutInfo] */
     private val layoutInfoState = mutableStateOf<LazyListLayoutInfo>(EmptyLazyListLayoutInfo)
@@ -149,19 +149,9 @@ class LazyListState constructor(
         private set
 
     /**
-     * The same as [firstVisibleItemIndex] but the read will not trigger remeasure.
-     */
-    internal val firstVisibleItemIndexNonObservable: DataIndex get() = scrollPosition.index
-
-    /**
-     * The same as [firstVisibleItemScrollOffset] but the read will not trigger remeasure.
-     */
-    internal val firstVisibleItemScrollOffsetNonObservable: Int get() = scrollPosition.scrollOffset
-
-    /**
      * Needed for [animateScrollToItem].  Updated on every measure.
      */
-    internal var density: Density = Density(1f, 1f)
+    internal var density: Density by mutableStateOf(Density(1f, 1f))
 
     /**
      * The ScrollableController instance. We keep it as we need to call stopAnimation on it once
@@ -202,7 +192,7 @@ class LazyListState constructor(
      * The [Remeasurement] object associated with our layout. It allows us to remeasure
      * synchronously during scroll.
      */
-    internal var remeasurement: Remeasurement? = null
+    internal var remeasurement: Remeasurement? by mutableStateOf(null)
         private set
     /**
      * The modifier which provides [remeasurement].
@@ -224,7 +214,7 @@ class LazyListState constructor(
     /**
      * Constraints passed to the prefetcher for premeasuring the prefetched items.
      */
-    internal var premeasureConstraints = Constraints()
+    internal var premeasureConstraints by mutableStateOf(Constraints())
 
     /**
      * Instantly brings the item at [index] to the top of the viewport, offset by [scrollOffset]
