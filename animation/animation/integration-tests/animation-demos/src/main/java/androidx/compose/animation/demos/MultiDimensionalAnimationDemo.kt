@@ -35,7 +35,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 
+@Preview
 @Composable
 fun MultiDimensionalAnimationDemo() {
     var currentState by remember { mutableStateOf(AnimState.Collapsed) }

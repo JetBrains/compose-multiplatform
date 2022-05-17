@@ -35,9 +35,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
+import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
+@Preview
 @Composable
 fun FlingGame() {
     Box(Modifier.fillMaxSize()) {
