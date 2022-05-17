@@ -91,7 +91,34 @@ inline fun <reified A : ComponentActivity> runAndroidComposeUiTest(
 fun <A : ComponentActivity> runAndroidComposeUiTest(
     activityClass: Class<A>,
     block: AndroidComposeUiTest<A>.() -> Unit
-) = ActivityScenarioTestEnvironment(activityClass).runTest(block)
+) {
+    // Don't start the scenario now, wait until we're inside runTest { },
+    // in case the Activity's onCreate/Start/Resume calls setContent
+    var scenario: ActivityScenario<A>? = null
+    val environment = AndroidComposeUiTestEnvironment {
+        requireNotNull(scenario) {
+            "ActivityScenario has not yet been launched, or has already finished. Make sure that " +
+                "any call to ComposeUiTest.setContent() and AndroidComposeUiTest.getActivity() " +
+                "is made within the lambda passed to AndroidComposeUiTestEnvironment.runTest()"
+        }.getActivity()
+    }
+    try {
+        environment.runTest {
+            scenario = ActivityScenario.launch(activityClass)
+            block()
+        }
+    } finally {
+        // Close the scenario outside runTest to avoid getting stuck.
+        //
+        // ActivityScenario.close() calls Instrumentation.waitForIdleSync(), which would time out
+        // if there is an infinite self-invalidating measure, layout, or draw loop. If the
+        // Compose content was set through the test's setContent method, it will remove the
+        // AndroidComposeView from the view hierarchy which breaks this loop, which is why we
+        // call close() outside the runTest lambda. This will not help if the content is not set
+        // through the test's setContent method though, in which case we'll still time out here.
+        scenario?.close()
+    }
+}
 
 /**
  * Variant of [runComposeUiTest] that does not launch an Activity. Use this if you need to have
@@ -105,8 +132,15 @@ fun <A : ComponentActivity> runAndroidComposeUiTest(
  * be able to find the content.
  */
 @ExperimentalTestApi
-fun runComposeUiTestWithoutActivity(block: ComposeUiTest.() -> Unit) =
-    NoActivityTestEnvironment().runTest(block)
+fun runComposeUiTestWithoutActivity(block: ComposeUiTest.() -> Unit) {
+    AndroidComposeUiTestEnvironment {
+        error(
+            "runComposeUiTestWithoutActivity {} does not provide an Activity to " +
+                "set Compose content in. Launch and use the Activity yourself, " +
+                "or use runAndroidComposeUiTest {}"
+        )
+    }.runTest(block)
+}
 
 /**
  * Variant of [ComposeUiTest] for when you want to have access to the current [activity] of type
@@ -138,69 +172,6 @@ sealed interface AndroidComposeUiTest<A : ComponentActivity> : ComposeUiTest {
 }
 
 /**
- * An [AndroidComposeUiTestEnvironment] that provides the [host Activity][activity] by launching
- * an [ActivityScenario].
- */
-@ExperimentalTestApi
-private class ActivityScenarioTestEnvironment<A : ComponentActivity>(
-    private val activityClass: Class<A>
-) : AndroidComposeUiTestEnvironment<A>() {
-
-    // Don't start the scenario now, wait until we're inside runTest { },
-    // in case the Activity's onCreate/Start/Resume calls setContent
-    private var scenario: ActivityScenario<A>? = null
-
-    override val activity: A?
-        get() = requireNotNull(scenario) {
-            "ActivityScenario has not yet been launched, or has already finished. Make sure that " +
-                "any call to ComposeUiTest.setContent() and AndroidComposeUiTest.getActivity() " +
-                "is made within the lambda passed to AndroidComposeUiTestEnvironment.runTest()"
-        }.getActivity()
-
-    override fun <R> runTest(block: AndroidComposeUiTest<A>.() -> R): R {
-        try {
-            return super.runTest {
-                scenario = ActivityScenario.launch(activityClass)
-                block()
-            }
-        } finally {
-            // Close the scenario outside runTest to avoid getting stuck.
-            //
-            // ActivityScenario.close() calls Instrumentation.waitForIdleSync(), which would time
-            // out if there is an infinite self-invalidating measure, layout, or draw loop. If the
-            // Compose content was set through the test's setContent method, it will remove the
-            // AndroidComposeView from the view hierarchy which breaks this loop, which is why we
-            // call close() outside the runTest lambda. This will not help if the content is not set
-            // through the test's setContent method though, in which case we'll still time out here.
-            scenario?.let {
-                scenario = null
-                it.close()
-            }
-        }
-    }
-}
-
-/**
- * An [AndroidComposeUiTestEnvironment] that doesn't provide an [activity]. This must only be
- * used when exposing the [AndroidComposeUiTestEnvironment.testReceiverScope] as a [ComposeUiTest].
- */
-@ExperimentalTestApi
-private class NoActivityTestEnvironment : AndroidComposeUiTestEnvironment<ComponentActivity>() {
-    override val activity: ComponentActivity? = null
-}
-
-/**
- * An [AndroidComposeUiTestEnvironment] that delegates retrieval of the [host Activity][activity]
- * to the given [activityProvider].
- */
-@OptIn(ExperimentalTestApi::class)
-private class ActivityProviderTestEnvironment<A : ComponentActivity>(
-    private val activityProvider: () -> A?
-) : AndroidComposeUiTestEnvironment<A>() {
-    override val activity: A? get() = activityProvider.invoke()
-}
-
-/**
  * Creates an [AndroidComposeUiTestEnvironment] that retrieves the
  * [host Activity][AndroidComposeUiTest.activity] by delegating to the given [activityProvider].
  * Use this if you need to launch an Activity in a way that is not compatible with any of the
@@ -225,9 +196,14 @@ private class ActivityProviderTestEnvironment<A : ComponentActivity>(
  * activity that was launched and hosts the Compose content
  */
 @ExperimentalTestApi
-fun <A : ComponentActivity> AndroidComposeUiTestEnvironment(
-    activityProvider: () -> A?
-): AndroidComposeUiTestEnvironment<A> = ActivityProviderTestEnvironment(activityProvider)
+inline fun <A : ComponentActivity> AndroidComposeUiTestEnvironment(
+    crossinline activityProvider: () -> A?
+): AndroidComposeUiTestEnvironment<A> {
+    return object : AndroidComposeUiTestEnvironment<A>() {
+        override val activity: A?
+            get() = activityProvider.invoke()
+    }
+}
 
 /**
  * A test environment that can [run tests][runTest] using the [test receiver scope][test]. Note
@@ -239,7 +215,7 @@ fun <A : ComponentActivity> AndroidComposeUiTestEnvironment(
  */
 @ExperimentalTestApi
 @OptIn(InternalTestApi::class, ExperimentalCoroutinesApi::class)
-sealed class AndroidComposeUiTestEnvironment<A : ComponentActivity> {
+abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity> {
     private val idlingResourceRegistry = IdlingResourceRegistry()
 
     internal val composeRootRegistry = ComposeRootRegistry()
@@ -281,6 +257,11 @@ sealed class AndroidComposeUiTestEnvironment<A : ComponentActivity> {
     private val testOwner = AndroidTestOwner()
     private val testContext = createTestContext(testOwner)
 
+    /**
+     * Returns the current host activity of type [A]. If no such activity is available, for
+     * example if you've navigated to a different activity and the original host has now been
+     * destroyed, this will return `null`.
+     */
     protected abstract val activity: A?
 
     /**
@@ -294,7 +275,7 @@ sealed class AndroidComposeUiTestEnvironment<A : ComponentActivity> {
      * Runs the given [block], setting up all test hooks before running the test and tearing them
      * down after running the test.
      */
-    open fun <R> runTest(block: AndroidComposeUiTest<A>.() -> R): R {
+    fun <R> runTest(block: AndroidComposeUiTest<A>.() -> R): R {
         if (Build.FINGERPRINT.lowercase() == "robolectric") {
             idlingStrategy = RobolectricIdlingStrategy(composeRootRegistry, composeIdlingResource)
         }
@@ -500,7 +481,8 @@ sealed class AndroidComposeUiTestEnvironment<A : ComponentActivity> {
                 // itself. Note that this won't have any effect if the content is not set with
                 // ComposeUiTest.setContent, but directly with ComponentActivity.setContent, which
                 // would be the typical case when testing an Activity that sets Compose content.
-                if (disposeContentHook != null) {
+                disposeContentHook?.let {
+                    disposeContentHook = null
                     runOnUiThread {
                         // NOTE: currently, calling dispose after an exception that happened during
                         // composition is not a safe call. Compose runtime should fix this, and then
@@ -509,11 +491,10 @@ sealed class AndroidComposeUiTestEnvironment<A : ComponentActivity> {
                         // exception. To fix this, we will just wrap this call in a try/catch of
                         // its own
                         try {
-                            disposeContentHook!!()
+                            it.invoke()
                         } catch (e: Exception) {
                             // ignore
                         }
-                        disposeContentHook = null
                     }
                 }
             }
@@ -567,9 +548,6 @@ sealed class AndroidComposeUiTestEnvironment<A : ComponentActivity> {
 internal fun <A : ComponentActivity> ActivityScenario<A>.getActivity(): A? {
     var activity: A? = null
     onActivity { activity = it }
-    if (activity == null) {
-        throw IllegalStateException("Activity was not set in the ActivityScenario")
-    }
     return activity
 }
 
