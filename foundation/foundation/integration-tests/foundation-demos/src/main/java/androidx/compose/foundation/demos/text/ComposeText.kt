@@ -84,6 +84,7 @@ import androidx.compose.ui.text.samples.TextStyleSample
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -98,6 +99,7 @@ val fontSize6 = 20.sp
 val fontSize8 = 25.sp
 val fontSize10 = 30.sp
 
+@Preview
 @Composable
 fun TextDemo() {
     LazyColumn {

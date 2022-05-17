@@ -52,6 +52,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.LineHeightStyle.Trim
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -62,6 +63,7 @@ private val HintStyle = TextStyle(fontSize = 14.sp)
 private fun Float.format(digits: Int = 2) = "%.${digits}f".format(this)
 private val FontSize = 60.sp
 
+@Preview
 @OptIn(ExperimentalTextApi::class)
 @Composable
 fun TextLineHeightDemo() {

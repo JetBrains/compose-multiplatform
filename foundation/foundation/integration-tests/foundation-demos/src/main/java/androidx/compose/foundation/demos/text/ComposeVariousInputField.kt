@@ -45,6 +45,7 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.toUpperCase
+import androidx.compose.ui.tooling.preview.Preview
 
 /**
  * The offset translator which works for all offset keep remains the same.
@@ -150,6 +151,7 @@ private fun emailOffsetTranslator(text: String) = object : OffsetMapping {
     }
 }
 
+@Preview
 @Composable
 fun VariousInputFieldDemo() {
     LazyColumn {

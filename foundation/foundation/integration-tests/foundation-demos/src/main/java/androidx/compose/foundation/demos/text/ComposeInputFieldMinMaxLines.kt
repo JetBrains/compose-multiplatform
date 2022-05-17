@@ -25,7 +25,9 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 
+@Preview
 @Composable
 fun BasicTextFieldMinMaxDemo() {
     LazyColumn {
