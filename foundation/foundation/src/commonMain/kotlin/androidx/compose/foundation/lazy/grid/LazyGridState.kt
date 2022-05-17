@@ -145,17 +145,17 @@ class LazyGridState constructor(
     /**
      * Needed for [animateScrollToItem]. Updated on every measure.
      */
-    internal var slotsPerLine: Int = 0
+    internal var slotsPerLine: Int by mutableStateOf(0)
 
     /**
      * Needed for [animateScrollToItem]. Updated on every measure.
      */
-    internal var density: Density = Density(1f, 1f)
+    internal var density: Density by mutableStateOf(Density(1f, 1f))
 
     /**
      * Needed for [notifyPrefetch].
      */
-    internal var isVertical: Boolean = true
+    internal var isVertical: Boolean by mutableStateOf(true)
 
     /**
      * The ScrollableController instance. We keep it as we need to call stopAnimation on it once
@@ -184,7 +184,7 @@ class LazyGridState constructor(
     /**
      * The list of handles associated with the items from the [lineToPrefetch] line.
      */
-    private var currentLinePrefetchHandles =
+    private val currentLinePrefetchHandles =
         mutableVectorOf<LazyLayoutPrefetchState.PrefetchHandle>()
 
     /**
@@ -197,7 +197,7 @@ class LazyGridState constructor(
      * The [Remeasurement] object associated with our layout. It allows us to remeasure
      * synchronously during scroll.
      */
-    private var remeasurement: Remeasurement? = null
+    private var remeasurement: Remeasurement? by mutableStateOf(null)
 
     /**
      * The modifier which provides [remeasurement].
@@ -217,8 +217,8 @@ class LazyGridState constructor(
     /**
      * Finds items on a line and their measurement constraints. Used for prefetching.
      */
-    internal var prefetchInfoRetriever: (line: LineIndex) -> List<Pair<Int, Constraints>> =
-        { emptyList() }
+    internal var prefetchInfoRetriever: (line: LineIndex) -> List<Pair<Int, Constraints>> by
+        mutableStateOf({ emptyList() })
 
     internal var placementAnimator by mutableStateOf<LazyGridItemPlacementAnimator?>(null)
 

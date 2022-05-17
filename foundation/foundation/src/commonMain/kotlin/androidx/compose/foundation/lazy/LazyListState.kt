@@ -151,7 +151,7 @@ class LazyListState constructor(
     /**
      * Needed for [animateScrollToItem].  Updated on every measure.
      */
-    internal var density: Density = Density(1f, 1f)
+    internal var density: Density by mutableStateOf(Density(1f, 1f))
 
     /**
      * The ScrollableController instance. We keep it as we need to call stopAnimation on it once
@@ -192,7 +192,7 @@ class LazyListState constructor(
      * The [Remeasurement] object associated with our layout. It allows us to remeasure
      * synchronously during scroll.
      */
-    internal var remeasurement: Remeasurement? = null
+    internal var remeasurement: Remeasurement? by mutableStateOf(null)
         private set
     /**
      * The modifier which provides [remeasurement].
@@ -214,7 +214,7 @@ class LazyListState constructor(
     /**
      * Constraints passed to the prefetcher for premeasuring the prefetched items.
      */
-    internal var premeasureConstraints = Constraints()
+    internal var premeasureConstraints by mutableStateOf(Constraints())
 
     /**
      * Instantly brings the item at [index] to the top of the viewport, offset by [scrollOffset]
