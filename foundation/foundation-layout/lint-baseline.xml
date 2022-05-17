@@ -7,9 +7,7 @@
         errorLine1="        val bitmap = activityTestRule.waitAndScreenShot()"
         errorLine2="                                      ~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/foundation/layout/BoxWithConstraintsTest.kt"
-            line="688"
-            column="39"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/foundation/layout/BoxWithConstraintsTest.kt"/>
     </issue>
 
 </issues>

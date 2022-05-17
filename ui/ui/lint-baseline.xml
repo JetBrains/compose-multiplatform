@@ -7,9 +7,7 @@
         errorLine1="        val bitmap = rule.waitAndScreenShot()"
         errorLine2="                          ~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/AlphaTest.kt"
-            line="231"
-            column="27"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/AlphaTest.kt"/>
     </issue>
 
     <issue
@@ -18,9 +16,7 @@
         errorLine1="        RenderNodeApi29(AndroidComposeView(activity)).apply {"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
-            line="227"
-            column="9"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"/>
     </issue>
 
     <issue
@@ -29,9 +25,7 @@
         errorLine1="            this.cameraDistance = cameraDistance"
         errorLine2="                 ~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
-            line="228"
-            column="18"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"/>
     </issue>
 
     <issue
@@ -40,9 +34,7 @@
         errorLine1="        }.dumpRenderNodeData().cameraDistance == cameraDistance"
         errorLine2="          ~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
-            line="229"
-            column="11"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"/>
     </issue>
 
     <issue
@@ -51,9 +43,7 @@
         errorLine1="        RenderNodeApi23(AndroidComposeView(activity)).apply {"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
-            line="234"
-            column="9"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"/>
     </issue>
 
     <issue
@@ -62,9 +52,7 @@
         errorLine1="            this.cameraDistance = cameraDistance"
         errorLine2="                 ~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
-            line="235"
-            column="18"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"/>
     </issue>
 
     <issue
@@ -73,9 +61,7 @@
         errorLine1="        }.dumpRenderNodeData().cameraDistance == -cameraDistance // Camera distance is negative"
         errorLine2="          ~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
-            line="236"
-            column="11"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"/>
     </issue>
 
     <issue
@@ -84,9 +70,7 @@
         errorLine1="    val bitmap = waitAndScreenShot()"
         errorLine2="                 ~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
-            line="3869"
-            column="18"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"/>
     </issue>
 
     <issue
@@ -95,9 +79,7 @@
         errorLine1="        val bitmap = rule.waitAndScreenShot()"
         errorLine2="                          ~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/ClipDrawTest.kt"
-            line="524"
-            column="27"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/ClipDrawTest.kt"/>
     </issue>
 
     <issue
@@ -106,9 +88,7 @@
         errorLine1="        parcel?.readBoolean()"
         errorLine2="                ~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/platform/DisposableSaveableStateRegistryTest.kt"
-            line="184"
-            column="17"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/platform/DisposableSaveableStateRegistryTest.kt"/>
     </issue>
 
     <issue
@@ -117,9 +97,7 @@
         errorLine1="        parcel?.readBoolean()"
         errorLine2="                ~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/platform/DisposableSaveableStateRegistryTest.kt"
-            line="184"
-            column="17"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/platform/DisposableSaveableStateRegistryTest.kt"/>
     </issue>
 
     <issue
@@ -128,9 +106,7 @@
         errorLine1="        parcel.writeBoolean(true)"
         errorLine2="               ~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/platform/DisposableSaveableStateRegistryTest.kt"
-            line="188"
-            column="16"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/platform/DisposableSaveableStateRegistryTest.kt"/>
     </issue>
 
     <issue
@@ -139,9 +115,7 @@
         errorLine1="    fun SemanticsNodeInteraction.captureToBitmap() = captureToImage().asAndroidBitmap()"
         errorLine2="                                                     ~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/DrawModifierTest.kt"
-            line="632"
-            column="54"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/DrawModifierTest.kt"/>
     </issue>
 
     <issue
@@ -150,9 +124,7 @@
         errorLine1="            .captureToImage()"
         errorLine2="             ~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/InvalidatingNotPlacedChildTest.kt"
-            line="378"
-            column="14"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/InvalidatingNotPlacedChildTest.kt"/>
     </issue>
 
     <issue
@@ -161,9 +133,7 @@
         errorLine1="        val bitmap = rule.waitAndScreenShot()"
         errorLine2="                          ~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/ShadowTest.kt"
-            line="377"
-            column="27"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/ShadowTest.kt"/>
     </issue>
 
     <issue
@@ -172,9 +142,7 @@
         errorLine1="        val bitmap = rule.onRoot().captureToImage().asAndroidBitmap()"
         errorLine2="                                   ~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/graphics/vector/VectorTest.kt"
-            line="694"
-            column="36"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/graphics/vector/VectorTest.kt"/>
     </issue>
 
     <issue
@@ -183,9 +151,7 @@
         errorLine1="    fun testNoopBlur() {"
         errorLine2="        ~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"
-            line="58"
-            column="9"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"/>
     </issue>
 
     <issue
@@ -194,9 +160,7 @@
         errorLine1="    fun testRectBoundedBlur() {"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"
-            line="138"
-            column="9"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"/>
     </issue>
 
     <issue
@@ -205,9 +169,7 @@
         errorLine1="    fun testUnboundedBlur() {"
         errorLine2="        ~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"
-            line="151"
-            column="9"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"/>
     </issue>
 
     <issue
@@ -216,9 +178,7 @@
         errorLine1="    fun testCircleBoundedBlur() {"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"
-            line="164"
-            column="9"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"/>
     </issue>
 
     <issue
@@ -227,9 +187,7 @@
         errorLine1="    fun testRectangleBlurredEdgeTreatmentHasShape() {"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"
-            line="174"
-            column="9"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"/>
     </issue>
 
     <issue
@@ -238,9 +196,7 @@
         errorLine1="    fun testUnboundedBlurredEdgeTreatmentDoesNotHaveShape() {"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"
-            line="179"
-            column="9"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"/>
     </issue>
 
 </issues>
