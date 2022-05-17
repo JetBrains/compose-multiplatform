@@ -1999,6 +1999,74 @@ class SubcomposeLayoutTest {
         rule.onNodeWithTag("0").assertIsNotDisplayed()
     }
 
+    @Test
+    fun getAlignmentsOnSubcomposeLayoutContent() {
+        var baseline: Int? = null
+        rule.setContent {
+            Layout(
+                {
+                    SubcomposeLayout { constraints ->
+                        val placeable = subcompose("0") {
+                            Layout(content = {}) { _, _ ->
+                                layout(10, 10, mapOf(FirstBaseline to 100)) {}
+                            }
+                        }.first().measure(constraints)
+                        layout(placeable.width, placeable.height) {
+                            placeable.place(0, 0)
+                        }
+                    }
+                }
+            ) { measurables, constraints ->
+                val titlePlaceable = measurables.first().measure(
+                    constraints.copy(minHeight = 0)
+                )
+                baseline = titlePlaceable[FirstBaseline]
+                layout(titlePlaceable.width, titlePlaceable.height) {
+                    titlePlaceable.place(0, 0)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(baseline).isEqualTo(100)
+        }
+    }
+
+    @Test
+    fun noNotMeasuredWrappersInTheHierarchy() {
+        lateinit var coordinates: LayoutCoordinates
+        var size: IntSize? = null
+        rule.setContent {
+            Box {
+                SubcomposeLayout { constraints ->
+                    val placeable = subcompose("0") {
+                        Box(Modifier
+                            .fillMaxSize()
+                            .onGloballyPositioned {
+                                coordinates = it
+                            }
+                            .onSizeChanged {
+                                size = it
+                            }
+                        )
+                    }.first().measure(constraints)
+                    layout(placeable.width, placeable.height) {
+                        placeable.place(0, 0)
+                    }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            var current: LayoutCoordinates? = coordinates
+            while (current != null) {
+                assertThat(current.isAttached)
+                assertThat(current.size).isEqualTo(size)
+                current = current.parentCoordinates
+            }
+        }
+    }
+
     private fun composeItems(
         state: SubcomposeLayoutState,
         items: MutableState<List<Int>>
