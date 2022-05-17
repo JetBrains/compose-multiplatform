@@ -364,8 +364,8 @@ internal fun CoreTextField(
     }
 
     val onPositionedModifier = Modifier.onGloballyPositioned {
-        if (textInputService != null) {
-            state.layoutCoordinates = it
+        state.layoutCoordinates = it
+        if (enabled) {
             if (state.handleState == HandleState.Selection) {
                 if (state.showFloatingToolbar) {
                     manager.showSelectionToolbar()
