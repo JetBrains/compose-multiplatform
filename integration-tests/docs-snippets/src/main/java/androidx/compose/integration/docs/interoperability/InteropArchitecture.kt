@@ -60,15 +60,15 @@ import androidx.navigation.compose.rememberNavController
  */
 
 private object InteropArchitectureSnippet1 {
-    class ExampleActivity : AppCompatActivity() {
+    class GreetingActivity : AppCompatActivity() {
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
 
             setContent {
                 MaterialTheme {
                     Column {
-                        Greeting("user1")
-                        Greeting("user2")
+                        GreetingScreen("user1")
+                        GreetingScreen("user2")
                     }
                 }
             }
@@ -76,11 +76,13 @@ private object InteropArchitectureSnippet1 {
     }
 
     @Composable
-    fun Greeting(userId: String) {
-        val greetingViewModel: GreetingViewModel = viewModel(
+    fun GreetingScreen(
+        userId: String,
+        viewModel: GreetingViewModel = viewModel(
             factory = GreetingViewModelFactory(userId)
         )
-        val messageUser by greetingViewModel.message.observeAsState("")
+    ) {
+        val messageUser by viewModel.message.observeAsState("")
 
         Text(messageUser)
     }
@@ -100,21 +102,23 @@ private object InteropArchitectureSnippet1 {
 
 private object InteropArchitectureSnippet2 {
     @Composable
-    fun MyScreen() {
+    fun MyApp() {
         NavHost(rememberNavController(), startDestination = "profile/{userId}") {
             /* ... */
             composable("profile/{userId}") { backStackEntry ->
-                Greeting(backStackEntry.arguments?.getString("userId") ?: "")
+                GreetingScreen(backStackEntry.arguments?.getString("userId") ?: "")
             }
         }
     }
 
     @Composable
-    fun Greeting(userId: String) {
-        val greetingViewModel: GreetingViewModel = viewModel(
+    fun GreetingScreen(
+        userId: String,
+        viewModel: GreetingViewModel = viewModel(
             factory = GreetingViewModelFactory(userId)
         )
-        val messageUser by greetingViewModel.message.observeAsState("")
+    ) {
+        val messageUser by viewModel.message.observeAsState("")
 
         Text(messageUser)
     }
