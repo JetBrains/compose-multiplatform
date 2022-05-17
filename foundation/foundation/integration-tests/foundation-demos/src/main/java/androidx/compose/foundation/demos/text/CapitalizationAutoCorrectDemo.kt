@@ -35,6 +35,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 private val KeyboardOptionsList = listOf(
@@ -76,6 +77,7 @@ private val KeyboardOptionsList = listOf(
     )
 )
 
+@Preview
 @Composable
 fun CapitalizationAutoCorrectDemo() {
     LazyColumn {

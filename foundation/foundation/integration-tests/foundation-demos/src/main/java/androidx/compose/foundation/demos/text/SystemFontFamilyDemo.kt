@@ -26,7 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 
+@Preview
 @Composable
 fun SystemFontFamilyDemo() {
     LazyColumn {
@@ -53,6 +55,7 @@ fun SystemFontFamilyDemo() {
     }
 }
 
+@Preview
 @Composable
 fun SystemFontFamilyDemoItem(fontFamily: FontFamily) {
     Row(modifier = Modifier.fillMaxWidth()) {
