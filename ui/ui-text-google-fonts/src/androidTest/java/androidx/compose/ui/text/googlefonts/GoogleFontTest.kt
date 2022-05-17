@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.googlefonts.test.R
 import androidx.core.provider.FontRequest
 import androidx.core.provider.FontsContractCompat
+import androidx.core.provider.FontsContractCompat.FontRequestCallback.FAIL_REASON_FONT_NOT_FOUND
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -229,6 +230,30 @@ class GoogleFontTest {
             }
             assertThat(exception?.message).contains("reason=42")
             assertThat(exception?.message).contains("GoogleFont(\"Foo\"")
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun GoogleFont_TypefaceLoader_throwsOnError_withFullListUrl() {
+        val compatLoader = CapturingFontsContractCompatLoader()
+        runTest(UnconfinedTestDispatcher()) {
+            val deferred = async(Job()) {
+                GoogleFontTypefaceLoader.awaitLoad(
+                    context,
+                    Font(GoogleFont("Foo"), TestProvider) as AndroidFont,
+                    compatLoader
+                )
+            }
+            compatLoader.callback?.onTypefaceRequestFailed(FAIL_REASON_FONT_NOT_FOUND)
+            var exception: IllegalStateException? = null
+            try {
+                assertThat(deferred.await())
+            } catch (ex: IllegalStateException) {
+                exception = ex
+            }
+            assertThat(exception?.message).contains("Font not found, please check availability " +
+                "on GoogleFont.Provider.AllFontsList: https://fonts.gstatic.com/s/a/directory.xml")
         }
     }
 
