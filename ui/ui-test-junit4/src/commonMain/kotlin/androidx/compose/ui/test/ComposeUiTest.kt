@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.Density
  *
  * Implementations of this method will launch a Compose host (such as an Activity on Android)
  * for you. If your test needs to launch its own host, use a platform specific variant that
- * doesn't launch anything for you (if available), e.g. [runComposeUiTestWithoutActivity] on
+ * doesn't launch anything for you (if available), e.g. [runEmptyComposeUiTest] on
  * Android. Always make sure that the Compose content is set during execution of the
  * [test lambda][block] so the test framework is aware of the content. Whether you need to
  * launch the host from within the test lambda as well depends on the platform.

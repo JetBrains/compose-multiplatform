@@ -121,9 +121,10 @@ fun <A : ComponentActivity> runAndroidComposeUiTest(
 }
 
 /**
- * Variant of [runComposeUiTest] that does not launch an Activity. Use this if you need to have
- * control over the timing and method of launching the Activity, for example when you want to
- * launch it with a custom Intent, or if you have a complex test setup.
+ * Variant of [runComposeUiTest] that does not launch an Activity to host Compose content in and
+ * thus acts as an "empty shell". Use this if you need to have control over the timing and method
+ * of launching the Activity, for example when you want to launch it with a custom Intent, or if
+ * you have a complex test setup.
  *
  * When using this method, calling [ComposeUiTest.setContent] will throw an IllegalStateException.
  * Instead, you'll have to set the content in the Activity that you have launched yourself,
@@ -132,12 +133,12 @@ fun <A : ComponentActivity> runAndroidComposeUiTest(
  * be able to find the content.
  */
 @ExperimentalTestApi
-fun runComposeUiTestWithoutActivity(block: ComposeUiTest.() -> Unit) {
+fun runEmptyComposeUiTest(block: ComposeUiTest.() -> Unit) {
     AndroidComposeUiTestEnvironment {
         error(
-            "runComposeUiTestWithoutActivity {} does not provide an Activity to " +
-                "set Compose content in. Launch and use the Activity yourself, " +
-                "or use runAndroidComposeUiTest {}"
+            "runEmptyComposeUiTest {} does not provide an Activity to set Compose content in. " +
+                "Launch and use the Activity yourself within the lambda passed to " +
+                "runEmptyComposeUiTest {}, or use runAndroidComposeUiTest {}"
         )
     }.runTest(block)
 }
@@ -175,7 +176,7 @@ sealed interface AndroidComposeUiTest<A : ComponentActivity> : ComposeUiTest {
  * Creates an [AndroidComposeUiTestEnvironment] that retrieves the
  * [host Activity][AndroidComposeUiTest.activity] by delegating to the given [activityProvider].
  * Use this if you need to launch an Activity in a way that is not compatible with any of the
- * existing [runComposeUiTest], [runAndroidComposeUiTest], or [runComposeUiTestWithoutActivity]
+ * existing [runComposeUiTest], [runAndroidComposeUiTest], or [runEmptyComposeUiTest]
  * methods.
  *
  * Valid use cases include, but are not limited to, creating your own JUnit test rule that

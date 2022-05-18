@@ -19,7 +19,7 @@ package androidx.compose.ui.test.junit4
 import androidx.compose.testutils.expectError
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.runComposeUiTestWithoutActivity
+import androidx.compose.ui.test.runEmptyComposeUiTest
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -35,7 +35,7 @@ class LaunchActivityTooEarlyTest {
         ActivityScenario.launch(CustomActivity::class.java)
 
         @OptIn(ExperimentalTestApi::class)
-        runComposeUiTestWithoutActivity {
+        runEmptyComposeUiTest {
             expectError<IllegalStateException>(
                 expectedMessage = "No compose hierarchies found in the app\\. Possible reasons " +
                     "include:.*\\bsetContent was called before the ComposeTestRule ran\\..*"

@@ -39,7 +39,7 @@ package androidx.compose.ui.test {
     method @androidx.compose.ui.test.ExperimentalTestApi public static <A extends androidx.activity.ComponentActivity> void runAndroidComposeUiTest(Class<A> activityClass, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.AndroidComposeUiTest<A>,kotlin.Unit> block);
     method @androidx.compose.ui.test.ExperimentalTestApi public static inline <reified A extends androidx.activity.ComponentActivity> void runAndroidComposeUiTest(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.AndroidComposeUiTest<A>,? extends kotlin.Unit> block);
     method @androidx.compose.ui.test.ExperimentalTestApi public static void runComposeUiTest(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.ComposeUiTest,kotlin.Unit> block);
-    method @androidx.compose.ui.test.ExperimentalTestApi public static void runComposeUiTestWithoutActivity(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.ComposeUiTest,kotlin.Unit> block);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void runEmptyComposeUiTest(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.ComposeUiTest,kotlin.Unit> block);
   }
 
   @androidx.compose.ui.test.ExperimentalTestApi public final class StateRestorationTester {
