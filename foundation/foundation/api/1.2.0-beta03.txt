@@ -40,6 +40,9 @@ package androidx.compose.foundation {
   public final class Clickable_androidKt {
   }
 
+  public final class ClipScrollableContainerKt {
+  }
+
   public final class DarkThemeKt {
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static boolean isSystemInDarkTheme();
   }
