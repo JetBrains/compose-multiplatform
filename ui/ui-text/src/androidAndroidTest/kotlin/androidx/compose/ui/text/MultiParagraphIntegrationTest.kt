@@ -17,12 +17,16 @@ package androidx.compose.ui.text
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.text.AnnotatedString.Range
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.intl.LocaleList
+import androidx.compose.ui.text.matchers.assertThat
+import androidx.compose.ui.text.platform.AndroidParagraph
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
@@ -1468,6 +1472,50 @@ class MultiParagraphIntegrationTest {
                 density = this,
                 fontFamilyResolver = UncachedFontFamilyResolver(context)
             )
+        }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun multiParagraph_appliesBrush_toTheWholeText() = with(defaultDensity) {
+        val fontSize = 20.sp
+        val fontSizeInPx = fontSize.toPx()
+        val brush = Brush.verticalGradient(listOf(Color.Blue, Color.Red))
+        val multiParagraph = simpleMultiParagraph(
+            text = buildAnnotatedString {
+                withStyle(ParagraphStyle(textAlign = TextAlign.Right)) {
+                    append("Lorem")
+                }
+                withStyle(ParagraphStyle()) {
+                    append("Ipsum")
+                }
+            },
+            style = TextStyle(
+                brush = brush,
+                fontSize = fontSize
+            ),
+            width = fontSizeInPx * 5
+        ).apply { disableAntialias() }
+
+        val multiParagraph2 = simpleMultiParagraph(
+            text = buildAnnotatedString {
+                append("Lorem\n")
+                append("Ipsum")
+            },
+            style = TextStyle(
+                brush = brush,
+                fontSize = fontSize
+            ),
+            width = fontSizeInPx * 5
+        ).apply { disableAntialias() }
+
+        assertThat(multiParagraph.bitmap(brush))
+            .isEqualToBitmap(multiParagraph2.bitmap(brush))
+    }
+
+    private fun MultiParagraph.disableAntialias() {
+        paragraphInfoList.forEach {
+            (it.paragraph as AndroidParagraph).textPaint.isAntiAlias = false
         }
     }
 

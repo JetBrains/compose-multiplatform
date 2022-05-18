@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.PlatformFontLoader
 import androidx.compose.ui.text.font.PlatformFontFamilyTypefaceAdapter
 import androidx.compose.ui.text.font.TypefaceRequestCache
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.AndroidFontResolveInterceptor
 import androidx.compose.ui.text.font.PlatformResolveInterceptor
 import kotlin.math.ceil
@@ -39,6 +40,30 @@ fun Paragraph.bitmap(): Bitmap {
         Bitmap.Config.ARGB_8888
     )
     this.paint(androidx.compose.ui.graphics.Canvas(Canvas(bitmap)))
+    return bitmap
+}
+
+/**
+ * MultiParagraph creates Paragraphs to vertically layout. However, a Paragraph is an immutable
+ * object that cannot be changed after its creation. Thus, Brush evaluation according to the total
+ * size of MultiParagraph cannot be delegated to Paragraph instances during initialization.
+ *
+ * We have to re-specify the brush during paint(draw) to apply it according to the total size of
+ * MultiParagraph.
+ */
+@OptIn(ExperimentalTextApi::class)
+fun MultiParagraph.bitmap(brush: Brush? = null): Bitmap {
+    val width = paragraphInfoList.maxByOrNull { it.paragraph.width }?.paragraph?.width ?: 0f
+    val bitmap = Bitmap.createBitmap(
+        width.toIntPx(),
+        height.toIntPx(),
+        Bitmap.Config.ARGB_8888
+    )
+    if (brush != null) {
+        this.paint(androidx.compose.ui.graphics.Canvas(Canvas(bitmap)), brush)
+    } else {
+        this.paint(androidx.compose.ui.graphics.Canvas(Canvas(bitmap)))
+    }
     return bitmap
 }
 

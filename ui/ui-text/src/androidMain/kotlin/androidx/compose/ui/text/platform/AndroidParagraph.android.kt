@@ -150,6 +150,9 @@ internal class AndroidParagraph(
             layout = firstLayout
         }
 
+        // Brush is not fully realized on text until layout is complete and size information
+        // is known. Brush can now be applied to the overall textpaint and all the spans.
+        textPaint.setBrush(style.brush, Size(width, height))
         layout.getShaderBrushSpans().forEach { shaderBrushSpan ->
             shaderBrushSpan.size = Size(width, height)
         }
