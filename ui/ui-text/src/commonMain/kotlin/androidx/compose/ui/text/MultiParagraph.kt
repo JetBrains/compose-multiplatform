@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.createFontFamilyResolver
+import androidx.compose.ui.text.platform.drawMultiParagraph
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Constraints
@@ -405,12 +406,7 @@ class MultiParagraph(
         shadow: Shadow? = null,
         decoration: TextDecoration? = null
     ) {
-        canvas.save()
-        paragraphInfoList.fastForEach {
-            it.paragraph.paint(canvas, brush, shadow, decoration)
-            canvas.translate(0f, it.paragraph.height)
-        }
-        canvas.restore()
+        drawMultiParagraph(canvas, brush, shadow, decoration)
     }
 
     /** Returns path that enclose the given text range. */

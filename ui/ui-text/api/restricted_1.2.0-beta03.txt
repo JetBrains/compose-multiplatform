@@ -1139,6 +1139,9 @@ package androidx.compose.ui.text.platform {
   public final class AndroidAccessibilitySpannableString_androidKt {
   }
 
+  public final class AndroidMultiParagraphDrawKt {
+  }
+
   public final class AndroidParagraphHelper_androidKt {
   }
 
