@@ -54,7 +54,7 @@ class DesktopComposeUiTest : ComposeUiTest {
     private val coroutineDispatcher = UnconfinedTestDispatcher()
     private val testScope = TestScope(coroutineDispatcher)
     override val mainClock: MainTestClock =
-        MainTestClockImpl(coroutineDispatcher, frameDelayMillis = 16L)
+        MainTestClockImpl(coroutineDispatcher.scheduler, frameDelayMillis = 16L)
     private val uncaughtExceptionHandler = UncaughtExceptionHandler()
     private val infiniteAnimationPolicy = object : InfiniteAnimationPolicy {
         override suspend fun <R> onInfiniteOperation(block: suspend () -> R): R {
