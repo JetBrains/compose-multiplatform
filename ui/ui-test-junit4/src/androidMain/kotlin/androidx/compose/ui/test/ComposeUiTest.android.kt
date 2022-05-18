@@ -250,13 +250,15 @@ sealed class AndroidComposeUiTestEnvironment<A : ComponentActivity> {
 
     private val recomposer: Recomposer
     private val testCoroutineDispatcher = UnconfinedTestDispatcher()
-    private val frameCoroutineScope = TestScope(testCoroutineDispatcher)
-    private val recomposerApplyCoroutineScope: CoroutineScope
+    private val testCoroutineScope = TestScope(testCoroutineDispatcher)
+    private val recomposerContinuationInterceptor =
+        ApplyingContinuationInterceptor(testCoroutineDispatcher)
+    private val recomposerCoroutineScope: CoroutineScope
     private val coroutineExceptionHandler = UncaughtExceptionHandler()
 
     init {
-        val frameClock = TestMonotonicFrameClock(frameCoroutineScope)
-        mainClockImpl = MainTestClockImpl(testCoroutineDispatcher, frameClock)
+        val frameClock = TestMonotonicFrameClock(testCoroutineScope)
+        mainClockImpl = MainTestClockImpl(testCoroutineDispatcher.scheduler, frameClock)
         val infiniteAnimationPolicy = object : InfiniteAnimationPolicy {
             override suspend fun <R> onInfiniteOperation(block: suspend () -> R): R {
                 if (mainClockImpl.autoAdvance) {
@@ -265,11 +267,11 @@ sealed class AndroidComposeUiTestEnvironment<A : ComponentActivity> {
                 return block()
             }
         }
-        recomposerApplyCoroutineScope = CoroutineScope(
-            testCoroutineDispatcher + frameClock + infiniteAnimationPolicy +
+        recomposerCoroutineScope = CoroutineScope(
+            recomposerContinuationInterceptor + frameClock + infiniteAnimationPolicy +
                 coroutineExceptionHandler + Job()
         )
-        recomposer = Recomposer(recomposerApplyCoroutineScope.coroutineContext)
+        recomposer = Recomposer(recomposerCoroutineScope.coroutineContext)
         composeIdlingResource = ComposeIdlingResource(
             composeRootRegistry, mainClockImpl, recomposer
         )
@@ -331,7 +333,7 @@ sealed class AndroidComposeUiTestEnvironment<A : ComponentActivity> {
         return WindowRecomposerPolicy.withFactory({ recomposer }) {
             try {
                 // Start the recomposer:
-                recomposerApplyCoroutineScope.launch {
+                recomposerCoroutineScope.launch {
                     recomposer.runRecomposeAndApplyChanges()
                 }
                 block()
@@ -340,7 +342,7 @@ sealed class AndroidComposeUiTestEnvironment<A : ComponentActivity> {
                 recomposer.cancel()
                 // Cancel our scope to ensure there are no active coroutines when
                 // cleanupTestCoroutines is called in the CleanupCoroutinesStatement
-                recomposerApplyCoroutineScope.cancel()
+                recomposerCoroutineScope.cancel()
             }
         }
     }
@@ -351,8 +353,8 @@ sealed class AndroidComposeUiTestEnvironment<A : ComponentActivity> {
         } finally {
             // runTest {} as the last step -
             // to replace deprecated TestCoroutineScope.cleanupTestCoroutines
-            frameCoroutineScope.runTest {}
-            frameCoroutineScope.cancel()
+            testCoroutineScope.runTest {}
+            testCoroutineScope.cancel()
             coroutineExceptionHandler.throwUncaught()
         }
     }
