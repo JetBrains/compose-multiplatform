@@ -79,7 +79,6 @@ import java.util.concurrent.CountDownLatch
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.roundToInt
-import org.junit.Ignore
 
 @Suppress("DEPRECATION")
 @LargeTest
@@ -190,7 +189,6 @@ class SelectionContainerTest {
         }
     }
 
-    @Ignore("b/230622412")
     @Test
     fun long_press_select_a_word_rtl_layout() {
         with(rule.density) {
