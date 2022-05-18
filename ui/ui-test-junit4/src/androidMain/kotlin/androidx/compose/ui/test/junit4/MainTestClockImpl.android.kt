@@ -19,14 +19,14 @@ package androidx.compose.ui.test.junit4
 import androidx.compose.ui.test.TestMonotonicFrameClock
 import androidx.compose.ui.test.frameDelayMillis
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.test.TestDispatcher
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class MainTestClockImpl(
-    testScheduler: TestCoroutineScheduler,
+    testDispatcher: TestDispatcher,
     frameClock: TestMonotonicFrameClock
 ) : AbstractMainTestClock(
-    testScheduler,
+    testDispatcher,
     frameClock.frameDelayMillis,
     ::runOnUiThread
 ) {
