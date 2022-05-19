@@ -65,7 +65,7 @@ import kotlinx.coroutines.flow.Flow
  * No action required if it's modified.
  */
 
-private object LibrariesSnippet1 {
+private object LibrariesSnippetActivityResult {
     @Composable
     fun GetContentExample() {
         var imageUri by remember { mutableStateOf<Uri?>(null) }
@@ -85,14 +85,14 @@ private object LibrariesSnippet1 {
 }
 
 @Composable
-private fun LibrariesSnippet2() {
+private fun LibrariesSnippetBackHandler() {
     var backHandlingEnabled by remember { mutableStateOf(true) }
     BackHandler(backHandlingEnabled) {
         // Handle back press
     }
 }
 
-private object LibrariesSnippet3 {
+private object LibrariesSnippetAddingViewModel {
     class MyViewModel : ViewModel() { /*...*/ }
 
     @Composable
@@ -103,7 +103,7 @@ private object LibrariesSnippet3 {
     }
 }
 
-private object LibrariesSnippet4 {
+private object LibrariesSnippetSameViewModelTwice {
     @Composable
     fun MyScreen(
         // Returns the same instance as long as the activity is alive,
@@ -117,7 +117,7 @@ private object LibrariesSnippet4 {
     ) { /* ... */ }
 }
 
-private object LibrariesSnippet5 {
+private object LibrariesSnippetRecomposesWhenStateChanges {
     @Composable
     fun MyScreen(
         viewModel: MyViewModel = viewModel()
@@ -132,7 +132,7 @@ private object LibrariesSnippet5 {
     }
 }
 
-private object LibrariesSnippet6 {
+private object LibrariesSnippetHilt {
     @HiltViewModel
     class MyViewModel @Inject constructor(
         private val savedStateHandle: SavedStateHandle,
@@ -145,7 +145,7 @@ private object LibrariesSnippet6 {
     ) { /* ... */ }
 }
 
-private object LibrariesSnippet7 {
+private object LibrariesSnippetHiltViewModel {
     // import androidx.hilt.navigation.compose.hiltViewModel
 
     @Composable
@@ -162,7 +162,7 @@ private object LibrariesSnippet7 {
     }
 }
 
-private object LibrariesSnippet8 {
+private object LibrariesSnippetBackStackEntry {
     // import androidx.hilt.navigation.compose.hiltViewModel
     // import androidx.navigation.compose.getBackStackEntry
 
@@ -175,7 +175,9 @@ private object LibrariesSnippet8 {
                     val parentEntry = remember(backStackEntry) {
                         navController.getBackStackEntry("Parent")
                     }
-                    val parentViewModel = hiltViewModel<ParentViewModel>(parentEntry)
+                    val parentViewModel = hiltViewModel<ParentViewModel>(
+                        parentEntry
+                    )
                     ExampleWithRouteScreen(parentViewModel)
                 }
             }
@@ -183,7 +185,7 @@ private object LibrariesSnippet8 {
     }
 }
 
-private object LibrariesSnippet9 {
+private object LibrariesSnippetPaging {
     @Composable
     fun MyScreen(flow: Flow<PagingData<String>>) {
         val lazyPagingItems = flow.collectAsLazyPagingItems()
@@ -195,7 +197,7 @@ private object LibrariesSnippet9 {
     }
 }
 
-private object LibrariesSnippet10 {
+private object LibrariesSnippetRemoteImages {
     @Composable
     fun MyScreen() {
         val painter = rememberImagePainter(
