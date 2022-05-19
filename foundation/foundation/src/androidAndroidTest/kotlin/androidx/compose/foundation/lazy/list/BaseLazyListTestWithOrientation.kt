@@ -186,6 +186,7 @@ open class BaseLazyListTestWithOrientation(private val orientation: Orientation)
         state: LazyListState = rememberLazyListState(),
         contentPadding: PaddingValues = PaddingValues(0.dp),
         reverseLayout: Boolean = false,
+        reverseArrangement: Boolean = false,
         flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
         userScrollEnabled: Boolean = true,
         spacedBy: Dp = 0.dp,
@@ -194,8 +195,8 @@ open class BaseLazyListTestWithOrientation(private val orientation: Orientation)
         if (vertical) {
             val verticalArrangement = when {
                 spacedBy != 0.dp -> Arrangement.spacedBy(spacedBy)
-                !reverseLayout -> Arrangement.Top
-                else -> Arrangement.Bottom
+                reverseLayout xor reverseArrangement -> Arrangement.Bottom
+                else -> Arrangement.Top
             }
             LazyColumn(
                 modifier = modifier,
@@ -210,8 +211,8 @@ open class BaseLazyListTestWithOrientation(private val orientation: Orientation)
         } else {
             val horizontalArrangement = when {
                 spacedBy != 0.dp -> Arrangement.spacedBy(spacedBy)
-                !reverseLayout -> Arrangement.Start
-                else -> Arrangement.End
+                reverseLayout xor reverseArrangement -> Arrangement.End
+                else -> Arrangement.Start
             }
             LazyRow(
                 modifier = modifier,
