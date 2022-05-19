@@ -84,7 +84,9 @@ internal fun rememberBoxMeasurePolicy(
 ) = if (alignment == Alignment.TopStart && !propagateMinConstraints) {
     DefaultBoxMeasurePolicy
 } else {
-    remember(alignment) { boxMeasurePolicy(alignment, propagateMinConstraints) }
+    remember(alignment, propagateMinConstraints) {
+        boxMeasurePolicy(alignment, propagateMinConstraints)
+    }
 }
 
 internal val DefaultBoxMeasurePolicy: MeasurePolicy = boxMeasurePolicy(Alignment.TopStart, false)
