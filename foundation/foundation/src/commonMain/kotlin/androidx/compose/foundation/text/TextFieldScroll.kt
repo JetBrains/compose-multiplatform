@@ -281,14 +281,55 @@ internal class TextFieldScrollerPosition(
         offset = offset.coerceIn(0f, difference)
     }
 
-    private fun coerceOffset(cursorStart: Float, cursorEnd: Float, containerSize: Int) {
+    /*@VisibleForTesting*/
+    internal fun coerceOffset(cursorStart: Float, cursorEnd: Float, containerSize: Int) {
         val startVisibleBound = offset
         val endVisibleBound = startVisibleBound + containerSize
-        if (cursorStart < startVisibleBound) {
-            offset -= startVisibleBound - cursorStart
-        } else if (cursorEnd > endVisibleBound) {
-            offset += cursorEnd - endVisibleBound
+        val offsetDifference = when {
+            // make bottom/end of the cursor visible
+            //
+            // text box
+            // +----------------------+
+            // |                      |
+            // |                      |
+            // |          cursor      |
+            // |             |        |
+            // +-------------|--------+
+            //               |
+            //
+            cursorEnd > endVisibleBound -> cursorEnd - endVisibleBound
+
+            // in rare cases when there's not enough space to fit the whole cursor, prioritise
+            // the bottom/end of the cursor
+            //
+            //             cursor
+            // text box      |
+            // +-------------|--------+
+            // |             |        |
+            // +-------------|--------+
+            //               |
+            //
+            cursorStart < startVisibleBound && cursorEnd - cursorStart > containerSize ->
+                cursorEnd - endVisibleBound
+
+            // make top/start of the cursor visible if there's enough space to fit the whole cursor
+            //
+            //               cursor
+            // text box       |
+            // +--------------|-------+
+            // |              |       |
+            // |                      |
+            // |                      |
+            // |                      |
+            // +----------------------+
+            //
+            cursorStart < startVisibleBound && cursorEnd - cursorStart <= containerSize ->
+                cursorStart - startVisibleBound
+
+            // otherwise keep current offset
+            else -> 0f
         }
+        offset += offsetDifference
     }
 
     fun getOffsetToFollow(selection: TextRange): Int {
