@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
@@ -48,11 +49,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.unit.dp
@@ -240,6 +243,21 @@ class RobolectricComposeTest {
         waitForIdle()
         val expectedFlingDistance = flingBehavior.totalDistance
         assertThat(scrollState.value).isEqualTo(expectedSwipeDistance + expectedFlingDistance)
+    }
+
+    // Regression test for b/227120770
+    @Test
+    fun testTextFieldInteraction() = runComposeUiTest {
+        val text = "a"
+        var updatedText = ""
+        setContent {
+            TextField(value = text, onValueChange = { updatedText = it })
+        }
+        onNodeWithText(text).assertIsDisplayed()
+        onNodeWithText(text).performTextInput("b")
+        runOnIdle {
+            assertThat(updatedText).isEqualTo("ab")
+        }
     }
 
     /**
