@@ -19,6 +19,7 @@ package androidx.compose.foundation.lazy.grid
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.list.LayoutInfoTestParam
@@ -465,6 +466,30 @@ class LazyGridLayoutInfoTest(
 
         rule.runOnIdle {
             assertThat(state.layoutInfo.orientation == Orientation.Vertical).isEqualTo(isVertical)
+        }
+    }
+
+    @Test
+    fun viewportOffsetsSmallContentReverseArrangement() {
+        val state = LazyGridState()
+        rule.setContent {
+            LazyGrid(
+                cells = 2,
+                modifier = Modifier.mainAxisSize(itemSizeDp * 5).crossAxisSize(itemSizeDp * 2),
+                state = state,
+                reverseLayout = reverseLayout,
+                reverseArrangement = true
+            ) {
+                items(8) {
+                    Box(Modifier.requiredSize(itemSizeDp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(state.layoutInfo.viewportStartOffset).isEqualTo(0)
+            assertThat(state.layoutInfo.viewportEndOffset).isEqualTo(itemSizePx * 5)
+            state.layoutInfo.assertVisibleItems(count = 8, cells = 2, startOffset = itemSizePx)
         }
     }
 
