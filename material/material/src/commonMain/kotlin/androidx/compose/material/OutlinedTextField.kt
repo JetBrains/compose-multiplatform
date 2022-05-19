@@ -475,7 +475,9 @@ private class OutlinedTextFieldMeasurePolicy(
 
         // measure label
         val labelConstraints = relaxedConstraints.offset(
-            horizontal = -occupiedSpaceHorizontally,
+            horizontal = -occupiedSpaceHorizontally -
+                paddingValues.calculateLeftPadding(layoutDirection).roundToPx() -
+                paddingValues.calculateRightPadding(layoutDirection).roundToPx(),
             vertical = -bottomPadding
         )
         val labelPlaceable =
