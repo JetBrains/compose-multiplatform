@@ -24,7 +24,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MonotonicFrameClock
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -136,6 +135,7 @@ class WindowInsetsControllerTest {
     @Before
     fun setup() {
         rule.activity.createdLatch.await(1, TimeUnit.SECONDS)
+        rule.activity.attachedToWindowLatch.await(1, TimeUnit.SECONDS)
         rule.runOnUiThread {
             val view = rule.activity.window.decorView
             shownAtStart = view.rootWindowInsets.isVisible(insetType)
@@ -646,11 +646,27 @@ class WindowInsetsControllerTest {
      */
     @Test
     fun quickAnimation() {
+        val view = rule.activity.window.decorView
+        val imeType = android.view.WindowInsets.Type.ime()
+
+        rule.runOnUiThread {
+            view.windowInsetsController?.show(imeType)
+        }
+
+        val imeAvailable = rule.runOnIdle {
+            val windowInsets = view.rootWindowInsets
+            val insets = windowInsets.getInsets(imeType)
+            shownSize = insets.value
+            windowInsets.isVisible(imeType) && insets.value != 0
+        }
+        if (!imeAvailable) {
+            return // IME isn't available on this device
+        }
         var imeBottom by mutableStateOf(0)
         var showDialog by mutableStateOf(false)
+        val focusRequester = FocusRequester()
         rule.setContent {
             imeBottom = WindowInsets.ime.getBottom(LocalDensity.current)
-            val focusRequester = FocusRequester()
             Column(Modifier.background(Color.White).wrapContentSize().imePadding()) {
                 BasicTextField(
                     "Hello World",
@@ -663,48 +679,24 @@ class WindowInsetsControllerTest {
                     }
                 }
             }
-            SideEffect {
-                focusRequester.requestFocus()
-            }
+        }
+
+        rule.runOnIdle {
+            focusRequester.requestFocus()
         }
 
         rule.onNodeWithTag("textField").assertIsFocused()
 
         rule.runOnIdle {
-            rule.activity.window.decorView.windowInsetsController?.show(
-                android.view.WindowInsets.Type.ime()
-            )
-        }
-
-        // We don't know when the IME will show up, so we should keep checking for it.
-        val endWaitImeShow = SystemClock.uptimeMillis() + 1000
-        while (imeBottom == 0 && SystemClock.uptimeMillis() < endWaitImeShow) {
-            Thread.sleep(10)
-        }
-
-        rule.runOnIdle {
             assertThat(imeBottom).isNotEqualTo(0)
         }
-
-        // wait for IME to finish showing
-        do {
-            val lastBottom = imeBottom
-            rule.waitForIdle()
-        } while (lastBottom != imeBottom)
 
         showDialog = true
 
         rule.waitForIdle() // wait for showDialog
 
         // We don't know when the IME will go away, so we should keep checking for it.
-        val endWaitImeHide = SystemClock.uptimeMillis() + 1000
-        while (imeBottom != 0 && SystemClock.uptimeMillis() < endWaitImeHide) {
-            Thread.sleep(10)
-        }
-
-        rule.runOnIdle {
-            assertThat(imeBottom).isEqualTo(0)
-        }
+        rule.waitUntil { imeBottom == 0 }
     }
 
     private fun initializeDeviceWithInsetsShown(): Boolean {
