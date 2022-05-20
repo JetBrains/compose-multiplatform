@@ -23,17 +23,20 @@ import org.gradle.api.GradleException
 import org.gradle.api.logging.Logger
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFiles
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import java.io.File
-
 /**
  * Updates API signature text files.
  * In practice, the values they will be updated to will match the APIs defined by the source code.
  */
+@CacheableTask
 abstract class UpdateApiTask : DefaultTask() {
     /** Text file from which API signatures will be read. */
     @get:Input
@@ -47,6 +50,7 @@ abstract class UpdateApiTask : DefaultTask() {
     var forceUpdate: Boolean = false
 
     @InputFiles
+    @PathSensitive(PathSensitivity.RELATIVE)
     fun getTaskInputs(): List<File>? {
         val inputApi = inputApiLocation.get()
         return listOf(

@@ -24,13 +24,17 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFiles
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import java.io.File
 
 /**
  * Task which depends on `[GenerateNativeApiTask] and takes the generated native API files from the
  * build directory and copies them to the current /native-api directory.
  */
+@DisableCachingByDefault(because = "Doesn't benefit from caching")
 abstract class UpdateNativeApi : DefaultTask() {
 
     @get:Internal
@@ -42,7 +46,7 @@ abstract class UpdateNativeApi : DefaultTask() {
     @get:Internal
     abstract val outputApiLocations: ListProperty<File>
 
-    @InputFiles
+    @[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
     fun getTaskInputs(): List<File> {
         return getLocationsForArtifacts(
             inputApiLocation.get(),

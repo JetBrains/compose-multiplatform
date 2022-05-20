@@ -20,18 +20,23 @@ import androidx.build.checkapi.ApiLocation
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
 /**
  * Task for verifying changes in the public Android resource surface, e.g. `public.xml`.
  */
+@CacheableTask
 abstract class CheckResourceApiReleaseTask : DefaultTask() {
     /** Reference resource API file (in source control). */
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val referenceApiFile: Property<File>
 
     /** Generated resource API file (in build output). */
@@ -39,6 +44,7 @@ abstract class CheckResourceApiReleaseTask : DefaultTask() {
     abstract val apiLocation: Property<ApiLocation>
 
     @InputFiles
+    @PathSensitive(PathSensitivity.RELATIVE)
     fun getTaskInput(): File {
         return apiLocation.get().resourceFile
     }

@@ -33,12 +33,14 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.service.ServiceRegistry
 import org.gradle.process.ExecOperations
+import org.gradle.work.DisableCachingByDefault
 
 /**
  * Base task with common logic for updating and launching studio in both the frameworks/support
  * project and playground projects. Project-specific configuration is provided by
  * [RootStudioTask] and [PlaygroundStudioTask].
  */
+@DisableCachingByDefault(because = "the purpose of this task is to launch Studio")
 abstract class StudioTask : DefaultTask() {
 
     // TODO: support -y and --update-only options? Can use @Option for this
@@ -267,6 +269,7 @@ abstract class StudioTask : DefaultTask() {
 /**
  * Task for launching studio in the frameworks/support project
  */
+@DisableCachingByDefault(because = "the purpose of this task is to launch Studio")
 abstract class RootStudioTask : StudioTask() {
     override val ideaProperties get() = projectRoot.resolve("development/studio/idea.properties")
 }
@@ -274,6 +277,7 @@ abstract class RootStudioTask : StudioTask() {
 /**
  * Task for launching studio in a playground project
  */
+@DisableCachingByDefault(because = "the purpose of this task is to launch Studio")
 abstract class PlaygroundStudioTask : RootStudioTask() {
     @get:Internal
     val supportRootFolder = (project.rootProject.property("ext") as ExtraPropertiesExtension)

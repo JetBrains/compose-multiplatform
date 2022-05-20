@@ -23,12 +23,14 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import java.io.File
 import java.util.ArrayList
 
 /**
  * Task for a json file of all dependencies for each artifactId
  */
+@DisableCachingByDefault(because = "Not worth caching")
 abstract class CreateAggregateLibraryBuildInfoFileTask : DefaultTask() {
     init {
         group = "Help"

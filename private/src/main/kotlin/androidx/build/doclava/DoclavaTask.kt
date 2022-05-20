@@ -19,12 +19,16 @@ package androidx.build.doclava
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import org.gradle.workers.WorkAction
@@ -47,11 +51,13 @@ val DEFAULT_DOCLAVA_CONFIG = ChecksConfig(
     )
 )
 
+@CacheableTask()
 abstract class DoclavaTask @Inject constructor(
     private val workerExecutor: WorkerExecutor
 ) : DefaultTask() {
 
     // All lowercase name to match MinimalJavadocOptions#docletpath
+    @Classpath
     private lateinit var docletpath: FileCollection
 
     @Input
@@ -130,10 +136,10 @@ abstract class DoclavaTask @Inject constructor(
     @OutputDirectory
     var destinationDir: File? = null
 
-    @InputFiles
+    @InputFiles @Classpath
     var classpath: FileCollection? = null
 
-    @InputFiles
+    @[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
     val sources = mutableListOf<FileCollection>()
 
     fun source(files: FileCollection) {
