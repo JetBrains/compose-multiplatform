@@ -39,8 +39,10 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         api(project(":compose:ui:ui-unit"))
         api("androidx.annotation:annotation:1.1.0")
 
+        // when updating the runtime version please also update the runtime-saveable version
         implementation(project(":compose:runtime:runtime"))
-        implementation("androidx.compose.runtime:runtime-saveable:1.1.1")
+        implementation(project(":compose:runtime:runtime-saveable"))
+
         implementation(project(":compose:ui:ui-util"))
         implementation(libs.kotlinStdlib)
         implementation("androidx.core:core:1.5.0")
@@ -98,8 +100,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 api(project(":compose:ui:ui-graphics"))
                 api(project(":compose:ui:ui-unit"))
 
+                // when updating the runtime version please also update the runtime-saveable version
                 implementation(project(":compose:runtime:runtime"))
                 implementation(project(":compose:runtime:runtime-saveable"))
+
                 implementation(project(":compose:ui:ui-util"))
             }
 
