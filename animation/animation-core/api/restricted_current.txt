@@ -243,6 +243,9 @@ package androidx.compose.animation.core {
     method public float transform(float fraction);
   }
 
+  public final class EasingFunctionsKt {
+  }
+
   public final class EasingKt {
     method public static androidx.compose.animation.core.Easing getFastOutLinearInEasing();
     method public static androidx.compose.animation.core.Easing getFastOutSlowInEasing();
