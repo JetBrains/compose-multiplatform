@@ -7,7 +7,7 @@ buildscript {
     repos.addMavenRepositories(repositories)
 
     dependencies {
-        classpath("androidx.build.gradle.gcpbuildcache:gcpbuildcache:1.0.0-alpha02")
+        classpath("androidx.build.gradle.gcpbuildcache:gcpbuildcache:1.0.0-alpha05")
     }
 }
 
