@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.layout.IntervalList
 import androidx.compose.foundation.lazy.layout.MutableIntervalList
 import androidx.compose.runtime.Composable
 
+@OptIn(ExperimentalFoundationApi::class)
 internal class LazyListScopeImpl : LazyListScope {
 
     private val _intervals = MutableIntervalList<LazyListIntervalContent>()
@@ -35,7 +36,7 @@ internal class LazyListScopeImpl : LazyListScope {
         contentType: (index: Int) -> Any?,
         itemContent: @Composable LazyItemScope.(index: Int) -> Unit
     ) {
-        _intervals.add(
+        _intervals.addInterval(
             count,
             LazyListIntervalContent(
                 key = key,
@@ -46,7 +47,7 @@ internal class LazyListScopeImpl : LazyListScope {
     }
 
     override fun item(key: Any?, contentType: Any?, content: @Composable LazyItemScope.() -> Unit) {
-        _intervals.add(
+        _intervals.addInterval(
             1,
             LazyListIntervalContent(
                 key = if (key != null) { _: Int -> key } else null,
@@ -65,7 +66,7 @@ internal class LazyListScopeImpl : LazyListScope {
         val headersIndexes = _headerIndexes ?: mutableListOf<Int>().also {
             _headerIndexes = it
         }
-        headersIndexes.add(_intervals.totalSize)
+        headersIndexes.add(_intervals.size)
 
         item(key, contentType, content)
     }

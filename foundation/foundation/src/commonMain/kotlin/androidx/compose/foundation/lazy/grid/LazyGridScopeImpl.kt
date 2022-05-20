@@ -33,7 +33,7 @@ internal class LazyGridScopeImpl : LazyGridScope {
         contentType: Any?,
         content: @Composable LazyGridItemScope.() -> Unit
     ) {
-        intervals.add(
+        intervals.addInterval(
             1,
             LazyGridIntervalContent(
                 key = key?.let { { key } },
@@ -52,7 +52,7 @@ internal class LazyGridScopeImpl : LazyGridScope {
         contentType: (index: Int) -> Any?,
         itemContent: @Composable LazyGridItemScope.(index: Int) -> Unit
     ) {
-        intervals.add(
+        intervals.addInterval(
             count,
             LazyGridIntervalContent(
                 key = key,
