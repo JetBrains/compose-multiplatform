@@ -722,6 +722,22 @@ package androidx.compose.foundation.lazy.grid {
 
 package androidx.compose.foundation.lazy.layout {
 
+  @androidx.compose.foundation.ExperimentalFoundationApi public sealed interface IntervalList<T> {
+    method public void forEach(optional int fromIndex, optional int toIndex, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.layout.IntervalList.Interval<T>,kotlin.Unit> block);
+    method public operator androidx.compose.foundation.lazy.layout.IntervalList.Interval<T> get(int index);
+    method public int getSize();
+    property public abstract int size;
+  }
+
+  public static final class IntervalList.Interval<T> {
+    method public int getSize();
+    method public int getStartIndex();
+    method public T! getValue();
+    property public final int size;
+    property public final int startIndex;
+    property public final T! value;
+  }
+
   public final class IntervalListKt {
   }
 
@@ -765,6 +781,15 @@ package androidx.compose.foundation.lazy.layout {
 
   public final class Lazy_androidKt {
     method @androidx.compose.foundation.ExperimentalFoundationApi public static Object getDefaultLazyLayoutKey(int index);
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi public final class MutableIntervalList<T> implements androidx.compose.foundation.lazy.layout.IntervalList<T> {
+    ctor public MutableIntervalList();
+    method public void addInterval(int size, T? value);
+    method public void forEach(int fromIndex, int toIndex, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.layout.IntervalList.Interval<T>,kotlin.Unit> block);
+    method public androidx.compose.foundation.lazy.layout.IntervalList.Interval<T> get(int index);
+    method public int getSize();
+    property public int size;
   }
 
   @androidx.compose.foundation.ExperimentalFoundationApi public interface PinnableParent {
