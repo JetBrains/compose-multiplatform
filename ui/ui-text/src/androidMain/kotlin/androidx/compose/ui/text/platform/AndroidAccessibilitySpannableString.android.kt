@@ -72,7 +72,10 @@ fun AnnotatedString.toAccessibilitySpannableString(
 ): SpannableString {
     val spannableString = SpannableString(text)
     spanStyles.fastForEach { (style, start, end) ->
-        spannableString.setSpanStyle(style, start, end, density, fontFamilyResolver)
+        // b/232238615 looking up fonts inside of accessibility does not honor overwritten
+        // FontFamilyResolver. This is not safe until Font.ResourceLoader is fully removed.
+        val noFontStyle = style.copy(fontFamily = null)
+        spannableString.setSpanStyle(noFontStyle, start, end, density, fontFamilyResolver)
     }
 
     getTtsAnnotations(0, length).fastForEach { (ttsAnnotation, start, end) ->

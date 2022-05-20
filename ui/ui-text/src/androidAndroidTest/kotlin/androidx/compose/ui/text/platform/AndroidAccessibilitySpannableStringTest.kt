@@ -37,6 +37,10 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.createFontFamilyResolver
+import androidx.compose.ui.text.font.testutils.AsyncTestTypefaceLoader
+import androidx.compose.ui.text.font.testutils.BlockingFauxFont
+import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.style.TextDecoration
@@ -50,6 +54,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth
 
 @OptIn(InternalTextApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -198,11 +203,10 @@ class AndroidAccessibilitySpannableStringTest {
             annotatedString.toAccessibilitySpannableString(density, resourceLoader)
 
         assertThat(spannableString).isInstanceOf(SpannableString::class.java)
-        assertThat(spannableString).hasSpan(
-            TypefaceSpan::class, 5, 10
-        ) {
-            it.family == "monospace"
-        }
+        Truth.assertThat(spannableString.getSpans(
+            0,
+            spannableString.length,
+            TypefaceSpan::class.java)).isEmpty()
     }
 
     @Test
@@ -283,5 +287,26 @@ class AndroidAccessibilitySpannableStringTest {
         ) {
             it.backgroundColor == backgroundColor.toArgb()
         }
+    }
+
+    @OptIn(InternalTextApi::class)
+    @Test
+    fun fontsInSpanStyles_areIgnored() {
+        // b/232238615
+        val loader = AsyncTestTypefaceLoader()
+        val font = BlockingFauxFont(loader, Typeface.MONOSPACE)
+        val string = buildAnnotatedString {
+            pushStyle(SpanStyle(fontFamily = font.toFontFamily()))
+            append("crashes if b/232238615 not fixed")
+        }
+        val density = Density(1f, 1f)
+        val context = InstrumentationRegistry.getInstrumentation().context
+        val fontFamilyResolver = createFontFamilyResolver(context)
+
+        // see if font span is added
+        string.toAccessibilitySpannableString(density, fontFamilyResolver)
+
+        // toAccessibilitySpannableString should _not_ make any font requests
+        Truth.assertThat(loader.blockingRequests).isEmpty()
     }
 }
