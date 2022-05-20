@@ -91,6 +91,7 @@ val AnimationDemos = DemoCategory(
             listOf(
                 ComposableDemo("Column Arrangements Demo") { ColumnConfigurationDemo() },
                 ComposableDemo("Row Arrangements Demo (Landscape)") { RowConfigurationDemo() },
+                ComposableDemo("Easing Functions Demo") { EasingInfoDemo() },
             )
         ),
 
