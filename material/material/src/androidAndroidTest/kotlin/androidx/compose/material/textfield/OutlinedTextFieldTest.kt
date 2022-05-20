@@ -284,6 +284,37 @@ class OutlinedTextFieldTest {
     }
 
     @Test
+    fun testOutlinedTextField_labelPosition_initial_withMultiLineLabel() {
+        val textFieldWidth = 200.dp
+        val labelSize = Ref<IntSize>()
+        rule.setMaterialContent {
+            Box {
+                OutlinedTextField(
+                    value = "",
+                    onValueChange = {},
+                    modifier = Modifier.requiredWidth(textFieldWidth),
+                    label = {
+                        Text(
+                            text = "long long long long long long long long long long long long",
+                            modifier = Modifier.onGloballyPositioned {
+                                labelSize.value = it.size
+                            }
+                        )
+                    }
+                )
+            }
+        }
+
+        rule.runOnIdleWithDensity {
+            // label size
+            assertThat(labelSize.value).isNotNull()
+            assertThat(labelSize.value?.height).isGreaterThan(0)
+            assertThat(labelSize.value?.width)
+                .isEqualTo(textFieldWidth.roundToPx() - 2 * ExpectedPadding.roundToPx())
+        }
+    }
+
+    @Test
     fun testOutlinedTextField_labelPosition_initial_withDefaultHeight() {
         val labelSize = Ref<IntSize>()
         val labelPosition = Ref<Offset>()
@@ -356,6 +387,40 @@ class OutlinedTextFieldTest {
             )
 
             assertThat(labelPosition.value?.y).isEqualTo(getLabelPosition(labelSize))
+        }
+    }
+
+    @Test
+    fun testOutlinedTextField_labelPosition_whenFocused_withMultiLineLabel() {
+        val textFieldWidth = 200.dp
+        val labelSize = Ref<IntSize>()
+        rule.setMaterialContent {
+            Box {
+                OutlinedTextField(
+                    value = "",
+                    onValueChange = {},
+                    modifier = Modifier.testTag(TextfieldTag).requiredWidth(textFieldWidth),
+                    label = {
+                        Text(
+                            text = "long long long long long long long long long long long long",
+                            modifier = Modifier.onGloballyPositioned {
+                                labelSize.value = it.size
+                            }
+                        )
+                    }
+                )
+            }
+        }
+
+        // click to focus
+        rule.onNodeWithTag(TextfieldTag).performClick()
+
+        rule.runOnIdleWithDensity {
+            // label size
+            assertThat(labelSize.value).isNotNull()
+            assertThat(labelSize.value?.height).isGreaterThan(0)
+            assertThat(labelSize.value?.width)
+                .isEqualTo(textFieldWidth.roundToPx() - 2 * ExpectedPadding.roundToPx())
         }
     }
 
