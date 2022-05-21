@@ -31,6 +31,7 @@ import com.android.build.gradle.LibraryPlugin
 import java.io.File
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.component.ModuleComponentSelector
@@ -59,14 +60,20 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
         configureKtlintCheckFile()
         tasks.register(CheckExternalDependencyLicensesTask.TASK_NAME)
 
-        // Validate the Android Gradle Plugin version, if specified.
+        // If we're running inside Studio, validate the Android Gradle Plugin version.
         val expectedAgpVersion = System.getenv("EXPECTED_AGP_VERSION")
-        if (expectedAgpVersion != null && expectedAgpVersion != ANDROID_GRADLE_PLUGIN_VERSION) {
-            throw Exception(
-                "Expected AGP version \"$expectedAgpVersion\" does not match actual " +
-                    "AGP version \"$ANDROID_GRADLE_PLUGIN_VERSION\". Please close and restart " +
-                    "Studio."
-            )
+        if (properties.containsKey("android.injected.invoked.from.ide")) {
+            if (expectedAgpVersion != ANDROID_GRADLE_PLUGIN_VERSION) {
+                throw GradleException(
+                    """
+                    Please close and restart Android Studio.
+
+                    Expected AGP version \"$expectedAgpVersion\" does not match actual AGP version
+                    \"$ANDROID_GRADLE_PLUGIN_VERSION\". This happens when AGP is updated while
+                    Studio is running and can be fixed by restarting Studio.
+                    """.trimIndent()
+                )
+            }
         }
 
         val buildOnServerTask = tasks.create(
