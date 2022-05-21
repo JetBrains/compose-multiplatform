@@ -401,17 +401,13 @@ class TextFieldDecorationBoxTest {
                     value = value,
                     onValueChange = {},
                     modifier = Modifier
-                        .indicatorLine(
-                            enabled = true,
+                        .indicatorLine(enabled = true,
                             isError = false,
                             colors = colors,
                             interactionSource = interactionSource,
-                            unfocusedIndicatorLineThickness = with(Density) { borderWidth.toDp() }
-                        )
-                        .size(
-                            with(Density) { textFieldWidth.toDp() },
-                            with(Density) { textFieldHeight.toDp() }
-                        ),
+                            unfocusedIndicatorLineThickness = with(Density) { borderWidth.toDp() })
+                        .size(with(Density) { textFieldWidth.toDp() },
+                            with(Density) { textFieldHeight.toDp() }),
                     singleLine = singleLine,
                     interactionSource = interactionSource
                 ) {
@@ -440,6 +436,37 @@ class TextFieldDecorationBoxTest {
                 } else null
             }
     }
+
+    @Test
+    fun outlinedTextFieldBox_innerTextLocation_withMultilineLabel() {
+        val labelHeight = 60.dp
+        assertSizeAndPosition_outlinedTextField(
+            TextFieldDefaults.outlinedTextFieldPadding(),
+            false,
+            labelHeight / 2 + InnerTextFieldHeight + TextFieldPadding,
+            labelHeight / 2,
+            true,
+            label = {
+                // imitates the multiline label
+                Box(Modifier.size(10.dp, labelHeight))
+            }
+        )
+        }
+
+    @Test
+    fun outlinedTextFieldBox_singleLine_innerTextLocation_withMultilineLabel() {
+        val labelHeight = 60.dp
+        assertSizeAndPosition_outlinedTextField(
+            TextFieldDefaults.outlinedTextFieldPadding(),
+            true,
+            labelHeight / 2 + InnerTextFieldHeight + TextFieldPadding,
+            labelHeight / 2,
+            true,
+            label = {
+                // imitates the multiline label
+                Box(Modifier.size(10.dp, labelHeight))
+            })
+        }
 
     private fun assertVerticalSizeAndPosition_outlinedTextField(
         padding: PaddingValues,
@@ -478,7 +505,8 @@ class TextFieldDecorationBoxTest {
         expectedSize: Dp,
         expectedPosition: Dp,
         vertical: Boolean,
-        layoutDirection: LayoutDirection = LayoutDirection.Ltr
+        layoutDirection: LayoutDirection = LayoutDirection.Ltr,
+        label: @Composable (() -> Unit)? = null
     ) {
         var size: IntSize? = null
         var position: Offset? = null
@@ -511,7 +539,8 @@ class TextFieldDecorationBoxTest {
                             singleLine = singleLine,
                             visualTransformation = VisualTransformation.None,
                             interactionSource = interactionSource,
-                            contentPadding = padding
+                            contentPadding = padding,
+                            label = label
                         )
                     }
                 }
