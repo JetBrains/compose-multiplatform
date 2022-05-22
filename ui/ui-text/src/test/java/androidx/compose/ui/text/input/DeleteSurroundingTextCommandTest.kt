@@ -18,6 +18,7 @@ package androidx.compose.ui.text.input
 
 import androidx.compose.ui.text.TextRange
 import com.google.common.truth.Truth.assertThat
+import kotlin.test.assertFailsWith
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -217,5 +218,21 @@ class DeleteSurroundingTextCommandTest {
         assertThat(eb.cursor).isEqualTo(2)
         assertThat(eb.compositionStart).isEqualTo(0)
         assertThat(eb.compositionEnd).isEqualTo(3)
+    }
+
+    @Test
+    fun throws_whenLengthBeforeInvalid() {
+        val error = assertFailsWith<IllegalArgumentException> {
+            DeleteSurroundingTextCommand(lengthBeforeCursor = -42, lengthAfterCursor = 0)
+        }
+        assertThat(error).hasMessageThat().contains("-42")
+    }
+
+    @Test
+    fun throws_whenLengthAfterInvalid() {
+        val error = assertFailsWith<IllegalArgumentException> {
+            DeleteSurroundingTextCommand(lengthBeforeCursor = 0, lengthAfterCursor = -42)
+        }
+        assertThat(error).hasMessageThat().contains("-42")
     }
 }

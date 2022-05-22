@@ -260,13 +260,22 @@ class SetComposingTextCommand(
 class DeleteSurroundingTextCommand(
     /**
      * The number of characters in UTF-16 before the cursor to be deleted.
+     * Must be non-negative.
      */
     val lengthBeforeCursor: Int,
     /**
      * The number of characters in UTF-16 after the cursor to be deleted.
+     * Must be non-negative.
      */
     val lengthAfterCursor: Int
 ) : EditCommand {
+    init {
+        require(lengthBeforeCursor >= 0 && lengthAfterCursor >= 0) {
+            "Expected lengthBeforeCursor and lengthAfterCursor to be non-negative, were " +
+                "$lengthBeforeCursor and $lengthAfterCursor respectively."
+        }
+    }
+
     override fun applyTo(buffer: EditingBuffer) {
         buffer.delete(
             buffer.selectionEnd,
@@ -312,13 +321,22 @@ class DeleteSurroundingTextCommand(
 class DeleteSurroundingTextInCodePointsCommand(
     /**
      * The number of characters in Unicode code points before the cursor to be deleted.
+     * Must be non-negative.
      */
     val lengthBeforeCursor: Int,
     /**
      * The number of characters in Unicode code points after the cursor to be deleted.
+     * Must be non-negative.
      */
     val lengthAfterCursor: Int
 ) : EditCommand {
+    init {
+        require(lengthBeforeCursor >= 0 && lengthAfterCursor >= 0) {
+            "Expected lengthBeforeCursor and lengthAfterCursor to be non-negative, were " +
+                "$lengthBeforeCursor and $lengthAfterCursor respectively."
+        }
+    }
+
     override fun applyTo(buffer: EditingBuffer) {
         // Convert code point length into character length. Then call the common logic of the
         // DeleteSurroundingTextEditOp
@@ -424,6 +442,7 @@ class SetSelectionCommand(
         return "SetSelectionCommand(start=$start, end=$end)"
     }
 }
+
 /**
  * Finishes the composing text that is currently active. This simply leaves the text as-is,
  * removing any special composing styling or other state that was around it. The cursor position
