@@ -156,6 +156,8 @@ val DONT_TRY_RERUNNING_TASK_TYPES = setOf(
     // due to GenerateModuleMetadata re-running
     "androidx.build.GMavenZipTask_Decorated",
     "org.gradle.api.publish.maven.tasks.PublishToMavenRepository_Decorated",
+    // This task is not cacheable by design due to large number of inputs
+    "androidx.build.license.CheckExternalDependencyLicensesTask_Decorated",
 )
 
 @Suppress("UnstableApiUsage") // usage of BuildService that's incubating
