@@ -132,6 +132,30 @@ class HardwareKeyboardTest {
     }
 
     @Test
+    fun textField_delete_atEnd() {
+        val text = "hello"
+        val value = mutableStateOf(
+            TextFieldValue(
+                text,
+                // Place cursor at end.
+                selection = TextRange(text.length)
+            )
+        )
+        keysSequenceTest(value = value) {
+            Key.Delete.downAndUp()
+            expectedText("hello")
+        }
+    }
+
+    @Test
+    fun textField_delete_whenEmpty() {
+        keysSequenceTest(initText = "") {
+            Key.Delete.downAndUp()
+            expectedText("")
+        }
+    }
+
+    @Test
     fun textField_nextWord() {
         keysSequenceTest(initText = "hello world") {
             Key.DirectionRight.downAndUp(META_CTRL_ON)
