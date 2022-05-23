@@ -249,16 +249,23 @@ package androidx.compose.ui.test {
   }
 
   @androidx.compose.ui.test.ExperimentalTestApi public interface KeyInjectionScope extends androidx.compose.ui.test.InjectionScope {
-    method public default long getDefaultPressDuration();
+    method public boolean isCapsLockOn();
     method public boolean isKeyDown(long key);
+    method public boolean isNumLockOn();
+    method public boolean isScrollLockOn();
     method public void keyDown(long key);
     method public void keyUp(long key);
-    property public default long defaultPressDuration;
+    property public abstract boolean isCapsLockOn;
+    property public abstract boolean isNumLockOn;
+    property public abstract boolean isScrollLockOn;
   }
 
   public final class KeyInjectionScopeKt {
     method @androidx.compose.ui.test.ExperimentalTestApi public static void pressKey(androidx.compose.ui.test.KeyInjectionScope, long key, optional long pressDuration);
-    method @androidx.compose.ui.test.ExperimentalTestApi public static void pressKeys(androidx.compose.ui.test.KeyInjectionScope, java.util.List<androidx.compose.ui.input.key.Key> keys, optional long pressDuration, optional long interPressDuration);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void pressKey(androidx.compose.ui.test.KeyInjectionScope, long key, int times, optional long pressDuration, optional long pauseDuration);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void pressKeys(androidx.compose.ui.test.KeyInjectionScope, java.util.List<androidx.compose.ui.input.key.Key> keys, optional long pressDuration, optional long pauseDuration);
+    field public static final long DefaultKeyPressDuration = 50L; // 0x32L
+    field public static final long DefaultPauseDurationBetweenKeyPresses = 50L; // 0x32L
   }
 
   public final class KeyInputHelpersKt {

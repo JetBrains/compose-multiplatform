@@ -112,6 +112,21 @@ internal abstract class InputDispatcher(
     val isTouchInProgress: Boolean
         get() = partialGesture != null
 
+    /**
+     * Indicates whether caps lock is on or not.
+     */
+    val isCapsLockOn: Boolean get() = keyInputState.capsLockOn
+
+    /**
+     * Indicates whether num lock is on or not.
+     */
+    val isNumLockOn: Boolean get() = keyInputState.numLockOn
+
+    /**
+     * Indicates whether scroll lock is on or not.
+     */
+    val isScrollLockOn: Boolean get() = keyInputState.scrollLockOn
+
     init {
         val rootHash = identityHashCode(root)
         val state = testContext.states.remove(rootHash)

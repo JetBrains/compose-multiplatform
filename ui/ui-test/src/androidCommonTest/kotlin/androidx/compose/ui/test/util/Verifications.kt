@@ -118,6 +118,7 @@ internal fun InputEvent.verifyMouseEvent(
     expectedPosition: Offset,
     expectedButtonState: Int,
     vararg expectedAxisValues: Pair<Int, Float>, // <axis, value>
+    expectedMetaState: Int = 0,
 ) {
     if (this is MotionEvent) {
         assertWithMessage("pointerCount").that(pointerCount).isEqualTo(1)
@@ -130,6 +131,7 @@ internal fun InputEvent.verifyMouseEvent(
         assertWithMessage("buttonState").that(buttonState).isEqualTo(expectedButtonState)
         assertWithMessage("source").that(source).isEqualTo(SourceMouse)
         assertWithMessage("toolType").that(getToolType(0)).isEqualTo(TypeMouse)
+        assertWithMessage("metaState").that(metaState).isEqualTo(expectedMetaState)
         expectedAxisValues.forEach { (axis, expectedValue) ->
             assertWithMessage("axisValue($axis)").that(getAxisValue(axis)).isEqualTo(expectedValue)
         }

@@ -19,6 +19,16 @@ package androidx.compose.ui.test
 import androidx.compose.ui.input.key.Key
 
 /**
+ * Default duration of a key press in milliseconds (duration between key down and key up).
+ */
+const val DefaultKeyPressDuration = 50L // milliseconds
+
+/**
+ * Default duration of the pause between sequential key presses in milliseconds.
+ */
+const val DefaultPauseDurationBetweenKeyPresses = 50L // milliseconds
+
+/**
  * The receiver scope of the key input injection lambda from [performKeyInput].
  *
  * All sequences and patterns of key input can be expressed using the two fundamental methods of
@@ -39,9 +49,28 @@ import androidx.compose.ui.input.key.Key
 interface KeyInjectionScope : InjectionScope {
 
     /**
-     * Default duration of a key press in milliseconds.
+     * Indicates whether caps lock is on or not.
+     *
+     * Note that this reflects the state of the injected input only, it does not correspond to the
+     * state of an actual keyboard attached to the device on which a test is run
      */
-    val defaultPressDuration: Long get() = 50 // milliseconds
+    val isCapsLockOn: Boolean
+
+    /**
+     * Indicates whether num lock is on or not.
+     *
+     * Note that this reflects the state of the injected input only, it does not correspond to the
+     * state of an actual keyboard attached to the device on which a test is run
+     */
+    val isNumLockOn: Boolean
+
+    /**
+     * Indicates whether scroll lock is on or not.
+     *
+     * Note that this reflects the state of the injected input only, it does not correspond to the
+     * state of an actual keyboard attached to the device on which a test is run
+     */
+    val isScrollLockOn: Boolean
 
     /**
      * Sends a key down event for the given [key].
@@ -76,6 +105,10 @@ internal class KeyInjectionScopeImpl(
 ) : KeyInjectionScope, InjectionScope by baseScope {
     private val inputDispatcher get() = baseScope.inputDispatcher
 
+    override val isCapsLockOn: Boolean get() = inputDispatcher.isCapsLockOn
+    override val isNumLockOn: Boolean get() = inputDispatcher.isNumLockOn
+    override val isScrollLockOn: Boolean get() = inputDispatcher.isScrollLockOn
+
     // TODO(b/233186704) Find out why KeyEvents not registered when injected together in batches.
     override fun keyDown(key: Key) {
         inputDispatcher.enqueueKeyDown(key)
@@ -98,32 +131,52 @@ internal class KeyInjectionScopeImpl(
  *
  * @param key The key to be pressed down.
  * @param pressDuration Duration of press in milliseconds.
- * Defaults to [KeyInjectionScope.defaultPressDuration].
  */
 @ExperimentalTestApi
-fun KeyInjectionScope.pressKey(key: Key, pressDuration: Long = defaultPressDuration) {
+fun KeyInjectionScope.pressKey(key: Key, pressDuration: Long = DefaultKeyPressDuration) {
     keyDown(key)
     advanceEventTime(pressDuration)
     keyUp(key)
 }
 
 /**
- * Holds down the key each of the given [keys] for the given [pressDuration] in sequence, with
- * [interPressDuration] milliseconds between each press.
+ * Presses the given [key] the given number of [times], for [pressDuration] milliseconds each time.
+ * Pauses for [pauseDuration] milliseconds in between each key press.
  *
- * If one keys is already down, an [IllegalStateException] will be thrown.
+ * If the given [key] is already down an [IllegalStateException] is thrown.
+ *
+ * @param key The key to be pressed.
+ * @param times The number of times to press the given key.
+ * @param pressDuration The length of time for which to hold each key press.
+ * @param pauseDuration The duration of the pause in between presses.
+ */
+@ExperimentalTestApi
+fun KeyInjectionScope.pressKey(
+    key: Key,
+    times: Int,
+    pressDuration: Long = DefaultKeyPressDuration,
+    pauseDuration: Long = DefaultPauseDurationBetweenKeyPresses
+) = (0 until times).forEach { idx ->
+    if (idx != 0) advanceEventTime(pauseDuration)
+    pressKey(key, pressDuration)
+}
+
+/**
+ * Holds down the key each of the given [keys] for the given [pressDuration] in sequence, with
+ * [pauseDuration] milliseconds between each press.
+ *
+ * If one of the keys is already down, an [IllegalStateException] will be thrown.
  *
  * @param keys The list of keys to be pressed down.
  * @param pressDuration Duration of press in milliseconds.
- * @param interPressDuration The duration between presses.
- * Both durations default to [KeyInjectionScope.defaultPressDuration].
+ * @param pauseDuration The duration between presses.
  */
 @ExperimentalTestApi
 fun KeyInjectionScope.pressKeys(
     keys: List<Key>,
-    pressDuration: Long = defaultPressDuration,
-    interPressDuration: Long = defaultPressDuration
+    pressDuration: Long = DefaultKeyPressDuration,
+    pauseDuration: Long = DefaultPauseDurationBetweenKeyPresses
 ) = keys.forEachIndexed { idx: Int, key: Key ->
-    if (idx != 0) advanceEventTime(interPressDuration)
+    if (idx != 0) advanceEventTime(pauseDuration)
     pressKey(key, pressDuration)
 }
