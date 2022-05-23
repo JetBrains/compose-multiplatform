@@ -18,10 +18,13 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
     kotlinPlugin(project(":compose:compiler:compiler"))
 
     implementation(libs.kotlinStdlib)
     implementation(project(":activity:activity-compose"))
+    implementation("androidx.appcompat:appcompat:1.4.1")
+    implementation("androidx.cardview:cardview:1.0.0")
     // old version of common-java8 conflicts with newer version, because both have
     // DefaultLifecycleEventObserver.
     // Outside of androidx this is resolved via constraint added to lifecycle-common,
