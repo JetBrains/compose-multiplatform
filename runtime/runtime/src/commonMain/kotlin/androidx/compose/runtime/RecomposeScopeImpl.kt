@@ -240,7 +240,8 @@ internal class RecomposeScopeImpl(
         if (
             instances.isNotEmpty() &&
             instances.all { instance ->
-                instance is DerivedState<*> && trackedDependencies[instance] == instance.value
+                instance is DerivedState<*> &&
+                    trackedDependencies[instance] == instance.currentValue
             }
         )
             return false
