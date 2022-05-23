@@ -23,6 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -31,6 +32,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.debugInspectorInfo
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 /**
  * Configure component to be hoverable via pointer enter/exit events.
@@ -51,6 +53,7 @@ fun Modifier.hoverable(
         properties["enabled"] = enabled
     }
 ) {
+    val scope = rememberCoroutineScope()
     var hoverInteraction by remember { mutableStateOf<HoverInteraction.Enter?>(null) }
 
     suspend fun emitEnter() {
@@ -96,11 +99,13 @@ fun Modifier.hoverable(
 //  LocalPointerPosition.current
             .pointerInput(interactionSource) {
                 val currentContext = currentCoroutineContext()
-                while (currentContext.isActive) {
-                    val event = awaitPointerEventScope { awaitPointerEvent() }
-                    when (event.type) {
-                        PointerEventType.Enter -> emitEnter()
-                        PointerEventType.Exit -> emitExit()
+                awaitPointerEventScope {
+                    while (currentContext.isActive) {
+                        val event = awaitPointerEvent()
+                        when (event.type) {
+                            PointerEventType.Enter -> scope.launch { emitEnter() }
+                            PointerEventType.Exit -> scope.launch { emitExit() }
+                        }
                     }
                 }
             }
