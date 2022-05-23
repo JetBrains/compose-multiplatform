@@ -85,10 +85,16 @@ private fun processSingleWindowScreenshot(
         it.config.contains(SemanticsProperties.IsPopup)
     }
     if (popupParentMaybe != null) {
+//  Uncomment when captureToImage(useAllWindows = true). is published
+//      throw IllegalArgumentException(
+//            "The node that is being captured to bitmap is in a popup or is a popup itself." +
+//                "Please use captureToImage(useAllWindows = true)."
+//      )
+
         // We do not support capturing popups to bitmap
         throw IllegalArgumentException(
-            "The node that is being captured to bitmap is in a popup or is a popup itself." +
-                "Please use captureToImage(useAllWindows = true)."
+            "The node that is being captured to bitmap is in " +
+                "a popup or is a popup itself. Popups currently cannot be captured to bitmap."
         )
     }
 
