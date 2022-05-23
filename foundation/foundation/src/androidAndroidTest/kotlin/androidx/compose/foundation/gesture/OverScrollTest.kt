@@ -16,6 +16,11 @@
 
 package androidx.compose.foundation.gesture
 
+import android.os.Build
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clipScrollableContainer
+import androidx.compose.foundation.gestures.AndroidEdgeEffectOverScrollController
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.OverScrollController
@@ -23,19 +28,26 @@ import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.overScroll
+import androidx.compose.foundation.gestures.rememberOverScrollController
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.matchers.isZero
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -45,17 +57,24 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
+import androidx.testutils.AnimationDurationScaleRule
 import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.assertWithMessage
+import kotlin.math.abs
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.math.abs
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class OverScrollTest {
     @get:Rule
     val rule = createComposeRule()
+
+    @get:Rule
+    val animationScaleRule: AnimationDurationScaleRule =
+        AnimationDurationScaleRule.createForAllTests(1f)
 
     private val boxTag = "box"
 
@@ -250,6 +269,75 @@ class OverScrollTest {
         assertThat(first).isEqualTo(second)
     }
 
+    @OptIn(ExperimentalFoundationApi::class)
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun overscrollIsNotClippingTheContentWhenPulled() {
+        // if we don't do it the overscroll effect will not even start.
+        animationScaleRule.setAnimationDurationScale(1f)
+
+        lateinit var controller: AndroidEdgeEffectOverScrollController
+        val tag = "container"
+        rule.setContent {
+            Box {
+                controller = rememberOverScrollController() as AndroidEdgeEffectOverScrollController
+                Box(
+                    Modifier
+                        .background(Color.Red)
+                        .testTag(tag)
+                ) {
+                    Box(
+                        Modifier
+                            .padding(horizontal = 10.dp)
+                            .size(10.dp)
+                            .clipScrollableContainer(true)
+                            .overScroll(controller)
+                            .drawBehind {
+                                val extraOffset = 10.dp
+                                    .roundToPx()
+                                    .toFloat()
+                                // we fill the whole parent container so we can test that
+                                // there is no clipping
+                                drawRect(
+                                    Color.Green,
+                                    Offset(-extraOffset, -extraOffset),
+                                    size = Size(
+                                        size.width + extraOffset * 2,
+                                        size.height + extraOffset * 2
+                                    )
+                                )
+                            }
+                    )
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            val oneSide = with(rule.density) { 10.dp.roundToPx().toFloat() }
+            controller.refreshContainerInfo(Size(oneSide, oneSide), true)
+            val offset = Offset(0f, 5f)
+            controller.consumePostScroll(
+                initialDragDelta = offset,
+                overScrollDelta = offset,
+                pointerPosition = null,
+                source = NestedScrollSource.Drag
+            )
+            // we have to disable further invalidation requests as otherwise while the overscroll
+            // effect is considered active (as it is in a pulled state) this will infinitely
+            // schedule next invalidation right from the drawing. this will make our test infra
+            // to never be switched into idle state so this fill freeze instead of proceeding
+            // to the next step in the test.
+            controller.invalidationEnabled = false
+        }
+
+        rule.onNodeWithTag(tag)
+            .captureToImage()
+            // if there is not clipping then the red parent is not visible
+            // but we also don't want to assert that the bg is Green as some overscroll
+            // effects can draw something else on top of this plain green background
+            .assertHasNoColor(Color.Red)
+    }
+
     class TestOverScrollController(
         private val consumePreCycles: Boolean = false,
         var animationRunning: Boolean = false
@@ -430,4 +518,15 @@ private fun ComposeContentTestRule.setOverscrollContentAndReturnViewConfig(
         }
     }
     return viewConfiguration!!
+}
+
+private fun ImageBitmap.assertHasNoColor(color: Color) {
+    val pixel = toPixelMap()
+    for (x in 0 until width) {
+        for (y in 0 until height) {
+            assertWithMessage(
+                "Pixel at [$x,$y] was equal to $color"
+            ).that(pixel[x, y]).isNotEqualTo(color)
+        }
+    }
 }
