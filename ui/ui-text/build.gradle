@@ -53,6 +53,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         testImplementation(libs.mockitoCore)
         testImplementation(libs.truth)
         testImplementation(libs.kotlinReflect)
+        testImplementation(libs.kotlinTest)
         testImplementation(libs.mockitoKotlin)
 
         androidTestImplementation(project(":compose:ui:ui-test-font"))
@@ -139,6 +140,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.mockitoCore)
                 implementation(libs.truth)
                 implementation(libs.kotlinReflect)
+                implementation(libs.kotlinTest)
                 implementation(libs.mockitoKotlin)
             }
 
@@ -158,6 +160,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             desktopTest.dependencies {
                 implementation(libs.truth)
                 implementation(libs.junit)
+                implementation(libs.kotlinTest)
                 implementation(libs.skikoCurrentOs)
                 implementation(project(":compose:foundation:foundation"))
                 implementation(project(":compose:ui:ui-test-junit4"))
