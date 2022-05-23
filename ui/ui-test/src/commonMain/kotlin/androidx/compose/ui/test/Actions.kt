@@ -416,6 +416,45 @@ fun SemanticsNodeInteraction.performMouseInput(
 }
 
 /**
+ * Executes the key input gesture specified in the given [block]. The gesture doesn't need to be
+ * complete and can be resumed in a later invocation of one of the `perform.*Input` methods. The
+ * event time is initialized to the current time of the [MainTestClock].
+ *
+ * All events that are injected from the [block] are batched together and sent after [block] is
+ * complete. This method blocks while the events are injected. If an error occurs during
+ * execution of [block] or injection of the events, all (subsequent) events are dropped and the
+ * error is thrown here.
+ *
+ * Due to the batching of events, all events in a block are sent together and no recomposition will
+ * take place in between events. Additionally all events will be generated before any of the events
+ * take effect. This means that the screen coordinates of all events are resolved before any of
+ * the events can cause the position of the node being injected into to change. This has certain
+ * advantages, for example, in the cases of nested scrolling or dragging an element around, it
+ * prevents the injection of events into a moving target since all events are enqueued before any
+ * of them has taken effect.
+ *
+ * @param block A lambda with [KeyInjectionScope] as receiver that describes the gesture by
+ * sending all key press events.
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
+ *
+ * @see KeyInjectionScope
+ */
+@ExperimentalTestApi
+fun SemanticsNodeInteraction.performKeyInput(
+    block: KeyInjectionScope.() -> Unit
+): SemanticsNodeInteraction {
+    val node = fetchSemanticsNode("Failed to inject key input.")
+    with(MultiModalInjectionScopeImpl(node, testContext)) {
+        try {
+            key(block)
+        } finally {
+            dispose()
+        }
+    }
+    return this
+}
+
+/**
  * Executes the multi-modal gesture specified in the given [block]. The gesture doesn't need to be
  * complete and can be resumed in a later invocation of one of the `perform.*Input` methods. The
  * event time is initialized to the current time of the [MainTestClock]. If only a single
@@ -449,7 +488,7 @@ fun SemanticsNodeInteraction.performMouseInput(
  *
  * @see MultiModalInjectionScope
  */
-// TODO(fresen): add example of multi-modal input when Keyboard input is added (touch and mouse
+// TODO(fresen): add example of multi-modal input when key input is added (touch and mouse
 //  don't work together, so an example with those two doesn't make sense)
 fun SemanticsNodeInteraction.performMultiModalInput(
     block: MultiModalInjectionScope.() -> Unit

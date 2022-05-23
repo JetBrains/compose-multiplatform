@@ -16,18 +16,28 @@
 
 package androidx.compose.ui.test.util
 
+import android.view.InputEvent
+import android.view.KeyEvent
 import android.view.MotionEvent
 
-internal class MotionEventRecorder {
+internal class InputEventRecorder {
 
-    private val _events = mutableListOf<MotionEvent>()
-    val events get() = _events as List<MotionEvent>
+    private val _events = mutableListOf<InputEvent>()
+    val events get() = _events as List<InputEvent>
 
     fun disposeEvents() {
-        _events.removeAll { it.recycle(); true }
+        _events.removeAll { if (it is MotionEvent) it.recycle(); true }
     }
 
-    fun recordEvent(event: MotionEvent) {
-        _events.add(MotionEvent.obtain(event))
+    /**
+     * [InputEvent] recorder which can record events of type [MotionEvent] and [KeyEvent].
+     */
+    fun recordEvent(event: InputEvent) {
+        when (event) {
+            is KeyEvent -> _events.add(KeyEvent(event))
+            is MotionEvent -> _events.add(MotionEvent.obtain(event))
+            else -> IllegalArgumentException("Given InputEvent must be a MotionEvent or KeyEvent" +
+                " not ${event::class.simpleName}")
+        }
     }
 }
