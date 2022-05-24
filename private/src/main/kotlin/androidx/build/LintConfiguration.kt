@@ -195,17 +195,6 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension) {
             fatal.add("VisibleForTests")
         }
 
-        // Re-enable after resolving b/233118540
-        if (
-            // for :room:room-compiler-processing-testing
-            extension.type == LibraryType.ANNOTATION_PROCESSOR_UTILS ||
-
-            // for :internal-testutils-paging
-            extension.type == LibraryType.INTERNAL_TEST_LIBRARY
-        ) {
-            disable.add("NullAnnotationGroup")
-        }
-
         // Disable dependency checks that suggest to change them. We want libraries to be
         // intentional with their dependency version bumps.
         disable.add("KtxExtensionAvailable")
