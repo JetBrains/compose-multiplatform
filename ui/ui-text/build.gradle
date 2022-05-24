@@ -88,7 +88,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         desktop()
         darwin()
         js()
-        includeUtil()
     }
 
     kotlin {
@@ -185,13 +184,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     }
     dependencies {
         samples(projectOrArtifact(":compose:ui:ui-text:ui-text-samples"))
-    }
-} else {
-    android {
-        sourceSets.main.java {
-           srcDirs += "../../util/util/src/commonMain/kotlin"
-           srcDirs += "../../util/util/src/jvmMain/kotlin"
-        }
     }
 }
 

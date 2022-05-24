@@ -19,8 +19,6 @@ package androidx.compose.runtime
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
-import androidx.compose.util.createSynchronizedObject
-import androidx.compose.util.synchronized
 
 /**
  * A boolean open or closed latch for awaiting a single repeating event, like pending

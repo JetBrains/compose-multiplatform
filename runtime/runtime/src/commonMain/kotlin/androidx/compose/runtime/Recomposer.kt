@@ -27,9 +27,6 @@ import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentSetOf
 import androidx.compose.runtime.snapshots.fastAny
 import androidx.compose.runtime.snapshots.fastGroupBy
-import androidx.compose.util.SynchronizedObject
-import androidx.compose.util.createSynchronizedObject
-import androidx.compose.util.synchronized
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope

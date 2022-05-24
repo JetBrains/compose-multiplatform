@@ -17,8 +17,6 @@
 package androidx.compose.runtime
 
 import androidx.compose.runtime.snapshots.fastForEach
-import androidx.compose.util.createSynchronizedObject
-import androidx.compose.util.synchronized
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation

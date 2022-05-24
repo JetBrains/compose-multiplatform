@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-package androidx.compose.util
+/*
+ATTENTION! Please note that this file has duplicates.
+This is to avoid publishing to a separate library.
+If you need to make changes to the content, then find duplicates on this comment.
+ */
+
+package androidx.compose.ui
 
 internal class SynchronizedObject : kotlinx.atomicfu.locks.SynchronizedObject()
 

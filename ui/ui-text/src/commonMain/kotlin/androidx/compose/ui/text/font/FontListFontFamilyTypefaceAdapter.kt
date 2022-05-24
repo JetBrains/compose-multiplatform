@@ -25,8 +25,8 @@ import androidx.compose.ui.text.caches.LruCache
 import androidx.compose.ui.text.caches.SimpleArrayMap
 import androidx.compose.ui.text.fastDistinctBy
 import androidx.compose.ui.text.fastFilter
-import androidx.compose.util.createSynchronizedObject
-import androidx.compose.util.synchronized
+import androidx.compose.ui.text.createSynchronizedObject
+import androidx.compose.ui.text.synchronized
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import kotlinx.coroutines.CancellationException
