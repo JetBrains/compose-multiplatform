@@ -53,11 +53,6 @@ dependencies {
     implementation(project(":jetpad-integration")) // Doesn't have a .pom, so not slow to load
 }
 
-// Exclude dokka coming from AGP. We don't need it and it conflicts with dackka: b/195305339
-configurations.configureEach { conf ->
-  conf.exclude(group:"org.jetbrains.dokka", module:"dokka-core")
-}
-
 // Saves configuration into destFile
 // Each line of destFile will be the absolute filepath of one of the files in configuration
 def saveConfigurationResolution(configuration, destFile) {
