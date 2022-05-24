@@ -64,9 +64,8 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
     /**
      * The callback to be invoked when the selection is initiated.
      */
-    internal var onSelectionUpdateStartCallback: (
-        (LayoutCoordinates, Offset, SelectionAdjustment) -> Unit
-    )? = null
+    internal var onSelectionUpdateStartCallback:
+        ((LayoutCoordinates, Offset, SelectionAdjustment) -> Unit)? = null
 
     /**
      * The callback to be invoked when the selection is initiated with selectAll [Selection].
@@ -79,9 +78,8 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
      * The callback to be invoked when the selection is updated.
      * If the first offset is null it means that the start of selection is unknown for the caller.
      */
-    internal var onSelectionUpdateCallback: (
-        (LayoutCoordinates, Offset, Offset, Boolean, SelectionAdjustment) -> Boolean
-    )? = null
+    internal var onSelectionUpdateCallback:
+        ((LayoutCoordinates, Offset, Offset, Boolean, SelectionAdjustment) -> Boolean)? = null
 
     /**
      * The callback to be invoked when selection update finished.
