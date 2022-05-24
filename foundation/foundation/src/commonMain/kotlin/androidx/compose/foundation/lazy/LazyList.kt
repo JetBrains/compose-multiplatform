@@ -231,6 +231,24 @@ private fun rememberLazyListMeasurePolicy(
 
         val itemsCount = itemProvider.itemCount
 
+        // can be negative if the content padding is larger than the max size from constraints
+        val mainAxisAvailableSize = if (isVertical) {
+            containerConstraints.maxHeight - totalVerticalPadding
+        } else {
+            containerConstraints.maxWidth - totalHorizontalPadding
+        }
+        val visualItemOffset = if (!reverseLayout || mainAxisAvailableSize > 0) {
+            IntOffset(startPadding, topPadding)
+        } else {
+            // When layout is reversed and paddings together take >100% of the available space,
+            // layout size is coerced to 0 when positioning. To take that space into account,
+            // we offset start padding by negative space between paddings.
+            IntOffset(
+                if (isVertical) startPadding else startPadding + mainAxisAvailableSize,
+                if (isVertical) topPadding + mainAxisAvailableSize else topPadding
+            )
+        }
+
         val measuredItemProvider = LazyMeasuredItemProvider(
             contentConstraints,
             isVertical,
@@ -251,19 +269,12 @@ private fun rememberLazyListMeasurePolicy(
                 beforeContentPadding = beforeContentPadding,
                 afterContentPadding = afterContentPadding,
                 spacing = spacing,
-                visualOffset = IntOffset(startPadding, topPadding),
+                visualOffset = visualItemOffset,
                 key = key,
                 placementAnimator = placementAnimator
             )
         }
         state.premeasureConstraints = measuredItemProvider.childConstraints
-
-        // can be negative if the content padding is larger than the max size from constraints
-        val mainAxisAvailableSize = if (isVertical) {
-            containerConstraints.maxHeight - totalVerticalPadding
-        } else {
-            containerConstraints.maxWidth - totalHorizontalPadding
-        }
 
         val firstVisibleItemIndex: DataIndex
         val firstVisibleScrollOffset: Int

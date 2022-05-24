@@ -231,6 +231,24 @@ private fun rememberLazyGridMeasurePolicy(
 
         val itemsCount = itemProvider.itemCount
 
+        // can be negative if the content padding is larger than the max size from constraints
+        val mainAxisAvailableSize = if (isVertical) {
+            constraints.maxHeight - totalVerticalPadding
+        } else {
+            constraints.maxWidth - totalHorizontalPadding
+        }
+        val visualItemOffset = if (!reverseLayout || mainAxisAvailableSize > 0) {
+            IntOffset(startPadding, topPadding)
+        } else {
+            // When layout is reversed and paddings together take >100% of the available space,
+            // layout size is coerced to 0 when positioning. To take that space into account,
+            // we offset start padding by negative space between paddings.
+            IntOffset(
+                if (isVertical) startPadding else startPadding + mainAxisAvailableSize,
+                if (isVertical) topPadding + mainAxisAvailableSize else topPadding
+            )
+        }
+
         val measuredItemProvider = LazyMeasuredItemProvider(
             itemProvider,
             this,
@@ -246,7 +264,7 @@ private fun rememberLazyGridMeasurePolicy(
                 layoutDirection = layoutDirection,
                 beforeContentPadding = beforeContentPadding,
                 afterContentPadding = afterContentPadding,
-                visualOffset = IntOffset(startPadding, topPadding),
+                visualOffset = visualItemOffset,
                 placeables = placeables,
                 placementAnimator = placementAnimator
             )
@@ -283,13 +301,6 @@ private fun rememberLazyGridMeasurePolicy(
                 slot += span
             }
             result
-        }
-
-        // can be negative if the content padding is larger than the max size from constraints
-        val mainAxisAvailableSize = if (isVertical) {
-            constraints.maxHeight - totalVerticalPadding
-        } else {
-            constraints.maxWidth - totalHorizontalPadding
         }
 
         val firstVisibleLineIndex: LineIndex
