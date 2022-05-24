@@ -104,10 +104,12 @@ class LazyListFocusMoveTest(param: Param) {
     @Test
     fun moveFocusAmongVisibleItems() {
         // Arrange.
-        rule.setLazyContent(50.dp) {
-            item { FocusableBox(0) }
-            item { FocusableBox(1, initiallyFocused) }
-            item { FocusableBox(2) }
+        rule.setTestContent {
+            lazyList(50.dp, lazyListState) {
+                item { FocusableBox(0) }
+                item { FocusableBox(1, initiallyFocused) }
+                item { FocusableBox(2) }
+            }
         }
         rule.runOnIdle { initiallyFocused.requestFocus() }
 
@@ -146,10 +148,12 @@ class LazyListFocusMoveTest(param: Param) {
     @Test
     fun moveFocusToItemThatIsJustBeyondBounds() {
         // Arrange.
-        rule.setLazyContent(30.dp) {
-            items(5) { FocusableBox(it) }
-            item { FocusableBox(5, initiallyFocused) }
-            items(5) { FocusableBox(it + 6) }
+        rule.setTestContent {
+            lazyList(30.dp, lazyListState) {
+                items(5) { FocusableBox(it) }
+                item { FocusableBox(5, initiallyFocused) }
+                items(5) { FocusableBox(it + 6) }
+            }
         }
         rule.runOnIdle {
             // Scroll so that the focused item is in the middle,
@@ -188,14 +192,16 @@ class LazyListFocusMoveTest(param: Param) {
     @Test
     fun moveFocusToItemThatIsFarBeyondBounds() {
         // Arrange.
-        rule.setLazyContent(30.dp) {
-            items(5) { FocusableBox(it) }
-            items(100) { Box(Modifier.size(10.dp)) }
-            item { FocusableBox(105) }
-            item { FocusableBox(106, initiallyFocused) }
-            item { FocusableBox(107) }
-            items(100) { Box(Modifier.size(10.dp)) }
-            items(5) { FocusableBox(it + 208) }
+        rule.setTestContent {
+            lazyList(30.dp, lazyListState) {
+                items(5) { FocusableBox(it) }
+                items(100) { Box(Modifier.size(10.dp)) }
+                item { FocusableBox(105) }
+                item { FocusableBox(106, initiallyFocused) }
+                item { FocusableBox(107) }
+                items(100) { Box(Modifier.size(10.dp)) }
+                items(5) { FocusableBox(it + 208) }
+            }
         }
         rule.runOnIdle {
             // Scroll so that the focused item is in the middle,
@@ -231,6 +237,143 @@ class LazyListFocusMoveTest(param: Param) {
         }
     }
 
+    @Test
+    fun moveFocusToItemThatIsBeyondBoundsAndInANestedLazyList() {
+        // Arrange.
+        rule.setTestContent {
+            lazyList(30.dp, lazyListState) {
+                item { lazyListCrossAxis(30.dp) { items(3) { FocusableBox(it + 0) } } }
+                item { FocusableBox(3) }
+                item { FocusableBox(4, initiallyFocused) }
+                item { FocusableBox(5) }
+                item { lazyListCrossAxis(30.dp) { items(3) { FocusableBox(it + 6) } } }
+            }
+        }
+        rule.runOnIdle {
+            // Scroll so that the focused item is in the middle,
+            // then move focus to the last visible item.
+            runBlocking { lazyListState.scrollToItem(1) }
+            initiallyFocused.requestFocus()
+            focusManager.moveFocus(focusDirection)
+        }
+
+        // Act.
+        val success = rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(success).isTrue()
+            when (focusDirection) {
+                Left -> when (layoutDirection) {
+                    Ltr -> assertThat(isFocused[if (reverseLayout) 8 else 0]).isTrue()
+                    Rtl -> assertThat(isFocused[if (reverseLayout) 2 else 6]).isTrue()
+                }
+                Right -> when (layoutDirection) {
+                    Ltr -> assertThat(isFocused[if (reverseLayout) 2 else 6]).isTrue()
+                    Rtl -> assertThat(isFocused[if (reverseLayout) 8 else 0]).isTrue()
+                }
+                Up -> assertThat(isFocused[if (reverseLayout) 8 else 0]).isTrue()
+                Down -> assertThat(isFocused[if (reverseLayout) 2 else 6]).isTrue()
+                In -> assertThat(isFocused[4]).isTrue()
+                Out -> assertThat(isLazyListFocused).isTrue()
+                else -> unsupportedDirection()
+            }
+        }
+    }
+
+    @Test
+    fun moveFocusToItemThatIsBeyondBoundsAndOutsideTheCurrentLazyList() {
+        // Arrange.
+        rule.setTestContent {
+            lazyList(30.dp, lazyListState) {
+                item { FocusableBox(0) }
+                item { lazyListCrossAxis(30.dp) { items(3) { FocusableBox(it + 1) } } }
+                item { FocusableBox(4, initiallyFocused) }
+                item { lazyListCrossAxis(30.dp) { items(3) { FocusableBox(it + 5) } } }
+                item { FocusableBox(8) }
+            }
+        }
+        rule.runOnIdle {
+            // Scroll so that the focused item is in the middle,
+            // then move focus to the last visible item.
+            runBlocking { lazyListState.scrollToItem(1) }
+            initiallyFocused.requestFocus()
+            focusManager.moveFocus(focusDirection)
+        }
+
+        // Act.
+        val success = rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(success).isTrue()
+            when (focusDirection) {
+                Left -> when (layoutDirection) {
+                    Ltr -> assertThat(isFocused[if (reverseLayout) 8 else 0]).isTrue()
+                    Rtl -> assertThat(isFocused[if (reverseLayout) 0 else 8]).isTrue()
+                }
+                Right -> when (layoutDirection) {
+                    Ltr -> assertThat(isFocused[if (reverseLayout) 0 else 8]).isTrue()
+                    Rtl -> assertThat(isFocused[if (reverseLayout) 8 else 0]).isTrue()
+                }
+                Up -> assertThat(isFocused[if (reverseLayout) 8 else 0]).isTrue()
+                Down -> assertThat(isFocused[if (reverseLayout) 0 else 8]).isTrue()
+                In -> assertThat(isFocused[6]).isTrue()
+                Out -> assertThat(isLazyListFocused).isTrue()
+                else -> unsupportedDirection()
+            }
+        }
+    }
+
+    @Test
+    fun moveFocusToAmongItemsInNestedLazyLists() {
+        // Arrange.
+        rule.setTestContent {
+            lazyList(30.dp, lazyListState) {
+                item { lazyListCrossAxis(30.dp) { items(3) { FocusableBox(it + 0) } } }
+                item { lazyListCrossAxis(30.dp) { items(3) { FocusableBox(it + 3) } } }
+                item { FocusableBox(6, initiallyFocused) }
+                item { lazyListCrossAxis(30.dp) { items(3) { FocusableBox(it + 7) } } }
+                item { lazyListCrossAxis(30.dp) { items(3) { FocusableBox(it + 10) } } } }
+        }
+        rule.runOnIdle {
+            // Scroll so that the focused item is in the middle,
+            // then move focus to the last visible item.
+            runBlocking { lazyListState.scrollToItem(1) }
+            initiallyFocused.requestFocus()
+            focusManager.moveFocus(focusDirection)
+        }
+
+        // Act.
+        val success = rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(success).isTrue()
+            when (focusDirection) {
+                Left -> when (layoutDirection) {
+                    Ltr -> assertThat(isFocused[if (reverseLayout) 12 else 0]).isTrue()
+                    Rtl -> assertThat(isFocused[if (reverseLayout) 2 else 10]).isTrue()
+                }
+                Right -> when (layoutDirection) {
+                    Ltr -> assertThat(isFocused[if (reverseLayout) 2 else 10]).isTrue()
+                    Rtl -> assertThat(isFocused[if (reverseLayout) 12 else 0]).isTrue()
+                }
+                Up -> assertThat(isFocused[if (reverseLayout) 12 else 0]).isTrue()
+                Down -> assertThat(isFocused[if (reverseLayout) 2 else 10]).isTrue()
+                In -> assertThat(isFocused[6]).isTrue()
+                Out -> assertThat(isLazyListFocused).isTrue()
+                else -> unsupportedDirection()
+            }
+        }
+    }
+
     @Composable
     private fun FocusableBox(index: Int, focusRequester: FocusRequester = FocusRequester()) {
         Box(
@@ -242,33 +385,65 @@ class LazyListFocusMoveTest(param: Param) {
         )
     }
 
-    private fun ComposeContentTestRule.setLazyContent(size: Dp, content: LazyListScope.() -> Unit) {
+    private fun ComposeContentTestRule.setTestContent(composable: @Composable () -> Unit) {
         setContent {
             CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
                 focusManager = LocalFocusManager.current
                 lazyListState = rememberLazyListState()
-                when (focusDirection) {
-                    Left, Right, In, Out -> LazyRow(
-                        modifier = Modifier
-                            .size(size)
-                            .onFocusChanged { isLazyListFocused = it.isFocused }
-                            .focusable(),
-                        state = lazyListState,
-                        reverseLayout = reverseLayout,
-                        content = content
-                    )
-                    Up, Down -> LazyColumn(
-                        modifier = Modifier
-                            .size(size)
-                            .onFocusChanged { isLazyListFocused = it.isFocused }
-                            .focusable(),
-                        state = lazyListState,
-                        reverseLayout = reverseLayout,
-                        content = content
-                    )
-                    else -> unsupportedDirection()
-                }
+                composable()
             }
+        }
+    }
+
+    @Composable
+    private fun lazyList(
+        size: Dp,
+        state: LazyListState = rememberLazyListState(),
+        content: LazyListScope.() -> Unit
+    ) {
+        when (focusDirection) {
+            Left, Right, In, Out -> LazyRow(
+                modifier = Modifier
+                    .size(size)
+                    .onFocusChanged { isLazyListFocused = it.isFocused }
+                    .focusable(),
+                state = state,
+                reverseLayout = reverseLayout,
+                content = content
+            )
+            Up, Down -> LazyColumn(
+                modifier = Modifier
+                    .size(size)
+                    .onFocusChanged { isLazyListFocused = it.isFocused }
+                    .focusable(),
+                state = state,
+                reverseLayout = reverseLayout,
+                content = content
+            )
+            else -> unsupportedDirection()
+        }
+    }
+
+    @Composable
+    private fun lazyListCrossAxis(
+        size: Dp,
+        state: LazyListState = rememberLazyListState(),
+        content: LazyListScope.() -> Unit
+    ) {
+        when (focusDirection) {
+            Left, Right, In, Out -> LazyColumn(
+                modifier = Modifier.size(size),
+                state = state,
+                reverseLayout = reverseLayout,
+                content = content
+            )
+            Up, Down -> LazyRow(
+                modifier = Modifier.size(size),
+                state = state,
+                reverseLayout = reverseLayout,
+                content = content
+            )
+            else -> unsupportedDirection()
         }
     }
 
