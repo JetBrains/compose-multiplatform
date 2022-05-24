@@ -137,8 +137,9 @@ val WindowInsets.Companion.displayCutout: WindowInsets
     get() = WindowInsetsHolder.current().displayCutout
 
 /**
- * For the [WindowInsetsCompat.Type.ime]. On [Build.VERSION_CODES.R] and above, the
- * soft keyboard can be detected and [ime] will animate when it shows.
+ * For the [WindowInsetsCompat.Type.ime]. On API level 23 (M) and above, the soft keyboard can be
+ * detected and [ime] will update when it shows. On API 30 (R) and above, the [ime] insets will
+ * animate synchronously with the actual IME animation.
  *
  * Developers should set `android:windowSoftInputMode="adjustResize"` in their
  * `AndroidManifest.xml` file and call `WindowCompat.setDecorFitsSystemWindows(window, false)`

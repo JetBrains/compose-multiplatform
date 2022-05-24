@@ -65,5 +65,6 @@ val FoundationDemos = DemoCategory(
         ComposableDemo("Custom Touch Slop Demo - Composition Locals") { CustomTouchSlopSample() },
         ComposableDemo("Focused bounds") { FocusedBoundsDemo() },
         ComposableDemo("Scrollable with focused child") { ScrollableFocusedChildDemo() },
+        ComposableDemo("Window insets") { WindowInsetsDemo() },
     )
 )
