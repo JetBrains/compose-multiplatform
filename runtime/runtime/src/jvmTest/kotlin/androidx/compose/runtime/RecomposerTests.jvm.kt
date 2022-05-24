@@ -18,29 +18,33 @@ package androidx.compose.runtime
 
 import androidx.compose.runtime.mock.TestMonotonicFrameClock
 import androidx.compose.runtime.snapshots.Snapshot
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.newSingleThreadContext
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
-import kotlinx.coroutines.CoroutineStart
-import org.junit.Test
+import java.lang.ref.WeakReference
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.test.fail
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import org.junit.Test
 
 class RecomposerTestsJvm {
 
@@ -187,6 +191,62 @@ class RecomposerTestsJvm {
             state <= Recomposer.State.ShuttingDown,
             "recomposer state $state but expected <= ShuttingDown"
         )
+    }
+
+    @Test
+    fun disposedInvalidatedCompositionDoesNotLeak(): Unit = runBlocking {
+        val recomposer = Recomposer(coroutineContext)
+
+        // Sent to when a frame is requested by recomposer
+        val frameRequestCh = Channel<Unit>(Channel.CONFLATED)
+
+        // Run recompositions with a clock that will never produce a frame, thereby leaving
+        // invalidations unhandled. Launch undispatched to get things moving before we proceed.
+        launch(
+            BroadcastFrameClock { frameRequestCh.trySend(Unit) },
+            start = CoroutineStart.UNDISPATCHED
+        ) {
+            recomposer.runRecomposeAndApplyChanges()
+        }
+
+        // Used to invalidate the composition below
+        var state by mutableStateOf(0)
+
+        // Create the composition to test in a function rather than directly, otherwise
+        // we end up with a hard reference from the stack sticking around preventing gc
+        fun createWeakComposition() = WeakReference(
+            Composition(UnitApplier(), recomposer).apply {
+                setContent {
+                    // This state read will invalidate the composition
+                    @Suppress("UNUSED_VARIABLE")
+                    val readme = state
+                }
+            }
+        )
+
+        // Hold only a weak reference to this created composition for the test
+        val weakRef = createWeakComposition()
+
+        // Ensure the recomposer is idle and ready to receive invalidations before we commit
+        // a snapshot that includes one
+        recomposer.currentState.first { it == Recomposer.State.Idle }
+
+        // Invalidate the composition
+        Snapshot.withMutableSnapshot { state++ }
+
+        withTimeoutOrNull(1000) {
+            frameRequestCh.receive()
+        } ?: fail("never requested a frame from recomposer")
+
+        // Bug 209497244 tracked the Recomposer keeping this composition
+        // in an invalidation list after disposal; confirm below that this becomes unreachable
+        weakRef.get()?.dispose() ?: fail("composition prematurely collected")
+
+        Runtime.getRuntime().gc()
+
+        assertNull(weakRef.get(), "composition was not collected after disposal")
+
+        recomposer.cancel()
     }
 }
 
