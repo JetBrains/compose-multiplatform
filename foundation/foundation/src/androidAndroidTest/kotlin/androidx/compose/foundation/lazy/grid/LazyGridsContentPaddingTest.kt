@@ -412,6 +412,41 @@ class LazyGridsContentPaddingTest {
     }
 
     @Test
+    fun verticalGrid_largeContentPaddingAndReverseLayout() {
+        val topPadding = itemSize * 2
+        val bottomPadding = itemSize * 2
+        val listSize = itemSize * 3
+        lateinit var state: LazyGridState
+        rule.setContentWithTestViewConfiguration {
+            LazyVerticalGrid(
+                GridCells.Fixed(1),
+                reverseLayout = true,
+                state = rememberLazyGridState().also { state = it },
+                modifier = Modifier.size(listSize),
+                contentPadding = PaddingValues(top = topPadding, bottom = bottomPadding),
+            ) {
+                items(3) { index ->
+                    Box(Modifier.size(itemSize).testTag("$index"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+        // Not visible.
+        rule.onNodeWithTag("1")
+            .assertIsNotDisplayed()
+
+        // Scroll to the top.
+        state.scrollBy(itemSize * 5f)
+
+        rule.onNodeWithTag("2").assertTopPositionInRootIsEqualTo(topPadding)
+        // Shouldn't be visible
+        rule.onNodeWithTag("1").assertIsNotDisplayed()
+        rule.onNodeWithTag("0").assertIsNotDisplayed()
+    }
+
+    @Test
     fun column_overscrollWithContentPadding() {
         lateinit var state: LazyGridState
         rule.setContent {
