@@ -35,6 +35,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.LayoutDirection
@@ -52,6 +53,7 @@ import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -322,6 +324,30 @@ class WindowInsetsDeviceTest {
         }
 
         rule.waitUntil(1000) { hasStatusBarInsets }
+    }
+
+    /**
+     * If we have setDecorFitsSystemWindows(false), there should be insets.
+     */
+    @Test
+    fun insetsSetAtStart() {
+        var leftInset = 0
+        var topInset = 0
+        var rightInset = 0
+        var bottomInset = 0
+
+        rule.setContent {
+            val insets = WindowInsets.safeContent
+            leftInset = insets.getLeft(LocalDensity.current, LocalLayoutDirection.current)
+            topInset = insets.getTop(LocalDensity.current)
+            rightInset = insets.getRight(LocalDensity.current, LocalLayoutDirection.current)
+            bottomInset = insets.getBottom(LocalDensity.current)
+        }
+
+        rule.waitForIdle()
+        assertTrue(
+            leftInset != 0 || topInset != 0 || rightInset != 0 || bottomInset != 0
+        )
     }
 
     class StatusBarsShowListener : OnApplyWindowInsetsListener {

@@ -20,8 +20,6 @@ import androidx.core.graphics.Insets as AndroidXInsets
 import android.os.Build
 import android.view.View
 import android.view.View.OnAttachStateChangeListener
-import androidx.annotation.DoNotInline
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.NonRestartableComposable
@@ -377,7 +375,6 @@ val WindowInsets.Companion.isTappableElementVisible: Boolean
 /**
  * The insets for various values in the current window.
  */
-@OptIn(ExperimentalLayoutApi::class)
 internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat?, view: View) {
     val captionBar =
         systemInsets(insets, WindowInsetsCompat.Type.captionBar(), "captionBar")
@@ -575,11 +572,7 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
         private fun getOrCreateFor(view: View): WindowInsetsHolder {
             return synchronized(viewMap) {
                 viewMap.getOrPut(view) {
-                    val insets = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        RootWindowInsetsApi23.rootWindowInsets(view)
-                    } else {
-                        null
-                    }
+                    val insets = null
                     WindowInsetsHolder(insets, view)
                 }
             }
@@ -605,19 +598,6 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
         ): ValueInsets {
             val initial = windowInsets?.getInsetsIgnoringVisibility(type) ?: AndroidXInsets.NONE
             return ValueInsets(initial, name)
-        }
-    }
-}
-
-/**
- * Used to get the [View.getRootWindowInsets] only on M and above
- */
-@RequiresApi(Build.VERSION_CODES.M)
-private object RootWindowInsetsApi23 {
-    @DoNotInline
-    fun rootWindowInsets(view: View): WindowInsetsCompat? {
-        return view.rootWindowInsets?.let {
-            WindowInsetsCompat.toWindowInsetsCompat(it, view)
         }
     }
 }
