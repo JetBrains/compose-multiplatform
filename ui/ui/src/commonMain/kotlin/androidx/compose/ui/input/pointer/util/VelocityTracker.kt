@@ -167,7 +167,6 @@ class VelocityTracker {
     private val samples: Array<PointAtTime?> = Array(HistorySize) { null }
     private var index: Int = 0
     private val useImpulse = true
-    internal var currentPositionDeltaAccumulator = Offset.Zero
 
     /**
      * Adds a position as the given time to the tracker.
@@ -246,7 +245,6 @@ class VelocityTracker {
      */
     fun resetTracking() {
         samples.fill(element = null)
-        currentPositionDeltaAccumulator = Offset.Zero
     }
 
     /**
@@ -341,13 +339,9 @@ class VelocityTracker {
 fun VelocityTracker.addPointerInputChange(event: PointerInputChange) {
     @OptIn(ExperimentalComposeUiApi::class)
     event.historical.fastForEach {
-        val historicalDelta = event.position - it.position
-        currentPositionDeltaAccumulator += historicalDelta
-        addPosition(it.uptimeMillis, currentPositionDeltaAccumulator)
+        addPosition(it.uptimeMillis, it.position)
     }
-    val delta = event.position - event.previousPosition
-    currentPositionDeltaAccumulator += delta
-    addPosition(event.uptimeMillis, currentPositionDeltaAccumulator)
+    addPosition(event.uptimeMillis, event.position)
 }
 
 private data class PointAtTime(val point: Offset, val time: Long)
@@ -355,7 +349,7 @@ private data class PointAtTime(val point: Offset, val time: Long)
 /**
  * A two dimensional velocity estimate.
  *
- * VelocityEstimates are computed by [VelocityTracker.getLsq2VelocityEstimate]. An
+ * VelocityEstimates are computed by [VelocityTracker.getVelocityEstimate]. An
  * estimate's [confidence] measures how well the velocity tracker's position
  * data fit a straight line, [durationMillis] is the time that elapsed between the
  * first and last position sample used to compute the velocity, and [offset]
