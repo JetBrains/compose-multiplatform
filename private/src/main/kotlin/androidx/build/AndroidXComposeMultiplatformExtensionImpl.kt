@@ -115,10 +115,6 @@ open class AndroidXComposeMultiplatformExtensionImpl @Inject constructor(
         uikitArm64Test.dependsOn(uikitTest)
     }
 
-    override fun includeUtil(): Unit {
-        addUtilDirectory("commonMain", "jvmMain", "jsMain", "nativeMain")
-    }
-
     private fun getOrCreateJvmMain(): KotlinSourceSet =
         getOrCreateSourceSet("jvmMain", "commonMain")
 

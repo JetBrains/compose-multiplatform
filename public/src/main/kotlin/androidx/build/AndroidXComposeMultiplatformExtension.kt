@@ -48,8 +48,4 @@ abstract class AndroidXComposeMultiplatformExtension {
       */
     abstract fun darwin(): Unit
 
-    /**
-      * Adds compose/util/util/src to source sets
-      */
-    abstract fun includeUtil(): Unit
 }
