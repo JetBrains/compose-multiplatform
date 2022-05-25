@@ -1015,6 +1015,8 @@ class Recomposer(
     internal override fun unregisterComposition(composition: ControlledComposition) {
         synchronized(stateLock) {
             knownCompositions -= composition
+            compositionInvalidations -= composition
+            compositionsAwaitingApply -= composition
         }
     }
 
