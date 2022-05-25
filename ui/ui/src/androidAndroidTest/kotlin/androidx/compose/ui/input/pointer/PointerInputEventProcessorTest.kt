@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.minus
 import androidx.compose.ui.unit.toOffset
+import androidx.compose.ui.util.fastMaxBy
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -182,6 +183,67 @@ class PointerInputEventProcessorTest {
                 }
             }
         }
+    }
+
+    /**
+     * PointerInputEventProcessor doesn't currently support reentrancy and
+     * b/233209795 indicates that it is likely causing a crash. This test
+     * ensures that if we have reentrancy that we exit without handling
+     * the event. This test can be replaced with tests supporting reentrant
+     * behavior when reentrancy is supported.
+     */
+    @Test
+    fun noReentrancy() {
+        var reentrancyCount = 0
+        // Arrange
+        val reentrantPointerInputFilter = object : PointerInputFilter() {
+            override fun onPointerEvent(
+                pointerEvent: PointerEvent,
+                pass: PointerEventPass,
+                bounds: IntSize
+            ) {
+                if (pass != PointerEventPass.Initial) {
+                    return
+                }
+                if (reentrancyCount > 1) {
+                    // Don't allow infinite recursion. Just enough to break the test.
+                    return
+                }
+                val oldId = pointerEvent.changes.fastMaxBy { it.id.value }!!.id.value.toInt()
+                val event = PointerInputEvent(oldId + 1, 14, Offset.Zero, true)
+                // force a reentrant call
+                val result = pointerInputEventProcessor.process(event)
+                assertThat(result.anyMovementConsumed).isFalse()
+                assertThat(result.dispatchedToAPointerInputModifier).isFalse()
+                pointerEvent.changes.forEach { it.consume() }
+                reentrancyCount++
+            }
+
+            override fun onCancel() {
+            }
+        }
+
+        val layoutNode = LayoutNode(
+            0,
+            0,
+            500,
+            500,
+            PointerInputModifierImpl2(reentrantPointerInputFilter)
+        )
+
+        addToRoot(layoutNode)
+
+        // Act
+
+        val result =
+            pointerInputEventProcessor.process(PointerInputEvent(8712, 3, Offset.Zero, true))
+
+        // Assert
+
+        assertThat(reentrancyCount).isEqualTo(1)
+
+        assertThat(result.anyMovementConsumed).isFalse()
+        assertThat(result.dispatchedToAPointerInputModifier).isTrue()
     }
 
     @Test
@@ -3165,12 +3227,14 @@ private class PointerInputModifierImpl2(override val pointerInputFilter: Pointer
 
 internal fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) =
     LayoutNode().apply {
-        this.modifier = Modifier.layout { measurable, constraints ->
-            val placeable = measurable.measure(constraints)
-            layout(placeable.width, placeable.height) {
-                placeable.place(x, y)
+        this.modifier = Modifier
+            .layout { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                layout(placeable.width, placeable.height) {
+                    placeable.place(x, y)
+                }
             }
-        }.then(modifier)
+            .then(modifier)
         measurePolicy = object : LayoutNode.NoIntrinsicsMeasurePolicy("not supported") {
             override fun MeasureScope.measure(
                 measurables: List<Measurable>,
