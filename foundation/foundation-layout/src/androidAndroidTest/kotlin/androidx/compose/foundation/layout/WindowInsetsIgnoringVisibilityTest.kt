@@ -16,16 +16,11 @@
 
 package androidx.compose.foundation.layout
 
-import android.content.Context
 import android.os.Build
-import android.view.View
 import android.view.ViewGroup
-import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -48,7 +43,7 @@ import org.junit.runner.RunWith
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
 class WindowInsetsIgnoringVisibilityTest {
     @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>()
+    val rule = createAndroidComposeRule<WindowInsetsActivity>()
 
     private lateinit var insetsView: InsetsView
 
@@ -68,13 +63,8 @@ class WindowInsetsIgnoringVisibilityTest {
         val type = WindowInsetsCompat.Type.captionBar()
         var isVisible = false
 
-        setContent {
-            val context = LocalView.current.context
-            val view = ViewWithRootInsets(context, createInsets(type, insets, true))
-            AndroidView(factory = { view })
-            CompositionLocalProvider(LocalView provides view) {
-                isVisible = WindowInsets.isCaptionBarVisible
-            }
+        setContent(createInsets(type, insets, true)) {
+            isVisible = WindowInsets.isCaptionBarVisible
         }
 
         rule.runOnIdle {
@@ -94,13 +84,8 @@ class WindowInsetsIgnoringVisibilityTest {
         val type = WindowInsetsCompat.Type.ime()
         var isVisible = false
 
-        setContent {
-            val context = LocalView.current.context
-            val view = ViewWithRootInsets(context, createInsets(type, insets, true))
-            AndroidView(factory = { view })
-            CompositionLocalProvider(LocalView provides view) {
-                isVisible = WindowInsets.isImeVisible
-            }
+        setContent(createInsets(type, insets, true)) {
+            isVisible = WindowInsets.isImeVisible
         }
 
         rule.runOnIdle {
@@ -120,13 +105,8 @@ class WindowInsetsIgnoringVisibilityTest {
         val type = WindowInsetsCompat.Type.statusBars()
         var isVisible = false
 
-        setContent {
-            val context = LocalView.current.context
-            val view = ViewWithRootInsets(context, createInsets(type, insets, true))
-            AndroidView(factory = { view })
-            CompositionLocalProvider(LocalView provides view) {
-                isVisible = WindowInsets.areStatusBarsVisible
-            }
+        setContent(createInsets(type, insets, true)) {
+            isVisible = WindowInsets.areStatusBarsVisible
         }
 
         rule.runOnIdle {
@@ -146,13 +126,8 @@ class WindowInsetsIgnoringVisibilityTest {
         val type = WindowInsetsCompat.Type.navigationBars()
         var isVisible = false
 
-        setContent {
-            val context = LocalView.current.context
-            val view = ViewWithRootInsets(context, createInsets(type, insets, true))
-            AndroidView(factory = { view })
-            CompositionLocalProvider(LocalView provides view) {
-                isVisible = WindowInsets.areNavigationBarsVisible
-            }
+        setContent(createInsets(type, insets, true)) {
+            isVisible = WindowInsets.areNavigationBarsVisible
         }
 
         rule.runOnIdle {
@@ -172,13 +147,8 @@ class WindowInsetsIgnoringVisibilityTest {
         val type = WindowInsetsCompat.Type.systemBars()
         var isVisible = false
 
-        setContent {
-            val context = LocalView.current.context
-            val view = ViewWithRootInsets(context, createInsets(type, insets, true))
-            AndroidView(factory = { view })
-            CompositionLocalProvider(LocalView provides view) {
-                isVisible = WindowInsets.areSystemBarsVisible
-            }
+        setContent(createInsets(type, insets, true)) {
+            isVisible = WindowInsets.areSystemBarsVisible
         }
 
         rule.runOnIdle {
@@ -198,13 +168,8 @@ class WindowInsetsIgnoringVisibilityTest {
         val type = WindowInsetsCompat.Type.tappableElement()
         var isVisible = false
 
-        setContent {
-            val context = LocalView.current.context
-            val view = ViewWithRootInsets(context, createInsets(type, insets, true))
-            AndroidView(factory = { view })
-            CompositionLocalProvider(LocalView provides view) {
-                isVisible = WindowInsets.isTappableElementVisible
-            }
+        setContent(createInsets(type, insets, true)) {
+            isVisible = WindowInsets.isTappableElementVisible
         }
 
         rule.runOnIdle {
@@ -234,13 +199,8 @@ class WindowInsetsIgnoringVisibilityTest {
         val type = WindowInsetsCompat.Type.captionBar()
         var ignoringVisibility = WindowInsets(0, 0, 0, 0)
 
-        setContent {
-            val context = LocalView.current.context
-            val view = ViewWithRootInsets(context, createInsets(type, insets, true))
-            AndroidView(factory = { view })
-            CompositionLocalProvider(LocalView provides view) {
-                ignoringVisibility = WindowInsets.captionBarIgnoringVisibility
-            }
+        setContent(createInsets(type, insets, true)) {
+            ignoringVisibility = WindowInsets.captionBarIgnoringVisibility
         }
 
         rule.runOnIdle {
@@ -260,13 +220,8 @@ class WindowInsetsIgnoringVisibilityTest {
         val type = WindowInsetsCompat.Type.navigationBars()
         var ignoringVisibility = WindowInsets(0, 0, 0, 0)
 
-        setContent {
-            val context = LocalView.current.context
-            val view = ViewWithRootInsets(context, createInsets(type, insets, true))
-            AndroidView(factory = { view })
-            CompositionLocalProvider(LocalView provides view) {
-                ignoringVisibility = WindowInsets.navigationBarsIgnoringVisibility
-            }
+        setContent(createInsets(type, insets, true)) {
+            ignoringVisibility = WindowInsets.navigationBarsIgnoringVisibility
         }
 
         rule.runOnIdle {
@@ -286,13 +241,8 @@ class WindowInsetsIgnoringVisibilityTest {
         val type = WindowInsetsCompat.Type.statusBars()
         var ignoringVisibility = WindowInsets(0, 0, 0, 0)
 
-        setContent {
-            val context = LocalView.current.context
-            val view = ViewWithRootInsets(context, createInsets(type, insets, true))
-            AndroidView(factory = { view })
-            CompositionLocalProvider(LocalView provides view) {
-                ignoringVisibility = WindowInsets.statusBarsIgnoringVisibility
-            }
+        setContent(createInsets(type, insets, true)) {
+            ignoringVisibility = WindowInsets.statusBarsIgnoringVisibility
         }
 
         rule.runOnIdle {
@@ -312,13 +262,8 @@ class WindowInsetsIgnoringVisibilityTest {
         val type = WindowInsetsCompat.Type.systemBars()
         var ignoringVisibility = WindowInsets(0, 0, 0, 0)
 
-        setContent {
-            val context = LocalView.current.context
-            val view = ViewWithRootInsets(context, createInsets(type, insets, true))
-            AndroidView(factory = { view })
-            CompositionLocalProvider(LocalView provides view) {
-                ignoringVisibility = WindowInsets.systemBarsIgnoringVisibility
-            }
+        setContent(createInsets(type, insets, true)) {
+            ignoringVisibility = WindowInsets.systemBarsIgnoringVisibility
         }
 
         rule.runOnIdle {
@@ -338,13 +283,8 @@ class WindowInsetsIgnoringVisibilityTest {
         val type = WindowInsetsCompat.Type.tappableElement()
         var ignoringVisibility = WindowInsets(0, 0, 0, 0)
 
-        setContent {
-            val context = LocalView.current.context
-            val view = ViewWithRootInsets(context, createInsets(type, insets, true))
-            AndroidView(factory = { view })
-            CompositionLocalProvider(LocalView provides view) {
-                ignoringVisibility = WindowInsets.tappableElementIgnoringVisibility
-            }
+        setContent(createInsets(type, insets, true)) {
+            ignoringVisibility = WindowInsets.tappableElementIgnoringVisibility
         }
 
         rule.runOnIdle {
@@ -377,10 +317,15 @@ class WindowInsetsIgnoringVisibilityTest {
         }
     }
 
-    private fun setContent(content: @Composable () -> Unit) {
+    private fun setContent(
+        initialInsets: WindowInsetsCompat? = null,
+        content: @Composable () -> Unit
+    ) {
         rule.setContent {
             AndroidView(factory = { context ->
-                val view = InsetsView(context)
+                val view = InsetsView(context).also {
+                    it.myInsets = initialInsets?.toWindowInsets()
+                }
                 insetsView = view
                 val composeView = ComposeView(rule.activity)
                 view.addView(
@@ -393,15 +338,6 @@ class WindowInsetsIgnoringVisibilityTest {
                 composeView.setContent(content)
                 view
             }, modifier = Modifier.fillMaxSize())
-        }
-    }
-
-    private class ViewWithRootInsets(
-        context: Context,
-        val insets: WindowInsetsCompat
-    ) : View(context) {
-        override fun getRootWindowInsets(): android.view.WindowInsets {
-            return insets.toWindowInsets()!!
         }
     }
 }

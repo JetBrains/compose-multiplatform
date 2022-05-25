@@ -15,17 +15,14 @@
  */
 package androidx.compose.foundation.layout
 
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.annotation.RequiresApi
 import androidx.core.view.WindowCompat
 import java.util.concurrent.CountDownLatch
 
 class WindowInsetsActivity : ComponentActivity() {
     val createdLatch = CountDownLatch(1)
 
-    @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
