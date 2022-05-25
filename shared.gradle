@@ -87,7 +87,7 @@ def parseConfigurationResolution(savedFile, throwOnError) {
 // Resolves a Configuration into a list of Dependency objects
 def resolveConfiguration(configuration) {
     def resolvedName = configuration.name
-    def cacheDir = new File(project.buildDir, "/" + resolvedName)
+    def cacheDir = new File(project.rootProject.buildDir, "/" + resolvedName)
     def inputsFile = new File(cacheDir, "/deps")
     def outputsFile = new File(cacheDir, "/result")
 
