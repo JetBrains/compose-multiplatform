@@ -124,28 +124,6 @@ const val VERIFY_UP_TO_DATE = "androidx.verifyUpToDate"
  */
 const val KMP_GITHUB_BUILD = "androidx.github.build"
 
-/**
- * If true, include mac targets when building KMP
- */
-const val KMP_ENABLE_MAC = "androidx.kmp.mac.enabled"
-
-/**
- * If true, include js targets when building KMP
- */
-const val KMP_ENABLE_JS = "androidx.kmp.js.enabled"
-
-/**
- * If true, include linux targets when building KMP
- */
-const val KMP_ENABLE_LINUX = "androidx.kmp.linux.enabled"
-
-/**
- * If true, include all native targets when building KMP.
- * Replaces KMP_ENABLE_MAC and KMP_ENABLE_LINUX in collections, and will eventually be
- * consolidated into the AndroidX plugin.
- */
-const val KMP_ENABLE_NATIVE = "androidx.kmp.native.enabled"
-
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALTERNATIVE_PROJECT_URL,
     VERSION_EXTRA_CHECK_ENABLED,
@@ -170,10 +148,7 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     PLAYGROUND_DOKKA_BUILD_ID,
     PROFILE_YOURKIT_AGENT_PATH,
     KMP_GITHUB_BUILD,
-    KMP_ENABLE_MAC,
-    KMP_ENABLE_JS,
-    KMP_ENABLE_LINUX,
-    KMP_ENABLE_NATIVE
+    ENABLED_KMP_TARGET_PLATFORMS
 )
 
 /**
