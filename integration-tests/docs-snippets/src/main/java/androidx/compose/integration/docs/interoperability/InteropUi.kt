@@ -29,6 +29,7 @@ import android.content.Context
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
@@ -49,7 +50,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AbstractComposeView
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
+import androidx.recyclerview.widget.RecyclerView
 
 /**
  * This file lets DevRel track changes to snippets present in
@@ -216,6 +220,66 @@ private object InteropUiSnippet8 {
                 /* Show grid with 8 columns */
             } else {
                 /* Show grid with 12 columns */
+            }
+        }
+    }
+}
+
+private object InteropUiSnippet9 {
+    // import androidx.compose.ui.platform.ComposeView
+
+    class MyComposeAdapter : RecyclerView.Adapter<MyComposeViewHolder>() {
+
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int,
+        ): MyComposeViewHolder {
+            return MyComposeViewHolder(ComposeView(parent.context))
+        }
+
+        override fun onViewRecycled(holder: MyComposeViewHolder) {
+            // Dispose the underlying Composition of the ComposeView
+            // when RecyclerView has recycled this ViewHolder
+            holder.composeView.disposeComposition()
+        }
+
+        /* Other methods */
+
+        // NOTE: DO NOT COPY THE METHODS BELOW IN THE CODE SNIPPETS
+        override fun onBindViewHolder(holder: MyComposeViewHolder, position: Int) {
+            TODO("Not yet implemented")
+        }
+
+        override fun getItemCount(): Int {
+            TODO("Not yet implemented")
+        }
+    }
+
+    class MyComposeViewHolder(
+        val composeView: ComposeView
+    ) : RecyclerView.ViewHolder(composeView) {
+        /* ... */
+    }
+}
+
+private object InteropUiSnippet10 {
+    // import androidx.compose.ui.platform.ViewCompositionStrategy
+
+    class MyComposeViewHolder(
+        val composeView: ComposeView
+    ) : RecyclerView.ViewHolder(composeView) {
+
+        init {
+            composeView.setViewCompositionStrategy(
+                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+            )
+        }
+
+        fun bind(input: String) {
+            composeView.setContent {
+                MdcTheme {
+                    Text(input)
+                }
             }
         }
     }
