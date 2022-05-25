@@ -69,7 +69,7 @@ internal class LazyListItemPlacementAnimator(
         layoutHeight: Int,
         reverseLayout: Boolean,
         positionedItems: MutableList<LazyListPositionedItem>,
-        itemProvider: LazyMeasuredItemProvider,
+        itemProvider: LazyMeasuredItemProvider
     ) {
         if (!positionedItems.fastAny { it.hasAnimations }) {
             // no animations specified - no work needed
@@ -123,7 +123,8 @@ internal class LazyListItemPlacementAnimator(
                             scrolledBy = notAnimatableDelta,
                             fallback = fallback,
                             reverseLayout = reverseLayout,
-                            mainAxisLayoutSize = mainAxisLayoutSize
+                            mainAxisLayoutSize = mainAxisLayoutSize,
+                            visibleItems = positionedItems
                         ) + if (reverseLayout) {
                             item.size - firstPlaceableSize
                         } else {
@@ -221,7 +222,8 @@ internal class LazyListItemPlacementAnimator(
                         scrolledBy = notAnimatableDelta,
                         fallback = mainAxisLayoutSize,
                         reverseLayout = reverseLayout,
-                        mainAxisLayoutSize = mainAxisLayoutSize
+                        mainAxisLayoutSize = mainAxisLayoutSize,
+                        visibleItems = positionedItems
                     )
                     val targetOffset = if (reverseLayout) {
                         mainAxisLayoutSize - absoluteTargetOffset - measuredItem.size
@@ -294,29 +296,70 @@ internal class LazyListItemPlacementAnimator(
         scrolledBy: IntOffset,
         reverseLayout: Boolean,
         mainAxisLayoutSize: Int,
-        fallback: Int
+        fallback: Int,
+        visibleItems: List<LazyListPositionedItem>
     ): Int {
-        val beforeViewportStart =
-            if (!reverseLayout) viewportEndItemIndex < index else viewportEndItemIndex > index
         val afterViewportEnd =
+            if (!reverseLayout) viewportEndItemIndex < index else viewportEndItemIndex > index
+        val beforeViewportStart =
             if (!reverseLayout) viewportStartItemIndex > index else viewportStartItemIndex < index
         return when {
-            beforeViewportStart -> {
-                val diff = (index - viewportEndItemIndex) * if (!reverseLayout) 1 else -1
-                mainAxisLayoutSize + viewportEndItemNotVisiblePartSize +
-                    averageItemsSize * (diff - 1) +
+            afterViewportEnd -> {
+                var itemsSizes = 0
+                // add sizes of the items between the last visible one and this one.
+                val range = if (!reverseLayout) {
+                    viewportEndItemIndex + 1 until index
+                } else {
+                    index + 1 until viewportEndItemIndex
+                }
+                for (i in range) {
+                    itemsSizes += visibleItems.getItemSize(
+                        itemIndex = i,
+                        fallback = averageItemsSize
+                    )
+                }
+                mainAxisLayoutSize + viewportEndItemNotVisiblePartSize + itemsSizes +
                     scrolledBy.mainAxis
             }
-            afterViewportEnd -> {
-                val diff = (viewportStartItemIndex - index) * if (!reverseLayout) 1 else -1
-                viewportStartItemNotVisiblePartSize - sizeWithSpacings -
-                    averageItemsSize * (diff - 1) +
-                    scrolledBy.mainAxis
+            beforeViewportStart -> {
+                // add the size of this item as we need the start offset of this item.
+                var itemsSizes = sizeWithSpacings
+                // add sizes of the items between the first visible one and this one.
+                val range = if (!reverseLayout) {
+                    index + 1 until viewportStartItemIndex
+                } else {
+                    viewportStartItemIndex + 1 until index
+                }
+                for (i in range) {
+                    itemsSizes += visibleItems.getItemSize(
+                        itemIndex = i,
+                        fallback = averageItemsSize
+                    )
+                }
+                viewportStartItemNotVisiblePartSize - itemsSizes + scrolledBy.mainAxis
             }
             else -> {
                 fallback
             }
         }
+    }
+
+    private fun List<LazyListPositionedItem>.getItemSize(itemIndex: Int, fallback: Int): Int {
+        if (isEmpty() || itemIndex < first().index || itemIndex > last().index) return fallback
+        if ((itemIndex - first().index) < (last().index - itemIndex)) {
+            for (index in indices) {
+                val item = get(index)
+                if (item.index == itemIndex) return item.sizeWithSpacings
+                if (item.index > itemIndex) break
+            }
+        } else {
+            for (index in lastIndex downTo 0) {
+                val item = get(index)
+                if (item.index == itemIndex) return item.sizeWithSpacings
+                if (item.index < itemIndex) break
+            }
+        }
+        return fallback
     }
 
     private fun startAnimationsIfNeeded(item: LazyListPositionedItem, itemInfo: ItemInfo) {
