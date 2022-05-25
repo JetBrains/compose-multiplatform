@@ -330,6 +330,7 @@ internal class AndroidInputDispatcher(
             eventTime = currentTime,
             action = action,
             coordinate = lastPosition,
+            metaState = keyInputState.constructMetaState(),
             buttonState = pressedButtons.fold(0) { state, buttonId -> state or buttonId },
             axis = axis,
             axisDelta = delta
@@ -341,6 +342,7 @@ internal class AndroidInputDispatcher(
         eventTime: Long,
         action: Int,
         coordinate: Offset,
+        metaState: Int,
         buttonState: Int,
         axis: Int = -1,
         axisDelta: Float = 0f
@@ -352,6 +354,7 @@ internal class AndroidInputDispatcher(
                     "eventTime=$eventTime, " +
                     "action=$action, " +
                     "coordinate=$coordinate, " +
+                    "metaState=$metaState, " +
                     "buttonState=$buttonState, " +
                     "axis=$axis, " +
                     "axisDelta=$axisDelta)"
@@ -382,7 +385,7 @@ internal class AndroidInputDispatcher(
                             }
                         }
                     ),
-                    /* metaState = */ 0,
+                    /* metaState = */ metaState,
                     /* buttonState = */ buttonState,
                     /* xPrecision = */ 1f,
                     /* yPrecision = */ 1f,
@@ -486,7 +489,7 @@ internal class AndroidInputDispatcher(
             ensureNotDisposed {
                 "Can't enqueue key event (" +
                     "downTime=$downTime, " +
-                    "eventTime=$eventTime" +
+                    "eventTime=$eventTime, " +
                     "action=$action, " +
                     "code=$code, " +
                     "metaState=$metaState)"

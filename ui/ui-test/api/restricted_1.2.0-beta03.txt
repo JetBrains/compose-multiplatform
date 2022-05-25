@@ -236,6 +236,8 @@ package androidx.compose.ui.test {
   }
 
   public final class KeyInjectionScopeKt {
+    field public static final long DefaultKeyPressDuration = 50L; // 0x32L
+    field public static final long DefaultPauseDurationBetweenKeyPresses = 50L; // 0x32L
   }
 
   public final class KeyInputHelpersKt {

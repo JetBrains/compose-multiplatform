@@ -36,7 +36,7 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * Tests if [KeyInjectionScope.pressKey], [KeyInjectionScope.pressKeys] and friends work
+ * Tests if [KeyInjectionScope.pressKey] and [KeyInjectionScope.pressKeys] work.
  */
 @LargeTest
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
@@ -85,6 +85,14 @@ class KeyPressTest {
         rule.performKeyInput { pressKey(Key.One) }
         rule.performKeyInput { pressKey(Key.Two) }
         rule.assertTyped("12")
+    }
+
+    @Test
+    fun pressKeyMultipleTimes_pressesKey_correctNumberOfTimes() {
+        rule.performKeyInput {
+            pressKey(Key.A, 10)
+        }
+        rule.assertTyped((1..10).joinToString(separator = "") { "a" })
     }
 
     @Test

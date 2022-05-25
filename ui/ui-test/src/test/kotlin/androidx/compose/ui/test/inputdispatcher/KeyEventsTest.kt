@@ -133,8 +133,78 @@ class KeyEventsTest : InputDispatcherTest() {
         subject.enqueueKeyDown(aKey)
         subject.flush()
 
-        recorder.events.last().verifyKeyEvent(keyDown, aKey.nativeKeyCode, 0,
-            0, capsLockMetaMask or leftShiftMetaMask)
+        assertTrue(subject.isCapsLockOn)
+        recorder.events.last().verifyKeyEvent(
+            keyDown, aKey.nativeKeyCode, 0, 0, capsLockMetaMask or leftShiftMetaMask
+        )
+    }
+
+    /* Lock key state tests. */
+
+    @Test
+    fun capsLock_startsOff() = assertFalse(subject.isCapsLockOn)
+
+    @Test
+    fun capsLockOn_afterDown() {
+        subject.enqueueKeyDown(capsLock)
+        assertTrue(subject.isCapsLockOn)
+    }
+
+    @Test
+    fun capsLockOn_afterPress() {
+        enqueueKeyPress(capsLock)
+        assertTrue(subject.isCapsLockOn)
+    }
+
+    @Test
+    fun capsLockOff_afterDoublePress() {
+        enqueueKeyPress(capsLock)
+        enqueueKeyPress(capsLock)
+        assertFalse(subject.isCapsLockOn)
+    }
+
+    @Test
+    fun numLock_startsOff() = assertFalse(subject.isNumLockOn)
+
+    @Test
+    fun numLockOn_afterDown() {
+        subject.enqueueKeyDown(numLock)
+        assertTrue(subject.isNumLockOn)
+    }
+
+    @Test
+    fun numLockOn_afterPress() {
+        enqueueKeyPress(numLock)
+        assertTrue(subject.isNumLockOn)
+    }
+
+    @Test
+    fun numLockOff_afterDoublePress() {
+        enqueueKeyPress(numLock)
+        enqueueKeyPress(numLock)
+        assertFalse(subject.isNumLockOn)
+    }
+
+    @Test
+    fun scrollLock_startsOff() = assertFalse(subject.isScrollLockOn)
+
+    @Test
+    fun scrollLockOn_afterDown() {
+        subject.enqueueKeyDown(scrollLock)
+        assertTrue(subject.isScrollLockOn)
+    }
+
+    @Test
+    fun scrollLockOn_afterPress() {
+        enqueueKeyPress(scrollLock)
+        assertTrue(subject.isScrollLockOn)
+    }
+
+    @Test
+    fun scrollLockOff_afterDoublePress() {
+        enqueueKeyPress(scrollLock)
+        enqueueKeyPress(scrollLock)
+        assertFalse(subject.isScrollLockOn)
     }
 
     /* Meta state generation. */
