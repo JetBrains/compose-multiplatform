@@ -50,25 +50,15 @@ open class BuildOnServerTask : DefaultTask() {
     @Internal
     lateinit var buildId: String
 
-    @Internal
-    var jetifierProjectPresent: Boolean = false
-
     @InputDirectory @PathSensitive(PathSensitivity.RELATIVE)
     lateinit var repositoryDirectory: File
 
     @InputFiles @PathSensitive(PathSensitivity.RELATIVE)
     fun getRequiredFiles(): List<File> {
-        val filesNames = mutableListOf(
+        return mutableListOf(
             "androidx_aggregate_build_info.txt",
             "top-of-tree-m2repository-all-$buildId.zip"
-        )
-
-        if (jetifierProjectPresent) {
-            filesNames.add("jetifier-standalone.zip")
-            filesNames.add("top-of-tree-m2repository-partially-dejetified-$buildId.zip")
-        }
-
-        return filesNames.map { fileName -> File(distributionDirectory, fileName) }
+        ).map { fileName -> File(distributionDirectory, fileName) }
     }
 
     @TaskAction

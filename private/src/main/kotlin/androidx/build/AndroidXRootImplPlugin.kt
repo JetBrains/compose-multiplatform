@@ -83,8 +83,6 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
         buildOnServerTask.distributionDirectory = getDistributionDirectory()
         buildOnServerTask.repositoryDirectory = getRepositoryDirectory()
         buildOnServerTask.buildId = getBuildId()
-        buildOnServerTask.jetifierProjectPresent =
-            project.findProject(":jetifier:jetifier-standalone") != null
         buildOnServerTask.dependsOn(
             tasks.register(
                 AndroidXImplPlugin.CREATE_AGGREGATE_BUILD_INFO_FILES_TASK,
@@ -101,11 +99,6 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
 
         val createArchiveTask = Release.getGlobalFullZipTask(this)
         buildOnServerTask.dependsOn(createArchiveTask)
-        val partiallyDejetifyArchiveTask = partiallyDejetifyArchiveTask(
-            getGlobalZipFile()
-        )
-        if (partiallyDejetifyArchiveTask != null)
-            buildOnServerTask.dependsOn(partiallyDejetifyArchiveTask)
 
         buildOnServerTask.dependsOn(
             tasks.register(
@@ -149,17 +142,6 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
             project.tasks.register("validateProperties", ValidatePropertiesTask::class.java)
         }
         project.configureRootProjectForLint()
-
-        if (partiallyDejetifyArchiveTask != null) {
-            project(":jetifier:jetifier-standalone").afterEvaluate { standAloneProject ->
-                partiallyDejetifyArchiveTask.configure {
-                    it.dependsOn(standAloneProject.tasks.named("installDist"))
-                }
-                createArchiveTask.configure {
-                    it.dependsOn(standAloneProject.tasks.named("dist"))
-                }
-            }
-        }
 
         tasks.register(AndroidXImplPlugin.BUILD_TEST_APKS_TASK)
 
