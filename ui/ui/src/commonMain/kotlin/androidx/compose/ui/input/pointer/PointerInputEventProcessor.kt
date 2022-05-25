@@ -39,6 +39,12 @@ internal class PointerInputEventProcessor(val root: LayoutNode) {
     private val hitResult = HitTestResult<PointerInputFilter>()
 
     /**
+     * [process] doesn't currently support reentrancy. This prevents reentrant calls
+     * from causing a crash with an early exit.
+     */
+    private var isProcessing = false
+
+    /**
      * Receives [PointerInputEvent]s and process them through the tree rooted on [root].
      *
      * @param pointerEvent The [PointerInputEvent] to process.
@@ -53,40 +59,54 @@ internal class PointerInputEventProcessor(val root: LayoutNode) {
         positionCalculator: PositionCalculator,
         isInBounds: Boolean = true
     ): ProcessResult {
+        if (isProcessing) {
+            // Processing currently does not support reentrancy.
+            return ProcessResult(
+                dispatchedToAPointerInputModifier = false,
+                anyMovementConsumed = false
+            )
+        }
+        try {
+            isProcessing = true
 
-        // Gets a new PointerInputChangeEvent with the PointerInputEvent.
-        val internalPointerEvent =
-            pointerInputChangeEventProducer.produce(pointerEvent, positionCalculator)
+            // Gets a new PointerInputChangeEvent with the PointerInputEvent.
+            val internalPointerEvent =
+                pointerInputChangeEventProducer.produce(pointerEvent, positionCalculator)
 
-        val isHover = !internalPointerEvent.changes.values.any { it.pressed || it.previousPressed }
+            val isHover =
+                !internalPointerEvent.changes.values.any { it.pressed || it.previousPressed }
 
-        // Add new hit paths to the tracker due to down events.
-        internalPointerEvent.changes.values.forEach { pointerInputChange ->
-            if (isHover || pointerInputChange.changedToDownIgnoreConsumed()) {
-                val isTouchEvent = pointerInputChange.type == PointerType.Touch
-                root.hitTest(pointerInputChange.position, hitResult, isTouchEvent)
-                if (hitResult.isNotEmpty()) {
-                    hitPathTracker.addHitPath(pointerInputChange.id, hitResult)
-                    hitResult.clear()
+            // Add new hit paths to the tracker due to down events.
+            internalPointerEvent.changes.values.forEach { pointerInputChange ->
+                if (isHover || pointerInputChange.changedToDownIgnoreConsumed()) {
+                    val isTouchEvent = pointerInputChange.type == PointerType.Touch
+                    root.hitTest(pointerInputChange.position, hitResult, isTouchEvent)
+                    if (hitResult.isNotEmpty()) {
+                        hitPathTracker.addHitPath(pointerInputChange.id, hitResult)
+                        hitResult.clear()
+                    }
                 }
             }
+
+            // Remove [PointerInputFilter]s that are no longer valid and refresh the offset information
+            // for those that are.
+            hitPathTracker.removeDetachedPointerInputFilters()
+
+            // Dispatch to PointerInputFilters
+            val dispatchedToSomething =
+                hitPathTracker.dispatchChanges(internalPointerEvent, isInBounds)
+
+            val anyMovementConsumed = if (internalPointerEvent.suppressMovementConsumption) {
+                false
+            } else {
+                internalPointerEvent.changes.values
+                    .any { it.positionChangedIgnoreConsumed() && it.isConsumed }
+            }
+
+            return ProcessResult(dispatchedToSomething, anyMovementConsumed)
+        } finally {
+            isProcessing = false
         }
-
-        // Remove [PointerInputFilter]s that are no longer valid and refresh the offset information
-        // for those that are.
-        hitPathTracker.removeDetachedPointerInputFilters()
-
-        // Dispatch to PointerInputFilters
-        val dispatchedToSomething = hitPathTracker.dispatchChanges(internalPointerEvent, isInBounds)
-
-        val anyMovementConsumed = if (internalPointerEvent.suppressMovementConsumption) {
-            false
-        } else {
-            internalPointerEvent.changes.values
-                .any { it.positionChangedIgnoreConsumed() && it.isConsumed }
-        }
-
-        return ProcessResult(dispatchedToSomething, anyMovementConsumed)
     }
 
     /**
