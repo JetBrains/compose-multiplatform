@@ -20,6 +20,7 @@ package androidx.compose.material3 {
     method @androidx.compose.runtime.Composable public static void LargeTopAppBar(kotlin.jvm.functions.Function0<kotlin.Unit> title, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit> navigationIcon, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> actions, optional androidx.compose.material3.TopAppBarColors colors, optional androidx.compose.material3.TopAppBarScrollBehavior? scrollBehavior);
     method @androidx.compose.runtime.Composable public static void MediumTopAppBar(kotlin.jvm.functions.Function0<kotlin.Unit> title, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit> navigationIcon, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> actions, optional androidx.compose.material3.TopAppBarColors colors, optional androidx.compose.material3.TopAppBarScrollBehavior? scrollBehavior);
     method @androidx.compose.runtime.Composable public static void SmallTopAppBar(kotlin.jvm.functions.Function0<kotlin.Unit> title, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit> navigationIcon, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> actions, optional androidx.compose.material3.TopAppBarColors colors, optional androidx.compose.material3.TopAppBarScrollBehavior? scrollBehavior);
+    method @androidx.compose.runtime.Composable public static androidx.compose.material3.TopAppBarScrollState rememberTopAppBarScrollState(optional float initialOffsetLimit, optional float initialOffset, optional float initialContentOffset);
   }
 
   @androidx.compose.material3.ExperimentalMaterial3Api public final class AssistChipDefaults {
@@ -772,29 +773,41 @@ package androidx.compose.material3 {
 
   public final class TopAppBarDefaults {
     method @androidx.compose.runtime.Composable public androidx.compose.material3.TopAppBarColors centerAlignedTopAppBarColors(optional long containerColor, optional long scrolledContainerColor, optional long navigationIconContentColor, optional long titleContentColor, optional long actionIconContentColor);
-    method @androidx.compose.material3.ExperimentalMaterial3Api public androidx.compose.material3.TopAppBarScrollBehavior enterAlwaysScrollBehavior(optional kotlin.jvm.functions.Function0<java.lang.Boolean> canScroll);
-    method @androidx.compose.material3.ExperimentalMaterial3Api public androidx.compose.material3.TopAppBarScrollBehavior exitUntilCollapsedScrollBehavior(androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float> decayAnimationSpec, optional kotlin.jvm.functions.Function0<java.lang.Boolean> canScroll);
+    method @androidx.compose.material3.ExperimentalMaterial3Api public androidx.compose.material3.TopAppBarScrollBehavior enterAlwaysScrollBehavior(androidx.compose.material3.TopAppBarScrollState state, optional kotlin.jvm.functions.Function0<java.lang.Boolean> canScroll);
+    method @androidx.compose.material3.ExperimentalMaterial3Api public androidx.compose.material3.TopAppBarScrollBehavior exitUntilCollapsedScrollBehavior(androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float> decayAnimationSpec, androidx.compose.material3.TopAppBarScrollState state, optional kotlin.jvm.functions.Function0<java.lang.Boolean> canScroll);
     method @androidx.compose.runtime.Composable public androidx.compose.material3.TopAppBarColors largeTopAppBarColors(optional long containerColor, optional long scrolledContainerColor, optional long navigationIconContentColor, optional long titleContentColor, optional long actionIconContentColor);
     method @androidx.compose.runtime.Composable public androidx.compose.material3.TopAppBarColors mediumTopAppBarColors(optional long containerColor, optional long scrolledContainerColor, optional long navigationIconContentColor, optional long titleContentColor, optional long actionIconContentColor);
-    method @androidx.compose.material3.ExperimentalMaterial3Api public androidx.compose.material3.TopAppBarScrollBehavior pinnedScrollBehavior(optional kotlin.jvm.functions.Function0<java.lang.Boolean> canScroll);
+    method @androidx.compose.material3.ExperimentalMaterial3Api public androidx.compose.material3.TopAppBarScrollBehavior pinnedScrollBehavior(androidx.compose.material3.TopAppBarScrollState state, optional kotlin.jvm.functions.Function0<java.lang.Boolean> canScroll);
     method @androidx.compose.runtime.Composable public androidx.compose.material3.TopAppBarColors smallTopAppBarColors(optional long containerColor, optional long scrolledContainerColor, optional long navigationIconContentColor, optional long titleContentColor, optional long actionIconContentColor);
     field public static final androidx.compose.material3.TopAppBarDefaults INSTANCE;
   }
 
   @androidx.compose.runtime.Stable public interface TopAppBarScrollBehavior {
-    method public float getContentOffset();
     method public androidx.compose.ui.input.nestedscroll.NestedScrollConnection getNestedScrollConnection();
+    method public float getScrollFraction();
+    method public androidx.compose.material3.TopAppBarScrollState getState();
+    property public abstract androidx.compose.ui.input.nestedscroll.NestedScrollConnection nestedScrollConnection;
+    property public abstract float scrollFraction;
+    property public abstract androidx.compose.material3.TopAppBarScrollState state;
+  }
+
+  @androidx.compose.runtime.Stable public final class TopAppBarScrollState {
+    ctor public TopAppBarScrollState(float offsetLimit, float offset, float contentOffset);
+    method public float getContentOffset();
     method public float getOffset();
     method public float getOffsetLimit();
-    method public float getScrollFraction();
     method public void setContentOffset(float);
     method public void setOffset(float);
     method public void setOffsetLimit(float);
-    property public abstract float contentOffset;
-    property public abstract androidx.compose.ui.input.nestedscroll.NestedScrollConnection nestedScrollConnection;
-    property public abstract float offset;
-    property public abstract float offsetLimit;
-    property public abstract float scrollFraction;
+    property public final float contentOffset;
+    property public final float offset;
+    property public final float offsetLimit;
+    field public static final androidx.compose.material3.TopAppBarScrollState.Companion Companion;
+  }
+
+  public static final class TopAppBarScrollState.Companion {
+    method public androidx.compose.runtime.saveable.Saver<androidx.compose.material3.TopAppBarScrollState,?> getSaver();
+    property public final androidx.compose.runtime.saveable.Saver<androidx.compose.material3.TopAppBarScrollState,?> Saver;
   }
 
   public final class TouchTargetKt {
