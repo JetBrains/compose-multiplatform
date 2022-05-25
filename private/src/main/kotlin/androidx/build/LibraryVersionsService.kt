@@ -21,6 +21,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.tomlj.Toml
+import org.tomlj.TomlParseResult
 
 /**
  * Loads Library groups and versions from a specified TOML file.
@@ -32,12 +33,14 @@ abstract class LibraryVersionsService : BuildService<LibraryVersionsService.Para
         var composeCustomGroup: Provider<String>
     }
 
+    private val parsedTomlFile: TomlParseResult by lazy {
+        Toml.parse(parameters.tomlFile.get())
+    }
+
     val libraryVersions: Map<String, Version> by lazy {
-        val result = Toml.parse(parameters.tomlFile.get())
-        val versions = result.getTable("versions")
+        val versions = parsedTomlFile.getTable("versions")
             ?: throw GradleException("Library versions toml file is missing [versions] table")
-        val versionNameSet = versions.keySet()
-        versionNameSet.associateWith { versionName ->
+        versions.keySet().associateWith { versionName ->
             val versionValue =
                 if (versionName.startsWith("COMPOSE") &&
                     parameters.composeCustomVersion.isPresent
@@ -54,11 +57,9 @@ abstract class LibraryVersionsService : BuildService<LibraryVersionsService.Para
     }
 
     val libraryGroups: Map<String, LibraryGroup> by lazy {
-        val result = Toml.parse(parameters.tomlFile.get())
-        val groups = result.getTable("groups")
+        val groups = parsedTomlFile.getTable("groups")
             ?: throw GradleException("Library versions toml file is missing [group] table")
-        val groupNameSet = groups.keySet()
-        groupNameSet.associateWith { name ->
+        groups.keySet().associateWith { name ->
             val groupDefinition = groups.getTable(name)!!
             val groupName = groupDefinition.getString("group")!!
             val finalGroupName = if (name.startsWith("COMPOSE") &&
