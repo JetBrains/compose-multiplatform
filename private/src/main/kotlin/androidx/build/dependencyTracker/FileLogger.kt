@@ -22,26 +22,44 @@ import org.gradle.internal.logging.slf4j.OutputEventListenerBackedLoggerContext
 import org.gradle.internal.time.Clock
 
 import java.io.File
+import java.io.Serializable
 
 /**
  * Gradle logger that logs to a file
  */
 class FileLogger(
     val file: File
-) : OutputEventListenerBackedLogger(
-    "my_logger",
-    OutputEventListenerBackedLoggerContext(
-        Clock {
-            System.currentTimeMillis()
+) : Serializable {
+    @Transient
+    var impl: OutputEventListenerBackedLogger? = null
+
+    fun toLogger(): OutputEventListenerBackedLogger {
+        if (impl == null) {
+            impl = OutputEventListenerBackedLogger(
+                "my_logger",
+                OutputEventListenerBackedLoggerContext(
+                    Clock {
+                        System.currentTimeMillis()
+                    }
+                ).also {
+                    it.level = LogLevel.DEBUG
+                    it.setOutputEventListener {
+                        file.appendText(it.toString() + "\n")
+                    }
+                },
+                Clock {
+                    System.currentTimeMillis()
+                }
+            )
         }
-    ).also {
-        file.writeText("")
-        it.level = LogLevel.DEBUG
-        it.setOutputEventListener {
-            file.appendText(it.toString() + "\n")
-        }
-    },
-    Clock {
-        System.currentTimeMillis()
+        return impl!!
     }
-)
+
+    fun lifecycle(text: String) {
+        toLogger().lifecycle(text)
+    }
+
+    fun info(text: String) {
+        toLogger().info(text)
+    }
+}
