@@ -71,6 +71,19 @@ internal class ComposeLayer {
 
     private val density get() = _component.density.density
 
+    /**
+     * Keyboard modifiers state might be changed when window is not focused, so window doesn't
+     * receive any key events.
+     * This flag is set when window focus changes. Then we can rely on it when handling the
+     * first movementEvent to get the actual keyboard modifiers state from it.
+     * After window gains focus, the first motionEvent.metaState (after focus gained) is used
+     * to update windowInfo.keyboardModifiers.
+     *
+     * TODO: needs to be set `true` when focus changes:
+     * (Window focus change is implemented in JB fork, but not upstreamed yet).
+     */
+    private var keyboardModifiersRequireUpdate = false
+
     fun makeAccessible(component: Component) = object : Accessible {
         override fun getAccessibleContext(): AccessibleContext? {
             // TODO move System.getenv out of this method
@@ -201,6 +214,10 @@ internal class ComposeLayer {
     private fun onMouseEvent(event: MouseEvent) {
         // AWT can send events after the window is disposed
         if (isDisposed) return
+        if (keyboardModifiersRequireUpdate) {
+            keyboardModifiersRequireUpdate = false
+            scene.setCurrentKeyboardModifiers(event.keyboardModifiers)
+        }
         scene.onMouseEvent(density, event)
     }
 
@@ -211,10 +228,24 @@ internal class ComposeLayer {
 
     private fun onKeyEvent(event: KeyEvent) {
         if (isDisposed) return
+        scene.setCurrentKeyboardModifiers(event.toPointerKeyboardModifiers())
         if (scene.sendKeyEvent(ComposeKeyEvent(event))) {
             event.consume()
         }
     }
+
+    private fun KeyEvent.toPointerKeyboardModifiers() = PointerKeyboardModifiers(
+        isCtrlPressed = this.isControlDown,
+        isMetaPressed = this.isMetaDown,
+        isAltPressed = this.isAltDown,
+        isShiftPressed = this.isShiftDown,
+        isAltGraphPressed = this.isAltGraphDown,
+        isSymPressed = false,
+        isFunctionPressed = false,
+        isCapsLockOn = getLockingKeyStateSafe(KeyEvent.VK_CAPS_LOCK),
+        isScrollLockOn = getLockingKeyStateSafe(KeyEvent.VK_SCROLL_LOCK),
+        isNumLockOn = getLockingKeyStateSafe(KeyEvent.VK_NUM_LOCK)
+    )
 
     fun dispose() {
         check(!isDisposed)

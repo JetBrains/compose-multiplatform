@@ -78,6 +78,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 
 private typealias Command = () -> Unit
 
@@ -156,6 +157,11 @@ internal class SkiaBasedOwner(
         },
         onPreviewKeyEvent = null
     )
+
+    @Suppress("unused") // to be used in JB fork (not all prerequisite changes added yet)
+    internal fun setCurrentKeyboardModifiers(modifiers: PointerKeyboardModifiers) {
+        _windowInfo.keyboardModifiers = modifiers
+    }
 
     var constraints: Constraints = Constraints()
         set(value) {

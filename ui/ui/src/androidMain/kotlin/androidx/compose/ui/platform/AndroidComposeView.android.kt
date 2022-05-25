@@ -111,6 +111,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.PointerIconDefaults
 import androidx.compose.ui.input.pointer.PointerIconService
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
+import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 import androidx.compose.ui.input.pointer.PositionCalculator
 import androidx.compose.ui.input.pointer.ProcessResult
 import androidx.compose.ui.input.rotary.RotaryScrollEvent
@@ -535,6 +536,17 @@ internal class AndroidComposeView(context: Context) :
         CalculateMatrixToWindowApi21()
     }
 
+    /**
+     * Keyboard modifiers state might be changed when window is not focused, so window doesn't
+     * receive any key events.
+     * This flag is set when window focus changes. Then we can rely on it when handling the
+     * first movementEvent to get the actual keyboard modifiers state from it.
+     * After window gains focus, the first motionEvent.metaState (after focus gained) is used
+     * to update windowInfo.keyboardModifiers.
+     * See [onWindowFocusChanged] and [sendMotionEvent]
+     */
+    private var keyboardModifiersRequireUpdate = false
+
     init {
         setWillNotDraw(false)
         isFocusable = true
@@ -585,6 +597,7 @@ internal class AndroidComposeView(context: Context) :
 
     override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
         _windowInfo.isWindowFocused = hasWindowFocus
+        keyboardModifiersRequireUpdate = true
         super.onWindowFocusChanged(hasWindowFocus)
 
         if (hasWindowFocus) {
@@ -609,6 +622,7 @@ internal class AndroidComposeView(context: Context) :
         if (isFocused) {
             // Focus lies within the Compose hierarchy, so we dispatch the key event to the
             // appropriate place.
+            _windowInfo.keyboardModifiers = PointerKeyboardModifiers(event.metaState)
             sendKeyEvent(KeyEvent(event))
         } else {
             // This Owner has a focused child view, which is a view interop use case,
@@ -1283,6 +1297,10 @@ internal class AndroidComposeView(context: Context) :
     }
 
     private fun sendMotionEvent(motionEvent: MotionEvent): ProcessResult {
+        if (keyboardModifiersRequireUpdate) {
+            keyboardModifiersRequireUpdate = false
+            _windowInfo.keyboardModifiers = PointerKeyboardModifiers(motionEvent.metaState)
+        }
         val pointerInputEvent =
             motionEventAdapter.convertToPointerInputEvent(motionEvent, this)
         return if (pointerInputEvent != null) {

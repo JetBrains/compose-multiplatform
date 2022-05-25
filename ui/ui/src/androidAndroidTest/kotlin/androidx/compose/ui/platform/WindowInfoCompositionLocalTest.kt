@@ -16,8 +16,14 @@
 
 package androidx.compose.ui.platform
 
+import android.view.KeyEvent
+import android.view.View
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.focus.setFocusableContent
+import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
+import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
@@ -193,5 +199,75 @@ class WindowInfoCompositionLocalTest {
         rule.waitForIdle()
         assertThat(mainWindowFocusGain.await(5, SECONDS)).isTrue()
         assertThat(mainWindowInfo.isWindowFocused).isTrue()
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    @Test
+    fun windowInfo_providesKeyModifiers() {
+        lateinit var mainWindowInfo: WindowInfo
+        lateinit var ownerView: View
+
+        var keyModifiers = PointerKeyboardModifiers(0)
+
+        rule.setFocusableContent {
+            ownerView = LocalView.current
+            mainWindowInfo = LocalWindowInfo.current
+
+            keyModifiers = mainWindowInfo.keyboardModifiers
+        }
+
+        assertThat(keyModifiers.packedValue).isEqualTo(0)
+
+        (rule as AndroidComposeTestRule<*, *>).runOnUiThread {
+            ownerView.requestFocus()
+        }
+
+        rule.runOnIdle {
+            val ctrlPressed = KeyEvent(
+                0, 0, KeyEvent.ACTION_DOWN,
+                KeyEvent.KEYCODE_CTRL_LEFT, 0, KeyEvent.META_CTRL_ON
+            )
+            ownerView.dispatchKeyEvent(ctrlPressed)
+        }
+
+        rule.waitForIdle()
+        assertThat(keyModifiers.packedValue).isEqualTo(KeyEvent.META_CTRL_ON)
+
+        rule.runOnIdle {
+            val altAndCtrlPressed = KeyEvent(
+                0, 0, KeyEvent.ACTION_DOWN,
+                KeyEvent.KEYCODE_ALT_LEFT, 0,
+                KeyEvent.META_CTRL_ON or KeyEvent.META_ALT_ON
+            )
+            ownerView.dispatchKeyEvent(altAndCtrlPressed)
+        }
+
+        rule.waitForIdle()
+        assertThat(keyModifiers.packedValue).isEqualTo(
+            KeyEvent.META_CTRL_ON or KeyEvent.META_ALT_ON
+        )
+
+        rule.runOnIdle {
+            val altUnpressed = KeyEvent(
+                0, 0, KeyEvent.ACTION_UP,
+                KeyEvent.KEYCODE_ALT_LEFT, 0,
+                KeyEvent.META_CTRL_ON
+            )
+            ownerView.dispatchKeyEvent(altUnpressed)
+        }
+
+        rule.waitForIdle()
+        assertThat(keyModifiers.packedValue).isEqualTo(KeyEvent.META_CTRL_ON)
+
+        rule.runOnIdle {
+            val ctrlUnpressed = KeyEvent(
+                0, 0, KeyEvent.ACTION_UP,
+                KeyEvent.KEYCODE_CTRL_LEFT, 0, 0
+            )
+            ownerView.dispatchKeyEvent(ctrlUnpressed)
+        }
+
+        rule.waitForIdle()
+        assertThat(keyModifiers.packedValue).isEqualTo(0)
     }
 }
