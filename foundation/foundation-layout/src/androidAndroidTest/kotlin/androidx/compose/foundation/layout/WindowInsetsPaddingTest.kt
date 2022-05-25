@@ -749,6 +749,31 @@ class WindowInsetsPaddingTest {
         assertThat(remaining.getInsets(WindowInsetsCompat.Type.statusBars()).top).isEqualTo(20)
     }
 
+    /**
+     * If we don't have setDecorFitsSystemWindows(false), there shouldn't be any insets
+     */
+    @Test
+    fun noInsets() {
+        var leftInset = -1
+        var topInset = -1
+        var rightInset = -1
+        var bottomInset = -1
+
+        setContent {
+            val insets = WindowInsets.safeContent
+            leftInset = insets.getLeft(LocalDensity.current, LocalLayoutDirection.current)
+            topInset = insets.getTop(LocalDensity.current)
+            rightInset = insets.getRight(LocalDensity.current, LocalLayoutDirection.current)
+            bottomInset = insets.getBottom(LocalDensity.current)
+        }
+
+        rule.waitForIdle()
+        assertThat(leftInset).isEqualTo(0)
+        assertThat(topInset).isEqualTo(0)
+        assertThat(rightInset).isEqualTo(0)
+        assertThat(bottomInset).isEqualTo(0)
+    }
+
     private fun sendInsets(
         type: Int,
         sentInsets: AndroidXInsets = AndroidXInsets.of(10, 11, 12, 13)
