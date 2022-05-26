@@ -311,10 +311,12 @@ internal fun XmlPullParser.parseObjectAnimator(
                 AccelerateDecelerateEasing
             )
             val holders = mutableListOf<PropertyValuesHolder<*>>()
-            // 2D; This <objectAnimator> has `propertyXName`, `propertyYName`, and `pathData`.
-            oa.getString(
+            val pathData = oa.getString(
                 AndroidVectorResources.STYLEABLE_PROPERTY_ANIMATOR_PATH_DATA
-            )?.let { pathData ->
+            )
+            if (pathData != null) {
+                // 2D; This <objectAnimator> has `pathData`. It should also have `propertyXName`
+                // and `propertyYName`.
                 holders.add(
                     PropertyValuesHolder2D(
                         oa.getString(
@@ -327,25 +329,26 @@ internal fun XmlPullParser.parseObjectAnimator(
                         interpolator
                     )
                 )
-            }
-            // 1D; This <objectAnimator> has `propertyName`, `valueFrom`, and `valueTo`.
-            oa.getString(
-                AndroidVectorResources.STYLEABLE_PROPERTY_ANIMATOR_PROPERTY_NAME
-            )?.let { propertyName ->
-                holders.add(
-                    a.getPropertyValuesHolder1D(
-                        propertyName,
-                        AndroidVectorResources.STYLEABLE_ANIMATOR_VALUE_TYPE,
-                        AndroidVectorResources.STYLEABLE_ANIMATOR_VALUE_FROM,
-                        AndroidVectorResources.STYLEABLE_ANIMATOR_VALUE_TO,
-                        interpolator
+            } else {
+                // 1D; This <objectAnimator> has `propertyName`, `valueFrom`, and `valueTo`.
+                oa.getString(
+                    AndroidVectorResources.STYLEABLE_PROPERTY_ANIMATOR_PROPERTY_NAME
+                )?.let { propertyName ->
+                    holders.add(
+                        a.getPropertyValuesHolder1D(
+                            propertyName,
+                            AndroidVectorResources.STYLEABLE_ANIMATOR_VALUE_TYPE,
+                            AndroidVectorResources.STYLEABLE_ANIMATOR_VALUE_FROM,
+                            AndroidVectorResources.STYLEABLE_ANIMATOR_VALUE_TO,
+                            interpolator
+                        )
                     )
-                )
-            }
-            // This <objectAnimator> has <propertyValuesHolder> inside.
-            forEachChildOf(TagObjectAnimator) {
-                if (eventType == XmlPullParser.START_TAG && name == TagPropertyValuesHolder) {
-                    holders.add(parsePropertyValuesHolder(res, theme, attrs, interpolator))
+                }
+                // This <objectAnimator> has <propertyValuesHolder> inside.
+                forEachChildOf(TagObjectAnimator) {
+                    if (eventType == XmlPullParser.START_TAG && name == TagPropertyValuesHolder) {
+                        holders.add(parsePropertyValuesHolder(res, theme, attrs, interpolator))
+                    }
                 }
             }
 

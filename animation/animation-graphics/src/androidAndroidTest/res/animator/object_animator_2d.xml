@@ -18,5 +18,6 @@
     android:duration="333"
     android:interpolator="@android:anim/linear_interpolator"
     android:pathData="L30,40 L70,60 L100,100"
+    android:propertyName="ignored"
     android:propertyXName="translateX"
     android:propertyYName="translateY" />
