@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 7.4.0-alpha01" type="baseline" client="gradle" dependencies="false" name="AGP (7.4.0-alpha01)" variant="all" version="7.4.0-alpha01">
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline infix fun Int.ror(other: Int) = this.rotateRight(other)"
+        errorLine2="                              ~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/BitwiseOperators.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline infix fun Int.rol(other: Int) = this.rotateLeft(other)"
+        errorLine2="                              ~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/BitwiseOperators.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T> List&lt;T>.fastForEach(action: (T) -> Unit) {"
+        errorLine2="                                ~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/snapshots/ListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T> List&lt;T>.fastForEachIndexed(action: (Int, T) -> Unit) {"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/snapshots/ListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T, R> List&lt;T>.fastMap(transform: (T) -> R): List&lt;R> {"
+        errorLine2="                                   ~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/snapshots/ListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T> List&lt;T>.fastAny(predicate: (T) -> Boolean): Boolean {"
+        errorLine2="                                ~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/snapshots/ListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T> List&lt;T>.fastAll(predicate: (T) -> Boolean): Boolean {"
+        errorLine2="                                ~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/snapshots/ListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T, K> List&lt;T>.fastGroupBy("
+        errorLine2="                                   ~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/snapshots/ListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T, R> List&lt;T>.fastMapNotNull(transform: (T) -> R?): List&lt;R> {"
+        errorLine2="                                   ~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/snapshots/ListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T> List&lt;T>.fastFilterIndexed(predicate: (index: Int, T) -> Boolean): List&lt;T> {"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/snapshots/ListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="        inline fun &lt;T> withoutReadObservation(block: @DisallowComposableCalls () -> T): T {"
+        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/snapshots/Snapshot.kt"/>
+    </issue>
+
+</issues>
