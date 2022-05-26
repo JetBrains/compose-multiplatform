@@ -27,7 +27,7 @@ const val COMPOSE_MPP_ENABLED = "androidx.compose.multiplatformEnabled"
 class Multiplatform {
     companion object {
         fun Project.isMultiplatformEnabled(): Boolean {
-            return properties.get(COMPOSE_MPP_ENABLED)?.toString()?.toBoolean() ?: false
+            return findProperty(COMPOSE_MPP_ENABLED)?.toString()?.toBoolean() ?: false
         }
 
         fun setEnabledForProject(project: Project, enabled: Boolean) {
