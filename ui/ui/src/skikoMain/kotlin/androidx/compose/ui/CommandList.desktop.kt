@@ -16,8 +16,8 @@
 
 package androidx.compose.ui
 
-import androidx.compose.util.createSynchronizedObject
-import androidx.compose.util.synchronized
+import androidx.compose.ui.createSynchronizedObject
+import androidx.compose.ui.synchronized
 
 /**
  * Allows postponing execution of some code (command), adding it to the list via [add],

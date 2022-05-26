@@ -21,8 +21,8 @@
 package androidx.compose.runtime.mock
 
 import androidx.compose.runtime.MonotonicFrameClock
-import androidx.compose.util.synchronized
-import androidx.compose.util.createSynchronizedObject
+import androidx.compose.runtime.synchronized
+import androidx.compose.runtime.createSynchronizedObject
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi

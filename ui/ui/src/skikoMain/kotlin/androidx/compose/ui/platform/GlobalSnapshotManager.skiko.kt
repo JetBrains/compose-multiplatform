@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.util.SynchronizedObject
+import androidx.compose.ui.SynchronizedObject
 
 /**
  * Platform-specific mechanism for starting a monitor of global snapshot state writes

@@ -16,8 +16,8 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.util.synchronized
-import androidx.compose.util.createSynchronizedObject
+import androidx.compose.ui.synchronized
+import androidx.compose.ui.createSynchronizedObject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
