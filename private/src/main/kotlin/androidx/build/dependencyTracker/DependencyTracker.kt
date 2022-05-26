@@ -34,23 +34,23 @@ class DependencyTracker(
 
     init {
         val result = mutableMapOf<String, MutableSet<String>>()
+        val stringBuilder = StringBuilder()
         rootProject.subprojects.forEach { project ->
-            logger?.info("checking ${project.path} for dependencies")
             project.configurations.forEach { config ->
-                logger?.info("checking config ${project.path}/$config for dependencies")
                 config
                     .dependencies
                     .filterIsInstance(ProjectDependency::class.java)
                     .forEach {
-                        logger?.info(
-                            "there is a dependency from ${project.path} to " +
-                                it.dependencyProject.path
+                        stringBuilder.append(
+                            "there is a dependency from ${project.path} (${config.name}) to " +
+                                it.dependencyProject.path + "\n"
                         )
                         result.getOrPut(it.dependencyProject.path) { mutableSetOf() }
                             .add(project.path)
                     }
             }
         }
+        logger?.info(stringBuilder.toString())
         dependentList = result
     }
 

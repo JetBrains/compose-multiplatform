@@ -127,6 +127,7 @@ abstract class AffectedModuleDetector(
             val distDir = rootProject.getDistributionDirectory()
             val outputFile = distDir.resolve(LOG_FILE_NAME)
 
+            outputFile.writeText("")
             val logger = FileLogger(outputFile)
             logger.info("setup: enabled: $enabled")
             if (!enabled) {
@@ -135,7 +136,7 @@ abstract class AffectedModuleDetector(
                     { spec ->
                         val params = spec.parameters
                         params.acceptAll = true
-                        params.log = outputFile
+                        params.log = logger
                     }
                 )
                 logger.info("using AcceptAll")
@@ -151,7 +152,7 @@ abstract class AffectedModuleDetector(
             gradle.taskGraph.whenReady {
                 logger.lifecycle("projects evaluated")
                 val projectGraph = ProjectGraph(rootProject)
-                val dependencyTracker = DependencyTracker(rootProject, logger)
+                val dependencyTracker = DependencyTracker(rootProject, logger.toLogger())
                 val provider = setupWithParams(
                     rootProject,
                     { spec ->
@@ -159,7 +160,7 @@ abstract class AffectedModuleDetector(
                         params.rootDir = rootProject.projectDir
                         params.projectGraph = projectGraph
                         params.dependencyTracker = dependencyTracker
-                        params.log = outputFile
+                        params.log = logger
                         params.baseCommitOverride = baseCommitOverride
                         params.changeInfoPath = changeInfoPath
                         params.manifestPath = manifestPath
@@ -258,7 +259,7 @@ abstract class AffectedModuleDetectorLoader :
         var rootDir: File
         var projectGraph: ProjectGraph
         var dependencyTracker: DependencyTracker
-        var log: File
+        var log: FileLogger?
         var cobuiltTestPaths: Set<Set<String>>?
         var alwaysBuildIfExists: Set<String>?
         var ignoredPaths: Set<String>?
@@ -268,7 +269,7 @@ abstract class AffectedModuleDetectorLoader :
     }
 
     val detector: AffectedModuleDetector by lazy {
-        val logger = FileLogger(parameters.log)
+        val logger = parameters.log!!
         if (parameters.acceptAll) {
             AcceptAll(null)
         } else {
@@ -278,7 +279,7 @@ abstract class AffectedModuleDetectorLoader :
             }
             val gitClient = GitClient.create(
                 rootProjectDir = parameters.rootDir,
-                logger = logger,
+                logger = logger.toLogger(),
                 changeInfoPath = parameters.changeInfoPath.get(),
                 manifestPath = parameters.manifestPath.get()
             )
@@ -295,7 +296,7 @@ abstract class AffectedModuleDetectorLoader :
             AffectedModuleDetectorImpl(
                 projectGraph = parameters.projectGraph,
                 dependencyTracker = parameters.dependencyTracker,
-                logger = logger,
+                logger = logger.toLogger(),
                 cobuiltTestPaths = parameters.cobuiltTestPaths
                     ?: AffectedModuleDetectorImpl.COBUILT_TEST_PATHS,
                 alwaysBuildIfExists = parameters.alwaysBuildIfExists
