@@ -20,6 +20,7 @@ import androidx.build.dependencies.AGP_LATEST
 import androidx.build.dependencies.KOTLIN_STDLIB
 import androidx.build.dependencies.KOTLIN_VERSION
 import androidx.build.dependencies.KSP_VERSION
+import com.google.common.annotations.VisibleForTesting
 import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -30,9 +31,10 @@ import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.work.DisableCachingByDefault
 
@@ -41,8 +43,12 @@ abstract class SdkResourceGenerator : DefaultTask() {
     @get:Input
     lateinit var tipOfTreeMavenRepoRelativePath: String
 
+    /**
+     * project-relative path to folder where outputs from buildSrc builds can be found
+     * (perhaps something like ../out/buildSrc)
+     */
     @get:Input
-    lateinit var buildSrcOutPath: String
+    lateinit var buildSrcOutRelativePath: String
 
     @get:[InputFile PathSensitive(PathSensitivity.NONE)]
     abstract val debugKeystore: RegularFileProperty
@@ -107,23 +113,31 @@ abstract class SdkResourceGenerator : DefaultTask() {
             writer.write("minSdkVersion=$minSdkVersion\n")
             writer.write("kotlinVersion=$kotlinVersion\n")
             writer.write("kspVersion=$kspVersion\n")
-            writer.write("buildSrcOutPath=$buildSrcOutPath\n")
+            writer.write("buildSrcOutRelativePath=$buildSrcOutRelativePath\n")
         }
     }
 
     companion object {
+        const val TASK_NAME = "generateSdkResource"
+
         @JvmStatic
         fun generateForHostTest(project: Project) {
+            val provider = registerSdkResourceGeneratorTask(project)
+            val extension = project.extensions.getByType<JavaPluginExtension>()
+            val testSources = extension.sourceSets.getByName("test")
+            testSources.output.dir(provider.flatMap { it.outputDir })
+        }
+
+        @VisibleForTesting
+        fun registerSdkResourceGeneratorTask(project: Project): TaskProvider<SdkResourceGenerator> {
             val generatedDirectory = File(project.buildDir, "generated/resources")
-            val provider = project.tasks.register(
-                "generateSdkResource",
-                SdkResourceGenerator::class.java
-            ) {
+            return project.tasks.register(TASK_NAME, SdkResourceGenerator::class.java) {
                 it.tipOfTreeMavenRepoRelativePath =
                     project.getRepositoryDirectory().toRelativeString(project.projectDir)
                 it.debugKeystore.set(project.getKeystore())
                 it.outputDir.set(generatedDirectory)
-                it.buildSrcOutPath = (project.properties["buildSrcOut"] as File).path
+                it.buildSrcOutRelativePath =
+                    (project.properties["buildSrcOut"] as File).toRelativeString(project.projectDir)
                 // Copy repositories used for the library project so that it can replicate the same
                 // maven structure in test.
                 it.repositoryUrls = project.repositories.filterIsInstance<MavenArtifactRepository>()
@@ -136,10 +150,6 @@ abstract class SdkResourceGenerator : DefaultTask() {
                         }
                     }
             }
-
-            val extension = project.extensions.getByType<JavaPluginExtension>()
-            val testSources = extension.sourceSets.getByName("test")
-            testSources.output.dir(provider.flatMap { it.outputDir })
         }
     }
 }
