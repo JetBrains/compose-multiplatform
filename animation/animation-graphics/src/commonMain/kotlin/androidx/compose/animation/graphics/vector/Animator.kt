@@ -41,6 +41,8 @@ import androidx.compose.ui.util.fastMaxBy
 import androidx.compose.ui.util.fastSumBy
 import androidx.compose.ui.util.lerp
 
+internal const val RepeatCountInfinite = -1
+
 internal sealed class Animator {
     abstract val totalDuration: Int
 
@@ -112,14 +114,18 @@ internal class Timestamp<T>(
             is PropertyValuesHolderColor -> holder.asKeyframeSpec(durationMillis)
             else -> throw RuntimeException("Unexpected value type: $holder")
         } as KeyframesSpec<T>
-        return if (repeatCount > 0) {
+        return if (repeatCount == 0) {
+            spec
+        } else {
             repeatable(
-                iterations = repeatCount + 1,
+                iterations = if (repeatCount == RepeatCountInfinite) {
+                    Int.MAX_VALUE
+                } else {
+                    repeatCount + 1
+                },
                 animation = spec,
                 repeatMode = repeatMode
             )
-        } else {
-            spec
         }
     }
 }
@@ -241,7 +247,7 @@ internal data class ObjectAnimator(
     val holders: List<PropertyValuesHolder<*>>
 ) : Animator() {
 
-    override val totalDuration = if (repeatCount == Int.MAX_VALUE) {
+    override val totalDuration = if (repeatCount == RepeatCountInfinite) {
         Int.MAX_VALUE
     } else {
         startDelay + duration * (repeatCount + 1)
