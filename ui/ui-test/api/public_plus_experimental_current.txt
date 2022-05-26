@@ -264,8 +264,8 @@ package androidx.compose.ui.test {
     method @androidx.compose.ui.test.ExperimentalTestApi public static void pressKey(androidx.compose.ui.test.KeyInjectionScope, long key, optional long pressDuration);
     method @androidx.compose.ui.test.ExperimentalTestApi public static void pressKey(androidx.compose.ui.test.KeyInjectionScope, long key, int times, optional long pressDuration, optional long pauseDuration);
     method @androidx.compose.ui.test.ExperimentalTestApi public static void pressKeys(androidx.compose.ui.test.KeyInjectionScope, java.util.List<androidx.compose.ui.input.key.Key> keys, optional long pressDuration, optional long pauseDuration);
-    field public static final long DefaultKeyPressDuration = 50L; // 0x32L
-    field public static final long DefaultPauseDurationBetweenKeyPresses = 50L; // 0x32L
+    field @androidx.compose.ui.test.ExperimentalTestApi public static final long DefaultKeyPressDuration = 50L; // 0x32L
+    field @androidx.compose.ui.test.ExperimentalTestApi public static final long DefaultPauseDurationBetweenKeyPresses = 50L; // 0x32L
   }
 
   public final class KeyInputHelpersKt {

@@ -21,11 +21,13 @@ import androidx.compose.ui.input.key.Key
 /**
  * Default duration of a key press in milliseconds (duration between key down and key up).
  */
+@ExperimentalTestApi
 const val DefaultKeyPressDuration = 50L // milliseconds
 
 /**
  * Default duration of the pause between sequential key presses in milliseconds.
  */
+@ExperimentalTestApi
 const val DefaultPauseDurationBetweenKeyPresses = 50L // milliseconds
 
 /**
