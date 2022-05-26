@@ -30,7 +30,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.TextFieldDefaults.indicatorLine
-import androidx.compose.material3.tokens.FilledTextFieldTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -171,7 +170,7 @@ fun TextField(
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = FilledTextFieldTokens.ContainerShape.toShape(),
+    shape: Shape = TextFieldDefaults.FilledShape,
     colors: TextFieldColors = TextFieldDefaults.textFieldColors()
 ) {
     // If color is not provided via the text style, use content color as a default
@@ -303,7 +302,7 @@ fun TextField(
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = FilledTextFieldTokens.ContainerShape.toShape(),
+    shape: Shape = TextFieldDefaults.FilledShape,
     colors: TextFieldColors = TextFieldDefaults.textFieldColors()
 ) {
     // If color is not provided via the text style, use content color as a default

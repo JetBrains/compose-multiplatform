@@ -324,9 +324,9 @@ fun BottomAppBar(
     icons: @Composable RowScope.() -> Unit,
     modifier: Modifier = Modifier,
     floatingActionButton: @Composable (() -> Unit)? = null,
-    containerColor: Color = BottomAppBarTokens.ContainerColor.toColor(),
+    containerColor: Color = BottomAppBarDefaults.ContainerColor,
     contentColor: Color = contentColorFor(containerColor),
-    tonalElevation: Dp = BottomAppBarTokens.ContainerElevation,
+    tonalElevation: Dp = BottomAppBarDefaults.ContainerElevation,
     contentPadding: PaddingValues = BottomAppBarDefaults.ContentPadding,
 ) = BottomAppBar(
         modifier = modifier,
@@ -379,9 +379,9 @@ fun BottomAppBar(
 @Composable
 fun BottomAppBar(
     modifier: Modifier = Modifier,
-    containerColor: Color = BottomAppBarTokens.ContainerColor.toColor(),
+    containerColor: Color = BottomAppBarDefaults.ContainerColor,
     contentColor: Color = contentColorFor(containerColor),
-    tonalElevation: Dp = BottomAppBarTokens.ContainerElevation,
+    tonalElevation: Dp = BottomAppBarDefaults.ContainerElevation,
     contentPadding: PaddingValues = BottomAppBarDefaults.ContentPadding,
     content: @Composable RowScope.() -> Unit
 ) {
@@ -801,6 +801,13 @@ class TopAppBarScrollState(offsetLimit: Float, offset: Float, contentOffset: Flo
 
 /** Contains default values used for the bottom app bar implementations. */
 object BottomAppBarDefaults {
+
+    /** Default color used for [BottomAppBar] container **/
+    val ContainerColor: Color @Composable get() = BottomAppBarTokens.ContainerColor.toColor()
+
+    /** Default elevation used for [BottomAppBar] **/
+    val ContainerElevation: Dp = BottomAppBarTokens.ContainerElevation
+
     /**
      * Default padding used for [BottomAppBar] when content are default size (24dp) icons in
      * [IconButton] that meet the minimum touch target (48.dp).

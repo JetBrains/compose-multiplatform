@@ -137,7 +137,7 @@ fun BadgedBox(
 @Composable
 fun Badge(
     modifier: Modifier = Modifier,
-    containerColor: Color = BadgeTokens.Color.toColor(),
+    containerColor: Color = BadgeDefaults.ContainerColor,
     contentColor: Color = contentColorFor(containerColor),
     content: @Composable (RowScope.() -> Unit)? = null,
 ) {
@@ -159,7 +159,8 @@ fun Badge(
             .clip(shape)
             .then(
                 if (content != null)
-                    Modifier.padding(horizontal = BadgeWithContentHorizontalPadding) else Modifier),
+                    Modifier.padding(horizontal = BadgeWithContentHorizontalPadding) else Modifier
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -177,6 +178,12 @@ fun Badge(
             }
         }
     }
+}
+
+/** Default values used for [Badge] implementations. */
+object BadgeDefaults {
+    /** Default container color for a badge. */
+    val ContainerColor: Color @Composable get() = BadgeTokens.Color.toColor()
 }
 
 /*@VisibleForTesting*/

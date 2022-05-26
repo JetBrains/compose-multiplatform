@@ -156,6 +156,12 @@ interface TextFieldColors {
  */
 @Immutable
 object TextFieldDefaults {
+    /** Default shape for an outlined text field. */
+    val OutlinedShape: Shape @Composable get() = OutlinedTextFieldTokens.ContainerShape.toShape()
+
+    /** Default shape for a filled text field. */
+    val FilledShape: Shape @Composable get() = FilledTextFieldTokens.ContainerShape.toShape()
+
     /**
      * The default min width applied for a [TextField] and [OutlinedTextField].
      * Note that you can override it by applying Modifier.heightIn directly on a text field.

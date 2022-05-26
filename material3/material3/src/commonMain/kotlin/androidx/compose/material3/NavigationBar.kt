@@ -93,9 +93,9 @@ import kotlin.math.roundToInt
 @Composable
 fun NavigationBar(
     modifier: Modifier = Modifier,
-    containerColor: Color = NavigationBarTokens.ContainerColor.toColor(),
+    containerColor: Color = NavigationBarDefaults.ContainerColor,
     contentColor: Color = MaterialTheme.colorScheme.contentColorFor(containerColor),
-    tonalElevation: Dp = NavigationBarTokens.ContainerElevation,
+    tonalElevation: Dp = NavigationBarDefaults.Elevation,
     content: @Composable RowScope.() -> Unit
 ) {
     Surface(
@@ -241,8 +241,18 @@ fun RowScope.NavigationBarItem(
     }
 }
 
+/** Defaults used in [NavigationBar]. */
+object NavigationBarDefaults {
+    /** Default color for a navigation bar. */
+    val ContainerColor: Color @Composable get() = NavigationBarTokens.ContainerColor.toColor()
+
+    /** Default elevation for a navigation bar. */
+    val Elevation: Dp = NavigationBarTokens.ContainerElevation
+}
+
 /** Defaults used in [NavigationBarItem]. */
 object NavigationBarItemDefaults {
+
     /**
      * Creates a [NavigationBarItemColors] with the provided colors according to the Material
      * specification.
