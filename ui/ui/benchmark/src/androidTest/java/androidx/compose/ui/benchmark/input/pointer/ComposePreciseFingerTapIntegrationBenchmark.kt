@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,13 +37,15 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Benchmark for simply tapping on an item in Compose.
+ * Benchmark for precise finger tapping (down, move, and up) on an item in Compose created from a
+ * real device.
  *
- * The intent is to measure the speed of all parts necessary for a normal tap starting from
- * [MotionEvent]s getting dispatched to a particular view.  The test therefore includes hit
- * testing and dispatch.
+ * The intent is to measure the speed of all parts necessary for a normal finger tap and move
+ * starting from [MotionEvent]s getting dispatched to a particular view.  The test therefore
+ * includes hit testing and dispatch.
  *
- * This is intended to be an equivalent counterpart to [AndroidTapIntegrationBenchmark].
+ * This is intended to be a more through benchmark of [ComposeTapIntegrationBenchmark] and a finger
+ * tapping version of [ComposePreciseStylusTapIntegrationBenchmark].
  *
  * The hierarchy is set up to look like:
  * rootView
@@ -53,14 +55,14 @@ import org.junit.runner.RunWith
  *     -> Text (with click listener)
  *     -> ...
  *
- * MotionEvents are dispatched to rootView as ACTION_DOWN followed by ACTION_UP.  The validity of
- * the test is verified inside the click listener with com.google.common.truth.Truth.assertThat
- * and by counting the clicks in the click listener and later verifying that they count is
- * sufficiently high.
+ * MotionEvents are dispatched to rootView as an ACTION_DOWN, an ACTION_MOVE, and finally
+ * an ACTION_UP.  The validity of the test is verified inside the click listener with
+ * com.google.common.truth.Truth.assertThat and by counting the clicks in the click listener and
+ * later verifying that they count is sufficiently high.
  */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class ComposeTapIntegrationBenchmark {
+class ComposePreciseFingerTapIntegrationBenchmark {
 
     @get:Rule
     val benchmarkRule = ComposeBenchmarkRule()
@@ -82,8 +84,15 @@ class ComposeTapIntegrationBenchmark {
     }
 
     private fun clickOnItem(item: Int, expectedLabel: String) {
+        val xDown = 0f
         // half height of an item + top of the chosen item = middle of the chosen item
-        val y = (ItemHeightPx / 2) + (item * ItemHeightPx)
+        val yDown = (ItemHeightPx / 2) + (item * ItemHeightPx)
+
+        val xMove = xDown + MOVE_AMOUNT_PX
+        val yMove = yDown + MOVE_AMOUNT_PX
+
+        val xUp = xMove + MOVE_AMOUNT_PX
+        val yUp = yMove + MOVE_AMOUNT_PX
 
         benchmarkRule.runBenchmarkFor({ ComposeTapTestCase() }) {
             doFramesUntilNoChangesPending()
@@ -93,30 +102,92 @@ class ComposeTapIntegrationBenchmark {
 
             val rootView = getHostView()
 
-            // Simple Events
-            val down = MotionEvent(
-                0,
+            // Precise Touch/Finger MotionEvents (Down, Move, Up)
+            // Based on real MotionEvents pulled from a device.
+            val fingerDownMotionEvent = android.view.MotionEvent.obtain(
+                8451548L,
+                8451548L,
                 android.view.MotionEvent.ACTION_DOWN,
                 1,
+                arrayOf(
+                    PointerProperties(0).apply {
+                        toolType = android.view.MotionEvent.TOOL_TYPE_FINGER
+                    }
+                ),
+                arrayOf(
+                    PointerCoords(xDown, yDown).apply {
+                        pressure = 1.0f
+                        size = 0.08639053f
+                    }
+                ),
                 0,
-                arrayOf(PointerProperties(0)),
-                arrayOf(PointerCoords(0f, y)),
-                rootView
+                0,
+                1.000625f,
+                1.0003906f,
+                6,
+                0x0, // Edge Flags value of 0.
+                0x1002, // Source of the event value of 4098
+                0x2 // Motion Event Flags value of 2
             )
 
-            val up = MotionEvent(
-                10,
+            val fingerMoveMotionEvent = android.view.MotionEvent.obtain(
+                8451548L,
+                8451632L,
+                android.view.MotionEvent.ACTION_MOVE,
+                1,
+                arrayOf(
+                    PointerProperties(0).apply {
+                        toolType = android.view.MotionEvent.TOOL_TYPE_FINGER
+                    }
+                ),
+                arrayOf(
+                    PointerCoords(xMove, yMove).apply {
+                        pressure = 1.0f
+                        size = 0.08639053f
+                    }
+                ),
+                0,
+                0,
+                1.000625f,
+                1.0003906f,
+                6,
+                0x0, // Edge Flags value of 0.
+                0x1002, // Source of the event value of 4098
+                0x2 // Motion Event Flags value of 2
+            )
+
+            val fingerUpMotionEvent = android.view.MotionEvent.obtain(
+                8451548L,
+                8451756L,
                 android.view.MotionEvent.ACTION_UP,
                 1,
+                arrayOf(
+                    PointerProperties(0).apply {
+                        toolType = android.view.MotionEvent.TOOL_TYPE_FINGER
+                    }
+                ),
+                arrayOf(
+                    PointerCoords(xUp, yUp).apply {
+                        pressure = 1.0f
+                        size = 0.08639053f
+                    }
+                ),
                 0,
-                arrayOf(PointerProperties(0)),
-                arrayOf(PointerCoords(0f, y)),
-                rootView
+                0,
+                1.000625f,
+                1.0003906f,
+                6,
+                0x0, // Edge Flags value of 0.
+                0x1002, // Source of the event value of 4098
+                0x2 // Motion Event Flags value of 2
             )
 
             benchmarkRule.measureRepeated {
-                rootView.dispatchTouchEvent(down)
-                rootView.dispatchTouchEvent(up)
+
+                rootView.dispatchTouchEvent(fingerDownMotionEvent)
+                rootView.dispatchTouchEvent(fingerMoveMotionEvent)
+                rootView.dispatchTouchEvent(fingerUpMotionEvent)
+
                 case.expectedClickCount++
                 assertThat(case.actualClickCount).isEqualTo(case.expectedClickCount)
             }
@@ -162,5 +233,8 @@ class ComposeTapIntegrationBenchmark {
                     .requiredHeight(itemHeightDp)
             )
         }
+    }
+    companion object {
+        private const val MOVE_AMOUNT_PX = 30f
     }
 }
