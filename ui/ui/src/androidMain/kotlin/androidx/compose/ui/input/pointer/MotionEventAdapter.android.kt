@@ -258,6 +258,8 @@ internal class MotionEventAdapter {
 
         val pointerId = getComposePointerId(motionEventPointerId)
 
+        val pressure = motionEvent.getPressure(index)
+
         var position = Offset(motionEvent.getX(index), motionEvent.getY(index))
         val rawPosition: Offset
         if (index == 0) {
@@ -323,6 +325,7 @@ internal class MotionEventAdapter {
             rawPosition,
             position,
             pressed,
+            pressure,
             toolType,
             issuesEnterExit,
             historical,

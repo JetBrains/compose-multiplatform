@@ -46,6 +46,7 @@ internal fun PointerInputEventData(
         position,
         position,
         down,
+        pressure = 1.0f,
         PointerType.Touch
     )
 }
@@ -252,12 +253,14 @@ internal fun InternalPointerEvent(
     motionEvent: MotionEvent
 ): InternalPointerEvent {
     val pointers = changes.values.map {
+        @OptIn(ExperimentalComposeUiApi::class)
         PointerInputEventData(
             id = it.id,
             uptime = it.uptimeMillis,
             positionOnScreen = it.position,
             position = it.position,
             down = it.pressed,
+            pressure = it.pressure,
             type = it.type
         )
     }
@@ -330,6 +333,7 @@ internal fun internalPointerEventOf(vararg changes: PointerInputChange): Interna
             positionOnScreen = it.position,
             position = it.position,
             down = it.pressed,
+            pressure = it.pressure,
             type = it.type,
             issuesEnterExit = false,
             historical = emptyList()
@@ -363,6 +367,7 @@ internal fun hoverInternalPointerEvent(
         positionOnScreen = change.position,
         position = change.position,
         down = change.pressed,
+        pressure = change.pressure,
         type = change.type,
         issuesEnterExit = true,
         historical = emptyList()

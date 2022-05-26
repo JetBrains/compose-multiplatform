@@ -163,6 +163,7 @@ private class PointerInputChangeEventProducer {
                     it.uptime,
                     it.position,
                     it.down,
+                    it.pressure,
                     previousTime,
                     previousPosition,
                     previousDown,

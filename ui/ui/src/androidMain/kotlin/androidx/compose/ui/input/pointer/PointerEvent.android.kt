@@ -19,6 +19,7 @@ package androidx.compose.ui.input.pointer
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_SCROLL
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 
@@ -83,6 +84,7 @@ actual class PointerEvent internal actual constructor(
     fun component1(): List<PointerInputChange> = changes
 
     // only because PointerEvent was a data class
+    @OptIn(ExperimentalComposeUiApi::class)
     fun copy(
         changes: List<PointerInputChange>,
         motionEvent: MotionEvent?
@@ -101,6 +103,7 @@ actual class PointerEvent internal actual constructor(
                     it.position,
                     it.position,
                     it.pressed,
+                    it.pressure,
                     it.type,
                     this.internalPointerEvent?.issuesEnterExitEvent(it.id) == true
                 )
