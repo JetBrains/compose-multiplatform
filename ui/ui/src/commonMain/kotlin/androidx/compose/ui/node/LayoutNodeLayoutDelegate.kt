@@ -35,8 +35,9 @@ import androidx.compose.ui.util.fastForEach
  */
 internal class LayoutNodeLayoutDelegate(
     private val layoutNode: LayoutNode,
-    var outerCoordinator: NodeCoordinator
 ) {
+    val outerCoordinator: NodeCoordinator
+        get() = layoutNode.nodes.outerCoordinator
     val lastConstraints: Constraints?
         get() = measurePassDelegate.lastConstraints
     val lastLookaheadConstraints: Constraints?

@@ -53,6 +53,9 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.HitTestResult
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.OwnerScope
+import androidx.compose.ui.node.SemanticsModifierNode
+import androidx.compose.ui.node.collapsedSemanticsConfiguration
+import androidx.compose.ui.node.requireLayoutNode
 import androidx.compose.ui.platform.accessibility.hasCollectionInfo
 import androidx.compose.ui.platform.accessibility.setCollectionInfo
 import androidx.compose.ui.platform.accessibility.setCollectionItemInfo
@@ -69,7 +72,6 @@ import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.SemanticsPropertiesAndroid
-import androidx.compose.ui.semantics.SemanticsEntity
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.state.ToggleableState
@@ -1536,13 +1538,13 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     internal fun hitTestSemanticsAt(x: Float, y: Float): Int {
         view.measureAndLayout()
 
-        val hitSemanticsEntities = HitTestResult<SemanticsEntity>()
+        val hitSemanticsEntities = HitTestResult<SemanticsModifierNode>()
         view.root.hitTestSemantics(
             pointerPosition = Offset(x, y),
             hitSemanticsEntities = hitSemanticsEntities
         )
 
-        val wrapper = hitSemanticsEntities.lastOrNull()?.layoutNode?.outerSemantics
+        val wrapper = hitSemanticsEntities.lastOrNull()?.requireLayoutNode()?.outerSemantics
         var virtualViewId = InvalidId
         if (wrapper != null) {
 
@@ -1556,10 +1558,14 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             if (!semanticsNode.unmergedConfig.contains(SemanticsProperties.InvisibleToUser) &&
                 !wrapperToCheckAlpha.isTransparent()
             ) {
-                val androidView = view.androidViewsHandler.layoutNodeToHolder[wrapper.layoutNode]
+                val layoutNode = wrapper.requireLayoutNode()
+                val androidView = view
+                    .androidViewsHandler
+                    .layoutNodeToHolder[layoutNode]
                 if (androidView == null) {
-                    virtualViewId =
-                        semanticsNodeIdToAccessibilityVirtualNodeId(wrapper.layoutNode.semanticsId)
+                    virtualViewId = semanticsNodeIdToAccessibilityVirtualNodeId(
+                        layoutNode.semanticsId
+                    )
                 }
             }
         }
@@ -1696,6 +1702,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     private fun sendSubtreeChangeAccessibilityEvents(
         layoutNode: LayoutNode,
         subtreeChangedSemanticsNodesIds: ArraySet<Int>
@@ -1720,7 +1727,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     ?.isMergingSemanticsOfDescendants == true
             }?.outerSemantics?.let { semanticsWrapper = it }
         }
-        val id = semanticsWrapper.layoutNode.semanticsId
+        val id = semanticsWrapper.requireLayoutNode().semanticsId
         if (!subtreeChangedSemanticsNodesIds.add(id)) {
             return
         }
@@ -1855,8 +1862,9 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                                     AccessibilityEvent.TYPE_VIEW_SELECTED
                                 )
                                 // Here we use the merged node
+                                @OptIn(ExperimentalComposeUiApi::class)
                                 val mergedNode =
-                                    SemanticsNode(newNode.outerSemanticsEntity, true)
+                                    SemanticsNode(newNode.outerSemanticsNode, true)
                                 val contentDescription = mergedNode.config.getOrNull(
                                     SemanticsProperties.ContentDescription
                                 )?.fastJoinToString(",")
@@ -2499,6 +2507,7 @@ private val SemanticsNode.isPassword: Boolean get() = config.contains(SemanticsP
 private val SemanticsNode.isTextField get() = this.unmergedConfig.contains(SemanticsActions.SetText)
 private val SemanticsNode.isRtl get() = layoutInfo.layoutDirection == LayoutDirection.Rtl
 
+@OptIn(ExperimentalComposeUiApi::class)
 private fun SemanticsNode.excludeLineAndPageGranularities(): Boolean {
     // text field that is not in focus
     if (isTextField && unmergedConfig.getOrNull(SemanticsProperties.Focused) != true) return true

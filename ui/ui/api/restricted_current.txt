@@ -21,6 +21,9 @@ package androidx.compose.ui {
     field public static final androidx.compose.ui.AbsoluteAlignment INSTANCE;
   }
 
+  public final class ActualKt {
+  }
+
   @androidx.compose.runtime.Stable public fun interface Alignment {
     method public long align(long size, long space, androidx.compose.ui.unit.LayoutDirection layoutDirection);
     field public static final androidx.compose.ui.Alignment.Companion Companion;
@@ -2173,6 +2176,9 @@ package androidx.compose.ui.modifier {
     method public static <T> androidx.compose.ui.modifier.ProvidableModifierLocal<T> modifierLocalOf(kotlin.jvm.functions.Function0<? extends T> defaultFactory);
   }
 
+  public final class ModifierLocalNodeKt {
+  }
+
   @androidx.compose.runtime.Stable @kotlin.jvm.JvmDefaultWithCompatibility public interface ModifierLocalProvider<T> extends androidx.compose.ui.Modifier.Element {
     method public androidx.compose.ui.modifier.ProvidableModifierLocal<T> getKey();
     method public T! getValue();
@@ -2194,6 +2200,9 @@ package androidx.compose.ui.modifier {
 }
 
 package androidx.compose.ui.node {
+
+  public final class BackwardsCompatNodeKt {
+  }
 
   @kotlin.PublishedApi internal interface ComposeUiNode {
     method public androidx.compose.ui.unit.Density getDensity();
@@ -2229,16 +2238,46 @@ package androidx.compose.ui.node {
     property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.platform.ViewConfiguration,kotlin.Unit> SetViewConfiguration;
   }
 
+  public final class DelegatableNodeKt {
+  }
+
+  public final class DrawModifierNodeKt {
+  }
+
   public final class HitTestResultKt {
   }
 
   public final class LayoutModifierNodeCoordinatorKt {
   }
 
+  public final class LayoutModifierNodeKt {
+  }
+
+  public final class LayoutNodeDrawScopeKt {
+  }
+
   public final class LayoutNodeKt {
   }
 
   public final class LayoutNodeLayoutDelegateKt {
+  }
+
+  public final class ModifierNodeElementKt {
+  }
+
+  public final class MyersDiffKt {
+  }
+
+  public final class NodeChainKt {
+  }
+
+  public final class NodeCoordinatorKt {
+  }
+
+  public final class NodeKindKt {
+  }
+
+  public final class PointerInputModifierNodeKt {
   }
 
   public final class Ref<T> {
@@ -2256,6 +2295,9 @@ package androidx.compose.ui.node {
     property public abstract androidx.compose.ui.unit.Density density;
     property public abstract androidx.compose.ui.semantics.SemanticsOwner semanticsOwner;
     property public abstract androidx.compose.ui.text.input.TextInputService textInputService;
+  }
+
+  public final class SemanticsModifierNodeKt {
   }
 
   public final class ViewInterop_androidKt {

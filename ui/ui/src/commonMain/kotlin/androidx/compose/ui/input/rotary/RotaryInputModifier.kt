@@ -18,7 +18,7 @@ package androidx.compose.ui.input.rotary
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.focus.FocusAwareEvent
+import androidx.compose.ui.input.focus.FocusDirectedInputEvent
 import androidx.compose.ui.input.focus.FocusAwareInputModifier
 import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.platform.debugInspectorInfo
@@ -101,7 +101,7 @@ internal val ModifierLocalRotaryScrollParent =
     modifierLocalOf<FocusAwareInputModifier<RotaryScrollEvent>?> { null }
 
 @ExperimentalComposeUiApi
-private fun ((RotaryScrollEvent) -> Boolean).focusAwareCallback() = { e: FocusAwareEvent ->
+private fun ((RotaryScrollEvent) -> Boolean).focusAwareCallback() = { e: FocusDirectedInputEvent ->
     check(e is RotaryScrollEvent) {
         "FocusAwareEvent is dispatched to the wrong FocusAwareParent."
     }

@@ -14,14 +14,6 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.node
+package androidx.compose.ui
 
-import androidx.compose.ui.Modifier
-
-/**
- * A [LayoutNodeEntity] that only contains a [Modifier] and no logic
- */
-internal class SimpleEntity<M : Modifier>(
-    coordinator: NodeCoordinator,
-    modifier: M
-) : LayoutNodeEntity<SimpleEntity<M>, M>(coordinator, modifier)
+internal expect fun areObjectsOfSameType(a: Any, b: Any): Boolean

@@ -21,19 +21,19 @@ import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.modifier.ProvidableModifierLocal
 
-internal interface FocusAwareEvent
+internal interface FocusDirectedInputEvent
 
 /**
- * A modifier that routes [FocusAwareEvent]s to the currently focused item.
+ * A modifier that routes [FocusDirectedInputEvent]s to the currently focused item.
  *
  * The event is routed to the focused item. Before reaching the focused item, [onPreEvent]() is
  * called for parents of the focused item. If the parents don't consume the event, [onPreEvent]()
  * is called for the focused item. If the event is still not consumed, [onEvent]() is called on the
  * focused item's parents.
  */
-internal open class FocusAwareInputModifier<T : FocusAwareEvent>(
-    val onEvent: ((FocusAwareEvent) -> Boolean)?,
-    val onPreEvent: ((FocusAwareEvent) -> Boolean)?,
+internal open class FocusAwareInputModifier<T : FocusDirectedInputEvent>(
+    val onEvent: ((FocusDirectedInputEvent) -> Boolean)?,
+    val onPreEvent: ((FocusDirectedInputEvent) -> Boolean)?,
     override val key: ProvidableModifierLocal<FocusAwareInputModifier<T>?>
 ) : ModifierLocalConsumer,
     ModifierLocalProvider<FocusAwareInputModifier<T>?> {

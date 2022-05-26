@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
@@ -32,6 +33,16 @@ import androidx.compose.ui.unit.IntOffset
 internal class InnerNodeCoordinator(
     layoutNode: LayoutNode
 ) : NodeCoordinator(layoutNode) {
+    @OptIn(ExperimentalComposeUiApi::class)
+    override val tail: Modifier.Node = object : Modifier.Node() {
+        override fun toString(): String {
+            return "<tail>"
+        }
+    }
+    init {
+        @OptIn(ExperimentalComposeUiApi::class)
+        tail.updateCoordinator(this)
+    }
 
     private inner class LookaheadDelegateImpl(
         scope: LookaheadScope
@@ -145,10 +156,11 @@ internal class InnerNodeCoordinator(
         }
     }
 
-    override fun <T : LayoutNodeEntity<T, M>, C, M : Modifier> hitTestChild(
-        hitTestSource: HitTestSource<T, C, M>,
+    @OptIn(ExperimentalComposeUiApi::class)
+    override fun <T : DelegatableNode> hitTestChild(
+        hitTestSource: HitTestSource<T>,
         pointerPosition: Offset,
-        hitTestResult: HitTestResult<C>,
+        hitTestResult: HitTestResult<T>,
         isTouchEvent: Boolean,
         isInLayer: Boolean
     ) {
