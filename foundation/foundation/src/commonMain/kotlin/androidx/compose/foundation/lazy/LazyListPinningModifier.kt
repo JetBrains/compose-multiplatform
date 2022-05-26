@@ -22,7 +22,9 @@ import androidx.compose.foundation.lazy.layout.PinnableParent
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalProvider
+import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.modifier.ProvidableModifierLocal
 import androidx.compose.ui.platform.debugInspectorInfo
 
@@ -49,23 +51,32 @@ internal fun Modifier.lazyListPinningModifier(
 private class LazyListPinningModifier(
     private val state: LazyListState,
     private val beyondBoundsInfo: LazyListBeyondBoundsInfo,
-) : ModifierLocalProvider<PinnableParent?>, PinnableParent {
+) : ModifierLocalProvider<PinnableParent?>, ModifierLocalConsumer, PinnableParent {
+    var pinnableGrandParent: PinnableParent? = null
+
     override val key: ProvidableModifierLocal<PinnableParent?>
         get() = ModifierLocalPinnableParent
 
     override val value: PinnableParent
         get() = this
 
-    override fun pinItems(): PinnableParent.PinnedItemsHandle {
-        if (!beyondBoundsInfo.hasIntervals()) return EmptyPinnedItemsHandle
-        return with(beyondBoundsInfo) {
+    override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) {
+        pinnableGrandParent = with(scope) { ModifierLocalPinnableParent.current }
+    }
+
+    override fun pinItems(): PinnableParent.PinnedItemsHandle = with(beyondBoundsInfo) {
+        if (hasIntervals()) {
             object : PinnableParent.PinnedItemsHandle {
+                val parentPinnedItemsHandle = pinnableGrandParent?.pinItems()
                 val interval = addInterval(start, end)
                 override fun unpin() {
                     removeInterval(interval)
+                    parentPinnedItemsHandle?.unpin()
                     state.remeasurement?.forceRemeasure()
                 }
             }
+        } else {
+            pinnableGrandParent?.pinItems() ?: EmptyPinnedItemsHandle
         }
     }
 

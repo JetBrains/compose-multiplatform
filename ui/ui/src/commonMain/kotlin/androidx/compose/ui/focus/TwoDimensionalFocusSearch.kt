@@ -128,7 +128,7 @@ private fun FocusModifier.searchChildren(
         if (!nextItem.focusState.isDeactivated) return onFound.invoke(nextItem)
 
         // If the result is deactivated, we search among its children.
-        if (nextItem.searchChildren(focusedItem, direction, onFound)) return true
+        if (nextItem.generateAndSearchChildren(focusedItem, direction, onFound)) return true
 
         // If there are no results among the children of the deactivated node,
         // repeat the search by excluding this deactivated node.
