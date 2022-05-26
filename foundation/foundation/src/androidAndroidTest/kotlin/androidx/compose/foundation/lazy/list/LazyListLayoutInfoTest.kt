@@ -431,6 +431,30 @@ class LazyListLayoutInfoTest(
         }
     }
 
+    @Test
+    fun viewportOffsetsSmallContentReverseArrangement() {
+        val state = LazyListState()
+        rule.setContent {
+            LazyColumnOrRow(
+                modifier = Modifier.requiredSize(itemSizeDp * 5),
+                reverseLayout = reverseLayout,
+                reverseArrangement = true,
+                state = state
+            ) {
+                items(4) {
+                    Box(Modifier.requiredSize(itemSizeDp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            println(state.layoutInfo.visibleItemsInfo.map { it.offset })
+            assertThat(state.layoutInfo.viewportStartOffset).isEqualTo(0)
+            assertThat(state.layoutInfo.viewportEndOffset).isEqualTo(itemSizePx * 5)
+            state.layoutInfo.assertVisibleItems(count = 4, startOffset = itemSizePx)
+        }
+    }
+
     fun LazyListLayoutInfo.assertVisibleItems(
         count: Int,
         startIndex: Int = 0,

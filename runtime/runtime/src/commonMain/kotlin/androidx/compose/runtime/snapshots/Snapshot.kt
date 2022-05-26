@@ -1027,9 +1027,10 @@ open class MutableSnapshot internal constructor(
 
 /**
  * The result of a applying a mutable snapshot. [Success] indicates that the snapshot was
- * successfully applied and is not visible as the global state of the state object (or visible
+ * successfully applied and is now visible as the global state of the state object (or visible
  * in the parent snapshot for a nested snapshot). [Failure] indicates one or more state objects
- * were modified by both this snapshot and in the global (or parent) snapshot.
+ * were modified by both this snapshot and in the global (or parent) snapshot, and the changes from
+ * this snapshot are **not** visible in the global or parent snapshot.
  */
 sealed class SnapshotApplyResult {
     /**

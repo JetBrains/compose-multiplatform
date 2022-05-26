@@ -47,6 +47,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.isActive
@@ -58,6 +59,7 @@ private class Time(hours: State<Int>, minutes: State<Int>, seconds: State<Int>) 
     val seconds by seconds
 }
 
+@Preview
 @Composable
 fun AnimatedClockDemo() {
     val calendar = remember { Calendar.getInstance() }

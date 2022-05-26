@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
@@ -53,6 +54,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
@@ -73,6 +77,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.swipeWithVelocity
@@ -1651,6 +1656,80 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
         rule.onNodeWithTag("0").assertIsNotDisplayed()
         rule.onNodeWithTag("2").assertIsDisplayed()
         rule.onNodeWithTag("3").assertIsDisplayed()
+    }
+
+    @Test
+    fun withZeroSizedFirstItem_shouldNotConsumedDrag() {
+        var scrollConsumedAccumulator = Offset.Zero
+        val collectingDataConnection = object : NestedScrollConnection {
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                scrollConsumedAccumulator += consumed
+                return Offset.Zero
+            }
+        }
+
+        rule.setContent {
+            val state = rememberLazyListState()
+            LazyColumnOrRow(
+                modifier = Modifier
+                    .testTag("mainList")
+                    .nestedScroll(collectingDataConnection),
+                state = state,
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(all = 10.dp)
+            ) {
+                item {
+                    Spacer(modifier = Modifier.size(size = 0.dp))
+                }
+                items(10) {
+                    Box(Modifier.fillMaxWidth()) {
+                        BasicText(text = it.toString())
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("mainList").performTouchInput {
+            swipeDown()
+        }
+
+        rule.runOnIdle {
+            assertThat(scrollConsumedAccumulator).isEqualTo(Offset.Zero)
+        }
+    }
+
+    @Test
+    fun withZeroSizedFirstItem_shouldKeepItemOnSizeChange() {
+        val firstItemSize = mutableStateOf(0.dp)
+
+        rule.setContent {
+            val state = rememberLazyListState()
+            LazyColumnOrRow(
+                modifier = Modifier
+                    .testTag("mainList"),
+                state = state,
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(all = 10.dp)
+            ) {
+                item {
+                    Spacer(modifier = Modifier
+                        .testTag("firstItem")
+                        .size(size = firstItemSize.value)
+                        .background(Color.Black))
+                }
+                items(10) {
+                    Box(Modifier.background(Color.Red).fillMaxWidth()) {
+                        BasicText(text = it.toString())
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("firstItem").assertIsNotDisplayed()
+        firstItemSize.value = 20.dp
+        rule.onNodeWithTag("firstItem").assertIsDisplayed()
     }
 
     @Test

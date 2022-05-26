@@ -386,6 +386,42 @@ class LazyListsContentPaddingTest(orientation: Orientation) :
     }
 
     @Test
+    fun contentLargePaddingAndReverseLayout() {
+        val topPadding = itemSize * 2
+        val bottomPadding = itemSize * 2
+        val listSize = itemSize * 3
+        lateinit var state: LazyListState
+        rule.setContentWithTestViewConfiguration {
+            LazyColumnOrRow(
+                reverseLayout = true,
+                state = rememberLazyListState().also { state = it },
+                modifier = Modifier.requiredSize(listSize),
+                contentPadding = PaddingValues(
+                    beforeContent = topPadding,
+                    afterContent = bottomPadding
+                ),
+            ) {
+                items(3) { index ->
+                    Box(Modifier.requiredSize(itemSize).testTag("$index"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertStartPositionInRootIsEqualTo(0.dp)
+        // Shouldn't be visible
+        rule.onNodeWithTag("1").assertIsNotDisplayed()
+
+        // Scroll to the top.
+        state.scrollBy(itemSize * 5f)
+
+        rule.onNodeWithTag("2").assertStartPositionInRootIsEqualTo(topPadding)
+        // Shouldn't be visible
+        rule.onNodeWithTag("1").assertIsNotDisplayed()
+        rule.onNodeWithTag("0").assertIsNotDisplayed()
+    }
+
+    @Test
     fun overscrollWithContentPadding() {
         lateinit var state: LazyListState
         rule.setContent {

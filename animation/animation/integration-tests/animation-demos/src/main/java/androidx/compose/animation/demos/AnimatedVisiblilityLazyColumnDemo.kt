@@ -17,7 +17,6 @@
 package androidx.compose.animation.demos
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.ExperimentalTransitionApi
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.expandVertically
@@ -42,10 +41,10 @@ import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.flow.collect
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalTransitionApi::class)
+@Preview
 @Composable
 fun AnimatedVisibilityLazyColumnDemo() {
     Column {

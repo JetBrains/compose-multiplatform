@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.foundation.text.selection.BaseTextPreparedSelection.Companion.NoCharacterFound
 import androidx.compose.foundation.text.selection.TextFieldPreparedSelection
 import androidx.compose.foundation.text.selection.TextFieldSelectionManager
 import androidx.compose.foundation.text.selection.TextPreparedSelectionState
@@ -129,8 +130,17 @@ internal class TextFieldKeyInput(
                         )
                     }?.apply()
                 KeyCommand.DELETE_NEXT_CHAR -> {
+                    // Note that some software keyboards, such as Samsungs, go through this code
+                    // path instead of making calls on the InputConnection directly.
                     deleteIfSelectedOr {
-                        DeleteSurroundingTextCommand(0, getNextCharacterIndex() - selection.end)
+                        val nextCharacterIndex = getNextCharacterIndex()
+                        // If there's no next character, it means the cursor is at the end of the
+                        // text, and this should be a no-op. See b/199919707.
+                        if (nextCharacterIndex != NoCharacterFound) {
+                            DeleteSurroundingTextCommand(0, nextCharacterIndex - selection.end)
+                        } else {
+                            null
+                        }
                     }?.apply()
                 }
                 KeyCommand.DELETE_PREV_WORD ->
@@ -194,7 +204,9 @@ internal class TextFieldKeyInput(
                 KeyCommand.REDO -> {
                     undoManager?.redo()?.let { this@TextFieldKeyInput.onValueChange(it) }
                 }
-                KeyCommand.CHARACTER_PALETTE -> { showCharacterPalette() }
+                KeyCommand.CHARACTER_PALETTE -> {
+                    showCharacterPalette()
+                }
             }
         }
         undoManager?.forceNextSnapshot()

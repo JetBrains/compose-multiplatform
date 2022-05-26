@@ -24,10 +24,16 @@
 package androidx.compose.integration.docs.libraries
 
 import android.graphics.Bitmap
+import android.net.Uri
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -59,35 +65,62 @@ import kotlinx.coroutines.flow.Flow
  * No action required if it's modified.
  */
 
-private object LibrariesSnippet1 {
-    class ExampleViewModel : ViewModel() { /*...*/ }
+private object LibrariesSnippetActivityResult {
+    @Composable
+    fun GetContentExample() {
+        var imageUri by remember { mutableStateOf<Uri?>(null) }
+        val launcher = rememberLauncherForActivityResult(GetContent()) { uri: Uri? ->
+            imageUri = uri
+        }
+        Column {
+            Button(onClick = { launcher.launch("image/*") }) {
+                Text(text = "Load Image")
+            }
+            Image(
+                painter = rememberImagePainter(imageUri),
+                contentDescription = "My Image"
+            )
+        }
+    }
+}
+
+@Composable
+private fun LibrariesSnippetBackHandler() {
+    var backHandlingEnabled by remember { mutableStateOf(true) }
+    BackHandler(backHandlingEnabled) {
+        // Handle back press
+    }
+}
+
+private object LibrariesSnippetAddingViewModel {
+    class MyViewModel : ViewModel() { /*...*/ }
 
     @Composable
-    fun MyExample(
-        viewModel: ExampleViewModel = viewModel()
+    fun MyScreen(
+        viewModel: MyViewModel = viewModel()
     ) {
         // use viewModel here
     }
 }
 
-private object LibrariesSnippet2 {
+private object LibrariesSnippetSameViewModelTwice {
     @Composable
-    fun MyExample(
+    fun MyScreen(
         // Returns the same instance as long as the activity is alive,
         // just as if you grabbed the instance from an Activity or Fragment
-        viewModel: ExampleViewModel = viewModel()
+        viewModel: MyViewModel = viewModel()
     ) { /* ... */ }
 
     @Composable
-    fun MyExample2(
-        viewModel: ExampleViewModel = viewModel() // Same instance as in MyExample
+    fun MyScreen2(
+        viewModel: MyViewModel = viewModel() // Same instance as in MyExample
     ) { /* ... */ }
 }
 
-private object LibrariesSnippet3 {
+private object LibrariesSnippetRecomposesWhenStateChanges {
     @Composable
-    fun MyExample(
-        viewModel: ExampleViewModel = viewModel()
+    fun MyScreen(
+        viewModel: MyViewModel = viewModel()
     ) {
         val dataExample = viewModel.exampleLiveData.observeAsState()
 
@@ -99,20 +132,20 @@ private object LibrariesSnippet3 {
     }
 }
 
-private object LibrariesSnippet4 {
+private object LibrariesSnippetHilt {
     @HiltViewModel
-    class ExampleViewModel @Inject constructor(
+    class MyViewModel @Inject constructor(
         private val savedStateHandle: SavedStateHandle,
         private val repository: ExampleRepository
     ) : ViewModel() { /* ... */ }
 
     @Composable
-    fun ExampleScreen(
-        exampleViewModel: ExampleViewModel = viewModel()
+    fun MyScreen(
+        viewModel: MyViewModel = viewModel()
     ) { /* ... */ }
 }
 
-private object LibrariesSnippet5 {
+private object LibrariesSnippetHiltViewModel {
     // import androidx.hilt.navigation.compose.hiltViewModel
 
     @Composable
@@ -121,15 +154,15 @@ private object LibrariesSnippet5 {
             composable("example") { backStackEntry ->
                 // Creates a ViewModel from the current BackStackEntry
                 // Available in the androidx.hilt:hilt-navigation-compose artifact
-                val exampleViewModel = hiltViewModel<ExampleViewModel>()
-                ExampleScreen(exampleViewModel)
+                val viewModel = hiltViewModel<MyViewModel>()
+                MyScreen(viewModel)
             }
             /* ... */
         }
     }
 }
 
-private object LibrariesSnippet6 {
+private object LibrariesSnippetBackStackEntry {
     // import androidx.hilt.navigation.compose.hiltViewModel
     // import androidx.navigation.compose.getBackStackEntry
 
@@ -142,7 +175,9 @@ private object LibrariesSnippet6 {
                     val parentEntry = remember(backStackEntry) {
                         navController.getBackStackEntry("Parent")
                     }
-                    val parentViewModel = hiltViewModel<ParentViewModel>(parentEntry)
+                    val parentViewModel = hiltViewModel<ParentViewModel>(
+                        parentEntry
+                    )
                     ExampleWithRouteScreen(parentViewModel)
                 }
             }
@@ -150,9 +185,9 @@ private object LibrariesSnippet6 {
     }
 }
 
-private object LibrariesSnippet7 {
+private object LibrariesSnippetPaging {
     @Composable
-    fun MyExample(flow: Flow<PagingData<String>>) {
+    fun MyScreen(flow: Flow<PagingData<String>>) {
         val lazyPagingItems = flow.collectAsLazyPagingItems()
         LazyColumn {
             items(lazyPagingItems) {
@@ -162,9 +197,9 @@ private object LibrariesSnippet7 {
     }
 }
 
-private object LibrariesSnippet8 {
+private object LibrariesSnippetRemoteImages {
     @Composable
-    fun MyExample() {
+    fun MyScreen() {
         val painter = rememberImagePainter(
             data = "https://picsum.photos/300/300",
             builder = {
@@ -228,7 +263,7 @@ private annotation class HiltViewModel
 private annotation class Inject
 
 private class ParentViewModel : ViewModel()
-private class ExampleViewModel : ViewModel() {
+private class MyViewModel : ViewModel() {
     val exampleLiveData = MutableLiveData(" ")
 }
 
@@ -238,7 +273,7 @@ private inline fun <reified VM : ViewModel> hiltViewModel(backStackEntry: NavBac
 }
 
 @Composable
-private fun ExampleScreen(vm: ExampleViewModel) {
+private fun MyScreen(vm: MyViewModel) {
     TODO()
 }
 

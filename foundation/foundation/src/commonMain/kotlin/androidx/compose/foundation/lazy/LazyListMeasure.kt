@@ -207,7 +207,9 @@ internal fun measureLazyList(
         if (beforeContentPadding > 0) {
             for (i in visibleItems.indices) {
                 val size = visibleItems[i].sizeWithSpacings
-                if (size <= currentFirstItemScrollOffset && i != visibleItems.lastIndex) {
+                if (currentFirstItemScrollOffset != 0 && size <= currentFirstItemScrollOffset &&
+                    i != visibleItems.lastIndex
+                ) {
                     currentFirstItemScrollOffset -= size
                     firstItem = visibleItems[i + 1]
                 } else {
@@ -344,10 +346,13 @@ private fun calculateItemsOffsets(
 
     if (hasSpareSpace) {
         require(extraItemsBefore.isEmpty() && extraItemsAfter.isEmpty())
+
         val itemsCount = items.size
+        fun Int.reverseAware() =
+            if (!reverseLayout) this else itemsCount - this - 1
+
         val sizes = IntArray(itemsCount) { index ->
-            val reverseLayoutAwareIndex = if (!reverseLayout) index else itemsCount - index - 1
-            items[reverseLayoutAwareIndex].size
+            items[index.reverseAware()].size
         }
         val offsets = IntArray(itemsCount) { 0 }
         if (isVertical) {
@@ -360,16 +365,20 @@ private fun calculateItemsOffsets(
                 density.arrange(mainAxisLayoutSize, sizes, LayoutDirection.Ltr, offsets)
             }
         }
-        offsets.forEachIndexed { index, absoluteOffset ->
-            val reverseLayoutAwareIndex = if (!reverseLayout) index else itemsCount - index - 1
-            val item = items[reverseLayoutAwareIndex]
+
+        val reverseAwareOffsetIndices =
+            if (!reverseLayout) offsets.indices else offsets.indices.reversed()
+        for (index in reverseAwareOffsetIndices) {
+            val absoluteOffset = offsets[index]
+            // when reverseLayout == true, offsets are stored in the reversed order to items
+            val item = items[index.reverseAware()]
             val relativeOffset = if (reverseLayout) {
+                // inverse offset to align with scroll direction for positioning
                 mainAxisLayoutSize - absoluteOffset - item.size
             } else {
                 absoluteOffset
             }
-            val addIndex = if (reverseLayout) 0 else positionedItems.size
-            positionedItems.add(addIndex, item.position(relativeOffset, layoutWidth, layoutHeight))
+            positionedItems.add(item.position(relativeOffset, layoutWidth, layoutHeight))
         }
     } else {
         var currentMainAxis = itemsScrollOffset

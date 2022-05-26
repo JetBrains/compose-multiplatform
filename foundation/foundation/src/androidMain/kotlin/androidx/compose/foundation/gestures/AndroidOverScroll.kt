@@ -17,7 +17,9 @@
 package androidx.compose.foundation.gestures
 
 import android.content.Context
+import android.os.Build
 import android.widget.EdgeEffect
+import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.EdgeEffectCompat.distanceCompat
 import androidx.compose.foundation.gestures.EdgeEffectCompat.onAbsorbCompat
@@ -38,11 +40,13 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Velocity
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.roundToInt
 
@@ -62,9 +66,17 @@ internal actual fun rememberOverScrollController(): OverScrollController {
 
 internal actual fun Modifier.overScroll(
     overScrollController: OverScrollController
-) = then(
-    DrawOverScrollModifier(overScrollController, debugInspectorInfo { name = "overScroll" })
-)
+) = if (overScrollController === NoOpOverscrollController) {
+    this
+} else {
+    then(StretchOverScrollNonClippingLayer)
+        .then(
+            DrawOverScrollModifier(overScrollController, debugInspectorInfo {
+                name = "overScroll"
+                value = overScrollController
+            })
+        )
+}
 
 private class DrawOverScrollModifier(
     private val overScrollController: OverScrollController,
@@ -95,9 +107,9 @@ private class DrawOverScrollModifier(
 }
 
 @OptIn(ExperimentalFoundationApi::class)
-private class AndroidEdgeEffectOverScrollController(
+internal class AndroidEdgeEffectOverScrollController(
     context: Context,
-    val overScrollConfig: OverScrollConfiguration
+    private val overScrollConfig: OverScrollConfiguration
 ) : OverScrollController {
     private val topEffect = EdgeEffectCompat.create(context, null)
     private val bottomEffect = EdgeEffectCompat.create(context, null)
@@ -119,8 +131,13 @@ private class AndroidEdgeEffectOverScrollController(
 
     private val redrawSignal = mutableStateOf(Unit, neverEqualPolicy())
 
+    @VisibleForTesting
+    internal var invalidationEnabled = true
+
     private fun invalidateOverScroll() {
-        redrawSignal.value = Unit
+        if (invalidationEnabled) {
+            redrawSignal.value = Unit
+        }
     }
 
     override fun release() {
@@ -451,3 +468,59 @@ private val NoOpOverscrollController = object : OverScrollController {
 
     override fun DrawScope.drawOverScroll() {}
 }
+
+internal val MaxSupportedElevation = 30.dp
+
+/**
+ * There is an unwanted behavior in the stretch overscroll effect we have to workaround:
+ * When the effect is started it is getting the current RenderNode bounds and clips the content
+ * by those bounds. Even if this RenderNode is not configured to do clipping. Or if it clips,
+ * but not within its bounds, but by the outline provided which could have a completely different
+ * bounds. That is what happens with our scrolling containers - they all clip by the rect which is
+ * larger than the RenderNode bounds in order to not clip the shadows drawn in the cross axis of
+ * the scrolling direction. This issue is not that visible in the Views world because Views do
+ * clip by default. So adding one more clip doesn't change much. Thus why the whole shadows
+ * mechanism in the Views world works differently, the shadows are drawn not in-place, but with
+ * the background of the first parent which has a background.
+ * In order to neutralize this unnecessary clipping we can use similar technique to what we
+ * use in those scrolling container clipping by extending the layer size on some predefined
+ * [MaxSupportedElevation] constant. In this case we have to solve that with two layout modifiers:
+ * 1) the inner one will measure its measurable as previously, but report to the parent modifier
+ * with added extra size.
+ * 2) the outer modifier will position its measurable with the layer, so the layer size is
+ * increased, and then report the measured size of its measurable without the added extra size.
+ * With such approach everything is measured and positioned as before, but we introduced an
+ * extra layer with the incremented size, which will be used by the overscroll effect and allows
+ * to draw the content without clipping the shadows.
+ */
+private val StretchOverScrollNonClippingLayer: Modifier =
+    // we only need to fix the layer size when the stretch overscroll is active (Android 12+)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        Modifier
+            .layout { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                val extraSizePx = (MaxSupportedElevation * 2).roundToPx()
+                layout(
+                    placeable.measuredWidth - extraSizePx, placeable.measuredHeight - extraSizePx
+                ) {
+                    // because this modifier report the size which is larger than the passed max
+                    // constraints this larger box will be automatically centered within the
+                    // constraints. we need to first add out offset and then neutralize the centering.
+                    placeable.placeWithLayer(
+                        -extraSizePx / 2 - (placeable.width - placeable.measuredWidth) / 2,
+                        -extraSizePx / 2 - (placeable.height - placeable.measuredHeight) / 2
+                    )
+                }
+            }
+            .layout { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                val extraSizePx = (MaxSupportedElevation * 2).roundToPx()
+                val width = placeable.width + extraSizePx
+                val height = placeable.height + extraSizePx
+                layout(width, height) {
+                    placeable.place(extraSizePx / 2, extraSizePx / 2)
+                }
+            }
+    } else {
+        Modifier
+    }

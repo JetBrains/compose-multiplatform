@@ -20,6 +20,7 @@ import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -64,7 +65,6 @@ import androidx.compose.ui.unit.width
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import org.junit.Assume.assumeTrue
 import org.junit.Before
@@ -1006,6 +1006,168 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
                 1 to itemSize / 2,
                 2 to itemSize * 3 / 2,
                 3 to itemSize * 5 / 2,
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun noAnimationWhenScrollForwardBySmallOffset() {
+        rule.setContent {
+            LazyList(maxSize = itemSizeDp * 3) {
+                items(listOf(0, 1, 2, 3, 4, 5, 6, 7), key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(itemSize / 2f)
+            }
+        }
+
+        onAnimationFrame { fraction ->
+            assertPositions(
+                0 to -itemSize / 2,
+                1 to itemSize / 2,
+                2 to itemSize * 3 / 2,
+                3 to itemSize * 5 / 2,
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun noAnimationWhenScrollBackwardBySmallOffset() {
+        rule.setContent {
+            LazyList(maxSize = itemSizeDp * 3, startIndex = 2) {
+                items(listOf(0, 1, 2, 3, 4, 5, 6, 7), key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(-itemSize / 2f)
+            }
+        }
+
+        onAnimationFrame { fraction ->
+            assertPositions(
+                1 to -itemSize / 2,
+                2 to itemSize / 2,
+                3 to itemSize * 3 / 2,
+                4 to itemSize * 5 / 2,
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun noAnimationWhenScrollForwardByLargeOffset() {
+        rule.setContent {
+            LazyList(maxSize = itemSizeDp * 3) {
+                items(listOf(0, 1, 2, 3, 4, 5, 6, 7), key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(itemSize * 2.5f)
+            }
+        }
+
+        onAnimationFrame { fraction ->
+            assertPositions(
+                2 to -itemSize / 2,
+                3 to itemSize / 2,
+                4 to itemSize * 3 / 2,
+                5 to itemSize * 5 / 2,
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun noAnimationWhenScrollBackwardByLargeOffset() {
+        rule.setContent {
+            LazyList(maxSize = itemSizeDp * 3, startIndex = 3) {
+                items(listOf(0, 1, 2, 3, 4, 5, 6, 7), key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(-itemSize * 2.5f)
+            }
+        }
+
+        onAnimationFrame { fraction ->
+            assertPositions(
+                0 to -itemSize / 2,
+                1 to itemSize / 2,
+                2 to itemSize * 3 / 2,
+                3 to itemSize * 5 / 2,
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun noAnimationWhenScrollForwardByLargeOffset_differentSizes() {
+        rule.setContent {
+            LazyList(maxSize = itemSizeDp * 3) {
+                items(listOf(0, 1, 2, 3, 4, 5, 6, 7), key = { it }) {
+                    Item(it, size = if (it % 2 == 0) itemSizeDp else itemSize2Dp)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(itemSize + itemSize2 + itemSize / 2f)
+            }
+        }
+
+        onAnimationFrame { fraction ->
+            assertPositions(
+                2 to -itemSize / 2,
+                3 to itemSize / 2,
+                4 to itemSize2 + itemSize / 2,
+                5 to itemSize2 + itemSize * 3 / 2,
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun noAnimationWhenScrollBackwardByLargeOffset_differentSizes() {
+        rule.setContent {
+            LazyList(maxSize = itemSizeDp * 3, startIndex = 3) {
+                items(listOf(0, 1, 2, 3, 4, 5, 6, 7), key = { it }) {
+                    Item(it, size = if (it % 2 == 0) itemSizeDp else itemSize2Dp)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(-(itemSize + itemSize2 + itemSize / 2f))
+            }
+        }
+
+        onAnimationFrame { fraction ->
+            assertPositions(
+                0 to -itemSize / 2,
+                1 to itemSize / 2,
+                2 to itemSize2 + itemSize / 2,
+                3 to itemSize2 + itemSize * 3 / 2,
                 fraction = fraction
             )
         }

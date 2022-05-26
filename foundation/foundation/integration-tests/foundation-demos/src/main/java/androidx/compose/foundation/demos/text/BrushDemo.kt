@@ -39,12 +39,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 
+@Preview
 @Composable
 fun TextBrushDemo() {
     LazyColumn {
@@ -63,6 +67,10 @@ fun TextBrushDemo() {
         item {
             TagLine(tag = "MultiLine Span Brush")
             MultiLineSpanBrush()
+        }
+        item {
+            TagLine(tag = "MultiParagraph Brush")
+            MultiParagraphBrush()
         }
         item {
             TagLine(tag = "Animated Brush")
@@ -156,6 +164,39 @@ fun MultiLineSpanBrush() {
             append("mpose is awesome")
         },
         fontSize = 30.sp,
+    )
+}
+
+@Composable
+fun MultiParagraphBrush() {
+    Text(
+        buildAnnotatedString {
+            withStyle(ParagraphStyle(textAlign = TextAlign.Right)) {
+                append(
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum" +
+                        " rhoncus est volutpat venenatis. Fusce semper, sapien ut venenatis" +
+                        " pellentesque, lorem dui aliquam sapien, non pharetra diam neque " +
+                        "id mi"
+                )
+            }
+
+            withStyle(ParagraphStyle(textAlign = TextAlign.Left)) {
+                append(
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum" +
+                        " rhoncus est volutpat venenatis. Fusce semper, sapien ut venenatis" +
+                        " pellentesque, lorem dui aliquam sapien, non pharetra diam neque " +
+                        "id mi"
+                )
+            }
+        },
+        style = TextStyle(
+            brush = Brush.radialGradient(
+                *RainbowStops.zip(RainbowColors).toTypedArray(),
+                radius = 600f,
+                tileMode = TileMode.Mirror
+            )
+        ),
+        fontSize = 30.sp
     )
 }
 

@@ -9,12 +9,15 @@ HSPLandroidx/compose/ui/graphics/AndroidPaint;->**(**)**
 HSPLandroidx/compose/ui/graphics/AndroidPaint_androidKt;->**(**)**
 HSPLandroidx/compose/ui/graphics/AndroidPath;->**(**)**
 HSPLandroidx/compose/ui/graphics/AndroidPath_androidKt;->**(**)**
+HSPLandroidx/compose/ui/graphics/AndroidPathMeasure;->**(**)**
 HSPLandroidx/compose/ui/graphics/BlendMode**->**(**)**
 HSPLandroidx/compose/ui/graphics/BlockGraphicsLayerModifier**->**(**)**
 HSPLandroidx/compose/ui/graphics/Brush;->**(**)**
 HSPLandroidx/compose/ui/graphics/Canvas$DefaultImpls;->**(**)**
 HSPLandroidx/compose/ui/graphics/CanvasHolder;->**(**)**
 HSPLandroidx/compose/ui/graphics/CanvasKt;->**(**)**
+HSPLandroidx/compose/ui/graphics/CanvasUtils;->**(**)**
+HSPLandroidx/compose/ui/graphics/CanvasZHelper**->**(**)**
 HSPLandroidx/compose/ui/graphics/ClipOp**->**(**)**
 HSPLandroidx/compose/ui/graphics/Color**->**(**)**
 HSPLandroidx/compose/ui/graphics/ColorFilter**->**(**)**

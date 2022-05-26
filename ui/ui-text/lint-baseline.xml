@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 7.4.0-alpha01" type="baseline" client="gradle" dependencies="false" name="AGP (7.4.0-alpha01)" variant="all" version="7.4.0-alpha01">
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="    @OptIn(InternalPlatformTextApi::class, ExperimentalTextApi::class)"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/AndroidFontListTypeface.android.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/AndroidParagraph.android.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/AndroidParagraph.android.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/AndroidParagraph.android.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class, ExperimentalTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/AndroidParagraphHelper.android.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/AndroidParagraphIntrinsics.android.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/AndroidParagraphIntrinsics.android.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/AndroidParagraphIntrinsics.android.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/style/BaselineShiftSpan.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/BoringLayoutFactory.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/BoringLayoutFactory.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/style/FontFeatureSpan.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/LayoutCompat.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/LayoutCompat.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/LayoutHelper.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/LayoutIntrinsics.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/LayoutIntrinsics.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/style/LetterSpacingSpanEm.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/style/LetterSpacingSpanPx.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/style/LineHeightSpan.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/style/LineHeightStyleSpan.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/PlaceholderExtensions.android.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/style/PlaceholderSpan.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/animation/SegmentBreaker.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/animation/SegmentBreaker.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/animation/SegmentType.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/style/ShadowSpan.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/style/SkewXSpan.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class, ExperimentalTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/SpannableExtensions.android.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/SpannableExtensions.android.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/SpannableExtensions.android.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/SpannableExtensions.android.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/SpannableExtensions.android.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/SpannableExtensions.android.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/SpannableExtensions.android.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/SpannableExtensions.android.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/SpannableExtensions.android.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/StaticLayoutFactory.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/StaticLayoutFactory.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/style/TextDecorationSpan.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/TextLayout.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/TextLayout.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/TextLayout.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/TextLayout.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/TextLayout.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/TextLayout.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/TextLayout.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/TextLayout.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/style/TypefaceSpan.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/selection/WordBoundary.kt"/>
+    </issue>
+
+</issues>

@@ -51,7 +51,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
 /**
- * Tests if [AndroidInputDispatcher.enqueueTouchDown] works
+ * Tests if [AndroidInputDispatcher.enqueueMousePress] and friends work.
  */
 @RunWith(AndroidJUnit4::class)
 @Config(minSdk = RobolectricMinSdk)
@@ -481,7 +481,7 @@ class MouseEventsTest : InputDispatcherTest() {
         scrollTest(ScrollWheel.Horizontal) { Pair(AXIS_HSCROLL, it) }
     }
 
-    fun scrollTest(scrollWheel: ScrollWheel, scrollAxis: (Float) -> Pair<Int, Float>) {
+    private fun scrollTest(scrollWheel: ScrollWheel, scrollAxis: (Float) -> Pair<Int, Float>) {
         // Scenario:
         // move mouse
         // scroll by 1f

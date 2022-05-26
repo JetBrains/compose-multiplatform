@@ -42,7 +42,7 @@ fun OnGloballyPositioned() {
             coordinates.positionInRoot()
             // These will be the alignment lines provided to the layout (empty here for Column).
             coordinates.providedAlignmentLines
-            // This will a LayoutCoordinates instance corresponding to the parent of Column.
+            // This will be a LayoutCoordinates instance corresponding to the parent of Column.
             coordinates.parentLayoutCoordinates
         }
     ) {

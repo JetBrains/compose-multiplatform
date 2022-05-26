@@ -2,10 +2,19 @@
 # =============================================
 HSPLandroidx/compose/material/ripple/AndroidRippleIndicationInstance;->**(**)**
 HSPLandroidx/compose/material/ripple/PlatformRipple;->**(**)**
+HSPLandroidx/compose/material/ripple/DebugRippleTheme;->**(**)**
 HSPLandroidx/compose/material/ripple/Ripple;->**(**)**
+HSPLandroidx/compose/material/ripple/RippleAlpha;->**(**)**
+HSPLandroidx/compose/material/ripple/RippleContainer;->**(**)**
+HSPLandroidx/compose/material/ripple/RippleHostMap;->**(**)**
 HSPLandroidx/compose/material/ripple/UnprojectedRipple;->**(**)**
 HSPLandroidx/compose/material/ripple/RippleHostView;->**(**)**
+HSPLandroidx/compose/material/ripple/RippleIndicationInstance;->**(**)**
+HSPLandroidx/compose/material/ripple/RippleKt;->**(**)**
 HSPLandroidx/compose/material/ripple/RippleHostMap;->**(**)**
 HSPLandroidx/compose/material/ripple/RippleContainer;->**(**)**
 HSPLandroidx/compose/material/ripple/RippleAlpha;->**(**)**
+HSPLandroidx/compose/material/ripple/RippleThemeKt**->**(**)**
+HSPLandroidx/compose/material/ripple/StateLayer;->**(**)**
+
 Landroidx/compose/material/ripple/*;

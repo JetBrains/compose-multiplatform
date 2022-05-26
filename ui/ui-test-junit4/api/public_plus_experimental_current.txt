@@ -6,10 +6,11 @@ package androidx.compose.ui.test {
     property public abstract A? activity;
   }
 
-  @androidx.compose.ui.test.ExperimentalTestApi public final class AndroidComposeUiTestEnvironment<A extends androidx.activity.ComponentActivity> {
-    ctor public AndroidComposeUiTestEnvironment(kotlin.jvm.functions.Function0<? extends A> activityProvider);
-    method public androidx.compose.ui.test.AndroidComposeUiTest<A> getTest();
+  @androidx.compose.ui.test.ExperimentalTestApi public abstract sealed class AndroidComposeUiTestEnvironment<A extends androidx.activity.ComponentActivity> {
+    method protected abstract A? getActivity();
+    method public final androidx.compose.ui.test.AndroidComposeUiTest<A> getTest();
     method public <R> R! runTest(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.AndroidComposeUiTest<A>,? extends R> block);
+    property protected abstract A? activity;
     property public final androidx.compose.ui.test.AndroidComposeUiTest<A> test;
   }
 
@@ -33,6 +34,7 @@ package androidx.compose.ui.test {
   }
 
   public final class ComposeUiTest_androidKt {
+    method @androidx.compose.ui.test.ExperimentalTestApi public static <A extends androidx.activity.ComponentActivity> androidx.compose.ui.test.AndroidComposeUiTestEnvironment<A> AndroidComposeUiTestEnvironment(kotlin.jvm.functions.Function0<? extends A> activityProvider);
     method @androidx.compose.ui.test.ExperimentalTestApi public static <A extends androidx.activity.ComponentActivity> void runAndroidComposeUiTest(Class<A> activityClass, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.AndroidComposeUiTest<A>,kotlin.Unit> block);
     method @androidx.compose.ui.test.ExperimentalTestApi public static inline <reified A extends androidx.activity.ComponentActivity> void runAndroidComposeUiTest(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.AndroidComposeUiTest<A>,? extends kotlin.Unit> block);
     method @androidx.compose.ui.test.ExperimentalTestApi public static void runComposeUiTest(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.ComposeUiTest,kotlin.Unit> block);
@@ -41,7 +43,7 @@ package androidx.compose.ui.test {
 
   @androidx.compose.ui.test.ExperimentalTestApi public final class StateRestorationTester {
     ctor public StateRestorationTester(androidx.compose.ui.test.ComposeUiTest composeTest);
-    method public void emulateSavedInstanceStateRestore();
+    method public void emulateSaveAndRestore();
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
   }
 

@@ -33,6 +33,7 @@ import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
@@ -230,6 +231,24 @@ private fun rememberLazyListMeasurePolicy(
 
         val itemsCount = itemProvider.itemCount
 
+        // can be negative if the content padding is larger than the max size from constraints
+        val mainAxisAvailableSize = if (isVertical) {
+            containerConstraints.maxHeight - totalVerticalPadding
+        } else {
+            containerConstraints.maxWidth - totalHorizontalPadding
+        }
+        val visualItemOffset = if (!reverseLayout || mainAxisAvailableSize > 0) {
+            IntOffset(startPadding, topPadding)
+        } else {
+            // When layout is reversed and paddings together take >100% of the available space,
+            // layout size is coerced to 0 when positioning. To take that space into account,
+            // we offset start padding by negative space between paddings.
+            IntOffset(
+                if (isVertical) startPadding else startPadding + mainAxisAvailableSize,
+                if (isVertical) topPadding + mainAxisAvailableSize else topPadding
+            )
+        }
+
         val measuredItemProvider = LazyMeasuredItemProvider(
             contentConstraints,
             isVertical,
@@ -250,18 +269,18 @@ private fun rememberLazyListMeasurePolicy(
                 beforeContentPadding = beforeContentPadding,
                 afterContentPadding = afterContentPadding,
                 spacing = spacing,
-                visualOffset = IntOffset(startPadding, topPadding),
+                visualOffset = visualItemOffset,
                 key = key,
                 placementAnimator = placementAnimator
             )
         }
         state.premeasureConstraints = measuredItemProvider.childConstraints
 
-        // can be negative if the content padding is larger than the max size from constraints
-        val mainAxisAvailableSize = if (isVertical) {
-            containerConstraints.maxHeight - totalVerticalPadding
-        } else {
-            containerConstraints.maxWidth - totalHorizontalPadding
+        val firstVisibleItemIndex: DataIndex
+        val firstVisibleScrollOffset: Int
+        Snapshot.withoutReadObservation {
+            firstVisibleItemIndex = DataIndex(state.firstVisibleItemIndex)
+            firstVisibleScrollOffset = state.firstVisibleItemScrollOffset
         }
 
         measureLazyList(
@@ -270,8 +289,8 @@ private fun rememberLazyListMeasurePolicy(
             mainAxisAvailableSize = mainAxisAvailableSize,
             beforeContentPadding = beforeContentPadding,
             afterContentPadding = afterContentPadding,
-            firstVisibleItemIndex = state.firstVisibleItemIndexNonObservable,
-            firstVisibleItemScrollOffset = state.firstVisibleItemScrollOffsetNonObservable,
+            firstVisibleItemIndex = firstVisibleItemIndex,
+            firstVisibleItemScrollOffset = firstVisibleScrollOffset,
             scrollToBeConsumed = state.scrollToBeConsumed,
             constraints = contentConstraints,
             isVertical = isVertical,

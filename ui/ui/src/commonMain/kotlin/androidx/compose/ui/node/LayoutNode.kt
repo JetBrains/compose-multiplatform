@@ -210,7 +210,18 @@ internal class LayoutNode(
         }
         invalidateUnfoldedVirtualChildren()
 
-        instance.outerLayoutNodeWrapper.wrappedBy = innerLayoutNodeWrapper
+        instance.outerLayoutNodeWrapper.wrappedBy = if (isVirtual) {
+            // if this node is virtual we use the inner wrapper of our parent
+            _foldedParent?.innerLayoutNodeWrapper
+        } else {
+            innerLayoutNodeWrapper
+        }
+        // and if the child is virtual we set our inner wrapper for the grandchildren
+        if (instance.isVirtual) {
+            instance._foldedChildren.forEach {
+                it.outerLayoutNodeWrapper.wrappedBy = innerLayoutNodeWrapper
+            }
+        }
 
         val owner = this.owner
         if (owner != null) {
@@ -233,23 +244,12 @@ internal class LayoutNode(
         require(count >= 0) {
             "count ($count) must be greater than 0"
         }
-        val attached = owner != null
         for (i in index + count - 1 downTo index) {
             val child = _foldedChildren.removeAt(i)
-            onZSortedChildrenInvalidated()
+            onChildRemoved(child)
             if (DebugChanges) {
                 println("$child removed from $this at index $i")
             }
-
-            if (attached) {
-                child.detach()
-            }
-            child._foldedParent = null
-
-            if (child.isVirtual) {
-                virtualChildrenCount--
-            }
-            invalidateUnfoldedVirtualChildren()
         }
     }
 
@@ -257,19 +257,27 @@ internal class LayoutNode(
      * Removes all children.
      */
     internal fun removeAll() {
-        val attached = owner != null
         for (i in _foldedChildren.size - 1 downTo 0) {
-            val child = _foldedChildren[i]
-            if (attached) {
-                child.detach()
-            }
-            child._foldedParent = null
+            onChildRemoved(_foldedChildren[i])
         }
         _foldedChildren.clear()
-        onZSortedChildrenInvalidated()
+    }
 
-        virtualChildrenCount = 0
+    private fun onChildRemoved(child: LayoutNode) {
+        if (owner != null) {
+            child.detach()
+        }
+        child._foldedParent = null
+        child.outerLayoutNodeWrapper.wrappedBy = null
+
+        if (child.isVirtual) {
+            virtualChildrenCount--
+            child._foldedChildren.forEach {
+                it.outerLayoutNodeWrapper.wrappedBy = null
+            }
+        }
         invalidateUnfoldedVirtualChildren()
+        onZSortedChildrenInvalidated()
     }
 
     /**

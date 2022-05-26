@@ -449,6 +449,38 @@ class TextFieldDecorationBoxTest {
             }
     }
 
+    @Test
+    fun outlinedTextFieldBox_innerTextLocation_withMultilineLabel() {
+        val labelHeight = 60.dp
+        assertSizeAndPosition_outlinedTextField(
+            TextFieldDefaults.outlinedTextFieldPadding(),
+            false,
+            labelHeight / 2 + InnerTextFieldHeight + TextFieldPadding,
+            labelHeight / 2,
+            true,
+            label = {
+                // imitates the multiline label
+                Box(Modifier.size(10.dp, labelHeight))
+            }
+        )
+    }
+
+    @Test
+    fun outlinedTextFieldBox_singleLine_innerTextLocation_withMultilineLabel() {
+        val labelHeight = 60.dp
+        assertSizeAndPosition_outlinedTextField(
+            TextFieldDefaults.outlinedTextFieldPadding(),
+            true,
+            labelHeight / 2 + InnerTextFieldHeight + TextFieldPadding,
+            labelHeight / 2,
+            true,
+            label = {
+                // imitates the multiline label
+                Box(Modifier.size(10.dp, labelHeight))
+            }
+        )
+    }
+
     private fun assertVerticalSizeAndPosition_outlinedTextField(
         padding: PaddingValues,
         singleLine: Boolean,
@@ -486,7 +518,8 @@ class TextFieldDecorationBoxTest {
         expectedSize: Dp,
         expectedPosition: Dp,
         vertical: Boolean,
-        layoutDirection: LayoutDirection = LayoutDirection.Ltr
+        layoutDirection: LayoutDirection = LayoutDirection.Ltr,
+        label: @Composable (() -> Unit)? = null
     ) {
         var size: IntSize? = null
         var position: Offset? = null
@@ -519,7 +552,8 @@ class TextFieldDecorationBoxTest {
                             singleLine = singleLine,
                             visualTransformation = VisualTransformation.None,
                             interactionSource = interactionSource,
-                            contentPadding = padding
+                            contentPadding = padding,
+                            label = label
                         )
                     }
                 }

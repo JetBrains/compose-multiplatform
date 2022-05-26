@@ -29,13 +29,13 @@ import android.content.Context
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.FloatingActionButton
@@ -49,10 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AbstractComposeView
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
-import androidx.recyclerview.widget.RecyclerView
 
 /**
  * This file lets DevRel track changes to snippets present in
@@ -159,9 +156,7 @@ private object InteropUiSnippet5 {
 
             setContent {
                 MaterialTheme {
-                    ProvideWindowInsets {
-                        MyScreen()
-                    }
+                    MyScreen()
                 }
             }
         }
@@ -170,11 +165,19 @@ private object InteropUiSnippet5 {
     @Composable
     fun MyScreen() {
         Box {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize() // fill the entire window
+                    .imePadding() // padding for the bottom for the IME
+                    .imeNestedScroll(), // scroll IME at the bottom
+                content = { }
+            )
             FloatingActionButton(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(16.dp) // normal 16dp of padding for FABs
-                    .navigationBarsPadding(), // Move it out from under the nav bar
+                    .navigationBarsPadding() // Move it out from under the nav bar
+                    .imePadding(), // padding for when IME appears
                 onClick = { }
             ) {
                 Icon( /* ... */)
@@ -218,66 +221,6 @@ private object InteropUiSnippet8 {
     }
 }
 
-private object InteropUiSnippet9 {
-    // import androidx.compose.ui.platform.ComposeView
-
-    class MyComposeAdapter : RecyclerView.Adapter<MyComposeViewHolder>() {
-
-        override fun onCreateViewHolder(
-            parent: ViewGroup,
-            viewType: Int,
-        ): MyComposeViewHolder {
-            return MyComposeViewHolder(ComposeView(parent.context))
-        }
-
-        override fun onViewRecycled(holder: MyComposeViewHolder) {
-            // Dispose the underlying Composition of the ComposeView
-            // when RecyclerView has recycled this ViewHolder
-            holder.composeView.disposeComposition()
-        }
-
-        /* Other methods */
-
-        // NOTE: DO NOT COPY THE METHODS BELOW IN THE CODE SNIPPETS
-        override fun onBindViewHolder(holder: MyComposeViewHolder, position: Int) {
-            TODO("Not yet implemented")
-        }
-
-        override fun getItemCount(): Int {
-            TODO("Not yet implemented")
-        }
-    }
-
-    class MyComposeViewHolder(
-        val composeView: ComposeView
-    ) : RecyclerView.ViewHolder(composeView) {
-        /* ... */
-    }
-}
-
-private object InteropUiSnippet10 {
-    // import androidx.compose.ui.platform.ViewCompositionStrategy
-
-    class MyComposeViewHolder(
-        val composeView: ComposeView
-    ) : RecyclerView.ViewHolder(composeView) {
-
-        init {
-            composeView.setViewCompositionStrategy(
-                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
-            )
-        }
-
-        fun bind(input: String) {
-            composeView.setContent {
-                MdcTheme {
-                    Text(input)
-                }
-            }
-        }
-    }
-}
-
 /*
 Fakes needed for snippets to build:
  */
@@ -310,10 +253,6 @@ private fun YourAppTheme(content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun ProvideWindowInsets(content: @Composable () -> Unit) {
-}
-
-@Composable
 private fun Icon() {
 }
 
@@ -339,6 +278,12 @@ private class WindowCompat {
 }
 
 private fun Modifier.navigationBarsPadding(): Modifier = this
+
+private fun Modifier.fillMaxSize(): Modifier = this
+
+private fun Modifier.imePadding(): Modifier = this
+
+private fun Modifier.imeNestedScroll(): Modifier = this
 
 private class ActivityExampleBinding {
     val root: Int = 0

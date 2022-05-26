@@ -177,6 +177,7 @@ open class BaseLazyGridTestWithOrientation(private val orientation: Orientation)
         state: LazyGridState = rememberLazyGridState(),
         contentPadding: PaddingValues = PaddingValues(0.dp),
         reverseLayout: Boolean = false,
+        reverseArrangement: Boolean = false,
         flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
         userScrollEnabled: Boolean = true,
         crossAxisSpacedBy: Dp = 0.dp,
@@ -188,6 +189,7 @@ open class BaseLazyGridTestWithOrientation(private val orientation: Orientation)
         state,
         contentPadding,
         reverseLayout,
+        reverseArrangement,
         flingBehavior,
         userScrollEnabled,
         crossAxisSpacedBy,
@@ -202,6 +204,7 @@ open class BaseLazyGridTestWithOrientation(private val orientation: Orientation)
         state: LazyGridState = rememberLazyGridState(),
         contentPadding: PaddingValues = PaddingValues(0.dp),
         reverseLayout: Boolean = false,
+        reverseArrangement: Boolean = false,
         flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
         userScrollEnabled: Boolean = true,
         crossAxisSpacedBy: Dp = 0.dp,
@@ -211,8 +214,8 @@ open class BaseLazyGridTestWithOrientation(private val orientation: Orientation)
         if (vertical) {
             val verticalArrangement = when {
                 mainAxisSpacedBy != 0.dp -> Arrangement.spacedBy(mainAxisSpacedBy)
-                !reverseLayout -> Arrangement.Top
-                else -> Arrangement.Bottom
+                reverseLayout xor reverseArrangement -> Arrangement.Bottom
+                else -> Arrangement.Top
             }
             val horizontalArrangement = when {
                 crossAxisSpacedBy != 0.dp -> Arrangement.spacedBy(crossAxisSpacedBy)
@@ -233,8 +236,8 @@ open class BaseLazyGridTestWithOrientation(private val orientation: Orientation)
         } else {
             val horizontalArrangement = when {
                 mainAxisSpacedBy != 0.dp -> Arrangement.spacedBy(mainAxisSpacedBy)
-                !reverseLayout -> Arrangement.Start
-                else -> Arrangement.End
+                reverseLayout xor reverseArrangement -> Arrangement.End
+                else -> Arrangement.Start
             }
             val verticalArrangement = when {
                 crossAxisSpacedBy != 0.dp -> Arrangement.spacedBy(crossAxisSpacedBy)

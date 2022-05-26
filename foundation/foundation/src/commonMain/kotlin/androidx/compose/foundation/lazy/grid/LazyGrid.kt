@@ -34,6 +34,7 @@ import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.MeasureResult
@@ -230,6 +231,24 @@ private fun rememberLazyGridMeasurePolicy(
 
         val itemsCount = itemProvider.itemCount
 
+        // can be negative if the content padding is larger than the max size from constraints
+        val mainAxisAvailableSize = if (isVertical) {
+            constraints.maxHeight - totalVerticalPadding
+        } else {
+            constraints.maxWidth - totalHorizontalPadding
+        }
+        val visualItemOffset = if (!reverseLayout || mainAxisAvailableSize > 0) {
+            IntOffset(startPadding, topPadding)
+        } else {
+            // When layout is reversed and paddings together take >100% of the available space,
+            // layout size is coerced to 0 when positioning. To take that space into account,
+            // we offset start padding by negative space between paddings.
+            IntOffset(
+                if (isVertical) startPadding else startPadding + mainAxisAvailableSize,
+                if (isVertical) topPadding + mainAxisAvailableSize else topPadding
+            )
+        }
+
         val measuredItemProvider = LazyMeasuredItemProvider(
             itemProvider,
             this,
@@ -245,7 +264,7 @@ private fun rememberLazyGridMeasurePolicy(
                 layoutDirection = layoutDirection,
                 beforeContentPadding = beforeContentPadding,
                 afterContentPadding = afterContentPadding,
-                visualOffset = IntOffset(startPadding, topPadding),
+                visualOffset = visualItemOffset,
                 placeables = placeables,
                 placementAnimator = placementAnimator
             )
@@ -284,25 +303,21 @@ private fun rememberLazyGridMeasurePolicy(
             result
         }
 
-        // can be negative if the content padding is larger than the max size from constraints
-        val mainAxisAvailableSize = if (isVertical) {
-            constraints.maxHeight - totalVerticalPadding
-        } else {
-            constraints.maxWidth - totalHorizontalPadding
-        }
-
         val firstVisibleLineIndex: LineIndex
         val firstVisibleLineScrollOffset: Int
-        if (state.firstVisibleItemIndexNonObservable.value < itemsCount || itemsCount <= 0) {
-            firstVisibleLineIndex = spanLayoutProvider.getLineIndexOfItem(
-                state.firstVisibleItemIndexNonObservable.value
-            )
-            firstVisibleLineScrollOffset = state.firstVisibleItemScrollOffsetNonObservable
-        } else {
-            // the data set has been updated and now we have less items that we were
-            // scrolled to before
-            firstVisibleLineIndex = spanLayoutProvider.getLineIndexOfItem(itemsCount - 1)
-            firstVisibleLineScrollOffset = 0
+
+        Snapshot.withoutReadObservation {
+            if (state.firstVisibleItemIndex < itemsCount || itemsCount <= 0) {
+                firstVisibleLineIndex = spanLayoutProvider.getLineIndexOfItem(
+                    state.firstVisibleItemIndex
+                )
+                firstVisibleLineScrollOffset = state.firstVisibleItemScrollOffset
+            } else {
+                // the data set has been updated and now we have less items that we were
+                // scrolled to before
+                firstVisibleLineIndex = spanLayoutProvider.getLineIndexOfItem(itemsCount - 1)
+                firstVisibleLineScrollOffset = 0
+            }
         }
         measureLazyGrid(
             itemsCount = itemsCount,

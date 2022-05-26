@@ -100,13 +100,13 @@ class LazyGridState constructor(
      * derived state in order to only have recompositions when the derived value changes:
      * @sample androidx.compose.foundation.samples.UsingGridScrollPositionInCompositionSample
      */
-    val firstVisibleItemIndex: Int get() = scrollPosition.observableIndex
+    val firstVisibleItemIndex: Int get() = scrollPosition.index.value
 
     /**
      * The scroll offset of the first visible item. Scrolling forward is positive - i.e., the
      * amount that the item is offset backwards
      */
-    val firstVisibleItemScrollOffset: Int get() = scrollPosition.observableScrollOffset
+    val firstVisibleItemScrollOffset: Int get() = scrollPosition.scrollOffset
 
     /** Backing state for [layoutInfo] */
     private val layoutInfoState = mutableStateOf<LazyGridLayoutInfo>(EmptyLazyGridLayoutInfo)
@@ -143,34 +143,19 @@ class LazyGridState constructor(
         private set
 
     /**
-     * The same as [firstVisibleItemIndex] but the read will not trigger remeasure.
+     * Needed for [animateScrollToItem]. Updated on every measure.
      */
-    internal val firstVisibleItemIndexNonObservable: ItemIndex get() = scrollPosition.index
-
-    /**
-     * The same as [firstVisibleItemScrollOffset] but the read will not trigger remeasure.
-     */
-    internal val firstVisibleItemScrollOffsetNonObservable: Int get() = scrollPosition.scrollOffset
-
-    /**
-     * Non-observable property with the count of items being visible during the last measure pass.
-     */
-    internal var visibleItemsCount = 0
+    internal var slotsPerLine: Int by mutableStateOf(0)
 
     /**
      * Needed for [animateScrollToItem]. Updated on every measure.
      */
-    internal var slotsPerLine: Int = 0
-
-    /**
-     * Needed for [animateScrollToItem]. Updated on every measure.
-     */
-    internal var density: Density = Density(1f, 1f)
+    internal var density: Density by mutableStateOf(Density(1f, 1f))
 
     /**
      * Needed for [notifyPrefetch].
      */
-    internal var isVertical: Boolean = true
+    internal var isVertical: Boolean by mutableStateOf(true)
 
     /**
      * The ScrollableController instance. We keep it as we need to call stopAnimation on it once
@@ -199,7 +184,7 @@ class LazyGridState constructor(
     /**
      * The list of handles associated with the items from the [lineToPrefetch] line.
      */
-    private var currentLinePrefetchHandles =
+    private val currentLinePrefetchHandles =
         mutableVectorOf<LazyLayoutPrefetchState.PrefetchHandle>()
 
     /**
@@ -212,7 +197,7 @@ class LazyGridState constructor(
      * The [Remeasurement] object associated with our layout. It allows us to remeasure
      * synchronously during scroll.
      */
-    private var remeasurement: Remeasurement? = null
+    private var remeasurement: Remeasurement? by mutableStateOf(null)
 
     /**
      * The modifier which provides [remeasurement].
@@ -232,8 +217,8 @@ class LazyGridState constructor(
     /**
      * Finds items on a line and their measurement constraints. Used for prefetching.
      */
-    internal var prefetchInfoRetriever: (line: LineIndex) -> List<Pair<Int, Constraints>> =
-        { emptyList() }
+    internal var prefetchInfoRetriever: (line: LineIndex) -> List<Pair<Int, Constraints>> by
+        mutableStateOf({ emptyList() })
 
     internal var placementAnimator by mutableStateOf<LazyGridItemPlacementAnimator?>(null)
 
@@ -392,7 +377,6 @@ class LazyGridState constructor(
      *  Updates the state with the new calculated scroll position and consumed scroll.
      */
     internal fun applyMeasureResult(result: LazyGridMeasureResult) {
-        visibleItemsCount = result.visibleItemsInfo.size
         scrollPosition.updateFromMeasureResult(result)
         scrollToBeConsumed -= result.consumedScroll
         layoutInfoState.value = result

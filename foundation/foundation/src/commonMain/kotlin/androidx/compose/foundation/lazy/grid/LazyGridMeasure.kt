@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastSumBy
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -199,7 +200,8 @@ internal fun measureLazyGrid(
         if (beforeContentPadding > 0) {
             for (i in visibleLines.indices) {
                 val size = visibleLines[i].mainAxisSizeWithSpacings
-                if (size <= currentFirstLineScrollOffset && i != visibleLines.lastIndex) {
+                if (currentFirstLineScrollOffset != 0 && size <= currentFirstLineScrollOffset &&
+                    i != visibleLines.lastIndex) {
                     currentFirstLineScrollOffset -= size
                     firstLine = visibleLines[i + 1]
                 } else {
@@ -285,13 +287,15 @@ private fun calculateItemsOffsets(
         check(firstLineScrollOffset == 0)
     }
 
-    val positionedItems = ArrayList<LazyGridPositionedItem>(lines.size)
+    val positionedItems = ArrayList<LazyGridPositionedItem>(lines.fastSumBy { it.items.size })
 
     if (hasSpareSpace) {
         val linesCount = lines.size
+        fun Int.reverseAware() =
+            if (!reverseLayout) this else linesCount - this - 1
+
         val sizes = IntArray(linesCount) { index ->
-            val reverseLayoutAwareIndex = if (!reverseLayout) index else linesCount - index - 1
-            lines[reverseLayoutAwareIndex].mainAxisSize
+            lines[index.reverseAware()].mainAxisSize
         }
         val offsets = IntArray(linesCount) { 0 }
         if (isVertical) {
@@ -304,17 +308,21 @@ private fun calculateItemsOffsets(
                 density.arrange(mainAxisLayoutSize, sizes, LayoutDirection.Ltr, offsets)
             }
         }
-        offsets.forEachIndexed { index, absoluteOffset ->
-            val reverseLayoutAwareIndex = if (!reverseLayout) index else linesCount - index - 1
-            val line = lines[reverseLayoutAwareIndex]
+
+        val reverseAwareOffsetIndices =
+            if (reverseLayout) offsets.indices.reversed() else offsets.indices
+
+        for (index in reverseAwareOffsetIndices) {
+            val absoluteOffset = offsets[index]
+            // when reverseLayout == true, offsets are stored in the reversed order to items
+            val line = lines[index.reverseAware()]
             val relativeOffset = if (reverseLayout) {
+                // inverse offset to align with scroll direction for positioning
                 mainAxisLayoutSize - absoluteOffset - line.mainAxisSize
             } else {
                 absoluteOffset
             }
-            val addIndex = if (reverseLayout) 0 else positionedItems.size
             positionedItems.addAll(
-                addIndex,
                 line.position(relativeOffset, layoutWidth, layoutHeight)
             )
         }

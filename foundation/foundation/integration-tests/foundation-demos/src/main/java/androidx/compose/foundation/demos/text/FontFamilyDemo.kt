@@ -42,9 +42,11 @@ import androidx.compose.ui.text.font.FontLoadingStrategy.Companion.Async
 import androidx.compose.ui.text.font.FontLoadingStrategy.Companion.OptionalLocal
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
+@Preview
 @Composable
 fun FontFamilyDemo() {
     LazyColumn {
@@ -55,6 +57,7 @@ fun FontFamilyDemo() {
     }
 }
 
+@Preview
 @OptIn(ExperimentalTextApi::class)
 @Composable
 fun AsyncFontFamilyDemo() {

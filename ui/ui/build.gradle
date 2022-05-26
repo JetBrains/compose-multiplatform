@@ -39,7 +39,10 @@ dependencies {
         implementation(libs.kotlinStdlibCommon)
         implementation(libs.kotlinCoroutinesCore)
 
-        api("androidx.compose.runtime:runtime-saveable:1.1.1")
+        // when updating the runtime version please also update the runtime-saveable version
+        implementation(project(":compose:runtime:runtime"))
+        api(project(":compose:runtime:runtime-saveable"))
+
         api(project(":compose:ui:ui-geometry"))
         api(project(":compose:ui:ui-graphics"))
         api(project(":compose:ui:ui-text"))
@@ -50,7 +53,6 @@ dependencies {
         // any dependency on this module.
         compileOnly(project(":compose:ui:ui-android-stubs"))
 
-        implementation(project(":compose:runtime:runtime"))
         implementation(project(":compose:ui:ui-util"))
         implementation(libs.kotlinStdlib)
         implementation("androidx.autofill:autofill:1.0.0")
@@ -58,7 +60,7 @@ dependencies {
 
         implementation("androidx.core:core:1.5.0")
         implementation('androidx.collection:collection:1.0.0')
-        implementation(project(":customview:customview-poolingcontainer"))
+        implementation("androidx.customview:customview-poolingcontainer:1.0.0-beta01")
         implementation("androidx.savedstate:savedstate-ktx:1.2.0-rc01")
         implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
         implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
@@ -83,7 +85,7 @@ dependencies {
         androidTestImplementation(libs.testUiautomator)
         androidTestImplementation(libs.kotlinCoroutinesTest)
         androidTestImplementation(libs.espressoCore)
-        androidTestImplementation(libs.espressoContrib)
+        androidTestImplementation(libs.bundles.espressoContrib)
         androidTestImplementation(libs.junit)
         androidTestImplementation(libs.dexmakerMockito)
         androidTestImplementation(libs.mockitoCore)
@@ -129,12 +131,14 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.kotlinStdlibCommon)
                 implementation(libs.kotlinCoroutinesCore)
 
-                api project(":compose:runtime:runtime-saveable")
+                // when updating the runtime version please also update the runtime-saveable version
+                implementation(project(":compose:runtime:runtime"))
+                api(project(":compose:runtime:runtime-saveable"))
+
                 api project(":compose:ui:ui-geometry")
                 api project(":compose:ui:ui-graphics")
                 api project(":compose:ui:ui-text")
                 api project(":compose:ui:ui-unit")
-                implementation(project(":compose:runtime:runtime"))
                 implementation(project(":compose:ui:ui-util"))
             }
 
@@ -147,7 +151,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation("androidx.autofill:autofill:1.0.0")
                 implementation(libs.kotlinCoroutinesAndroid)
 
-                implementation(project(":customview:customview-poolingcontainer"))
+                implementation("androidx.customview:customview-poolingcontainer:1.0.0-beta01")
                 implementation("androidx.savedstate:savedstate-ktx:1.2.0-rc01")
                 implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
                 implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
@@ -198,7 +202,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.testExtJunitKtx)
                 implementation(libs.kotlinCoroutinesTest)
                 implementation(libs.espressoCore)
-                implementation(libs.espressoContrib)
+                implementation(libs.bundles.espressoContrib)
                 implementation(libs.junit)
                 implementation(libs.dexmakerMockito)
                 implementation(libs.mockitoCore)

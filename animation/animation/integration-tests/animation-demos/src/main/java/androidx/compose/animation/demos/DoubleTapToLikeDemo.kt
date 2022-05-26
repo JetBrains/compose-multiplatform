@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.tooling.preview.Preview
 
 private enum class LikedStates {
     Initial,
@@ -47,6 +48,7 @@ private enum class LikedStates {
     Disappeared
 }
 
+@Preview
 @Composable
 fun DoubleTapToLikeDemo() {
 

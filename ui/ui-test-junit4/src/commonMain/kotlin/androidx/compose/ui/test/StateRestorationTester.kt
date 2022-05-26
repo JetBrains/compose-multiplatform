@@ -30,11 +30,12 @@ import androidx.compose.runtime.setValue
  *
  * Instead of calling [ComposeUiTest.setContent] you need to use [setContent] on this
  * object, then change your state so there is some change to be restored, then execute
- * [emulateSavedInstanceStateRestore] and assert your state is restored properly.
+ * [emulateSaveAndRestore] and assert your state is restored properly.
  *
- * Note that this tests only the restoration of the local state of the composable you passed to
- * [setContent] and useful for testing [androidx.compose.runtime.saveable.rememberSaveable]
- * integration. It is not testing the integration with any other life cycles or Activity callbacks.
+ * Note that this only tests the restoration of the local state of the composable you passed to
+ * [setContent] and it is useful for testing uses of
+ * [rememberSaveable][androidx.compose.runtime.saveable.rememberSaveable]. It is not testing the
+ * integration with app and/or platform specific lifecycles.
  */
 @ExperimentalTestApi
 class StateRestorationTester(private val composeTest: ComposeUiTest) {
@@ -43,7 +44,7 @@ class StateRestorationTester(private val composeTest: ComposeUiTest) {
 
     /**
      * This functions is a direct replacement for [ComposeUiTest.setContent] if you are
-     * going to use [emulateSavedInstanceStateRestore] in the test.
+     * going to use [emulateSaveAndRestore] in the test.
      *
      * @see ComposeUiTest.setContent
      */
@@ -57,12 +58,13 @@ class StateRestorationTester(private val composeTest: ComposeUiTest) {
     }
 
     /**
-     * Saves all the state stored via [savedInstanceState] or [rememberSaveable],
-     * disposes current composition, and composes again the content passed to [setContent].
-     * Allows to test how your component behaves when the state restoration is happening.
-     * Note that the state stored via regular state() or remember() will be lost.
+     * Emulates a save and restore cycle of the current composition. First all state that is
+     * remembered with [rememberSaveable][androidx.compose.runtime.saveable.rememberSaveable]
+     * is stored, then the current composition is disposed, and finally the composition is
+     * composed again. This allows you to test how your component behaves when state
+     * restoration is happening. Note that state stored via [remember] will be lost.
      */
-    fun emulateSavedInstanceStateRestore() {
+    fun emulateSaveAndRestore() {
         val registry = checkNotNull(registry) {
             "setContent should be called first!"
         }

@@ -87,10 +87,12 @@ class RecompositionTest {
             GetAllParametersCommand(rootId, skipSystemComposables = false)
         ).getAllParametersResponse
 
+        // Buttons have double recompose counts, as they are
+        // recomposed on the down event for the press indication
         var nodes = Nodes(composables, parameters)
-        assertThat(nodes.button1.recomposeCount).isEqualTo(3)
+        assertThat(nodes.button1.recomposeCount).isEqualTo(6)
         assertThat(nodes.text1.recomposeCount).isEqualTo(3)
-        assertThat(nodes.button2.recomposeCount).isEqualTo(1)
+        assertThat(nodes.button2.recomposeCount).isEqualTo(2)
         assertThat(nodes.text2.recomposeCount).isEqualTo(1)
 
         // Stop counting but keep the current counts:
@@ -107,9 +109,9 @@ class RecompositionTest {
         ).getComposablesResponse
         nodes = Nodes(composables, parameters)
 
-        assertThat(nodes.button1.recomposeCount).isEqualTo(3)
+        assertThat(nodes.button1.recomposeCount).isEqualTo(6)
         assertThat(nodes.text1.recomposeCount).isEqualTo(3)
-        assertThat(nodes.button2.recomposeCount).isEqualTo(1)
+        assertThat(nodes.button2.recomposeCount).isEqualTo(2)
         assertThat(nodes.text2.recomposeCount).isEqualTo(1)
 
         // Continue counting:
@@ -126,9 +128,11 @@ class RecompositionTest {
         ).getComposablesResponse
         nodes = Nodes(composables, parameters)
 
-        assertThat(nodes.button1.recomposeCount).isEqualTo(4)
+        // Buttons have double recompose counts, as they are
+        // recomposed on the down event for the press indication
+        assertThat(nodes.button1.recomposeCount).isEqualTo(8)
         assertThat(nodes.text1.recomposeCount).isEqualTo(4)
-        assertThat(nodes.button2.recomposeCount).isEqualTo(2)
+        assertThat(nodes.button2.recomposeCount).isEqualTo(4)
         assertThat(nodes.text2.recomposeCount).isEqualTo(2)
 
         // Continue counting but reset the counts:
@@ -145,9 +149,11 @@ class RecompositionTest {
         ).getComposablesResponse
         nodes = Nodes(composables, parameters)
 
-        assertThat(nodes.button1.recomposeCount).isEqualTo(1)
+        // Buttons have double recompose counts, as they are
+        // recomposed on the down event for the press indication
+        assertThat(nodes.button1.recomposeCount).isEqualTo(2)
         assertThat(nodes.text1.recomposeCount).isEqualTo(1)
-        assertThat(nodes.button2.recomposeCount).isEqualTo(1)
+        assertThat(nodes.button2.recomposeCount).isEqualTo(2)
         assertThat(nodes.text2.recomposeCount).isEqualTo(1)
     }
 

@@ -39,8 +39,10 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         api(project(":compose:ui:ui-unit"))
         api("androidx.annotation:annotation:1.1.0")
 
+        // when updating the runtime version please also update the runtime-saveable version
         implementation(project(":compose:runtime:runtime"))
-        implementation("androidx.compose.runtime:runtime-saveable:1.1.1")
+        implementation(project(":compose:runtime:runtime-saveable"))
+
         implementation(project(":compose:ui:ui-util"))
         implementation(libs.kotlinStdlib)
         implementation("androidx.core:core:1.5.0")
@@ -53,6 +55,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         testImplementation(libs.mockitoCore)
         testImplementation(libs.truth)
         testImplementation(libs.kotlinReflect)
+        testImplementation(libs.kotlinTest)
         testImplementation(libs.mockitoKotlin)
 
         androidTestImplementation(project(":compose:ui:ui-test-font"))
@@ -98,8 +101,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 api(project(":compose:ui:ui-graphics"))
                 api(project(":compose:ui:ui-unit"))
 
+                // when updating the runtime version please also update the runtime-saveable version
                 implementation(project(":compose:runtime:runtime"))
                 implementation(project(":compose:runtime:runtime-saveable"))
+
                 implementation(project(":compose:ui:ui-util"))
             }
 
@@ -139,6 +144,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.mockitoCore)
                 implementation(libs.truth)
                 implementation(libs.kotlinReflect)
+                implementation(libs.kotlinTest)
                 implementation(libs.mockitoKotlin)
             }
 
@@ -158,6 +164,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             desktopTest.dependencies {
                 implementation(libs.truth)
                 implementation(libs.junit)
+                implementation(libs.kotlinTest)
                 implementation(libs.skikoCurrentOs)
                 implementation(project(":compose:foundation:foundation"))
                 implementation(project(":compose:ui:ui-test-junit4"))

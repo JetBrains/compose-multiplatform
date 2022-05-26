@@ -17,11 +17,8 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.lazy.layout.IntervalHolder
 import androidx.compose.foundation.lazy.layout.IntervalList
 import androidx.compose.foundation.lazy.layout.getDefaultLazyLayoutKey
-import androidx.compose.foundation.lazy.layout.intervalForIndex
-import androidx.compose.foundation.lazy.layout.intervalIndexForItemIndex
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -30,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.snapshots.Snapshot
 
 @ExperimentalFoundationApi
 @Composable
@@ -38,9 +36,15 @@ internal fun rememberItemProvider(
     content: LazyListScope.() -> Unit
 ): LazyListItemProvider {
     val latestContent = rememberUpdatedState(content)
+
+    // mutableState + LaunchedEffect below are used instead of derivedStateOf to ensure that update
+    // of derivedState in return expr will only happen after the state value has been changed.
     val nearestItemsRangeState = remember(state) {
         mutableStateOf(
-            calculateNearestItemsRange(state.firstVisibleItemIndexNonObservable.value)
+            Snapshot.withoutReadObservation {
+                // State read is observed in composition, causing it to recompose 1 additional time.
+                calculateNearestItemsRange(state.firstVisibleItemIndex)
+            }
         )
     }
     LaunchedEffect(nearestItemsRangeState) {
@@ -49,6 +53,7 @@ internal fun rememberItemProvider(
             // recreated when the state is updated with a new range.
             .collect { nearestItemsRangeState.value = it }
     }
+
     return remember(nearestItemsRangeState) {
         LazyListItemProviderImpl(
             derivedStateOf {
@@ -65,46 +70,32 @@ internal fun rememberItemProvider(
 
 @ExperimentalFoundationApi
 internal class LazyListItemsSnapshot(
-    private val list: IntervalList<LazyListIntervalContent>,
+    private val intervals: IntervalList<LazyListIntervalContent>,
     val headerIndexes: List<Int>,
     nearestItemsRange: IntRange
 ) {
-    /**
-     * Caches the last interval we binary searched for. We might not need to recalculate
-     * for subsequent queries, as they tend to be localised.
-     */
-    private var lastInterval: IntervalHolder<LazyListIntervalContent>? = null
-
-    val itemsCount get() = list.totalSize
-
-    private fun getIntervalForIndex(itemIndex: Int) = lastInterval.let {
-        if (it != null && itemIndex in it.startIndex until it.startIndex + it.size) {
-            it
-        } else {
-            list.intervalForIndex(itemIndex).also { lastInterval = it }
-        }
-    }
+    val itemsCount get() = intervals.size
 
     fun getKey(index: Int): Any {
-        val interval = getIntervalForIndex(index)
+        val interval = intervals[index]
         val localIntervalIndex = index - interval.startIndex
-        val key = interval.content.key?.invoke(localIntervalIndex)
+        val key = interval.value.key?.invoke(localIntervalIndex)
         return key ?: getDefaultLazyLayoutKey(index)
     }
 
     @Composable
     fun Item(scope: LazyItemScope, index: Int) {
-        val interval = getIntervalForIndex(index)
+        val interval = intervals[index]
         val localIntervalIndex = index - interval.startIndex
-        interval.content.item.invoke(scope, localIntervalIndex)
+        interval.value.item.invoke(scope, localIntervalIndex)
     }
 
-    val keyToIndexMap: Map<Any, Int> = generateKeyToIndexMap(nearestItemsRange, list)
+    val keyToIndexMap: Map<Any, Int> = generateKeyToIndexMap(nearestItemsRange, intervals)
 
     fun getContentType(index: Int): Any? {
-        val interval = getIntervalForIndex(index)
+        val interval = intervals[index]
         val localIntervalIndex = index - interval.startIndex
-        return interval.content.type.invoke(localIntervalIndex)
+        return interval.value.type.invoke(localIntervalIndex)
     }
 }
 
@@ -136,33 +127,29 @@ internal class LazyListItemProviderImpl(
  * the indexes in the passed [range].
  * The returned map will not contain the values for intervals with no key mapping provided.
  */
+@ExperimentalFoundationApi
 internal fun generateKeyToIndexMap(
     range: IntRange,
     list: IntervalList<LazyListIntervalContent>
 ): Map<Any, Int> {
     val first = range.first
     check(first >= 0)
-    val last = minOf(range.last, list.totalSize - 1)
+    val last = minOf(range.last, list.size - 1)
     return if (last < first) {
         emptyMap()
     } else {
         hashMapOf<Any, Int>().also { map ->
-            var intervalIndex = list.intervalIndexForItemIndex(first)
-            var itemIndex = first
-            while (itemIndex <= last) {
-                val interval = list.intervals[intervalIndex]
-                val keyFactory = interval.content.key
-                if (keyFactory != null) {
-                    val localItemIndex = itemIndex - interval.startIndex
-                    if (localItemIndex == interval.size) {
-                        intervalIndex++
-                    } else {
-                        map[keyFactory(localItemIndex)] = itemIndex
-                        itemIndex++
+            list.forEach(
+                fromIndex = first,
+                toIndex = last,
+            ) {
+                if (it.value.key != null) {
+                    val keyFactory = requireNotNull(it.value.key)
+                    val start = maxOf(first, it.startIndex)
+                    val end = minOf(last, it.startIndex + it.size - 1)
+                    for (i in start..end) {
+                        map[keyFactory(i - it.startIndex)] = i
                     }
-                } else {
-                    intervalIndex++
-                    itemIndex = interval.startIndex + interval.size
                 }
             }
         }

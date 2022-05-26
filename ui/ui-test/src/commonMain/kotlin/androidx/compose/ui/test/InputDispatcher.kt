@@ -15,7 +15,9 @@
  */
 package androidx.compose.ui.test
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.node.RootForTest
 
 internal expect fun createInputDispatcher(
@@ -51,6 +53,14 @@ internal expect fun createInputDispatcher(
  * * [enqueueMouseCancel]
  * * [enqueueMouseScroll]
  *
+ * Rotary input:
+ * * [enqueueRotaryScrollHorizontally]
+ * * [enqueueRotaryScrollVertically]
+ *
+ * Key input:
+ * * [enqueueKeyDown]
+ * * [enqueueKeyUp]
+ *
  * Chaining methods:
  * * [advanceEventTime]
  */
@@ -85,6 +95,12 @@ internal abstract class InputDispatcher(
     protected var mouseInputState: MouseInputState = MouseInputState()
 
     /**
+     * The state of the keyboard keys. The key input state is always available.
+     * It starts with no keys pressed down and the [KeyInputState.downTime] set to zero.
+     */
+    protected var keyInputState: KeyInputState = KeyInputState()
+
+    /**
      * The state of the rotary button.
      */
     protected var rotaryInputState: RotaryInputState = RotaryInputState()
@@ -96,12 +112,28 @@ internal abstract class InputDispatcher(
     val isTouchInProgress: Boolean
         get() = partialGesture != null
 
+    /**
+     * Indicates whether caps lock is on or not.
+     */
+    val isCapsLockOn: Boolean get() = keyInputState.capsLockOn
+
+    /**
+     * Indicates whether num lock is on or not.
+     */
+    val isNumLockOn: Boolean get() = keyInputState.numLockOn
+
+    /**
+     * Indicates whether scroll lock is on or not.
+     */
+    val isScrollLockOn: Boolean get() = keyInputState.scrollLockOn
+
     init {
         val rootHash = identityHashCode(root)
         val state = testContext.states.remove(rootHash)
         if (state != null) {
             partialGesture = state.partialGesture
             mouseInputState = state.mouseInputState
+            keyInputState = state.keyInputState
         }
     }
 
@@ -111,7 +143,8 @@ internal abstract class InputDispatcher(
             testContext.states[rootHash] =
                 InputDispatcherState(
                     partialGesture,
-                    mouseInputState
+                    mouseInputState,
+                    keyInputState
                 )
         }
     }
@@ -153,6 +186,14 @@ internal abstract class InputDispatcher(
      * [Offset.Zero].
      */
     val currentMousePosition: Offset get() = mouseInputState.lastPosition
+
+    /**
+     * Indicates if the given [key] is pressed down or not.
+     *
+     * @param key The key to be checked.
+     * @return true if given [key] is pressed, otherwise false.
+     */
+    fun isKeyDown(key: Key): Boolean = keyInputState.isKeyDown(key)
 
     /**
      * Generates a down touch event at [position] for the pointer with the given [pointerId].
@@ -498,6 +539,48 @@ internal abstract class InputDispatcher(
         }
     }
 
+    /**
+     * Generates a key down event for the given [key].
+     *
+     * @param key The keyboard key to be pushed down. Platform specific.
+     */
+    fun enqueueKeyDown(key: Key) {
+        val keyboard = keyInputState
+
+        check(!keyboard.isKeyDown(key)) {
+            "Cannot send key down event, Key($key) is already pressed down."
+        }
+
+        // TODO(Onadim): Figure out whether key input needs to enqueue a touch cancel.
+        // Down time is the time of the most recent key down event, which is now.
+        keyboard.downTime = currentTime
+
+        // Add key to pressed keys.
+        keyboard.setKeyDown(key)
+
+        keyboard.enqueueDown(key)
+    }
+
+    /**
+     * Generates a key up event for the given [key].
+     *
+     * @param key The keyboard key to be released. Platform specific.
+     */
+    fun enqueueKeyUp(key: Key) {
+        val keyboard = keyInputState
+
+        check(keyboard.isKeyDown(key)) {
+            "Cannot send key up event, Key($key) is not pressed down."
+        }
+
+        // TODO(Onadim): Figure out whether key input needs to enqueue a touch cancel.
+        // Remove key from pressed keys.
+        keyboard.setKeyUp(key)
+
+        // Send the up event
+        keyboard.enqueueUp(key)
+    }
+
     fun enqueueRotaryScrollHorizontally(horizontalScrollPixels: Float) {
         // TODO(b/214437966): figure out if ongoing scroll events need to be cancelled.
         rotaryInputState.enqueueRotaryScrollHorizontally(horizontalScrollPixels)
@@ -548,6 +631,10 @@ internal abstract class InputDispatcher(
     protected abstract fun MouseInputState.enqueueExit()
 
     protected abstract fun MouseInputState.enqueueCancel()
+
+    protected abstract fun KeyInputState.enqueueDown(key: Key)
+
+    protected abstract fun KeyInputState.enqueueUp(key: Key)
 
     @OptIn(ExperimentalTestApi::class)
     protected abstract fun MouseInputState.enqueueScroll(delta: Float, scrollWheel: ScrollWheel)
@@ -622,6 +709,52 @@ internal class MouseInputState {
 }
 
 /**
+ * The current key input state. Contains the keys that are pressed, the down time of the
+ * keyboard (which is the time of the last key down event), the state of the lock keys and
+ * the device ID.
+ */
+internal class KeyInputState {
+    private val downKeys: HashSet<Key> = hashSetOf()
+
+    var downTime: Long = 0
+    var capsLockOn: Boolean = false
+    var numLockOn: Boolean = false
+    var scrollLockOn: Boolean = false
+
+    fun isKeyDown(key: Key): Boolean = downKeys.contains(key)
+
+    fun setKeyUp(key: Key) = downKeys.remove(key)
+
+    fun setKeyDown(key: Key) {
+        updateLockKeys(key)
+        downKeys.add(key)
+    }
+
+    /**
+     * Updates lock key state values.
+     *
+     * Note that lock keys may not be toggled in the same way across all platforms.
+     *
+     * Take caps lock as an example; consistently, all platforms turn caps lock on upon the first
+     * key down event, and it stays on after the subsequent key up. However, on some platforms caps
+     * lock will turn off immediately upon the next key down event (MacOS for example), whereas
+     * other platforms (e.g. linux) wait for the next key up event before turning caps lock off.
+     *
+     * This by calling this function whenever a lock key is pressed down, MacOS-like behaviour is
+     * achieved.
+     */
+    // TODO(Onadim): Investigate how lock key toggling is handled in Android, ChromeOS and Windows.
+    @OptIn(ExperimentalComposeUiApi::class)
+    private fun updateLockKeys(key: Key) {
+        when (key) {
+            Key.CapsLock -> capsLockOn = !capsLockOn
+            Key.NumLock -> numLockOn = !numLockOn
+            Key.ScrollLock -> scrollLockOn = !scrollLockOn
+        }
+    }
+}
+
+/**
  * We don't have any state associated with RotaryInput, but we use a RotaryInputState class for
  * consistency with the other APIs.
  */
@@ -634,8 +767,10 @@ internal class RotaryInputState
  * @param partialGesture The state of an incomplete gesture. If no gesture was in progress
  * when the state of the [InputDispatcher] was saved, this will be `null`.
  * @param mouseInputState The state of the mouse.
+ * @param keyInputState The state of the keyboard.
  */
 internal data class InputDispatcherState(
     val partialGesture: PartialGesture?,
     val mouseInputState: MouseInputState,
+    val keyInputState: KeyInputState
 )

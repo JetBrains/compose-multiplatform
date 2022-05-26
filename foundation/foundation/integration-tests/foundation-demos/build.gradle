@@ -37,6 +37,8 @@ dependencies {
     implementation(project(":compose:ui:ui-text"))
     implementation(project(":compose:ui:ui-text:ui-text-samples"))
     implementation(project(":paging:paging-compose:integration-tests:paging-demos"))
+    implementation(project(":compose:ui:ui-tooling-preview"))
+    debugImplementation(project(":compose:ui:ui-tooling"))
 }
 
 android {

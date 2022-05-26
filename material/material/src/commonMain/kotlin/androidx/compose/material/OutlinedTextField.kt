@@ -475,7 +475,9 @@ private class OutlinedTextFieldMeasurePolicy(
 
         // measure label
         val labelConstraints = relaxedConstraints.offset(
-            horizontal = -occupiedSpaceHorizontally,
+            horizontal = -occupiedSpaceHorizontally -
+                paddingValues.calculateLeftPadding(layoutDirection).roundToPx() -
+                paddingValues.calculateRightPadding(layoutDirection).roundToPx(),
             vertical = -bottomPadding
         )
         val labelPlaceable =
@@ -487,7 +489,10 @@ private class OutlinedTextFieldMeasurePolicy(
         // measure text field
         // on top we offset either by default padding or by label's half height if its too big
         // minHeight must not be set to 0 due to how foundation TextField treats zero minHeight
-        val topPadding = max(heightOrZero(labelPlaceable) / 2, bottomPadding)
+        val topPadding = max(
+            heightOrZero(labelPlaceable) / 2,
+            paddingValues.calculateTopPadding().roundToPx()
+        )
         val textConstraints = constraints.offset(
             horizontal = -occupiedSpaceHorizontally,
             vertical = -bottomPadding - topPadding
@@ -763,11 +768,14 @@ private fun Placeable.PlacementScope.place(
 
     // placed center vertically and after the leading icon horizontally if single line text field
     // placed to the top with padding for multi line text field
-    val textVerticalPosition = if (singleLine) {
-        Alignment.CenterVertically.align(textFieldPlaceable.height, height)
-    } else {
-        topPadding
-    }
+    val textVerticalPosition = max(
+        if (singleLine) {
+            Alignment.CenterVertically.align(textFieldPlaceable.height, height)
+        } else {
+            topPadding
+        },
+        heightOrZero(labelPlaceable) / 2
+    )
     textFieldPlaceable.placeRelative(widthOrZero(leadingPlaceable), textVerticalPosition)
 
     // placed similar to the input text above
