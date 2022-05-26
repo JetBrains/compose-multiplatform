@@ -28,11 +28,13 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.setProperty
+import org.gradle.api.tasks.CacheableTask
 
 /**
  * Task for verifying the androidx dependency-stability-suffix rule
  * (A library is only as stable as its least stable dependency)
  */
+@CacheableTask
 abstract class VerifyDependencyVersionsTask : DefaultTask() {
 
     init {

@@ -21,10 +21,13 @@ import androidx.build.getOperatingSystem
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFiles
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import org.gradle.workers.WorkAction
@@ -40,6 +43,7 @@ import javax.inject.Inject
  * directory to that stored under /native-api using abidiff. Throws an [AbiDiffException] if the API
  * has incompatible changes.
  */
+@CacheableTask
 abstract class CheckNativeApiCompatibilityTask : DefaultTask() {
 
     @get:Inject
@@ -57,7 +61,7 @@ abstract class CheckNativeApiCompatibilityTask : DefaultTask() {
     @get:Input
     abstract val strict: Property<Boolean>
 
-    @InputFiles
+    @[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
     fun getTaskInputs(): List<File> {
         return getLocationsForArtifacts(
             builtApiLocation.get(),

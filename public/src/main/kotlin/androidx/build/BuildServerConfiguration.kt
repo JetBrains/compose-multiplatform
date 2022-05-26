@@ -109,12 +109,6 @@ fun Project.getLibraryMetricsDirectory(): File =
     File(getDistributionDirectory(), "librarymetrics")
 
 /**
- * Directory to put test apk hash json files.
- */
-fun Project.getApkHashDumpDirectory(): File =
-    File(getDistributionDirectory(), "test-apk-hashes")
-
-/**
  * Directory to put json metrics so they can be consumed by the metrics dashboards.
  */
 fun Project.getLibraryReportsDirectory(): File =

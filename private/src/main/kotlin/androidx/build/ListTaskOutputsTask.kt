@@ -25,10 +25,12 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 
 /**
  * Finds the outputs of every task and saves this mapping into a file
  */
+@DisableCachingByDefault(because = "Uses too many inputs to be feasible to cache, but runs quickly")
 abstract class ListTaskOutputsTask : DefaultTask() {
     @OutputFile
     val outputFile: Property<File> = project.objects.property(File::class.java)

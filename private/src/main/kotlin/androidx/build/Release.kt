@@ -24,6 +24,7 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.plugin.devel.GradlePluginDevelopmentExtension
+import org.gradle.work.DisableCachingByDefault
 import java.io.File
 import java.util.Locale
 
@@ -44,6 +45,8 @@ data class Artifact(
 /**
  * Zip task that zips all artifacts from given candidates.
  */
+@DisableCachingByDefault(because = "Zip tasks are not worth caching according to Gradle")
+// See https://github.com/gradle/gradle/commit/7e5c5bc9b2c23d872e1c45c855f07ca223f6c270#diff-ce55b0f0cdcf2174eb47d333d348ff6fbd9dbe5cd8c3beeeaf633ea23b74ed9eR38
 open class GMavenZipTask : Zip() {
 
     init {

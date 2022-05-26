@@ -50,6 +50,7 @@ import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.TestExtension
 import com.android.build.gradle.TestPlugin
 import com.android.build.gradle.TestedExtension
+import com.android.build.gradle.internal.lint.AndroidLintTask
 import com.android.build.gradle.internal.tasks.AnalyticsRecordingTask
 import com.android.build.gradle.internal.tasks.ListingFileRedirectTask
 import com.android.build.gradle.tasks.BundleAar
@@ -90,6 +91,8 @@ import org.apache.tools.zip.ZipFile
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.register
+import org.jetbrains.kotlin.gradle.targets.native.KotlinNativeHostTestRun
+import org.jetbrains.kotlin.gradle.testing.KotlinTaskTestRun
 
 /**
  * A plugin which enables all of the Gradle customizations for AndroidX.
@@ -282,6 +285,7 @@ class AndroidXImplPlugin : Plugin<Project> {
             project.extensions.findByType<LibraryExtension>()?.apply {
                 configureAndroidLibraryWithMultiplatformPluginOptions()
             }
+            project.configureKmpBuildOnServer()
         }
     }
 
@@ -346,6 +350,17 @@ class AndroidXImplPlugin : Plugin<Project> {
                         "top-level source directory for libraries, use \"java\" instead: " +
                         mainKotlinSrcDir.path
                 )
+            }
+        }
+
+        // Remove the lint and column attributes from generated lint baseline XML.
+        project.tasks.withType(AndroidLintTask::class.java).configureEach { task ->
+            if (task.name.startsWith("updateLintBaseline")) {
+                task.doLast {
+                    task.outputs.files.find { it.name == "lint-baseline.xml" }?.let { file ->
+                        file.writeText(removeLineAndColumnAttributes(file.readText()))
+                    }
+                }
             }
         }
 
@@ -678,7 +693,6 @@ class AndroidXImplPlugin : Plugin<Project> {
             // Skip copying AndroidTest apks if they have no source code (no tests to run).
             if (!testApk || project.hasAndroidTestSourceCode()) {
                 addToTestZips(project, packageTask)
-                project.addToApkHashDump(packageTask)
             }
         }
         project.tasks.withType(ListingFileRedirectTask::class.java).forEach {
@@ -724,6 +738,31 @@ class AndroidXImplPlugin : Plugin<Project> {
         sourceSets.findByName("main")!!.manifest.srcFile("src/androidMain/AndroidManifest.xml")
         sourceSets.findByName("androidTest")!!
             .manifest.srcFile("src/androidAndroidTest/AndroidManifest.xml")
+    }
+
+    private fun Project.configureKmpBuildOnServer() {
+        val kmpExtension = checkNotNull(
+            project.extensions.findByType<KotlinMultiplatformExtension>()
+        ) {
+            """
+            Project ${project.path} applies kotlin multiplatform plugin but we cannot find the
+            KotlinMultiplatformExtension.
+            """.trimIndent()
+        }
+        // Add all "configured" native tests to the buildOnServer task.
+        // Note that we don't check if platform is enabled in flags because it wouldn't be
+        // configured in the first place if the target is not enabled
+        kmpExtension.testableTargets.all { kotlinTarget ->
+            kotlinTarget.testRuns.all { kotlinTestRun ->
+                // Need to check for both KotlinNativeHostTest (to ensure it runs on host, not on
+                // an emulator or simulator) and also KotlinTaskTestRun to ensure it has a task.
+                // Unfortunately, there is no parent interface/class that covers both cases.
+                if (kotlinTestRun is KotlinNativeHostTestRun &&
+                    kotlinTestRun is KotlinTaskTestRun<*, *>) {
+                    project.addToBuildOnServer(kotlinTestRun.executionTask)
+                }
+            }
+        }
     }
 
     private fun AppExtension.configureAndroidApplicationOptions(project: Project) {
@@ -790,7 +829,6 @@ class AndroidXImplPlugin : Plugin<Project> {
     }
 
     companion object {
-        const val APK_HASH_DUMP = "apkHashDump"
         const val BUILD_TEST_APKS_TASK = "buildTestApks"
         const val CHECK_RELEASE_READY_TASK = "checkReleaseReady"
         const val CREATE_LIBRARY_BUILD_INFO_FILES_TASK = "createLibraryBuildInfoFiles"
@@ -1064,6 +1102,14 @@ fun AndroidXExtension.validateMavenVersion() {
  */
 fun removeTargetSdkVersion(manifest: String): String = manifest.replace(
     "\\s*android:targetSdkVersion=\".+?\"".toRegex(),
+    ""
+)
+
+/**
+ * Removes the line and column attributes from the [baseline].
+ */
+fun removeLineAndColumnAttributes(baseline: String): String = baseline.replace(
+    "\\s*(line|column)=\"\\d+?\"".toRegex(),
     ""
 )
 

@@ -55,6 +55,8 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
@@ -64,6 +66,7 @@ import org.gradle.kotlin.dsl.all
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.dokka.gradle.DokkaAndroidTask
 import org.jetbrains.dokka.gradle.PackageOptions
 
@@ -592,6 +595,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
     }
 }
 
+@DisableCachingByDefault(because = "Doesn't benefit from caching")
 open class DocsBuildOnServer : DefaultTask() {
     @Internal
     lateinit var docsType: String
@@ -600,7 +604,7 @@ open class DocsBuildOnServer : DefaultTask() {
     @Internal
     lateinit var distributionDirectory: File
 
-    @InputFiles
+    @[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
     fun getRequiredFiles(): List<File> {
         return listOf(
             File(distributionDirectory, "dackka-$docsType-docs-$buildId.zip"),

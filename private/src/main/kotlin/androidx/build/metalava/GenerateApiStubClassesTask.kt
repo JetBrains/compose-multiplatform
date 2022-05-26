@@ -17,12 +17,14 @@
 package androidx.build.metalava
 
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.WorkerExecutor
 import java.io.File
 import javax.inject.Inject
 
+@CacheableTask
 abstract class GenerateApiStubClassesTask @Inject constructor(
     workerExecutor: WorkerExecutor
 ) : MetalavaTask(workerExecutor) {

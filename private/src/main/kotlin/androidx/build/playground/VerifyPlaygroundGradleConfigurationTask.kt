@@ -23,8 +23,11 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 
@@ -33,17 +36,22 @@ import org.gradle.api.tasks.TaskProvider
  * to ensure playgrounds do not define any property in their own build that conflicts with the
  * main build.
  */
+@CacheableTask
 abstract class VerifyPlaygroundGradleConfigurationTask : DefaultTask() {
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val androidxProperties: RegularFileProperty
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val playgroundProperties: RegularFileProperty
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val androidxGradleWrapper: RegularFileProperty
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val playgroundGradleWrapper: RegularFileProperty
 
     @get:OutputFile
@@ -52,7 +60,9 @@ abstract class VerifyPlaygroundGradleConfigurationTask : DefaultTask() {
     @TaskAction
     fun checkPlaygroundGradleConfiguration() {
         compareProperties()
-        compareGradleWrapperVersion()
+        // TODO: re-enable when https://github.com/gradle/gradle/issues/20778
+        //  is fixed.
+        // compareGradleWrapperVersion()
         // put the success into an output so that task can be up to date.
         outputFile.get().asFile.writeText("valid", Charsets.UTF_8)
     }

@@ -31,13 +31,20 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.work.DisableCachingByDefault
 
+@DisableCachingByDefault(because = "Simply generates a small file and doesn't benefit from caching")
 abstract class SdkResourceGenerator : DefaultTask() {
     @get:Input
     lateinit var tipOfTreeMavenRepoRelativePath: String
 
-    @get:InputFile
+    @get:Input
+    lateinit var buildSrcOutPath: String
+
+    @get:[InputFile PathSensitive(PathSensitivity.NONE)]
     abstract val debugKeystore: RegularFileProperty
 
     @get:Input
@@ -100,6 +107,7 @@ abstract class SdkResourceGenerator : DefaultTask() {
             writer.write("minSdkVersion=$minSdkVersion\n")
             writer.write("kotlinVersion=$kotlinVersion\n")
             writer.write("kspVersion=$kspVersion\n")
+            writer.write("buildSrcOutPath=$buildSrcOutPath\n")
         }
     }
 
@@ -115,6 +123,7 @@ abstract class SdkResourceGenerator : DefaultTask() {
                     project.getRepositoryDirectory().toRelativeString(project.projectDir)
                 it.debugKeystore.set(project.getKeystore())
                 it.outputDir.set(generatedDirectory)
+                it.buildSrcOutPath = (project.properties["buildSrcOut"] as File).path
                 // Copy repositories used for the library project so that it can replicate the same
                 // maven structure in test.
                 it.repositoryUrls = project.repositories.filterIsInstance<MavenArtifactRepository>()

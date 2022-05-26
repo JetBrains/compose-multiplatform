@@ -21,6 +21,7 @@ import com.google.gson.GsonBuilder
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
@@ -28,6 +29,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Zip
 import java.io.File
 
+@CacheableTask
 abstract class ModuleInfoGenerator : DefaultTask() {
     @get:OutputFile
     abstract val outputFile: RegularFileProperty

@@ -24,11 +24,15 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import java.io.File
 import java.util.concurrent.TimeUnit
 
 /** Compares two API txt files against each other. */
+@DisableCachingByDefault(because = "Doesn't benefit from caching")
 abstract class CheckApiEquivalenceTask : DefaultTask() {
     /**
      * Api file (in the build dir) to check
@@ -42,7 +46,7 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
     @get:Input
     abstract val checkedInApis: ListProperty<ApiLocation>
 
-    @InputFiles
+    @InputFiles @PathSensitive(PathSensitivity.RELATIVE)
     fun getTaskInputs(): List<File> {
         val checkedInApiLocations = checkedInApis.get()
         val checkedInApiFiles = checkedInApiLocations.flatMap { checkedInApiLocation ->

@@ -22,12 +22,14 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import java.io.File
 import java.io.PrintWriter
 
 /**
  * Task that allows to write a version to a given output file.
  */
+@DisableCachingByDefault(because = "Doesn't benefit from caching")
 open class VersionFileWriterTask : DefaultTask() {
     @get:Input
     lateinit var version: String
