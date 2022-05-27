@@ -19,6 +19,7 @@ package androidx.compose.ui.text {
     method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<java.lang.String>> getStringAnnotations(int start, int end);
     method public String getText();
     method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.TtsAnnotation>> getTtsAnnotations(int start, int end);
+    method @androidx.compose.ui.text.ExperimentalTextApi public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.UrlAnnotation>> getUrlAnnotations(int start, int end);
     method @androidx.compose.runtime.Stable public operator androidx.compose.ui.text.AnnotatedString plus(androidx.compose.ui.text.AnnotatedString other);
     method public androidx.compose.ui.text.AnnotatedString subSequence(int startIndex, int endIndex);
     method public androidx.compose.ui.text.AnnotatedString subSequence(long range);
@@ -36,6 +37,7 @@ package androidx.compose.ui.text {
     method public void addStyle(androidx.compose.ui.text.SpanStyle style, int start, int end);
     method public void addStyle(androidx.compose.ui.text.ParagraphStyle style, int start, int end);
     method @androidx.compose.ui.text.ExperimentalTextApi public void addTtsAnnotation(androidx.compose.ui.text.TtsAnnotation ttsAnnotation, int start, int end);
+    method @androidx.compose.ui.text.ExperimentalTextApi public void addUrlAnnotation(androidx.compose.ui.text.UrlAnnotation urlAnnotation, int start, int end);
     method public void append(String text);
     method public void append(char char);
     method public void append(androidx.compose.ui.text.AnnotatedString text);
@@ -46,6 +48,7 @@ package androidx.compose.ui.text {
     method public int pushStyle(androidx.compose.ui.text.SpanStyle style);
     method public int pushStyle(androidx.compose.ui.text.ParagraphStyle style);
     method public int pushTtsAnnotation(androidx.compose.ui.text.TtsAnnotation ttsAnnotation);
+    method @androidx.compose.ui.text.ExperimentalTextApi public int pushUrlAnnotation(androidx.compose.ui.text.UrlAnnotation urlAnnotation);
     method public androidx.compose.ui.text.AnnotatedString toAnnotatedString();
     property public final int length;
   }
@@ -78,6 +81,7 @@ package androidx.compose.ui.text {
     method public static androidx.compose.ui.text.AnnotatedString toUpperCase(androidx.compose.ui.text.AnnotatedString, optional androidx.compose.ui.text.intl.LocaleList localeList);
     method @androidx.compose.ui.text.ExperimentalTextApi public static inline <R> R withAnnotation(androidx.compose.ui.text.AnnotatedString.Builder, String tag, String annotation, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString.Builder,? extends R> block);
     method @androidx.compose.ui.text.ExperimentalTextApi public static inline <R> R withAnnotation(androidx.compose.ui.text.AnnotatedString.Builder, androidx.compose.ui.text.TtsAnnotation ttsAnnotation, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString.Builder,? extends R> block);
+    method @androidx.compose.ui.text.ExperimentalTextApi public static inline <R> R withAnnotation(androidx.compose.ui.text.AnnotatedString.Builder, androidx.compose.ui.text.UrlAnnotation urlAnnotation, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString.Builder,? extends R> block);
     method public static inline <R> R withStyle(androidx.compose.ui.text.AnnotatedString.Builder, androidx.compose.ui.text.SpanStyle style, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString.Builder,? extends R> block);
     method public static inline <R> R withStyle(androidx.compose.ui.text.AnnotatedString.Builder, androidx.compose.ui.text.ParagraphStyle style, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString.Builder,? extends R> block);
   }
@@ -567,6 +571,12 @@ package androidx.compose.ui.text {
   }
 
   public abstract sealed class TtsAnnotation {
+  }
+
+  @androidx.compose.ui.text.ExperimentalTextApi public final class UrlAnnotation {
+    ctor public UrlAnnotation(String url);
+    method public String getUrl();
+    property public final String url;
   }
 
   public final class VerbatimTtsAnnotation extends androidx.compose.ui.text.TtsAnnotation {
@@ -1267,6 +1277,10 @@ package androidx.compose.ui.text.platform.extensions {
   public final class TtsAnnotationExtensions_androidKt {
     method public static android.text.style.TtsSpan toSpan(androidx.compose.ui.text.TtsAnnotation);
     method public static android.text.style.TtsSpan toSpan(androidx.compose.ui.text.VerbatimTtsAnnotation);
+  }
+
+  public final class UrlAnnotationExtensions_androidKt {
+    method @androidx.compose.ui.text.ExperimentalTextApi public static android.text.style.URLSpan toSpan(androidx.compose.ui.text.UrlAnnotation);
   }
 
 }

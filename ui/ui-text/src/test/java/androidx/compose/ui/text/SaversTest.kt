@@ -346,6 +346,8 @@ class SaversTest {
             withAnnotation(VerbatimTtsAnnotation("verbatim1")) { append("2") }
             withAnnotation(tag = "Tag2", annotation = "Annotation2") { append("3") }
             withAnnotation(VerbatimTtsAnnotation("verbatim2")) { append("4") }
+            withAnnotation(UrlAnnotation("url1")) { append("5") }
+            withAnnotation(UrlAnnotation("url2")) { append("6") }
         }
 
         val saved = with(AnnotatedStringSaver) { defaultSaverScope.save(original) }
@@ -367,6 +369,8 @@ class SaversTest {
             withAnnotation(VerbatimTtsAnnotation("verbatim1")) { append("6") }
             withAnnotation(tag = "Tag2", annotation = "Annotation2") { append("7") }
             withAnnotation(VerbatimTtsAnnotation("verbatim2")) { append("8") }
+            withAnnotation(UrlAnnotation("url1")) { append("9") }
+            withAnnotation(UrlAnnotation("url2")) { append("10") }
         }
 
         val saved = with(AnnotatedStringSaver) { defaultSaverScope.save(original) }
