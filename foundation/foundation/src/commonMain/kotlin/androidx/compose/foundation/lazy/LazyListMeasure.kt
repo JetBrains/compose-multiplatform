@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.abs
+import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sign
 
@@ -219,11 +220,13 @@ internal fun measureLazyList(
         }
 
         // Compose extra items before or after the visible items.
+        fun LazyListBeyondBoundsInfo.startIndex() = min(start, itemsCount - 1)
+        fun LazyListBeyondBoundsInfo.endIndex() = min(end, itemsCount - 1)
         val extraItemsBefore =
             if (beyondBoundsInfo.hasIntervals() &&
-                visibleItems.first().index > beyondBoundsInfo.start) {
+                visibleItems.first().index > beyondBoundsInfo.startIndex()) {
                 mutableListOf<LazyMeasuredItem>().apply {
-                    for (i in visibleItems.first().index - 1 downTo beyondBoundsInfo.start) {
+                    for (i in visibleItems.first().index - 1 downTo beyondBoundsInfo.startIndex()) {
                         add(itemProvider.getAndMeasure(DataIndex(i)))
                     }
                 }
@@ -232,9 +235,9 @@ internal fun measureLazyList(
             }
         val extraItemsAfter =
             if (beyondBoundsInfo.hasIntervals() &&
-                visibleItems.last().index < beyondBoundsInfo.end) {
+                visibleItems.last().index < beyondBoundsInfo.endIndex()) {
                 mutableListOf<LazyMeasuredItem>().apply {
-                    for (i in visibleItems.last().index until beyondBoundsInfo.end) {
+                    for (i in visibleItems.last().index until beyondBoundsInfo.endIndex()) {
                         add(itemProvider.getAndMeasure(DataIndex(i + 1)))
                     }
                 }
