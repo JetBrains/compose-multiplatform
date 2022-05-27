@@ -141,6 +141,9 @@ abstract class AbiDwWorkAction @Inject constructor(private val execOperations: E
             it.args = listOf(
                 "--drop-private-types",
                 "--no-show-locs",
+                "--short-locs",
+                "--no-comp-dir-path",
+                "--no-corpus-path",
                 "--out-file",
                 tempFile.toString(),
                 parameters.pathToLib
