@@ -156,6 +156,14 @@ tasks.register("run") {
     dependsOnComposeTask(":compose:desktop:desktop:desktop-samples:run")
 }
 
+tasks.register("runMppJs") {
+    dependsOnComposeTask(":compose:mpp:demo:jsRun")
+}
+
+tasks.register("runMppNative") {
+    dependsOnComposeTask(":compose:mpp:demo:runDebugExecutable")
+}
+
 val mavenCentral = MavenCentralProperties(project)
 if (mavenCentral.signArtifacts) {
     signing.useInMemoryPgpKeys(
