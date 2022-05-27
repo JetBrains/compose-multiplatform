@@ -18,7 +18,7 @@ package androidx.compose.ui.platform
 
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.platform.GlobalSnapshotManager.ensureStarted
-import androidx.compose.util.createSynchronizedObject
+import androidx.compose.ui.createSynchronizedObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
