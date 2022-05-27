@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,10 +41,6 @@ import org.junit.Test
 @LargeTest
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
 class KeyPressTest {
-    companion object {
-        private val enter = Key.Enter
-        private val backspace = Key.Backspace
-    }
 
     @get:Rule
     val rule = createComposeRule()
@@ -61,13 +57,16 @@ class KeyPressTest {
 
     @Test
     fun pressingEnter_typesNewLine() {
-        rule.performKeyInput { pressKey(enter) }
+        rule.performKeyInput { pressKey(Key.Enter) }
         rule.assertTyped("\n")
     }
 
     @Test
     fun pressingLetterKeys_typesLetterChars() {
-        rule.performKeyInput { pressKey(Key.A); pressKey(Key.B) }
+        rule.performKeyInput {
+            pressKey(Key.A)
+            pressKey(Key.B)
+        }
         rule.performKeyInput { pressKey(Key.B) }
         rule.assertTyped("abb")
     }
@@ -103,9 +102,7 @@ class KeyPressTest {
             pressKey(Key.C)
         }
         rule.assertTyped("abc")
-        rule.performKeyInput {
-            pressKey(backspace)
-        }
+        rule.performKeyInput { pressKey(Key.Backspace) }
         rule.assertTyped("ab")
     }
 }

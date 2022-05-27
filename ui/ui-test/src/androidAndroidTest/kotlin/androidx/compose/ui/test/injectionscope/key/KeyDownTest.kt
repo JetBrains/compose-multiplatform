@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import androidx.compose.ui.test.KeyInjectionScope
 import androidx.compose.ui.test.injectionscope.key.Common.assertTyped
 import androidx.compose.ui.test.injectionscope.key.Common.performKeyInput
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.keysDown
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.util.TestTextField
@@ -40,10 +41,6 @@ import org.junit.Test
 @MediumTest
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
 class KeyDownTest {
-    companion object {
-        private val enterKey = Key.Enter
-        private val aKey = Key.A
-    }
 
     @get:Rule
     val rule = createComposeRule()
@@ -60,37 +57,37 @@ class KeyDownTest {
 
     @Test
     fun doubleDown_throwsIllegalStateException() {
-        rule.performKeyInput { keyDown(enterKey) }
+        rule.performKeyInput { keyDown(Key.Enter) }
         expectError<IllegalStateException>(
-            expectedMessage =
-            "Cannot send key down event, Key\\($enterKey\\) is already pressed down."
+            expectedMessage = "Cannot send key down event, " +
+                "Key\\(${Key.Enter}\\) is already pressed down."
         ) {
-            rule.performKeyInput { keyDown(enterKey) }
+            rule.performKeyInput { keyDown(Key.Enter) }
         }
     }
 
     @Test
     fun unDownedKey_isNotDown() {
-        rule.performKeyInput { assertFalse(isKeyDown(aKey)) }
+        rule.performKeyInput { assertFalse(isKeyDown(Key.A)) }
     }
 
     @Test
     fun downedKey_isDown() {
         rule.performKeyInput {
-            keyDown(aKey)
-            assertTrue(isKeyDown(aKey))
+            keyDown(Key.A)
+            assertTrue(isKeyDown(Key.A))
         }
     }
 
     @Test
     fun enterDown_typesNewLine() {
-        rule.performKeyInput { keyDown(enterKey) }
+        rule.performKeyInput { keyDown(Key.Enter) }
         rule.assertTyped("\n")
     }
 
     @Test
     fun letterDown_typesLetter() {
-        rule.performKeyInput { keyDown(aKey) }
+        rule.performKeyInput { keyDown(Key.A) }
         rule.assertTyped("a")
     }
 
@@ -98,7 +95,7 @@ class KeyDownTest {
     fun letterDownWithShiftDown_typesCapitalLetter() {
         rule.performKeyInput {
             keyDown(Key.ShiftLeft)
-            keyDown(aKey)
+            keyDown(Key.A)
         }
         rule.assertTyped("A")
     }
@@ -110,5 +107,23 @@ class KeyDownTest {
             keyDown(Key.Semicolon)
         }
         rule.assertTyped(":")
+    }
+
+    @Test
+    fun downedKeys_areDown() {
+        rule.performKeyInput {
+            keysDown(listOf(Key.A, Key.Enter))
+            assertTrue(isKeyDown(Key.A))
+            assertTrue(isKeyDown(Key.Enter))
+        }
+    }
+
+    @Test
+    fun duplicates_inKeysDown_throwIllegalStateException() {
+        expectError<IllegalArgumentException>(
+            expectedMessage = "List of keys must not contain any duplicates."
+        ) {
+            rule.performKeyInput { keysDown(listOf(Key.A, Key.A)) }
+        }
     }
 }
