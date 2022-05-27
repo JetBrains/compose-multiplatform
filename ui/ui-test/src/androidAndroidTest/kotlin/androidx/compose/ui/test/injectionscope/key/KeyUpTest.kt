@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import androidx.compose.ui.test.KeyInjectionScope
 import androidx.compose.ui.test.injectionscope.key.Common.assertTyped
 import androidx.compose.ui.test.injectionscope.key.Common.performKeyInput
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.keysUp
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.util.TestTextField
@@ -39,9 +40,6 @@ import org.junit.Test
 @MediumTest
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
 class KeyUpTest {
-    companion object {
-        private val A = Key.A
-    }
 
     @get:Rule
     val rule = createComposeRule()
@@ -57,29 +55,29 @@ class KeyUpTest {
     @Test
     fun upWithoutDown_throwsIllegalStateException() {
         expectError<IllegalStateException>(
-            expectedMessage = "Cannot send key up event, Key\\($A\\) is not pressed down."
+            expectedMessage = "Cannot send key up event, Key\\(${Key.A}\\) is not pressed down."
         ) {
-            rule.performKeyInput { keyUp(A) }
+            rule.performKeyInput { keyUp(Key.A) }
         }
     }
 
     @Test
     fun doubleUp_throwsIllegalStateException() {
-        rule.performKeyInput { keyDown(A) }
-        rule.performKeyInput { keyUp(A) }
+        rule.performKeyInput { keyDown(Key.A) }
+        rule.performKeyInput { keyUp(Key.A) }
         expectError<IllegalStateException>(
-            expectedMessage = "Cannot send key up event, Key\\($A\\) is not pressed down."
+            expectedMessage = "Cannot send key up event, Key\\(${Key.A}\\) is not pressed down."
         ) {
-            rule.performKeyInput { keyUp(A) }
+            rule.performKeyInput { keyUp(Key.A) }
         }
     }
 
     @Test
     fun upKey_isNotDown() {
         rule.performKeyInput {
-            keyDown(A)
-            keyUp(A)
-            assertFalse(isKeyDown(A))
+            keyDown(Key.A)
+            keyUp(Key.A)
+            assertFalse(isKeyDown(Key.A))
         }
     }
 
@@ -89,8 +87,31 @@ class KeyUpTest {
         rule.performKeyInput {
             keyDown(Key.ShiftLeft)
             keyUp(Key.ShiftLeft)
-            keyDown(A)
+            keyDown(Key.A)
         }
         rule.assertTyped("a")
+    }
+
+    @Test
+    fun keysAreUp_after_keysUp() {
+        rule.performKeyInput {
+            keyDown(Key.A)
+            keyDown(Key.Enter)
+        }
+        rule.performKeyInput {
+            keysUp(listOf(Key.A, Key.Enter))
+            assertFalse(isKeyDown(Key.A))
+            assertFalse(isKeyDown(Key.Enter))
+        }
+    }
+
+    @Test
+    fun duplicates_inKeysDown_throwIllegalStateException() {
+        rule.performKeyInput { keyDown(Key.A) }
+        expectError<IllegalArgumentException>(
+            expectedMessage = "List of keys must not contain any duplicates."
+        ) {
+            rule.performKeyInput { keysUp(listOf(Key.A, Key.A)) }
+        }
     }
 }
