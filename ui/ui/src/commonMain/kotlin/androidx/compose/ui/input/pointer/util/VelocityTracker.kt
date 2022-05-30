@@ -19,8 +19,8 @@ package androidx.compose.ui.input.pointer.util
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputChange
-import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.unit.Velocity
+import androidx.compose.ui.util.fastForEach
 import kotlin.math.abs
 import kotlin.math.sign
 import kotlin.math.sqrt
@@ -106,8 +106,8 @@ private fun kineticEnergyToVelocity(work: Float): Float {
 
 private class ImpulseCalculator {
     private var work = 0f
-    private var previousT: Long? = null
-    private var previousX: Float? = null
+    private var previousT: Long = Long.MAX_VALUE
+    private var previousX: Float = Float.NaN
     private var initialCondition = true
 
     /**
@@ -122,7 +122,7 @@ private class ImpulseCalculator {
     fun addPosition(timeMillis: Long, x: Float) {
         // t[i] is in milliseconds, but due to FP arithmetic, convert to seconds
         val SecondsPerMs = 0.001f
-        if (previousT == null || previousX == null) {
+        if (previousT == Long.MAX_VALUE || previousX.isNaN()) {
             previousT = timeMillis
             previousX = x
             // This is a first data point, nothing to compute here
@@ -134,7 +134,7 @@ private class ImpulseCalculator {
             return
         }
         val vprev = kineticEnergyToVelocity(work) // v[i-1]
-        val vcurr = (x - previousX!!) / (SecondsPerMs * (timeMillis - previousT!!)) // v[i]
+        val vcurr = (x - previousX) / (SecondsPerMs * (timeMillis - previousT)) // v[i]
         work += (vcurr - vprev) * abs(vcurr)
         if (initialCondition) {
             work *= 0.5f
@@ -146,8 +146,8 @@ private class ImpulseCalculator {
 
     fun reset() {
         work = 0f
-        previousT = null
-        previousX = null
+        previousT = Long.MAX_VALUE
+        previousX = Float.NaN
         initialCondition = true
     }
 }
