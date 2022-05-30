@@ -67,7 +67,7 @@ fun main() = singleWindowApplication {
     val density = LocalDensity.current
     Column {
         AsyncImage(
-            load = { loadImageBitmap(File("sample.png")) },
+            load = { useResource("sample.png",::loadImageBitmap) },
             painterFor = { remember { BitmapPainter(it) } },
             contentDescription = "Sample",
             modifier = Modifier.width(200.dp)
@@ -80,7 +80,7 @@ fun main() = singleWindowApplication {
             modifier = Modifier.width(200.dp)
         )
         AsyncImage(
-            load = { loadXmlImageVector(File("compose-logo.xml"), density) },
+            load = { useResource("compose-logo.xml") { loadXmlImageVector(InputSource(it), density) } },
             painterFor = { rememberVectorPainter(it) },
             contentDescription = "Compose logo",
             contentScale = ContentScale.FillWidth,
@@ -142,6 +142,7 @@ fun loadSvgPainter(url: String, density: Density): Painter =
 fun loadXmlImageVector(url: String, density: Density): ImageVector =
     URL(url).openStream().buffered().use { loadXmlImageVector(InputSource(it), density) }
 
+
 /* Loading from network with Ktor client API (https://ktor.io/docs/client.html). */
 
 /*
@@ -154,6 +155,7 @@ suspend fun loadSvgPainter(url: String, density: Density): Painter =
 
 suspend fun loadXmlImageVector(url: String, density: Density): ImageVector =
     urlStream(url).use { loadXmlImageVector(InputSource(it), density) }
+
 
 @OptIn(KtorExperimentalAPI::class)
 private suspend fun urlStream(url: String) = HttpClient(CIO).use {
