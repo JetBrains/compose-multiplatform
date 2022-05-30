@@ -190,8 +190,21 @@ private fun rememberLazyGridMeasurePolicy(
         constraints.assertNotNestingScrollableContainers(isVertical)
 
         // resolve content paddings
-        val startPadding = contentPadding.calculateStartPadding(layoutDirection).roundToPx()
-        val endPadding = contentPadding.calculateEndPadding(layoutDirection).roundToPx()
+        val startPadding =
+            if (isVertical) {
+                contentPadding.calculateLeftPadding(layoutDirection).roundToPx()
+            } else {
+                // in horizontal configuration, padding is reversed by placeRelative
+                contentPadding.calculateStartPadding(layoutDirection).roundToPx()
+            }
+
+        val endPadding =
+            if (isVertical) {
+                contentPadding.calculateRightPadding(layoutDirection).roundToPx()
+            } else {
+                // in horizontal configuration, padding is reversed by placeRelative
+                contentPadding.calculateEndPadding(layoutDirection).roundToPx()
+            }
         val topPadding = contentPadding.calculateTopPadding().roundToPx()
         val bottomPadding = contentPadding.calculateBottomPadding().roundToPx()
         val totalVerticalPadding = topPadding + bottomPadding

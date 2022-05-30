@@ -16,20 +16,28 @@
 
 package androidx.compose.foundation.lazy.list
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
@@ -793,6 +801,69 @@ class LazyListsContentPaddingTest(orientation: Orientation) :
         rule.runOnIdle {
             state.assertScrollPosition(3, itemSize * 3.5f)
             state.assertVisibleItems(3 to -itemSize * 3.5f)
+        }
+    }
+
+    @Test
+    fun unevenPaddingWithRtl() {
+        val padding = PaddingValues(start = 20.dp, end = 8.dp)
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                LazyColumnOrRow(
+                    modifier = Modifier
+                        .testTag("list")
+                        .mainAxisSize(itemSize * 2),
+                    state = state,
+                    contentPadding = padding
+                ) {
+                    items(4) {
+                        Box(
+                            Modifier
+                                .testTag("$it")
+                                .background(Color.Red)
+                                .size(itemSize)
+                        ) {
+                            BasicText("$it")
+                        }
+                    }
+                }
+            }
+        }
+
+        if (vertical) {
+            rule.onNodeWithTag("0")
+                .assertStartPositionInRootIsEqualTo(0.dp)
+                .assertCrossAxisStartPositionInRootIsEqualTo(
+                    padding.calculateLeftPadding(LayoutDirection.Rtl)
+                )
+
+            rule.onNodeWithTag("list")
+                .assertWidthIsEqualTo(28.dp + itemSize)
+        } else {
+            rule.onNodeWithTag("0")
+                .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
+                .assertStartPositionInRootIsEqualTo(
+                    // list width - itemSize - padding
+                    itemSize * 2 - itemSize - padding.calculateRightPadding(LayoutDirection.Rtl)
+                )
+        }
+
+        state.scrollBy(itemSize * 4)
+
+        if (vertical) {
+            rule.onNodeWithTag("3")
+                .assertStartPositionInRootIsEqualTo(itemSize)
+                .assertCrossAxisStartPositionInRootIsEqualTo(
+                    padding.calculateLeftPadding(LayoutDirection.Rtl)
+                )
+        } else {
+            rule.onNodeWithTag("3")
+                .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
+                .assertStartPositionInRootIsEqualTo(
+                    padding.calculateLeftPadding(LayoutDirection.Rtl)
+                )
         }
     }
 
