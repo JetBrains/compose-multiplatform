@@ -66,6 +66,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.findRoot
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
@@ -141,6 +142,39 @@ class AndroidPointerInputTest {
                 0,
                 arrayOf(PointerProperties(0)),
                 arrayOf(PointerCoords(Float.NaN, Float.NaN))
+            )
+
+            val androidComposeView = findAndroidComposeView(container)!!
+            // Act
+            val actual = androidComposeView.dispatchTouchEvent(motionEvent)
+
+            // Assert
+            assertThat(actual).isFalse()
+        }
+    }
+
+    @Test
+    fun dispatchTouchEvent_infiniteCoordinates() {
+        countDown { latch ->
+            rule.runOnUiThread {
+                container.setContent {
+                    FillLayout(
+                        Modifier
+                            .consumeMovementGestureFilter()
+                            .onGloballyPositioned { latch.countDown() }
+                    )
+                }
+            }
+        }
+
+        rule.runOnUiThread {
+            val motionEvent = MotionEvent(
+                0,
+                ACTION_DOWN,
+                1,
+                0,
+                arrayOf(PointerProperties(0)),
+                arrayOf(PointerCoords(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY))
             )
 
             val androidComposeView = findAndroidComposeView(container)!!
@@ -722,6 +756,39 @@ class AndroidPointerInputTest {
         assertTrue(tapLatch.await(1, TimeUnit.SECONDS))
         rule.runOnUiThread {
             assertEquals(0, insideTap)
+        }
+    }
+
+    @Test
+    fun dispatchNotAttached() {
+        val tapLatch = CountDownLatch(1)
+        val layoutLatch = CountDownLatch(1)
+        rule.runOnUiThread {
+            container.setContent {
+                with(LocalDensity.current) {
+                    Box(
+                        Modifier
+                            .onPlaced {
+                                layoutLatch.countDown()
+                            }
+                            .pointerInput(Unit) {
+                                awaitPointerEventScope {
+                                    awaitFirstDown()
+                                    tapLatch.countDown()
+                                }
+                            }
+                            .requiredSize(10.toDp())
+                    )
+                }
+            }
+        }
+        assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
+
+        val composeView = findAndroidComposeView(container) as AndroidComposeView
+        rule.runOnUiThread {
+            container.removeAllViews()
+            val down = createPointerEventAt(0, ACTION_DOWN, intArrayOf(5, 5))
+            assertFalse(composeView.dispatchTouchEvent(down))
         }
     }
 
