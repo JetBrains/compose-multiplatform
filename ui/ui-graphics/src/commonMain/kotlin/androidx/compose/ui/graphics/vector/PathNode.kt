@@ -281,7 +281,7 @@ private inline fun pathNodesFromArgs(
     nodeFor: (subArray: FloatArray) -> PathNode
 ): List<PathNode> {
     return (0..args.size - numArgs step numArgs).map { index ->
-        val subArray = args.slice(index until index + numArgs).toFloatArray()
+        val subArray = args.copyOfRange(index, index + numArgs)
         val node = nodeFor(subArray)
         when {
             // According to the spec, if a MoveTo is followed by multiple pairs of coordinates,
