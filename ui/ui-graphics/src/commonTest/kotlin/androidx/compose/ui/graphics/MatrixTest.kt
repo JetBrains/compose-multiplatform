@@ -74,6 +74,17 @@ class MatrixTest {
     }
 
     @Test
+    fun mapPointInfinite() {
+        val matrix = Matrix()
+        matrix[3, 3] = 0f
+
+        assertEquals(Offset.Zero, matrix.map(Offset(1f, 1f)))
+        matrix[3, 3] = Float.MIN_VALUE
+
+        assertEquals(Offset.Zero, matrix.map(Offset(1f, 1f)))
+    }
+
+    @Test
     fun mapRect() {
         val matrix = Matrix()
 
