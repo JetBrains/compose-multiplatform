@@ -17,7 +17,7 @@
 package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.assertNotNestingScrollableContainers
+import androidx.compose.foundation.checkScrollableContainerConstraints
 import androidx.compose.foundation.clipScrollableContainer
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
@@ -102,6 +102,7 @@ internal fun LazyGrid(
 
     ScrollPositionUpdater(itemProvider, state)
 
+    val orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal
     LazyLayout(
         modifier = modifier
             .then(state.remeasurementModifier)
@@ -114,9 +115,9 @@ internal fun LazyGrid(
                 reverseScrolling = reverseLayout,
                 userScrollEnabled = userScrollEnabled
             )
-            .clipScrollableContainer(isVertical)
+            .clipScrollableContainer(orientation)
             .scrollable(
-                orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
+                orientation = orientation,
                 reverseDirection = run {
                     // A finger moves with the content, not with the viewport. Therefore,
                     // always reverse once to have "natural" gesture that goes reversed to layout
@@ -186,8 +187,11 @@ private fun rememberLazyGridMeasurePolicy(
     verticalArrangement,
     placementAnimator
 ) {
-    { constraints ->
-        constraints.assertNotNestingScrollableContainers(isVertical)
+    { containerConstraints ->
+        checkScrollableContainerConstraints(
+            containerConstraints,
+            if (isVertical) Orientation.Vertical else Orientation.Horizontal
+        )
 
         // resolve content paddings
         val startPadding =
@@ -217,12 +221,13 @@ private fun rememberLazyGridMeasurePolicy(
             else -> endPadding // !isVertical && reverseLayout
         }
         val afterContentPadding = totalMainAxisPadding - beforeContentPadding
-        val contentConstraints = constraints.offset(-totalHorizontalPadding, -totalVerticalPadding)
+        val contentConstraints =
+            containerConstraints.offset(-totalHorizontalPadding, -totalVerticalPadding)
 
         state.updateScrollPositionIfTheFirstItemWasMoved(itemProvider)
 
         val spanLayoutProvider = itemProvider.spanLayoutProvider
-        val resolvedSlotSizesSums = slotSizesSums(constraints)
+        val resolvedSlotSizesSums = slotSizesSums(containerConstraints)
         spanLayoutProvider.slotsPerLine = resolvedSlotSizesSums.size
 
         // Update the state's cached Density and slotsPerLine
@@ -246,9 +251,9 @@ private fun rememberLazyGridMeasurePolicy(
 
         // can be negative if the content padding is larger than the max size from constraints
         val mainAxisAvailableSize = if (isVertical) {
-            constraints.maxHeight - totalVerticalPadding
+            containerConstraints.maxHeight - totalVerticalPadding
         } else {
-            constraints.maxWidth - totalHorizontalPadding
+            containerConstraints.maxWidth - totalHorizontalPadding
         }
         val visualItemOffset = if (!reverseLayout || mainAxisAvailableSize > 0) {
             IntOffset(startPadding, topPadding)
@@ -352,8 +357,8 @@ private fun rememberLazyGridMeasurePolicy(
             placementAnimator = placementAnimator,
             layout = { width, height, placement ->
                 layout(
-                    constraints.constrainWidth(width + totalHorizontalPadding),
-                    constraints.constrainHeight(height + totalVerticalPadding),
+                    containerConstraints.constrainWidth(width + totalHorizontalPadding),
+                    containerConstraints.constrainHeight(height + totalVerticalPadding),
                     emptyMap(),
                     placement
                 )
@@ -363,7 +368,7 @@ private fun rememberLazyGridMeasurePolicy(
             refreshOverScrollInfo(
                 overScrollController,
                 it,
-                constraints,
+                containerConstraints,
                 totalHorizontalPadding,
                 totalVerticalPadding
             )

@@ -33,6 +33,10 @@ package androidx.compose.foundation {
     method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static void Canvas(androidx.compose.ui.Modifier modifier, String contentDescription, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> onDraw);
   }
 
+  public final class CheckScrollableContainerConstraintsKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static void checkScrollableContainerConstraints(long constraints, androidx.compose.foundation.gestures.Orientation orientation);
+  }
+
   public final class ClickableKt {
     method public static androidx.compose.ui.Modifier clickable(androidx.compose.ui.Modifier, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
     method public static androidx.compose.ui.Modifier clickable(androidx.compose.ui.Modifier, androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, androidx.compose.foundation.Indication? indication, optional boolean enabled, optional String? onClickLabel, optional androidx.compose.ui.semantics.Role? role, kotlin.jvm.functions.Function0<kotlin.Unit> onClick);
@@ -44,7 +48,7 @@ package androidx.compose.foundation {
   }
 
   public final class ClipScrollableContainerKt {
-    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.ui.Modifier clipScrollableContainer(androidx.compose.ui.Modifier, boolean isVertical);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.ui.Modifier clipScrollableContainer(androidx.compose.ui.Modifier, androidx.compose.foundation.gestures.Orientation orientation);
   }
 
   public final class DarkThemeKt {

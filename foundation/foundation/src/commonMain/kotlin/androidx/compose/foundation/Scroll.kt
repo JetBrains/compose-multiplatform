@@ -286,8 +286,9 @@ private fun Modifier.scroll(
                 )
             }
         }
+        val orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal
         val scrolling = Modifier.scrollable(
-            orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
+            orientation = orientation,
             reverseDirection = run {
                 // A finger moves with the content, not with the viewport. Therefore,
                 // always reverse once to have "natural" gesture that goes reversed to layout
@@ -307,7 +308,7 @@ private fun Modifier.scroll(
         )
         val layout =
             ScrollingLayoutModifier(state, reverseScrolling, isVertical, overScrollController)
-        semantics.clipScrollableContainer(isVertical).then(scrolling).then(layout)
+        semantics.clipScrollableContainer(orientation).then(scrolling).then(layout)
     },
     inspectorInfo = debugInspectorInfo {
         name = "scroll"
@@ -325,11 +326,16 @@ private data class ScrollingLayoutModifier(
     val isVertical: Boolean,
     val overScrollController: OverScrollController
 ) : LayoutModifier {
+    @OptIn(ExperimentalFoundationApi::class)
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
     ): MeasureResult {
-        constraints.assertNotNestingScrollableContainers(isVertical)
+        checkScrollableContainerConstraints(
+            constraints,
+            if (isVertical) Orientation.Vertical else Orientation.Horizontal
+        )
+
         val childConstraints = constraints.copy(
             maxHeight = if (isVertical) Constraints.Infinity else constraints.maxHeight,
             maxWidth = if (isVertical) constraints.maxWidth else Constraints.Infinity
@@ -371,32 +377,4 @@ private data class ScrollingLayoutModifier(
         measurable: IntrinsicMeasurable,
         width: Int
     ) = measurable.maxIntrinsicHeight(width)
-}
-
-internal fun Constraints.assertNotNestingScrollableContainers(isVertical: Boolean) {
-    if (isVertical) {
-        check(maxHeight != Constraints.Infinity) {
-            "Vertically scrollable component was measured with an infinity maximum height " +
-                "constraints, which is disallowed. One of the common reasons is nesting layouts " +
-                "like LazyColumn and Column(Modifier.verticalScroll()). If you want to add a " +
-                "header before the list of items please add a header as a separate item() before " +
-                "the main items() inside the LazyColumn scope. There are could be other reasons " +
-                "for this to happen: your ComposeView was added into a LinearLayout with some " +
-                "weight, you applied Modifier.wrapContentSize(unbounded = true) or wrote a " +
-                "custom layout. Please try to remove the source of infinite constraints in the " +
-                "hierarchy above the scrolling container."
-        }
-    } else {
-        check(maxWidth != Constraints.Infinity) {
-            "Horizontally scrollable component was measured with an infinity maximum width " +
-                "constraints, which is disallowed. One of the common reasons is nesting layouts " +
-                "like LazyRow and Row(Modifier.horizontalScroll()). If you want to add a " +
-                "header before the list of items please add a header as a separate item() before " +
-                "the main items() inside the LazyRow scope. There are could be other reasons " +
-                "for this to happen: your ComposeView was added into a LinearLayout with some " +
-                "weight, you applied Modifier.wrapContentSize(unbounded = true) or wrote a " +
-                "custom layout. Please try to remove the source of infinite constraints in the " +
-                "hierarchy above the scrolling container."
-        }
-    }
 }
