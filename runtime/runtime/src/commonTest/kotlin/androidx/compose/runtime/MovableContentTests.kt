@@ -1284,6 +1284,30 @@ class MovableContentTests {
         hashList2.assertAllTheSame()
         assertNotEquals(hashList1.first(), hashList2.first())
     }
+
+    @Test
+    fun keyInsideMovableContentShouldntChangeWhenRecomposed() = compositionTest {
+        val hashList = mutableListOf<Int>()
+        val counter = mutableStateOf(0)
+        val movableContent = movableContentOf {
+            hashList.add(currentCompositeKeyHash)
+            Text("counter=${counter.value}")
+        }
+        compose {
+            movableContent()
+        }
+
+        validate {
+            Text("counter=${counter.value}")
+        }
+
+        counter.value++
+        expectChanges()
+        revalidate()
+
+        assertEquals(2, hashList.size)
+        assertEquals(hashList[0], hashList[1])
+    }
 }
 
 @Composable
