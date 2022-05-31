@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,23 +18,23 @@ import androidx.build.LibraryType
 
 plugins {
     id("AndroidXPlugin")
-    id("com.android.library")
-    id("AndroidXComposePlugin")
+    id("kotlin")
 }
 
 dependencies {
-    api("androidx.activity:activity:1.2.0")
-    lintPublish(project(":compose:ui:ui-test-manifest-lint"))
+    compileOnly(libs.androidLintMinApi)
+    compileOnly(libs.kotlinStdlib)
+
+    testImplementation(libs.kotlinStdlib)
+    testImplementation(libs.androidLint)
+    testImplementation(libs.androidLintTests)
+    testImplementation(libs.junit)
 }
 
 androidx {
-    name = "Compose Testing manifest dependency"
-    type = LibraryType.PUBLISHED_TEST_LIBRARY
+    name = "Compose Testing Manifest lint checks"
+    type = LibraryType.LINT
     mavenGroup = LibraryGroups.COMPOSE_UI
-    inceptionYear = "2021"
-    description = "Compose testing library that should be added as a debugImplementation dependency to add properties to the debug manifest necessary for testing an application"
-}
-
-android {
-    namespace "androidx.compose.ui.test.manifest"
+    inceptionYear = "2022"
+    description = "Lint checks for Android Test Manifest"
 }
