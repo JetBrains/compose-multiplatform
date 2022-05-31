@@ -29,6 +29,8 @@ After a successful launch on the device - you can delete this temporary project.
 Certificates will remain in login.keychain  
 
 ## Run on iOS device
-set teamId in local.properties  
-`./gradlew iosDeployDeviceRelease`  
-During the build, you will be prompted to access login.keychain  
+ - set teamId in local.properties  
+ - In build.gradle.kts  
+add block `connectedDevice("Device") {  }` to compose.experimental.uikit.application.deployConfigurations  
+ - `./gradlew iosDeployDeviceRelease`  
+ - During the build, you will be prompted to access login.keychain  
