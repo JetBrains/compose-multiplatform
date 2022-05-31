@@ -128,7 +128,6 @@ class ComposePlugin : Plugin<Project> {
                     if (overrideDefaultJvmTarget) {
                         jvmTarget = "11".takeIf { jvmTarget.toDouble() < 11 } ?: jvmTarget
                     }
-                    useIR = true
                 }
             }
         }
