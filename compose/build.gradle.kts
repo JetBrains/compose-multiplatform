@@ -156,12 +156,18 @@ tasks.register("run") {
     dependsOnComposeTask(":compose:desktop:desktop:desktop-samples:run")
 }
 
+for (i in 1..4) {
+    tasks.register("run$i") {
+        dependsOnComposeTask(":compose:desktop:desktop:desktop-samples:run$i")
+    }
+}
+
 tasks.register("runMppJs") {
     dependsOnComposeTask(":compose:mpp:demo:jsRun")
 }
 
-tasks.register("runMppNative") {
-    dependsOnComposeTask(":compose:mpp:demo:runDebugExecutable")
+tasks.register("runMppMacos") {
+    dependsOnComposeTask(":compose:mpp:demo:runDebugExecutableMacosX64")
 }
 
 val mavenCentral = MavenCentralProperties(project)
