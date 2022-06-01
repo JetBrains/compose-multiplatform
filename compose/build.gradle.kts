@@ -156,6 +156,28 @@ tasks.register("run") {
     dependsOnComposeTask(":compose:desktop:desktop:desktop-samples:run")
 }
 
+for (i in 1..4) {
+    tasks.register("run$i") {
+        dependsOnComposeTask(":compose:desktop:desktop:desktop-samples:run$i")
+    }
+}
+
+tasks.register("runWindowApi") {
+    dependsOnComposeTask(":compose:desktop:desktop:desktop-samples:runWindowApi")
+}
+
+tasks.register("runVsync") {
+    dependsOnComposeTask(":compose:desktop:desktop:desktop-samples:runVsync")
+}
+
+tasks.register("runMppJs") {
+    dependsOnComposeTask(":compose:mpp:demo:jsRun")
+}
+
+tasks.register("runMppMacos") {
+    dependsOnComposeTask(":compose:mpp:demo:runDebugExecutableMacosX64")
+}
+
 val mavenCentral = MavenCentralProperties(project)
 if (mavenCentral.signArtifacts) {
     signing.useInMemoryPgpKeys(

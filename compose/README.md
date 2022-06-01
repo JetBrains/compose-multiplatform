@@ -3,11 +3,11 @@
 Composite build of [Compose-jb sources](https://github.com/JetBrains/androidx)
 
 ## Download submodules after downloading the main project:
-```
+```bash
 git submodule update --init --recursive
 ```
 Set this property to always update submodules on git checkout/pull/reset:
-```
+```bash
 git config --global submodule.recurse true
 ```
 
@@ -50,18 +50,48 @@ export COMPOSE_CUSTOM_VERSION=0.0.0-custom
 (on Windows it doesn't build at the moment, the issue is in the line `packageInspector(project, project(":compose:ui:ui-inspection")` in `compose/frameworks/support/compose/ui/ui/build.gradle`)
 
 Publish extended icons:
-```
+```bash
 ./scripts/publishExtendedIcons
 ```
 
+### Run tests
+
 Run tests for Desktop:
-```
+```bash
 ./scripts/testDesktop
 ```
 
 Run tests for Web:
-```
+```bash
 ./scripts/testWeb
+```
+
+Run tests for Android:
+```bash
+./scripts/testAndroidUnit.sh
+```
+```bash
+./scripts/testAndroidInEmulator.sh # first run android simulator or connect device
+```
+
+### Run samples
+Run jvm desktop sample:
+```bash
+./scripts/runGradle run
+```
+another jvm desktop samples: 
+```bash
+./scripts/runGradle run1 run2 run3 run4 runWindowApi runVsync
+```
+
+Run wasm sample:
+```bash
+./scripts/runGradle runMppJs
+```
+
+Run native macos sample:
+```bash
+./scripts/runGradle runMppMacos
 ```
 
 ## Multiplatform build
