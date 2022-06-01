@@ -42,8 +42,6 @@ import androidx.annotation.IntDef
     value = [
         UI_MODE_TYPE_MASK,
         UI_MODE_TYPE_UNDEFINED,
-        UI_MODE_NIGHT_NO,
-        UI_MODE_NIGHT_YES,
         UI_MODE_TYPE_APPLIANCE,
         UI_MODE_TYPE_CAR,
         UI_MODE_TYPE_DESK,
