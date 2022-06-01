@@ -162,6 +162,14 @@ for (i in 1..4) {
     }
 }
 
+tasks.register("runWindowApi") {
+    dependsOnComposeTask(":compose:desktop:desktop:desktop-samples:runWindowApi")
+}
+
+tasks.register("runVsync") {
+    dependsOnComposeTask(":compose:desktop:desktop:desktop-samples:runVsync")
+}
+
 tasks.register("runMppJs") {
     dependsOnComposeTask(":compose:mpp:demo:jsRun")
 }
