@@ -65,6 +65,9 @@ private val DisabledRules = listOf(
     "final-newline",
     // TODO: reenable when https://github.com/pinterest/ktlint/issues/1221 is resolved
     "indent",
+    // TODO: reenable when 'indent' is also enabled, meanwhile its to keep the status-quo
+    //       see: https://github.com/pinterest/ktlint/releases/tag/0.45.0
+    "wrapping",
 ).joinToString(",")
 
 private const val ExcludeTestDataFiles = "**/test-data/**/*.kt"
