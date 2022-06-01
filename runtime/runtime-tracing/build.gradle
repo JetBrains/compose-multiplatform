@@ -33,8 +33,8 @@ android {
 dependencies {
     api("androidx.annotation:annotation:1.3.0")
     implementation(libs.kotlinStdlib)
-    implementation(projectOrArtifact(":compose:runtime:runtime"))
-    implementation(projectOrArtifact(":tracing:tracing-perfetto"))
+    implementation(project(":compose:runtime:runtime"))
+    implementation(project(":tracing:tracing-perfetto"))
     implementation("androidx.startup:startup-runtime:1.1.1")
     androidTestImplementation(libs.testExtJunit)
     androidTestImplementation(libs.testRunner)
