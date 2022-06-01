@@ -2,6 +2,96 @@
 <issues format="6" by="lint 7.4.0-alpha01" type="baseline" client="gradle" dependencies="false" name="AGP (7.4.0-alpha01)" variant="all" version="7.4.0-alpha01">
 
     <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T> List&lt;T>.fastFilter(predicate: (T) -> Boolean): List&lt;T> {"
+        errorLine2="                                ~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/text/TempListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T> List&lt;T>.fastForEach(action: (T) -> Unit) {"
+        errorLine2="                                ~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/TempListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T, R, C : MutableCollection&lt;in R>> List&lt;T>.fastMapTo("
+        errorLine2="                                                                ~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/TempListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T, K> List&lt;T>.fastDistinctBy(selector: (T) -> K): List&lt;T> {"
+        errorLine2="                                   ~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/text/TempListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T, R> List&lt;T>.fastZipWithNext(transform: (T, T) -> R): List&lt;R> {"
+        errorLine2="                                   ~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/TempListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T, R : Comparable&lt;R>> List&lt;T>.fastMinByOrNull(selector: (T) -> R): T? {"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/text/TempListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T, R> List&lt;T>.fastFold(initial: R, operation: (acc: R, T) -> R): R {"
+        errorLine2="                                   ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/text/TempListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T, R> List&lt;T>.fastFlatMap(transform: (T) -> Iterable&lt;R>): List&lt;R> {"
+        errorLine2="                                   ~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/text/TempListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T> List&lt;T>.fastFilterNot(predicate: (T) -> Boolean): List&lt;T> {"
+        errorLine2="                                ~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/text/TempListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T> List&lt;T>.fastTakeWhile(predicate: (T) -> Boolean): List&lt;T> {"
+        errorLine2="                                ~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/text/TempListUtils.kt"/>
+    </issue>
+
+    <issue
         id="NullAnnotationGroup"
         message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
         errorLine1="    @OptIn(InternalPlatformTextApi::class, ExperimentalTextApi::class)"
