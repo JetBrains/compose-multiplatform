@@ -63,6 +63,8 @@ import androidx.compose.material3.samples.FloatingActionButtonSample
 import androidx.compose.material3.samples.IconButtonSample
 import androidx.compose.material3.samples.IconTabs
 import androidx.compose.material3.samples.IconToggleButtonSample
+import androidx.compose.material3.samples.IndeterminateCircularProgressIndicatorSample
+import androidx.compose.material3.samples.IndeterminateLinearProgressIndicatorSample
 import androidx.compose.material3.samples.InputChipSample
 import androidx.compose.material3.samples.InputChipWithAvatarSample
 import androidx.compose.material3.samples.LargeFloatingActionButtonSample
@@ -70,6 +72,7 @@ import androidx.compose.material3.samples.LeadingIconTabs
 import androidx.compose.material3.samples.LinearProgressIndicatorSample
 import androidx.compose.material3.samples.MenuSample
 import androidx.compose.material3.samples.ModalNavigationDrawerSample
+import androidx.compose.material3.samples.NavigationBarItemWithBadge
 import androidx.compose.material3.samples.NavigationBarSample
 import androidx.compose.material3.samples.NavigationBarWithOnlySelectedLabelsSample
 import androidx.compose.material3.samples.NavigationRailBottomAlignSample
@@ -125,6 +128,17 @@ data class Example(
     val sourceUrl: String,
     val content: @Composable () -> Unit
 )
+
+private const val BadgeExampleDescription = "Badge examples"
+private const val BadgeExampleSourceUrl = "$SampleSourceUrl/BadgeSamples.kt"
+val BadgeExamples =
+    listOf(
+        Example(
+            name = ::NavigationBarItemWithBadge.name,
+            description = BadgeExampleDescription,
+            sourceUrl = BadgeExampleSourceUrl
+        ) { NavigationBarItemWithBadge() }
+    )
 
 private const val ButtonsExampleDescription = "Button examples"
 private const val ButtonsExampleSourceUrl = "$SampleSourceUrl/ButtonSamples.kt"
@@ -560,11 +574,25 @@ val ProgressIndicatorsExamples = listOf(
         LinearProgressIndicatorSample()
     },
     Example(
+        name = ::IndeterminateLinearProgressIndicatorSample.name,
+        description = ProgressIndicatorsExampleDescription,
+        sourceUrl = ProgressIndicatorsExampleSourceUrl
+    ) {
+        IndeterminateLinearProgressIndicatorSample()
+    },
+    Example(
         name = ::CircularProgressIndicatorSample.name,
         description = ProgressIndicatorsExampleDescription,
         sourceUrl = ProgressIndicatorsExampleSourceUrl
     ) {
         CircularProgressIndicatorSample()
+    },
+    Example(
+        name = ::IndeterminateCircularProgressIndicatorSample.name,
+        description = ProgressIndicatorsExampleDescription,
+        sourceUrl = ProgressIndicatorsExampleSourceUrl
+    ) {
+        IndeterminateCircularProgressIndicatorSample()
     }
 )
 
@@ -826,6 +854,9 @@ val TextFieldsExamples = listOf(
     // width. As a result, they grow horizontally if enough text is typed. To prevent this behavior
     // in Catalog app the code below restricts the width of every text field sample
     it.copy(content = {
-        Box(Modifier.wrapContentWidth().width(280.dp)) { it.content() }
+        Box(
+            Modifier
+                .wrapContentWidth()
+                .width(280.dp)) { it.content() }
     })
 }
