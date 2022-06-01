@@ -80,6 +80,17 @@ class TextStyleTest {
 
     @OptIn(ExperimentalTextApi::class)
     @Test
+    fun `constructor with customized brush and alpha`() {
+        val brush = Brush.linearGradient(colors = listOf(Color.Blue, Color.Red))
+
+        val style = TextStyle(brush = brush, alpha = 0.3f)
+
+        assertThat(style.brush).isEqualTo(brush)
+        assertThat(style.alpha).isEqualTo(0.3f)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
     fun `constructor with gradient brush has unspecified color`() {
         val brush = Brush.linearGradient(colors = listOf(Color.Blue, Color.Red))
 
@@ -146,6 +157,16 @@ class TextStyleTest {
         val style = TextStyle(color = color)
 
         assertThat(style.color).isEqualTo(color)
+    }
+
+    @Test
+    fun `constructor with half-transparent color`() {
+        val color = Color.Red.copy(alpha = 0.5f)
+
+        val style = TextStyle(color = color)
+
+        assertThat(style.color).isEqualTo(color)
+        assertThat(style.alpha).isWithin(1f / 256f).of(0.5f)
     }
 
     @Test
@@ -615,6 +636,36 @@ class TextStyleTest {
 
         assertThat(mergedStyle.color).isEqualTo(Color.Unspecified)
         assertThat(mergedStyle.brush).isEqualTo(brush)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge brush with brush uses other's alpha`() {
+        val brush = Brush.linearGradient(listOf(Color.Blue, Color.Red))
+
+        val style = TextStyle(brush = brush, alpha = 0.3f)
+        val otherStyle = TextStyle(brush = brush, alpha = 0.6f)
+
+        val mergedStyle = style.merge(otherStyle)
+
+        assertThat(mergedStyle.color).isEqualTo(Color.Unspecified)
+        assertThat(mergedStyle.brush).isEqualTo(brush)
+        assertThat(mergedStyle.alpha).isEqualTo(0.6f)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge brush with brush uses current alpha if other's is NaN`() {
+        val brush = Brush.linearGradient(listOf(Color.Blue, Color.Red))
+
+        val style = TextStyle(brush = brush, alpha = 0.3f)
+        val otherStyle = TextStyle(brush = brush)
+
+        val mergedStyle = style.merge(otherStyle)
+
+        assertThat(mergedStyle.color).isEqualTo(Color.Unspecified)
+        assertThat(mergedStyle.brush).isEqualTo(brush)
+        assertThat(mergedStyle.alpha).isEqualTo(0.3f)
     }
 
     @Test

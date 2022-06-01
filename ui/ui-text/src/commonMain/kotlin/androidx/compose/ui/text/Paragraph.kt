@@ -252,6 +252,7 @@ interface Paragraph {
     fun paint(
         canvas: Canvas,
         brush: Brush,
+        alpha: Float = Float.NaN,
         shadow: Shadow? = null,
         textDecoration: TextDecoration? = null
     ) {
