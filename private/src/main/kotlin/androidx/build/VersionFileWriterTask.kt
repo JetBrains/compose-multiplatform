@@ -67,8 +67,8 @@ fun Project.configureVersionFileWriter(
 
     afterEvaluate {
         writeVersionFile.configure {
-            val group = properties["group"] as String
-            val artifactId = properties["name"] as String
+            val group = findProperty("group") as String
+            val artifactId = findProperty("name") as String
             val version = if (androidXExtension.publish.shouldPublish()) {
                 version().toString()
             } else {
