@@ -25,7 +25,7 @@ import androidx.compose.material.Text
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.runComposeUiTestWithoutActivity
+import androidx.compose.ui.test.runEmptyComposeUiTest
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -38,7 +38,7 @@ import org.junit.runner.RunWith
 @OptIn(ExperimentalTestApi::class)
 class ComposeInFragmentTest {
     @Test
-    fun test() = runComposeUiTestWithoutActivity {
+    fun test() = runEmptyComposeUiTest {
         launchFragmentInContainer<CustomFragment>()
         onNodeWithText("Hello Compose").assertExists()
     }
