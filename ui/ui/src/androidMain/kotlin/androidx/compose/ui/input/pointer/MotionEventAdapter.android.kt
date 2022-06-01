@@ -295,10 +295,10 @@ internal class MotionEventAdapter {
         val scrollDelta = if (motionEvent.actionMasked == ACTION_SCROLL) {
             val x = motionEvent.getAxisValue(MotionEvent.AXIS_HSCROLL)
             val y = motionEvent.getAxisValue(MotionEvent.AXIS_VSCROLL)
-            // NOTE: we revert the scroll offset because android is special compared to other
-            // platforms and send the reversed sign for up and down mouse wheel scroll. In order to
-            // support better x-platform mouse scroll, we revert to be in line with desktop and web
-            // platforms.
+            // NOTE: we invert the y scroll offset because android is special compared to other
+            // platforms and uses the opposite sign for vertical mouse wheel scrolls. In order to
+            // support better x-platform mouse scroll, we invert the y-offset to be in line with
+            // desktop and web.
             //
             // This looks more natural, because when we scroll mouse wheel up,
             // we move the wheel point (that touches the finger) up. And if we work in the usual
@@ -307,8 +307,11 @@ internal class MotionEventAdapter {
             // Web also behaves this way. See deltaY:
             // https://developer.mozilla.org/en-US/docs/Web/API/Element/wheel_event
             // https://jsfiddle.net/27zwteog
-            // (wheelDelta on the other hand is deprecated and inverted):
-            Offset(x, -y)
+            // (wheelDelta on the other hand is deprecated and inverted)
+            //
+            // We then add 0f to prevent injecting -0.0f into the pipeline, which can be
+            // problematic when doing comparisons.
+            Offset(x, -y + 0f)
         } else {
             Offset.Zero
         }
