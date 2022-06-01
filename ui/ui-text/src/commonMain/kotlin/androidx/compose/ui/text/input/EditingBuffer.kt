@@ -242,7 +242,7 @@ class EditingBuffer(
                 "start ($start) offset is outside of text region ${gapBuffer.length}"
             )
         }
-        if (end < 0 || end> gapBuffer.length) {
+        if (end < 0 || end > gapBuffer.length) {
             throw IndexOutOfBoundsException(
                 "end ($end) offset is outside of text region ${gapBuffer.length}"
             )
@@ -274,7 +274,7 @@ class EditingBuffer(
                 "start ($start) offset is outside of text region ${gapBuffer.length}"
             )
         }
-        if (end < 0 || end> gapBuffer.length) {
+        if (end < 0 || end > gapBuffer.length) {
             throw IndexOutOfBoundsException(
                 "end ($end) offset is outside of text region ${gapBuffer.length}"
             )
