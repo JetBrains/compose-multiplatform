@@ -12,7 +12,7 @@ package androidx.compose.animation.tooling {
     property public final Object value;
   }
 
-  public interface ComposeAnimation {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface ComposeAnimation {
     method public Object getAnimationObject();
     method public default String? getLabel();
     method public default java.util.Set<java.lang.Object> getStates();

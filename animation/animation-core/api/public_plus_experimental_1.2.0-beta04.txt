@@ -46,7 +46,7 @@ package androidx.compose.animation.core {
     method @androidx.compose.runtime.Composable public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.runtime.State<T> animateValueAsState(T? targetValue, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, optional androidx.compose.animation.core.AnimationSpec<T> animationSpec, optional T? visibilityThreshold, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit>? finishedListener);
   }
 
-  public interface Animation<T, V extends androidx.compose.animation.core.AnimationVector> {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface Animation<T, V extends androidx.compose.animation.core.AnimationVector> {
     method public long getDurationNanos();
     method public T! getTargetValue();
     method public androidx.compose.animation.core.TwoWayConverter<T,V> getTypeConverter();
@@ -335,7 +335,7 @@ package androidx.compose.animation.core {
     method public <V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.VectorizedFiniteAnimationSpec<V> vectorize(androidx.compose.animation.core.TwoWayConverter<T,V> converter);
   }
 
-  public interface FloatAnimationSpec extends androidx.compose.animation.core.AnimationSpec<java.lang.Float> {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface FloatAnimationSpec extends androidx.compose.animation.core.AnimationSpec<java.lang.Float> {
     method public long getDurationNanos(float initialValue, float targetValue, float initialVelocity);
     method public default float getEndVelocity(float initialValue, float targetValue, float initialVelocity);
     method public float getValueFromNanos(long playTimeNanos, float initialValue, float targetValue, float initialVelocity);
@@ -568,7 +568,7 @@ package androidx.compose.animation.core {
     property public final java.util.List<androidx.compose.animation.core.Transition<?>> transitions;
   }
 
-  public static interface Transition.Segment<S> {
+  @kotlin.jvm.JvmDefaultWithCompatibility public static interface Transition.Segment<S> {
     method public S! getInitialState();
     method public S! getTargetState();
     method public default infix boolean isTransitioningTo(S?, S? targetState);
@@ -635,7 +635,7 @@ package androidx.compose.animation.core {
     method public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.IntSize,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.unit.IntSize.Companion);
   }
 
-  public interface VectorizedAnimationSpec<V extends androidx.compose.animation.core.AnimationVector> {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface VectorizedAnimationSpec<V extends androidx.compose.animation.core.AnimationVector> {
     method public long getDurationNanos(V initialValue, V targetValue, V initialVelocity);
     method public default V getEndVelocity(V initialValue, V targetValue, V initialVelocity);
     method public V getValueFromNanos(long playTimeNanos, V initialValue, V targetValue, V initialVelocity);
@@ -656,7 +656,7 @@ package androidx.compose.animation.core {
     property public abstract float absVelocityThreshold;
   }
 
-  public interface VectorizedDurationBasedAnimationSpec<V extends androidx.compose.animation.core.AnimationVector> extends androidx.compose.animation.core.VectorizedFiniteAnimationSpec<V> {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface VectorizedDurationBasedAnimationSpec<V extends androidx.compose.animation.core.AnimationVector> extends androidx.compose.animation.core.VectorizedFiniteAnimationSpec<V> {
     method public int getDelayMillis();
     method public int getDurationMillis();
     method public default long getDurationNanos(V initialValue, V targetValue, V initialVelocity);
@@ -664,7 +664,7 @@ package androidx.compose.animation.core {
     property public abstract int durationMillis;
   }
 
-  public interface VectorizedFiniteAnimationSpec<V extends androidx.compose.animation.core.AnimationVector> extends androidx.compose.animation.core.VectorizedAnimationSpec<V> {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface VectorizedFiniteAnimationSpec<V extends androidx.compose.animation.core.AnimationVector> extends androidx.compose.animation.core.VectorizedAnimationSpec<V> {
     method public default boolean isInfinite();
     property public default boolean isInfinite;
   }

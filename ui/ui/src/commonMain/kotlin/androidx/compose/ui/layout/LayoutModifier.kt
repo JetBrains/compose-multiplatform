@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * A [Modifier.Element] that changes how its wrapped content is measured and laid out.
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.IntSize
  *
  * @see androidx.compose.ui.layout.Layout
  */
+@JvmDefaultWithCompatibility
 interface LayoutModifier : Modifier.Element {
     /**
      * The function used to measure the modifier. The [measurable] corresponds to the

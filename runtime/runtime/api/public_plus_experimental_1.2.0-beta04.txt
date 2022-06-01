@@ -24,7 +24,7 @@ package androidx.compose.runtime {
   public final class ActualJvm_jvmKt {
   }
 
-  public interface Applier<N> {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface Applier<N> {
     method public void clear();
     method public void down(N? node);
     method public N! getCurrent();
@@ -298,7 +298,7 @@ package androidx.compose.runtime {
   @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level.ERROR, message="This is internal API that may change frequently and without warning.") public @interface InternalComposeTracingApi {
   }
 
-  public interface MonotonicFrameClock extends kotlin.coroutines.CoroutineContext.Element {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface MonotonicFrameClock extends kotlin.coroutines.CoroutineContext.Element {
     method public default kotlin.coroutines.CoroutineContext.Key<?> getKey();
     method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R>);
     property public default kotlin.coroutines.CoroutineContext.Key<?> key;
@@ -454,7 +454,7 @@ package androidx.compose.runtime {
   public final class SlotTableKt {
   }
 
-  public interface SnapshotMutationPolicy<T> {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface SnapshotMutationPolicy<T> {
     method public boolean equivalent(T? a, T? b);
     method public default T? merge(T? previous, T? current, T? applied);
   }
@@ -998,7 +998,7 @@ package androidx.compose.runtime.snapshots {
     method @Deprecated public void withNoObservations(kotlin.jvm.functions.Function0<kotlin.Unit> block);
   }
 
-  public interface StateObject {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface StateObject {
     method public androidx.compose.runtime.snapshots.StateRecord getFirstStateRecord();
     method public default androidx.compose.runtime.snapshots.StateRecord? mergeRecords(androidx.compose.runtime.snapshots.StateRecord previous, androidx.compose.runtime.snapshots.StateRecord current, androidx.compose.runtime.snapshots.StateRecord applied);
     method public void prependStateRecord(androidx.compose.runtime.snapshots.StateRecord value);

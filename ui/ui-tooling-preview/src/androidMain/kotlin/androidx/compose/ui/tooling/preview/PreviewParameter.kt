@@ -17,11 +17,13 @@
 package androidx.compose.ui.tooling.preview
 
 import kotlin.reflect.KClass
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * Interface to be implemented by any provider of values that you want to be injected as @[Preview]
  * parameters. This allows providing sample information for previews.
  */
+@JvmDefaultWithCompatibility
 interface PreviewParameterProvider<T> {
     /**
      * [Sequence] of values of type [T] to be passed as @[Preview] parameter.

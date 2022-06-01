@@ -22,6 +22,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
 import kotlin.math.roundToInt
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * A density of the screen. Used for convert [Dp] to pixels.
@@ -44,6 +45,7 @@ private data class DensityImpl(
  * @sample androidx.compose.ui.unit.samples.WithDensitySample
  */
 @Immutable
+@JvmDefaultWithCompatibility
 interface Density {
 
     /**

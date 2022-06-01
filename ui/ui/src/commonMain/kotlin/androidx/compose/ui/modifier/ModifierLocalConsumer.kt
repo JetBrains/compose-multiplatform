@@ -22,12 +22,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * A Modifier that can be used to consume [ModifierLocal]s that were provided by other modifiers to
  * the left of this modifier, or above this modifier in the layout tree.
  */
 @Stable
+@JvmDefaultWithCompatibility
 interface ModifierLocalConsumer : Modifier.Element {
     /**
      * This function is called whenever one of the consumed values has changed.

@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * Invoke [onPlaced] after the parent [LayoutModifier] and parent layout has been placed and before
@@ -70,6 +71,7 @@ private class OnPlacedModifierImpl(
  *
  * @sample androidx.compose.ui.samples.OnPlaced
  */
+@JvmDefaultWithCompatibility
 interface OnPlacedModifier : Modifier.Element {
     /**
      * [onPlaced] is called after parent [LayoutModifier] and parent layout gets placed and

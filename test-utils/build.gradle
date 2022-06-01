@@ -17,6 +17,7 @@
 import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryType
 import androidx.build.Publish
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
@@ -121,4 +122,12 @@ androidx {
 
 android {
     namespace "androidx.compose.testutils"
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
 }

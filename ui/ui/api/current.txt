@@ -120,7 +120,7 @@ package androidx.compose.ui {
     method public static androidx.compose.ui.Modifier materialize(androidx.compose.runtime.Composer, androidx.compose.ui.Modifier modifier);
   }
 
-  @androidx.compose.runtime.Stable public interface Modifier {
+  @androidx.compose.runtime.Stable @kotlin.jvm.JvmDefaultWithCompatibility public interface Modifier {
     method public boolean all(kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier.Element,java.lang.Boolean> predicate);
     method public boolean any(kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier.Element,java.lang.Boolean> predicate);
     method public <R> R! foldIn(R? initial, kotlin.jvm.functions.Function2<? super R,? super androidx.compose.ui.Modifier.Element,? extends R> operation);
@@ -136,7 +136,7 @@ package androidx.compose.ui {
     method public <R> R! foldOut(R? initial, kotlin.jvm.functions.Function2<? super androidx.compose.ui.Modifier.Element,? super R,? extends R> operation);
   }
 
-  public static interface Modifier.Element extends androidx.compose.ui.Modifier {
+  @kotlin.jvm.JvmDefaultWithCompatibility public static interface Modifier.Element extends androidx.compose.ui.Modifier {
     method public default boolean all(kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier.Element,java.lang.Boolean> predicate);
     method public default boolean any(kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier.Element,java.lang.Boolean> predicate);
     method public default <R> R! foldIn(R? initial, kotlin.jvm.functions.Function2<? super R,? super androidx.compose.ui.Modifier.Element,? extends R> operation);
@@ -228,11 +228,11 @@ package androidx.compose.ui.draw {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier clipToBounds(androidx.compose.ui.Modifier);
   }
 
-  public interface DrawCacheModifier extends androidx.compose.ui.draw.DrawModifier {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface DrawCacheModifier extends androidx.compose.ui.draw.DrawModifier {
     method public void onBuildCache(androidx.compose.ui.draw.BuildDrawCacheParams params);
   }
 
-  public interface DrawModifier extends androidx.compose.ui.Modifier.Element {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface DrawModifier extends androidx.compose.ui.Modifier.Element {
     method public void draw(androidx.compose.ui.graphics.drawscope.ContentDrawScope);
   }
 
@@ -297,7 +297,7 @@ package androidx.compose.ui.focus {
     property public final int Up;
   }
 
-  public interface FocusEventModifier extends androidx.compose.ui.Modifier.Element {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface FocusEventModifier extends androidx.compose.ui.Modifier.Element {
     method public void onFocusEvent(androidx.compose.ui.focus.FocusState focusState);
   }
 
@@ -346,7 +346,7 @@ package androidx.compose.ui.focus {
     property public final androidx.compose.ui.focus.FocusRequester up;
   }
 
-  @Deprecated public interface FocusOrderModifier extends androidx.compose.ui.Modifier.Element {
+  @Deprecated @kotlin.jvm.JvmDefaultWithCompatibility public interface FocusOrderModifier extends androidx.compose.ui.Modifier.Element {
     method @Deprecated public void populateFocusOrder(androidx.compose.ui.focus.FocusOrder focusOrder);
   }
 
@@ -406,7 +406,7 @@ package androidx.compose.ui.focus {
   public final class FocusRequesterKt {
   }
 
-  public interface FocusRequesterModifier extends androidx.compose.ui.Modifier.Element {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface FocusRequesterModifier extends androidx.compose.ui.Modifier.Element {
     method public androidx.compose.ui.focus.FocusRequester getFocusRequester();
     property public abstract androidx.compose.ui.focus.FocusRequester focusRequester;
   }
@@ -448,7 +448,7 @@ package androidx.compose.ui.graphics {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier toolingGraphicsLayer(androidx.compose.ui.Modifier);
   }
 
-  public interface GraphicsLayerScope extends androidx.compose.ui.unit.Density {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface GraphicsLayerScope extends androidx.compose.ui.unit.Density {
     method public float getAlpha();
     method public default long getAmbientShadowColor();
     method public float getCameraDistance();
@@ -591,7 +591,7 @@ package androidx.compose.ui.graphics.vector {
     method @androidx.compose.runtime.Composable @androidx.compose.ui.graphics.vector.VectorComposable public static void Path(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> pathData, optional int pathFillType, optional String name, optional androidx.compose.ui.graphics.Brush? fill, optional float fillAlpha, optional androidx.compose.ui.graphics.Brush? stroke, optional float strokeAlpha, optional float strokeLineWidth, optional int strokeLineCap, optional int strokeLineJoin, optional float strokeLineMiter, optional float trimPathStart, optional float trimPathEnd, optional float trimPathOffset);
   }
 
-  public interface VectorConfig {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface VectorConfig {
     method public default <T> T! getOrDefault(androidx.compose.ui.graphics.vector.VectorProperty<T> property, T? defaultValue);
   }
 
@@ -1445,7 +1445,7 @@ package androidx.compose.ui.input.key {
 
 package androidx.compose.ui.input.nestedscroll {
 
-  public interface NestedScrollConnection {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface NestedScrollConnection {
     method public default suspend Object? onPostFling(long consumed, long available, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity>);
     method public default long onPostScroll(long consumed, long available, int source);
     method public default suspend Object? onPreFling(long available, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity>);
@@ -1486,7 +1486,7 @@ package androidx.compose.ui.input.nestedscroll {
 
 package androidx.compose.ui.input.pointer {
 
-  @kotlin.coroutines.RestrictsSuspension public interface AwaitPointerEventScope extends androidx.compose.ui.unit.Density {
+  @kotlin.coroutines.RestrictsSuspension @kotlin.jvm.JvmDefaultWithCompatibility public interface AwaitPointerEventScope extends androidx.compose.ui.unit.Density {
     method public suspend Object? awaitPointerEvent(optional androidx.compose.ui.input.pointer.PointerEventPass pass, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerEvent>);
     method public androidx.compose.ui.input.pointer.PointerEvent getCurrentEvent();
     method public default long getExtendedTouchPadding();
@@ -1664,12 +1664,12 @@ package androidx.compose.ui.input.pointer {
     property public final long size;
   }
 
-  public interface PointerInputModifier extends androidx.compose.ui.Modifier.Element {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface PointerInputModifier extends androidx.compose.ui.Modifier.Element {
     method public androidx.compose.ui.input.pointer.PointerInputFilter getPointerInputFilter();
     property public abstract androidx.compose.ui.input.pointer.PointerInputFilter pointerInputFilter;
   }
 
-  public interface PointerInputScope extends androidx.compose.ui.unit.Density {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface PointerInputScope extends androidx.compose.ui.unit.Density {
     method public suspend <R> Object? awaitPointerEventScope(kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.AwaitPointerEventScope,? super kotlin.coroutines.Continuation<? super R>,?> block, kotlin.coroutines.Continuation<? super R>);
     method public default long getExtendedTouchPadding();
     method public default boolean getInterceptOutOfBoundsChildEvents();
@@ -1827,7 +1827,7 @@ package androidx.compose.ui.layout {
     property public final float value;
   }
 
-  public interface GraphicLayerInfo {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface GraphicLayerInfo {
     method public long getLayerId();
     method public default long getOwnerViewId();
     property public abstract long layerId;
@@ -1921,7 +1921,7 @@ package androidx.compose.ui.layout {
     method @Deprecated @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public static void MultiMeasureLayout(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function0<kotlin.Unit> content, androidx.compose.ui.layout.MeasurePolicy measurePolicy);
   }
 
-  public interface LayoutModifier extends androidx.compose.ui.Modifier.Element {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface LayoutModifier extends androidx.compose.ui.Modifier.Element {
     method public default int maxIntrinsicHeight(androidx.compose.ui.layout.IntrinsicMeasureScope, androidx.compose.ui.layout.IntrinsicMeasurable measurable, int width);
     method public default int maxIntrinsicWidth(androidx.compose.ui.layout.IntrinsicMeasureScope, androidx.compose.ui.layout.IntrinsicMeasurable measurable, int height);
     method public androidx.compose.ui.layout.MeasureResult measure(androidx.compose.ui.layout.MeasureScope, androidx.compose.ui.layout.Measurable measurable, long constraints);
@@ -1937,7 +1937,7 @@ package androidx.compose.ui.layout {
     method public androidx.compose.ui.layout.Placeable measure(long constraints);
   }
 
-  @androidx.compose.runtime.Stable public fun interface MeasurePolicy {
+  @androidx.compose.runtime.Stable @kotlin.jvm.JvmDefaultWithCompatibility public fun interface MeasurePolicy {
     method public default int maxIntrinsicHeight(androidx.compose.ui.layout.IntrinsicMeasureScope, java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable> measurables, int width);
     method public default int maxIntrinsicWidth(androidx.compose.ui.layout.IntrinsicMeasureScope, java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable> measurables, int height);
     method public androidx.compose.ui.layout.MeasureResult measure(androidx.compose.ui.layout.MeasureScope, java.util.List<? extends androidx.compose.ui.layout.Measurable> measurables, long constraints);
@@ -1955,7 +1955,7 @@ package androidx.compose.ui.layout {
     property public abstract int width;
   }
 
-  public interface MeasureScope extends androidx.compose.ui.layout.IntrinsicMeasureScope {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface MeasureScope extends androidx.compose.ui.layout.IntrinsicMeasureScope {
     method public default androidx.compose.ui.layout.MeasureResult layout(int width, int height, optional java.util.Map<androidx.compose.ui.layout.AlignmentLine,java.lang.Integer> alignmentLines, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.Placeable.PlacementScope,kotlin.Unit> placementBlock);
   }
 
@@ -1982,7 +1982,7 @@ package androidx.compose.ui.layout {
     property public final androidx.compose.ui.Modifier modifier;
   }
 
-  public interface OnGloballyPositionedModifier extends androidx.compose.ui.Modifier.Element {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface OnGloballyPositionedModifier extends androidx.compose.ui.Modifier.Element {
     method public void onGloballyPositioned(androidx.compose.ui.layout.LayoutCoordinates coordinates);
   }
 
@@ -1990,7 +1990,7 @@ package androidx.compose.ui.layout {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier onGloballyPositioned(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LayoutCoordinates,kotlin.Unit> onGloballyPositioned);
   }
 
-  public interface OnPlacedModifier extends androidx.compose.ui.Modifier.Element {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface OnPlacedModifier extends androidx.compose.ui.Modifier.Element {
     method public void onPlaced(androidx.compose.ui.layout.LayoutCoordinates coordinates);
   }
 
@@ -1998,7 +1998,7 @@ package androidx.compose.ui.layout {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier onPlaced(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LayoutCoordinates,kotlin.Unit> onPlaced);
   }
 
-  public interface OnRemeasuredModifier extends androidx.compose.ui.Modifier.Element {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface OnRemeasuredModifier extends androidx.compose.ui.Modifier.Element {
     method public void onRemeasured(long size);
   }
 
@@ -2006,7 +2006,7 @@ package androidx.compose.ui.layout {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier onSizeChanged(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntSize,kotlin.Unit> onSizeChanged);
   }
 
-  public interface ParentDataModifier extends androidx.compose.ui.Modifier.Element {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface ParentDataModifier extends androidx.compose.ui.Modifier.Element {
     method public Object? modifyParentData(androidx.compose.ui.unit.Density, Object? parentData);
   }
 
@@ -2060,7 +2060,7 @@ package androidx.compose.ui.layout {
     method public void forceRemeasure();
   }
 
-  public interface RemeasurementModifier extends androidx.compose.ui.Modifier.Element {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface RemeasurementModifier extends androidx.compose.ui.Modifier.Element {
     method public void onRemeasurementAvailable(androidx.compose.ui.layout.Remeasurement remeasurement);
   }
 
@@ -2146,7 +2146,7 @@ package androidx.compose.ui.modifier {
   @androidx.compose.runtime.Stable public abstract sealed class ModifierLocal<T> {
   }
 
-  @androidx.compose.runtime.Stable public interface ModifierLocalConsumer extends androidx.compose.ui.Modifier.Element {
+  @androidx.compose.runtime.Stable @kotlin.jvm.JvmDefaultWithCompatibility public interface ModifierLocalConsumer extends androidx.compose.ui.Modifier.Element {
     method public void onModifierLocalsUpdated(androidx.compose.ui.modifier.ModifierLocalReadScope scope);
   }
 
@@ -2157,7 +2157,7 @@ package androidx.compose.ui.modifier {
     method public static <T> androidx.compose.ui.modifier.ProvidableModifierLocal<T> modifierLocalOf(kotlin.jvm.functions.Function0<? extends T> defaultFactory);
   }
 
-  @androidx.compose.runtime.Stable public interface ModifierLocalProvider<T> extends androidx.compose.ui.Modifier.Element {
+  @androidx.compose.runtime.Stable @kotlin.jvm.JvmDefaultWithCompatibility public interface ModifierLocalProvider<T> extends androidx.compose.ui.Modifier.Element {
     method public androidx.compose.ui.modifier.ProvidableModifierLocal<T> getKey();
     method public T! getValue();
     property public abstract androidx.compose.ui.modifier.ProvidableModifierLocal<T> key;
@@ -2347,7 +2347,7 @@ package androidx.compose.ui.platform {
   public final class DisposableSaveableStateRegistry_androidKt {
   }
 
-  public interface InfiniteAnimationPolicy extends kotlin.coroutines.CoroutineContext.Element {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface InfiniteAnimationPolicy extends kotlin.coroutines.CoroutineContext.Element {
     method public default kotlin.coroutines.CoroutineContext.Key<?> getKey();
     method public suspend <R> Object? onInfiniteOperation(kotlin.jvm.functions.Function1<? super kotlin.coroutines.Continuation<? super R>,?> block, kotlin.coroutines.Continuation<? super R>);
     property public default kotlin.coroutines.CoroutineContext.Key<?> key;
@@ -2370,7 +2370,7 @@ package androidx.compose.ui.platform {
     ctor public InspectableModifier.End();
   }
 
-  public interface InspectableValue {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface InspectableValue {
     method public default kotlin.sequences.Sequence<androidx.compose.ui.platform.ValueElement> getInspectableElements();
     method public default String? getNameFallback();
     method public default Object? getValueOverride();
@@ -2496,7 +2496,7 @@ package androidx.compose.ui.platform {
   public final class ViewCompositionStrategy_androidKt {
   }
 
-  public interface ViewConfiguration {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface ViewConfiguration {
     method public long getDoubleTapMinTimeMillis();
     method public long getDoubleTapTimeoutMillis();
     method public long getLongPressTimeoutMillis();
@@ -2509,7 +2509,7 @@ package androidx.compose.ui.platform {
     property public abstract float touchSlop;
   }
 
-  public interface ViewRootForInspector {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface ViewRootForInspector {
     method public default androidx.compose.ui.platform.AbstractComposeView? getSubCompositionView();
     method public default android.view.View? getViewRoot();
     property public default androidx.compose.ui.platform.AbstractComposeView? subCompositionView;
@@ -2749,7 +2749,7 @@ package androidx.compose.ui.semantics {
     method public static <T> T? getOrNull(androidx.compose.ui.semantics.SemanticsConfiguration, androidx.compose.ui.semantics.SemanticsPropertyKey<T> key);
   }
 
-  public interface SemanticsModifier extends androidx.compose.ui.Modifier.Element {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface SemanticsModifier extends androidx.compose.ui.Modifier.Element {
     method public int getId();
     method public androidx.compose.ui.semantics.SemanticsConfiguration getSemanticsConfiguration();
     property public abstract int id;

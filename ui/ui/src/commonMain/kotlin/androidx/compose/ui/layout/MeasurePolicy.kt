@@ -19,6 +19,7 @@ package androidx.compose.ui.layout
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.util.fastMap
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * Defines the measure and layout behavior of a [Layout]. [Layout] and [MeasurePolicy] are the way
@@ -51,6 +52,7 @@ import androidx.compose.ui.util.fastMap
  * @see Layout
  */
 @Stable
+@JvmDefaultWithCompatibility
 fun interface MeasurePolicy {
     /**
      * The function that defines the measurement and layout. Each [Measurable] in the [measurables]

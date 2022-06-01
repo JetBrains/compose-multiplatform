@@ -88,3 +88,11 @@ androidx {
 android {
     namespace "androidx.compose.ui.geometry"
 }
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
+}
