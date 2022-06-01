@@ -34,7 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.runComposeUiTestWithoutActivity
+import androidx.compose.ui.test.runEmptyComposeUiTest
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -62,7 +62,7 @@ class MultipleActivitiesWithoutComposeTest {
     val activityScenarioRule = ActivityScenarioRule(Activity1::class.java)
 
     @Test
-    fun test() = runComposeUiTestWithoutActivity {
+    fun test() = runEmptyComposeUiTest {
         onView(withText("CLICK_1")).perform(click())
         onView(withText("CLICK_2")).perform(click())
         onNodeWithTag("compose-box").assertExists()
