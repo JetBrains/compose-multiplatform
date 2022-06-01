@@ -23,11 +23,11 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.focus.FocusStateImpl.Active
-import androidx.compose.ui.focus.FocusStateImpl.Captured
-import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
-import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
+import androidx.compose.ui.focus.FocusStateImpl.Captured
 import androidx.compose.ui.focus.FocusStateImpl.Deactivated
+import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
+import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.input.focus.FocusAwareInputModifier
 import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.key.ModifierLocalKeyInput
@@ -254,7 +254,6 @@ internal fun Modifier.focusTarget(focusModifier: FocusModifier): Modifier {
 internal val ResetFocusModifierLocals: Modifier = Modifier
     // Reset the FocusProperties modifier local.
     .then(
-        @Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
         object : ModifierLocalProvider<FocusPropertiesModifier?> {
             override val key: ProvidableModifierLocal<FocusPropertiesModifier?>
                 get() = ModifierLocalFocusProperties
@@ -265,7 +264,6 @@ internal val ResetFocusModifierLocals: Modifier = Modifier
     )
     // Update the FocusEvent listener modifier local value to null.
     .then(
-        @Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
         object : ModifierLocalProvider<FocusEventModifierLocal?> {
             override val key: ProvidableModifierLocal<FocusEventModifierLocal?>
                 get() = ModifierLocalFocusEvent
@@ -275,7 +273,6 @@ internal val ResetFocusModifierLocals: Modifier = Modifier
     )
     // Update the FocusRequesters modifier local value to null.
     .then(
-        @Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
         object : ModifierLocalProvider<FocusRequesterModifierLocal?> {
             override val key: ProvidableModifierLocal<FocusRequesterModifierLocal?>
                 get() = ModifierLocalFocusRequester
