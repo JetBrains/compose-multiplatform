@@ -2564,7 +2564,11 @@ internal class ComposerImpl(
     private fun SlotReader.groupCompoundKeyPart(group: Int) =
         if (hasObjectKey(group)) {
             groupObjectKey(group)?.let {
-                if (it is Enum<*>) it.ordinal else it.hashCode()
+                when (it) {
+                    is Enum<*> -> it.ordinal
+                    is MovableContent<*> -> movableContentKey
+                    else -> it.hashCode()
+                }
             } ?: 0
         } else groupKey(group).let {
             if (it == reuseKey) groupAux(group)?.let { aux ->
@@ -2776,6 +2780,11 @@ internal class ComposerImpl(
         startMovableGroup(movableContentKey, content)
         changed(parameter)
 
+        // All movable content has a compound hash value rooted at the content itself so the hash
+        // value doesn't change as the content moves in the tree.
+        val savedCompoundKeyHash = compoundKeyHash
+        compoundKeyHash = movableContentKey
+
         if (inserting) writer.markGroup()
 
         // Capture the local providers at the point of the invocation. This allows detecting
@@ -2784,11 +2793,6 @@ internal class ComposerImpl(
         val providersChanged = if (inserting) false else reader.groupAux != locals
         if (providersChanged) providerUpdates[reader.currentGroup] = locals
         start(compositionLocalMapKey, compositionLocalMap, false, locals)
-
-        // All movable content has a compound hash value rooted at the content itself so the hash
-        // value doesn't change as the content moves in the tree.
-        val savedCompoundKeyHash = compoundKeyHash
-        compoundKeyHash = movableContentKey
 
         // Either insert a place-holder to be inserted later (either created new or moved from
         // another location) or (re)compose the movable content. This is forced if a new value
@@ -2817,8 +2821,8 @@ internal class ComposerImpl(
         }
 
         // Restore the state back to what is expected by the caller.
-        compoundKeyHash = savedCompoundKeyHash
         endGroup()
+        compoundKeyHash = savedCompoundKeyHash
         endMovableGroup()
     }
 
