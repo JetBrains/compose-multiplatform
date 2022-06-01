@@ -218,7 +218,7 @@ fun ChipGroupSingleLineSample() {
         Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
             repeat(9) { index ->
                 InputChip(
-                    modifier = Modifier.padding(horizontal = 8.dp),
+                    modifier = Modifier.padding(horizontal = 4.dp),
                     onClick = { /* do something*/ },
                     label = { Text("Chip $index") }
                 )
