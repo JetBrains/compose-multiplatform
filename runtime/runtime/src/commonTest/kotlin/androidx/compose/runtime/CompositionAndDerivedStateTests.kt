@@ -385,6 +385,79 @@ class CompositionAndDerivedStateTests {
         val observed = (composition as? CompositionImpl)?.observedObjects ?: emptyList()
         assertEquals(2, observed.count())
     }
+
+    @Test
+    fun changingTheDerivedStateInstanceShouldClearDependencies() = compositionTest {
+        var reload by mutableStateOf(0)
+
+        compose {
+            val itemValue = remember(reload) {
+                derivedStateOf {
+                    reload
+                }
+            }
+
+            val items = remember(reload) {
+                derivedStateOf {
+                    List(10) { itemValue.value }
+                }
+            }
+
+            Text("List of size ${items.value.size}")
+        }
+
+        validate {
+            Text("List of size 10")
+        }
+
+        repeat(10) {
+            reload++
+            advance()
+        }
+
+        revalidate()
+
+        // Validate there are only 2 observed dependencies, one per each derived state
+        val observed = (composition as? CompositionImpl)?.derivedStateDependencies ?: emptyList()
+        assertEquals(2, observed.count())
+    }
+
+    @Test
+    fun changingDerivedStateDependenciesShouldClearThem() = compositionTest {
+        var reload by mutableStateOf(0)
+
+        compose {
+            val itemValue = remember(reload) {
+                derivedStateOf { 1 }
+            }
+
+            val intermediateState = rememberUpdatedState(itemValue)
+
+            val snapshot = remember {
+                derivedStateOf {
+                    List(10) { intermediateState.value.value }
+                }
+            }
+
+            Text("List of size ${snapshot.value.size}")
+        }
+
+        validate {
+            Text("List of size 10")
+        }
+
+        repeat(10) {
+            reload++
+            advance()
+        }
+
+        revalidate()
+
+        // Validate there are only 2 observed dependencies, one for intermediateState, one for itemValue
+        val observed = (composition as? CompositionImpl)?.derivedStateDependencies ?: emptyList()
+        println(observed)
+        assertEquals(2, observed.count())
+    }
 }
 
 @Composable
