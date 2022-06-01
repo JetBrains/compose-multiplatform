@@ -17,7 +17,7 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.assertNotNestingScrollableContainers
+import androidx.compose.foundation.checkScrollableContainerConstraints
 import androidx.compose.foundation.clipScrollableContainer
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
@@ -100,6 +100,7 @@ internal fun LazyList(
 
     ScrollPositionUpdater(itemProvider, state)
 
+    val orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal
     LazyLayout(
         modifier = modifier
             .then(state.remeasurementModifier)
@@ -112,11 +113,11 @@ internal fun LazyList(
                 reverseScrolling = reverseLayout,
                 userScrollEnabled = userScrollEnabled
             )
-            .clipScrollableContainer(isVertical)
+            .clipScrollableContainer(orientation)
             .lazyListBeyondBoundsModifier(state, beyondBoundsInfo, reverseLayout)
             .lazyListPinningModifier(state, beyondBoundsInfo)
             .scrollable(
-                orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
+                orientation = orientation,
                 reverseDirection = run {
                     // A finger moves with the content, not with the viewport. Therefore,
                     // always reverse once to have "natural" gesture that goes reversed to layout
@@ -193,7 +194,10 @@ private fun rememberLazyListMeasurePolicy(
     placementAnimator
 ) {
     { containerConstraints ->
-        containerConstraints.assertNotNestingScrollableContainers(isVertical)
+        checkScrollableContainerConstraints(
+            containerConstraints,
+            if (isVertical) Orientation.Vertical else Orientation.Horizontal
+        )
 
         // resolve content paddings
         val startPadding =

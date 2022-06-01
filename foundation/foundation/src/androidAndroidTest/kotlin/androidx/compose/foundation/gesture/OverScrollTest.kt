@@ -290,7 +290,7 @@ class OverScrollTest {
                         Modifier
                             .padding(horizontal = 10.dp)
                             .size(10.dp)
-                            .clipScrollableContainer(true)
+                            .clipScrollableContainer(Orientation.Vertical)
                             .overScroll(controller)
                             .drawBehind {
                                 val extraOffset = 10.dp
