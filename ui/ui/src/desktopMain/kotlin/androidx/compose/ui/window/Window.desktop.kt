@@ -199,7 +199,7 @@ fun Window(
                 set(currentTransparent, window::isTransparent::set)
                 set(currentResizable, window::setResizable)
                 set(currentEnabled, window::setEnabled)
-                set(currentFocusable, window::setFocusable)
+                set(currentFocusable, window::setFocusableWindowState)
                 set(currentAlwaysOnTop, window::setAlwaysOnTop)
             }
             if (state.size != appliedState.size) {

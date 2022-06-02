@@ -170,11 +170,11 @@ class WindowParameterTest {
         }
 
         awaitIdle()
-        assertThat(window?.isFocusable).isFalse()
+        assertThat(window?.isFocusableWindow).isFalse()
 
         focusable = true
         awaitIdle()
-        assertThat(window?.isFocusable).isTrue()
+        assertThat(window?.isFocusableWindow).isTrue()
 
         window?.dispatchEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSING))
     }

@@ -177,7 +177,7 @@ fun Dialog(
                 set(currentTransparent, dialog::isTransparent::set)
                 set(currentResizable, dialog::setResizable)
                 set(currentEnabled, dialog::setEnabled)
-                set(currentFocusable, dialog::setFocusable)
+                set(currentFocusable, dialog::setFocusableWindowState)
             }
             if (state.size != appliedState.size) {
                 dialog.setSizeSafely(state.size)
