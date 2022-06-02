@@ -78,6 +78,7 @@ import androidx.compose.material3.samples.NavigationBarWithOnlySelectedLabelsSam
 import androidx.compose.material3.samples.NavigationRailBottomAlignSample
 import androidx.compose.material3.samples.NavigationRailSample
 import androidx.compose.material3.samples.NavigationRailWithOnlySelectedLabelsSample
+import androidx.compose.material3.samples.OneLineListItem
 import androidx.compose.material3.samples.OutlinedButtonSample
 import androidx.compose.material3.samples.OutlinedCardSample
 import androidx.compose.material3.samples.OutlinedIconButtonSample
@@ -117,7 +118,9 @@ import androidx.compose.material3.samples.TextFieldWithIcons
 import androidx.compose.material3.samples.TextFieldWithPlaceholder
 import androidx.compose.material3.samples.TextFieldWithSupportingText
 import androidx.compose.material3.samples.TextTabs
+import androidx.compose.material3.samples.ThreeLineListItem
 import androidx.compose.material3.samples.TriStateCheckboxSample
+import androidx.compose.material3.samples.TwoLineListItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -426,6 +429,32 @@ val FloatingActionButtonsExamples =
             sourceUrl = FloatingActionButtonsExampleSourceUrl,
         ) { SmallFloatingActionButtonSample() }
     )
+
+private const val ListsExampleDescription = "List examples"
+private const val ListsExampleSourceUrl = "$SampleSourceUrl/ListSamples.kt"
+val ListsExamples = listOf(
+    Example(
+        name = ::OneLineListItem.name,
+        description = ListsExampleDescription,
+        sourceUrl = ListsExampleSourceUrl
+    ) {
+        OneLineListItem()
+    },
+    Example(
+        name = ::TwoLineListItem.name,
+        description = ListsExampleDescription,
+        sourceUrl = ListsExampleSourceUrl
+    ) {
+        TwoLineListItem()
+    },
+    Example(
+        name = ::ThreeLineListItem.name,
+        description = ListsExampleDescription,
+        sourceUrl = ListsExampleSourceUrl
+    ) {
+        ThreeLineListItem()
+    },
+)
 
 private const val IconButtonExampleDescription = "Icon button examples"
 private const val IconButtonExampleSourceUrl = "$SampleSourceUrl/IconButtonSamples.kt"
