@@ -186,7 +186,7 @@ private fun PopupLayout(
                     val width = constraints.maxWidth
                     val height = constraints.maxHeight
 
-                    layout(constraints.maxWidth, constraints.maxHeight) {
+                    layout(width, height) {
                         measurables.forEach {
                             val placeable = it.measure(constraints)
                             val position = popupPositionProvider.calculatePosition(
