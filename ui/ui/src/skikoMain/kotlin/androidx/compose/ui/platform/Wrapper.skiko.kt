@@ -49,7 +49,7 @@ internal fun SkiaBasedOwner.setContent(
                 uriHandler = remember { PlatformUriHandler() },
                 content = content
             )
-            LaunchedEffect(owner) { accessibilityController?.syncLoop() }
+            LaunchedEffect(owner) { accessibilityController.syncLoop() }
         }
     }
     return composition

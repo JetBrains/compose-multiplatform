@@ -168,9 +168,7 @@ private fun PopupLayout(
     val parentComposition = rememberCompositionContext()
     val (owner, composition) = remember {
         val owner = SkiaBasedOwner(
-            platformInputService = scene.platformInputService,
-            component = scene.component,
-            windowInfo = scene.component.windowInfo,
+            platform = scene.platform,
             pointerPositionUpdater = scene.pointerPositionUpdater,
             density = density,
             isFocusable = focusable,

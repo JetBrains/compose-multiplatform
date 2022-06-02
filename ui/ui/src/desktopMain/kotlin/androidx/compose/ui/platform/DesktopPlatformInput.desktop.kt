@@ -26,10 +26,9 @@ import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.SetComposingTextCommand
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.substring
-import androidx.compose.ui.unit.Density
-import java.awt.Point
 import java.awt.Rectangle
 import java.awt.event.InputMethodEvent
+import java.awt.event.KeyEvent
 import java.awt.font.TextHitInfo
 import java.awt.im.InputMethodRequests
 import java.text.AttributedCharacterIterator
@@ -39,15 +38,7 @@ import java.util.Locale
 import kotlin.math.max
 import kotlin.math.min
 
-internal actual interface PlatformInputComponent {
-    fun enableInput(inputMethodRequests: InputMethodRequests)
-    fun disableInput()
-    // Input service needs to know this information to implement Input Method support
-    val locationOnScreen: Point
-    val density: Density
-}
-
-internal actual class PlatformInput actual constructor(val component: PlatformComponent) :
+internal class PlatformInput(private val component: PlatformComponent) :
     PlatformTextInputService {
     data class CurrentInput(
         var value: TextFieldValue,
@@ -57,7 +48,7 @@ internal actual class PlatformInput actual constructor(val component: PlatformCo
         var focusedRect: Rect? = null
     )
 
-    var currentInput: CurrentInput? = null
+    private var currentInput: CurrentInput? = null
 
     // This is required to support input of accented characters using press-and-hold method (http://support.apple.com/kb/PH11264).
     // JDK currently properly supports this functionality only for TextComponent/JTextComponent descendants.
@@ -97,6 +88,8 @@ internal actual class PlatformInput actual constructor(val component: PlatformCo
         }
     }
 
+    // TODO(https://github.com/JetBrains/compose-jb/issues/2040): probably the position of input method
+    //  popup isn't correct now
     @Deprecated("This method should not be called, used BringIntoViewRequester instead.")
     override fun notifyFocusedRect(rect: Rect) {
         currentInput?.let { input ->
@@ -104,14 +97,38 @@ internal actual class PlatformInput actual constructor(val component: PlatformCo
         }
     }
 
-    internal fun inputMethodCaretPositionChanged(
+    fun onKeyEvent(keyEvent: KeyEvent) {
+        when (keyEvent.id) {
+            KeyEvent.KEY_TYPED ->
+                charKeyPressed = true
+            KeyEvent.KEY_RELEASED ->
+                charKeyPressed = false
+        }
+    }
+
+    fun onInputEvent(event: InputMethodEvent) {
+        if (!event.isConsumed) {
+            when (event.id) {
+                InputMethodEvent.INPUT_METHOD_TEXT_CHANGED -> {
+                    replaceInputMethodText(event)
+                    event.consume()
+                }
+                InputMethodEvent.CARET_POSITION_CHANGED -> {
+                    inputMethodCaretPositionChanged(event)
+                    event.consume()
+                }
+            }
+        }
+    }
+
+    private fun inputMethodCaretPositionChanged(
         @Suppress("UNUSED_PARAMETER") event: InputMethodEvent
     ) {
         // Which OSes and which input method could produce such events? We need to have some
         // specific cases in mind before implementing this
     }
 
-    internal fun replaceInputMethodText(event: InputMethodEvent) {
+    private fun replaceInputMethodText(event: InputMethodEvent) {
         currentInput?.let { input ->
             if (event.text == null) {
                 return
@@ -138,7 +155,7 @@ internal actual class PlatformInput actual constructor(val component: PlatformCo
         }
     }
 
-    fun methodRequestsForInput(input: CurrentInput) =
+    private fun methodRequestsForInput(input: CurrentInput) =
         object : InputMethodRequests {
             override fun getLocationOffset(x: Int, y: Int): TextHitInfo? {
                 if (input.value.composition != null) {

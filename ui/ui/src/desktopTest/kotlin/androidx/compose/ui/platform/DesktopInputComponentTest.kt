@@ -30,6 +30,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.awt.Component
 import java.awt.event.InputMethodEvent
+import java.awt.im.InputMethodRequests
 import java.text.AttributedString
 
 private object DummyComponent : Component()
@@ -41,7 +42,7 @@ class DesktopInputComponentTest {
     fun replaceInputMethodText_basic() {
         val processor = EditProcessor()
 
-        val input = PlatformInput(DummyPlatformComponent)
+        val input = PlatformInput(PlatformComponent.Empty)
         val inputService = TextInputService(input)
 
         val session = inputService.startInput(
@@ -55,7 +56,7 @@ class DesktopInputComponentTest {
 
         val familyEmoji = "\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC66\u200D\uD83D\uDC66"
 
-        input.replaceInputMethodText(
+        input.onInputEvent(
             InputMethodEvent(
                 DummyComponent,
                 InputMethodEvent.INPUT_METHOD_TEXT_CHANGED,
@@ -77,7 +78,17 @@ class DesktopInputComponentTest {
         assumeTrue(isMacOs)
         val processor = EditProcessor()
 
-        val component = DummyPlatformComponent
+        val component = object : PlatformComponent by PlatformComponent.Empty {
+            var enabledInput: InputMethodRequests? = null
+
+            override fun enableInput(inputMethodRequests: InputMethodRequests) {
+                enabledInput = inputMethodRequests
+            }
+
+            override fun disableInput() {
+                enabledInput = null
+            }
+        }
         val input = PlatformInput(component)
         val inputService = TextInputService(input)
 
@@ -93,7 +104,7 @@ class DesktopInputComponentTest {
         component.enabledInput!!.getSelectedText(null)
         input.charKeyPressed = false
 
-        input.replaceInputMethodText(
+        input.onInputEvent(
             InputMethodEvent(
                 DummyComponent,
                 InputMethodEvent.INPUT_METHOD_TEXT_CHANGED,

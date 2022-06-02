@@ -24,6 +24,7 @@ import androidx.compose.ui.input.pointer.PointerButtons
 import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 import androidx.compose.ui.platform.DesktopPlatform
 import androidx.compose.ui.platform.AccessibilityControllerImpl
+import androidx.compose.ui.platform.Platform
 import androidx.compose.ui.platform.PlatformComponent
 import androidx.compose.ui.platform.WindowInfoImpl
 import androidx.compose.ui.unit.Constraints
@@ -35,7 +36,6 @@ import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.MainUIDispatcher
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkikoView
-import java.awt.Cursor
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.Graphics
@@ -62,8 +62,13 @@ import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 import androidx.compose.ui.ComposeScene
+import androidx.compose.ui.input.pointer.AwtCursor
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.PointerType
+import androidx.compose.ui.platform.PlatformInput
+import androidx.compose.ui.semantics.SemanticsOwner
+import java.awt.Cursor
 
 internal class ComposeLayer {
     private var isDisposed = false
@@ -91,9 +96,22 @@ internal class ComposeLayer {
         }
     }
 
+    private val platform = object : Platform {
+        override fun setPointerIcon(pointerIcon: PointerIcon) {
+            _component.cursor = (pointerIcon as? AwtCursor)?.cursor ?: Cursor(Cursor.DEFAULT_CURSOR)
+        }
+
+        override fun accessibilityController(owner: SemanticsOwner) =
+            AccessibilityControllerImpl(owner, _component)
+
+        override val windowInfo = WindowInfoImpl()
+
+        override val textInputService = PlatformInput(_component)
+    }
+
     internal val scene = ComposeScene(
         MainUIDispatcher + coroutineExceptionHandler,
-        _component,
+        platform,
         Density(1f),
         _component::needRedraw,
         createSyntheticNativeMoveEvent = _component::createSyntheticMouseEvent,
@@ -119,7 +137,7 @@ internal class ComposeLayer {
         System.getenv("COMPOSE_DISABLE_ACCESSIBILITY") != null
     }
 
-    fun makeAccessible(component: Component) = object : Accessible {
+    private fun makeAccessible(component: Component) = object : Accessible {
         override fun getAccessibleContext(): AccessibleContext? {
             if (a11yDisabled) return null
             val controller =
@@ -166,15 +184,6 @@ internal class ComposeLayer {
         }
 
         override fun getInputMethodRequests() = currentInputMethodRequests
-        private var _desiredCursor: Cursor? = null
-        override var desiredCursor: Cursor
-            get() = _desiredCursor ?: super.getCursor()
-            set(value) { _desiredCursor = value }
-
-        override fun commitCursor() {
-            super.setCursor(_desiredCursor ?: Cursor(Cursor.DEFAULT_CURSOR))
-            _desiredCursor = null
-        }
 
         override fun enableInput(inputMethodRequests: InputMethodRequests) {
             currentInputMethodRequests = inputMethodRequests
@@ -235,17 +244,13 @@ internal class ComposeLayer {
             )
         }
 
-        private val _windowInfo = WindowInfoImpl()
-
-        override val windowInfo = _windowInfo
-
         private fun refreshWindowFocus() {
-            windowInfo.isWindowFocused = window?.isFocused ?: false
+            platform.windowInfo.isWindowFocused = window?.isFocused ?: false
             keyboardModifiersRequireUpdate = true
         }
 
         fun setCurrentKeyboardModifiers(modifiers: PointerKeyboardModifiers) {
-            _windowInfo.keyboardModifiers = modifiers
+            platform.windowInfo.keyboardModifiers = modifiers
         }
     }
 
@@ -263,7 +268,7 @@ internal class ComposeLayer {
                 if (isDisposed) return
                 if (event != null) {
                     catchExceptions {
-                        scene.onInputMethodEvent(event)
+                        platform.textInputService.onInputEvent(event)
                     }
                 }
             }
@@ -271,7 +276,7 @@ internal class ComposeLayer {
             override fun inputMethodTextChanged(event: InputMethodEvent) {
                 if (isDisposed) return
                 catchExceptions {
-                    scene.onInputMethodEvent(event)
+                    platform.textInputService.onInputEvent(event)
                 }
             }
         })
@@ -315,6 +320,7 @@ internal class ComposeLayer {
 
     private fun onKeyEvent(event: KeyEvent) = catchExceptions {
         if (isDisposed) return@catchExceptions
+        platform.textInputService.onKeyEvent(event)
         _component.setCurrentKeyboardModifiers(event.toPointerKeyboardModifiers())
         if (scene.sendKeyEvent(ComposeKeyEvent(event))) {
             event.consume()

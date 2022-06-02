@@ -42,10 +42,8 @@ import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.areAnyPressed
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AccessibilityController
-import androidx.compose.ui.platform.PlatformComponent
+import androidx.compose.ui.platform.Platform
 import androidx.compose.ui.platform.SkiaBasedOwner
-import androidx.compose.ui.platform.PlatformInput
-import androidx.compose.ui.platform.DummyPlatformComponent
 import androidx.compose.ui.platform.FlushCoroutineDispatcher
 import androidx.compose.ui.platform.GlobalSnapshotManager
 import androidx.compose.ui.platform.setContent
@@ -56,14 +54,15 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toIntRect
 import androidx.compose.ui.synchronized
+import kotlin.coroutines.CoroutineContext
+import kotlin.jvm.Volatile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.Canvas
-import kotlin.coroutines.CoroutineContext
-import kotlin.jvm.Volatile
+import org.jetbrains.skiko.currentNanoTime
 import org.jetbrains.skiko.SkiaLayer
 
 internal val LocalComposeScene = staticCompositionLocalOf<ComposeScene> {
@@ -87,7 +86,7 @@ internal val LocalComposeScene = staticCompositionLocalOf<ComposeScene> {
  */
 class ComposeScene internal constructor(
     coroutineContext: CoroutineContext = Dispatchers.Unconfined,
-    internal val component: PlatformComponent,
+    internal val platform: Platform,
     density: Density = Density(1f),
     private val invalidate: () -> Unit = {},
     @Deprecated("Will be removed in Compose 1.3")
@@ -110,7 +109,7 @@ class ComposeScene internal constructor(
         invalidate: () -> Unit = {}
     ) : this(
         coroutineContext,
-        DummyPlatformComponent,
+        Platform.Empty,
         density,
         invalidate
     )
@@ -187,7 +186,6 @@ class ComposeScene internal constructor(
     private val recomposer = Recomposer(coroutineContext + job + effectDispatcher)
 
     internal val pointerPositionUpdater = PointerPositionUpdater(::invalidateIfNeeded, ::sendAsMove)
-    internal val platformInputService: PlatformInput = PlatformInput(component)
 
     internal var mainOwner: SkiaBasedOwner? = null
     private var composition: Composition? = null
@@ -249,10 +247,6 @@ class ComposeScene internal constructor(
         owner.requestDraw = ::requestDraw
         owner.dispatchSnapshotChanges = snapshotChanges::add
         owner.constraints = constraints
-        owner.accessibilityController = makeAccessibilityController(
-            owner,
-            component
-        )
         invalidateIfNeeded()
         if (owner.isFocusable) {
             focusedOwner = owner
@@ -324,9 +318,7 @@ class ComposeScene internal constructor(
         composition?.dispose()
         mainOwner?.dispose()
         val mainOwner = SkiaBasedOwner(
-            platformInputService,
-            component,
-            component.windowInfo,
+            platform,
             pointerPositionUpdater,
             density,
             IntSize(constraints.maxWidth, constraints.maxHeight).toIntRect(),
@@ -418,7 +410,7 @@ class ComposeScene internal constructor(
         eventType: PointerEventType,
         position: Offset,
         scrollDelta: Offset = Offset(0f, 0f),
-        timeMillis: Long = currentMillis(),
+        timeMillis: Long = (currentNanoTime() / 1E6).toLong(),
         type: PointerType = PointerType.Mouse,
         buttons: PointerButtons? = null,
         keyboardModifiers: PointerKeyboardModifiers? = null,
@@ -530,8 +522,6 @@ class ComposeScene internal constructor(
     fun sendKeyEvent(event: ComposeKeyEvent): Boolean = postponeInvalidation {
         return focusedOwner?.sendKeyEvent(event) == true
     }
-
-    internal fun onInputMethodEvent(event: Any) = this.onPlatformInputMethodEvent(event)
 }
 
 private class DefaultPointerStateTracker {
@@ -548,8 +538,6 @@ private class DefaultPointerStateTracker {
     var keyboardModifiers = PointerKeyboardModifiers()
         private set
 }
-
-internal expect fun ComposeScene.onPlatformInputMethodEvent(event: Any)
 
 private fun pointerInputEvent(
     eventType: PointerEventType,
@@ -595,12 +583,5 @@ private fun createMoveEvent(
     buttons = sourceEvent.buttons,
     keyboardModifiers = sourceEvent.keyboardModifiers
 )
-
-internal expect fun makeAccessibilityController(
-    skiaBasedOwner: SkiaBasedOwner,
-    component: PlatformComponent
-): AccessibilityController
-
-internal expect fun currentMillis(): Long
 
 internal expect fun createSkiaLayer(): SkiaLayer

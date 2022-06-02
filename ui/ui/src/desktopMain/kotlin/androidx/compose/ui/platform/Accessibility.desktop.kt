@@ -18,6 +18,7 @@ package androidx.compose.ui.platform
 
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.semantics.SemanticsNode
+import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.state.ToggleableState
@@ -31,7 +32,7 @@ import javax.accessibility.AccessibleState
 import kotlinx.coroutines.delay
 
 internal class AccessibilityControllerImpl(
-    val owner: SkiaBasedOwner,
+    private val owner: SemanticsOwner,
     val desktopComponent: PlatformComponent
 ) : AccessibilityController {
     private var currentNodesInvalidated = true
@@ -181,7 +182,7 @@ internal class AccessibilityControllerImpl(
     }
 
     val rootSemanticNode: SemanticsNode
-        get() = owner.semanticsOwner.rootSemanticsNode
+        get() = owner.rootSemanticsNode
 
     val rootAccessible: ComposeAccessible
         get() = currentNodes[rootSemanticNode.id]!!

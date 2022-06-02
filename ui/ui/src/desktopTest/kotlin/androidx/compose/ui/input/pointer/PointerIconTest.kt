@@ -24,8 +24,8 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.platform.DummyPlatformComponent
 import androidx.compose.ui.platform.LocalPointerIconService
+import androidx.compose.ui.platform.Platform
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.use
@@ -70,9 +70,9 @@ class PointerIconTest {
 
     @Test
     fun commitsToComponent() {
-        val component = DummyPlatformComponent
+        val component = IconPlatform()
         val surface = Surface.makeRasterN32Premul(100, 100)
-        val scene = ComposeScene(component = component)
+        val scene = ComposeScene(platform = component)
 
         try {
             scene.constraints = Constraints(maxWidth = surface.width, maxHeight = surface.height)
@@ -90,7 +90,7 @@ class PointerIconTest {
             }
 
             scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
-            assertThat(component.desiredCursor.type).isEqualTo(Cursor.TEXT_CURSOR)
+            assertThat(component._pointerIcon).isEqualTo(PointerIconDefaults.Text)
         } finally {
             scene.close()
         }
@@ -98,9 +98,9 @@ class PointerIconTest {
 
     @Test
     fun preservedIfSameEventDispatchedTwice() {
-        val component = DummyPlatformComponent
+        val component = IconPlatform()
         val surface = Surface.makeRasterN32Premul(100, 100)
-        val scene = ComposeScene(component = component)
+        val scene = ComposeScene(platform = component)
 
         try {
             scene.constraints = Constraints(maxWidth = surface.width, maxHeight = surface.height)
@@ -119,7 +119,7 @@ class PointerIconTest {
 
             scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
             scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
-            assertThat(component.desiredCursor.type).isEqualTo(Cursor.TEXT_CURSOR)
+            assertThat(component._pointerIcon).isEqualTo(PointerIconDefaults.Text)
         } finally {
             scene.close()
         }
@@ -181,5 +181,13 @@ class PointerIconTest {
 
         scene.sendPointerEvent(PointerEventType.Move, Offset(15f, 15f))
         assertThat(iconService.current).isEqualTo(PointerIconDefaults.Hand)
+    }
+
+    private class IconPlatform: Platform by Platform.Empty {
+        var _pointerIcon: PointerIcon? = null
+
+        override fun setPointerIcon(pointerIcon: PointerIcon) {
+            this._pointerIcon = pointerIcon
+        }
     }
 }

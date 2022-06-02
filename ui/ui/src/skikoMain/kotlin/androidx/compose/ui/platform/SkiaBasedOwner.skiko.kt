@@ -62,7 +62,6 @@ import androidx.compose.ui.input.pointer.TestPointerInputEventData
 import androidx.compose.ui.layout.RootMeasurePolicy
 import androidx.compose.ui.modifier.ModifierLocalManager
 import androidx.compose.ui.node.InternalCoreApi
-import androidx.compose.ui.node.InvokeOnCanvas
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeDrawScope
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
@@ -91,9 +90,7 @@ private typealias Command = () -> Unit
     InternalComposeUiApi::class
 )
 internal class SkiaBasedOwner(
-    private val platformInputService: PlatformInput,
-    private val component: PlatformComponent,
-    override val windowInfo: WindowInfo,
+    private val platform: Platform,
     private val pointerPositionUpdater: PointerPositionUpdater,
     density: Density = Density(1f, 1f),
     bounds: IntRect = IntRect.Zero,
@@ -102,13 +99,12 @@ internal class SkiaBasedOwner(
     private val onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
     private val onKeyEvent: (KeyEvent) -> Boolean = { false },
 ) : Owner, RootForTest, SkiaRootForTest, PositionCalculator {
+    override val windowInfo: WindowInfo get() = platform.windowInfo
 
-    internal fun isHovered(point: Offset): Boolean {
+    fun isHovered(point: Offset): Boolean {
         val intOffset = IntOffset(point.x.toInt(), point.y.toInt())
         return bounds.contains(intOffset)
     }
-
-    internal var accessibilityController: AccessibilityController? = null
 
     var bounds by mutableStateOf(bounds)
 
@@ -195,7 +191,7 @@ internal class SkiaBasedOwner(
         // we don't need to call root.detach() because root will be garbage collected
     }
 
-    override val textInputService = TextInputService(platformInputService)
+    override val textInputService = TextInputService(platform.textInputService)
 
     @Deprecated(
         "fontLoader is deprecated, use fontFamilyResolver",
@@ -215,14 +211,15 @@ internal class SkiaBasedOwner(
 
     override val semanticsOwner: SemanticsOwner = SemanticsOwner(root)
 
+    internal var accessibilityController = platform.accessibilityController(semanticsOwner)
+
     override val autofillTree = AutofillTree()
 
     override val autofill: Autofill? get() = null
 
     override val viewConfiguration: ViewConfiguration = DefaultViewConfiguration(density)
 
-    override fun sendKeyEvent(keyEvent: KeyEvent): Boolean =
-        sendKeyEvent(platformInputService, keyInputModifier, keyEvent)
+    override fun sendKeyEvent(keyEvent: KeyEvent): Boolean = keyInputModifier.processKeyInput(keyEvent)
 
     override var showLayoutBounds = false
 
@@ -370,7 +367,7 @@ internal class SkiaBasedOwner(
             }
         ).also {
             if (it.dispatchedToAPointerInputModifier) {
-                commitPointerIcon(component)
+                commitPointerIcon()
             }
         }
     }
@@ -418,31 +415,12 @@ internal class SkiaBasedOwner(
         requestLayout?.invoke()
     }
 
-    override val pointerIconService: PointerIconService =
-        object : PointerIconService {
-            override var current: PointerIcon
-                get() = getPointerIcon(component)
-                set(value) { setPointerIcon(component, value) }
-        }
+    private fun commitPointerIcon() {
+        platform.setPointerIcon(pointerIconService.current)
+        pointerIconService.current = PointerIconDefaults.Default
+    }
+
+    override val pointerIconService = object : PointerIconService {
+        override var current: PointerIcon = PointerIconDefaults.Default
+    }
 }
-
-internal expect fun sendKeyEvent(
-    platformInputService: PlatformInput,
-    keyInputModifier: KeyInputModifier,
-    keyEvent: KeyEvent
-): Boolean
-
-internal expect fun commitPointerIcon(
-    containerCursor: PlatformComponentWithCursor?
-)
-
-@OptIn(ExperimentalComposeUiApi::class)
-internal expect fun setPointerIcon(
-    containerCursor: PlatformComponentWithCursor?,
-    icon: PointerIcon?
-)
-
-@OptIn(ExperimentalComposeUiApi::class)
-internal expect fun getPointerIcon(
-    containerCursor: PlatformComponentWithCursor?
-): PointerIcon
