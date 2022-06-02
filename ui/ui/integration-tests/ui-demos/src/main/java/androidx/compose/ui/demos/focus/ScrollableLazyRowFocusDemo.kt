@@ -44,7 +44,7 @@ fun ScrollableLazyRowFocusDemo() {
     val state = rememberLazyListState()
     var reverseLayout by remember { mutableStateOf(false) }
     Column {
-        Text("Use the DPad to move focus in the Row")
+        Text("Use the DPad or Tab keys to move focus in the Row")
         LazyRow(state = state, reverseLayout = reverseLayout) {
             items(count = 10) { FocusableBox(it.toString()) }
             items(count = 10) { NonFocusableBox((it + 10).toString()) }
