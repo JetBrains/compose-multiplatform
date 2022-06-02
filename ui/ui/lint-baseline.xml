@@ -121,24 +121,6 @@
     <issue
         id="BanInlineOptIn"
         message="Inline functions cannot opt into experimental APIs."
-        errorLine1="private inline fun &lt;T> MutableVector&lt;T>.forEachItemAfter(item: T, action: (T) -> Unit) {"
-        errorLine2="                                        ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/focus/OneDimensionalFocusSearch.kt"/>
-    </issue>
-
-    <issue
-        id="BanInlineOptIn"
-        message="Inline functions cannot opt into experimental APIs."
-        errorLine1="private inline fun &lt;T> MutableVector&lt;T>.forEachItemBefore(item: T, action: (T) -> Unit) {"
-        errorLine2="                                        ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/ui/focus/OneDimensionalFocusSearch.kt"/>
-    </issue>
-
-    <issue
-        id="BanInlineOptIn"
-        message="Inline functions cannot opt into experimental APIs."
         errorLine1="internal inline fun &lt;T, R> List&lt;T>.fastZipWithNext(transform: (T, T) -> R): List&lt;R> {"
         errorLine2="                                   ~~~~~~~~~~~~~~~">
         <location
