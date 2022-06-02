@@ -287,6 +287,7 @@ internal class RecomposeScopeImpl(
                             if (remove) {
                                 composition.removeObservation(instance, this)
                                 (instance as? DerivedState<*>)?.let {
+                                    composition.removeDerivedStateObservation(it)
                                     trackedDependencies?.let { dependencies ->
                                         dependencies.remove(it)
                                         if (dependencies.size == 0) {
