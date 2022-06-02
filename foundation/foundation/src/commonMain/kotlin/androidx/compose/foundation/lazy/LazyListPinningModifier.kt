@@ -19,32 +19,26 @@ package androidx.compose.foundation.lazy
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.layout.ModifierLocalPinnableParent
 import androidx.compose.foundation.lazy.layout.PinnableParent
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.modifier.ProvidableModifierLocal
-import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * This is a temporary placeholder implementation of pinning until we implement b/195049010.
  */
+@Suppress("ComposableModifierFactory")
+@Composable
 internal fun Modifier.lazyListPinningModifier(
     state: LazyListState,
     beyondBoundsInfo: LazyListBeyondBoundsInfo
-) = composed(
-    "androidx.compose.foundation.lazy",
-    state,
-    beyondBoundsInfo,
-    debugInspectorInfo {
-        name = "lazyListPinningModifier"
-        properties["state"] = state
-        properties["beyondBoundsInfo"] = beyondBoundsInfo
+): Modifier {
+    return this then remember(state, beyondBoundsInfo) {
+        LazyListPinningModifier(state, beyondBoundsInfo)
     }
-) {
-    remember(state, beyondBoundsInfo) { LazyListPinningModifier(state, beyondBoundsInfo) }
 }
 
 @OptIn(ExperimentalFoundationApi::class)

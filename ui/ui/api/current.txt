@@ -113,10 +113,6 @@ package androidx.compose.ui {
 
   public final class ComposedModifierKt {
     method public static androidx.compose.ui.Modifier composed(androidx.compose.ui.Modifier, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> inspectorInfo, kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier,? extends androidx.compose.ui.Modifier> factory);
-    method public static androidx.compose.ui.Modifier composed(androidx.compose.ui.Modifier, String fullyQualifiedName, Object? key1, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> inspectorInfo, kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier,? extends androidx.compose.ui.Modifier> factory);
-    method public static androidx.compose.ui.Modifier composed(androidx.compose.ui.Modifier, String fullyQualifiedName, Object? key1, Object? key2, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> inspectorInfo, kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier,? extends androidx.compose.ui.Modifier> factory);
-    method public static androidx.compose.ui.Modifier composed(androidx.compose.ui.Modifier, String fullyQualifiedName, Object? key1, Object? key2, Object? key3, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> inspectorInfo, kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier,? extends androidx.compose.ui.Modifier> factory);
-    method public static androidx.compose.ui.Modifier composed(androidx.compose.ui.Modifier, String fullyQualifiedName, Object![]? keys, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> inspectorInfo, kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier,? extends androidx.compose.ui.Modifier> factory);
     method public static androidx.compose.ui.Modifier materialize(androidx.compose.runtime.Composer, androidx.compose.ui.Modifier modifier);
   }
 
