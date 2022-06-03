@@ -20,6 +20,7 @@ import android.content.Context
 import android.graphics.Typeface
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
@@ -130,7 +131,8 @@ fun AsyncFontFamilyDemo() {
         Spacer(Modifier.height(16.dp))
         Text(
             "(Normal, Normal) text with async loading with fallback (2000ms)",
-            fontFamily = fontFamily
+            fontFamily = fontFamily,
+            modifier = Modifier.fillMaxWidth().height(100.dp)
         )
         Text(
             "(W200, Normal) text async loading, same FontFamily (500ms)",
