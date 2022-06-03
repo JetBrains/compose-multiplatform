@@ -18,6 +18,7 @@ downloadLinuxSDK() {
     clone ../prebuilts/fullsdk-linux/platforms/android-32 https://android.googlesource.com/platform/prebuilts/fullsdk/platforms/android-32 master
     clone ../prebuilts/fullsdk-linux/sources/android-32 https://android.googlesource.com/platform/prebuilts/fullsdk/sources/android-32 master
     clone ../prebuilts/fullsdk-linux/ndk https://android.googlesource.com/toolchain/prebuilts/ndk/r23 master
+    ln -s "$PWD/../prebuilts/fullsdk-linux/ndk" ../prebuilts/fullsdk-linux/ndk-bundle # prepare to update androidx submodule
     clone ../prebuilts/fullsdk-linux/build-tools/30.0.3 https://android.googlesource.com/platform/prebuilts/fullsdk-linux/build-tools/30.0.3 master
     clone ../prebuilts/fullsdk-linux/platform-tools https://android.googlesource.com/platform/prebuilts/fullsdk-linux/platform-tools master
     clone ../prebuilts/fullsdk-linux/tools https://android.googlesource.com/platform/prebuilts/fullsdk-linux/tools master
@@ -29,6 +30,7 @@ downloadMacOsSDK() {
     clone ../prebuilts/fullsdk-darwin/platforms/android-32 https://android.googlesource.com/platform/prebuilts/fullsdk/platforms/android-32 master
     clone ../prebuilts/fullsdk-darwin/sources/android-32 https://android.googlesource.com/platform/prebuilts/fullsdk/sources/android-32 master
     clone ../prebuilts/fullsdk-darwin/ndk https://android.googlesource.com/toolchain/prebuilts/ndk-darwin/r23 master
+    ln -s "$PWD/../prebuilts/fullsdk-darwin/ndk" ../prebuilts/fullsdk-darwin/ndk-bundle # prepare to update androidx submodule
     clone ../prebuilts/fullsdk-darwin/build-tools/30.0.3 https://android.googlesource.com/platform/prebuilts/fullsdk-darwin/build-tools/30.0.3 master
     clone ../prebuilts/fullsdk-darwin/platform-tools https://android.googlesource.com/platform/prebuilts/fullsdk-darwin/platform-tools master
     clone ../prebuilts/fullsdk-darwin/tools https://android.googlesource.com/platform/prebuilts/fullsdk-darwin/tools master
