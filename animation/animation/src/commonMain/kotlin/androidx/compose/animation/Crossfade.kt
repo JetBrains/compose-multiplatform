@@ -42,7 +42,25 @@ import androidx.compose.ui.util.fastForEach
  * the [content] called with the new key will be faded in.
  * @param modifier Modifier to be applied to the animation container.
  * @param animationSpec the [AnimationSpec] to configure the animation.
+ * @param label An optional label to differentiate from other animations in Android Studio.
  */
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun <T> Crossfade(
+    targetState: T,
+    modifier: Modifier = Modifier,
+    animationSpec: FiniteAnimationSpec<Float> = tween(),
+    label: String = "Crossfade",
+    content: @Composable (T) -> Unit
+) {
+    val transition = updateTransition(targetState, label)
+    transition.Crossfade(modifier, animationSpec, content = content)
+}
+
+@Deprecated(
+    "Crossfade API now has a new label parameter added.",
+    level = DeprecationLevel.HIDDEN
+)
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun <T> Crossfade(

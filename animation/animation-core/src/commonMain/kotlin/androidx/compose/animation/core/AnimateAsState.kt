@@ -54,6 +54,7 @@ private val defaultAnimation = spring<Float>()
  *                      will be used by default.
  * @param visibilityThreshold An optional threshold for deciding when the animation value is
  *                            considered close enough to the targetValue.
+ * @param label An optional label to differentiate from other animations in Android Studio.
  * @param finishedListener An optional end listener to get notified when the animation is finished.
  * @return A [State] object, the value of which is updated by animation.
  */
@@ -62,6 +63,7 @@ fun animateFloatAsState(
     targetValue: Float,
     animationSpec: AnimationSpec<Float> = defaultAnimation,
     visibilityThreshold: Float = 0.01f,
+    label: String = "FloatAnimation",
     finishedListener: ((Float) -> Unit)? = null
 ): State<Float> {
     val resolvedAnimSpec =
@@ -75,6 +77,7 @@ fun animateFloatAsState(
         Float.VectorConverter,
         resolvedAnimSpec,
         visibilityThreshold,
+        label,
         finishedListener
     )
 }
@@ -97,6 +100,7 @@ fun animateFloatAsState(
  * @param targetValue Target value of the animation
  * @param animationSpec The animation that will be used to change the value through time. Physics
  *                    animation will be used by default.
+ * @param label An optional label to differentiate from other animations in Android Studio.
  * @param finishedListener An optional end listener to get notified when the animation is finished.
  * @return A [State] object, the value of which is updated by animation.
  */
@@ -104,12 +108,14 @@ fun animateFloatAsState(
 fun animateDpAsState(
     targetValue: Dp,
     animationSpec: AnimationSpec<Dp> = dpDefaultSpring,
+    label: String = "DpAnimation",
     finishedListener: ((Dp) -> Unit)? = null
 ): State<Dp> {
     return animateValueAsState(
         targetValue,
         Dp.VectorConverter,
         animationSpec,
+        label = label,
         finishedListener = finishedListener
     )
 }
@@ -135,6 +141,7 @@ private val dpDefaultSpring = spring<Dp>(visibilityThreshold = Dp.VisibilityThre
  * @param targetValue Target value of the animation
  * @param animationSpec The animation that will be used to change the value through time. Physics
  *                    animation will be used by default.
+ * @param label An optional label to differentiate from other animations in Android Studio.
  * @param finishedListener An optional end listener to get notified when the animation is finished.
  * @return A [State] object, the value of which is updated by animation.
  */
@@ -142,12 +149,14 @@ private val dpDefaultSpring = spring<Dp>(visibilityThreshold = Dp.VisibilityThre
 fun animateSizeAsState(
     targetValue: Size,
     animationSpec: AnimationSpec<Size> = sizeDefaultSpring,
+    label: String = "SizeAnimation",
     finishedListener: ((Size) -> Unit)? = null
 ): State<Size> {
     return animateValueAsState(
         targetValue,
         Size.VectorConverter,
         animationSpec,
+        label = label,
         finishedListener = finishedListener
     )
 }
@@ -172,6 +181,7 @@ private val sizeDefaultSpring = spring(visibilityThreshold = Size.VisibilityThre
  * @param targetValue Target value of the animation
  * @param animationSpec The animation that will be used to change the value through time. Physics
  *                    animation will be used by default.
+ * @param label An optional label to differentiate from other animations in Android Studio.
  * @param finishedListener An optional end listener to get notified when the animation is finished.
  * @return A [State] object, the value of which is updated by animation.
  */
@@ -179,10 +189,15 @@ private val sizeDefaultSpring = spring(visibilityThreshold = Size.VisibilityThre
 fun animateOffsetAsState(
     targetValue: Offset,
     animationSpec: AnimationSpec<Offset> = offsetDefaultSpring,
+    label: String = "OffsetAnimation",
     finishedListener: ((Offset) -> Unit)? = null
 ): State<Offset> {
     return animateValueAsState(
-        targetValue, Offset.VectorConverter, animationSpec, finishedListener = finishedListener
+        targetValue,
+        Offset.VectorConverter,
+        animationSpec,
+        label = label,
+        finishedListener = finishedListener
     )
 }
 
@@ -207,6 +222,7 @@ private val offsetDefaultSpring = spring(visibilityThreshold = Offset.Visibility
  * @param targetValue Target value of the animation
  * @param animationSpec The animation that will be used to change the value through time. Physics
  *                    animation will be used by default.
+ * @param label An optional label to differentiate from other animations in Android Studio.
  * @param finishedListener An optional end listener to get notified when the animation is finished.
  * @return A [State] object, the value of which is updated by animation.
  */
@@ -214,10 +230,15 @@ private val offsetDefaultSpring = spring(visibilityThreshold = Offset.Visibility
 fun animateRectAsState(
     targetValue: Rect,
     animationSpec: AnimationSpec<Rect> = rectDefaultSpring,
+    label: String = "RectAnimation",
     finishedListener: ((Rect) -> Unit)? = null
 ): State<Rect> {
     return animateValueAsState(
-        targetValue, Rect.VectorConverter, animationSpec, finishedListener = finishedListener
+        targetValue,
+        Rect.VectorConverter,
+        animationSpec,
+        label = label,
+        finishedListener = finishedListener
     )
 }
 
@@ -239,6 +260,7 @@ private val rectDefaultSpring = spring(visibilityThreshold = Rect.VisibilityThre
  * @param targetValue Target value of the animation
  * @param animationSpec The animation that will be used to change the value through time. Physics
  *                    animation will be used by default.
+ * @param label An optional label to differentiate from other animations in Android Studio.
  * @param finishedListener An optional end listener to get notified when the animation is finished.
  * @return A [State] object, the value of which is updated by animation.
  */
@@ -246,10 +268,15 @@ private val rectDefaultSpring = spring(visibilityThreshold = Rect.VisibilityThre
 fun animateIntAsState(
     targetValue: Int,
     animationSpec: AnimationSpec<Int> = intDefaultSpring,
+    label: String = "IntAnimation",
     finishedListener: ((Int) -> Unit)? = null
 ): State<Int> {
     return animateValueAsState(
-        targetValue, Int.VectorConverter, animationSpec, finishedListener = finishedListener
+        targetValue,
+        Int.VectorConverter,
+        animationSpec,
+        label = label,
+        finishedListener = finishedListener
     )
 }
 
@@ -273,6 +300,7 @@ private val intDefaultSpring = spring(visibilityThreshold = Int.VisibilityThresh
  * @param targetValue Target value of the animation
  * @param animationSpec The animation that will be used to change the value through time. Physics
  *                    animation will be used by default.
+ * @param label An optional label to differentiate from other animations in Android Studio.
  * @param finishedListener An optional end listener to get notified when the animation is finished.
  * @return A [State] object, the value of which is updated by animation.
  */
@@ -280,10 +308,15 @@ private val intDefaultSpring = spring(visibilityThreshold = Int.VisibilityThresh
 fun animateIntOffsetAsState(
     targetValue: IntOffset,
     animationSpec: AnimationSpec<IntOffset> = intOffsetDefaultSpring,
+    label: String = "IntOffsetAnimation",
     finishedListener: ((IntOffset) -> Unit)? = null
 ): State<IntOffset> {
     return animateValueAsState(
-        targetValue, IntOffset.VectorConverter, animationSpec, finishedListener = finishedListener
+        targetValue,
+        IntOffset.VectorConverter,
+        animationSpec,
+        label = label,
+        finishedListener = finishedListener
     )
 }
 
@@ -305,6 +338,7 @@ private val intOffsetDefaultSpring = spring(visibilityThreshold = IntOffset.Visi
  * @param targetValue Target value of the animation
  * @param animationSpec The animation that will be used to change the value through time. Physics
  *                    animation will be used by default.
+ * @param label An optional label to differentiate from other animations in Android Studio.
  * @param finishedListener An optional end listener to get notified when the animation is finished.
  * @return A [State] object, the value of which is updated by animation.
  */
@@ -312,10 +346,15 @@ private val intOffsetDefaultSpring = spring(visibilityThreshold = IntOffset.Visi
 fun animateIntSizeAsState(
     targetValue: IntSize,
     animationSpec: AnimationSpec<IntSize> = intSizeDefaultSpring,
+    label: String = "IntSizeAnimation",
     finishedListener: ((IntSize) -> Unit)? = null
 ): State<IntSize> {
     return animateValueAsState(
-        targetValue, IntSize.VectorConverter, animationSpec, finishedListener = finishedListener
+        targetValue,
+        IntSize.VectorConverter,
+        animationSpec,
+        label = label,
+        finishedListener = finishedListener
     )
 }
 
@@ -343,6 +382,7 @@ private val intSizeDefaultSpring = spring(visibilityThreshold = IntSize.Visibili
  *                    animation will be used by default.
  * @param visibilityThreshold An optional threshold to define when the animation value can be
  *                            considered close enough to the targetValue to end the animation.
+ * @param label An optional label to differentiate from other animations in Android Studio.
  * @param finishedListener An optional end listener to get notified when the animation is finished.
  * @return A [State] object, the value of which is updated by animation.
  */
@@ -350,17 +390,25 @@ private val intSizeDefaultSpring = spring(visibilityThreshold = IntSize.Visibili
 fun <T, V : AnimationVector> animateValueAsState(
     targetValue: T,
     typeConverter: TwoWayConverter<T, V>,
-    @Suppress("UNINITIALIZED_PARAMETER_WARNING") // b/235315629
-    animationSpec: AnimationSpec<T> = remember {
-        spring(visibilityThreshold = visibilityThreshold)
-    },
+    animationSpec: AnimationSpec<T> = remember { spring() },
     visibilityThreshold: T? = null,
+    label: String = "ValueAnimation",
     finishedListener: ((T) -> Unit)? = null
 ): State<T> {
 
-    val animatable = remember { Animatable(targetValue, typeConverter) }
+    val animatable = remember { Animatable(targetValue, typeConverter, visibilityThreshold, label) }
     val listener by rememberUpdatedState(finishedListener)
-    val animSpec by rememberUpdatedState(animationSpec)
+    val animSpec: AnimationSpec<T> by rememberUpdatedState(
+        animationSpec.run {
+            if (visibilityThreshold != null && this is SpringSpec &&
+                this.visibilityThreshold != visibilityThreshold
+            ) {
+                spring(dampingRatio, stiffness, visibilityThreshold)
+            } else {
+                this
+            }
+        }
+    )
     val channel = remember { Channel<T>(Channel.CONFLATED) }
     SideEffect {
         channel.trySend(targetValue)
@@ -383,3 +431,151 @@ fun <T, V : AnimationVector> animateValueAsState(
     }
     return animatable.asState()
 }
+
+@Deprecated(
+    "animate*AsState APIs now have a new label parameter added.",
+    level = DeprecationLevel.HIDDEN
+)
+@Composable
+fun animateFloatAsState(
+    targetValue: Float,
+    animationSpec: AnimationSpec<Float> = defaultAnimation,
+    visibilityThreshold: Float = 0.01f,
+    finishedListener: ((Float) -> Unit)? = null
+): State<Float> = animateFloatAsState(
+        targetValue,
+        animationSpec,
+        visibilityThreshold,
+        finishedListener = finishedListener
+    )
+
+@Deprecated(
+    "animate*AsState APIs now have a new label parameter added.",
+    level = DeprecationLevel.HIDDEN
+)
+@Composable
+fun animateDpAsState(
+    targetValue: Dp,
+    animationSpec: AnimationSpec<Dp> = dpDefaultSpring,
+    finishedListener: ((Dp) -> Unit)? = null
+): State<Dp> {
+    return animateValueAsState(
+        targetValue,
+        Dp.VectorConverter,
+        animationSpec,
+        finishedListener = finishedListener
+    )
+}
+
+@Deprecated(
+    "animate*AsState APIs now have a new label parameter added.",
+    level = DeprecationLevel.HIDDEN
+)
+@Composable
+fun animateSizeAsState(
+    targetValue: Size,
+    animationSpec: AnimationSpec<Size> = sizeDefaultSpring,
+    finishedListener: ((Size) -> Unit)? = null
+): State<Size> {
+    return animateValueAsState(
+        targetValue,
+        Size.VectorConverter,
+        animationSpec,
+        finishedListener = finishedListener
+    )
+}
+
+@Deprecated(
+    "animate*AsState APIs now have a new label parameter added.",
+    level = DeprecationLevel.HIDDEN
+)
+@Composable
+fun animateOffsetAsState(
+    targetValue: Offset,
+    animationSpec: AnimationSpec<Offset> = offsetDefaultSpring,
+    finishedListener: ((Offset) -> Unit)? = null
+): State<Offset> {
+    return animateValueAsState(
+        targetValue, Offset.VectorConverter, animationSpec, finishedListener = finishedListener
+    )
+}
+
+@Deprecated(
+    "animate*AsState APIs now have a new label parameter added.",
+    level = DeprecationLevel.HIDDEN
+)
+@Composable
+fun animateRectAsState(
+    targetValue: Rect,
+    animationSpec: AnimationSpec<Rect> = rectDefaultSpring,
+    finishedListener: ((Rect) -> Unit)? = null
+): State<Rect> {
+    return animateValueAsState(
+        targetValue, Rect.VectorConverter, animationSpec, finishedListener = finishedListener
+    )
+}
+
+@Deprecated(
+    "animate*AsState APIs now have a new label parameter added.",
+    level = DeprecationLevel.HIDDEN
+)
+@Composable
+fun animateIntAsState(
+    targetValue: Int,
+    animationSpec: AnimationSpec<Int> = intDefaultSpring,
+    finishedListener: ((Int) -> Unit)? = null
+): State<Int> {
+    return animateValueAsState(
+        targetValue, Int.VectorConverter, animationSpec, finishedListener = finishedListener
+    )
+}
+
+@Deprecated(
+    "animate*AsState APIs now have a new label parameter added.",
+    level = DeprecationLevel.HIDDEN
+)
+@Composable
+fun animateIntOffsetAsState(
+    targetValue: IntOffset,
+    animationSpec: AnimationSpec<IntOffset> = intOffsetDefaultSpring,
+    finishedListener: ((IntOffset) -> Unit)? = null
+): State<IntOffset> {
+    return animateValueAsState(
+        targetValue, IntOffset.VectorConverter, animationSpec, finishedListener = finishedListener
+    )
+}
+
+@Deprecated(
+    "animate*AsState APIs now have a new label parameter added.",
+    level = DeprecationLevel.HIDDEN
+)
+@Composable
+fun animateIntSizeAsState(
+    targetValue: IntSize,
+    animationSpec: AnimationSpec<IntSize> = intSizeDefaultSpring,
+    finishedListener: ((IntSize) -> Unit)? = null
+): State<IntSize> {
+    return animateValueAsState(
+        targetValue, IntSize.VectorConverter, animationSpec, finishedListener = finishedListener
+    )
+}
+
+@Deprecated(
+    "animate*AsState APIs now have a new label parameter added.",
+    level = DeprecationLevel.HIDDEN
+)
+@Composable
+fun <T, V : AnimationVector> animateValueAsState(
+    targetValue: T,
+    typeConverter: TwoWayConverter<T, V>,
+    animationSpec: AnimationSpec<T> = remember { spring() },
+    visibilityThreshold: T? = null,
+    finishedListener: ((T) -> Unit)? = null
+): State<T> = animateValueAsState(
+    targetValue = targetValue,
+    typeConverter = typeConverter,
+    animationSpec = animationSpec,
+    visibilityThreshold = visibilityThreshold,
+    label = "ValueAnimation",
+    finishedListener = finishedListener
+)
