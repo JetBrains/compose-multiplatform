@@ -28,6 +28,10 @@ import androidx.compose.foundation.text.selection.mouseSelectionDetector
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.neverEqualPolicy
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -306,15 +310,16 @@ internal class TextController(val state: TextState) : RememberObserver {
             // NOTE(text-perf-review): current implementation of layout means that layoutResult
             // will _never_ be the same instance. We should try and fast path case where
             // everything is the same and return same instance in that case.
+            val prevLayout = state.layoutResult
             val layoutResult = state.textDelegate.layout(
                 constraints,
                 layoutDirection,
-                state.layoutResult
+                prevLayout
             )
-            if (state.layoutResult != layoutResult) {
+            if (prevLayout != layoutResult) {
                 state.onTextLayout(layoutResult)
 
-                state.layoutResult?.let { prevLayoutResult ->
+                prevLayout?.let { prevLayoutResult ->
                     // If the input text of this CoreText has changed, notify the SelectionContainer.
                     if (prevLayoutResult.layoutInput.text != layoutResult.layoutInput.text) {
                         selectionRegistrar?.notifySelectableChange(state.selectableId)
@@ -339,7 +344,6 @@ internal class TextController(val state: TextState) : RememberObserver {
                     )
                 }
             }
-
             return layout(
                 layoutResult.size.width,
                 layoutResult.size.height,
@@ -421,6 +425,7 @@ internal class TextController(val state: TextState) : RememberObserver {
     private fun Modifier.drawTextAndSelectionBehind(): Modifier =
         this.graphicsLayer().drawBehind {
             state.layoutResult?.let {
+                state.drawScopeInvalidation
                 val selection = selectionRegistrar?.subselections?.get(state.selectableId)
 
                 if (selection != null) {
@@ -525,12 +530,20 @@ internal class TextState(
 
     /** The latest TextLayoutResult calculated in the measure block.*/
     var layoutResult: TextLayoutResult? = null
+        set(value) {
+            drawScopeInvalidation = Unit
+            field = value
+        }
 
     /** The global position calculated during the last notifyPosition callback */
     var previousGlobalPosition: Offset = Offset.Zero
 
     /** The background color of selection */
     var selectionBackgroundColor: Color = Color.Unspecified
+
+    /** Read in draw scopes to invalidate when layoutResult  */
+    var drawScopeInvalidation by mutableStateOf(Unit, neverEqualPolicy())
+        private set
 }
 
 /**
