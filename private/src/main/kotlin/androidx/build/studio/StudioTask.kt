@@ -46,6 +46,7 @@ abstract class StudioTask : DefaultTask() {
     // TODO: support -y and --update-only options? Can use @Option for this
     @TaskAction
     fun studiow() {
+        validateEnvironment()
         install()
         launch()
     }
@@ -126,6 +127,22 @@ abstract class StudioTask : DefaultTask() {
 
     private val licenseAcceptedFile: File by lazy {
         File("$studioInstallationDir/STUDIOW_LICENSE_ACCEPTED")
+    }
+
+    /**
+     * Ensure that we can launch Studio without issue.
+     */
+    private fun validateEnvironment() {
+        if (System.getenv().containsKey("SSH_CLIENT") && !System.getenv().containsKey("DISPLAY")) {
+            throw GradleException(
+                """
+                Studio must be run from a graphical session.
+
+                Could not read DISPLAY environment variable.  If you are using SSH into a remote
+                machine, consider using either ssh -X or switching to Chrome Remote Desktop.
+                """.trimIndent()
+            )
+        }
     }
 
     /**
