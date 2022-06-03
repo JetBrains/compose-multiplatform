@@ -44,7 +44,7 @@ class TrivialTracingBenchmark {
     @Test
     fun test_composable_names_present_in_trace() {
         val metrics = COMPOSABLE_NAMES.map { composableName ->
-            TraceSectionMetric("%$PACKAGE_NAME.$composableName %$FILE_NAME:% key=%")
+            TraceSectionMetric("%$PACKAGE_NAME.$composableName %$FILE_NAME:%")
         }
         benchmarkRule.measureRepeated(
             packageName = PACKAGE_NAME,
