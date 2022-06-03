@@ -16,6 +16,7 @@
 
 package androidx.build.docs
 
+import androidx.build.enforceKtlintVersion
 import androidx.build.SupportConfig
 import androidx.build.dackka.DackkaTask
 import androidx.build.dependencies.KOTLIN_VERSION
@@ -240,6 +241,9 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
      * - stubs(project(":foo:foo-stubs")) - stubs needed for a documented library
      */
     private fun createConfigurations(project: Project) {
+        project.configurations.all {
+            project.enforceKtlintVersion(it)
+        }
         project.dependencies.components.all<SourcesVariantRule>()
         val docsConfiguration = project.configurations.create("docs") {
             it.isCanBeResolved = false

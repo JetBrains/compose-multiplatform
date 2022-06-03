@@ -15,6 +15,7 @@
  */
 package androidx.build.license
 
+import androidx.build.enforceKtlintVersion
 import androidx.build.getCheckoutRoot
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -117,6 +118,8 @@ fun Project.configureExternalDependencyLicenseCheck() {
                         project.objects.named<Usage>(Usage.JAVA_RUNTIME)
                     )
                 }
+                // workaround for b/234884534
+                project.enforceKtlintVersion(checkerConfig)
 
                 project
                     .configurations
