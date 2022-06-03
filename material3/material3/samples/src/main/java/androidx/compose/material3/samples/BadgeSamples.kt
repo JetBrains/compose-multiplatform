@@ -26,6 +26,9 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 
 @Sampled
 @Composable
@@ -33,7 +36,18 @@ fun NavigationBarItemWithBadge() {
     NavigationBar {
         NavigationBarItem(
             icon = {
-                BadgedBox(badge = { Badge { Text("8") } }) {
+                BadgedBox(
+                    badge = {
+                        Badge {
+                            val badgeNumber = "8"
+                            Text(
+                                badgeNumber,
+                                modifier = Modifier.semantics {
+                                    contentDescription = "$badgeNumber new notifications"
+                                }
+                            )
+                        }
+                    }) {
                     Icon(
                         Icons.Filled.Star,
                         contentDescription = "Favorite"
