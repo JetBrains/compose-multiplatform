@@ -17,7 +17,7 @@ clone() {
 downloadLinuxSDK() {
     clone ../prebuilts/fullsdk-linux/platforms/android-32 https://android.googlesource.com/platform/prebuilts/fullsdk/platforms/android-32 master
     clone ../prebuilts/fullsdk-linux/sources/android-32 https://android.googlesource.com/platform/prebuilts/fullsdk/sources/android-32 master
-    clone ../prebuilts/fullsdk-linux/ndk https://android.googlesource.com/toolchain/prebuilts/ndk/r23 master
+    clone ../prebuilts/fullsdk-linux/ndk-bundle https://android.googlesource.com/toolchain/prebuilts/ndk/r23 master
     clone ../prebuilts/fullsdk-linux/build-tools/30.0.3 https://android.googlesource.com/platform/prebuilts/fullsdk-linux/build-tools/30.0.3 master
     clone ../prebuilts/fullsdk-linux/platform-tools https://android.googlesource.com/platform/prebuilts/fullsdk-linux/platform-tools master
     clone ../prebuilts/fullsdk-linux/tools https://android.googlesource.com/platform/prebuilts/fullsdk-linux/tools master
