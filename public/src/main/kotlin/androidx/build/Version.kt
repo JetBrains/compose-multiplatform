@@ -68,7 +68,9 @@ data class Version(
     )
 
     override fun toString(): String {
-        return "$major.$minor.$patch${extra ?: ""}"
+        return if (extra != null) {
+            "$major.$minor.$patch$extra"
+        } else "$major.$minor.$patch"
     }
 
     companion object {
