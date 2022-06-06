@@ -70,7 +70,7 @@ class AttributesTests {
             Div(attrs = {
                 classes("c1", "c2")
                 classes(listOf("c3", "c4"))
-                classes(arrayOf("c5", "c6"))
+                classes(classes = arrayOf("c5", "c6"))
             })
         }
 
