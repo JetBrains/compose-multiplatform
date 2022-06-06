@@ -207,7 +207,7 @@ package androidx.compose.foundation.gestures {
   public final class OverScrollConfigurationKt {
   }
 
-  public interface PressGestureScope extends androidx.compose.ui.unit.Density {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface PressGestureScope extends androidx.compose.ui.unit.Density {
     method public suspend Object? awaitRelease(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public suspend Object? tryAwaitRelease(kotlin.coroutines.Continuation<? super java.lang.Boolean>);
   }

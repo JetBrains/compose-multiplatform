@@ -20,6 +20,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * Create a new Canvas instance that targets its drawing commands
@@ -167,6 +168,7 @@ fun Canvas.scale(sx: Float, sy: Float = sx, pivotX: Float, pivotY: Float) {
  */
 expect val Canvas.nativeCanvas: NativeCanvas
 
+@JvmDefaultWithCompatibility
 interface Canvas {
 
     /**

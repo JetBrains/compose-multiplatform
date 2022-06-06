@@ -151,6 +151,7 @@ tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         freeCompilerArgs += [
                 "-opt-in=kotlin.Experimental",
+                "-Xjvm-default=all"
         ]
     }
 }

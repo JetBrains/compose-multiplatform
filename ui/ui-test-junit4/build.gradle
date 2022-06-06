@@ -16,6 +16,7 @@
 
 import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
@@ -156,4 +157,12 @@ androidx {
     inceptionYear = "2020"
     description = "Compose testing integration with JUnit4"
     legacyDisableKotlinStrictApiMode = true
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
 }

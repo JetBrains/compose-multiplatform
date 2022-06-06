@@ -17,6 +17,7 @@
 package androidx.compose.ui
 
 import androidx.compose.runtime.Stable
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * An ordered, immutable collection of [modifier elements][Modifier.Element] that decorate or add
@@ -56,6 +57,7 @@ import androidx.compose.runtime.Stable
  */
 @Suppress("ModifierFactoryExtensionFunction")
 @Stable
+@JvmDefaultWithCompatibility
 interface Modifier {
 
     /**
@@ -102,6 +104,7 @@ interface Modifier {
     /**
      * A single element contained within a [Modifier] chain.
      */
+    @JvmDefaultWithCompatibility
     interface Element : Modifier {
         override fun <R> foldIn(initial: R, operation: (R, Element) -> R): R =
             operation(initial, this)

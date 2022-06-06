@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * Invoke [onGloballyPositioned] with the [LayoutCoordinates] of the element when the
@@ -78,6 +79,7 @@ private class OnGloballyPositionedModifierImpl(
  * Usage example:
  * @sample androidx.compose.ui.samples.OnGloballyPositioned
  */
+@JvmDefaultWithCompatibility
 interface OnGloballyPositionedModifier : Modifier.Element {
     /**
      * Called with the final LayoutCoordinates of the Layout after measuring.

@@ -23,6 +23,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * A Modifier that can be used to provide [ModifierLocal]s that can be read by other modifiers to
@@ -30,6 +31,7 @@ import androidx.compose.ui.platform.debugInspectorInfo
  * modifier is attached to.
  */
 @Stable
+@JvmDefaultWithCompatibility
 interface ModifierLocalProvider<T> : Modifier.Element {
     /**
      * Each [ModifierLocalProvider] stores a [ModifierLocal] instance that can be used as a key

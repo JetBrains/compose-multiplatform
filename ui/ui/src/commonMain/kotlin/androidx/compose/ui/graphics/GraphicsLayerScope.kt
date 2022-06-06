@@ -17,6 +17,7 @@
 package androidx.compose.ui.graphics
 
 import androidx.compose.ui.unit.Density
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * Default camera distance for all layers
@@ -33,6 +34,7 @@ val DefaultShadowColor = Color.Black
  * ([scaleX], [scaleY]), rotation ([rotationX], [rotationY], [rotationZ]), opacity ([alpha]), shadow
  * ([shadowElevation], [shape]), and clipping ([clip], [shape]).
  */
+@JvmDefaultWithCompatibility
 interface GraphicsLayerScope : Density {
     /**
      * The horizontal scale of the drawn area. Default value is `1`.

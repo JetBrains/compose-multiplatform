@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.center
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * Simultaneously translate the [DrawScope] coordinate space by [left] and [top] as well as modify
@@ -282,6 +283,7 @@ inline fun DrawScope.withTransform(
  * @sample androidx.compose.ui.graphics.samples.DrawScopeSample
  */
 @DrawScopeMarker
+@JvmDefaultWithCompatibility
 interface DrawScope : Density {
 
     /**

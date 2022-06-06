@@ -17,11 +17,13 @@
 package androidx.compose.ui.layout
 
 import androidx.compose.ui.Modifier
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * A [Modifier.Element] that provides a [Remeasurement] object associated with the layout node
  * the modifier is applied to.
  */
+@JvmDefaultWithCompatibility
 interface RemeasurementModifier : Modifier.Element {
     /**
      * This method is executed when the modifier is attached to the layout node.

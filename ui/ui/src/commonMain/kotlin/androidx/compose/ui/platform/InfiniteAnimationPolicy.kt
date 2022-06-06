@@ -19,6 +19,7 @@ package androidx.compose.ui.platform
 import androidx.compose.runtime.withFrameNanos
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * Provides a policy that will be applied to animations that get their frame time from
@@ -31,6 +32,7 @@ import kotlin.coroutines.coroutineContext
  * By default no policy is installed, except in instrumented tests that use
  * [androidx.compose.ui.test.junit4.ComposeTestRule].
  */
+@JvmDefaultWithCompatibility
 interface InfiniteAnimationPolicy : CoroutineContext.Element {
     /**
      * Call this to apply the policy on the given suspending [block]. Execution of the block is

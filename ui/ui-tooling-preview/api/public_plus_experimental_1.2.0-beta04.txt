@@ -72,7 +72,7 @@ package androidx.compose.ui.tooling.preview {
     property public abstract kotlin.reflect.KClass<? extends androidx.compose.ui.tooling.preview.PreviewParameterProvider<?>> provider;
   }
 
-  public interface PreviewParameterProvider<T> {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface PreviewParameterProvider<T> {
     method public default int getCount();
     method public kotlin.sequences.Sequence<T> getValues();
     property public default int count;

@@ -19,6 +19,7 @@ package androidx.compose.ui.layout
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * A [modifier][Modifier.Element] that can be used to respond to relocation requests to relocate
@@ -39,6 +40,7 @@ import androidx.compose.ui.geometry.Rect
     message = "Please use BringIntoViewResponder instead.",
     level = DeprecationLevel.ERROR
 )
+@JvmDefaultWithCompatibility
 interface RelocationModifier : Modifier.Element {
     /**
      * Compute the destination given the source rectangle and current bounds.

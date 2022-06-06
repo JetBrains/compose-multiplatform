@@ -53,17 +53,17 @@ package androidx.compose.foundation.layout {
     field public static final androidx.compose.foundation.layout.Arrangement.Absolute INSTANCE;
   }
 
-  @androidx.compose.runtime.Stable public static interface Arrangement.Horizontal {
+  @androidx.compose.runtime.Stable @kotlin.jvm.JvmDefaultWithCompatibility public static interface Arrangement.Horizontal {
     method public void arrange(androidx.compose.ui.unit.Density, int totalSize, int[] sizes, androidx.compose.ui.unit.LayoutDirection layoutDirection, int[] outPositions);
     method public default float getSpacing();
     property public default float spacing;
   }
 
-  @androidx.compose.runtime.Stable public static interface Arrangement.HorizontalOrVertical extends androidx.compose.foundation.layout.Arrangement.Horizontal androidx.compose.foundation.layout.Arrangement.Vertical {
+  @androidx.compose.runtime.Stable @kotlin.jvm.JvmDefaultWithCompatibility public static interface Arrangement.HorizontalOrVertical extends androidx.compose.foundation.layout.Arrangement.Horizontal androidx.compose.foundation.layout.Arrangement.Vertical {
     property public default float spacing;
   }
 
-  @androidx.compose.runtime.Stable public static interface Arrangement.Vertical {
+  @androidx.compose.runtime.Stable @kotlin.jvm.JvmDefaultWithCompatibility public static interface Arrangement.Vertical {
     method public void arrange(androidx.compose.ui.unit.Density, int totalSize, int[] sizes, int[] outPositions);
     method public default float getSpacing();
     property public default float spacing;

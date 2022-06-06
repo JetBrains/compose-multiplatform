@@ -18,6 +18,7 @@ package androidx.compose.animation.core
 
 import androidx.compose.animation.core.AnimationConstants.DefaultDurationMillis
 import kotlin.math.min
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * [VectorizedAnimationSpec]s are stateless vector based animation specifications. They do
@@ -39,6 +40,7 @@ import kotlin.math.min
  *
  * @see Animation
  */
+@JvmDefaultWithCompatibility
 interface VectorizedAnimationSpec<V : AnimationVector> {
     /**
      * Whether or not the [VectorizedAnimationSpec] specifies an infinite animation. That is, one
@@ -157,6 +159,7 @@ internal fun <V : AnimationVector> VectorizedAnimationSpec<V>.getValueFromMillis
  * [VectorizedSnapSpec], [VectorizedSpringSpec], etc. The [VectorizedAnimationSpec] that does
  * __not__ implement this is: [InfiniteRepeatableSpec].
  */
+@JvmDefaultWithCompatibility
 interface VectorizedFiniteAnimationSpec<V : AnimationVector> : VectorizedAnimationSpec<V> {
     override val isInfinite: Boolean get() = false
 }
@@ -164,6 +167,7 @@ interface VectorizedFiniteAnimationSpec<V : AnimationVector> : VectorizedAnimati
 /**
  * Base class for [VectorizedAnimationSpec]s that are based on a fixed [durationMillis].
  */
+@JvmDefaultWithCompatibility
 interface VectorizedDurationBasedAnimationSpec<V : AnimationVector> :
     VectorizedFiniteAnimationSpec<V> {
     /**

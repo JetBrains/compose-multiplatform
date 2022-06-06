@@ -24,6 +24,7 @@ import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * The receiver scope of the touch input injection lambda from [performTouchInput].
@@ -76,6 +77,7 @@ import kotlin.math.roundToLong
  *
  * @see InjectionScope
  */
+@JvmDefaultWithCompatibility
 interface TouchInjectionScope : InjectionScope {
     /**
      * Returns the current position of the given [pointerId]. The default [pointerId] is 0. The

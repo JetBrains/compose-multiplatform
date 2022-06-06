@@ -20,6 +20,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * The receiver scope of all input injection lambdas offered in `ui-test`, such as
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.IntSize
  * [SemanticsNode][androidx.compose.ui.semantics.SemanticsNode] from the
  * [SemanticsNodeInteraction] on which the input injection method is called.
  */
+@JvmDefaultWithCompatibility
 interface InjectionScope : Density {
     /**
      * The default time between two successive events.

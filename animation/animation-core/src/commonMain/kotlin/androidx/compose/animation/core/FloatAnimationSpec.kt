@@ -17,6 +17,7 @@
 package androidx.compose.animation.core
 
 import androidx.compose.animation.core.AnimationConstants.DefaultDurationMillis
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * [FloatAnimationSpec] interface is similar to [VectorizedAnimationSpec], except it deals
@@ -32,6 +33,7 @@ import androidx.compose.animation.core.AnimationConstants.DefaultDurationMillis
  *
  * @see [VectorizedAnimationSpec]
  */
+@JvmDefaultWithCompatibility
 interface FloatAnimationSpec : AnimationSpec<Float> {
     /**
      * Calculates the value of the animation at given the playtime, with the provided start/end

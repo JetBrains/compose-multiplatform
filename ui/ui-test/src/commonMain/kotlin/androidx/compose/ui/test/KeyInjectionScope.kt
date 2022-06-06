@@ -18,6 +18,7 @@ package androidx.compose.ui.test
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.Key
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * Default duration of a key press in milliseconds (duration between key down and key up).
@@ -49,6 +50,7 @@ private const val DefaultPauseDurationBetweenKeyPresses = 50L // milliseconds
  * @see InjectionScope
  */
 @ExperimentalTestApi
+@JvmDefaultWithCompatibility
 interface KeyInjectionScope : InjectionScope {
 
     /**
