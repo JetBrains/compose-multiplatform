@@ -34,6 +34,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
+import androidx.test.screenshot.matchers.MSSIMMatcher
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -71,7 +72,7 @@ class DialogScreenshotTest {
     fun dialogWithElevation() {
         rule.setContent {
             Dialog(onDismissRequest = {}) {
-                val elevation = with(LocalDensity.current) { 16.dp.toPx() }
+                val elevation = with(LocalDensity.current) { 8.dp.toPx() }
                 Box(
                     Modifier
                         .graphicsLayer(
@@ -87,6 +88,10 @@ class DialogScreenshotTest {
 
         rule.onNode(isDialog())
             .captureToImage()
-            .assertAgainstGolden(screenshotRule, "dialogWithElevation")
+            .assertAgainstGolden(
+                screenshotRule,
+                "dialogWithElevation",
+                matcher = MSSIMMatcher(threshold = 0.999)
+            )
     }
 }
