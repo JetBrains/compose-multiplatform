@@ -96,18 +96,16 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
     fun <T : Any> observeReads(scope: T, onValueChangedForScope: (T) -> Unit, block: () -> Unit) {
         val oldMap = currentMap
         val oldPaused = isPaused
-        val applyMap = synchronized(applyMaps) { ensureMap(onValueChangedForScope) }
+        val applyMap = synchronized(applyMaps) {
+            ensureMap(onValueChangedForScope).also {
+                it.map.removeScope(scope)
+            }
+        }
         val oldScope = applyMap.currentScope
 
         applyMap.currentScope = scope
         currentMap = applyMap
         isPaused = false
-
-        synchronized(applyMaps) {
-            applyMap.map.removeValueIf {
-                it === scope
-            }
-        }
 
         Snapshot.observe(readObserver, null, block)
 
