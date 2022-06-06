@@ -55,6 +55,7 @@ Preview functionality (check your application UI without building/running it) fo
    * [components](components) - custom components of Compose Multiplatform
        * [Split Pane](components/SplitPane)
    * [experimental](experimental) - experimental components and examples
+       * [BrowserView](https://github.com/vlad-lubenskyi/compose-browser-view) - An experimental [JxBrowser](https://www.teamdev.com/jxbrowser) component for Compose Desktop
        * [cef](experimental/cef) - CEF integration in Jetpack Compose (somewhat outdated)
        * [Video Player](experimental/components/VideoPlayer)
        * [LWJGL integration](experimental/lwjgl-integration) - An example showing how to integrate Compose with [LWJGL](https://www.lwjgl.org)
