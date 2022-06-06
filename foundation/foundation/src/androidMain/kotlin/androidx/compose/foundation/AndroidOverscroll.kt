@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.gestures
+package androidx.compose.foundation
 
 import android.content.Context
 import android.os.Build
 import android.widget.EdgeEffect
 import androidx.annotation.VisibleForTesting
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.gestures.EdgeEffectCompat.distanceCompat
-import androidx.compose.foundation.gestures.EdgeEffectCompat.onAbsorbCompat
-import androidx.compose.foundation.gestures.EdgeEffectCompat.onPullDistanceCompat
+import androidx.compose.foundation.EdgeEffectCompat.distanceCompat
+import androidx.compose.foundation.EdgeEffectCompat.onAbsorbCompat
+import androidx.compose.foundation.EdgeEffectCompat.onPullDistanceCompat
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
@@ -41,76 +40,65 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Velocity
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.roundToInt
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
-internal actual fun rememberOverScrollController(): OverScrollController {
+internal actual fun rememberOverscrollEffect(): OverscrollEffect {
     val context = LocalContext.current
-    val config = LocalOverScrollConfiguration.current
+    val config = LocalOverscrollConfiguration.current
     return remember(context, config) {
         if (config != null) {
-            AndroidEdgeEffectOverScrollController(context, config)
+            AndroidEdgeEffectOverscrollEffect(context, config)
         } else {
-            NoOpOverscrollController
+            NoOpOverscrollEffect
         }
     }
 }
 
-internal actual fun Modifier.overScroll(
-    overScrollController: OverScrollController
-) = if (overScrollController === NoOpOverscrollController) {
-    this
-} else {
-    then(StretchOverScrollNonClippingLayer)
-        .then(
-            DrawOverScrollModifier(overScrollController, debugInspectorInfo {
-                name = "overScroll"
-                value = overScrollController
-            })
-        )
-}
-
-private class DrawOverScrollModifier(
-    private val overScrollController: OverScrollController,
+private class DrawOverscrollModifier(
+    private val overscrollEffect: AndroidEdgeEffectOverscrollEffect,
     inspectorInfo: InspectorInfo.() -> Unit
 ) : DrawModifier, InspectorValueInfo(inspectorInfo) {
 
     override fun ContentDrawScope.draw() {
         drawContent()
-        with(overScrollController) {
-            drawOverScroll()
+        with(overscrollEffect) {
+            drawOverscroll()
         }
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is DrawOverScrollModifier) return false
+        if (other !is DrawOverscrollModifier) return false
 
-        return overScrollController == other.overScrollController
+        return overscrollEffect == other.overscrollEffect
     }
 
     override fun hashCode(): Int {
-        return overScrollController.hashCode()
+        return overscrollEffect.hashCode()
     }
 
     override fun toString(): String {
-        return "DrawOverScrollModifier(overScrollController=$overScrollController)"
+        return "DrawOverscrollModifier(overscrollEffect=$overscrollEffect)"
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
-internal class AndroidEdgeEffectOverScrollController(
+internal class AndroidEdgeEffectOverscrollEffect(
     context: Context,
-    private val overScrollConfig: OverScrollConfiguration
-) : OverScrollController {
+    private val overscrollConfig: OverscrollConfiguration
+) : OverscrollEffect {
     private val topEffect = EdgeEffectCompat.create(context, null)
     private val bottomEffect = EdgeEffectCompat.create(context, null)
     private val leftEffect = EdgeEffectCompat.create(context, null)
@@ -126,7 +114,7 @@ internal class AndroidEdgeEffectOverScrollController(
     private val rightEffectNegation = EdgeEffectCompat.create(context, null)
 
     init {
-        allEffects.fastForEach { it.color = overScrollConfig.glowColor.toArgb() }
+        allEffects.fastForEach { it.color = overscrollConfig.glowColor.toArgb() }
     }
 
     private val redrawSignal = mutableStateOf(Unit, neverEqualPolicy())
@@ -134,28 +122,17 @@ internal class AndroidEdgeEffectOverScrollController(
     @VisibleForTesting
     internal var invalidationEnabled = true
 
-    private fun invalidateOverScroll() {
-        if (invalidationEnabled) {
-            redrawSignal.value = Unit
-        }
-    }
-
-    override fun release() {
-        if (ignoreOverscroll()) return
-        var needsInvalidation = false
-        allEffects.fastForEach {
-            it.onRelease()
-            needsInvalidation = it.isFinished || needsInvalidation
-        }
-        if (needsInvalidation) invalidateOverScroll()
-    }
+    private var scrollCycleInProgress: Boolean = false
 
     override fun consumePreScroll(
         scrollDelta: Offset,
         pointerPosition: Offset?,
         source: NestedScrollSource
     ): Offset {
-        if (ignoreOverscroll() || source != NestedScrollSource.Drag) return Offset.Zero
+        if (!scrollCycleInProgress) {
+            stopOverscrollAnimation()
+            scrollCycleInProgress = true
+        }
         val pointer = pointerPosition ?: containerSize.center
         val consumedPixelsY = when {
             scrollDelta.y == 0f -> 0f
@@ -186,38 +163,36 @@ internal class AndroidEdgeEffectOverScrollController(
             else -> 0f
         }
         val consumedOffset = Offset(consumedPixelsX, consumedPixelsY)
-        if (consumedOffset != Offset.Zero) invalidateOverScroll()
+        if (consumedOffset != Offset.Zero) invalidateOverscroll()
         return consumedOffset
     }
 
     override fun consumePostScroll(
         initialDragDelta: Offset,
-        overScrollDelta: Offset,
+        overscrollDelta: Offset,
         pointerPosition: Offset?,
         source: NestedScrollSource
     ) {
-        if (ignoreOverscroll()) return
         var needsInvalidation = false
         if (source == NestedScrollSource.Drag) {
             val pointer = pointerPosition ?: containerSize.center
-            if (overScrollDelta.x > 0) {
-                pullLeft(overScrollDelta, pointer)
-            } else if (overScrollDelta.x < 0) {
-                pullRight(overScrollDelta, pointer)
+            if (overscrollDelta.x > 0) {
+                pullLeft(overscrollDelta, pointer)
+            } else if (overscrollDelta.x < 0) {
+                pullRight(overscrollDelta, pointer)
             }
-            if (overScrollDelta.y > 0) {
-                pullTop(overScrollDelta, pointer)
-            } else if (overScrollDelta.y < 0) {
-                pullBottom(overScrollDelta, pointer)
+            if (overscrollDelta.y > 0) {
+                pullTop(overscrollDelta, pointer)
+            } else if (overscrollDelta.y < 0) {
+                pullBottom(overscrollDelta, pointer)
             }
-            needsInvalidation = overScrollDelta != Offset.Zero || needsInvalidation
+            needsInvalidation = overscrollDelta != Offset.Zero || needsInvalidation
         }
         needsInvalidation = releaseOppositeOverscroll(initialDragDelta) || needsInvalidation
-        if (needsInvalidation) invalidateOverScroll()
+        if (needsInvalidation) invalidateOverscroll()
     }
 
-    override fun consumePreFling(velocity: Velocity): Velocity {
-        if (ignoreOverscroll()) return Velocity.Zero
+    override suspend fun consumePreFling(velocity: Velocity): Velocity {
         val consumedX = if (velocity.x > 0f && leftEffect.distanceCompat != 0f) {
             leftEffect.onAbsorbCompat(velocity.x.roundToInt())
             velocity.x
@@ -237,12 +212,12 @@ internal class AndroidEdgeEffectOverScrollController(
             0f
         }
         val consumed = Velocity(consumedX, consumedY)
-        if (consumed != Velocity.Zero) invalidateOverScroll()
+        if (consumed != Velocity.Zero) invalidateOverscroll()
         return consumed
     }
 
-    override fun consumePostFling(velocity: Velocity) {
-        if (ignoreOverscroll()) return
+    override suspend fun consumePostFling(velocity: Velocity) {
+        scrollCycleInProgress = false
         if (velocity.x > 0) {
             leftEffect.onAbsorbCompat(velocity.x.roundToInt())
         } else if (velocity.x < 0) {
@@ -253,39 +228,89 @@ internal class AndroidEdgeEffectOverScrollController(
         } else if (velocity.y < 0) {
             bottomEffect.onAbsorbCompat(-velocity.y.roundToInt())
         }
-        if (velocity != Velocity.Zero) invalidateOverScroll()
+        if (velocity != Velocity.Zero) invalidateOverscroll()
+        animateToRelease()
     }
 
     private var containerSize = Size.Zero
-    private var isContentScrolls = false
 
-    override fun refreshContainerInfo(size: Size, isContentScrolls: Boolean) {
-        val differentSize = size != containerSize
-        val differentScroll = this.isContentScrolls != isContentScrolls
-        containerSize = size
-        this.isContentScrolls = isContentScrolls
-        if (differentSize) {
-            topEffect.setSize(size.width.roundToInt(), size.height.roundToInt())
-            bottomEffect.setSize(size.width.roundToInt(), size.height.roundToInt())
-            leftEffect.setSize(size.height.roundToInt(), size.width.roundToInt())
-            rightEffect.setSize(size.height.roundToInt(), size.width.roundToInt())
+    private val isEnabledState = mutableStateOf(false)
+    override var isEnabled: Boolean = false
+        get() = isEnabledState.value
+        set(value) {
+            // Use field instead of isEnabledState to avoid a state read
+            val enabledChanged = field != value
+            isEnabledState.value = value
+            field = value
 
-            topEffectNegation.setSize(size.width.roundToInt(), size.height.roundToInt())
-            bottomEffectNegation.setSize(size.width.roundToInt(), size.height.roundToInt())
-            leftEffectNegation.setSize(size.height.roundToInt(), size.width.roundToInt())
-            rightEffectNegation.setSize(size.height.roundToInt(), size.width.roundToInt())
+            if (enabledChanged) {
+                scrollCycleInProgress = false
+                animateToRelease()
+            }
         }
 
-        if (differentScroll || differentSize) {
-            invalidateOverScroll()
-            release()
+    override val isInProgress: Boolean
+        get() {
+            return allEffects.fastAny { it.distanceCompat != 0f }
+        }
+
+    private fun stopOverscrollAnimation(): Boolean {
+        var stopped = false
+        val fakeDisplacement = containerSize.center // displacement doesn't matter here
+        if (leftEffect.distanceCompat != 0f) {
+            pullLeft(Offset.Zero, fakeDisplacement)
+            stopped = true
+        }
+        if (rightEffect.distanceCompat != 0f) {
+            pullRight(Offset.Zero, fakeDisplacement)
+            stopped = true
+        }
+        if (topEffect.distanceCompat != 0f) {
+            pullTop(Offset.Zero, fakeDisplacement)
+            stopped = true
+        }
+        if (bottomEffect.distanceCompat != 0f) {
+            pullBottom(Offset.Zero, fakeDisplacement)
+            stopped = true
+        }
+        return stopped
+    }
+
+    private val onNewSize: (IntSize) -> Unit = { size ->
+        val differentSize = size.toSize() != containerSize
+        containerSize = size.toSize()
+        if (differentSize) {
+            topEffect.setSize(size.width, size.height)
+            bottomEffect.setSize(size.width, size.height)
+            leftEffect.setSize(size.height, size.width)
+            rightEffect.setSize(size.height, size.width)
+
+            topEffectNegation.setSize(size.width, size.height)
+            bottomEffectNegation.setSize(size.width, size.height)
+            leftEffectNegation.setSize(size.height, size.width)
+            rightEffectNegation.setSize(size.height, size.width)
+        }
+        if (differentSize) {
+            invalidateOverscroll()
+            animateToRelease()
         }
     }
 
-    override fun DrawScope.drawOverScroll() {
+    override val effectModifier: Modifier = Modifier
+        .then(StretchOverscrollNonClippingLayer)
+        .onSizeChanged(onNewSize)
+        .then(
+            DrawOverscrollModifier(
+                this@AndroidEdgeEffectOverscrollEffect,
+                debugInspectorInfo {
+                    name = "overscroll"
+                    value = this@AndroidEdgeEffectOverscrollEffect
+                })
+        )
+
+    fun DrawScope.drawOverscroll() {
         this.drawIntoCanvas { it ->
             redrawSignal.value // <-- value read to redraw if needed
-            if (ignoreOverscroll()) return
             val canvas = it.nativeCanvas
             var needsInvalidate = false
             // each side workflow:
@@ -324,7 +349,7 @@ internal class AndroidEdgeEffectOverScrollController(
                 needsInvalidate = drawBottom(bottomEffect, canvas) || needsInvalidate
                 bottomEffectNegation.onPullDistanceCompat(bottomEffect.distanceCompat, 0f)
             }
-            if (needsInvalidate) invalidateOverScroll()
+            if (needsInvalidate) invalidateOverscroll()
         }
     }
 
@@ -333,7 +358,7 @@ internal class AndroidEdgeEffectOverScrollController(
         canvas.rotate(270f)
         canvas.translate(
             -containerSize.height,
-            overScrollConfig.drawPadding.calculateLeftPadding(layoutDirection).toPx()
+            overscrollConfig.drawPadding.calculateLeftPadding(layoutDirection).toPx()
         )
         val needsInvalidate = left.draw(canvas)
         canvas.restoreToCount(restore)
@@ -342,7 +367,7 @@ internal class AndroidEdgeEffectOverScrollController(
 
     private fun DrawScope.drawTop(top: EdgeEffect, canvas: NativeCanvas): Boolean {
         val restore = canvas.save()
-        canvas.translate(0f, overScrollConfig.drawPadding.calculateTopPadding().toPx())
+        canvas.translate(0f, overscrollConfig.drawPadding.calculateTopPadding().toPx())
         val needsInvalidate = top.draw(canvas)
         canvas.restoreToCount(restore)
         return needsInvalidate
@@ -351,7 +376,7 @@ internal class AndroidEdgeEffectOverScrollController(
     private fun DrawScope.drawRight(right: EdgeEffect, canvas: NativeCanvas): Boolean {
         val restore = canvas.save()
         val width = containerSize.width.roundToInt()
-        val rightPadding = overScrollConfig.drawPadding.calculateRightPadding(layoutDirection)
+        val rightPadding = overscrollConfig.drawPadding.calculateRightPadding(layoutDirection)
         canvas.rotate(90f)
         canvas.translate(0f, -width.toFloat() + rightPadding.toPx())
         val needsInvalidate = right.draw(canvas)
@@ -362,33 +387,27 @@ internal class AndroidEdgeEffectOverScrollController(
     private fun DrawScope.drawBottom(bottom: EdgeEffect, canvas: NativeCanvas): Boolean {
         val restore = canvas.save()
         canvas.rotate(180f)
-        val bottomPadding = overScrollConfig.drawPadding.calculateBottomPadding().toPx()
+        val bottomPadding = overscrollConfig.drawPadding.calculateBottomPadding().toPx()
         canvas.translate(-containerSize.width, -containerSize.height + bottomPadding)
         val needsInvalidate = bottom.draw(canvas)
         canvas.restoreToCount(restore)
         return needsInvalidate
     }
 
-    override fun stopOverscrollAnimation(): Boolean {
-        var stopped = false
-        val fakeDisplacement = containerSize.center // displacement doesn't matter here
-        if (leftEffect.distanceCompat != 0f) {
-            pullLeft(Offset.Zero, fakeDisplacement)
-            stopped = true
+    private fun invalidateOverscroll() {
+        if (invalidationEnabled) {
+            redrawSignal.value = Unit
         }
-        if (rightEffect.distanceCompat != 0f) {
-            pullRight(Offset.Zero, fakeDisplacement)
-            stopped = true
+    }
+
+    // animate the edge effects to 0 (no overscroll). Usually needed when the finger is up.
+    private fun animateToRelease() {
+        var needsInvalidation = false
+        allEffects.fastForEach {
+            it.onRelease()
+            needsInvalidation = it.isFinished || needsInvalidation
         }
-        if (topEffect.distanceCompat != 0f) {
-            pullTop(Offset.Zero, fakeDisplacement)
-            stopped = true
-        }
-        if (bottomEffect.distanceCompat != 0f) {
-            pullBottom(Offset.Zero, fakeDisplacement)
-            stopped = true
-        }
-        return stopped
+        if (needsInvalidation) invalidateOverscroll()
     }
 
     private fun releaseOppositeOverscroll(delta: Offset): Boolean {
@@ -421,7 +440,10 @@ internal class AndroidEdgeEffectOverScrollController(
     private fun pullBottom(scroll: Offset, displacement: Offset): Float {
         val displacementX: Float = displacement.x / containerSize.width
         val pullY = scroll.y / containerSize.height
-        return -bottomEffect.onPullDistanceCompat(-pullY, 1 - displacementX) * containerSize.height
+        return -bottomEffect.onPullDistanceCompat(
+            -pullY,
+            1 - displacementX
+        ) * containerSize.height
     }
 
     private fun pullLeft(scroll: Offset, displacement: Offset): Float {
@@ -435,14 +457,10 @@ internal class AndroidEdgeEffectOverScrollController(
         val pullX = scroll.x / containerSize.width
         return -rightEffect.onPullDistanceCompat(-pullX, displacementY) * containerSize.width
     }
-
-    private fun ignoreOverscroll(): Boolean {
-        return !overScrollConfig.forceShowAlways && !isContentScrolls
-    }
 }
 
-private val NoOpOverscrollController = object : OverScrollController {
-    override fun release() {}
+@OptIn(ExperimentalFoundationApi::class)
+private val NoOpOverscrollEffect = object : OverscrollEffect {
 
     override fun consumePreScroll(
         scrollDelta: Offset,
@@ -452,24 +470,24 @@ private val NoOpOverscrollController = object : OverScrollController {
 
     override fun consumePostScroll(
         initialDragDelta: Offset,
-        overScrollDelta: Offset,
+        overscrollDelta: Offset,
         pointerPosition: Offset?,
         source: NestedScrollSource
     ) {
     }
 
-    override fun consumePreFling(velocity: Velocity): Velocity = Velocity.Zero
+    override suspend fun consumePreFling(velocity: Velocity): Velocity = Velocity.Zero
 
-    override fun consumePostFling(velocity: Velocity) {}
+    override suspend fun consumePostFling(velocity: Velocity) {}
 
-    override fun refreshContainerInfo(size: Size, isContentScrolls: Boolean) {}
+    override var isEnabled: Boolean = false
 
-    override fun stopOverscrollAnimation(): Boolean = false
+    override val isInProgress: Boolean
+        get() = false
 
-    override fun DrawScope.drawOverScroll() {}
+    override val effectModifier: Modifier
+        get() = Modifier
 }
-
-internal val MaxSupportedElevation = 30.dp
 
 /**
  * There is an unwanted behavior in the stretch overscroll effect we have to workaround:
@@ -493,7 +511,7 @@ internal val MaxSupportedElevation = 30.dp
  * extra layer with the incremented size, which will be used by the overscroll effect and allows
  * to draw the content without clipping the shadows.
  */
-private val StretchOverScrollNonClippingLayer: Modifier =
+private val StretchOverscrollNonClippingLayer: Modifier =
     // we only need to fix the layer size when the stretch overscroll is active (Android 12+)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         Modifier
@@ -501,7 +519,8 @@ private val StretchOverScrollNonClippingLayer: Modifier =
                 val placeable = measurable.measure(constraints)
                 val extraSizePx = (MaxSupportedElevation * 2).roundToPx()
                 layout(
-                    placeable.measuredWidth - extraSizePx, placeable.measuredHeight - extraSizePx
+                    placeable.measuredWidth - extraSizePx,
+                    placeable.measuredHeight - extraSizePx
                 ) {
                     // because this modifier report the size which is larger than the passed max
                     // constraints this larger box will be automatically centered within the

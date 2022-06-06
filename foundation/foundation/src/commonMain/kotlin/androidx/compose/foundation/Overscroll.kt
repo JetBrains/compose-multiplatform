@@ -14,27 +14,28 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.gestures
+package androidx.compose.foundation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.unit.Velocity
 
 /**
  * Controller to control the overscroll logic for a particular scrollable container.
+ *
+ * This entity defines the "how" of the overscroll effect. If the default platform effect is needed,
+ * consider using [ScrollableDefaults.overscrollEffect]. In order for overscroll to work,
+ * the controller is supposed to be passed to [scrollable] modifier to receive the data of
+ * overscroll, and then applied where appropriate using [overscroll] modifier.
+ *
+ * @sample androidx.compose.foundation.samples.OverscrollSample
  */
-internal interface OverScrollController {
-    /**
-     * Release overscroll effects from being bounded by the current scroll cycle.
-     *
-     * This is usually called when effects are no longer matter for a particular pointer
-     * interaction and is called on pointer UP or any radical change that requires reinitialisation.
-     */
-    fun release()
+@ExperimentalFoundationApi
+@Stable
+interface OverscrollEffect {
 
     /**
      * Consume any overscroll before the scroll happens if needed.
@@ -60,18 +61,18 @@ internal interface OverScrollController {
     /**
      * Process scroll delta that is available after the scroll iteration is over.
      *
-     * This is the main method to show an overscroll, as [overScrollDelta] will be a
+     * This is the main method to show an overscroll, as [overscrollDelta] will be a
      * non-[zero][Offset.Zero] only if the scroll is happening at the bound of a scrollable
      * container.
      *
      * @param initialDragDelta initial drag delta before any consumption was made
-     * @param overScrollDelta the amount of overscroll left after the scroll process
+     * @param overscrollDelta the amount of overscroll left after the scroll process
      * @param pointerPosition the pointer location in the bounds of the container
      * @param source source of the scroll event
      */
     fun consumePostScroll(
         initialDragDelta: Offset,
-        overScrollDelta: Offset,
+        overscrollDelta: Offset,
         pointerPosition: Offset?,
         source: NestedScrollSource
     )
@@ -89,40 +90,51 @@ internal interface OverScrollController {
      * @return the amount of velocity that overscroll effect consumed that won't be available for
      * fling operation
      */
-    fun consumePreFling(
-        velocity: Velocity
-    ): Velocity
+    suspend fun consumePreFling(velocity: Velocity): Velocity
 
     /**
      * Feed and process velocity overscroll to show an effect.
      *
      * @param velocity the amount of velocity that is left for overscroll after the fling happened.
      */
-    fun consumePostFling(velocity: Velocity)
+    suspend fun consumePostFling(velocity: Velocity)
 
     /**
-     * Set information regarding scrollable container for overscroll.
+     * Whether the overscroll effect is enabled or not. If it is not enabled, [scrollable] won't
+     * send the events to this effect.
+     */
+    var isEnabled: Boolean
+
+    /**
+     * Whether over scroll within this controller is currently on progress or not, e.g. if the
+     * overscroll effect is playing animation or shown/interactable in any other way.
      *
-     * @param size the size of the container that scrolls
-     * @param isContentScrolls whether content can scroll within the scrollable container or not
+     * @return true if there is over scroll happening at the time of the call, false otherwise
      */
-    fun refreshContainerInfo(size: Size, isContentScrolls: Boolean)
+    val isInProgress: Boolean
 
     /**
-     * Stop overscroll animation (if happening)
-     *
-     * @return true if there was an animation that has been stopped, false if there was no
-     * animation.
+     * A modifier that will apply the overscroll effect as desired
      */
-    fun stopOverscrollAnimation(): Boolean
-
-    /**
-     * Draw the overscroll effect.
-     */
-    fun DrawScope.drawOverScroll()
+    val effectModifier: Modifier
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal expect fun rememberOverScrollController(): OverScrollController
+internal expect fun rememberOverscrollEffect(): OverscrollEffect
 
-internal expect fun Modifier.overScroll(overScrollController: OverScrollController): Modifier
+/**
+ * Modifier to apply the overscroll as specified by [OverscrollEffect]
+ *
+ * This modifier is a convenience method to call [OverscrollEffect.effectModifier], which
+ * performs the actual overscroll logic. Note that this modifier is the representation of the
+ * overscroll on the UI, to make overscroll events to be propagated to the [OverscrollEffect],
+ * you have to pass it to [scrollable].
+ *
+ * @sample androidx.compose.foundation.samples.OverscrollSample
+ *
+ * @param overscrollEffect controller that defines the behavior and the overscroll state.
+ */
+@ExperimentalFoundationApi
+fun Modifier.overscroll(overscrollEffect: OverscrollEffect): Modifier =
+    this.then(overscrollEffect.effectModifier)

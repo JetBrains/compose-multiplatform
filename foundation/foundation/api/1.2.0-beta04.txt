@@ -4,6 +4,9 @@ package androidx.compose.foundation {
   public final class ActualJvmKt {
   }
 
+  public final class AndroidOverscrollKt {
+  }
+
   public final class BackgroundKt {
     method public static androidx.compose.ui.Modifier background(androidx.compose.ui.Modifier, long color, optional androidx.compose.ui.graphics.Shape shape);
     method public static androidx.compose.ui.Modifier background(androidx.compose.ui.Modifier, androidx.compose.ui.graphics.Brush brush, optional androidx.compose.ui.graphics.Shape shape, optional float alpha);
@@ -105,6 +108,12 @@ package androidx.compose.foundation {
     method public suspend <T, R> Object? mutateWith(T? receiver, optional androidx.compose.foundation.MutatePriority priority, kotlin.jvm.functions.Function2<? super T,? super kotlin.coroutines.Continuation<? super R>,?> block, kotlin.coroutines.Continuation<? super R>);
   }
 
+  public final class OverscrollConfigurationKt {
+  }
+
+  public final class OverscrollKt {
+  }
+
   public final class ProgressSemanticsKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier progressSemantics(androidx.compose.ui.Modifier, float value, optional kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange, optional int steps);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier progressSemantics(androidx.compose.ui.Modifier);
@@ -149,9 +158,6 @@ package androidx.compose.foundation {
 }
 
 package androidx.compose.foundation.gestures {
-
-  public final class AndroidOverScrollKt {
-  }
 
   public final class AndroidScrollable_androidKt {
   }
@@ -202,9 +208,6 @@ package androidx.compose.foundation.gestures {
   public enum Orientation {
     enum_constant public static final androidx.compose.foundation.gestures.Orientation Horizontal;
     enum_constant public static final androidx.compose.foundation.gestures.Orientation Vertical;
-  }
-
-  public final class OverScrollConfigurationKt {
   }
 
   @kotlin.jvm.JvmDefaultWithCompatibility public interface PressGestureScope extends androidx.compose.ui.unit.Density {

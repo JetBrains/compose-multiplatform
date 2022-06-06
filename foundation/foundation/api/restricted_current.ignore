@@ -1,3 +1,7 @@
 // Baseline format: 1.0
+RemovedClass: androidx.compose.foundation.gestures.AndroidOverScrollKt:
+    Removed class androidx.compose.foundation.gestures.AndroidOverScrollKt
+RemovedClass: androidx.compose.foundation.gestures.OverScrollConfigurationKt:
+    Removed class androidx.compose.foundation.gestures.OverScrollConfigurationKt
 RemovedClass: androidx.compose.foundation.lazy.LazyGridDeprecatedKt:
     Removed class androidx.compose.foundation.lazy.LazyGridDeprecatedKt

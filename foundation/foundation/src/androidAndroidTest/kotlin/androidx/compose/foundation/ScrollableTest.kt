@@ -21,7 +21,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.ModifierLocalScrollableContainer
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.OverScrollController
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.animateScrollBy
@@ -47,8 +46,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -77,7 +74,6 @@ import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.junit.After
 import org.junit.Before
@@ -581,7 +577,8 @@ class ScrollableTest {
                         )
                 ) {
                     Box(
-                        modifier = Modifier.size(300.dp)
+                        modifier = Modifier
+                            .size(300.dp)
                             .testTag(scrollableBoxTag)
                             .clickable {
                                 assertWithMessage("Clickable shouldn't click when fling caught")
@@ -730,7 +727,8 @@ class ScrollableTest {
                         )
                 ) {
                     Box(
-                        modifier = Modifier.testTag(scrollableBoxTag)
+                        modifier = Modifier
+                            .testTag(scrollableBoxTag)
                             .size(300.dp)
                             .scrollable(
                                 state = innerState,
@@ -792,7 +790,8 @@ class ScrollableTest {
                         )
                 ) {
                     Box(
-                        modifier = Modifier.testTag(scrollableBoxTag)
+                        modifier = Modifier
+                            .testTag(scrollableBoxTag)
                             .size(300.dp)
                             .scrollable(
                                 state = innerState,
@@ -906,7 +905,8 @@ class ScrollableTest {
                         .nestedScroll(preConsumingParent)
                 ) {
                     Box(
-                        modifier = Modifier.size(300.dp)
+                        modifier = Modifier
+                            .size(300.dp)
                             .testTag(scrollableBoxTag)
                             .scrollable(
                                 state = controller,
@@ -976,7 +976,8 @@ class ScrollableTest {
                         .nestedScroll(parent)
                 ) {
                     Box(
-                        modifier = Modifier.size(300.dp)
+                        modifier = Modifier
+                            .size(300.dp)
                             .testTag(scrollableBoxTag)
                             .scrollable(
                                 state = controller,
@@ -1044,7 +1045,8 @@ class ScrollableTest {
                         .nestedScroll(parent)
                 ) {
                     Box(
-                        modifier = Modifier.size(300.dp)
+                        modifier = Modifier
+                            .size(300.dp)
                             .testTag(scrollableBoxTag)
                             .scrollable(
                                 state = controller,
@@ -1086,14 +1088,16 @@ class ScrollableTest {
         rule.setContentAndGetScope {
             Box {
                 Box(
-                    modifier = Modifier.size(300.dp)
+                    modifier = Modifier
+                        .size(300.dp)
                         .scrollable(
                             state = controller,
                             orientation = Orientation.Horizontal
                         )
                 ) {
                     Box(
-                        Modifier.size(200.dp)
+                        Modifier
+                            .size(200.dp)
                             .testTag(scrollableBoxTag)
                             .nestedScroll(child, dispatcher)
                     )
@@ -1156,14 +1160,16 @@ class ScrollableTest {
         rule.setContentAndGetScope {
             Box {
                 Box(
-                    modifier = Modifier.size(300.dp)
+                    modifier = Modifier
+                        .size(300.dp)
                         .scrollable(
                             state = parentController,
                             orientation = Orientation.Horizontal
                         )
                 ) {
                     Box(
-                        Modifier.size(200.dp)
+                        Modifier
+                            .size(200.dp)
                             .testTag(scrollableBoxTag)
                             .scrollable(
                                 enabled = false,
@@ -1218,14 +1224,16 @@ class ScrollableTest {
         rule.setContentAndGetScope {
             Box {
                 Box(
-                    modifier = Modifier.size(300.dp)
+                    modifier = Modifier
+                        .size(300.dp)
                         .scrollable(
                             state = parentController,
                             orientation = Orientation.Horizontal
                         )
                 ) {
                     Box(
-                        Modifier.size(200.dp)
+                        Modifier
+                            .size(200.dp)
                             .scrollable(
                                 enabled = false,
                                 orientation = Orientation.Horizontal,
@@ -1233,7 +1241,8 @@ class ScrollableTest {
                             )
                     ) {
                         Box(
-                            Modifier.size(200.dp)
+                            Modifier
+                                .size(200.dp)
                                 .testTag(scrollableBoxTag)
                                 .scrollable(
                                     orientation = Orientation.Horizontal,
@@ -1299,7 +1308,8 @@ class ScrollableTest {
                         )
                 ) {
                     Box(
-                        modifier = Modifier.size(300.dp)
+                        modifier = Modifier
+                            .size(300.dp)
                             .testTag(scrollableBoxTag)
                             .scrollable(
                                 state = innerState,
@@ -1701,7 +1711,8 @@ class ScrollableTest {
         rule.setContentAndGetScope {
             Box(
                 modifier = Modifier
-                    .size(100.dp).scrollable(
+                    .size(100.dp)
+                    .scrollable(
                         state = controller,
                         orientation = Orientation.Horizontal
                     )
@@ -1780,7 +1791,8 @@ class ScrollableTest {
         rule.setContentAndGetScope {
             Box(
                 modifier = Modifier
-                    .size(100.dp).scrollable(
+                    .size(100.dp)
+                    .scrollable(
                         state = controller,
                         orientation = Orientation.Horizontal
                     )
@@ -1825,7 +1837,8 @@ class ScrollableTest {
         rule.setContentAndGetScope {
             Box(
                 modifier = Modifier
-                    .size(100.dp).scrollable(
+                    .size(100.dp)
+                    .scrollable(
                         state = controller,
                         orientation = Orientation.Horizontal
                     )
@@ -1948,7 +1961,7 @@ class ScrollableTest {
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
                 "orientation",
                 "state",
-                "overScrollController",
+                "overscrollEffect",
                 "enabled",
                 "reverseDirection",
                 "flingBehavior",
@@ -1957,6 +1970,7 @@ class ScrollableTest {
         }
     }
 
+    @OptIn(ExperimentalFoundationApi::class)
     @Test
     fun producingEqualMaterializedModifierAfterRecomposition() {
         val state = ScrollableState { it }
@@ -1969,7 +1983,7 @@ class ScrollableTest {
                 Modifier.scrollable(
                     state,
                     Orientation.Vertical,
-                    NoOpOverscrollController
+                    NoOpOverscrollEffect
                 )
             )
         }
@@ -1995,7 +2009,10 @@ class ScrollableTest {
         rule.setContent {
             focusManager = LocalFocusManager.current
             Column {
-                Column(Modifier.size(10.dp).verticalScroll(rememberScrollState())) {
+                Column(
+                    Modifier
+                        .size(10.dp)
+                        .verticalScroll(rememberScrollState())) {
                     Box(
                         Modifier
                             .size(10.dp)
@@ -2010,7 +2027,10 @@ class ScrollableTest {
                             .focusable()
                     )
                 }
-                Box(Modifier.size(10.dp).focusable())
+                Box(
+                    Modifier
+                        .size(10.dp)
+                        .focusable())
             }
         }
 
@@ -2027,15 +2047,16 @@ class ScrollableTest {
                 Box(
                     modifier = Modifier
                         .testTag(scrollableBoxTag)
-                        .size(100.dp).then(scrollable)
+                        .size(100.dp)
+                        .then(scrollable)
                 )
             }
         }
     }
 }
 
-private val NoOpOverscrollController = object : OverScrollController {
-    override fun release() {}
+@OptIn(ExperimentalFoundationApi::class)
+private val NoOpOverscrollEffect = object : OverscrollEffect {
 
     override fun consumePreScroll(
         scrollDelta: Offset,
@@ -2045,19 +2066,20 @@ private val NoOpOverscrollController = object : OverScrollController {
 
     override fun consumePostScroll(
         initialDragDelta: Offset,
-        overScrollDelta: Offset,
+        overscrollDelta: Offset,
         pointerPosition: Offset?,
         source: NestedScrollSource
     ) {
     }
 
-    override fun consumePreFling(velocity: Velocity): Velocity = Velocity.Zero
+    override suspend fun consumePreFling(velocity: Velocity): Velocity = Velocity.Zero
 
-    override fun consumePostFling(velocity: Velocity) {}
+    override suspend fun consumePostFling(velocity: Velocity) {}
 
-    override fun refreshContainerInfo(size: Size, isContentScrolls: Boolean) {}
+    override var isEnabled: Boolean = false
 
-    override fun stopOverscrollAnimation(): Boolean = false
+    override val isInProgress: Boolean
+        get() = false
 
-    override fun DrawScope.drawOverScroll() {}
+    override val effectModifier: Modifier get() = Modifier
 }
