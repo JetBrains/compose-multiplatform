@@ -169,7 +169,7 @@ to the most natural implementation of movable content being composed lazily at f
 instead of eagerly. It would also require placing to validate the composition locals of the
 placement  and potentially invalidate the composition if the composition locals are different than
 expected. To  reduce unused locals from causing an invalidation it might require tracking the usage
-of  compostion lcoals and only invalidate if a composition locals it uses is different instead of
+of compostion locals and only invalidate if a composition locals it uses is different instead of
 just the  scope being different.
 
 Recomposition of an invalid movable content has the same or slightly slower performance than
@@ -181,10 +181,10 @@ composition local of a state object.
 
 * `+` Prevents most eager composition.
 * `-` Placing a content can potentially invalidate it, requiring it to be fully recomposed
-    (without skipping). To reduce the impact of this might require tracking which composition lcoals
+    (without skipping). To reduce the impact of this might require tracking which composition locals
     are used by the movable content, which is currently not needed.
 * `+` Movable content will always use the same ambients as a normal composable lambda.
-* `+` Movable content will always be placable.
+* `+` Movable content will always be placeable.
 * `+` Movable content behave nearly identically to composable functions except for state and
     associated nodes.
 
@@ -229,7 +229,7 @@ more than once, the composition function whose state is being tracked is just ca
 produce a duplicate state. Instead of solely using composition order (which might cause the state
 to move unexpectedly), a new state will only be created for invocations that were not present in
 the previous composition and order of composition will be used for movable content whose source
-locations change. In other words, movable content will only move its state if the labmda was
+locations change. In other words, movable content will only move its state if the lambda was
 not called in the same location in the composition as it was called in the previous composition.
 This is not true of keys as the first use of a key might steal the state of a key that was
 generated in the same location it was previously.
@@ -327,7 +327,7 @@ There are two options for calculating a compound hashcode, either a) have a hash
 independent where the content is placed, or b) use the compound hashcode at the location of the
 placement of the conent.
 
-#### Chosen solution: Use the hashcode indepenent of where the content is placed.
+#### Chosen solution: Use the hashcode independent of where the content is placed.
 
 In this option the compound hashcode is fixed at the time the movable content lambda is created.
 
