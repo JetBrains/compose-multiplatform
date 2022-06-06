@@ -410,8 +410,24 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 8: Change return type t
                 }
 
                 interface Bar {
+                    val modifier1: TestModifier?
                     val modifier2: TestModifier
-                    val modifier3: TestModifier
+                }
+
+                object Baz : Bar {
+                    override val modifier1: TestModifier? = null
+                    override val modifier2: TestModifier = TestModifier
+                    val modifier3: TestModifier = TestModifier
+                    val modifier4: TestModifier? get() = null
+                    val modifier5: TestModifier get() = TestModifier
+                }
+
+                val Qux = object : Bar {
+                    override val modifier1: TestModifier? = null
+                    override val modifier2: TestModifier = TestModifier
+                    val modifier3: TestModifier = TestModifier
+                    val modifier4: TestModifier? get() = null
+                    val modifier5: TestModifier get() = TestModifier
                 }
             """
             ),
