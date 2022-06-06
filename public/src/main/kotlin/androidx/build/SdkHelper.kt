@@ -150,3 +150,10 @@ fun Project.getSupportRootFolder(): File {
 fun Project.getCheckoutRoot(): File {
     return project.getSupportRootFolder().parentFile.parentFile
 }
+
+/**
+ * Returns the path to the konan prebuilts folder (e.g. <root>/prebuilts/androidx/konan).
+ */
+fun Project.getKonanPrebuiltsFolder(): File {
+    return getCheckoutRoot().resolve("prebuilts/androidx/konan")
+}

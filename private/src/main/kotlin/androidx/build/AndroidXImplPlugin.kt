@@ -84,9 +84,11 @@ import java.io.File
 import java.time.Duration
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
+import org.gradle.api.artifacts.repositories.IvyArtifactRepository
 import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.targets.native.KotlinNativeHostTestRun
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.kotlin.gradle.testing.KotlinTaskTestRun
 
 /**
@@ -277,6 +279,7 @@ class AndroidXImplPlugin : Plugin<Project> {
             }
         }
         if (plugin is KotlinMultiplatformPluginWrapper) {
+            project.configureKonanDirectory()
             project.extensions.findByType<LibraryExtension>()?.apply {
                 configureAndroidLibraryWithMultiplatformPluginOptions()
             }
@@ -680,6 +683,62 @@ class AndroidXImplPlugin : Plugin<Project> {
         sourceSets.findByName("main")!!.manifest.srcFile("src/androidMain/AndroidManifest.xml")
         sourceSets.findByName("androidTest")!!
             .manifest.srcFile("src/androidAndroidTest/AndroidManifest.xml")
+    }
+
+    /**
+     * Sets the konan distribution url to the prebuilts directory.
+     */
+    private fun Project.configureKonanDirectory() {
+        if (StudioType.isPlayground(this)) {
+            return // playground does not use prebuilts
+        }
+        overrideKotlinNativeCompilerRepository()
+        tasks.withType(KotlinNativeCompile::class.java).configureEach {
+            // use relative path so it doesn't affect gradle remote cache.
+            val relativePath = getKonanPrebuiltsFolder().relativeTo(rootProject.projectDir).path
+            it.kotlinOptions.freeCompilerArgs += listOf(
+                "-Xoverride-konan-properties=dependenciesUrl=file:$relativePath"
+            )
+        }
+    }
+
+    /**
+     * Until kotlin 1.7, we cannot set the repository URL where KMP plugin downloads the kotlin
+     * native compiler. This method implements a workaround for 1.6.21.
+     * We hijack the repository added by NativeCompilerDownloader to make it point to the konan
+     * prebuilts directory.
+     * After kotlin 1.7, we should use nativeBaseDownloadUrl property:
+     * https://github.com/JetBrains/kotlin/blob/025a21761b326767207b4a373593a3c2d24b8056/libraries/
+     *   tools/kotlin-gradle-plugin/src/common/kotlin/org/jetbrains/kotlin/gradle/plugin/
+     *   KotlinProperties.kt#L223
+     */
+    private fun Project.overrideKotlinNativeCompilerRepository() {
+        this.repositories.whenObjectAdded {
+            if (it is IvyArtifactRepository) {
+                if (it.url.host == "download.jetbrains.com" &&
+                    it.url.path.contains("kotlin/native/builds")
+                ) {
+                    val fileUrl = project.getKonanPrebuiltsFolder().resolve(
+                        "nativeCompilerPrebuilts"
+                    ).resolve(
+                        it.url.path.substringAfter("kotlin/native/builds/")
+                    ).canonicalFile
+                    check(fileUrl.exists()) {
+                        val konanVersion = getVersionByName("kotlinNative")
+                        """
+                        Missing kotlin native compiler prebuilt in $fileUrl. If you are updating
+                        kotlin version, please add the new compiler to the prebuilts/androidx/konan
+                        repository. You can download them by invoking the following script:
+
+                        ../../prebuilts/androidx/konan/download-native-compiler-prebuilts.sh $konanVersion
+
+                        Please don't forget to commit that version into the konan repository.
+                        """.trimIndent()
+                    }
+                    it.url = fileUrl.toURI()
+                }
+            }
+        }
     }
 
     private fun Project.configureKmpBuildOnServer() {
