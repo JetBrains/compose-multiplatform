@@ -46,7 +46,7 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public static long offset(long, optional int horizontal, optional int vertical);
   }
 
-  @androidx.compose.runtime.Immutable public interface Density {
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmDefaultWithCompatibility public interface Density {
     method public float getDensity();
     method public float getFontScale();
     method @androidx.compose.runtime.Stable public default int roundToPx(float);

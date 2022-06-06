@@ -21,11 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.platform.AtomicInt
 import androidx.compose.ui.platform.debugInspectorInfo
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * A [Modifier.Element] that adds semantics key/value for use in testing,
  * accessibility, and similar use cases.
  */
+@JvmDefaultWithCompatibility
 interface SemanticsModifier : Modifier.Element {
     /**
      * The unique id of this semantics.

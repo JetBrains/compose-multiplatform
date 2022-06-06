@@ -56,3 +56,11 @@ androidx {
     inceptionYear = "2022"
     description = "Allows for additional tracing in a Compose app (e.g. tracing of Composables taking part in a Recomposition"
 }
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
+}

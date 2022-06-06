@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlin.math.min
 import kotlin.math.roundToInt
-
+import kotlin.jvm.JvmDefaultWithCompatibility
 /**
  * Used to specify the arrangement of the layout's children in layouts like [Row] or [Column] in
  * the main axis direction (horizontal and vertical, respectively).
@@ -42,6 +42,7 @@ object Arrangement {
      * Used to specify the horizontal arrangement of the layout's children in layouts like [Row].
      */
     @Stable
+    @JvmDefaultWithCompatibility
     interface Horizontal {
         /**
          * Spacing that should be added between any two adjacent layout children.
@@ -70,6 +71,7 @@ object Arrangement {
      * Used to specify the vertical arrangement of the layout's children in layouts like [Column].
      */
     @Stable
+    @JvmDefaultWithCompatibility
     interface Vertical {
         /**
          * Spacing that should be added between any two adjacent layout children.
@@ -97,6 +99,7 @@ object Arrangement {
      * [Column].
      */
     @Stable
+    @JvmDefaultWithCompatibility
     interface HorizontalOrVertical : Horizontal, Vertical {
         /**
          * Spacing that should be added between any two adjacent layout children.

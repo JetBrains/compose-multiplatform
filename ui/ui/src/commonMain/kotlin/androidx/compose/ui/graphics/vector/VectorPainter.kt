@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * Default identifier for the root group if a Vector graphic
@@ -308,6 +309,7 @@ sealed class VectorProperty<T> {
  * This can be passed to [RenderVectorGroup] to alter some property values when the [VectorGroup]
  * is rendered.
  */
+@JvmDefaultWithCompatibility
 interface VectorConfig {
     fun <T> getOrDefault(property: VectorProperty<T>, defaultValue: T): T {
         return defaultValue

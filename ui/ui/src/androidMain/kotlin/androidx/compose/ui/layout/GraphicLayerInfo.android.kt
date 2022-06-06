@@ -16,9 +16,12 @@
 
 package androidx.compose.ui.layout
 
+import kotlin.jvm.JvmDefaultWithCompatibility
+
 /**
  * The info about the graphics layers used by tooling.
  */
+@JvmDefaultWithCompatibility
 interface GraphicLayerInfo {
     /**
      * The ID of the layer. This is used by tooling to match a layer to the associated

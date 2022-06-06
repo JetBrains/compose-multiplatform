@@ -16,6 +16,8 @@
 
 package androidx.compose.animation.tooling
 
+import kotlin.jvm.JvmDefaultWithCompatibility
+
 /**
  * Type of the animation. Different types might have different properties, for example a
  * `TransitionAnimation` (represented by [TRANSITION_ANIMATION]) has a set of states associated
@@ -30,6 +32,7 @@ public enum class ComposeAnimationType {
  * Android Studio. Since both ends communicate mostly using bytecode manipulation and reflection,
  * being able to parse these objects into a common type makes
  */
+@JvmDefaultWithCompatibility
 public interface ComposeAnimation {
 
     /**

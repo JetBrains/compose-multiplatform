@@ -18,6 +18,7 @@ import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryType
 import androidx.build.Publish
 import androidx.build.RunApiTasks
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
@@ -56,4 +57,12 @@ androidx {
 
 android {
     namespace "androidx.compose.ui.text.font.test"
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
 }

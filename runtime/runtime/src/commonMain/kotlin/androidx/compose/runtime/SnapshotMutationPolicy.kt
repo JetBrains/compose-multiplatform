@@ -22,6 +22,7 @@ import androidx.compose.runtime.snapshots.MutableSnapshot
 // Explicit imports for these needed in common source sets.
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * A policy to control how the result of [mutableStateOf] report and merge changes to
@@ -35,6 +36,7 @@ import kotlin.jvm.JvmMultifileClass
  *
  * @sample androidx.compose.runtime.samples.counterSample
  */
+@JvmDefaultWithCompatibility
 interface SnapshotMutationPolicy<T> {
     /**
      * Determine if setting a state value's are equivalent and should be treated as equal. If

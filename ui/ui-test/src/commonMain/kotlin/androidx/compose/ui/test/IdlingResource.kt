@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.test
 
+import kotlin.jvm.JvmDefaultWithCompatibility
+
 /**
  * Represents a resource of an application under test which can cause asynchronous background
  * work to happen during test execution (e.g. an http request in response to a button click).
@@ -31,6 +33,7 @@ package androidx.compose.ui.test
  * .registerIdlingResource], and the interaction will wait for that resource to become idle prior
  * to performing it.
  */
+@JvmDefaultWithCompatibility
 interface IdlingResource {
     /**
      * Whether or not the [IdlingResource] is idle when reading this value. This should always be
