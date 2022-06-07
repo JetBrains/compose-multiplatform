@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.gestures
+package androidx.compose.foundation
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.compositionLocalOf
@@ -27,26 +26,22 @@ import androidx.compose.ui.graphics.Color
  *
  * @param glowColor color for the glow effect, if the platform effect is a glow effect, otherwise
  * ignored.
- * @param forceShowAlways force show overscroll even if content doesn't scroll (is smaller
- * than a scrollable container itself)
  * @param drawPadding the amount of padding to apply from scrollable container bounds to
  * effect before drawing it
  */
 @ExperimentalFoundationApi
 @Stable
-class OverScrollConfiguration(
+class OverscrollConfiguration(
     val glowColor: Color = Color(0xff666666), // taken from EdgeEffect.java defaults
-    val forceShowAlways: Boolean = false,
     val drawPadding: PaddingValues = PaddingValues()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as OverScrollConfiguration
+        other as OverscrollConfiguration
 
         if (glowColor != other.glowColor) return false
-        if (forceShowAlways != other.forceShowAlways) return false
         if (drawPadding != other.drawPadding) return false
 
         return true
@@ -54,14 +49,12 @@ class OverScrollConfiguration(
 
     override fun hashCode(): Int {
         var result = glowColor.hashCode()
-        result = 31 * result + forceShowAlways.hashCode()
         result = 31 * result + drawPadding.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "OverScrollConfiguration(glowColor=$glowColor, " +
-            "forceShowAlways=$forceShowAlways, drawPadding=$drawPadding)"
+        return "OverscrollConfiguration(glowColor=$glowColor, drawPadding=$drawPadding)"
     }
 }
 
@@ -72,6 +65,6 @@ class OverScrollConfiguration(
 @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
 @ExperimentalFoundationApi
 @get:ExperimentalFoundationApi
-val LocalOverScrollConfiguration = compositionLocalOf<OverScrollConfiguration?> {
-    OverScrollConfiguration()
+val LocalOverscrollConfiguration = compositionLocalOf<OverscrollConfiguration?> {
+    OverscrollConfiguration()
 }

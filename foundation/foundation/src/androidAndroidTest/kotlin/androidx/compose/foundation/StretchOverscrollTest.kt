@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.gesture
+package androidx.compose.foundation
 
 import android.os.Build
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
@@ -37,10 +36,10 @@ import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.testutils.AnimationDurationScaleRule
 import com.google.common.truth.Truth.assertThat
+import kotlin.math.abs
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.math.abs
 
 @MediumTest
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.S)

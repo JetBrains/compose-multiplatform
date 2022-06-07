@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.gestures
+package androidx.compose.foundation
 
 import android.content.Context
 import android.os.Build

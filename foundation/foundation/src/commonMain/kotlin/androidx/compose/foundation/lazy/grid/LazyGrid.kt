@@ -17,13 +17,12 @@
 package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.OverscrollEffect
 import androidx.compose.foundation.checkScrollableContainerConstraints
 import androidx.compose.foundation.clipScrollableContainer
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.OverScrollController
 import androidx.compose.foundation.gestures.ScrollableDefaults
-import androidx.compose.foundation.gestures.rememberOverScrollController
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -31,12 +30,12 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.lazy.layout.LazyLayout
 import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
+import androidx.compose.foundation.overscroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Constraints
@@ -75,7 +74,7 @@ internal fun LazyGrid(
     /** The content of the grid */
     content: LazyGridScope.() -> Unit
 ) {
-    val overScrollController = rememberOverScrollController()
+    val overscrollEffect = ScrollableDefaults.overscrollEffect()
 
     val itemProvider = rememberItemProvider(state, content)
 
@@ -88,7 +87,7 @@ internal fun LazyGrid(
     val measurePolicy = rememberLazyGridMeasurePolicy(
         itemProvider,
         state,
-        overScrollController,
+        overscrollEffect,
         slotSizesSums,
         contentPadding,
         reverseLayout,
@@ -116,6 +115,7 @@ internal fun LazyGrid(
                 userScrollEnabled = userScrollEnabled
             )
             .clipScrollableContainer(orientation)
+            .overscroll(overscrollEffect)
             .scrollable(
                 orientation = orientation,
                 reverseDirection = run {
@@ -132,7 +132,7 @@ internal fun LazyGrid(
                 interactionSource = state.internalInteractionSource,
                 flingBehavior = flingBehavior,
                 state = state,
-                overScrollController = overScrollController,
+                overscrollEffect = overscrollEffect,
                 enabled = userScrollEnabled
             ),
         prefetchState = state.prefetchState,
@@ -161,7 +161,7 @@ private fun rememberLazyGridMeasurePolicy(
     /** The state of the list. */
     state: LazyGridState,
     /** The overscroll controller. */
-    overScrollController: OverScrollController,
+    overscrollEffect: OverscrollEffect,
     /** Prefix sums of cross axis sizes of slots of the grid. */
     slotSizesSums: Density.(Constraints) -> List<Int>,
     /** The inner padding to be added for the whole content(nor for each individual item) */
@@ -178,7 +178,7 @@ private fun rememberLazyGridMeasurePolicy(
     placementAnimator: LazyGridItemPlacementAnimator
 ) = remember<LazyLayoutMeasureScope.(Constraints) -> MeasureResult>(
     state,
-    overScrollController,
+    overscrollEffect,
     slotSizesSums,
     contentPadding,
     reverseLayout,
@@ -365,33 +365,19 @@ private fun rememberLazyGridMeasurePolicy(
             }
         ).also {
             state.applyMeasureResult(it)
-            refreshOverScrollInfo(
-                overScrollController,
-                it,
-                containerConstraints,
-                totalHorizontalPadding,
-                totalVerticalPadding
-            )
+            refreshOverscrollInfo(overscrollEffect, it)
         }
     }
 }
 
-private fun refreshOverScrollInfo(
-    overScrollController: OverScrollController,
-    result: LazyGridMeasureResult,
-    constraints: Constraints,
-    totalHorizontalPadding: Int,
-    totalVerticalPadding: Int
+@OptIn(ExperimentalFoundationApi::class)
+private fun refreshOverscrollInfo(
+    overscrollEffect: OverscrollEffect,
+    result: LazyGridMeasureResult
 ) {
     val canScrollForward = result.canScrollForward
     val canScrollBackward = (result.firstVisibleLine?.items?.firstOrNull() ?: 0) != 0 ||
         result.firstVisibleLineScrollOffset != 0
 
-    overScrollController.refreshContainerInfo(
-        Size(
-            constraints.constrainWidth(result.width + totalHorizontalPadding).toFloat(),
-            constraints.constrainHeight(result.height + totalVerticalPadding).toFloat()
-        ),
-        canScrollForward || canScrollBackward
-    )
+    overscrollEffect.isEnabled = canScrollForward || canScrollBackward
 }

@@ -18,9 +18,9 @@ package androidx.compose.ui.test.junit4
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.FlingBehavior
-import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -203,7 +203,7 @@ class RobolectricComposeTest {
         setContent {
             WithTouchSlop(touchSlop = touchSlop) {
                 // turn off visual overscroll for calculation correctness
-                CompositionLocalProvider(LocalOverScrollConfiguration provides null) {
+                CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
                     Box(Modifier.fillMaxSize()) {
                         Column(
                             Modifier.requiredSize(200.dp).verticalScroll(
