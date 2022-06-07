@@ -30,8 +30,11 @@ interface MotionDurationScale : CoroutineContext.Element {
     /**
      * Defines the multiplier for the duration of the motion. This value should be non-negative.
      *
-     * 0f would cause motion to finish in the next frame callback. Larger [scaleFactor] will result
-     * in longer durations for the motion/animation (i.e. slower animation).
+     * A [scaleFactor] of 1.0f would play the motion in real time. 0f would cause motion to
+     * finish in the next frame callback. Larger [scaleFactor] will result
+     * in longer durations for the motion/animation (i.e. slower animation). For example,
+     * a [scaleFactor] of 10f would cause an animation with a duration of 100ms to finish in
+     * 1000ms.
      */
     val scaleFactor: Float
 
