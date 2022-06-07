@@ -183,6 +183,23 @@ class TextDelegateIntegrationTest {
         assertThat(layoutResult.lineCount).isEqualTo(2)
         assertThat(layoutResult.isLineEllipsized(1)).isTrue()
     }
+
+    @Test
+    fun TextLayoutResult_sameWidth_inRtlAndLtr_withLetterSpacing() {
+        val fontSize = 20f
+        val text = AnnotatedString(text = "Hello World")
+        val textDelegate = TextDelegate(
+            text = text,
+            style = TextStyle(fontSize = fontSize.sp, letterSpacing = 0.5.sp),
+            overflow = TextOverflow.Ellipsis,
+            density = density,
+            fontFamilyResolver = fontFamilyResolver
+        )
+        val layoutResultLtr = textDelegate.layout(Constraints(), LayoutDirection.Ltr)
+        val layoutResultRtl = textDelegate.layout(Constraints(), LayoutDirection.Rtl)
+
+        assertThat(layoutResultLtr.size.width).isEqualTo(layoutResultRtl.size.width)
+    }
 }
 
 private fun TextLayoutResult.toBitmap() = Bitmap.createBitmap(
