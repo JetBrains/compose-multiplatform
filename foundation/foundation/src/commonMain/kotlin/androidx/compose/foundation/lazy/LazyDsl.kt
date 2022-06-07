@@ -25,11 +25,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * Receiver scope which is used by [LazyColumn] and [LazyRow].
  */
 @LazyScopeMarker
+@JvmDefaultWithCompatibility
 interface LazyListScope {
     /**
      * Adds a single item.

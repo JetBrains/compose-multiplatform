@@ -20,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * The clock that drives [frames][MonotonicFrameClock.withFrameNanos],
@@ -93,6 +94,7 @@ import androidx.compose.runtime.snapshots.Snapshot
  *
  * @sample androidx.compose.ui.test.samples.testControlClock
  */
+@JvmDefaultWithCompatibility
 interface MainTestClock {
     /**
      * The current time of this clock in milliseconds.

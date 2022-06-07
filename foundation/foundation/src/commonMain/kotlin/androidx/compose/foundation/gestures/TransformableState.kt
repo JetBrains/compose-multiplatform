@@ -30,12 +30,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.geometry.Offset
 import kotlinx.coroutines.coroutineScope
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * State of [transformable]. Allows for a granular control of how different gesture
  * transformations are consumed by the user as well as to write custom transformation methods
  * using [transform] suspend function.
  */
+@JvmDefaultWithCompatibility
 interface TransformableState {
     /**
      * Call this function to take control of transformations and gain the ability to send transform
@@ -61,6 +63,7 @@ interface TransformableState {
 /**
  * Scope used for suspending transformation operations
  */
+@JvmDefaultWithCompatibility
 interface TransformScope {
     /**
      * Attempts to transform by [zoomChange] in relative multiplied value, by [panChange] in

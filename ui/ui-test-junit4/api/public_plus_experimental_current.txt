@@ -90,7 +90,7 @@ package androidx.compose.ui.test.junit4 {
   public final class AndroidSynchronization_androidKt {
   }
 
-  public interface ComposeContentTestRule extends androidx.compose.ui.test.junit4.ComposeTestRule {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface ComposeContentTestRule extends androidx.compose.ui.test.junit4.ComposeTestRule {
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
   }
 
@@ -100,7 +100,7 @@ package androidx.compose.ui.test.junit4 {
   public final class ComposeRootRegistry_androidKt {
   }
 
-  public interface ComposeTestRule extends org.junit.rules.TestRule androidx.compose.ui.test.SemanticsNodeInteractionsProvider {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface ComposeTestRule extends org.junit.rules.TestRule androidx.compose.ui.test.SemanticsNodeInteractionsProvider {
     method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public androidx.compose.ui.unit.Density getDensity();
     method public androidx.compose.ui.test.MainTestClock getMainClock();

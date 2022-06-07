@@ -19,11 +19,13 @@ package androidx.compose.ui.graphics
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.colorspace.ColorSpace
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * Graphics object that represents a 2 dimensional array of pixel information represented
  * as ARGB values
  */
+@JvmDefaultWithCompatibility
 interface ImageBitmap {
 
     /** The number of image pixels along the ImageBitmap's horizontal axis. */
