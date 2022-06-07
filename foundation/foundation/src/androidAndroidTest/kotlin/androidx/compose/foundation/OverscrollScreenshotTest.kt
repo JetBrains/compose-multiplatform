@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.gesture
+package androidx.compose.foundation
 
 import android.os.Build
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.GOLDEN_UI
-import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
-import androidx.compose.foundation.gestures.OverScrollConfiguration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
@@ -56,7 +51,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
 @OptIn(ExperimentalTestApi::class)
-class OverScrollScreenshotTest {
+class OverscrollScreenshotTest {
     @get:Rule
     val rule = createComposeRule()
 
@@ -67,7 +62,7 @@ class OverScrollScreenshotTest {
     val animationScaleRule: AnimationDurationScaleRule =
         AnimationDurationScaleRule.createForAllTests(1f)
 
-    val overScrollTag = "overScrollTag"
+    val overscrollTag = "overscrollTag"
 
     @Test
     @Ignore("b/197325932 no animations in screenshot tests")
@@ -77,7 +72,7 @@ class OverScrollScreenshotTest {
             VerticalScrollable()
         }
 
-        rule.onNodeWithTag(overScrollTag)
+        rule.onNodeWithTag(overscrollTag)
             .performTouchInput {
                 down(Offset(centerX + width / 2 - 10, centerY))
                 moveBy(Offset(0f, 500f))
@@ -86,7 +81,7 @@ class OverScrollScreenshotTest {
                 }
             }
 
-        rule.onNodeWithTag(overScrollTag)
+        rule.onNodeWithTag(overscrollTag)
             .captureToImage()
             .assertAgainstGolden(screenshotRule, "overscroll_top_origin")
     }
@@ -99,7 +94,7 @@ class OverScrollScreenshotTest {
             VerticalScrollable()
         }
 
-        rule.onNodeWithTag(overScrollTag)
+        rule.onNodeWithTag(overscrollTag)
             .performTouchInput {
                 down(Offset(centerX + width / 2 - 10, centerY))
                 moveBy(Offset(0f, -500f))
@@ -108,7 +103,7 @@ class OverScrollScreenshotTest {
                 }
             }
 
-        rule.onNodeWithTag(overScrollTag)
+        rule.onNodeWithTag(overscrollTag)
             .captureToImage()
             .assertAgainstGolden(screenshotRule, "overscroll_bottom_origin")
     }
@@ -121,7 +116,7 @@ class OverScrollScreenshotTest {
             HorizontalScrollable()
         }
 
-        rule.onNodeWithTag(overScrollTag)
+        rule.onNodeWithTag(overscrollTag)
             .performTouchInput {
                 down(Offset(centerX, centerY + height / 2 - 10))
                 moveBy(Offset(500f, 0f))
@@ -130,7 +125,7 @@ class OverScrollScreenshotTest {
                 }
             }
 
-        rule.onNodeWithTag(overScrollTag)
+        rule.onNodeWithTag(overscrollTag)
             .captureToImage()
             .assertAgainstGolden(screenshotRule, "overscroll_left_origin")
     }
@@ -143,7 +138,7 @@ class OverScrollScreenshotTest {
             HorizontalScrollable()
         }
 
-        rule.onNodeWithTag(overScrollTag)
+        rule.onNodeWithTag(overscrollTag)
             .performTouchInput {
                 down(Offset(centerX, centerY + height / 2 - 10))
                 moveBy(Offset(-500f, 0f))
@@ -152,7 +147,7 @@ class OverScrollScreenshotTest {
                 }
             }
 
-        rule.onNodeWithTag(overScrollTag)
+        rule.onNodeWithTag(overscrollTag)
             .captureToImage()
             .assertAgainstGolden(screenshotRule, "overscroll_right_origin")
     }
@@ -161,7 +156,7 @@ class OverScrollScreenshotTest {
     @Composable
     fun VerticalScrollable() {
         CompositionLocalProvider(
-            LocalOverScrollConfiguration provides OverScrollConfiguration(
+            LocalOverscrollConfiguration provides OverscrollConfiguration(
                 glowColor = Color.Red,
                 drawPadding = PaddingValues(10.dp)
             )
@@ -174,7 +169,7 @@ class OverScrollScreenshotTest {
                     Modifier
                         .border(5.dp, Color.Black)
                         .size(width = 400.dp, height = 200.dp)
-                        .testTag(overScrollTag)
+                        .testTag(overscrollTag)
                 ) {
                     items(7) {
                         Box(Modifier.size(400.dp, 50.dp))
@@ -188,7 +183,7 @@ class OverScrollScreenshotTest {
     @Composable
     fun HorizontalScrollable() {
         CompositionLocalProvider(
-            LocalOverScrollConfiguration provides OverScrollConfiguration(
+            LocalOverscrollConfiguration provides OverscrollConfiguration(
                 glowColor = Color.Red,
                 drawPadding = PaddingValues(10.dp)
             )
@@ -201,7 +196,7 @@ class OverScrollScreenshotTest {
                     Modifier
                         .border(5.dp, Color.Black)
                         .size(width = 200.dp, height = 400.dp)
-                        .testTag(overScrollTag)
+                        .testTag(overscrollTag)
                 ) {
                     items(7) {
                         Box(Modifier.size(50.dp, 400.dp))

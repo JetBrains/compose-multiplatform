@@ -59,7 +59,7 @@ fun Modifier.clipScrollableContainer(orientation: Orientation) =
  * user will need to have a larger unclipped area for some reason they can always add the needed
  * padding inside the scrollable area.
  */
-private val MaxSupportedElevation = 30.dp
+internal val MaxSupportedElevation = 30.dp
 
 private val HorizontalScrollableClipModifier = Modifier.clip(object : Shape {
     override fun createOutline(

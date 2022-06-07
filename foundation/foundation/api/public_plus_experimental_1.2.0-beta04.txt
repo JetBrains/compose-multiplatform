@@ -4,6 +4,9 @@ package androidx.compose.foundation {
   public final class ActualJvmKt {
   }
 
+  public final class AndroidOverscrollKt {
+  }
+
   public final class BackgroundKt {
     method public static androidx.compose.ui.Modifier background(androidx.compose.ui.Modifier, long color, optional androidx.compose.ui.graphics.Shape shape);
     method public static androidx.compose.ui.Modifier background(androidx.compose.ui.Modifier, androidx.compose.ui.graphics.Brush brush, optional androidx.compose.ui.graphics.Shape shape, optional float alpha);
@@ -133,6 +136,37 @@ package androidx.compose.foundation {
     method public suspend <T, R> Object? mutateWith(T? receiver, optional androidx.compose.foundation.MutatePriority priority, kotlin.jvm.functions.Function2<? super T,? super kotlin.coroutines.Continuation<? super R>,?> block, kotlin.coroutines.Continuation<? super R>);
   }
 
+  @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public final class OverscrollConfiguration {
+    ctor public OverscrollConfiguration(optional long glowColor, optional androidx.compose.foundation.layout.PaddingValues drawPadding);
+    method public androidx.compose.foundation.layout.PaddingValues getDrawPadding();
+    method public long getGlowColor();
+    property public final androidx.compose.foundation.layout.PaddingValues drawPadding;
+    property public final long glowColor;
+  }
+
+  public final class OverscrollConfigurationKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.foundation.OverscrollConfiguration> getLocalOverscrollConfiguration();
+    property @androidx.compose.foundation.ExperimentalFoundationApi public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.foundation.OverscrollConfiguration> LocalOverscrollConfiguration;
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public interface OverscrollEffect {
+    method public suspend Object? consumePostFling(long velocity, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public void consumePostScroll(long initialDragDelta, long overscrollDelta, androidx.compose.ui.geometry.Offset? pointerPosition, int source);
+    method public suspend Object? consumePreFling(long velocity, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity>);
+    method public long consumePreScroll(long scrollDelta, androidx.compose.ui.geometry.Offset? pointerPosition, int source);
+    method public androidx.compose.ui.Modifier getEffectModifier();
+    method public boolean isEnabled();
+    method public boolean isInProgress();
+    method public void setEnabled(boolean);
+    property public abstract androidx.compose.ui.Modifier effectModifier;
+    property public abstract boolean isEnabled;
+    property public abstract boolean isInProgress;
+  }
+
+  public final class OverscrollKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.ui.Modifier overscroll(androidx.compose.ui.Modifier, androidx.compose.foundation.OverscrollEffect overscrollEffect);
+  }
+
   public final class ProgressSemanticsKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier progressSemantics(androidx.compose.ui.Modifier, float value, optional kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange, optional int steps);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier progressSemantics(androidx.compose.ui.Modifier);
@@ -177,9 +211,6 @@ package androidx.compose.foundation {
 }
 
 package androidx.compose.foundation.gestures {
-
-  public final class AndroidOverScrollKt {
-  }
 
   public final class AndroidScrollable_androidKt {
   }
@@ -232,21 +263,6 @@ package androidx.compose.foundation.gestures {
     enum_constant public static final androidx.compose.foundation.gestures.Orientation Vertical;
   }
 
-  @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public final class OverScrollConfiguration {
-    ctor public OverScrollConfiguration(optional long glowColor, optional boolean forceShowAlways, optional androidx.compose.foundation.layout.PaddingValues drawPadding);
-    method public androidx.compose.foundation.layout.PaddingValues getDrawPadding();
-    method public boolean getForceShowAlways();
-    method public long getGlowColor();
-    property public final androidx.compose.foundation.layout.PaddingValues drawPadding;
-    property public final boolean forceShowAlways;
-    property public final long glowColor;
-  }
-
-  public final class OverScrollConfigurationKt {
-    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.foundation.gestures.OverScrollConfiguration> getLocalOverScrollConfiguration();
-    property @androidx.compose.foundation.ExperimentalFoundationApi public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.foundation.gestures.OverScrollConfiguration> LocalOverScrollConfiguration;
-  }
-
   @kotlin.jvm.JvmDefaultWithCompatibility public interface PressGestureScope extends androidx.compose.ui.unit.Density {
     method public suspend Object? awaitRelease(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public suspend Object? tryAwaitRelease(kotlin.coroutines.Continuation<? super java.lang.Boolean>);
@@ -264,11 +280,13 @@ package androidx.compose.foundation.gestures {
 
   public final class ScrollableDefaults {
     method @androidx.compose.runtime.Composable public androidx.compose.foundation.gestures.FlingBehavior flingBehavior();
+    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public androidx.compose.foundation.OverscrollEffect overscrollEffect();
     field public static final androidx.compose.foundation.gestures.ScrollableDefaults INSTANCE;
   }
 
   public final class ScrollableKt {
     method public static androidx.compose.ui.Modifier scrollable(androidx.compose.ui.Modifier, androidx.compose.foundation.gestures.ScrollableState state, androidx.compose.foundation.gestures.Orientation orientation, optional boolean enabled, optional boolean reverseDirection, optional androidx.compose.foundation.gestures.FlingBehavior? flingBehavior, optional androidx.compose.foundation.interaction.MutableInteractionSource? interactionSource);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.ui.Modifier scrollable(androidx.compose.ui.Modifier, androidx.compose.foundation.gestures.ScrollableState state, androidx.compose.foundation.gestures.Orientation orientation, androidx.compose.foundation.OverscrollEffect? overscrollEffect, optional boolean enabled, optional boolean reverseDirection, optional androidx.compose.foundation.gestures.FlingBehavior? flingBehavior, optional androidx.compose.foundation.interaction.MutableInteractionSource? interactionSource);
   }
 
   public interface ScrollableState {
