@@ -93,6 +93,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlin.math.abs
+import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 import kotlinx.coroutines.CancellationException
@@ -162,7 +163,7 @@ fun Slider(
         modifier
             .minimumTouchTargetSize()
             .requiredSizeIn(minWidth = ThumbRadius * 2, minHeight = ThumbRadius * 2)
-            .sliderSemantics(value, tickFractions, enabled, onValueChange, valueRange, steps)
+            .sliderSemantics(value, enabled, onValueChange, valueRange, steps)
             .focusable(enabled, interactionSource)
     ) {
         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
@@ -399,21 +400,22 @@ fun RangeSlider(
         val coercedEnd = values.endInclusive.coerceIn(values.start, valueRange.endInclusive)
         val fractionStart = calcFraction(valueRange.start, valueRange.endInclusive, coercedStart)
         val fractionEnd = calcFraction(valueRange.start, valueRange.endInclusive, coercedEnd)
+        val startSteps = floor(steps * fractionEnd).toInt()
+        val endSteps = floor(steps * (1f - fractionStart)).toInt()
+
         val startThumbSemantics = Modifier.sliderSemantics(
             coercedStart,
-            tickFractions,
             enabled,
             { value -> onValueChangeState.value.invoke(value..coercedEnd) },
             valueRange.start..coercedEnd,
-            steps
+            startSteps
         )
         val endThumbSemantics = Modifier.sliderSemantics(
             coercedEnd,
-            tickFractions,
             enabled,
             { value -> onValueChangeState.value.invoke(coercedStart..value) },
             coercedStart..valueRange.endInclusive,
-            steps
+            endSteps
         )
 
         RangeSliderImpl(
@@ -632,7 +634,9 @@ private fun RangeSliderImpl(
         val offsetStart = widthDp * positionFractionStart
         val offsetEnd = widthDp * positionFractionEnd
         Track(
-            Modifier.align(Alignment.CenterStart).fillMaxSize(),
+            Modifier
+                .align(Alignment.CenterStart)
+                .fillMaxSize(),
             colors,
             enabled,
             positionFractionStart,
@@ -676,7 +680,10 @@ private fun BoxScope.SliderThumb(
     enabled: Boolean,
     thumbSize: Dp
 ) {
-    Box(Modifier.padding(start = offset).align(Alignment.CenterStart)) {
+    Box(
+        Modifier
+            .padding(start = offset)
+            .align(Alignment.CenterStart)) {
         val interactions = remember { mutableStateListOf<Interaction>() }
         LaunchedEffect(interactionSource) {
             interactionSource.interactions.collect { interaction ->
@@ -833,7 +840,6 @@ private fun CorrectValueSideEffect(
 
 private fun Modifier.sliderSemantics(
     value: Float,
-    tickFractions: List<Float>,
     enabled: Boolean,
     onValueChange: (Float) -> Unit,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
@@ -844,11 +850,21 @@ private fun Modifier.sliderSemantics(
         if (!enabled) disabled()
         setProgress(
             action = { targetValue ->
-                val newValue = targetValue.coerceIn(valueRange.start, valueRange.endInclusive)
+                var newValue = targetValue.coerceIn(valueRange.start, valueRange.endInclusive)
+                val originalVal = newValue
                 val resolvedValue = if (steps > 0) {
-                    tickFractions
-                        .map { lerp(valueRange.start, valueRange.endInclusive, it) }
-                        .minByOrNull { abs(it - newValue) } ?: newValue
+                    var distance: Float = newValue
+                    for (i in 0..steps + 1) {
+                        val stepValue = lerp(
+                            valueRange.start,
+                            valueRange.endInclusive,
+                            i.toFloat() / (steps + 1))
+                        if (abs(stepValue - originalVal) <= distance) {
+                            distance = abs(stepValue - originalVal)
+                            newValue = stepValue
+                        }
+                    }
+                    newValue
                 } else {
                     newValue
                 }
@@ -1130,7 +1146,8 @@ internal val TrackHeight = 4.dp
 private val SliderHeight = 48.dp
 private val SliderMinWidth = 144.dp // TODO: clarify min width
 private val DefaultSliderConstraints =
-    Modifier.widthIn(min = SliderMinWidth)
+    Modifier
+        .widthIn(min = SliderMinWidth)
         .heightIn(max = SliderHeight)
 
 private val SliderToTickAnimation = TweenSpec<Float>(durationMillis = 100)
