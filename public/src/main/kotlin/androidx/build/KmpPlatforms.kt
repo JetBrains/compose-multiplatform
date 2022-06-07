@@ -71,8 +71,9 @@ fun Project.enabledKmpPlatforms(): Set<KmpPlatform> {
 }
 
 fun Project.enableJs(): Boolean = enabledKmpPlatforms().contains(KmpPlatform.JS)
-fun Project.enableMac(): Boolean = enabledKmpPlatforms().contains(KmpPlatform.MAC)
-fun Project.enableLinux(): Boolean = enabledKmpPlatforms().contains(KmpPlatform.LINUX)
+fun Project.enableMac(): Boolean =
+    enabledKmpPlatforms().contains(KmpPlatform.MAC) || Multiplatform.isKotlinNativeEnabled(this)
+fun Project.enableLinux(): Boolean =
+    enabledKmpPlatforms().contains(KmpPlatform.LINUX) || Multiplatform.isKotlinNativeEnabled(this)
 fun Project.enableJvm(): Boolean = enabledKmpPlatforms().contains(KmpPlatform.JVM)
-fun Project.enableNative(): Boolean =
-    (enableMac() && enableLinux()) || Multiplatform.isKotlinNativeEnabled(this)
+fun Project.enableNative(): Boolean = enableMac() && enableLinux()
