@@ -108,10 +108,18 @@ class FloatingActionButtonTest {
         rule
             .setMaterialContentForSizeAssertions {
                 FloatingActionButton(onClick = {}) {
-                    Icon(Icons.Filled.Favorite, null)
+                    Icon(
+                        Icons.Filled.Favorite,
+                        null,
+                        modifier = Modifier.testTag("icon"))
                 }
             }
             .assertIsSquareWithSize(FabPrimaryTokens.ContainerHeight)
+
+        rule
+            .onNodeWithTag("icon", useUnmergedTree = true)
+            .assertHeightIsEqualTo(FabPrimaryTokens.IconSize)
+            .assertWidthIsEqualTo(FabPrimaryTokens.IconSize)
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -121,12 +129,21 @@ class FloatingActionButtonTest {
             .setMaterialContentForSizeAssertions {
                 CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
                     SmallFloatingActionButton(onClick = {}) {
-                        Icon(Icons.Filled.Favorite, null)
+                        Icon(
+                            Icons.Filled.Favorite,
+                            null,
+                            modifier = Modifier.testTag("icon")
+                        )
                     }
                 }
             }
             // Expecting the size to be equal to the token size.
             .assertIsSquareWithSize(FabPrimarySmallTokens.ContainerHeight)
+
+        rule
+            .onNodeWithTag("icon", useUnmergedTree = true)
+            .assertHeightIsEqualTo(FabPrimarySmallTokens.IconSize)
+            .assertWidthIsEqualTo(FabPrimarySmallTokens.IconSize)
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -152,10 +169,21 @@ class FloatingActionButtonTest {
         rule
             .setMaterialContentForSizeAssertions {
                 LargeFloatingActionButton(onClick = {}) {
-                    Icon(Icons.Filled.Favorite, null)
+                    Icon(
+                        Icons.Filled.Favorite,
+                        null,
+                        modifier = Modifier
+                            .size(FloatingActionButtonDefaults.LargeIconSize)
+                            .testTag("icon")
+                    )
                 }
             }
             .assertIsSquareWithSize(FabPrimaryLargeTokens.ContainerHeight)
+
+        rule
+            .onNodeWithTag("icon", useUnmergedTree = true)
+            .assertHeightIsEqualTo(FloatingActionButtonDefaults.LargeIconSize)
+            .assertWidthIsEqualTo(FloatingActionButtonDefaults.LargeIconSize)
     }
 
     @Test
@@ -402,7 +430,7 @@ class FloatingActionButtonTest {
     }
 
     @Test
-    fun expandedExtendedFabTextHasSizeFromSpecAndTextVisible() {
+    fun expandedExtendedFabTextAndIconHaveSizeFromSpecAndVisible() {
         rule.setMaterialContent(lightColorScheme()) {
             ExtendedFloatingActionButton(
                 expanded = true,
@@ -419,6 +447,11 @@ class FloatingActionButtonTest {
             )
         }
 
+        rule
+            .onNodeWithTag("icon", useUnmergedTree = true)
+            .assertHeightIsEqualTo(ExtendedFabPrimaryTokens.IconSize)
+            .assertWidthIsEqualTo(ExtendedFabPrimaryTokens.IconSize)
+
         rule.onNodeWithTag("FAB")
             .assertHeightIsEqualTo(ExtendedFabPrimaryTokens.ContainerHeight)
             .assertWidthIsAtLeast(80.dp)
@@ -428,7 +461,7 @@ class FloatingActionButtonTest {
     }
 
     @Test
-    fun collapsedExtendedFabTextHasSizeFromSpecAndTextNotVisible() {
+    fun collapsedExtendedFabTextAndIconHaveSizeFromSpecAndTextNotVisible() {
         rule.setMaterialContent(lightColorScheme()) {
             ExtendedFloatingActionButton(
                 expanded = false,
@@ -447,6 +480,12 @@ class FloatingActionButtonTest {
 
         rule.onNodeWithTag("FAB")
             .assertIsSquareWithSize(FabPrimaryTokens.ContainerHeight)
+
+        rule
+            .onNodeWithTag("icon", useUnmergedTree = true)
+            .assertHeightIsEqualTo(ExtendedFabPrimaryTokens.IconSize)
+            .assertWidthIsEqualTo(ExtendedFabPrimaryTokens.IconSize)
+
         rule.onNodeWithTag("text", useUnmergedTree = true).assertDoesNotExist()
         rule.onNodeWithTag("icon", useUnmergedTree = true).assertIsDisplayed()
     }
