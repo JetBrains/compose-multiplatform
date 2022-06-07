@@ -19,6 +19,7 @@ package androidx.compose.ui.input.pointer
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ComposeScene
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.ImageComposeScene
@@ -30,7 +31,11 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.use
 import com.google.common.truth.Truth.assertThat
-import java.awt.Cursor
+import kotlin.coroutines.coroutineContext
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.jetbrains.skia.Surface
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -183,7 +188,84 @@ class PointerIconTest {
         assertThat(iconService.current).isEqualTo(PointerIconDefaults.Hand)
     }
 
-    private class IconPlatform: Platform by Platform.Empty {
+    @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun whenHoveredShouldCommitWithoutMoveWhenIconChanges() = runTest(UnconfinedTestDispatcher()) {
+        val component = IconPlatform()
+        val surface = Surface.makeRasterN32Premul(100, 100)
+        var scene: ComposeScene? = null
+
+        scene = ComposeScene(platform = component, invalidate = {
+            scene?.render(surface.canvas, 1)
+        }, coroutineContext = coroutineContext)
+
+        val iconState = mutableStateOf(PointerIconDefaults.Text)
+
+        val recomposeChannel = Channel<Int>(Channel.CONFLATED) // helps with waiting for recomposition
+        var count = 0
+        try {
+            scene.constraints = Constraints(maxWidth = surface.width, maxHeight = surface.height)
+            scene.setContent {
+                Box(
+                    modifier = Modifier.pointerHoverIcon(iconState.value).size(30.dp, 30.dp)
+                )
+                recomposeChannel.trySend(++count)
+            }
+            scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
+            assertThat(recomposeChannel.receive()).isEqualTo(1)
+            assertThat(component._pointerIcon).isEqualTo(PointerIconDefaults.Text)
+
+            // No move, but change should be applied anyway
+            iconState.value = PointerIconDefaults.Crosshair
+            assertThat(recomposeChannel.receive()).isEqualTo(2)
+            assertThat(component._pointerIcon).isEqualTo(PointerIconDefaults.Crosshair)
+        } finally {
+            scene.close()
+        }
+    }
+
+    @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun whenNotHoveredShouldNeverCommit() = runTest(UnconfinedTestDispatcher()) {
+        val component = IconPlatform()
+        val surface = Surface.makeRasterN32Premul(100, 100)
+        var scene: ComposeScene? = null
+
+        scene = ComposeScene(platform = component, invalidate = {
+            scene?.render(surface.canvas, 1)
+        }, coroutineContext = coroutineContext)
+
+        val iconState = mutableStateOf(PointerIconDefaults.Text)
+
+        val recomposeChannel = Channel<Int>(Channel.CONFLATED) // helps with waiting for recomposition
+        var count = 0
+        try {
+            scene.constraints = Constraints(maxWidth = surface.width, maxHeight = surface.height)
+            scene.setContent {
+                Box(modifier = Modifier.size(100.dp, 100.dp).pointerInput(Unit) { }) {
+                    Box(
+                        modifier = Modifier.pointerHoverIcon(iconState.value).size(30.dp, 30.dp)
+                    )
+                }
+                recomposeChannel.trySend(++count)
+            }
+            assertThat(recomposeChannel.receive()).isEqualTo(1)
+            assertThat(component._pointerIcon).isEqualTo(null)
+
+            // No move, not hovered. No pointer icon change expected
+            iconState.value = PointerIconDefaults.Crosshair
+            assertThat(recomposeChannel.receive()).isEqualTo(2)
+            assertThat(component._pointerIcon).isEqualTo(null)
+
+            // Move, but not hovered. Pointer Icon should be Default
+            scene.sendPointerEvent(PointerEventType.Move, Offset(90f, 95f))
+            assertThat(component._pointerIcon).isEqualTo(PointerIconDefaults.Default)
+        } finally {
+            scene.close()
+        }
+    }
+
+    private class IconPlatform : Platform by Platform.Empty {
         var _pointerIcon: PointerIcon? = null
 
         override fun setPointerIcon(pointerIcon: PointerIcon) {

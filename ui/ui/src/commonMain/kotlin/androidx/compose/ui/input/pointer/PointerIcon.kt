@@ -16,14 +16,15 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.boundsInParent
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalPointerIconService
 import androidx.compose.ui.platform.debugInspectorInfo
 
@@ -48,6 +49,8 @@ internal expect val pointerIconHand: PointerIcon
 
 internal interface PointerIconService {
     var current: PointerIcon
+
+    fun requestUpdate() {}
 }
 
 /**
@@ -73,18 +76,32 @@ fun Modifier.pointerHoverIcon(icon: PointerIcon, overrideDescendants: Boolean = 
         if (pointerIconService == null) {
             Modifier
         } else {
-            this.pointerInput(icon, overrideDescendants) {
+            val rememberIcon = rememberUpdatedState(icon)
+            val rememberOverrideDescendants = rememberUpdatedState(overrideDescendants)
+            val hovered = remember { mutableStateOf(false) }
+
+            if (hovered.value) {
+                DisposableEffect(icon) {
+                    pointerIconService.requestUpdate()
+                    onDispose { }
+                }
+            }
+
+            this.pointerInput(Unit) {
                 awaitPointerEventScope {
                     while (true) {
-                        val pass = if (overrideDescendants)
+                        val pass = if (rememberOverrideDescendants.value)
                             PointerEventPass.Main
                         else
                             PointerEventPass.Initial
                         val event = awaitPointerEvent(pass)
                         val isOutsideRelease = event.type == PointerEventType.Release &&
                             event.changes[0].isOutOfBounds(size, Size.Zero)
+
+                        hovered.value = false
                         if (event.type != PointerEventType.Exit && !isOutsideRelease) {
-                            pointerIconService.current = icon
+                            hovered.value = true
+                            pointerIconService.current = rememberIcon.value
                         }
                     }
                 }

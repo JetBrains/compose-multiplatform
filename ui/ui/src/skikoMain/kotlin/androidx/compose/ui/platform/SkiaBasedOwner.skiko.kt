@@ -256,7 +256,7 @@ internal class SkiaBasedOwner(
         if (
             measureAndLayoutDelegate.measureAndLayout {
                 if (sendPointerUpdate) {
-                    pointerPositionUpdater.onLayout()
+                    pointerPositionUpdater.needUpdate()
                 }
             }
         ) {
@@ -422,5 +422,9 @@ internal class SkiaBasedOwner(
 
     override val pointerIconService = object : PointerIconService {
         override var current: PointerIcon = PointerIconDefaults.Default
+
+        override fun requestUpdate() {
+            pointerPositionUpdater.needUpdate()
+        }
     }
 }

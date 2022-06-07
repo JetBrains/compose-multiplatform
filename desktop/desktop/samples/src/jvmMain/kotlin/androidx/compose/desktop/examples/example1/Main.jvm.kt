@@ -35,6 +35,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -83,6 +84,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.pointer.isAltPressed
 import androidx.compose.ui.input.pointer.isCtrlPressed
 import androidx.compose.ui.input.pointer.isMetaPressed
@@ -139,9 +141,15 @@ val dispatchedFonts = FontFamily(
     Font("NotoSans-Regular.ttf", style = FontStyle.Normal)
 )
 
+private val isCtrlPressed = mutableStateOf(false)
+
 fun main() = singleWindowApplication(
     title = title,
-    state = WindowState(width = 1024.dp, height = 850.dp)
+    state = WindowState(width = 1024.dp, height = 850.dp),
+    onPreviewKeyEvent = {
+        isCtrlPressed.value = it.isCtrlPressed
+        false
+    }
 ) {
     App()
 }
@@ -548,6 +556,16 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
                 Modifier.size(100.dp).align(Alignment.CenterVertically),
                 tint = Color.Blue.copy(alpha = 0.5f)
             )
+        }
+
+        Box(modifier = Modifier.size(150.dp).background(Color.Gray).pointerHoverIcon(
+            if (isCtrlPressed.value) PointerIconDefaults.Hand else PointerIconDefaults.Default
+        )) {
+            Box(modifier = Modifier.offset(20.dp, 20.dp).size(100.dp).background(Color.Blue).pointerHoverIcon(
+                if (isCtrlPressed.value) PointerIconDefaults.Crosshair else PointerIconDefaults.Text,
+            )) {
+                Text("pointerHoverIcon test with Ctrl")
+            }
         }
     }
 }

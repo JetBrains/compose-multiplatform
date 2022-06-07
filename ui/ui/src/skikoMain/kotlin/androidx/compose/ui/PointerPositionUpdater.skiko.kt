@@ -19,6 +19,7 @@ package androidx.compose.ui
 import androidx.compose.ui.input.pointer.HitPathTracker
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerInputEvent
+import kotlin.js.JsName
 
 internal class PointerPositionUpdater(
     private val onNeedUpdate: () -> Unit,
@@ -47,7 +48,8 @@ internal class PointerPositionUpdater(
         lastEvent = event
     }
 
-    fun onLayout() {
+    @JsName("setNeedUpdate")
+    fun needUpdate() {
         needUpdate = true
         onNeedUpdate()
     }
