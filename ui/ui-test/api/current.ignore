@@ -1,11 +1,3 @@
 // Baseline format: 1.0
-AddedAbstractMethod: androidx.compose.ui.test.MultiModalInjectionScope#touch(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.TouchInjectionScope,kotlin.Unit>):
-    Added method androidx.compose.ui.test.MultiModalInjectionScope.touch(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.TouchInjectionScope,kotlin.Unit>)
-
-
-RemovedMethod: androidx.compose.ui.test.InjectionScope#dispose():
-    Removed method androidx.compose.ui.test.InjectionScope.dispose()
-RemovedMethod: androidx.compose.ui.test.InjectionScope#flush():
-    Removed method androidx.compose.ui.test.InjectionScope.flush()
-RemovedMethod: androidx.compose.ui.test.MultiModalInjectionScope#getTouch():
-    Removed method androidx.compose.ui.test.MultiModalInjectionScope.getTouch()
+ParameterNameChange: androidx.compose.ui.test.MainTestClock#setAutoAdvance(boolean) parameter #0:
+    Attempted to remove parameter name from parameter arg1 in androidx.compose.ui.test.MainTestClock.setAutoAdvance

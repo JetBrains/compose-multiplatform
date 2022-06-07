@@ -37,8 +37,10 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+@Preview
 @Composable
 fun TextSelectionDemo() {
     LazyColumn {
@@ -75,6 +77,7 @@ fun TextSelectionDemo() {
     }
 }
 
+@Preview
 @Composable
 fun TextDemoSelection() {
     val arabicSentence =
@@ -117,6 +120,7 @@ fun TextDemoSelection() {
     }
 }
 
+@Preview
 @Composable
 fun TextDemoSelectionWithStringInput() {
     SelectionContainer {
@@ -130,6 +134,7 @@ fun TextDemoSelectionWithStringInput() {
     }
 }
 
+@Preview
 @Composable
 fun TextDemoSelection2DArrayVertical() {
     var text = ""
@@ -169,6 +174,7 @@ fun TextDemoSelection2DArrayVertical() {
     }
 }
 
+@Preview
 @Composable
 fun TextDemoSelectionEnableAndDisable() {
     val textSelectable = "This text is selectable."

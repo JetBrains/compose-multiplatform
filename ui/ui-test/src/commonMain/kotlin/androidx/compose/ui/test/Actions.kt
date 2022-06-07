@@ -18,6 +18,7 @@ package androidx.compose.ui.test
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.input.rotary.RotaryScrollEvent
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.semantics.AccessibilityAction
@@ -274,25 +275,16 @@ fun SemanticsNodeInteraction.performScrollToNode(
  * execution of [block] or injection of the events, all (subsequent) events are dropped and the
  * error is thrown here.
  *
- * Example usage:
- * ```
- * testRule.onNodeWithTag("myWidget")
- *     .performGesture { swipeUp() }
+ * Due to the batching of events, all events in a block are sent together and no recomposition will
+ * take place in between events. Additionally all events will be generated before any of the events
+ * take effect. This means that the screen coordinates of all events are resolved before any of
+ * the events can cause the position of the node being injected into to change. This has certain
+ * advantages, for example, in the cases of nested scrolling or dragging an element around, it
+ * prevents the injection of events into a moving target since all events are enqueued before any
+ * of them has taken effect.
  *
- * testRule.onNodeWithTag("myWidget")
- *     .performGesture { click(center) }
- *
- * testRule.onNodeWithTag("myWidget")
- *     .performGesture { down(topLeft) }
- *     .assertHasClickAction()
- *     .performGesture { up(topLeft) }
- *
- * testRule.onNodeWithTag("myWidget")
- *     .performGesture { click() }
- * testRule.mainClock.advanceTimeBy(100)
- * testRule.onNodeWithTag("myWidget")
- *     .performGesture(true) { swipeUp() }
- * ```
+ * Example of performing a click:
+ * @sample androidx.compose.ui.test.samples.gestureClick
  *
  * @param block A lambda with [GestureScope] as receiver that describes the gesture by
  * sending all touch events.
@@ -334,29 +326,25 @@ fun SemanticsNodeInteraction.performGesture(
  * execution of [block] or injection of the events, all (subsequent) events are dropped and the
  * error is thrown here.
  *
- * Example usage:
- * ```
- * // Perform a swipe up
- * testRule.onNodeWithTag("myWidget")
- *     .performTouchInput { swipeUp() }
+ * Due to the batching of events, all events in a block are sent together and no recomposition will
+ * take place in between events. Additionally all events will be generated before any of the events
+ * take effect. This means that the screen coordinates of all events are resolved before any of
+ * the events can cause the position of the node being injected into to change. This has certain
+ * advantages, for example, in the cases of nested scrolling or dragging an element around, it
+ * prevents the injection of events into a moving target since all events are enqueued before any
+ * of them has taken effect.
  *
- * // Perform a click off-center
- * testRule.onNodeWithTag("myWidget")
- *     .performTouchInput { click(percentOffset(.2f, .5f) }
+ * Example of performing a swipe up:
+ * @sample androidx.compose.ui.test.samples.touchInputSwipeUp
  *
- * // Do an assertion while performing a click
- * testRule.onNodeWithTag("myWidget")
- *     .performTouchInput { down(topLeft) }
- *     .assertHasClickAction()
- *     .performTouchInput { up(topLeft) }
+ * Example of performing an off-center click:
+ * @sample androidx.compose.ui.test.samples.touchInputClickOffCenter
  *
- * // Perform a click-and-drag
- * testRule.onNodeWithTag("myWidget").performTouchInput {
- *     click()
- *     advanceEventTime(100)
- *     swipeUp()
- * }
- * ```
+ * Example of doing an assertion during a click:
+ * @sample androidx.compose.ui.test.samples.touchInputAssertDuringClick
+ *
+ * Example of performing a click-and-drag:
+ * @sample androidx.compose.ui.test.samples.touchInputClickAndDrag
  *
  * @param block A lambda with [TouchInjectionScope] as receiver that describes the gesture by
  * sending all touch events.
@@ -392,25 +380,19 @@ fun SemanticsNodeInteraction.performTouchInput(
  * execution of [block] or injection of the events, all (subsequent) events are dropped and the
  * error is thrown here.
  *
- * Example usage:
- * ```
- * onNodeWithTag("myWidget")
- *    .performMouseInput {
- *        click(center)
- *    }
+ * Due to the batching of events, all events in a block are sent together and no recomposition will
+ * take place in between events. Additionally all events will be generated before any of the events
+ * take effect. This means that the screen coordinates of all events are resolved before any of
+ * the events can cause the position of the node being injected into to change. This has certain
+ * advantages, for example, in the cases of nested scrolling or dragging an element around, it
+ * prevents the injection of events into a moving target since all events are enqueued before any
+ * of them has taken effect.
  *
- * onNodeWithTag("myWidget")
- *    // Scroll down while the primary mouse button is down:
- *    .performMouseInput {
- *        down()
- *        repeat(6) {
- *            advanceEventTime()
- *            scroll(-1f)
- *        }
- *        advanceEventTime()
- *        up()
- *    }
- * ```
+ * Example of performing a mouse click:
+ * @sample androidx.compose.ui.test.samples.mouseInputClick
+ *
+ * Example of scrolling the mouse wheel while the mouse button is pressed:
+ * @sample androidx.compose.ui.test.samples.mouseInputScrollWhileDown
  *
  * @param block A lambda with [MouseInjectionScope] as receiver that describes the gesture by
  * sending all mouse events.
@@ -426,6 +408,45 @@ fun SemanticsNodeInteraction.performMouseInput(
     with(MultiModalInjectionScopeImpl(node, testContext)) {
         try {
             mouse(block)
+        } finally {
+            dispose()
+        }
+    }
+    return this
+}
+
+/**
+ * Executes the key input gesture specified in the given [block]. The gesture doesn't need to be
+ * complete and can be resumed in a later invocation of one of the `perform.*Input` methods. The
+ * event time is initialized to the current time of the [MainTestClock].
+ *
+ * All events that are injected from the [block] are batched together and sent after [block] is
+ * complete. This method blocks while the events are injected. If an error occurs during
+ * execution of [block] or injection of the events, all (subsequent) events are dropped and the
+ * error is thrown here.
+ *
+ * Due to the batching of events, all events in a block are sent together and no recomposition will
+ * take place in between events. Additionally all events will be generated before any of the events
+ * take effect. This means that the screen coordinates of all events are resolved before any of
+ * the events can cause the position of the node being injected into to change. This has certain
+ * advantages, for example, in the cases of nested scrolling or dragging an element around, it
+ * prevents the injection of events into a moving target since all events are enqueued before any
+ * of them has taken effect.
+ *
+ * @param block A lambda with [KeyInjectionScope] as receiver that describes the gesture by
+ * sending all key press events.
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
+ *
+ * @see KeyInjectionScope
+ */
+@ExperimentalTestApi
+fun SemanticsNodeInteraction.performKeyInput(
+    block: KeyInjectionScope.() -> Unit
+): SemanticsNodeInteraction {
+    val node = fetchSemanticsNode("Failed to inject key input.")
+    with(MultiModalInjectionScopeImpl(node, testContext)) {
+        try {
+            key(block)
         } finally {
             dispose()
         }
@@ -453,13 +474,21 @@ fun SemanticsNodeInteraction.performMouseInput(
  * execution of [block] or injection of the events, all (subsequent) events are dropped and the
  * error is thrown here.
  *
+ * Due to the batching of events, all events in a block are sent together and no recomposition will
+ * take place in between events. Additionally all events will be generated before any of the events
+ * take effect. This means that the screen coordinates of all events are resolved before any of
+ * the events can cause the position of the node being injected into to change. This has certain
+ * advantages, for example, in the cases of nested scrolling or dragging an element around, it
+ * prevents the injection of events into a moving target since all events are enqueued before any
+ * of them has taken effect.
+ *
  * @param block A lambda with [MultiModalInjectionScope] as receiver that describes the gesture
  * by sending all multi modal events.
  * @return The [SemanticsNodeInteraction] that is the receiver of this method
  *
  * @see MultiModalInjectionScope
  */
-// TODO(fresen): add example of multi-modal input when Keyboard input is added (touch and mouse
+// TODO(fresen): add example of multi-modal input when key input is added (touch and mouse
 //  don't work together, so an example with those two doesn't make sense)
 fun SemanticsNodeInteraction.performMultiModalInput(
     block: MultiModalInjectionScope.() -> Unit
@@ -553,6 +582,26 @@ fun SemanticsNodeInteraction.performSemanticsAction(
     return performSemanticsAction(key) { it.invoke() }
 }
 
+/**
+ * Send the specified [RotaryScrollEvent] to the focused component.
+ *
+ * @return true if the event was consumed. False otherwise.
+ */
+@ExperimentalTestApi
+fun SemanticsNodeInteraction.performRotaryScrollInput(
+    block: RotaryInjectionScope.() -> Unit
+): SemanticsNodeInteraction {
+    val node = fetchSemanticsNode("Failed to send rotary Event")
+    with(MultiModalInjectionScopeImpl(node, testContext)) {
+        try {
+            rotary(block)
+        } finally {
+            dispose()
+        }
+    }
+    return this
+}
+
 // TODO(200928505): get a more accurate indication if it is a lazy list
 private val SemanticsNode.isLazyList: Boolean
     get() = ScrollBy in config && ScrollToIndex in config
@@ -585,7 +634,9 @@ private fun SemanticsNodeInteraction.requireSemantics(
 ) {
     val missingProperties = properties.filter { it !in node.config }
     if (missingProperties.isNotEmpty()) {
-        val msg = "${errorMessage()}, the node is missing [${missingProperties.joinToString()}]"
+        val msg = "${errorMessage()}, the node is missing [${
+            missingProperties.joinToString { it.name }
+        }]"
         throw AssertionError(buildGeneralErrorMessage(msg, selector, node))
     }
 }

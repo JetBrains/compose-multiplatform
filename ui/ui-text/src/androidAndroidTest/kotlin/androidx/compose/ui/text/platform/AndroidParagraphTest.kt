@@ -1,6 +1,7 @@
 package androidx.compose.ui.text.platform
 
 import android.graphics.Paint
+import android.graphics.Typeface
 import android.text.TextPaint
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.BackgroundColorSpan
@@ -10,15 +11,20 @@ import android.text.style.LocaleSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.ScaleXSpan
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TestFontResourceLoader
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.UncachedFontFamilyResolver
 import androidx.compose.ui.text.android.InternalPlatformTextApi
 import androidx.compose.ui.text.android.TextLayout
 import androidx.compose.ui.text.android.style.BaselineShiftSpan
@@ -28,18 +34,22 @@ import androidx.compose.ui.text.android.style.LetterSpacingSpanPx
 import androidx.compose.ui.text.android.style.ShadowSpan
 import androidx.compose.ui.text.android.style.SkewXSpan
 import androidx.compose.ui.text.android.style.TextDecorationSpan
+import androidx.compose.ui.text.ceilToInt
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.testutils.AsyncTestTypefaceLoader
+import androidx.compose.ui.text.font.testutils.BlockingFauxFont
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.matchers.assertThat
+import androidx.compose.ui.text.platform.style.ShaderBrushSpan
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -49,19 +59,10 @@ import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.atLeastOnce
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.spy
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.Mockito
 import kotlin.math.ceil
 import kotlin.math.roundToInt
+import org.junit.Test
+import org.junit.runner.RunWith
 
 @OptIn(InternalPlatformTextApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -76,6 +77,7 @@ AndroidParagraphTest {
     private val defaultDensity = Density(density = 1f)
     private val context = InstrumentationRegistry.getInstrumentation().context
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
     fun draw_with_newline_and_line_break_default_values() {
         with(defaultDensity) {
@@ -93,7 +95,8 @@ AndroidParagraphTest {
 
                 val textPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
                 textPaint.textSize = fontSize.toPx()
-                textPaint.typeface = TypefaceAdapter().create(basicFontFamily)
+                textPaint.typeface = UncachedFontFamilyResolver(context)
+                    .resolve(BASIC_MEASURE_FONT.toFontFamily()).value as Typeface
 
                 val layout = TextLayout(
                     charSequence = text,
@@ -152,6 +155,80 @@ AndroidParagraphTest {
         assertThat(paragraph.charSequence).hasSpan(ForegroundColorSpan::class, 0, text.length)
         assertThat(paragraph.charSequence).hasSpan(ForegroundColorSpan::class, 0, "abc".length)
         assertThat(paragraph.charSequence).hasSpanOnTop(ForegroundColorSpan::class, 0, "abc".length)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testAnnotatedString_setBrushOnWholeText() {
+        val text = "abcde"
+        val brush = Brush.linearGradient(listOf(Color.Black, Color.White))
+        val spanStyle = SpanStyle(brush = brush)
+
+        val paragraph = simpleParagraph(
+            text = text,
+            spanStyles = listOf(AnnotatedString.Range(spanStyle, 0, text.length)),
+            width = 100.0f
+        )
+
+        assertThat(paragraph.charSequence).hasSpan(ShaderBrushSpan::class, 0, text.length) {
+            it.shaderBrush == brush
+        }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testAnnotatedString_setSolidColorBrushOnWholeText() {
+        val text = "abcde"
+        val brush = SolidColor(Color.Red)
+        val spanStyle = SpanStyle(brush = brush)
+
+        val paragraph = simpleParagraph(
+            text = text,
+            spanStyles = listOf(AnnotatedString.Range(spanStyle, 0, text.length)),
+            width = 100.0f
+        )
+
+        assertThat(paragraph.charSequence).hasSpan(ForegroundColorSpan::class, 0, text.length)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testAnnotatedString_setBrushOnPartOfText() {
+        val text = "abcde"
+        val brush = Brush.linearGradient(listOf(Color.Black, Color.White))
+        val spanStyle = SpanStyle(brush = brush)
+
+        val paragraph = simpleParagraph(
+            text = text,
+            spanStyles = listOf(AnnotatedString.Range(spanStyle, 0, "abc".length)),
+            width = 100.0f
+        )
+
+        assertThat(paragraph.charSequence).hasSpan(ShaderBrushSpan::class, 0, "abc".length) {
+            it.shaderBrush == brush
+        }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testAnnotatedString_brushSpanReceivesSize() {
+        with(defaultDensity) {
+            val text = "abcde"
+            val brush = Brush.linearGradient(listOf(Color.Black, Color.White))
+            val spanStyle = SpanStyle(brush = brush)
+            val fontSize = 10.sp
+
+            val paragraph = simpleParagraph(
+                text = text,
+                spanStyles = listOf(AnnotatedString.Range(spanStyle, 0, "abc".length)),
+                width = 100.0f,
+                style = TextStyle(fontSize = fontSize, fontFamily = basicFontFamily)
+            )
+
+            assertThat(paragraph.charSequence).hasSpan(ShaderBrushSpan::class, 0, "abc".length) {
+                it.size == Size(100.0f, fontSize.toPx())
+            }
+        }
     }
 
     @Test
@@ -750,69 +827,43 @@ AndroidParagraphTest {
     @Test
     @MediumTest
     fun testEmptyFontFamily() {
-        val typefaceAdapter = mock<TypefaceAdapter>()
         val paragraph = simpleParagraph(
             text = "abc",
-            typefaceAdapter = typefaceAdapter,
             width = Float.MAX_VALUE
         )
 
-        verify(typefaceAdapter, never()).create(
-            fontFamily = any(),
-            fontWeight = any(),
-            fontStyle = anyFontStyle(),
-            fontSynthesis = anyFontSynthesis()
-        )
         assertThat(paragraph.textPaint.typeface).isNull()
     }
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
     @MediumTest
     fun testEmptyFontFamily_withBoldFontWeightSelection() {
-        val typefaceAdapter = spy(TypefaceAdapter())
-
         val paragraph = simpleParagraph(
             text = "abc",
             style = TextStyle(
                 fontFamily = null,
                 fontWeight = FontWeight.Bold
             ),
-            typefaceAdapter = typefaceAdapter,
             width = Float.MAX_VALUE
         )
-
-        verify(typefaceAdapter, times(1)).create(
-            fontFamily = eq(null),
-            fontWeight = eq(FontWeight.Bold),
-            fontStyle = eqFontStyle(FontStyle.Normal),
-            fontSynthesis = eqFontSynthesis(FontSynthesis.All)
-        )
-
         val typeface = paragraph.textPaint.typeface
         assertThat(typeface).isNotNull()
         assertThat(typeface.isBold).isTrue()
         assertThat(typeface.isItalic).isFalse()
     }
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
     @MediumTest
     fun testEmptyFontFamily_withFontStyleSelection() {
-        val typefaceAdapter = spy(TypefaceAdapter())
         val paragraph = simpleParagraph(
             text = "abc",
             style = TextStyle(
                 fontFamily = null,
                 fontStyle = FontStyle.Italic
             ),
-            typefaceAdapter = typefaceAdapter,
             width = Float.MAX_VALUE
-        )
-
-        verify(typefaceAdapter, times(1)).create(
-            fontFamily = eq(null),
-            fontWeight = eq(FontWeight.Normal),
-            fontStyle = eqFontStyle(FontStyle.Italic),
-            fontSynthesis = eqFontSynthesis(FontSynthesis.All)
         )
 
         val typeface = paragraph.textPaint.typeface
@@ -821,10 +872,10 @@ AndroidParagraphTest {
         assertThat(typeface.isItalic).isTrue()
     }
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
     @MediumTest
     fun testFontFamily_withGenericFamilyName() {
-        val typefaceAdapter = spy(TypefaceAdapter())
         val fontFamily = FontFamily.SansSerif
 
         val paragraph = simpleParagraph(
@@ -832,15 +883,7 @@ AndroidParagraphTest {
             style = TextStyle(
                 fontFamily = fontFamily
             ),
-            typefaceAdapter = typefaceAdapter,
             width = Float.MAX_VALUE
-        )
-
-        verify(typefaceAdapter, times(1)).create(
-            fontFamily = eq(fontFamily),
-            fontWeight = eq(FontWeight.Normal),
-            fontStyle = eqFontStyle(FontStyle.Normal),
-            fontSynthesis = eqFontSynthesis(FontSynthesis.All)
         )
 
         val typeface = paragraph.textPaint.typeface
@@ -849,28 +892,25 @@ AndroidParagraphTest {
         assertThat(typeface.isItalic).isFalse()
     }
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
     @MediumTest
     fun testFontFamily_withCustomFont() {
-        val typefaceAdapter = spy(TypefaceAdapter())
+        val typefaceLoader = AsyncTestTypefaceLoader()
+        val expectedTypeface: Typeface = UncachedFontFamilyResolver(context)
+            .resolve(BASIC_MEASURE_FONT.toFontFamily()).value as Typeface
+        val font = BlockingFauxFont(typefaceLoader, expectedTypeface)
         val paragraph = simpleParagraph(
             text = "abc",
             style = TextStyle(
-                fontFamily = basicFontFamily
+                fontFamily = font.toFontFamily()
             ),
-            typefaceAdapter = typefaceAdapter,
             width = Float.MAX_VALUE
         )
 
-        verify(typefaceAdapter, atLeastOnce()).create(
-            fontFamily = eq(basicFontFamily),
-            fontWeight = eq(FontWeight.Normal),
-            fontStyle = eqFontStyle(FontStyle.Normal),
-            fontSynthesis = eqFontSynthesis(FontSynthesis.All)
-        )
-        val typeface = paragraph.textPaint.typeface
-        assertThat(typeface.isBold).isFalse()
-        assertThat(typeface.isItalic).isFalse()
+        val typeface: Typeface = paragraph.textPaint.typeface
+
+        assertThat(typeface).isSameInstanceAs(expectedTypeface)
     }
 
     @Test
@@ -938,6 +978,139 @@ AndroidParagraphTest {
             for (i in 0 until paragraph.lineCount) {
                 assertThat(paragraph.isEllipsisApplied(i)).isFalse()
             }
+        }
+    }
+
+    @Test
+    fun testEllipsis_withLimitedHeightFitAllLines_doesNotEllipsis() {
+        with(defaultDensity) {
+            val text = "This is a text"
+            val fontSize = 30.sp
+            val paragraph = simpleParagraph(
+                text = text,
+                ellipsis = true,
+                style = TextStyle(
+                    fontFamily = basicFontFamily,
+                    fontSize = fontSize
+                ),
+                width = 4 * fontSize.toPx(),
+                height = 6 * fontSize.toPx(),
+            )
+
+            for (i in 0 until paragraph.lineCount) {
+                assertThat(paragraph.isEllipsisApplied(i)).isFalse()
+            }
+        }
+    }
+
+    @Test
+    fun testEllipsis_withLimitedHeight_doesEllipsis() {
+        with(defaultDensity) {
+            val text = "This is a text"
+            val fontSize = 30.sp
+            val paragraph = simpleParagraph(
+                text = text,
+                ellipsis = true,
+                style = TextStyle(
+                    fontFamily = basicFontFamily,
+                    fontSize = fontSize
+                ),
+                width = 4 * fontSize.toPx(),
+                height = 2.2f * fontSize.toPx(), // fits 2 lines
+            )
+
+            assertThat(paragraph.lineCount).isEqualTo(2)
+            assertThat(paragraph.isEllipsisApplied(paragraph.lineCount - 1)).isTrue()
+        }
+    }
+
+    @Test
+    fun testEllipsis_withLimitedHeight_ellipsisFalse_doesNotEllipsis() {
+        with(defaultDensity) {
+            val text = "This is a text"
+            val fontSize = 30.sp
+            val paragraph = simpleParagraph(
+                text = text,
+                ellipsis = false,
+                style = TextStyle(
+                    fontFamily = basicFontFamily,
+                    fontSize = fontSize
+                ),
+                width = 4 * fontSize.toPx(),
+                height = 2.2f * fontSize.toPx(), // fits 2 lines
+            )
+
+            for (i in 0 until paragraph.lineCount) {
+                assertThat(paragraph.isEllipsisApplied(i)).isFalse()
+            }
+        }
+    }
+
+    @Test
+    fun testEllipsis_withMaxLinesMoreThanTextLines_andLimitedHeight_doesEllipsis() {
+        with(defaultDensity) {
+            val text = "This is a text"
+            val fontSize = 30.sp
+            val paragraph = simpleParagraph(
+                text = text,
+                ellipsis = true,
+                style = TextStyle(
+                    fontFamily = basicFontFamily,
+                    fontSize = fontSize
+                ),
+                width = 4 * fontSize.toPx(),
+                height = 2.2f * fontSize.toPx(), // fits 2 lines
+                maxLines = 5
+            )
+
+            assertThat(paragraph.lineCount).isEqualTo(2)
+            assertThat(paragraph.isEllipsisApplied(paragraph.lineCount - 1)).isTrue()
+        }
+    }
+
+    @Test
+    fun testEllipsis_withMaxLines_andLimitedHeight_doesEllipsis() {
+        with(defaultDensity) {
+            val text = "This is a text"
+            val fontSize = 30.sp
+            val paragraph = simpleParagraph(
+                text = text,
+                ellipsis = true,
+                style = TextStyle(
+                    fontFamily = basicFontFamily,
+                    fontSize = fontSize
+                ),
+                width = 4 * fontSize.toPx(),
+                height = 4 * fontSize.toPx(),
+                maxLines = 2
+            )
+
+            assertThat(paragraph.lineCount).isEqualTo(2)
+            assertThat(paragraph.isEllipsisApplied(paragraph.lineCount - 1)).isTrue()
+        }
+    }
+
+    @Test
+    fun testEllipsis_withSpans_withLimitedHeight_doesEllipsis() {
+        with(defaultDensity) {
+            val text = "This is a text"
+            val fontSize = 30.sp
+            val paragraph = simpleParagraph(
+                text = text,
+                spanStyles = listOf(
+                    AnnotatedString.Range(SpanStyle(fontSize = fontSize * 2), 0, 2)
+                ),
+                ellipsis = true,
+                style = TextStyle(
+                    fontFamily = basicFontFamily,
+                    fontSize = fontSize
+                ),
+                width = 4 * fontSize.toPx(),
+                height = 2.2f * fontSize.toPx() // fits 2 lines
+            )
+
+            assertThat(paragraph.lineCount).isEqualTo(1)
+            assertThat(paragraph.isEllipsisApplied(paragraph.lineCount - 1)).isTrue()
         }
     }
 
@@ -1348,15 +1521,63 @@ AndroidParagraphTest {
         assertThat(paragraph.textLocale.toLanguageTag()).isEqualTo("ja")
     }
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
-    fun floatingWidth() {
-        val floatWidth = 1.3f
-        val paragraph = simpleParagraph(
-            text = "Hello, World",
-            width = floatWidth
+    fun withIncludeFontPadding() {
+        val text = "A"
+
+        @Suppress("DEPRECATION")
+        val style = TextStyle(
+            fontSize = 20.sp,
+            platformStyle = PlatformTextStyle(includeFontPadding = true)
         )
 
-        assertThat(floatWidth).isEqualTo(paragraph.width)
+        val paragraphPaddingTrue = simpleParagraph(
+            text = text,
+            style = style,
+            width = Float.MAX_VALUE
+        )
+
+        @Suppress("DEPRECATION")
+        val paragraphPaddingFalse = simpleParagraph(
+            text = text,
+            style = style.copy(platformStyle = PlatformTextStyle(includeFontPadding = false)),
+            width = Float.MAX_VALUE
+        )
+
+        assertThat(paragraphPaddingTrue.height).isNotEqualTo(paragraphPaddingFalse.height)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun setMinWidthConstraints_notSupported() {
+        val minWidthConstraints = Constraints(minWidth = 100)
+        AndroidParagraph(
+            text = "",
+            style = TextStyle(),
+            spanStyles = listOf(),
+            placeholders = listOf(),
+            maxLines = Int.MAX_VALUE,
+            ellipsis = true,
+            constraints = minWidthConstraints,
+            fontFamilyResolver = UncachedFontFamilyResolver(context),
+            density = defaultDensity,
+        )
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun setMinHeightConstraints_notSupported() {
+        val minHeightConstraints = Constraints(minHeight = 100)
+        AndroidParagraph(
+            text = "",
+            style = TextStyle(),
+            spanStyles = listOf(),
+            placeholders = listOf(),
+            maxLines = Int.MAX_VALUE,
+            ellipsis = true,
+            constraints = minHeightConstraints,
+            fontFamilyResolver = UncachedFontFamilyResolver(context),
+            density = defaultDensity,
+        )
     }
 
     private fun simpleParagraph(
@@ -1367,52 +1588,26 @@ AndroidParagraphTest {
         ellipsis: Boolean = false,
         maxLines: Int = Int.MAX_VALUE,
         width: Float,
+        height: Float = Float.POSITIVE_INFINITY,
         style: TextStyle? = null,
-        typefaceAdapter: TypefaceAdapter = TypefaceAdapter()
+        fontFamilyResolver: FontFamily.Resolver = UncachedFontFamilyResolver(context)
     ): AndroidParagraph {
         return AndroidParagraph(
             text = text,
             spanStyles = spanStyles,
             placeholders = listOf(),
-            typefaceAdapter = typefaceAdapter,
             style = TextStyle(
                 textAlign = textAlign,
                 textIndent = textIndent
             ).merge(style),
             maxLines = maxLines,
             ellipsis = ellipsis,
-            width = width,
-            density = Density(density = 1f)
+            constraints = Constraints(
+                maxWidth = width.ceilToInt(),
+                maxHeight = height.ceilToInt()
+            ),
+            density = Density(density = 1f),
+            fontFamilyResolver = fontFamilyResolver
         )
     }
-
-    private fun TypefaceAdapter() = TypefaceAdapter(
-        resourceLoader = TestFontResourceLoader(context)
-    )
-}
-
-internal fun eqFontStyle(fontStyle: FontStyle): FontStyle {
-    return Mockito.argThat { arg: Any ->
-        if (arg is Int) {
-            arg == fontStyle.value
-        } else {
-            arg == fontStyle
-        }
-    } as FontStyle? ?: fontStyle
-}
-
-internal fun eqFontSynthesis(fontSynthesis: FontSynthesis): FontSynthesis {
-    return Mockito.argThat { arg: Any ->
-        if (arg is Int) {
-            arg == fontSynthesis.value
-        } else {
-            arg == fontSynthesis
-        }
-    } as FontSynthesis? ?: fontSynthesis
-}
-
-internal fun anyFontSynthesis(): FontSynthesis {
-    return Mockito.argThat { arg: Any ->
-        arg is Int || arg is FontSynthesis
-    } as FontSynthesis? ?: FontSynthesis.None
 }

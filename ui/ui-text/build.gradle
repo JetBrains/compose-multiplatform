@@ -15,7 +15,6 @@
  */
 
 import androidx.build.AndroidXComposePlugin
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -34,17 +33,20 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
          * corresponding block below
          */
         implementation(libs.kotlinStdlibCommon)
+        implementation(libs.kotlinCoroutinesCore)
 
         api(project(":compose:ui:ui-graphics"))
         api(project(":compose:ui:ui-unit"))
         api("androidx.annotation:annotation:1.1.0")
 
+        // when updating the runtime version please also update the runtime-saveable version
         implementation(project(":compose:runtime:runtime"))
         implementation(project(":compose:runtime:runtime-saveable"))
+
         implementation(project(":compose:ui:ui-util"))
         implementation(libs.kotlinStdlib)
-        implementation("androidx.collection:collection:1.1.0")
         implementation("androidx.core:core:1.5.0")
+        implementation('androidx.collection:collection:1.0.0')
 
         testImplementation(project(":compose:ui:ui-test-font"))
         testImplementation(libs.testRules)
@@ -53,6 +55,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         testImplementation(libs.mockitoCore)
         testImplementation(libs.truth)
         testImplementation(libs.kotlinReflect)
+        testImplementation(libs.kotlinTest)
         testImplementation(libs.mockitoKotlin)
 
         androidTestImplementation(project(":compose:ui:ui-test-font"))
@@ -80,10 +83,12 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 }
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
-        jvm("desktop")
+        desktop()
+    }
 
+    kotlin {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block below
@@ -91,12 +96,15 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         sourceSets {
             commonMain.dependencies {
                 implementation(libs.kotlinStdlibCommon)
+                implementation(libs.kotlinCoroutinesCore)
 
                 api(project(":compose:ui:ui-graphics"))
                 api(project(":compose:ui:ui-unit"))
 
+                // when updating the runtime version please also update the runtime-saveable version
                 implementation(project(":compose:runtime:runtime"))
                 implementation(project(":compose:runtime:runtime-saveable"))
+
                 implementation(project(":compose:ui:ui-util"))
             }
 
@@ -115,16 +123,19 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 dependsOn(skikoMain)
                 dependsOn(jvmMain)
             }
-            androidMain.dependsOn(jvmMain)
 
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
-                implementation("androidx.collection:collection:1.1.0")
                 implementation("androidx.core:core:1.5.0")
+                implementation('androidx.collection:collection:1.0.0')
             }
 
             androidMain.kotlin.srcDirs("../../../text/text/src/main/java")
 
+            // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
+            //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
+            //  level dependencies block instead:
+            //  `dependencies { testImplementation(libs.robolectric) }`
             androidTest.dependencies {
                 implementation(project(":compose:ui:ui-test-font"))
                 implementation(libs.testRules)
@@ -133,6 +144,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.mockitoCore)
                 implementation(libs.truth)
                 implementation(libs.kotlinReflect)
+                implementation(libs.kotlinTest)
                 implementation(libs.mockitoKotlin)
             }
 
@@ -152,6 +164,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             desktopTest.dependencies {
                 implementation(libs.truth)
                 implementation(libs.junit)
+                implementation(libs.kotlinTest)
                 implementation(libs.skikoCurrentOs)
                 implementation(project(":compose:foundation:foundation"))
                 implementation(project(":compose:ui:ui-test-junit4"))
@@ -167,14 +180,20 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose UI Text"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.UI
+    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2019"
     description = "Compose Text primitives and utilities"
     legacyDisableKotlinStrictApiMode = true
 }
 
+android {
+    namespace "androidx.compose.ui.text"
+}
+
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
-        freeCompilerArgs += ["-XXLanguage:+InlineClasses"]
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
     }
 }

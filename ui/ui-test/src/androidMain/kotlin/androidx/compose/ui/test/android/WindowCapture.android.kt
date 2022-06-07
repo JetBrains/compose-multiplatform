@@ -65,7 +65,7 @@ private fun <R> withDrawingEnabled(block: () -> R): R {
     }
 }
 
-private fun View.forceRedraw(testContext: TestContext) {
+internal fun View.forceRedraw(testContext: TestContext) {
     var drawDone = false
     handler.post {
         if (Build.VERSION.SDK_INT >= 29 && isHardwareAccelerated) {

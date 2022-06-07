@@ -16,6 +16,7 @@
 
 package androidx.compose.compiler.plugins.kotlin
 
+import org.jetbrains.kotlin.diagnostics.rendering.CommonRenderers
 import org.jetbrains.kotlin.diagnostics.rendering.DefaultErrorMessages
 import org.jetbrains.kotlin.diagnostics.rendering.DiagnosticFactoryToRendererMap
 import org.jetbrains.kotlin.diagnostics.rendering.Renderers
@@ -75,7 +76,7 @@ class ComposeErrorMessages : DefaultErrorMessages.Extension {
         MAP.put(
             ComposeErrors.CONFLICTING_OVERLOADS,
             "Conflicting overloads: {0}",
-            Renderers.commaSeparated(
+            CommonRenderers.commaSeparated(
                 Renderers.FQ_NAMES_IN_TYPES_WITH_ANNOTATIONS
             )
         )
@@ -86,7 +87,7 @@ class ComposeErrorMessages : DefaultErrorMessages.Extension {
         )
         MAP.put(
             ComposeErrors.COMPOSABLE_SUSPEND_FUN,
-            "Composable properties are not able to have backing fields"
+            "Composable function cannot be annotated as suspend"
         )
         MAP.put(
             ComposeErrors.ABSTRACT_COMPOSABLE_DEFAULT_PARAMETER_VALUE,
@@ -106,6 +107,18 @@ class ComposeErrorMessages : DefaultErrorMessages.Extension {
                 " was expected",
             RENDER_TYPE_WITH_ANNOTATIONS,
             RENDER_TYPE_WITH_ANNOTATIONS
+        )
+        MAP.put(
+            ComposeErrors.COMPOSE_APPLIER_CALL_MISMATCH,
+            "Calling a {0} composable function where a {1} composable was expected",
+            Renderers.TO_STRING,
+            Renderers.TO_STRING
+        )
+        MAP.put(
+            ComposeErrors.COMPOSE_APPLIER_PARAMETER_MISMATCH,
+            "A {0} composable parameter was provided where a {1} composable was expected",
+            Renderers.TO_STRING,
+            Renderers.TO_STRING
         )
     }
 }

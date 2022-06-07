@@ -18,12 +18,14 @@ package androidx.compose.runtime
 
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * Provides a time source for display frames and the ability to perform an action on the next frame.
  * This may be used for matching timing with the refresh rate of a display or otherwise
  * synchronizing work with a desired frame rate.
  */
+@JvmDefaultWithCompatibility
 interface MonotonicFrameClock : CoroutineContext.Element {
     /**
      * Suspends until a new frame is requested, immediately invokes [onFrame] with the frame time

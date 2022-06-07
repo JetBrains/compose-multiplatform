@@ -15,9 +15,10 @@
  */
 
 import androidx.build.AndroidXComposePlugin
-import androidx.build.LibraryGroups
+import androidx.build.LibraryType
 import androidx.build.Publish
 import androidx.build.RunApiTasks
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
@@ -28,13 +29,9 @@ plugins {
 AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
-        jvm("desktop")
-
-        sourceSets {
-            desktopMain.dependsOn(jvmMain)
-        }
+        desktop()
     }
 
     android {
@@ -49,10 +46,23 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
 androidx {
     name = "Compose Test Font resources"
+    type = LibraryType.INTERNAL_TEST_LIBRARY
     publish = Publish.NONE
-    mavenGroup = LibraryGroups.Compose.UI
+    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2020"
     description = "Fonts designed for testing text capabilities"
     runApiTasks = new RunApiTasks.Yes()
     legacyDisableKotlinStrictApiMode = true
+}
+
+android {
+    namespace "androidx.compose.ui.text.font.test"
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
 }

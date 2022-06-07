@@ -52,6 +52,7 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.OnPlacedModifier
 import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -59,7 +60,7 @@ import androidx.compose.ui.unit.round
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalComposeUiApi::class)
+@Preview
 @Composable
 fun AnimatedPlacementDemo() {
     var alignment by remember { mutableStateOf(Alignment.TopStart) }
@@ -133,9 +134,6 @@ class AnimatedPlacementModifier(val scope: CoroutineScope) : OnPlacedModifier, L
                 anim.animateTo(targetOffset, spring(stiffness = Spring.StiffnessMediumLow))
             }
         }
-        // Offset the child in the opposite direction to the targetOffset, and slowly catch
-        // up to zero offset via an animation to achieve an overall animated movement.
-        animatable?.let { it.value - targetOffset } ?: IntOffset.Zero
     }
 }
 

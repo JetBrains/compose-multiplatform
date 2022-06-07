@@ -15,7 +15,6 @@
  */
 
 import androidx.build.AndroidXComposePlugin
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import androidx.build.RunApiTasks
 import androidx.compose.material.icons.generator.tasks.IconGenerationTask
@@ -74,6 +73,7 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":compose:ui:ui"))
                 implementation(project(":test:screenshot:screenshot"))
                 implementation(project(":compose:ui:ui-test-junit4"))
+                implementation(project(":compose:test-utils"))
                 implementation("androidx.activity:activity-compose:1.3.1")
                 implementation("androidx.appcompat:appcompat:1.3.0")
 
@@ -139,10 +139,14 @@ if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Material Icons Extended"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.MATERIAL
+    mavenGroup = LibraryGroups.COMPOSE_MATERIAL
     // This module has a large number (5000+) of generated source files and so doc generation /
     // API tracking will simply take too long
     runApiTasks = new RunApiTasks.No("Five thousand generated source files")
     inceptionYear = "2020"
     description = "Compose Material Design extended icons. This module contains all Material icons. It is a very large dependency and should not be included directly."
+}
+
+android {
+    namespace "androidx.compose.material.icons.extended"
 }

@@ -19,28 +19,29 @@ package androidx.compose.foundation.lazy.layout
 import android.view.Choreographer
 import android.view.Display
 import android.view.View
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.RememberObserver
+import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.layout.SubcomposeLayoutState
 import androidx.compose.ui.layout.SubcomposeLayoutState.PrecomposedSlotHandle
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.util.fastAny
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.util.trace
 import java.util.concurrent.TimeUnit
 
+@ExperimentalFoundationApi
 @Composable
 internal actual fun LazyLayoutPrefetcher(
-    prefetchPolicy: LazyLayoutPrefetchPolicy,
-    state: LazyLayoutState,
+    prefetchState: LazyLayoutPrefetchState,
     itemContentFactory: LazyLayoutItemContentFactory,
     subcomposeLayoutState: SubcomposeLayoutState
 ) {
     val view = LocalView.current
-    remember(subcomposeLayoutState, prefetchPolicy, view) {
+    remember(subcomposeLayoutState, prefetchState, view) {
         LazyLayoutPrefetcher(
-            prefetchPolicy,
-            state,
+            prefetchState,
             subcomposeLayoutState,
             itemContentFactory,
             view
@@ -103,29 +104,22 @@ internal actual fun LazyLayoutPrefetcher(
  *    so critical given that we don't need to calculate the deadline.
  *    Tracking bug: 187393922
  */
+@ExperimentalFoundationApi
 internal class LazyLayoutPrefetcher(
-    private val prefetchPolicy: LazyLayoutPrefetchPolicy,
-    private val state: LazyLayoutState,
+    private val prefetchState: LazyLayoutPrefetchState,
     private val subcomposeLayoutState: SubcomposeLayoutState,
     private val itemContentFactory: LazyLayoutItemContentFactory,
     private val view: View
 ) : RememberObserver,
-    LazyLayoutOnPostMeasureListener,
-    LazyLayoutPrefetchPolicy.Subscriber,
+    LazyLayoutPrefetchState.Prefetcher,
     Runnable,
     Choreographer.FrameCallback {
 
     /**
-     * The index scheduled to be prefetched (or the last prefetched index if the prefetch is
-     * done, in this case [precomposedSlotHandle] is not null and associated with this index).
-     * TODO(popam): probably this should be a queue rather than one element
+     * The list of currently not processed prefetch requests. The requests will be processed one by
+     * during subsequent [run]s.
      */
-    private var indexToPrefetch = -1
-
-    /**
-     * Non-null when the item with [indexToPrefetch] index was prefetched.
-     */
-    private var precomposedSlotHandle: PrecomposedSlotHandle? = null
+    private val prefetchRequests = mutableVectorOf<PrefetchRequest>()
 
     /**
      * Average time the prefetching operations takes. Keeping it allows us to not start the work
@@ -134,8 +128,6 @@ internal class LazyLayoutPrefetcher(
      */
     private var averagePrecomposeTimeNs: Long = 0
     private var averagePremeasureTimeNs: Long = 0
-
-    private var premeasuringIsNeeded = false
 
     private var prefetchScheduled = false
 
@@ -150,64 +142,77 @@ internal class LazyLayoutPrefetcher(
 
     /**
      * Callback to be executed when the prefetching is needed.
-     * [indexToPrefetch] will be used as an input.
+     * [prefetchRequests] will be used as an input.
      */
     override fun run() {
-        if (indexToPrefetch == -1 || !prefetchScheduled || !isActive) {
+        if (prefetchRequests.isEmpty() || !prefetchScheduled || !isActive ||
+            view.windowVisibility != View.VISIBLE
+        ) {
             // incorrect input. ignore
+            prefetchScheduled = false
             return
         }
-        if (precomposedSlotHandle == null) {
-            trace("compose:lazylist:prefetch:compose") {
-                val latestFrameVsyncNs = TimeUnit.MILLISECONDS.toNanos(view.drawingTime)
-                val nextFrameNs = latestFrameVsyncNs + frameIntervalNs
-                val beforeNs = System.nanoTime()
-                if (beforeNs > nextFrameNs || beforeNs + averagePrecomposeTimeNs < nextFrameNs) {
-                    val index = indexToPrefetch
-                    val itemsProvider = state.itemsProvider()
-                    if (view.windowVisibility == View.VISIBLE &&
-                        index in 0 until itemsProvider.itemsCount
-                    ) {
-                        precomposedSlotHandle = precompose(itemsProvider, index)
+        val latestFrameVsyncNs = TimeUnit.MILLISECONDS.toNanos(view.drawingTime)
+        val nextFrameNs = latestFrameVsyncNs + frameIntervalNs
+        var scheduleForNextFrame = false
+        while (prefetchRequests.isNotEmpty() && !scheduleForNextFrame) {
+            val request = prefetchRequests[0]
+            val itemProvider = itemContentFactory.itemProvider()
+            if (request.canceled || request.index !in 0 until itemProvider.itemCount) {
+                prefetchRequests.removeAt(0)
+            } else if (request.precomposeHandle == null) {
+                trace("compose:lazylist:prefetch:compose") {
+                    val beforeTimeNs = System.nanoTime()
+                    // check if there is enough time left in this frame. otherwise, we schedule
+                    // a next frame callback in which we will post the message in the handler again.
+                    if (enoughTimeLeft(beforeTimeNs, nextFrameNs, averagePrecomposeTimeNs)) {
+                        val key = itemProvider.getKey(request.index)
+                        val content = itemContentFactory.getContent(request.index, key)
+                        request.precomposeHandle = subcomposeLayoutState.precompose(key, content)
                         averagePrecomposeTimeNs = calculateAverageTime(
-                            System.nanoTime() - beforeNs,
+                            System.nanoTime() - beforeTimeNs,
                             averagePrecomposeTimeNs
                         )
-                        // now schedule premeasure on the next frame
-                        choreographer.postFrameCallback(this)
                     } else {
-                        prefetchScheduled = false
+                        scheduleForNextFrame = true
                     }
-                } else {
-                    // there is not enough time left in this frame. we schedule a next frame callback
-                    // in which we are going to post the message in the handler again.
-                    choreographer.postFrameCallback(this)
                 }
-            }
-        } else {
-            trace("compose:lazylist:prefetch:measure") {
-                // the precomposition happened already. premeasure now
-                val latestFrameVsyncNs = TimeUnit.MILLISECONDS.toNanos(view.drawingTime)
-                val nextFrameNs = latestFrameVsyncNs + frameIntervalNs
-                val beforeNs = System.nanoTime()
-                if (beforeNs > nextFrameNs || beforeNs + averagePremeasureTimeNs < nextFrameNs) {
-                    if (view.windowVisibility == View.VISIBLE) {
-                        premeasuringIsNeeded = true
-                        state.remeasure()
+            } else {
+                check(!request.measured)
+                trace("compose:lazylist:prefetch:measure") {
+                    val beforeTimeNs = System.nanoTime()
+                    if (enoughTimeLeft(beforeTimeNs, nextFrameNs, averagePremeasureTimeNs)) {
+                        val handle = request.precomposeHandle!!
+                        repeat(handle.placeablesCount) { placeableIndex ->
+                            handle.premeasure(
+                                placeableIndex,
+                                request.constraints
+                            )
+                        }
                         averagePremeasureTimeNs = calculateAverageTime(
-                            System.nanoTime() - beforeNs,
+                            System.nanoTime() - beforeTimeNs,
                             averagePremeasureTimeNs
                         )
+                        // we finished this request
+                        prefetchRequests.removeAt(0)
+                    } else {
+                        scheduleForNextFrame = true
                     }
-                    prefetchScheduled = false
-                } else {
-                    // there is not enough time left in this frame. we schedule a next frame callback
-                    // in which we are going to post the message in the handler again.
-                    choreographer.postFrameCallback(this)
                 }
             }
         }
+
+        if (scheduleForNextFrame) {
+            // there is not enough time left in this frame. we schedule a next frame callback
+            // in which we are going to post the message in the handler again.
+            choreographer.postFrameCallback(this)
+        } else {
+            prefetchScheduled = false
+        }
     }
+
+    private fun enoughTimeLeft(now: Long, nextFrame: Long, average: Long) =
+        now > nextFrame || now + average < nextFrame
 
     /**
      * Choreographer frame callback. It will be called when during the previous frame we didn't
@@ -220,15 +225,6 @@ internal class LazyLayoutPrefetcher(
         }
     }
 
-    private fun precompose(
-        itemsProvider: LazyLayoutItemsProvider,
-        index: Int
-    ): PrecomposedSlotHandle {
-        val key = itemsProvider.getKey(index)
-        val content = itemContentFactory.getContent(index, key)
-        return subcomposeLayoutState.precompose(key, content)
-    }
-
     private fun calculateAverageTime(new: Long, current: Long): Long {
         // Calculate a weighted moving average of time taken to compose an item. We use weighted
         // moving average to bias toward more recent measurements, and to minimize storage /
@@ -236,62 +232,56 @@ internal class LazyLayoutPrefetcher(
         return if (current == 0L) {
             new
         } else {
+            // dividing first to avoid a potential overflow
             current / 4 * 3 + new / 4
         }
     }
 
-    override fun scheduleForPrefetch(index: Int) {
-        indexToPrefetch = index
-        precomposedSlotHandle = null
-        premeasuringIsNeeded = false
+    override fun schedulePrefetch(
+        index: Int,
+        constraints: Constraints
+    ): LazyLayoutPrefetchState.PrefetchHandle {
+        val request = PrefetchRequest(index, constraints)
+        prefetchRequests.add(request)
         if (!prefetchScheduled) {
             prefetchScheduled = true
             // schedule the prefetching
             view.post(this)
         }
-    }
-
-    override fun removeFromPrefetch(index: Int) {
-        if (index == indexToPrefetch) {
-            precomposedSlotHandle?.dispose()
-            indexToPrefetch = -1
-        }
-    }
-
-    override fun onPostMeasure(
-        result: LazyLayoutMeasureResult,
-        placeablesProvider: LazyLayoutPlaceablesProvider
-    ) {
-        val index = indexToPrefetch
-        if (premeasuringIsNeeded && index != -1) {
-            check(isActive)
-            val itemsProvider = state.itemsProvider()
-            if (index < itemsProvider.itemsCount) {
-                val isVisibleAlready = result.visibleItemsInfo.fastAny { it.index == index }
-                if (isVisibleAlready) {
-                    premeasuringIsNeeded = false
-                } else {
-                    placeablesProvider.getAndMeasure(index, prefetchPolicy.constraints)
-                }
-            }
-        }
+        return request
     }
 
     override fun onRemembered() {
-        prefetchPolicy.prefetcher = this
-        state.onPostMeasureListener = this
+        prefetchState.prefetcher = this
         isActive = true
     }
 
     override fun onForgotten() {
         isActive = false
-        prefetchPolicy.prefetcher = null
-        state.onPostMeasureListener = null
+        prefetchState.prefetcher = null
         view.removeCallbacks(this)
         choreographer.removeFrameCallback(this)
     }
 
     override fun onAbandoned() {}
+
+    private class PrefetchRequest(
+        val index: Int,
+        val constraints: Constraints
+    ) : LazyLayoutPrefetchState.PrefetchHandle {
+
+        var precomposeHandle: PrecomposedSlotHandle? = null
+        var canceled = false
+        var measured = false
+
+        override fun cancel() {
+            if (!canceled) {
+                canceled = true
+                precomposeHandle?.dispose()
+                precomposeHandle = null
+            }
+        }
+    }
 
     companion object {
 

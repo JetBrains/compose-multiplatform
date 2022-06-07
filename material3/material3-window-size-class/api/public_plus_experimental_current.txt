@@ -1,0 +1,53 @@
+// Signature format: 4.0
+package androidx.compose.material3.windowsizeclass {
+
+  public final class AndroidWindowSizeClass_androidKt {
+    method @androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi @androidx.compose.runtime.Composable public static androidx.compose.material3.windowsizeclass.WindowSizeClass calculateWindowSizeClass(android.app.Activity activity);
+  }
+
+  @kotlin.RequiresOptIn(message="This material3-window-size-class API is experimental and is likely to change or to " + "be removed in the future.") public @interface ExperimentalMaterial3WindowSizeClassApi {
+  }
+
+  public final class TestOnly_jvmKt {
+  }
+
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class WindowHeightSizeClass {
+    field public static final androidx.compose.material3.windowsizeclass.WindowHeightSizeClass.Companion Companion;
+  }
+
+  public static final class WindowHeightSizeClass.Companion {
+    method public String getCompact();
+    method public String getExpanded();
+    method public String getMedium();
+    property public final String Compact;
+    property public final String Expanded;
+    property public final String Medium;
+  }
+
+  @androidx.compose.runtime.Immutable public final class WindowSizeClass {
+    method public String getHeightSizeClass();
+    method public String getWidthSizeClass();
+    property public final String heightSizeClass;
+    property public final String widthSizeClass;
+    field public static final androidx.compose.material3.windowsizeclass.WindowSizeClass.Companion Companion;
+  }
+
+  public static final class WindowSizeClass.Companion {
+    method @androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi @org.jetbrains.annotations.TestOnly public androidx.compose.material3.windowsizeclass.WindowSizeClass calculateFromSize(long size);
+  }
+
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class WindowWidthSizeClass {
+    field public static final androidx.compose.material3.windowsizeclass.WindowWidthSizeClass.Companion Companion;
+  }
+
+  public static final class WindowWidthSizeClass.Companion {
+    method public String getCompact();
+    method public String getExpanded();
+    method public String getMedium();
+    property public final String Compact;
+    property public final String Expanded;
+    property public final String Medium;
+  }
+
+}
+

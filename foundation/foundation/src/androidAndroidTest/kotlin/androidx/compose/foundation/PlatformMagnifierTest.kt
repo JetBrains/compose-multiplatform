@@ -25,6 +25,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.center
@@ -40,14 +41,13 @@ import org.junit.runner.RunWith
 
 @OptIn(ExperimentalFoundationApi::class)
 @MediumTest
-// Magnifier doesn't provide any read APIs on 28 so this test can only run on 29+.
-@SdkSuppress(minSdkVersion = 29)
 @RunWith(AndroidJUnit4::class)
 class PlatformMagnifierTest {
 
     @get:Rule
     val rule = createComposeRule()
 
+    @SdkSuppress(minSdkVersion = 29)
     @Test
     fun androidPlatformMagnifier_showsMagnifier() {
         val magnifier = createAndroidPlatformMagnifier()
@@ -64,6 +64,7 @@ class PlatformMagnifierTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = 29)
     @Test
     fun androidPlatformMagnifier_updatesZoom_whenValid() {
         val magnifier = createAndroidPlatformMagnifier()
@@ -86,6 +87,7 @@ class PlatformMagnifierTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = 29)
     @Test
     fun androidPlatformMagnifier_doesNotUpdateZoom_whenNaN() {
         val magnifier = createAndroidPlatformMagnifier()
@@ -108,6 +110,7 @@ class PlatformMagnifierTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = 29)
     @Test
     fun androidPlatformMagnifier_specifiesMagnifierCenter_whenSpecified() {
         val magnifier = createAndroidPlatformMagnifier()
@@ -129,6 +132,7 @@ class PlatformMagnifierTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = 29)
     @Test
     fun androidPlatformMagnifier_doesNotSpecifyMagnifierCenter_whenNotSpecified() {
         // To avoid making this test depend on the actual default offset the framework happens to
@@ -156,8 +160,28 @@ class PlatformMagnifierTest {
         }
     }
 
-    private fun createAndroidPlatformMagnifier():
-        PlatformMagnifierFactoryApi28Impl.PlatformMagnifierImpl {
+    @SdkSuppress(minSdkVersion = 28)
+    @Test
+    fun androidPlatformMagnifier_returnsDefaultSize() {
+        val magnifier = createAndroidPlatformMagnifier()
+        assertThat(magnifier.size.width).isGreaterThan(0)
+        assertThat(magnifier.size.height).isGreaterThan(0)
+    }
+
+    // Size is only configurable on 29+
+    @SdkSuppress(minSdkVersion = 29)
+    @Test
+    fun androidPlatformMagnifier_usesRequestedSize() {
+        val magnifierSize = IntSize(10, 11)
+        val magnifier = with(rule.density) {
+            createAndroidPlatformMagnifier(size = magnifierSize.toSize().toDpSize())
+        }
+        assertThat(magnifier.size).isEqualTo(magnifierSize)
+    }
+
+    private fun createAndroidPlatformMagnifier(
+        size: DpSize = DpSize.Unspecified
+    ): PlatformMagnifierFactoryApi28Impl.PlatformMagnifierImpl {
         lateinit var magnifier: PlatformMagnifierFactoryApi28Impl.PlatformMagnifierImpl
         rule.setContent {
             val dpSize = with(LocalDensity.current) { VIEW_SIZE.toSize().toDpSize() }
@@ -171,7 +195,7 @@ class PlatformMagnifierTest {
                         view = currentView,
                         density = density,
                         initialZoom = Float.NaN,
-                        style = MagnifierStyle.Default,
+                        style = MagnifierStyle(size = size),
                     ) as PlatformMagnifierFactoryApi28Impl.PlatformMagnifierImpl
                     onDispose {}
                 }

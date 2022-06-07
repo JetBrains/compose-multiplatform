@@ -52,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
+import androidx.compose.ui.UiComposable
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -63,6 +64,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.ViewRootForInspector
+import androidx.compose.ui.platform.withInfiniteAnimationFrameNanos
 import androidx.compose.ui.semantics.popup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
@@ -74,12 +76,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastMap
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
-import androidx.savedstate.ViewTreeSavedStateRegistryOwner
-import kotlinx.coroutines.android.awaitFrame
-import kotlinx.coroutines.isActive
-import org.jetbrains.annotations.TestOnly
+import androidx.savedstate.findViewTreeSavedStateRegistryOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import java.util.UUID
 import kotlin.math.roundToInt
+import kotlinx.coroutines.isActive
+import org.jetbrains.annotations.TestOnly
 
 /**
  * Properties used to customize the behavior of a [Popup].
@@ -111,7 +113,7 @@ class PopupProperties @ExperimentalComposeUiApi constructor(
     val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
     val excludeFromSystemGesture: Boolean = true,
     val clippingEnabled: Boolean = true,
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalComposeUiApi
     val usePlatformDefaultWidth: Boolean = false
 ) {
@@ -165,6 +167,10 @@ class PopupProperties @ExperimentalComposeUiApi constructor(
 
 /**
  * Opens a popup with the given content.
+ *
+ * A popup is a floating container that appears on top of the current activity.
+ * It is especially useful for non-modal UI surfaces that remain hidden until they
+ * are needed, for example floating menus like Cut/Copy/Paste.
  *
  * The popup is positioned relative to its parent, using the [alignment] and [offset].
  * The popup is visible as long as it is part of the composition hierarchy.
@@ -294,7 +300,7 @@ fun Popup(
     // and only do the other position calculations in that case.
     LaunchedEffect(popupLayout) {
         while (isActive) {
-            awaitFrame()
+            withInfiniteAnimationFrameNanos {}
             popupLayout.pollForLocationOnScreenChange()
         }
     }
@@ -319,7 +325,7 @@ fun Popup(
     }
 }
 
-// TODO(b/142431825): This is a hack to work around Popups not using Semantics for test tags
+// TODO(b/139861182): This is a hack to work around Popups not using Semantics for test tags
 //  We should either remove it, or come up with an abstracted general solution that isn't specific
 //  to Popup
 internal val LocalPopupTestTag = compositionLocalOf { "DEFAULT_TEST_TAG" }
@@ -415,7 +421,7 @@ internal class PopupLayout(
         id = android.R.id.content
         ViewTreeLifecycleOwner.set(this, ViewTreeLifecycleOwner.get(composeView))
         ViewTreeViewModelStoreOwner.set(this, ViewTreeViewModelStoreOwner.get(composeView))
-        ViewTreeSavedStateRegistryOwner.set(this, ViewTreeSavedStateRegistryOwner.get(composeView))
+        setViewTreeSavedStateRegistryOwner(composeView.findViewTreeSavedStateRegistryOwner())
         // Set unique id for AbstractComposeView. This allows state restoration for the state
         // defined inside the Popup via rememberSaveable()
         setTag(R.id.compose_view_saveable_id_tag, "Popup:$popupId")
@@ -454,6 +460,7 @@ internal class PopupLayout(
     }
 
     @Composable
+    @UiComposable
     override fun Content() {
         content()
     }

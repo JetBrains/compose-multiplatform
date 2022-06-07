@@ -45,7 +45,7 @@ import org.junit.runners.Parameterized
 @MediumTest
 @RunWith(Parameterized::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@OptIn(ExperimentalTestApi::class)
+@OptIn(ExperimentalTestApi::class, ExperimentalMaterial3Api::class)
 class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
 
     @get:Rule
@@ -62,11 +62,9 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
 
     @Test
     fun checkBox_checked() {
-        rule.setContent {
-            MaterialTheme(scheme.colorScheme) {
-                Box(wrap.testTag(wrapperTestTag)) {
-                    Checkbox(checked = true, onCheckedChange = { })
-                }
+        rule.setMaterialContent(scheme.colorScheme) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                Checkbox(checked = true, onCheckedChange = { })
             }
         }
         assertToggeableAgainstGolden("checkBox_${scheme.name}_checked")
@@ -74,11 +72,9 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
 
     @Test
     fun checkBox_unchecked() {
-        rule.setContent {
-            MaterialTheme(scheme.colorScheme) {
-                Box(wrap.testTag(wrapperTestTag)) {
-                    Checkbox(modifier = wrap, checked = false, onCheckedChange = { })
-                }
+        rule.setMaterialContent(scheme.colorScheme) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                Checkbox(modifier = wrap, checked = false, onCheckedChange = { })
             }
         }
         assertToggeableAgainstGolden("checkBox_${scheme.name}_unchecked")
@@ -86,11 +82,9 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
 
     @Test
     fun checkBox_pressed() {
-        rule.setContent {
-            MaterialTheme(scheme.colorScheme) {
-                Box(wrap.testTag(wrapperTestTag)) {
-                    Checkbox(modifier = wrap, checked = false, onCheckedChange = { })
-                }
+        rule.setMaterialContent(scheme.colorScheme) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                Checkbox(modifier = wrap, checked = false, onCheckedChange = { })
             }
         }
 
@@ -111,15 +105,13 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
 
     @Test
     fun checkBox_indeterminate() {
-        rule.setContent {
-            MaterialTheme(scheme.colorScheme) {
-                Box(wrap.testTag(wrapperTestTag)) {
-                    TriStateCheckbox(
-                        state = ToggleableState.Indeterminate,
-                        modifier = wrap,
-                        onClick = {}
-                    )
-                }
+        rule.setMaterialContent(scheme.colorScheme) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                TriStateCheckbox(
+                    state = ToggleableState.Indeterminate,
+                    modifier = wrap,
+                    onClick = {}
+                )
             }
         }
         assertToggeableAgainstGolden("checkBox_${scheme.name}_indeterminate")
@@ -127,15 +119,13 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
 
     @Test
     fun checkBox_disabled_checked() {
-        rule.setContent {
-            MaterialTheme(scheme.colorScheme) {
-                Box(wrap.testTag(wrapperTestTag)) {
-                    Checkbox(
-                        modifier = wrap,
-                        checked = true,
-                        enabled = false,
-                        onCheckedChange = { })
-                }
+        rule.setMaterialContent(scheme.colorScheme) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                Checkbox(
+                    modifier = wrap,
+                    checked = true,
+                    enabled = false,
+                    onCheckedChange = { })
             }
         }
         assertToggeableAgainstGolden("checkBox_${scheme.name}_disabled_checked")
@@ -143,15 +133,13 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
 
     @Test
     fun checkBox_disabled_unchecked() {
-        rule.setContent {
-            MaterialTheme(scheme.colorScheme) {
-                Box(wrap.testTag(wrapperTestTag)) {
-                    Checkbox(
-                        modifier = wrap,
-                        checked = false,
-                        enabled = false,
-                        onCheckedChange = { })
-                }
+        rule.setMaterialContent(scheme.colorScheme) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                Checkbox(
+                    modifier = wrap,
+                    checked = false,
+                    enabled = false,
+                    onCheckedChange = { })
             }
         }
         assertToggeableAgainstGolden("checkBox_${scheme.name}_disabled_unchecked")
@@ -159,16 +147,14 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
 
     @Test
     fun checkBox_disabled_indeterminate() {
-        rule.setContent {
-            MaterialTheme(scheme.colorScheme) {
-                Box(wrap.testTag(wrapperTestTag)) {
-                    TriStateCheckbox(
-                        state = ToggleableState.Indeterminate,
-                        enabled = false,
-                        modifier = wrap,
-                        onClick = {}
-                    )
-                }
+        rule.setMaterialContent(scheme.colorScheme) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                TriStateCheckbox(
+                    state = ToggleableState.Indeterminate,
+                    enabled = false,
+                    modifier = wrap,
+                    onClick = {}
+                )
             }
         }
         assertToggeableAgainstGolden("checkBox_${scheme.name}_disabled_indeterminate")
@@ -177,15 +163,13 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
     @Test
     fun checkBox_unchecked_animateToChecked() {
         val isChecked = mutableStateOf(false)
-        rule.setContent {
-            MaterialTheme(scheme.colorScheme) {
-                Box(wrap.testTag(wrapperTestTag)) {
-                    Checkbox(
-                        modifier = wrap,
-                        checked = isChecked.value,
-                        onCheckedChange = { isChecked.value = it }
-                    )
-                }
+        rule.setMaterialContent(scheme.colorScheme) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                Checkbox(
+                    modifier = wrap,
+                    checked = isChecked.value,
+                    onCheckedChange = { isChecked.value = it }
+                )
             }
         }
 
@@ -208,15 +192,13 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
     @Test
     fun checkBox_checked_animateToUnchecked() {
         val isChecked = mutableStateOf(true)
-        rule.setContent {
-            MaterialTheme(scheme.colorScheme) {
-                Box(wrap.testTag(wrapperTestTag)) {
-                    Checkbox(
-                        modifier = wrap,
-                        checked = isChecked.value,
-                        onCheckedChange = { isChecked.value = it }
-                    )
-                }
+        rule.setMaterialContent(scheme.colorScheme) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                Checkbox(
+                    modifier = wrap,
+                    checked = isChecked.value,
+                    onCheckedChange = { isChecked.value = it }
+                )
             }
         }
 
@@ -238,15 +220,13 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
 
     @Test
     fun checkBox_hover() {
-        rule.setContent {
-            MaterialTheme(scheme.colorScheme) {
-                Box(wrap.testTag(wrapperTestTag)) {
-                    Checkbox(
-                        modifier = wrap,
-                        checked = true,
-                        onCheckedChange = { }
-                    )
-                }
+        rule.setMaterialContent(scheme.colorScheme) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                Checkbox(
+                    modifier = wrap,
+                    checked = true,
+                    onCheckedChange = { }
+                )
             }
         }
 
@@ -262,19 +242,17 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
     fun checkBox_focus() {
         val focusRequester = FocusRequester()
 
-        rule.setContent {
-            MaterialTheme(scheme.colorScheme) {
-                Box(wrap.testTag(wrapperTestTag)) {
-                    Checkbox(
-                        modifier = wrap
-                            // Normally this is only focusable in non-touch mode, so let's force it to
-                            // always be focusable so we can test how it appears
-                            .focusProperties { canFocus = true }
-                            .focusRequester(focusRequester),
-                        checked = true,
-                        onCheckedChange = { }
-                    )
-                }
+        rule.setMaterialContent(scheme.colorScheme) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                Checkbox(
+                    modifier = wrap
+                        // Normally this is only focusable in non-touch mode, so let's force it to
+                        // always be focusable so we can test how it appears
+                        .focusProperties { canFocus = true }
+                        .focusRequester(focusRequester),
+                    checked = true,
+                    onCheckedChange = { }
+                )
             }
         }
 

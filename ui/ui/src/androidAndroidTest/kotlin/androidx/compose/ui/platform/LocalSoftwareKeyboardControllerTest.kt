@@ -19,7 +19,6 @@ package androidx.compose.ui.platform
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
@@ -32,7 +31,6 @@ import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextInputService
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import com.nhaarman.mockitokotlin2.inOrder
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.times
@@ -99,34 +97,6 @@ class LocalSoftwareKeyboardControllerTest {
         rule.runOnIdle {
             verify(platformTextInputService, times(1))
                 .hideSoftwareKeyboard()
-        }
-    }
-
-    @Test
-    fun localSoftwareKeybardController_whenFocused_delegatesToPlatformService() {
-        val platformTextInputService = mock<PlatformTextInputService>()
-        val textInputService = TextInputService(platformTextInputService)
-        var controller: SoftwareKeyboardController? = null
-
-        rule.setContent {
-            CompositionLocalProvider(
-                LocalTextInputService provides textInputService
-            ) {
-                controller = LocalSoftwareKeyboardController.current
-                BasicTextField("string", {})
-            }
-        }
-
-        rule.onNodeWithText("string").performClick()
-
-        rule.runOnIdle {
-            controller?.hide()
-            controller?.show()
-            inOrder(platformTextInputService) {
-                verify(platformTextInputService).showSoftwareKeyboard() // focus
-                verify(platformTextInputService).hideSoftwareKeyboard() // explicit call
-                verify(platformTextInputService).showSoftwareKeyboard() // explicit call
-            }
         }
     }
 

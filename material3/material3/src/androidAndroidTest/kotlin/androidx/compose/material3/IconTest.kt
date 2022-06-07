@@ -26,8 +26,8 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
-import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -159,7 +159,7 @@ class IconTest {
         val height = 24.dp
         val testTag = "testTag"
         var expectedIntSize: IntSize? = null
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val image: ImageBitmap
             with(LocalDensity.current) {
                 image = createBitmapWithColor(
@@ -196,7 +196,7 @@ class IconTest {
         val width = 35.dp
         val height = 83.dp
         val testTag = "testTag"
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val image: ImageBitmap
             with(LocalDensity.current) {
                 image = createBitmapWithColor(
@@ -219,7 +219,7 @@ class IconTest {
         val width = 35.dp
         val height = 83.dp
         val testTag = "testTag"
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val image: ImageBitmap
             with(LocalDensity.current) {
                 image = createBitmapWithColor(

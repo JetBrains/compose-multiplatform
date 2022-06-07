@@ -31,4 +31,6 @@
     <string name="close_sheet" msgid="7573152094250666567">"शीट बंद करा"</string>
     <string name="default_error_message" msgid="8038256446254964252">"इनपुट चुकीचे आहे"</string>
     <string name="default_popup_window_title" msgid="6312721426453364202">"पॉप-अप विंडो"</string>
+    <string name="range_start" msgid="7097486360902471446">"रेंजची सुरुवात"</string>
+    <string name="range_end" msgid="5941395253238309765">"रेंजचा शेवट"</string>
 </resources>

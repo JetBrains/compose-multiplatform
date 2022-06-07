@@ -30,9 +30,11 @@ import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -233,6 +235,7 @@ class LazyColumnTest {
             assertThat(state.firstVisibleItemIndex).isEqualTo(9)
         }
     }
+
     @Test
     fun changingDataTest() {
         val dataLists = listOf(
@@ -472,6 +475,41 @@ class LazyColumnTest {
             .assertPixels {
                 Color.Blue
             }
+    }
+
+    @Test
+    fun wrappedNestedLazyRowDisplayCorrectContent() {
+        lateinit var state: LazyListState
+        rule.setContentWithTestViewConfiguration {
+            state = rememberLazyListState()
+            LazyColumn(Modifier.size(20.dp), state = state) {
+                items(100) {
+                    LazyRowWrapped {
+                        BasicText("$it", Modifier.size(21.dp))
+                    }
+                }
+            }
+        }
+
+        (1..10).forEach { item ->
+            rule.runOnIdle {
+                runBlocking {
+                    state.scrollToItem(item)
+                }
+            }
+
+            rule.onNodeWithText("$item")
+                .assertIsDisplayed()
+        }
+    }
+
+    @Composable
+    private fun LazyRowWrapped(content: @Composable () -> Unit) {
+        LazyRow {
+            items(count = 1) {
+                content()
+            }
+        }
     }
 }
 

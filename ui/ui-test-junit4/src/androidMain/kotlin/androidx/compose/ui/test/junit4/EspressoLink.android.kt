@@ -24,7 +24,6 @@ import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.IdlingResourceTimeoutException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.junit.runners.model.Statement
 
 /**
  * Idling strategy for regular Android Instrumented tests, built on Espresso.
@@ -53,24 +52,20 @@ internal class EspressoLink(
 
     fun getDiagnosticMessageIfBusy(): String? = registry.getDiagnosticMessageIfBusy()
 
-    override fun getStatementFor(base: Statement): Statement {
-        return object : Statement() {
-            override fun evaluate() {
-                @Suppress("DEPRECATION") // See comment below
-                try {
-                    // TODO(b/205550018): remove usage of deprecated API when b/205550018 is fixed
-                    // When (un)registering via IdlingRegistry, the resource will only be removed
-                    // from IdlingResourceRegistry when the two sources of truth are synced with
-                    // each other, which only happens in interactions with UiController and would
-                    // thus require awaiting quiescence (e.g. Espresso.onIdle())
-                    // However, the deprecated (un)register methods on Espresso also trigger a sync
-                    // between the two sources of truth, which means we don't have to do an onIdle()
-                    Espresso.registerIdlingResources(this@EspressoLink)
-                    base.evaluate()
-                } finally {
-                    Espresso.unregisterIdlingResources(this@EspressoLink)
-                }
-            }
+    override fun <R> withStrategy(block: () -> R): R {
+        @Suppress("DEPRECATION") // See comment below
+        try {
+            // TODO(b/205550018): remove usage of deprecated API when b/205550018 is fixed
+            // When (un)registering via IdlingRegistry, the resource will only be removed
+            // from IdlingResourceRegistry when the two sources of truth are synced with
+            // each other, which only happens in interactions with UiController and would
+            // thus require awaiting quiescence (e.g. Espresso.onIdle())
+            // However, the deprecated (un)register methods on Espresso also trigger a sync
+            // between the two sources of truth, which means we don't have to do an onIdle()
+            Espresso.registerIdlingResources(this@EspressoLink)
+            return block()
+        } finally {
+            Espresso.unregisterIdlingResources(this@EspressoLink)
         }
     }
 
@@ -97,11 +92,11 @@ internal fun runEspressoOnIdle() {
         Espresso.onIdle()
     } catch (e: Throwable) {
 
-        // Happens on the global time out, usually when global idling time out is less
-        // or equal to dynamic idling time out or when the timeout is not due to individual
-        // idling resource. This does not necessary mean that it can't be due to idling
-        // resource being busy. So we try to check if it failed due to compose being busy and
-        // add some extra information to the developer.
+        // Happens on the global time out, usually when the global timeout (the master policy)
+        // is less than or equal to the idling resource timeout or when the timeout is not due to
+        // an individual idling resource. This does not necessarily mean that it can't be due to
+        // an idling resource being busy. So we try to check if it failed due to compose being busy
+        // and add some extra information to the developer.
         val appNotIdleMaybe = tryToFindCause<AppNotIdleException>(e)
         if (appNotIdleMaybe != null) {
             rethrowWithMoreInfo(appNotIdleMaybe, wasGlobalTimeout = true)

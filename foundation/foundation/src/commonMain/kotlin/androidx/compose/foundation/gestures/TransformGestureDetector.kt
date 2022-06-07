@@ -20,13 +20,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
-import androidx.compose.ui.input.pointer.positionChangeConsumed
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastSumBy
-import kotlin.contracts.ExperimentalContracts
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -63,7 +60,7 @@ suspend fun PointerInputScope.detectTransformGestures(
             awaitFirstDown(requireUnconsumed = false)
             do {
                 val event = awaitPointerEvent()
-                val canceled = event.changes.fastAny { it.positionChangeConsumed() }
+                val canceled = event.changes.fastAny { it.isConsumed }
                 if (!canceled) {
                     val zoomChange = event.calculateZoom()
                     val rotationChange = event.calculateRotation()
@@ -99,7 +96,7 @@ suspend fun PointerInputScope.detectTransformGestures(
                         }
                         event.changes.fastForEach {
                             if (it.positionChanged()) {
-                                it.consumeAllChanges()
+                                it.consume()
                             }
                         }
                     }
@@ -238,7 +235,6 @@ fun PointerEvent.calculateCentroidSize(useCurrent: Boolean = true): Float {
  * Example Usage:
  * @sample androidx.compose.foundation.samples.CalculateCentroidSize
  */
-@OptIn(ExperimentalContracts::class)
 fun PointerEvent.calculateCentroid(
     useCurrent: Boolean = true
 ): Offset {

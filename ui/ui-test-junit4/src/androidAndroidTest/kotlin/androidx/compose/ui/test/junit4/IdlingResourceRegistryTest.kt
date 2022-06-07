@@ -23,7 +23,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.currentTime
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,7 +43,7 @@ class IdlingResourceRegistryTest {
 
     private var onIdleCalled = false
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val scope = TestCoroutineScope()
+    private val scope = TestScope(UnconfinedTestDispatcher())
     @OptIn(InternalTestApi::class)
     private val registry = IdlingResourceRegistry(scope).apply {
         setOnIdleCallback { onIdleCalled = true }
@@ -47,7 +51,8 @@ class IdlingResourceRegistryTest {
 
     @After
     fun verifyRegistryStoppedPolling() {
-        scope.cleanupTestCoroutines()
+        // to replace deprecated scope.cleanupTestCoroutines() we use runTest {}
+        scope.runTest {}
     }
 
     @Test
@@ -154,7 +159,10 @@ class IdlingResourceRegistryTest {
 
     private fun assertThatPollingStartsAndEnds(makeIdle: () -> Unit) {
         // Check that we're not polling already ..
-        assertThat(scope.advanceUntilIdle()).isEqualTo(0L)
+        val beforeTime = scope.currentTime
+        scope.advanceUntilIdle()
+        assertThat(scope.currentTime - beforeTime).isEqualTo(0L)
+
         // .. and that we're not idle
         assertThat(registry.isIdleNow).isFalse()
 
@@ -166,7 +174,9 @@ class IdlingResourceRegistryTest {
         makeIdle.invoke()
 
         // Verify that it has polled ..
-        assertThat(scope.advanceUntilIdle()).isGreaterThan(0L)
+        val beforeTime2 = scope.currentTime
+        scope.advanceUntilIdle()
+        assertThat(scope.currentTime - beforeTime2).isGreaterThan(0L)
         // .. the registry is now idle
         assertThat(registry.isIdleNow).isTrue()
         // .. and the onIdle callback was called
@@ -175,8 +185,9 @@ class IdlingResourceRegistryTest {
 
     private fun assertNotPolling() {
         // Check that no poll job is running ..
-        assertThat(scope.advanceUntilIdle()).isEqualTo(0L)
-        scope.cleanupTestCoroutines()
+        val beforeTime = scope.currentTime
+        scope.advanceUntilIdle()
+        assertThat(scope.currentTime - beforeTime).isEqualTo(0L)
         // .. and that the onIdle callback was not called
         assertThat(onIdleCalled).isFalse()
     }

@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.focus
 
+import android.view.KeyEvent as AndroidKeyEvent
+import android.view.KeyEvent.ACTION_DOWN as KeyDown
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
@@ -34,8 +36,6 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import android.view.KeyEvent as AndroidKeyEvent
-import android.view.KeyEvent.ACTION_DOWN as KeyDown
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -96,13 +96,14 @@ class ComposeViewKeyEventInteropTest {
                     BasicText(
                         text = "Item 1",
                         modifier = Modifier
-                            .focusOrder(item1) { right = item2 }
+                            .focusRequester(item1)
+                            .focusProperties { right = item2 }
                             .focusable()
                     )
                     BasicText(
                         text = "Item 2",
                         modifier = Modifier
-                            .focusOrder(item2)
+                            .focusRequester(item2)
                             .focusable()
                     )
                 }
@@ -127,7 +128,8 @@ class ComposeViewKeyEventInteropTest {
                 BasicText(
                     text = "Item 1",
                     modifier = Modifier
-                        .focusOrder(item1) { down = item2 }
+                        .focusRequester(item1)
+                        .focusProperties { down = item2 }
                         .focusable()
                 )
             }
@@ -152,7 +154,8 @@ class ComposeViewKeyEventInteropTest {
                     BasicText(
                         text = "Item 1",
                         modifier = Modifier
-                            .focusOrder(item1) { down = item2 }
+                            .focusRequester(item1)
+                            .focusProperties { down = item2 }
                             .focusable()
                     )
                 }

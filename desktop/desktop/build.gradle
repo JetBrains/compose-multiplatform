@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
-import androidx.build.LibraryVersions
 import androidx.build.RunApiTasks
 import androidx.build.BuildOnServerKt
 import androidx.build.SupportConfigKt
@@ -84,7 +82,7 @@ tasks.findByName("jvmTest").configure {
 androidx {
     name = "Jetpack Compose desktop implementation"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.DESKTOP
+    mavenGroup = LibraryGroups.COMPOSE_DESKTOP
     inceptionYear = "2020"
     legacyDisableKotlinStrictApiMode = true
     runApiTasks = new RunApiTasks.No(
@@ -97,13 +95,14 @@ PublicationContainer.metaClass.jvmOs = { name, skikoDeps ->
         artifactId = "${project.name}-jvm-$name"
         def projectGroup = project.group
         def projectName = project.name
+        def composeVersion = androidx.LibraryVersions.COMPOSE
         pom {
             withXml {
                 def dependenciesNode = asNode().appendNode("dependencies")
                 def desktopDependency = dependenciesNode.appendNode("dependency")
                 desktopDependency.appendNode("groupId", projectGroup)
                 desktopDependency.appendNode("artifactId", projectName)
-                desktopDependency.appendNode("version", LibraryVersions.COMPOSE)
+                desktopDependency.appendNode("version", composeVersion)
                 desktopDependency.appendNode("scope", "compile")
                 for (skiko in skikoDeps) {
                     def skikoModule = skiko.get().module

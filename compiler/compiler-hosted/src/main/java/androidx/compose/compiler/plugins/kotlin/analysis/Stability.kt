@@ -19,6 +19,7 @@ package androidx.compose.compiler.plugins.kotlin.analysis
 import androidx.compose.compiler.plugins.kotlin.ComposeFqNames
 import androidx.compose.compiler.plugins.kotlin.lower.annotationClass
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.backend.common.ir.isFinalClass
 import org.jetbrains.kotlin.backend.jvm.ir.isInlineClassType
 import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
 import org.jetbrains.kotlin.ir.declarations.IrClass
@@ -226,6 +227,16 @@ class StabilityInferencer(val context: IrPluginContext) {
         }
     }
 
+    private fun IrClass.isProtobufType(): Boolean {
+        // Quick exit as all protos are final
+        if (!isFinalClass) return false
+        val directParentClassName =
+            superTypes.lastOrNull { !it.isInterface() }
+                ?.classOrNull?.owner?.fqNameWhenAvailable?.toString()
+        return directParentClassName == "com.google.protobuf.GeneratedMessageLite" ||
+            directParentClassName == "com.google.protobuf.GeneratedMessage"
+    }
+
     fun IrAnnotationContainer.stabilityParamBitmask(): Int? {
         @Suppress("UNCHECKED_CAST")
         return (
@@ -235,7 +246,6 @@ class StabilityInferencer(val context: IrPluginContext) {
             )?.value
     }
 
-    // TODO: kotlinx.immutable
     // TODO: FunctionReference
     private val stableBuiltinTypes = mapOf(
         "kotlin.Pair" to 0b11,
@@ -244,13 +254,27 @@ class StabilityInferencer(val context: IrPluginContext) {
         "kotlin.Result" to 0b1,
         "kotlin.ranges.ClosedRange" to 0b1,
         "kotlin.ranges.ClosedFloatingPointRange" to 0b1,
+        // Guava
+        "com.google.common.collect.ImmutableList" to 0b1,
+        "com.google.common.collect.ImmutableEnumMap" to 0b11,
+        "com.google.common.collect.ImmutableMap" to 0b11,
+        "com.google.common.collect.ImmutableEnumSet" to 0b1,
+        "com.google.common.collect.ImmutableSet" to 0b1,
+        // Kotlinx immutable
+        "kotlinx.collections.immutable.ImmutableList" to 0b1,
+        "kotlinx.collections.immutable.ImmutableSet" to 0b1,
+        "kotlinx.collections.immutable.ImmutableMap" to 0b11,
     )
 
-    // TODO: mapOf, setOf, buildList, buildMap, buildSet, etc.
+    // TODO: buildList, buildMap, buildSet, etc.
     private val stableProducingFunctions = mapOf(
         "kotlin.collections.CollectionsKt.emptyList" to 0,
         "kotlin.collections.CollectionsKt.listOf" to 0b1,
         "kotlin.collections.CollectionsKt.listOfNotNull" to 0b1,
+        "kotlin.collections.MapsKt.mapOf" to 0b11,
+        "kotlin.collections.MapsKt.emptyMap" to 0,
+        "kotlin.collections.SetsKt.setOf" to 0b1,
+        "kotlin.collections.SetsKt.emptySet" to 0,
     )
 
     fun stabilityOf(
@@ -263,38 +287,41 @@ class StabilityInferencer(val context: IrPluginContext) {
         if (declaration.hasStableMarkedDescendant()) return Stability.Stable
         if (declaration.isEnumClass || declaration.isEnumEntry) return Stability.Stable
         if (declaration.defaultType.isPrimitiveType()) return Stability.Stable
+        if (declaration.isProtobufType()) return Stability.Stable
+
+        if (declaration.origin == IrDeclarationOrigin.IR_BUILTINS_STUB) {
+            error("Builtins Stub: ${declaration.name}")
+        }
 
         val analyzing = currentlyAnalyzing + symbol
 
-        when (declaration.origin) {
-            IrDeclarationOrigin.IR_EXTERNAL_DECLARATION_STUB -> {
-                val fqName = declaration.fqNameWhenAvailable?.toString() ?: ""
-                val stability: Stability
-                val mask: Int
-                if (stableBuiltinTypes.contains(fqName)) {
-                    mask = stableBuiltinTypes[fqName] ?: 0
-                    stability = Stability.Stable
-                } else {
-                    mask = declaration.stabilityParamBitmask() ?: return Stability.Unstable
-                    stability = Stability.Runtime(declaration)
-                }
-                return when (mask) {
-                    0 -> stability
-                    else -> stability + Stability.Combined(
-                        declaration.typeParameters.mapIndexedNotNull { index, irTypeParameter ->
-                            if (mask and (0b1 shl index) != 0) {
-                                val sub = substitutions.get(irTypeParameter.symbol)
-                                if (sub != null)
-                                    stabilityOf(sub, substitutions, analyzing)
-                                else
-                                    Stability.Parameter(irTypeParameter)
-                            } else null
-                        }
-                    )
-                }
+        if (canInferStability(declaration)) {
+            val fqName = declaration.fqNameWhenAvailable?.toString() ?: ""
+            val stability: Stability
+            val mask: Int
+            if (stableBuiltinTypes.contains(fqName)) {
+                mask = stableBuiltinTypes[fqName] ?: 0
+                stability = Stability.Stable
+            } else {
+                mask = declaration.stabilityParamBitmask() ?: return Stability.Unstable
+                stability = Stability.Runtime(declaration)
             }
-            IrDeclarationOrigin.IR_EXTERNAL_JAVA_DECLARATION_STUB -> return Stability.Unstable
-            IrDeclarationOrigin.IR_BUILTINS_STUB -> error("Builtins Stub: ${declaration.name}")
+            return when (mask) {
+                0 -> stability
+                else -> stability + Stability.Combined(
+                    declaration.typeParameters.mapIndexedNotNull { index, irTypeParameter ->
+                        if (mask and (0b1 shl index) != 0) {
+                            val sub = substitutions.get(irTypeParameter.symbol)
+                            if (sub != null)
+                                stabilityOf(sub, substitutions, analyzing)
+                            else
+                                Stability.Parameter(irTypeParameter)
+                        } else null
+                    }
+                )
+            }
+        } else if (declaration.origin == IrDeclarationOrigin.IR_EXTERNAL_JAVA_DECLARATION_STUB) {
+            return Stability.Unstable
         }
 
         if (declaration.isInterface) {
@@ -318,6 +345,12 @@ class StabilityInferencer(val context: IrPluginContext) {
         }
 
         return stability
+    }
+
+    private fun canInferStability(declaration: IrClass): Boolean {
+        val fqName = declaration.fqNameWhenAvailable?.toString() ?: ""
+        return stableBuiltinTypes.contains(fqName) ||
+            declaration.origin == IrDeclarationOrigin.IR_EXTERNAL_DECLARATION_STUB
     }
 
     fun stabilityOf(

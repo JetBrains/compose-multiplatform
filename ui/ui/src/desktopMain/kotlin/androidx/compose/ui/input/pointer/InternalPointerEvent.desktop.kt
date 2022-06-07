@@ -21,6 +21,8 @@ import java.awt.event.MouseEvent
 internal actual class InternalPointerEvent constructor(
     val type: PointerEventType,
     actual val changes: Map<PointerId, PointerInputChange>,
+    val buttons: PointerButtons,
+    val keyboardModifiers: PointerKeyboardModifiers,
     val mouseEvent: MouseEvent?
 ) {
     actual constructor(
@@ -29,6 +31,8 @@ internal actual class InternalPointerEvent constructor(
     ) : this(
         pointerInputEvent.eventType,
         changes,
+        pointerInputEvent.buttons,
+        pointerInputEvent.keyboardModifiers,
         pointerInputEvent.mouseEvent
     )
 

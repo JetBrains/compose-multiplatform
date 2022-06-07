@@ -15,8 +15,8 @@
  */
 
 
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
@@ -46,8 +46,20 @@ dependencies {
 androidx {
     name = "Compose LiveData integration"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.RUNTIME
+    mavenGroup = LibraryGroups.COMPOSE_RUNTIME
     inceptionYear = "2020"
     description = "Compose integration with LiveData"
     legacyDisableKotlinStrictApiMode = true
+}
+
+android {
+    namespace "androidx.compose.runtime.livedata"
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
 }

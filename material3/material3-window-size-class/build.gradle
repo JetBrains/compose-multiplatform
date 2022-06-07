@@ -1,0 +1,124 @@
+/*
+ * Copyright 2022 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import androidx.build.AndroidXComposePlugin
+import androidx.build.LibraryType
+import androidx.build.Publish
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    id("AndroidXPlugin")
+    id("com.android.library")
+    id("AndroidXComposePlugin")
+}
+
+AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
+
+dependencies {
+    kotlinPlugin(project(":compose:compiler:compiler"))
+
+    if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block below
+         */
+        implementation(libs.kotlinStdlibCommon)
+        api(project(":compose:runtime:runtime"))
+        api(project(":compose:ui:ui"))
+        api(project(":compose:ui:ui-unit"))
+        implementation("androidx.window:window:1.1.0-alpha02")
+
+        testImplementation(libs.kotlinTest)
+        testImplementation(libs.truth)
+
+        androidTestImplementation(project(":compose:test-utils"))
+        androidTestImplementation(project(":compose:foundation:foundation"))
+        androidTestImplementation(libs.testRules)
+        androidTestImplementation(libs.testRunner)
+        androidTestImplementation(libs.junit)
+        androidTestImplementation(libs.truth)
+
+        samples(project(":compose:material3:material3-window-size-class:material3-window-size-class-samples"))
+    }
+}
+
+if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
+    kotlin {
+        android()
+        jvm("desktop")
+
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block above
+         */
+        sourceSets {
+            commonMain.dependencies {
+                implementation(libs.kotlinStdlibCommon)
+                api(project(":compose:runtime:runtime"))
+                api(project(":compose:ui:ui"))
+                api(project(":compose:ui:ui-unit"))
+            }
+
+            jvmMain.dependencies {
+                implementation(libs.kotlinStdlib)
+            }
+
+            androidMain.dependencies {
+                implementation("androidx.window:window:1.1.0-alpha02")
+            }
+
+            androidMain.dependsOn(jvmMain)
+            desktopMain.dependsOn(jvmMain)
+
+            androidTest.dependencies {
+                implementation(libs.kotlinTest)
+                implementation(libs.truth)
+            }
+
+            androidAndroidTest.dependencies {
+                implementation(project(":compose:test-utils"))
+                implementation(project(":compose:foundation:foundation"))
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.junit)
+                implementation(libs.truth)
+            }
+        }
+    }
+    dependencies {
+        samples(project(":compose:material3:material3-window-size-class:material3-window-size-class-samples"))
+    }
+}
+
+androidx {
+    name = "Compose Material 3 Window Size Class"
+    type = LibraryType.PUBLISHED_LIBRARY
+    mavenGroup = LibraryGroups.COMPOSE_MATERIAL3
+    inceptionYear = "2022"
+    description = "Provides window size classes for building responsive UIs"
+}
+
+android {
+    namespace "androidx.compose.material3.windowsizeclass"
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
+}

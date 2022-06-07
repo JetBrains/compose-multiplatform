@@ -17,7 +17,6 @@
 package androidx.compose.compiler.plugins.kotlin.lower.decoys
 
 import androidx.compose.compiler.plugins.kotlin.ModuleMetrics
-import androidx.compose.compiler.plugins.kotlin.lower.AbstractComposeLowering
 import androidx.compose.compiler.plugins.kotlin.lower.ModuleLoweringPass
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.ir.remapTypeParameters
@@ -26,11 +25,13 @@ import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrDelegatingConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionReference
+import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrDelegatingConstructorCallImpl
@@ -48,20 +49,52 @@ class SubstituteDecoyCallsTransformer(
     pluginContext: IrPluginContext,
     symbolRemapper: DeepCopySymbolRemapper,
     bindingTrace: BindingTrace,
-    override val signatureBuilder: IdSignatureSerializer,
+    signatureBuilder: IdSignatureSerializer,
     metrics: ModuleMetrics,
-) : AbstractComposeLowering(
-    context = pluginContext,
+) : AbstractDecoysLowering(
+    pluginContext = pluginContext,
     symbolRemapper = symbolRemapper,
     bindingTrace = bindingTrace,
     metrics = metrics,
-),
-    ModuleLoweringPass,
-    DecoyTransformBase {
+    signatureBuilder = signatureBuilder
+), ModuleLoweringPass {
+
     override fun lower(module: IrModuleFragment) {
         module.transformChildrenVoid()
 
         module.patchDeclarationParents()
+    }
+
+    /*
+    * Some properties defined in classes get initialized by using values provided in
+    * constructors:
+    *   class TakesComposable(name: String, age: Int, val c: @Composable () -> Unit) {
+    *        var nameAndAge: String = "$name,$age"
+    *   }
+    *
+    * Since [ComposerTypeRemapper].remapType() skips decoys (including decoy constructors),
+    * the value getters (e.g `name` or `age` above) keep references to old value parameter symbols
+    * from decoy constructors.
+    * Therefore, getters for values from constructors need to be substituted by getters for values
+    * from constructors with DecoyImplementation annotation.
+    */
+    override fun visitGetValue(expression: IrGetValue): IrExpression {
+        val originalGetValue = super.visitGetValue(expression)
+
+        val valueParameter = expression.symbol.owner as? IrValueParameter
+            ?: return originalGetValue
+
+        val constructorParent = valueParameter.parent as? IrConstructor
+            ?: return originalGetValue
+
+        if (!constructorParent.isDecoy()) {
+            return originalGetValue
+        }
+
+        val targetConstructor = constructorParent.getComposableForDecoy().owner as IrConstructor
+        val targetValueParameter = targetConstructor.valueParameters[valueParameter.index]
+
+        return irGet(targetValueParameter)
     }
 
     override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {

@@ -15,8 +15,8 @@
  */
 
 import androidx.build.AndroidXComposePlugin
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
@@ -37,20 +37,29 @@ dependencies {
 
         api("androidx.annotation:annotation:1.1.0")
         api(project(":compose:ui:ui"))
-        api(project(":compose:ui:ui-unit"))
+        api("androidx.compose.ui:ui-unit:1.1.1")
 
         implementation(project(":compose:runtime:runtime"))
         implementation("androidx.compose.ui:ui-util:1.0.0")
+        implementation("androidx.core:core:1.7.0")
+        implementation("androidx.compose.animation:animation-core:1.1.1")
         implementation(libs.kotlinStdlibCommon)
 
         testImplementation(libs.testRules)
         testImplementation(libs.testRunner)
         testImplementation(libs.junit)
+        testImplementation(libs.truth)
 
         androidTestImplementation(project(":compose:foundation:foundation"))
         androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.0")
         androidTestImplementation(project(":compose:test-utils"))
         androidTestImplementation("androidx.activity:activity-compose:1.3.1")
+        // old version of common-java8 conflicts with newer version, because both have
+        // DefaultLifecycleEventObserver.
+        // Outside of androidx this is resolved via constraint added to lifecycle-common,
+        // but it doesn't work in androidx.
+        // See aosp/1804059
+        androidTestImplementation(project(":lifecycle:lifecycle-common-java8"))
         androidTestImplementation(libs.testRules)
         androidTestImplementation(libs.testRunner)
         androidTestImplementation(libs.junit)
@@ -61,10 +70,12 @@ dependencies {
 }
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
-        jvm("desktop")
+        desktop()
+    }
 
+    kotlin {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block above
@@ -80,16 +91,23 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
+                implementation("androidx.core:core:1.7.0")
+                implementation("androidx.compose.animation:animation-core:1.1.1")
             }
 
             desktopMain.dependencies {
                 implementation(libs.kotlinStdlib)
             }
 
+            // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
+            //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
+            //  level dependencies block instead:
+            //  `dependencies { testImplementation(libs.robolectric) }`
             androidTest.dependencies {
                 implementation(libs.testRules)
                 implementation(libs.testRunner)
                 implementation(libs.junit)
+                implementation(libs.truth)
             }
 
             androidAndroidTest.dependencies {
@@ -113,8 +131,20 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Layouts"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.FOUNDATION
+    mavenGroup = LibraryGroups.COMPOSE_FOUNDATION
     inceptionYear = "2019"
     description = "Compose layout implementations"
     legacyDisableKotlinStrictApiMode = true
+}
+
+android {
+    namespace "androidx.compose.foundation.layout"
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=all"
+        ]
+    }
 }

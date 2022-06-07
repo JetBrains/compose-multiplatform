@@ -73,6 +73,18 @@ internal class RenderNodeApi29(val ownerView: AndroidComposeView) : DeviceRender
             renderNode.elevation = value
         }
 
+    override var ambientShadowColor: Int
+        get() = renderNode.ambientShadowColor
+        set(value) {
+            renderNode.ambientShadowColor = value
+        }
+
+    override var spotShadowColor: Int
+        get() = renderNode.spotShadowColor
+        set(value) {
+            renderNode.spotShadowColor = value
+        }
+
     override var rotationZ: Float
         get() = renderNode.rotationZ
         set(value) {
@@ -202,6 +214,8 @@ internal class RenderNodeApi29(val ownerView: AndroidComposeView) : DeviceRender
             translationX = renderNode.translationX,
             translationY = renderNode.translationY,
             elevation = renderNode.elevation,
+            ambientShadowColor = renderNode.ambientShadowColor,
+            spotShadowColor = renderNode.spotShadowColor,
             rotationZ = renderNode.rotationZ,
             rotationX = renderNode.rotationX,
             rotationY = renderNode.rotationY,

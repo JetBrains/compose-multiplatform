@@ -47,7 +47,36 @@ class RemeasurementModifierTest {
         assertMeasuredAndLaidOut(root.first)
         // but still remeasured
         assertRemeasured(root.first) {
-            remeasurementObj!!.forceRemeasure()
+            assertRelaidOut(root.first) {
+                remeasurementObj!!.forceRemeasure()
+            }
+        }
+    }
+
+    @Test
+    fun otherNodesAreNotRemeasured() {
+        var remeasurementObj: Remeasurement? = null
+        val root = root {
+            add(
+                node {
+                    modifier = object : RemeasurementModifier {
+                        override fun onRemeasurementAvailable(remeasurement: Remeasurement) {
+                            remeasurementObj = remeasurement
+                        }
+                    }
+                }
+            )
+            add(node())
+        }
+
+        createDelegate(root)
+
+        assertThat(remeasurementObj).isNotNull()
+        root.second.requestRemeasure()
+        assertNotRemeasured(root.second) {
+            assertNotRelaidOut(root.second) {
+                remeasurementObj!!.forceRemeasure()
+            }
         }
     }
 }

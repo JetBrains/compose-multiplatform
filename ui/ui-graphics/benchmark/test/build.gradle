@@ -34,3 +34,7 @@ dependencies {
     androidTestImplementation(libs.testRules)
     androidTestImplementation(libs.truth)
 }
+
+android {
+    namespace "androidx.compose.ui.graphics.benchmark.test"
+}

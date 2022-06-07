@@ -17,6 +17,8 @@
 package androidx.compose.ui.test
 
 import android.os.Build
+import android.view.View
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -26,19 +28,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.testutils.assertContainsColor
 import androidx.compose.testutils.assertPixels
 import androidx.compose.testutils.expectError
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
+import kotlin.math.roundToInt
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -107,6 +116,36 @@ class BitmapCapturingTest(val config: TestConfig) {
     }
 
     @Test
+    fun captureIndividualRects_checkSizeAndColors_multiWindow() {
+        composeCheckerboard()
+
+        var calledCount = 0
+        rule.onNodeWithTag(tagTopLeft)
+            .captureToImage(useAllWindows = true)
+            .assertPixels(expectedSize = IntSize(100, 50)) {
+                calledCount++
+                colorTopLeft
+            }
+        assertThat(calledCount).isEqualTo((100 * 50))
+
+        rule.onNodeWithTag(tagTopRight)
+            .captureToImage(useAllWindows = true)
+            .assertPixels(expectedSize = IntSize(100, 50)) {
+                colorTopRight
+            }
+        rule.onNodeWithTag(tagBottomLeft)
+            .captureToImage(useAllWindows = true)
+            .assertPixels(expectedSize = IntSize(100, 50)) {
+                colorBottomLeft
+            }
+        rule.onNodeWithTag(tagBottomRight)
+            .captureToImage(useAllWindows = true)
+            .assertPixels(expectedSize = IntSize(100, 50)) {
+                colorBottomRight
+            }
+    }
+
+    @Test
     fun captureRootContainer_checkSizeAndColors() {
         composeCheckerboard()
 
@@ -117,45 +156,22 @@ class BitmapCapturingTest(val config: TestConfig) {
             }
     }
 
-    // TODO(b/207491761): Move test to test-utils. It tests assertPixels(), not captureToImage()
     @Test
-    fun assertWrongColor_expectException() {
+    fun captureRootContainer_checkSizeAndColors_multiWindow() {
         composeCheckerboard()
 
-        expectError<AssertionError>(
-            expectedMessage = "Pixel\\(0, 0\\) expected to be " +
-                "Color\\(1.0, 1.0, 0.0, 1.0, .*\\), but was " +
-                "Color\\(1.0, 0.0, 0.0, 1.0, .*\\).*"
-        ) {
-            rule.onNodeWithTag(tagTopLeft)
-                .captureToImage()
-                .assertPixels(expectedSize = IntSize(100, 50)) {
-                    colorBottomRight // Assuming wrong color
-                }
-        }
-    }
-
-    // TODO(b/207491761): Move test to test-utils. It tests assertPixels(), not captureToImage()
-    @Test
-    fun assertWrongSize_expectException() {
-        composeCheckerboard()
-
-        expectError<AssertionError>(
-            expectedMessage = "Bitmap size is wrong! Expected '10 x 10' but got '100 x 50'.*"
-        ) {
-            rule.onNodeWithTag(tagTopLeft)
-                .captureToImage()
-                .assertPixels(expectedSize = IntSize(10, 10)) {
-                    colorBottomLeft
-                }
-        }
+        rule.onNodeWithTag(rootTag)
+            .captureToImage(useAllWindows = true)
+            .assertPixels(expectedSize = IntSize(200, 100)) {
+                expectedColorProvider(it)
+            }
     }
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.P) // b/163023027
     fun captureDialog_verifyBackground() {
         // Test that we are really able to capture dialogs to bitmap.
-        rule.setContent {
+        setContent {
             AlertDialog(onDismissRequest = {}, confirmButton = {}, backgroundColor = Color.Red)
         }
 
@@ -165,9 +181,27 @@ class BitmapCapturingTest(val config: TestConfig) {
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.P) // b/163023027
+    fun captureDialog_verifyBackground_multiWindow() {
+        // Test that we are really able to capture dialogs to bitmap.
+        setContent {
+            AlertDialog(
+                onDismissRequest = {},
+                confirmButton = {},
+                modifier = Modifier.size(200.dp),
+                backgroundColor = Color.Red
+            )
+        }
+
+        rule.onNode(isDialog())
+            .captureToImage(useAllWindows = true)
+            .assertContainsColor(Color.Red)
+    }
+
+    @Test
     fun capturePopup_shouldFail() {
         // Test that we throw an error when trying to capture a popup.
-        rule.setContent {
+        setContent {
             Box {
                 Popup {
                     Text("Hello")
@@ -176,12 +210,133 @@ class BitmapCapturingTest(val config: TestConfig) {
         }
 
         expectError<IllegalArgumentException>(
-            expectedMessage = ".*Popups currently cannot be captured to bitmap.*"
+            expectedMessage = "The node that is being captured " +
+                "to bitmap is in a popup or is a popup itself.*"
         ) {
             rule.onNode(isPopup())
                 .captureToImage()
         }
     }
+
+    @Test
+    fun capturePopup_verifyBackground_multiWindow() {
+        setContent {
+            Box {
+                Popup {
+                    Box(Modifier.background(Color.Red)) {
+                        Text("Hello")
+                    }
+                }
+            }
+        }
+
+        rule.onNode(isPopup())
+            .captureToImage(useAllWindows = true)
+            .assertContainsColor(Color.Red)
+    }
+
+    @Test
+    fun capturePopup_withComposable_verifyBackground_multiWindow() {
+        setContent {
+            Box(
+                Modifier
+                    .testTag(rootTag)
+                    .size(300.dp)
+                    .background(Color.Yellow)
+            ) {
+                Popup {
+                    Box(Modifier.background(Color.Red)) {
+                        Text("Hello")
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag(rootTag)
+            .captureToImage(useAllWindows = true)
+            .assertContainsColor(Color.Red)
+            .assertContainsColor(Color.Yellow)
+    }
+
+    @Test
+    fun captureDialog_withOffset_verifyBackground_multiWindow() {
+        setContent {
+            Box(
+                Modifier
+                    .testTag(rootTag)
+                    .size(300.dp)
+                    .background(Color.Yellow)
+            ) {
+                Dialog({}) {
+                    Box(Modifier.size(300.dp).background(Color.Red)) {
+                        Text("Hello")
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag(rootTag)
+            .captureToImage(useAllWindows = true)
+            .assertContainsColor(Color.Red)
+    }
+
+    @Test
+    fun captureDialog_noShadow_verifyBackground_multiWindow() {
+        setContent {
+            Box(
+                Modifier
+                    .testTag(rootTag)
+                    .size(300.dp)
+                    .background(Color.Yellow)
+            ) {
+                Dialog({}) {
+                    Box(Modifier.testTag("dialog").size(300.dp).background(Color.Red)) {
+                        Text("Hello")
+                    }
+                }
+            }
+        }
+
+        // Remove scrim
+        val dialogWindowProvider =
+            findDialogWindowProviderInParent(fetchNodeRootView("dialog"))
+        rule.runOnUiThread {
+            val originalAttributes = dialogWindowProvider?.window?.attributes
+            originalAttributes?.dimAmount = 0.0f
+
+            // Reapply flag
+            dialogWindowProvider?.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+            dialogWindowProvider?.window?.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        }
+
+        rule.onNodeWithTag(rootTag)
+            .captureToImage(useAllWindows = true)
+            .assertContainsColor(Color.Red)
+            .assertContainsColor(Color.Yellow)
+    }
+
+    @Test
+    fun capturePopup_verifySize_multiWindow() {
+        val boxSize = 200.dp
+        val boxSizePx = boxSize.toPixel(rule.density).roundToInt()
+        setContent {
+            Box {
+                Popup {
+                    Box(Modifier.size(boxSize)) {
+                        Text("Hello")
+                    }
+                }
+            }
+        }
+
+        rule.onNode(isPopup())
+            .captureToImage(useAllWindows = true)
+            .let {
+                assertThat(IntSize(it.width, it.height)).isEqualTo(IntSize(boxSizePx, boxSizePx))
+            }
+    }
+
+    private fun Dp.toPixel(density: Density) = this.value * density.density
 
     private fun expectedColorProvider(pos: IntOffset): Color {
         if (pos.y < 50) {
@@ -202,7 +357,7 @@ class BitmapCapturingTest(val config: TestConfig) {
 
     private fun composeCheckerboard() {
         with(rule.density) {
-            rule.setContent {
+            setContent {
                 Box(Modifier.background(colorBg)) {
                     Box(Modifier.padding(top = 20.toDp()).background(colorBg)) {
                         Column(Modifier.testTag(rootTag)) {
@@ -240,4 +395,24 @@ class BitmapCapturingTest(val config: TestConfig) {
             }
         }
     }
+
+    private fun setContent(content: @Composable () -> Unit) {
+        when (val activity = rule.activity) {
+            is ActivityWithActionBar -> activity.setContent(content)
+            else -> rule.setContent(content)
+        }
+    }
+
+    private fun fetchNodeRootView(nodeTag: String): View {
+        return fetchNodeInteraction(nodeTag).fetchRootView()
+    }
+
+    private fun fetchNodeInteraction(nodeTag: String): SemanticsNodeInteraction {
+        return rule.onNodeWithTag(nodeTag)
+    }
+}
+
+private fun SemanticsNodeInteraction.fetchRootView(): View {
+    val node = fetchSemanticsNode()
+    return (node.root as ViewRootForTest).view
 }

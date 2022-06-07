@@ -18,6 +18,7 @@ package androidx.compose.material.icons.generator
 
 import com.google.common.base.CaseFormat
 import java.io.File
+import java.util.Locale
 
 /**
  * Processes vector drawables in [iconDirectory] into a list of icons, removing any unwanted
@@ -74,7 +75,7 @@ class IconProcessor(
             val theme = dir.name.toIconTheme()
             val icons = dir.walk().filter { !it.isDirectory }.toList()
 
-            icons.map { file ->
+            val transformedIcons = icons.map { file ->
                 val filename = file.nameWithoutExtension
                 val kotlinName = filename.toKotlinPropertyName()
 
@@ -89,6 +90,25 @@ class IconProcessor(
                     fileContent = processXmlFile(file.readText())
                 )
             }
+
+            // Ensure icon names are unique when accounting for case insensitive filesystems -
+            // workaround for b/216295020
+            transformedIcons
+                .groupBy { it.kotlinName.lowercase(Locale.ROOT) }
+                .filter { it.value.size > 1 }
+                .filterNot { entry ->
+                    entry.value.map { it.kotlinName }.containsAll(AllowedDuplicateIconNames)
+                }
+                .forEach { entry ->
+                    throw IllegalStateException(
+                        """Found multiple icons with the same case-insensitive filename:
+                                | ${entry.value.joinToString()}. Generating icons with the same
+                                | case-insensitive filename will cause issues on devices without
+                                | a case sensitive filesystem (OSX / Windows).""".trimMargin()
+                    )
+                }
+
+            transformedIcons
         }
     }
 }
@@ -119,13 +139,13 @@ private fun ensureIconsExistInAllThemes(icons: List<Icon>) {
     }
 
     val expectedIconNames = groupedIcons.values.map { themeIcons ->
-        themeIcons.map { icon -> icon.kotlinName }
+        themeIcons.map { icon -> icon.kotlinName }.sorted()
     }
 
     expectedIconNames.first().let { expected ->
         expectedIconNames.forEach { actual ->
             check(actual == expected) {
-                "Not all icons were found in all themes"
+                "Not all icons were found in all themes $actual $expected"
             }
         }
     }
@@ -178,3 +198,7 @@ private fun String.toKotlinPropertyName(): String {
         if (name.first().isDigit()) "_$name" else name
     }
 }
+
+// These icons have already shipped in a stable release, so it is too late to rename / remove one to
+// fix the clash.
+private val AllowedDuplicateIconNames = listOf("AddChart", "Addchart")

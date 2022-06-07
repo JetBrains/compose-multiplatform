@@ -19,7 +19,9 @@ package androidx.compose.foundation.demos.text
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 
+@Preview
 @Composable
 fun KeyboardTypeDemo() {
     LazyColumn {

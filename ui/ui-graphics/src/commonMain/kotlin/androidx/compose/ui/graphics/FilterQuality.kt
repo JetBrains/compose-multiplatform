@@ -22,9 +22,9 @@ import androidx.compose.runtime.Immutable
  * Quality levels for image filters.
  * See [Paint.filterQuality].
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class FilterQuality internal constructor(val value: Int) {
+@kotlin.jvm.JvmInline
+value class FilterQuality internal constructor(val value: Int) {
 
     companion object {
         /**

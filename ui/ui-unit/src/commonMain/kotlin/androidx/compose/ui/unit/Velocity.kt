@@ -34,9 +34,9 @@ fun Velocity(x: Float, y: Float) = Velocity(packFloats(x, y))
 /**
  * A two dimensional velocity in pixels per second.
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class Velocity internal constructor(private val packedValue: Long) {
+@kotlin.jvm.JvmInline
+value class Velocity internal constructor(private val packedValue: Long) {
 
     /**
      * The horizontal component of the velocity in pixels per second.

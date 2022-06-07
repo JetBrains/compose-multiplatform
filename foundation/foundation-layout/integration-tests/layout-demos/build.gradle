@@ -35,3 +35,7 @@ dependencies {
     implementation(project(":compose:ui:ui"))
     implementation(project(":compose:ui:ui-text"))
 }
+
+android {
+    namespace "androidx.compose.foundation.layout.demos"
+}

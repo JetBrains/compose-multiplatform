@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.tokens.NavigationBar
+import androidx.compose.material3.tokens.BadgeTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -37,21 +37,23 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.unit.dp
 
-// TODO(b/197880751): Update spec link.
 /**
- * A BadgeBox is used to decorate [content] with a [badge] that can contain dynamic information,
- * such
- * as the presence of a new notification or a number of pending requests. Badges can be icon only
- * or contain short text.
+ * Material Design badge box.
+ *
+ * A badge represents dynamic information such as a number of pending requests in a navigation bar.
+ *
+ * Badges can be icon only or contain short text.
+ *
+ * ![Badge image](https://developer.android.com/images/reference/androidx/compose/material3/badge.png)
  *
  * A common use case is to display a badge with navigation bar items.
- * For more information, see [Navigation Bar](https://material.io/components/bottom-navigation#behavior)
+ * For more information, see [Navigation Bar](https://m3.material.io/components/navigation-bar/overview)
  *
  * A simple icon with badge example looks like:
  * @sample androidx.compose.material3.samples.NavigationBarItemWithBadge
  *
  * @param badge the badge to be displayed - typically a [Badge]
- * @param modifier optional [Modifier] for this item
+ * @param modifier the [Modifier] to be applied to this BadgedBox
  * @param content the anchor to which this badge will be positioned
  *
  */
@@ -101,7 +103,7 @@ fun BadgedBox(
         ) {
             // Use the width of the badge to infer whether it has any content (based on radius used
             // in [Badge]) and determine its horizontal offset.
-            val hasContent = badgePlaceable.width > (NavigationBar.BadgeSize.roundToPx())
+            val hasContent = badgePlaceable.width > (BadgeTokens.Size.roundToPx())
             val badgeHorizontalOffset =
                 if (hasContent) BadgeWithContentHorizontalOffset else BadgeOffset
             val badgeVerticalOffset =
@@ -116,26 +118,35 @@ fun BadgedBox(
 }
 
 /**
- * Badge is a component that can contain dynamic information, such as the presence of a new
- * notification or a number of pending requests. Badges can be icon only or contain short text.
+ * A badge represents dynamic information such as a number of pending requests in a navigation bar.
+ *
+ * Badges can be icon only or contain short text.
+ *
+ * ![Badge image](https://developer.android.com/images/reference/androidx/compose/material3/badge.png)
  *
  * See [BadgedBox] for a top level layout that will properly place the badge relative to content
  * such as text or an icon.
  *
- * @param modifier optional [Modifier] for this item
- * @param containerColor the background color for the badge
- * @param contentColor the color of label text rendered in the badge
- * @param content optional content to be rendered inside the badge
+ * @param modifier the [Modifier] to be applied to this badge
+ * @param containerColor the color used for the background of this badge
+ * @param contentColor the preferred color for content inside this badge. Defaults to either the
+ * matching content color for [containerColor], or to the current [LocalContentColor] if
+ * [containerColor] is not a color from the theme.
+ * @param content optional content to be rendered inside this badge
  */
 @Composable
 fun Badge(
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.fromToken(NavigationBar.BadgeColor),
+    containerColor: Color = BadgeTokens.Color.toColor(),
     contentColor: Color = contentColorFor(containerColor),
     content: @Composable (RowScope.() -> Unit)? = null,
 ) {
-    val size = if (content != null) NavigationBar.LargeBadgeSize else NavigationBar.BadgeSize
-    val shape = if (content != null) NavigationBar.LargeBadgeShape else NavigationBar.BadgeShape
+    val size = if (content != null) BadgeTokens.LargeSize else BadgeTokens.Size
+    val shape = if (content != null) {
+        BadgeTokens.LargeShape.toShape()
+    } else {
+        BadgeTokens.Shape.toShape()
+    }
 
     // Draw badge container.
     Row(
@@ -158,7 +169,7 @@ fun Badge(
                 LocalContentColor provides contentColor
             ) {
                 val style =
-                    MaterialTheme.typography.fromToken(NavigationBar.LargeBadgeLabelFontFamily)
+                    MaterialTheme.typography.fromToken(BadgeTokens.LargeLabelTextFont)
                 ProvideTextStyle(
                     value = style,
                     content = { content() }

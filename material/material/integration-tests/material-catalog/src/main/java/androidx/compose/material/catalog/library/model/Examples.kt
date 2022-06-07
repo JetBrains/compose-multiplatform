@@ -33,7 +33,10 @@ import androidx.compose.material.samples.ButtonSample
 import androidx.compose.material.samples.ButtonWithIconSample
 import androidx.compose.material.samples.CardSample
 import androidx.compose.material.samples.CheckboxSample
+import androidx.compose.material.samples.ChipGroupSingleLineSample
+import androidx.compose.material.samples.ChipSample
 import androidx.compose.material.samples.CircularProgressIndicatorSample
+import androidx.compose.material.samples.ClickableCardSample
 import androidx.compose.material.samples.ClickableListItems
 import androidx.compose.material.samples.CompactNavigationRailSample
 import androidx.compose.material.samples.CustomAlertDialogSample
@@ -54,6 +57,7 @@ import androidx.compose.material.samples.NavigationRailWithOnlySelectedLabelsSam
 import androidx.compose.material.samples.OneLineListItems
 import androidx.compose.material.samples.OneLineRtlLtrListItems
 import androidx.compose.material.samples.OutlinedButtonSample
+import androidx.compose.material.samples.OutlinedChipWithIconSample
 import androidx.compose.material.samples.OutlinedTextFieldSample
 import androidx.compose.material.samples.PasswordTextField
 import androidx.compose.material.samples.RadioButtonSample
@@ -244,6 +248,13 @@ val CardsExamples = listOf(
         sourceUrl = CardsExampleSourceUrl
     ) {
         CardSample()
+    },
+    Example(
+        name = ::ClickableCardSample.name,
+        description = CardsExampleDescription,
+        sourceUrl = CardsExampleSourceUrl
+    ) {
+        ClickableCardSample()
     }
 )
 
@@ -263,6 +274,32 @@ val CheckboxesExamples = listOf(
         sourceUrl = CheckboxesExampleSourceUrl
     ) {
         TriStateCheckboxSample()
+    }
+)
+
+private const val ChipsExampleDescription = "Chips examples"
+private const val ChipsExampleSourceUrl = "$SampleSourceUrl/ChipSamples.kt"
+val ChipsExamples = listOf(
+    Example(
+        name = ::ChipSample.name,
+        description = ChipsExampleDescription,
+        sourceUrl = ChipsExampleSourceUrl
+    ) {
+        ChipSample()
+    },
+    Example(
+        name = ::OutlinedChipWithIconSample.name,
+        description = ChipsExampleDescription,
+        sourceUrl = ChipsExampleSourceUrl
+    ) {
+        OutlinedChipWithIconSample()
+    },
+    Example(
+        name = ::ChipGroupSingleLineSample.name,
+        description = ChipsExampleDescription,
+        sourceUrl = ChipsExampleSourceUrl
+    ) {
+        ChipGroupSingleLineSample()
     }
 )
 

@@ -30,6 +30,7 @@ import androidx.compose.ui.input.pointer.PointerIconService
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -43,7 +44,7 @@ val LocalAccessibilityManager = staticCompositionLocalOf<AccessibilityManager?> 
  * The CompositionLocal that can be used to trigger autofill actions.
  * Eg. [Autofill.requestAutofillForNode].
  */
-@Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+@Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
 @get:ExperimentalComposeUiApi
 @ExperimentalComposeUiApi
 val LocalAutofill = staticCompositionLocalOf<Autofill?> { null }
@@ -54,7 +55,7 @@ val LocalAutofill = staticCompositionLocalOf<Autofill?> { null }
  * [AutofillTree] is a temporary data structure that will be replaced by Autofill Semantics
  * (b/138604305).
  */
-@Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+@Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
 @get:ExperimentalComposeUiApi
 @ExperimentalComposeUiApi
 val LocalAutofillTree = staticCompositionLocalOf<AutofillTree> {
@@ -90,11 +91,21 @@ val LocalFocusManager = staticCompositionLocalOf<FocusManager> {
 /**
  * The CompositionLocal to provide platform font loading methods.
  *
- * Use [androidx.compose.ui.res.fontResource] instead.
  * @suppress
  */
+@Suppress("DEPRECATION")
+@Deprecated("LocalFontLoader is replaced with LocalFontFamilyResolver",
+    replaceWith = ReplaceWith("LocalFontFamilyResolver")
+)
 val LocalFontLoader = staticCompositionLocalOf<Font.ResourceLoader> {
     noLocalProvidedFor("LocalFontLoader")
+}
+
+/**
+ * The CompositionLocal for compose font resolution from FontFamily.
+ */
+val LocalFontFamilyResolver = staticCompositionLocalOf<FontFamily.Resolver> {
+    noLocalProvidedFor("LocalFontFamilyResolver")
 }
 
 /**
@@ -170,7 +181,9 @@ internal fun ProvideCommonCompositionLocals(
         LocalClipboardManager provides owner.clipboardManager,
         LocalDensity provides owner.density,
         LocalFocusManager provides owner.focusManager,
-        LocalFontLoader provides owner.fontLoader,
+        @Suppress("DEPRECATION") LocalFontLoader
+            providesDefault @Suppress("DEPRECATION") owner.fontLoader,
+        LocalFontFamilyResolver providesDefault owner.fontFamilyResolver,
         LocalHapticFeedback provides owner.hapticFeedBack,
         LocalInputModeManager provides owner.inputModeManager,
         LocalLayoutDirection provides owner.layoutDirection,

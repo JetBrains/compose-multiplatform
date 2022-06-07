@@ -57,7 +57,8 @@ fun Window.sendKeyEvent(
     modifiers: Int = 0
 ): Boolean {
     val event = KeyEvent(
-        focusOwner,
+        // if we would just use `focusOwner` then it will be null if the window is minimized
+        mostRecentFocusOwner,
         KeyEvent.KEY_PRESSED,
         0,
         modifiers,
@@ -97,7 +98,7 @@ fun JFrame.sendMouseWheelEvent(
     x: Int,
     y: Int,
     scrollType: Int,
-    scrollAmount: Int,
+    wheelRotation: Int,
     modifiers: Int = 0,
 ): Boolean {
     // we use width and height instead of x and y because we can send (-1, -1), but still need
@@ -113,8 +114,8 @@ fun JFrame.sendMouseWheelEvent(
         1,
         false,
         scrollType,
-        scrollAmount,
-        1
+        1,
+        wheelRotation
     )
     component.dispatchEvent(event)
     return event.isConsumed

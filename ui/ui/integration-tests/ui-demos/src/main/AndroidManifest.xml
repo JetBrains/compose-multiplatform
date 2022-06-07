@@ -14,9 +14,9 @@
   ~ limitations under the License
   -->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="androidx.compose.ui.demos">
-    <application>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application
+        android:theme="@style/Theme.MaterialComponents.Light">
         <activity
             android:name=".viewinterop.ComposeNothingInAndroidTap"
             android:configChanges="orientation|screenSize"
@@ -45,5 +45,14 @@
             android:name=".viewinterop.ComposeInAndroidDialogDismissDialogDuringDispatch"
             android:configChanges="orientation|screenSize"
             android:label="Dialog" />
+        <activity
+            android:name=".viewinterop.ComposeInAndroidCoordinatorLayout"
+            android:configChanges="orientation|screenSize"
+            android:label="Compose in Coordinator Layout Activity" />
+
+        <activity
+            android:name=".viewinterop.ViewComposeViewNestedScrollInteropDemo"
+            android:configChanges="orientation|screenSize"
+            android:label="Coordinator Layout Activity with Compose > View" />
     </application>
 </manifest>

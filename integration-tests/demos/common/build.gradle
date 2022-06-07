@@ -29,3 +29,7 @@ dependencies {
     api("androidx.fragment:fragment-ktx:1.3.6")
     implementation(projectOrArtifact(":compose:runtime:runtime"))
 }
+
+android {
+    namespace "androidx.compose.integration.demos.common"
+}

@@ -16,7 +16,6 @@
 
 
 import androidx.build.BundleInsideHelper
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
 plugins {
@@ -42,7 +41,7 @@ dependencies {
 androidx {
     name = "Compose Material Lint Checks"
     type = LibraryType.LINT
-    mavenGroup = LibraryGroups.Compose.MATERIAL
+    mavenGroup = LibraryGroups.COMPOSE_MATERIAL
     inceptionYear = "2021"
     description = "Compose Material Lint Checks"
 }

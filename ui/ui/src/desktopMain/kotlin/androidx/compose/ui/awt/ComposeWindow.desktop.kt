@@ -19,13 +19,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.window.FrameWindowScope
-import androidx.compose.ui.window.UndecoratedWindowResizer
 import androidx.compose.ui.window.WindowPlacement
 import org.jetbrains.skiko.GraphicsApi
-import org.jetbrains.skiko.hostOs
-import org.jetbrains.skiko.OS
-import java.awt.Color
 import java.awt.Component
+import java.awt.GraphicsConfiguration
 import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
 import java.awt.event.MouseWheelListener
@@ -34,10 +31,14 @@ import javax.swing.JFrame
 /**
  * ComposeWindow is a window for building UI using Compose for Desktop.
  * ComposeWindow inherits javax.swing.JFrame.
+ *
+ * @param graphicsConfiguration the GraphicsConfiguration that is used to construct the new window.
+ * If null, the system default GraphicsConfiguration is assumed.
  */
-class ComposeWindow : JFrame() {
-    private val delegate = ComposeWindowDelegate(this)
-    internal val layer get() = delegate.layer
+class ComposeWindow(
+    graphicsConfiguration: GraphicsConfiguration? = null
+) : JFrame(graphicsConfiguration) {
+    private val delegate = ComposeWindowDelegate(this, ::isUndecorated)
 
     init {
         contentPane.add(delegate.pane)
@@ -96,16 +97,14 @@ class ComposeWindow : JFrame() {
         super.dispose()
     }
 
-    private val undecoratedWindowResizer = UndecoratedWindowResizer(this, layer)
-
     override fun setUndecorated(value: Boolean) {
         super.setUndecorated(value)
-        undecoratedWindowResizer.enabled = isUndecorated && isResizable
+        delegate.undecoratedWindowResizer.enabled = isUndecorated && isResizable
     }
 
     override fun setResizable(value: Boolean) {
         super.setResizable(value)
-        undecoratedWindowResizer.enabled = isUndecorated && isResizable
+        delegate.undecoratedWindowResizer.enabled = isUndecorated && isResizable
     }
 
     /**
@@ -113,24 +112,7 @@ class ComposeWindow : JFrame() {
      * Transparency should be set only if window is not showing and `isUndecorated` is set to
      * `true`, otherwise AWT will throw an exception.
      */
-    var isTransparent: Boolean
-        get() = layer.component.transparency
-        set(value) {
-            if (value != layer.component.transparency) {
-                check(isUndecorated) { "Window should be undecorated!" }
-                check(!isDisplayable) {
-                    "Cannot change transparency if window is already displayable."
-                }
-                layer.component.transparency = value
-                if (value) {
-                    if (hostOs != OS.Windows) {
-                        background = Color(0, 0, 0, 0)
-                    }
-                } else {
-                    background = null
-                }
-            }
-        }
+    var isTransparent: Boolean by delegate::isTransparent
 
     var placement: WindowPlacement
         get() = when {
@@ -156,11 +138,7 @@ class ComposeWindow : JFrame() {
     /**
      * `true` if the window is in fullscreen mode, `false` otherwise
      */
-    private var isFullscreen: Boolean
-        get() = layer.component.fullscreen
-        set(value) {
-            layer.component.fullscreen = value
-        }
+    private var isFullscreen: Boolean by delegate::fullscreen
 
     /**
      * `true` if the window is maximized to fill all available screen space, `false` otherwise

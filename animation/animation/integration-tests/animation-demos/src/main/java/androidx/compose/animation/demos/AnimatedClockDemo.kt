@@ -47,6 +47,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.isActive
@@ -58,6 +59,7 @@ private class Time(hours: State<Int>, minutes: State<Int>, seconds: State<Int>) 
     val seconds by seconds
 }
 
+@Preview
 @Composable
 fun AnimatedClockDemo() {
     val calendar = remember { Calendar.getInstance() }
@@ -65,9 +67,13 @@ fun AnimatedClockDemo() {
     val minutes = remember { mutableStateOf(calendar[Calendar.MINUTE]) }
     val hours = remember { mutableStateOf(calendar[Calendar.HOUR_OF_DAY]) }
     LaunchedEffect(key1 = Unit) {
+        // Start from 23:59:50 to give an impressive animation for all numbers
+        calendar.set(2020, 10, 10, 23, 59, 50)
+        val initialTime = calendar.timeInMillis
+        val firstFrameTime = withInfiniteAnimationFrameMillis { it }
         while (isActive) {
             withInfiniteAnimationFrameMillis {
-                calendar.timeInMillis = System.currentTimeMillis()
+                calendar.timeInMillis = it - firstFrameTime + initialTime
                 seconds.value = calendar[Calendar.SECOND]
                 minutes.value = calendar[Calendar.MINUTE]
                 hours.value = calendar[Calendar.HOUR_OF_DAY]

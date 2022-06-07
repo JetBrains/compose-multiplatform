@@ -295,13 +295,9 @@ fun LeadingIconTabsWithBadge(
                     else -> false
                 }
                 LeadingIconTab(
-                    text = { Text(title) },
-                    icon = {
+                    text = {
                         if (!showBadge) {
-                            Icon(
-                                icon,
-                                contentDescription = "Localized description"
-                            )
+                            Text(title)
                         } else {
                             DemoBadgedBox(
                                 when (index) {
@@ -310,12 +306,15 @@ fun LeadingIconTabsWithBadge(
                                     else -> null
                                 }
                             ) {
-                                Icon(
-                                    Icons.Filled.Favorite,
-                                    contentDescription = "Localized description"
-                                )
+                                Text(title)
                             }
                         }
+                    },
+                    icon = {
+                        Icon(
+                            icon,
+                            contentDescription = "Localized description"
+                        )
                     },
                     selected = state == index,
                     onClick = {

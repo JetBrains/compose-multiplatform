@@ -17,8 +17,12 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.gestures.DraggableState
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -30,10 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.interaction.DragInteraction
-import androidx.compose.foundation.interaction.Interaction
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -49,7 +49,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -574,6 +573,41 @@ class DraggableTest {
             assertThat((interactions[1] as DragInteraction.Cancel).start)
                 .isEqualTo(interactions[0])
         }
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun draggable_cancelMidDown_shouldContinueWithNextDown() {
+        var total = 0f
+
+        setDraggableContent {
+            Modifier.draggable(Orientation.Horizontal) { total += it }
+        }
+
+        rule.onNodeWithTag(draggableBoxTag).performMouseInput {
+            enter()
+            exit()
+        }
+
+        assertThat(total).isEqualTo(0f)
+        rule.onNodeWithTag(draggableBoxTag).performTouchInput {
+            down(center)
+            cancel()
+        }
+
+        assertThat(total).isEqualTo(0f)
+        rule.onNodeWithTag(draggableBoxTag).performMouseInput {
+            enter()
+            exit()
+        }
+
+        assertThat(total).isEqualTo(0f)
+        rule.onNodeWithTag(draggableBoxTag).performTouchInput {
+            down(center)
+            moveBy(Offset(100f, 100f))
+        }
+
+        assertThat(total).isGreaterThan(0f)
     }
 
     @Test

@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":compose:foundation:foundation-layout:integration-tests:foundation-layout-demos"))
     implementation(project(":compose:foundation:foundation:integration-tests:foundation-demos"))
     implementation(project(":compose:material:material:integration-tests:material-demos"))
+    implementation(project(":compose:material3:material3:integration-tests:material3-demos"))
     implementation(project(":navigation:navigation-compose:integration-tests:navigation-demos"))
     implementation(project(":compose:ui:ui:integration-tests:ui-demos"))
 
@@ -44,4 +45,5 @@ android {
         // part of CI.
         archivesBaseName = "compose-demos-testapp"
     }
+    namespace "androidx.compose.integration.demos"
 }

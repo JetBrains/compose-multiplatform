@@ -17,7 +17,7 @@ package androidx.compose.material3
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.tokens.IconButton
+import androidx.compose.material3.tokens.IconButtonTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -41,14 +41,16 @@ import androidx.compose.ui.semantics.semantics
  * Icon component that draws [imageVector] using [tint], defaulting to [LocalContentColor]. For a
  * clickable icon, see [IconButton].
  *
- * @param imageVector [ImageVector] to draw inside this Icon
+ * To learn more about icons, see [Material Design icons](https://m3.material.io/styles/icons/overview)
+ *
+ * @param imageVector [ImageVector] to draw inside this icon
  * @param contentDescription text used by accessibility services to describe what this icon
  * represents. This should always be provided unless this icon is used for decorative purposes, and
  * does not represent a meaningful action that a user can take. This text should be localized, such
  * as by using [androidx.compose.ui.res.stringResource] or similar
- * @param modifier optional [Modifier] for this Icon
+ * @param modifier the [Modifier] to be applied to this icon
  * @param tint tint to be applied to [imageVector]. If [Color.Unspecified] is provided, then no tint
- * is applied
+ * is applied.
  */
 @Composable
 fun Icon(
@@ -69,14 +71,16 @@ fun Icon(
  * Icon component that draws [bitmap] using [tint], defaulting to [LocalContentColor]. For a
  * clickable icon, see [IconButton].
  *
- * @param bitmap [ImageBitmap] to draw inside this Icon
+ * To learn more about icons, see [Material Design icons](https://m3.material.io/styles/icons/overview)
+ *
+ * @param bitmap [ImageBitmap] to draw inside this icon
  * @param contentDescription text used by accessibility services to describe what this icon
  * represents. This should always be provided unless this icon is used for decorative purposes, and
  * does not represent a meaningful action that a user can take. This text should be localized, such
  * as by using [androidx.compose.ui.res.stringResource] or similar
- * @param modifier optional [Modifier] for this Icon
+ * @param modifier the [Modifier] to be applied to this icon
  * @param tint tint to be applied to [bitmap]. If [Color.Unspecified] is provided, then no tint is
- * applied
+ * applied.
  */
 @Composable
 fun Icon(
@@ -98,14 +102,16 @@ fun Icon(
  * Icon component that draws a [painter] using [tint], defaulting to [LocalContentColor]. For a
  * clickable icon, see [IconButton].
  *
- * @param painter [Painter] to draw inside this Icon
+ * To learn more about icons, see [Material Design icons](https://m3.material.io/styles/icons/overview)
+ *
+ * @param painter [Painter] to draw inside this icon
  * @param contentDescription text used by accessibility services to describe what this icon
  * represents. This should always be provided unless this icon is used for decorative purposes, and
  * does not represent a meaningful action that a user can take. This text should be localized, such
  * as by using [androidx.compose.ui.res.stringResource] or similar
- * @param modifier optional [Modifier] for this Icon
+ * @param modifier the [Modifier] to be applied to this icon
  * @param tint tint to be applied to [painter]. If [Color.Unspecified] is provided, then no tint is
- * applied
+ * applied.
  */
 @Composable
 fun Icon(
@@ -145,4 +151,4 @@ private fun Modifier.defaultSizeFor(painter: Painter) =
 private fun Size.isInfinite() = width.isInfinite() && height.isInfinite()
 
 // Default icon size, for icons with no intrinsic size information
-private val DefaultIconSizeModifier = Modifier.size(IconButton.IconSize)
+private val DefaultIconSizeModifier = Modifier.size(IconButtonTokens.IconSize)

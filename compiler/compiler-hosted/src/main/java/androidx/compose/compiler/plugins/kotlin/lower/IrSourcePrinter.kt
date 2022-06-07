@@ -173,8 +173,10 @@ class IrSourcePrinterVisitor(
     }
 
     override fun visitFile(declaration: IrFile) {
-//        println("// FILE: ${declaration.fileEntry.name}")
-        declaration.declarations.printJoin("\n")
+        includeFileNameInExceptionTrace(declaration) {
+//          println("// FILE: ${declaration.fileEntry.name}")
+            declaration.declarations.printJoin("\n")
+        }
     }
 
     override fun visitValueParameter(declaration: IrValueParameter) {
@@ -307,6 +309,7 @@ class IrSourcePrinterVisitor(
                 "rangeTo" -> ".."
                 "plusAssign" -> "+="
                 "minusAssign" -> "-="
+                "unaryMinus" -> "-"
                 "timesAssign" -> "*="
                 "divAssign" -> "/="
                 "remAssign" -> "%="
@@ -319,11 +322,17 @@ class IrSourcePrinterVisitor(
                 "EQEQ" -> if (isInNotCall) "!=" else "=="
                 "EQEQEQ" -> if (isInNotCall) "!==" else "==="
                 "OROR" -> "||"
+                "ieee754equals" -> "=="
+
                 // no names for
                 "invoke", "get", "set" -> ""
-                "iterator", "hasNext", "next", "getValue", "setValue" -> name
+                "iterator", "hasNext", "next", "getValue", "setValue",
+                "noWhenBranchMatchedException" -> name
                 "CHECK_NOT_NULL" -> "!!"
-                else -> error("Unhandled operator $name")
+                else -> {
+                    if (name.startsWith("component")) name
+                    else error("Unhandled operator $name")
+                }
             }
 
             val printBinary = when (name) {
@@ -379,22 +388,31 @@ class IrSourcePrinterVisitor(
                     expression.getValueArgument(1)?.print()
                 }
                 // builtin static operators
-                "greater", "less", "lessOrEqual", "greaterOrEqual", "EQEQ", "EQEQEQ" -> {
+                "greater", "less", "lessOrEqual", "greaterOrEqual", "EQEQ", "EQEQEQ",
+                "ieee754equals" -> {
                     expression.getValueArgument(0)?.print()
                     print(" $opSymbol ")
                     expression.getValueArgument(1)?.print()
                 }
-                "iterator", "hasNext", "next", "getValue", "setValue" -> {
+                "iterator", "hasNext", "next", "getValue", "setValue",
+                "noWhenBranchMatchedException" -> {
                     (expression.dispatchReceiver ?: expression.extensionReceiver)?.print()
                     print(".")
                     print(opSymbol)
                     print("()")
                 }
-                // else binary
                 else -> {
-                    (expression.dispatchReceiver ?: expression.extensionReceiver)?.print()
-                    print(" $opSymbol ")
-                    expression.getValueArgument(0)?.print()
+                    if (name.startsWith("component")) {
+                        (expression.dispatchReceiver ?: expression.extensionReceiver)?.print()
+                        print(".")
+                        print(opSymbol)
+                        print("()")
+                    } else {
+                        // else binary
+                        (expression.dispatchReceiver ?: expression.extensionReceiver)?.print()
+                        print(" $opSymbol ")
+                        expression.getValueArgument(0)?.print()
+                    }
                 }
             }
             printIntsAsBinary = prevPrintBinary
@@ -414,22 +432,7 @@ class IrSourcePrinterVisitor(
             return
         }
 
-        val dispatchReceiver = expression.dispatchReceiver
-        val extensionReceiver = expression.extensionReceiver
-        val dispatchIsSpecial = dispatchReceiver.let {
-            it is IrGetValue && it.symbol.owner.name.isSpecial
-        }
-        val extensionIsSpecial = extensionReceiver.let {
-            it is IrGetValue && it.symbol.owner.name.isSpecial
-        }
-
-        if (dispatchReceiver != null && !dispatchIsSpecial) {
-            dispatchReceiver.print()
-            print(".")
-        } else if (extensionReceiver != null && !extensionIsSpecial) {
-            extensionReceiver.print()
-            print(".")
-        }
+        expression.printExplicitReceiver(".")
 
         val prop = (function as? IrSimpleFunction)?.correspondingPropertySymbol?.owner
 
@@ -451,6 +454,25 @@ class IrSourcePrinterVisitor(
             annotations.printJoin(if (onePerLine) "\n" else " ")
             if (onePerLine) println()
             else print(" ")
+        }
+    }
+
+    private fun IrMemberAccessExpression<*>.printExplicitReceiver(suffix: String? = null) {
+        val dispatchReceiver = dispatchReceiver
+        val extensionReceiver = extensionReceiver
+        val dispatchIsSpecial = dispatchReceiver.let {
+            it is IrGetValue && it.symbol.owner.name.isSpecial
+        }
+        val extensionIsSpecial = extensionReceiver.let {
+            it is IrGetValue && it.symbol.owner.name.isSpecial
+        }
+
+        if (dispatchReceiver != null && !dispatchIsSpecial) {
+            dispatchReceiver.print()
+            suffix?.let(::print)
+        } else if (extensionReceiver != null && !extensionIsSpecial) {
+            extensionReceiver.print()
+            suffix?.let(::print)
         }
     }
 
@@ -481,7 +503,7 @@ class IrSourcePrinterVisitor(
                 useParameterNames = true
             }
         }
-        val multiline = useParameterNames && !forceSingleLine
+        val multiline = arguments.isNotEmpty() && useParameterNames && !forceSingleLine
         if (arguments.isNotEmpty() || trailingLambda == null) {
             print("(")
             if (multiline) {
@@ -555,13 +577,16 @@ class IrSourcePrinterVisitor(
             IrTypeOperator.NOT_INSTANCEOF -> {
                 expression.argument.print()
             }
-            IrTypeOperator.CAST, IrTypeOperator.IMPLICIT_CAST -> {
+            IrTypeOperator.CAST, IrTypeOperator.IMPLICIT_CAST, IrTypeOperator.SAFE_CAST -> {
                 expression.argument.print()
             }
             IrTypeOperator.SAM_CONVERSION -> {
                 expression.argument.print()
             }
             IrTypeOperator.IMPLICIT_NOTNULL -> {
+                expression.argument.print()
+            }
+            IrTypeOperator.INSTANCEOF -> {
                 expression.argument.print()
             }
             else -> error("Unknown type operator: ${expression.operator}")
@@ -751,7 +776,10 @@ class IrSourcePrinterVisitor(
     override fun visitReturn(expression: IrReturn) {
         val value = expression.value
         // only print the return statement directly if it is not a lambda
-        if (expression.returnTargetSymbol.descriptor.name.asString() != "<anonymous>") {
+        val returnTarget = expression.returnTargetSymbol.owner
+        if (returnTarget !is IrFunction ||
+            returnTarget.name.asString() != "<anonymous>" &&
+            returnTarget.origin != IrDeclarationOrigin.ADAPTER_FOR_CALLABLE_REFERENCE) {
             print("return ")
         }
         if (expression.type.isUnit() || value.type.isUnit()) {
@@ -780,7 +808,7 @@ class IrSourcePrinterVisitor(
                 lhs.print()
                 print("--")
             }
-            IrStatementOrigin.LAMBDA -> {
+            IrStatementOrigin.LAMBDA, IrStatementOrigin.ADAPTED_FUNCTION_REFERENCE -> {
                 val function = expression.statements[0] as IrFunction
                 function.printAsLambda()
             }
@@ -793,7 +821,11 @@ class IrSourcePrinterVisitor(
                 val rhsStatement = expression.statements[1]
                 val rhs = when (rhsStatement) {
                     is IrBlock -> {
-                        rhsStatement.statements[1]
+                        val target = rhsStatement.statements[1]
+                        when (target) {
+                            is IrVariable -> target.initializer
+                            else -> target
+                        }
                     }
                     else -> {
                         rhsStatement
@@ -1188,22 +1220,7 @@ class IrSourcePrinterVisitor(
 
     override fun visitFunctionReference(expression: IrFunctionReference) {
         val function = expression.symbol.owner
-        val dispatchReceiver = expression.dispatchReceiver
-        val extensionReceiver = expression.extensionReceiver
-        val dispatchIsSpecial = dispatchReceiver.let {
-            it is IrGetValue && it.symbol.owner.name.isSpecial
-        }
-        val extensionIsSpecial = extensionReceiver.let {
-            it is IrGetValue && it.symbol.owner.name.isSpecial
-        }
-
-        if (dispatchReceiver != null && !dispatchIsSpecial) {
-            dispatchReceiver.print()
-            print("::")
-        } else if (extensionReceiver != null && !extensionIsSpecial) {
-            extensionReceiver.print()
-            print("::")
-        }
+        expression.printExplicitReceiver("::")
 
         val prop = (function as? IrSimpleFunction)?.correspondingPropertySymbol?.owner
 
@@ -1242,7 +1259,10 @@ class IrSourcePrinterVisitor(
     }
 
     override fun visitPropertyReference(expression: IrPropertyReference) {
-        print("<<PROPREF>>")
+        val property = expression.symbol.owner
+        expression.printExplicitReceiver()
+        print("::")
+        print(property.name)
     }
 
     override fun visitSpreadElement(spread: IrSpreadElement) {

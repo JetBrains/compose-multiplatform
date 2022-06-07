@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
     id("kotlin-android")
+}
+
+android {
+    namespace "androidx.compose.integration.macrobenchmark"
 }
 
 android.defaultConfig {
@@ -38,3 +44,10 @@ dependencies {
 // Define a task dependency so the app is installed before we run macro benchmarks.
 tasks.getByPath(":compose:integration-tests:macrobenchmark:connectedCheck")
     .dependsOn(tasks.getByPath(":compose:integration-tests:macrobenchmark-target:installRelease"))
+
+// Allow usage of Kotlin's @OptIn.
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += ["-opt-in=kotlin.RequiresOptIn"]
+    }
+}

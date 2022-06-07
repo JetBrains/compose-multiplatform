@@ -18,13 +18,18 @@ package androidx.compose.ui.text
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.createFontFamilyResolver
+import androidx.compose.ui.text.platform.drawMultiParagraph
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
@@ -35,16 +40,49 @@ import kotlin.math.max
  * [ParagraphStyle]s in a given text.
  *
  * @param intrinsics previously calculated text intrinsics
+ * @param constraints how wide and tall the text is allowed to be. [Constraints.maxWidth]
+ * will define the width of the MultiParagraph. [Constraints.maxHeight] helps defining the
+ * number of lines that fit with ellipsis is true. Minimum components of the [Constraints]
+ * object are no-op.
  * @param maxLines the maximum number of lines that the text can have
  * @param ellipsis whether to ellipsize text, applied only when [maxLines] is set
- * @param width how wide the text is allowed to be
  */
 class MultiParagraph(
     val intrinsics: MultiParagraphIntrinsics,
+    constraints: Constraints,
     val maxLines: Int = DefaultMaxLines,
     ellipsis: Boolean = false,
-    width: Float
 ) {
+
+    /**
+     * Lays out and renders multiple paragraphs at once. Unlike [Paragraph], supports multiple
+     * [ParagraphStyle]s in a given text.
+     *
+     * @param intrinsics previously calculated text intrinsics
+     * @param maxLines the maximum number of lines that the text can have
+     * @param ellipsis whether to ellipsize text, applied only when [maxLines] is set
+     * @param width how wide the text is allowed to be
+     */
+    @Deprecated(
+        "MultiParagraph that takes maximum allowed width is deprecated, pass constraints instead.",
+        ReplaceWith(
+            "MultiParagraph(intrinsics, Constraints(maxWidth = ceil(width).toInt()), " +
+                "maxLines, ellipsis)",
+            "kotlin.math.ceil",
+            "androidx.compose.ui.unit.Constraints"
+        )
+    )
+    constructor(
+        intrinsics: MultiParagraphIntrinsics,
+        maxLines: Int = DefaultMaxLines,
+        ellipsis: Boolean = false,
+        width: Float
+    ) : this(
+        intrinsics,
+        Constraints(maxWidth = width.ceilToInt()),
+        maxLines,
+        ellipsis
+    )
 
     /**
      *  Lays out a given [annotatedString] with the given constraints. Unlike a [Paragraph],
@@ -66,6 +104,11 @@ class MultiParagraph(
      * @throws IllegalArgumentException if [ParagraphStyle.textDirection] is not set, or
      * any of the [placeholders] crosses paragraph boundary.
      */
+    @Suppress("DEPRECATION")
+    @Deprecated("Font.ResourceLoader is deprecated, use fontFamilyResolver instead",
+        replaceWith = ReplaceWith("MultiParagraph(annotatedString, style, " +
+            "placeholders, maxLines, ellipsis, width, density, fontFamilyResolver)")
+    )
     constructor(
         annotatedString: AnnotatedString,
         style: TextStyle,
@@ -81,11 +124,107 @@ class MultiParagraph(
             style = style,
             placeholders = placeholders,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = createFontFamilyResolver(resourceLoader)
         ),
         maxLines = maxLines,
         ellipsis = ellipsis,
-        width = width
+        constraints = Constraints(maxWidth = width.ceilToInt())
+    )
+
+    /**
+     *  Lays out a given [annotatedString] with the given constraints. Unlike a [Paragraph],
+     *  [MultiParagraph] can handle a text what has multiple paragraph styles.
+     *
+     * @param annotatedString the text to be laid out
+     * @param style the [TextStyle] to be applied to the whole text
+     * @param width how wide the text is allowed to be
+     * @param density density of the device
+     * @param fontFamilyResolver to be used to load the font given in [SpanStyle]s
+     * @param placeholders a list of [Placeholder]s that specify ranges of text which will be
+     * skipped during layout and replaced with [Placeholder]. It's required that the range of each
+     * [Placeholder] doesn't cross paragraph boundary, otherwise [IllegalArgumentException] is
+     * thrown.
+     * @param maxLines the maximum number of lines that the text can have
+     * @param ellipsis whether to ellipsize text, applied only when [maxLines] is set
+     *
+     * @see Placeholder
+     * @throws IllegalArgumentException if [ParagraphStyle.textDirection] is not set, or
+     * any of the [placeholders] crosses paragraph boundary.
+     */
+    @Deprecated(
+        "MultiParagraph that takes maximum allowed width is deprecated, pass constraints instead.",
+        ReplaceWith(
+            "MultiParagraph(annotatedString, style, Constraints(maxWidth = ceil(width).toInt()), " +
+                "density, fontFamilyResolver, placeholders, maxLines, ellipsis)",
+            "kotlin.math.ceil",
+            "androidx.compose.ui.unit.Constraints"
+        )
+    )
+    constructor(
+        annotatedString: AnnotatedString,
+        style: TextStyle,
+        width: Float,
+        density: Density,
+        fontFamilyResolver: FontFamily.Resolver,
+        placeholders: List<AnnotatedString.Range<Placeholder>> = listOf(),
+        maxLines: Int = Int.MAX_VALUE,
+        ellipsis: Boolean = false
+    ) : this(
+        intrinsics = MultiParagraphIntrinsics(
+            annotatedString = annotatedString,
+            style = style,
+            placeholders = placeholders,
+            density = density,
+            fontFamilyResolver = fontFamilyResolver
+        ),
+        maxLines = maxLines,
+        ellipsis = ellipsis,
+        constraints = Constraints(maxWidth = width.ceilToInt())
+    )
+
+    /**
+     *  Lays out a given [annotatedString] with the given constraints. Unlike a [Paragraph],
+     *  [MultiParagraph] can handle a text what has multiple paragraph styles.
+     *
+     * @param annotatedString the text to be laid out
+     * @param style the [TextStyle] to be applied to the whole text
+     * @param constraints how wide and tall the text is allowed to be. [Constraints.maxWidth]
+     * will define the width of the MultiParagraph. [Constraints.maxHeight] helps defining the
+     * number of lines that fit with ellipsis is true. Minimum components of the [Constraints]
+     * object are no-op.
+     * @param density density of the device
+     * @param fontFamilyResolver to be used to load the font given in [SpanStyle]s
+     * @param placeholders a list of [Placeholder]s that specify ranges of text which will be
+     * skipped during layout and replaced with [Placeholder]. It's required that the range of each
+     * [Placeholder] doesn't cross paragraph boundary, otherwise [IllegalArgumentException] is
+     * thrown.
+     * @param maxLines the maximum number of lines that the text can have
+     * @param ellipsis whether to ellipsize text, applied only when [maxLines] is set
+     *
+     * @see Placeholder
+     * @throws IllegalArgumentException if [ParagraphStyle.textDirection] is not set, or
+     * any of the [placeholders] crosses paragraph boundary.
+     */
+    constructor(
+        annotatedString: AnnotatedString,
+        style: TextStyle,
+        constraints: Constraints,
+        density: Density,
+        fontFamilyResolver: FontFamily.Resolver,
+        placeholders: List<AnnotatedString.Range<Placeholder>> = listOf(),
+        maxLines: Int = Int.MAX_VALUE,
+        ellipsis: Boolean = false
+    ) : this(
+        intrinsics = MultiParagraphIntrinsics(
+            annotatedString = annotatedString,
+            style = style,
+            placeholders = placeholders,
+            density = density,
+            fontFamilyResolver = fontFamilyResolver
+        ),
+        maxLines = maxLines,
+        ellipsis = ellipsis,
+        constraints = constraints
     )
 
     private val annotatedString get() = intrinsics.annotatedString
@@ -167,6 +306,11 @@ class MultiParagraph(
     internal val paragraphInfoList: List<ParagraphInfo>
 
     init {
+        require(constraints.minWidth == 0 && constraints.minHeight == 0) {
+            "Setting Constraints.minWidth and Constraints.minHeight is not supported, " +
+                "these should be the default zero values instead."
+        }
+
         var currentHeight = 0f
         var currentLineCount = 0
         var didExceedMaxLines = false
@@ -178,9 +322,16 @@ class MultiParagraph(
             val paragraphInfo = infoList[index]
             val paragraph = Paragraph(
                 paragraphInfo.intrinsics,
+                Constraints(
+                    maxWidth = constraints.maxWidth,
+                    maxHeight = if (constraints.hasBoundedHeight) {
+                        (constraints.maxHeight - currentHeight.ceilToInt()).coerceAtLeast(0)
+                    } else {
+                        constraints.maxHeight
+                    }
+                ),
                 maxLines - currentLineCount,
                 ellipsis,
-                width
             )
 
             val paragraphTop = currentHeight
@@ -215,7 +366,7 @@ class MultiParagraph(
         this.lineCount = currentLineCount
         this.didExceedMaxLines = didExceedMaxLines
         this.paragraphInfoList = paragraphInfoList
-        this.width = width
+        this.width = constraints.maxWidth.toFloat()
         this.placeholderRects = paragraphInfoList.fastFlatMap { paragraphInfo ->
             with(paragraphInfo) {
                 paragraph.placeholderRects.fastMap { it?.toGlobal() }
@@ -245,6 +396,17 @@ class MultiParagraph(
             canvas.translate(0f, it.paragraph.height)
         }
         canvas.restore()
+    }
+
+    /** Paint the paragraphs to canvas. */
+    @ExperimentalTextApi
+    fun paint(
+        canvas: Canvas,
+        brush: Brush,
+        shadow: Shadow? = null,
+        decoration: TextDecoration? = null
+    ) {
+        drawMultiParagraph(canvas, brush, shadow, decoration)
     }
 
     /** Returns path that enclose the given text range. */

@@ -29,14 +29,17 @@ import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.GenericFontFamily
-import androidx.compose.ui.text.platform.TypefaceAdapter.Companion.getTypefaceStyle
+import androidx.compose.ui.text.font.createFontFamilyResolver
+import androidx.compose.ui.text.font.getAndroidTypefaceStyle
 import androidx.compose.ui.text.platform.extensions.setBackground
 import androidx.compose.ui.text.platform.extensions.setColor
 import androidx.compose.ui.text.platform.extensions.setFontSize
@@ -55,12 +58,24 @@ import androidx.compose.ui.util.fastForEach
 @InternalTextApi // used in ui:ui
 fun AnnotatedString.toAccessibilitySpannableString(
     density: Density,
-    resourceLoader: Font.ResourceLoader
+    @Suppress("DEPRECATION") resourceLoader: Font.ResourceLoader
+): SpannableString {
+    @Suppress("DEPRECATION")
+    return toAccessibilitySpannableString(density, createFontFamilyResolver(resourceLoader))
+}
+
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+@InternalTextApi // used in ui:ui
+fun AnnotatedString.toAccessibilitySpannableString(
+    density: Density,
+    fontFamilyResolver: FontFamily.Resolver
 ): SpannableString {
     val spannableString = SpannableString(text)
-    val typefaceAdapter = TypefaceAdapter(resourceLoader = resourceLoader)
     spanStyles.fastForEach { (style, start, end) ->
-        spannableString.setSpanStyle(style, start, end, density, typefaceAdapter)
+        // b/232238615 looking up fonts inside of accessibility does not honor overwritten
+        // FontFamilyResolver. This is not safe until Font.ResourceLoader is fully removed.
+        val noFontStyle = style.copy(fontFamily = null)
+        spannableString.setSpanStyle(noFontStyle, start, end, density, fontFamilyResolver)
     }
 
     getTtsAnnotations(0, length).fastForEach { (ttsAnnotation, start, end) ->
@@ -76,12 +91,13 @@ fun AnnotatedString.toAccessibilitySpannableString(
 }
 
 /** Apply the serializable styles to SpannableString. */
+@OptIn(ExperimentalTextApi::class)
 private fun SpannableString.setSpanStyle(
     spanStyle: SpanStyle,
     start: Int,
     end: Int,
     density: Density,
-    typefaceAdapter: TypefaceAdapter
+    fontFamilyResolver: FontFamily.Resolver
 ) {
     setColor(spanStyle.color, start, end)
 
@@ -94,7 +110,7 @@ private fun SpannableString.setSpanStyle(
         val fontWeight = spanStyle.fontWeight ?: FontWeight.Normal
         val fontStyle = spanStyle.fontStyle ?: FontStyle.Normal
         setSpan(
-            StyleSpan(getTypefaceStyle(fontWeight, fontStyle)),
+            StyleSpan(getAndroidTypefaceStyle(fontWeight, fontStyle)),
             start,
             end,
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -114,10 +130,11 @@ private fun SpannableString.setSpanStyle(
             )
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                val typeface = typefaceAdapter.create(
+                // TODO(b/214587005): Check for async here and uncache
+                val typeface = fontFamilyResolver.resolve(
                     fontFamily = spanStyle.fontFamily,
                     fontSynthesis = spanStyle.fontSynthesis ?: FontSynthesis.All
-                )
+                ).value as Typeface
                 setSpan(
                     Api28Impl.createTypefaceSpan(typeface),
                     start,

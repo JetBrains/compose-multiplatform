@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
@@ -47,8 +47,20 @@ dependencies {
 androidx {
     name = "Compose ViewBinding"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.UI
+    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2020"
     description = "Compose integration with ViewBinding"
     legacyDisableKotlinStrictApiMode = true
+}
+
+android {
+    namespace "androidx.compose.ui.viewbinding"
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
 }

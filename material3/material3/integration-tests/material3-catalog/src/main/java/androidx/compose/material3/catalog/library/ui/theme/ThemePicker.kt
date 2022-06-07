@@ -20,8 +20,14 @@ import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.add
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Divider
 import androidx.compose.material.RadioButton
@@ -46,8 +52,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.rememberInsetsPaddingValues
 
 @Composable
 fun ThemePicker(
@@ -55,11 +59,15 @@ fun ThemePicker(
     onThemeChange: (theme: Theme) -> Unit
 ) {
     LazyColumn(
-        contentPadding = rememberInsetsPaddingValues(
-            insets = LocalWindowInsets.current.navigationBars,
-            additionalTop = ThemePickerPadding,
-            additionalBottom = ThemePickerPadding
-        ),
+        contentPadding = WindowInsets.safeDrawing
+            .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+            .add(
+                WindowInsets(
+                    top = ThemePickerPadding,
+                    bottom = ThemePickerPadding
+                )
+            )
+            .asPaddingValues(),
         verticalArrangement = Arrangement.spacedBy(ThemePickerPadding)
     ) {
         item {

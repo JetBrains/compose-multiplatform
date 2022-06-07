@@ -16,8 +16,8 @@
 
 
 import androidx.build.AndroidXComposePlugin
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
@@ -32,16 +32,18 @@ dependencies {
     if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         implementation(libs.kotlinStdlib)
         api("androidx.annotation:annotation:1.2.0")
-        api(project(":compose:runtime:runtime"))
+        api("androidx.compose.runtime:runtime:1.1.1")
         testImplementation(libs.junit)
     }
 }
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
-        jvm("desktop")
+        desktop()
+    }
 
+    kotlin {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block above
@@ -49,12 +51,16 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         sourceSets {
             commonMain.dependencies {
                 implementation(libs.kotlinStdlibCommon)
-                api("androidx.annotation:annotation:1.2.0")
                 api(project(":compose:runtime:runtime"))
             }
 
-            androidMain.dependsOn(jvmMain)
-            desktopMain.dependsOn(jvmMain)
+            androidMain.dependencies {
+                api("androidx.annotation:annotation:1.2.0")
+            }
+
+            androidTest.dependencies {
+                implementation(libs.junit)
+            }
         }
     }
 }
@@ -63,9 +69,21 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Tooling API"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.UI
+    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2021"
     description = "Compose tooling library API. This library provides the API required to declare" +
             " @Preview composables in user apps."
     legacyDisableKotlinStrictApiMode = true
+}
+
+android {
+    namespace "androidx.compose.ui.tooling.preview"
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
 }

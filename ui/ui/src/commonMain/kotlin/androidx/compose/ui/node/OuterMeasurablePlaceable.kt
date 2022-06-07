@@ -85,25 +85,13 @@ internal class OuterMeasurablePlaceable(
         @Suppress("Deprecation")
         layoutNode.canMultiMeasure = layoutNode.canMultiMeasure ||
             (parent != null && parent.canMultiMeasure)
-        @Suppress("Deprecation")
-        if (layoutNode.layoutState == LayoutState.NeedsRemeasure ||
-            measurementConstraints != constraints
-        ) {
+        if (layoutNode.measurePending || measurementConstraints != constraints) {
             layoutNode.alignmentLines.usedByModifierMeasurement = false
             layoutNode._children.forEach { it.alignmentLines.usedDuringParentMeasurement = false }
             measuredOnce = true
-            layoutNode.layoutState = LayoutState.Measuring
-            measurementConstraints = constraints
             val outerWrapperPreviousMeasuredSize = outerWrapper.size
-            owner.snapshotObserver.observeMeasureSnapshotReads(layoutNode) {
-                outerWrapper.measure(constraints)
-            }
-            // The resulting layout state might be Ready. This can happen when the layout node's
-            // own modifier is querying an alignment line during measurement, therefore we
-            // need to also layout the layout node.
-            if (layoutNode.layoutState == LayoutState.Measuring) {
-                layoutNode.layoutState = LayoutState.NeedsRelayout
-            }
+            measurementConstraints = constraints
+            layoutNode.performMeasure(constraints)
             val sizeChanged = outerWrapper.size != outerWrapperPreviousMeasuredSize ||
                 outerWrapper.width != width ||
                 outerWrapper.height != height
@@ -116,6 +104,9 @@ internal class OuterMeasurablePlaceable(
             // trigger extra remeasure request on our node. we do it now in order to report the
             // final measured size to our parent without doing extra pass later.
             owner.forceMeasureTheSubtree(layoutNode)
+
+            // Restore the intrinsics usage for the sub-tree
+            layoutNode.resetSubtreeIntrinsicsUsage()
         }
         return false
     }
@@ -212,6 +203,42 @@ internal class OuterMeasurablePlaceable(
         // remeasurements, but it makes sure such component states are using the correct final
         // constraints/sizes.
         layoutNode.requestRemeasure()
+
+        // Mark the intrinsics size has been used by the parent if it hasn't already been marked.
+        val parent = layoutNode.parent
+        if (parent != null &&
+            layoutNode.intrinsicsUsageByParent == LayoutNode.UsageByParent.NotUsed
+        ) {
+            layoutNode.intrinsicsUsageByParent = when (parent.layoutState) {
+                LayoutState.Measuring -> LayoutNode.UsageByParent.InMeasureBlock
+                LayoutState.LayingOut -> LayoutNode.UsageByParent.InLayoutBlock
+                // Called from parent's intrinsic measurement
+                else -> parent.intrinsicsUsageByParent
+            }
+        }
+    }
+
+    /**
+     * If this was used in an intrinsics measurement, find the parent that used it and
+     * invalidate either the measure block or layout block.
+     */
+    fun invalidateIntrinsicsParent(forceRequest: Boolean) {
+        val parent = layoutNode.parent
+        val intrinsicsUsageByParent = layoutNode.intrinsicsUsageByParent
+        if (parent != null && intrinsicsUsageByParent != LayoutNode.UsageByParent.NotUsed) {
+            // find measuring parent
+            var intrinsicsUsingParent: LayoutNode = parent
+            while (intrinsicsUsingParent.intrinsicsUsageByParent == intrinsicsUsageByParent) {
+                intrinsicsUsingParent = intrinsicsUsingParent.parent ?: break
+            }
+            when (intrinsicsUsageByParent) {
+                LayoutNode.UsageByParent.InMeasureBlock ->
+                    intrinsicsUsingParent.requestRemeasure(forceRequest)
+                LayoutNode.UsageByParent.InLayoutBlock ->
+                    intrinsicsUsingParent.requestRelayout(forceRequest)
+                else -> error("Intrinsics isn't used by the parent")
+            }
+        }
     }
 
     /**

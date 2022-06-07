@@ -15,7 +15,6 @@
  */
 
 
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import androidx.build.Publish
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -44,7 +43,7 @@ androidx {
     name = "Material Icon Generator"
     type = LibraryType.OTHER_CODE_PROCESSOR
     publish = Publish.NONE
-    mavenGroup = LibraryGroups.Compose.MATERIAL
+    mavenGroup = LibraryGroups.COMPOSE_MATERIAL
     inceptionYear = "2020"
     description = "Generator module that parses XML drawables to generate programmatic " +
             "representations of Material Icons."
@@ -52,6 +51,6 @@ androidx {
 
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
-        freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
 }

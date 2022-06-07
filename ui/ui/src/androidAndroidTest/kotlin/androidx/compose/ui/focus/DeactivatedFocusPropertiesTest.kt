@@ -73,7 +73,7 @@ class DeactivatedFocusPropertiesTest {
         var isDeactivated: Boolean? = null
         rule.setFocusableContent {
             Box(modifier = Modifier
-                .focusProperties { isDeactivated = true }
+                .focusProperties { canFocus = false }
                 .onFocusChanged { isDeactivated = it.isDeactivated }
                 .focusTarget()
             )

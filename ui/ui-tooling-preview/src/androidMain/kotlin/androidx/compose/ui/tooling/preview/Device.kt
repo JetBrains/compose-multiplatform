@@ -45,6 +45,17 @@ object Devices {
     const val PIXEL_4_XL = "id:pixel_4_xl"
 
     const val AUTOMOTIVE_1024p = "id:automotive_1024p_landscape"
+
+    const val WEAR_OS_LARGE_ROUND = "id:wearos_large_round"
+    const val WEAR_OS_SMALL_ROUND = "id:wearos_small_round"
+    const val WEAR_OS_SQUARE = "id:wearos_square"
+    const val WEAR_OS_RECT = "id:wearos_rect"
+
+    // Reference devices
+    const val PHONE = "spec:id=reference_phone,shape=Normal,width=411,height=891,unit=dp,dpi=420"
+    const val FOLDABLE = "spec:shape=Normal,width=673,height=841,unit=dp,dpi=480"
+    const val TABLET = "spec:shape=Normal,width=1280,height=800,unit=dp,dpi=420"
+    const val DESKTOP = "spec:shape=Normal,width=1920,height=1080,unit=dp,dpi=420"
 }
 
 /**
@@ -77,7 +88,17 @@ object Devices {
         Devices.PIXEL_4,
         Devices.PIXEL_4_XL,
 
-        Devices.AUTOMOTIVE_1024p
+        Devices.AUTOMOTIVE_1024p,
+
+        Devices.WEAR_OS_LARGE_ROUND,
+        Devices.WEAR_OS_SMALL_ROUND,
+        Devices.WEAR_OS_SQUARE,
+        Devices.WEAR_OS_RECT,
+
+        Devices.PHONE,
+        Devices.FOLDABLE,
+        Devices.TABLET,
+        Devices.DESKTOP,
     ]
 )
 annotation class Device

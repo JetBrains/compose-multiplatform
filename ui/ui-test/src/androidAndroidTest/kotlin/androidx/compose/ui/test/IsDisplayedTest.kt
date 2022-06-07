@@ -108,7 +108,7 @@ class IsDisplayedTest(val config: TestConfig) {
 
     @Test
     fun componentInScrollable_isDisplayed() {
-        rule.setContent {
+        setContent {
             Column(modifier = Modifier.requiredSize(100.dp).verticalScroll(rememberScrollState())) {
                 repeat(10) { Item(it, height = 30.dp) }
             }
@@ -120,7 +120,7 @@ class IsDisplayedTest(val config: TestConfig) {
 
     @Test
     fun componentInScrollable_isNotDisplayed() {
-        rule.setContent {
+        setContent {
             Column(modifier = Modifier.requiredSize(100.dp).verticalScroll(rememberScrollState())) {
                 repeat(10) { Item(it, height = 30.dp) }
             }
@@ -134,7 +134,7 @@ class IsDisplayedTest(val config: TestConfig) {
     fun togglePlacement() {
         var place by mutableStateOf(true)
 
-        rule.setContent {
+        setContent {
             PlaceConditionally(place) {
                 // Item instead of BoundaryNode because we need non-zero size
                 Item(0)
@@ -156,7 +156,7 @@ class IsDisplayedTest(val config: TestConfig) {
     fun toggleParentPlacement() {
         var place by mutableStateOf(true)
 
-        rule.setContent {
+        setContent {
             PlaceConditionally(place) {
                 Box {
                     // Item instead of BoundaryNode because we need non-zero size
@@ -178,7 +178,7 @@ class IsDisplayedTest(val config: TestConfig) {
 
     @Test
     fun rowTooSmall() {
-        rule.setContent {
+        setContent {
             Row(modifier = Modifier.requiredSize(100.dp)) {
                 repeat(10) { Item(it, width = 30.dp) }
             }
@@ -249,5 +249,12 @@ class IsDisplayedTest(val config: TestConfig) {
 
         onComposeView().check(matches(not(isDisplayed())))
         rule.onNodeWithTag("item0").assertIsNotDisplayed()
+    }
+
+    private fun setContent(content: @Composable () -> Unit) {
+        when (val activity = rule.activity) {
+            is ActivityWithActionBar -> activity.setContent(content)
+            else -> rule.setContent(content)
+        }
     }
 }

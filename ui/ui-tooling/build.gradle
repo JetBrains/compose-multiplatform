@@ -15,8 +15,8 @@
  */
 
 import androidx.build.AndroidXComposePlugin
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
@@ -33,12 +33,13 @@ dependencies {
         implementation(libs.kotlinStdlib)
 
         api("androidx.annotation:annotation:1.1.0")
-        implementation(project(":compose:animation:animation"))
+        implementation("androidx.compose.animation:animation:1.1.1")
 
-        api(project(":compose:runtime:runtime"))
+        api("androidx.compose.runtime:runtime:1.1.1")
         api(project(":compose:ui:ui"))
         api(project(":compose:ui:ui-tooling-preview"))
         api(project(":compose:ui:ui-tooling-data"))
+        implementation("androidx.savedstate:savedstate-ktx:1.2.0-rc01")
         implementation("androidx.compose.material:material:1.0.0")
         implementation("androidx.activity:activity-compose:1.3.0")
 
@@ -63,10 +64,12 @@ dependencies {
 }
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
-        jvm("desktop")
+        desktop()
+    }
 
+    kotlin {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block above
@@ -81,6 +84,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
                 implementation(project(":compose:animation:animation"))
+                implementation("androidx.savedstate:savedstate-ktx:1.2.0-rc01")
 
                 api(project(":compose:ui:ui-tooling-data"))
                 implementation(project(":compose:material:material"))
@@ -91,9 +95,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 compileOnly(libs.kotlinReflect)
             }
 
-            androidMain.dependsOn(jvmMain)
-            desktopMain.dependsOn(jvmMain)
-
             desktopMain.dependencies {
                 implementation(libs.kotlinStdlib)
                 implementation(project(":compose:runtime:runtime"))
@@ -102,6 +103,13 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
             androidAndroidTest.dependencies {
                 implementation(project(":compose:ui:ui-test-junit4"))
+                // old version of common-java8 conflicts with newer version, because both have
+                // DefaultLifecycleEventObserver.
+                // Outside of androidx this is resolved via constraint added to lifecycle-common,
+                // but it doesn't work in androidx.
+                // See aosp/1804059
+                implementation(project(":lifecycle:lifecycle-common-java8"))
+                implementation(project(":lifecycle:lifecycle-viewmodel-savedstate"))
 
                 implementation(libs.junit)
                 implementation(libs.testRunner)
@@ -123,8 +131,20 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Tooling"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.UI
+    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2019"
     description = "Compose tooling library. This library exposes information to our tools for better IDE support."
     legacyDisableKotlinStrictApiMode = true
+}
+
+android {
+    namespace "androidx.compose.ui.tooling"
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
 }

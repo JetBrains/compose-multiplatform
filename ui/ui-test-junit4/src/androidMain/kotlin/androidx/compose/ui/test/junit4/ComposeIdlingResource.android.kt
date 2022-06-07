@@ -16,10 +16,12 @@
 
 package androidx.compose.ui.test.junit4
 
+import android.view.View
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.test.IdlingResource
+import kotlin.math.max
 
 /**
  * Provides an idle check to be registered into Espresso.
@@ -64,7 +66,7 @@ internal class ComposeIdlingResource(
                 composeRootRegistry.getCreatedComposeRoots().any { it.isBusyAttaching }
 
             val composeRoots = composeRootRegistry.getRegisteredComposeRoots()
-            hadPendingMeasureLayout = composeRoots.any { it.hasPendingMeasureOrLayout }
+            hadPendingMeasureLayout = composeRoots.any { it.shouldWaitForMeasureAndLayout }
 
             return !shouldPumpTime() &&
                 !hadPendingSetContent &&
@@ -75,7 +77,7 @@ internal class ComposeIdlingResource(
         val wasBusy = hadSnapshotChanges || hadRecomposerChanges || hadAwaitersOnMainClock ||
             hadPendingSetContent || hadPendingMeasureLayout
 
-        if (wasBusy) {
+        if (!wasBusy) {
             return null
         }
 
@@ -103,10 +105,51 @@ internal class ComposeIdlingResource(
     }
 }
 
-internal val ViewRootForTest.isBusyAttaching: Boolean
+private val ViewRootForTest.isBusyAttaching: Boolean
     get() {
         // If the rootView has a parent, it is the ViewRootImpl, which is set in
         // windowManager.addView(). If the rootView doesn't have a parent, the view hasn't been
         // attached to a window yet, or is removed again.
         return view.rootView.parent != null && !view.isAttachedToWindow
+    }
+
+/**
+ * Whether or not we should wait until this root has done a measure/layout pass. Not necessarily
+ * the same as if the root has a pending measure/layout pass, e.g. if the pending measure/layout
+ * pass will never happen because the containing View is GONE anyway.
+ */
+internal val ViewRootForTest.shouldWaitForMeasureAndLayout: Boolean
+    get() {
+        // Should wait if: 1) there actually is a pending measure/layout
+        return hasPendingMeasureOrLayout &&
+            // 2) the containing View is not GONE
+            !view.isEffectivelyGone &&
+            // 3) the containing View is not INVISIBLE while trying to do the
+            // measure/layout pass by only invalidating the containing View
+            !(view.isEffectivelyInvisible && !view.isLayoutRequested)
+    }
+
+private val View.isEffectivelyGone: Boolean
+    get() {
+        return effectiveVisibility == View.GONE
+    }
+
+private val View.isEffectivelyInvisible: Boolean
+    get() {
+        return effectiveVisibility == View.INVISIBLE
+    }
+
+/**
+ * Return the effective visibility of the View, which accounts for the visibility of ancestors.
+ * If the view or any of its ancestors is GONE, this view is GONE. Otherwise, if this view or any
+ * of its ancestors is INVISIBLE, this view is INVISIBLE. Otherwise, this view is VISIBLE.
+ */
+private val View.effectiveVisibility: Int
+    get() {
+        // Visibility values increase as they express "less visible", so the effective visibility
+        // is the maximum of all visibility values from this view to the root.
+        return when (visibility) {
+            View.GONE -> View.GONE
+            else -> max(visibility, (parent as? View)?.effectiveVisibility ?: View.VISIBLE)
+        }
     }

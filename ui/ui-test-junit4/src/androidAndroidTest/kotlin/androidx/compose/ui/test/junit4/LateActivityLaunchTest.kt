@@ -17,28 +17,26 @@
 package androidx.compose.ui.test.junit4
 
 import android.content.Intent
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.runEmptyComposeUiTest
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalTestApi::class)
 class LateActivityLaunchTest {
-
-    @get:Rule
-    val rule = createEmptyComposeRule()
-
     @Test
-    fun test() {
+    fun test() = runEmptyComposeUiTest {
         ActivityScenario.launch<CustomActivity>(
             Intent(ApplicationProvider.getApplicationContext(), CustomActivity::class.java)
         ).use {
-            rule.onNode(hasText("Hello")).assertExists()
+            onNode(hasText("Hello")).assertExists()
         }
     }
 }

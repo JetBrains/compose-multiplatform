@@ -32,7 +32,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -45,7 +44,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collect
@@ -89,15 +87,13 @@ fun FloatingActionButton(
     content: @Composable () -> Unit
 ) {
     Surface(
+        onClick = onClick,
         modifier = modifier,
         shape = shape,
         color = backgroundColor,
         contentColor = contentColor,
         elevation = elevation.elevation(interactionSource).value,
-        onClick = onClick,
-        role = Role.Button,
         interactionSource = interactionSource,
-        indication = rememberRipple()
     ) {
         CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
             ProvideTextStyle(MaterialTheme.typography.button) {

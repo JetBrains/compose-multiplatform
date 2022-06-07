@@ -9,33 +9,51 @@ HSPLandroidx/compose/foundation/BorderStroke;->**(**)**
 HSPLandroidx/compose/foundation/CanvasKt;->**(**)**
 HSPLandroidx/compose/foundation/Clickable**->**(**)**
 HSPLandroidx/compose/foundation/Focusable**->**(**)**
+HSPLandroidx/compose/foundation/FocusedBoundsKt**->**(**)**
+HSPLandroidx/compose/foundation/FocusedBoundsObserverModifier**->**(**)**
+HSPLandroidx/compose/foundation/HoverableKt**->**(**)**
 HSPLandroidx/compose/foundation/ImageKt**->**(**)**
 HSPLandroidx/compose/foundation/IndicationKt**->**(**)**
 HSPLandroidx/compose/foundation/IndicationModifier;->**(**)**
+HSPLandroidx/compose/foundation/MutatePriority;->**(**)**
 HSPLandroidx/compose/foundation/MutatorMutex;->**(**)**
+HSPLandroidx/compose/foundation/PinnableParentConsumer;->**(**)**
 HSPLandroidx/compose/foundation/ScrollKt**->**(**)**
 HSPLandroidx/compose/foundation/ScrollState**->**(**)**
 HSPLandroidx/compose/foundation/ScrollingLayoutModifier**->**(**)**
 #
 # Include everything inside of the gestures namespace
-HSPLandroidx/compose/foundation/gestures/**;->**(**)**
+HSPLandroidx/compose/foundation/gestures/**->**(**)**
 #
 # Include everything inside of the interaction namespace
-HSPLandroidx/compose/foundation/interaction/*;->**(**)**
+HSPLandroidx/compose/foundation/interaction/*->**(**)**
 #
-# Include everything inside of the lazy namespace
-HSPLandroidx/compose/foundation/lazy/*;->**(**)**
+# Include everything inside of the layout namespaces
+HSPLandroidx/compose/foundation/layout/**->**(**)**
+
+# Include everything inside of the lazy namespaces
+HSPLandroidx/compose/foundation/lazy/**->**(**)**
+
+# Include everything inside relocation namespace
+HSPLandroidx/compose/foundation/relocation/**->**(**)**
+
+# Include everything inside selection namespace
+HSPLandroidx/compose/foundation/selection/**->**(**)**
+
 #
 # common shape classes
 HSPLandroidx/compose/foundation/shape/CornerBasedShape;->**(**)**
-HSPLandroidx/compose/foundation/shape/RoundedCornerShape;->**(**)**
 HSPLandroidx/compose/foundation/shape/CornerSizeKt;->**(**)**
 HSPLandroidx/compose/foundation/shape/DpCornerSize;->**(**)**
+HSPLandroidx/compose/foundation/shape/RoundedCornerShape;->**(**)**
+HSPLandroidx/compose/foundation/shape/PercentCornerSize;->**(**)**
 #
+
 # Include everything inside of the text namespace
-HSPLandroidx/compose/foundation/text/*;->**(**)**
+HSPLandroidx/compose/foundation/text/*->**(**)**
 HSPLandroidx/compose/foundation/text/selection/SimpleLayoutKt**->**(**)**
 HSPLandroidx/compose/foundation/text/selection/TextFieldSelectionManager;->**(**)**
+
 #
 # Include all of foundation
 Landroidx/compose/foundation/**;

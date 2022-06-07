@@ -277,7 +277,7 @@ object ColorSpaces {
      * | Range                   | (L: `[0.0, 1.0]`, a: `[-2, 2]`, b: `[-2, 2]`)           |
      * ```
      */
-    internal val Oklab: ColorSpace = Oklab(
+    val Oklab: ColorSpace = Oklab(
         "Oklab",
         id = 17
     )

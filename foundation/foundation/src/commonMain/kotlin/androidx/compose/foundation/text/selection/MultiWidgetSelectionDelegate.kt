@@ -119,6 +119,17 @@ internal class MultiWidgetSelectionDelegate(
             offset.coerceIn(0, textLength - 1)
         )
     }
+
+    override fun getRangeOfLineContaining(offset: Int): TextRange {
+        val textLayoutResult = layoutResultCallback() ?: return TextRange.Zero
+        val textLength = textLayoutResult.layoutInput.text.length
+        if (textLength < 1) return TextRange.Zero
+        val line = textLayoutResult.getLineForOffset(offset.coerceIn(0, textLength - 1))
+        return TextRange(
+            start = textLayoutResult.getLineStart(line),
+            end = textLayoutResult.getLineEnd(line, visibleEnd = true)
+        )
+    }
 }
 
 /**

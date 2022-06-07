@@ -20,7 +20,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -49,7 +49,7 @@ internal fun TextLayoutResult.canReuse(
     overflow: TextOverflow,
     density: Density,
     layoutDirection: LayoutDirection,
-    resourceLoader: Font.ResourceLoader,
+    fontFamilyResolver: FontFamily.Resolver,
     constraints: Constraints
 ): Boolean {
 
@@ -57,16 +57,21 @@ internal fun TextLayoutResult.canReuse(
 
     // Check if this is created from the same parameter.
     val layoutInput = this.layoutInput
+    if (multiParagraph.intrinsics.hasStaleResolvedFonts) {
+        // one of the resolved fonts has updated, and this MultiParagraph is no longer valid for
+        // measure or display
+        return false
+    }
     if (!(
         layoutInput.text == text &&
-            layoutInput.style.canReuseLayout(style) &&
+            layoutInput.style.hasSameLayoutAffectingAttributes(style) &&
             layoutInput.placeholders == placeholders &&
             layoutInput.maxLines == maxLines &&
             layoutInput.softWrap == softWrap &&
             layoutInput.overflow == overflow &&
             layoutInput.density == density &&
             layoutInput.layoutDirection == layoutDirection &&
-            layoutInput.resourceLoader == resourceLoader
+            layoutInput.fontFamilyResolver == fontFamilyResolver
         )
     ) {
         return false
@@ -79,28 +84,6 @@ internal fun TextLayoutResult.canReuse(
         // If width does not matter, we can result the same layout.
         return true
     }
-    return constraints.maxWidth == layoutInput.constraints.maxWidth
-}
-
-/**
- * Returns true if text layout created with this TextStyle can be reused for the [other] TextStyle.
- */
-internal fun TextStyle.canReuseLayout(other: TextStyle): Boolean {
-    return (this === other) || (
-        fontSize == other.fontSize &&
-        fontWeight == other.fontWeight &&
-        fontStyle == other.fontStyle &&
-        fontSynthesis == other.fontSynthesis &&
-        fontFamily == other.fontFamily &&
-        fontFeatureSettings == other.fontFeatureSettings &&
-        letterSpacing == other.letterSpacing &&
-        baselineShift == other.baselineShift &&
-        textGeometricTransform == other.textGeometricTransform &&
-        localeList == other.localeList &&
-        background == other.background &&
-        textAlign == other.textAlign &&
-        textDirection == other.textDirection &&
-        lineHeight == other.lineHeight &&
-        textIndent == other.textIndent
-        )
+    return constraints.maxWidth == layoutInput.constraints.maxWidth &&
+        constraints.maxHeight == layoutInput.constraints.maxHeight
 }

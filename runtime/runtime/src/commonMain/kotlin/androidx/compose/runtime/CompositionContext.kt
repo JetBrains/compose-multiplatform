@@ -55,4 +55,16 @@ abstract class CompositionContext internal constructor() {
     internal open fun getCompositionLocalScope(): CompositionLocalMap = EmptyCompositionLocalMap
     internal open fun startComposing() {}
     internal open fun doneComposing() {}
+
+    internal abstract fun insertMovableContent(reference: MovableContentStateReference)
+    internal abstract fun deletedMovableContent(reference: MovableContentStateReference)
+
+    internal abstract fun movableContentStateReleased(
+        reference: MovableContentStateReference,
+        data: MovableContentState
+    )
+
+    internal open fun movableContentStateResolve(
+        reference: MovableContentStateReference
+    ): MovableContentState? = null
 }

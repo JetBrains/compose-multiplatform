@@ -1,257 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.2.0-dev" type="baseline" client="gradle" dependencies="false" name="AGP (7.2.0-dev)" variant="all" version="7.2.0-dev">
+<issues format="6" by="lint 7.4.0-alpha01" type="baseline" client="gradle" dependencies="false" name="AGP (7.4.0-alpha01)" variant="all" version="7.4.0-alpha01">
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="    internal val currentRecomposeScope: RecomposeScopeImpl?"
-        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~">
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline infix fun Int.ror(other: Int) = this.rotateRight(other)"
+        errorLine2="                              ~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/Composer.kt"
-            line="1788"
-            column="18"/>
+            file="src/commonMain/kotlin/androidx/compose/runtime/BitwiseOperators.kt"/>
     </issue>
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="    internal override val recomposeCoroutineContext: CoroutineContext"
-        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline infix fun Int.rol(other: Int) = this.rotateLeft(other)"
+        errorLine2="                              ~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/Recomposer.kt"
-            line="179"
-            column="27"/>
+            file="src/commonMain/kotlin/androidx/compose/runtime/BitwiseOperators.kt"/>
     </issue>
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="    fun get(index: Int) = (currentSlot + index).let { slotIndex ->"
-        errorLine2="        ~~~">
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T> List&lt;T>.fastForEach(action: (T) -> Unit) {"
+        errorLine2="                                ~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SlotTable.kt"
-            line="694"
-            column="9"/>
+            file="src/commonMain/kotlin/androidx/compose/runtime/snapshots/ListUtils.kt"/>
     </issue>
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> mutableStateListOf(vararg elements: T) ="
-        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T> List&lt;T>.fastForEachIndexed(action: (Int, T) -> Unit) {"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="233"
-            column="9"/>
+            file="src/commonMain/kotlin/androidx/compose/runtime/snapshots/ListUtils.kt"/>
     </issue>
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> mutableStateListOf(vararg elements: T) ="
-        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T, R> List&lt;T>.fastMap(transform: (T) -> R): List&lt;R> {"
+        errorLine2="                                   ~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="233"
-            column="9"/>
+            file="src/commonMain/kotlin/androidx/compose/runtime/snapshots/ListUtils.kt"/>
     </issue>
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> mutableStateListOf(vararg elements: T) ="
-        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T> List&lt;T>.fastAny(predicate: (T) -> Boolean): Boolean {"
+        errorLine2="                                ~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="233"
-            column="9"/>
+            file="src/commonMain/kotlin/androidx/compose/runtime/snapshots/ListUtils.kt"/>
     </issue>
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> mutableStateListOf(vararg elements: T) ="
-        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T> List&lt;T>.fastAll(predicate: (T) -> Boolean): Boolean {"
+        errorLine2="                                ~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="233"
-            column="9"/>
+            file="src/commonMain/kotlin/androidx/compose/runtime/snapshots/ListUtils.kt"/>
     </issue>
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> mutableStateListOf(vararg elements: T) ="
-        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T, K> List&lt;T>.fastGroupBy("
+        errorLine2="                                   ~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="233"
-            column="9"/>
+            file="src/commonMain/kotlin/androidx/compose/runtime/snapshots/ListUtils.kt"/>
     </issue>
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> Collection&lt;T>.toMutableStateList() = SnapshotStateList&lt;T>().also { it.addAll(this) }"
-        errorLine2="                      ~~~~~~~~~~~~~~~~~~">
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T, R> List&lt;T>.fastMapNotNull(transform: (T) -> R?): List&lt;R> {"
+        errorLine2="                                   ~~~~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="240"
-            column="23"/>
+            file="src/commonMain/kotlin/androidx/compose/runtime/snapshots/ListUtils.kt"/>
     </issue>
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> Collection&lt;T>.toMutableStateList() = SnapshotStateList&lt;T>().also { it.addAll(this) }"
-        errorLine2="                      ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="240"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> Collection&lt;T>.toMutableStateList() = SnapshotStateList&lt;T>().also { it.addAll(this) }"
-        errorLine2="                      ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="240"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> Collection&lt;T>.toMutableStateList() = SnapshotStateList&lt;T>().also { it.addAll(this) }"
-        errorLine2="                      ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="240"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> Collection&lt;T>.toMutableStateList() = SnapshotStateList&lt;T>().also { it.addAll(this) }"
-        errorLine2="                      ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="240"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> mutableStateMapOf(vararg pairs: Pair&lt;K, V>) ="
-        errorLine2="           ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="262"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> mutableStateMapOf(vararg pairs: Pair&lt;K, V>) ="
-        errorLine2="           ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="262"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> mutableStateMapOf(vararg pairs: Pair&lt;K, V>) ="
-        errorLine2="           ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="262"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> mutableStateMapOf(vararg pairs: Pair&lt;K, V>) ="
-        errorLine2="           ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="262"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> mutableStateMapOf(vararg pairs: Pair&lt;K, V>) ="
-        errorLine2="           ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="262"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> Iterable&lt;Pair&lt;K, V>>.toMutableStateMap() ="
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T> List&lt;T>.fastFilterIndexed(predicate: (index: Int, T) -> Boolean): List&lt;T> {"
         errorLine2="                                ~~~~~~~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="270"
-            column="33"/>
+            file="src/commonMain/kotlin/androidx/compose/runtime/snapshots/ListUtils.kt"/>
     </issue>
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> Iterable&lt;Pair&lt;K, V>>.toMutableStateMap() ="
-        errorLine2="                                ~~~~~~~~~~~~~~~~~">
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="        inline fun &lt;T> withoutReadObservation(block: @DisallowComposableCalls () -> T): T {"
+        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="270"
-            column="33"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> Iterable&lt;Pair&lt;K, V>>.toMutableStateMap() ="
-        errorLine2="                                ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="270"
-            column="33"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> Iterable&lt;Pair&lt;K, V>>.toMutableStateMap() ="
-        errorLine2="                                ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="270"
-            column="33"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> Iterable&lt;Pair&lt;K, V>>.toMutableStateMap() ="
-        errorLine2="                                ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="270"
-            column="33"/>
+            file="src/commonMain/kotlin/androidx/compose/runtime/snapshots/Snapshot.kt"/>
     </issue>
 
 </issues>

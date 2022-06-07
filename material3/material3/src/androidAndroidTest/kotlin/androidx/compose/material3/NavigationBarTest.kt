@@ -59,7 +59,7 @@ import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.compose.material3.tokens.NavigationBar as NavigationBarTokens
+import androidx.compose.material3.tokens.NavigationBarTokens
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -72,7 +72,7 @@ class NavigationBarTest {
 
     @Test
     fun defaultSemantics() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             NavigationBar {
                 NavigationBarItem(
                     modifier = Modifier.testTag("item"),
@@ -101,7 +101,7 @@ class NavigationBarTest {
 
     @Test
     fun disabledSemantics() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             NavigationBar {
                 NavigationBarItem(
                     enabled = false,
@@ -150,6 +150,7 @@ class NavigationBarTest {
         lateinit var parentCoords: LayoutCoordinates
         val itemCoords = mutableMapOf<Int, LayoutCoordinates>()
         rule.setMaterialContent(
+            lightColorScheme(),
             Modifier.onGloballyPositioned { coords: LayoutCoordinates ->
                 parentCoords = coords
             }
@@ -190,7 +191,7 @@ class NavigationBarTest {
 
     @Test
     fun navigationBarItemContent_withLabel_sizeAndPosition() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 NavigationBar {
                     NavigationBarItem(
@@ -235,7 +236,7 @@ class NavigationBarTest {
 
     @Test
     fun navigationBarItemContent_withLabel_unselected_sizeAndPosition() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 NavigationBar {
                     NavigationBarItem(
@@ -269,7 +270,7 @@ class NavigationBarTest {
 
     @Test
     fun navigationBarItemContent_withoutLabel_sizeAndPosition() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 NavigationBar {
                     NavigationBarItem(
@@ -297,7 +298,7 @@ class NavigationBarTest {
 
     @Test
     fun navigationBar_selectNewItem() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             var selectedItem by remember { mutableStateOf(0) }
             val items = listOf("Songs", "Artists", "Playlists")
 
@@ -336,7 +337,7 @@ class NavigationBarTest {
     @Test
     fun disabled_noClicks() {
         var clicks = 0
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             NavigationBar {
                 NavigationBarItem(
                     enabled = false,

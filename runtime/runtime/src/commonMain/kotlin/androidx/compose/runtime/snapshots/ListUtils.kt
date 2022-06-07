@@ -84,6 +84,42 @@ internal inline fun <T, R> List<T>.fastMap(transform: (T) -> R): List<R> {
     return target
 }
 
+@OptIn(ExperimentalContracts::class)
+internal inline fun <T> List<T>.fastAny(predicate: (T) -> Boolean): Boolean {
+    contract { callsInPlace(predicate) }
+    fastForEach {
+        if (predicate(it)) return true
+    }
+    return false
+}
+
+/**
+ * Returns `true` if all elements match the given [predicate].
+ *
+ * **Do not use for collections that come from public APIs**, since they may not support random
+ * access in an efficient way, and this method may actually be a lot slower. Only use for
+ * collections that are created by code we control and are known to support random access.
+ */
+@OptIn(ExperimentalContracts::class)
+internal inline fun <T> List<T>.fastAll(predicate: (T) -> Boolean): Boolean {
+    contract { callsInPlace(predicate) }
+    fastForEach { if (!predicate(it)) return false }
+    return true
+}
+
+@OptIn(ExperimentalContracts::class)
+internal inline fun <T, K> List<T>.fastGroupBy(
+    keySelector: (T) -> K
+): Map<K, List<T>> {
+    contract { callsInPlace(keySelector) }
+    val destination = HashMap<K, ArrayList<T>>(size)
+    fastForEach {
+        val key = keySelector(it)
+        val list = destination.getOrPut(key) { ArrayList<T>() }
+        list.add(it)
+    }
+    return destination
+}
 /**
  * Creates a string from all the elements separated using [separator] and using the given [prefix]
  * and [postfix] if supplied.

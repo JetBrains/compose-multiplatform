@@ -16,96 +16,126 @@
 
 package androidx.compose.ui.window
 
-import androidx.compose.ui.awt.ComposeLayer
-import java.awt.Dimension
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.isPrimaryPressed
+import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import java.awt.Cursor
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
-import java.awt.event.MouseMotionAdapter
+import java.awt.Dimension
 import java.awt.MouseInfo
 import java.awt.Point
 import java.awt.Window
 
-internal const val DefaultBorderThickness = 8
+internal val DefaultBorderThickness = 8.dp
 
 internal class UndecoratedWindowResizer(
     private val window: Window,
-    layer: ComposeLayer,
-    var enabled: Boolean = false,
-    var borderThickness: Int = DefaultBorderThickness
+    var borderThickness: Dp = DefaultBorderThickness
 ) {
+    var enabled: Boolean by mutableStateOf(false)
+
     private var initialPointPos = Point()
     private var initialWindowPos = Point()
     private var initialWindowSize = Dimension()
-    private var sides = 0
-    private var isResizing = false
 
-    private val motionListener = object : MouseMotionAdapter() {
-        override fun mouseDragged(event: MouseEvent) = resize()
-        override fun mouseMoved(event: MouseEvent) = changeCursor(event)
+    @Composable
+    fun Content() {
+        if (enabled) {
+            Layout(
+                {
+                    Side(Cursor.W_RESIZE_CURSOR, Side.Left)
+                    Side(Cursor.E_RESIZE_CURSOR, Side.Right)
+                    Side(Cursor.N_RESIZE_CURSOR, Side.Top)
+                    Side(Cursor.S_RESIZE_CURSOR, Side.Bottom)
+                    Side(Cursor.NW_RESIZE_CURSOR, Side.Left or Side.Top)
+                    Side(Cursor.NE_RESIZE_CURSOR, Side.Right or Side.Top)
+                    Side(Cursor.SW_RESIZE_CURSOR, Side.Left or Side.Bottom)
+                    Side(Cursor.SE_RESIZE_CURSOR, Side.Right or Side.Bottom)
+                },
+                Modifier,
+                measurePolicy = { measurables, constraints ->
+                    val b = borderThickness.roundToPx()
+                    fun Measurable.measureSide(width: Int, height: Int) = measure(
+                        Constraints.fixed(width.coerceAtLeast(0), height.coerceAtLeast(0))
+                    )
+
+                    val left = measurables[0].measureSide(b, constraints.maxHeight - 2 * b)
+                    val right = measurables[1].measureSide(b, constraints.maxHeight - 2 * b)
+                    val top = measurables[2].measureSide(constraints.maxWidth - 2 * b, b)
+                    val bottom = measurables[3].measureSide(constraints.maxWidth - 2 * b, b)
+                    val leftTop = measurables[4].measureSide(b, b)
+                    val rightTop = measurables[5].measureSide(b, b)
+                    val leftBottom = measurables[6].measureSide(b, b)
+                    val rightBottom = measurables[7].measureSide(b, b)
+                    layout(constraints.maxWidth, constraints.maxHeight) {
+                        left.place(0, b)
+                        right.place(constraints.maxWidth - b, b)
+                        top.place(b, 0)
+                        bottom.place(0, constraints.maxHeight - b)
+                        leftTop.place(0, 0)
+                        rightTop.place(constraints.maxWidth - b, 0)
+                        leftBottom.place(0, constraints.maxHeight - b)
+                        rightBottom.place(constraints.maxWidth - b, constraints.maxHeight - b)
+                    }
+                }
+            )
+        }
     }
 
-    private val mouseListener = object : MouseAdapter() {
-        override fun mousePressed(event: MouseEvent) {
-            if (sides != 0) {
-                isResizing = true
+    private fun Modifier.resizeOnDrag(sides: Int) = pointerInput(Unit) {
+        var isResizing = false
+        awaitPointerEventScope {
+            while (true) {
+                val event = awaitPointerEvent()
+                val change = event.changes.first()
+                val changedToPressed = !change.previousPressed && change.pressed
+
+                if (event.buttons.isPrimaryPressed && changedToPressed) {
+                    initialPointPos = MouseInfo.getPointerInfo().location
+                    initialWindowPos = Point(window.x, window.y)
+                    initialWindowSize = Dimension(window.width, window.height)
+                    isResizing = true
+                }
+
+                if (!event.buttons.isPrimaryPressed) {
+                    isResizing = false
+                }
+
+                if (event.type == PointerEventType.Move) {
+                    if (isResizing) {
+                        resize(sides)
+                    }
+                }
             }
-            initialPointPos = MouseInfo.getPointerInfo().location
-            initialWindowPos = Point(window.x, window.y)
-            initialWindowSize = Dimension(window.width, window.height)
-        }
-        override fun mouseReleased(event: MouseEvent) {
-            isResizing = false
         }
     }
 
-    init {
-        layer.component.addMouseListener(mouseListener)
-        layer.component.addMouseMotionListener(motionListener)
-    }
+    @Composable
+    private fun Side(cursorId: Int, sides: Int) = Layout(
+        {},
+        Modifier.cursor(cursorId).resizeOnDrag(sides),
+        measurePolicy = { _, constraints ->
+            layout(constraints.maxWidth, constraints.maxHeight) {}
+        }
+    )
 
-    private fun changeCursor(event: MouseEvent) {
-        if (!enabled || isResizing) {
-            return
-        }
-        val point = event.getPoint()
-        sides = getSides(point)
-        when (sides) {
-            Side.Left.value -> window.setCursor(Cursor(Cursor.W_RESIZE_CURSOR))
-            Side.Top.value -> window.setCursor(Cursor(Cursor.N_RESIZE_CURSOR))
-            Side.Right.value -> window.setCursor(Cursor(Cursor.E_RESIZE_CURSOR))
-            Side.Bottom.value -> window.setCursor(Cursor(Cursor.S_RESIZE_CURSOR))
-            Corner.LeftTop.value -> window.setCursor(Cursor(Cursor.NW_RESIZE_CURSOR))
-            Corner.LeftBottom.value -> window.setCursor(Cursor(Cursor.SW_RESIZE_CURSOR))
-            Corner.RightTop.value -> window.setCursor(Cursor(Cursor.NE_RESIZE_CURSOR))
-            Corner.RightBottom.value -> window.setCursor(Cursor(Cursor.SE_RESIZE_CURSOR))
-            else -> window.setCursor(Cursor(Cursor.DEFAULT_CURSOR))
-        }
-    }
+    @OptIn(ExperimentalComposeUiApi::class)
+    private fun Modifier.cursor(awtCursorId: Int) =
+        pointerHoverIcon(PointerIcon(Cursor(awtCursorId)))
 
-    private fun getSides(point: Point): Int {
-        var sides = 0
-        val tolerance = borderThickness
-        if (point.x <= tolerance) {
-            sides += Side.Left.value
-        }
-        if (point.x >= window.width - tolerance) {
-            sides += Side.Right.value
-        }
-        if (point.y <= tolerance) {
-            sides += Side.Top.value
-        }
-        if (point.y >= window.height - tolerance) {
-            sides += Side.Bottom.value
-        }
-        return sides
-    }
-
-    private fun resize() {
-        if (!enabled || sides == 0) {
-            return
-        }
-
+    private fun resize(sides: Int) {
         val pointPos = MouseInfo.getPointerInfo().location
         val diffX = pointPos.x - initialPointPos.x
         val diffY = pointPos.y - initialPointPos.y
@@ -114,18 +144,18 @@ internal class UndecoratedWindowResizer(
         var newWidth = window.width
         var newHeight = window.height
 
-        if (contains(sides, Side.Left.value)) {
+        if (contains(sides, Side.Left)) {
             newWidth = initialWindowSize.width - diffX
             newWidth = newWidth.coerceAtLeast(window.minimumSize.width)
             newXPos = initialWindowPos.x + initialWindowSize.width - newWidth
-        } else if (contains(sides, Side.Right.value)) {
+        } else if (contains(sides, Side.Right)) {
             newWidth = initialWindowSize.width + diffX
         }
-        if (contains(sides, Side.Top.value)) {
+        if (contains(sides, Side.Top)) {
             newHeight = initialWindowSize.height - diffY
             newHeight = newHeight.coerceAtLeast(window.minimumSize.height)
             newYPos = initialWindowPos.y + initialWindowSize.height - newHeight
-        } else if (contains(sides, Side.Bottom.value)) {
+        } else if (contains(sides, Side.Bottom)) {
             newHeight = initialWindowSize.height + diffY
         }
         window.setLocation(newXPos, newYPos)
@@ -139,17 +169,10 @@ internal class UndecoratedWindowResizer(
         return false
     }
 
-    private enum class Side(val value: Int) {
-        Left(0x0001),
-        Top(0x0010),
-        Right(0x0100),
-        Bottom(0x1000)
-    }
-
-    private enum class Corner(val value: Int) {
-        LeftTop(0x0011),
-        LeftBottom(0x1001),
-        RightTop(0x0110),
-        RightBottom(0x1100)
+    private object Side {
+        val Left = 0x0001
+        val Top = 0x0010
+        val Right = 0x0100
+        val Bottom = 0x1000
     }
 }

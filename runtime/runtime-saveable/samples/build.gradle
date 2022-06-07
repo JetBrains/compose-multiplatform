@@ -15,7 +15,6 @@
  */
 
 
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
 plugins {
@@ -41,7 +40,11 @@ dependencies {
 androidx {
     name = "AndroidX Compose Saved Instance State System Samples"
     type = LibraryType.SAMPLES
-    mavenGroup = LibraryGroups.Compose.RUNTIME
+    mavenGroup = LibraryGroups.COMPOSE_RUNTIME
     inceptionYear = "2019"
     description = "Contains the sample code for the Androidx Compose Saved Instance State System"
+}
+
+android {
+    namespace "androidx.compose.runtime.saveable.samples"
 }

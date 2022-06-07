@@ -126,6 +126,12 @@ private fun canBeSavedToBundle(value: Any): Boolean {
             return false
         }
     }
+    // lambdas in Kotlin implement Serializable, but will crash if you really try to save them.
+    // we check for both Function and Serializable (see kotlin.jvm.internal.Lambda) to support
+    // custom user defined classes implementing Function interface.
+    if (value is Function<*> && value is Serializable) {
+        return false
+    }
     for (cl in AcceptableClasses) {
         if (cl.isInstance(value)) {
             return true
@@ -160,6 +166,7 @@ private val AcceptableClasses = arrayOf(
     SizeF::class.java
 )
 
+@Suppress("DEPRECATION")
 private fun Bundle.toMap(): Map<String, List<Any?>>? {
     val map = mutableMapOf<String, List<Any?>>()
     this.keySet().forEach { key ->

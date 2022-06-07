@@ -22,6 +22,10 @@ package androidx.compose.integration.docs.state
 import android.content.res.Resources
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
@@ -42,6 +46,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -192,13 +199,14 @@ private fun StateSnippets8() {
             val scaffoldState = rememberScaffoldState()
             val coroutineScope = rememberCoroutineScope()
 
-            Scaffold(scaffoldState = scaffoldState) {
+            Scaffold(scaffoldState = scaffoldState) { innerPadding ->
                 MyContent(
                     showSnackbar = { message ->
                         coroutineScope.launch {
                             scaffoldState.snackbarHostState.showSnackbar(message)
                         }
-                    }
+                    },
+                    modifier = Modifier.padding(innerPadding)
                 )
             }
         }
@@ -261,8 +269,84 @@ private fun StateSnippets10() {
                         )
                     }
                 }
-            ) {
-                NavHost(navController = myAppState.navController, "initial") { /* ... */ }
+            ) { innerPadding ->
+                NavHost(
+                    navController = myAppState.navController,
+                    startDestination = "initial",
+                    modifier = Modifier.padding(innerPadding)
+                ) { /* ... */ }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StateSnippets11() {
+    data class ExampleUiState(
+        val dataToDisplayOnScreen: List<Example> = emptyList(),
+        val userMessages: List<Message> = emptyList(),
+        val loading: Boolean = false
+    )
+
+    class ExampleViewModel(
+        private val repository: MyRepository,
+        private val savedState: SavedStateHandle
+    ) : ViewModel() {
+
+        var uiState by mutableStateOf(ExampleUiState())
+            private set
+
+        // Business logic
+        fun somethingRelatedToBusinessLogic() { /* ... */ }
+    }
+
+    @Composable
+    fun ExampleScreen(viewModel: ExampleViewModel = viewModel()) {
+
+        val uiState = viewModel.uiState
+        /* ... */
+
+        ExampleReusableComponent(
+            someData = uiState.dataToDisplayOnScreen,
+            onDoSomething = { viewModel.somethingRelatedToBusinessLogic() }
+        )
+    }
+
+    @Composable
+    fun ExampleReusableComponent(someData: Any, onDoSomething: () -> Unit) {
+        /* ... */
+        Button(onClick = onDoSomething) {
+            Text("Do something")
+        }
+    }
+}
+
+@Composable
+private fun StateSnippets12() {
+    class ExampleState(
+        val lazyListState: LazyListState,
+        private val resources: Resources,
+        private val expandedItems: List<Item> = emptyList()
+    ) {
+        fun isExpandedItem(item: Item): Boolean = TODO()
+        /* ... */
+    }
+
+    @Composable
+    fun rememberExampleState(/* ... */): ExampleState { TODO() }
+
+    @Composable
+    fun ExampleScreen(viewModel: ExampleViewModel = viewModel()) {
+
+        val uiState = viewModel.uiState
+        val exampleState = rememberExampleState()
+
+        LazyColumn(state = exampleState.lazyListState) {
+            items(uiState.dataToDisplayOnScreen) { item ->
+                if (exampleState.isExpandedItem(item)) {
+                    /* ... */
+                }
+                /* ... */
             }
         }
     }
@@ -286,7 +370,7 @@ private object binding {
 private fun MyTheme(content: @Composable () -> Unit) {}
 
 @Composable
-private fun MyContent(showSnackbar: (String) -> Unit) {}
+private fun MyContent(showSnackbar: (String) -> Unit, modifier: Modifier = Modifier) {}
 
 @Composable
 private fun BottomBar(tabs: Unit, navigateToRoute: (String) -> Unit) {}
@@ -316,3 +400,21 @@ private class MyAppState(
  */
 private annotation class Parcelize
 private interface Parcelable
+
+private class Example
+private class Item
+private class Message
+private class MyRepository
+
+@Composable
+private fun ExampleReusableComponent(someData: List<Example>, onDoSomething: () -> Unit) {}
+
+private class ExampleViewModel : ViewModel() {
+    val uiState = ExampleUiState()
+}
+
+private data class ExampleUiState(
+    val dataToDisplayOnScreen: List<Item> = emptyList(),
+    val userMessages: List<Message> = emptyList(),
+    val loading: Boolean = false
+)

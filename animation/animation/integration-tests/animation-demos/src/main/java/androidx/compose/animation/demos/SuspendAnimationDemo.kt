@@ -18,7 +18,9 @@ package androidx.compose.animation.demos
 
 import androidx.compose.animation.core.samples.AnimatableAnimateToGenericsType
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 
+@Preview
 @Composable
 fun SuspendAnimationDemo() {
     // Pulling from sample code

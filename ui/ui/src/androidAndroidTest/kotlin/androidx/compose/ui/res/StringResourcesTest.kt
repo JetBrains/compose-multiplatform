@@ -17,6 +17,7 @@
 package androidx.compose.ui.res
 
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.R
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -171,6 +172,36 @@ class StringResourcesTest {
             CompositionLocalProvider(LocalContext provides context) {
                 assertThat(stringArrayResource(R.array.string_array))
                     .isEqualTo(arrayOf("string1", "string2"))
+            }
+        }
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    @Test
+    fun pluralStringResource_withoutArguments() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+        rule.setContent {
+            CompositionLocalProvider(LocalContext provides context) {
+                assertThat(pluralStringResource(R.plurals.plurals_without_arguments, 1))
+                    .isEqualTo("There is one Android here")
+                assertThat(pluralStringResource(R.plurals.plurals_without_arguments, 42))
+                    .isEqualTo("There are a number of Androids here")
+            }
+        }
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    @Test
+    fun pluralStringResource_withArguments() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+        rule.setContent {
+            CompositionLocalProvider(LocalContext provides context) {
+                assertThat(pluralStringResource(R.plurals.plurals_with_arguments, 1, 1))
+                    .isEqualTo("There is 1 Android here")
+                assertThat(pluralStringResource(R.plurals.plurals_with_arguments, 42, 42))
+                    .isEqualTo("There are 42 Androids here")
             }
         }
     }

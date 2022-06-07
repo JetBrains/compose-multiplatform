@@ -19,4 +19,6 @@ HSPLandroidx/compose/animation/SplineBasedFloatDecayAnimationSpec**->**(**)**
 HSPLandroidx/compose/animation/ChangeSize;->**(**)**
 HSPLandroidx/compose/animation/CrossfadeAnimationItem;->**(**)**
 HSPLandroidx/compose/animation/EnterExitTransitionKt;->**(**)**
+HSPLandroidx/compose/animation/ColorVectorConverterKt**->**(**)**
+HSPLandroidx/compose/animation/SingleValueAnimationKt;->**(**)**
 Landroidx/compose/animation/*;

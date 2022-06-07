@@ -18,8 +18,8 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="indeterminate" msgid="2486394087603402002">"Ani zaškrtnuto, ani nezaškrtnuto"</string>
-    <string name="on" msgid="8655164131929253426">"Zap"</string>
-    <string name="off" msgid="875452955155264703">"Vyp"</string>
+    <string name="on" msgid="8655164131929253426">"Zapnuto"</string>
+    <string name="off" msgid="875452955155264703">"Vypnuto"</string>
     <string name="selected" msgid="6043586758067023">"Vybráno"</string>
     <string name="not_selected" msgid="6610465462668679431">"Nevybráno"</string>
     <string name="template_percent" msgid="5946805113151406391">"<xliff:g id="PERCENTAGE">%1$d</xliff:g> procent."</string>
@@ -31,4 +31,6 @@
     <string name="close_sheet" msgid="7573152094250666567">"Zavřít sešit"</string>
     <string name="default_error_message" msgid="8038256446254964252">"Neplatný údaj"</string>
     <string name="default_popup_window_title" msgid="6312721426453364202">"Vyskakovací okno"</string>
+    <string name="range_start" msgid="7097486360902471446">"Začátek rozsahu"</string>
+    <string name="range_end" msgid="5941395253238309765">"Konec rozsahu"</string>
 </resources>

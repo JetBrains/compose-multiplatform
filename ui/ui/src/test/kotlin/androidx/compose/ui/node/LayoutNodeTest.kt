@@ -27,6 +27,7 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
@@ -54,8 +55,9 @@ import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.WindowInfo
 import androidx.compose.ui.semantics.SemanticsConfiguration
 import androidx.compose.ui.semantics.SemanticsModifier
-import androidx.compose.ui.semantics.SemanticsWrapper
+import androidx.compose.ui.semantics.SemanticsEntity
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -67,22 +69,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.zIndex
 import com.google.common.truth.Truth.assertThat
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.ExpectedException
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
 class LayoutNodeTest {
-    @get:Rule
-    val thrown = ExpectedException.none()!!
-
     // Ensure that attach and detach work properly
     @Test
     fun layoutNodeAttachDetach() {
@@ -532,9 +531,9 @@ class LayoutNodeTest {
         val node1 = LayoutNode()
         node1.attach(owner)
 
-        thrown.expect(IllegalArgumentException::class.java)
-
-        node1.coordinates.localPositionOf(node0.coordinates, Offset(5f, 15f))
+        Assert.assertThrows(IllegalArgumentException::class.java) {
+            node1.coordinates.localPositionOf(node0.coordinates, Offset(5f, 15f))
+        }
     }
 
     @Test
@@ -610,16 +609,18 @@ class LayoutNodeTest {
     @Test
     fun testAddBeyondCurrent() {
         val node = LayoutNode()
-        thrown.expect(IndexOutOfBoundsException::class.java)
-        node.insertAt(1, LayoutNode())
+        Assert.assertThrows(IndexOutOfBoundsException::class.java) {
+            node.insertAt(1, LayoutNode())
+        }
     }
 
     // LayoutNode shouldn't allow adding below 0
     @Test
     fun testAddBelowZero() {
         val node = LayoutNode()
-        thrown.expect(IndexOutOfBoundsException::class.java)
-        node.insertAt(-1, LayoutNode())
+        Assert.assertThrows(IndexOutOfBoundsException::class.java) {
+            node.insertAt(-1, LayoutNode())
+        }
     }
 
     // LayoutNode should error when removing at index < 0
@@ -627,8 +628,9 @@ class LayoutNodeTest {
     fun testRemoveNegativeIndex() {
         val node = LayoutNode()
         node.insertAt(0, LayoutNode())
-        thrown.expect(IndexOutOfBoundsException::class.java)
-        node.removeAt(-1, 1)
+        Assert.assertThrows(IndexOutOfBoundsException::class.java) {
+            node.removeAt(-1, 1)
+        }
     }
 
     // LayoutNode should error when removing at index > count
@@ -636,8 +638,9 @@ class LayoutNodeTest {
     fun testRemoveBeyondIndex() {
         val node = LayoutNode()
         node.insertAt(0, LayoutNode())
-        thrown.expect(IndexOutOfBoundsException::class.java)
-        node.removeAt(1, 1)
+        Assert.assertThrows(IndexOutOfBoundsException::class.java) {
+            node.removeAt(1, 1)
+        }
     }
 
     // LayoutNode should error when removing at count < 0
@@ -645,8 +648,9 @@ class LayoutNodeTest {
     fun testRemoveNegativeCount() {
         val node = LayoutNode()
         node.insertAt(0, LayoutNode())
-        thrown.expect(IllegalArgumentException::class.java)
-        node.removeAt(0, -1)
+        Assert.assertThrows(IllegalArgumentException::class.java) {
+            node.removeAt(0, -1)
+        }
     }
 
     // LayoutNode should error when removing at count > entry count
@@ -654,16 +658,18 @@ class LayoutNodeTest {
     fun testRemoveWithIndexBeyondSize() {
         val node = LayoutNode()
         node.insertAt(0, LayoutNode())
-        thrown.expect(IndexOutOfBoundsException::class.java)
-        node.removeAt(0, 2)
+        Assert.assertThrows(IndexOutOfBoundsException::class.java) {
+            node.removeAt(0, 2)
+        }
     }
 
     // LayoutNode should error when there aren't enough items
     @Test
     fun testRemoveWithIndexEqualToSize() {
         val node = LayoutNode()
-        thrown.expect(IndexOutOfBoundsException::class.java)
-        node.removeAt(0, 1)
+        Assert.assertThrows(IndexOutOfBoundsException::class.java) {
+            node.removeAt(0, 1)
+        }
     }
 
     // LayoutNode should allow removing two items
@@ -741,19 +747,31 @@ class LayoutNodeTest {
     @Test
     fun layoutNodeWrapperAttachedWhenLayoutNodeAttached() {
         val layoutNode = LayoutNode()
-        val layoutModifier = Modifier.graphicsLayer { }
+        // 2 modifiers at the start
+        val layoutModifier = Modifier.graphicsLayer { }.graphicsLayer { }
 
         layoutNode.modifier = layoutModifier
         val oldLayoutNodeWrapper = layoutNode.outerLayoutNodeWrapper
+        val oldInnerLayoutNodeWrapper = oldLayoutNodeWrapper.wrapped
         assertFalse(oldLayoutNodeWrapper.isAttached)
+        assertNotNull(oldInnerLayoutNodeWrapper)
+        assertFalse(oldInnerLayoutNodeWrapper!!.isAttached)
 
         layoutNode.attach(MockOwner())
         assertTrue(oldLayoutNodeWrapper.isAttached)
 
+        // only 1 modifier now, so one should be detached and the other can be reused
         layoutNode.modifier = Modifier.graphicsLayer()
         val newLayoutNodeWrapper = layoutNode.outerLayoutNodeWrapper
+
+        // one can be reused, but we don't care which one
+        val notReused = if (newLayoutNodeWrapper == oldLayoutNodeWrapper) {
+            oldInnerLayoutNodeWrapper
+        } else {
+            oldLayoutNodeWrapper
+        }
         assertTrue(newLayoutNodeWrapper.isAttached)
-        assertFalse(oldLayoutNodeWrapper.isAttached)
+        assertFalse(notReused.isAttached)
     }
 
     @Test
@@ -1126,7 +1144,7 @@ class LayoutNodeTest {
             ).apply {
                 attach(MockOwner())
             }
-        val hit = HitTestResult<SemanticsWrapper>()
+        val hit = HitTestResult<SemanticsEntity>()
 
         layoutNode.hitTestSemantics(Offset(-3f, 3f), hit)
 
@@ -1145,7 +1163,7 @@ class LayoutNodeTest {
         val layoutNode = LayoutNode(0, 0, 1, 1, semanticsModifier, DpSize(48.dp, 48.dp))
         outerNode.add(layoutNode)
         layoutNode.onNodePlaced()
-        val hit = HitTestResult<SemanticsWrapper>()
+        val hit = HitTestResult<SemanticsEntity>()
 
         layoutNode.hitTestSemantics(Offset(-3f, 3f), hit)
 
@@ -1173,42 +1191,42 @@ class LayoutNodeTest {
         layoutNode2.onNodePlaced()
 
         // Hit closer to layoutNode1
-        val hit1 = HitTestResult<SemanticsWrapper>()
+        val hit1 = HitTestResult<SemanticsEntity>()
         outerNode.hitTestSemantics(Offset(5.1f, 5.5f), hit1, true)
 
         assertThat(hit1).hasSize(1)
         assertThat(hit1[0].modifier).isEqualTo(semanticsModifier1)
 
         // Hit closer to layoutNode2
-        val hit2 = HitTestResult<SemanticsWrapper>()
+        val hit2 = HitTestResult<SemanticsEntity>()
         outerNode.hitTestSemantics(Offset(5.9f, 5.5f), hit2, true)
 
         assertThat(hit2).hasSize(1)
         assertThat(hit2[0].modifier).isEqualTo(semanticsModifier2)
 
         // Hit closer to layoutNode1
-        val hit3 = HitTestResult<SemanticsWrapper>()
+        val hit3 = HitTestResult<SemanticsEntity>()
         outerNode.hitTestSemantics(Offset(5.5f, 5.1f), hit3, true)
 
         assertThat(hit3).hasSize(1)
         assertThat(hit3[0].modifier).isEqualTo(semanticsModifier1)
 
         // Hit closer to layoutNode2
-        val hit4 = HitTestResult<SemanticsWrapper>()
+        val hit4 = HitTestResult<SemanticsEntity>()
         outerNode.hitTestSemantics(Offset(5.5f, 5.9f), hit4, true)
 
         assertThat(hit4).hasSize(1)
         assertThat(hit4[0].modifier).isEqualTo(semanticsModifier2)
 
         // Hit inside layoutNode1
-        val hit5 = HitTestResult<SemanticsWrapper>()
+        val hit5 = HitTestResult<SemanticsEntity>()
         outerNode.hitTestSemantics(Offset(4.9f, 4.9f), hit5, true)
 
         assertThat(hit5).hasSize(1)
         assertThat(hit5[0].modifier).isEqualTo(semanticsModifier1)
 
         // Hit inside layoutNode2
-        val hit6 = HitTestResult<SemanticsWrapper>()
+        val hit6 = HitTestResult<SemanticsEntity>()
         outerNode.hitTestSemantics(Offset(6.1f, 6.1f), hit6, true)
 
         assertThat(hit6).hasSize(1)
@@ -1235,14 +1253,14 @@ class LayoutNodeTest {
         layoutNode2.onNodePlaced()
 
         // Hit layoutNode1
-        val hit1 = HitTestResult<SemanticsWrapper>()
+        val hit1 = HitTestResult<SemanticsEntity>()
         outerNode.hitTestSemantics(Offset(3.95f, 3.95f), hit1, true)
 
         assertThat(hit1).hasSize(1)
         assertThat(hit1[0].modifier).isEqualTo(semanticsModifier1)
 
         // Hit layoutNode2
-        val hit2 = HitTestResult<SemanticsWrapper>()
+        val hit2 = HitTestResult<SemanticsEntity>()
         outerNode.hitTestSemantics(Offset(4.05f, 4.05f), hit2, true)
 
         assertThat(hit2).hasSize(1)
@@ -2113,8 +2131,8 @@ class LayoutNodeTest {
         val wrapper1 = root.outerLayoutNodeWrapper
         val wrapper2 = root.outerLayoutNodeWrapper.wrapped
 
-        assertEquals(modifier1, (wrapper1 as DelegatingLayoutNodeWrapper<*>).modifier)
-        assertEquals(modifier2, (wrapper2 as DelegatingLayoutNodeWrapper<*>).modifier)
+        assertEquals(modifier1, (wrapper1 as ModifiedLayoutNode).modifier)
+        assertEquals(modifier2, (wrapper2 as ModifiedLayoutNode).modifier)
 
         root.modifier = modifier2.then(modifier1)
 
@@ -2122,11 +2140,11 @@ class LayoutNodeTest {
         assertEquals(wrapper1, root.outerLayoutNodeWrapper.wrapped)
         assertEquals(
             modifier1,
-            (root.outerLayoutNodeWrapper.wrapped as DelegatingLayoutNodeWrapper<*>).modifier
+            (root.outerLayoutNodeWrapper.wrapped as ModifiedLayoutNode).modifier
         )
         assertEquals(
             modifier2,
-            (root.outerLayoutNodeWrapper as DelegatingLayoutNodeWrapper<*>).modifier
+            (root.outerLayoutNodeWrapper as ModifiedLayoutNode).modifier
         )
     }
 
@@ -2281,20 +2299,27 @@ private class MockOwner(
         get() = TODO("Not yet implemented")
     override val windowInfo: WindowInfo
         get() = TODO("Not yet implemented")
+    @Deprecated(
+        "fontLoader is deprecated, use fontFamilyResolver",
+        replaceWith = ReplaceWith("fontFamilyResolver")
+    )
+    @Suppress("DEPRECATION")
     override val fontLoader: Font.ResourceLoader
+        get() = TODO("Not yet implemented")
+    override val fontFamilyResolver: FontFamily.Resolver
         get() = TODO("Not yet implemented")
     override val layoutDirection: LayoutDirection
         get() = LayoutDirection.Ltr
     override var showLayoutBounds: Boolean = false
     override val snapshotObserver = OwnerSnapshotObserver { it.invoke() }
 
-    override fun onRequestMeasure(layoutNode: LayoutNode) {
+    override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
         onRequestMeasureParams += layoutNode
-        layoutNode.layoutState = LayoutNode.LayoutState.NeedsRemeasure
+        layoutNode.markMeasurePending()
     }
 
-    override fun onRequestRelayout(layoutNode: LayoutNode) {
-        layoutNode.layoutState = LayoutNode.LayoutState.NeedsRelayout
+    override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) {
+        layoutNode.markLayoutPending()
     }
 
     override fun onAttach(node: LayoutNode) {
@@ -2316,7 +2341,21 @@ private class MockOwner(
     override fun measureAndLayout(sendPointerUpdate: Boolean) {
     }
 
+    override fun measureAndLayout(layoutNode: LayoutNode, constraints: Constraints) {
+    }
+
     override fun forceMeasureTheSubtree(layoutNode: LayoutNode) {
+    }
+
+    override fun registerOnEndApplyChangesListener(listener: () -> Unit) {
+        listener()
+    }
+
+    override fun onEndApplyChanges() {
+    }
+
+    override fun registerOnLayoutCompletedListener(listener: Owner.OnLayoutCompletedListener) {
+        TODO("Not yet implemented")
     }
 
     override fun createLayer(
@@ -2339,6 +2378,8 @@ private class MockOwner(
                 shape: Shape,
                 clip: Boolean,
                 renderEffect: RenderEffect?,
+                ambientShadowColor: Color,
+                spotShadowColor: Color,
                 layoutDirection: LayoutDirection,
                 density: Density
             ) {
@@ -2426,7 +2467,7 @@ private fun LayoutNode(
             }
     }
     attach(MockOwner())
-    layoutState = LayoutNode.LayoutState.NeedsRemeasure
+    markMeasurePending()
     remeasure(Constraints())
     var wrapper: LayoutNodeWrapper? = outerLayoutNodeWrapper
     while (wrapper != null) {

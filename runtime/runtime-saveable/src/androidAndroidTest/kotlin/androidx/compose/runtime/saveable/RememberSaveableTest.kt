@@ -410,6 +410,44 @@ class RememberSaveableTest {
             assertThat(composedValue).isEqualTo(1)
         }
     }
+
+    @Test
+    fun changingInputIsNotAffectingOrderOfRestoration() {
+        var counter = 0
+        var input by mutableStateOf(0)
+        var withInput: Int? = null
+        var withoutInput: String? = null
+
+        restorationTester.setContent {
+            withInput = rememberSaveable(input) { counter++ }
+            withoutInput = rememberSaveable { (counter++).toString() }
+        }
+
+        rule.runOnIdle {
+            assertThat(withInput).isNotNull()
+            withInput = null
+            input++
+        }
+
+        var expectedWithInput: Int? = null
+        var expectedWithoutInput: String? = null
+
+        rule.runOnIdle {
+            assertThat(withInput).isNotNull()
+            assertThat(withoutInput).isNotNull()
+            expectedWithInput = withInput
+            expectedWithoutInput = withoutInput
+            withInput = null
+            withoutInput = null
+        }
+
+        restorationTester.emulateSavedInstanceStateRestore()
+
+        rule.runOnIdle {
+            assertThat(withInput).isEqualTo(expectedWithInput)
+            assertThat(withoutInput).isEqualTo(expectedWithoutInput)
+        }
+    }
 }
 
 @Composable

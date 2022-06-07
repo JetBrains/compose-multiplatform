@@ -65,6 +65,8 @@ internal class RecomposeScopeImpl(
      */
     val valid: Boolean get() = composition != null && anchor?.valid ?: false
 
+    val canRecompose: Boolean get() = block != null
+
     /**
      * Used is set when the [RecomposeScopeImpl] is used by, for example, [currentRecomposeScope].
      * This is used as the result of [Composer.endRestartGroup] and indicates whether the lambda
@@ -219,6 +221,12 @@ internal class RecomposeScopeImpl(
     }
 
     /**
+     * Returns true if the scope is observing derived state which might make this scope
+     * conditionally invalidated.
+     */
+    val isConditional: Boolean get() = trackedDependencies != null
+
+    /**
      * Determine if the scope should be considered invalid.
      *
      * @param instances The set of objects reported as invalidating this scope.
@@ -232,7 +240,8 @@ internal class RecomposeScopeImpl(
         if (
             instances.isNotEmpty() &&
             instances.all { instance ->
-                instance is DerivedState<*> && trackedDependencies[instance] == instance.value
+                instance is DerivedState<*> &&
+                    trackedDependencies[instance] == instance.currentValue
             }
         )
             return false
@@ -278,6 +287,7 @@ internal class RecomposeScopeImpl(
                             if (remove) {
                                 composition.removeObservation(instance, this)
                                 (instance as? DerivedState<*>)?.let {
+                                    composition.removeDerivedStateObservation(it)
                                     trackedDependencies?.let { dependencies ->
                                         dependencies.remove(it)
                                         if (dependencies.size == 0) {

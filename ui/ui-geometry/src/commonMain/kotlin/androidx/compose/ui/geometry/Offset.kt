@@ -56,9 +56,9 @@ fun Offset(x: Float, y: Float) = Offset(packFloats(x, y))
  * Creates an offset. The first argument sets [x], the horizontal component,
  * and the second sets [y], the vertical component.
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class Offset internal constructor(internal val packedValue: Long) {
+@kotlin.jvm.JvmInline
+value class Offset internal constructor(internal val packedValue: Long) {
 
     @Stable
     val x: Float

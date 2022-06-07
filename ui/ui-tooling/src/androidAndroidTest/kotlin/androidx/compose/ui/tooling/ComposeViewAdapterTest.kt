@@ -335,6 +335,14 @@ class ComposeViewAdapterTest {
         )
     }
 
+    @Test
+    fun multipreviewTest() {
+        assertRendersCorrectly(
+                "androidx.compose.ui.tooling.SimpleComposablePreviewKt",
+                "Multipreview"
+        )
+    }
+
     /**
      * Check that no re-composition happens without forcing it.
      */
@@ -352,8 +360,8 @@ class ComposeViewAdapterTest {
             )
         }
 
-        // API before 22, might issue an additional draw under testing.
-        val expectedDrawCount = if (Build.VERSION.SDK_INT < 22) 2 else 1
+        // API before 29, might issue an additional draw under testing.
+        val expectedDrawCount = if (Build.VERSION.SDK_INT < 29) 2 else 1
         repeat(5) {
             activityTestRule.runOnUiThread {
                 assertEquals(1, compositionCount.get())

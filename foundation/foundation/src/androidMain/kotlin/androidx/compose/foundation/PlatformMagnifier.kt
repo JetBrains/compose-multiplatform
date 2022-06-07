@@ -24,6 +24,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
 import kotlin.math.roundToInt
 
 @Stable
@@ -64,6 +65,9 @@ internal interface PlatformMagnifierFactory {
  */
 internal interface PlatformMagnifier {
 
+    /** Returns the actual size of the magnifier widget, even if not specified at creation. */
+    val size: IntSize
+
     /** Causes the magnifier to re-copy the magnified pixels. Wraps [Magnifier.update]. */
     fun updateContent()
 
@@ -96,6 +100,10 @@ internal object PlatformMagnifierFactoryApi28Impl : PlatformMagnifierFactory {
 
     @RequiresApi(28)
     open class PlatformMagnifierImpl(val magnifier: Magnifier) : PlatformMagnifier {
+
+        override val size: IntSize
+            get() = IntSize(magnifier.width, magnifier.height)
+
         override fun updateContent() {
             magnifier.update()
         }

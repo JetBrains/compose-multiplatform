@@ -29,8 +29,8 @@ plugins {
 android {
     defaultConfig {
         applicationId "androidx.compose.material.catalog"
-        versionCode 2000
-        versionName "2.0.0"
+        versionCode 2001
+        versionName "2.0.1"
     }
     buildTypes {
         release {
@@ -39,12 +39,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
         }
     }
+    namespace "androidx.compose.material.catalog"
 }
 
 dependencies {
     kotlinPlugin project(":compose:compiler:compiler")
     implementation(libs.kotlinStdlib)
     implementation project(":compose:runtime:runtime")
+    implementation project(":compose:foundation:foundation-layout")
     implementation project(":compose:ui:ui")
     implementation project(":compose:material:material")
     implementation project(":compose:material3:material3")
@@ -52,7 +54,12 @@ dependencies {
     implementation project(":compose:material3:material3:integration-tests:material3-catalog")
     implementation "androidx.activity:activity-compose:1.3.1"
     implementation project(":navigation:navigation-compose")
-    implementation "com.google.accompanist:accompanist-insets:0.18.0"
+    // old version of common-java8 conflicts with newer version, because both have
+    // DefaultLifecycleEventObserver.
+    // Outside of androidx this is resolved via constraint added to lifecycle-common,
+    // but it doesn't work in androidx.
+    // See aosp/1804059
+    implementation projectOrArtifact(":lifecycle:lifecycle-common-java8")
 }
 
 // We want to publish a release APK of this project for the Compose Material Catalog

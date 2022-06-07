@@ -35,7 +35,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.tokens.NavigationRail
+import androidx.compose.material3.tokens.NavigationRailTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
@@ -58,14 +58,16 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
 /**
+ * <a href="https://m3.material.io/components/navigation-rail/overview" class="external" target="_blank">Material Design bottom navigation rail</a>.
+ *
+ * Navigation rails provide access to primary destinations in apps when using tablet and desktop
+ * screens.
+ *
  * ![Navigation rail image](https://developer.android.com/images/reference/androidx/compose/material3/navigation-rail.png)
  *
- * Material Design navigation rail.
- *
- * [NavigationRail] is a side navigation component that allows movement between primary destinations
- * in an app. The navigation rail should be used to display three to seven app destinations and,
- * optionally, a Floating Action Button or a logo header. Each destination is typically represented
- * by an icon and an optional text label.
+ * The navigation rail should be used to display three to seven app destinations and, optionally, a
+ * [FloatingActionButton] or a logo header. Each destination is typically represented by an icon and
+ * an optional text label.
  *
  * [NavigationRail] should contain multiple [NavigationRailItem]s, each representing a singular
  * destination.
@@ -76,19 +78,19 @@ import kotlin.math.roundToInt
  * See [NavigationRailItem] for configuration specific to each item, and not the overall
  * NavigationRail component.
  *
- * @param modifier optional [Modifier] for this NavigationRail
- * @param containerColor the container color for this NavigationRail
- * @param contentColor the preferred content color provided by this NavigationRail to its children.
- * Defaults to either the matching content color for [containerColor], or if [containerColor] is not
- * a color from the theme, this will keep the same value set above this NavigationRail
- * @param header optional header that may hold a Floating Action Button or a logo
- * @param content destinations inside this NavigationRail. This should contain multiple
- * [NavigationRailItem]s
+ * @param modifier the [Modifier] to be applied to this navigation rail
+ * @param containerColor the color used for the background of this navigation rail. Use
+ * [Color.Transparent] to have no color.
+ * @param contentColor the preferred color for content inside this navigation rail. Defaults to
+ * either the matching content color for [containerColor], or to the current [LocalContentColor] if
+ * [containerColor] is not a color from the theme.
+ * @param header optional header that may hold a [FloatingActionButton] or a logo
+ * @param content the content of this navigation rail, typically 3-7 [NavigationRailItem]s
  */
 @Composable
 fun NavigationRail(
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.fromToken(NavigationRail.ContainerColor),
+    containerColor: Color = NavigationRailTokens.ContainerColor.toColor(),
     contentColor: Color = contentColorFor(containerColor),
     header: @Composable (ColumnScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
@@ -100,7 +102,7 @@ fun NavigationRail(
     ) {
         Column(
             Modifier.fillMaxHeight()
-                .width(NavigationRail.ContainerWidth)
+                .width(NavigationRailTokens.ContainerWidth)
                 .padding(vertical = NavigationRailVerticalPadding)
                 .selectableGroup(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -120,23 +122,27 @@ fun NavigationRail(
  *
  * A [NavigationRailItem] represents a destination within a [NavigationRail].
  *
+ * Navigation rails provide access to primary destinations in apps when using tablet and desktop
+ * screens.
+ *
  * The text label is always shown (if it exists) when selected. Showing text labels if not selected
  * is controlled by [alwaysShowLabel].
  *
  * @param selected whether this item is selected
- * @param onClick the callback to be invoked when this item is selected
+ * @param onClick called when this item is clicked
  * @param icon icon for this item, typically an [Icon]
- * @param modifier optional [Modifier] for this item
- * @param enabled controls the enabled state of this item. When false, this item will not be
- * clickable and will appear disabled to accessibility services
+ * @param modifier the [Modifier] to be applied to this item
+ * @param enabled controls the enabled state of this item. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
  * @param label optional text label for this item
  * @param alwaysShowLabel whether to always show the label for this item. If false, the label will
  * only be shown when this item is selected.
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this NavigationRailItem. You can create and pass in your own remembered
- * [MutableInteractionSource] if you want to observe [Interaction]s and customize the appearance /
- * behavior of this NavigationRailItem in different [Interaction]s.
- * @param colors the various colors used in elements of this item
+ * for this item. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this item in different states.
+ * @param colors [NavigationRailItemColors] that will be used to resolve the colors used for this
+ * item in different states. See [NavigationRailItemDefaults.colors].
  */
 @Composable
 fun NavigationRailItem(
@@ -157,7 +163,7 @@ fun NavigationRailItem(
 
     val styledLabel: @Composable (() -> Unit)? = label?.let {
         @Composable {
-            val style = MaterialTheme.typography.fromToken(NavigationRail.LabelTextFont)
+            val style = MaterialTheme.typography.fromToken(NavigationRailTokens.LabelTextFont)
             val textColor by colors.textColor(selected = selected)
             CompositionLocalProvider(LocalContentColor provides textColor) {
                 ProvideTextStyle(style, content = label)
@@ -189,9 +195,9 @@ fun NavigationRailItem(
                     .background(
                         color = colors.indicatorColor.copy(alpha = animationProgress),
                         shape = if (label != null) {
-                            NavigationRail.ActiveIndicatorShape
+                            NavigationRailTokens.ActiveIndicatorShape.toShape()
                         } else {
-                            NavigationRail.NoLabelActiveIndicatorShape
+                            NavigationRailTokens.NoLabelActiveIndicatorShape.toShape()
                         }
                     )
             )
@@ -222,16 +228,11 @@ object NavigationRailItemDefaults {
      */
     @Composable
     fun colors(
-        selectedIconColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationRail.ActiveIconColor),
-        unselectedIconColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationRail.InactiveIconColor),
-        selectedTextColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationRail.ActiveLabelTextColor),
-        unselectedTextColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationRail.InactiveLabelTextColor),
-        indicatorColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationRail.ActiveIndicatorColor),
+        selectedIconColor: Color = NavigationRailTokens.ActiveIconColor.toColor(),
+        unselectedIconColor: Color = NavigationRailTokens.InactiveIconColor.toColor(),
+        selectedTextColor: Color = NavigationRailTokens.ActiveLabelTextColor.toColor(),
+        unselectedTextColor: Color = NavigationRailTokens.InactiveLabelTextColor.toColor(),
+        indicatorColor: Color = NavigationRailTokens.ActiveIndicatorColor.toColor(),
     ): NavigationRailItemColors = remember(
         selectedIconColor,
         unselectedIconColor,
@@ -504,21 +505,21 @@ private const val ItemAnimationDurationMillis: Int = 150
 
 /*@VisibleForTesting*/
 /** Width of an individual [NavigationRailItem]. */
-internal val NavigationRailItemWidth: Dp = NavigationRail.ContainerWidth
+internal val NavigationRailItemWidth: Dp = NavigationRailTokens.ContainerWidth
 
 /*@VisibleForTesting*/
 /** Height of an individual [NavigationRailItem]. */
-internal val NavigationRailItemHeight: Dp = NavigationRail.NoLabelActiveIndicatorHeight
+internal val NavigationRailItemHeight: Dp = NavigationRailTokens.NoLabelActiveIndicatorHeight
 
 /*@VisibleForTesting*/
 /** Vertical padding between the contents of a [NavigationRailItem] and its top/bottom. */
 internal val NavigationRailItemVerticalPadding: Dp = 4.dp
 
 private val IndicatorHorizontalPadding: Dp =
-    (NavigationRail.ActiveIndicatorWidth - NavigationRail.IconSize) / 2
+    (NavigationRailTokens.ActiveIndicatorWidth - NavigationRailTokens.IconSize) / 2
 
 private val IndicatorVerticalPaddingWithLabel: Dp =
-    (NavigationRail.ActiveIndicatorHeight - NavigationRail.IconSize) / 2
+    (NavigationRailTokens.ActiveIndicatorHeight - NavigationRailTokens.IconSize) / 2
 
 private val IndicatorVerticalPaddingNoLabel: Dp =
-    (NavigationRail.NoLabelActiveIndicatorHeight - NavigationRail.IconSize) / 2
+    (NavigationRailTokens.NoLabelActiveIndicatorHeight - NavigationRailTokens.IconSize) / 2

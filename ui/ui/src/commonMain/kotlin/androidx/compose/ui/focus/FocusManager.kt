@@ -25,9 +25,7 @@ import androidx.compose.ui.focus.FocusStateImpl.Captured
 import androidx.compose.ui.focus.FocusStateImpl.Deactivated
 import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
-import androidx.compose.ui.node.ModifiedFocusNode
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.util.fastForEach
 
 interface FocusManager {
     /**
@@ -45,7 +43,7 @@ interface FocusManager {
      * Moves focus in the specified [direction][FocusDirection].
      *
      * If you are not satisfied with the default focus order, consider setting a custom order using
-     * [Modifier.focusOrder()][focusOrder].
+     * [Modifier.focusProperties()][focusProperties].
      *
      * @return true if focus was moved successfully. false if the focused item is unchanged.
      *
@@ -68,9 +66,8 @@ internal class FocusManagerImpl(
      * A [Modifier] that can be added to the [Owners][androidx.compose.ui.node.Owner] modifier
      * list that contains the modifiers required by the focus system. (Eg, a root focus modifier).
      */
-    val modifier: Modifier
-        // TODO(b/168831247): return an empty Modifier when there are no focusable children.
-        get() = Modifier.focusTarget(focusModifier)
+    // TODO(b/168831247): return an empty Modifier when there are no focusable children.
+    val modifier: Modifier = Modifier.focusTarget(focusModifier)
 
     lateinit var layoutDirection: LayoutDirection
 
@@ -96,7 +93,7 @@ internal class FocusManagerImpl(
      * all the focus modifiers in the component hierarchy.
      */
     fun releaseFocus() {
-        focusModifier.focusNode.clearFocus(forcedClear = true)
+        focusModifier.clearFocus(forcedClear = true)
     }
 
     /**
@@ -113,7 +110,7 @@ internal class FocusManagerImpl(
         // focus. So after clearing focus within the compose hierarchy, we should restore focus to
         // the root focus modifier to maintain consistency with the host view.
         val rootInitialState = focusModifier.focusState
-        if (focusModifier.focusNode.clearFocus(force)) {
+        if (focusModifier.clearFocus(force)) {
             focusModifier.focusState = when (rootInitialState) {
                 Active, ActiveParent, Captured -> Active
                 Deactivated, DeactivatedParent -> Deactivated
@@ -130,7 +127,7 @@ internal class FocusManagerImpl(
     override fun moveFocus(focusDirection: FocusDirection): Boolean {
 
         // If there is no active node in this sub-hierarchy, we can't move focus.
-        val source = focusModifier.focusNode.findActiveFocusNode() ?: return false
+        val source = focusModifier.findActiveFocusNode() ?: return false
 
         // Check if a custom focus traversal order is specified.
         val nextFocusRequester = source.customFocusSearch(focusDirection, layoutDirection)
@@ -141,41 +138,13 @@ internal class FocusManagerImpl(
             return true
         }
 
-        val destination = focusModifier.focusNode.focusSearch(focusDirection, layoutDirection)
-        if (destination == source) {
-            return false
-        }
-
-        // TODO(b/144116848): This is a hack to make Next/Previous wrap around. This must be
-        //  replaced by code that sends the move request back to the view system. The view system
-        //  will then pass focus to other views, and ultimately return back to this compose view.
-        if (destination == null) {
-            // Check if we need to wrap around (no destination and a non-root item is focused)
-            if (focusModifier.focusState.hasFocus && !focusModifier.focusState.isFocused) {
-                // Next and Previous wraps around.
-                return when (focusDirection) {
-                    Next, Previous -> {
-                        // Clear Focus to send focus the root node.
-                        // Wrap around by requesting focus for the root and then calling moveFocus.
-                        clearFocus(force = false)
-
-                        if (focusModifier.focusState.isFocused) {
-                            moveFocus(focusDirection)
-                        } else {
-                            false
-                        }
-                    }
-                    else -> false
-                }
-            }
-            return false
-        }
-
-        checkNotNull(destination.findParentFocusNode()) { "Move focus landed at the root." }
-
-        // If we found a potential next item, move focus to it.
-        destination.requestFocus()
-        return true
+        return focusModifier.focusSearch(focusDirection, layoutDirection) { destination ->
+            if (destination == source) return@focusSearch false
+            checkNotNull(destination.parent) { "Move focus landed at the root." }
+            // If we found a potential next item, move focus to it.
+            destination.requestFocus()
+            true
+        }.let { foundNextItem -> foundNextItem || wrapAroundFocus(focusDirection) }
     }
 
     /**
@@ -187,15 +156,60 @@ internal class FocusManagerImpl(
      * to change a property, and need to see the change in the current snapshot, use this API.
      */
     fun fetchUpdatedFocusProperties() {
-        focusModifier.focusNode.updateProperties()
+        focusModifier.updateProperties()
+    }
+
+    /**
+     * Searches for the currently focused item.
+     *
+     * @return the currently focused item.
+     */
+    @Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+    internal fun getActiveFocusModifier(): FocusModifier? {
+        return focusModifier.findActiveItem()
+    }
+
+    // TODO(b/144116848): This is a hack to make Next/Previous wrap around. This must be
+    //  replaced by code that sends the move request back to the view system. The view system
+    //  will then pass focus to other views, and ultimately return back to this compose view.
+    private fun wrapAroundFocus(focusDirection: FocusDirection): Boolean {
+        // Wrap is not supported when this sub-hierarchy doesn't have focus.
+        if (!focusModifier.focusState.hasFocus || focusModifier.focusState.isFocused) return false
+
+        // Next and Previous wraps around.
+        when (focusDirection) {
+            Next, Previous -> {
+                // Clear Focus to send focus the root node.
+                clearFocus(force = false)
+                if (!focusModifier.focusState.isFocused) return false
+
+                // Wrap around by calling moveFocus after the root gains focus.
+                return moveFocus(focusDirection)
+            }
+            // We only wrap-around for 1D Focus search.
+            else -> return false
+        }
     }
 }
 
-private fun ModifiedFocusNode.updateProperties() {
+private fun FocusModifier.updateProperties() {
     // Update the focus node with the current focus properties.
-    with(modifier.modifierLocalReadScope) {
-        setUpdatedProperties(ModifierLocalFocusProperties.current)
-    }
+    refreshFocusProperties()
+
     // Update the focus properties for all children.
-    focusableChildren(excludeDeactivated = false).fastForEach { it.updateProperties() }
+    children.forEach { it.updateProperties() }
+}
+
+/**
+ * Find the focus modifier in this sub-hierarchy that is currently focused.
+ */
+@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+private fun FocusModifier.findActiveItem(): FocusModifier? {
+    return when (focusState) {
+        Active, Captured -> this
+        ActiveParent, DeactivatedParent -> {
+            focusedChild?.findActiveItem() ?: error("no child")
+        }
+        Deactivated, Inactive -> null
+    }
 }

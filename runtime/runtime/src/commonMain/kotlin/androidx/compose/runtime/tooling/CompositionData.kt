@@ -71,7 +71,14 @@ interface CompositionGroup : CompositionData {
     /**
      * The data stored in the slot table for this group. This information includes the values
      * stored for parameters that are checked for change, any value passed as a parameter for
-     * [remember] and the last value returned by [remember], etc.
+     * [androidx.compose.runtime.remember] and the last value returned by
+     * [androidx.compose.runtime.remember], etc.
      */
     val data: Iterable<Any?>
+
+    /**
+     * A value that identifies a Group independently of movement caused by recompositions.
+     */
+    val identity: Any?
+      get() = null
 }

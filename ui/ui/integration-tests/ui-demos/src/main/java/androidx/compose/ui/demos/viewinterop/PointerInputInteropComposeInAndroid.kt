@@ -54,6 +54,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.demos.R
 import androidx.compose.ui.graphics.Color
@@ -67,6 +68,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 
+@OptIn(ExperimentalComposeUiApi::class)
 val ComposeInAndroidDemos = DemoCategory(
     "Compose in Android Interop",
     listOf(

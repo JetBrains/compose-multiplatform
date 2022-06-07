@@ -18,19 +18,19 @@ package androidx.compose.ui.test.junit4
 
 import androidx.compose.ui.test.ComposeTimeoutException
 import androidx.compose.ui.test.MainTestClock
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlin.math.ceil
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineScheduler
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal abstract class AbstractMainTestClock(
-    private val testDispatcher: TestCoroutineDispatcher,
+    private val testScheduler: TestCoroutineScheduler,
     private val frameDelayMillis: Long,
     private val runOnUiThread: (action: () -> Unit) -> Unit
 ) : MainTestClock {
 
     override val currentTime: Long
-        get() = testDispatcher.currentTime
+        get() = testScheduler.currentTime
 
     override var autoAdvance: Boolean = true
 
@@ -65,7 +65,13 @@ internal abstract class AbstractMainTestClock(
 
     private fun advanceDispatcher(millis: Long) {
         runOnUiThread {
-            testDispatcher.advanceTimeBy(millis)
+            testScheduler.advanceTimeBy(millis)
+
+            // Since coroutines 1.6.0
+            // `advanceTimeBy` doesn't run the tasks that are scheduled at exactly
+            // `currentTime + delayTimeMillis`. See `advanceTimeBy`.
+            // Therefore we also call `runCurrent` as it's done in TestCoroutineDispatcher
+            testScheduler.runCurrent()
         }
     }
 }

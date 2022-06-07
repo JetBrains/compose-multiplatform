@@ -14,119 +14,93 @@
  * limitations under the License.
  */
 
-@file:Suppress("DEPRECATION")
-
 package androidx.compose.foundation.gestures
 
+import androidx.compose.runtime.Composable
+import androidx.compose.foundation.fastFold
 import androidx.compose.foundation.DesktopPlatform
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
-import androidx.compose.ui.input.mouse.MouseScrollOrientation
-import androidx.compose.ui.input.mouse.MouseScrollUnit
-import androidx.compose.ui.input.mouse.mouseScrollFilter
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.unit.dp
+import java.awt.event.MouseWheelEvent
 import kotlin.math.sqrt
 
-// TODO(demin): figure out how we can provide a public API for changing MouseScrollConfig.
-//  There are two ways:
-//  - provide as CompositionLocal
-//  - provide as a parameter Modifier.scrollable(mouseScrollConfig=)
-//  This should be done only after new Pointer Input API with mouse support
-internal val LocalMouseScrollConfig = compositionLocalOf { MouseScrollableConfig.CurrentPlatform }
+// TODO(demin): Chrome on Windows/Linux uses different scroll strategy
+//  (always the same scroll offset, bounds-independent).
+//  Figure out why and decide if we can use this strategy instead of the current one.
+internal val LocalScrollConfig = compositionLocalOf {
+    when (DesktopPlatform.Current) {
+        DesktopPlatform.Linux -> LinuxGnomeConfig
+        DesktopPlatform.Windows -> WindowsWinUIConfig
+        DesktopPlatform.MacOS -> MacOSCocoaConfig
+        DesktopPlatform.Unknown -> WindowsWinUIConfig
+    }
+}
 
-// TODO(demin): implement smooth scroll animation on Windows
-// TODO(demin): implement touchpad bounce physics on MacOS
-// TODO(demin): maybe we need to differentiate different linux environments (Gnome/KDE)
-// TODO(demin): do we need support real line scrolling (i.e. scroll by 3 text lines)?
-internal actual fun Modifier.mouseScrollable(
-    orientation: Orientation,
-    onScroll: (Float) -> Unit
-): Modifier = composed {
-    val density = LocalDensity.current
-    val config = LocalMouseScrollConfig.current
+@Composable
+internal actual fun platformScrollConfig() = LocalScrollConfig.current
 
-    mouseScrollFilter { event, bounds ->
-        if (isOrientationEqual(orientation, event.orientation)) {
-            val scrollBounds = when (orientation) {
-                Orientation.Vertical -> bounds.height
-                Orientation.Horizontal -> bounds.width
-            }
-            val scrollOffset = config.offsetOf(event.delta, scrollBounds, density)
-            onScroll(-scrollOffset)
-            true
+// TODO(demin): is this formula actually correct? some experimental values don't fit
+//  the formula
+internal object LinuxGnomeConfig : ScrollConfig {
+    // the formula was determined experimentally based on Ubuntu Nautilus behaviour
+    override fun Density.calculateMouseWheelScroll(event: PointerEvent, bounds: IntSize): Offset {
+        return if (event.shouldScrollByPage) {
+            calculateOffsetByPage(event, bounds)
         } else {
-            false
-        }
+            Offset(
+                x = event.totalScrollDelta.x * sqrt(bounds.width.toFloat()),
+                y = event.totalScrollDelta.y * sqrt(bounds.height.toFloat())
+            )
+        } * -event.scrollAmount
     }
 }
 
-private fun isOrientationEqual(
-    orientation: Orientation,
-    mouseOrientation: MouseScrollOrientation
-): Boolean {
-    return if (mouseOrientation == MouseScrollOrientation.Horizontal) {
-        orientation == Orientation.Horizontal
-    } else {
-        orientation == Orientation.Vertical
-    }
-}
-
-private fun MouseScrollableConfig.offsetOf(
-    unit: MouseScrollUnit,
-    bounds: Int,
-    density: Density
-) = when (unit) {
-    is MouseScrollUnit.Line -> offsetOf(unit.value, bounds, density)
-
-    // TODO(demin): Chrome/Firefox on Windows scroll differently: value * 0.90f * bounds
-    //
-    // TODO(demin): How can we integrate page scrolling into MouseScrollConfig and new
-    //  Pointer Input API with mouse support?
+internal object WindowsWinUIConfig : ScrollConfig {
     // the formula was determined experimentally based on Windows Start behaviour
-    is MouseScrollUnit.Page -> unit.value * bounds.toFloat()
-}
-
-internal interface MouseScrollableConfig {
-    fun offsetOf(scrollDelta: Float, bounds: Int, density: Density): Float
-
-    // TODO(demin): Chrome on Windows/Linux uses different scroll strategy
-    //  (always the same scroll offset, bounds-independent).
-    //  Figure out why and decide if we can use this strategy instead of the current one.
-    companion object {
-        // TODO(demin): is this formula actually correct? some experimental values don't fit
-        //  the formula
-        val LinuxGnome = object : MouseScrollableConfig {
-            // the formula was determined experimentally based on Ubuntu Nautilus behaviour
-            override fun offsetOf(scrollDelta: Float, bounds: Int, density: Density): Float {
-                return scrollDelta * sqrt(bounds.toFloat())
-            }
-        }
-
-        val WindowsWinUI = object : MouseScrollableConfig {
-            // the formula was determined experimentally based on Windows Start behaviour
-            override fun offsetOf(scrollDelta: Float, bounds: Int, density: Density): Float {
-                return scrollDelta * bounds / 20f
-            }
-        }
-
-        val MacOSCocoa = object : MouseScrollableConfig {
-            // the formula was determined experimentally based on MacOS Finder behaviour
-            // MacOS driver will send events with accelerating delta
-            override fun offsetOf(scrollDelta: Float, bounds: Int, density: Density): Float {
-                return with(density) {
-                    scrollDelta * 10.dp.toPx()
-                }
-            }
-        }
-
-        val CurrentPlatform: MouseScrollableConfig = when (DesktopPlatform.Current) {
-            DesktopPlatform.Linux -> LinuxGnome
-            DesktopPlatform.Windows -> WindowsWinUI
-            DesktopPlatform.MacOS -> MacOSCocoa
-            DesktopPlatform.Unknown -> WindowsWinUI
-        }
+    override fun Density.calculateMouseWheelScroll(event: PointerEvent, bounds: IntSize): Offset {
+        return if (event.shouldScrollByPage) {
+            calculateOffsetByPage(event, bounds)
+        } else {
+            Offset(
+                x = event.totalScrollDelta.x * (bounds.width / 20f),
+                y = event.totalScrollDelta.y * (bounds.height / 20f)
+            )
+        } * -event.scrollAmount
     }
 }
+
+internal object MacOSCocoaConfig : ScrollConfig {
+    // the formula was determined experimentally based on MacOS Finder behaviour
+    // MacOS driver will send events with accelerating delta
+    override fun Density.calculateMouseWheelScroll(event: PointerEvent, bounds: IntSize): Offset {
+        return if (event.shouldScrollByPage) {
+            calculateOffsetByPage(event, bounds)
+        } else {
+            event.totalScrollDelta * 10.dp.toPx()
+        } * -event.scrollAmount
+    }
+}
+
+// TODO(demin): Chrome/Firefox on Windows scroll differently: value * 0.90f * bounds
+// the formula was determined experimentally based on Windows Start behaviour
+private fun calculateOffsetByPage(event: PointerEvent, bounds: IntSize): Offset {
+    return Offset(
+        x = event.totalScrollDelta.x * bounds.width,
+        y = event.totalScrollDelta.y * bounds.height
+    )
+}
+
+private val PointerEvent.scrollAmount
+    get() =
+        (mouseEvent as? MouseWheelEvent)?.scrollAmount?.toFloat() ?: 1f
+
+private val PointerEvent.shouldScrollByPage
+    get() =
+        (mouseEvent as? MouseWheelEvent)?.scrollType == MouseWheelEvent.WHEEL_BLOCK_SCROLL
+
+private val PointerEvent.totalScrollDelta
+    get() = this.changes.fastFold(Offset.Zero) { acc, c -> acc + c.scrollDelta }

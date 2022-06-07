@@ -47,8 +47,6 @@ MissingBuildMethod: androidx.compose.ui.graphics.vector.PathBuilder:
     androidx.compose.ui.graphics.vector.PathBuilder does not declare a `build()` method, but builder classes are expected to
 
 
-MissingNullability: androidx.compose.ui.graphics.Color#component5():
-    Missing nullability on method `component5` return
 MissingNullability: androidx.compose.ui.graphics.PaintKt#Paint():
     Missing nullability on method `Paint` return
 

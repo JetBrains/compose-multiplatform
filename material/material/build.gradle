@@ -15,7 +15,6 @@
  */
 
 import androidx.build.AndroidXComposePlugin
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
 plugins {
@@ -39,12 +38,12 @@ dependencies {
         api(project(":compose:material:material-icons-core"))
         api(project(":compose:material:material-ripple"))
         api(project(":compose:runtime:runtime"))
-        api(project(":compose:ui:ui"))
-        api("androidx.compose.ui:ui-text:1.0.0")
+        api(project(":compose:ui:ui:"))
+        api(project(":compose:ui:ui-text"))
 
         implementation(libs.kotlinStdlibCommon)
         implementation("androidx.compose.animation:animation:1.0.0")
-        implementation(project(":compose:foundation:foundation-layout"))
+        implementation("androidx.compose.foundation:foundation-layout:1.1.1")
         implementation("androidx.compose.ui:ui-util:1.0.0")
 
         // TODO: remove next 3 dependencies when b/202810604 is fixed
@@ -76,9 +75,12 @@ dependencies {
 }
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
-        jvm("desktop")
+        desktop()
+    }
+
+    kotlin {
 
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
@@ -113,6 +115,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.kotlinStdlib)
             }
 
+            // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
+            //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
+            //  level dependencies block instead:
+            //  `dependencies { testImplementation(libs.robolectric) }`
             androidTest.dependencies {
                 implementation(libs.testRules)
                 implementation(libs.testRunner)
@@ -134,6 +140,13 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.mockitoKotlin)
                 implementation(libs.testUiautomator)
             }
+
+            desktopTest.dependencies {
+                implementation(project(":compose:ui:ui-test-junit4"))
+                implementation(libs.truth)
+                implementation(libs.junit)
+                implementation(libs.skikoCurrentOs)
+            }
         }
     }
     dependencies {
@@ -144,7 +157,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Material Components"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.MATERIAL
+    mavenGroup = LibraryGroups.COMPOSE_MATERIAL
     inceptionYear = "2018"
     description = "Compose Material Design Components library"
     legacyDisableKotlinStrictApiMode = true
@@ -154,4 +167,5 @@ androidx {
 android {
     sourceSets.androidTest.assets.srcDirs +=
             project.rootDir.absolutePath + "/../../golden/compose/material/material"
+    namespace "androidx.compose.material"
 }

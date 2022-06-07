@@ -161,6 +161,28 @@ class DisposableSaveableStateRegistryTest {
         assertFalse(registry.canBeSaved(CustomCharSequence()))
     }
 
+    @UiThreadTest
+    @Test
+    fun lambdaCantBeSaved() {
+        val registry = DisposableSaveableStateRegistry(ContainerKey, TestOwner())
+
+        val lambda: () -> Int = { 1 }
+        assertFalse(registry.canBeSaved(lambda))
+        val lambdaWithArguments: (String, Int) -> Unit = { _, _ -> }
+        assertFalse(registry.canBeSaved(lambdaWithArguments))
+        val lambdaWithReceiver: String.() -> Unit = { }
+        assertFalse(registry.canBeSaved(lambdaWithReceiver))
+    }
+
+    @UiThreadTest
+    @Test
+    fun customParcelableFunctionCanBeSaved() {
+        val registry = DisposableSaveableStateRegistry(ContainerKey, TestOwner())
+
+        val function = CustomParcelableFunction()
+        assertTrue(registry.canBeSaved(function))
+    }
+
     private fun Any?.asBoxed(): Any = this!!
 }
 
@@ -181,11 +203,11 @@ private class CustomCharSequence : CharSequence {
 @SuppressLint("BanParcelableUsage")
 private class CustomParcelable(parcel: Parcel? = null) : Parcelable {
     init {
-        parcel?.readBoolean()
+        parcel?.readInt()
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeBoolean(true)
+        parcel.writeInt(0)
     }
 
     override fun describeContents(): Int {
@@ -202,6 +224,32 @@ private class CustomParcelable(parcel: Parcel? = null) : Parcelable {
     }
 }
 
+@SuppressLint("BanParcelableUsage")
+private class CustomParcelableFunction(parcel: Parcel? = null) : Parcelable, (String) -> Unit {
+    init {
+        parcel?.readInt()
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeInt(0)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    override fun invoke(param: String) {}
+
+    companion object {
+        @Suppress("unused")
+        @JvmField
+        val CREATOR = object : Parcelable.Creator<CustomParcelableFunction> {
+            override fun createFromParcel(parcel: Parcel) = CustomParcelableFunction(parcel)
+            override fun newArray(size: Int) = arrayOfNulls<CustomParcelableFunction?>(size)
+        }
+    }
+}
+
 private class TestOwner(
     restoredBundle: Bundle? = null
 ) : SavedStateRegistryOwner {
@@ -214,7 +262,8 @@ private class TestOwner(
         lifecycle.currentState = Lifecycle.State.RESUMED
     }
 
-    override fun getSavedStateRegistry(): SavedStateRegistry = controller.savedStateRegistry
+    override val savedStateRegistry: SavedStateRegistry
+        get() = controller.savedStateRegistry
     override fun getLifecycle(): Lifecycle = lifecycle
 
     fun save() = Bundle().apply {

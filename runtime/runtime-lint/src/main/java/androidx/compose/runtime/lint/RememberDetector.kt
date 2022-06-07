@@ -20,6 +20,7 @@ package androidx.compose.runtime.lint
 
 import androidx.compose.lint.Names
 import androidx.compose.lint.isInPackageName
+import androidx.compose.lint.isVoidOrUnit
 import com.android.tools.lint.detector.api.Category
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Implementation
@@ -29,7 +30,6 @@ import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
 import com.intellij.psi.PsiMethod
-import com.intellij.psi.PsiType
 import org.jetbrains.uast.UCallExpression
 import java.util.EnumSet
 
@@ -41,7 +41,7 @@ class RememberDetector : Detector(), SourceCodeScanner {
 
     override fun visitMethodCall(context: JavaContext, node: UCallExpression, method: PsiMethod) {
         if (method.isInPackageName(Names.Runtime.PackageName)) {
-            if (node.getExpressionType() == PsiType.VOID) {
+            if (node.getExpressionType().isVoidOrUnit) {
                 context.report(
                     RememberReturnType,
                     node,

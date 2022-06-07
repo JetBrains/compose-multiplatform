@@ -16,8 +16,10 @@
 package androidx.compose.ui.text.platform
 
 import androidx.compose.ui.text.Cache
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontListFontFamily
+import androidx.compose.ui.text.font.FontLoadingStrategy
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.GenericFontFamily
@@ -28,12 +30,11 @@ import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.TypefaceFontProvider
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.Typeface
+import androidx.compose.ui.text.font.createFontFamilyResolver
 
-sealed class PlatformFont : Font {
+expect sealed class PlatformFont : Font {
     abstract val identity: String
-
     internal val cacheKey: String
-        get() = "${this::class.qualifiedName}|$identity"
 }
 
 /**
@@ -54,6 +55,9 @@ class LoadedFont internal constructor(
     override val weight: FontWeight,
     override val style: FontStyle
 ) : PlatformFont() {
+    @ExperimentalTextApi
+    override val loadingStrategy: FontLoadingStrategy = FontLoadingStrategy.Blocking
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is LoadedFont) return false
@@ -117,7 +121,37 @@ fun Typeface(typeface: SkTypeface, alias: String? = null): Typeface {
 // It has the static .getInstance() method, how would that work?
 internal expect fun FontListFontFamily.makeAlias(): String
 
+@Suppress("DEPRECATION", "OverridingDeprecatedMember")
+@Deprecated(
+    "Replaced with PlatformFontLoader during the introduction of async fonts, all usages" +
+        " should be replaced",
+    ReplaceWith("PlatformFontLoader"),
+)
 class FontLoader : Font.ResourceLoader {
+
+    internal val fontCache: FontCache = FontCache()
+    internal val fontFamilyResolver: FontFamily.Resolver = createFontFamilyResolver(fontCache)
+
+    // TODO: we need to support:
+    //  1. font collection (.ttc). Looks like skia currently doesn't have
+    //  proper interfaces or they are broken (.makeFromFile(*, 1) always fails)
+    //  2. variable fonts. for them we also need to extend definition interfaces to support
+    //  custom variation settings
+    @Deprecated(
+        "Replaced by FontFamily.Resolver, this method should not be called",
+        ReplaceWith("FontFamily.Resolver.resolve(font, )"),
+    )
+    override fun load(font: Font): SkTypeface {
+        if (font !is PlatformFont) {
+            throw IllegalArgumentException("Unsupported font type: $font")
+        }
+        return fontCache.load(font).typeface!!
+    }
+}
+
+class FontLoadResult(val typeface: SkTypeface?, val aliases: List<String>)
+
+internal class FontCache {
     internal val fonts = FontCollection()
     private val fontProvider = TypefaceFontProvider()
 
@@ -133,17 +167,36 @@ class FontLoader : Font.ResourceLoader {
 
     private val registered = HashSet<String>()
 
-    internal fun ensureRegistered(fontFamily: FontFamily): List<String> =
+    internal fun load(font: PlatformFont): FontLoadResult {
+        val typeface = loadFromTypefacesCache(font)
+        ensureRegistered(typeface, font.cacheKey)
+        return FontLoadResult(typeface, listOf(font.cacheKey))
+    }
+
+    internal fun loadPlatformTypes(
+        fontFamily: FontFamily,
+        fontWeight: FontWeight = FontWeight.Normal,
+        fontStyle: FontStyle = FontStyle.Normal
+    ): FontLoadResult {
+        val aliases = ensureRegistered(fontFamily)
+        val style = fontStyle.toSkFontStyle().withWeight(fontWeight.weight)
+        return FontLoadResult(fonts.findTypefaces(aliases.toTypedArray(), style).first(), aliases)
+    }
+
+    private fun ensureRegistered(typeface: SkTypeface, key: String) {
+        if (!registered.contains(key)) {
+            fontProvider.registerTypeface(typeface, key)
+            registered.add(key)
+        }
+    }
+
+    private fun ensureRegistered(fontFamily: FontFamily): List<String> =
         when (fontFamily) {
             is FontListFontFamily -> {
-                val alias = fontFamily.makeAlias()
-                if (!registered.contains(alias)) {
-                    fontFamily.fonts.forEach {
-                        fontProvider.registerTypeface(load(it), alias)
-                    }
-                    registered.add(alias)
-                }
-                listOf(alias)
+                // not supported
+                throw IllegalArgumentException(
+                    "Don't load FontListFontFamily through ensureRegistered: $fontFamily"
+                )
             }
             is LoadedFontFamily -> {
                 val typeface = fontFamily.typeface as SkiaBackedTypeface
@@ -158,24 +211,6 @@ class FontLoader : Font.ResourceLoader {
             FontFamily.Default -> mapGenericFontFamily(FontFamily.SansSerif)
             else -> throw IllegalArgumentException("Unknown font family type: $fontFamily")
         }
-
-    // TODO: we need to support:
-    //  1. font collection (.ttc). Looks like skia currently doesn't have
-    //  proper interfaces or they are broken (.makeFromFile(*, 1) always fails)
-    //  2. variable fonts. for them we also need to extend definition interfaces to support
-    //  custom variation settings
-    override fun load(font: Font): SkTypeface =
-        loadFromTypefacesCache(font)
-
-    internal fun findTypeface(
-        fontFamily: FontFamily,
-        fontWeight: FontWeight = FontWeight.Normal,
-        fontStyle: FontStyle = FontStyle.Normal
-    ): SkTypeface? {
-        val aliases = ensureRegistered(fontFamily)
-        val style = fontStyle.toSkFontStyle().withWeight(fontWeight.weight)
-        return fonts.findTypefaces(aliases.toTypedArray(), style).first()
-    }
 }
 
 internal expect val typefacesCache: Cache<String, SkTypeface>

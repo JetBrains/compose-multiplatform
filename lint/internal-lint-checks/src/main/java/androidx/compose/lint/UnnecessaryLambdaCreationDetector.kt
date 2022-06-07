@@ -133,7 +133,7 @@ class UnnecessaryLambdaCreationDetector : Detector(), SourceCodeScanner {
                 //  incorrectly returns an UnknownKotlinExpression instead of a UParameter
                 //  https://youtrack.jetbrains.com/issue/KTIJ-19125
                 is UnknownKotlinExpression -> return
-                else -> throw IllegalStateException(resolvedLambdaSource.toString())
+                else -> error(parentExpression.asSourceString())
             }
 
             if (isComposable != expectedComposable) return

@@ -118,11 +118,9 @@ private class PainterModifier(
         height: Int
     ): Int {
         return if (useIntrinsicSize) {
-            val constraints = Constraints(maxHeight = height)
-            val layoutWidth =
-                measurable.minIntrinsicWidth(modifyConstraints(constraints).maxHeight)
-            val scaledSize = calculateScaledSize(Size(layoutWidth.toFloat(), height.toFloat()))
-            max(scaledSize.width.roundToInt(), layoutWidth)
+            val constraints = modifyConstraints(Constraints(maxHeight = height))
+            val layoutWidth = measurable.minIntrinsicWidth(height)
+            max(constraints.minWidth, layoutWidth)
         } else {
             measurable.minIntrinsicWidth(height)
         }
@@ -133,11 +131,9 @@ private class PainterModifier(
         height: Int
     ): Int {
         return if (useIntrinsicSize) {
-            val constraints = Constraints(maxHeight = height)
-            val layoutWidth =
-                measurable.maxIntrinsicWidth(modifyConstraints(constraints).maxHeight)
-            val scaledSize = calculateScaledSize(Size(layoutWidth.toFloat(), height.toFloat()))
-            max(scaledSize.width.roundToInt(), layoutWidth)
+            val constraints = modifyConstraints(Constraints(maxHeight = height))
+            val layoutWidth = measurable.maxIntrinsicWidth(height)
+            max(constraints.minWidth, layoutWidth)
         } else {
             measurable.maxIntrinsicWidth(height)
         }
@@ -148,11 +144,9 @@ private class PainterModifier(
         width: Int
     ): Int {
         return if (useIntrinsicSize) {
-            val constraints = Constraints(maxWidth = width)
-            val layoutHeight =
-                measurable.minIntrinsicHeight(modifyConstraints(constraints).maxWidth)
-            val scaledSize = calculateScaledSize(Size(width.toFloat(), layoutHeight.toFloat()))
-            max(scaledSize.height.roundToInt(), layoutHeight)
+            val constraints = modifyConstraints(Constraints(maxWidth = width))
+            val layoutHeight = measurable.minIntrinsicHeight(width)
+            max(constraints.minHeight, layoutHeight)
         } else {
             measurable.minIntrinsicHeight(width)
         }
@@ -163,11 +157,9 @@ private class PainterModifier(
         width: Int
     ): Int {
         return if (useIntrinsicSize) {
-            val constraints = Constraints(maxWidth = width)
-            val layoutHeight =
-                measurable.maxIntrinsicHeight(modifyConstraints(constraints).maxWidth)
-            val scaledSize = calculateScaledSize(Size(width.toFloat(), layoutHeight.toFloat()))
-            max(scaledSize.height.roundToInt(), layoutHeight)
+            val constraints = modifyConstraints(Constraints(maxWidth = width))
+            val layoutHeight = measurable.maxIntrinsicHeight(width)
+            max(constraints.minHeight, layoutHeight)
         } else {
             measurable.maxIntrinsicHeight(width)
         }

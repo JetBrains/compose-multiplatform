@@ -27,11 +27,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import kotlin.math.min
 
+@Preview
 @Composable
 fun TailFollowingTextFieldDemo() {
     Column {

@@ -15,9 +15,9 @@
  */
 
 import androidx.build.AndroidXComposePlugin
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import androidx.build.Publish
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
@@ -37,17 +37,21 @@ dependencies {
          * corresponding block below
          */
         implementation(libs.kotlinStdlibCommon)
-        implementation(project(":compose:animation:animation-core"))
-        implementation(project(":compose:foundation:foundation-layout"))
+        implementation("androidx.compose.animation:animation-core:1.1.1")
+        implementation("androidx.compose.foundation:foundation-layout:1.1.1")
         implementation("androidx.compose.ui:ui-util:1.0.0")
-
         api(project(":compose:foundation:foundation"))
         api("androidx.compose.material:material-icons-core:1.0.2")
         api("androidx.compose.material:material-ripple:1.0.0")
         api("androidx.compose.runtime:runtime:1.0.1")
         api("androidx.compose.ui:ui-graphics:1.0.1")
-        api(project(":compose:ui:ui"))
+        api("androidx.compose.ui:ui:1.1.1")
         api("androidx.compose.ui:ui-text:1.0.1")
+
+        // TODO: remove next 3 dependencies when b/202810604 is fixed
+        implementation("androidx.savedstate:savedstate-ktx:1.2.0-rc01")
+        implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
+        implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
 
         testImplementation(libs.testRules)
         testImplementation(libs.testRunner)
@@ -64,14 +68,19 @@ dependencies {
         androidTestImplementation(libs.dexmakerMockito)
         androidTestImplementation(libs.mockitoCore)
         androidTestImplementation(libs.mockitoKotlin)
+        androidTestImplementation(libs.testUiautomator)
+
+        lintPublish project(":compose:material3:material3-lint")
     }
 }
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
-        jvm("desktop")
+        desktop()
+    }
 
+    kotlin {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block above
@@ -93,12 +102,21 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
+
+                // TODO: remove next 3 dependencies when b/202810604 is fixed
+                implementation("androidx.savedstate:savedstate:1.1.0")
+                implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
+                implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
             }
 
             desktopMain.dependencies {
                 implementation(libs.kotlinStdlib)
             }
 
+            // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
+            //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
+            //  level dependencies block instead:
+            //  `dependencies { testImplementation(libs.robolectric) }`
             androidTest.dependencies {
                 implementation(libs.testRules)
                 implementation(libs.testRunner)
@@ -118,6 +136,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.dexmakerMockito)
                 implementation(libs.mockitoCore)
                 implementation(libs.mockitoKotlin)
+                implementation(libs.testUiautomator)
             }
         }
     }
@@ -126,7 +145,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Material3 Components"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.MATERIAL3
+    mavenGroup = LibraryGroups.COMPOSE_MATERIAL3
     inceptionYear = "2021"
     description = "Compose Material You Design Components library"
 }
@@ -135,4 +154,13 @@ androidx {
 android {
     sourceSets.androidTest.assets.srcDirs +=
             project.rootDir.absolutePath + "/../../golden/compose/material3/material3"
+    namespace "androidx.compose.material3"
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
 }

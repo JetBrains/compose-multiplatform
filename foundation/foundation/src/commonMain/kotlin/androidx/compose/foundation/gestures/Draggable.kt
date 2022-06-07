@@ -39,21 +39,19 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
-import androidx.compose.ui.input.pointer.consumeAllChanges
-import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.input.pointer.util.addPointerInputChange
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Velocity
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.math.sign
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.isActive
-import kotlin.coroutines.cancellation.CancellationException
-import kotlin.math.sign
 
 /**
  * State of [draggable]. Allows for a granular control of how deltas are consumed by the user as
@@ -261,38 +259,44 @@ internal fun Modifier.draggable(
     Modifier.pointerInput(orientation, enabled, reverseDirection) {
         if (!enabled) return@pointerInput
         coroutineScope {
-            forEachGesture {
+            try {
                 awaitPointerEventScope {
-                    val velocityTracker = VelocityTracker()
-                    awaitDownAndSlop(
-                        canDragState,
-                        startImmediatelyState,
-                        velocityTracker,
-                        orientation
-                    )?.let {
-                        var isDragSuccessful = false
-                        try {
-                            isDragSuccessful = awaitDrag(
-                                it,
-                                velocityTracker,
-                                channel,
-                                reverseDirection,
-                                orientation
-                            )
-                        } catch (cancellation: CancellationException) {
-                            isDragSuccessful = false
-                            if (!isActive) throw cancellation
-                        } finally {
-                            val event = if (isDragSuccessful) {
-                                val velocity =
-                                    velocityTracker.calculateVelocity().toFloat(orientation)
-                                DragStopped(velocity * if (reverseDirection) -1 else 1)
-                            } else {
-                                DragCancelled
+                    while (isActive) {
+                        val velocityTracker = VelocityTracker()
+                        awaitDownAndSlop(
+                            canDragState,
+                            startImmediatelyState,
+                            velocityTracker,
+                            orientation
+                        )?.let {
+                            var isDragSuccessful = false
+                            try {
+                                isDragSuccessful = awaitDrag(
+                                    it,
+                                    velocityTracker,
+                                    channel,
+                                    reverseDirection,
+                                    orientation
+                                )
+                            } catch (cancellation: CancellationException) {
+                                isDragSuccessful = false
+                                if (!isActive) throw cancellation
+                            } finally {
+                                val event = if (isDragSuccessful) {
+                                    val velocity =
+                                        velocityTracker.calculateVelocity().toFloat(orientation)
+                                    DragStopped(velocity * if (reverseDirection) -1 else 1)
+                                } else {
+                                    DragCancelled
+                                }
+                                channel.trySend(event)
                             }
-                            channel.trySend(event)
                         }
                     }
+                }
+            } catch (exception: CancellationException) {
+                if (!isActive) {
+                    throw exception
                 }
             }
         }
@@ -310,7 +314,7 @@ private suspend fun AwaitPointerEventScope.awaitDownAndSlop(
     return if (!canDrag.value.invoke(initialDown)) {
         null
     } else if (startDragImmediately.value.invoke()) {
-        initialDown.consumeAllChanges()
+        initialDown.consume()
         velocityTracker.addPointerInputChange(initialDown)
         // since we start immediately we don't wait for slop and the initial delta is 0
         initialDown to 0f
@@ -320,7 +324,7 @@ private suspend fun AwaitPointerEventScope.awaitDownAndSlop(
         var initialDelta = 0f
         val postPointerSlop = { event: PointerInputChange, offset: Float ->
             velocityTracker.addPointerInputChange(event)
-            event.consumePositionChange()
+            event.consume()
             initialDelta = offset
         }
         val afterSlopResult = if (orientation == Orientation.Vertical) {
@@ -357,7 +361,7 @@ private suspend fun AwaitPointerEventScope.awaitDrag(
     val dragTick: (PointerInputChange) -> Unit = { event ->
         velocityTracker.addPointerInputChange(event)
         val delta = event.positionChange().toFloat(orientation)
-        event.consumePositionChange()
+        event.consume()
         channel.trySend(
             DragDelta(
                 if (reverseDirection) delta * -1 else delta,

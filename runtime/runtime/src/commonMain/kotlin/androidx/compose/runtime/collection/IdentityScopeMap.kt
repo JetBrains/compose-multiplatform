@@ -217,11 +217,27 @@ internal class IdentityScopeMap<T : Any> {
      * removed, that value is removed also.
      */
     inline fun removeValueIf(predicate: (scope: T) -> Boolean) {
+        removingScopes { scopeSet ->
+            scopeSet.removeValueIf(predicate)
+        }
+    }
+
+    /**
+     * Removes given scope from all sets. If all scopes for a given value are removed, that value
+     * is removed as well.
+     */
+    fun removeScope(scope: T) {
+        removingScopes { scopeSet ->
+            scopeSet.remove(scope)
+        }
+    }
+
+    private inline fun removingScopes(removalOperation: (IdentityArraySet<T>) -> Unit) {
         var destinationIndex = 0
         for (i in 0 until size) {
             val valueIndex = valueOrder[i]
             val set = scopeSets[valueIndex]!!
-            set.removeValueIf(predicate)
+            removalOperation(set)
             if (set.size > 0) {
                 if (destinationIndex != i) {
                     // We'll bubble-up the now-free key-order by swapping the index with the one
@@ -253,10 +269,9 @@ internal class IdentityScopeMap<T : Any> {
             val mid = (low + high).ushr(1)
             val midValue = valueAt(mid)
             val midValHash = identityHashCode(midValue)
-            val comparison = midValHash - valueIdentity
             when {
-                comparison < 0 -> low = mid + 1
-                comparison > 0 -> high = mid - 1
+                midValHash < valueIdentity -> low = mid + 1
+                midValHash > valueIdentity -> high = mid - 1
                 value === midValue -> return mid
                 else -> return findExactIndex(mid, value, valueIdentity)
             }

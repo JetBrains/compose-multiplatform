@@ -16,17 +16,26 @@
 package androidx.compose.ui.text.platform
 
 import androidx.compose.ui.text.Cache
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.ExpireAfterAccessCache
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontListFontFamily
+import androidx.compose.ui.text.font.FontLoadingStrategy
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.util.fastForEach
 import java.io.File
 import java.security.MessageDigest
 import org.jetbrains.skia.Data
+import org.jetbrains.skia.makeFromFile
 import org.jetbrains.skia.Typeface as SkTypeface
+
+actual sealed class PlatformFont : Font {
+    actual abstract val identity: String
+    internal actual val cacheKey: String
+        get() = "${this::class.qualifiedName}|$identity"
+}
 
 internal val GenericFontFamiliesMapping by lazy {
     when (Platform.Current) {
@@ -85,6 +94,9 @@ class ResourceFont internal constructor(
     override val identity
         get() = name
 
+    @ExperimentalTextApi
+    override val loadingStrategy: FontLoadingStrategy = FontLoadingStrategy.Blocking
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -141,10 +153,13 @@ fun Font(
 class FileFont internal constructor(
     val file: File,
     override val weight: FontWeight = FontWeight.Normal,
-    override val style: FontStyle = FontStyle.Normal
+    override val style: FontStyle = FontStyle.Normal,
 ) : PlatformFont() {
     override val identity
         get() = file.toString()
+
+    @ExperimentalTextApi
+    override val loadingStrategy: FontLoadingStrategy = FontLoadingStrategy.Blocking
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -25,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.referentialEqualityPolicy
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshots.SnapshotMutableState
 import androidx.compose.runtime.structuralEqualityPolicy
 
@@ -87,17 +88,19 @@ fun <T : Any> rememberSaveable(
         restored ?: init()
     }
 
-    // save the latest passed saver object into a state object to be able to use it when we will
-    // be saving the value. keeping value in mutableStateOf() allows us to properly handle
-    // possible compose transactions cancellations
-    val saverHolder = remember { mutableStateOf(saver) }
-    saverHolder.value = saver
-
     // re-register if the registry or key has been changed
     if (registry != null) {
-        DisposableEffect(registry, finalKey, value) {
+        // we want to use the latest instances of saver and value in the valueProvider lambda
+        // without restarting DisposableEffect as it would cause re-registering the provider in
+        // the different order. so we use rememberUpdatedState.
+        val saverState = rememberUpdatedState(saver)
+        val valueState = rememberUpdatedState(value)
+
+        DisposableEffect(registry, finalKey) {
             val valueProvider = {
-                with(saverHolder.value) { SaverScope { registry.canBeSaved(it) }.save(value) }
+                with(saverState.value) {
+                    SaverScope { registry.canBeSaved(it) }.save(valueState.value)
+                }
             }
             registry.requireCanBeSaved(valueProvider())
             val entry = registry.registerProvider(finalKey, valueProvider)

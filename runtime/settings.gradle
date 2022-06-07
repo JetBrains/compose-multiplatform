@@ -27,6 +27,7 @@ rootProject.name = "compose-runtime"
 playground {
     setupPlayground("../..")
     selectProjectsFromAndroidX({ name ->
+        if (name == ":compose:runtime:runtime-tracing") return false
         if (name.startsWith(":compose:runtime") && name != ":compose:runtime") return true
         if (name == ":annotation:annotation-sampled") return true
         if (isNeededForComposePlayground(name)) return true

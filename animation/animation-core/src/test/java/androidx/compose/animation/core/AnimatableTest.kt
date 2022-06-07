@@ -16,13 +16,17 @@
 
 package androidx.compose.animation.core
 
+import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import com.google.common.truth.Truth.assertThat
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
+import kotlin.math.abs
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -31,9 +35,6 @@ import kotlinx.coroutines.withContext
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
-import kotlin.math.abs
 
 @RunWith(JUnit4::class)
 class AnimatableTest {
@@ -193,22 +194,55 @@ class AnimatableTest {
                 0f,
                 200f
             )
-            val clock = SuspendAnimationTest.TestFrameClock()
+            val clock = MyTestFrameClock()
             val interval = 50
             coroutineScope {
                 withContext(clock) {
                     val animatable = Animatable(0f)
-                    launch {
-                        // Put in a bunch of frames 50 milliseconds apart
-                        for (frameTimeMillis in 0..1000 step interval) {
-                            clock.frame(frameTimeMillis * 1_000_000L)
-                            delay(5)
-                        }
-                    }
-                    // The first frame should start at 100ms
                     var playTimeMillis by mutableStateOf(0L)
-                    suspendCoroutine<Unit> {
-                        launch {
+
+                    suspend fun createInterruption() {
+                        val anim2 = TargetBasedAnimation(
+                            spring(),
+                            Float.VectorConverter,
+                            animatable.value,
+                            300f,
+                            animatable.velocity
+                        )
+                        assertEquals(100L, playTimeMillis)
+                        var firstFrame = true
+                        val result2 = animatable.animateTo(300f, spring()) {
+                            // First frame will arrive with a timestamp of the time of interruption,
+                            // which is 100ms. The subsequent frames will be consistent with what's
+                            // tracked in `playTimeMillis`.
+                            val playTime = if (firstFrame) 100L else playTimeMillis
+                            assertTrue(isRunning)
+                            assertEquals(300f, targetValue)
+                            assertEquals(
+                                anim2.getValueFromMillis((playTime - 100)),
+                                value
+                            )
+                            assertEquals(
+                                anim2.getVelocityFromMillis((playTime - 100)),
+                                velocity
+                            )
+                            if (!firstFrame) {
+                                playTimeMillis += interval
+                                clock.trySendFrame(playTimeMillis * 1_000_000L)
+                            } else {
+                                firstFrame = false
+                            }
+                        }
+                        assertFalse(animatable.isRunning)
+                        assertEquals(AnimationEndReason.Finished, result2.endReason)
+                        assertEquals(300f, animatable.targetValue)
+                        assertEquals(300f, animatable.value)
+                        assertEquals(0f, animatable.velocity)
+                    }
+
+                    clock.trySendFrame(0)
+                    launch {
+                        try {
                             animatable.animateTo(
                                 200f,
                                 animationSpec = tween(200, easing = LinearEasing)
@@ -223,40 +257,21 @@ class AnimatableTest {
 
                                 assertTrue(playTimeMillis <= 100)
                                 if (playTimeMillis == 100L) {
-                                    // Interrupt here
-                                    it.resume(Unit)
+                                    this@withContext.launch {
+                                        // No more new frame until the ongoing animation is canceled.
+                                        createInterruption()
+                                    }
+                                } else {
+                                    playTimeMillis += interval
+                                    clock.trySendFrame(playTimeMillis * 1_000_000L)
                                 }
-                                playTimeMillis += 50L
                             }
+                        } finally {
+                            // At this point the previous animation on the Animatable has been
+                            // canceled. Pump a frame to get the new animation going.
+                            playTimeMillis += interval
+                            clock.trySendFrame(playTimeMillis * 1_000_000L)
                         }
-                    }
-                    launch {
-                        var playTimeMillis2 = 100L
-                        val anim2 = TargetBasedAnimation(
-                            spring(),
-                            Float.VectorConverter,
-                            animatable.value,
-                            300f,
-                            animatable.velocity
-                        )
-                        val result2 = animatable.animateTo(300f, spring()) {
-                            assertTrue(isRunning)
-                            assertEquals(300f, targetValue)
-                            assertEquals(
-                                anim2.getValueFromMillis((playTimeMillis2 - 100)),
-                                value
-                            )
-                            assertEquals(
-                                anim2.getVelocityFromMillis((playTimeMillis2 - 100)),
-                                velocity
-                            )
-                            playTimeMillis2 += interval
-                        }
-                        assertFalse(animatable.isRunning)
-                        assertEquals(AnimationEndReason.Finished, result2.endReason)
-                        assertEquals(300f, animatable.targetValue)
-                        assertEquals(300f, animatable.value)
-                        assertEquals(0f, animatable.velocity)
                     }
                 }
             }
@@ -291,5 +306,51 @@ class AnimatableTest {
             animatable.snapTo(animatable.lowerBound!! - 100f)
         }
         assertEquals(animatable.lowerBound!!, animatable.value)
+    }
+
+    @Test
+    fun animationResult_toString() {
+        val animatable = AnimationResult(
+            endReason = AnimationEndReason.Finished,
+            endState = AnimationState(42f)
+        )
+        val string = animatable.toString()
+        assertThat(string).contains(AnimationResult::class.java.simpleName)
+        assertThat(string).contains("endReason=Finished")
+        assertThat(string).contains("endState=")
+    }
+
+    @Test
+    fun animationState_toString() {
+        val state = AnimationState(
+            initialValue = 42f,
+            initialVelocity = 2f,
+            lastFrameTimeNanos = 4000L,
+            finishedTimeNanos = 3000L,
+            isRunning = true
+        )
+        val string = state.toString()
+        assertThat(string).contains(AnimationState::class.java.simpleName)
+        assertThat(string).contains("value=42.0")
+        assertThat(string).contains("velocity=2.0")
+        assertThat(string).contains("lastFrameTimeNanos=4000")
+        assertThat(string).contains("finishedTimeNanos=3000")
+        assertThat(string).contains("isRunning=true")
+    }
+
+    private class MyTestFrameClock : MonotonicFrameClock {
+        // Make the send non-blocking
+        private val frameCh = Channel<Long>(Channel.UNLIMITED)
+
+        suspend fun frame(frameTimeNanos: Long) {
+            frameCh.send(frameTimeNanos)
+        }
+
+        fun trySendFrame(frameTimeNanos: Long) {
+            frameCh.trySend(frameTimeNanos)
+        }
+
+        override suspend fun <R> withFrameNanos(onFrame: (Long) -> R): R =
+            onFrame(frameCh.receive())
     }
 }

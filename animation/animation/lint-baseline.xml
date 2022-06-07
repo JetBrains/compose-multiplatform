@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.2.0-dev" type="baseline" client="gradle" dependencies="false" name="AGP (7.2.0-dev)" variant="all" version="7.2.0-dev">
+<issues format="6" by="lint 7.4.0-alpha01" type="baseline" client="gradle" dependencies="false" name="AGP (7.4.0-alpha01)" variant="all" version="7.4.0-alpha01">
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="    infix fun ContentTransform.using(sizeTransform: SizeTransform?) = this.apply {"
-        errorLine2="                               ~~~~~">
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="private inline fun AnimatedEnterExitImpl("
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/animation/AnimatedContent.kt"
-            line="293"
-            column="32"/>
+            file="src/commonMain/kotlin/androidx/compose/animation/AnimatedVisibility.kt"/>
     </issue>
 
 </issues>

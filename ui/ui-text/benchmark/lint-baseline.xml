@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.1.0-beta02" type="baseline" client="gradle" dependencies="false" name="AGP (7.1.0-beta02)" variant="all" version="7.1.0-beta02">
+<issues format="6" by="lint 7.3.0-alpha08" type="baseline" client="gradle" dependencies="false" name="AGP (7.3.0-alpha08)" variant="all" version="7.3.0-alpha08">
 
     <issue
         id="SoonBlockedPrivateApi"
-        message="Reflective access to freeTextLayoutCaches will throw an exception when targeting API 31 and above"
+        message="Reflective access to freeTextLayoutCaches will throw an exception when targeting API 32 and above"
         errorLine1="            val freeCaches = Canvas::class.java.getDeclaredMethod(&quot;freeTextLayoutCaches&quot;)"
         errorLine2="                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/androidx/compose/ui/text/benchmark/TextBenchmarkTestRule.kt"
-            line="79"
-            column="30"/>
+            file="src/main/java/androidx/compose/ui/text/benchmark/TextBenchmarkTestRule.kt"/>
     </issue>
 
     <issue
@@ -18,9 +16,7 @@
         errorLine1="            freeCaches.invoke(null)"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/androidx/compose/ui/text/benchmark/TextBenchmarkTestRule.kt"
-            line="81"
-            column="13"/>
+            file="src/main/java/androidx/compose/ui/text/benchmark/TextBenchmarkTestRule.kt"/>
     </issue>
 
 </issues>

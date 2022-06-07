@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
 plugins {
@@ -42,7 +41,11 @@ dependencies {
 androidx {
     name = "AndroidX Compose UI Animation Graphics Library Samples"
     type = LibraryType.SAMPLES
-    mavenGroup = LibraryGroups.Compose.ANIMATION
+    mavenGroup = LibraryGroups.COMPOSE_ANIMATION
     inceptionYear = "2021"
     description = "Contains the sample code for the Androidx Compose UI Animation Graphics Library"
+}
+
+android {
+    namespace "androidx.compose.animation.graphics.samples"
 }

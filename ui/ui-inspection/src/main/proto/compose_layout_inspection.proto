@@ -92,6 +92,15 @@ message ComposableNode {
     int32 flags = 9;
 
     int64 view_id = 10;
+
+    // The number of recompositions detected since the last counter reset
+    int32 recompose_count = 11;
+
+    // The number of recomposition skips detected since the last counter reset
+    int32 recompose_skips = 12;
+
+    // The anchor hash of the composable. See InspectorNode.anchorHash.
+    sint32 anchor_hash = 13;
 }
 
 // In Android, a resource id is a simple integer. This class holds the namespace, type, and name
@@ -185,6 +194,9 @@ message ParameterReference {
 
   // The kind of parameter this is a reference to
   Kind kind = 4;
+
+  // The anchor hash of the composable. See InspectorNode.anchorHash.
+  sint32 anchor_hash = 5;
 }
 
 // A collection of all parameters associated with a single composable
@@ -212,7 +224,10 @@ message GetComposablesCommand {
   bool skip_system_composables = 2;
   // If the cached data generation matches the specified generation then the cache is still valid.
   int32 generation = 3;
+  // If true, extract all parameters even if `delayParameterExtractions` is off.
+  bool extract_all_parameters = 4;
 }
+
 message GetComposablesResponse {
     // A collection of all text referenced by other fields in this message
     repeated StringEntry strings = 1;
@@ -235,6 +250,8 @@ message GetParametersCommand {
   int32 max_initial_iterable_size = 5;
   // If the cached data generation matches the specified generation then the cache is still valid.
   int32 generation = 6;
+  // The anchor hash of the composable. See InspectorNode.anchorHash.
+  sint32 anchor_hash = 7;
 }
 
 message GetParametersResponse {
@@ -278,12 +295,30 @@ message GetParameterDetailsResponse {
   Parameter parameter = 3;
 }
 
+message UpdateSettingsCommand {
+  // If true, start (or continue) counting repositions.
+  // If false stop counting recompositions.
+  bool include_recompose_counts = 1;
+  // If true, the recomposition counts will be kept.
+  // If false, the recomposition counts will be reset.
+  bool keep_recompose_counts = 2;
+  // If true, the compose parameters will not be extracted before
+  bool delay_parameter_extractions = 3;
+}
+
+// The active settings after handling of an UpdateSettingsCommand
+message UpdateSettingsResponse {
+  // If true, the agent has the capability for delaying parameter extractions
+  bool can_delay_parameter_extractions = 3;
+}
+
 message Command {
   oneof specialized {
     GetComposablesCommand get_composables_command = 1;
     GetParametersCommand get_parameters_command = 2;
     GetAllParametersCommand get_all_parameters_command = 3;
     GetParameterDetailsCommand get_parameter_details_command = 4;
+    UpdateSettingsCommand update_settings_command = 5;
   }
 }
 
@@ -293,6 +328,7 @@ message Response {
     GetParametersResponse get_parameters_response = 2;
     GetAllParametersResponse get_all_parameters_response = 3;
     GetParameterDetailsResponse get_parameter_details_response = 4;
+    UpdateSettingsResponse update_settings_response = 5;
 
     UnknownCommandResponse unknown_command_response = 100;
   }

@@ -1,0 +1,31 @@
+// Baseline format: 1.0
+InvalidNullConversion: androidx.compose.ui.text.font.FontKt#Font(int, androidx.compose.ui.text.font.FontWeight, int):
+    Attempted to remove @NonNull annotation from method androidx.compose.ui.text.font.FontKt.Font(int,androidx.compose.ui.text.font.FontWeight,int)
+
+
+RemovedClass: androidx.compose.ui.text.TextLayoutResultKt:
+    Removed class androidx.compose.ui.text.TextLayoutResultKt
+
+
+RemovedMethod: androidx.compose.ui.text.PlaceholderVerticalAlign#PlaceholderVerticalAlign():
+    Removed constructor androidx.compose.ui.text.PlaceholderVerticalAlign()
+RemovedMethod: androidx.compose.ui.text.TextRange#TextRange():
+    Removed constructor androidx.compose.ui.text.TextRange()
+RemovedMethod: androidx.compose.ui.text.font.FontStyle#FontStyle():
+    Removed constructor androidx.compose.ui.text.font.FontStyle()
+RemovedMethod: androidx.compose.ui.text.font.FontSynthesis#FontSynthesis():
+    Removed constructor androidx.compose.ui.text.font.FontSynthesis()
+RemovedMethod: androidx.compose.ui.text.input.ImeAction#ImeAction():
+    Removed constructor androidx.compose.ui.text.input.ImeAction()
+RemovedMethod: androidx.compose.ui.text.input.KeyboardCapitalization#KeyboardCapitalization():
+    Removed constructor androidx.compose.ui.text.input.KeyboardCapitalization()
+RemovedMethod: androidx.compose.ui.text.input.KeyboardType#KeyboardType():
+    Removed constructor androidx.compose.ui.text.input.KeyboardType()
+RemovedMethod: androidx.compose.ui.text.style.BaselineShift#BaselineShift():
+    Removed constructor androidx.compose.ui.text.style.BaselineShift()
+RemovedMethod: androidx.compose.ui.text.style.TextAlign#TextAlign():
+    Removed constructor androidx.compose.ui.text.style.TextAlign()
+RemovedMethod: androidx.compose.ui.text.style.TextDirection#TextDirection():
+    Removed constructor androidx.compose.ui.text.style.TextDirection()
+RemovedMethod: androidx.compose.ui.text.style.TextOverflow#TextOverflow():
+    Removed constructor androidx.compose.ui.text.style.TextOverflow()

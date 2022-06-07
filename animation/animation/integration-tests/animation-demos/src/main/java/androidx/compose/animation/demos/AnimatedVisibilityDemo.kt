@@ -54,10 +54,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlin.math.max
 import kotlin.math.min
 
+@Preview
 @Composable
 fun AnimatedVisibilityDemo() {
     val animateContentSize = remember { mutableStateOf(false) }
@@ -68,7 +70,6 @@ fun AnimatedVisibilityDemo() {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AnimatedItems(animateContentSize: Boolean) {
     var itemNum by remember { mutableStateOf(0) }

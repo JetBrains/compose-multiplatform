@@ -64,11 +64,9 @@ class NavigationRailScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setContent {
-            MaterialTheme(lightColorScheme()) {
-                scope = rememberCoroutineScope()
-                DefaultNavigationRail(interactionSource)
-            }
+        composeTestRule.setMaterialContent(lightColorScheme()) {
+            scope = rememberCoroutineScope()
+            DefaultNavigationRail(interactionSource)
         }
 
         assertNavigationRailMatches(
@@ -85,11 +83,9 @@ class NavigationRailScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setContent {
-            MaterialTheme(lightColorScheme()) {
-                scope = rememberCoroutineScope()
-                DefaultNavigationRail(interactionSource)
-            }
+        composeTestRule.setMaterialContent(lightColorScheme()) {
+            scope = rememberCoroutineScope()
+            DefaultNavigationRail(interactionSource)
         }
 
         assertNavigationRailMatches(
@@ -106,11 +102,9 @@ class NavigationRailScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setContent {
-            MaterialTheme(darkColorScheme()) {
-                scope = rememberCoroutineScope()
-                DefaultNavigationRail(interactionSource)
-            }
+        composeTestRule.setMaterialContent(darkColorScheme()) {
+            scope = rememberCoroutineScope()
+            DefaultNavigationRail(interactionSource)
         }
 
         assertNavigationRailMatches(
@@ -127,11 +121,9 @@ class NavigationRailScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setContent {
-            MaterialTheme(darkColorScheme()) {
-                scope = rememberCoroutineScope()
-                DefaultNavigationRail(interactionSource)
-            }
+        composeTestRule.setMaterialContent(darkColorScheme()) {
+            scope = rememberCoroutineScope()
+            DefaultNavigationRail(interactionSource)
         }
 
         assertNavigationRailMatches(
@@ -148,11 +140,9 @@ class NavigationRailScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setContent {
-            MaterialTheme(lightColorScheme()) {
-                scope = rememberCoroutineScope()
-                DefaultNavigationRail(interactionSource, withHeaderFab = true)
-            }
+        composeTestRule.setMaterialContent(lightColorScheme()) {
+            scope = rememberCoroutineScope()
+            DefaultNavigationRail(interactionSource, withHeaderFab = true)
         }
 
         assertNavigationRailMatches(
@@ -169,11 +159,9 @@ class NavigationRailScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setContent {
-            MaterialTheme(lightColorScheme()) {
-                scope = rememberCoroutineScope()
-                DefaultNavigationRail(interactionSource, withHeaderFab = true)
-            }
+        composeTestRule.setMaterialContent(lightColorScheme()) {
+            scope = rememberCoroutineScope()
+            DefaultNavigationRail(interactionSource, withHeaderFab = true)
         }
 
         assertNavigationRailMatches(

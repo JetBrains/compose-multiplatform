@@ -126,7 +126,7 @@ class MutableVectorBenchmark : ComposeBenchmarkBase() {
         val list = ArrayList<Int>(arraySize)
         benchmarkRule.measureRepeated {
             list.addAll(content)
-            while (list.isNotEmpty()) {
+            repeat(arraySize) {
                 list.removeAt(list.lastIndex)
             }
         }
@@ -137,7 +137,7 @@ class MutableVectorBenchmark : ComposeBenchmarkBase() {
         val list = MutableVector<Int>(arraySize)
         benchmarkRule.measureRepeated {
             list.addAll(content)
-            while (list.isNotEmpty()) {
+            repeat(arraySize) {
                 list.removeAt(list.lastIndex)
             }
         }
@@ -148,7 +148,7 @@ class MutableVectorBenchmark : ComposeBenchmarkBase() {
         val list = ArrayList<Int>(arraySize)
         benchmarkRule.measureRepeated {
             list.addAll(content)
-            while (list.isNotEmpty()) {
+            repeat(arraySize) {
                 list.removeAt(0)
             }
         }
@@ -159,7 +159,7 @@ class MutableVectorBenchmark : ComposeBenchmarkBase() {
         val list = MutableVector<Int>(arraySize)
         benchmarkRule.measureRepeated {
             list.addAll(content)
-            while (list.isNotEmpty()) {
+            repeat(arraySize) {
                 list.removeAt(0)
             }
         }
@@ -260,48 +260,99 @@ class MutableVectorBenchmark : ComposeBenchmarkBase() {
     @Test
     fun addAllArrayList() {
         val list = mutableListOf(*content)
+        val list2 = ArrayList<Int>(list.size * 4)
         benchmarkRule.measureRepeated {
+            list2.addAll(list)
+            list2.addAll(list)
+            list2.addAll(list)
+            list2.addAll(list)
+            runWithTimingDisabled {
+                list2.clear()
+            }
+        }
+    }
+
+    // These are temporary, to investigate CI instability (b/208713172)
+    @Test fun addAllArrayList1() = addAllArrayList()
+    @Test fun addAllArrayList2() = addAllArrayList()
+    @Test fun addAllArrayList3() = addAllArrayList()
+    @Test fun addAllArrayList4() = addAllArrayList()
+    @Test fun addAllArrayListRotateInput() {
+        val listOfLists = List(16) { mutableListOf(*content) }
+        var counter = 0
+        benchmarkRule.measureRepeated {
+            val list = listOfLists[counter % 16]
             val list2 = mutableListOf<Int>()
             list2.addAll(list)
             list2.addAll(list)
             list2.addAll(list)
             list2.addAll(list)
+            counter++
         }
     }
 
     @Test
     fun addAllVector() {
         val list = mutableVectorOf(*content)
+        val list2 = MutableVector<Int>(list.size * 4)
         benchmarkRule.measureRepeated {
-            val list2 = mutableVectorOf<Int>()
             list2.addAll(list)
             list2.addAll(list)
             list2.addAll(list)
             list2.addAll(list)
+            runWithTimingDisabled {
+                list2.clear()
+            }
+        }
+    }
+
+    // These are temporary, to investigate CI instability (b/208713172)
+    @Test fun addAllVector1() = addAllVector()
+    @Test fun addAllVector2() = addAllVector()
+    @Test fun addAllVector3() = addAllVector()
+    @Test fun addAllVector4() = addAllVector()
+    @Test fun addAllVectorRotateInput() {
+        val listOfLists = List(16) { mutableVectorOf(*content) }
+        var counter = 0
+        val list2 = MutableVector<Int>(content.size * 4)
+        benchmarkRule.measureRepeated {
+            val list = listOfLists[counter % 16]
+            list2.addAll(list)
+            list2.addAll(list)
+            list2.addAll(list)
+            list2.addAll(list)
+            list2.clear()
+            counter++
         }
     }
 
     @Test
     fun insertAllArrayList() {
         val list = mutableListOf(*content)
+        val list2 = ArrayList<Int>(content.size * 4)
         benchmarkRule.measureRepeated {
-            val list2 = mutableListOf<Int>()
             list2.addAll(0, list)
             list2.addAll(0, list)
             list2.addAll(0, list)
             list2.addAll(0, list)
+            runWithTimingDisabled {
+                list2.clear()
+            }
         }
     }
 
     @Test
     fun insertAllVector() {
         val list = mutableVectorOf(*content)
+        val list2 = MutableVector<Int>(list.size * 4)
         benchmarkRule.measureRepeated {
-            val list2 = mutableVectorOf<Int>()
             list2.addAll(0, list)
             list2.addAll(0, list)
             list2.addAll(0, list)
             list2.addAll(0, list)
+            runWithTimingDisabled {
+                list2.clear()
+            }
         }
     }
 
@@ -311,7 +362,7 @@ class MutableVectorBenchmark : ComposeBenchmarkBase() {
         list.addAll(content)
         benchmarkRule.measureRepeated {
             repeat(arraySize) {
-                list[it] = list[it] + 1
+                list[it] = list[(it + 1) % 100]
             }
         }
     }
@@ -322,7 +373,7 @@ class MutableVectorBenchmark : ComposeBenchmarkBase() {
         list.addAll(content)
         benchmarkRule.measureRepeated {
             repeat(arraySize) {
-                list[it] = list[it] + 1
+                list[it] = list[(it + 1) % 100]
             }
         }
     }

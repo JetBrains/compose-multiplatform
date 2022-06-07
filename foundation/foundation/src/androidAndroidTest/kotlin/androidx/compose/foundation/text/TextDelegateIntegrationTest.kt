@@ -18,9 +18,11 @@ package androidx.compose.foundation.text
 
 import android.graphics.Bitmap
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -32,6 +34,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlin.math.roundToInt
 
 @OptIn(InternalFoundationTextApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -41,7 +44,8 @@ class TextDelegateIntegrationTest {
     private val fontFamily = TEST_FONT_FAMILY
     private val density = Density(density = 1f)
     private val context = InstrumentationRegistry.getInstrumentation().context
-    private val resourceLoader = TestFontResourceLoader(context)
+    @OptIn(ExperimentalTextApi::class)
+    private val fontFamilyResolver = createFontFamilyResolver(context)
 
     @Test
     fun minIntrinsicWidth_getter() {
@@ -54,7 +58,7 @@ class TextDelegateIntegrationTest {
                 text = annotatedString,
                 style = TextStyle.Default,
                 density = this,
-                resourceLoader = resourceLoader
+                fontFamilyResolver = fontFamilyResolver
             )
 
             textDelegate.layoutIntrinsics(LayoutDirection.Ltr)
@@ -75,7 +79,7 @@ class TextDelegateIntegrationTest {
                 text = annotatedString,
                 style = TextStyle.Default,
                 density = this,
-                resourceLoader = resourceLoader
+                fontFamilyResolver = fontFamilyResolver
             )
 
             textDelegate.layoutIntrinsics(LayoutDirection.Ltr)
@@ -85,42 +89,13 @@ class TextDelegateIntegrationTest {
         }
     }
 
-//    @Test
-//    fun multiParagraphIntrinsics_isReused() {
-//        val textDelegate = TextDelegate(
-//            text = AnnotatedString(text = "abc"),
-//            style = TextStyle.Default,
-//            density = density,
-//            resourceLoader = resourceLoader
-//        )
-//
-//        // create the intrinsics object
-//        textDelegate.layoutIntrinsics(LayoutDirection.Ltr)
-//        val multiParagraphIntrinsics = textDelegate.paragraphIntrinsics
-//
-//        // layout should create the MultiParagraph. The final MultiParagraph is expected to use
-//        // the previously calculated intrinsics
-//        val layoutResult = textDelegate.layout(Constraints(), LayoutDirection.Ltr)
-//        val layoutIntrinsics = layoutResult.multiParagraph.intrinsics
-//
-//        // primary assertions to make sure that the objects are not null
-//        assertThat(layoutIntrinsics.infoList.get(0)).isNotNull()
-//        assertThat(multiParagraphIntrinsics?.infoList?.get(0)).isNotNull()
-//
-//        // the intrinsics passed to multi paragraph should be the same instance
-//        assertThat(layoutIntrinsics).isSameInstanceAs(multiParagraphIntrinsics)
-//        // the ParagraphIntrinsic in the MultiParagraphIntrinsic should be the same instance
-//        assertThat(layoutIntrinsics.infoList.get(0))
-//            .isSameInstanceAs(multiParagraphIntrinsics?.infoList?.get(0))
-//    }
-
     @Test
     fun TextLayoutInput_reLayout_withDifferentHeight() {
         val textDelegate = TextDelegate(
             text = AnnotatedString(text = "Hello World!"),
             style = TextStyle.Default,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
         val width = 200
         val heightFirstLayout = 100
@@ -145,7 +120,7 @@ class TextDelegateIntegrationTest {
             text = AnnotatedString(text = "Hello World!"),
             style = TextStyle.Default,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
         val width = 200
         val heightFirstLayout = 100
@@ -174,7 +149,7 @@ class TextDelegateIntegrationTest {
             softWrap = false,
             overflow = TextOverflow.Ellipsis,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
         textDelegate.layoutIntrinsics(LayoutDirection.Ltr)
         // Makes width smaller than needed.
@@ -184,6 +159,29 @@ class TextDelegateIntegrationTest {
 
         assertThat(layoutResult.lineCount).isEqualTo(1)
         assertThat(layoutResult.isLineEllipsized(0)).isTrue()
+    }
+
+    @Test
+    fun TextLayoutResult_layoutWithLimitedHeight_withEllipsis() {
+        val fontSize = 20f
+        val text = AnnotatedString(text = "Hello World! Hello World! Hello World! Hello World!")
+        val textDelegate = TextDelegate(
+            text = text,
+            style = TextStyle(fontSize = fontSize.sp),
+            overflow = TextOverflow.Ellipsis,
+            density = density,
+            fontFamilyResolver = fontFamilyResolver
+        )
+        textDelegate.layoutIntrinsics(LayoutDirection.Ltr)
+
+        val constraints = Constraints(
+            maxWidth = textDelegate.maxIntrinsicWidth / 4,
+            maxHeight = (fontSize * 2.7).roundToInt() // fully fits at most 2 lines
+        )
+        val layoutResult = textDelegate.layout(constraints, LayoutDirection.Ltr)
+
+        assertThat(layoutResult.lineCount).isEqualTo(2)
+        assertThat(layoutResult.isLineEllipsized(1)).isTrue()
     }
 }
 

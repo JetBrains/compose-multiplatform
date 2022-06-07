@@ -37,3 +37,7 @@ dependencies {
     androidTestImplementation(libs.kotlinTestCommon)
     androidTestImplementation(libs.truth)
 }
+
+android {
+    namespace "androidx.compose.foundation.layout.benchmark"
+}

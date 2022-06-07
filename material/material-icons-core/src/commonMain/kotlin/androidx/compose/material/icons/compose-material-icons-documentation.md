@@ -37,6 +37,8 @@ A separate library, `androidx.compose.material:material-icons-extended`, contain
 |      | **APIs** | **Description** |
 | ---- | -------- | --------------- |
 | **Icon** | [androidx.compose.material.Icon] | Icon |
+|  | [androidx.compose.material3.Icon] | M3 icon |
 | **Icon button** | [androidx.compose.material.IconButton] | Icon button |
+|  | [androidx.compose.material3.IconButton] | M3 icon button |
 | **Icon toggle button** | [androidx.compose.material.IconToggleButton] | Icon toggle button |
-
+|  | [androidx.compose.material3.IconToggleButton] | M3 icon toggle button |

@@ -23,9 +23,9 @@ import androidx.compose.runtime.Immutable
  *
  * Used by [Canvas.drawVertices].
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class VertexMode internal constructor(@Suppress("unused") private val value: Int) {
+@kotlin.jvm.JvmInline
+value class VertexMode internal constructor(@Suppress("unused") private val value: Int) {
 
     companion object {
         /**

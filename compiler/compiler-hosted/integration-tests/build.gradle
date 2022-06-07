@@ -22,6 +22,7 @@ plugins {
     id("AndroidXPlugin")
     id("com.android.library")
     id("kotlin-android")
+    id("com.google.protobuf")
 }
 
 dependencies {
@@ -49,17 +50,22 @@ dependencies {
     testImplementation(files(toolsJar))
 
     testImplementation(libs.kotlinStdlib)
+    testImplementation(libs.protobufLite)
+    testImplementation(libs.guavaAndroid)
     testImplementation(project(":compose:compiler:compiler-hosted"))
     testImplementation(projectOrArtifact(":compose:material:material"))
-    testImplementation(projectOrArtifact(":compose:runtime:runtime"))
+    testImplementation(project(":compose:runtime:runtime"))
     testImplementation(projectOrArtifact(":compose:ui:ui"))
     testImplementation("androidx.core:core-ktx:1.1.0")
     testImplementation("androidx.activity:activity-ktx:1.2.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.3.4")
 }
 
 afterEvaluate {
     tasks.withType(Test) { t ->
         t.dependsOn(":compose:compiler:compiler:embeddedPlugin")
+
+        maxHeapSize("1024m")
     }
 }
 
@@ -70,11 +76,12 @@ android {
     lintOptions {
         disable("SyntheticAccessor")
     }
+    namespace "androidx.compose.runtime.tests"
 }
 
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
-        freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn"]
+        freeCompilerArgs += ["-opt-in=kotlin.RequiresOptIn"]
     }
 }
 
@@ -83,4 +90,22 @@ androidx {
     publish = Publish.NONE
     inceptionYear = "2019"
     description = "Contains test for the compose compiler plugin"
+}
+
+protobuf {
+    protoc {
+        artifact = libs.protobufCompiler.get()
+    }
+    // Generates the java proto-lite code for the protos in this project. See
+    // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
+    // for more information.
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    option "lite"
+                }
+            }
+        }
+    }
 }

@@ -23,10 +23,17 @@ val TextDemos = DemoCategory(
     "Text",
     listOf(
         ComposableDemo("Static text") { TextDemo() },
+        ComposableDemo("Brush") { TextBrushDemo() },
+        ComposableDemo("Ellipsize") { EllipsizeDemo() },
         ComposableDemo("Typeface") { TypefaceDemo() },
+        ComposableDemo("FontFamily fallback") { FontFamilyDemo() },
+        ComposableDemo("All system font families") { SystemFontFamilyDemo() },
         ComposableDemo("Text selection") { TextSelectionDemo() },
         ComposableDemo("Text selection sample") { TextSelectionSample() },
         ComposableDemo("Multi paragraph") { MultiParagraphDemo() },
+        ComposableDemo("IncludeFontPadding & Clip") { TextFontPaddingDemo() },
+        ComposableDemo("Layout Reuse") { TextReuseLayoutDemo() },
+        ComposableDemo("Line Height Behavior") { TextLineHeightDemo() },
         ComposableDemo("Interactive text") { InteractiveTextDemo() },
         DemoCategory(
             "Input fields",
@@ -37,6 +44,9 @@ val TextDemos = DemoCategory(
                 ComposableDemo("Various input fields") { VariousInputFieldDemo() },
                 ComposableDemo("Tricky input field") { InputFieldTrickyUseCase() },
                 ComposableDemo("Focus transition") { TextFieldFocusTransition() },
+                ComposableDemo("Focus keyboard interaction") {
+                    TextFieldFocusKeyboardInteraction()
+                },
                 ComposableDemo("Tail Following Text Field") { TailFollowingTextFieldDemo() },
                 ComposableDemo("Scrollable text fields") { ScrollableTextFieldDemo() },
                 ComposableDemo("Min/Max Lines") { BasicTextFieldMinMaxDemo() },
@@ -46,6 +56,7 @@ val TextDemos = DemoCategory(
                 ComposableDemo("Inside Dialog") { onNavigateUp ->
                     DialogInputFieldDemo(onNavigateUp)
                 },
+                ComposableDemo("Inside scrollable") { TextFieldsInScrollableDemo() }
             )
         ),
         ComposableDemo("Text Accessibility") { TextAccessibilityDemo() }

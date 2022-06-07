@@ -48,6 +48,11 @@ sealed class Group(
     val location: SourceLocation?,
 
     /**
+     * An optional value that identifies a Group independently of movement caused by recompositions.
+     */
+    val identity: Any?,
+
+    /**
      * The bounding layout box for the group.
      */
     val box: IntRect,
@@ -134,10 +139,11 @@ class CallGroup(
     name: String?,
     box: IntRect,
     location: SourceLocation?,
+    identity: Any?,
     override val parameters: List<ParameterInformation>,
     data: Collection<Any?>,
     children: Collection<Group>
-) : Group(key, name, location, box, data, children)
+) : Group(key, name, location, identity, box, data, children)
 
 /**
  * A group that represents an emitted node
@@ -154,13 +160,14 @@ class NodeGroup(
     data: Collection<Any?>,
     override val modifierInfo: List<ModifierInfo>,
     children: Collection<Group>
-) : Group(key, null, null, box, data, children)
+) : Group(key, null, null, null, box, data, children)
 
 @UiToolingDataApi
 private object EmptyGroup : Group(
     key = null,
     name = null,
     location = null,
+    identity = null,
     box = emptyBox,
     data = emptyList(),
     children = emptyList()
@@ -177,7 +184,7 @@ internal val emptyBox = IntRect(0, 0, 0, 0)
 private val tokenizer = Regex("(\\d+)|([,])|([*])|([:])|L|(P\\([^)]*\\))|(C(\\(([^)]*)\\))?)|@")
 
 private fun MatchResult.isNumber() = groups[1] != null
-private fun MatchResult.number() = groupValues[1].toInt()
+private fun MatchResult.number() = groupValues[1].parseToInt()
 private val MatchResult.text get() = groupValues[0]
 private fun MatchResult.isChar(c: String) = text == c
 private fun MatchResult.isFileName() = groups[4] != null
@@ -228,6 +235,20 @@ private class Parameter(
     val inlineClass: String? = null
 )
 
+private fun String.parseToInt(): Int =
+    try {
+        toInt()
+    } catch (_: NumberFormatException) {
+        throw ParseError()
+    }
+
+private fun String.parseToInt(radix: Int): Int =
+    try {
+        toInt(radix)
+    } catch (_: NumberFormatException) {
+        throw ParseError()
+    }
+
 // The parameter information follows the following grammar:
 //
 //   parameters: (parameter|run) ("," parameter | run)*
@@ -252,7 +273,7 @@ private fun parseParameters(parameters: String): List<Parameter> {
         val mr = currentResult
         if (mr == null || !mr.isANumber) throw ParseError()
         next()
-        return mr.text.toInt()
+        return mr.text.parseToInt()
     }
 
     fun expectClassName(): String {
@@ -338,7 +359,7 @@ private fun parseParameters(parameters: String): List<Parameter> {
 private fun sourceInformationContextOf(
     information: String,
     parent: SourceInformationContext?
-): SourceInformationContext {
+): SourceInformationContext? {
     var currentResult = tokenizer.find(information)
 
     fun next(): MatchResult? {
@@ -351,30 +372,34 @@ private fun sourceInformationContextOf(
         var offset: Int? = null
         var length: Int? = null
 
-        var mr = currentResult
-        if (mr != null && mr.isNumber()) {
-            // Offsets are 0 based in the data, we need 1 based.
-            lineNumber = mr.number() + 1
-            mr = next()
-        }
-        if (mr != null && mr.isChar("@")) {
-            // Offset
-            mr = next()
-            if (mr == null || !mr.isNumber()) {
-                return null
+        try {
+            var mr = currentResult
+            if (mr != null && mr.isNumber()) {
+                // Offsets are 0 based in the data, we need 1 based.
+                lineNumber = mr.number() + 1
+                mr = next()
             }
-            offset = mr.number()
-            mr = next()
-            if (mr != null && mr.isChar("L")) {
+            if (mr != null && mr.isChar("@")) {
+                // Offset
                 mr = next()
                 if (mr == null || !mr.isNumber()) {
                     return null
                 }
-                length = mr.number()
+                offset = mr.number()
+                mr = next()
+                if (mr != null && mr.isChar("L")) {
+                    mr = next()
+                    if (mr == null || !mr.isNumber()) {
+                        return null
+                    }
+                    length = mr.number()
+                }
             }
+            if (lineNumber != null && offset != null && length != null)
+                return SourceLocationInfo(lineNumber, offset, length)
+        } catch (_: ParseError) {
+            return null
         }
-        if (lineNumber != null && offset != null && length != null)
-            return SourceLocationInfo(lineNumber, offset, length)
         return null
     }
     val sourceLocations = mutableListOf<SourceLocationInfo>()
@@ -416,7 +441,7 @@ private fun sourceInformationContextOf(
                     sourceFile = sourceFile
                         .substring(0 until sourceFile.length - hashText.length - 1)
                     packageHash = try {
-                        hashText.toInt(36)
+                        hashText.parseToInt(36)
                     } catch (_: NumberFormatException) {
                         -1
                     }
@@ -425,7 +450,8 @@ private fun sourceInformationContextOf(
             }
             else -> break@loop
         }
-        require(mr != currentResult) { "regex didn't advance" }
+        if (mr == currentResult)
+            return null
     }
 
     return SourceInformationContext(
@@ -466,6 +492,8 @@ private fun CompositionGroup.getGroup(parentContext: SourceInformationContext?):
             if (children.isEmpty()) emptyBox else
                 children.map { g -> g.box }.reduce { acc, box -> box.union(acc) }
     }
+    val location =
+        if (context?.isCall == true) { parentContext?.nextSourceLocation() } else { null }
     return if (node != null) NodeGroup(
         key,
         node,
@@ -478,8 +506,11 @@ private fun CompositionGroup.getGroup(parentContext: SourceInformationContext?):
             key,
             context?.name,
             box,
-            if (context != null && context.isCall) {
-                parentContext?.nextSourceLocation()
+            location,
+            identity = if (!context?.name.isNullOrEmpty() &&
+                (box.bottom - box.top > 0 || box.right - box.left > 0)
+            ) {
+                this.identity
             } else {
                 null
             },
@@ -619,7 +650,7 @@ private const val STABLE_BITS = 0b100
  */
 @UiToolingDataApi
 val Group.position: String?
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @UiToolingDataApi
     get() = keyPosition(key)
 

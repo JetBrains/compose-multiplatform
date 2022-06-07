@@ -19,62 +19,101 @@ package androidx.compose.ui.platform.actionmodecallback
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
+import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.platform.ActionCallback
-
-internal const val MENU_ITEM_COPY = 0
-internal const val MENU_ITEM_PASTE = 1
-internal const val MENU_ITEM_CUT = 2
-internal const val MENU_ITEM_SELECT_ALL = 3
 
 internal class TextActionModeCallback(
+    val onActionModeDestroy: (() -> Unit)? = null,
     var rect: Rect = Rect.Zero,
-    var onCopyRequested: ActionCallback? = null,
-    var onPasteRequested: ActionCallback? = null,
-    var onCutRequested: ActionCallback? = null,
-    var onSelectAllRequested: ActionCallback? = null
+    var onCopyRequested: (() -> Unit)? = null,
+    var onPasteRequested: (() -> Unit)? = null,
+    var onCutRequested: (() -> Unit)? = null,
+    var onSelectAllRequested: (() -> Unit)? = null
 ) {
     fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
         requireNotNull(menu)
         requireNotNull(mode)
 
         onCopyRequested?.let {
-            menu.add(0, MENU_ITEM_COPY, 0, android.R.string.copy)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+            addMenuItem(menu, MenuItemOption.Copy)
         }
-
         onPasteRequested?.let {
-            menu.add(0, MENU_ITEM_PASTE, 1, android.R.string.paste)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+            addMenuItem(menu, MenuItemOption.Paste)
         }
-
         onCutRequested?.let {
-            menu.add(0, MENU_ITEM_CUT, 2, android.R.string.cut)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+            addMenuItem(menu, MenuItemOption.Cut)
         }
-
         onSelectAllRequested?.let {
-            menu.add(0, MENU_ITEM_SELECT_ALL, 3, android.R.string.selectAll)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+            addMenuItem(menu, MenuItemOption.SelectAll)
         }
         return true
     }
 
-    fun onPrepareActionMode(): Boolean {
-        return false
+    // this method is called to populate new menu items when the actionMode was invalidated
+    fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+        if (mode == null || menu == null) return false
+        updateMenuItems(menu)
+        // should return true so that new menu items are populated
+        return true
     }
 
     fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         when (item!!.itemId) {
-            MENU_ITEM_COPY -> onCopyRequested?.invoke()
-            MENU_ITEM_PASTE -> onPasteRequested?.invoke()
-            MENU_ITEM_CUT -> onCutRequested?.invoke()
-            MENU_ITEM_SELECT_ALL -> onSelectAllRequested?.invoke()
+            MenuItemOption.Copy.id -> onCopyRequested?.invoke()
+            MenuItemOption.Paste.id -> onPasteRequested?.invoke()
+            MenuItemOption.Cut.id -> onCutRequested?.invoke()
+            MenuItemOption.SelectAll.id -> onSelectAllRequested?.invoke()
             else -> return false
         }
         mode?.finish()
         return true
     }
 
-    fun onDestroyActionMode() {}
+    fun onDestroyActionMode() {
+        onActionModeDestroy?.invoke()
+    }
+
+    @VisibleForTesting
+    internal fun updateMenuItems(menu: Menu) {
+        addOrRemoveMenuItem(menu, MenuItemOption.Copy, onCopyRequested)
+        addOrRemoveMenuItem(menu, MenuItemOption.Paste, onPasteRequested)
+        addOrRemoveMenuItem(menu, MenuItemOption.Cut, onCutRequested)
+        addOrRemoveMenuItem(menu, MenuItemOption.SelectAll, onSelectAllRequested)
+    }
+
+    internal fun addMenuItem(menu: Menu, item: MenuItemOption) {
+        menu.add(0, item.id, item.order, item.titleResource)
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+    }
+
+    private fun addOrRemoveMenuItem(
+        menu: Menu,
+        item: MenuItemOption,
+        callback: (() -> Unit)?
+    ) {
+        when {
+            callback != null && menu.findItem(item.id) == null -> addMenuItem(menu, item)
+            callback == null && menu.findItem(item.id) != null -> menu.removeItem(item.id)
+        }
+    }
+}
+
+internal enum class MenuItemOption(val id: Int) {
+    Copy(0),
+    Paste(1),
+    Cut(2),
+    SelectAll(3);
+
+    val titleResource: Int
+        get() = when (this) {
+            Copy -> android.R.string.copy
+            Paste -> android.R.string.paste
+            Cut -> android.R.string.cut
+            SelectAll -> android.R.string.selectAll
+        }
+
+    /**
+     * This item will be shown before all items that have order greater than this value.
+     */
+    val order = id
 }

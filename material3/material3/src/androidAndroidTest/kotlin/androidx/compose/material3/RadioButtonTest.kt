@@ -43,6 +43,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@OptIn(ExperimentalMaterial3Api::class)
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class RadioButtonTest {
@@ -66,7 +67,7 @@ class RadioButtonTest {
     fun radioGroupTest_defaultSemantics() {
         val selected = mutableStateOf(itemOne)
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Column {
                 options.forEach { item ->
                     RadioButton(
@@ -99,7 +100,7 @@ class RadioButtonTest {
     fun radioGroupTest_ensureUnselectable() {
         val selected = mutableStateOf(itemOne)
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Column {
                 options.forEach { item ->
                     RadioButton(
@@ -126,7 +127,7 @@ class RadioButtonTest {
     @Test
     fun radioGroupTest_clickSelect() {
         val selected = mutableStateOf(itemOne)
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Column {
                 options.forEach { item ->
                     RadioButton(
@@ -152,7 +153,7 @@ class RadioButtonTest {
     @Test
     fun radioGroup_untoggleableAndMergeable_whenNullLambda() {
         val parentTag = "parent"
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Column(Modifier.semantics(mergeDescendants = true) {}.testTag(parentTag)) {
                 RadioButton(
                     selected = true,
@@ -172,7 +173,7 @@ class RadioButtonTest {
     fun radioGroupTest_clickSelectTwoDifferentItems() {
         val selected = mutableStateOf(itemOne)
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Column {
                 options.forEach { item ->
                     RadioButton(
@@ -287,7 +288,10 @@ class RadioButtonTest {
                 CompositionLocalProvider(
                     LocalMinimumTouchTargetEnforcement provides minimumTouchTarget
                 ) {
-                    RadioButton(selected = selected, onClick = if (clickable) { {} } else null)
+                    RadioButton(
+                        selected = selected, onClick = if (clickable) {
+                            {}
+                        } else null)
                 }
             }
             .run {

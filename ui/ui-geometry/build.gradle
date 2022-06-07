@@ -15,7 +15,6 @@
  */
 
 import androidx.build.AndroidXComposePlugin
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -36,7 +35,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
         api("androidx.annotation:annotation:1.1.0")
 
-        implementation(project(":compose:runtime:runtime"))
+        implementation("androidx.compose.runtime:runtime:1.1.1")
         implementation(project(":compose:ui:ui-util"))
         implementation(libs.kotlinStdlib)
 
@@ -47,10 +46,12 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 }
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
-        jvm("desktop")
+        desktop()
+    }
 
+    kotlin {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block above
@@ -68,7 +69,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
             }
-
             commonTest.dependencies {
                 implementation(kotlin("test-junit"))
             }
@@ -79,14 +79,20 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Geometry"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.UI
+    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2020"
     description = "Compose classes related to dimensions without units"
     legacyDisableKotlinStrictApiMode = true
 }
 
+android {
+    namespace "androidx.compose.ui.geometry"
+}
+
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
-        freeCompilerArgs += ["-XXLanguage:+InlineClasses"]
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
     }
 }

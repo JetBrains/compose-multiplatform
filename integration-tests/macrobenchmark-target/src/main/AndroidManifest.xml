@@ -15,8 +15,7 @@
   -->
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="androidx.compose.integration.macrobenchmark.target">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:label="Jetpack Compose Macrobenchmark Target"
@@ -41,6 +40,14 @@
 <!--            </intent-filter>-->
             <intent-filter>
                 <action android:name="androidx.compose.integration.macrobenchmark.target.TRIVIAL_STARTUP_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".FullyDrawnStartupActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.compose.integration.macrobenchmark.target.FULLY_DRAWN_STARTUP_ACTIVITY" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -73,6 +80,50 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="androidx.compose.integration.macrobenchmark.target.NESTED_LISTS_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".DifferentTypesListActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="androidx.compose.integration.macrobenchmark.target.DIFFERENT_TYPES_LIST_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".LazyVerticalGridActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.compose.integration.macrobenchmark.target.LAZY_VERTICAL_GRID_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".TrivialTracingActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.compose.integration.macrobenchmark.target.TRIVIAL_TRACING_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".AndroidViewListActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat">
+            <intent-filter>
+                <action android:name="androidx.compose.integration.macrobenchmark.target.ANDROIDVIEW_LIST_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".RecyclerViewListActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat">
+            <intent-filter>
+                <action android:name="androidx.compose.integration.macrobenchmark.target.RECYCLERVIEW_LIST_ACTIVITY" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

@@ -41,12 +41,15 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.platform.LocalFontLoader
 import androidx.compose.ui.platform.ViewRootForTest
-import androidx.compose.ui.tooling.CommonPreviewUtils.invokeComposableViaReflection
+import androidx.compose.ui.text.font.createFontFamilyResolver
+import androidx.compose.ui.tooling.ComposableInvoker.invokeComposable
 import androidx.compose.ui.tooling.animation.PreviewAnimationClock
 import androidx.compose.ui.tooling.data.Group
 import androidx.compose.ui.tooling.data.SourceLocation
@@ -65,7 +68,7 @@ import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
-import androidx.savedstate.ViewTreeSavedStateRegistryOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import java.lang.reflect.Method
 
 private const val TOOLS_NS_URI = "http://schemas.android.com/tools"
@@ -157,12 +160,7 @@ internal class ComposeViewAdapter : FrameLayout {
      * composition, we save it and throw it during onLayout, this allows Studio to catch it and
      * display it to the user.
      */
-    private var delayedException: Throwable? = null
-
-    /**
-     * A lock to take to access delayedException.
-     */
-    private val delayExceptionLock = Any()
+    private val delayedException = ThreadSafeException()
 
     /**
      * The [Composable] to be rendered in the preview. It is initialized when this adapter
@@ -282,13 +280,9 @@ internal class ComposeViewAdapter : FrameLayout {
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
 
-        synchronized(delayExceptionLock) {
-            delayedException?.let { exception ->
-                // There was a pending exception. Throw it here since Studio will catch it and show
-                // it to the user.
-                throw exception
-            }
-        }
+        // If there was a pending exception then throw it here since Studio will catch it and show
+        // it to the user.
+        delayedException.throwIfPresent()
 
         processViewInfos()
         if (composableName.isNotEmpty()) {
@@ -527,8 +521,10 @@ internal class ComposeViewAdapter : FrameLayout {
         // We need to replace the FontResourceLoader to avoid using ResourcesCompat.
         // ResourcesCompat can not load fonts within Layoutlib and, since Layoutlib always runs
         // the latest version, we do not need it.
+        @Suppress("DEPRECATION")
         CompositionLocalProvider(
             LocalFontLoader provides LayoutlibFontResourceLoader(context),
+            LocalFontFamilyResolver provides createFontFamilyResolver(context),
             LocalOnBackPressedDispatcherOwner provides FakeOnBackPressedDispatcherOwner,
             LocalActivityResultRegistryOwner provides FakeActivityResultRegistryOwner,
         ) {
@@ -557,6 +553,7 @@ internal class ComposeViewAdapter : FrameLayout {
      * @param onCommit callback invoked after every commit of the preview composable.
      * @param onDraw callback invoked after every draw of the adapter. Only for test use.
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     @VisibleForTesting
     internal fun init(
         className: String,
@@ -590,7 +587,7 @@ internal class ComposeViewAdapter : FrameLayout {
                 // class loads correctly.
                 val composable = {
                     try {
-                        invokeComposableViaReflection(
+                        invokeComposable(
                             className,
                             methodName,
                             composer,
@@ -604,9 +601,7 @@ internal class ComposeViewAdapter : FrameLayout {
                         while (exception is ReflectiveOperationException) {
                             exception = exception.cause ?: break
                         }
-                        synchronized(delayExceptionLock) {
-                            delayedException = exception
-                        }
+                        delayedException.set(exception)
                         throw t
                     }
                 }
@@ -659,7 +654,7 @@ internal class ComposeViewAdapter : FrameLayout {
     private fun init(attrs: AttributeSet) {
         // ComposeView and lifecycle initialization
         ViewTreeLifecycleOwner.set(this, FakeSavedStateRegistryOwner)
-        ViewTreeSavedStateRegistryOwner.set(this, FakeSavedStateRegistryOwner)
+        setViewTreeSavedStateRegistryOwner(FakeSavedStateRegistryOwner)
         ViewTreeViewModelStoreOwner.set(this, FakeViewModelStoreOwner)
         addView(composeView)
 
@@ -724,7 +719,9 @@ internal class ComposeViewAdapter : FrameLayout {
             lifecycle.currentState = Lifecycle.State.RESUMED
         }
 
-        override fun getSavedStateRegistry(): SavedStateRegistry = controller.savedStateRegistry
+        override val savedStateRegistry: SavedStateRegistry
+            get() = controller.savedStateRegistry
+
         override fun getLifecycle(): Lifecycle = lifecycle
     }
 

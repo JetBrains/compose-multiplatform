@@ -45,18 +45,26 @@ import org.junit.runners.Parameterized
 @ExperimentalComposeUiApi
 @MediumTest
 @RunWith(Parameterized::class)
-class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
+class CustomFocusTraversalTest(
+    private val moveFocusProgrammatically: Boolean,
+    private val useFocusOrderModifier: Boolean
+) {
     @get:Rule
     val rule = createComposeRule()
 
     companion object {
         @JvmStatic
-        @Parameterized.Parameters(name = "moveFocusProgrammatically = {0}")
-        fun initParameters() = listOf(true, false)
+        @Parameterized.Parameters(name = "moveFocusProgrammatically = {0}, useFocusModifier = {1}")
+        fun initParameters() = listOf(
+            arrayOf(true, true),
+            arrayOf(true, false),
+            arrayOf(false, true),
+            arrayOf(false, false)
+        )
     }
 
     @Test
-    fun focusOrder_next() {
+    fun focusProperties_next() {
         // Arrange.
         var item1Focused = false
         var item2Focused = false
@@ -68,7 +76,8 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
             Row {
                 Box(
                     Modifier
-                        .focusOrder(item1) { next = item3 }
+                        .focusRequester(item1)
+                        .dynamicFocusProperties { next = item3 }
                         .onFocusChanged { item1Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -79,7 +88,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 )
                 Box(
                     Modifier
-                        .focusOrder(item3)
+                        .focusRequester(item3)
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -89,7 +98,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Next)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Next)
+            }
         } else {
             rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, Tab.nativeKeyCode)))
         }
@@ -103,7 +114,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
     }
 
     @Test
-    fun focusOrder_previous() {
+    fun focusProperties_previous() {
         // Arrange.
         var item1Focused = false
         var item2Focused = false
@@ -115,7 +126,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
             Row {
                 Box(
                     Modifier
-                        .focusOrder(item1)
+                        .focusRequester(item1)
                         .onFocusChanged { item1Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -126,7 +137,8 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 )
                 Box(
                     Modifier
-                        .focusOrder(item3) { previous = item1 }
+                        .focusRequester(item3)
+                        .dynamicFocusProperties { previous = item1 }
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -136,7 +148,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Previous)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Previous)
+            }
         } else {
             val nativeEvent = AndroidKeyEvent(0L, 0L, KeyDown, Tab.nativeKeyCode, 0, META_SHIFT_ON)
             rule.onRoot().performKeyPress(KeyEvent(nativeEvent))
@@ -151,7 +165,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
     }
 
     @Test
-    fun focusOrder_up() {
+    fun focusProperties_up() {
         // Arrange.
         var item1Focused = false
         var item2Focused = false
@@ -163,7 +177,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
             Column {
                 Box(
                     Modifier
-                        .focusOrder(item1)
+                        .focusRequester(item1)
                         .onFocusChanged { item1Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -174,7 +188,8 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 )
                 Box(
                     Modifier
-                        .focusOrder(item3) { up = item1 }
+                        .focusRequester(item3)
+                        .dynamicFocusProperties { up = item1 }
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -184,7 +199,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Up)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Up)
+            }
         } else {
             val nativeKeyEvent = AndroidKeyEvent(KeyDown, DirectionUp.nativeKeyCode)
             rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
@@ -199,7 +216,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
     }
 
     @Test
-    fun focusOrder_down() {
+    fun focusProperties_down() {
         // Arrange.
         var item1Focused = false
         var item2Focused = false
@@ -211,7 +228,8 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
             Column {
                 Box(
                     Modifier
-                        .focusOrder(item1) { down = item3 }
+                        .focusRequester(item1)
+                        .dynamicFocusProperties { down = item3 }
                         .onFocusChanged { item1Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -222,7 +240,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 )
                 Box(
                     Modifier
-                        .focusOrder(item3)
+                        .focusRequester(item3)
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -232,7 +250,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Down)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Down)
+            }
         } else {
             val nativeKeyEvent = AndroidKeyEvent(KeyDown, DirectionDown.nativeKeyCode)
             rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
@@ -247,7 +267,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
     }
 
     @Test
-    fun focusOrder_left() {
+    fun focusProperties_left() {
         // Arrange.
         var item1Focused = false
         var item2Focused = false
@@ -259,7 +279,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
             Row {
                 Box(
                     Modifier
-                        .focusOrder(item1)
+                        .focusRequester(item1)
                         .onFocusChanged { item1Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -270,7 +290,8 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 )
                 Box(
                     Modifier
-                        .focusOrder(item3) { left = item1 }
+                        .focusRequester(item3)
+                        .dynamicFocusProperties { left = item1 }
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -280,7 +301,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Left)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Left)
+            }
         } else {
             val nativeKeyEvent = AndroidKeyEvent(KeyDown, DirectionLeft.nativeKeyCode)
             rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
@@ -295,7 +318,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
     }
 
     @Test
-    fun focusOrder_right() {
+    fun focusProperties_right() {
         // Arrange.
         var item1Focused = false
         var item2Focused = false
@@ -307,7 +330,8 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
             Row {
                 Box(
                     Modifier
-                        .focusOrder(item1) { right = item3 }
+                        .focusRequester(item1)
+                        .dynamicFocusProperties { right = item3 }
                         .onFocusChanged { item1Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -318,7 +342,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 )
                 Box(
                     Modifier
-                        .focusOrder(item3)
+                        .focusRequester(item3)
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -328,7 +352,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Right)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Right)
+            }
         } else {
             val nativeKeyEvent = AndroidKeyEvent(KeyDown, DirectionRight.nativeKeyCode)
             rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
@@ -345,7 +371,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
     // TODO(b/176847718): Verify that this test works correctly when the LocalLayoutDirection
     //  changes.
     @Test
-    fun focusOrder_start() {
+    fun focusProperties_start() {
         // Arrange.
         var item1Focused = false
         var item2Focused = false
@@ -357,7 +383,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
             Row {
                 Box(
                     Modifier
-                        .focusOrder(item1)
+                        .focusRequester(item1)
                         .onFocusChanged { item1Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -368,7 +394,8 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 )
                 Box(
                     Modifier
-                        .focusOrder(item3) { start = item1 }
+                        .focusRequester(item3)
+                        .dynamicFocusProperties { start = item1 }
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -378,7 +405,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Left)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Left)
+            }
         } else {
             val nativeKeyEvent = AndroidKeyEvent(KeyDown, DirectionLeft.nativeKeyCode)
             rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
@@ -395,7 +424,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
     // TODO(b/176847718): Verify that this test works correctly when the LocalLayoutDirection
     //  changes.
     @Test
-    fun focusOrder_end() {
+    fun focusProperties_end() {
         // Arrange.
         var item1Focused = false
         var item2Focused = false
@@ -407,7 +436,8 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
             Row {
                 Box(
                     Modifier
-                        .focusOrder(item1) { end = item3 }
+                        .focusRequester(item1)
+                        .dynamicFocusProperties { end = item3 }
                         .onFocusChanged { item1Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -418,7 +448,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 )
                 Box(
                     Modifier
-                        .focusOrder(item3)
+                        .focusRequester(item3)
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -428,7 +458,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Right)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Right)
+            }
         } else {
             val nativeKeyEvent = AndroidKeyEvent(KeyDown, DirectionRight.nativeKeyCode)
             rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
@@ -443,7 +475,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
     }
 
     @Test
-    fun focusOrder_outermostParentWins() {
+    fun focusProperties_outermostParentWins() {
         // Arrange.
         var item1Focused = false
         var item2Focused = false
@@ -454,10 +486,11 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
         rule.setFocusableContent {
             focusManager = LocalFocusManager.current
             Row {
-                Box(Modifier.focusOrder { next = item4 }) {
+                Box(Modifier.dynamicFocusProperties { next = item4 }) {
                     Box(
                         Modifier
-                            .focusOrder(item1) { next = item3 }
+                            .focusRequester(item1)
+                            .dynamicFocusProperties { next = item3 }
                             .onFocusChanged { item1Focused = it.isFocused }
                             .focusTarget()
                     )
@@ -469,13 +502,13 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 )
                 Box(
                     Modifier
-                        .focusOrder(item3)
+                        .focusRequester(item3)
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusTarget()
                 )
                 Box(
                     Modifier
-                        .focusOrder(item4)
+                        .focusRequester(item4)
                         .onFocusChanged { item4Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -485,7 +518,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Next)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Next)
+            }
         } else {
             rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, Tab.nativeKeyCode)))
         }
@@ -500,7 +535,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
     }
 
     @Test
-    fun focusOrder_parentCanResetCustomNextSetByChild() {
+    fun focusProperties_parentCanResetCustomNextSetByChild() {
         // Arrange.
         var item1Focused = false
         var item2Focused = false
@@ -510,10 +545,11 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
         rule.setFocusableContent {
             focusManager = LocalFocusManager.current
             Row {
-                Box(Modifier.focusOrder { next = FocusRequester.Default }) {
+                Box(Modifier.dynamicFocusProperties { next = FocusRequester.Default }) {
                     Box(
                         Modifier
-                            .focusOrder(item1) { next = item3 }
+                            .focusRequester(item1)
+                            .dynamicFocusProperties { next = item3 }
                             .onFocusChanged { item1Focused = it.isFocused }
                             .focusTarget()
                     )
@@ -525,7 +561,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 )
                 Box(
                     Modifier
-                        .focusOrder(item3)
+                        .focusRequester(item3)
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -535,7 +571,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Next)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Next)
+            }
         } else {
             rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, Tab.nativeKeyCode)))
         }
@@ -549,7 +587,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
     }
 
     @Test
-    fun focusOrder_emptyFocusOrderInParent_doesNotResetCustomNextSetByChild() {
+    fun focusProperties_emptyfocusPropertiesInParent_doesNotResetCustomNextSetByChild() {
         // Arrange.
         var item1Focused = false
         var item2Focused = false
@@ -559,10 +597,11 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
         rule.setFocusableContent {
             focusManager = LocalFocusManager.current
             Row {
-                Box(Modifier.focusOrder { }) {
+                Box(Modifier.dynamicFocusProperties { }) {
                     Box(
                         Modifier
-                            .focusOrder(item1) { next = item3 }
+                            .focusRequester(item1)
+                            .dynamicFocusProperties { next = item3 }
                             .onFocusChanged { item1Focused = it.isFocused }
                             .focusTarget()
                     )
@@ -574,7 +613,7 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
                 )
                 Box(
                     Modifier
-                        .focusOrder(item3)
+                        .focusRequester(item3)
                         .onFocusChanged { item3Focused = it.isFocused }
                         .focusTarget()
                 )
@@ -584,7 +623,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Next)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Next)
+            }
         } else {
             rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, Tab.nativeKeyCode)))
         }
@@ -594,6 +635,23 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
             assertThat(item1Focused).isFalse()
             assertThat(item2Focused).isFalse()
             assertThat(item3Focused).isTrue()
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    fun Modifier.dynamicFocusProperties(block: FocusOrder.() -> Unit): Modifier =
+        if (useFocusOrderModifier) {
+            this.then(ReceiverFocusOrderModifier(block))
+        } else {
+            focusProperties(FocusOrderToProperties(block))
+        }
+
+    @Suppress("DEPRECATION")
+    class ReceiverFocusOrderModifier(
+        val block: FocusOrder.() -> Unit
+    ) : FocusOrderModifier {
+        override fun populateFocusOrder(focusOrder: FocusOrder) {
+            focusOrder.block()
         }
     }
 }

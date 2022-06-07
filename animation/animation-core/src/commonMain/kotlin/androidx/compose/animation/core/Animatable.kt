@@ -458,4 +458,6 @@ class AnimationResult<T, V : AnimationVector>(
      *    [BoundReached] being the end reason.
      */
     val endReason: AnimationEndReason
-)
+) {
+    override fun toString(): String = "AnimationResult(endReason=$endReason, endState=$endState)"
+}

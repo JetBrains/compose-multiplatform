@@ -1,13 +1,20 @@
 # Baseline profile rules for androidx.compose.ui
 # =============================================
 #
+# input
+HSPLandroidx/compose/ui/input/InputMode;->**(**)**
+HSPLandroidx/compose/ui/input/InputModeManagerImpl;->**(**)**
+HSPLandroidx/compose/ui/input/key/KeyInputModifier**->**(**)**
+
 # nested scroll
 HSPLandroidx/compose/ui/input/nestedscroll/NestedScrollDelegatingWrapper;->**(**)**
 HSPLandroidx/compose/ui/input/nestedscroll/NestedScrollDispatcher**->**(**)**
 HSPLandroidx/compose/ui/input/nestedscroll/NestedScrollModifier**->**(**)**
 #
 # pointer input
+HSPLandroidx/compose/ui/input/pointer/AwaitPointerEventScope**->**(**)**
 HSPLandroidx/compose/ui/input/pointer/ConsumedData;->**(**)**
+HSPLandroidx/compose/ui/input/pointer/HistoricalChange;->**(**)**
 HSPLandroidx/compose/ui/input/pointer/HitPathTracker;->**(**)**
 HSPLandroidx/compose/ui/input/pointer/InternalPointerEvent;->**(**)**
 HSPLandroidx/compose/ui/input/pointer/MotionEventAdapter;->**(**)**
@@ -30,12 +37,18 @@ HSPLandroidx/compose/ui/input/pointer/RequestDisallowInterceptTouchEvent;->**(**
 HSPLandroidx/compose/ui/input/pointer/ProcessResult;->**(**)**
 HSPLandroidx/compose/ui/input/pointer/PointerType;->**(**)**
 HSPLandroidx/compose/ui/input/pointer/SuspendingPointerInputFilter**->**(**)**
+HSPLandroidx/compose/ui/input/pointer/util/ImpulseCalculator;->**(**)**
 HSPLandroidx/compose/ui/input/pointer/util/Matrix;->**(**)**
 HSPLandroidx/compose/ui/input/pointer/util/PointAtTime;->**(**)**
 HSPLandroidx/compose/ui/input/pointer/util/PolynomialFit;->**(**)**
 HSPLandroidx/compose/ui/input/pointer/util/Vector;->**(**)**
 HSPLandroidx/compose/ui/input/pointer/util/VelocityEstimate;->**(**)**
 HSPLandroidx/compose/ui/input/pointer/util/VelocityTracker;->**(**)**
+
+#
+# rotary
+HSPLandroidx/compose/ui/input/rotary/RotaryInputModifier**->**(**)**
+
 #
 # layout. include everything
 HSPLandroidx/compose/ui/layout/**->**(**)**
@@ -46,45 +59,72 @@ HSPLandroidx/compose/ui/node/**->**(**)**
 # platform
 HSPLandroidx/compose/ui/platform/AndroidComposeView**->**(**)**
 HSPLandroidx/compose/ui/platform/AbstractComposeView**->**(**)**
+HSPLandroidx/compose/ui/platform/AndroidComposeViewAccessibilityDelegateCompat**->**(**)**
+HSPLandroidx/compose/ui/platform/AndroidComposeViewForceDarkMode**->**(**)**
+HSPLandroidx/compose/ui/platform/AndroidComposeViewVerificationHelperMethods**->**(**)**
 HSPLandroidx/compose/ui/platform/AndroidComposeView_androidKt;->**(**)**
 HSPLandroidx/compose/ui/platform/AndroidCompositionLocals_androidKt**->**(**)**
 HSPLandroidx/compose/ui/platform/AndroidFontResourceLoader;->**(**)**
+HSPLandroidx/compose/ui/platform/AndroidTextToolbar;->**(**)**
 HSPLandroidx/compose/ui/platform/AndroidUiDispatcher**->**(**)**
 HSPLandroidx/compose/ui/platform/AndroidUiFrameClock**->**(**)**
+HSPLandroidx/compose/ui/platform/AndroidUriHandler;->**(**)**
+HSPLandroidx/compose/ui/platform/AndroidViewConfiguration;->**(**)**
+HSPLandroidx/compose/ui/platform/AndroidViewsHandler;->**(**)**
+HSPLandroidx/compose/ui/platform/ComposableSingletons**->**(**)**
+HSPLandroidx/compose/ui/platform/ComposeView**->**(**)**
 HSPLandroidx/compose/ui/platform/CompositionLocalsKt**->**(**)**
 HSPLandroidx/compose/ui/platform/DisposableSaveableStateRegistry;->**(**)**
 HSPLandroidx/compose/ui/platform/DisposableSaveableStateRegistry_androidKt**->**(**)**
 HSPLandroidx/compose/ui/platform/GlobalSnapshotManager**->**(**)**
+HSPLandroidx/compose/ui/platform/InspectableModifier**->**(**)**
 HSPLandroidx/compose/ui/platform/InspectableValueKt$NoInspectorInfo$1;-><init>()V
 HSPLandroidx/compose/ui/platform/InspectableValueKt;->getNoInspectorInfo()Lkotlin/jvm/functions/Function1;
 HSPLandroidx/compose/ui/platform/InspectableValueKt;->isDebugInspectorInfoEnabled()Z
 HSPLandroidx/compose/ui/platform/InspectorValueInfo;-><init>(Lkotlin/jvm/functions/Function1;)V
-HSPLandroidx/compose/ui/platform/RenderNodeLayer;->**(**)**
-HSPLandroidx/compose/ui/platform/RenderNodeApi29;->**(**)**
+HSPLandroidx/compose/ui/platform/InvertMatrixKt;->**(**)**
+HSPLandroidx/compose/ui/platform/LayerMatrixCache;->**(**)**
+HSPLandroidx/compose/ui/platform/MotionDurationScaleImpl;->**(**)**
+HSPLandroidx/compose/ui/platform/RenderNodeLayer**->**(**)**
+HSPLandroidx/compose/ui/platform/RenderNodeApi**->**(**)**
 HSPLandroidx/compose/ui/platform/OutlineResolver;->**(**)**
 HSPLandroidx/compose/ui/platform/RenderNodeMatrixCache;->**(**)**
+HSPLandroidx/compose/ui/platform/ViewCompositionStrategy**->**(**)**
+HSPLandroidx/compose/ui/platform/ViewLayer;->**(**)**
+HSPLandroidx/compose/ui/platform/WeakCache;->**(**)**
+HSPLandroidx/compose/ui/platform/WindowInfoImpl;->**(**)**
 HSPLandroidx/compose/ui/platform/WindowRecomposerPolicy**->**(**)**
 HSPLandroidx/compose/ui/platform/WindowRecomposer_androidKt**->**(**)**
 HSPLandroidx/compose/ui/platform/WrappedComposition**->**(**)**
-HSPLandroidx/compose/ui/res/StringResources_androidKt;->**(**)**
-HSPLandroidx/compose/ui/res/PainterResources_androidKt;->**(**)**
-HSPLandroidx/compose/ui/res/ImageResources_androidKt;->**(**)**
+HSPLandroidx/compose/ui/platform/WrapperRenderNodeLayerHelperMethods**->**(**)**
+HSPLandroidx/compose/ui/platform/Wrapper**->**(**)**
+HSPLandroidx/compose/ui/platform/accessibility/CollectionInfoKt;->**(**)**
 #
 # semantics
 HSPLandroidx/compose/ui/semantics/AccessibilityAction;->**(**)**
+HSPLandroidx/compose/ui/semantics/CollectionInfo;->**(**)**
+HSPLandroidx/compose/ui/semantics/NodeLocationHolder;->**(**)**
+HSPLandroidx/compose/ui/semantics/Role;->**(**)**
+HSPLandroidx/compose/ui/semantics/ScrollAxisRange;->**(**)**
 HSPLandroidx/compose/ui/semantics/SemanticsActions;->**(**)**
 HSPLandroidx/compose/ui/semantics/SemanticsConfiguration;->**(**)**
+HSPLandroidx/compose/ui/semantics/SemanticsEntity;->**(**)**
 HSPLandroidx/compose/ui/semantics/SemanticsModifier$DefaultImpls;->**(**)**
 HSPLandroidx/compose/ui/semantics/SemanticsModifierCore$Companion;->**(**)**
 HSPLandroidx/compose/ui/semantics/SemanticsModifierCore;->**(**)**
 HSPLandroidx/compose/ui/semantics/SemanticsModifierKt**->**(**)**
 HSPLandroidx/compose/ui/semantics/SemanticsNode;->**(**)**
+HSPLandroidx/compose/ui/platform/SemanticsNodeWithAdjustedBounds;->**(**)**
 HSPLandroidx/compose/ui/semantics/SemanticsNodeKt;->**(**)**
+HSPLandroidx/compose/ui/semantics/SemanticsOwner;->**(**)**
 HSPLandroidx/compose/ui/semantics/SemanticsProperties**->**(**)**
 HSPLandroidx/compose/ui/semantics/SemanticsPropertiesKt**->**(**)**
+HSPLandroidx/compose/ui/semantics/SemanticsPropertyKey**->**(**)**
+HSPLandroidx/compose/ui/semantics/SemanticsSort**->**(**)**
 HSPLandroidx/compose/ui/semantics/SemanticsWrapper;->**(**)**
 #
 # res
+HSPLandroidx/compose/ui/res/ImageVectorCache;->**(**)**
 HSPLandroidx/compose/ui/res/StringResources_androidKt;->**(**)**
 HSPLandroidx/compose/ui/res/PainterResources_androidKt;->**(**)**
 HSPLandroidx/compose/ui/res/ImageResources_androidKt;->**(**)**
@@ -93,4 +133,39 @@ HSPLandroidx/compose/ui/Alignment**->**(**)**
 #
 # root level things
 HSPLandroidx/compose/ui/Modifier**->**(**)**
+HSPLandroidx/compose/ui/CombinedModifier**->**(**)**
 HSPLandroidx/compose/ui/ComposedModifier**->**(**)**
+HSPLandroidx/compose/ui/KeyedComposedModifier**->**(**)**
+HSPLandroidx/compose/ui/MotionDurationScale**->**(**)**
+#
+# autofill
+HSPLandroidx/compose/ui/autofill/AndroidAutofill**->**(**)**
+HSPLandroidx/compose/ui/autofill/AutofillCallback;->**(**)**
+HSPLandroidx/compose/ui/autofill/AutofillTree;->**(**)**
+#
+# draw
+HSPLandroidx/compose/ui/draw/ClipKt**->**(**)**
+HSPLandroidx/compose/ui/draw/DrawBackgroundModifier;->**(**)**
+HSPLandroidx/compose/ui/draw/DrawModifiert**->**(**)**
+HSPLandroidx/compose/ui/draw/ShadowKt**->**(**)**
+#
+# focus
+HSPLandroidx/compose/ui/focus/FocusChangedModifier**->**(**)**
+HSPLandroidx/compose/ui/focus/FocusEventModifierKt**->**(**)**
+HSPLandroidx/compose/ui/focus/FocusEventModifierLocal;->**(**)**
+HSPLandroidx/compose/ui/focus/FocusManagerImpl;->**(**)**
+HSPLandroidx/compose/ui/focus/FocusManagerKt**->**(**)**
+HSPLandroidx/compose/ui/focus/FocusModifier**->**(**)**
+HSPLandroidx/compose/ui/focus/FocusPropertiesImpl;->**(**)**
+HSPLandroidx/compose/ui/focus/FocusPropertiesKt**->**(**)**
+HSPLandroidx/compose/ui/focus/FocusPropertiesModifier;->**(**)**
+HSPLandroidx/compose/ui/focus/FocusRequester**->**(**)**
+HSPLandroidx/compose/ui/focus/FocusStateImpl;->**(**)**
+
+#
+# geometry include everything
+HSPLandroidx/compose/ui/geometry/**->**(**)**
+
+#
+# graphics include everything
+HSPLandroidx/compose/ui/graphics/**->**(**)**

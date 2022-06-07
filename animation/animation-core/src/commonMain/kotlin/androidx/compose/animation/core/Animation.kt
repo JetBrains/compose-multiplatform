@@ -16,6 +16,8 @@
 
 package androidx.compose.animation.core
 
+import kotlin.jvm.JvmDefaultWithCompatibility
+
 /**
  * This interface provides a convenient way to query from an [VectorizedAnimationSpec] or
  * [FloatDecayAnimationSpec]: It spares the need to pass the starting conditions and in some cases
@@ -33,6 +35,7 @@ package androidx.compose.animation.core
  * @see [Animatable]
  * @see [updateTransition]
  */
+@JvmDefaultWithCompatibility
 interface Animation<T, V : AnimationVector> {
     /**
      * This amount of time in nanoseconds that the animation will run before it finishes

@@ -85,6 +85,7 @@ import org.junit.runner.RunWith
 
 private const val ROOT_ID = 3L
 private const val NODE_ID = -7L
+private const val ANCHOR_HASH = 77
 private const val PARAM_INDEX = 4
 private const val MAX_RECURSIONS = 2
 private const val MAX_ITERABLE_SIZE = 5
@@ -884,12 +885,12 @@ class ParameterFactoryTest {
         )
         validate(create("style", style)) {
             parameter("style", ParameterType.String, TextStyle::class.java.simpleName) {
-                parameter("background", ParameterType.String, "Unspecified")
-                parameter("color", ParameterType.Color, Color.Red.toArgb(), index = 2)
-                parameter("fontSize", ParameterType.String, "Unspecified", index = 5)
-                parameter("letterSpacing", ParameterType.String, "Unspecified", index = 9)
-                parameter("lineHeight", ParameterType.String, "Unspecified", index = 10)
-                parameter("textDecoration", ParameterType.String, "Underline", index = 14)
+                parameter("color", ParameterType.Color, Color.Red.toArgb())
+                parameter("fontSize", ParameterType.String, "Unspecified", index = 1)
+                parameter("letterSpacing", ParameterType.String, "Unspecified", index = 7)
+                parameter("background", ParameterType.String, "Unspecified", index = 11)
+                parameter("textDecoration", ParameterType.String, "Underline", index = 12)
+                parameter("lineHeight", ParameterType.String, "Unspecified", index = 15)
             }
         }
     }
@@ -922,6 +923,7 @@ class ParameterFactoryTest {
         val parameter = factory.create(
             ROOT_ID,
             NODE_ID,
+            ANCHOR_HASH,
             name,
             value,
             ParameterKind.Normal,
@@ -956,6 +958,7 @@ class ParameterFactoryTest {
         factory.expand(
             ROOT_ID,
             NODE_ID,
+            ANCHOR_HASH,
             name,
             value,
             reference,
@@ -972,7 +975,7 @@ class ParameterFactoryTest {
     }
 
     private fun ref(vararg reference: Int): NodeParameterReference =
-        NodeParameterReference(NODE_ID, ParameterKind.Normal, PARAM_INDEX, reference)
+        NodeParameterReference(NODE_ID, ANCHOR_HASH, ParameterKind.Normal, PARAM_INDEX, reference)
 
     private fun validate(
         parameter: NodeParameter,
@@ -992,7 +995,8 @@ class ParameterFactoryTest {
         maxInitialIterableSize: Int
     ) {
         factory.clearReferenceCache()
-        val reference = NodeParameterReference(NODE_ID, ParameterKind.Normal, PARAM_INDEX, indices)
+        val reference =
+            NodeParameterReference(NODE_ID, ANCHOR_HASH, ParameterKind.Normal, PARAM_INDEX, indices)
         val expanded = expand(
             name,
             value,

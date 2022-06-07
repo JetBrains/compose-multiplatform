@@ -48,8 +48,10 @@ import androidx.compose.ui.graphics.vector.Path
 import androidx.compose.ui.graphics.vector.PathData
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+@Preview
 @OptIn(ExperimentalAnimationGraphicsApi::class)
 @Composable
 fun AnimatedVectorGraphicsDemo() {
@@ -88,7 +90,8 @@ fun createSampleVectorPainter(toggle: Boolean): Painter {
         defaultHeight = 24.dp,
         viewportWidth = 24f,
         viewportHeight = 24f,
-        name = "sample"
+        name = "sample",
+        autoMirror = true
     ) { _, _ ->
         val transition = updateTransition(targetState = toggle, label = "sample")
         val duration = 3000

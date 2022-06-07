@@ -32,7 +32,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.runEmptyComposeUiTest
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -50,6 +52,7 @@ import org.junit.Test
  * When that button is clicked, Activity3 is launched, which contains Compose content.
  * The Compose content is finally asserted to exist.
  */
+@OptIn(ExperimentalTestApi::class)
 class MultipleActivitiesWithoutComposeTest {
 
     // Because Activity1 does not use Compose, we do not have to guarantee that the
@@ -58,14 +61,11 @@ class MultipleActivitiesWithoutComposeTest {
     @get:Rule
     val activityScenarioRule = ActivityScenarioRule(Activity1::class.java)
 
-    @get:Rule
-    val composeTestRule = createEmptyComposeRule()
-
     @Test
-    fun test() {
+    fun test() = runEmptyComposeUiTest {
         onView(withText("CLICK_1")).perform(click())
         onView(withText("CLICK_2")).perform(click())
-        composeTestRule.onNodeWithTag("compose-box").assertExists()
+        onNodeWithTag("compose-box").assertExists()
     }
 
     class Activity1 : ComponentActivity() {

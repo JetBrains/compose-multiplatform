@@ -17,11 +17,15 @@
 package androidx.compose.ui.demos
 
 import androidx.compose.foundation.demos.text.SoftwareKeyboardControllerDemo
+import androidx.compose.integration.demos.common.ActivityDemo
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.demos.autofill.ExplicitAutofillTypesDemo
+import androidx.compose.ui.demos.focus.AdjacentScrollablesFocusDemo
 import androidx.compose.ui.demos.focus.CaptureFocusDemo
 import androidx.compose.ui.demos.focus.ClickableInLazyColumnDemo
+import androidx.compose.ui.demos.focus.ConditionalFocusabilityDemo
 import androidx.compose.ui.demos.focus.CustomFocusOrderDemo
 import androidx.compose.ui.demos.focus.FocusInDialogDemo
 import androidx.compose.ui.demos.focus.FocusInPopupDemo
@@ -29,7 +33,10 @@ import androidx.compose.ui.demos.focus.FocusManagerMoveFocusDemo
 import androidx.compose.ui.demos.focus.FocusableDemo
 import androidx.compose.ui.demos.focus.OneDimensionalFocusSearchDemo
 import androidx.compose.ui.demos.focus.ReuseFocusRequesterDemo
+import androidx.compose.ui.demos.focus.ScrollableLazyRowFocusDemo
 import androidx.compose.ui.demos.focus.ScrollableRowFocusDemo
+import androidx.compose.ui.demos.focus.LazyListChildFocusDemos
+import androidx.compose.ui.demos.focus.NestedLazyListFocusSearchDemo
 import androidx.compose.ui.demos.focus.TwoDimensionalFocusSearchDemo
 import androidx.compose.ui.demos.gestures.ButtonMetaStateDemo
 import androidx.compose.ui.demos.gestures.DetectTapGesturesDemo
@@ -54,15 +61,19 @@ import androidx.compose.ui.demos.gestures.ScaleGestureFilterDemo
 import androidx.compose.ui.demos.gestures.ScrollGestureFilterDemo
 import androidx.compose.ui.demos.gestures.VerticalScrollerInDrawerDemo
 import androidx.compose.ui.demos.input.TouchModeDemo
-import androidx.compose.ui.demos.focus.ConditionalFocusabilityDemo
-import androidx.compose.ui.demos.keyinput.KeyInputDemo
 import androidx.compose.ui.demos.keyinput.InterceptEnterToSendMessageDemo
+import androidx.compose.ui.demos.keyinput.KeyInputDemo
 import androidx.compose.ui.demos.modifier.CommunicatingModifierDemo
+import androidx.compose.ui.demos.recyclerview.RecyclerViewDemos
 import androidx.compose.ui.demos.viewinterop.AndroidInComposeDemos
 import androidx.compose.ui.demos.viewinterop.ComplexTouchInterop
+import androidx.compose.ui.demos.viewinterop.ComposeInAndroidCoordinatorLayout
 import androidx.compose.ui.demos.viewinterop.ComposeInAndroidDemos
+import androidx.compose.ui.demos.viewinterop.ComposeViewComposeNestedInterop
 import androidx.compose.ui.demos.viewinterop.EditTextInteropDemo
 import androidx.compose.ui.demos.viewinterop.FocusTransferDemo
+import androidx.compose.ui.demos.viewinterop.NestedScrollInteropComposeParentWithAndroidChild
+import androidx.compose.ui.demos.viewinterop.ViewComposeViewNestedScrollInteropDemo
 import androidx.compose.ui.demos.viewinterop.ViewInteropDemo
 import androidx.compose.ui.samples.NestedScrollConnectionSample
 
@@ -132,7 +143,11 @@ private val FocusDemos = DemoCategory(
         ComposableDemo("FocusManager.moveFocus()") { FocusManagerMoveFocusDemo() },
         ComposableDemo("Capture/Free Focus") { CaptureFocusDemo() },
         ComposableDemo("Focus In Scrollable Row") { ScrollableRowFocusDemo() },
+        ComposableDemo("Focus in Lazy Row") { ScrollableLazyRowFocusDemo() },
+        ComposableDemo("LazyList Child Focusability") { LazyListChildFocusDemos() },
+        ComposableDemo("Focus In Adjacent Scrollable Rows") { AdjacentScrollablesFocusDemo() },
         ComposableDemo("Clickable in LazyColumn") { ClickableInLazyColumnDemo() },
+        ComposableDemo("Nested LazyLists") { NestedLazyListFocusSearchDemo() },
         ComposableDemo("Conditional Focusability") { ConditionalFocusabilityDemo() }
     )
 )
@@ -153,6 +168,27 @@ private val GraphicsDemos = DemoCategory(
     )
 )
 
+@OptIn(ExperimentalComposeUiApi::class)
+private val NestedScrollInteropDemos = DemoCategory(
+    "Nested Scroll Interop",
+    listOf(
+        ActivityDemo(
+            "(Collaborating) View -> Compose",
+            ComposeInAndroidCoordinatorLayout::class
+        ),
+        ActivityDemo(
+            "(Collaborating) View -> Compose -> View",
+            ViewComposeViewNestedScrollInteropDemo::class
+        ),
+        ComposableDemo("Compose -> View") {
+            NestedScrollInteropComposeParentWithAndroidChild()
+        },
+        ComposableDemo("Compose -> (Collaborating) View -> Compose Interop") {
+            ComposeViewComposeNestedInterop()
+        }
+    )
+)
+
 private val ViewInteropDemos = DemoCategory(
     "View Interop",
     listOf(
@@ -162,6 +198,7 @@ private val ViewInteropDemos = DemoCategory(
         ComplexTouchInterop,
         ComposableDemo("TextField Interop") { EditTextInteropDemo() },
         ComposableDemo("Focus Transfer") { FocusTransferDemo() },
+        NestedScrollInteropDemos
     )
 )
 
@@ -187,5 +224,6 @@ val CoreDemos = DemoCategory(
         GestureDemos,
         ViewInteropDemos,
         ComposableDemo("Software Keyboard Controller") { SoftwareKeyboardControllerDemo() },
+        RecyclerViewDemos
     )
 )

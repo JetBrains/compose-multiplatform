@@ -1,59 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.1.0-beta02" type="baseline" client="gradle" dependencies="false" name="AGP (7.1.0-beta02)" variant="all" version="7.1.0-beta02">
+<issues format="6" by="lint 7.4.0-alpha01" type="baseline" client="gradle" dependencies="false" name="AGP (7.4.0-alpha01)" variant="all" version="7.4.0-alpha01">
 
     <issue
-        id="NewApi"
-        message="Call requires API level 30 (current min is 21): `isSoftwareKeyboardShown`"
-        errorLine1="            if (view.isSoftwareKeyboardShown()) {"
-        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~">
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T> List&lt;T>.fastFilter(predicate: (T) -> Boolean): List&lt;T> {"
+        errorLine2="                                ~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/foundation/text/CoreTextFieldSoftKeyboardTest.kt"
-            line="183"
-            column="22"/>
+            file="src/commonMain/kotlin/androidx/compose/foundation/TempListUtils.kt"/>
     </issue>
 
     <issue
-        id="NewApi"
-        message="Call requires API level 30 (current min is 21): `hideKeyboard`"
-        errorLine1="                view.hideKeyboard()"
-        errorLine2="                     ~~~~~~~~~~~~">
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T, R> List&lt;T>.fastFold(initial: R, operation: (acc: R, T) -> R): R {"
+        errorLine2="                                   ~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/foundation/text/CoreTextFieldSoftKeyboardTest.kt"
-            line="184"
-            column="22"/>
+            file="src/commonMain/kotlin/androidx/compose/foundation/TempListUtils.kt"/>
     </issue>
 
     <issue
-        id="NewApi"
-        message="Call requires API level 30 (current min is 21): `isSoftwareKeyboardShown`"
-        errorLine1="                view.waitUntil(timeout) { !view.isSoftwareKeyboardShown() }"
-        errorLine2="                                                ~~~~~~~~~~~~~~~~~~~~~~~">
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T, R> List&lt;T>.fastMapIndexedNotNull("
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/foundation/text/CoreTextFieldSoftKeyboardTest.kt"
-            line="185"
-            column="49"/>
+            file="src/commonMain/kotlin/androidx/compose/foundation/TempListUtils.kt"/>
     </issue>
 
     <issue
-        id="NewApi"
-        message="Call requires API level 30 (current min is 21): `android.view.View#setWindowInsetsAnimationCallback`"
-        errorLine1="    rootView.setWindowInsetsAnimationCallback("
-        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T, R : Comparable&lt;R>> List&lt;T>.fastMaxOfOrNull(selector: (T) -> R): R? {"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/foundation/text/CoreTextFieldSoftKeyboardTest.kt"
-            line="193"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="NewApi"
-        message="Call requires API level 30 (current min is 21): `InsetAnimationCallback`"
-        errorLine1="        InsetAnimationCallback {"
-        errorLine2="        ^">
-        <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/foundation/text/CoreTextFieldSoftKeyboardTest.kt"
-            line="194"
-            column="9"/>
+            file="src/commonMain/kotlin/androidx/compose/foundation/TempListUtils.kt"/>
     </issue>
 
 </issues>

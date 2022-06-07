@@ -522,6 +522,36 @@ class BoxTest : LayoutTest() {
     }
 
     @Test
+    fun testBox_tracksPropagateMinConstraintsChanges() = with(density) {
+        val measuredLatch = CountDownLatch(2)
+
+        val pmc = mutableStateOf(true)
+
+        show {
+            Box(
+                Modifier.requiredWidthIn(20.dp, 40.dp),
+                propagateMinConstraints = pmc.value,
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    Modifier
+                        .width(10.dp)
+                        .onSizeChanged {
+                            if (measuredLatch.count == 2L) {
+                                assertEquals(20.dp.roundToPx(), it.width)
+                                pmc.value = false
+                            } else {
+                                assertEquals(10.dp.roundToPx(), it.width)
+                            }
+                            measuredLatch.countDown()
+                        }
+                )
+            }
+        }
+        assertTrue(measuredLatch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
     fun testBox_hasCorrectIntrinsicMeasurements() = with(density) {
         val testWidth = 90.toDp()
         val testHeight = 80.toDp()

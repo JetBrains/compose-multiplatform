@@ -20,7 +20,10 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.test.filters.SmallTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.currentTime
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
@@ -30,7 +33,7 @@ import org.junit.Test
 @SmallTest
 class TestMonotonicFrameClockTest {
     @Test
-    fun testMonotonicFrameClockRunsFrame() = runBlockingTest {
+    fun testMonotonicFrameClockRunsFrame() = runTest(UnconfinedTestDispatcher()) {
         val frameDelayNanos = 16_000_000L
         withContext(TestMonotonicFrameClock(this, frameDelayNanos)) {
             val startTime = currentTime

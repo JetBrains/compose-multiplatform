@@ -19,9 +19,11 @@ package androidx.compose.ui.graphics
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 expect fun Path(): Path
 
+@JvmDefaultWithCompatibility
 /* expect class */ interface Path {
 
     /**

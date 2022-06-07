@@ -17,15 +17,19 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFontLoader
+import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontSynthesis
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.resolveDefaults
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -34,11 +38,26 @@ import androidx.compose.ui.unit.LayoutDirection
 @Suppress("ModifierInspectorInfo")
 internal fun Modifier.textFieldMinSize(style: TextStyle) = composed {
     val density = LocalDensity.current
-    val resourceLoader = LocalFontLoader.current
+    val fontFamilyResolver = LocalFontFamilyResolver.current
     val layoutDirection = LocalLayoutDirection.current
 
-    val minSizeState = remember { TextFieldSize(layoutDirection, density, resourceLoader, style) }
-    minSizeState.update(layoutDirection, density, resourceLoader, style)
+    val resolvedStyle = remember(style, layoutDirection) {
+        resolveDefaults(style, layoutDirection)
+    }
+    val typeface by remember(fontFamilyResolver, resolvedStyle) {
+        fontFamilyResolver.resolve(
+            resolvedStyle.fontFamily,
+            resolvedStyle.fontWeight ?: FontWeight.Normal,
+            resolvedStyle.fontStyle ?: FontStyle.Normal,
+            resolvedStyle.fontSynthesis ?: FontSynthesis.All
+        )
+    }
+
+    val minSizeState = remember {
+        TextFieldSize(layoutDirection, density, fontFamilyResolver, style, typeface)
+    }
+
+    minSizeState.update(layoutDirection, density, fontFamilyResolver, resolvedStyle, typeface)
 
     Modifier.layout { measurable, constraints ->
         Modifier.defaultMinSize()
@@ -58,8 +77,9 @@ internal fun Modifier.textFieldMinSize(style: TextStyle) = composed {
 private class TextFieldSize(
     var layoutDirection: LayoutDirection,
     var density: Density,
-    var resourceLoader: Font.ResourceLoader,
-    var style: TextStyle
+    var fontFamilyResolver: FontFamily.Resolver,
+    var resolvedStyle: TextStyle,
+    var typeface: Any
 ) {
     var minSize = computeMinSize()
         private set
@@ -67,27 +87,30 @@ private class TextFieldSize(
     fun update(
         layoutDirection: LayoutDirection,
         density: Density,
-        resourceLoader: Font.ResourceLoader,
-        style: TextStyle
+        fontFamilyResolver: FontFamily.Resolver,
+        resolvedStyle: TextStyle,
+        typeface: Any
     ) {
         if (layoutDirection != this.layoutDirection ||
             density != this.density ||
-            resourceLoader != this.resourceLoader ||
-            style != this.style
+            fontFamilyResolver != this.fontFamilyResolver ||
+            resolvedStyle != this.resolvedStyle ||
+            typeface != this.typeface
         ) {
             this.layoutDirection = layoutDirection
             this.density = density
-            this.resourceLoader = resourceLoader
-            this.style = style
+            this.fontFamilyResolver = fontFamilyResolver
+            this.resolvedStyle = resolvedStyle
+            this.typeface = typeface
             minSize = computeMinSize()
         }
     }
 
     private fun computeMinSize(): IntSize {
         return computeSizeForDefaultText(
-            style = resolveDefaults(style, layoutDirection),
+            style = resolvedStyle,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
     }
 }

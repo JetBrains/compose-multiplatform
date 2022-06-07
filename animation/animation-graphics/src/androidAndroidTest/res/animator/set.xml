@@ -25,6 +25,7 @@
         <objectAnimator
             android:duration="100"
             android:propertyName="intProperty"
+            android:repeatCount="infinite"
             android:valueFrom="100"
             android:valueTo="200"
             android:valueType="intType" />

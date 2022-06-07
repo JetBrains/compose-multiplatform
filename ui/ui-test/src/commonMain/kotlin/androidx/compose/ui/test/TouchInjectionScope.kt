@@ -24,6 +24,7 @@ import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * The receiver scope of the touch input injection lambda from [performTouchInput].
@@ -57,35 +58,26 @@ import kotlin.math.roundToLong
  * [performTouchInput] has executed its code block. Because gestures don't have to be defined all
  * in the same [performTouchInput] block, keep in mind that while the gesture is not complete,
  * all code you execute in between these blocks will be executed while imaginary fingers are
- * actively touching the screen.
+ * actively touching the screen. The events sent as part of the same batch will not be interrupted
+ * by recomposition, however, if a gesture spans multiple [performTouchInput] blocks it is
+ * important to remember that recomposition, layout and drawing could take place during the
+ * gesture, which may lead to events being injected into a moving target. As pointer positions are
+ * manipulated in the current node's local coordinate system, this could lead to issues caused by
+ * the fact that part of the gesture will take effect before the rest of the events have been
+ * enqueued.
  *
- * Example usage:
- * ```
- * onNodeWithTag("myWidget")
- *    .performTouchInput {
- *        click(center)
- *    }
+ * Example of performing a click:
+ * @sample androidx.compose.ui.test.samples.touchInputClick
  *
- * onNodeWithTag("myWidget")
- *    // Perform an L-shaped gesture
- *    .performTouchInput {
- *        down(topLeft)
- *        move(topLeft + percentOffset(0f, .1f))
- *        move(topLeft + percentOffset(0f, .2f))
- *        move(topLeft + percentOffset(0f, .3f))
- *        move(topLeft + percentOffset(0f, .4f))
- *        move(centerLeft)
- *        move(centerLeft + percentOffset(.1f, 0f))
- *        move(centerLeft + percentOffset(.2f, 0f))
- *        move(centerLeft + percentOffset(.3f, 0f))
- *        move(centerLeft + percentOffset(.4f, 0f))
- *        move(center)
- *        up()
- *    }
- * ```
+ * Example of performing a swipe up:
+ * @sample androidx.compose.ui.test.samples.touchInputSwipeUp
+ *
+ * Example of performing an L-shaped gesture:
+ * @sample androidx.compose.ui.test.samples.touchInputLShapedGesture
  *
  * @see InjectionScope
  */
+@JvmDefaultWithCompatibility
 interface TouchInjectionScope : InjectionScope {
     /**
      * Returns the current position of the given [pointerId]. The default [pointerId] is 0. The

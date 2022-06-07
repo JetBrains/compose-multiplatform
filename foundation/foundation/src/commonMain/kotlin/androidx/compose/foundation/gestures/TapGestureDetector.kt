@@ -26,10 +26,7 @@ import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToDownIgnoreConsumed
 import androidx.compose.ui.input.pointer.changedToUp
-import androidx.compose.ui.input.pointer.consumeAllChanges
-import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.input.pointer.isOutOfBounds
-import androidx.compose.ui.input.pointer.positionChangeConsumed
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.fastAll
@@ -38,11 +35,13 @@ import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * Receiver scope for [detectTapGestures]'s `onPress` lambda. This offers
  * two methods to allow waiting for the press to be released.
  */
+@JvmDefaultWithCompatibility
 interface PressGestureScope : Density {
     /**
      * Waits for the press to be released before returning. If the gesture was canceled by
@@ -93,7 +92,7 @@ suspend fun PointerInputScope.detectTapGestures(
     forEachGesture {
         awaitPointerEventScope {
             val down = awaitFirstDown()
-            down.consumeDownChange()
+            down.consume()
             pressScope.reset()
             if (onPress !== NoPressGesture) launch {
                 pressScope.onPress(down.position)
@@ -110,7 +109,7 @@ suspend fun PointerInputScope.detectTapGestures(
                 if (upOrCancel == null) {
                     pressScope.cancel() // tap-up was canceled
                 } else {
-                    upOrCancel.consumeDownChange()
+                    upOrCancel.consume()
                     pressScope.release()
                 }
             } catch (_: PointerEventTimeoutCancellationException) {
@@ -141,7 +140,7 @@ suspend fun PointerInputScope.detectTapGestures(
                             withTimeout(longPressTimeout) {
                                 val secondUp = waitForUpOrCancellation()
                                 if (secondUp != null) {
-                                    secondUp.consumeDownChange()
+                                    secondUp.consume()
                                     pressScope.release()
                                     onDoubleTap(secondUp.position)
                                 } else {
@@ -173,7 +172,7 @@ suspend fun PointerInputScope.detectTapGestures(
 private suspend fun AwaitPointerEventScope.consumeUntilUp() {
     do {
         val event = awaitPointerEvent()
-        event.changes.fastForEach { it.consumeAllChanges() }
+        event.changes.fastForEach { it.consume() }
     } while (event.changes.fastAny { it.pressed })
 }
 
@@ -208,7 +207,7 @@ internal suspend fun PointerInputScope.detectTapAndPress(
             pressScope.reset()
             awaitPointerEventScope {
 
-                val down = awaitFirstDown().also { it.consumeDownChange() }
+                val down = awaitFirstDown().also { it.consume() }
 
                 if (onPress !== NoPressGesture) {
                     launch { pressScope.onPress(down.position) }
@@ -218,7 +217,7 @@ internal suspend fun PointerInputScope.detectTapAndPress(
                 if (up == null) {
                     pressScope.cancel() // tap-up was canceled
                 } else {
-                    up.consumeDownChange()
+                    up.consume()
                     pressScope.release()
                     onTap?.invoke(up.position)
                 }
@@ -267,7 +266,7 @@ suspend fun AwaitPointerEventScope.waitForUpOrCancellation(): PointerInputChange
         }
 
         if (event.changes.fastAny {
-                it.consumed.downChange || it.isOutOfBounds(size, extendedTouchPadding)
+                it.isConsumed || it.isOutOfBounds(size, extendedTouchPadding)
             }
         ) {
             return null // Canceled
@@ -276,7 +275,7 @@ suspend fun AwaitPointerEventScope.waitForUpOrCancellation(): PointerInputChange
         // Check for cancel by position consumption. We can look on the Final pass of the
         // existing pointer event because it comes after the Main pass we checked above.
         val consumeCheck = awaitPointerEvent(PointerEventPass.Final)
-        if (consumeCheck.changes.fastAny { it.positionChangeConsumed() }) {
+        if (consumeCheck.changes.fastAny { it.isConsumed }) {
             return null
         }
     }

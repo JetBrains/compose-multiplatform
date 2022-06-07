@@ -17,6 +17,7 @@
 package androidx.compose.material3
 
 import android.os.Build
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -27,6 +28,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -34,6 +36,7 @@ import androidx.compose.testutils.assertPixels
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asAndroidBitmap
@@ -42,6 +45,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
@@ -50,6 +54,7 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -67,6 +72,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@OptIn(ExperimentalMaterial3Api::class)
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class SurfaceTest {
@@ -79,7 +85,7 @@ class SurfaceTest {
     fun noTonalElevationColorIsSetOnNonElevatedSurfaceColor() {
         var absoluteTonalElevation: Dp = 0.dp
         var surfaceColor: Color = Color.Unspecified
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             surfaceColor = MaterialTheme.colorScheme.surface
             Box(
                 Modifier
@@ -114,7 +120,7 @@ class SurfaceTest {
         var absoluteTonalElevation: Dp = 0.dp
         var surfaceTonalColor: Color = Color.Unspecified
         var surfaceColor: Color
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             surfaceColor = MaterialTheme.colorScheme.surface
             Box(
                 Modifier
@@ -149,7 +155,7 @@ class SurfaceTest {
     @Test
     fun tonalElevationColorIsNotSetOnNonSurfaceColor() {
         var absoluteTonalElevation: Dp = 0.dp
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(
                 Modifier
                     .size(10.dp, 10.dp)
@@ -181,7 +187,7 @@ class SurfaceTest {
     fun absoluteElevationCompositionLocalIsSet() {
         var outerElevation: Dp? = null
         var innerElevation: Dp? = null
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Surface(tonalElevation = 2.dp) {
                 outerElevation = LocalAbsoluteTonalElevation.current
                 Surface(tonalElevation = 4.dp) {
@@ -199,7 +205,7 @@ class SurfaceTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun absoluteElevationIsNotUsedForShadows() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Column {
                 Box(
                     Modifier
@@ -257,7 +263,7 @@ class SurfaceTest {
     fun contentColorSetBeforeModifier() {
         var contentColor: Color = Color.Unspecified
         val expectedColor = Color.Blue
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             CompositionLocalProvider(LocalContentColor provides Color.Red) {
                 Surface(
                     Modifier.composed {
@@ -277,13 +283,34 @@ class SurfaceTest {
     }
 
     @Test
-    fun clickableOverload_semantics() {
+    fun clickable_semantics() {
         val count = mutableStateOf(0)
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Surface(
+                onClick = { count.value += 1 },
                 modifier = Modifier.testTag("surface"),
-                role = Role.Checkbox,
-                onClick = { count.value += 1 }
+            ) {
+                Text("${count.value}")
+                Spacer(Modifier.size(30.dp))
+            }
+        }
+        rule.onNodeWithTag("surface")
+            .assertHasClickAction()
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
+            .assertIsEnabled()
+            // since we merge descendants we should have text on the same node
+            .assertTextEquals("0")
+            .performClick()
+            .assertTextEquals("1")
+    }
+
+    @Test
+    fun clickable_withCustomSemantics() {
+        val count = mutableStateOf(0)
+        rule.setMaterialContent(lightColorScheme()) {
+            Surface(
+                onClick = { count.value += 1 },
+                modifier = Modifier.semantics { role = Role.Checkbox }.testTag("surface"),
             ) {
                 Text("${count.value}")
                 Spacer(Modifier.size(30.dp))
@@ -300,38 +327,75 @@ class SurfaceTest {
     }
 
     @Test
-    fun clickableOverload_clickAction() {
+    fun clickable_clickAction() {
         val count = mutableStateOf(0f)
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Surface(
-                modifier = Modifier.testTag("surface"),
-                onClick = { count.value += 1 }
-            ) {
-                Spacer(Modifier.size(30.dp))
-            }
+                onClick = { count.value += 1 },
+                modifier = Modifier.testTag("surface")
+            ) { Spacer(Modifier.size(30.dp)) }
         }
-        rule.onNodeWithTag("surface")
-            .performClick()
+        rule.onNodeWithTag("surface").performClick()
         Truth.assertThat(count.value).isEqualTo(1)
 
-        rule.onNodeWithTag("surface")
-            .performClick()
-            .performClick()
+        rule.onNodeWithTag("surface").performClick().performClick()
         Truth.assertThat(count.value).isEqualTo(3)
     }
 
     @Test
-    fun clickableOverload_enabled_disabled() {
+    fun clickable_clickOutsideShapeBounds() {
+        val count = mutableStateOf(0f)
+        rule.setMaterialContent(lightColorScheme()) {
+            Surface(
+                onClick = { count.value += 1 },
+                modifier = Modifier.testTag("surface"),
+                shape = CircleShape
+            ) { Spacer(Modifier.size(100.dp)) }
+        }
+        // Click inside the circular shape bounds. Expecting an increase in count.
+        rule.onNodeWithTag("surface").performClick()
+        Truth.assertThat(count.value).isEqualTo(1)
+
+        // Click outside the circular shape bounds. Expecting unchanged count.
+        rule.onNodeWithTag("surface").performTouchInput { click(Offset(10f, 10f)) }
+        Truth.assertThat(count.value).isEqualTo(1)
+    }
+
+    @Test
+    fun clickable_smallTouchTarget_clickOutsideShapeBounds() {
+        val count = mutableStateOf(0f)
+        rule.setMaterialContent(lightColorScheme()) {
+            Surface(
+                onClick = { count.value += 1 },
+                modifier = Modifier.testTag("surface"),
+                shape = CircleShape
+            ) { Spacer(Modifier.size(40.dp)) }
+        }
+        // Click inside the circular shape bounds. Expecting an increase in count.
+        rule.onNodeWithTag("surface").performClick()
+        Truth.assertThat(count.value).isEqualTo(1)
+
+        // Click outside the circular shape bounds. Still expecting an increase in count, as the
+        // touch target has a minimum size of 48dp.
+        rule.onNodeWithTag("surface").performTouchInput { click(Offset(2f, 2f)) }
+        Truth.assertThat(count.value).isEqualTo(2)
+    }
+
+    @Test
+    fun clickable_enabled_disabled() {
         val count = mutableStateOf(0f)
         val enabled = mutableStateOf(true)
-        rule.setMaterialContent {
+        val interactionSource = MutableInteractionSource()
+        rule.setMaterialContent(lightColorScheme()) {
             Surface(
-                modifier = Modifier.testTag("surface"),
-                enabled = enabled.value,
-                onClick = { count.value += 1 }
-            ) {
-                Spacer(Modifier.size(30.dp))
-            }
+                modifier = Modifier.testTag("surface")
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null,
+                        enabled = enabled.value,
+                        onClick = { count.value += 1 },
+                    )
+            ) { Spacer(Modifier.size(30.dp)) }
         }
         rule.onNodeWithTag("surface")
             .assertIsEnabled()
@@ -350,7 +414,7 @@ class SurfaceTest {
     }
 
     @Test
-    fun clickableOverload_interactionSource() {
+    fun clickable_interactionSource() {
         val interactionSource = MutableInteractionSource()
 
         var scope: CoroutineScope? = null
@@ -360,9 +424,10 @@ class SurfaceTest {
         rule.setContent {
             scope = rememberCoroutineScope()
             Surface(
-                modifier = Modifier.testTag("surface"),
                 onClick = {},
-                interactionSource = interactionSource
+                modifier =
+                Modifier.testTag("surface"),
+                interactionSource = interactionSource,
             ) {
                 Spacer(Modifier.size(30.dp))
             }
@@ -401,7 +466,232 @@ class SurfaceTest {
         }
     }
 
-    // TODO(b/198216553): Add surface_blockClicksBehind test from M2 after Button is added.
+    @Test
+    fun surface_blockClicksBehind() {
+        val state = mutableStateOf(0)
+        rule.setContent {
+            Box(Modifier.fillMaxSize()) {
+                Button(
+                    modifier = Modifier.fillMaxSize().testTag("clickable"),
+                    onClick = { state.value += 1 }
+                ) { Text("button fullscreen") }
+                Surface(
+                    Modifier.fillMaxSize().testTag("surface"),
+                ) {}
+            }
+        }
+        rule.onNodeWithTag("clickable").assertHasClickAction().performClick()
+        // still 0
+        Truth.assertThat(state.value).isEqualTo(0)
+    }
+
+    @Test
+    fun selectable_semantics() {
+        val selected = mutableStateOf(false)
+        rule.setMaterialContent(lightColorScheme()) {
+            Surface(
+                selected = selected.value,
+                onClick = { selected.value = !selected.value },
+                modifier = Modifier.testTag("surface"),
+            ) {
+                Text("${selected.value}")
+                Spacer(Modifier.size(30.dp))
+            }
+        }
+        rule.onNodeWithTag("surface")
+            .assertHasClickAction()
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab))
+            .assertIsEnabled()
+            // since we merge descendants we should have text on the same node
+            .assertTextEquals("false")
+            .performClick()
+            .assertTextEquals("true")
+    }
+
+    @Test
+    fun selectable_customSemantics() {
+        val selected = mutableStateOf(false)
+        rule.setMaterialContent(lightColorScheme()) {
+            Surface(
+                selected = selected.value,
+                onClick = { selected.value = !selected.value },
+                modifier = Modifier.semantics { role = Role.Switch }.testTag("surface"),
+            ) {
+                Text("${selected.value}")
+                Spacer(Modifier.size(30.dp))
+            }
+        }
+        rule.onNodeWithTag("surface")
+            .assertHasClickAction()
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Switch))
+            .assertIsEnabled()
+            // since we merge descendants we should have text on the same node
+            .assertTextEquals("false")
+            .performClick()
+            .assertTextEquals("true")
+    }
+
+    @Test
+    fun selectable_clickAction() {
+        val selected = mutableStateOf(false)
+        rule.setMaterialContent(lightColorScheme()) {
+            Surface(
+                selected = selected.value,
+                onClick = { selected.value = !selected.value },
+                modifier = Modifier.testTag("surface")
+            ) { Spacer(Modifier.size(30.dp)) }
+        }
+        rule.onNodeWithTag("surface").performClick()
+        Truth.assertThat(selected.value).isTrue()
+
+        rule.onNodeWithTag("surface").performClick()
+        Truth.assertThat(selected.value).isFalse()
+    }
+
+    @Test
+    fun selectable_clickOutsideShapeBounds() {
+        val selected = mutableStateOf(false)
+        rule.setMaterialContent(lightColorScheme()) {
+            Surface(
+                selected = selected.value,
+                onClick = { selected.value = !selected.value },
+                modifier = Modifier.testTag("surface"),
+                shape = CircleShape
+            ) { Spacer(Modifier.size(100.dp)) }
+        }
+        // Click inside the circular shape bounds. Expecting a selection change.
+        rule.onNodeWithTag("surface").performClick()
+        Truth.assertThat(selected.value).isTrue()
+
+        // Click outside the circular shape bounds. Expecting a selection to stay as it.
+        rule.onNodeWithTag("surface").performTouchInput { click(Offset(10f, 10f)) }
+        Truth.assertThat(selected.value).isTrue()
+    }
+
+    @Test
+    fun selectable_smallTouchTarget_clickOutsideShapeBounds() {
+        val selected = mutableStateOf(false)
+        rule.setMaterialContent(lightColorScheme()) {
+            Surface(
+                selected = selected.value,
+                onClick = { selected.value = !selected.value },
+                modifier = Modifier.testTag("surface"),
+                shape = CircleShape
+            ) { Spacer(Modifier.size(40.dp)) }
+        }
+        // Click inside the circular shape bounds. Expecting a selection change.
+        rule.onNodeWithTag("surface").performClick()
+        Truth.assertThat(selected.value).isTrue()
+
+        // Click outside the circular shape bounds. Still expecting a selection change, as the
+        // touch target has a minimum size of 48dp.
+        rule.onNodeWithTag("surface").performTouchInput { click(Offset(2f, 2f)) }
+        Truth.assertThat(selected.value).isFalse()
+    }
+
+    @Test
+    fun toggleable_semantics() {
+        val toggled = mutableStateOf(false)
+        rule.setMaterialContent(lightColorScheme()) {
+            Surface(
+                checked = toggled.value,
+                onCheckedChange = { toggled.value = !toggled.value },
+                modifier = Modifier.testTag("surface"),
+            ) {
+                Text("${toggled.value}")
+                Spacer(Modifier.size(30.dp))
+            }
+        }
+        rule.onNodeWithTag("surface")
+            .assertHasClickAction()
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Switch))
+            .assertIsEnabled()
+            // since we merge descendants we should have text on the same node
+            .assertTextEquals("false")
+            .performClick()
+            .assertTextEquals("true")
+    }
+
+    @Test
+    fun toggleable_customSemantics() {
+        val toggled = mutableStateOf(false)
+        rule.setMaterialContent(lightColorScheme()) {
+            Surface(
+                checked = toggled.value,
+                onCheckedChange = { toggled.value = !toggled.value },
+                modifier = Modifier.semantics { role = Role.Tab }.testTag("surface"),
+            ) {
+                Text("${toggled.value}")
+                Spacer(Modifier.size(30.dp))
+            }
+        }
+        rule.onNodeWithTag("surface")
+            .assertHasClickAction()
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab))
+            .assertIsEnabled()
+            // since we merge descendants we should have text on the same node
+            .assertTextEquals("false")
+            .performClick()
+            .assertTextEquals("true")
+    }
+
+    @Test
+    fun toggleable_toggleAction() {
+        val toggled = mutableStateOf(false)
+        rule.setMaterialContent(lightColorScheme()) {
+            Surface(
+                checked = toggled.value,
+                onCheckedChange = { toggled.value = !toggled.value },
+                modifier = Modifier.testTag("surface")
+            ) { Spacer(Modifier.size(30.dp)) }
+        }
+        rule.onNodeWithTag("surface").performClick()
+        Truth.assertThat(toggled.value).isTrue()
+
+        rule.onNodeWithTag("surface").performClick()
+        Truth.assertThat(toggled.value).isFalse()
+    }
+
+    @Test
+    fun toggleable_clickOutsideShapeBounds() {
+        val checked = mutableStateOf(false)
+        rule.setMaterialContent(lightColorScheme()) {
+            Surface(
+                checked = checked.value,
+                onCheckedChange = { checked.value = !checked.value },
+                modifier = Modifier.testTag("surface"),
+                shape = CircleShape
+            ) { Spacer(Modifier.size(100.dp)) }
+        }
+        // Click inside the circular shape bounds. Expecting a checked state change.
+        rule.onNodeWithTag("surface").performClick()
+        Truth.assertThat(checked.value).isTrue()
+
+        // Click outside the circular shape bounds. Expecting the checked state to stay as it.
+        rule.onNodeWithTag("surface").performTouchInput { click(Offset(10f, 10f)) }
+        Truth.assertThat(checked.value).isTrue()
+    }
+
+    @Test
+    fun toggleable_smallTouchTarget_clickOutsideShapeBounds() {
+        val checked = mutableStateOf(false)
+        rule.setMaterialContent(lightColorScheme()) {
+            Surface(
+                checked = checked.value,
+                onCheckedChange = { checked.value = !checked.value },
+                modifier = Modifier.testTag("surface"),
+                shape = CircleShape
+            ) { Spacer(Modifier.size(40.dp)) }
+        }
+        // Click inside the circular shape bounds. Expecting a checked state change.
+        rule.onNodeWithTag("surface").performClick()
+        Truth.assertThat(checked.value).isTrue()
+
+        // Click outside the circular shape bounds. Still expecting a checked state change, as the
+        // touch target has a minimum size of 48dp.
+        rule.onNodeWithTag("surface").performTouchInput { click(Offset(2f, 2f)) }
+        Truth.assertThat(checked.value).isFalse()
+    }
 
     // regression test for b/189411183
     @Test
@@ -421,7 +711,7 @@ class SurfaceTest {
                                     awaitPointerEventScope {
                                         hitTested.value = true
                                         val event = awaitPointerEvent(PointerEventPass.Final)
-                                        Truth.assertThat(event.changes[0].consumed.downChange)
+                                        Truth.assertThat(event.changes[0].isConsumed)
                                             .isFalse()
                                     }
                                 }

@@ -33,6 +33,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 internal class ImeOptionsData(
@@ -101,9 +102,24 @@ private val ImeOptionsList = listOf(
             imeAction = ImeAction.Send
         ),
         name = "multiLine/Number/Send"
+    ),
+    ImeOptionsData(
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Decimal
+        ),
+        name = "singleLine/Decimal"
+    ),
+    ImeOptionsData(
+        singleLine = false,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Decimal
+        ),
+        name = "multiLine/Decimal"
     )
 )
 
+@Preview
 @Composable
 fun ImeSingleLineDemo() {
     LazyColumn {

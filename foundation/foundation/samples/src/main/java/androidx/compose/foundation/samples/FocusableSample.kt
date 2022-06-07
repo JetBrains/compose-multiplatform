@@ -17,10 +17,15 @@
 package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.border
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +33,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.Red
+import androidx.compose.ui.unit.dp
 
 @Sampled
 @Composable
@@ -55,6 +63,41 @@ fun FocusableSample() {
         )
         Button(onClick = { focusRequester.requestFocus() }) {
             Text("Bring focus to the text above")
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Sampled
+@Composable
+fun FocusGroupSample() {
+    Row {
+        Column(Modifier.focusGroup()) {
+            Button({}) { Text("Row1 Col1") }
+            Button({}) { Text("Row2 Col1") }
+            Button({}) { Text("Row3 Col1") }
+        }
+        Column(Modifier.focusGroup()) {
+            Button({}) { Text("Row1 Col2") }
+            Button({}) { Text("Row2 Col2") }
+            Button({}) { Text("Row3 Col2") }
+        }
+    }
+}
+
+@Sampled
+@Composable
+fun FocusableFocusGroupSample() {
+    val interactionSource = remember { MutableInteractionSource() }
+    LazyRow(
+        Modifier
+            .focusable(interactionSource = interactionSource)
+            .border(1.dp, if (interactionSource.collectIsFocusedAsState().value) Red else Black)
+    ) {
+        repeat(10) {
+            item {
+                Button({}) { Text("Button$it") }
+            }
         }
     }
 }

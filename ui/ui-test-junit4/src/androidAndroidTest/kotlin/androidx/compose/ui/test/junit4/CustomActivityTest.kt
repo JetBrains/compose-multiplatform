@@ -23,10 +23,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.testutils.expectError
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.runAndroidComposeUiTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -52,13 +54,25 @@ class CustomActivity : ComponentActivity() {
  */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalTestApi::class)
 class CustomActivityTest {
-
-    @get:Rule
-    val rule = createAndroidComposeRule<CustomActivity>()
+    private companion object {
+        const val ContentAlreadySetError = "androidx\\.compose\\.ui\\.test\\.junit4\\." +
+            "CustomActivity@[0-9A-Fa-f]* has already set content\\. If you have populated the " +
+            "Activity with a ComposeView, make sure to call setContent on that ComposeView " +
+            "instead of on the test rule; and make sure that that call to `setContent \\{\\}` " +
+            "is done after the ComposeTestRule has run"
+    }
 
     @Test
-    fun launchCustomActivity() {
-        rule.onNodeWithText("Hello").assertExists()
+    fun launchCustomActivity() = runAndroidComposeUiTest<CustomActivity> {
+        onNodeWithText("Hello").assertExists()
+    }
+
+    @Test
+    fun setContentOnActivityWithContent() = runAndroidComposeUiTest<CustomActivity> {
+        expectError<IllegalStateException>(expectedMessage = ContentAlreadySetError) {
+            setContent { Text("Hello") }
+        }
     }
 }

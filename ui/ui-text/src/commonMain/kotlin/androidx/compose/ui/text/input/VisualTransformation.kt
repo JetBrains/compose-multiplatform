@@ -57,7 +57,7 @@ class TransformedText(
  * Interface used for changing visual output of the input field.
  *
  * This interface can be used for changing visual output of the text in the input field.
- * For example, you can mask characters in password filed with asterisk with
+ * For example, you can mask characters in password field with asterisk with
  * [PasswordVisualTransformation].
  */
 @Immutable

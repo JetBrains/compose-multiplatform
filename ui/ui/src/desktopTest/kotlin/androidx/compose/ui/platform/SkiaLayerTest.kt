@@ -16,7 +16,10 @@
 
 package androidx.compose.ui.platform
 
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
@@ -28,6 +31,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.round
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import kotlin.math.PI
@@ -312,6 +317,58 @@ class SkiaLayerTest {
         assertEquals(IntOffset(-10 * 4 + 60, 100 * 2 + 7), matrix.map(Offset(100f, 10f)).round())
     }
 
+    @Test
+    fun `is in layer`() {
+        layer.resize(IntSize(0, 0))
+        layer.updateProperties(
+            clip = false
+        )
+
+        assertTrue(layer.isInLayer(Offset(-1f, -1f)))
+        assertTrue(layer.isInLayer(Offset(0f, 0f)))
+        assertTrue(layer.isInLayer(Offset(1f, 1f)))
+
+        layer.resize(IntSize(0, 0))
+        layer.updateProperties(
+            clip = true
+        )
+
+        assertFalse(layer.isInLayer(Offset(-1f, -1f)))
+        assertFalse(layer.isInLayer(Offset(0f, 0f)))
+        assertFalse(layer.isInLayer(Offset(1f, 1f)))
+
+        layer.resize(IntSize(0, 0))
+        layer.updateProperties(
+            clip = true,
+            shape = CircleShape
+        )
+
+        assertFalse(layer.isInLayer(Offset(-1f, -1f)))
+        assertFalse(layer.isInLayer(Offset(0f, 0f)))
+        assertFalse(layer.isInLayer(Offset(1f, 1f)))
+
+        layer.resize(IntSize(1, 2))
+        layer.updateProperties(
+            clip = true
+        )
+
+        assertFalse(layer.isInLayer(Offset(-1f, -1f)))
+        assertTrue(layer.isInLayer(Offset(0f, 0f)))
+        assertTrue(layer.isInLayer(Offset(0f, 1f)))
+        assertFalse(layer.isInLayer(Offset(0f, 2f)))
+        assertFalse(layer.isInLayer(Offset(1f, 0f)))
+
+        layer.resize(IntSize(100, 200))
+        layer.updateProperties(
+            clip = true,
+            shape = CircleShape
+        )
+
+        assertFalse(layer.isInLayer(Offset(5f, 5f)))
+        assertFalse(layer.isInLayer(Offset(95f, 195f)))
+        assertTrue(layer.isInLayer(Offset(50f, 100f)))
+    }
+
     private fun TestSkiaLayer() = SkiaLayer(
         Density(1f, 1f),
         invalidateParentLayer = {},
@@ -325,6 +382,8 @@ class SkiaLayerTest {
         translationX: Float = 0f,
         translationY: Float = 0f,
         shadowElevation: Float = 0f,
+        ambientShadowColor: Color = DefaultShadowColor,
+        spotShadowColor: Color = DefaultShadowColor,
         rotationX: Float = 0f,
         rotationY: Float = 0f,
         rotationZ: Float = 0f,
@@ -336,8 +395,8 @@ class SkiaLayerTest {
     ) {
         updateLayerProperties(
             scaleX, scaleY, alpha, translationX, translationY, shadowElevation, rotationX,
-            rotationY, rotationZ, cameraDistance, transformOrigin, shape, clip,
-            renderEffect, LayoutDirection.Ltr, Density(1f, 1f)
+            rotationY, rotationZ, cameraDistance, transformOrigin, shape, clip, renderEffect,
+            ambientShadowColor, spotShadowColor, LayoutDirection.Ltr, Density(1f, 1f)
         )
     }
 }

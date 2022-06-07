@@ -51,7 +51,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
 /**
- * Tests if [AndroidInputDispatcher.enqueueTouchDown] works
+ * Tests if [AndroidInputDispatcher.enqueueMousePress] and friends work.
  */
 @RunWith(AndroidJUnit4::class)
 @Config(minSdk = RobolectricMinSdk)
@@ -473,7 +473,7 @@ class MouseEventsTest : InputDispatcherTest() {
 
     @Test
     fun scroll_vertically() {
-        scrollTest(ScrollWheel.Vertical) { Pair(AXIS_VSCROLL, it) }
+        scrollTest(ScrollWheel.Vertical) { Pair(AXIS_VSCROLL, -it) }
     }
 
     @Test
@@ -481,7 +481,7 @@ class MouseEventsTest : InputDispatcherTest() {
         scrollTest(ScrollWheel.Horizontal) { Pair(AXIS_HSCROLL, it) }
     }
 
-    fun scrollTest(scrollWheel: ScrollWheel, scrollAxis: (Float) -> Pair<Int, Float>) {
+    private fun scrollTest(scrollWheel: ScrollWheel, scrollAxis: (Float) -> Pair<Int, Float>) {
         // Scenario:
         // move mouse
         // scroll by 1f
@@ -727,7 +727,7 @@ class MouseEventsTest : InputDispatcherTest() {
         events.removeFirst(3).let { (enterEvent, hoverEvent, scrollEvent) ->
             enterEvent.verifyMouseEvent(ACTION_HOVER_ENTER, t, Offset.Zero, 0)
             hoverEvent.verifyMouseEvent(ACTION_HOVER_MOVE, t, Offset.Zero, 0)
-            scrollEvent.verifyMouseEvent(ACTION_SCROLL, t, Offset.Zero, 0, Pair(AXIS_VSCROLL, 1f))
+            scrollEvent.verifyMouseEvent(ACTION_SCROLL, t, Offset.Zero, 0, Pair(AXIS_VSCROLL, -1f))
         }
     }
 

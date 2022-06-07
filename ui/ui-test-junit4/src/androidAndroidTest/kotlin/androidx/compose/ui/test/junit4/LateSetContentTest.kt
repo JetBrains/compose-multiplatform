@@ -21,20 +21,20 @@ import android.os.Handler
 import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.util.BoundaryNode
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.runAndroidComposeUiTest
 import androidx.test.filters.LargeTest
-import org.junit.Rule
 import org.junit.Test
 
 @LargeTest
+@OptIn(ExperimentalTestApi::class)
 class LateSetContentTest {
-    @get:Rule
-    val rule = createAndroidComposeRule<Activity>()
 
     @Test
-    fun test() {
-        rule.onNodeWithTag("Node").assertExists()
+    fun test() = runAndroidComposeUiTest<Activity> {
+        onNodeWithTag("Node").assertExists()
     }
 
     class Activity : ComponentActivity() {

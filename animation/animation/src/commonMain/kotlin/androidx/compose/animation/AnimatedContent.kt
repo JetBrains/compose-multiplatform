@@ -298,9 +298,9 @@ class AnimatedContentScope<S> internal constructor(
      * [SlideDirection] defines the direction of the slide in/out for [slideIntoContainer] and
      * [slideOutOfContainer]. The supported directions are: [Left], [Right], [Up] and [Down].
      */
-    @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
     @Immutable
-    inline class SlideDirection internal constructor(private val value: Int) {
+    @kotlin.jvm.JvmInline
+    value class SlideDirection internal constructor(private val value: Int) {
         companion object {
             val Left = SlideDirection(0)
             val Right = SlideDirection(1)

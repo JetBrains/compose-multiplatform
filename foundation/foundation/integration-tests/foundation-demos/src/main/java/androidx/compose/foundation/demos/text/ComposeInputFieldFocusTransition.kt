@@ -27,14 +27,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusOrder
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 
+@Preview
 @Composable
 fun TextFieldFocusTransition() {
     val focusRequesters = remember { List(6) { FocusRequester() } }
@@ -59,7 +62,8 @@ private fun TextFieldWithFocusRequesters(
         value = state.value,
         modifier = demoTextFieldModifiers
             .onFocusChanged { color = if (it.isFocused) Red else Black }
-            .focusOrder(focusRequester) { next = nextFocusRequester },
+            .focusRequester(focusRequester)
+            .focusProperties { next = nextFocusRequester },
         textStyle = TextStyle(color = color, fontSize = 32.sp),
         onValueChange = { state.value = it },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)

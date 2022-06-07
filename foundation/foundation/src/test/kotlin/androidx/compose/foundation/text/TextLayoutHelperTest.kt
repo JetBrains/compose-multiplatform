@@ -17,12 +17,14 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.MultiParagraph
+import androidx.compose.ui.text.MultiParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.TextLayoutInput
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -32,6 +34,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,14 +43,18 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class TextLayoutHelperTest {
 
-    lateinit var resourceLoader: Font.ResourceLoader
+    lateinit var fontFamilyResolver: FontFamily.Resolver
 
     lateinit var referenceResult: TextLayoutResult
 
     @Before
     fun setUp() {
-        resourceLoader = mock()
+        fontFamilyResolver = mock()
 
+        val intrinsics = mock<MultiParagraphIntrinsics>()
+        val multiParagraph = mock<MultiParagraph>()
+        whenever(multiParagraph.intrinsics).thenReturn(intrinsics)
+        whenever(intrinsics.hasStaleResolvedFonts).thenReturn(false)
         referenceResult = TextLayoutResult(
             TextLayoutInput(
                 text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
@@ -58,10 +65,10 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = Constraints.fixedWidth(100)
             ),
-            multiParagraph = mock(),
+            multiParagraph = multiParagraph,
             size = IntSize(50, 50)
         )
     }
@@ -79,7 +86,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = constraints
             )
         ).isTrue()
@@ -98,7 +105,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = constraints
             )
         ).isFalse()
@@ -117,7 +124,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = constraints
             )
         ).isFalse()
@@ -136,7 +143,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = constraints
             )
         ).isFalse()
@@ -155,7 +162,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = constraints
             )
         ).isFalse()
@@ -174,7 +181,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Clip,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = constraints
             )
         ).isFalse()
@@ -193,7 +200,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(2.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = constraints
             )
         ).isFalse()
@@ -212,7 +219,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Rtl,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = constraints
             )
         ).isFalse()
@@ -231,14 +238,14 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = mock(),
+                fontFamilyResolver = mock(),
                 constraints = constraints
             )
         ).isFalse()
     }
 
     @Test
-    fun testCanReuse_different_constraints() {
+    fun testCanReuse_different_constraintsWidth() {
         assertThat(
             referenceResult.canReuse(
                 text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
@@ -249,8 +256,26 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = Constraints.fixedWidth(200)
+            )
+        ).isFalse()
+    }
+
+    @Test
+    fun testCanReuse_different_constraintsHeight() {
+        assertThat(
+            referenceResult.canReuse(
+                text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
+                style = TextStyle(),
+                placeholders = emptyList(),
+                maxLines = 1,
+                softWrap = true,
+                overflow = TextOverflow.Ellipsis,
+                density = Density(1.0f),
+                layoutDirection = LayoutDirection.Ltr,
+                fontFamilyResolver = fontFamilyResolver,
+                constraints = Constraints.fixedHeight(200)
             )
         ).isFalse()
     }
@@ -273,9 +298,28 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = Constraints.fixedWidth(200)
             )
         ).isFalse()
+    }
+
+    @Test
+    fun testCanReuse_notLatestTypefaces_isFalse() {
+        val constraints = Constraints.fixedWidth(100)
+        whenever(referenceResult.multiParagraph.intrinsics.hasStaleResolvedFonts)
+            .thenReturn(true)
+        assertThat(referenceResult.canReuse(
+            text = AnnotatedString.Builder("Hello, World").toAnnotatedString(),
+            style = TextStyle(),
+            placeholders = emptyList(),
+            maxLines = 1,
+            softWrap = true,
+            overflow = TextOverflow.Ellipsis,
+            density = Density(1.0f),
+            layoutDirection = LayoutDirection.Ltr,
+            fontFamilyResolver = fontFamilyResolver,
+            constraints = constraints
+        )).isFalse()
     }
 }

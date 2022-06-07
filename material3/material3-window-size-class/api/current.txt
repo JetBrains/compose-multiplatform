@@ -1,0 +1,48 @@
+// Signature format: 4.0
+package androidx.compose.material3.windowsizeclass {
+
+  public final class AndroidWindowSizeClass_androidKt {
+  }
+
+  public final class TestOnly_jvmKt {
+  }
+
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class WindowHeightSizeClass {
+    field public static final androidx.compose.material3.windowsizeclass.WindowHeightSizeClass.Companion Companion;
+  }
+
+  public static final class WindowHeightSizeClass.Companion {
+    method public String getCompact();
+    method public String getExpanded();
+    method public String getMedium();
+    property public final String Compact;
+    property public final String Expanded;
+    property public final String Medium;
+  }
+
+  @androidx.compose.runtime.Immutable public final class WindowSizeClass {
+    method public String getHeightSizeClass();
+    method public String getWidthSizeClass();
+    property public final String heightSizeClass;
+    property public final String widthSizeClass;
+    field public static final androidx.compose.material3.windowsizeclass.WindowSizeClass.Companion Companion;
+  }
+
+  public static final class WindowSizeClass.Companion {
+  }
+
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class WindowWidthSizeClass {
+    field public static final androidx.compose.material3.windowsizeclass.WindowWidthSizeClass.Companion Companion;
+  }
+
+  public static final class WindowWidthSizeClass.Companion {
+    method public String getCompact();
+    method public String getExpanded();
+    method public String getMedium();
+    property public final String Compact;
+    property public final String Expanded;
+    property public final String Medium;
+  }
+
+}
+

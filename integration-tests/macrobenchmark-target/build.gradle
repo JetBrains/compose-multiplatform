@@ -6,23 +6,36 @@ plugins {
 }
 
 android {
+    namespace "androidx.compose.integration.macrobenchmark.target"
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt")
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"),
+                    'proguard-rules.pro'
         }
     }
 }
 
 dependencies {
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
     kotlinPlugin(project(":compose:compiler:compiler"))
 
     implementation(libs.kotlinStdlib)
     implementation(project(":activity:activity-compose"))
+    implementation("androidx.appcompat:appcompat:1.4.1")
+    implementation("androidx.cardview:cardview:1.0.0")
+    // old version of common-java8 conflicts with newer version, because both have
+    // DefaultLifecycleEventObserver.
+    // Outside of androidx this is resolved via constraint added to lifecycle-common,
+    // but it doesn't work in androidx.
+    // See aosp/1804059
+    implementation projectOrArtifact(":lifecycle:lifecycle-common-java8")
     implementation(project(":compose:foundation:foundation-layout"))
+    implementation(project(":compose:foundation:foundation"))
     implementation(project(":compose:material:material"))
     implementation(project(":compose:runtime:runtime"))
+    implementation(project(":compose:runtime:runtime-tracing"))
     implementation(project(":compose:ui:ui"))
     implementation(project(":compose:ui:ui-tooling"))
 }

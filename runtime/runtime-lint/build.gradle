@@ -16,7 +16,6 @@
 
 
 import androidx.build.BundleInsideHelper
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
 plugins {
@@ -42,7 +41,7 @@ dependencies {
 androidx {
     name = "Compose Runtime Lint Checks"
     type = LibraryType.LINT
-    mavenGroup = LibraryGroups.Compose.RUNTIME
+    mavenGroup = LibraryGroups.COMPOSE_RUNTIME
     inceptionYear = "2020"
     description = "Compose Runtime Lint Checks"
 }

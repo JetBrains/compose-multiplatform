@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
+import org.jetbrains.kotlin.resolve.descriptorUtil.annotationClass
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeUtils.NO_EXPECTED_TYPE
 import org.jetbrains.kotlin.types.TypeUtils.UNIT_EXPECTED_TYPE
@@ -40,15 +41,28 @@ object ComposeFqNames {
     private const val internalRoot = "$root.internal"
     fun fqNameFor(cname: String) = FqName("$root.$cname")
     fun internalFqNameFor(cname: String) = FqName("$internalRoot.$cname")
-
+    fun composablesFqNameFor(cname: String) = fqNameFor("ComposablesKt.$cname")
     val Composable = fqNameFor("Composable")
+    val ComposableTarget = fqNameFor("ComposableTarget")
+    val ComposableTargetMarker = fqNameFor("ComposableTargetMarker")
+    val ComposableTargetMarkerDescription = "description"
+    val ComposableTargetMarkerDescriptionName = Name.identifier("description")
+    val ComposableTargetApplierArgument = Name.identifier("applier")
+    val ComposableOpenTarget = fqNameFor("ComposableOpenTarget")
+    val ComposableOpenTargetIndexArgument = Name.identifier("index")
+    val ComposableInferredTarget = fqNameFor("ComposableInferredTarget")
+    val ComposableInferredTargetSchemeArgument = Name.identifier("scheme")
     val internal = fqNameFor("internal")
     val CurrentComposerIntrinsic = fqNameFor("<get-currentComposer>")
+    val getCurrentComposerFullName = composablesFqNameFor("<get-currentComposer>")
     val DisallowComposableCalls = fqNameFor("DisallowComposableCalls")
     val ReadOnlyComposable = fqNameFor("ReadOnlyComposable")
     val ExplicitGroupsComposable = fqNameFor("ExplicitGroupsComposable")
     val NonRestartableComposable = fqNameFor("NonRestartableComposable")
+    val composableLambdaType = internalFqNameFor("ComposableLambda")
     val composableLambda = internalFqNameFor("composableLambda")
+    val composableLambdaFullName =
+        internalFqNameFor("ComposableLambdaKt.composableLambda")
     val composableLambdaInstance = internalFqNameFor("composableLambdaInstance")
     val remember = fqNameFor("remember")
     val key = fqNameFor("key")
@@ -103,6 +117,32 @@ fun Annotated.hasExplicitGroupsAnnotation(): Boolean =
     annotations.findAnnotation(ComposeFqNames.ExplicitGroupsComposable) != null
 fun Annotated.hasDisallowComposableCallsAnnotation(): Boolean =
     annotations.findAnnotation(ComposeFqNames.DisallowComposableCalls) != null
+fun Annotated.compositionTarget(): String? =
+    annotations.map { it.compositionTarget() }.firstOrNull { it != null }
+
+fun Annotated.hasCompositionTargetMarker(): Boolean =
+    annotations.findAnnotation(
+        ComposeFqNames.ComposableTargetMarker
+    ) != null
+
+fun AnnotationDescriptor.compositionTarget(): String? =
+    if (fqName == ComposeFqNames.ComposableTarget)
+        allValueArguments[ComposeFqNames.ComposableTargetApplierArgument]?.value as? String
+    else if (annotationClass?.hasCompositionTargetMarker() == true) this.fqName.toString() else null
+
+fun Annotated.compositionScheme(): String? =
+    annotations.findAnnotation(
+        ComposeFqNames.ComposableInferredTarget
+    )?.allValueArguments?.let {
+        it[ComposeFqNames.ComposableInferredTargetSchemeArgument]?.value as? String
+    }
+
+fun Annotated.compositionOpenTarget(): Int? =
+    annotations.findAnnotation(
+        ComposeFqNames.ComposableOpenTarget
+    )?.allValueArguments?.let {
+        it[ComposeFqNames.ComposableOpenTargetIndexArgument]?.value as Int
+    }
 
 internal val KotlinType.isSpecialType: Boolean get() =
     this === NO_EXPECTED_TYPE || this === UNIT_EXPECTED_TYPE

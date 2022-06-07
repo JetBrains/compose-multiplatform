@@ -19,7 +19,7 @@
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="indeterminate" msgid="2486394087603402002">"Флажок не установлен и не снят"</string>
     <string name="on" msgid="8655164131929253426">"Включено"</string>
-    <string name="off" msgid="875452955155264703">"Выключено"</string>
+    <string name="off" msgid="875452955155264703">"Отключено"</string>
     <string name="selected" msgid="6043586758067023">"Выбрано"</string>
     <string name="not_selected" msgid="6610465462668679431">"Не выбрано"</string>
     <string name="template_percent" msgid="5946805113151406391">"Процентов: <xliff:g id="PERCENTAGE">%1$d</xliff:g>."</string>
@@ -31,4 +31,6 @@
     <string name="close_sheet" msgid="7573152094250666567">"Закрыть лист"</string>
     <string name="default_error_message" msgid="8038256446254964252">"Неправильный ввод"</string>
     <string name="default_popup_window_title" msgid="6312721426453364202">"Всплывающее окно"</string>
+    <string name="range_start" msgid="7097486360902471446">"Начало диапазона"</string>
+    <string name="range_end" msgid="5941395253238309765">"Конец диапазона"</string>
 </resources>

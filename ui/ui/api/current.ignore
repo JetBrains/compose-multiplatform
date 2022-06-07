@@ -1,27 +1,9 @@
 // Baseline format: 1.0
-AddedAbstractMethod: androidx.compose.ui.layout.LayoutInfo#getDensity():
-    Added method androidx.compose.ui.layout.LayoutInfo.getDensity()
-AddedAbstractMethod: androidx.compose.ui.layout.LayoutInfo#getLayoutDirection():
-    Added method androidx.compose.ui.layout.LayoutInfo.getLayoutDirection()
-AddedAbstractMethod: androidx.compose.ui.layout.LayoutInfo#getViewConfiguration():
-    Added method androidx.compose.ui.layout.LayoutInfo.getViewConfiguration()
-
-
-InvalidNullConversion: androidx.compose.ui.graphics.GraphicsLayerModifierKt#graphicsLayer(androidx.compose.ui.Modifier, float, float, float, float, float, float, float, float, float, float, long, androidx.compose.ui.graphics.Shape, boolean):
-    Attempted to remove @NonNull annotation from method androidx.compose.ui.graphics.GraphicsLayerModifierKt.graphicsLayer(androidx.compose.ui.Modifier,float,float,float,float,float,float,float,float,float,float,long,androidx.compose.ui.graphics.Shape,boolean)
-
-
-RemovedClass: androidx.compose.ui.graphics.vector.AnimatorKt:
-    Removed class androidx.compose.ui.graphics.vector.AnimatorKt
-RemovedClass: androidx.compose.ui.graphics.vector.compat.XmlAnimatedVectorParser_androidKt:
-    Removed class androidx.compose.ui.graphics.vector.compat.XmlAnimatedVectorParser_androidKt
-RemovedClass: androidx.compose.ui.graphics.vector.compat.XmlAnimatorParser_androidKt:
-    Removed class androidx.compose.ui.graphics.vector.compat.XmlAnimatorParser_androidKt
-RemovedClass: androidx.compose.ui.graphics.vector.compat.XmlPullParserUtils_androidKt:
-    Removed class androidx.compose.ui.graphics.vector.compat.XmlPullParserUtils_androidKt
-RemovedClass: androidx.compose.ui.input.pointer.MotionEventAdapter_androidKt:
-    Removed class androidx.compose.ui.input.pointer.MotionEventAdapter_androidKt
-RemovedClass: androidx.compose.ui.res.AnimatedVectorResources_androidKt:
-    Removed class androidx.compose.ui.res.AnimatedVectorResources_androidKt
-RemovedClass: androidx.compose.ui.res.AnimatorResources_androidKt:
-    Removed class androidx.compose.ui.res.AnimatorResources_androidKt
+RemovedMethod: androidx.compose.ui.ComposedModifierKt#composed(androidx.compose.ui.Modifier, String, Object, Object, Object, kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit>, kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier,? extends androidx.compose.ui.Modifier>):
+    Removed method androidx.compose.ui.ComposedModifierKt.composed(androidx.compose.ui.Modifier,String,Object,Object,Object,kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit>,kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier,? extends androidx.compose.ui.Modifier>)
+RemovedMethod: androidx.compose.ui.ComposedModifierKt#composed(androidx.compose.ui.Modifier, String, Object, Object, kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit>, kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier,? extends androidx.compose.ui.Modifier>):
+    Removed method androidx.compose.ui.ComposedModifierKt.composed(androidx.compose.ui.Modifier,String,Object,Object,kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit>,kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier,? extends androidx.compose.ui.Modifier>)
+RemovedMethod: androidx.compose.ui.ComposedModifierKt#composed(androidx.compose.ui.Modifier, String, Object, kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit>, kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier,? extends androidx.compose.ui.Modifier>):
+    Removed method androidx.compose.ui.ComposedModifierKt.composed(androidx.compose.ui.Modifier,String,Object,kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit>,kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier,? extends androidx.compose.ui.Modifier>)
+RemovedMethod: androidx.compose.ui.ComposedModifierKt#composed(androidx.compose.ui.Modifier, String, Object[], kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit>, kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier,? extends androidx.compose.ui.Modifier>):
+    Removed method androidx.compose.ui.ComposedModifierKt.composed(androidx.compose.ui.Modifier,String,Object[],kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit>,kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier,? extends androidx.compose.ui.Modifier>)

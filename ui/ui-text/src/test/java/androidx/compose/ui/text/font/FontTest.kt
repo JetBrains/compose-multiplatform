@@ -15,11 +15,13 @@
  */
 package androidx.compose.ui.text.font
 
+import androidx.compose.ui.text.ExperimentalTextApi
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
+@ExperimentalTextApi
 @RunWith(JUnit4::class)
 class FontTest {
 

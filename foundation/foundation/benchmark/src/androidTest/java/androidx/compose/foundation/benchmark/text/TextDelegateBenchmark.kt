@@ -22,19 +22,20 @@ import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.foundation.text.InternalFoundationTextApi
 import androidx.compose.foundation.text.TextDelegate
-import androidx.test.filters.LargeTest
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.benchmark.RandomTextGenerator
 import androidx.compose.ui.text.benchmark.TextBenchmarkTestRule
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.benchmark.cartesian
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.createFontFamilyResolver
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.sp
+import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -70,13 +71,6 @@ class TextDelegateBenchmark(
 
     private val layoutDirection = LayoutDirection.Ltr
 
-    // A fake font loader required to construct Paragraph
-    private val resourceLoader = object : Font.ResourceLoader {
-        override fun load(font: Font): Any {
-            return false
-        }
-    }
-
     lateinit var instrumentationContext: Context
     // Width is initialized in setup().
     private var width: Int = 0
@@ -91,6 +85,7 @@ class TextDelegateBenchmark(
         ).roundToInt()
     }
 
+    @OptIn(ExperimentalTextApi::class)
     private fun textDelegate(textGenerator: RandomTextGenerator): TextDelegate {
         val text = textGenerator.nextAnnotatedString(
             length = textLength,
@@ -102,10 +97,11 @@ class TextDelegateBenchmark(
             text = text,
             density = Density(density = instrumentationContext.resources.displayMetrics.density),
             style = TextStyle(fontSize = fontSize),
-            resourceLoader = resourceLoader
+            fontFamilyResolver = createFontFamilyResolver(instrumentationContext)
         )
     }
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
     fun constructor() {
         textBenchmarkTestRule.generator { textGenerator ->
@@ -122,7 +118,7 @@ class TextDelegateBenchmark(
                     text = text,
                     density = Density(density = 1f),
                     style = TextStyle(fontSize = fontSize),
-                    resourceLoader = resourceLoader
+                    fontFamilyResolver = createFontFamilyResolver(instrumentationContext)
                 )
             }
         }

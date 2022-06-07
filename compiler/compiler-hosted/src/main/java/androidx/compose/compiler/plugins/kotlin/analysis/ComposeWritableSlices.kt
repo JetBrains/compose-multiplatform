@@ -1,5 +1,8 @@
 package androidx.compose.compiler.plugins.kotlin.analysis
 
+import androidx.compose.compiler.plugins.kotlin.lower.KeyInfo
+import androidx.compose.compiler.plugins.kotlin.FunctionMetrics
+import androidx.compose.compiler.plugins.kotlin.inference.LazyScheme
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -25,5 +28,17 @@ object ComposeWritableSlices {
     val IS_COMPOSABLE_SINGLETON: WritableSlice<IrAttributeContainer, Boolean> =
         BasicWritableSlice(RewritePolicy.DO_NOTHING)
     val IS_COMPOSABLE_SINGLETON_CLASS: WritableSlice<IrAttributeContainer, Boolean> =
+        BasicWritableSlice(RewritePolicy.DO_NOTHING)
+    val DURABLE_FUNCTION_KEY: WritableSlice<IrAttributeContainer, KeyInfo> =
+        BasicWritableSlice(RewritePolicy.DO_NOTHING)
+    val DURABLE_FUNCTION_KEYS: WritableSlice<IrAttributeContainer, List<KeyInfo>> =
+        BasicWritableSlice(RewritePolicy.DO_NOTHING)
+    val HAS_TRANSFORMED_LAMBDA: WritableSlice<IrAttributeContainer, Boolean> =
+        BasicWritableSlice(RewritePolicy.DO_NOTHING)
+    val IS_TRANSFORMED_LAMBDA: WritableSlice<IrAttributeContainer, Boolean> =
+        BasicWritableSlice(RewritePolicy.DO_NOTHING)
+    val COMPOSE_LAZY_SCHEME: WritableSlice<Any, LazyScheme> =
+        BasicWritableSlice(RewritePolicy.DO_NOTHING)
+    val FUNCTION_METRICS: WritableSlice<IrAttributeContainer, FunctionMetrics> =
         BasicWritableSlice(RewritePolicy.DO_NOTHING)
 }

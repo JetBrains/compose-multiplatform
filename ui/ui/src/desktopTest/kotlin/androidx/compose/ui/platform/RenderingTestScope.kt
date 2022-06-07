@@ -38,7 +38,7 @@ internal fun renderingTest(
     height: Int,
     context: CoroutineContext = Dispatchers.Swing,
     block: suspend RenderingTestScope.() -> Unit
-) = runBlocking(context) {
+) = runBlocking(Dispatchers.Swing) {
     val scope = RenderingTestScope(width, height, context)
     try {
         scope.block()
@@ -75,7 +75,7 @@ internal class RenderingTestScope(
         }
 
     fun dispose() {
-        scene.dispose()
+        scene.close()
         frameDispatcher.cancel()
     }
 

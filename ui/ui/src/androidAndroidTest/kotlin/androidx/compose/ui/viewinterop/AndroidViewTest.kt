@@ -71,7 +71,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryOwner
-import androidx.savedstate.ViewTreeSavedStateRegistryOwner
+import androidx.savedstate.findViewTreeSavedStateRegistryOwner
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
@@ -485,8 +485,9 @@ class AndroidViewTest {
         val compositionSavedStateRegistryOwner = object : SavedStateRegistryOwner {
             // We don't actually need to ever get actual instances.
             override fun getLifecycle(): Lifecycle = throw UnsupportedOperationException()
-            override fun getSavedStateRegistry(): SavedStateRegistry =
-                throw UnsupportedOperationException()
+
+            override val savedStateRegistry: SavedStateRegistry
+                get() = throw UnsupportedOperationException()
         }
         var childViewTreeSavedStateRegistryOwner: SavedStateRegistryOwner? = null
 
@@ -506,7 +507,7 @@ class AndroidViewTest {
                             override fun onAttachedToWindow() {
                                 super.onAttachedToWindow()
                                 childViewTreeSavedStateRegistryOwner =
-                                    ViewTreeSavedStateRegistryOwner.get(this)
+                                    findViewTreeSavedStateRegistryOwner()
                             }
                         }
                     }
@@ -636,6 +637,7 @@ class AndroidViewTest {
             return bundle
         }
 
+        @Suppress("DEPRECATION")
         override fun onRestoreInstanceState(state: Parcelable?) {
             super.onRestoreInstanceState((state as Bundle).getParcelable("superState"))
             onRestoredValue(state.getString(key)!!)

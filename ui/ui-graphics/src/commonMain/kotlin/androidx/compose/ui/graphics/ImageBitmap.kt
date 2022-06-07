@@ -141,9 +141,9 @@ fun ImageBitmap.toPixelMap(
  * how pixels are stored. This affects the quality (color depth) as
  * well as the ability to display transparent/translucent colors.
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-inline class ImageBitmapConfig internal constructor(val value: Int) {
+@kotlin.jvm.JvmInline
+value class ImageBitmapConfig internal constructor(val value: Int) {
     companion object {
         /**
          * Each pixel is stored on 4 bytes. Each channel (RGB and alpha

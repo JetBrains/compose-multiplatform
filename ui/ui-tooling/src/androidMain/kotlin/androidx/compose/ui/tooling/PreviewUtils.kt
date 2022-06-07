@@ -75,6 +75,33 @@ internal fun getPreviewProviderParameters(
 }
 
 private fun Sequence<Any?>.toArray(size: Int): Array<Any?> {
-    val iter = iterator()
-    return Array(size) { iter.next() }
+    val iterator = iterator()
+    return Array(size) { iterator.next() }
+}
+
+/**
+ * A simple wrapper to store and throw exception later in a thread-safe way.
+ */
+internal class ThreadSafeException {
+    private var exception: Throwable? = null
+
+    /**
+     * A lock to take to access exception.
+     */
+    private val lock = Any()
+
+    fun set(throwable: Throwable) {
+        synchronized(lock) {
+            exception = throwable
+        }
+    }
+
+    fun throwIfPresent() {
+        synchronized(lock) {
+            exception?.let {
+                exception = null
+                throw it
+            }
+        }
+    }
 }

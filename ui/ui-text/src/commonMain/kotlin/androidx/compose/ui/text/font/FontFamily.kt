@@ -18,17 +18,82 @@ package androidx.compose.ui.text.font
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.text.fastDistinctBy
+import androidx.compose.runtime.State
 
 /**
- * The base class of the font families.
+ * The primary typography interface for Compose applications.
  *
  * @see FontListFontFamily
  * @see GenericFontFamily
+ * @see FontFamily.Resolver
  */
+// TODO(b/214587299): Add large ktdoc comment here about how it all works, including fallback and
+//  optional
 @Immutable
-// TODO Unused parameter canLoadSynchronously
-sealed class FontFamily(val canLoadSynchronously: Boolean) {
+sealed class FontFamily(canLoadSynchronously: Boolean) {
+
+    /**
+     * Main interface for resolving [FontFamily] into a platform-specific typeface for use in
+     * Compose-based applications.
+     *
+     * Fonts are loaded via [Resolver.resolve] from a FontFamily and a type request, and return a
+     * platform-specific typeface.
+     *
+     * Fonts may be preloaded by calling [Resolver.preload] to avoid text reflow when async fonts
+     * load.
+     */
+    sealed interface Resolver {
+
+        /**
+         * Preloading resolves and caches all fonts reachable in a [FontFamily].
+         *
+         * Fonts are consider reachable if they are the first entry in the fallback chain for any
+         * call to [resolve].
+         *
+         * This method will suspend until:
+         *
+         * 1. All [FontLoadingStrategy.Async] fonts that are reachable have completed loading, or
+         * failed to load
+         * 2. All reachable fonts in the fallback chain have been loaded and inserted into the
+         * cache
+         *
+         * After returning, all fonts with [FontLoadingStrategy.Async] and
+         * [FontLoadingStrategy.OptionalLocal] will be permanently cached. In contrast to [resolve]
+         * this method will throw when a reachable [FontLoadingStrategy.Async] font fails to
+         * resolve.
+         *
+         * All fonts with [FontLoadingStrategy.Blocking] will be cached with normal eviction rules.
+         *
+         * @throws IllegalStateException if any reachable font fails to load
+         * @param fontFamily the family to resolve all fonts from
+         */
+        suspend fun preload(
+            fontFamily: FontFamily
+        )
+
+        /**
+         * Resolves a typeface using any appropriate logic for the [FontFamily].
+         *
+         * [FontListFontFamily] will always resolve using fallback chains and load using
+         * [Font.ResourceLoader].
+         *
+         * Platform specific [FontFamily] will resolve according to platform behavior, as documented
+         * for each [FontFamily].
+         *
+         * @param fontFamily family to resolve. If `null` will use [FontFamily.Default]
+         * @param fontWeight desired font weight
+         * @param fontStyle desired font style
+         * @param fontSynthesis configuration for font synthesis
+         * @throws IllegalStateException if the FontFamily cannot resolve a to a typeface
+         * @return platform-specific Typeface such as [android.graphics.Typeface]
+         */
+        fun resolve(
+            fontFamily: FontFamily? = null,
+            fontWeight: FontWeight = FontWeight.Normal,
+            fontStyle: FontStyle = FontStyle.Normal,
+            fontSynthesis: FontSynthesis = FontSynthesis.All
+        ): State<Any>
+    }
     companion object {
         /**
          * The platform default font.
@@ -42,7 +107,7 @@ sealed class FontFamily(val canLoadSynchronously: Boolean) {
          *
          * See [CSS sans-serif](https://www.w3.org/TR/css-fonts-3/#sans-serif)
          */
-        val SansSerif = GenericFontFamily("sans-serif")
+        val SansSerif = GenericFontFamily("sans-serif", "FontFamily.SansSerif")
 
         /**
          * The formal text style for scripts.
@@ -51,7 +116,7 @@ sealed class FontFamily(val canLoadSynchronously: Boolean) {
          *
          * See [CSS serif](https://www.w3.org/TR/css-fonts-3/#serif)
          */
-        val Serif = GenericFontFamily("serif")
+        val Serif = GenericFontFamily("serif", "FontFamily.Serif")
 
         /**
          * Font family where glyphs have the same fixed width.
@@ -60,7 +125,7 @@ sealed class FontFamily(val canLoadSynchronously: Boolean) {
          *
          * See [CSS monospace](https://www.w3.org/TR/css-fonts-3/#monospace)
          */
-        val Monospace = GenericFontFamily("monospace")
+        val Monospace = GenericFontFamily("monospace", "FontFamily.Monospace")
 
         /**
          * Cursive, hand-written like font family.
@@ -72,8 +137,15 @@ sealed class FontFamily(val canLoadSynchronously: Boolean) {
          *
          * See [CSS cursive](https://www.w3.org/TR/css-fonts-3/#cursive)
          */
-        val Cursive = GenericFontFamily("cursive")
+        val Cursive = GenericFontFamily("cursive", "FontFamily.Cursive")
     }
+
+    @Suppress("CanBePrimaryConstructorProperty") // for deprecation
+    @get:Deprecated(
+        message = "Unused property that has no meaning. Do not use.",
+        level = DeprecationLevel.ERROR
+    )
+    val canLoadSynchronously = canLoadSynchronously
 }
 
 /**
@@ -94,15 +166,16 @@ sealed class SystemFontFamily : FontFamily(true)
  */
 @Immutable
 class FontListFontFamily internal constructor(
-    val fonts: List<Font>
+    fonts: List<Font>
 ) : FileBasedFontFamily(), List<Font> by fonts {
     init {
         check(fonts.isNotEmpty()) { "At least one font should be passed to FontFamily" }
-        check(fonts.fastDistinctBy { Pair(it.weight, it.style) }.size == fonts.size) {
-            "There cannot be two fonts with the same FontWeight and FontStyle in the same " +
-                "FontFamily"
-        }
     }
+
+    /**
+     * The fallback list of fonts used for resolving typefaces for this FontFamily.
+     */
+    val fonts: List<Font> = ArrayList(fonts)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -132,13 +205,20 @@ class FontListFontFamily internal constructor(
  * @see FontFamily.Cursive
  */
 @Immutable
-class GenericFontFamily internal constructor(val name: String) : SystemFontFamily()
+class GenericFontFamily internal constructor(
+    val name: String,
+    private val fontFamilyName: String
+) : SystemFontFamily() {
+    override fun toString(): String = fontFamilyName
+}
 
 /**
  * Defines a default font family.
  */
 @Immutable
-internal class DefaultFontFamily internal constructor() : SystemFontFamily()
+internal class DefaultFontFamily internal constructor() : SystemFontFamily() {
+    override fun toString(): String = "FontFamily.Default"
+}
 
 /**
  * Defines a font family that is already loaded Typeface.

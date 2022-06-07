@@ -782,8 +782,8 @@ internal class LayoutWeightImpl(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         val otherModifier = other as? LayoutWeightImpl ?: return false
-        return weight != otherModifier.weight &&
-            fill != otherModifier.fill
+        return weight == otherModifier.weight &&
+            fill == otherModifier.fill
     }
 
     override fun hashCode(): Int {

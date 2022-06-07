@@ -28,8 +28,10 @@ import androidx.compose.foundation.samples.DrawBackgroundColor
 import androidx.compose.foundation.samples.DrawBackgroundShapedBrush
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+@Preview
 @Composable
 fun DrawModifiersDemo() {
     Row {

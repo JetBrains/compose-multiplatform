@@ -27,8 +27,8 @@ import kotlin.math.min
 import kotlin.math.sin
 
 // TODO(mount): This class needs some optimization
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-inline class Matrix(
+@kotlin.jvm.JvmInline
+value class Matrix(
     val values: FloatArray = floatArrayOf(
         1f, 0f, 0f, 0f,
         0f, 1f, 0f, 0f,
@@ -49,7 +49,8 @@ inline class Matrix(
         val x = point.x
         val y = point.y
         val z = this[0, 3] * x + this[1, 3] * y + this[3, 3]
-        val pZ = if (z == 0f) 0f else 1f / z
+        val inverseZ = 1 / z
+        val pZ = if (inverseZ.isFinite()) inverseZ else 0f
 
         return Offset(
             x = pZ * (this[0, 0] * x + this[1, 0] * y + this[3, 0]),

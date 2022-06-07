@@ -15,6 +15,7 @@
  */
 
 import androidx.build.Publish
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
@@ -28,12 +29,12 @@ dependencies {
     implementation(libs.kotlinStdlib)
     implementation project(":core:core")
     implementation project(":compose:runtime:runtime")
+    implementation project(":compose:foundation:foundation-layout")
     implementation project(":compose:ui:ui")
     implementation project(":compose:material:material")
     implementation project(":compose:material3:material3")
     implementation project(":compose:material3:material3:material3-samples")
     implementation project(":navigation:navigation-compose")
-    implementation "com.google.accompanist:accompanist-insets:0.18.0"
 }
 
 androidx {
@@ -41,4 +42,16 @@ androidx {
     publish = Publish.NONE
     inceptionYear = "2021"
     description = "This is a project for the Compose Material You Catalog."
+}
+
+android {
+    namespace "androidx.compose.material3.catalog.library"
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
 }

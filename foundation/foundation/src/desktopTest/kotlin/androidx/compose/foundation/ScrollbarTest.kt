@@ -16,8 +16,8 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.foundation.gestures.LocalMouseScrollConfig
-import androidx.compose.foundation.gestures.MouseScrollableConfig
+import androidx.compose.foundation.gestures.LocalScrollConfig
+import androidx.compose.foundation.gestures.ScrollConfig
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -39,6 +39,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.TouchInjectionScope
@@ -48,7 +49,9 @@ import androidx.compose.ui.test.junit4.DesktopComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -127,6 +130,25 @@ class ScrollbarTest {
 
             rule.onNodeWithTag("scrollbar").performTouchInput {
                 instantSwipe(start = Offset(10f, 25f), end = Offset(0f, 50f))
+            }
+            rule.awaitIdle()
+            rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
+        }
+    }
+
+    @Test
+    fun `drag outside slider and back`() {
+        runBlocking(Dispatchers.Main) {
+            rule.setContent {
+                TestBox(size = 100.dp, childSize = 20.dp, childCount = 10, scrollbarWidth = 10.dp)
+            }
+            rule.awaitIdle()
+
+            rule.onNodeWithTag("scrollbar").performTouchInput {
+                down(Offset(10f, 25f))
+                moveBy(Offset(0f, 50f))
+                moveBy(Offset(0f, -50f))
+                up()
             }
             rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
@@ -431,7 +453,7 @@ class ScrollbarTest {
     @OptIn(InternalTestApi::class, ExperimentalComposeUiApi::class)
     private fun ComposeTestRule.performMouseScroll(x: Int, y: Int, delta: Float) {
         (this as DesktopComposeTestRule).scene.sendPointerEvent(
-            PointerEventType.Move,
+            PointerEventType.Scroll,
             Offset(x.toFloat(), y.toFloat()),
             scrollDelta = Offset(x = 0f, y = delta)
         )
@@ -546,7 +568,19 @@ class ScrollbarTest {
             unhoverColor = Color.Black,
             hoverColor = Color.Red
         ),
-        LocalMouseScrollConfig provides MouseScrollableConfig.MacOSCocoa,
+        LocalScrollConfig provides TestConfig,
         content = content
     )
 }
+
+internal object TestConfig : ScrollConfig {
+    // the formula was determined experimentally based on MacOS Finder behaviour
+    // MacOS driver will send events with accelerating delta
+    override fun Density.calculateMouseWheelScroll(event: PointerEvent, bounds: IntSize): Offset {
+        return -event.totalScrollDelta * 10.dp.toPx()
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+private val PointerEvent.totalScrollDelta
+    get() = this.changes.fastFold(Offset.Zero) { acc, c -> acc + c.scrollDelta }

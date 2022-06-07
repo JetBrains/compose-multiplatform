@@ -44,7 +44,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState
-import androidx.compose.ui.focus.focusOrder
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -53,7 +54,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.keyEvent
+import androidx.compose.ui.input.pointer.AwaitPointerEventScope
+import androidx.compose.ui.input.pointer.PointerButtons
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.platform.renderingTest
@@ -66,7 +72,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertFalse
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import java.awt.event.KeyEvent
@@ -436,6 +441,91 @@ class ComposeSceneTest {
         assertFalse(hasRenders())
     }
 
+    @Test(timeout = 5000)
+    fun `receive buttons`() = renderingTest(
+        width = 40,
+        height = 40,
+        context = Dispatchers.Unconfined
+    ) {
+        val receivedButtons = mutableListOf<PointerButtons>()
+
+        setContent {
+            Box(
+                Modifier.size(40.dp).onPointerEvent(PointerEventType.Press) {
+                    receivedButtons.add(it.buttons)
+                }
+            )
+        }
+
+        var buttons = PointerButtons(isSecondaryPressed = true, isBackPressed = true)
+        scene.sendPointerEvent(
+            PointerEventType.Press,
+            Offset(0f, 0f),
+            buttons = buttons
+        )
+        assertThat(receivedButtons.size).isEqualTo(1)
+        assertThat(receivedButtons.last()).isEqualTo(buttons)
+
+        buttons = PointerButtons(
+            isPrimaryPressed = true,
+            isTertiaryPressed = true,
+            isForwardPressed = true
+        )
+        scene.sendPointerEvent(
+            PointerEventType.Press,
+            Offset(0f, 0f),
+            buttons = buttons
+        )
+        assertThat(receivedButtons.size).isEqualTo(2)
+        assertThat(receivedButtons.last()).isEqualTo(buttons)
+    }
+
+    @Test(timeout = 5000)
+    fun `receive modifiers`() = renderingTest(
+        width = 40,
+        height = 40,
+        context = Dispatchers.Unconfined
+    ) {
+        val receivedKeyboardModifiers = mutableListOf<PointerKeyboardModifiers>()
+
+        setContent {
+            Box(
+                Modifier.size(40.dp).onPointerEvent(PointerEventType.Press) {
+                    receivedKeyboardModifiers.add(it.keyboardModifiers)
+                }
+            )
+        }
+
+        var keyboardModifiers = PointerKeyboardModifiers(isAltPressed = true)
+        scene.sendPointerEvent(
+            PointerEventType.Press,
+            Offset(0f, 0f),
+            keyboardModifiers = keyboardModifiers
+        )
+        assertThat(receivedKeyboardModifiers.size).isEqualTo(1)
+        assertThat(receivedKeyboardModifiers.last()).isEqualTo(keyboardModifiers)
+
+        keyboardModifiers = PointerKeyboardModifiers(
+            isCtrlPressed = true,
+            isMetaPressed = true,
+            isAltPressed = false,
+            isShiftPressed = true,
+            isAltGraphPressed = true,
+            isSymPressed = true,
+            isFunctionPressed = true,
+            isCapsLockOn = true,
+            isScrollLockOn = true,
+            isNumLockOn = true,
+        )
+        scene.sendPointerEvent(
+            PointerEventType.Press,
+            Offset(0f, 0f),
+            keyboardModifiers = keyboardModifiers
+        )
+        assertThat(receivedKeyboardModifiers.size).isEqualTo(2)
+        assertThat(receivedKeyboardModifiers.last()).isEqualTo(keyboardModifiers)
+    }
+
     @Test(expected = TestException::class)
     fun `catch exception in LaunchedEffect`() {
         runBlocking(Dispatchers.Main) {
@@ -450,12 +540,7 @@ class ComposeSceneTest {
 
     private class TestException : RuntimeException()
 
-    // TODO(https://github.com/JetBrains/compose-jb/issues/1136): fix deadlock
     @ExperimentalComposeUiApi
-    @Ignore(
-        "This test never ends because of the deadlock" +
-            "(https://github.com/JetBrains/compose-jb/issues/1136)"
-    )
     @Test
     fun `focus management by keys`() {
         var field1FocusState: FocusState? = null
@@ -470,7 +555,8 @@ class ComposeSceneTest {
                     maxLines = 1,
                     modifier = Modifier
                         .onFocusChanged { field1FocusState = it }
-                        .focusOrder(focusItem1) {
+                        .focusRequester(focusItem1)
+                        .focusProperties {
                             next = focusItem2
                         }
                 )
@@ -480,7 +566,8 @@ class ComposeSceneTest {
                     maxLines = 1,
                     modifier = Modifier
                         .onFocusChanged { field2FocusState = it }
-                        .focusOrder(focusItem2) {
+                        .focusRequester(focusItem2)
+                        .focusProperties {
                             previous = focusItem1
                         }
                 )
@@ -507,6 +594,20 @@ class ComposeSceneTest {
         composeRule.runOnIdle {
             assertThat(field1FocusState!!.isFocused).isTrue()
             assertThat(field2FocusState!!.isFocused).isFalse()
+        }
+    }
+
+    private fun Modifier.onPointerEvent(
+        eventType: PointerEventType,
+        onEvent: AwaitPointerEventScope.(event: PointerEvent) -> Unit
+    ) = pointerInput(eventType, onEvent) {
+        awaitPointerEventScope {
+            while (true) {
+                val event = awaitPointerEvent()
+                if (event.type == eventType) {
+                    onEvent(event)
+                }
+            }
         }
     }
 }

@@ -23,6 +23,7 @@ import android.graphics.Bitmap
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.transition.TransitionManager
 import android.view.PixelCopy
 import android.view.View
 import android.view.ViewGroup
@@ -56,6 +57,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
@@ -256,7 +258,9 @@ class AndroidLayoutDrawTest {
                 clip = true,
                 layoutDirection = LayoutDirection.Ltr,
                 density = Density(1f),
-                renderEffect = null
+                renderEffect = null,
+                ambientShadowColor = DefaultShadowColor,
+                spotShadowColor = DefaultShadowColor
             )
         }
         // Verify that the camera distance is applied properly even after accounting for
@@ -3629,6 +3633,37 @@ class AndroidLayoutDrawTest {
         )
 
         assertEquals(1, innerDrawLatch.count)
+    }
+
+    /**
+     * Android Transitions should be possible with Compose Views. View layers can
+     * confuse the Android Transition system.
+     */
+    @Test
+    fun worksWithTransitions() {
+        val frameLayout = FrameLayout(activity)
+        activityTestRule.runOnUiThread {
+            activity.setContentView(frameLayout)
+            val composeView = ComposeView(activity).apply {
+                setContent {
+                    Box {}
+                }
+            }
+            frameLayout.addView(composeView)
+        }
+
+        activityTestRule.runOnUiThread {
+            TransitionManager.beginDelayedTransition(frameLayout)
+            frameLayout.removeAllViews()
+            val composeView = ComposeView(activity).apply {
+                setContent {
+                    Box(Modifier.drawLatchModifier()) {}
+                }
+            }
+            frameLayout.addView(composeView)
+        }
+
+        assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
     }
 
     private fun Modifier.layout(onLayout: () -> Unit) = layout { measurable, constraints ->

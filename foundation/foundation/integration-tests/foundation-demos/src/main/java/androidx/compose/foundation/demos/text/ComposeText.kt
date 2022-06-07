@@ -16,17 +16,49 @@
 
 package androidx.compose.foundation.demos.text
 
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.ListItem
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -50,7 +82,11 @@ import androidx.compose.ui.text.samples.TextOverflowVisibleFixedSizeSample
 import androidx.compose.ui.text.samples.TextOverflowVisibleMinHeightSample
 import androidx.compose.ui.text.samples.TextStyleSample
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 
@@ -63,6 +99,7 @@ val fontSize6 = 20.sp
 val fontSize8 = 25.sp
 val fontSize10 = 30.sp
 
+@Preview
 @Composable
 fun TextDemo() {
     LazyColumn {
@@ -137,6 +174,10 @@ fun TextDemo() {
         item {
             TagLine(tag = "textOverflow: Clip, Ellipsis, Visible")
             TextDemoTextOverflow()
+        }
+        item {
+            TagLine(tag = "inline content")
+            TextDemoInlineContent()
         }
     }
 }
@@ -539,4 +580,156 @@ fun TextDemoTextOverflow() {
     TextOverflowVisibleFixedSizeSample()
     SecondTagLine(tag = "overflow = TextOverflow.Visible with fixed width and min height")
     TextOverflowVisibleMinHeightSample()
+}
+
+@Composable
+fun TextDemoInlineContent() {
+    val inlineContentId = "box"
+    val inlineTextContent = InlineTextContent(
+        placeholder = Placeholder(
+            width = 5.em,
+            height = 1.em,
+            placeholderVerticalAlign = PlaceholderVerticalAlign.AboveBaseline
+        )
+    ) {
+        val colorAnimation = rememberInfiniteTransition()
+        val color by colorAnimation.animateColor(
+            initialValue = Color.Red,
+            targetValue = Color.Blue,
+            animationSpec = infiniteRepeatable(tween(1000), RepeatMode.Reverse)
+        )
+        Box(modifier = Modifier.fillMaxSize().background(color))
+    }
+
+    Text(
+        text = buildAnnotatedString {
+            append("Here is a wide inline composable ")
+            appendInlineContent(inlineContentId)
+            append(" that is repeatedly changing its color.")
+        },
+        inlineContent = mapOf(inlineContentId to inlineTextContent),
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    SecondTagLine(tag = "RTL Layout")
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        Text(
+            text = buildAnnotatedString {
+                append("Here is a wide inline composable ")
+                appendInlineContent(inlineContentId)
+                append(" that is repeatedly changing its color.")
+            },
+            inlineContent = mapOf(inlineContentId to inlineTextContent),
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+
+    SecondTagLine(tag = "Bidi Text - LTR/RTL")
+    Text(
+        text = buildAnnotatedString {
+            append("$displayText   ")
+            appendInlineContent(inlineContentId)
+            append("$displayTextArabic   ")
+        },
+        inlineContent = mapOf(inlineContentId to inlineTextContent),
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    SecondTagLine(tag = "Bidi Text - RTL/LTR")
+    Text(
+        text = buildAnnotatedString {
+            append("$displayTextArabic   ")
+            appendInlineContent(inlineContentId)
+            append("$displayText   ")
+        },
+        inlineContent = mapOf(inlineContentId to inlineTextContent),
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun EllipsizeDemo() {
+    var softWrap by remember { mutableStateOf(true) }
+    var ellipsis by remember { mutableStateOf(true) }
+    var withSpans by remember { mutableStateOf(false) }
+    val lineHeight = remember { mutableStateOf(16.sp) }
+    val heightRestriction = remember { mutableStateOf(45.dp) }
+
+    Column {
+        ListItem(
+            Modifier.selectable(softWrap) { softWrap = !softWrap },
+            trailing = { Switch(softWrap, null) }
+        ) {
+            Text("Soft wrap")
+        }
+        ListItem(
+            Modifier.selectable(ellipsis) { ellipsis = !ellipsis },
+            trailing = { Switch(ellipsis, null) }
+        ) {
+            Text("Ellipsis")
+        }
+        ListItem(
+            Modifier.selectable(withSpans) { withSpans = !withSpans },
+            trailing = { Switch(withSpans, null) },
+            secondaryText = { Text("Text with spans") }
+        ) {
+            Text("Spans")
+        }
+
+        Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                IconButton({
+                    heightRestriction.value = (heightRestriction.value + 5.dp).coerceAtMost(300.dp)
+                }) {
+                    Icon(Icons.Default.KeyboardArrowUp, "Increase height")
+                }
+                Text("Max height ${heightRestriction.value}")
+                IconButton({
+                    heightRestriction.value = (heightRestriction.value - 5.dp).coerceAtLeast(0.dp)
+                }) {
+                    Icon(Icons.Default.KeyboardArrowDown, "Decrease height")
+                }
+            }
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                IconButton({
+                    lineHeight.value = ((lineHeight.value.value + 2f)).coerceAtMost(100f).sp
+                }) {
+                    Icon(Icons.Default.KeyboardArrowUp, "Increase line height")
+                }
+                Text("Line height ${lineHeight.value.value.toInt().sp}")
+                IconButton({
+                    lineHeight.value = ((lineHeight.value.value - 2f)).coerceAtLeast(5f).sp
+                }) {
+                    Icon(Icons.Default.KeyboardArrowDown, "Decrease line height")
+                }
+            }
+        }
+
+        val fontSize = 16.sp
+        val text = "This is a very-very " +
+            "long text that has a limited height and width to test how it's ellipsized." +
+            " This is a second sentence of the text."
+        val textWithSpans = buildAnnotatedString {
+            withStyle(SpanStyle(fontSize = fontSize / 2)) {
+                append("This is a very-very long text that has ")
+            }
+            withStyle(SpanStyle(fontSize = fontSize * 2)) {
+                append("a limited height")
+            }
+            append(" and width to test how it's ellipsized. This is a second sentence of the text.")
+        }
+        Text(
+            text = if (withSpans) textWithSpans else AnnotatedString(text),
+            fontSize = fontSize,
+            lineHeight = lineHeight.value,
+            modifier = Modifier
+                .background(Color.Magenta)
+                .width(200.dp)
+                .heightIn(max = heightRestriction.value),
+            softWrap = softWrap,
+            overflow = if (ellipsis) TextOverflow.Ellipsis else TextOverflow.Clip
+        )
+    }
 }

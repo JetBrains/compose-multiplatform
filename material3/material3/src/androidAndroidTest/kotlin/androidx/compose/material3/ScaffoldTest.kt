@@ -19,6 +19,7 @@ package androidx.compose.material3
 import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,6 +41,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.zIndex
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -77,7 +79,7 @@ class ScaffoldTest {
     fun scaffold_onlyContent_stackSlot() {
         var child1: Offset = Offset.Zero
         var child2: Offset = Offset.Zero
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Scaffold {
                 Text(
                     "One",
@@ -95,10 +97,11 @@ class ScaffoldTest {
 
     @Test
     fun scaffold_AppbarAndContent_inColumn() {
+        var scaffoldSize: IntSize = IntSize.Zero
         var appbarPosition: Offset = Offset.Zero
-        var appbarSize: IntSize = IntSize.Zero
         var contentPosition: Offset = Offset.Zero
-        rule.setMaterialContent {
+        var contentSize: IntSize = IntSize.Zero
+        rule.setMaterialContent(lightColorScheme()) {
             Scaffold(
                 topBar = {
                     Box(
@@ -108,31 +111,37 @@ class ScaffoldTest {
                             .background(color = Color.Red)
                             .onGloballyPositioned { positioned: LayoutCoordinates ->
                                 appbarPosition = positioned.localToWindow(Offset.Zero)
-                                appbarSize = positioned.size
                             }
                     )
-                }
+                },
+                modifier = Modifier
+                    .onGloballyPositioned { positioned: LayoutCoordinates ->
+                        scaffoldSize = positioned.size
+                    }
             ) {
                 Box(
                     Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
+                        .fillMaxSize()
                         .background(Color.Blue)
-                        .onGloballyPositioned { contentPosition = it.localToWindow(Offset.Zero) }
+                        .onGloballyPositioned { positioned: LayoutCoordinates ->
+                            contentPosition = positioned.positionInParent()
+                            contentSize = positioned.size
+                        }
                 )
             }
         }
-        assertThat(appbarPosition.y + appbarSize.height.toFloat())
-            .isEqualTo(contentPosition.y)
+        assertThat(appbarPosition.y).isEqualTo(contentPosition.y)
+        assertThat(scaffoldSize).isEqualTo(contentSize)
     }
 
     @Test
     fun scaffold_bottomBarAndContent_inStack() {
+        var scaffoldSize: IntSize = IntSize.Zero
         var appbarPosition: Offset = Offset.Zero
         var appbarSize: IntSize = IntSize.Zero
         var contentPosition: Offset = Offset.Zero
         var contentSize: IntSize = IntSize.Zero
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Scaffold(
                 bottomBar = {
                     Box(
@@ -145,12 +154,15 @@ class ScaffoldTest {
                                 appbarSize = positioned.size
                             }
                     )
-                }
+                },
+                modifier = Modifier
+                    .onGloballyPositioned { positioned: LayoutCoordinates ->
+                        scaffoldSize = positioned.size
+                    }
             ) {
                 Box(
                     Modifier
                         .fillMaxSize()
-                        .height(50.dp)
                         .background(color = Color.Blue)
                         .onGloballyPositioned { positioned: LayoutCoordinates ->
                             contentPosition = positioned.positionInParent()
@@ -162,6 +174,52 @@ class ScaffoldTest {
         val appBarBottom = appbarPosition.y + appbarSize.height
         val contentBottom = contentPosition.y + contentSize.height
         assertThat(appBarBottom).isEqualTo(contentBottom)
+        assertThat(scaffoldSize).isEqualTo(contentSize)
+    }
+
+    @Test
+    fun scaffold_innerPadding_lambdaParam() {
+        var topBarSize: IntSize = IntSize.Zero
+        var bottomBarSize: IntSize = IntSize.Zero
+        lateinit var innerPadding: PaddingValues
+
+        rule.setContent {
+            Scaffold(
+                topBar = {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .background(color = Color.Red)
+                            .onGloballyPositioned { positioned: LayoutCoordinates ->
+                                topBarSize = positioned.size
+                            }
+                    )
+                },
+                bottomBar = {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(100.dp)
+                            .background(color = Color.Red)
+                            .onGloballyPositioned { positioned: LayoutCoordinates ->
+                                bottomBarSize = positioned.size
+                            }
+                    )
+                }
+            ) {
+                innerPadding = it
+                Text("body")
+            }
+        }
+        rule.runOnIdle {
+            with(rule.density) {
+                assertThat(innerPadding.calculateTopPadding())
+                    .isEqualTo(topBarSize.toSize().height.toDp())
+                assertThat(innerPadding.calculateBottomPadding())
+                    .isEqualTo(bottomBarSize.toSize().height.toDp())
+            }
+        }
     }
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)

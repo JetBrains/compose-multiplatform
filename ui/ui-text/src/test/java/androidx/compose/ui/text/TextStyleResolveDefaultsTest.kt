@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.text
 
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.FontFamily
@@ -46,10 +47,12 @@ class TextStyleResolveDefaultsTest {
     private val DefaultLineHeight = TextUnit.Unspecified
     private val DefaultColor = Color.Black
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
     fun test_default_values() {
         // We explicitly expect the default values since we do not want to change these values.
         resolveDefaults(TextStyle(), LayoutDirection.Ltr).also {
+            assertThat(it.brush).isNull()
             assertThat(it.color).isEqualTo(DefaultColor)
             assertThat(it.fontSize).isEqualTo(DefaultFontSize)
             assertThat(it.fontWeight).isEqualTo(FontWeight.Normal)
@@ -68,8 +71,36 @@ class TextStyleResolveDefaultsTest {
             assertThat(it.textDirection).isEqualTo(TextDirection.Ltr)
             assertThat(it.lineHeight).isEqualTo(DefaultLineHeight)
             assertThat(it.textIndent).isEqualTo(TextIndent.None)
+            assertThat(it.platformStyle).isNull()
         }
     }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun test_use_provided_values_brush() {
+        val brush = Brush.linearGradient(listOf(Color.White, Color.Black))
+
+        assertThat(
+            resolveDefaults(
+                TextStyle(brush = brush),
+                direction = LayoutDirection.Ltr
+            ).brush
+        ).isEqualTo(brush)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun test_use_provided_values_shader_brush_color_unspecified() {
+        val brush = Brush.linearGradient(listOf(Color.White, Color.Black))
+
+        assertThat(
+            resolveDefaults(
+                TextStyle(brush = brush),
+                direction = LayoutDirection.Ltr
+            ).color
+        ).isEqualTo(Color.Unspecified)
+    }
+
     @Test
     fun test_use_provided_values_color() {
         assertThat(

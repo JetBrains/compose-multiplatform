@@ -18,6 +18,7 @@ package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.DesktopPlatform
 import androidx.compose.foundation.text.MappedKeys
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.isMetaPressed
@@ -31,3 +32,8 @@ internal actual fun isCopyKeyEvent(keyEvent: KeyEvent) =
         DesktopPlatform.MacOS -> keyEvent.isMetaPressed
         else -> keyEvent.isCtrlPressed
     } || keyEvent.key == MappedKeys.Copy
+
+/**
+ * Magnification is not supported on desktop.
+ */
+internal actual fun Modifier.selectionMagnifier(manager: SelectionManager): Modifier = this

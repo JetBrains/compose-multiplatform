@@ -15,12 +15,14 @@
  */
 package androidx.compose.ui.text.font
 
+import androidx.compose.ui.text.ExperimentalTextApi
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
+@OptIn(ExperimentalTextApi::class)
 class FontFamilyTest {
 
     private val resourceId1 = 1
@@ -73,8 +75,8 @@ class FontFamilyTest {
         assertThat(fontFamily).isNotEqualTo(otherFontFamily)
     }
 
-    @Test(expected = IllegalStateException::class)
-    fun `cannot add two fonts that have the same FontWeight and FontStyle`() {
+    @Test
+    fun `can add fallback font at same weight and style`() {
         FontFamily(
             Font(
                 resId = resourceId1,
@@ -82,7 +84,7 @@ class FontFamilyTest {
                 style = FontStyle.Italic
             ),
             Font(
-                resId = resourceId2,
+                resId = resourceId1,
                 weight = FontWeight.W900,
                 style = FontStyle.Italic
             )

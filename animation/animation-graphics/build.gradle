@@ -16,8 +16,8 @@
 
 
 import androidx.build.AndroidXComposePlugin
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
@@ -38,8 +38,8 @@ dependencies {
         api("androidx.annotation:annotation:1.1.0")
         api(project(":compose:animation:animation"))
         api("androidx.compose.foundation:foundation-layout:1.0.0")
-        api(project(":compose:runtime:runtime"))
-        api(project(":compose:ui:ui"))
+        api("androidx.compose.runtime:runtime:1.1.1")
+        api("androidx.compose.ui:ui:1.1.1")
         api("androidx.compose.ui:ui-geometry:1.0.0")
 
         implementation("androidx.compose.ui:ui-util:1.0.0")
@@ -63,10 +63,12 @@ dependencies {
 }
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
-        jvm("desktop")
+        desktop()
+    }
 
+    kotlin {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block above
@@ -93,6 +95,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.kotlinStdlib)
             }
 
+            // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
+            //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
+            //  level dependencies block instead:
+            //  `dependencies { testImplementation(libs.robolectric) }`
             androidTest.dependencies {
                 implementation(libs.testRules)
                 implementation(libs.testRunner)
@@ -103,6 +109,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.testRules)
                 implementation(libs.testRunner)
                 implementation(libs.junit)
+                implementation(libs.truth)
                 implementation(project(":compose:foundation:foundation"))
                 implementation(project(":compose:ui:ui-test-junit4"))
                 implementation(project(":compose:test-utils"))
@@ -117,7 +124,19 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Animation Graphics"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.ANIMATION
+    mavenGroup = LibraryGroups.COMPOSE_ANIMATION
     inceptionYear = "2021"
     description = "Compose Animation Graphics Library for using animated-vector resources in Compose"
+}
+
+android {
+    namespace "androidx.compose.animation.graphics"
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
 }

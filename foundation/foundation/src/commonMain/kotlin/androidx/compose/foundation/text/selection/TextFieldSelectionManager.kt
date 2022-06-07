@@ -16,13 +16,14 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.foundation.text.DefaultCursorThickness
 import androidx.compose.foundation.text.Handle
 import androidx.compose.foundation.text.HandleState
 import androidx.compose.foundation.text.InternalFoundationTextApi
 import androidx.compose.foundation.text.TextDragObserver
 import androidx.compose.foundation.text.TextFieldState
 import androidx.compose.foundation.text.UndoManager
-import androidx.compose.foundation.text.detectDragGesturesWithObserver
+import androidx.compose.foundation.text.detectDownAndDragGesturesWithObserver
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,7 +50,10 @@ import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.text.input.getTextAfterSelection
 import androidx.compose.ui.text.input.getTextBeforeSelection
 import androidx.compose.ui.text.style.ResolvedTextDirection
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
 
@@ -133,6 +137,19 @@ internal class TextFieldSelectionManager(
     private var dragTotalDistance = Offset.Zero
 
     /**
+     * A flag to check if a selection or cursor handle is being dragged, and which handle is being
+     * dragged.
+     * If this value is non-null, then onPress will not select any text.
+     * This value will be set to non-null when either handle is being dragged, and be reset to null
+     * when the dragging is stopped.
+     */
+    var draggingHandle: Handle? by mutableStateOf(null)
+        private set
+
+    var currentDragPosition: Offset? by mutableStateOf(null)
+        private set
+
+    /**
      * The old [TextFieldValue] before entering the selection mode on long press. Used to exit
      * the selection mode.
      */
@@ -142,10 +159,22 @@ internal class TextFieldSelectionManager(
      * [TextDragObserver] for long press and drag to select in TextField.
      */
     internal val touchSelectionObserver = object : TextDragObserver {
+        override fun onDown(point: Offset) {
+            // Not supported for long-press-drag.
+        }
+
+        override fun onUp() {
+            // Nothing to do.
+        }
+
         override fun onStart(startPoint: Offset) {
-            state?.let {
-                if (it.draggingHandle != null) return
-            }
+            if (draggingHandle != null) return
+            // While selecting by long-press-dragging, the "end" of the selection is always the one
+            // being controlled by the drag.
+            draggingHandle = Handle.SelectionEnd
+
+            // ensuring that current action mode (selection toolbar) is invalidated
+            hideSelectionToolbar()
 
             // Long Press at the blank area, the cursor should show up at the end of the line.
             if (state?.layoutResult?.isPositionOnText(startPoint) != true) {
@@ -182,6 +211,7 @@ internal class TextFieldSelectionManager(
                 dragBeginOffsetInText = offset
             }
             dragBeginPosition = startPoint
+            currentDragPosition = dragBeginPosition
             dragTotalDistance = Offset.Zero
         }
 
@@ -191,12 +221,13 @@ internal class TextFieldSelectionManager(
 
             dragTotalDistance += delta
             state?.layoutResult?.let { layoutResult ->
+                currentDragPosition = dragBeginPosition + dragTotalDistance
                 val startOffset = dragBeginOffsetInText ?: layoutResult.getOffsetForPosition(
                     position = dragBeginPosition,
                     coerceInVisibleBounds = false
                 )
                 val endOffset = layoutResult.getOffsetForPosition(
-                    position = dragBeginPosition + dragTotalDistance,
+                    position = currentDragPosition!!,
                     coerceInVisibleBounds = false
                 )
                 updateSelection(
@@ -211,6 +242,8 @@ internal class TextFieldSelectionManager(
         }
 
         override fun onStop() {
+            draggingHandle = null
+            currentDragPosition = null
             state?.showFloatingToolbar = true
             if (textToolbar?.status == TextToolbarStatus.Hidden) showSelectionToolbar()
             dragBeginOffsetInText = null
@@ -308,16 +341,26 @@ internal class TextFieldSelectionManager(
     /**
      * [TextDragObserver] for dragging the selection handles to change the selection in TextField.
      */
-    internal fun handleDragObserver(isStartHandle: Boolean): TextDragObserver {
-        return object : TextDragObserver {
+    internal fun handleDragObserver(isStartHandle: Boolean): TextDragObserver =
+        object : TextDragObserver {
+            override fun onDown(point: Offset) {
+                draggingHandle = if (isStartHandle) Handle.SelectionStart else Handle.SelectionEnd
+                currentDragPosition = getAdjustedCoordinates(getHandlePosition(isStartHandle))
+            }
+
+            override fun onUp() {
+                draggingHandle = null
+                currentDragPosition = null
+            }
+
             override fun onStart(startPoint: Offset) {
                 // The position of the character where the drag gesture should begin. This is in
                 // the composable coordinates.
                 dragBeginPosition = getAdjustedCoordinates(getHandlePosition(isStartHandle))
+                currentDragPosition = dragBeginPosition
                 // Zero out the total distance that being dragged.
                 dragTotalDistance = Offset.Zero
-                state?.draggingHandle =
-                    if (isStartHandle) Handle.SelectionStart else Handle.SelectionEnd
+                draggingHandle = if (isStartHandle) Handle.SelectionStart else Handle.SelectionEnd
                 state?.showFloatingToolbar = false
             }
 
@@ -325,15 +368,16 @@ internal class TextFieldSelectionManager(
                 dragTotalDistance += delta
 
                 state?.layoutResult?.value?.let { layoutResult ->
+                    currentDragPosition = dragBeginPosition + dragTotalDistance
                     val startOffset = if (isStartHandle)
-                        layoutResult.getOffsetForPosition(dragBeginPosition + dragTotalDistance)
+                        layoutResult.getOffsetForPosition(currentDragPosition!!)
                     else
                         offsetMapping.originalToTransformed(value.selection.start)
 
                     val endOffset = if (isStartHandle)
                         offsetMapping.originalToTransformed(value.selection.end)
                     else
-                        layoutResult.getOffsetForPosition(dragBeginPosition + dragTotalDistance)
+                        layoutResult.getOffsetForPosition(currentDragPosition!!)
 
                     updateSelection(
                         value = value,
@@ -347,57 +391,67 @@ internal class TextFieldSelectionManager(
             }
 
             override fun onStop() {
-                state?.draggingHandle = null
+                draggingHandle = null
+                currentDragPosition = null
                 state?.showFloatingToolbar = true
                 if (textToolbar?.status == TextToolbarStatus.Hidden) showSelectionToolbar()
             }
 
             override fun onCancel() {}
         }
-    }
 
     /**
      * [TextDragObserver] for dragging the cursor to change the selection in TextField.
      */
-    internal fun cursorDragObserver(): TextDragObserver {
-        return object : TextDragObserver {
-            override fun onStart(startPoint: Offset) {
-                // The position of the character where the drag gesture should begin. This is in
-                // the composable coordinates.
-                dragBeginPosition = getAdjustedCoordinates(getHandlePosition(true))
-                // Zero out the total distance that being dragged.
-                dragTotalDistance = Offset.Zero
-                state?.draggingHandle = Handle.Cursor
-            }
-
-            override fun onDrag(delta: Offset) {
-                dragTotalDistance += delta
-
-                state?.layoutResult?.value?.let { layoutResult ->
-                    val offset =
-                        layoutResult.getOffsetForPosition(dragBeginPosition + dragTotalDistance)
-
-                    val newSelection = TextRange(offset, offset)
-
-                    // Nothing changed, skip onValueChange hand hapticFeedback.
-                    if (newSelection == value.selection) return
-
-                    hapticFeedBack?.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                    onValueChange(
-                        createTextFieldValue(
-                            annotatedString = value.annotatedString,
-                            selection = newSelection
-                        )
-                    )
-                }
-            }
-
-            override fun onStop() {
-                state?.draggingHandle = null
-            }
-
-            override fun onCancel() {}
+    internal fun cursorDragObserver(): TextDragObserver = object : TextDragObserver {
+        override fun onDown(point: Offset) {
+            draggingHandle = Handle.Cursor
+            currentDragPosition = getAdjustedCoordinates(getHandlePosition(true))
         }
+
+        override fun onUp() {
+            draggingHandle = null
+            currentDragPosition = null
+        }
+
+        override fun onStart(startPoint: Offset) {
+            // The position of the character where the drag gesture should begin. This is in
+            // the composable coordinates.
+            dragBeginPosition = getAdjustedCoordinates(getHandlePosition(true))
+            currentDragPosition = dragBeginPosition
+            // Zero out the total distance that being dragged.
+            dragTotalDistance = Offset.Zero
+            draggingHandle = Handle.Cursor
+        }
+
+        override fun onDrag(delta: Offset) {
+            dragTotalDistance += delta
+
+            state?.layoutResult?.value?.let { layoutResult ->
+                currentDragPosition = dragBeginPosition + dragTotalDistance
+                val offset = layoutResult.getOffsetForPosition(currentDragPosition!!)
+
+                val newSelection = TextRange(offset, offset)
+
+                // Nothing changed, skip onValueChange hand hapticFeedback.
+                if (newSelection == value.selection) return
+
+                hapticFeedBack?.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onValueChange(
+                    createTextFieldValue(
+                        annotatedString = value.annotatedString,
+                        selection = newSelection
+                    )
+                )
+            }
+        }
+
+        override fun onStop() {
+            draggingHandle = null
+            currentDragPosition = null
+        }
+
+        override fun onCancel() {}
     }
 
     /**
@@ -534,17 +588,13 @@ internal class TextFieldSelectionManager(
 
     /*@VisibleForTesting*/
     internal fun selectAll() {
-        setHandleState(HandleState.None)
-
         val newValue = createTextFieldValue(
             annotatedString = value.annotatedString,
             selection = TextRange(0, value.text.length)
         )
         onValueChange(newValue)
         oldValue = oldValue.copy(selection = newValue.selection)
-        hideSelectionToolbar()
         state?.showFloatingToolbar = true
-        showSelectionToolbar()
     }
 
     internal fun getHandlePosition(isStartHandle: Boolean): Offset {
@@ -555,6 +605,18 @@ internal class TextFieldSelectionManager(
             isStart = isStartHandle,
             areHandlesCrossed = value.selection.reversed
         )
+    }
+
+    internal fun getCursorPosition(density: Density): Offset {
+        val offset = offsetMapping.originalToTransformed(value.selection.start)
+        val layoutResult = state?.layoutResult!!.value
+        val cursorRect = layoutResult.getCursorRect(
+            offset.coerceIn(0, layoutResult.layoutInput.text.length)
+        )
+        val x = with(density) {
+            cursorRect.left + DefaultCursorThickness.toPx() / 2
+        }
+        return Offset(x, cursorRect.bottom)
     }
 
     /**
@@ -585,9 +647,7 @@ internal class TextFieldSelectionManager(
             }
         } else null
 
-        val selectAll: (() -> Unit)? = if (value.selection.length != value.text.length &&
-            oldValue.selection.length != oldValue.text.length
-        ) {
+        val selectAll: (() -> Unit)? = if (value.selection.length != value.text.length) {
             {
                 selectAll()
             }
@@ -605,6 +665,21 @@ internal class TextFieldSelectionManager(
     internal fun hideSelectionToolbar() {
         if (textToolbar?.status == TextToolbarStatus.Shown) {
             textToolbar?.hide()
+        }
+    }
+
+    fun contextMenuOpenAdjustment(position: Offset) {
+        state?.layoutResult?.let { layoutResult ->
+            val offset = layoutResult.getOffsetForPosition(position)
+            if (!value.selection.contains(offset)) {
+                updateSelection(
+                    value = value,
+                    transformedStartOffset = offset,
+                    transformedEndOffset = offset,
+                    isStartHandle = false,
+                    adjustment = SelectionAdjustment.Word
+                )
+            }
         }
     }
 
@@ -740,7 +815,7 @@ internal fun TextFieldSelectionHandle(
         direction = direction,
         handlesCrossed = manager.value.selection.reversed,
         modifier = Modifier.pointerInput(observer) {
-            detectDragGesturesWithObserver(observer)
+            detectDownAndDragGesturesWithObserver(observer)
         },
         content = null
     )
@@ -757,3 +832,71 @@ internal fun TextFieldSelectionManager.isSelectionHandleInVisibleBound(
 
 // TODO(b/180075467) it should be part of PointerEvent API in one way or another
 internal expect val PointerEvent.isShiftPressed: Boolean
+
+/**
+ * Optionally shows a magnifier widget, if the current platform supports it, for the current state
+ * of a [TextFieldSelectionManager]. Should check [TextFieldSelectionManager.draggingHandle] to see
+ * which handle is being dragged and then calculate the magnifier position for that handle.
+ *
+ * Actual implementations should as much as possible actually live in this common source set, _not_
+ * the platform-specific source sets. The actual implementations of this function should then just
+ * delegate to those functions.
+ */
+internal expect fun Modifier.textFieldMagnifier(manager: TextFieldSelectionManager): Modifier
+
+internal fun calculateSelectionMagnifierCenterAndroid(
+    manager: TextFieldSelectionManager,
+    magnifierSize: IntSize
+): Offset {
+    // Never show the magnifier in an empty text field.
+    if (manager.value.text.isEmpty()) return Offset.Unspecified
+    val rawTextOffset = when (manager.draggingHandle) {
+        null -> return Offset.Unspecified
+        Handle.Cursor,
+        Handle.SelectionStart -> manager.value.selection.start
+        Handle.SelectionEnd -> manager.value.selection.end
+    }
+    val textOffset = manager.offsetMapping.originalToTransformed(rawTextOffset)
+        .coerceIn(manager.value.text.indices)
+    val layoutResult = manager.state?.layoutResult?.value ?: return Offset.Unspecified
+    // Center vertically on the current line.
+    // If the text hasn't been laid out yet, don't show the modifier.
+    val offsetCenter = layoutResult.getBoundingBox(textOffset).center
+
+    val containerCoordinates = manager.state?.layoutCoordinates ?: return Offset.Unspecified
+    val fieldCoordinates =
+        manager.state?.layoutResult?.innerTextFieldCoordinates ?: return Offset.Unspecified
+    val localDragPosition = manager.currentDragPosition?.let {
+        fieldCoordinates.localPositionOf(containerCoordinates, it)
+    } ?: return Offset.Unspecified
+    val dragX = localDragPosition.x
+    val line = layoutResult.getLineForOffset(textOffset)
+    val lineStartOffset = layoutResult.getLineStart(line)
+    val lineEndOffset = layoutResult.getLineEnd(line, visibleEnd = true)
+    val areHandlesCrossed = manager.value.selection.start > manager.value.selection.end
+    val lineStart = layoutResult.getHorizontalPosition(
+        lineStartOffset,
+        isStart = true,
+        areHandlesCrossed = areHandlesCrossed
+    )
+    val lineEnd = layoutResult.getHorizontalPosition(
+        lineEndOffset,
+        isStart = false,
+        areHandlesCrossed = areHandlesCrossed
+    )
+    val lineMin = minOf(lineStart, lineEnd)
+    val lineMax = maxOf(lineStart, lineEnd)
+    val centerX = dragX.coerceIn(lineMin, lineMax)
+
+    // Hide the magnifier when dragged too far (outside the horizontal bounds of how big the
+    // magnifier actually is). See
+    // https://cs.android.com/android/platform/superproject/+/master:frameworks/base/core/java/android/widget/Editor.java;l=5228-5231;drc=2fdb6bd709be078b72f011334362456bb758922c
+    if ((dragX - centerX).absoluteValue > magnifierSize.width / 2) {
+        return Offset.Unspecified
+    }
+
+    return containerCoordinates.localPositionOf(
+        fieldCoordinates,
+        Offset(centerX, offsetCenter.y)
+    )
+}

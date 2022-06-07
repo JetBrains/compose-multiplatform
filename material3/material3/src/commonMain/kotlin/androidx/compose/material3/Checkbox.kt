@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.triStateToggleable
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.tokens.CheckboxTokens
-import androidx.compose.material3.tokens.ColorSchemeKey
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
@@ -63,24 +62,26 @@ import kotlin.math.max
  * Checkboxes allow users to select one or more items from a set. Checkboxes can turn an option on
  * or off.
  *
+ * ![Checkbox image](https://developer.android.com/images/reference/androidx/compose/material3/checkbox.png)
+ *
  * @sample androidx.compose.material3.samples.CheckboxSample
  *
  * @see [TriStateCheckbox] if you require support for an indeterminate state.
  *
- * @param checked whether this Checkbox is checked or unchecked
- * @param onCheckedChange callback to be invoked when checkbox is being clicked,
- * therefore the change of checked state in requested.  If null, then this is passive
- * and relies entirely on a higher-level component to control the "checked" state
- * @param modifier Modifier to be applied to the layout of this [Checkbox]
- * @param enabled controls the enabled state of the [Checkbox]. When `false`, this [Checkbox] will
- * not be clickable/selectable
+ * @param checked whether this checkbox is checked or unchecked
+ * @param onCheckedChange called when this checkbox is clicked. If `null`, then this checkbox will
+ * not be interactable, unless something else handles its input events and updates its state.
+ * @param modifier the [Modifier] to be applied to this checkbox
+ * @param enabled controls the enabled state of this checkbox. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this [Checkbox]. You can create and pass in your own remembered [MutableInteractionSource] if
- * you want to observe [Interaction]s and customize the appearance / behavior of this [Checkbox] in
- * different [Interaction]s
- * @param colors [CheckboxColors] that will be used to resolve the color used for this [Checkbox] in
- * different states. See [CheckboxDefaults.colors]
+ * for this checkbox. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this checkbox in different states.
+ * @param colors [CheckboxColors] that will be used to resolve the colors used for this checkbox in
+ * different states. See [CheckboxDefaults.colors].
  */
+@ExperimentalMaterial3Api
 @Composable
 fun Checkbox(
     checked: Boolean,
@@ -110,25 +111,24 @@ fun Checkbox(
  * checkboxes are unchecked. If some, but not all, child checkboxes are checked, the parent checkbox
  * becomes an indeterminate checkbox.
  *
+ * ![Checkbox image](https://developer.android.com/images/reference/androidx/compose/material3/indeterminate-checkbox.png)
+ *
  * @sample androidx.compose.material3.samples.TriStateCheckboxSample
  *
  * @see [Checkbox] if you want a simple component that represents Boolean state
  *
- * @param state whether TriStateCheckbox is checked, unchecked or in indeterminate state
- * callback to be invoked when the TriStateCheckbox is clicked.
-
- * @param onClick callback to be invoked when checkbox is being clicked, therefore the change of
- * ToggleableState state is requested. If null, then this [TriStateCheckbox] will not handle input
- * events, and only act as a visual indicator of [state]
- * @param modifier Modifier to be applied to the layout of the [TriStateCheckbox]
- * @param enabled controls the enabled state of the [TriStateCheckbox]. When `false`, this
- * [TriStateCheckbox] will not be clickable/selectable
+ * @param state whether this checkbox is checked, unchecked, or in an indeterminate state
+ * @param onClick called when this checkbox is clicked. If `null`, then this checkbox will not be
+ * interactable, unless something else handles its input events and updates its [state].
+ * @param modifier the [Modifier] to be applied to this checkbox
+ * @param enabled controls the enabled state of this checkbox. When `false`, this component will not
+ * respond to user input, and it will appear visually disabled and disabled to accessibility
+ * services.
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this [TriStateCheckbox]. You can create and pass in your own remembered
- * [MutableInteractionSource] if you want to observe [Interaction]s and customize the
- * appearance / behavior of this [TriStateCheckbox] in different [Interaction]s
- * @param colors [CheckboxColors] that will be used to resolve the color used for this
- * [TriStateCheckbox] in different states. See [CheckboxDefaults.colors]
+ * for this checkbox. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this checkbox in different states.
+ * @param colors [CheckboxColors] that will be used to resolve the colors used for this checkbox in
+ * different states. See [CheckboxDefaults.colors].
  */
 @Composable
 fun TriStateCheckbox(
@@ -230,17 +230,20 @@ object CheckboxDefaults {
      */
     @Composable
     fun colors(
-        checkedColor: Color = MaterialTheme.colorScheme.fromToken(CheckboxTokens.SelectedIconColor),
+        checkedColor: Color =
+            MaterialTheme.colorScheme.fromToken(CheckboxTokens.SelectedContainerColor),
         uncheckedColor: Color =
-            MaterialTheme.colorScheme.fromToken(CheckboxTokens.UnselectedIconColor),
-        // TODO(b/188529841): Update the token when this issue is resolved.
-        checkmarkColor: Color = MaterialTheme.colorScheme.fromToken(ColorSchemeKey.Surface),
+            MaterialTheme.colorScheme.fromToken(CheckboxTokens.UnselectedOutlineColor),
+        checkmarkColor: Color =
+            MaterialTheme.colorScheme.fromToken(CheckboxTokens.SelectedIconColor),
         disabledCheckedColor: Color =
-            MaterialTheme.colorScheme.fromToken(CheckboxTokens.DisabledSelectedIconColor)
-                .copy(alpha = CheckboxTokens.DisabledSelectedIconOpacity),
+            MaterialTheme.colorScheme
+                .fromToken(CheckboxTokens.SelectedDisabledContainerColor)
+                .copy(alpha = CheckboxTokens.SelectedDisabledContainerOpacity),
         disabledUncheckedColor: Color =
-            MaterialTheme.colorScheme.fromToken(CheckboxTokens.DisabledUnselectedIconColor)
-                .copy(alpha = CheckboxTokens.DisabledUnselectedIconOpacity),
+            MaterialTheme.colorScheme
+                .fromToken(CheckboxTokens.UnselectedDisabledOutlineColor)
+                .copy(alpha = CheckboxTokens.UnselectedDisabledContainerOpacity),
         disabledIndeterminateColor: Color = disabledCheckedColor
     ): CheckboxColors {
         return remember(

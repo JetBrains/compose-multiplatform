@@ -1,27 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.1.0-beta02" type="baseline" client="gradle" dependencies="false" name="AGP (7.1.0-beta02)" variant="all" version="7.1.0-beta02">
-
-    <issue
-        id="NewApi"
-        message="Call requires API level 24 (current min is 21): `java.lang.Long#max`"
-        errorLine1="        val duration = max("
-        errorLine2="                       ~~~">
-        <location
-            file="src/test/java/androidx/compose/animation/core/AnimationTest.kt"
-            line="285"
-            column="24"/>
-    </issue>
-
-    <issue
-        id="NewApi"
-        message="Call requires API level 24 (current min is 21): `java.lang.Long#max`"
-        errorLine1="            max("
-        errorLine2="            ~~~">
-        <location
-            file="src/test/java/androidx/compose/animation/core/AnimationTest.kt"
-            line="287"
-            column="13"/>
-    </issue>
+<issues format="6" by="lint 7.3.0-alpha07" type="baseline" client="gradle" dependencies="false" name="AGP (7.3.0-alpha07)" variant="all" version="7.3.0-alpha07">
 
     <issue
         id="NewApi"
@@ -29,9 +7,7 @@
         errorLine1="        testCases.parallelStream().forEach {"
         errorLine2="                  ~~~~~~~~~~~~~~">
         <location
-            file="src/test/java/androidx/compose/animation/core/SpringEstimationTest.kt"
-            line="54"
-            column="19"/>
+            file="src/test/java/androidx/compose/animation/core/SpringEstimationTest.kt"/>
     </issue>
 
     <issue
@@ -40,9 +16,7 @@
         errorLine1="        testCases.parallelStream().forEach {"
         errorLine2="                                   ~~~~~~~">
         <location
-            file="src/test/java/androidx/compose/animation/core/SpringEstimationTest.kt"
-            line="54"
-            column="36"/>
+            file="src/test/java/androidx/compose/animation/core/SpringEstimationTest.kt"/>
     </issue>
 
 </issues>

@@ -16,9 +16,20 @@
 
 package androidx.compose.foundation.gestures
 
-import androidx.compose.ui.Modifier
+import androidx.compose.foundation.fastFold
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEvent
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 
-internal actual fun Modifier.mouseScrollable(
-    orientation: Orientation,
-    onScroll: (Float) -> Unit
-): Modifier = this
+@Composable
+internal actual fun platformScrollConfig(): ScrollConfig = AndroidConfig
+
+private object AndroidConfig : ScrollConfig {
+    override fun Density.calculateMouseWheelScroll(event: PointerEvent, bounds: IntSize): Offset {
+        // 64 dp value is taken from ViewConfiguration.java, replace with better solution
+        return event.changes.fastFold(Offset.Zero) { acc, c -> acc + c.scrollDelta } * -64.dp.toPx()
+    }
+}

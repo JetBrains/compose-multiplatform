@@ -9,6 +9,7 @@ dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 
     implementation(libs.kotlinStdlib)
+    implementation(libs.material)
 
     implementation(project(":compose:animation:animation"))
     implementation(project(":compose:foundation:foundation"))
@@ -20,15 +21,21 @@ dependencies {
     implementation(project(":compose:runtime:runtime-livedata"))
     implementation(project(":compose:ui:ui"))
     implementation(project(":compose:ui:ui-text"))
+    implementation(project(":compose:ui:ui-tooling-preview"))
     implementation(project(":compose:ui:ui-viewbinding"))
 
     implementation("androidx.fragment:fragment-ktx:1.2.5")
-    implementation("androidx.recyclerview:recyclerview:1.1.0")
+    implementation(project(":recyclerview:recyclerview"))
+    implementation(project(":customview:customview-poolingcontainer"))
     implementation("androidx.viewpager2:viewpager2:1.0.0")
+    implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
+
+    debugImplementation(project(":compose:ui:ui-tooling"))
 }
 
 android {
     buildFeatures {
         viewBinding true
     }
+    namespace "androidx.compose.ui.demos"
 }

@@ -40,7 +40,7 @@ class ParcelableMutableStateTests(
         val parcel = Parcel.obtain()
         parcel.writeParcelable(a as Parcelable, 0)
         parcel.setDataPosition(0)
-        @Suppress("UNCHECKED_CAST")
+        @Suppress("UNCHECKED_CAST", "deprecation")
         val restored =
             parcel.readParcelable<Parcelable>(javaClass.classLoader) as SnapshotMutableState<Int>
 

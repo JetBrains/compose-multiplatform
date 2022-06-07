@@ -1666,6 +1666,8 @@ class SwipeableTest {
 
         assertThat(swipeableState.currentValue).isEqualTo("A")
 
+        // This actually produces a velocity of 300,000 (1500 px moved in 5 ms), but we are
+        // relying on the compatibility behaviour that 2 points produce a zero velocity.
         rule.onNodeWithTag(swipeableTag)
             .performTouchInput {
                 down(Offset(x = 10f, y = 10f))

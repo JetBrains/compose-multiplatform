@@ -21,4 +21,10 @@ dependencies {
     implementation(project(":compose:animation:animation-core:animation-core-samples"))
     implementation(project(":compose:foundation:foundation"))
     implementation(project(":compose:material:material"))
+    implementation(project(":compose:ui:ui-tooling-preview"))
+    debugImplementation(project(":compose:ui:ui-tooling"))
+}
+
+android {
+    namespace "androidx.compose.animation.demos"
 }

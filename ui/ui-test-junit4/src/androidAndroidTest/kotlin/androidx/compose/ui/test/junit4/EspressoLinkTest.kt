@@ -21,14 +21,16 @@ import androidx.test.espresso.Espresso
 import androidx.test.espresso.IdlingRegistry
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.After
 import org.junit.Test
-import org.junit.runners.model.Statement
 
 class EspressoLinkTest {
     @OptIn(InternalTestApi::class, ExperimentalCoroutinesApi::class)
-    private val espressoLink = EspressoLink(IdlingResourceRegistry(TestCoroutineScope()))
+    private val espressoLink = EspressoLink(
+        IdlingResourceRegistry(TestScope(UnconfinedTestDispatcher()))
+    )
 
     @After
     fun tearDown() {
@@ -54,15 +56,12 @@ class EspressoLinkTest {
         // Check the private registry:
         assertThat(@Suppress("DEPRECATION") Espresso.getIdlingResources()).hasSize(0)
 
-        // "Run" the test:
-        espressoLink.getStatementFor(object : Statement() {
-            override fun evaluate() {
-                assertThat(IdlingRegistry.getInstance().resources)
-                    .containsExactlyElementsIn(listOf(espressoLink))
-                assertThat(@Suppress("DEPRECATION") Espresso.getIdlingResources())
-                    .containsExactlyElementsIn(listOf(espressoLink))
-            }
-        }).evaluate()
+        espressoLink.withStrategy {
+            assertThat(IdlingRegistry.getInstance().resources)
+                .containsExactlyElementsIn(listOf(espressoLink))
+            assertThat(@Suppress("DEPRECATION") Espresso.getIdlingResources())
+                .containsExactlyElementsIn(listOf(espressoLink))
+        }
 
         // Check if espressoLink is removed from both places:
         assertThat(IdlingRegistry.getInstance().resources).hasSize(0)

@@ -68,7 +68,7 @@ val AndroidInComposeDemos = DemoCategory(
         },
         ComposableDemo("MotionEventPointerInputFilter") {
             PointerInteropFilterDemo()
-        }
+        },
     )
 )
 

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
@@ -25,12 +25,25 @@ plugins {
 
 dependencies {
     api("androidx.activity:activity:1.2.0")
+    lintPublish(project(":compose:ui:ui-test-manifest-lint"))
 }
 
 androidx {
     name = "Compose Testing manifest dependency"
-    type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.UI
+    type = LibraryType.PUBLISHED_TEST_LIBRARY
+    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2021"
     description = "Compose testing library that should be added as a debugImplementation dependency to add properties to the debug manifest necessary for testing an application"
+}
+
+android {
+    namespace "androidx.compose.ui.test.manifest"
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
 }

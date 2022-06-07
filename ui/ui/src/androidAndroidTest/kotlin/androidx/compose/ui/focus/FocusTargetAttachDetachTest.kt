@@ -450,7 +450,6 @@ class FocusTargetAttachDetachTest {
             ) {
                 Box(
                     modifier = Modifier
-                        .onFocusChanged { focusState = it }
                         .then(
                             if (optionalFocusTarget)
                                 Modifier

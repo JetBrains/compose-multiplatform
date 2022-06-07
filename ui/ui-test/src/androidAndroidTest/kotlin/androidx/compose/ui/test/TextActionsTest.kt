@@ -30,6 +30,7 @@ import androidx.compose.ui.test.util.BoundaryNode
 import androidx.compose.ui.test.util.expectErrorMessageStartsWith
 import androidx.compose.ui.text.input.ImeAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -89,6 +90,7 @@ class TextActionsTest {
         }
     }
 
+    @FlakyTest(bugId = 215584831)
     @Test
     fun sendTextTwice_shouldAppend() {
         var lastSeenText = ""

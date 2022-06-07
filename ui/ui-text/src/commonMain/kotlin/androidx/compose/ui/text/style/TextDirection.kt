@@ -21,8 +21,8 @@ package androidx.compose.ui.text.style
  *
  * @see ResolvedTextDirection
  */
-@Suppress("INLINE_CLASS_DEPRECATED")
-inline class TextDirection internal constructor(internal val value: Int) {
+@kotlin.jvm.JvmInline
+value class TextDirection internal constructor(internal val value: Int) {
 
     override fun toString(): String {
         return when (this) {

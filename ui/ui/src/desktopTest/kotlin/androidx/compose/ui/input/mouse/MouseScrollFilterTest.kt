@@ -27,12 +27,14 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth.assertThat
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @OptIn(ExperimentalComposeUiApi::class)
 @RunWith(JUnit4::class)
+@Ignore // TODO(b/217238066) remove after migration to ImageComposeScene (it will be upstreamed from Compose MPP 1.0.0)
 class MouseScrollFilterTest {
     private val window = TestComposeWindow(width = 100, height = 100, density = Density(2f))
 

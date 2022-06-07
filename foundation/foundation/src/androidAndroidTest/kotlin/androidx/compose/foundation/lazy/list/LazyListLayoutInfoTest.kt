@@ -16,11 +16,10 @@
 
 package androidx.compose.foundation.lazy.list
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -31,15 +30,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -47,16 +45,20 @@ import org.junit.runners.Parameterized
 @MediumTest
 @RunWith(Parameterized::class)
 class LazyListLayoutInfoTest(
-    private val reverseLayout: Boolean
-) {
+    param: LayoutInfoTestParam
+) : BaseLazyListTestWithOrientation(param.orientation) {
     companion object {
         @JvmStatic
-        @Parameterized.Parameters(name = "reverseLayout={0}")
-        fun initParameters(): Array<Any> = arrayOf(false, true)
+        @Parameterized.Parameters(name = "{0}")
+        fun initParameters(): Array<Any> = arrayOf(
+            LayoutInfoTestParam(Orientation.Vertical, false),
+            LayoutInfoTestParam(Orientation.Vertical, true),
+            LayoutInfoTestParam(Orientation.Horizontal, false),
+            LayoutInfoTestParam(Orientation.Horizontal, true),
+        )
     }
 
-    @get:Rule
-    val rule = createComposeRule()
+    private val reverseLayout = param.reverseLayout
 
     private var itemSizePx: Int = 50
     private var itemSizeDp: Dp = Dp.Infinity
@@ -72,7 +74,7 @@ class LazyListLayoutInfoTest(
     fun visibleItemsAreCorrect() {
         lateinit var state: LazyListState
         rule.setContent {
-            LazyColumn(
+            LazyColumnOrRow(
                 state = rememberLazyListState().also { state = it },
                 reverseLayout = reverseLayout,
                 modifier = Modifier.requiredSize(itemSizeDp * 3.5f)
@@ -92,7 +94,7 @@ class LazyListLayoutInfoTest(
     fun visibleItemsAreCorrectAfterScroll() {
         lateinit var state: LazyListState
         rule.setContent {
-            LazyColumn(
+            LazyColumnOrRow(
                 state = rememberLazyListState().also { state = it },
                 reverseLayout = reverseLayout,
                 modifier = Modifier.requiredSize(itemSizeDp * 3.5f)
@@ -115,10 +117,10 @@ class LazyListLayoutInfoTest(
     fun visibleItemsAreCorrectWithSpacing() {
         lateinit var state: LazyListState
         rule.setContent {
-            LazyColumn(
+            LazyColumnOrRow(
                 state = rememberLazyListState().also { state = it },
                 reverseLayout = reverseLayout,
-                verticalArrangement = Arrangement.spacedBy(itemSizeDp),
+                spacedBy = itemSizeDp,
                 modifier = Modifier.requiredSize(itemSizeDp * 3.5f)
             ) {
                 items((0..5).toList()) {
@@ -141,7 +143,7 @@ class LazyListLayoutInfoTest(
         lateinit var state: LazyListState
         val currentInfo = StableRef<LazyListLayoutInfo?>(null)
         rule.setContent {
-            LazyColumn(
+            LazyColumnOrRow(
                 state = rememberLazyListState().also { state = it },
                 reverseLayout = reverseLayout,
                 modifier = Modifier.requiredSize(itemSizeDp * 3.5f)
@@ -177,7 +179,7 @@ class LazyListLayoutInfoTest(
             currentInfo = state.layoutInfo
         }
         rule.setContent {
-            LazyColumn(
+            LazyColumnOrRow(
                 reverseLayout = reverseLayout,
                 state = rememberLazyListState().also { state = it }
             ) {
@@ -206,7 +208,7 @@ class LazyListLayoutInfoTest(
         var count by mutableStateOf(10)
         lateinit var state: LazyListState
         rule.setContent {
-            LazyColumn(
+            LazyColumnOrRow(
                 reverseLayout = reverseLayout,
                 state = rememberLazyListState().also { state = it }
             ) {
@@ -227,13 +229,13 @@ class LazyListLayoutInfoTest(
     }
 
     @Test
-    fun viewportOffsetsAreCorrect() {
+    fun viewportOffsetsAndSizeAreCorrect() {
         val sizePx = 45
         val sizeDp = with(rule.density) { sizePx.toDp() }
         lateinit var state: LazyListState
         rule.setContent {
-            LazyColumn(
-                Modifier.requiredSize(sizeDp),
+            LazyColumnOrRow(
+                Modifier.mainAxisSize(sizeDp).crossAxisSize(sizeDp * 2),
                 reverseLayout = reverseLayout,
                 state = rememberLazyListState().also { state = it }
             ) {
@@ -246,26 +248,34 @@ class LazyListLayoutInfoTest(
         rule.runOnIdle {
             assertThat(state.layoutInfo.viewportStartOffset).isEqualTo(0)
             assertThat(state.layoutInfo.viewportEndOffset).isEqualTo(sizePx)
+            assertThat(state.layoutInfo.viewportSize).isEqualTo(
+                if (vertical) IntSize(sizePx * 2, sizePx) else IntSize(sizePx, sizePx * 2)
+            )
         }
     }
 
     @Test
-    fun viewportOffsetsAreCorrectWithContentPadding() {
+    fun viewportOffsetsAndSizeAreCorrectWithContentPadding() {
         val sizePx = 45
         val startPaddingPx = 10
         val endPaddingPx = 15
         val sizeDp = with(rule.density) { sizePx.toDp() }
-        val topPaddingDp = with(rule.density) {
+        val beforeContentPaddingDp = with(rule.density) {
             if (!reverseLayout) startPaddingPx.toDp() else endPaddingPx.toDp()
         }
-        val bottomPaddingDp = with(rule.density) {
+        val afterContentPaddingDp = with(rule.density) {
             if (!reverseLayout) endPaddingPx.toDp() else startPaddingPx.toDp()
         }
         lateinit var state: LazyListState
         rule.setContent {
-            LazyColumn(
-                Modifier.requiredSize(sizeDp),
-                contentPadding = PaddingValues(top = topPaddingDp, bottom = bottomPaddingDp),
+            LazyColumnOrRow(
+                Modifier.mainAxisSize(sizeDp).crossAxisSize(sizeDp * 2),
+                contentPadding = PaddingValues(
+                    beforeContent = beforeContentPaddingDp,
+                    afterContent = afterContentPaddingDp,
+                    beforeContentCrossAxis = 2.dp,
+                    afterContentCrossAxis = 2.dp
+                ),
                 reverseLayout = reverseLayout,
                 state = rememberLazyListState().also { state = it }
             ) {
@@ -278,6 +288,170 @@ class LazyListLayoutInfoTest(
         rule.runOnIdle {
             assertThat(state.layoutInfo.viewportStartOffset).isEqualTo(-startPaddingPx)
             assertThat(state.layoutInfo.viewportEndOffset).isEqualTo(sizePx - startPaddingPx)
+            assertThat(state.layoutInfo.afterContentPadding).isEqualTo(endPaddingPx)
+            assertThat(state.layoutInfo.viewportSize).isEqualTo(
+                if (vertical) IntSize(sizePx * 2, sizePx) else IntSize(sizePx, sizePx * 2)
+            )
+        }
+    }
+
+    @Test
+    fun emptyItemsInVisibleItemsInfo() {
+        lateinit var state: LazyListState
+        rule.setContent {
+            LazyColumnOrRow(
+                state = rememberLazyListState().also { state = it }
+            ) {
+                item { Box(Modifier) }
+                item { }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(state.layoutInfo.visibleItemsInfo.size).isEqualTo(2)
+            assertThat(state.layoutInfo.visibleItemsInfo.first().index).isEqualTo(0)
+            assertThat(state.layoutInfo.visibleItemsInfo.last().index).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun emptyContent() {
+        lateinit var state: LazyListState
+        val sizePx = 45
+        val startPaddingPx = 10
+        val endPaddingPx = 15
+        val sizeDp = with(rule.density) { sizePx.toDp() }
+        val beforeContentPaddingDp = with(rule.density) {
+            if (!reverseLayout) startPaddingPx.toDp() else endPaddingPx.toDp()
+        }
+        val afterContentPaddingDp = with(rule.density) {
+            if (!reverseLayout) endPaddingPx.toDp() else startPaddingPx.toDp()
+        }
+        rule.setContent {
+            LazyColumnOrRow(
+                Modifier.mainAxisSize(sizeDp).crossAxisSize(sizeDp * 2),
+                state = rememberLazyListState().also { state = it },
+                reverseLayout = reverseLayout,
+                contentPadding = PaddingValues(
+                    beforeContent = beforeContentPaddingDp,
+                    afterContent = afterContentPaddingDp
+                )
+            ) {
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(state.layoutInfo.viewportStartOffset).isEqualTo(-startPaddingPx)
+            assertThat(state.layoutInfo.viewportEndOffset).isEqualTo(sizePx - startPaddingPx)
+            assertThat(state.layoutInfo.beforeContentPadding).isEqualTo(startPaddingPx)
+            assertThat(state.layoutInfo.afterContentPadding).isEqualTo(endPaddingPx)
+            assertThat(state.layoutInfo.viewportSize).isEqualTo(
+                if (vertical) IntSize(sizePx * 2, sizePx) else IntSize(sizePx, sizePx * 2)
+            )
+        }
+    }
+
+    @Test
+    fun viewportIsLargerThenTheContent() {
+        lateinit var state: LazyListState
+        val sizePx = 45
+        val startPaddingPx = 10
+        val endPaddingPx = 15
+        val sizeDp = with(rule.density) { sizePx.toDp() }
+        val beforeContentPaddingDp = with(rule.density) {
+            if (!reverseLayout) startPaddingPx.toDp() else endPaddingPx.toDp()
+        }
+        val afterContentPaddingDp = with(rule.density) {
+            if (!reverseLayout) endPaddingPx.toDp() else startPaddingPx.toDp()
+        }
+        rule.setContent {
+            LazyColumnOrRow(
+                Modifier.mainAxisSize(sizeDp).crossAxisSize(sizeDp * 2),
+                state = rememberLazyListState().also { state = it },
+                reverseLayout = reverseLayout,
+                contentPadding = PaddingValues(
+                    beforeContent = beforeContentPaddingDp,
+                    afterContent = afterContentPaddingDp
+                )
+            ) {
+                item {
+                    Box(Modifier.size(sizeDp / 2))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(state.layoutInfo.viewportStartOffset).isEqualTo(-startPaddingPx)
+            assertThat(state.layoutInfo.viewportEndOffset).isEqualTo(sizePx - startPaddingPx)
+            assertThat(state.layoutInfo.beforeContentPadding).isEqualTo(startPaddingPx)
+            assertThat(state.layoutInfo.afterContentPadding).isEqualTo(endPaddingPx)
+            assertThat(state.layoutInfo.viewportSize).isEqualTo(
+                if (vertical) IntSize(sizePx * 2, sizePx) else IntSize(sizePx, sizePx * 2)
+            )
+        }
+    }
+
+    @Test
+    fun reverseLayoutIsCorrect() {
+        lateinit var state: LazyListState
+        rule.setContent {
+            LazyColumnOrRow(
+                state = rememberLazyListState().also { state = it },
+                reverseLayout = reverseLayout,
+                modifier = Modifier.requiredSize(itemSizeDp * 3.5f)
+            ) {
+                items((0..5).toList()) {
+                    Box(Modifier.requiredSize(itemSizeDp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(state.layoutInfo.reverseLayout).isEqualTo(reverseLayout)
+        }
+    }
+
+    @Test
+    fun orientationIsCorrect() {
+        lateinit var state: LazyListState
+        rule.setContent {
+            LazyColumnOrRow(
+                state = rememberLazyListState().also { state = it },
+                modifier = Modifier.requiredSize(itemSizeDp * 3.5f)
+            ) {
+                items((0..5).toList()) {
+                    Box(Modifier.requiredSize(itemSizeDp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(state.layoutInfo.orientation)
+                .isEqualTo(if (vertical) Orientation.Vertical else Orientation.Horizontal)
+        }
+    }
+
+    @Test
+    fun viewportOffsetsSmallContentReverseArrangement() {
+        val state = LazyListState()
+        rule.setContent {
+            LazyColumnOrRow(
+                modifier = Modifier.requiredSize(itemSizeDp * 5),
+                reverseLayout = reverseLayout,
+                reverseArrangement = true,
+                state = state
+            ) {
+                items(4) {
+                    Box(Modifier.requiredSize(itemSizeDp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            println(state.layoutInfo.visibleItemsInfo.map { it.offset })
+            assertThat(state.layoutInfo.viewportStartOffset).isEqualTo(0)
+            assertThat(state.layoutInfo.viewportEndOffset).isEqualTo(itemSizePx * 5)
+            state.layoutInfo.assertVisibleItems(count = 4, startOffset = itemSizePx)
         }
     }
 
@@ -299,6 +473,15 @@ class LazyListLayoutInfoTest(
             currentIndex++
             currentOffset += it.size + spacing
         }
+    }
+}
+
+class LayoutInfoTestParam(
+    val orientation: Orientation,
+    val reverseLayout: Boolean
+) {
+    override fun toString(): String {
+        return "orientation=$orientation;reverseLayout=$reverseLayout"
     }
 }
 

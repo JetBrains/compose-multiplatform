@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.UiComposable
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -54,11 +55,13 @@ import androidx.compose.ui.unit.LayoutDirection
  * @param content The content of the [BoxWithConstraints].
  */
 @Composable
+@UiComposable
 fun BoxWithConstraints(
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
     propagateMinConstraints: Boolean = false,
-    content: @Composable BoxWithConstraintsScope.() -> Unit
+    content:
+        @Composable @UiComposable BoxWithConstraintsScope.() -> Unit
 ) {
     val measurePolicy = rememberBoxMeasurePolicy(contentAlignment, propagateMinConstraints)
     SubcomposeLayout(modifier) { constraints ->
@@ -109,12 +112,12 @@ private data class BoxWithConstraintsScopeImpl(
     private val density: Density,
     override val constraints: Constraints
 ) : BoxWithConstraintsScope, BoxScope by BoxScopeInstance {
-    override val minWidth: Dp
-        get() = with(density) { constraints.minWidth.toDp() }
-    override val maxWidth: Dp
-        get() = with(density) { constraints.maxWidth.toDp() }
-    override val minHeight: Dp
-        get() = with(density) { constraints.minHeight.toDp() }
-    override val maxHeight: Dp
-        get() = with(density) { constraints.maxHeight.toDp() }
+    override val minWidth: Dp get() = with(density) { constraints.minWidth.toDp() }
+    override val maxWidth: Dp get() = with(density) {
+        if (constraints.hasBoundedWidth) constraints.maxWidth.toDp() else Dp.Infinity
+    }
+    override val minHeight: Dp get() = with(density) { constraints.minHeight.toDp() }
+    override val maxHeight: Dp get() = with(density) {
+        if (constraints.hasBoundedHeight) constraints.maxHeight.toDp() else Dp.Infinity
+    }
 }

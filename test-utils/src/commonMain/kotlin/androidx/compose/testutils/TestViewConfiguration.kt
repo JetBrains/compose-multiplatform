@@ -23,6 +23,17 @@ import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.DpSize
 
 /**
+ * Default values for [TestViewConfiguration]. This object exists so we can leverage the default
+ * implementation of members from [ViewConfiguration].
+ */
+private val Default = object : ViewConfiguration {
+    override val longPressTimeoutMillis: Long = 500L
+    override val doubleTapTimeoutMillis: Long = 300L
+    override val doubleTapMinTimeMillis: Long = 40L
+    override val touchSlop: Float = 18f
+}
+
+/**
  * A [ViewConfiguration] that can be used for testing. The default values are representative for
  * Android devices, but can be set to any value desired for a test. See the `With*` functions for
  * shorthands that create a [TestViewConfiguration] and provide it as a [LocalViewConfiguration].
@@ -31,13 +42,14 @@ import androidx.compose.ui.unit.DpSize
  * @see WithDoubleTapTimeoutMillis
  * @see WithDoubleTapMinTimeMillis
  * @see WithTouchSlop
+ * @see WithMinimumTouchTargetSize
  */
 class TestViewConfiguration(
-    override val longPressTimeoutMillis: Long = 500L,
-    override val doubleTapTimeoutMillis: Long = 300L,
-    override val doubleTapMinTimeMillis: Long = 40L,
-    override val touchSlop: Float = 18f,
-    override val minimumTouchTargetSize: DpSize = DpSize.Zero
+    override val longPressTimeoutMillis: Long = Default.longPressTimeoutMillis,
+    override val doubleTapTimeoutMillis: Long = Default.doubleTapTimeoutMillis,
+    override val doubleTapMinTimeMillis: Long = Default.doubleTapMinTimeMillis,
+    override val touchSlop: Float = Default.touchSlop,
+    override val minimumTouchTargetSize: DpSize = Default.minimumTouchTargetSize
 ) : ViewConfiguration
 
 @Composable
@@ -68,6 +80,14 @@ fun WithDoubleTapMinTimeMillis(doubleTapMinTimeMillis: Long, content: @Composabl
 fun WithTouchSlop(touchSlop: Float, content: @Composable () -> Unit) {
     WithViewConfiguration(
         TestViewConfiguration(touchSlop = touchSlop),
+        content = content
+    )
+}
+
+@Composable
+fun WithMinimumTouchTargetSize(minimumTouchTargetSize: DpSize, content: @Composable () -> Unit) {
+    WithViewConfiguration(
+        TestViewConfiguration(minimumTouchTargetSize = minimumTouchTargetSize),
         content = content
     )
 }

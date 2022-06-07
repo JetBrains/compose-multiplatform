@@ -16,7 +16,9 @@
 
 package androidx.compose.ui.graphics.colorspace
 
+import kotlin.math.abs
 import kotlin.math.pow
+import kotlin.math.sign
 
 /**
  * Implementation of the Oklab color space. Oklab uses
@@ -34,22 +36,22 @@ internal class Oklab(
         get() = true
 
     override fun getMinValue(component: Int): Float {
-        return if (component == 0) 0f else -2f
+        return if (component == 0) 0f else -0.5f
     }
 
     override fun getMaxValue(component: Int): Float {
-        return if (component == 0) 1f else 2f
+        return if (component == 0) 1f else 0.5f
     }
 
     override fun toXyz(v: FloatArray): FloatArray {
         v[0] = v[0].coerceIn(0f, 1f)
-        v[1] = v[1].coerceIn(-2f, 2f)
-        v[2] = v[2].coerceIn(-2f, 2f)
+        v[1] = v[1].coerceIn(-0.5f, 0.5f)
+        v[2] = v[2].coerceIn(-0.5f, 0.5f)
 
         mul3x3Float3(InverseM2, v)
-        v[0] = v[0].pow(3f)
-        v[1] = v[1].pow(3f)
-        v[2] = v[2].pow(3f)
+        v[0] = v[0] * v[0] * v[0]
+        v[1] = v[1] * v[1] * v[1]
+        v[2] = v[2] * v[2] * v[2]
         mul3x3Float3(InverseM1, v)
 
         return v
@@ -58,9 +60,9 @@ internal class Oklab(
     override fun fromXyz(v: FloatArray): FloatArray {
         mul3x3Float3(M1, v)
 
-        v[0] = v[0].pow(1f / 3f)
-        v[1] = v[1].pow(1f / 3f)
-        v[2] = v[2].pow(1f / 3f)
+        v[0] = sign(v[0]) * abs(v[0]).pow(1.0f / 3.0f)
+        v[1] = sign(v[1]) * abs(v[1]).pow(1.0f / 3.0f)
+        v[2] = sign(v[2]) * abs(v[2]).pow(1.0f / 3.0f)
 
         mul3x3Float3(M2, v)
         return v
@@ -79,7 +81,7 @@ internal class Oklab(
                 -0.1288597137f, 0.0361456387f, 0.6338517070f
             ),
             chromaticAdaptation(
-                matrix = Adaptation.VonKries.transform,
+                matrix = Adaptation.Bradford.transform,
                 srcWhitePoint = Illuminant.D50.toXyz(),
                 dstWhitePoint = Illuminant.D65.toXyz()
             )

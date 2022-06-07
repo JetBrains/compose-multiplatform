@@ -16,7 +16,6 @@
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
 plugins {
@@ -27,6 +26,9 @@ plugins {
 dependencies {
     compileOnly(libs.kotlinStdlib)
     compileOnly(libs.kotlinCompiler)
+
+    testImplementation(libs.kotlinStdlib)
+    testImplementation(libs.junit)
 }
 
 tasks.withType(KotlinCompile).configureEach {
@@ -34,8 +36,7 @@ tasks.withType(KotlinCompile).configureEach {
         jvmTarget = "1.8"
         freeCompilerArgs = [
                 "-Xskip-metadata-version-check",
-                "-Xjvm-default=enable",
-                "-Xopt-in=kotlin.RequiresOptIn"
+                "-opt-in=kotlin.RequiresOptIn"
         ]
     }
 }
@@ -45,7 +46,7 @@ androidx {
     // This is only published because that is required when exporting it to g3.
     // Nobody should ever get this artifact from maven; just from studio or from source
     type = LibraryType.COMPILER_PLUGIN
-    mavenGroup = LibraryGroups.Compose.COMPILER
+    mavenGroup = LibraryGroups.COMPOSE_COMPILER
     inceptionYear = "2019"
     description = "Contains the Kotlin compiler plugin for Compose used in Android Studio and IDEA"
 }

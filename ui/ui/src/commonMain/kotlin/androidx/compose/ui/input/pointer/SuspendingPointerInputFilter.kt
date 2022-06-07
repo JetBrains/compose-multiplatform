@@ -31,14 +31,6 @@ import androidx.compose.ui.platform.synchronized
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastAll
-import kotlinx.coroutines.CancellableContinuation
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
@@ -48,6 +40,15 @@ import kotlin.coroutines.createCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.math.max
+import kotlinx.coroutines.CancellableContinuation
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * Receiver scope for awaiting pointer events in a call to
@@ -59,6 +60,7 @@ import kotlin.math.max
  * affect the next stage of the input processing pipeline.
  */
 @RestrictsSuspension
+@JvmDefaultWithCompatibility
 interface AwaitPointerEventScope : Density {
     /**
      * The measured size of the pointer input region. Input events will be reported with
@@ -127,6 +129,7 @@ interface AwaitPointerEventScope : Density {
 // gesture detectors as suspending extensions with a PointerInputScope receiver, also making this
 // interface implement CoroutineScope would be an invitation to break structured concurrency in
 // these extensions, leaving other launched coroutines running in the calling scope.
+@JvmDefaultWithCompatibility
 interface PointerInputScope : Density {
     /**
      * The measured size of the pointer input region. Input events will be reported with
@@ -205,6 +208,22 @@ fun Modifier.pointerInput(
  * pointer input events. Extension functions on [PointerInputScope] or [AwaitPointerEventScope]
  * may be defined to perform higher-level gesture detection. The pointer input handling [block]
  * will be cancelled and **re-started** when [pointerInput] is recomposed with a different [key1].
+ *
+ * When a [pointerInput] modifier is created by composition, if [block] captures any local
+ * variables to operate on, two patterns are common for working with changes to those variables
+ * depending on the desired behavior.
+ *
+ * Specifying the captured value as a [key][key1] parameter will cause [block] to cancel
+ * and restart from the beginning if the value changes:
+ *
+ * @sample androidx.compose.ui.samples.keyedPointerInputModifier
+ *
+ * If [block] should **not** restart when a captured value is changed but the value should still
+ * be updated for its next use, use
+ * [rememberUpdatedState][androidx.compose.runtime.rememberUpdatedState] to update a value holder
+ * that is accessed by [block]:
+ *
+ * @sample androidx.compose.ui.samples.rememberedUpdatedParameterPointerInputModifier
  */
 fun Modifier.pointerInput(
     key1: Any?,
@@ -218,11 +237,10 @@ fun Modifier.pointerInput(
 ) {
     val density = LocalDensity.current
     val viewConfiguration = LocalViewConfiguration.current
-    remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.apply {
-        val filter = this
-        LaunchedEffect(this, key1) {
+    remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.also { filter ->
+        LaunchedEffect(filter, key1) {
             filter.coroutineScope = this
-            block()
+            filter.block()
         }
     }
 }
@@ -236,6 +254,22 @@ fun Modifier.pointerInput(
  * may be defined to perform higher-level gesture detection. The pointer input handling [block]
  * will be cancelled and **re-started** when [pointerInput] is recomposed with a different [key1] or
  * [key2].
+ *
+ * When a [pointerInput] modifier is created by composition, if [block] captures any local
+ * variables to operate on, two patterns are common for working with changes to those variables
+ * depending on the desired behavior.
+ *
+ * Specifying the captured value as a [key][key1] parameter will cause [block] to cancel
+ * and restart from the beginning if the value changes:
+ *
+ * @sample androidx.compose.ui.samples.keyedPointerInputModifier
+ *
+ * If [block] should **not** restart when a captured value is changed but the value should still
+ * be updated for its next use, use
+ * [rememberUpdatedState][androidx.compose.runtime.rememberUpdatedState] to update a value holder
+ * that is accessed by [block]:
+ *
+ * @sample androidx.compose.ui.samples.rememberedUpdatedParameterPointerInputModifier
  */
 fun Modifier.pointerInput(
     key1: Any?,
@@ -252,7 +286,7 @@ fun Modifier.pointerInput(
     val density = LocalDensity.current
     val viewConfiguration = LocalViewConfiguration.current
     remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.also { filter ->
-        LaunchedEffect(this, key1, key2) {
+        LaunchedEffect(filter, key1, key2) {
             filter.coroutineScope = this
             filter.block()
         }
@@ -267,6 +301,22 @@ fun Modifier.pointerInput(
  * pointer input events. Extension functions on [PointerInputScope] or [AwaitPointerEventScope]
  * may be defined to perform higher-level gesture detection. The pointer input handling [block]
  * will be cancelled and **re-started** when [pointerInput] is recomposed with any different [keys].
+ *
+ * When a [pointerInput] modifier is created by composition, if [block] captures any local
+ * variables to operate on, two patterns are common for working with changes to those variables
+ * depending on the desired behavior.
+ *
+ * Specifying the captured value as a [key][keys] parameter will cause [block] to cancel
+ * and restart from the beginning if the value changes:
+ *
+ * @sample androidx.compose.ui.samples.keyedPointerInputModifier
+ *
+ * If [block] should **not** restart when a captured value is changed but the value should still
+ * be updated for its next use, use
+ * [rememberUpdatedState][androidx.compose.runtime.rememberUpdatedState] to update a value holder
+ * that is accessed by [block]:
+ *
+ * @sample androidx.compose.ui.samples.rememberedUpdatedParameterPointerInputModifier
  */
 fun Modifier.pointerInput(
     vararg keys: Any?,
@@ -280,11 +330,10 @@ fun Modifier.pointerInput(
 ) {
     val density = LocalDensity.current
     val viewConfiguration = LocalViewConfiguration.current
-    remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.apply {
-        val filter = this
-        LaunchedEffect(this, *keys) {
+    remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.also { filter ->
+        LaunchedEffect(filter, *keys) {
             filter.coroutineScope = this
-            block()
+            filter.block()
         }
     }
 }
@@ -433,12 +482,15 @@ internal class SuspendingPointerInputFilter(
             return // There aren't any pressed pointers, so we don't need to send any events.
         }
         val newChanges = lastEvent.changes.fastMapNotNull { old ->
-            old.copy(
-                currentPressed = false,
+            PointerInputChange(
+                id = old.id,
+                position = old.position,
+                uptimeMillis = old.uptimeMillis,
+                pressed = false,
                 previousPosition = old.position,
-                previousTime = old.uptimeMillis,
+                previousUptimeMillis = old.uptimeMillis,
                 previousPressed = old.pressed,
-                consumed = ConsumedData(downChange = old.pressed)
+                isInitiallyConsumed = old.pressed
             )
         }
 

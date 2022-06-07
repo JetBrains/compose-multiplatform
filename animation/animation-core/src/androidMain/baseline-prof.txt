@@ -2,7 +2,9 @@
 # =============================================
 # In practice it seems like almost every class in animation/core ends up getting loaded in even a
 # relatively small sample, and most end up getting marked as "HSP". Since Animation is a high value
-# target for performance (fade in, scroll, etc) we are going to be liberal in the animation profile
+# target for performance - fade in, scroll, etc we are going to be liberal in the animation profile
 # rules and just mark the entire module.
-HSPLandroidx/compose/animation/core/**;->**(**)**
+
+HSPLandroidx/compose/animation/core/**->**(**)**
+
 Landroidx/compose/animation/core/**;

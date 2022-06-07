@@ -28,13 +28,13 @@ package androidx.compose.ui.text.font
  *  It is possible to fake an increase of [FontWeight] but not a decrease. It is possible to fake
  *  a regular font slanted, but not vice versa.
  *
- *  `FontSynthesis` works the same way as the [CSS font-synthesis](https://www.w3
- *  .org/TR/css-fonts-4/#font-synthesis) property.
+ *  `FontSynthesis` works the same way as the
+ *  [CSS font-synthesis](https://www.w3.org/TR/css-fonts-4/#font-synthesis) property.
  *
  *  @sample androidx.compose.ui.text.samples.FontFamilySynthesisSample
  **/
-@Suppress("INLINE_CLASS_DEPRECATED")
-inline class FontSynthesis internal constructor(internal val value: Int) {
+@kotlin.jvm.JvmInline
+value class FontSynthesis internal constructor(internal val value: Int) {
 
     override fun toString(): String {
         return when (this) {
@@ -78,3 +78,24 @@ inline class FontSynthesis internal constructor(internal val value: Int) {
     internal val isStyleOn: Boolean
         get() = this == All || this == Style
 }
+
+/**
+ * Perform platform-specific font synthesis such as fake bold or fake italic.
+ *
+ * Platforms are not required to support synthesis, in which case they should return [typeface].
+ *
+ * Platforms that support synthesis should check [FontSynthesis.isWeightOn] and
+ * [FontSynthesis.isStyleOn] in this method before synthesizing bold or italic, respectively.
+ *
+ * @param typeface a platform-specific typeface
+ * @param font initial font that generated the typeface via loading
+ * @param requestedWeight app-requested weight (may be different than the font's weight)
+ * @param requestedStyle app-requested style (may be different than the font's style)
+ * @return a synthesized typeface, or the passed [typeface] if synthesis is not needed or supported.
+ */
+internal expect fun FontSynthesis.synthesizeTypeface(
+    typeface: Any,
+    font: Font,
+    requestedWeight: FontWeight,
+    requestedStyle: FontStyle
+): Any

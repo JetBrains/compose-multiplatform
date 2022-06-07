@@ -150,7 +150,7 @@ private fun AboutSection(
 ) {
     Text(
         text = stringResource(R.string.io_about_title).uppercase(
-            LocaleListCompat.getDefault().get(0)
+            LocaleListCompat.getDefault().get(0)!!
         ),
         style = MaterialTheme.typography.body2,
         fontWeight = FontWeight.SemiBold,

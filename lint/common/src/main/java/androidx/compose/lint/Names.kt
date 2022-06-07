@@ -109,6 +109,12 @@ fun Package(packageName: String): PackageName =
     PackageName(packageName.split("."))
 
 /**
+ * @return a [PackageName] with a Java-style (separated with `.`) [packageName].
+ */
+fun Package(packageName: PackageName, shortName: String): PackageName =
+    PackageName(packageName.segments + shortName.split("."))
+
+/**
  * @return a [Name] with the provided [pkg] and Java-style (separated with `.`) [shortName].
  */
 fun Name(pkg: PackageName, shortName: String): Name =

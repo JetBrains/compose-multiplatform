@@ -38,17 +38,25 @@ internal fun getSelectionHandleCoordinates(
     areHandlesCrossed: Boolean
 ): Offset {
     val line = textLayoutResult.getLineForOffset(offset)
-    val offsetToCheck =
-        if (isStart && !areHandlesCrossed || !isStart && areHandlesCrossed) offset
-        else max(offset - 1, 0)
-    val bidiRunDirection = textLayoutResult.getBidiRunDirection(offsetToCheck)
-    val paragraphDirection = textLayoutResult.getParagraphDirection(offset)
-
-    val x = textLayoutResult.getHorizontalPosition(
-        offset = offset,
-        usePrimaryDirection = bidiRunDirection == paragraphDirection
-    )
+    val x = textLayoutResult.getHorizontalPosition(offset, isStart, areHandlesCrossed)
     val y = textLayoutResult.getLineBottom(line)
 
     return Offset(x, y)
+}
+
+internal fun TextLayoutResult.getHorizontalPosition(
+    offset: Int,
+    isStart: Boolean,
+    areHandlesCrossed: Boolean
+): Float {
+    val offsetToCheck =
+        if (isStart && !areHandlesCrossed || !isStart && areHandlesCrossed) offset
+        else max(offset - 1, 0)
+    val bidiRunDirection = getBidiRunDirection(offsetToCheck)
+    val paragraphDirection = getParagraphDirection(offset)
+
+    return getHorizontalPosition(
+        offset = offset,
+        usePrimaryDirection = bidiRunDirection == paragraphDirection
+    )
 }

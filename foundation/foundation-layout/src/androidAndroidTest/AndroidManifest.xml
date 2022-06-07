@@ -14,11 +14,14 @@
      limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="androidx.compose.foundation.layout">
+    xmlns:tools="http://schemas.android.com/tools">
     <application>
         <activity
             android:name="androidx.compose.foundation.layout.TestActivity"
+            android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen" />
+        <activity
+            android:name="androidx.compose.foundation.layout.WindowInsetsActivity"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen" />
     </application>
 </manifest>

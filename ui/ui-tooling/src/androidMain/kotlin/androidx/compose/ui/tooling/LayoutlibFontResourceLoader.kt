@@ -27,7 +27,12 @@ import androidx.compose.ui.text.font.ResourceFont
 /**
  * Layoutlib implementation for [Font.ResourceLoader]
  */
+@Suppress("DEPRECATION")
 internal class LayoutlibFontResourceLoader(private val context: Context) : Font.ResourceLoader {
+    @Deprecated(
+        "Replaced by FontFamily.Resolver, this method should not be called",
+        replaceWith = ReplaceWith("FontFamily.Resolver.resolve(font, )")
+    )
     override fun load(font: Font): Typeface {
         return if (font is ResourceFont && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ResourceFontHelper.load(context, font)

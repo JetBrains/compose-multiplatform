@@ -39,6 +39,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.UiComposable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
@@ -447,11 +448,12 @@ private fun BackLayerTransition(
 }
 
 @Composable
+@UiComposable
 private fun BackdropStack(
     modifier: Modifier,
-    backLayer: @Composable () -> Unit,
+    backLayer: @Composable @UiComposable () -> Unit,
     calculateBackLayerConstraints: (Constraints) -> Constraints,
-    frontLayer: @Composable (Constraints, Float) -> Unit
+    frontLayer: @Composable @UiComposable (Constraints, Float) -> Unit
 ) {
     SubcomposeLayout(modifier) { constraints ->
         val backLayerPlaceable =

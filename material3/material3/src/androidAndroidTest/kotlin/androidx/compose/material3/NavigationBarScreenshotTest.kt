@@ -62,11 +62,9 @@ class NavigationBarScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setContent {
-            MaterialTheme(lightColorScheme()) {
-                scope = rememberCoroutineScope()
-                DefaultNavigationBar(interactionSource)
-            }
+        composeTestRule.setMaterialContent(lightColorScheme()) {
+            scope = rememberCoroutineScope()
+            DefaultNavigationBar(interactionSource)
         }
 
         assertNavigationBarMatches(
@@ -83,11 +81,9 @@ class NavigationBarScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setContent {
-            MaterialTheme(lightColorScheme()) {
-                scope = rememberCoroutineScope()
-                DefaultNavigationBar(interactionSource)
-            }
+        composeTestRule.setMaterialContent(lightColorScheme()) {
+            scope = rememberCoroutineScope()
+            DefaultNavigationBar(interactionSource)
         }
 
         assertNavigationBarMatches(
@@ -104,11 +100,9 @@ class NavigationBarScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setContent {
-            MaterialTheme(darkColorScheme()) {
-                scope = rememberCoroutineScope()
-                DefaultNavigationBar(interactionSource)
-            }
+        composeTestRule.setMaterialContent(darkColorScheme()) {
+            scope = rememberCoroutineScope()
+            DefaultNavigationBar(interactionSource)
         }
 
         assertNavigationBarMatches(
@@ -125,11 +119,9 @@ class NavigationBarScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setContent {
-            MaterialTheme(darkColorScheme()) {
-                scope = rememberCoroutineScope()
-                DefaultNavigationBar(interactionSource)
-            }
+        composeTestRule.setMaterialContent(darkColorScheme()) {
+            scope = rememberCoroutineScope()
+            DefaultNavigationBar(interactionSource)
         }
 
         assertNavigationBarMatches(

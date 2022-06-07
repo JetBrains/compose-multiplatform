@@ -261,7 +261,7 @@ private object InteropSnippet9 {
             val intentFilter = IntentFilter(systemAction)
             val broadcast = object : BroadcastReceiver() {
                 override fun onReceive(context: Context?, intent: Intent?) {
-                    onSystemEvent(intent)
+                    currentOnSystemEvent(intent)
                 }
             }
 

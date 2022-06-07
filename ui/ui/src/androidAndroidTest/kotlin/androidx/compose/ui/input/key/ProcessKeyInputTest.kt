@@ -324,6 +324,46 @@ class ProcessKeyInputTest {
     }
 
     @Test
+    fun parent_child_noKeyInputModifierForChild() {
+        // Arrange.
+        val focusRequester = FocusRequester()
+        var triggerIndex = 1
+        var parentOnKeyEventTrigger = 0
+        var parentOnPreviewKeyEventTrigger = 0
+        rule.setFocusableContent {
+            Box(
+                modifier = Modifier
+                    .onKeyEvent {
+                        parentOnKeyEventTrigger = triggerIndex++
+                        false
+                    }
+                    .onPreviewKeyEvent {
+                        parentOnPreviewKeyEventTrigger = triggerIndex++
+                        false
+                    }
+            ) {
+                Box(
+                    modifier = Modifier
+                        .focusRequester(focusRequester)
+                        .focusTarget()
+                )
+            }
+        }
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+        }
+
+        // Act.
+        rule.onRoot().performKeyPress(keyEvent(KeyCodeA, KeyUp))
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(parentOnPreviewKeyEventTrigger).isEqualTo(1)
+            assertThat(parentOnKeyEventTrigger).isEqualTo(2)
+        }
+    }
+
+    @Test
     fun grandParent_parent_child() {
         // Arrange.
         val focusRequester = FocusRequester()

@@ -36,40 +36,43 @@ internal fun down(
         durationMillis,
         Offset(x, y),
         false,
-        ConsumedData()
+        isInitiallyConsumed = false
     )
 
 internal fun PointerInputChange.moveTo(durationMillis: Long, x: Float = 0f, y: Float = 0f) =
-    copy(
-        previousTime = uptimeMillis,
+    PointerInputChange(
+        id = this.id,
+        previousUptimeMillis = uptimeMillis,
         previousPressed = pressed,
         previousPosition = position,
-        currentTime = durationMillis,
-        currentPressed = true,
-        currentPosition = Offset(x, y),
-        consumed = ConsumedData()
+        uptimeMillis = durationMillis,
+        pressed = true,
+        position = Offset(x, y),
+        isInitiallyConsumed = false
     )
 
 internal fun PointerInputChange.moveBy(durationMillis: Long, dx: Float = 0f, dy: Float = 0f) =
-    copy(
-        previousTime = uptimeMillis,
+    PointerInputChange(
+        id = this.id,
+        previousUptimeMillis = uptimeMillis,
         previousPressed = pressed,
         previousPosition = position,
-        currentTime = uptimeMillis + durationMillis,
-        currentPressed = true,
-        currentPosition = Offset(position.x + dx, position.y + dy),
-        consumed = ConsumedData()
+        uptimeMillis = uptimeMillis + durationMillis,
+        pressed = true,
+        position = Offset(position.x + dx, position.y + dy),
+        isInitiallyConsumed = false
     )
 
 internal fun PointerInputChange.up(durationMillis: Long) =
-    copy(
-        previousTime = uptimeMillis,
+    PointerInputChange(
+        id = this.id,
+        previousUptimeMillis = uptimeMillis,
         previousPressed = pressed,
         previousPosition = position,
-        currentTime = durationMillis,
-        currentPressed = false,
-        currentPosition = position,
-        consumed = ConsumedData()
+        uptimeMillis = durationMillis,
+        pressed = false,
+        position = position,
+        isInitiallyConsumed = false
     )
 
 /**

@@ -59,7 +59,7 @@ internal fun Modifier.minimumTouchTargetSize(): Modifier = composed(
  * a layout / near to another component without any padding, there will not be enough space for
  * an accessible touch target.
  */
-@Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+@Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
 @get:ExperimentalMaterial3Api
 @ExperimentalMaterial3Api
 val LocalMinimumTouchTargetEnforcement: ProvidableCompositionLocal<Boolean> =

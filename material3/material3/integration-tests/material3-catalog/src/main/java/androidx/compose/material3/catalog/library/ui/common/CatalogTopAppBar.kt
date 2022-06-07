@@ -18,6 +18,11 @@ package androidx.compose.material3.catalog.library.ui.common
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -43,8 +48,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.insets.statusBarsPadding
 
 @Composable
 fun CatalogTopAppBar(
@@ -143,9 +146,11 @@ fun CatalogTopAppBar(
             },
             scrollBehavior = scrollBehavior,
             colors = foregroundColors,
-            modifier = Modifier
-                .statusBarsPadding()
-                .navigationBarsPadding(bottom = false)
+            modifier = Modifier.windowInsetsPadding(
+                WindowInsets.safeDrawing.only(
+                    WindowInsetsSides.Horizontal + WindowInsetsSides.Top
+                )
+            )
         )
     }
 }

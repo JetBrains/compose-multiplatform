@@ -24,7 +24,7 @@ import androidx.compose.runtime.Stable
  * current layout node. The provided [ModifierLocal]s are also available to layout nodes that are
  * children of the current layout node.
  *
- * One must create a [ModifierLocal] instance, which cah be referenced by consumers statically.
+ * One must create a [ModifierLocal] instance, which can be referenced by consumers statically.
  * [ModifierLocal] instances themselves hold no data, and can be thought of as a type-safe
  * identifier for the data being passed to other modifiers to the right of the providing
  * modifier or down the tree. [ModifierLocal] factory functions take a single parameter: a
@@ -41,7 +41,7 @@ import androidx.compose.runtime.Stable
  * @see modifierLocalConsumer
  */
 @Stable
-sealed class ModifierLocal<T> private constructor(internal val defaultFactory: () -> T)
+sealed class ModifierLocal<T> constructor(internal val defaultFactory: () -> T)
 
 /**
  * [ProvidableModifierLocal]s are [ModifierLocal]s that can be used to provide values using a

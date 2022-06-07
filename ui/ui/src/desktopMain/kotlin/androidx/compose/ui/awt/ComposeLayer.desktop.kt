@@ -23,6 +23,10 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.platform.PlatformComponent
 import androidx.compose.ui.ComposeScene
+import androidx.compose.ui.input.pointer.PointerButtons
+import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
+import androidx.compose.ui.platform.DesktopPlatform
+import androidx.compose.ui.platform.AccessibilityControllerImpl
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.window.density
@@ -30,12 +34,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkiaRenderer
+import org.jetbrains.skiko.SkikoView
 import java.awt.Cursor
+import java.awt.Component
 import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Point
+import java.awt.Toolkit
 import java.awt.event.FocusEvent
+import java.awt.event.InputEvent
 import java.awt.event.InputMethodEvent
 import java.awt.event.InputMethodListener
 import java.awt.event.KeyAdapter
@@ -45,15 +52,12 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionAdapter
 import java.awt.event.MouseWheelEvent
 import java.awt.im.InputMethodRequests
+import javax.accessibility.Accessible
+import javax.accessibility.AccessibleContext
 import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 
 internal class ComposeLayer {
     private var isDisposed = false
-
-    // TODO(demin): probably we need to get rid of asynchronous events. it was added because of
-    //  slow lazy scroll. But events become unpredictable, and we can't consume them.
-    //  Alternative solution to a slow scroll - merge multiple scroll events into a single one.
-    private val events = AWTDebounceEventQueue()
 
     private val _component = ComponentImpl()
     val component: SkiaLayer get() = _component
@@ -67,13 +71,27 @@ internal class ComposeLayer {
 
     private val density get() = _component.density.density
 
-    private inner class ComponentImpl : SkiaLayer(), PlatformComponent {
+    fun makeAccessible(component: Component) = object : Accessible {
+        override fun getAccessibleContext(): AccessibleContext? {
+            // TODO move System.getenv out of this method
+            if (System.getenv("COMPOSE_DISABLE_ACCESSIBILITY") != null) return null
+            val controller =
+                scene.mainOwner?.accessibilityController as? AccessibilityControllerImpl
+            val accessible = controller?.rootAccessible
+            accessible?.getAccessibleContext()?.accessibleParent = component.parent as Accessible
+            return accessible?.getAccessibleContext()
+        }
+    }
+
+    private inner class ComponentImpl :
+        SkiaLayer(externalAccessibleFactory = ::makeAccessible), Accessible, PlatformComponent {
         var currentInputMethodRequests: InputMethodRequests? = null
 
         override fun addNotify() {
             super.addNotify()
             resetDensity()
             initContent()
+            updateSceneSize()
         }
 
         override fun paint(g: Graphics) {
@@ -97,17 +115,20 @@ internal class ComposeLayer {
             currentInputMethodRequests = null
         }
 
-        override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
+        override fun doLayout() {
+            super.doLayout()
+            updateSceneSize()
+        }
+
+        private fun updateSceneSize() {
             this@ComposeLayer.scene.constraints = Constraints(
                 maxWidth = (width * density.density).toInt().coerceAtLeast(0),
                 maxHeight = (height * density.density).toInt().coerceAtLeast(0)
             )
-            super.setBounds(x, y, width, height)
         }
 
-        override fun doLayout() {
-            super.doLayout()
-            preferredSize = Dimension(
+        override fun getPreferredSize(): Dimension {
+            return if (isPreferredSizeSet) super.getPreferredSize() else Dimension(
                 (this@ComposeLayer.scene.contentSize.width / density.density).toInt(),
                 (this@ComposeLayer.scene.contentSize.height / density.density).toInt()
             )
@@ -121,12 +142,15 @@ internal class ComposeLayer {
 
         private fun resetDensity() {
             density = (this as SkiaLayer).density
-            this@ComposeLayer.scene.density = density
+            if (this@ComposeLayer.scene.density != density) {
+                this@ComposeLayer.scene.density = density
+                updateSceneSize()
+            }
         }
     }
 
     init {
-        _component.renderer = object : SkiaRenderer {
+        _component.skikoView = object : SkikoView {
             override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                 try {
                     scene.render(canvas, nanoTime)
@@ -140,69 +164,61 @@ internal class ComposeLayer {
 
         _component.addInputMethodListener(object : InputMethodListener {
             override fun caretPositionChanged(event: InputMethodEvent?) {
+                if (isDisposed) return
                 if (event != null) {
                     scene.onInputMethodEvent(event)
                 }
             }
 
-            override fun inputMethodTextChanged(event: InputMethodEvent) = events.post {
+            override fun inputMethodTextChanged(event: InputMethodEvent) {
+                if (isDisposed) return
                 scene.onInputMethodEvent(event)
             }
         })
 
         _component.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(event: MouseEvent) = Unit
-
-            override fun mousePressed(event: MouseEvent) = events.post {
-                scene.onMouseEvent(density, event)
-            }
-
-            override fun mouseReleased(event: MouseEvent) = events.post {
-                scene.onMouseEvent(density, event)
-            }
-
-            override fun mouseEntered(event: MouseEvent) = events.post {
-                scene.onMouseEvent(density, event)
-            }
-
-            override fun mouseExited(event: MouseEvent) = events.post {
-                scene.onMouseEvent(density, event)
-            }
+            override fun mousePressed(event: MouseEvent) = onMouseEvent(event)
+            override fun mouseReleased(event: MouseEvent) = onMouseEvent(event)
+            override fun mouseEntered(event: MouseEvent) = onMouseEvent(event)
+            override fun mouseExited(event: MouseEvent) = onMouseEvent(event)
         })
         _component.addMouseMotionListener(object : MouseMotionAdapter() {
-            override fun mouseDragged(event: MouseEvent) = events.post {
-                scene.onMouseEvent(density, event)
-            }
-
-            override fun mouseMoved(event: MouseEvent) = events.post {
-                scene.onMouseEvent(density, event)
-            }
+            override fun mouseDragged(event: MouseEvent) = onMouseEvent(event)
+            override fun mouseMoved(event: MouseEvent) = onMouseEvent(event)
         })
         _component.addMouseWheelListener { event ->
-            events.post {
-                scene.onMouseWheelEvent(density, event)
-            }
+            onMouseWheelEvent(event)
         }
         _component.focusTraversalKeysEnabled = false
         _component.addKeyListener(object : KeyAdapter() {
-            override fun keyPressed(event: KeyEvent) {
-                scene.sendKeyEvent(event)
-            }
-
-            override fun keyReleased(event: KeyEvent) {
-                scene.sendKeyEvent(event)
-            }
-
-            override fun keyTyped(event: KeyEvent) {
-                scene.sendKeyEvent(event)
-            }
+            override fun keyPressed(event: KeyEvent) = onKeyEvent(event)
+            override fun keyReleased(event: KeyEvent) = onKeyEvent(event)
+            override fun keyTyped(event: KeyEvent) = onKeyEvent(event)
         })
+    }
+
+    private fun onMouseEvent(event: MouseEvent) {
+        // AWT can send events after the window is disposed
+        if (isDisposed) return
+        scene.onMouseEvent(density, event)
+    }
+
+    private fun onMouseWheelEvent(event: MouseWheelEvent) {
+        if (isDisposed) return
+        scene.onMouseWheelEvent(density, event)
+    }
+
+    private fun onKeyEvent(event: KeyEvent) {
+        if (isDisposed) return
+        if (scene.sendKeyEvent(ComposeKeyEvent(event))) {
+            event.consume()
+        }
     }
 
     fun dispose() {
         check(!isDisposed)
-        scene.dispose()
-        events.cancel()
+        scene.close()
         _component.dispose()
         _initContent = null
         isDisposed = true
@@ -256,6 +272,8 @@ private fun ComposeScene.onMouseEvent(
         position = Offset(event.x.toFloat(), event.y.toFloat()) * density,
         timeMillis = event.`when`,
         type = PointerType.Mouse,
+        buttons = event.buttons,
+        keyboardModifiers = event.keyboardModifiers,
         nativeEvent = event
     )
 }
@@ -276,11 +294,46 @@ private fun ComposeScene.onMouseWheelEvent(
         },
         timeMillis = event.`when`,
         type = PointerType.Mouse,
+        buttons = event.buttons,
+        keyboardModifiers = event.keyboardModifiers,
         nativeEvent = event
     )
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
-private fun ComposeScene.sendKeyEvent(event: KeyEvent) {
-    sendKeyEvent(ComposeKeyEvent(event))
+private val MouseEvent.buttons get() = PointerButtons(
+    isPrimaryPressed = (modifiersEx and MouseEvent.BUTTON1_DOWN_MASK) != 0 && !isMacOsCtrlClick,
+    isSecondaryPressed = (modifiersEx and MouseEvent.BUTTON3_DOWN_MASK) != 0 || isMacOsCtrlClick,
+    isTertiaryPressed = (modifiersEx and MouseEvent.BUTTON2_DOWN_MASK) != 0,
+    isBackPressed = (modifiersEx and MouseEvent.getMaskForButton(4)) != 0,
+    isForwardPressed = (modifiersEx and MouseEvent.getMaskForButton(5)) != 0,
+)
+
+@OptIn(ExperimentalComposeUiApi::class)
+private val MouseEvent.keyboardModifiers get() = PointerKeyboardModifiers(
+    isCtrlPressed = (modifiersEx and InputEvent.CTRL_DOWN_MASK) != 0,
+    isMetaPressed = (modifiersEx and InputEvent.META_DOWN_MASK) != 0,
+    isAltPressed = (modifiersEx and InputEvent.ALT_DOWN_MASK) != 0,
+    isShiftPressed = (modifiersEx and InputEvent.SHIFT_DOWN_MASK) != 0,
+    isAltGraphPressed = (modifiersEx and InputEvent.ALT_GRAPH_DOWN_MASK) != 0,
+    isSymPressed = false,
+    isFunctionPressed = false,
+    isCapsLockOn = getLockingKeyStateSafe(KeyEvent.VK_CAPS_LOCK),
+    isScrollLockOn = getLockingKeyStateSafe(KeyEvent.VK_SCROLL_LOCK),
+    isNumLockOn = getLockingKeyStateSafe(KeyEvent.VK_NUM_LOCK),
+)
+
+private fun getLockingKeyStateSafe(
+    mask: Int
+): Boolean = try {
+    Toolkit.getDefaultToolkit().getLockingKeyState(mask)
+} catch (_: Exception) {
+    false
 }
+
+private val MouseEvent.isMacOsCtrlClick
+    get() = (
+            DesktopPlatform.Current == DesktopPlatform.MacOS &&
+                    ((modifiersEx and InputEvent.BUTTON1_DOWN_MASK) != 0) &&
+                    ((modifiersEx and InputEvent.CTRL_DOWN_MASK) != 0)
+            )

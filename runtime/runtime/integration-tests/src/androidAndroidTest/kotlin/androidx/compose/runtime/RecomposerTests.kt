@@ -30,7 +30,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -125,7 +126,7 @@ class RecomposerTests : BaseComposeTest() {
 
     @Test
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun runningRecomposerFlow() = runBlockingTest {
+    fun runningRecomposerFlow() = runTest(UnconfinedTestDispatcher()) {
         lateinit var recomposer: RecomposerInfo
         val recomposerJob = launch(TestMonotonicFrameClock(this)) {
             withRunningRecomposer {

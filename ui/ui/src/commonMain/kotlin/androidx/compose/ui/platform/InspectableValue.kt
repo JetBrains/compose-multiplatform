@@ -17,6 +17,7 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.ui.Modifier
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * An empty [InspectorInfo] DSL.
@@ -31,6 +32,7 @@ var isDebugInspectorInfoEnabled = false
 /**
  * A compose value that is inspectable by tools. It gives access to private parts of a value.
  */
+@JvmDefaultWithCompatibility
 interface InspectableValue {
 
     /**
@@ -120,7 +122,12 @@ abstract class InspectorValueInfo(private val info: InspectorInfo.() -> Unit) : 
 }
 
 /**
- * Factory method for avoiding DSL allocation when no debug inspector info is needed.
+ * Use this to specify modifier information for compose tooling.
+ *
+ * This factory method allows the specified information to be stripped out by ProGuard in
+ * release builds.
+ *
+ * @sample androidx.compose.ui.samples.InspectableModifierSample
  */
 inline fun debugInspectorInfo(
     crossinline definitions: InspectorInfo.() -> Unit

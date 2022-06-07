@@ -51,7 +51,7 @@ class FindParentFocusNodeTest(private val deactivated: Boolean) {
 
         // Act.
         val rootFocusNode = rule.runOnIdle {
-            focusModifier.focusNode.findParentFocusNode()!!.findParentFocusNode()
+            focusModifier.parent!!.parent
         }
 
         // Assert.
@@ -83,12 +83,12 @@ class FindParentFocusNodeTest(private val deactivated: Boolean) {
 
         // Act.
         val parent = rule.runOnIdle {
-            modifier3.focusNode.findParentFocusNode()
+            modifier3.parent
         }
 
         // Assert.
         rule.runOnIdle {
-            assertThat(parent).isEqualTo(modifier2.focusNode)
+            assertThat(parent).isEqualTo(modifier2)
         }
     }
 
@@ -112,12 +112,12 @@ class FindParentFocusNodeTest(private val deactivated: Boolean) {
 
         // Act.
         val parent = rule.runOnIdle {
-            modifier3.focusNode.findParentFocusNode()
+            modifier3.parent
         }
 
         // Assert.
         rule.runOnIdle {
-            assertThat(parent).isEqualTo(modifier2.focusNode)
+            assertThat(parent).isEqualTo(modifier2)
         }
     }
 
@@ -143,12 +143,12 @@ class FindParentFocusNodeTest(private val deactivated: Boolean) {
 
         // Act.
         val parent = rule.runOnIdle {
-            focusModifier.focusNode.findParentFocusNode()
+            focusModifier.parent
         }
 
         // Assert.
         rule.runOnIdle {
-            assertThat(parent).isEqualTo(parentFocusModifier2.focusNode)
+            assertThat(parent).isEqualTo(parentFocusModifier2)
         }
     }
 
@@ -181,12 +181,12 @@ class FindParentFocusNodeTest(private val deactivated: Boolean) {
 
         // Act.
         val parent = rule.runOnIdle {
-            focusModifier.focusNode.findParentFocusNode()
+            focusModifier.parent
         }
 
         // Assert.
         rule.runOnIdle {
-            assertThat(parent).isEqualTo(parentFocusModifier.focusNode)
+            assertThat(parent).isEqualTo(parentFocusModifier)
         }
     }
 
@@ -216,12 +216,12 @@ class FindParentFocusNodeTest(private val deactivated: Boolean) {
 
         // Act.
         val parent = rule.runOnIdle {
-            focusModifier.focusNode.findParentFocusNode()
+            focusModifier.parent
         }
 
         // Assert.
         rule.runOnIdle {
-            assertThat(parent).isEqualTo(grandparentFocusModifier.focusNode)
+            assertThat(parent).isEqualTo(grandparentFocusModifier)
         }
     }
 }

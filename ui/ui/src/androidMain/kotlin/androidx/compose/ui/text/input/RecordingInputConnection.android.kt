@@ -29,7 +29,6 @@ import android.view.inputmethod.ExtractedText
 import android.view.inputmethod.ExtractedTextRequest
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputContentInfo
-import androidx.annotation.VisibleForTesting
 
 internal const val DEBUG = false
 internal const val TAG = "RecordingIC"
@@ -52,7 +51,6 @@ internal class RecordingInputConnection(
     private var batchDepth: Int = 0
 
     // The input state.
-    @VisibleForTesting
     internal var mTextFieldValue: TextFieldValue = initState
         set(value) {
             if (DEBUG) { logDebug("mTextFieldValue : $field -> $value") }
@@ -297,8 +295,28 @@ internal class RecordingInputConnection(
 
     override fun performContextMenuAction(id: Int): Boolean = ensureActive {
         if (DEBUG) { logDebug("performContextMenuAction($id)") }
-        Log.w(TAG, "performContextMenuAction is not supported")
+        when (id) {
+            android.R.id.selectAll -> {
+                addEditCommandWithBatch(SetSelectionCommand(0, mTextFieldValue.text.length))
+            }
+            // TODO(siyamed): Need proper connection to cut/copy/paste
+            android.R.id.cut -> sendSynthesizedKeyEvent(KeyEvent.KEYCODE_CUT)
+            android.R.id.copy -> sendSynthesizedKeyEvent(KeyEvent.KEYCODE_COPY)
+            android.R.id.paste -> sendSynthesizedKeyEvent(KeyEvent.KEYCODE_PASTE)
+            android.R.id.startSelectingText -> {} // not supported
+            android.R.id.stopSelectingText -> {} // not supported
+            android.R.id.copyUrl -> {} // not supported
+            android.R.id.switchInputMethod -> {} // not supported
+            else -> {
+                // not supported
+            }
+        }
         return false
+    }
+
+    private fun sendSynthesizedKeyEvent(code: Int) {
+        sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, code))
+        sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, code))
     }
 
     override fun performEditorAction(editorAction: Int): Boolean = ensureActive {

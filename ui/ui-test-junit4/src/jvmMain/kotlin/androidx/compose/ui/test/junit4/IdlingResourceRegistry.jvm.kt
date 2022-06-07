@@ -25,7 +25,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.junit.runners.model.Statement
 
 internal class IdlingResourceRegistry
 @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -153,16 +152,12 @@ internal constructor(
         return replace("\n(?=.)".toRegex(), "\n$prefix")
     }
 
-    fun getStatementFor(base: Statement): Statement {
-        return object : Statement() {
-            override fun evaluate() {
-                try {
-                    base.evaluate()
-                } finally {
-                    if (pollScopeOverride == null) {
-                        if (pollScope.coroutineContext[Job] != null) pollScope.cancel()
-                    }
-                }
+    fun <R> withRegistry(block: () -> R): R {
+        try {
+            return block()
+        } finally {
+            if (pollScopeOverride == null) {
+                if (pollScope.coroutineContext[Job] != null) pollScope.cancel()
             }
         }
     }

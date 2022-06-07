@@ -22,6 +22,7 @@ import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -173,31 +174,54 @@ open class BaseLazyListTestWithOrientation(private val orientation: Orientation)
         }
     }
 
+    fun SemanticsNodeInteraction.scrollBy(offset: Dp) = scrollBy(
+        x = if (vertical) 0.dp else offset,
+        y = if (!vertical) 0.dp else offset,
+        density = rule.density
+    )
+
     @Composable
     fun LazyColumnOrRow(
         modifier: Modifier = Modifier,
         state: LazyListState = rememberLazyListState(),
         contentPadding: PaddingValues = PaddingValues(0.dp),
         reverseLayout: Boolean = false,
+        reverseArrangement: Boolean = false,
         flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
+        userScrollEnabled: Boolean = true,
+        spacedBy: Dp = 0.dp,
         content: LazyListScope.() -> Unit
     ) {
         if (vertical) {
+            val verticalArrangement = when {
+                spacedBy != 0.dp -> Arrangement.spacedBy(spacedBy)
+                reverseLayout xor reverseArrangement -> Arrangement.Bottom
+                else -> Arrangement.Top
+            }
             LazyColumn(
                 modifier = modifier,
                 state = state,
                 contentPadding = contentPadding,
                 reverseLayout = reverseLayout,
                 flingBehavior = flingBehavior,
+                userScrollEnabled = userScrollEnabled,
+                verticalArrangement = verticalArrangement,
                 content = content
             )
         } else {
+            val horizontalArrangement = when {
+                spacedBy != 0.dp -> Arrangement.spacedBy(spacedBy)
+                reverseLayout xor reverseArrangement -> Arrangement.End
+                else -> Arrangement.Start
+            }
             LazyRow(
                 modifier = modifier,
                 state = state,
                 contentPadding = contentPadding,
                 reverseLayout = reverseLayout,
                 flingBehavior = flingBehavior,
+                userScrollEnabled = userScrollEnabled,
+                horizontalArrangement = horizontalArrangement,
                 content = content
             )
         }

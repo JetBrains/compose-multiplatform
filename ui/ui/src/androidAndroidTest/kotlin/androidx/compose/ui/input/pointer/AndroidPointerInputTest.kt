@@ -51,7 +51,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.OpenComposeView
 import androidx.compose.ui.composed
@@ -67,6 +66,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.findRoot
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
@@ -142,6 +142,39 @@ class AndroidPointerInputTest {
                 0,
                 arrayOf(PointerProperties(0)),
                 arrayOf(PointerCoords(Float.NaN, Float.NaN))
+            )
+
+            val androidComposeView = findAndroidComposeView(container)!!
+            // Act
+            val actual = androidComposeView.dispatchTouchEvent(motionEvent)
+
+            // Assert
+            assertThat(actual).isFalse()
+        }
+    }
+
+    @Test
+    fun dispatchTouchEvent_infiniteCoordinates() {
+        countDown { latch ->
+            rule.runOnUiThread {
+                container.setContent {
+                    FillLayout(
+                        Modifier
+                            .consumeMovementGestureFilter()
+                            .onGloballyPositioned { latch.countDown() }
+                    )
+                }
+            }
+        }
+
+        rule.runOnUiThread {
+            val motionEvent = MotionEvent(
+                0,
+                ACTION_DOWN,
+                1,
+                0,
+                arrayOf(PointerProperties(0)),
+                arrayOf(PointerCoords(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY))
             )
 
             val androidComposeView = findAndroidComposeView(container)!!
@@ -726,6 +759,39 @@ class AndroidPointerInputTest {
         }
     }
 
+    @Test
+    fun dispatchNotAttached() {
+        val tapLatch = CountDownLatch(1)
+        val layoutLatch = CountDownLatch(1)
+        rule.runOnUiThread {
+            container.setContent {
+                with(LocalDensity.current) {
+                    Box(
+                        Modifier
+                            .onPlaced {
+                                layoutLatch.countDown()
+                            }
+                            .pointerInput(Unit) {
+                                awaitPointerEventScope {
+                                    awaitFirstDown()
+                                    tapLatch.countDown()
+                                }
+                            }
+                            .requiredSize(10.toDp())
+                    )
+                }
+            }
+        }
+        assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
+
+        val composeView = findAndroidComposeView(container) as AndroidComposeView
+        rule.runOnUiThread {
+            container.removeAllViews()
+            val down = createPointerEventAt(0, ACTION_DOWN, intArrayOf(5, 5))
+            assertFalse(composeView.dispatchTouchEvent(down))
+        }
+    }
+
     private fun assertHoverEvent(
         event: PointerEvent,
         isEnter: Boolean = false,
@@ -743,7 +809,6 @@ class AndroidPointerInputTest {
         assertThat(event.type).isEqualTo(expectedHoverType)
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
     private fun assertScrollEvent(
         event: PointerEvent,
         scrollExpected: Offset
@@ -752,8 +817,8 @@ class AndroidPointerInputTest {
         val change = event.changes[0]
         assertThat(change.pressed).isFalse()
         assertThat(event.type).isEqualTo(PointerEventType.Scroll)
-        // we agreed to reverse the delta in android to be in line with other platforms
-        assertThat(change.scrollDelta).isEqualTo(-scrollExpected)
+        // we agreed to reverse Y in android to be in line with other platforms
+        assertThat(change.scrollDelta).isEqualTo(scrollExpected.copy(y = scrollExpected.y * -1))
     }
 
     private fun dispatchMouseEvent(
@@ -852,7 +917,7 @@ class AndroidPointerInputTest {
                         awaitPointerEventScope {
                             while (true) {
                                 val event = awaitPointerEvent()
-                                event.changes[0].consumeAllChanges()
+                                event.changes[0].consume()
                                 events += event
                             }
                         }
@@ -885,7 +950,7 @@ class AndroidPointerInputTest {
                             awaitPointerEventScope {
                                 while (true) {
                                     val event = awaitPointerEvent()
-                                    event.changes[0].consumeAllChanges()
+                                    event.changes[0].consume()
                                     events += event
                                 }
                             }
@@ -1014,7 +1079,7 @@ class AndroidPointerInputTest {
                         awaitPointerEventScope {
                             while (true) {
                                 val event = awaitPointerEvent()
-                                event.changes[0].consumeAllChanges()
+                                event.changes[0].consume()
                                 events += event
                             }
                         }
@@ -1047,7 +1112,7 @@ class AndroidPointerInputTest {
                         awaitPointerEventScope {
                             while (true) {
                                 val event = awaitPointerEvent()
-                                event.changes[0].consumeAllChanges()
+                                event.changes[0].consume()
                                 events += event
                             }
                         }
@@ -1086,7 +1151,7 @@ class AndroidPointerInputTest {
                         awaitPointerEventScope {
                             while (true) {
                                 val event = awaitPointerEvent()
-                                event.changes[0].consumeAllChanges()
+                                event.changes[0].consume()
                                 events += event
                             }
                         }
@@ -1124,7 +1189,7 @@ class AndroidPointerInputTest {
                         awaitPointerEventScope {
                             while (true) {
                                 val event = awaitPointerEvent()
-                                event.changes[0].consumeAllChanges()
+                                event.changes[0].consume()
                                 events += event
                             }
                         }
@@ -1160,7 +1225,7 @@ class AndroidPointerInputTest {
                             awaitPointerEventScope {
                                 while (true) {
                                     val event = awaitPointerEvent()
-                                    event.changes[0].consumeAllChanges()
+                                    event.changes[0].consume()
                                     eventLog += event
                                 }
                             }
@@ -1216,7 +1281,7 @@ class AndroidPointerInputTest {
                                 awaitPointerEventScope {
                                     while (true) {
                                         val event = awaitPointerEvent()
-                                        event.changes[0].consumeAllChanges()
+                                        event.changes[0].consume()
                                         eventLog += event
                                     }
                                 }
@@ -1255,7 +1320,7 @@ class AndroidPointerInputTest {
                                 awaitPointerEventScope {
                                     while (true) {
                                         val event = awaitPointerEvent()
-                                        event.changes[0].consumeAllChanges()
+                                        event.changes[0].consume()
                                         eventLog += event
                                     }
                                 }
@@ -1301,7 +1366,7 @@ class AndroidPointerInputTest {
                                     awaitPointerEventScope {
                                         while (true) {
                                             val event = awaitPointerEvent()
-                                            event.changes[0].consumeAllChanges()
+                                            event.changes[0].consume()
                                             eventLog += event
                                         }
                                     }
@@ -1341,7 +1406,7 @@ class AndroidPointerInputTest {
                         awaitPointerEventScope {
                             while (true) {
                                 val event = awaitPointerEvent()
-                                event.changes[0].consumeAllChanges()
+                                event.changes[0].consume()
                                 eventLog += event
                             }
                         }
@@ -1552,7 +1617,7 @@ class AndroidPointerInputTest {
                                 awaitPointerEventScope {
                                     while (true) {
                                         val event = awaitPointerEvent()
-                                        event.changes[0].consumeAllChanges()
+                                        event.changes[0].consume()
                                         eventLog += event.type
                                     }
                                 }
@@ -1632,7 +1697,7 @@ class AndroidPointerInputTest {
                                 awaitPointerEventScope {
                                     while (true) {
                                         val event = awaitPointerEvent()
-                                        event.changes[0].consumeAllChanges()
+                                        event.changes[0].consume()
                                         eventLog += event.type
                                     }
                                 }
@@ -1710,7 +1775,7 @@ class AndroidPointerInputTest {
                             awaitPointerEventScope {
                                 while (true) {
                                     val event = awaitPointerEvent()
-                                    event.changes.forEach { it.consumeAllChanges() }
+                                    event.changes.forEach { it.consume() }
                                     eventLog += event
                                 }
                             }
@@ -1759,7 +1824,7 @@ class AndroidPointerInputTest {
                             awaitPointerEventScope {
                                 while (true) {
                                     val event = awaitPointerEvent()
-                                    event.changes.forEach { it.consumeAllChanges() }
+                                    event.changes.forEach { it.consume() }
                                     eventLog += event
                                 }
                             }
@@ -1864,7 +1929,7 @@ private class ConsumeMovementGestureFilter(val consumeMovement: Boolean) : Point
     ) {
         if (consumeMovement) {
             pointerEvent.changes.fastForEach {
-                it.consumePositionChange()
+                it.consume()
             }
         }
     }
@@ -1882,7 +1947,7 @@ private class ConsumeDownChangeFilter : PointerInputFilter() {
         pointerEvent.changes.fastForEach {
             if (it.changedToDown()) {
                 onDown(it.position)
-                it.consumeDownChange()
+                it.consume()
             }
         }
     }

@@ -16,62 +16,108 @@
 
 package androidx.compose.foundation.lazy.layout
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.SubcomposeLayoutState
+import androidx.compose.ui.layout.SubcomposeSlotReusePolicy
+import androidx.compose.ui.unit.Constraints
 
 /**
- * A layout that only composes and lays out currently visible items. Can be used to build
+ * A layout that only composes and lays out currently needed items. Can be used to build
  * efficient scrollable layouts.
+ *
+ * @param itemProvider provides all the needed info about the items which could be used to
+ * compose and measure items as part of [measurePolicy].
+ * @param modifier to apply on the layout
+ * @param prefetchState allows to schedule items for prefetching
+ * @param measurePolicy Measure policy which allows to only compose and measure needed items.
  */
+@ExperimentalFoundationApi
 @Composable
-internal fun LazyLayout(
-    itemsProvider: () -> LazyLayoutItemsProvider,
+fun LazyLayout(
+    itemProvider: LazyLayoutItemProvider,
     modifier: Modifier = Modifier,
-    state: LazyLayoutState = rememberLazyLayoutState(),
-    prefetchPolicy: LazyLayoutPrefetchPolicy? = null,
-    measurePolicy: LazyMeasurePolicy
+    prefetchState: LazyLayoutPrefetchState? = null,
+    measurePolicy: LazyLayoutMeasureScope.(Constraints) -> MeasureResult
 ) {
-    state.itemsProvider = itemsProvider
-    val itemContentFactory = rememberItemContentFactory(state)
-    val subcomposeLayoutState = remember { SubcomposeLayoutState(MaxItemsToRetainForReuse) }
-    prefetchPolicy?.let {
-        LazyLayoutPrefetcher(prefetchPolicy, state, itemContentFactory, subcomposeLayoutState)
+    val currentItemProvider = rememberUpdatedState(itemProvider)
+
+    val saveableStateHolder = rememberSaveableStateHolder()
+    val itemContentFactory = remember {
+        LazyLayoutItemContentFactory(saveableStateHolder) { currentItemProvider.value }
+    }
+    val subcomposeLayoutState = remember {
+        SubcomposeLayoutState(LazyLayoutItemReusePolicy(itemContentFactory))
+    }
+    prefetchState?.let {
+        LazyLayoutPrefetcher(
+            prefetchState,
+            itemContentFactory,
+            subcomposeLayoutState
+        )
     }
 
     SubcomposeLayout(
         subcomposeLayoutState,
-        modifier.then(state.remeasurementModifier)
-    ) { constraints ->
-        itemContentFactory.onBeforeMeasure(this, constraints)
+        modifier,
+        remember(itemContentFactory, measurePolicy) {
+            { constraints ->
+                itemContentFactory.onBeforeMeasure(this, constraints)
 
-        val placeablesProvider = LazyLayoutPlaceablesProvider(
-            state.itemsProvider(),
-            itemContentFactory,
-            this
-        )
-        val measureResult = with(measurePolicy) { measure(placeablesProvider, constraints) }
-
-        state.onPostMeasureListener?.apply { onPostMeasure(measureResult, placeablesProvider) }
-        state.layoutInfoState.value = measureResult
-        state.layoutInfoNonObservable = measureResult
-
-        measureResult
-    }
+                with(LazyLayoutMeasureScopeImpl(itemContentFactory, this)) {
+                    measurePolicy(constraints)
+                }
+            }
+        }
+    )
 }
 
-private const val MaxItemsToRetainForReuse = 2
+@ExperimentalFoundationApi
+private class LazyLayoutItemReusePolicy(
+    private val factory: LazyLayoutItemContentFactory
+) : SubcomposeSlotReusePolicy {
+    private val countPerType = mutableMapOf<Any?, Int>()
+
+    override fun getSlotsToRetain(slotIds: SubcomposeSlotReusePolicy.SlotIdsSet) {
+        countPerType.clear()
+        with(slotIds.iterator()) {
+            while (hasNext()) {
+                val slotId = next()
+                val type = factory.getContentType(slotId)
+                val currentCount = countPerType[type] ?: 0
+                if (currentCount == MaxItemsToRetainForReuse) {
+                    remove()
+                } else {
+                    countPerType[type] = currentCount + 1
+                }
+            }
+        }
+    }
+
+    override fun areCompatible(slotId: Any?, reusableSlotId: Any?): Boolean =
+        factory.getContentType(slotId) == factory.getContentType(reusableSlotId)
+}
+
+/**
+ * We currently use the same number of items to reuse (recycle) items as RecyclerView does:
+ * 5 (RecycledViewPool.DEFAULT_MAX_SCRAP) + 2 (Recycler.DEFAULT_CACHE_SIZE)
+ */
+private const val MaxItemsToRetainForReuse = 7
 
 /**
  * Platform specific implementation of lazy layout items prefetching - precomposing next items in
  * advance during the scrolling.
  */
+@ExperimentalFoundationApi
 @Composable
 internal expect fun LazyLayoutPrefetcher(
-    prefetchPolicy: LazyLayoutPrefetchPolicy,
-    state: LazyLayoutState,
+    prefetchState: LazyLayoutPrefetchState,
     itemContentFactory: LazyLayoutItemContentFactory,
     subcomposeLayoutState: SubcomposeLayoutState
 )

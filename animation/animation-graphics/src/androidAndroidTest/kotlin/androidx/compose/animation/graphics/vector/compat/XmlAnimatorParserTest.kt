@@ -31,6 +31,7 @@ import androidx.compose.animation.graphics.res.AccelerateEasing
 import androidx.compose.animation.graphics.res.DecelerateEasing
 import androidx.compose.animation.graphics.res.loadAnimatorResource
 import androidx.compose.animation.graphics.test.R
+import androidx.compose.animation.graphics.vector.RepeatCountInfinite
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -182,6 +183,7 @@ class XmlAnimatorParserTest {
             assertThat(s.animators).hasSize(2)
             (s.animators[0] as ObjectAnimator).let { oa ->
                 assertThat(oa.holders).hasSize(1)
+                assertThat(oa.repeatCount).isEqualTo(RepeatCountInfinite)
                 (oa.holders[0] as PropertyValuesHolderInt).let { holder ->
                     assertThat(holder.propertyName).isEqualTo("intProperty")
                 }

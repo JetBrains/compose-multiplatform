@@ -16,45 +16,96 @@ For more information, check out the <a href="https://developer.android.com/jetpa
 
 ### Theming
 
-Material 3 makes brand expression in an interface simpler and more beautiful than ever before, with <a href="https://m3.material.io/styles/color/overview" class="external" target="_blank">color</a> and <a href="https://m3.material.io/styles/typography/overview" class="external" target="_blank">typography</a> theming.
-
 |      | **APIs** | **Description** |
 | ---- | -------- | --------------- |
 | **Material Theming** | [MaterialTheme] | M3 theme |
 | **Color scheme** | [ColorScheme] | M3 color scheme |
-| **Dynamic color** | [dynamicLightColorScheme] | Dynamic light color scheme |
-|  | [dynamicDarkColorScheme] | Dynamic dark color scheme |
-| **Typography** | [Typography] | M3 type scale |
+|  | [lightColorScheme] | M3 light color scheme |
+|  | [darkColorScheme] | M3 dark color scheme |
+| **Dynamic color** | [dynamicLightColorScheme] | M3 dynamic light color scheme |
+|  | [dynamicDarkColorScheme] | M3 dynamic dark color scheme |
+| **Typography** | [Typography] | M3 typography |
+| **Shape** | [Shapes] | M3 shape |
 
 ### Components
 
-Material 3 Components are interactive building blocks for creating a user interface.
-
 |      | **APIs** | **Description** |
 | ---- | -------- | --------------- |
+| **Badge** | [Badge] | M3 badge |
+|  | [BadgedBox] | M3 badged box |
+| **Bottom app bar** | [BottomAppBar] | M3 bottom app bar |
 | **Buttons** | [Button] | M3 filled button |
 |  | [ElevatedButton] | M3 elevated button |
 |  | [FilledTonalButton] | M3 filled tonal button |
 |  | [OutlinedButton] | M3 outlined button |
 |  | [TextButton] | M3 text button |
+| **Cards** | [Card] | M3 filled card |
+|  | [ElevatedCard] | M3 elevated card |
+|  | [OutlinedCard] | M3 outlined card |
+| **Checkbox** | [Checkbox] | M3 checkbox |
+|  | [TriStateCheckbox] | M3 indeterminate checkbox |
+| **Chips** | [AssistChip] | M3 assist chip |
+|  | [ElevatedAssistChip] | M3 elevated assist chip |
+|  | [FilterChip] | M3 filter chip |
+|  | [ElevatedFilterChip] | M3 elevated filter chip |
+|  | [InputChip] | M3 input chip |
+|  | [SuggestionChip] | M3 suggestion chip |
+|  | [ElevatedSuggestionChip] | M3 elevated suggestion chip |
+| **Dialogs** | [AlertDialog] | M3 basic dialog |
+| **Dividers** | [Divider] | M3 divider |
+| **Extended FAB** | [ExtendedFloatingActionButton] | M3 extended FAB |
 | **FAB** | [FloatingActionButton] | M3 FAB |
 |  | [SmallFloatingActionButton] | M3 small FAB |
 |  | [LargeFloatingActionButton] | M3 large FAB |
-| **Extended FAB** | [ExtendedFloatingActionButton] | M3 extended FAB |
-| **Dialogs** | [AlertDialog] | M3 basic dialog |
+| **Icon button** | [IconButton] | M3 standard icon button |
+|  | [IconToggleButton] | M3 standard icon toggle button |
+|  | [FilledIconButton] | M3 filled icon button |
+|  | [FilledIconToggleButton] | M3 filled icon toggle button |
+|  | [FilledTonalIconButton] | M3 filled tonal icon button |
+|  | [FilledTonalIconToggleButton] | M3 filled tonal icon toggle button |
+|  | [OutlinedIconButton] | M3 outlined icon button |
+|  | [OutlinedIconToggleButton] | M3 outlined icon toggle button |
+| **Menus** | [DropdownMenu] | M3 menu |
+|  | [DropdownMenuItem] | M3 menu item |
+|  | [ExposedDropdownMenuBox] | M3 exposed dropdown menu |
 | **Navigation bar** | [NavigationBar] | M3 navigation bar |
-| **Navigation drawer** | [NavigationDrawer] | M3 navigation drawer |
+|  | [NavigationBarItem] | M3 navigation bar item |
+| **Navigation drawer** | [ModalNavigationDrawer] | M3 modal navigation drawer |
+|  | [PermanentNavigationDrawer] | M3 permanent standard navigation drawer |
+|  | [DismissibleNavigationDrawer] | M3 dismissible standard navigation drawer |
+|  | [NavigationDrawerItem] | M3 navigation drawer item |
 | **Navigation rail** | [NavigationRail] | M3 navigation rail |
-| **Top app bar** | [SmallTopAppBar] | M3 small top app bar |
-|  | [CenterAlignedTopAppBar] | M3 center-aligned top app bar |
+|  | [NavigationRailItem] | M3 navigation rail item |
+| **Progress indicators** | [LinearProgressIndicator] | M3 linear progress indicator |
+|  | [CircularProgressIndicator] | M3 circular progress indicator |
+| **Radio button** | [RadioButton] | M3 radio button |
+| **Sliders** | [Slider] | M3 slider |
+|  | [RangeSlider] | M3 range slider |
+| **Snackbars** | [Snackbar] | M3 snackbar |
+| **Switch** | [Switch] | M3 switch |
+| **Tabs** | [Tab] | M3 tab |
+|  | [LeadingIconTab] | M3 leading icon tab |
+|  | [TabRow] | M3 tab row |
+|  | [ScrollableTabRow] | M3 scrollable tab row |
+| **Text fields** | [TextField] | M3 filled text field |
+|  | [OutlinedTextField] | M3 outlined text field |
+| **Top app bar** | [CenterAlignedTopAppBar] | M3 center-aligned top app bar |
+|  | [SmallTopAppBar] | M3 small top app bar |
 |  | [MediumTopAppBar] | M3 medium top app bar |
 |  | [LargeTopAppBar] | M3 large top app bar |
 
 ### Surfaces and layout
 
-Material 3 defines the qualities that can be expressed by UI regions, surfaces, and components.
-
 |      | **APIs** | **Description** |
 | ---- | -------- | --------------- |
 | **Surfaces** | [Surface] | M3 surface |
-| **Layout** | [Scaffold] | Basic M3 visual layout structure |
+| **Scaffold** | [Scaffold] | M3 layout |
+
+### Icons and text
+
+|      | **APIs** | **Description** |
+| ---- | -------- | --------------- |
+| **Icon** | [Icon] | M3 icon |
+| **Text** | [Text] | M3 text |
+
+Also check out the `androidx.compose.material.icons` [package](/reference/kotlin/androidx/compose/material/icons/package-summary).

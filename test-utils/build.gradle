@@ -15,7 +15,9 @@
  */
 
 import androidx.build.AndroidXComposePlugin
+import androidx.build.LibraryType
 import androidx.build.Publish
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
@@ -43,6 +45,12 @@ dependencies {
         implementation(projectOrArtifact(":compose:ui:ui-unit"))
         implementation(projectOrArtifact(":compose:ui:ui-graphics"))
         implementation(projectOrArtifact(":activity:activity-compose"))
+        // old version of common-java8 conflicts with newer version, because both have
+        // DefaultLifecycleEventObserver.
+        // Outside of androidx this is resolved via constraint added to lifecycle-common,
+        // but it doesn't work in androidx.
+        // See aosp/1804059
+        implementation(projectOrArtifact(":lifecycle:lifecycle-common-java8"))
         implementation(libs.testCore)
         implementation(libs.testRules)
 
@@ -58,8 +66,11 @@ dependencies {
 }
 
 if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
+    }
+
+    kotlin {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block above
@@ -85,6 +96,10 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.testRules)
             }
 
+            // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
+            //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
+            //  level dependencies block instead:
+            //  `dependencies { testImplementation(libs.robolectric) }`
             androidTest.dependencies {
                 implementation(libs.truth)
             }
@@ -99,7 +114,20 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
 androidx {
     name = "Compose Internal Test Utils"
+    type = LibraryType.INTERNAL_TEST_LIBRARY
     publish = Publish.NONE
     inceptionYear = "2020"
     description = "Compose internal test utils."
+}
+
+android {
+    namespace "androidx.compose.testutils"
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
 }

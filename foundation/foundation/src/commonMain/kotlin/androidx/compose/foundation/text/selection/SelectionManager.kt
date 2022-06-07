@@ -22,18 +22,20 @@ import androidx.compose.foundation.fastFold
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
+import androidx.compose.foundation.text.Handle
+import androidx.compose.foundation.text.TextDragObserver
+import androidx.compose.foundation.text.selection.Selection.AnchorInfo
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.foundation.text.TextDragObserver
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.key.KeyEvent
@@ -48,20 +50,26 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.text.AnnotatedString
-import kotlinx.coroutines.coroutineScope
+import androidx.compose.ui.unit.IntSize
+import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
+import kotlinx.coroutines.coroutineScope
 
 /**
  * A bridge class between user interaction to the text composables for text selection.
  */
 internal class SelectionManager(private val selectionRegistrar: SelectionRegistrarImpl) {
+
+    private val _selection: MutableState<Selection?> = mutableStateOf(null)
+
     /**
      * The current selection.
      */
-    var selection: Selection? = null
+    var selection: Selection?
+        get() = _selection.value
         set(value) {
-            field = value
+            _selection.value = value
             if (value != null) {
                 updateHandleOffsets()
             }
@@ -107,27 +115,30 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     /**
      * Modifier for selection container.
      */
-    val modifier get() = Modifier
-        .onClearSelectionRequested { onRelease() }
-        .onGloballyPositioned { containerLayoutCoordinates = it }
-        .focusRequester(focusRequester)
-        .onFocusChanged { focusState ->
-            if (!focusState.isFocused && hasFocus) {
-                onRelease()
+    val modifier
+        get() = Modifier
+            .onClearSelectionRequested { onRelease() }
+            .onGloballyPositioned { containerLayoutCoordinates = it }
+            .focusRequester(focusRequester)
+            .onFocusChanged { focusState ->
+                if (!focusState.isFocused && hasFocus) {
+                    onRelease()
+                }
+                hasFocus = focusState.isFocused
             }
-            hasFocus = focusState.isFocused
-        }
-        .focusable()
-        .onKeyEvent {
-            if (isCopyKeyEvent(it)) {
-                copy()
-                true
-            } else {
-                false
+            .focusable()
+            .onKeyEvent {
+                if (isCopyKeyEvent(it)) {
+                    copy()
+                    true
+                } else {
+                    false
+                }
             }
-        }
+            .then(if (shouldShowMagnifier) Modifier.selectionMagnifier(this) else Modifier)
 
     private var previousPosition: Offset? = null
+
     /**
      * Layout Coordinates of the selection container.
      */
@@ -148,13 +159,15 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
      * The beginning position of the drag gesture. Every time a new drag gesture starts, it wil be
      * recalculated.
      */
-    private var dragBeginPosition = Offset.Zero
+    internal var dragBeginPosition by mutableStateOf(Offset.Zero)
+        private set
 
     /**
      * The total distance being dragged of the drag gesture. Every time a new drag gesture starts,
      * it will be zeroed out.
      */
-    private var dragTotalDistance = Offset.Zero
+    internal var dragTotalDistance by mutableStateOf(Offset.Zero)
+        private set
 
     /**
      * The calculated position of the start handle in the [SelectionContainer] coordinates. It
@@ -162,10 +175,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
      * It is a [State] so reading it during the composition will cause recomposition every time
      * the position has been changed.
      */
-    var startHandlePosition by mutableStateOf<Offset?>(
-        null,
-        policy = structuralEqualityPolicy()
-    )
+    var startHandlePosition: Offset? by mutableStateOf(null)
         private set
 
     /**
@@ -174,11 +184,24 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
      * It is a [State] so reading it during the composition will cause recomposition every time
      * the position has been changed.
      */
-    var endHandlePosition by mutableStateOf<Offset?>(
-        null,
-        policy = structuralEqualityPolicy()
-    )
+    var endHandlePosition: Offset? by mutableStateOf(null)
         private set
+
+    /**
+     * The handle that is currently being dragged, or null when no handle is being dragged. To get
+     * the position of the last drag event, use [currentDragPosition].
+     */
+    var draggingHandle: Handle? by mutableStateOf(null)
+        private set
+
+    /**
+     * When a handle is being dragged (i.e. [draggingHandle] is non-null), this is the last position
+     * of the actual drag event. It is not clamped to handle positions. Null when not being dragged.
+     */
+    var currentDragPosition: Offset? by mutableStateOf(null)
+        private set
+
+    private val shouldShowMagnifier get() = draggingHandle != null
 
     init {
         selectionRegistrar.onPositionChangeCallback = { selectableId ->
@@ -242,6 +265,10 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
 
         selectionRegistrar.onSelectionUpdateEndCallback = {
             showSelectionToolbar()
+            // This property is set by updateSelection while dragging, so we need to clear it after
+            // the original selection drag.
+            draggingHandle = null
+            currentDragPosition = null
         }
 
         selectionRegistrar.onSelectableChangeCallback = { selectableKey ->
@@ -265,32 +292,19 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         }
     }
 
-    private fun currentSelectionStartPosition(): Offset? {
-        return selection?.let { selection ->
-            val startSelectable =
-                selectionRegistrar.selectableMap[selection.start.selectableId]
-
-            requireContainerCoordinates().localPositionOf(
-                startSelectable?.getLayoutCoordinates()!!,
-                getAdjustedCoordinates(
-                    startSelectable.getHandlePosition(
-                        selection = selection,
-                        isStartHandle = true
-                    )
-                )
-            )
-        }
+    /**
+     * Returns the [Selectable] responsible for managing the given [AnchorInfo], or null if the
+     * anchor is not from a currently-registered [Selectable].
+     */
+    internal fun getAnchorSelectable(anchor: AnchorInfo): Selectable? {
+        return selectionRegistrar.selectableMap[anchor.selectableId]
     }
 
     private fun updateHandleOffsets() {
         val selection = selection
         val containerCoordinates = containerLayoutCoordinates
-        val startSelectable = selection?.start?.selectableId?.let {
-            selectionRegistrar.selectableMap[it]
-        }
-        val endSelectable = selection?.end?.selectableId?.let {
-            selectionRegistrar.selectableMap[it]
-        }
+        val startSelectable = selection?.start?.let(::getAnchorSelectable)
+        val endSelectable = selection?.end?.let(::getAnchorSelectable)
         val startLayoutCoordinates = startSelectable?.getLayoutCoordinates()
         val endLayoutCoordinates = endSelectable?.getLayoutCoordinates()
         if (
@@ -426,8 +440,8 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
      */
     private fun getContentRect(): Rect {
         val selection = selection ?: return Rect.Zero
-        val startSelectable = selectionRegistrar.selectableMap[selection.start.selectableId]
-        val endSelectable = selectionRegistrar.selectableMap[selection.start.selectableId]
+        val startSelectable = getAnchorSelectable(selection.start)
+        val endSelectable = getAnchorSelectable(selection.end)
         val startLayoutCoordinates = startSelectable?.getLayoutCoordinates() ?: return Rect.Zero
         val endLayoutCoordinates = endSelectable?.getLayoutCoordinates() ?: return Rect.Zero
 
@@ -496,71 +510,104 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         }
     }
 
-    fun handleDragObserver(isStartHandle: Boolean): TextDragObserver {
-        return object : TextDragObserver {
-            override fun onStart(startPoint: Offset) {
-                hideSelectionToolbar()
-                val selection = selection!!
-                val startSelectable =
-                    selectionRegistrar.selectableMap[selection.start.selectableId]
-                val endSelectable =
-                    selectionRegistrar.selectableMap[selection.end.selectableId]
-                // The LayoutCoordinates of the composable where the drag gesture should begin. This
-                // is used to convert the position of the beginning of the drag gesture from the
-                // composable coordinates to selection container coordinates.
-                val beginLayoutCoordinates = if (isStartHandle) {
-                    startSelectable?.getLayoutCoordinates()!!
+    fun handleDragObserver(isStartHandle: Boolean): TextDragObserver = object : TextDragObserver {
+        override fun onDown(point: Offset) {
+            val selection = selection ?: return
+            val anchor = if (isStartHandle) selection.start else selection.end
+            val selectable = getAnchorSelectable(anchor) ?: return
+            // The LayoutCoordinates of the composable where the drag gesture should begin. This
+            // is used to convert the position of the beginning of the drag gesture from the
+            // composable coordinates to selection container coordinates.
+            val beginLayoutCoordinates = selectable.getLayoutCoordinates() ?: return
+
+            // The position of the character where the drag gesture should begin. This is in
+            // the composable coordinates.
+            val beginCoordinates = getAdjustedCoordinates(
+                selectable.getHandlePosition(
+                    selection = selection, isStartHandle = isStartHandle
+                )
+            )
+
+            // Convert the position where drag gesture begins from composable coordinates to
+            // selection container coordinates.
+            currentDragPosition = requireContainerCoordinates().localPositionOf(
+                beginLayoutCoordinates,
+                beginCoordinates
+            )
+            draggingHandle = if (isStartHandle) Handle.SelectionStart else Handle.SelectionEnd
+        }
+
+        override fun onUp() {
+            draggingHandle = null
+            currentDragPosition = null
+        }
+
+        override fun onStart(startPoint: Offset) {
+            hideSelectionToolbar()
+            val selection = selection!!
+            val startSelectable =
+                selectionRegistrar.selectableMap[selection.start.selectableId]
+            val endSelectable =
+                selectionRegistrar.selectableMap[selection.end.selectableId]
+            // The LayoutCoordinates of the composable where the drag gesture should begin. This
+            // is used to convert the position of the beginning of the drag gesture from the
+            // composable coordinates to selection container coordinates.
+            val beginLayoutCoordinates = if (isStartHandle) {
+                startSelectable?.getLayoutCoordinates()!!
+            } else {
+                endSelectable?.getLayoutCoordinates()!!
+            }
+
+            // The position of the character where the drag gesture should begin. This is in
+            // the composable coordinates.
+            val beginCoordinates = getAdjustedCoordinates(
+                if (isStartHandle) {
+                    startSelectable!!.getHandlePosition(
+                        selection = selection, isStartHandle = true
+                    )
                 } else {
-                    endSelectable?.getLayoutCoordinates()!!
+                    endSelectable!!.getHandlePosition(
+                        selection = selection, isStartHandle = false
+                    )
                 }
+            )
 
-                // The position of the character where the drag gesture should begin. This is in
-                // the composable coordinates.
-                val beginCoordinates = getAdjustedCoordinates(
-                    if (isStartHandle) {
-                        startSelectable!!.getHandlePosition(
-                            selection = selection, isStartHandle = true
-                        )
-                    } else {
-                        endSelectable!!.getHandlePosition(
-                            selection = selection, isStartHandle = false
-                        )
-                    }
-                )
+            // Convert the position where drag gesture begins from composable coordinates to
+            // selection container coordinates.
+            dragBeginPosition = requireContainerCoordinates().localPositionOf(
+                beginLayoutCoordinates,
+                beginCoordinates
+            )
 
-                // Convert the position where drag gesture begins from composable coordinates to
-                // selection container coordinates.
-                dragBeginPosition = requireContainerCoordinates().localPositionOf(
-                    beginLayoutCoordinates,
-                    beginCoordinates
-                )
+            // Zero out the total distance that being dragged.
+            dragTotalDistance = Offset.Zero
+        }
 
-                // Zero out the total distance that being dragged.
+        override fun onDrag(delta: Offset) {
+            dragTotalDistance += delta
+            val endPosition = dragBeginPosition + dragTotalDistance
+            val consumed = updateSelection(
+                newPosition = endPosition,
+                previousPosition = dragBeginPosition,
+                isStartHandle = isStartHandle,
+                adjustment = SelectionAdjustment.CharacterWithWordAccelerate
+            )
+            if (consumed) {
+                dragBeginPosition = endPosition
                 dragTotalDistance = Offset.Zero
             }
+        }
 
-            override fun onDrag(delta: Offset) {
-                dragTotalDistance += delta
-                val endPosition = dragBeginPosition + dragTotalDistance
-                val consumed = updateSelection(
-                    newPosition = endPosition,
-                    previousPosition = dragBeginPosition,
-                    isStartHandle = isStartHandle,
-                    adjustment = SelectionAdjustment.CharacterWithWordAccelerate
-                )
-                if (consumed) {
-                    dragBeginPosition = endPosition
-                    dragTotalDistance = Offset.Zero
-                }
-            }
+        override fun onStop() {
+            showSelectionToolbar()
+            draggingHandle = null
+            currentDragPosition = null
+        }
 
-            override fun onStop() {
-                showSelectionToolbar()
-            }
-
-            override fun onCancel() {
-                showSelectionToolbar()
-            }
+        override fun onCancel() {
+            showSelectionToolbar()
+            draggingHandle = null
+            currentDragPosition = null
         }
     }
 
@@ -693,6 +740,8 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         isStartHandle: Boolean,
         adjustment: SelectionAdjustment,
     ): Boolean {
+        draggingHandle = if (isStartHandle) Handle.SelectionStart else Handle.SelectionEnd
+        currentDragPosition = if (isStartHandle) startHandlePosition else endHandlePosition
         val newSubselections = mutableMapOf<Long, Selection>()
         var moveConsumed = false
         val newSelection = selectionRegistrar.sort(requireContainerCoordinates())
@@ -720,6 +769,19 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         }
         return moveConsumed
     }
+
+    fun contextMenuOpenAdjustment(position: Offset) {
+        val isEmptySelection = selection?.toTextRange()?.collapsed ?: true
+        // TODO(b/209483184) the logic should be more complex here, it should check that current
+        // selection doesn't include click position
+        if (isEmptySelection) {
+            startSelection(
+                position = position,
+                isStartHandle = true,
+                adjustment = SelectionAdjustment.Word
+            )
+        }
+    }
 }
 
 internal fun merge(lhs: Selection?, rhs: Selection?): Selection? {
@@ -727,6 +789,64 @@ internal fun merge(lhs: Selection?, rhs: Selection?): Selection? {
 }
 
 internal expect fun isCopyKeyEvent(keyEvent: KeyEvent): Boolean
+
+internal expect fun Modifier.selectionMagnifier(manager: SelectionManager): Modifier
+
+internal fun calculateSelectionMagnifierCenterAndroid(
+    manager: SelectionManager,
+    magnifierSize: IntSize
+): Offset {
+    fun getMagnifierCenter(anchor: AnchorInfo, isStartHandle: Boolean): Offset {
+        val selectable = manager.getAnchorSelectable(anchor) ?: return Offset.Unspecified
+        val containerCoordinates = manager.containerLayoutCoordinates ?: return Offset.Unspecified
+        val selectableCoordinates = selectable.getLayoutCoordinates() ?: return Offset.Unspecified
+        // The end offset is exclusive.
+        val offset = if (isStartHandle) anchor.offset else anchor.offset - 1
+
+        // The horizontal position doesn't snap to cursor positions but should directly track the
+        // actual drag.
+        val localDragPosition = selectableCoordinates.localPositionOf(
+            containerCoordinates,
+            manager.currentDragPosition!!
+        )
+        val dragX = localDragPosition.x
+        // But it is constrained by the horizontal bounds of the current line.
+        val centerX = selectable.getRangeOfLineContaining(offset).let { line ->
+            val lineMin = selectable.getBoundingBox(line.min)
+            // line.end is exclusive, but we want the bounding box of the actual last character in
+            // the line.
+            val lineMax = selectable.getBoundingBox((line.max - 1).coerceAtLeast(line.min))
+            val minX = minOf(lineMin.left, lineMax.left)
+            val maxX = maxOf(lineMin.right, lineMax.right)
+            dragX.coerceIn(minX, maxX)
+        }
+
+        // Hide the magnifier when dragged too far (outside the horizontal bounds of how big the
+        // magnifier actually is). See
+        // https://cs.android.com/android/platform/superproject/+/master:frameworks/base/core/java/android/widget/Editor.java;l=5228-5231;drc=2fdb6bd709be078b72f011334362456bb758922c
+        if ((dragX - centerX).absoluteValue > magnifierSize.width / 2) {
+            return Offset.Unspecified
+        }
+
+        // Let the selectable determine the vertical position of the magnifier, since it should be
+        // clamped to the center of text lines.
+        val anchorBounds = selectable.getBoundingBox(offset)
+        val centerY = anchorBounds.center.y
+
+        return containerCoordinates.localPositionOf(
+            sourceCoordinates = selectableCoordinates,
+            relativeToSource = Offset(centerX, centerY)
+        )
+    }
+
+    val selection = manager.selection ?: return Offset.Unspecified
+    return when (manager.draggingHandle) {
+        null -> return Offset.Unspecified
+        Handle.SelectionStart -> getMagnifierCenter(selection.start, isStartHandle = true)
+        Handle.SelectionEnd -> getMagnifierCenter(selection.end, isStartHandle = false)
+        Handle.Cursor -> error("SelectionContainer does not support cursor")
+    }
+}
 
 internal fun getCurrentSelectedText(
     selectable: Selectable,

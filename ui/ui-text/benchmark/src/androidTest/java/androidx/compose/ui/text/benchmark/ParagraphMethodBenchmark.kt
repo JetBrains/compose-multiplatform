@@ -16,15 +16,21 @@
 
 package androidx.compose.ui.text.benchmark
 
+import android.content.Context
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.createFontFamilyResolver
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.sp
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
+import kotlin.math.ceil
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,8 +57,11 @@ class ParagraphMethodBenchmark(private val textType: TextType, private val textL
         )
     }
 
+    private val context: Context = InstrumentationRegistry.getInstrumentation().context
+
     // A fake resource loader required to construct Paragraph
-    private val resourceLoader = ParagraphBenchmark.resourceLoader
+    @OptIn(ExperimentalTextApi::class)
+    private val fontFamilyResolver = createFontFamilyResolver(context)
 
     private fun paragraphIntrinsics(
         textGenerator: RandomTextGenerator,
@@ -68,7 +77,7 @@ class ParagraphMethodBenchmark(private val textType: TextType, private val textL
             text = text,
             density = Density(density = 1f),
             style = TextStyle(fontSize = 12.sp),
-            resourceLoader = resourceLoader,
+            fontFamilyResolver = fontFamilyResolver,
             spanStyles = spanStyles
         )
     }
@@ -81,7 +90,9 @@ class ParagraphMethodBenchmark(private val textType: TextType, private val textL
         val paragraphIntrinsics = paragraphIntrinsics(textGenerator, textLength)
         return Paragraph(
             paragraphIntrinsics = paragraphIntrinsics,
-            width = paragraphIntrinsics.maxIntrinsicWidth / preferredLineCount
+            constraints = Constraints(
+                maxWidth = ceil(paragraphIntrinsics.maxIntrinsicWidth / preferredLineCount).toInt()
+            )
         )
     }
 

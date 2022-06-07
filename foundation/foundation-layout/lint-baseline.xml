@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.1.0-beta02" type="baseline" client="gradle" dependencies="false" name="AGP (7.1.0-beta02)" variant="all" version="7.1.0-beta02">
+<issues format="6" by="lint 7.3.0-alpha07" type="baseline" client="gradle" dependencies="false" name="AGP (7.3.0-alpha07)" variant="all" version="7.3.0-alpha07">
 
     <issue
         id="NewApi"
@@ -7,9 +7,7 @@
         errorLine1="        val bitmap = activityTestRule.waitAndScreenShot()"
         errorLine2="                                      ~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/foundation/layout/BoxWithConstraintsTest.kt"
-            line="673"
-            column="39"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/foundation/layout/BoxWithConstraintsTest.kt"/>
     </issue>
 
 </issues>

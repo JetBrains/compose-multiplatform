@@ -26,8 +26,8 @@ import androidx.compose.ui.ExperimentalComposeUiApi
  *
  * @sample androidx.compose.ui.samples.KeyEventIsAltPressedSample
  */
-@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-expect inline class Key(val keyCode: Long) {
+@kotlin.jvm.JvmInline
+expect value class Key(val keyCode: Long) {
     companion object {
         /** Unknown key. */
         @ExperimentalComposeUiApi

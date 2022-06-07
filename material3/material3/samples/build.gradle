@@ -15,7 +15,6 @@
  */
 
 
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
 plugins {
@@ -40,12 +39,17 @@ dependencies {
     implementation(project(":compose:runtime:runtime"))
     implementation("androidx.compose.ui:ui:1.0.0")
     implementation("androidx.compose.ui:ui-text:1.0.0")
+    implementation("androidx.savedstate:savedstate-ktx:1.2.0-rc01")
 }
 
 androidx {
     name = "AndroidX Compose Material3 Components Samples"
     type = LibraryType.SAMPLES
-    mavenGroup = LibraryGroups.Compose.MATERIAL3
+    mavenGroup = LibraryGroups.COMPOSE_MATERIAL3
     inceptionYear = "2021"
     description = "Contains the sample code for the AndroidX Compose Material You components."
+}
+
+android {
+    namespace "androidx.compose.material3.samples"
 }

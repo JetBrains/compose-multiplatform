@@ -28,10 +28,12 @@ import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * A [Modifier.Element] that draws into the space of the layout.
  */
+@JvmDefaultWithCompatibility
 interface DrawModifier : Modifier.Element {
 
     fun ContentDrawScope.draw()
@@ -41,6 +43,7 @@ interface DrawModifier : Modifier.Element {
  * [DrawModifier] implementation that supports building a cache of objects
  * to be referenced across draw calls
  */
+@JvmDefaultWithCompatibility
 interface DrawCacheModifier : DrawModifier {
 
     /**

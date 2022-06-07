@@ -16,10 +16,10 @@
 
 package androidx.compose.compiler.plugins.kotlin.lower
 
-import androidx.compose.compiler.plugins.kotlin.ModuleMetrics
 import androidx.compose.compiler.plugins.kotlin.ComposeFqNames
+import androidx.compose.compiler.plugins.kotlin.FunctionMetrics
 import androidx.compose.compiler.plugins.kotlin.KtxNameConventions
-import androidx.compose.compiler.plugins.kotlin.allowsComposableCalls
+import androidx.compose.compiler.plugins.kotlin.ModuleMetrics
 import androidx.compose.compiler.plugins.kotlin.analysis.ComposeWritableSlices
 import androidx.compose.compiler.plugins.kotlin.analysis.Stability
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
@@ -49,7 +49,6 @@ import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.AnonymousFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
-import org.jetbrains.kotlin.fir.java.topLevelName
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -59,14 +58,17 @@ import org.jetbrains.kotlin.ir.builders.declarations.addTypeParameter
 import org.jetbrains.kotlin.ir.builders.declarations.addValueParameter
 import org.jetbrains.kotlin.ir.builders.declarations.buildField
 import org.jetbrains.kotlin.ir.builders.declarations.buildFun
+import org.jetbrains.kotlin.ir.builders.declarations.buildProperty
 import org.jetbrains.kotlin.ir.builders.irBlock
 import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
+import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrField
+import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.declarations.IrValueDeclaration
@@ -77,6 +79,7 @@ import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrTypeParameterImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrValueParameterImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrVariableImpl
+import org.jetbrains.kotlin.ir.declarations.name
 import org.jetbrains.kotlin.ir.expressions.IrBranch
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
@@ -129,13 +132,17 @@ import org.jetbrains.kotlin.ir.types.typeWith
 import org.jetbrains.kotlin.ir.util.DeepCopySymbolRemapper
 import org.jetbrains.kotlin.ir.util.SYNTHETIC_OFFSET
 import org.jetbrains.kotlin.ir.util.constructedClass
+import org.jetbrains.kotlin.ir.util.fqNameForIrSerialization
 import org.jetbrains.kotlin.ir.util.functions
 import org.jetbrains.kotlin.ir.util.getArguments
 import org.jetbrains.kotlin.ir.util.getPrimitiveArrayElementType
+import org.jetbrains.kotlin.ir.util.getPropertyGetter
 import org.jetbrains.kotlin.ir.util.isCrossinline
 import org.jetbrains.kotlin.ir.util.isFunction
 import org.jetbrains.kotlin.ir.util.isNoinline
+import org.jetbrains.kotlin.ir.util.primaryConstructor
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
+import org.jetbrains.kotlin.load.kotlin.computeJvmDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.platform.jvm.isJvm
@@ -157,15 +164,6 @@ abstract class AbstractComposeLowering(
     val bindingTrace: BindingTrace,
     val metrics: ModuleMetrics
 ) : IrElementTransformerVoid(), ModuleLoweringPass {
-
-    var inlinedFunctions: Set<InlineLambdaInfo> = setOf()
-
-    override fun lower(module: IrModuleFragment) {
-        // TODO: Might be worth caching this up in ComposeIrGenerationExtension, or maybe not
-        // because it might be better to keep the transforms independent.
-        inlinedFunctions = IrInlineReferenceLocator.scan(context, module)
-    }
-
     @ObsoleteDescriptorBasedAPI
     protected val typeTranslator =
         TypeTranslatorImpl(
@@ -213,12 +211,20 @@ abstract class AbstractComposeLowering(
     }
 
     fun getTopLevelClass(fqName: FqName): IrClassSymbol {
-        return context.referenceClass(fqName) ?: error("Class not found in the classpath: $fqName")
+        return getTopLevelClassOrNull(fqName) ?: error("Class not found in the classpath: $fqName")
+    }
+
+    fun getTopLevelClassOrNull(fqName: FqName): IrClassSymbol? {
+        return context.referenceClass(fqName)
     }
 
     fun getTopLevelFunction(fqName: FqName): IrFunctionSymbol {
-        return context.referenceFunctions(fqName).firstOrNull()
+        return getTopLevelFunctionOrNull(fqName)
             ?: error("Function not found in the classpath: $fqName")
+    }
+
+    fun getTopLevelFunctionOrNull(fqName: FqName): IrFunctionSymbol? {
+        return context.referenceFunctions(fqName).firstOrNull()
     }
 
     fun getTopLevelFunctions(fqName: FqName): List<IrSimpleFunctionSymbol> {
@@ -237,6 +243,10 @@ abstract class AbstractComposeLowering(
         ComposeFqNames.internalFqNameFor(name)
     )
 
+    fun getInternalClassOrNull(name: String) = getTopLevelClassOrNull(
+        ComposeFqNames.internalFqNameFor(name)
+    )
+
     fun getTopLevelPropertyGetter(fqName: FqName): IrFunctionSymbol {
         val propertySymbol = context.referenceProperties(fqName).firstOrNull()
             ?: error("Property was not found $fqName")
@@ -244,6 +254,15 @@ abstract class AbstractComposeLowering(
             propertySymbol.owner.getter!!.symbol
         )
     }
+
+    fun metricsFor(function: IrFunction): FunctionMetrics =
+        (function as? IrAttributeContainer)?.let {
+            context.irTrace[ComposeWritableSlices.FUNCTION_METRICS, it] ?: run {
+                val metrics = metrics.makeFunctionMetrics(function)
+                context.irTrace.record(ComposeWritableSlices.FUNCTION_METRICS, it, metrics)
+                metrics
+            }
+        } ?: metrics.makeFunctionMetrics(function)
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     fun KotlinType.toIrType(): IrType = typeTranslator.translateType(this)
@@ -298,11 +317,22 @@ abstract class AbstractComposeLowering(
         val classSymbol = type.classOrNull ?: return this
         val klass = classSymbol.owner
         if (klass.isInline) {
-            return coerceInlineClasses(
-                this,
-                type,
-                type.unboxInlineClass()
-            ).unboxValueIfInline()
+            if (context.platform.isJvm()) {
+                return coerceInlineClasses(
+                    this,
+                    type,
+                    type.unboxInlineClass()
+                ).unboxValueIfInline()
+            } else {
+                val primaryValueParameter = klass.primaryConstructor?.valueParameters?.get(0)
+                    ?: error("Expected a value parameter")
+                val fieldGetter = klass.getPropertyGetter(primaryValueParameter.name.identifier)
+                    ?: error("Expected a getter")
+                return irCall(
+                    symbol = fieldGetter,
+                    dispatchReceiver = this
+                ).unboxValueIfInline()
+            }
         }
         return this
     }
@@ -334,13 +364,6 @@ abstract class AbstractComposeLowering(
 
     fun IrClass.isComposableSingletonClass(): Boolean {
         return context.irTrace[ComposeWritableSlices.IS_COMPOSABLE_SINGLETON_CLASS, this] == true
-    }
-
-    fun IrFunction.isInlinedLambda(): Boolean {
-        for (element in inlinedFunctions) {
-            if (element.argument.function == this) return true
-        }
-        return false
     }
 
     protected val KotlinType.isEnum
@@ -383,15 +406,6 @@ abstract class AbstractComposeLowering(
 
     fun KotlinType.isFinal(): Boolean = (constructor.declarationDescriptor as? ClassDescriptor)
         ?.modality == Modality.FINAL
-
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
-    fun FunctionDescriptor.allowsComposableCalls(): Boolean {
-        return allowsComposableCalls(context.bindingContext)
-    }
-
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
-    fun IrFunctionExpression.allowsComposableCalls(): Boolean =
-        function.descriptor.allowsComposableCalls(context.bindingContext)
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     private fun IrFunction.createParameterDeclarations() {
@@ -516,6 +530,7 @@ abstract class AbstractComposeLowering(
                     )
                 },
                 null,
+                emptyList(),
                 emptyList(),
                 kotlinType.getValueParameterTypesFromFunctionType().mapIndexed { i, t ->
                     ValueParameterDescriptorImpl(
@@ -1053,6 +1068,15 @@ abstract class AbstractComposeLowering(
         }
     }
 
+    protected fun makeStabilityProp(): IrProperty {
+        return context.irFactory.buildProperty {
+            startOffset = SYNTHETIC_OFFSET
+            endOffset = SYNTHETIC_OFFSET
+            name = KtxNameConventions.STABILITY_PROP_FLAG
+            visibility = DescriptorVisibilities.PRIVATE
+        }
+    }
+
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     fun IrExpression.isStatic(): Boolean {
         return when (this) {
@@ -1254,6 +1278,22 @@ abstract class AbstractComposeLowering(
             null
         }
     }
+
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
+    fun IrSimpleFunction.sourceKey(): Int {
+        val info = context.irTrace[
+            ComposeWritableSlices.DURABLE_FUNCTION_KEY,
+            this
+        ]
+        if (info != null) {
+            info.used = true
+            return info.key
+        }
+        val signature = symbol.descriptor.computeJvmDescriptor(withName = false)
+        val name = fqNameForIrSerialization
+        val stringKey = "$name$signature"
+        return stringKey.hashCode()
+    }
 }
 
 private val unsafeSymbolsRegex = "[ <>]".toRegex()
@@ -1312,3 +1352,14 @@ fun ParameterDescriptor.index(): Int =
     }
 
 fun getUnderlyingType(irClass: IrClass) = irClass.inlineClassRepresentation!!.underlyingType
+
+inline fun <T> includeFileNameInExceptionTrace(file: IrFile, body: () -> T): T {
+    try {
+        return body()
+    } catch (e: Exception) {
+        throw Exception("IR lowering failed at: ${file.name}", e)
+    }
+}
+
+fun FqName.topLevelName() =
+    asString().substringBefore(".")

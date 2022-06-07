@@ -19,8 +19,10 @@ package androidx.compose.material3
 import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -50,31 +52,29 @@ class AppBarScreenshotTest {
 
     @Test
     fun smallAppBar_lightTheme() {
-        composeTestRule.setContent {
-            MaterialTheme {
-                Box(Modifier.testTag(TestTag)) {
-                    SmallTopAppBar(
-                        navigationIcon = {
-                            IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(
-                                    imageVector = Icons.Filled.ArrowBack,
-                                    contentDescription = "Back"
-                                )
-                            }
-                        },
-                        title = {
-                            Text("Title")
-                        },
-                        actions = {
-                            IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Favorite,
-                                    contentDescription = "Like"
-                                )
-                            }
+        composeTestRule.setMaterialContent(lightColorScheme()) {
+            Box(Modifier.testTag(TopAppBarTestTag)) {
+                SmallTopAppBar(
+                    navigationIcon = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
                         }
-                    )
-                }
+                    },
+                    title = {
+                        Text("Title")
+                    },
+                    actions = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.Favorite,
+                                contentDescription = "Like"
+                            )
+                        }
+                    }
+                )
             }
         }
 
@@ -83,31 +83,29 @@ class AppBarScreenshotTest {
 
     @Test
     fun smallAppBar_darkTheme() {
-        composeTestRule.setContent {
-            MaterialTheme(colorScheme = darkColorScheme()) {
-                Box(Modifier.testTag(TestTag)) {
-                    SmallTopAppBar(
-                        navigationIcon = {
-                            IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(
-                                    imageVector = Icons.Filled.ArrowBack,
-                                    contentDescription = "Back"
-                                )
-                            }
-                        },
-                        title = {
-                            Text("Title")
-                        },
-                        actions = {
-                            IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Favorite,
-                                    contentDescription = "Like"
-                                )
-                            }
+        composeTestRule.setMaterialContent(darkColorScheme()) {
+            Box(Modifier.testTag(TopAppBarTestTag)) {
+                SmallTopAppBar(
+                    navigationIcon = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
                         }
-                    )
-                }
+                    },
+                    title = {
+                        Text("Title")
+                    },
+                    actions = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.Favorite,
+                                contentDescription = "Like"
+                            )
+                        }
+                    }
+                )
             }
         }
 
@@ -116,31 +114,29 @@ class AppBarScreenshotTest {
 
     @Test
     fun centerAlignedAppBar_lightTheme() {
-        composeTestRule.setContent {
-            MaterialTheme {
-                Box(Modifier.testTag(TestTag)) {
-                    CenterAlignedTopAppBar(
-                        navigationIcon = {
-                            IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(
-                                    imageVector = Icons.Filled.ArrowBack,
-                                    contentDescription = "Back"
-                                )
-                            }
-                        },
-                        title = {
-                            Text("Title")
-                        },
-                        actions = {
-                            IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Favorite,
-                                    contentDescription = "Like"
-                                )
-                            }
+        composeTestRule.setMaterialContent(lightColorScheme()) {
+            Box(Modifier.testTag(TopAppBarTestTag)) {
+                CenterAlignedTopAppBar(
+                    navigationIcon = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
                         }
-                    )
-                }
+                    },
+                    title = {
+                        Text("Title")
+                    },
+                    actions = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.Favorite,
+                                contentDescription = "Like"
+                            )
+                        }
+                    }
+                )
             }
         }
 
@@ -149,31 +145,29 @@ class AppBarScreenshotTest {
 
     @Test
     fun centerAlignedAppBar_darkTheme() {
-        composeTestRule.setContent {
-            MaterialTheme(colorScheme = darkColorScheme()) {
-                Box(Modifier.testTag(TestTag)) {
-                    CenterAlignedTopAppBar(
-                        navigationIcon = {
-                            IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(
-                                    imageVector = Icons.Filled.ArrowBack,
-                                    contentDescription = "Back"
-                                )
-                            }
-                        },
-                        title = {
-                            Text("Title")
-                        },
-                        actions = {
-                            IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Favorite,
-                                    contentDescription = "Like"
-                                )
-                            }
+        composeTestRule.setMaterialContent(darkColorScheme()) {
+            Box(Modifier.testTag(TopAppBarTestTag)) {
+                CenterAlignedTopAppBar(
+                    navigationIcon = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
                         }
-                    )
-                }
+                    },
+                    title = {
+                        Text("Title")
+                    },
+                    actions = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.Favorite,
+                                contentDescription = "Like"
+                            )
+                        }
+                    }
+                )
             }
         }
 
@@ -182,31 +176,29 @@ class AppBarScreenshotTest {
 
     @Test
     fun mediumAppBar_lightTheme() {
-        composeTestRule.setContent {
-            MaterialTheme {
-                Box(Modifier.testTag(TestTag)) {
-                    MediumTopAppBar(
-                        navigationIcon = {
-                            IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(
-                                    imageVector = Icons.Filled.ArrowBack,
-                                    contentDescription = "Back"
-                                )
-                            }
-                        },
-                        title = {
-                            Text("Title")
-                        },
-                        actions = {
-                            IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Favorite,
-                                    contentDescription = "Like"
-                                )
-                            }
+        composeTestRule.setMaterialContent(lightColorScheme()) {
+            Box(Modifier.testTag(TopAppBarTestTag)) {
+                MediumTopAppBar(
+                    navigationIcon = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
                         }
-                    )
-                }
+                    },
+                    title = {
+                        Text("Title")
+                    },
+                    actions = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.Favorite,
+                                contentDescription = "Like"
+                            )
+                        }
+                    }
+                )
             }
         }
 
@@ -215,31 +207,29 @@ class AppBarScreenshotTest {
 
     @Test
     fun mediumAppBar_darkTheme() {
-        composeTestRule.setContent {
-            MaterialTheme(colorScheme = darkColorScheme()) {
-                Box(Modifier.testTag(TestTag)) {
-                    MediumTopAppBar(
-                        navigationIcon = {
-                            IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(
-                                    imageVector = Icons.Filled.ArrowBack,
-                                    contentDescription = "Back"
-                                )
-                            }
-                        },
-                        title = {
-                            Text("Title")
-                        },
-                        actions = {
-                            IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Favorite,
-                                    contentDescription = "Like"
-                                )
-                            }
+        composeTestRule.setMaterialContent(darkColorScheme()) {
+            Box(Modifier.testTag(TopAppBarTestTag)) {
+                MediumTopAppBar(
+                    navigationIcon = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
                         }
-                    )
-                }
+                    },
+                    title = {
+                        Text("Title")
+                    },
+                    actions = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.Favorite,
+                                contentDescription = "Like"
+                            )
+                        }
+                    }
+                )
             }
         }
 
@@ -248,31 +238,29 @@ class AppBarScreenshotTest {
 
     @Test
     fun largeAppBar_lightTheme() {
-        composeTestRule.setContent {
-            MaterialTheme {
-                Box(Modifier.testTag(TestTag)) {
-                    LargeTopAppBar(
-                        navigationIcon = {
-                            IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(
-                                    imageVector = Icons.Filled.ArrowBack,
-                                    contentDescription = "Back"
-                                )
-                            }
-                        },
-                        title = {
-                            Text("Title")
-                        },
-                        actions = {
-                            IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Favorite,
-                                    contentDescription = "Like"
-                                )
-                            }
+        composeTestRule.setMaterialContent(lightColorScheme()) {
+            Box(Modifier.testTag(TopAppBarTestTag)) {
+                LargeTopAppBar(
+                    navigationIcon = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
                         }
-                    )
-                }
+                    },
+                    title = {
+                        Text("Title")
+                    },
+                    actions = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.Favorite,
+                                contentDescription = "Like"
+                            )
+                        }
+                    }
+                )
             }
         }
 
@@ -281,42 +269,106 @@ class AppBarScreenshotTest {
 
     @Test
     fun largeAppBar_darkTheme() {
-        composeTestRule.setContent {
-            MaterialTheme(colorScheme = darkColorScheme()) {
-                Box(Modifier.testTag(TestTag)) {
-                    LargeTopAppBar(
-                        navigationIcon = {
-                            IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(
-                                    imageVector = Icons.Filled.ArrowBack,
-                                    contentDescription = "Back"
-                                )
-                            }
-                        },
-                        title = {
-                            Text("Title")
-                        },
-                        actions = {
-                            IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Favorite,
-                                    contentDescription = "Like"
-                                )
-                            }
+        composeTestRule.setMaterialContent(darkColorScheme()) {
+            Box(Modifier.testTag(TopAppBarTestTag)) {
+                LargeTopAppBar(
+                    navigationIcon = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
                         }
-                    )
-                }
+                    },
+                    title = {
+                        Text("Title")
+                    },
+                    actions = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.Favorite,
+                                contentDescription = "Like"
+                            )
+                        }
+                    }
+                )
             }
         }
 
         assertAppBarAgainstGolden(goldenIdentifier = "largeAppBar_darkTheme")
     }
 
-    private fun assertAppBarAgainstGolden(goldenIdentifier: String) {
-        composeTestRule.onNodeWithTag(TestTag)
+    @Test
+    fun bottomAppBarWithFAB_lightTheme() {
+        composeTestRule.setMaterialContent(lightColorScheme()) {
+            Box(Modifier.testTag(BottomAppBarTestTag)) {
+                BottomAppBar(
+                    icons = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.Menu,
+                                contentDescription = "Menu"
+                            )
+                        }
+                    },
+                    floatingActionButton = {
+                        FloatingActionButton(
+                            onClick = { /* do something */ },
+                            elevation = BottomAppBarDefaults.floatingActionButtonElevation()
+                        ) {
+                            Icon(Icons.Filled.Add, "Localized description")
+                        }
+                    }
+                )
+            }
+        }
+
+        assertAppBarAgainstGolden(
+            goldenIdentifier = "bottomAppBarWithFAB_lightTheme",
+            testTag = BottomAppBarTestTag
+        )
+    }
+
+    @Test
+    fun bottomAppBarWithFAB_darkTheme() {
+        composeTestRule.setMaterialContent(darkColorScheme()) {
+            Box(Modifier.testTag(BottomAppBarTestTag)) {
+                BottomAppBar(
+                    icons = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.Menu,
+                                contentDescription = "Menu"
+                            )
+                        }
+                    },
+                    floatingActionButton = {
+                        FloatingActionButton(
+                            onClick = { /* do something */ },
+                            elevation = BottomAppBarDefaults.floatingActionButtonElevation()
+                        ) {
+                            Icon(Icons.Filled.Add, "Localized description")
+                        }
+                    }
+                )
+            }
+        }
+
+        assertAppBarAgainstGolden(
+            goldenIdentifier = "bottomAppBarWithFAB_darkTheme",
+            testTag = BottomAppBarTestTag
+        )
+    }
+
+    private fun assertAppBarAgainstGolden(
+        goldenIdentifier: String,
+        testTag: String = TopAppBarTestTag
+    ) {
+        composeTestRule.onNodeWithTag(testTag)
             .captureToImage()
             .assertAgainstGolden(screenshotRule, goldenIdentifier)
     }
 
-    private val TestTag = "topAppBar"
+    private val TopAppBarTestTag = "topAppBar"
+    private val BottomAppBarTestTag = "bottomAppBar"
 }

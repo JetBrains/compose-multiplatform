@@ -23,6 +23,7 @@ import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,15 +41,25 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.platform.inspectable
+import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.toSize
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+
+/**
+ * A function on elements that are magnified with a [magnifier] modifier that returns the position
+ * of the center of the magnified content in the coordinate space of the root composable.
+ */
+internal val MagnifierPositionInRoot =
+    SemanticsPropertyKey<() -> Offset>("MagnifierPositionInRoot")
 
 /**
  * Specifies how a [magnifier] should create the underlying [Magnifier] widget. These properties
@@ -206,13 +217,17 @@ class MagnifierStyle internal constructor(
  * offset is specified by the system.
  * @param zoom See [Magnifier.setZoom]. Not supported on SDK levels < Q.
  * @param style The [MagnifierStyle] to use to configure the magnifier widget.
+ * @param onSizeChanged An optional callback that will be invoked when the magnifier widget is
+ * initialized to report on its actual size. This can be useful if one of the default
+ * [MagnifierStyle]s is used to find out what size the system decided to use for the widget.
  */
 @ExperimentalFoundationApi
 fun Modifier.magnifier(
     sourceCenter: Density.() -> Offset,
     magnifierCenter: Density.() -> Offset = { Offset.Unspecified },
     zoom: Float = Float.NaN,
-    style: MagnifierStyle = MagnifierStyle.Default
+    style: MagnifierStyle = MagnifierStyle.Default,
+    onSizeChanged: ((DpSize) -> Unit)? = null
 ): Modifier = inspectable(
     // Publish inspector info even if magnification isn't supported.
     inspectorInfo = debugInspectorInfo {
@@ -229,6 +244,7 @@ fun Modifier.magnifier(
             magnifierCenter = magnifierCenter,
             zoom = zoom,
             style = style,
+            onSizeChanged = onSizeChanged,
             platformMagnifierFactory = PlatformMagnifierFactory.getForCurrentPlatform()
         )
     } else {
@@ -252,6 +268,7 @@ internal fun Modifier.magnifier(
     magnifierCenter: Density.() -> Offset,
     zoom: Float,
     style: MagnifierStyle,
+    onSizeChanged: ((DpSize) -> Unit)?,
     platformMagnifierFactory: PlatformMagnifierFactory
 ): Modifier = composed {
     val view = LocalView.current
@@ -260,6 +277,18 @@ internal fun Modifier.magnifier(
     val updatedSourceCenter by rememberUpdatedState(sourceCenter)
     val updatedMagnifierCenter by rememberUpdatedState(magnifierCenter)
     val updatedZoom by rememberUpdatedState(zoom)
+    val updatedOnSizeChanged by rememberUpdatedState(onSizeChanged)
+    val sourceCenterInRoot by remember {
+        derivedStateOf {
+            val sourceCenterOffset = updatedSourceCenter(density)
+            if (anchorPositionInRoot.isSpecified && sourceCenterOffset.isSpecified) {
+                anchorPositionInRoot + sourceCenterOffset
+            } else {
+                Offset.Unspecified
+            }
+        }
+    }
+    val isMagnifierShown by remember { derivedStateOf { sourceCenterInRoot.isSpecified } }
 
     /**
      * Used to request that the magnifier updates its buffer when the layer is redrawn.
@@ -287,6 +316,13 @@ internal fun Modifier.magnifier(
         style == MagnifierStyle.TextDefault
     ) {
         val magnifier = platformMagnifierFactory.create(style, view, density, zoom)
+        var previousSize = magnifier.size.also { newSize ->
+            updatedOnSizeChanged?.invoke(
+                with(density) {
+                    newSize.toSize().toDpSize()
+                }
+            )
+        }
 
         // Ask the magnifier to do another pixel copy whenever the nearest layer is redrawn.
         onNeedsUpdate
@@ -297,13 +333,11 @@ internal fun Modifier.magnifier(
             // Update the modifier in a snapshotFlow so it will be restarted whenever any state read
             // by the update function changes.
             snapshotFlow {
-                val sourceCenterOffset = updatedSourceCenter(density)
-
                 // Once the position is set, it's never null again, so we don't need to worry about
                 // dismissing the magnifier if this expression changes value.
-                if (anchorPositionInRoot.isSpecified && sourceCenterOffset.isSpecified) {
+                if (isMagnifierShown) {
                     magnifier.update(
-                        sourceCenter = anchorPositionInRoot + sourceCenterOffset,
+                        sourceCenter = sourceCenterInRoot,
                         magnifierCenter = updatedMagnifierCenter(density).let {
                             if (it.isSpecified) {
                                 anchorPositionInRoot + it
@@ -313,6 +347,17 @@ internal fun Modifier.magnifier(
                         },
                         zoom = updatedZoom
                     )
+
+                    magnifier.size.let { size ->
+                        if (size != previousSize) {
+                            previousSize = size
+                            updatedOnSizeChanged?.invoke(
+                                with(density) {
+                                    size.toSize().toDpSize()
+                                }
+                            )
+                        }
+                    }
                 } else {
                     // Can't place the magnifier at an unspecified location, so just hide it.
                     magnifier.dismiss()
@@ -337,6 +382,9 @@ internal fun Modifier.magnifier(
             // Note that this won't do anything if the magnifier is showing a different layer,
             // but it handles the case where the cursor is blinking so it's better than nothing.
             onNeedsUpdate.tryEmit(Unit)
+        }
+        .semantics {
+            this[MagnifierPositionInRoot] = { sourceCenterInRoot }
         }
 }
 

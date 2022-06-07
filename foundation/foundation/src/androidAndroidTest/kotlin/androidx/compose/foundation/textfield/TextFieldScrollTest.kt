@@ -18,18 +18,23 @@ package androidx.compose.foundation.textfield
 
 import android.os.Build
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.Handle
 import androidx.compose.foundation.text.TextFieldScrollerPosition
 import androidx.compose.foundation.text.TextLayoutResultProxy
 import androidx.compose.foundation.text.maxLinesHeight
+import androidx.compose.foundation.text.selection.isSelectionHandle
 import androidx.compose.foundation.text.textFieldScroll
 import androidx.compose.foundation.text.textFieldScrollable
 import androidx.compose.foundation.verticalScroll
@@ -53,11 +58,17 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.isPopup
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeDown
@@ -225,7 +236,7 @@ class TextFieldScrollTest {
             }
         }
 
-        rule.runOnIdle {}
+        rule.waitForIdle()
 
         rule.onNodeWithTag(tag)
             .captureToImage()
@@ -260,7 +271,7 @@ class TextFieldScrollTest {
             }
         }
 
-        rule.runOnIdle {}
+        rule.waitForIdle()
 
         rule.onNodeWithTag(tag)
             .captureToImage()
@@ -543,6 +554,104 @@ class TextFieldScrollTest {
                 )
             )
         }
+    }
+
+    @Test
+    fun textField_cursorHandle_hidden_whenScrolledOutOfView() {
+        val size = 100
+        val tag = "Text"
+
+        with(rule.density) {
+            rule.setContent {
+                BasicTextField(
+                    value = longText,
+                    onValueChange = {},
+                    modifier = Modifier
+                        .padding(size.toDp())
+                        .size(size.toDp())
+                        .testTag(tag)
+                )
+            }
+        }
+
+        // Click to focus and show handle.
+        rule.onNodeWithTag(tag)
+            .performClick()
+
+        rule.onNode(isSelectionHandle(Handle.Cursor)).assertIsDisplayed()
+
+        // Scroll up by twice the height to move the cursor out of the visible area.
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                down(center)
+                moveBy(Offset(x = 0f, y = -size * 2f))
+            }
+
+        // Check that cursor is hidden.
+        rule.onAllNodes(isSelectionHandle()).assertCountEquals(0)
+
+        // Scroll back and make sure the handles are shown again.
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                moveBy(Offset(x = 0f, y = size * 2f))
+            }
+
+        rule.onNode(isSelectionHandle(Handle.Cursor)).assertIsDisplayed()
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun textField_selectionHandles_hidden_whenScrolledOutOfView() {
+        val size = 200
+        val tag = "Text"
+
+        with(rule.density) {
+            rule.setContent {
+                BasicTextField(
+                    value = longText,
+                    onValueChange = {},
+                    modifier = Modifier
+                        .border(0.dp, Color.Gray)
+                        .padding(size.toDp())
+                        .border(0.dp, Color.Black)
+                        .size(size.toDp())
+                        .testTag(tag)
+                )
+            }
+        }
+
+        // Select something to ensure both handles are visible.
+        rule.onNodeWithTag(tag)
+            // TODO(b/209698586) Use performTextInputSelection once that method actually updates
+            //  the text handles.
+            // .performTextInputSelection(TextRange(0, 1))
+            .performTouchInput {
+                longClick()
+            }
+
+        // Check that both handles are displayed (if not, we can't check that they get hidden).
+        rule.onNode(isSelectionHandle(Handle.SelectionStart)).assertIsDisplayed()
+        rule.onNode(isSelectionHandle(Handle.SelectionEnd)).assertIsDisplayed()
+
+        // Scroll up by twice the height to move the cursor out of the visible area.
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                down(center)
+                moveBy(Offset(x = 0f, y = -size * 2f))
+            }
+
+        // Check that cursor is hidden.
+        rule.onAllNodes(isPopup())
+            .assertCountEquals(0)
+
+        // Scroll back and make sure the handles are shown again.
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                moveBy(Offset(x = 0f, y = size * 2f))
+            }
+
+        rule.onNode(isSelectionHandle(Handle.SelectionStart)).assertIsDisplayed()
+        rule.onNode(isSelectionHandle(Handle.SelectionEnd)).assertIsDisplayed()
     }
 
     private fun ComposeContentTestRule.setupHorizontallyScrollableContent(

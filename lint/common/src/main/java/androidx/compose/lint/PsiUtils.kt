@@ -34,7 +34,16 @@ fun PsiMethod.isInPackageName(packageName: PackageName): Boolean {
  * Whether this [PsiMethod] returns Unit
  */
 val PsiMethod.returnsUnit
-    get() = returnType == PsiType.VOID
+    get() = returnType.isVoidOrUnit
+
+/**
+ * Whether this [PsiType] is `void` or [Unit]
+ *
+ * In Kotlin 1.6 some expressions now explicitly return [Unit] instead of just being [PsiType.VOID],
+ * so this returns whether this type is either.
+ */
+val PsiType?.isVoidOrUnit
+    get() = this == PsiType.VOID || this?.canonicalText == "kotlin.Unit"
 
 /**
  * @return whether [this] inherits from [name]. Returns `true` if [this] _is_ directly [name].

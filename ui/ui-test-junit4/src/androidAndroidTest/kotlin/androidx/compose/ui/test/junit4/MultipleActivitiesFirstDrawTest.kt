@@ -22,19 +22,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.runAndroidComposeUiTest
 import androidx.test.espresso.Espresso
 import androidx.test.filters.MediumTest
-import org.junit.Rule
 import org.junit.Test
 
 @MediumTest
+@OptIn(ExperimentalTestApi::class)
 class MultipleActivitiesFirstDrawTest {
 
-    @get:Rule
-    val rule = createAndroidComposeRule<Activity1>()
-
     @Test
-    fun test() {
+    fun test() = runAndroidComposeUiTest<Activity1> {
         Espresso.onIdle()
         // doesn't timeout
     }

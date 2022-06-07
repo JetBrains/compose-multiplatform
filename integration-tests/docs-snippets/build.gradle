@@ -44,6 +44,13 @@ dependencies {
     implementation(project(":navigation:navigation-compose"))
     implementation("androidx.activity:activity-compose:1.3.1")
     implementation(project(":lifecycle:lifecycle-viewmodel-compose"))
+    // old version of common-java8 conflicts with newer version, because both have
+    // DefaultLifecycleEventObserver.
+    // Outside of androidx this is resolved via constraint added to lifecycle-common,
+    // but it doesn't work in androidx.
+    // See aosp/1804059
+    implementation(project(":lifecycle:lifecycle-common-java8"))
+    implementation(project(":lifecycle:lifecycle-viewmodel-savedstate"))
     implementation(project(":paging:paging-compose"))
 
     implementation(libs.kotlinStdlib)
@@ -61,15 +68,9 @@ androidx {
     description = "Compose Documentation Snippets on developer.android.com"
 }
 
+android {
+    namespace "androidx.compose.integration.docs"
+}
+
 android.defaultConfig.minSdkVersion 21
 android.buildFeatures.viewBinding true
-
-// needed only while https://youtrack.jetbrains.com/issue/KT-47000 isn't resolved which is
-// targeted to 1.6
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=enable",
-        ]
-    }
-}

@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.text.platform.extensions
 
+import android.graphics.Typeface
 import android.os.Build
 import android.text.Spannable
 import android.text.Spanned
@@ -27,11 +28,15 @@ import android.text.style.LocaleSpan
 import android.text.style.MetricAffectingSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.ScaleXSpan
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.android.InternalPlatformTextApi
@@ -40,19 +45,23 @@ import androidx.compose.ui.text.android.style.FontFeatureSpan
 import androidx.compose.ui.text.android.style.LetterSpacingSpanEm
 import androidx.compose.ui.text.android.style.LetterSpacingSpanPx
 import androidx.compose.ui.text.android.style.LineHeightSpan
+import androidx.compose.ui.text.android.style.LineHeightStyleSpan
 import androidx.compose.ui.text.android.style.ShadowSpan
 import androidx.compose.ui.text.android.style.SkewXSpan
 import androidx.compose.ui.text.android.style.TextDecorationSpan
 import androidx.compose.ui.text.android.style.TypefaceSpan
 import androidx.compose.ui.text.fastFilter
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intersect
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.intl.LocaleList
-import androidx.compose.ui.text.platform.TypefaceAdapter
+import androidx.compose.ui.text.platform.style.ShaderBrushSpan
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
@@ -108,30 +117,55 @@ internal fun Spannable.setTextIndent(
     }
 }
 
+@OptIn(InternalPlatformTextApi::class, ExperimentalTextApi::class)
+internal fun Spannable.setLineHeight(
+    lineHeight: TextUnit,
+    contextFontSize: Float,
+    density: Density,
+    lineHeightStyle: LineHeightStyle
+) {
+    val resolvedLineHeight = resolveLineHeightInPx(lineHeight, contextFontSize, density)
+    if (!resolvedLineHeight.isNaN()) {
+        setSpan(
+            span = LineHeightStyleSpan(
+                lineHeight = resolvedLineHeight,
+                startIndex = 0,
+                endIndex = length,
+                trimFirstLineTop = lineHeightStyle.trim.isTrimFirstLineTop(),
+                trimLastLineBottom = lineHeightStyle.trim.isTrimLastLineBottom(),
+                topPercentage = lineHeightStyle.alignment.topPercentage
+            ),
+            start = 0,
+            end = length
+        )
+    }
+}
+
 @OptIn(InternalPlatformTextApi::class)
-@Suppress("DEPRECATION")
 internal fun Spannable.setLineHeight(
     lineHeight: TextUnit,
     contextFontSize: Float,
     density: Density
 ) {
-    when (lineHeight.type) {
-        TextUnitType.Sp -> with(density) {
-            setSpan(
-                LineHeightSpan(ceil(lineHeight.toPx()).toInt()),
-                0,
-                length
-            )
-        }
-        TextUnitType.Em -> {
-            setSpan(
-                LineHeightSpan(ceil(lineHeight.value * contextFontSize).toInt()),
-                0,
-                length
-            )
-        }
-        else -> {
-        } // Do nothing
+    val resolvedLineHeight = resolveLineHeightInPx(lineHeight, contextFontSize, density)
+    if (!resolvedLineHeight.isNaN()) {
+        setSpan(
+            span = LineHeightSpan(lineHeight = resolvedLineHeight),
+            start = 0,
+            end = length
+        )
+    }
+}
+
+private fun resolveLineHeightInPx(
+    lineHeight: TextUnit,
+    contextFontSize: Float,
+    density: Density
+): Float {
+    return when (lineHeight.type) {
+        TextUnitType.Sp -> with(density) { lineHeight.toPx() }
+        TextUnitType.Em -> lineHeight.value * contextFontSize
+        else -> Float.NaN
     }
 }
 
@@ -139,10 +173,10 @@ internal fun Spannable.setSpanStyles(
     contextTextStyle: TextStyle,
     spanStyles: List<AnnotatedString.Range<SpanStyle>>,
     density: Density,
-    typefaceAdapter: TypefaceAdapter
+    resolveTypeface: (FontFamily?, FontWeight, FontStyle, FontSynthesis) -> Typeface,
 ) {
 
-    setFontAttributes(contextTextStyle, spanStyles, typefaceAdapter)
+    setFontAttributes(contextTextStyle, spanStyles, resolveTypeface)
 
     // LetterSpacingSpanPx/LetterSpacingSpanSP has lower priority than normal spans. Because
     // letterSpacing relies on the fontSize on [Paint] to compute Px/Sp from Em. So it must be
@@ -182,6 +216,8 @@ private fun Spannable.setSpanStyle(
     setBaselineShift(style.baselineShift, start, end)
 
     setColor(style.color, start, end)
+
+    setBrush(style.brush, start, end)
 
     setTextDecoration(style.textDecoration, start, end)
 
@@ -226,13 +262,13 @@ private fun Spannable.setSpanStyle(
  * @param contextTextStyle the global [TextStyle] for the entire string.
  * @param spanStyles the [spanStyles] to be applied, this function will first filter out the font
  * related [SpanStyle]s and then apply them to this [Spannable].
- * @param typefaceAdapter the [TypefaceAdapter] used to resolve font.
+ * @param fontFamilyResolver the [Font.ResourceLoader] used to resolve font.
  */
 @OptIn(InternalPlatformTextApi::class)
 private fun Spannable.setFontAttributes(
     contextTextStyle: TextStyle,
     spanStyles: List<AnnotatedString.Range<SpanStyle>>,
-    typefaceAdapter: TypefaceAdapter
+    resolveTypeface: (FontFamily?, FontWeight, FontStyle, FontSynthesis) -> Typeface,
 ) {
     val fontRelatedSpanStyles = spanStyles.fastFilter {
         it.item.hasFontAttributes() || it.item.fontSynthesis != null
@@ -257,11 +293,11 @@ private fun Spannable.setFontAttributes(
     ) { spanStyle, start, end ->
         setSpan(
             TypefaceSpan(
-                typefaceAdapter.create(
-                    fontFamily = spanStyle.fontFamily,
-                    fontWeight = spanStyle.fontWeight ?: FontWeight.Normal,
-                    fontStyle = spanStyle.fontStyle ?: FontStyle.Normal,
-                    fontSynthesis = spanStyle.fontSynthesis ?: FontSynthesis.All
+                resolveTypeface(
+                    spanStyle.fontFamily,
+                    spanStyle.fontWeight ?: FontWeight.Normal,
+                    spanStyle.fontStyle ?: FontStyle.Normal,
+                    spanStyle.fontSynthesis ?: FontSynthesis.All
                 )
             ),
             start,
@@ -286,6 +322,7 @@ internal fun flattenFontStylesAndApply(
     spanStyles: List<AnnotatedString.Range<SpanStyle>>,
     block: (SpanStyle, Int, Int) -> Unit
 ) {
+    // quick way out for single SpanStyle or empty list.
     if (spanStyles.size <= 1) {
         if (spanStyles.isNotEmpty()) {
             block(
@@ -297,6 +334,8 @@ internal fun flattenFontStylesAndApply(
         return
     }
 
+    // Sort all span start and end points.
+    // S1--S2--E1--S3--E3--E2
     val spanCount = spanStyles.size
     val transitionOffsets = Array(spanCount * 2) { 0 }
     spanStyles.fastForEachIndexed { idx, spanStyle ->
@@ -305,6 +344,11 @@ internal fun flattenFontStylesAndApply(
     }
     transitionOffsets.sort()
 
+    // S1--S2--E1--S3--E3--E2
+    // - Go through all minimum intervals
+    // - Find Spans that intersect with the given interval
+    // - Merge all spans in order, starting from contextFontSpanStyle
+    // - Apply the merged SpanStyle to the minimal interval
     var lastTransitionOffsets = transitionOffsets.first()
     for (transitionOffset in transitionOffsets) {
         // There might be duplicated transition offsets, we skip them here.
@@ -315,7 +359,9 @@ internal fun flattenFontStylesAndApply(
         // Check all spans that intersects with this transition range.
         var mergedSpanStyle = contextFontSpanStyle
         spanStyles.fastForEach { spanStyle ->
+            // Empty spans do not intersect with anything, skip them.
             if (
+                spanStyle.start != spanStyle.end &&
                 intersect(lastTransitionOffsets, transitionOffset, spanStyle.start, spanStyle.end)
             ) {
                 mergedSpanStyle = mergedSpanStyle.merge(spanStyle.item)
@@ -443,6 +489,23 @@ internal fun Spannable.setColor(color: Color, start: Int, end: Int) {
 private fun Spannable.setBaselineShift(baselineShift: BaselineShift?, start: Int, end: Int) {
     baselineShift?.let {
         setSpan(BaselineShiftSpan(it.multiplier), start, end)
+    }
+}
+
+private fun Spannable.setBrush(
+    brush: Brush?,
+    start: Int,
+    end: Int
+) {
+    brush?.let {
+        when (brush) {
+            is SolidColor -> {
+                setColor(brush.value, start, end)
+            }
+            is ShaderBrush -> {
+                setSpan(ShaderBrushSpan(brush), start, end)
+            }
+        }
     }
 }
 

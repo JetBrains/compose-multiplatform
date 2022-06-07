@@ -15,7 +15,6 @@
  */
 
 import androidx.build.AndroidXComposePlugin
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -38,7 +37,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         api("androidx.annotation:annotation:1.1.0")
 
         implementation(libs.kotlinStdlib)
-        implementation(project(":compose:runtime:runtime"))
+        implementation("androidx.compose.runtime:runtime:1.1.1")
         implementation(project(":compose:ui:ui-util"))
 
         testImplementation(libs.junit)
@@ -56,9 +55,12 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 }
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
-        jvm("desktop")
+        desktop()
+    }
+
+    kotlin {
 
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
@@ -83,6 +85,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(kotlin("test-junit"))
             }
 
+            // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
+            //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
+            //  level dependencies block instead:
+            //  `dependencies { testImplementation(libs.robolectric) }`
             androidTest.dependencies {
                 implementation(libs.truth)
             }
@@ -102,14 +108,20 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Unit"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.UI
+    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2020"
     description = "Compose classes for simple units"
     legacyDisableKotlinStrictApiMode = true
 }
 
+android {
+    namespace "androidx.compose.ui.unit"
+}
+
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
-        freeCompilerArgs += ["-XXLanguage:+InlineClasses"]
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
     }
 }

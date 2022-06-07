@@ -214,10 +214,17 @@ private fun ComposeBenchmarkRule.toggleStateBenchmark(
 
         measureRepeated {
             runWithTimingDisabled {
+                assertNoPendingChanges()
                 getTestCase().beforeToggle()
+                if (hasPendingChanges()) {
+                    doFrame()
+                }
                 assertNoPendingChanges()
             }
             getTestCase().toggle()
+            if (hasPendingChanges()) {
+                doFrame()
+            }
             runWithTimingDisabled {
                 assertNoPendingChanges()
                 getTestCase().afterToggle()

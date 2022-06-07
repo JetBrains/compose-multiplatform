@@ -127,6 +127,56 @@ class PreviewAnimationClockTest {
     }
 
     @Test
+    fun getAnimatedPropertiesWithNotSyncedTime() {
+        var rotationAnimation: ComposeAnimation? = null
+        var offsetAnimation: ComposeAnimation? = null
+        var animatedVisibility: Transition<Any>? = null
+
+        composeRule.setContent {
+            rotationAnimation = setUpRotationColorScenario()
+            offsetAnimation = setUpOffsetScenario()
+            animatedVisibility = createAnimationVisibility(1000)
+        }
+        composeRule.waitForIdle()
+        testClock.trackAnimatedVisibility(animatedVisibility!!)
+        composeRule.waitForIdle()
+        val animatedVisibilityComposeAnimation = testClock.trackedAnimatedVisibility.single()
+        testClock.setClockTimes(
+            mapOf(
+                rotationAnimation!! to 500,
+                offsetAnimation!! to 200,
+                animatedVisibilityComposeAnimation to 800
+            )
+        )
+        composeRule.waitForIdle()
+
+        var animatedProperties = testClock.getAnimatedProperties(rotationAnimation!!)
+        val rotation = animatedProperties.single { it.label == "myRotation" }
+        // We're animating from RC1 (0 degrees) to RC3 (360 degrees). There is a transition of
+        // 1000ms defined for the rotation, and we set the clock to 50% of this time.
+        assertEquals(180f, rotation.value as Float, eps)
+
+        animatedProperties = testClock.getAnimatedProperties(offsetAnimation!!)
+        val offset = animatedProperties.single { it.label == "myOffset" }
+        // We're animating from O1 (0) to O2 (100). There is a transition of 800ms defined for
+        // the offset, and we set the clock to 25% of this time.
+        assertEquals(25f, offset.value as Float, eps)
+
+        animatedProperties = testClock.getAnimatedProperties(animatedVisibilityComposeAnimation)
+        val scale = animatedProperties.single { it.label == "box scale" }
+        // We're animating from invisible to visible, which means PreEnter (scale 0.5f) to
+        // Visible (scale 1f). Animation duration is 1000ms, so the current clock time
+        // corresponds to 80% of it.
+        assertEquals(0.9f, scale.value as Float, 0.0001f)
+
+        animatedProperties = testClock.getAnimatedProperties(animatedVisibilityComposeAnimation)
+        val alpha = animatedProperties.single { it.label == "Built-in alpha" }
+        // We're animating from invisible (Built-in alpha 0f) to visible (Built-in alpha 1f),
+        // 1000ms being the animation duration, clock time corresponds to 80% of it.
+        assertEquals(0.8f, alpha.value)
+    }
+
+    @Test
     fun getAnimatedPropertiesReturnsAllDescendantAnimations() {
         var transitionAnimation: ComposeAnimation? = null
 

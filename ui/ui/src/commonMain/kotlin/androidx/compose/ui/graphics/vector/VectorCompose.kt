@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 
 @Composable
+@VectorComposable
 fun Group(
     name: String = DefaultGroupName,
     rotation: Float = DefaultRotation,
@@ -35,7 +36,7 @@ fun Group(
     translationX: Float = DefaultTranslationX,
     translationY: Float = DefaultTranslationY,
     clipPathData: List<PathNode> = EmptyPath,
-    content: @Composable () -> Unit
+    content: @Composable @VectorComposable () -> Unit
 ) {
     ComposeNode<GroupComponent, VectorApplier>(
         factory = { GroupComponent() },
@@ -56,6 +57,7 @@ fun Group(
 }
 
 @Composable
+@VectorComposable
 fun Path(
     pathData: List<PathNode>,
     pathFillType: PathFillType = DefaultFillType,

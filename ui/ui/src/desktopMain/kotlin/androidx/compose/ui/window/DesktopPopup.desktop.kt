@@ -170,6 +170,7 @@ private fun PopupLayout(
     val (owner, composition) = remember {
         val owner = SkiaBasedOwner(
             platformInputService = scene.platformInputService,
+            component = scene.component,
             density = density,
             isPopup = true,
             isFocusable = focusable,
@@ -185,17 +186,12 @@ private fun PopupLayout(
                     val width = constraints.maxWidth
                     val height = constraints.maxHeight
 
-                    val windowSize = IntSize(
-                        width = width,
-                        height = height
-                    )
-
                     layout(constraints.maxWidth, constraints.maxHeight) {
                         measurables.forEach {
                             val placeable = it.measure(constraints)
                             val position = popupPositionProvider.calculatePosition(
                                 anchorBounds = parentBounds,
-                                windowSize = windowSize,
+                                windowSize = IntSize(width, height),
                                 layoutDirection = layoutDirection,
                                 popupContentSize = IntSize(placeable.width, placeable.height)
                             )

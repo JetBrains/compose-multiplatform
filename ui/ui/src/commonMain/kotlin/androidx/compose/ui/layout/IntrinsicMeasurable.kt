@@ -22,7 +22,7 @@ package androidx.compose.ui.layout
  */
 interface IntrinsicMeasurable {
     /**
-     * Data provided by the `ParentData`
+     * Data provided by the [ParentDataModifier].
      */
     val parentData: Any?
 

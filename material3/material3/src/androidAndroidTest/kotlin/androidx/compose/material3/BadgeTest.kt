@@ -19,7 +19,7 @@ import android.os.Build
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.tokens.NavigationBar
+import androidx.compose.material3.tokens.BadgeTokens
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,8 +62,8 @@ class BadgeTest {
             .setMaterialContentForSizeAssertions {
                 Badge()
             }
-            .assertHeightIsEqualTo(NavigationBar.BadgeSize)
-            .assertWidthIsEqualTo(NavigationBar.BadgeSize)
+            .assertHeightIsEqualTo(BadgeTokens.Size)
+            .assertWidthIsEqualTo(BadgeTokens.Size)
     }
 
     @Test
@@ -72,8 +72,8 @@ class BadgeTest {
             .setMaterialContentForSizeAssertions {
                 Badge { Text("1") }
             }
-            .assertHeightIsEqualTo(NavigationBar.LargeBadgeSize)
-            .assertWidthIsEqualTo(NavigationBar.LargeBadgeSize)
+            .assertHeightIsEqualTo(BadgeTokens.LargeSize)
+            .assertWidthIsEqualTo(BadgeTokens.LargeSize)
     }
 
     @Test
@@ -82,8 +82,8 @@ class BadgeTest {
             .setMaterialContentForSizeAssertions {
                 Badge { Text("999+") }
             }
-            .assertHeightIsEqualTo(NavigationBar.LargeBadgeSize)
-            .assertWidthIsAtLeast(NavigationBar.LargeBadgeSize)
+            .assertHeightIsEqualTo(BadgeTokens.LargeSize)
+            .assertWidthIsAtLeast(BadgeTokens.LargeSize)
     }
 
     @Test
@@ -103,9 +103,11 @@ class BadgeTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun badge_noContent_shape() {
+        var shape = Shapes.None
         var errorColor = Color.Unspecified
-        rule.setMaterialContent {
-            errorColor = MaterialTheme.colorScheme.fromToken(NavigationBar.BadgeColor)
+        rule.setMaterialContent(lightColorScheme()) {
+            shape = BadgeTokens.Shape.toShape()
+            errorColor = BadgeTokens.Color.toColor()
             Badge(modifier = Modifier.testTag(TestBadgeTag))
         }
 
@@ -113,7 +115,7 @@ class BadgeTest {
             .captureToImage()
             .assertShape(
                 density = rule.density,
-                shape = NavigationBar.BadgeShape,
+                shape = shape,
                 shapeColor = errorColor,
                 backgroundColor = Color.White,
                 shapeOverlapPixelCount = with(rule.density) { 1.dp.toPx() }
@@ -123,7 +125,7 @@ class BadgeTest {
     @Test
     fun badgeBox_noContent_position() {
         rule
-            .setMaterialContent {
+            .setMaterialContent(lightColorScheme()) {
                 BadgedBox(badge = { Badge(Modifier.testTag(TestBadgeTag)) }) {
                     Icon(
                         icon,
@@ -137,8 +139,8 @@ class BadgeTest {
         val badgeBounds = badge.getUnclippedBoundsInRoot()
         badge.assertPositionInRootIsEqualTo(
             expectedLeft =
-                anchorBounds.right + BadgeOffset +
-                    max((NavigationBar.BadgeSize - badgeBounds.width) / 2, 0.dp),
+            anchorBounds.right + BadgeOffset +
+                max((BadgeTokens.Size - badgeBounds.width) / 2, 0.dp),
             expectedTop = -badgeBounds.height / 2
         )
     }
@@ -146,7 +148,7 @@ class BadgeTest {
     @Test
     fun badgeBox_shortContent_position() {
         rule
-            .setMaterialContent {
+            .setMaterialContent(lightColorScheme()) {
                 BadgedBox(badge = { Badge { Text("8") } }) {
                     Icon(
                         icon,
@@ -160,9 +162,9 @@ class BadgeTest {
         val badgeBounds = badge.getUnclippedBoundsInRoot()
         badge.assertPositionInRootIsEqualTo(
             expectedLeft = anchorBounds.right + BadgeWithContentHorizontalOffset + max
-            (
                 (
-                    NavigationBar.LargeBadgeSize - badgeBounds.width
+                (
+                    BadgeTokens.LargeSize - badgeBounds.width
                     ) / 2,
                 0.dp
             ),
@@ -173,7 +175,7 @@ class BadgeTest {
     @Test
     fun badgeBox_longContent_position() {
         rule
-            .setMaterialContent {
+            .setMaterialContent(lightColorScheme()) {
                 BadgedBox(badge = { Badge { Text("999+") } }) {
                     Icon(
                         icon,
@@ -196,7 +198,7 @@ class BadgeTest {
 
     @Test
     fun badge_notMergingDescendants_withOwnContentDescription() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             BadgedBox(
                 badge = {
                     Badge { Text("99+") }

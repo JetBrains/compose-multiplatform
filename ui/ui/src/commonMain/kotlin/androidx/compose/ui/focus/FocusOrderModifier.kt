@@ -18,17 +18,16 @@ package androidx.compose.ui.focus
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.node.ModifiedFocusNode
-import androidx.compose.ui.platform.InspectorInfo
-import androidx.compose.ui.platform.InspectorValueInfo
-import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.LayoutDirection
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * A [modifier][Modifier.Element] that can be used to set a custom focus traversal order.
  *
  * @see Modifier.focusOrder
  */
+@Deprecated("Use Modifier.focusProperties() instead")
+@JvmDefaultWithCompatibility
 interface FocusOrderModifier : Modifier.Element {
 
     /**
@@ -36,6 +35,7 @@ interface FocusOrderModifier : Modifier.Element {
      * [right][FocusOrder.right] / [up][FocusOrder.up] / [down][FocusOrder.down] items if
      * you don't want to use the default focus traversal order.
      */
+    @Suppress("DEPRECATION")
     fun populateFocusOrder(focusOrder: FocusOrder)
 }
 
@@ -44,49 +44,75 @@ interface FocusOrderModifier : Modifier.Element {
  *
  * @sample androidx.compose.ui.samples.CustomFocusOrderSample
  */
-class FocusOrder {
+@Deprecated("Use FocusProperties instead")
+class FocusOrder internal constructor(private val focusProperties: FocusProperties) {
+    constructor() : this(FocusPropertiesImpl())
 
     /**
      * A custom item to be used when the user requests a focus moves to the "next" item.
      *
      * @sample androidx.compose.ui.samples.CustomFocusOrderSample
      */
-    var next: FocusRequester = FocusRequester.Default
+    var next: FocusRequester
+        get() = focusProperties.next
+        set(next) {
+            focusProperties.next = next
+        }
 
     /**
      * A custom item to be used when the user requests a focus moves to the "previous" item.
      *
      * @sample androidx.compose.ui.samples.CustomFocusOrderSample
      */
-    var previous: FocusRequester = FocusRequester.Default
+    var previous: FocusRequester
+        get() = focusProperties.previous
+        set(previous) {
+            focusProperties.previous = previous
+        }
 
     /**
      *  A custom item to be used when the user moves focus "up".
      *
      *  @sample androidx.compose.ui.samples.CustomFocusOrderSample
      */
-    var up: FocusRequester = FocusRequester.Default
+    var up: FocusRequester
+        get() = focusProperties.up
+        set(up) {
+            focusProperties.up = up
+        }
 
     /**
      *  A custom item to be used when the user moves focus "down".
      *
      *  @sample androidx.compose.ui.samples.CustomFocusOrderSample
      */
-    var down: FocusRequester = FocusRequester.Default
+    var down: FocusRequester
+        get() = focusProperties.down
+        set(down) {
+            focusProperties.down = down
+        }
 
     /**
      * A custom item to be used when the user requests a focus moves to the "left" item.
      *
      * @sample androidx.compose.ui.samples.CustomFocusOrderSample
      */
-    var left: FocusRequester = FocusRequester.Default
+    var left: FocusRequester
+        get() = focusProperties.left
+        set(left) {
+            focusProperties.left = left
+        }
 
     /**
      * A custom item to be used when the user requests a focus moves to the "right" item.
      *
      * @sample androidx.compose.ui.samples.CustomFocusOrderSample
      */
-    var right: FocusRequester = FocusRequester.Default
+    var right: FocusRequester
+        get() = focusProperties.right
+        set(right) {
+            focusProperties.right = right
+        }
 
     /**
      * A custom item to be used when the user requests a focus moves to the "left" in LTR mode and
@@ -94,7 +120,11 @@ class FocusOrder {
      *
      * @sample androidx.compose.ui.samples.CustomFocusOrderSample
      */
-    var start: FocusRequester = FocusRequester.Default
+    var start: FocusRequester
+        get() = focusProperties.start
+        set(start) {
+            focusProperties.start = start
+        }
 
     /**
      * A custom item to be used when the user requests a focus moves to the "right" in LTR mode
@@ -102,16 +132,11 @@ class FocusOrder {
      *
      * @sample androidx.compose.ui.samples.CustomFocusOrderSample
      */
-    var end: FocusRequester = FocusRequester.Default
-}
-
-internal class FocusOrderModifierImpl(
-    val focusOrderReceiver: FocusOrder.() -> Unit,
-    inspectorInfo: InspectorInfo.() -> Unit
-) : FocusOrderModifier, InspectorValueInfo(inspectorInfo) {
-    override fun populateFocusOrder(focusOrder: FocusOrder) {
-        focusOrderReceiver(focusOrder)
-    }
+    var end: FocusRequester
+        get() = focusProperties.end
+        set(end) {
+            focusProperties.end = end
+        }
 }
 
 /**
@@ -124,17 +149,18 @@ internal class FocusOrderModifierImpl(
  *
  * @sample androidx.compose.ui.samples.CustomFocusOrderSample
  */
-fun Modifier.focusOrder(focusOrderReceiver: FocusOrder.() -> Unit): Modifier {
-    return this.then(
-        FocusOrderModifierImpl(
-            focusOrderReceiver = focusOrderReceiver,
-            inspectorInfo = debugInspectorInfo {
-                name = "focusOrder"
-                properties["focusOrderReceiver"] = focusOrderReceiver
-            }
-        )
+@Deprecated(
+    "Use focusProperties() instead",
+    ReplaceWith(
+        "this.focusProperties(focusOrderReceiver)",
+        "androidx.compose.ui.focus.focusProperties"
     )
-}
+)
+fun Modifier.focusOrder(
+    @Suppress("DEPRECATION")
+    focusOrderReceiver: FocusOrder.() -> Unit
+): Modifier =
+    focusProperties(FocusOrderToProperties(focusOrderReceiver))
 
 /**
  * A modifier that lets you specify a [FocusRequester] for the current composable so that this
@@ -142,46 +168,53 @@ fun Modifier.focusOrder(focusOrderReceiver: FocusOrder.() -> Unit): Modifier {
  *
  * @sample androidx.compose.ui.samples.CustomFocusOrderSample
  */
+@Deprecated(
+    "Use focusRequster() instead",
+    ReplaceWith("this.focusRequester(focusRequester)", "androidx.compose.ui.focus.focusRequester")
+)
 fun Modifier.focusOrder(focusRequester: FocusRequester): Modifier = focusRequester(focusRequester)
 
 /**
  * A modifier that lets you specify a [FocusRequester] for the current composable along with
  * [focusOrder].
- *
- * @sample androidx.compose.ui.samples.CustomFocusOrderSample
  */
+@Deprecated(
+    "Use focusProperties() and focusRequester() instead",
+    ReplaceWith(
+        "this.focusRequester(focusRequester).focusProperties(focusOrderReceiver)",
+        "androidx.compose.ui.focus.focusProperties, androidx.compose.ui.focus.focusRequester"
+    )
+)
 fun Modifier.focusOrder(
     focusRequester: FocusRequester,
+    @Suppress("DEPRECATION")
     focusOrderReceiver: FocusOrder.() -> Unit
 ): Modifier = this
     .focusRequester(focusRequester)
-    .focusOrder(focusOrderReceiver)
+    .focusProperties(FocusOrderToProperties(focusOrderReceiver))
 
 /**
  * Search up the component tree for any parent/parents that have specified a custom focus order.
  * Allowing parents higher up the hierarchy to overwrite the focus order specified by their
  * children.
  */
-internal fun ModifiedFocusNode.customFocusSearch(
+internal fun FocusModifier.customFocusSearch(
     focusDirection: FocusDirection,
     layoutDirection: LayoutDirection
 ): FocusRequester {
-    val focusOrder = FocusOrder()
-    wrappedBy?.populateFocusOrder(focusOrder)
-
     return when (focusDirection) {
-        FocusDirection.Next -> focusOrder.next
-        FocusDirection.Previous -> focusOrder.previous
-        FocusDirection.Up -> focusOrder.up
-        FocusDirection.Down -> focusOrder.down
+        FocusDirection.Next -> focusProperties.next
+        FocusDirection.Previous -> focusProperties.previous
+        FocusDirection.Up -> focusProperties.up
+        FocusDirection.Down -> focusProperties.down
         FocusDirection.Left -> when (layoutDirection) {
-            LayoutDirection.Ltr -> focusOrder.start
-            LayoutDirection.Rtl -> focusOrder.end
-        }.takeUnless { it == FocusRequester.Default } ?: focusOrder.left
+            LayoutDirection.Ltr -> focusProperties.start
+            LayoutDirection.Rtl -> focusProperties.end
+        }.takeUnless { it == FocusRequester.Default } ?: focusProperties.left
         FocusDirection.Right -> when (layoutDirection) {
-            LayoutDirection.Ltr -> focusOrder.end
-            LayoutDirection.Rtl -> focusOrder.start
-        }.takeUnless { it == FocusRequester.Default } ?: focusOrder.right
+            LayoutDirection.Ltr -> focusProperties.end
+            LayoutDirection.Rtl -> focusProperties.start
+        }.takeUnless { it == FocusRequester.Default } ?: focusProperties.right
         // TODO(b/183746982): add focus order API for "In" and "Out".
         //  Developers can to specify a custom "In" to specify which child should be visited when
         //  the user presses dPad center. (They can also redirect the "In" to some other item).
@@ -192,5 +225,27 @@ internal fun ModifiedFocusNode.customFocusSearch(
         @OptIn(ExperimentalComposeUiApi::class)
         (FocusDirection.Out) -> FocusRequester.Default
         else -> error("invalid FocusDirection")
+    }
+}
+
+@Suppress("DEPRECATION")
+internal class FocusOrderToProperties(
+    val focusOrderReceiver: FocusOrder.() -> Unit
+) : (FocusProperties) -> Unit {
+    override fun invoke(focusProperties: FocusProperties) {
+        focusOrderReceiver(FocusOrder(focusProperties))
+    }
+}
+
+/**
+ * Used internally for FocusOrderModifiers so that we can compare the modifiers and can reuse
+ * the ModifierLocalConsumerEntity and ModifierLocalProviderEntity.
+ */
+@Suppress("DEPRECATION")
+internal class FocusOrderModifierToProperties(
+    val modifier: FocusOrderModifier
+) : (FocusProperties) -> Unit {
+    override fun invoke(focusProperties: FocusProperties) {
+        modifier.populateFocusOrder(FocusOrder(focusProperties))
     }
 }

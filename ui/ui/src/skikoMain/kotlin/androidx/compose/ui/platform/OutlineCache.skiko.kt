@@ -38,7 +38,7 @@ internal class OutlineCache(
         set(value) {
             if (value != field) {
                 field = value
-                update()
+                outline = createOutline()
             }
         }
 
@@ -46,7 +46,7 @@ internal class OutlineCache(
         set(value) {
             if (value != field) {
                 field = value
-                update()
+                outline = createOutline()
             }
         }
 
@@ -54,7 +54,7 @@ internal class OutlineCache(
         set(value) {
             if (value != field) {
                 field = value
-                update()
+                outline = createOutline()
             }
         }
 
@@ -62,19 +62,13 @@ internal class OutlineCache(
         set(value) {
             if (value != field) {
                 field = value
-                update()
+                outline = createOutline()
             }
         }
 
-    var outline: Outline? = null
+    var outline: Outline = createOutline()
         private set
 
-    private fun update() {
-        outline = if (size != IntSize.Zero) {
-            val floatSize = size.toSize()
-            shape.createOutline(floatSize, layoutDirection, density)
-        } else {
-            null
-        }
-    }
+    private fun createOutline() =
+        shape.createOutline(size.toSize(), layoutDirection, density)
 }

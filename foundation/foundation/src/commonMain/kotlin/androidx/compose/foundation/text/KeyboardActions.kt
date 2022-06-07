@@ -40,8 +40,8 @@ class KeyboardActions(
      * indicates that the default implementation should be executed. The default implementation
      * moves focus to the next item in the focus traversal order.
      *
-     * See [Modifier.focusOrder()][androidx.compose.ui.focus.focusOrder] for more details on how
-     * to specify a custom focus order if needed.
+     * See [Modifier.focusProperties()][androidx.compose.ui.focus.focusProperties] for more details
+     * on how to specify a custom focus order if needed.
      */
     val onNext: (KeyboardActionScope.() -> Unit)? = null,
 
@@ -50,8 +50,8 @@ class KeyboardActions(
      * indicates that the default implementation should be executed. The default implementation
      * moves focus to the previous item in the focus traversal order.
      *
-     * See [Modifier.focusOrder()][androidx.compose.ui.focus.focusOrder] for more details on how
-     * to specify a custom focus order if needed.
+     * See [Modifier.focusProperties()][androidx.compose.ui.focus.focusProperties] for more details
+     * on how to specify a custom focus order if needed.
      */
     val onPrevious: (KeyboardActionScope.() -> Unit)? = null,
 

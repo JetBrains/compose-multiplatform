@@ -81,10 +81,10 @@ inline fun Box(
 internal fun rememberBoxMeasurePolicy(
     alignment: Alignment,
     propagateMinConstraints: Boolean
-) = remember(alignment) {
-    if (alignment == Alignment.TopStart && !propagateMinConstraints) {
-        DefaultBoxMeasurePolicy
-    } else {
+) = if (alignment == Alignment.TopStart && !propagateMinConstraints) {
+    DefaultBoxMeasurePolicy
+} else {
+    remember(alignment, propagateMinConstraints) {
         boxMeasurePolicy(alignment, propagateMinConstraints)
     }
 }

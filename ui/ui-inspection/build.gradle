@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -47,14 +46,17 @@ dependencies {
     androidTestImplementation(libs.kotlinStdlib)
     androidTestImplementation(libs.kotlinCoroutinesAndroid)
     androidTestImplementation(libs.testCore)
+    androidTestImplementation(project(":compose:ui:ui-tooling"))
     androidTestImplementation(project(":compose:ui:ui-tooling-data"))
     androidTestImplementation(project(":compose:ui:ui"))
     androidTestImplementation(project(":compose:ui:ui-util"))
     androidTestImplementation(project(":compose:ui:ui-test-junit4"))
+    androidTestImplementation(project(":compose:ui:ui-test-font"))
     androidTestImplementation(project(":compose:material:material"))
     androidTestImplementation(project(":inspection:inspection-testing"))
     androidTestImplementation("androidx.activity:activity-compose:1.3.1")
     androidTestImplementation(libs.testRunner)
+    androidTestImplementation(libs.testRules)
     androidTestImplementation(libs.testExtJunit)
     androidTestImplementation(libs.truth)
 }
@@ -62,7 +64,7 @@ dependencies {
 androidx {
     name = "Android Compose Layout Inspector"
     type = LibraryType.IDE_PLUGIN
-    mavenGroup = LibraryGroups.Compose.UI
+    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2021"
     description = "Compose layout inspector. Exposes information to our tools for better IDE support."
 }
@@ -80,7 +82,7 @@ android {
     externalNativeBuild {
         cmake {
             path "src/main/cpp/CMakeLists.txt"
-            version "3.18.1"
+            version libs.versions.cmake.get()
         }
     }
 
@@ -88,12 +90,13 @@ android {
         // Restriction not important for inspectors, which only runs at dev-time
         disable("SyntheticAccessor")
     }
+    namespace "androidx.compose.ui.inspection"
 }
 
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         freeCompilerArgs += [
-                "-Xopt-in=kotlin.RequiresOptIn",
+                "-opt-in=kotlin.RequiresOptIn",
                 "-P", "plugin:androidx.compose.compiler.plugins.kotlin:sourceInformation=true"
         ]
     }
@@ -101,4 +104,12 @@ tasks.withType(KotlinCompile).configureEach {
 
 inspection {
     name = "compose-ui-inspection.jar"
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
 }

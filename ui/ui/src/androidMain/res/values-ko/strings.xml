@@ -31,4 +31,6 @@
     <string name="close_sheet" msgid="7573152094250666567">"시트 닫기"</string>
     <string name="default_error_message" msgid="8038256446254964252">"입력이 잘못됨"</string>
     <string name="default_popup_window_title" msgid="6312721426453364202">"팝업 창"</string>
+    <string name="range_start" msgid="7097486360902471446">"범위 시작"</string>
+    <string name="range_end" msgid="5941395253238309765">"범위 끝"</string>
 </resources>

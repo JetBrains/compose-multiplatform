@@ -162,6 +162,7 @@ class MutableVector<T> @PublishedApi internal constructor(
             destination = content,
             destinationOffset = size
         )
+        size += elements.size
         return true
     }
 
@@ -935,7 +936,10 @@ class MutableVector<T> @PublishedApi internal constructor(
 
         override fun containsAll(elements: Collection<T>): Boolean = vector.containsAll(elements)
 
-        override fun get(index: Int): T = vector[index]
+        override fun get(index: Int): T {
+            checkIndex(index)
+            return vector[index]
+        }
 
         override fun indexOf(element: T): Int = vector.indexOf(element)
 
@@ -965,14 +969,22 @@ class MutableVector<T> @PublishedApi internal constructor(
 
         override fun removeAll(elements: Collection<T>): Boolean = vector.removeAll(elements)
 
-        override fun removeAt(index: Int): T = vector.removeAt(index)
+        override fun removeAt(index: Int): T {
+            checkIndex(index)
+            return vector.removeAt(index)
+        }
 
         override fun retainAll(elements: Collection<T>): Boolean = vector.retainAll(elements)
 
-        override fun set(index: Int, element: T): T = vector.set(index, element)
+        override fun set(index: Int, element: T): T {
+            checkIndex(index)
+            return vector.set(index, element)
+        }
 
-        override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> =
-            SubList(this, fromIndex, toIndex)
+        override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> {
+            checkSubIndex(fromIndex, toIndex)
+            return SubList(this, fromIndex, toIndex)
+        }
     }
 
     /**
@@ -1006,7 +1018,10 @@ class MutableVector<T> @PublishedApi internal constructor(
             return true
         }
 
-        override fun get(index: Int): T = list[index + start]
+        override fun get(index: Int): T {
+            checkIndex(index)
+            return list[index + start]
+        }
 
         override fun indexOf(element: T): Int {
             for (i in start until end) {
@@ -1084,6 +1099,7 @@ class MutableVector<T> @PublishedApi internal constructor(
         }
 
         override fun removeAt(index: Int): T {
+            checkIndex(index)
             val item = list.removeAt(index + start)
             end--
             return item
@@ -1101,10 +1117,39 @@ class MutableVector<T> @PublishedApi internal constructor(
             return originalEnd != end
         }
 
-        override fun set(index: Int, element: T): T = list.set(index + start, element)
+        override fun set(index: Int, element: T): T {
+            checkIndex(index)
+            return list.set(index + start, element)
+        }
 
-        override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> =
-            SubList(this, fromIndex, toIndex)
+        override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> {
+            checkSubIndex(fromIndex, toIndex)
+            return SubList(this, fromIndex, toIndex)
+        }
+    }
+}
+
+private fun List<*>.checkIndex(index: Int) {
+    val size = size
+    if (index < 0 || index >= size) {
+        throw IndexOutOfBoundsException("Index $index is out of bounds. " +
+            "The list has $size elements.")
+    }
+}
+
+private fun List<*>.checkSubIndex(fromIndex: Int, toIndex: Int) {
+    val size = size
+    if (fromIndex > toIndex) {
+        throw IllegalArgumentException("Indices are out of order. fromIndex ($fromIndex) is " +
+            "greater than toIndex ($toIndex).")
+    }
+    if (fromIndex < 0) {
+        throw IndexOutOfBoundsException("fromIndex ($fromIndex) is less than 0.")
+    }
+    if (toIndex > size) {
+        throw IndexOutOfBoundsException(
+            "toIndex ($toIndex) is more than than the list size ($size)"
+        )
     }
 }
 
