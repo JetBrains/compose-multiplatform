@@ -53,6 +53,8 @@ import androidx.testutils.AnimationDurationScaleRule
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlin.math.abs
+import kotlinx.coroutines.runBlocking
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -67,6 +69,12 @@ class OverscrollTest {
     @get:Rule
     val animationScaleRule: AnimationDurationScaleRule =
         AnimationDurationScaleRule.createForAllTests(1f)
+
+    @Before
+    fun before() {
+        // if we don't do it the overscroll effect will not even start.
+        animationScaleRule.setAnimationDurationScale(1f)
+    }
 
     private val boxTag = "box"
 
@@ -319,9 +327,6 @@ class OverscrollTest {
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun overscrollIsNotClippingTheContentWhenPulled() {
-        // if we don't do it the overscroll effect will not even start.
-        animationScaleRule.setAnimationDurationScale(1f)
-
         lateinit var controller: AndroidEdgeEffectOverscrollEffect
         val tag = "container"
         rule.setContent {
@@ -381,6 +386,68 @@ class OverscrollTest {
             // but we also don't want to assert that the bg is Green as some overscroll
             // effects can draw something else on top of this plain green background
             .assertHasNoColor(Color.Red)
+    }
+
+    @OptIn(ExperimentalFoundationApi::class)
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun zeroSizedEffectIsNotConsumingOffsetsAndVelocity() {
+        lateinit var effect: OverscrollEffect
+        rule.setContent {
+            Box {
+                effect = rememberOverscrollEffect()
+                Box(
+                    Modifier
+                        .overscroll(effect)
+                        .size(0.dp)
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            repeat(2) {
+                val offset = Offset(-10f, -10f)
+                assertThat(
+                    effect.consumePreScroll(offset, null, NestedScrollSource.Drag)
+                ).isEqualTo(Offset.Zero)
+                effect.consumePostScroll(offset, offset, null, NestedScrollSource.Drag)
+            }
+            val velocity = Velocity(-5f, -5f)
+            runBlocking {
+                assertThat(
+                    effect.consumePreFling(velocity)
+                ).isEqualTo(Velocity.Zero)
+                effect.consumePostFling(velocity)
+            }
+        }
+    }
+
+    @OptIn(ExperimentalFoundationApi::class)
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun notAttachedEffectIsNotConsumingOffsetsAndVelocity() {
+        lateinit var effect: OverscrollEffect
+        rule.setContent {
+            effect = rememberOverscrollEffect()
+        }
+
+        rule.runOnIdle {
+            repeat(2) {
+                val offset = Offset(0f, 10f)
+                assertThat(
+                    effect.consumePreScroll(offset, null, NestedScrollSource.Drag)
+                ).isEqualTo(Offset.Zero)
+                effect.consumePostScroll(offset, offset, null, NestedScrollSource.Drag)
+            }
+
+            val velocity = Velocity(0f, 5f)
+            runBlocking {
+                assertThat(
+                    effect.consumePreFling(velocity)
+                ).isEqualTo(Velocity.Zero)
+                effect.consumePostFling(velocity)
+            }
+        }
     }
 
     class TestOverscrollEffect(
