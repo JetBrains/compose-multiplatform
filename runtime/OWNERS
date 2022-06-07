@@ -2,3 +2,6 @@
 jsproch@google.com
 chuckj@google.com
 lelandr@google.com
+
+# Per-file for Playground infra
+per-file settings.gradle = yboyar@google.com, dustinlam@google.com, rahulrav@google.com
