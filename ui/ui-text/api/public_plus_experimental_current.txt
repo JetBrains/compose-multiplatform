@@ -165,7 +165,7 @@ package androidx.compose.ui.text {
   public final class MultiParagraphKt {
   }
 
-  public interface Paragraph {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface Paragraph {
     method public androidx.compose.ui.text.style.ResolvedTextDirection getBidiRunDirection(int offset);
     method public androidx.compose.ui.geometry.Rect getBoundingBox(int offset);
     method public androidx.compose.ui.geometry.Rect getCursorRect(int offset);

@@ -17,10 +17,12 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.ui.geometry.Rect
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * Interface for text-related toolbar.
  */
+@JvmDefaultWithCompatibility
 interface TextToolbar {
     /**
      * Show the floating toolbar(post-M) or primary toolbar(pre-M) for copying, cutting and pasting
