@@ -17,33 +17,41 @@
 package androidx.build.playground
 
 import com.google.common.annotations.VisibleForTesting
+import java.io.File
+import java.util.Properties
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
-import java.io.File
-import java.util.Properties
 
 /**
  * Compares the playground Gradle configuration with the main androidx Gradle configuration
  * to ensure playgrounds do not define any property in their own build that conflicts with the
  * main build.
  */
+@CacheableTask
 abstract class VerifyPlaygroundGradleConfigurationTask : DefaultTask() {
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val androidxProperties: RegularFileProperty
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val playgroundProperties: RegularFileProperty
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val androidxGradleWrapper: RegularFileProperty
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val playgroundGradleWrapper: RegularFileProperty
 
     @get:OutputFile
@@ -52,7 +60,9 @@ abstract class VerifyPlaygroundGradleConfigurationTask : DefaultTask() {
     @TaskAction
     fun checkPlaygroundGradleConfiguration() {
         compareProperties()
-        compareGradleWrapperVersion()
+        // TODO: re-enable when https://github.com/gradle/gradle/issues/20778
+        //  is fixed.
+        // compareGradleWrapperVersion()
         // put the success into an output so that task can be up to date.
         outputFile.get().asFile.writeText("valid", Charsets.UTF_8)
     }
@@ -71,10 +81,12 @@ abstract class VerifyPlaygroundGradleConfigurationTask : DefaultTask() {
             playgroundGradleWrapper.get().asFile
         )
         if (androidxGradleVersion != playgroundGradleVersion) {
-            throw GradleException("""
+            throw GradleException(
+                """
                 Playground gradle version ($playgroundGradleVersion) must match the AndroidX main
                 build gradle version ($androidxGradleVersion).
-            """.trimIndent())
+                """.trimIndent()
+            )
         }
     }
 
@@ -99,15 +111,26 @@ abstract class VerifyPlaygroundGradleConfigurationTask : DefaultTask() {
         // this includes properties that are not defined in the root androidx build as they might
         // be properties which can alter the build output. We might consider allow listing certain
         // properties in the future if necessary.
-        playgroundProperties.forEach {
-            val rootValue = rootProperties[it.key]
-            if (rootValue != it.value) {
+        val propertyKeys = rootProperties.keys + playgroundProperties.keys
+        propertyKeys.forEach { key ->
+            val rootValue = rootProperties[key]
+            val playgroundValue = playgroundProperties[key]
+
+            if (rootValue != playgroundValue &&
+                !ignoredProperties.contains(key) &&
+                exceptedProperties[key] != playgroundValue
+            ) {
                 throw GradleException(
                     """
-                    ${it.key} is defined as ${it.value} in playground properties but
-                    it does not match the value defined in root properties file ($rootValue).
-                    Having inconsistent properties in playground projects might trigger wrong
-                    compilation output in the main AndroidX build, thus not allowed.
+                    $key is defined in ${androidxProperties.get().asFile.absolutePath} as
+                    $rootValue, which differs from $playgroundValue defined in
+                    ${this.playgroundProperties.get().asFile.absolutePath}. If this change is
+                    intentional, you can ignore it by adding it to ignoredProperties in
+                    VerifyPlaygroundGradleConfigurationTask.kt
+
+                    Note: Having inconsistent properties in playground projects might trigger wrong
+                    compilation output in the main AndroidX build, so if a property is defined in
+                    playground properties, its value **MUST** match that of regular AndroidX build.
                     """.trimIndent()
                 )
             }
@@ -122,6 +145,21 @@ abstract class VerifyPlaygroundGradleConfigurationTask : DefaultTask() {
 
     companion object {
         private const val TASK_NAME = "verifyPlaygroundGradleConfiguration"
+
+        // A mapping of the expected override in playground, which should generally follow AOSP on
+        // androidx-main. Generally, should only be used for conflicting properties which have
+        // different values in different built targets on AOSP, but still should be declared in
+        // playground.
+        private val exceptedProperties = mapOf(
+            "androidx.writeVersionedApiFiles" to "true",
+        )
+
+        private val ignoredProperties = setOf(
+            "org.gradle.jvmargs",
+            "org.gradle.daemon",
+            "android.builder.sdkDownload",
+            "android.suppressUnsupportedCompileSdk",
+        )
 
         /**
          * Regular expression to extract the gradle version from a distributionUrl property.

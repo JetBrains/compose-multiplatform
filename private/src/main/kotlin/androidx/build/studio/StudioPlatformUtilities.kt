@@ -79,7 +79,12 @@ sealed class StudioPlatformUtilities(val projectRoot: File, val studioInstallati
         val osName = if (System.getProperty("os.name").lowercase(Locale.ROOT).contains("linux")) {
             "linux"
         } else {
-            "mac"
+            // Only works when using native version of JDK, otherwise it will fallback to x86_64
+            if (System.getProperty("os.arch") == "aarch64") {
+                "mac_arm"
+            } else {
+                "mac"
+            }
         }
 
         fun get(projectRoot: File, studioInstallationDir: File): StudioPlatformUtilities {
@@ -171,11 +176,6 @@ private class LinuxUtilities(projectRoot: File, studioInstallationDir: File) :
     }
 
     override fun StudioTask.updateJvmHeapSize() {
-        val vmoptions =
-            File(binaryDirectory, "bin/studio.vmoptions")
-        val newText = vmoptions.readText().replace(jvmHeapRegex, "-Xmx4g")
-        vmoptions.writeText(newText)
-
         val vmoptions64 =
             File(binaryDirectory, "bin/studio64.vmoptions")
         val newText64 = vmoptions64.readText().replace(jvmHeapRegex, "-Xmx8g")

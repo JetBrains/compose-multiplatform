@@ -16,6 +16,7 @@
 
 package androidx.build
 
+import androidx.build.dependencies.KOTLIN_NATIVE_VERSION
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
@@ -26,14 +27,16 @@ import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.android.build.gradle.internal.lint.AndroidLintTask
 import com.android.build.gradle.internal.lint.LintModelWriterTask
 import com.android.build.gradle.internal.lint.VariantInputs
+import java.io.File
 import kotlin.reflect.KFunction
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.tasks.ClasspathNormalizer
-import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.withType
@@ -43,7 +46,6 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.io.File
 
 const val composeSourceOption =
     "plugin:androidx.compose.compiler.plugins.kotlin:sourceInformation=true"
@@ -98,6 +100,12 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
         ) {
             if (isMultiplatformEnabled) {
                 project.apply(plugin = "kotlin-multiplatform")
+
+                project.extensions.create(
+                    AndroidXComposeMultiplatformExtension::class.java,
+                    "androidXComposeMultiplatform",
+                    AndroidXComposeMultiplatformExtensionImpl::class.java
+                )
             } else {
                 project.apply(plugin = "org.jetbrains.kotlin.android")
             }
@@ -148,6 +156,7 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
                     error.add("ModifierParameter")
                     error.add("MutableCollectionMutableState")
                     error.add("UnnecessaryComposedModifier")
+                    error.add("FrequentlyChangedStateReadInComposition")
 
                     // Paths we want to enable ListIterator checks for - for higher level
                     // libraries it won't have a noticeable performance impact, and we don't want
@@ -230,8 +239,10 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
                     java.includes.add("**/*.kt")
                 }
                 sourceSets.findByName("test")?.apply {
-                    java.srcDirs("src/test/kotlin")
-                    res.srcDirs("src/test/res")
+                    java.srcDirs(
+                        "src/commonTest/kotlin", "src/jvmTest/kotlin"
+                    )
+                    res.srcDirs("src/commonTest/res", "src/jvmTest/res")
 
                     // Keep Kotlin files in java source sets so the source set is not empty when
                     // running unit tests which would prevent the tests from running in CI.
@@ -255,6 +266,10 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
          * resolved.
          */
         private fun Project.configureForMultiplatform() {
+            // This is to allow K/N not matching the kotlinVersion
+            (this.rootProject.property("ext") as ExtraPropertiesExtension)
+                .set("kotlin.native.version", KOTLIN_NATIVE_VERSION)
+
             val multiplatformExtension = checkNotNull(multiplatformExtension) {
                 "Unable to configureForMultiplatform() when " +
                     "multiplatformExtension is null (multiplatform plugin not enabled?)"
@@ -319,7 +334,7 @@ fun Project.configureComposeImplPluginForAndroidx() {
     val libraryReportsDirectory = project.rootProject.getLibraryReportsDirectory()
     project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
         // TODO(b/157230235): remove when this is enabled by default
-        compile.kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+        compile.kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
         compile.inputs.files({ kotlinPlugin })
             .withPropertyName("composeCompilerExtension")
             .withNormalizer(ClasspathNormalizer::class.java)

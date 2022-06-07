@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2017 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,21 @@
  * limitations under the License.
  */
 
-package androidx.build.studio
+package androidx.build
 
 /**
- * Studio version information used for setting up the correct version of Android Studio.
+ * This object contains the library group, as well as whether libraries
+ * in this group are all required to have the same development version.
  */
-class StudioVersions(
-    val studioVersion: String
-)
+data class LibraryGroup(
+    val group: String = "unspecified",
+    val atomicGroupVersion: Version?,
+) : java.io.Serializable {
+
+    // Denotes if the LibraryGroup is atomic
+    val requireSameVersion = (atomicGroupVersion != null)
+
+    companion object {
+        private const val serialVersionUID = 345435634564L
+    }
+}

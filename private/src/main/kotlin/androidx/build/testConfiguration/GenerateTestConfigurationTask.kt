@@ -24,11 +24,14 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
@@ -38,10 +41,12 @@ import java.io.File
  * format that gets zipped alongside the APKs to be tested.
  * This config gets ingested by Tradefed.
  */
+@CacheableTask
 abstract class GenerateTestConfigurationTask : DefaultTask() {
 
     @get:InputFiles
     @get:Optional
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val appFolder: DirectoryProperty
 
     @get:Internal
@@ -52,6 +57,7 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
     abstract val appProjectPath: Property<String>
 
     @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val testFolder: DirectoryProperty
 
     @get:Internal
@@ -114,6 +120,13 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
         }
         val isPresubmit = isPresubmitBuild()
         configBuilder.isPostsubmit(!isPresubmit)
+        // Will be using the constrained configs for all devices api 26 and below.
+        // Don't attempt to remove APKs after testing. We can't remove the apk on API < 27 due to a
+        // platform crash that occurs when handling a PACKAGE_CHANGED broadcast after the package has
+        // been removed. See b/37264334.
+        if (isConstrained) {
+            configBuilder.cleanupApks(false)
+        }
         when (affectedModuleDetectorSubset.get()) {
             ProjectSubset.DEPENDENT_PROJECTS -> {
                 // Don't ever run full tests of RV if it is dependent, since they take > 45 minutes

@@ -16,7 +16,6 @@
 
 package androidx.build
 
-import androidx.build.checkapi.jvmCompileInputsFromKmpProject
 import androidx.build.java.JavaCompileInputs
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.builder.core.BuilderConstants
@@ -58,7 +57,7 @@ fun Project.configureErrorProneForJava() {
         makeKmpErrorProneTask(
             javaCompileProvider,
             jvmJarProvider,
-            project.jvmCompileInputsFromKmpProject()
+            JavaCompileInputs.fromKmpJvmTarget(project)
         )
     } else {
         makeErrorProneTask(javaCompileProvider)

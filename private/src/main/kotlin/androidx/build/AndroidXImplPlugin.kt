@@ -37,6 +37,9 @@ import androidx.build.studio.StudioTask
 import androidx.build.testConfiguration.addAppApkToTestConfigGeneration
 import androidx.build.testConfiguration.addToTestZips
 import androidx.build.testConfiguration.configureTestConfigGeneration
+import com.android.build.api.artifact.SingleArtifact
+import com.android.build.api.dsl.ManagedVirtualDevice
+import com.android.build.api.dsl.TestOptions
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.HasAndroidTest
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
@@ -48,6 +51,7 @@ import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.TestExtension
 import com.android.build.gradle.TestPlugin
 import com.android.build.gradle.TestedExtension
+import com.android.build.gradle.internal.lint.AndroidLintTask
 import com.android.build.gradle.internal.tasks.AnalyticsRecordingTask
 import com.android.build.gradle.internal.tasks.ListingFileRedirectTask
 import org.gradle.api.GradleException
@@ -80,6 +84,12 @@ import java.io.File
 import java.time.Duration
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
+import org.gradle.api.artifacts.repositories.IvyArtifactRepository
+import org.gradle.kotlin.dsl.KotlinClosure1
+import org.gradle.kotlin.dsl.register
+import org.jetbrains.kotlin.gradle.targets.native.KotlinNativeHostTestRun
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
+import org.jetbrains.kotlin.gradle.testing.KotlinTaskTestRun
 
 /**
  * A plugin which enables all of the Gradle customizations for AndroidX.
@@ -113,12 +123,40 @@ class AndroidXImplPlugin : Plugin<Project> {
 
         project.configureTaskTimeouts()
         project.configureMavenArtifactUpload(extension)
-        project.configureExportLibraryGroupsToXml()
         project.configureExternalDependencyLicenseCheck()
         project.configureProjectStructureValidation(extension)
         project.configureProjectVersionValidation(extension)
+        project.registerProjectOrArtifact()
 
         project.configurations.create("samples")
+    }
+
+    private fun Project.registerProjectOrArtifact() {
+        // Add a method for each sub project where they can declare an optional
+        // dependency on a project or its latest snapshot artifact.
+        if (!StudioType.isPlayground(this)) {
+            // In AndroidX build, this is always enforced to the project
+            extra.set(
+                PROJECT_OR_ARTIFACT_EXT_NAME,
+                KotlinClosure1<String, Project>(
+                    function = {
+                        // this refers to the first parameter of the closure.
+                        project(this)
+                    }
+                )
+            )
+        } else {
+            // In Playground builds, they are converted to the latest SNAPSHOT artifact if the
+            // project is not included in that playground.
+            extra.set(
+                PROJECT_OR_ARTIFACT_EXT_NAME,
+                KotlinClosure1<String, Any>(
+                    function = {
+                        AndroidXPlaygroundRootImplPlugin.projectOrArtifact(rootProject, this)
+                    }
+                )
+            )
+        }
     }
 
     /**
@@ -138,10 +176,10 @@ class AndroidXImplPlugin : Plugin<Project> {
         AffectedModuleDetector.configureTaskGuard(task)
 
         // Robolectric 1.7 increased heap size requirements, see b/207169653.
-        task.maxHeapSize = "2g"
+        task.maxHeapSize = "3g"
 
         val xmlReportDestDir = project.getHostTestResultDirectory()
-        val archiveName = "${project.path.asFilenamePrefix()}_${task.name}.zip"
+        val archiveName = "${project.path}:${task.name}.zip"
         if (project.isDisplayTestOutput()) {
             // Enable tracing to see results in command line
             task.testLogging.apply {
@@ -197,7 +235,7 @@ class AndroidXImplPlugin : Plugin<Project> {
                 }
                 val ignoreFailuresProperty = project.providers.gradleProperty(
                     TEST_FAILURES_DO_NOT_FAIL_TEST_TASK
-                ).forUseAtConfigurationTime()
+                )
                 if (ignoreFailuresProperty.isPresent) {
                     task.ignoreFailures = true
                 }
@@ -241,9 +279,11 @@ class AndroidXImplPlugin : Plugin<Project> {
             }
         }
         if (plugin is KotlinMultiplatformPluginWrapper) {
+            project.configureKonanDirectory()
             project.extensions.findByType<LibraryExtension>()?.apply {
                 configureAndroidLibraryWithMultiplatformPluginOptions()
             }
+            project.configureKmpBuildOnServer()
         }
     }
 
@@ -287,7 +327,7 @@ class AndroidXImplPlugin : Plugin<Project> {
         }
     }
 
-    @Suppress("UnstableApiUsage") // AGP DSL APIs
+    @Suppress("UnstableApiUsage", "DEPRECATION") // AGP DSL APIs
     private fun configureWithLibraryPlugin(
         project: Project,
         androidXExtension: AndroidXExtension
@@ -295,6 +335,46 @@ class AndroidXImplPlugin : Plugin<Project> {
         val libraryExtension = project.extensions.getByType<LibraryExtension>().apply {
             configureAndroidBaseOptions(project, androidXExtension)
             configureAndroidLibraryOptions(project, androidXExtension)
+
+            // Make sure the main Kotlin source set doesn't contain anything under src/main/kotlin.
+            val mainKotlinSrcDir = (sourceSets.findByName("main")?.kotlin
+                as com.android.build.gradle.api.AndroidSourceDirectorySet)
+                .srcDirs
+                .filter { it.name == "kotlin" }
+                .getOrNull(0)
+            if (mainKotlinSrcDir?.isDirectory == true) {
+                throw GradleException(
+                    "Invalid project structure! AndroidX does not support \"kotlin\" as a " +
+                        "top-level source directory for libraries, use \"java\" instead: " +
+                        mainKotlinSrcDir.path
+                )
+            }
+        }
+
+        // Remove the lint and column attributes from generated lint baseline XML.
+        project.tasks.withType(AndroidLintTask::class.java).configureEach { task ->
+            if (task.name.startsWith("updateLintBaseline")) {
+                task.doLast {
+                    task.outputs.files.find { it.name == "lint-baseline.xml" }?.let { file ->
+                        file.writeText(removeLineAndColumnAttributes(file.readText()))
+                    }
+                }
+            }
+        }
+
+        // Remove the android:targetSdkVersion element from the manifest used for AARs.
+        project.extensions.getByType<LibraryAndroidComponentsExtension>().onVariants { variant ->
+            project.tasks.register(
+                variant.name + "AarManifestTransformer",
+                AarManifestTransformerTask::class.java
+            ).let { taskProvider ->
+                variant.artifacts.use(taskProvider)
+                    .wiredWithFiles(
+                        AarManifestTransformerTask::aarFile,
+                        AarManifestTransformerTask::updatedAarFile
+                    )
+                    .toTransform(SingleArtifact.AAR)
+            }
         }
 
         project.extensions.getByType<com.android.build.api.dsl.LibraryExtension>().apply {
@@ -393,17 +473,6 @@ class AndroidXImplPlugin : Plugin<Project> {
         project.addToProjectMap(extension)
     }
 
-    private fun Project.configureExportLibraryGroupsToXml() {
-        project.tasks.register(
-            "exportLibraryGroupsToXml",
-            ExportLibraryGroupsToXmlTask::class.java
-        ) { task ->
-            task.libraryGroupFile = project.file("${project.getSupportRootFolder()}" +
-                "/buildSrc/public/src/main/kotlin/androidx/build/LibraryGroups.kt")
-            task.xmlOutputFile = project.file("${project.buildDir}/lint/library-groups.xml")
-        }
-    }
-
     private fun Project.configureProjectStructureValidation(
         extension: AndroidXExtension
     ) {
@@ -427,6 +496,25 @@ class AndroidXImplPlugin : Plugin<Project> {
         }
     }
 
+    @Suppress("UnstableApiUsage") // Usage of ManagedVirtualDevice
+    private fun TestOptions.configureVirtualDevices() {
+        managedDevices.devices.register<ManagedVirtualDevice>("pixel2api29") {
+            device = "Pixel 2"
+            apiLevel = 29
+            systemImageSource = "aosp"
+        }
+        managedDevices.devices.register<ManagedVirtualDevice>("pixel2api30") {
+            device = "Pixel 2"
+            apiLevel = 30
+            systemImageSource = "aosp"
+        }
+        managedDevices.devices.register<ManagedVirtualDevice>("pixel2api31") {
+            device = "Pixel 2"
+            apiLevel = 31
+            systemImageSource = "aosp"
+        }
+    }
+
     private fun BaseExtension.configureAndroidBaseOptions(
         project: Project,
         androidXExtension: AndroidXExtension
@@ -440,12 +528,12 @@ class AndroidXImplPlugin : Plugin<Project> {
         buildToolsVersion = BUILD_TOOLS_VERSION
         defaultConfig.targetSdk = TARGET_SDK_VERSION
         ndkVersion = SupportConfig.NDK_VERSION
-        ndkPath = project.getNdkPath().absolutePath
 
         defaultConfig.testInstrumentationRunner = INSTRUMENTATION_RUNNER
 
         testOptions.animationsDisabled = true
         testOptions.unitTests.isReturnDefaultValues = true
+        testOptions.configureVirtualDevices()
 
         // Include resources in Robolectric tests as a workaround for b/184641296 and
         // ensure the build directory exists as a workaround for b/187970292.
@@ -595,6 +683,87 @@ class AndroidXImplPlugin : Plugin<Project> {
         sourceSets.findByName("main")!!.manifest.srcFile("src/androidMain/AndroidManifest.xml")
         sourceSets.findByName("androidTest")!!
             .manifest.srcFile("src/androidAndroidTest/AndroidManifest.xml")
+    }
+
+    /**
+     * Sets the konan distribution url to the prebuilts directory.
+     */
+    private fun Project.configureKonanDirectory() {
+        if (StudioType.isPlayground(this)) {
+            return // playground does not use prebuilts
+        }
+        overrideKotlinNativeCompilerRepository()
+        tasks.withType(KotlinNativeCompile::class.java).configureEach {
+            // use relative path so it doesn't affect gradle remote cache.
+            val relativePath = getKonanPrebuiltsFolder().relativeTo(rootProject.projectDir).path
+            it.kotlinOptions.freeCompilerArgs += listOf(
+                "-Xoverride-konan-properties=dependenciesUrl=file:$relativePath"
+            )
+        }
+    }
+
+    /**
+     * Until kotlin 1.7, we cannot set the repository URL where KMP plugin downloads the kotlin
+     * native compiler. This method implements a workaround for 1.6.21.
+     * We hijack the repository added by NativeCompilerDownloader to make it point to the konan
+     * prebuilts directory.
+     * After kotlin 1.7, we should use nativeBaseDownloadUrl property:
+     * https://github.com/JetBrains/kotlin/blob/025a21761b326767207b4a373593a3c2d24b8056/libraries/
+     *   tools/kotlin-gradle-plugin/src/common/kotlin/org/jetbrains/kotlin/gradle/plugin/
+     *   KotlinProperties.kt#L223
+     */
+    private fun Project.overrideKotlinNativeCompilerRepository() {
+        this.repositories.whenObjectAdded {
+            if (it is IvyArtifactRepository) {
+                if (it.url.host == "download.jetbrains.com" &&
+                    it.url.path.contains("kotlin/native/builds")
+                ) {
+                    val fileUrl = project.getKonanPrebuiltsFolder().resolve(
+                        "nativeCompilerPrebuilts"
+                    ).resolve(
+                        it.url.path.substringAfter("kotlin/native/builds/")
+                    ).canonicalFile
+                    check(fileUrl.exists()) {
+                        val konanVersion = getVersionByName("kotlinNative")
+                        """
+                        Missing kotlin native compiler prebuilt in $fileUrl. If you are updating
+                        kotlin version, please add the new compiler to the prebuilts/androidx/konan
+                        repository. You can download them by invoking the following script:
+
+                        ../../prebuilts/androidx/konan/download-native-compiler-prebuilts.sh $konanVersion
+
+                        Please don't forget to commit that version into the konan repository.
+                        """.trimIndent()
+                    }
+                    it.url = fileUrl.toURI()
+                }
+            }
+        }
+    }
+
+    private fun Project.configureKmpBuildOnServer() {
+        val kmpExtension = checkNotNull(
+            project.extensions.findByType<KotlinMultiplatformExtension>()
+        ) {
+            """
+            Project ${project.path} applies kotlin multiplatform plugin but we cannot find the
+            KotlinMultiplatformExtension.
+            """.trimIndent()
+        }
+        // Add all "configured" native tests to the buildOnServer task.
+        // Note that we don't check if platform is enabled in flags because it wouldn't be
+        // configured in the first place if the target is not enabled
+        kmpExtension.testableTargets.all { kotlinTarget ->
+            kotlinTarget.testRuns.all { kotlinTestRun ->
+                // Need to check for both KotlinNativeHostTest (to ensure it runs on host, not on
+                // an emulator or simulator) and also KotlinTaskTestRun to ensure it has a task.
+                // Unfortunately, there is no parent interface/class that covers both cases.
+                if (kotlinTestRun is KotlinNativeHostTestRun &&
+                    kotlinTestRun is KotlinTaskTestRun<*, *>) {
+                    project.addToBuildOnServer(kotlinTestRun.executionTask)
+                }
+            }
+        }
     }
 
     private fun AppExtension.configureAndroidApplicationOptions(project: Project) {
@@ -782,7 +951,6 @@ private fun Project.configureJavaCompilationWarnings(task: KotlinCompile) {
         task.kotlinOptions.allWarningsAsErrors = true
     }
     task.kotlinOptions.freeCompilerArgs += listOf(
-        "-Xskip-runtime-version-check",
         "-Xskip-metadata-version-check"
     )
 }
@@ -914,7 +1082,7 @@ fun Project.validateProjectStructure(groupId: String) {
 fun AndroidXExtension.validateMavenVersion() {
     val mavenGroup = mavenGroup
     val mavenVersion = mavenVersion
-    val forcedVersion = mavenGroup?.forcedVersion
+    val forcedVersion = mavenGroup?.atomicGroupVersion
     if (forcedVersion != null && forcedVersion == mavenVersion) {
         throw GradleException(
             """
@@ -929,3 +1097,13 @@ fun AndroidXExtension.validateMavenVersion() {
         )
     }
 }
+
+/**
+ * Removes the line and column attributes from the [baseline].
+ */
+fun removeLineAndColumnAttributes(baseline: String): String = baseline.replace(
+    "\\s*(line|column)=\"\\d+?\"".toRegex(),
+    ""
+)
+
+const val PROJECT_OR_ARTIFACT_EXT_NAME = "projectOrArtifact"

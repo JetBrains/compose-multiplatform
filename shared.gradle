@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 apply plugin: "kotlin"
 apply from: "../kotlin-dsl-dependency.gradle"
+apply plugin: "java-gradle-plugin"
 
 buildscript {
     project.ext.supportRootFolder = project.projectDir.getParentFile().getParentFile()
@@ -26,6 +27,12 @@ configurations {
 }
 
 dependencies {
+    cacheableApi(libs.toml)
+    cacheableImplementation(libs.gson)
+    cacheableImplementation(libs.dom4j) {
+        // Optional dependency where Ivy fails to parse the POM file.
+        exclude(group:"net.java.dev.msv", module:"xsdlib")
+    }
     cacheableApi(libs.androidGradlePluginz)
     cacheableImplementation(libs.dexMemberList)
     cacheableApi(libs.kotlinGradlePluginz)
@@ -44,11 +51,6 @@ dependencies {
     // dependencies whose resolutions we don't need to cache
     compileOnly(findGradleKotlinDsl()) // Only one file in this configuration, no need to cache it
     implementation(project(":jetpad-integration")) // Doesn't have a .pom, so not slow to load
-}
-
-// Exclude dokka coming from AGP. We don't need it and it conflicts with dackka: b/195305339
-configurations.configureEach { conf ->
-  conf.exclude(group:"org.jetbrains.dokka", module:"dokka-core")
 }
 
 // Saves configuration into destFile
@@ -85,7 +87,7 @@ def parseConfigurationResolution(savedFile, throwOnError) {
 // Resolves a Configuration into a list of Dependency objects
 def resolveConfiguration(configuration) {
     def resolvedName = configuration.name
-    def cacheDir = new File(project.buildDir, "/" + resolvedName)
+    def cacheDir = new File(project.rootProject.buildDir, "/" + resolvedName)
     def inputsFile = new File(cacheDir, "/deps")
     def outputsFile = new File(cacheDir, "/result")
 
@@ -132,4 +134,8 @@ loadConfigurationQuicklyInto(configurations.cacheableRuntimeOnly, configurations
 project.tasks.withType(Jar) { task ->
     task.reproducibleFileOrder = true
     task.preserveFileTimestamps = false
+}
+
+validatePlugins {
+    enableStricterValidation = true
 }

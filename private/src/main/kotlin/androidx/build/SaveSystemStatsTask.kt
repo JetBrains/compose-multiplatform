@@ -21,11 +21,13 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import java.io.File
 import java.lang.management.ManagementFactory
 import java.lang.Runtime
 import com.sun.management.OperatingSystemMXBean
 
+@DisableCachingByDefault(because = "Simply creates a small file and doesn't benefit from caching")
 /**
  * Saves system stats (cpu, memory) to a file
  */

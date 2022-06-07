@@ -114,11 +114,7 @@ object ResourceTasks {
             // Since apiLocation isn't a File, we have to manually set up the dependency.
             task.dependsOn(generateResourceApi)
             task.outputApiLocations.set(outputApiLocations)
-            task.forceUpdate.set(
-                // forUseAtConfigurationTime() is deprecated in Gradle 7.4, but we still use 7.3
-                @Suppress("DEPRECATION")
-                project.providers.gradleProperty("force").forUseAtConfigurationTime().isPresent
-            )
+            task.forceUpdate.set(project.providers.gradleProperty("force").isPresent)
             checkResourceApiRelease?.let {
                 // If a developer (accidentally) makes a non-backwards compatible change to an
                 // API, the developer will want to be informed of it as soon as possible.

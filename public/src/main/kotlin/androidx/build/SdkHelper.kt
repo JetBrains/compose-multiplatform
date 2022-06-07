@@ -88,17 +88,6 @@ fun Project.getSdkPath(): File {
 }
 
 /**
- * @return the root project's platform-specific NDK path as a file.
- */
-fun Project.getNdkPath(): File {
-    val sdkPath = getSdkPath()
-    return getPathFromEnvironmentVariableOrNull("ANDROID_NDK_ROOT")
-        // One of the default paths when ndk is installed for the first time via sdkmanager.
-        ?: fileIfExistsOrNull(sdkPath, "ndk-bundle")
-        ?: File(sdkPath, "ndk")
-}
-
-/**
  * @return [File] representing the path stored in [envValue] if it exists, `null` otherwise.
  */
 private fun getPathFromEnvironmentVariableOrNull(envVar: String): File? {
@@ -160,4 +149,11 @@ fun Project.getSupportRootFolder(): File {
  */
 fun Project.getCheckoutRoot(): File {
     return project.getSupportRootFolder().parentFile.parentFile
+}
+
+/**
+ * Returns the path to the konan prebuilts folder (e.g. <root>/prebuilts/androidx/konan).
+ */
+fun Project.getKonanPrebuiltsFolder(): File {
+    return getCheckoutRoot().resolve("prebuilts/androidx/konan")
 }

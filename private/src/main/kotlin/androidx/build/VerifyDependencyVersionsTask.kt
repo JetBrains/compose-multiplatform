@@ -28,11 +28,13 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.setProperty
+import org.gradle.api.tasks.CacheableTask
 
 /**
  * Task for verifying the androidx dependency-stability-suffix rule
- * (A library is only as stable as its lease stable dependency)
+ * (A library is only as stable as its least stable dependency)
  */
+@CacheableTask
 abstract class VerifyDependencyVersionsTask : DefaultTask() {
 
     init {
@@ -193,6 +195,8 @@ private fun shouldVerifyConfiguration(configuration: Configuration): Boolean {
 
     // Don't check any configurations that directly bundle the dependencies with the output
     if (name == "bundleInside") return false
+    if (name == "embedThemesDebug") return false
+    if (name == "embedThemesRelease") return false
 
     // Don't check any compile-only configurations
     if (name.startsWith("compile")) return false

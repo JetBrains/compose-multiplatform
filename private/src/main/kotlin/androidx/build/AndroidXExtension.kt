@@ -16,17 +16,41 @@
 
 package androidx.build
 
-import androidx.build.Multiplatform.Companion.isMultiplatformEnabled
 import androidx.build.checkapi.shouldConfigureApiTasks
 import groovy.lang.Closure
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
-import java.util.ArrayList
+import java.io.File
+
 /**
  * Extension for [AndroidXImplPlugin] that's responsible for holding configuration options.
  */
 open class AndroidXExtension(val project: Project) {
+    @JvmField
+    val LibraryVersions: Map<String, Version>
+    @JvmField
+    val LibraryGroups: Map<String, LibraryGroup>
+
+    init {
+        val toml = project.objects.fileProperty().fileValue(
+            File(project.getSupportRootFolder(), "libraryversions.toml")
+        )
+        val content = project.providers.fileContents(toml)
+        val composeCustomVersion = project.providers.environmentVariable("COMPOSE_CUSTOM_VERSION")
+        val composeCustomGroup = project.providers.environmentVariable("COMPOSE_CUSTOM_GROUP")
+
+        val serviceProvider = project.gradle.sharedServices.registerIfAbsent(
+            "libraryVersionsService",
+            LibraryVersionsService::class.java
+        ) { spec ->
+            spec.parameters.tomlFile = content.asText
+            spec.parameters.composeCustomVersion = composeCustomVersion
+            spec.parameters.composeCustomGroup = composeCustomGroup
+        }
+        LibraryGroups = serviceProvider.get().libraryGroups
+        LibraryVersions = serviceProvider.get().libraryVersions
+    }
 
     var name: Property<String?> = project.objects.property(String::class.java)
     fun setName(newName: String) { name.set(newName) }
@@ -45,7 +69,7 @@ open class AndroidXExtension(val project: Project) {
     private fun chooseProjectVersion() {
         val version: Version
         val group: String? = mavenGroup?.group
-        val groupVersion: Version? = mavenGroup?.forcedVersion
+        val groupVersion: Version? = mavenGroup?.atomicGroupVersion
         val mavenVersion: Version? = mavenVersion
         if (mavenVersion != null) {
             if (groupVersion != null && !isGroupVersionOverrideAllowed()) {
@@ -159,12 +183,30 @@ open class AndroidXExtension(val project: Project) {
 
     var benchmarkRunAlsoInterpreted = false
 
-    var multiplatform: Boolean
+    var bypassCoordinateValidation = false
+
+    /**
+     * Which KMP platforms are published by this project, as a list of artifact suffixes or an empty
+     * list for non-KMP projects.
+     *
+     * Setting this property to a non-empty list also sets the [multiplatform] property to `true`.
+     */
+    var publishPlatforms: List<String> = emptyList()
+        set(value) {
+            multiplatform = value.isNotEmpty()
+            field = value
+        }
+
+    /**
+     * Whether this project uses KMP.
+     *
+     * Consider setting the [publishPlatforms] property instead to ensure KMP artifacts are
+     * published.
+     */
+    var multiplatform: Boolean = false
         set(value) {
             Multiplatform.setEnabledForProject(project, value)
-        }
-        get() {
-            return project.isMultiplatformEnabled()
+            field = value
         }
 
     fun shouldEnforceKotlinStrictApiMode(): Boolean {

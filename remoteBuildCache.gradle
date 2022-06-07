@@ -1,24 +1,65 @@
-def useRemoteBuildCache = System.getenv("USE_ANDROIDX_REMOTE_BUILD_CACHE") == "true"
+import androidx.build.gradle.gcpbuildcache.GcpBuildCache
+import androidx.build.gradle.gcpbuildcache.GcpBuildCacheServiceFactory
 
-if (useRemoteBuildCache) {
-    logger.warn("Using AndroidX remote build cache")
-    gradle.settingsEvaluated { settings ->
-        settings.buildCache {
-            remote(HttpBuildCache) {
-                def osName = System.getProperty("os.name").toLowerCase()
-                switch (osName) {
-                    case { it.contains("mac os x") }:
-                    case { it.contains("darwin") }:
-                    case { it.contains("osx") }:
-                        url = "http://gradle-remote-cache.uplink2.goog:999/cache/"
-                        break
-                    default:
-                        url = "http://gradle-remote-cache.uplink.goog:999/cache/"
-                        break
+buildscript {
+    ext.supportRootFolder = buildscript.sourceFile.getParentFile().getParentFile()
+    apply(from: "repos.gradle")
+    repos.addMavenRepositories(repositories)
+
+    dependencies {
+        classpath("androidx.build.gradle.gcpbuildcache:gcpbuildcache:1.0.0-alpha05")
+    }
+}
+
+def cacheSetting = System.getenv("USE_ANDROIDX_REMOTE_BUILD_CACHE")
+def BUILD_NUMBER = System.getenv("BUILD_NUMBER")
+
+switch (cacheSetting) {
+    case "true":
+    case "uplink": // legacy build cache
+        gradle.settingsEvaluated { settings ->
+            settings.buildCache {
+                remote(HttpBuildCache) {
+                    def osName = System.getProperty("os.name").toLowerCase()
+                    switch (osName) {
+                        case { it.contains("mac os x") }:
+                        case { it.contains("darwin") }:
+                        case { it.contains("osx") }:
+                            url = "http://gradle-remote-cache.uplink2.goog:999/cache/"
+                            break
+                        default:
+                            url = "http://gradle-remote-cache.uplink.goog:999/cache/"
+                            break
+                    }
+                    allowInsecureProtocol = true
+                    push = true
                 }
-                allowInsecureProtocol = true
-                push = true
             }
         }
-    }
+        break
+    case "gcp":
+        gradle.settingsEvaluated { settings ->
+            buildCache {
+              registerBuildCacheService(GcpBuildCache, GcpBuildCacheServiceFactory)
+            }
+
+            settings.buildCache {
+                remote(GcpBuildCache) {
+                    projectId = "androidx-ge"
+                    bucketName = "androidx-gradle-remote-cache"
+                    push = (BUILD_NUMBER != null && !BUILD_NUMBER.startsWith("P"))
+                }
+            }
+        }
+        break
+    case "false":
+        break
+    default:
+        def uplinkLinux = new File("/usr/bin/uplink-helper")
+        def uplinkMac = new File("/usr/local/bin/uplink-helper")
+        if (uplinkLinux.exists() || uplinkMac.exists()) {
+            logger.warn("\u001B[31m\nIt looks like you are a Googler running without remote build "
+                    + "cache. Enable it for faster builds, see " +
+                    "http://go/androidx-dev#remote-build-cache\u001B[0m\n")
+        }
 }

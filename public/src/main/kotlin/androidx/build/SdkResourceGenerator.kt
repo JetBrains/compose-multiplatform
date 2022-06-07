@@ -20,33 +20,41 @@ import androidx.build.dependencies.AGP_LATEST
 import androidx.build.dependencies.KOTLIN_STDLIB
 import androidx.build.dependencies.KOTLIN_VERSION
 import androidx.build.dependencies.KSP_VERSION
+import com.google.common.annotations.VisibleForTesting
+import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.getByType
-import java.io.File
-import java.util.Properties
+import org.gradle.work.DisableCachingByDefault
 
+@DisableCachingByDefault(because = "Simply generates a small file and doesn't benefit from caching")
 abstract class SdkResourceGenerator : DefaultTask() {
     @get:Input
-    lateinit var prebuiltsRoot: String
+    lateinit var tipOfTreeMavenRepoRelativePath: String
 
+    /**
+     * project-relative path to folder where outputs from buildSrc builds can be found
+     * (perhaps something like ../out/buildSrc)
+     */
     @get:Input
-    lateinit var localSupportRepo: String
+    lateinit var buildSrcOutRelativePath: String
 
-    @get:InputFile
+    @get:[InputFile PathSensitive(PathSensitivity.NONE)]
     abstract val debugKeystore: RegularFileProperty
 
     @get:Input
-    val compileSdkVersion: Int = SupportConfig.TARGET_SDK_VERSION
+    val compileSdkVersion: String = SupportConfig.COMPILE_SDK_VERSION
 
     @get:Input
     val buildToolsVersion: String = SupportConfig.BUILD_TOOLS_VERSION
@@ -73,70 +81,75 @@ abstract class SdkResourceGenerator : DefaultTask() {
     lateinit var repositoryUrls: List<String>
 
     @get:Input
-    val rootProjectPath: String = project.rootProject.rootDir.absolutePath
+    val rootProjectRelativePath: String =
+        project.rootProject.rootDir.toRelativeString(project.projectDir)
 
-    @get:PathSensitive(PathSensitivity.NONE)
-    @get:InputFile
-    abstract val gradleWrapperProperties: RegularFileProperty
+    private val projectDir: File = project.projectDir
 
-    @get:OutputFile
-    abstract val outputFile: RegularFileProperty
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
 
     @TaskAction
     fun generateFile() {
+        // Note all the paths in sdk.prop have to be relative to projectDir to make this task
+        // cacheable between different computers
+        val outputFile = outputDir.file("sdk.prop")
         outputFile.get().asFile.writer().use { writer ->
-            writer.write("prebuiltsRoot=$prebuiltsRoot\n")
-            writer.write("localSupportRepo=$localSupportRepo\n")
-            writer.write("compileSdkVersion=$compileSdkVersion\n")
-            writer.write("buildToolsVersion=$buildToolsVersion\n")
-            writer.write("minSdkVersion=$minSdkVersion\n")
-            writer.write("debugKeystore=${debugKeystore.get().asFile.canonicalPath}\n")
+            writer.write("tipOfTreeMavenRepoRelativePath=$tipOfTreeMavenRepoRelativePath\n")
+            writer.write(
+                "debugKeystoreRelativePath=${
+                    debugKeystore.get().asFile.toRelativeString(projectDir)
+                }\n"
+            )
+            writer.write("rootProjectRelativePath=$rootProjectRelativePath\n")
+            val encodedRepositoryUrls = repositoryUrls.joinToString(",")
+            writer.write("repositoryUrls=$encodedRepositoryUrls\n")
+
             writer.write("agpDependency=$agpDependency\n")
             writer.write("navigationRuntime=$navigationRuntime\n")
             writer.write("kotlinStdlib=$kotlinStdlib\n")
-
-            val gradlewPropFile = gradleWrapperProperties.asFile.get()
-            val distributionUrl = gradlewPropFile.reader().use {
-                Properties().apply { load(it) }.getProperty("distributionUrl")
-            }.let { File(gradlewPropFile.parentFile, it).canonicalPath }
-
-            writer.write("gradleDistributionUrl=$distributionUrl\n")
+            writer.write("compileSdkVersion=$compileSdkVersion\n")
+            writer.write("buildToolsVersion=$buildToolsVersion\n")
+            writer.write("minSdkVersion=$minSdkVersion\n")
             writer.write("kotlinVersion=$kotlinVersion\n")
             writer.write("kspVersion=$kspVersion\n")
-            writer.write("rootProjectPath=$rootProjectPath\n")
-            val encodedRepositoryUrls = repositoryUrls.joinToString(",")
-            writer.write("repositoryUrls=$encodedRepositoryUrls\n")
+            writer.write("buildSrcOutRelativePath=$buildSrcOutRelativePath\n")
         }
     }
 
     companion object {
+        const val TASK_NAME = "generateSdkResource"
+
         @JvmStatic
         fun generateForHostTest(project: Project) {
+            val provider = registerSdkResourceGeneratorTask(project)
+            val extension = project.extensions.getByType<JavaPluginExtension>()
+            val testSources = extension.sourceSets.getByName("test")
+            testSources.output.dir(provider.flatMap { it.outputDir })
+        }
+
+        @VisibleForTesting
+        fun registerSdkResourceGeneratorTask(project: Project): TaskProvider<SdkResourceGenerator> {
             val generatedDirectory = File(project.buildDir, "generated/resources")
-            val provider = project.tasks.register(
-                "generateSdkResource",
-                SdkResourceGenerator::class.java
-            ) {
-                it.prebuiltsRoot = project.getPrebuiltsRoot().canonicalPath
+            return project.tasks.register(TASK_NAME, SdkResourceGenerator::class.java) {
+                it.tipOfTreeMavenRepoRelativePath =
+                    project.getRepositoryDirectory().toRelativeString(project.projectDir)
                 it.debugKeystore.set(project.getKeystore())
-                it.localSupportRepo = project.getRepositoryDirectory().canonicalPath
-                it.gradleWrapperProperties.set(
-                    File(project.rootDir, "gradle/wrapper/gradle-wrapper.properties")
-                )
-                it.outputFile.set(File(generatedDirectory, "sdk.prop"))
+                it.outputDir.set(generatedDirectory)
+                it.buildSrcOutRelativePath =
+                    (project.properties["buildSrcOut"] as File).toRelativeString(project.projectDir)
                 // Copy repositories used for the library project so that it can replicate the same
                 // maven structure in test.
                 it.repositoryUrls = project.repositories.filterIsInstance<MavenArtifactRepository>()
                     .map {
-                        it.url.toString()
+                        if (it.url.scheme == "file") {
+                            // Make file paths relative to projectDir
+                            File(it.url.path).toRelativeString(project.projectDir)
+                        } else {
+                            it.url.toString()
+                        }
                     }
             }
-            project.tasks.named("compileTestJava").configure { it.dependsOn(provider) }
-            project.tasks.named("processTestResources").configure { it.dependsOn(provider) }
-
-            val extension = project.extensions.getByType<JavaPluginExtension>()
-            val resources = extension.sourceSets.getByName("test").resources
-            resources.srcDirs(setOf(resources.srcDirs, generatedDirectory))
         }
     }
 }

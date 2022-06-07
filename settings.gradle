@@ -19,8 +19,6 @@ include ":plugins"
 include ":private"
 include ":public"
 
-enableFeaturePreview("VERSION_CATALOGS")
-
 dependencyResolutionManagement {
     versionCatalogs {
         libs {

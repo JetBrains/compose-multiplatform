@@ -48,61 +48,14 @@ private const val ENABLE_FLAG_NAME = VERIFY_UP_TO_DATE
 val ALLOW_RERUNNING_TASKS = setOf(
     "buildOnServer",
     "checkExternalLicenses",
+    // https://youtrack.jetbrains.com/issue/KT-52632
+    "commonizeNativeDistribution",
     "createDiffArchiveForAll",
-    "createProjectZip",
     "externalNativeBuildDebug",
     "externalNativeBuildRelease",
     "generateDebugUnitTestConfig",
     "generateJsonModelDebug",
     "generateJsonModelRelease",
-    "generateMetadataFileForAndroidDebugPublication",
-    "generateMetadataFileForAndroidReleasePublication",
-    "generateMetadataFileForDesktopPublication",
-    "generateMetadataFileForJvmPublication",
-    "generateMetadataFileForJvmlinux-x64Publication",
-    "generateMetadataFileForJvmlinux-arm64Publication",
-    "generateMetadataFileForJvmmacos-x64Publication",
-    "generateMetadataFileForJvmmacos-arm64Publication",
-    "generateMetadataFileForJvmwindows-x64Publication",
-    "generateMetadataFileForJvmallPublication",
-    "generateMetadataFileForMavenPublication",
-    "generateMetadataFileForMetadataPublication",
-    "generateMetadataFileForKotlinMultiplatformPublication",
-    "generateMetadataFileForPluginMavenPublication",
-    "generatePomFileForBenchmarkPluginMarkerMavenPublication",
-    "generatePomFileForAndroidDebugPublication",
-    "generatePomFileForAndroidReleasePublication",
-    "generatePomFileForDesktopPublication",
-    "generatePomFileForJvmlinux-x64Publication",
-    "generatePomFileForJvmlinux-arm64Publication",
-    "generatePomFileForJvmmacos-x64Publication",
-    "generatePomFileForJvmmacos-arm64Publication",
-    "generatePomFileForJvmwindows-x64Publication",
-    "generatePomFileForJvmallPublication",
-    "generatePomFileForJvmPublication",
-    "generatePomFileForKotlinMultiplatformPublication",
-    "generatePomFileForMavenPublication",
-    "generatePomFileForPluginMavenPublication",
-    "generatePomFileForMetadataPublication",
-    "generatePomFileForSafeargsJavaPluginMarkerMavenPublication",
-    "generatePomFileForSafeargsKotlinPluginMarkerMavenPublication",
-    "publishBenchmarkPluginMarkerMavenPublicationToMavenRepository",
-    "publishAndroidDebugPublicationToMavenRepository",
-    "publishAndroidReleasePublicationToMavenRepository",
-    "publishDesktopPublicationToMavenRepository",
-    "publishJvmPublicationToMavenRepository",
-    "publishJvmlinux-x64PublicationToMavenRepository",
-    "publishJvmlinux-arm64PublicationToMavenRepository",
-    "publishJvmmacos-x64PublicationToMavenRepository",
-    "publishJvmmacos-arm64PublicationToMavenRepository",
-    "publishJvmwindows-x64PublicationToMavenRepository",
-    "publishJvmallPublicationToMavenRepository",
-    "publishKotlinMultiplatformPublicationToMavenRepository",
-    "publishMavenPublicationToMavenRepository",
-    "publishMetadataPublicationToMavenRepository",
-    "publishPluginMavenPublicationToMavenRepository",
-    "publishSafeargsJavaPluginMarkerMavenPublicationToMavenRepository",
-    "publishSafeargsKotlinPluginMarkerMavenPublicationToMavenRepository",
     /**
      * relocateShadowJar is used to configure the ShadowJar hence it does not have any outputs.
      * https://github.com/johnrengelman/shadow/issues/561
@@ -186,25 +139,27 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     // Flakily not up-to-date, b/176120659
     "doclavaDocs",
 
-    // We should be able to remove these entries when b/160392650 is fixed
-    "lint",
-    "lintAnalyzeDebug",
-    "lintDebug",
-    "lintVitalDebug",
-    "lintWithExpandProjectionDebug",
-    "lintWithoutExpandProjectionDebug",
-    "lintWithNullAwareTypeConverterDebug",
-    "lintWithKaptDebug",
-    "lintWithKspDebug",
-    "lintTargetSdk29Debug",
-    "lintTargetSdk30Debug",
-    "lintTargetSdkLatestDebug",
-
     // We know that these tasks are never up to date due to maven-metadata.xml changing
     // https://github.com/gradle/gradle/issues/11203
     "partiallyDejetifyArchive",
     "stripArchiveForPartialDejetification",
     "createArchive"
+)
+
+val DONT_TRY_RERUNNING_TASK_TYPES = setOf(
+    "com.android.build.gradle.internal.lint.AndroidLintTextOutputTask_Decorated",
+    // lint report tasks
+    "com.android.build.gradle.internal.lint.AndroidLintTask_Decorated",
+    // lint analysis tasks b/223287425
+    "com.android.build.gradle.internal.lint.AndroidLintAnalysisTask_Decorated",
+    // https://github.com/gradle/gradle/issues/11717
+    "org.gradle.api.publish.tasks.GenerateModuleMetadata_Decorated",
+    "org.gradle.api.publish.maven.tasks.GenerateMavenPom_Decorated",
+    // due to GenerateModuleMetadata re-running
+    "androidx.build.GMavenZipTask_Decorated",
+    "org.gradle.api.publish.maven.tasks.PublishToMavenRepository_Decorated",
+    // This task is not cacheable by design due to large number of inputs
+    "androidx.build.license.CheckExternalDependencyLicensesTask_Decorated",
 )
 
 @Suppress("UnstableApiUsage") // usage of BuildService that's incubating
@@ -245,10 +200,7 @@ abstract class TaskUpToDateValidator :
     companion object {
         // Tells whether to create a TaskUpToDateValidator listener
         private fun shouldEnable(project: Project): Boolean {
-            // forUseAtConfigurationTime() is deprecated in Gradle 7.4, but we still use 7.3
-            @Suppress("DEPRECATION")
-            return project.providers.gradleProperty(ENABLE_FLAG_NAME)
-                .forUseAtConfigurationTime().isPresent
+            return project.providers.gradleProperty(ENABLE_FLAG_NAME).isPresent
         }
 
         private fun isAllowedToRerunTask(taskPath: String): Boolean {
@@ -268,7 +220,8 @@ abstract class TaskUpToDateValidator :
         private fun shouldTryRerunningTask(task: Task): Boolean {
             return !(
                 DONT_TRY_RERUNNING_TASKS.contains(task.name) ||
-                    DONT_TRY_RERUNNING_TASKS.contains(task.path)
+                    DONT_TRY_RERUNNING_TASKS.contains(task.path) ||
+                    DONT_TRY_RERUNNING_TASK_TYPES.contains(task::class.qualifiedName)
                 )
         }
 

@@ -17,7 +17,7 @@
 package androidx.build
 
 import androidx.build.gitclient.Commit
-import androidx.build.gitclient.GitClientImpl
+import androidx.build.gitclient.GitClient
 import androidx.build.gitclient.GitCommitRange
 import androidx.build.jetpad.LibraryBuildInfoFile
 import com.google.gson.GsonBuilder
@@ -26,20 +26,21 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.work.DisableCachingByDefault
 import java.io.File
+import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 
 /**
  * This task generates a library build information file containing the artifactId, groupId, and
  * version of public androidx dependencies and release checklist of the library for consumption
  * by the Jetpack Release Service (JetPad).
  */
-@CacheableTask
+@DisableCachingByDefault(because = "uses git sha as input")
 abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
     init {
         group = "Help"
@@ -160,23 +161,7 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
                     task.artifactId.set(name)
                     task.groupId.set(group)
                     task.version.set(project.version.toString())
-                    task.kotlinVersion.set(
-                        project.provider {
-                            // For Kotlin libraries, populate the Kotlin version. Note that
-                            // we assume all of androidx uses the same version of the Kotlin
-                            // stdlib.
-                            project.configurations.filter {
-                                it.name == "releaseRuntimeElements"
-                            }.forEach { configuration ->
-                                configuration.allDependencies.forEach { dep ->
-                                    if (dep.group.toString().startsWith("org.jetbrains.kotlin")) {
-                                        return@provider androidx.build.dependencies.kotlinVersion
-                                    }
-                                }
-                            }
-                            null
-                        }
-                    )
+                    task.kotlinVersion.set(project.getKotlinPluginVersion())
                     task.projectDir.set(
                         project.projectDir.absolutePath.removePrefix(
                             project.getSupportRootFolder().absolutePath
@@ -233,7 +218,14 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
          * of the build that is released.  Thus, we use frameworks/support to get the sha
          */
         private fun Project.getFrameworksSupportCommitShaAtHead(): String {
-            val commitList: List<Commit> = GitClientImpl(project.getSupportRootFolder(), logger)
+            val gitClient = GitClient.create(
+                project.getSupportRootFolder(),
+                logger,
+                GitClient.getChangeInfoPath(project).get(),
+                GitClient.getManifestPath(project).get()
+            )
+            val commitList: List<Commit> =
+                gitClient
                 .getGitLog(
                     GitCommitRange(
                         fromExclusive = "",

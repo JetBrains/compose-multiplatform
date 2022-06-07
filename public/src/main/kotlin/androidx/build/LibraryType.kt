@@ -66,6 +66,19 @@ enum class LibraryType(
         sourceJars = true,
         checkApi = RunApiTasks.Yes()
     ),
+    PUBLISHED_TEST_LIBRARY(
+        publish = Publish.SNAPSHOT_AND_RELEASE,
+        sourceJars = true,
+        checkApi = RunApiTasks.Yes()
+    ),
+    INTERNAL_TEST_LIBRARY(
+        checkApi = RunApiTasks.No("Internal Library")
+    ),
+    PUBLISHED_NATIVE_LIBRARY(
+        publish = Publish.SNAPSHOT_AND_RELEASE,
+        sourceJars = true,
+        checkApi = RunApiTasks.Yes()
+    ),
     SAMPLES(
         publish = Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = true,
@@ -76,6 +89,12 @@ enum class LibraryType(
         sourceJars = false,
         checkApi = RunApiTasks.No("Lint Library"),
         compilationTarget = CompilationTarget.HOST
+    ),
+    COMPILER_DAEMON(
+        Publish.SNAPSHOT_AND_RELEASE,
+        sourceJars = false,
+        RunApiTasks.No("Compiler Daemon (Host-only)"),
+        CompilationTarget.HOST
     ),
     COMPILER_PLUGIN(
         Publish.SNAPSHOT_AND_RELEASE,

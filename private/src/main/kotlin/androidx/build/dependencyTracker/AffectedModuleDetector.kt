@@ -18,7 +18,7 @@ package androidx.build.dependencyTracker
 
 import androidx.build.dependencyTracker.AffectedModuleDetector.Companion.ENABLE_ARG
 import androidx.build.getDistributionDirectory
-import androidx.build.gitclient.GitClientImpl
+import androidx.build.gitclient.GitClient
 import androidx.build.gradle.isRoot
 import java.io.File
 import org.gradle.api.Action
@@ -118,7 +118,7 @@ abstract class AffectedModuleDetector(
             // AffectedModuleDetector is ready. Callers won't be able to use it until the wrapped
             // detector has been assigned, but configureTaskGuard can still reference it in
             // closures that will execute during task execution.
-            var instance = AffectedModuleDetectorWrapper()
+            val instance = AffectedModuleDetectorWrapper()
             rootProject.extensions.add(ROOT_PROP_NAME, instance)
 
             val enabled = rootProject.hasProperty(ENABLE_ARG) &&
@@ -127,6 +127,7 @@ abstract class AffectedModuleDetector(
             val distDir = rootProject.getDistributionDirectory()
             val outputFile = distDir.resolve(LOG_FILE_NAME)
 
+            outputFile.writeText("")
             val logger = FileLogger(outputFile)
             logger.info("setup: enabled: $enabled")
             if (!enabled) {
@@ -135,7 +136,7 @@ abstract class AffectedModuleDetector(
                     { spec ->
                         val params = spec.parameters
                         params.acceptAll = true
-                        params.log = outputFile
+                        params.log = logger
                     }
                 )
                 logger.info("using AcceptAll")
@@ -146,10 +147,12 @@ abstract class AffectedModuleDetector(
             if (baseCommitOverride != null) {
                 logger.info("using base commit override $baseCommitOverride")
             }
+            val changeInfoPath = GitClient.getChangeInfoPath(rootProject)
+            val manifestPath = GitClient.getManifestPath(rootProject)
             gradle.taskGraph.whenReady {
                 logger.lifecycle("projects evaluated")
                 val projectGraph = ProjectGraph(rootProject)
-                val dependencyTracker = DependencyTracker(rootProject, logger)
+                val dependencyTracker = DependencyTracker(rootProject, logger.toLogger())
                 val provider = setupWithParams(
                     rootProject,
                     { spec ->
@@ -157,8 +160,10 @@ abstract class AffectedModuleDetector(
                         params.rootDir = rootProject.projectDir
                         params.projectGraph = projectGraph
                         params.dependencyTracker = dependencyTracker
-                        params.log = outputFile
+                        params.log = logger
                         params.baseCommitOverride = baseCommitOverride
+                        params.changeInfoPath = changeInfoPath
+                        params.manifestPath = manifestPath
                     }
                 )
                 logger.info("using real detector")
@@ -173,13 +178,12 @@ abstract class AffectedModuleDetector(
             if (!rootProject.isRoot) {
                 throw IllegalArgumentException("this should've been the root project")
             }
-            val serviceProvider = rootProject.getGradle().getSharedServices()
+            return rootProject.gradle.sharedServices
                 .registerIfAbsent(
                     SERVICE_NAME,
                     AffectedModuleDetectorLoader::class.java,
                     configureAction
                 )
-            return serviceProvider
         }
 
         fun getInstance(project: Project): AffectedModuleDetector {
@@ -255,15 +259,17 @@ abstract class AffectedModuleDetectorLoader :
         var rootDir: File
         var projectGraph: ProjectGraph
         var dependencyTracker: DependencyTracker
-        var log: File
+        var log: FileLogger?
         var cobuiltTestPaths: Set<Set<String>>?
         var alwaysBuildIfExists: Set<String>?
         var ignoredPaths: Set<String>?
         var baseCommitOverride: String?
+        var changeInfoPath: Provider<String>
+        var manifestPath: Provider<String>
     }
 
     val detector: AffectedModuleDetector by lazy {
-        val logger = FileLogger(parameters.log)
+        val logger = parameters.log!!
         if (parameters.acceptAll) {
             AcceptAll(null)
         } else {
@@ -271,19 +277,26 @@ abstract class AffectedModuleDetectorLoader :
             if (baseCommitOverride != null) {
                 logger.info("using base commit override $baseCommitOverride")
             }
-            val gitClient = GitClientImpl(
-                workingDir = parameters.rootDir,
-                logger = logger
+            val gitClient = GitClient.create(
+                rootProjectDir = parameters.rootDir,
+                logger = logger.toLogger(),
+                changeInfoPath = parameters.changeInfoPath.get(),
+                manifestPath = parameters.manifestPath.get()
             )
             val changedFilesProvider: ChangedFilesProvider = {
                 val baseSha = baseCommitOverride ?: gitClient.findPreviousSubmittedChange()
-                baseSha?.let(gitClient::findChangedFilesSince)
+                check(baseSha != null) {
+                    "gitClient returned null from findPreviousSubmittedChange"
+                }
+                val changedFiles = gitClient.findChangedFilesSince(baseSha)
+                logger.info("changed files: $changedFiles")
+                changedFiles
             }
 
             AffectedModuleDetectorImpl(
                 projectGraph = parameters.projectGraph,
                 dependencyTracker = parameters.dependencyTracker,
-                logger = logger,
+                logger = logger.toLogger(),
                 cobuiltTestPaths = parameters.cobuiltTestPaths
                     ?: AffectedModuleDetectorImpl.COBUILT_TEST_PATHS,
                 alwaysBuildIfExists = parameters.alwaysBuildIfExists
@@ -603,6 +616,12 @@ class AffectedModuleDetectorImpl constructor(
             setOf(
                 ":wear:compose:integration-tests:macrobenchmark",
                 ":wear:compose:integration-tests:macrobenchmark-target"
+            ),
+            // Changing generator code changes the output for generated icons, which are tested in
+            // material-icons-extended.
+            setOf(
+                ":compose:material:material:icons:generator",
+                ":compose:material:material-icons-extended"
             ),
         )
 

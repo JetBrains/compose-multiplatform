@@ -20,15 +20,19 @@ import androidx.build.checkapi.ApiBaselinesLocation
 import androidx.build.checkapi.ApiLocation
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.OutputFiles
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.WorkerExecutor
 import java.io.File
 import javax.inject.Inject
 
+@CacheableTask
 abstract class UpdateApiLintBaselineTask @Inject constructor(
     workerExecutor: WorkerExecutor
 ) : MetalavaTask(workerExecutor) {
@@ -56,7 +60,7 @@ abstract class UpdateApiLintBaselineTask @Inject constructor(
         val baselineFile = baselines.get().apiLintFile
         val checkArgs = getGenerateApiArgs(
             bootClasspath, dependencyClasspath,
-            sourcePaths.files.filter { it.exists() }, null, GenerateApiMode.PublicApi,
+            sourcePaths.files.filter { it.exists() }, null, GenerateApiMode.ExperimentalApi,
             ApiLintMode.CheckBaseline(baselineFile, targetsJavaConsumers.get()),
             manifestPath.orNull?.asFile?.absolutePath
         )
@@ -66,6 +70,7 @@ abstract class UpdateApiLintBaselineTask @Inject constructor(
     }
 }
 
+@CacheableTask
 abstract class IgnoreApiChangesTask @Inject constructor(
     workerExecutor: WorkerExecutor
 ) : MetalavaTask(workerExecutor) {
@@ -85,7 +90,7 @@ abstract class IgnoreApiChangesTask @Inject constructor(
     @get:Input
     abstract val baselines: Property<ApiBaselinesLocation>
 
-    @InputFiles
+    @[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
     fun getTaskInputs(): List<File> {
         val referenceApiLocation = referenceApi.get()
         return listOf(

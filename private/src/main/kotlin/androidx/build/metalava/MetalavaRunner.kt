@@ -17,11 +17,14 @@
 package androidx.build.metalava
 
 import androidx.build.checkapi.ApiLocation
+import androidx.build.getLibraryByName
 import androidx.build.java.JavaCompileInputs
 import androidx.build.logging.TERMINAL_RED
 import androidx.build.logging.TERMINAL_RESET
+import java.io.ByteArrayOutputStream
+import java.io.File
+import javax.inject.Inject
 import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.SetProperty
@@ -29,9 +32,6 @@ import org.gradle.process.ExecOperations
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 import org.gradle.workers.WorkerExecutor
-import java.io.ByteArrayOutputStream
-import java.io.File
-import javax.inject.Inject
 
 // MetalavaRunner stores common configuration for executing Metalava
 
@@ -91,15 +91,8 @@ abstract class MetalavaWorkAction @Inject constructor(
 }
 
 fun Project.getMetalavaClasspath(): FileCollection {
-    @Suppress("UnstableApiUsage") // Usage of VersionCatalogsExtension
     val configuration = configurations.findByName("metalava") ?: configurations.create("metalava") {
-        val libs = project.extensions.getByType(
-            VersionCatalogsExtension::class.java
-        ).find("libs").get()
-        val dependency = dependencies.create(
-            libs.findDependency("metalava").get().get()
-        )
-        it.dependencies.add(dependency)
+        it.dependencies.add(dependencies.create(getLibraryByName("metalava")))
     }
     return project.files(configuration)
 }
@@ -205,9 +198,11 @@ fun generateApi(
     workerExecutor: WorkerExecutor,
     pathToManifest: String? = null
 ) {
+    // API lint runs on the experimental pass, which also includes public API. This means API lint
+    // can safely be skipped on the public pass.
     generateApi(
         metalavaClasspath, files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-        apiLocation, GenerateApiMode.PublicApi, apiLintMode, workerExecutor, pathToManifest
+        apiLocation, GenerateApiMode.PublicApi, ApiLintMode.Skip, workerExecutor, pathToManifest
     )
     generateApi(
         metalavaClasspath, files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
@@ -296,8 +291,15 @@ fun getGenerateApiArgs(
             args += listOf("--show-unannotated")
         }
         is GenerateApiMode.AllRestrictedApis, GenerateApiMode.RestrictToLibraryGroupPrefixApis -> {
-            // Show restricted APIs despite @hide.
+            // Despite being hidden we still track the following:
+            // * @RestrictTo(Scope.LIBRARY_GROUP_PREFIX): inter-library APIs
+            // * @PublishedApi: needs binary stability for inline methods
+            // * @RestrictTo(Scope.LIBRARY_GROUP): APIs between libraries in non-atomic groups
             args += listOf(
+                // hide RestrictTo(LIBRARY), use --show-annotation for RestrictTo with
+                // specific arguments
+                "--hide-annotation",
+                "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY)",
                 "--show-annotation",
                 "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope." +
                     "LIBRARY_GROUP_PREFIX)",

@@ -27,11 +27,22 @@ const val COMPOSE_MPP_ENABLED = "androidx.compose.multiplatformEnabled"
 class Multiplatform {
     companion object {
         fun Project.isMultiplatformEnabled(): Boolean {
-            return properties.get(COMPOSE_MPP_ENABLED)?.toString()?.toBoolean() ?: false
+            return findProperty(COMPOSE_MPP_ENABLED)?.toString()?.toBoolean() ?: false
         }
 
         fun setEnabledForProject(project: Project, enabled: Boolean) {
             project.extra.set(COMPOSE_MPP_ENABLED, enabled)
+        }
+
+        /**
+         * Returns true if kotlin native targets should be enabled.
+         */
+        @JvmStatic
+        fun isKotlinNativeEnabled(project: Project): Boolean {
+            return System.getenv()["ANDROIDX_PROJECTS"] == "KMP" ||
+                StudioType.isPlayground(project) ||
+                project.providers.gradleProperty("androidx.kmp.native.enabled")
+                    .orNull?.toBoolean() == true
         }
     }
 }

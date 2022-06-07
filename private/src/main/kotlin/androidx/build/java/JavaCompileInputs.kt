@@ -18,9 +18,14 @@ package androidx.build.java
 
 import androidx.build.getAndroidJar
 import androidx.build.multiplatformExtension
+import java.io.File
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.SourceSet
+import org.gradle.kotlin.dsl.get
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 
 // JavaCompileInputs contains the information required to compile Java/Kotlin code
 // This can be helpful for creating Metalava and Dokka tasks with the same settings
@@ -55,6 +60,35 @@ data class JavaCompileInputs(
             )
         }
 
+        /**
+         * Returns the JavaCompileInputs for the `jvm` target of a KMP project.
+         *
+         * @param project The project whose main jvm target inputs will be returned.
+         */
+        fun fromKmpJvmTarget(
+            project: Project
+        ): JavaCompileInputs {
+            val kmpExtension = checkNotNull(project.multiplatformExtension) {
+                """
+                ${project.path} needs to have Kotlin Multiplatform Plugin applied to obtain its
+                jvm source sets.
+                """.trimIndent()
+            }
+            val jvmTarget = kmpExtension.targets.requirePlatform(
+                KotlinPlatformType.jvm
+            )
+            val sourceCollection = jvmTarget.sourceFiles(
+                compilationName = KotlinCompilation.MAIN_COMPILATION_NAME
+            )
+
+            return JavaCompileInputs(
+                sourcePaths = project.files(sourceCollection),
+                dependencyClasspath = jvmTarget
+                    .compilations[KotlinCompilation.MAIN_COMPILATION_NAME].compileDependencyFiles,
+                bootClasspath = project.getAndroidJar()
+            )
+        }
+
         // Constructs a JavaCompileInputs from a sourceset
         fun fromSourceSet(sourceSet: SourceSet, project: Project): JavaCompileInputs {
             val sourcePaths: FileCollection = project.files(
@@ -76,13 +110,12 @@ data class JavaCompileInputs(
             // with a common and Android source set, this will look inside commonMain and
             // androidMain.
             val taskDependencies = mutableListOf<Any>(variant.javaCompileProvider)
-            val sourceFiles = project.multiplatformExtension?.run {
-                sourceSets
-                    .filter { it.name.contains("main", ignoreCase = true) }
-                    // TODO(igotti): come up with better filtering for non-Android sources.
-                    .filterNot { it.name == "desktopMain" || it.name == "skikoMain" }
-                    .flatMap { it.kotlin.sourceDirectories }
-                    .also { require(it.isNotEmpty()) }
+            val sourceFiles = project.multiplatformExtension?.let { kmpExtension ->
+                project.provider {
+                    kmpExtension.targets.requirePlatform(
+                        KotlinPlatformType.androidJvm
+                    ).sourceFiles(compilationName = variant.name)
+                }
             } ?: project.provider {
                 variant
                     .getSourceFolders(com.android.build.gradle.api.SourceKind.JAVA)
@@ -99,6 +132,58 @@ data class JavaCompileInputs(
                 sourceCollection.builtBy(dep)
             }
             return sourceCollection
+        }
+
+        /**
+         * Returns the list of Files (might be directories) that are included in the compilation
+         * of this target.
+         *
+         * @param compilationName The name of the compilation. A target might have separate
+         * compilations (e.g. main vs test for jvm or debug vs release for Android)
+         */
+        private fun KotlinTarget.sourceFiles(
+            compilationName: String
+        ): List<File> {
+            val selectedCompilation = checkNotNull(compilations.findByName(compilationName)) {
+                """
+                Cannot find $compilationName compilation configuration of $name in
+                ${project.parent}.
+                Available compilations: ${compilations.joinToString(", ") { it.name }}
+                """.trimIndent()
+            }
+            return selectedCompilation
+                .allKotlinSourceSets
+                .flatMap {
+                    it.kotlin.sourceDirectories
+                }.also {
+                    require(it.isNotEmpty()) {
+                        """
+                        Didn't find any source sets for $selectedCompilation in ${project.path}.
+                        """.trimIndent()
+                    }
+                }
+        }
+
+        /**
+         * Returns the [KotlinTarget] that targets the given platform type.
+         *
+         * This method will throw if there are no matching targets or there are more than 1 matching
+         * target.
+         */
+        private fun Collection<KotlinTarget>.requirePlatform(
+            expectedPlatformType: KotlinPlatformType
+        ): KotlinTarget {
+            return this.singleOrNull {
+                it.platformType == expectedPlatformType
+            } ?: error(
+                """
+                Expected 1 and only 1 kotlin target with $expectedPlatformType. Found $size.
+                Matching compilation targets:
+                    ${joinToString(",") { it.name }}
+                All compilation targets:
+                    ${this@requirePlatform.joinToString(",") { it.name }}
+                """.trimIndent()
+            )
         }
     }
 }

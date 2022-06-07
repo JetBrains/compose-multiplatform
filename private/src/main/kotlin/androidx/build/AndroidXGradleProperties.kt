@@ -106,6 +106,12 @@ const val PLAYGROUND_METALAVA_BUILD_ID = "androidx.playground.metalavaBuildId"
 const val PLAYGROUND_DOKKA_BUILD_ID = "androidx.playground.dokkaBuildId"
 
 /**
+ * Filepath to the java agent of YourKit for profiling
+ * If this value is set, profiling via YourKit will automatically be enabled
+ */
+const val PROFILE_YOURKIT_AGENT_PATH = "androidx.profile.yourkitAgentPath"
+
+/**
  * Specifies to validate that the build doesn't generate any unrecognized messages
  * This prevents developers from inadvertently adding new warnings to the build output
  */
@@ -138,6 +144,13 @@ const val KMP_ENABLE_JS = "androidx.kmp.js.enabled"
  */
 const val KMP_ENABLE_LINUX = "androidx.kmp.linux.enabled"
 
+/**
+ * If true, include all native targets when building KMP.
+ * Replaces KMP_ENABLE_MAC and KMP_ENABLE_LINUX in collections, and will eventually be
+ * consolidated into the AndroidX plugin.
+ */
+const val KMP_ENABLE_NATIVE = "androidx.kmp.native.enabled"
+
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALL_WARNINGS_AS_ERRORS,
     ALTERNATIVE_PROJECT_URL,
@@ -161,10 +174,12 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     PLAYGROUND_SNAPSHOT_BUILD_ID,
     PLAYGROUND_METALAVA_BUILD_ID,
     PLAYGROUND_DOKKA_BUILD_ID,
+    PROFILE_YOURKIT_AGENT_PATH,
     KMP_GITHUB_BUILD,
     KMP_ENABLE_MAC,
     KMP_ENABLE_JS,
-    KMP_ENABLE_LINUX
+    KMP_ENABLE_LINUX,
+    KMP_ENABLE_NATIVE
 )
 
 /**
@@ -216,7 +231,7 @@ fun Project.validateAllAndroidxArgumentsAreRecognized() {
  * artifacts to be tracked and displayed on test dashboards in a different format
  */
 fun Project.isDisplayTestOutput(): Boolean =
-    (providers.gradleProperty(DISPLAY_TEST_OUTPUT).forUseAtConfigurationTime().orNull)?.toBoolean()
+    (providers.gradleProperty(DISPLAY_TEST_OUTPUT).orNull)?.toBoolean()
         ?: true
 
 /**

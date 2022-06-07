@@ -18,30 +18,35 @@ package androidx.build.studio
 
 import androidx.build.StudioType
 import androidx.build.getSupportRootFolder
+import androidx.build.getVersionByName
 import com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
+import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.internal.tasks.userinput.UserInputHandler
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.service.ServiceRegistry
 import org.gradle.process.ExecOperations
-import java.io.File
-import javax.inject.Inject
+import org.gradle.work.DisableCachingByDefault
 
 /**
  * Base task with common logic for updating and launching studio in both the frameworks/support
  * project and playground projects. Project-specific configuration is provided by
  * [RootStudioTask] and [PlaygroundStudioTask].
  */
+@DisableCachingByDefault(because = "the purpose of this task is to launch Studio")
 abstract class StudioTask : DefaultTask() {
 
     // TODO: support -y and --update-only options? Can use @Option for this
     @TaskAction
     fun studiow() {
+        validateEnvironment()
         install()
         launch()
     }
@@ -66,21 +71,8 @@ abstract class StudioTask : DefaultTask() {
     @get:Internal
     protected open val installParentDir: File = project.rootDir
 
-    @Suppress("UnstableApiUsage") // For use of VersionCatalog
     private val studioVersion by lazy {
-        val libs = project.extensions.getByType(
-            VersionCatalogsExtension::class.java
-        ).find("libs").get()
-
-        fun getVersion(key: String): String {
-            val version = libs.findVersion(key)
-            return if (version.isPresent) {
-                version.get().requiredVersion
-            } else {
-                throw GradleException("Could not find a version for `$key`")
-            }
-        }
-        getVersion("androidStudio")
+        project.getVersionByName("androidStudio")
     }
 
     /**
@@ -128,12 +120,6 @@ abstract class StudioTask : DefaultTask() {
     open val vmOptions = File(project.getSupportRootFolder(), "development/studio/studio.vmoptions")
 
     /**
-     * [StudioArchiveCreator] that will ensure that an archive is present at [studioArchivePath]
-     */
-    @get:Internal
-    protected abstract val studioArchiveCreator: StudioArchiveCreator
-
-    /**
      * List of additional environment variables to pass into the Studio application.
      */
     @get:Internal
@@ -141,6 +127,22 @@ abstract class StudioTask : DefaultTask() {
 
     private val licenseAcceptedFile: File by lazy {
         File("$studioInstallationDir/STUDIOW_LICENSE_ACCEPTED")
+    }
+
+    /**
+     * Ensure that we can launch Studio without issue.
+     */
+    private fun validateEnvironment() {
+        if (System.getenv().containsKey("SSH_CLIENT") && !System.getenv().containsKey("DISPLAY")) {
+            throw GradleException(
+                """
+                Studio must be run from a graphical session.
+
+                Could not read DISPLAY environment variable.  If you are using SSH into a remote
+                machine, consider using either ssh -X or switching to Chrome Remote Desktop.
+                """.trimIndent()
+            )
+        }
     }
 
     /**
@@ -153,7 +155,7 @@ abstract class StudioTask : DefaultTask() {
             studioInstallationDir.parentFile.deleteRecursively()
             // Create installation directory and any needed parent directories
             studioInstallationDir.mkdirs()
-            studioArchiveCreator(
+            downloadStudioArchive(
                 execOperations,
                 studioVersion,
                 studioArchiveName,
@@ -190,14 +192,20 @@ abstract class StudioTask : DefaultTask() {
     }
 
     private fun launchStudio() {
+        check(ideaProperties.exists()) {
+            "Invalid Studio properties file location: ${ideaProperties.canonicalPath}"
+        }
+        check(vmOptions.exists()) {
+            "Invalid Studio vm options file location: ${vmOptions.canonicalPath}"
+        }
         ProcessBuilder().apply {
             inheritIO()
             with(platformUtilities) { command(launchCommandArguments) }
 
             val additionalStudioEnvironmentProperties = mapOf(
                 // These environment variables are used to set up AndroidX's default configuration.
-                "STUDIO_PROPERTIES" to ideaProperties.absolutePath,
-                "STUDIO_VM_OPTIONS" to vmOptions.absolutePath,
+                "STUDIO_PROPERTIES" to ideaProperties.canonicalPath,
+                "STUDIO_VM_OPTIONS" to vmOptions.canonicalPath,
                 // This environment variable prevents Studio from showing IDE inspection warnings
                 // for nullability issues, if the context is deprecated. This environment variable
                 // is consumed by InteroperabilityDetector.kt
@@ -231,6 +239,26 @@ abstract class StudioTask : DefaultTask() {
         return true
     }
 
+    private fun downloadStudioArchive(
+        execOperations: ExecOperations,
+        studioVersion: String,
+        filename: String,
+        destinationPath: String
+    ) {
+        val url = "https://dl.google.com/dl/android/studio/ide-zips/$studioVersion/$filename"
+        val tmpDownloadPath = File("$destinationPath.tmp").absolutePath
+        println("Downloading $url to $tmpDownloadPath")
+        execOperations.exec { execSpec ->
+            with(execSpec) {
+                executable("curl")
+                args(url, "--output", tmpDownloadPath)
+            }
+        }
+
+        // Renames temp archive to the final archive name
+        Files.move(Paths.get(tmpDownloadPath), Paths.get(destinationPath))
+    }
+
     private fun extractStudioArchive() {
         val fromPath = studioArchivePath
         val toPath = studioInstallationDir.absolutePath
@@ -258,14 +286,15 @@ abstract class StudioTask : DefaultTask() {
 /**
  * Task for launching studio in the frameworks/support project
  */
+@DisableCachingByDefault(because = "the purpose of this task is to launch Studio")
 abstract class RootStudioTask : StudioTask() {
-    override val studioArchiveCreator = UrlArchiveCreator
     override val ideaProperties get() = projectRoot.resolve("development/studio/idea.properties")
 }
 
 /**
  * Task for launching studio in a playground project
  */
+@DisableCachingByDefault(because = "the purpose of this task is to launch Studio")
 abstract class PlaygroundStudioTask : RootStudioTask() {
     @get:Internal
     val supportRootFolder = (project.rootProject.property("ext") as ExtraPropertiesExtension)
@@ -279,7 +308,7 @@ abstract class PlaygroundStudioTask : RootStudioTask() {
     override val additionalEnvironmentProperties: Map<String, String>
         get() = mapOf("ALLOW_PUBLIC_REPOS" to "true")
     override val ideaProperties
-        get() = supportRootFolder.resolve("../playground-common/idea.properties")
+        get() = supportRootFolder.resolve("playground-common/idea.properties")
     override val vmOptions
-        get() = supportRootFolder.resolve("../playground-common/studio.vmoptions")
+        get() = supportRootFolder.resolve("playground-common/studio.vmoptions")
 }

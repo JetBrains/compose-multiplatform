@@ -29,9 +29,13 @@ import androidx.build.getBuildId
 import androidx.build.getCheckoutRoot
 import androidx.build.getDistributionDirectory
 import androidx.build.getKeystore
+import androidx.build.getLibraryByName
 import com.android.build.api.attributes.BuildTypeAttr
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
+import java.io.File
+import java.io.FileNotFoundException
+import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -42,6 +46,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.DocsType
+import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.DuplicatesStrategy
@@ -50,6 +55,8 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
@@ -59,11 +66,9 @@ import org.gradle.kotlin.dsl.all
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.dokka.gradle.DokkaAndroidTask
 import org.jetbrains.dokka.gradle.PackageOptions
-import java.io.File
-import java.io.FileNotFoundException
-import javax.inject.Inject
 
 /**
  * Plugin that allows to build documentation for a given set of prebuilt and tip of tree projects.
@@ -111,7 +116,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             unzippedSamplesSources,
             samplesSourcesConfiguration
         )
-        val unzippedDocsSources = File(project.buildDir, "unzippedDocsSources")
+        val unzippedDocsSources = File(project.buildDir, "srcs")
         val unzipDocsTask = configureUnzipTask(
             project,
             "unzipDocsSources",
@@ -265,6 +270,10 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
                     DocsType.DOCS_TYPE_ATTRIBUTE,
                     project.objects.named<DocsType>(DocsType.SOURCES)
                 )
+                it.attribute(
+                    LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
+                    project.objects.named<LibraryElements>(LibraryElements.JAR)
+                )
             }
         }
         docsSourcesConfiguration = project.configurations.create("docs-sources") {
@@ -337,12 +346,11 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
         val generatedDocsDir = project.file("${project.buildDir}/dackkaDocs")
 
         val dackkaConfiguration = project.configurations.create("dackka").apply {
-            dependencies.add(project.dependencies.create(DACKKA_DEPENDENCY))
+            dependencies.add(project.dependencies.create(project.getLibraryByName("dackka")))
         }
 
         val dackkaTask = project.tasks.register("dackkaDocs", DackkaTask::class.java) { task ->
             task.apply {
-                dependsOn(dackkaConfiguration)
                 dependsOn(unzipDocsTask)
                 dependsOn(unzipSamplesTask)
 
@@ -568,6 +576,8 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
         project.tasks.whenTaskAdded { task ->
             if (task is Test || task.name.startsWith("assemble") ||
                 task.name == "lint" ||
+                task.name == "lintDebug" ||
+                task.name == "lintAnalyzeDebug" ||
                 task.name == "transformDexArchiveWithExternalLibsDexMergerForPublicDebug" ||
                 task.name == "transformResourcesWithMergeJavaResForPublicDebug" ||
                 task.name == "checkPublicDebugDuplicateClasses"
@@ -585,6 +595,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
     }
 }
 
+@DisableCachingByDefault(because = "Doesn't benefit from caching")
 open class DocsBuildOnServer : DefaultTask() {
     @Internal
     lateinit var docsType: String
@@ -593,7 +604,7 @@ open class DocsBuildOnServer : DefaultTask() {
     @Internal
     lateinit var distributionDirectory: File
 
-    @InputFiles
+    @[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
     fun getRequiredFiles(): List<File> {
         return listOf(
             File(distributionDirectory, "dackka-$docsType-docs-$buildId.zip"),
@@ -641,7 +652,6 @@ abstract class SourcesVariantRule : ComponentMetadataRule {
     }
 }
 
-private const val DACKKA_DEPENDENCY = "com.google.devsite:dackka:0.0.13"
 private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
 
 // List of packages to exclude from both Java and Kotlin refdoc generation

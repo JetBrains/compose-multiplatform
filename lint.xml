@@ -29,6 +29,8 @@
         <ignore path="**/src/androidTest/**" />
         <!-- Required for Kotlin multi-platform tests. -->
         <ignore path="**/src/androidAndroidTest/**" />
+        <ignore path="**/src/jvmTest/**" />
+        <ignore path="**/src/commonTest/**" />
         <!-- Required for AppSearch icing tests. -->
         <ignore path="**/java/tests/**" />
     </issue>
