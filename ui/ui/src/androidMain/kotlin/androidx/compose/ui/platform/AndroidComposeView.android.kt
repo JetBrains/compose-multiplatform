@@ -773,15 +773,33 @@ internal class AndroidComposeView(context: Context) :
         measureAndLayoutDelegate.forceMeasureTheSubtree(layoutNode)
     }
 
-    override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
-        if (measureAndLayoutDelegate.requestRemeasure(layoutNode, forceRequest)) {
+    override fun onRequestMeasure(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean,
+        forceRequest: Boolean
+    ) {
+        if (affectsLookahead) {
+            if (measureAndLayoutDelegate.requestLookaheadRemeasure(layoutNode, forceRequest)) {
+                scheduleMeasureAndLayout(layoutNode)
+            }
+        } else if (measureAndLayoutDelegate.requestRemeasure(layoutNode, forceRequest)) {
             scheduleMeasureAndLayout(layoutNode)
         }
     }
 
-    override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) {
-        if (measureAndLayoutDelegate.requestRelayout(layoutNode, forceRequest)) {
-            scheduleMeasureAndLayout()
+    override fun onRequestRelayout(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean,
+        forceRequest: Boolean
+    ) {
+        if (affectsLookahead) {
+            if (measureAndLayoutDelegate.requestLookaheadRelayout(layoutNode, forceRequest)) {
+                scheduleMeasureAndLayout()
+            }
+        } else {
+            if (measureAndLayoutDelegate.requestRelayout(layoutNode, forceRequest)) {
+                scheduleMeasureAndLayout()
+            }
         }
     }
 
@@ -1040,7 +1058,7 @@ internal class AndroidComposeView(context: Context) :
      */
     private fun invalidateLayoutNodeMeasurement(node: LayoutNode) {
         measureAndLayoutDelegate.requestRemeasure(node)
-        node._children.forEach { invalidateLayoutNodeMeasurement(it) }
+        node.forEachChild { invalidateLayoutNodeMeasurement(it) }
     }
 
     /**
@@ -1048,7 +1066,7 @@ internal class AndroidComposeView(context: Context) :
      */
     private fun invalidateLayers(node: LayoutNode) {
         node.invalidateLayers()
-        node._children.forEach { invalidateLayers(it) }
+        node.forEachChild { invalidateLayers(it) }
     }
 
     override fun invalidateDescendants() {

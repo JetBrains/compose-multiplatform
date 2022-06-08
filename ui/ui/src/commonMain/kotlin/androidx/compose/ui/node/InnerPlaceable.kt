@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PaintingStyle
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
@@ -35,15 +36,64 @@ internal class InnerPlaceable(
 
     override val measureScope get() = layoutNode.measureScope
 
+    private inner class LookaheadDelegateImpl(
+        scope: LookaheadScope
+    ) : LookaheadDelegate(this, scope) {
+
+        // Lookahead measure
+        override fun measure(constraints: Constraints): Placeable =
+            performingMeasure(constraints) {
+                // before rerunning the user's measure block reset previous measuredByParent for children
+                layoutNode.forEachChild {
+                    it.measuredByParentInLookahead = LayoutNode.UsageByParent.NotUsed
+                }
+                val measureResult = with(layoutNode.measurePolicy) {
+                    layoutNode.measureScope.measure(
+                        layoutNode.childLookaheadMeasurables,
+                        constraints
+                    )
+                }
+                measureResult
+            }
+
+        override fun calculateAlignmentLine(alignmentLine: AlignmentLine): Int {
+            return (alignmentLinesOwner
+                .calculateAlignmentLines()[alignmentLine] ?: AlignmentLine.Unspecified).also {
+                cachedAlignmentLinesMap[alignmentLine] = it
+            }
+        }
+
+        override fun placeChildren() {
+            layoutNode.layoutDelegate.lookaheadPassDelegate!!.onPlaced()
+            alignmentLinesOwner.layoutChildren()
+        }
+
+        override fun minIntrinsicWidth(height: Int) =
+            layoutNode.intrinsicsPolicy.minLookaheadIntrinsicWidth(height)
+
+        override fun minIntrinsicHeight(width: Int) =
+            layoutNode.intrinsicsPolicy.minLookaheadIntrinsicHeight(width)
+
+        override fun maxIntrinsicWidth(height: Int) =
+            layoutNode.intrinsicsPolicy.maxLookaheadIntrinsicWidth(height)
+
+        override fun maxIntrinsicHeight(width: Int) =
+            layoutNode.intrinsicsPolicy.maxLookaheadIntrinsicHeight(width)
+    }
+
+    override fun createLookaheadDelegate(scope: LookaheadScope): LookaheadDelegate {
+        return LookaheadDelegateImpl(scope)
+    }
+
     override fun measure(constraints: Constraints): Placeable = performingMeasure(constraints) {
         // before rerunning the user's measure block reset previous measuredByParent for children
-        layoutNode._children.forEach {
+        layoutNode.forEachChild {
             it.measuredByParent = LayoutNode.UsageByParent.NotUsed
         }
-        val measureResult = with(layoutNode.measurePolicy) {
-            layoutNode.measureScope.measure(layoutNode.children, constraints)
+
+        measureResult = with(layoutNode.measurePolicy) {
+            layoutNode.measureScope.measure(layoutNode.childMeasurables, constraints)
         }
-        layoutNode.handleMeasureResult(measureResult)
         onMeasured()
         return this
     }
@@ -72,7 +122,7 @@ internal class InnerPlaceable(
         // No need to place our wrapped as well (we might have actually done this already in
         // get(line), to obtain the position of the alignment line the wrapper currently needs
         // our position in order ot know how to offset the value we provided).
-        if (wrappedBy?.isShallowPlacing == true) return
+        if (isShallowPlacing) return
 
         onPlaced()
 
@@ -80,7 +130,10 @@ internal class InnerPlaceable(
     }
 
     override fun calculateAlignmentLine(alignmentLine: AlignmentLine): Int {
-        return layoutNode.calculateAlignmentLines()[alignmentLine] ?: AlignmentLine.Unspecified
+        return lookaheadDelegate?.calculateAlignmentLine(alignmentLine)
+            ?: alignmentLinesOwner
+                .calculateAlignmentLines()[alignmentLine]
+            ?: AlignmentLine.Unspecified
     }
 
     override fun performDraw(canvas: Canvas) {

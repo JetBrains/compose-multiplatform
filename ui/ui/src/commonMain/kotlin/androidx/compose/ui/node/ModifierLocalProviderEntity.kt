@@ -88,7 +88,7 @@ internal class ModifierLocalProviderEntity(
         }
         consumers.forEach { it.invalidateConsumersOf(local) }
         next?.invalidateConsumersOf(local, stopIfProvided = true)
-            ?: layoutNode._children.forEach {
+            ?: layoutNode.forEachChild {
                 it.modifierLocalsHead.invalidateConsumersOf(local, stopIfProvided = true)
             }
     }

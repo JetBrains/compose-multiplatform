@@ -3301,12 +3301,28 @@ private class TestOwner : Owner {
         get() = false
         set(@Suppress("UNUSED_PARAMETER") value) {}
 
-    override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
-        delegate.requestRemeasure(layoutNode)
+    override fun onRequestMeasure(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean,
+        forceRequest: Boolean
+    ) {
+        if (affectsLookahead) {
+            delegate.requestLookaheadRemeasure(layoutNode)
+        } else {
+            delegate.requestRemeasure(layoutNode)
+        }
     }
 
-    override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) {
-        delegate.requestRelayout(layoutNode)
+    override fun onRequestRelayout(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean,
+        forceRequest: Boolean
+    ) {
+        if (affectsLookahead) {
+            delegate.requestLookaheadRelayout(layoutNode)
+        } else {
+            delegate.requestRelayout(layoutNode)
+        }
     }
 
     override fun onAttach(node: LayoutNode) {

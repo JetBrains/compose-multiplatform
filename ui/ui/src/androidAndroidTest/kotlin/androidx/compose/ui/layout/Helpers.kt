@@ -71,8 +71,16 @@ private class FakeOwner(
     override val measureIteration: Long
         get() = delegate.measureIteration
 
-    override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
-        delegate.requestRemeasure(layoutNode)
+    override fun onRequestMeasure(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean,
+        forceRequest: Boolean
+    ) {
+        if (affectsLookahead) {
+            delegate.requestLookaheadRemeasure(layoutNode)
+        } else {
+            delegate.requestRemeasure(layoutNode)
+        }
     }
 
     override fun measureAndLayout(sendPointerUpdate: Boolean) {
@@ -156,8 +164,11 @@ private class FakeOwner(
     override fun createLayer(drawBlock: (Canvas) -> Unit, invalidateParentLayer: () -> Unit) =
         TODO("Not yet implemented")
 
-    override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) =
-        TODO("Not yet implemented")
+    override fun onRequestRelayout(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean,
+        forceRequest: Boolean
+    ) = TODO("Not yet implemented")
 
     override fun calculatePositionInWindow(localPosition: Offset) = TODO("Not yet implemented")
     override fun calculateLocalPosition(positionInWindow: Offset) = TODO("Not yet implemented")

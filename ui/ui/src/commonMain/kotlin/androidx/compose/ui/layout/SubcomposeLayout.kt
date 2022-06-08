@@ -419,7 +419,7 @@ internal class LayoutNodeSubcompositionsState(
         currentIndex++
 
         subcompose(node, slotId, content)
-        return node.children
+        return node.childMeasurables
     }
 
     private fun subcompose(node: LayoutNode, slotId: Any?, content: @Composable () -> Unit) {
@@ -654,12 +654,12 @@ internal class LayoutNodeSubcompositionsState(
             }
 
             override val placeablesCount: Int
-                get() = precomposeMap[slotId]?._children?.size ?: 0
+                get() = precomposeMap[slotId]?.children?.size ?: 0
 
             override fun premeasure(index: Int, constraints: Constraints) {
                 val node = precomposeMap[slotId]
                 if (node != null && node.isAttached) {
-                    val size = node._children.size
+                    val size = node.children.size
                     if (index < 0 || index >= size) {
                         throw IndexOutOfBoundsException(
                             "Index ($index) is out of bound of [0, $size)"
@@ -667,7 +667,7 @@ internal class LayoutNodeSubcompositionsState(
                     }
                     require(!node.isPlaced)
                     root.ignoreRemeasureRequests {
-                        node.requireOwner().measureAndLayout(node._children[index], constraints)
+                        node.requireOwner().measureAndLayout(node.children[index], constraints)
                     }
                 }
             }
