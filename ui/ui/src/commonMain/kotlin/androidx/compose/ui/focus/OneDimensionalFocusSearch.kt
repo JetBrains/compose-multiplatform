@@ -45,7 +45,8 @@ private fun FocusModifier.forwardFocusSearch(
 ): Boolean = when (focusState) {
     ActiveParent, DeactivatedParent -> {
         val focusedChild = focusedChild ?: error(NoActiveChild)
-        focusedChild.forwardFocusSearch(onFound) || searchChildren(focusedChild, Next, onFound)
+        focusedChild.forwardFocusSearch(onFound) ||
+            generateAndSearchChildren(focusedChild, Next, onFound)
     }
     Active, Captured, Deactivated -> pickChildForForwardSearch(onFound)
     Inactive -> onFound.invoke(this)
@@ -65,11 +66,11 @@ private fun FocusModifier.backwardFocusSearch(
 
             DeactivatedParent -> focusedChild.backwardFocusSearch(onFound) ||
                 // Since this item is deactivated, just skip it and search among its siblings.
-                searchChildren(focusedChild, Previous, onFound)
+                generateAndSearchChildren(focusedChild, Previous, onFound)
 
             // Since this item "is focused", it means we already visited all its children.
             // So just search among its siblings.
-            Active, Captured -> searchChildren(focusedChild, Previous, onFound)
+            Active, Captured -> generateAndSearchChildren(focusedChild, Previous, onFound)
 
             Deactivated, Inactive -> error(NoActiveChild)
         }
@@ -86,6 +87,28 @@ private fun FocusModifier.backwardFocusSearch(
     Inactive -> pickChildForBackwardSearch(onFound) || onFound.invoke(this)
 }
 
+// Search among your children for the next child.
+// If the next child is not found, generate more children by requesting a beyondBoundsLayout.
+private fun FocusModifier.generateAndSearchChildren(
+    focusedItem: FocusModifier,
+    direction: FocusDirection,
+    onFound: (FocusModifier) -> Boolean
+): Boolean {
+    // Search among the currently available children.
+    if (searchChildren(focusedItem, direction, onFound)) {
+        return true
+    }
+
+    // Generate more items until searchChildren() finds a result.
+    return searchBeyondBounds(direction) {
+        // Search among the added children. (The search continues as long as we return null).
+        searchChildren(focusedItem, direction, onFound).takeIf { found ->
+            // Stop searching when we find a result or if we don't have any more content.
+            found || !hasMoreContent
+        }
+    } ?: false
+}
+
 // Search for the next sibling that should be granted focus.
 private fun FocusModifier.searchChildren(
     focusedItem: FocusModifier,
@@ -95,7 +118,7 @@ private fun FocusModifier.searchChildren(
     check(focusState == ActiveParent || focusState == DeactivatedParent) {
         "This function should only be used within a parent that has focus."
     }
-
+    children.sort()
     when (direction) {
         Next -> children.forEachItemAfter(focusedItem) { child ->
             if (child.isEligibleForFocusSearch && child.forwardFocusSearch(onFound)) return true
@@ -117,13 +140,17 @@ private fun FocusModifier.searchChildren(
 
 private fun FocusModifier.pickChildForForwardSearch(
     onFound: (FocusModifier) -> Boolean
-): Boolean = children.any { it.forwardFocusSearch(onFound) }
+): Boolean {
+    children.sort()
+    return children.any { it.isEligibleForFocusSearch && it.forwardFocusSearch(onFound) }
+}
 
 private fun FocusModifier.pickChildForBackwardSearch(
     onFound: (FocusModifier) -> Boolean
 ): Boolean {
+    children.sort()
     children.forEachReversed {
-        if (it.backwardFocusSearch(onFound)) {
+        if (it.isEligibleForFocusSearch && it.backwardFocusSearch(onFound)) {
             return true
         }
     }
@@ -132,6 +159,7 @@ private fun FocusModifier.pickChildForBackwardSearch(
 
 private fun FocusModifier.isRoot() = parent == null
 
+@Suppress("BanInlineOptIn")
 @OptIn(ExperimentalContracts::class)
 private inline fun <T> MutableVector<T>.forEachItemAfter(item: T, action: (T) -> Unit) {
     contract { callsInPlace(action) }
@@ -146,6 +174,7 @@ private inline fun <T> MutableVector<T>.forEachItemAfter(item: T, action: (T) ->
     }
 }
 
+@Suppress("BanInlineOptIn")
 @OptIn(ExperimentalContracts::class)
 private inline fun <T> MutableVector<T>.forEachItemBefore(item: T, action: (T) -> Unit) {
     contract { callsInPlace(action) }
@@ -158,4 +187,21 @@ private inline fun <T> MutableVector<T>.forEachItemBefore(item: T, action: (T) -
             itemFound = true
         }
     }
+}
+
+/**
+ * Sort the focus modifiers. in place order
+ *
+ * We want to visit the nodes in placement order instead of composition order.
+ * This is because components like LazyList reuse nodes without re-composing them, but it always
+ * re-places nodes that are reused.
+ *
+ * Instead of sorting the items, we could just look for the next largest place order index in linear
+ * time. However if the next item is deactivated, not eligible for focus search or none of its
+ * children are focusable we would have to backtrack and find the item with the next largest place
+ * order index. This would be more expensive than sorting the items. In addition to this, sorting
+ * the items makes the next focus search more efficient.
+ */
+private fun MutableVector<FocusModifier>.sort() {
+    sortWith(compareBy { it.layoutNodeWrapper?.layoutNode?.placeOrder })
 }
