@@ -22,7 +22,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -56,7 +56,7 @@ private const val dotComposableHeight = 200f
 
 @Composable
 private fun Dots(position: Float) {
-    Canvas(modifier = Modifier.size(400.dp, dotComposableHeight.dp)) {
+    Canvas(modifier = Modifier.requiredSize(400.dp, dotComposableHeight.dp)) {
         val centerY = dotComposableHeight / 2
         for (currentDotPosition in 1..totalDotCount) {
             val dotSize = getDotSizeForPosition(position, currentDotPosition)

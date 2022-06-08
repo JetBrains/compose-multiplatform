@@ -113,7 +113,7 @@ internal class FocusRequesterModifierLocal(
                 layoutNode1 = layoutNode1.parent!!
                 layoutNode2 = layoutNode2.parent!!
             }
-            val children = layoutNode1.parent!!._children
+            val children = layoutNode1.parent!!.children
             val index1 = children.indexOf(layoutNode1)
             val index2 = children.indexOf(layoutNode2)
             if (index1 < index2) mod1 else mod2

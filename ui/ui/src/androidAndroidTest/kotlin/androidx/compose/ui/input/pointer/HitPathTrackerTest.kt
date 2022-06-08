@@ -3646,12 +3646,26 @@ private class MockOwner(
         TODO("Not yet implemented")
     }
 
-    override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
+    override fun onRequestMeasure(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean,
+        forceRequest: Boolean
+    ) {
         onRequestMeasureParams += layoutNode
+        if (affectsLookahead) {
+            layoutNode.markLookaheadMeasurePending()
+        }
         layoutNode.markMeasurePending()
     }
 
-    override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) {
+    override fun onRequestRelayout(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean,
+        forceRequest: Boolean
+    ) {
+        if (affectsLookahead) {
+            layoutNode.markLookaheadLayoutPending()
+        }
         layoutNode.markLayoutPending()
     }
 

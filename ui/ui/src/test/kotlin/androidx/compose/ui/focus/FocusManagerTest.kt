@@ -24,6 +24,7 @@ import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.node.InnerPlaceable
 import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.node.add
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -78,7 +79,7 @@ class FocusManagerTest(private val initialFocusState: FocusState) {
             val child = FocusModifier(Active).apply {
                 layoutNodeWrapper = InnerPlaceable(childLayoutNode)
             }
-            focusModifier.layoutNodeWrapper!!.layoutNode._children.add(childLayoutNode)
+            focusModifier.layoutNodeWrapper!!.layoutNode.add(childLayoutNode)
             focusModifier.focusedChild = child
         }
 
@@ -103,7 +104,7 @@ class FocusManagerTest(private val initialFocusState: FocusState) {
             val child = FocusModifier(Active).apply {
                 layoutNodeWrapper = InnerPlaceable(childLayoutNode)
             }
-            focusModifier.layoutNodeWrapper!!.layoutNode._children.add(childLayoutNode)
+            focusModifier.layoutNodeWrapper!!.layoutNode.add(childLayoutNode)
             focusModifier.focusedChild = child
         }
 
@@ -131,7 +132,7 @@ class FocusManagerTest(private val initialFocusState: FocusState) {
             val child = FocusModifier(Active).apply {
                 layoutNodeWrapper = InnerPlaceable(childLayoutNode)
             }
-            focusModifier.layoutNodeWrapper!!.layoutNode._children.add(childLayoutNode)
+            focusModifier.layoutNodeWrapper!!.layoutNode.add(childLayoutNode)
             focusModifier.focusedChild = child
         }
 
@@ -160,7 +161,7 @@ class FocusManagerTest(private val initialFocusState: FocusState) {
             val child = FocusModifier(Captured).apply {
                 layoutNodeWrapper = InnerPlaceable(childLayoutNode)
             }
-            focusModifier.layoutNodeWrapper!!.layoutNode._children.add(childLayoutNode)
+            focusModifier.layoutNodeWrapper!!.layoutNode.add(childLayoutNode)
             focusModifier.focusedChild = child
 
             // Act.

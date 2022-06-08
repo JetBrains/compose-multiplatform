@@ -15,6 +15,7 @@
  */
 
 @file:Suppress("NOTHING_TO_INLINE")
+@file:OptIn(ExperimentalComposeUiApi::class)
 
 package androidx.compose.ui.node
 
@@ -35,17 +36,18 @@ import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.LookaheadLayoutCoordinatesImpl
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.layout.VerticalAlignmentLine
+import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.layout.findRoot
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.semantics.SemanticsEntity
 import androidx.compose.ui.semantics.SemanticsModifier
+import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
@@ -59,7 +61,9 @@ import androidx.compose.ui.unit.plus
  */
 internal abstract class LayoutNodeWrapper(
     internal val layoutNode: LayoutNode
-) : Placeable(), Measurable, LayoutCoordinates, OwnerScope, (Canvas) -> Unit {
+) : LookaheadCapablePlaceable(), Measurable, LayoutCoordinates, OwnerScope,
+        (Canvas) -> Unit {
+
     internal open val wrapped: LayoutNodeWrapper? get() = null
     internal var wrappedBy: LayoutNodeWrapper? = null
 
@@ -86,6 +90,19 @@ internal abstract class LayoutNodeWrapper(
         return this.wrappedBy?.isTransparent() ?: return false
     }
 
+    override val alignmentLinesOwner: AlignmentLinesOwner
+        get() = layoutNode.layoutDelegate.alignmentLinesOwner
+
+    override val child: LookaheadCapablePlaceable?
+        get() = wrapped
+
+    override fun replace() {
+        placeAt(position, zIndex, layerBlock)
+    }
+
+    override val hasMeasureResult: Boolean
+        get() = _measureResult != null
+
     private var _isAttached = false
     final override val isAttached: Boolean
         get() {
@@ -96,7 +113,7 @@ internal abstract class LayoutNodeWrapper(
         }
 
     private var _measureResult: MeasureResult? = null
-    var measureResult: MeasureResult
+    override var measureResult: MeasureResult
         get() = _measureResult ?: error(UnmeasuredError)
         internal set(value) {
             val old = _measureResult
@@ -110,21 +127,7 @@ internal abstract class LayoutNodeWrapper(
                 if ((!oldAlignmentLines.isNullOrEmpty() || value.alignmentLines.isNotEmpty()) &&
                     value.alignmentLines != oldAlignmentLines
                 ) {
-                    if (wrapped?.layoutNode == layoutNode) {
-                        layoutNode.parent?.onAlignmentsChanged()
-                        // We might need to request remeasure or relayout for the parent in
-                        // case they ask for the lines so we are the query owner, without
-                        // marking dirty our alignment lines (because only the modifier's changed).
-                        if (layoutNode.alignmentLines.usedDuringParentMeasurement) {
-                            layoutNode.parent?.requestRemeasure()
-                        } else if (layoutNode.alignmentLines.usedDuringParentLayout) {
-                            layoutNode.parent?.requestRelayout()
-                        }
-                    } else {
-                        // It means we are an InnerPlaceable.
-                        layoutNode.onAlignmentsChanged()
-                    }
-                    layoutNode.alignmentLines.dirty = true
+                    alignmentLinesOwner.alignmentLines.onAlignmentsChanged()
 
                     val oldLines = oldAlignmentLines
                         ?: (mutableMapOf<AlignmentLine, Int>().also { oldAlignmentLines = it })
@@ -134,10 +137,31 @@ internal abstract class LayoutNodeWrapper(
             }
         }
 
-    private val hasMeasureResult: Boolean
-        get() = _measureResult != null
+    internal var lookaheadDelegate: LookaheadDelegate? = null
+        private set
 
     private var oldAlignmentLines: MutableMap<AlignmentLine, Int>? = null
+
+    /**
+     * Creates a new lookaheadDelegate instance when the scope changes. If the provided scope is
+     * null, it means the lookahead root does not exit (or no longer exists), set
+     * the [lookaheadDelegate] to null.
+     */
+    internal fun updateLookaheadScope(scope: LookaheadScope?) {
+        lookaheadDelegate = scope?.let {
+            if (it != lookaheadDelegate?.lookaheadScope) {
+                createLookaheadDelegate(it)
+            } else {
+                lookaheadDelegate
+            }
+        }
+    }
+
+    protected fun updateLookaheadDelegate(lookaheadDelegate: LookaheadDelegate) {
+        this.lookaheadDelegate = lookaheadDelegate
+    }
+
+    abstract fun createLookaheadDelegate(scope: LookaheadScope): LookaheadDelegate
 
     override val providedAlignmentLines: Set<AlignmentLine>
         get() {
@@ -172,8 +196,8 @@ internal abstract class LayoutNodeWrapper(
         entities.forEach(EntityList.DrawEntityType) { it.onMeasureResultChanged() }
     }
 
-    var position: IntOffset = IntOffset.Zero
-        private set
+    override var position: IntOffset = IntOffset.Zero
+        protected set
 
     var zIndex: Float = 0f
         protected set
@@ -205,10 +229,6 @@ internal abstract class LayoutNodeWrapper(
             check(isAttached) { ExpectAttachedLayoutCoordinates }
             return wrappedBy
         }
-
-    // True when the wrapper is running its own placing block to obtain the position of the
-    // wrapped, but is not interested in the position of the wrapped of the wrapped.
-    var isShallowPlacing = false
 
     private var _rectCache: MutableRect? = null
     protected val rectCache: MutableRect
@@ -243,19 +263,6 @@ internal abstract class LayoutNodeWrapper(
         }
     }
 
-    abstract fun calculateAlignmentLine(alignmentLine: AlignmentLine): Int
-
-    final override fun get(alignmentLine: AlignmentLine): Int {
-        if (!hasMeasureResult) return AlignmentLine.Unspecified
-        val measuredPosition = calculateAlignmentLine(alignmentLine)
-        if (measuredPosition == AlignmentLine.Unspecified) return AlignmentLine.Unspecified
-        return measuredPosition + if (alignmentLine is VerticalAlignmentLine) {
-            apparentToRealOffset.x
-        } else {
-            apparentToRealOffset.y
-        }
-    }
-
     /**
      * An initialization function that is called when the [LayoutNodeWrapper] is initially created,
      * and also called when the [LayoutNodeWrapper] is re-used.
@@ -282,11 +289,7 @@ internal abstract class LayoutNodeWrapper(
             } else {
                 wrappedBy?.invalidateLayer()
             }
-            if (wrapped?.layoutNode != layoutNode) {
-                layoutNode.onAlignmentsChanged()
-            } else {
-                layoutNode.parent?.onAlignmentsChanged()
-            }
+            invalidateAlignmentLinesFromPositionChange()
             layoutNode.owner?.onLayoutChange(layoutNode)
         }
         this.zIndex = zIndex
@@ -322,7 +325,9 @@ internal abstract class LayoutNodeWrapper(
     }
 
     fun onPlaced() {
-        @OptIn(ExperimentalComposeUiApi::class)
+        entities.forEach(EntityList.LookaheadOnPlacedEntityType) {
+            it.modifier.onPlaced(lookaheadDelegate!!.lookaheadLayoutCoordinates)
+        }
         entities.forEach(EntityList.OnPlacedEntityType) {
             it.modifier.onPlaced(this)
         }
@@ -682,12 +687,15 @@ internal abstract class LayoutNodeWrapper(
         return owner.calculatePositionInWindow(positionInRoot)
     }
 
+    private fun LayoutCoordinates.toWrapper() =
+        (this as? LookaheadLayoutCoordinatesImpl)?.wrapper ?: this as LayoutNodeWrapper
+
     override fun localPositionOf(
         sourceCoordinates: LayoutCoordinates,
         relativeToSource: Offset
     ): Offset {
-        val layoutNodeWrapper = sourceCoordinates as LayoutNodeWrapper
-        val commonAncestor = findCommonAncestor(sourceCoordinates)
+        val layoutNodeWrapper = sourceCoordinates.toWrapper()
+        val commonAncestor = findCommonAncestor(layoutNodeWrapper)
 
         var position = relativeToSource
         var wrapper = layoutNodeWrapper
@@ -707,8 +715,8 @@ internal abstract class LayoutNodeWrapper(
         check(sourceCoordinates.isAttached) {
             "LayoutCoordinates $sourceCoordinates is not attached!"
         }
-        val layoutNodeWrapper = sourceCoordinates as LayoutNodeWrapper
-        val commonAncestor = findCommonAncestor(sourceCoordinates)
+        val layoutNodeWrapper = sourceCoordinates.toWrapper()
+        val commonAncestor = findCommonAncestor(layoutNodeWrapper)
 
         val bounds = rectCache
         bounds.left = 0f
@@ -1046,7 +1054,8 @@ internal abstract class LayoutNodeWrapper(
         val offsetFromEdge = offsetFromEdge(pointerPosition)
 
         return if ((width > 0f || height > 0f) &&
-            offsetFromEdge.x <= width && offsetFromEdge.y <= height) {
+            offsetFromEdge.x <= width && offsetFromEdge.y <= height
+        ) {
             offsetFromEdge.getDistanceSquared()
         } else {
             Float.POSITIVE_INFINITY // miss
@@ -1145,7 +1154,7 @@ internal abstract class LayoutNodeWrapper(
 
                 override fun shouldHitTestChildren(parentLayoutNode: LayoutNode) =
                     parentLayoutNode.outerSemantics?.collapsedSemanticsConfiguration()
-                         ?.isClearingSemantics != true
+                        ?.isClearingSemantics != true
 
                 override fun childHitTest(
                     layoutNode: LayoutNode,
