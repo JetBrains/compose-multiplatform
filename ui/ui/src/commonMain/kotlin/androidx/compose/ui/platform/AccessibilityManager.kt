@@ -16,9 +16,12 @@
 
 package androidx.compose.ui.platform
 
+import kotlin.jvm.JvmDefaultWithCompatibility
+
 /**
  * Interface for managing accessibility.
  */
+@JvmDefaultWithCompatibility
 interface AccessibilityManager {
     /**
      * Calculate the recommended timeout for changes to the UI needed by this user. Controls should

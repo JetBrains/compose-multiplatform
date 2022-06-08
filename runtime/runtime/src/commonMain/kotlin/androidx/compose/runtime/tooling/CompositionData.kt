@@ -16,6 +16,8 @@
 
 package androidx.compose.runtime.tooling
 
+import kotlin.jvm.JvmDefaultWithCompatibility
+
 /**
  * A [CompositionData] is the data tracked by the composer during composition.
  *
@@ -48,6 +50,7 @@ interface CompositionData {
  * have access to data tracked during composition. The tools API should be used instead which
  * provides a more usable interpretation of the slot table.
  */
+@JvmDefaultWithCompatibility
 interface CompositionGroup : CompositionData {
     /**
      * A value used to identify the group within its siblings and is typically a compiler
