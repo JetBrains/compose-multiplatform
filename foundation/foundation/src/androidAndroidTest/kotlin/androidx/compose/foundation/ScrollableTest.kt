@@ -30,13 +30,7 @@ import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentComposer
@@ -52,16 +46,13 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.materialize
 import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalReadScope
-import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -74,35 +65,22 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipe
-import androidx.compose.ui.test.swipeDown
-import androidx.compose.ui.test.swipeLeft
-import androidx.compose.ui.test.swipeRight
-import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.CoordinatesProvider
-import androidx.test.espresso.action.GeneralLocation
-import androidx.test.espresso.action.GeneralSwipeAction
-import androidx.test.espresso.action.Press
-import androidx.test.espresso.action.Swipe
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
-import kotlin.math.abs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import org.hamcrest.CoreMatchers.allOf
-import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.math.abs
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -114,8 +92,6 @@ class ScrollableTest {
     private val scrollableBoxTag = "scrollableBox"
 
     private lateinit var scope: CoroutineScope
-
-    private val VelocityTrackerCalculationThreshold = 50
 
     private fun ComposeContentTestRule.setContentAndGetScope(content: @Composable () -> Unit) {
         setContent {
@@ -2062,189 +2038,6 @@ class ScrollableTest {
         rule.runOnIdle { focusManager.moveFocus(FocusDirection.Down) }
 
         rule.runOnIdle { assertThat(nextItemIsFocused).isTrue() }
-    }
-
-    @Test
-    fun verticalScrollable_assertVelocityCalculationIsSimilarInsideOutsideVelocityTracker() {
-        // arrange
-        val tracker = VelocityTracker()
-        var initialTouchPosition = 0f
-        var velocity = Velocity.Zero
-        val capturingScrollConnection = object : NestedScrollConnection {
-            override suspend fun onPreFling(available: Velocity): Velocity {
-                velocity += available
-                return Velocity.Zero
-            }
-        }
-        val controller = ScrollableState { delta ->
-            initialTouchPosition += delta
-            tracker.addPosition(rule.mainClock.currentTime, Offset(0f, initialTouchPosition))
-            0f
-        }
-
-        setScrollableContent {
-            Modifier
-                .nestedScroll(capturingScrollConnection)
-                .scrollable(controller, Orientation.Vertical)
-        }
-
-        // act
-        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
-            tracker.addPosition(rule.mainClock.currentTime, Offset(0f, 0f))
-            swipeUp()
-        }
-
-        // assert
-        rule.runOnIdle {
-            val diff = abs((velocity - tracker.calculateVelocity()).y)
-            assertThat(diff).isLessThan(VelocityTrackerCalculationThreshold)
-        }
-        tracker.resetTracking()
-        velocity = Velocity.Zero
-
-        // act
-        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
-            tracker.addPosition(rule.mainClock.currentTime, Offset(0f, 0f))
-            swipeDown()
-        }
-
-        // assert
-        rule.runOnIdle {
-            val diff = abs((velocity - tracker.calculateVelocity()).y)
-            assertThat(diff).isLessThan(VelocityTrackerCalculationThreshold)
-        }
-    }
-
-    @Test
-    fun horizontalScrollable_assertVelocityCalculationIsSimilarInsideOutsideVelocityTracker() {
-        // arrange
-        val tracker = VelocityTracker()
-        var initialTouchPosition = 0f
-        var velocity = Velocity.Zero
-        val capturingScrollConnection = object : NestedScrollConnection {
-            override suspend fun onPreFling(available: Velocity): Velocity {
-                velocity += available
-                return Velocity.Zero
-            }
-        }
-        val controller = ScrollableState { delta ->
-            initialTouchPosition += delta
-            tracker.addPosition(rule.mainClock.currentTime, Offset(initialTouchPosition, 0f))
-            0f
-        }
-
-        setScrollableContent {
-            Modifier
-                .nestedScroll(capturingScrollConnection)
-                .scrollable(controller, Orientation.Horizontal)
-        }
-
-        // act
-        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
-            tracker.addPosition(rule.mainClock.currentTime, Offset(0f, 0f))
-            swipeLeft()
-        }
-
-        // assert
-        rule.runOnIdle {
-            val diff = abs((velocity - tracker.calculateVelocity()).x)
-            assertThat(diff).isLessThan(VelocityTrackerCalculationThreshold)
-        }
-        tracker.resetTracking()
-        velocity = Velocity.Zero
-
-        // act
-        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
-            tracker.addPosition(rule.mainClock.currentTime, Offset(0f, 0f))
-            swipeRight()
-        }
-
-        // assert
-        rule.runOnIdle {
-            val diff = abs((velocity - tracker.calculateVelocity()).x)
-            assertThat(diff).isLessThan(VelocityTrackerCalculationThreshold)
-        }
-    }
-
-    @Test
-    fun offsetsScrollable_velocityCalculationShouldConsiderLocalPositions() {
-        // arrange
-        var velocity = Velocity.Zero
-        val fullScreen = mutableStateOf(false)
-        lateinit var scrollState: LazyListState
-        val capturingScrollConnection = object : NestedScrollConnection {
-            override suspend fun onPreFling(available: Velocity): Velocity {
-                velocity += available
-                return Velocity.Zero
-            }
-        }
-        rule.setContent {
-            scrollState = rememberLazyListState()
-            Column(modifier = Modifier.nestedScroll(capturingScrollConnection)) {
-                if (!fullScreen.value) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.Black)
-                            .height(400.dp)
-                    )
-                }
-
-                LazyColumn(state = scrollState) {
-                    items(100) {
-                        Box(
-                            modifier = Modifier
-                                .padding(10.dp)
-                                .background(Color.Red)
-                                .fillMaxWidth()
-                                .height(50.dp)
-                        )
-                    }
-                }
-            }
-        }
-        // act
-        // Register generated velocity with offset
-        composeViewSwipeUp()
-        rule.waitForIdle()
-        val previousVelocity = velocity
-        velocity = Velocity.Zero
-        // Remove offset and restart scroll
-        fullScreen.value = true
-        rule.runOnIdle {
-            runBlocking {
-                scrollState.scrollToItem(0)
-            }
-        }
-        rule.waitForIdle()
-        // Register generated velocity without offset, should be larger as there was more
-        // screen to cover.
-        composeViewSwipeUp()
-
-        // assert
-        rule.runOnIdle {
-            assertThat(abs(previousVelocity.y)).isNotEqualTo(abs(velocity.y))
-        }
-    }
-
-    private fun composeViewSwipeUp() {
-        onView(allOf(instanceOf(AbstractComposeView::class.java)))
-            .perform(
-                espressoSwipe(
-                    GeneralLocation.BOTTOM_CENTER,
-                    GeneralLocation.CENTER
-                )
-            )
-    }
-
-    private fun espressoSwipe(
-        start: CoordinatesProvider,
-        end: CoordinatesProvider
-    ): GeneralSwipeAction {
-        return GeneralSwipeAction(
-            Swipe.FAST, start, end,
-            Press.FINGER
-        )
     }
 
     private fun setScrollableContent(scrollableModifierFactory: @Composable () -> Modifier) {
