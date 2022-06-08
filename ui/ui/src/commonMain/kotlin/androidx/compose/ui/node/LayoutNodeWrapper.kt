@@ -29,9 +29,11 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isFinite
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.DefaultCameraDistance
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.ReusableGraphicsLayerScope
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.layout.AlignmentLine
@@ -243,6 +245,11 @@ internal abstract class LayoutNodeWrapper(
      */
     val entities = EntityList()
 
+    /**
+     * The current layer's positional attributes.
+     */
+    private var layerPositionalProperties: LayerPositionalProperties? = null
+
     protected inline fun performingMeasure(
         constraints: Constraints,
         block: () -> Placeable
@@ -393,6 +400,9 @@ internal abstract class LayoutNodeWrapper(
             snapshotObserver.observeReads(this, onCommitAffectingLayerParams) {
                 layerBlock.invoke(graphicsLayerScope)
             }
+            val layerPositionalProperties = layerPositionalProperties
+                ?: LayerPositionalProperties().also { layerPositionalProperties = it }
+            layerPositionalProperties.copyFrom(graphicsLayerScope)
             layer.updateLayerProperties(
                 scaleX = graphicsLayerScope.scaleX,
                 scaleY = graphicsLayerScope.scaleY,
@@ -1108,13 +1118,26 @@ internal abstract class LayoutNodeWrapper(
         const val UnmeasuredError = "Asking for measurement result of unmeasured layout modifier"
         private val onCommitAffectingLayerParams: (LayoutNodeWrapper) -> Unit = { wrapper ->
             if (wrapper.isValid) {
-                wrapper.updateLayerParameters()
+                // wrapper.layerPositionalProperties should always be non-null here, but
+                // we'll just be careful with a null check.
+                val layerPositionalProperties = wrapper.layerPositionalProperties
+                if (layerPositionalProperties == null) {
+                    wrapper.updateLayerParameters()
+                } else {
+                    tmpLayerPositionalProperties.copyFrom(layerPositionalProperties)
+                    wrapper.updateLayerParameters()
+                    if (!tmpLayerPositionalProperties.hasSameValuesAs(layerPositionalProperties)) {
+                        val layoutNode = wrapper.layoutNode
+                        layoutNode.owner?.requestOnPositionedCallback(layoutNode)
+                    }
+                }
             }
         }
         private val onCommitAffectingLayer: (LayoutNodeWrapper) -> Unit = { wrapper ->
             wrapper.layer?.invalidate()
         }
         private val graphicsLayerScope = ReusableGraphicsLayerScope()
+        private val tmpLayerPositionalProperties = LayerPositionalProperties()
 
         /**
          * Hit testing specifics for pointer input.
@@ -1169,5 +1192,57 @@ internal abstract class LayoutNodeWrapper(
                     isInLayer
                 )
             }
+    }
+}
+
+/**
+ * These are the components of a layer that changes the position and may lead
+ * to an OnGloballyPositionedCallback.
+ */
+private class LayerPositionalProperties {
+    private var scaleX: Float = 1f
+    private var scaleY: Float = 1f
+    private var translationX: Float = 0f
+    private var translationY: Float = 0f
+    private var rotationX: Float = 0f
+    private var rotationY: Float = 0f
+    private var rotationZ: Float = 0f
+    private var cameraDistance: Float = DefaultCameraDistance
+    private var transformOrigin: TransformOrigin = TransformOrigin.Center
+
+    fun copyFrom(other: LayerPositionalProperties) {
+        scaleX = other.scaleX
+        scaleY = other.scaleY
+        translationX = other.translationX
+        translationY = other.translationY
+        rotationX = other.rotationX
+        rotationY = other.rotationY
+        rotationZ = other.rotationZ
+        cameraDistance = other.cameraDistance
+        transformOrigin = other.transformOrigin
+    }
+
+    fun copyFrom(scope: GraphicsLayerScope) {
+        scaleX = scope.scaleX
+        scaleY = scope.scaleY
+        translationX = scope.translationX
+        translationY = scope.translationY
+        rotationX = scope.rotationX
+        rotationY = scope.rotationY
+        rotationZ = scope.rotationZ
+        cameraDistance = scope.cameraDistance
+        transformOrigin = scope.transformOrigin
+    }
+
+    fun hasSameValuesAs(other: LayerPositionalProperties): Boolean {
+        return scaleX == other.scaleX &&
+            scaleY == other.scaleY &&
+            translationX == other.translationX &&
+            translationY == other.translationY &&
+            rotationX == other.rotationX &&
+            rotationY == other.rotationY &&
+            rotationZ == other.rotationZ &&
+            cameraDistance == other.cameraDistance &&
+            transformOrigin == other.transformOrigin
     }
 }
