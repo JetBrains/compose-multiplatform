@@ -130,6 +130,12 @@ class AndroidXPlaygroundRootImplPlugin : Plugin<Project> {
                 }
                 repository.content {
                     it.includeGroupByRegex(playgroundRepository.includeGroupRegex)
+                    if (playgroundRepository.includeModuleRegex != null) {
+                        it.includeModuleByRegex(
+                            playgroundRepository.includeGroupRegex,
+                            playgroundRepository.includeModuleRegex
+                        )
+                    }
                 }
             }
         }
@@ -141,6 +147,11 @@ class AndroidXPlaygroundRootImplPlugin : Plugin<Project> {
     private class PlaygroundRepositories(
         props: PlaygroundProperties
     ) {
+        val sonatypeSnapshot = PlaygroundRepository(
+            url = "https://oss.sonatype.org/content/repositories/snapshots",
+            includeGroupRegex = """com\.pinterest.*""",
+            includeModuleRegex = """ktlint.*"""
+        )
         val snapshots = PlaygroundRepository(
             "https://androidx.dev/snapshots/builds/${props.snapshotBuildId}/artifacts/repository",
             includeGroupRegex = """androidx\..*"""
@@ -158,12 +169,13 @@ class AndroidXPlaygroundRootImplPlugin : Plugin<Project> {
             "https://androidx.dev/storage/prebuilts/androidx/internal/repository",
             includeGroupRegex = """androidx\..*"""
         )
-        val all = listOf(snapshots, metalava, doclava, prebuilts)
+        val all = listOf(sonatypeSnapshot, snapshots, metalava, doclava, prebuilts)
     }
 
     private data class PlaygroundRepository(
         val url: String,
-        val includeGroupRegex: String
+        val includeGroupRegex: String,
+        val includeModuleRegex: String? = null
     )
 
     private data class PlaygroundProperties(
