@@ -307,6 +307,7 @@ private fun Modifier.scroll(
             ScrollingLayoutModifier(state, reverseScrolling, isVertical, overscrollEffect)
         semantics
             .clipScrollableContainer(orientation)
+            .overscroll(overscrollEffect)
             .then(scrolling)
             .then(layout)
     },

@@ -129,7 +129,8 @@ fun Modifier.scrollable(
  * interpreted by the user land logic and contains useful information about on-going events.
  * @param orientation orientation of the scrolling
  * @param overscrollEffect effect to which the deltas will be fed when the scrollable have
- * some scrolling delta left. Pass `null` for no overscroll.
+ * some scrolling delta left. Pass `null` for no overscroll. If you pass an effect you should
+ * also apply [androidx.compose.foundation.overscroll] modifier.
  * @param enabled whether or not scrolling in enabled
  * @param reverseDirection reverse the direction of the scroll, so top to bottom scroll will
  * behave like bottom to top and left to right will behave like right to left.

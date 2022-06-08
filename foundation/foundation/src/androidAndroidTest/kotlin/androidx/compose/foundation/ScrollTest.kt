@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -80,6 +81,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
+import androidx.testutils.AnimationDurationScaleRule
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.CoroutineScope
@@ -116,6 +118,10 @@ class ScrollTest {
         Color(red = 0, green = 0, blue = 0xFF, alpha = 0xFF),
         Color(red = 0xA5, green = 0, blue = 0xFF, alpha = 0xFF)
     )
+
+    @get:Rule
+    val animationScaleRule: AnimationDurationScaleRule =
+        AnimationDurationScaleRule.createForAllTests(1f)
 
     private lateinit var scope: CoroutineScope
 
@@ -747,6 +753,35 @@ class ScrollTest {
         scrollNode.performTouchInput { swipeUp() }
 
         assertThat(yScrollState?.value?.invoke()).isEqualTo(scrollState.value)
+    }
+
+    @Test
+    fun overscrollWithOverscrollEnabled() {
+        animationScaleRule.setAnimationDurationScale(1f)
+
+        val containerSize = with(rule.density) { 100.toDp() }
+        val contentSize = with(rule.density) { 110.toDp() }
+        val scrollState = ScrollState(initial = 0)
+        rule.setContent {
+            Box {
+                Box(Modifier.size(containerSize, containerSize)) {
+                    Column(
+                        Modifier
+                            .testTag(scrollerTag)
+                            .verticalScroll(state = scrollState)
+                    ) {
+                        Box(Modifier.height(contentSize).fillMaxWidth())
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag(scrollerTag)
+            .performTouchInput { swipeUp() }
+
+        rule.runOnIdle {
+            assertThat(scrollState.value).isEqualTo(10)
+        }
     }
 
     private fun composeVerticalScroller(
