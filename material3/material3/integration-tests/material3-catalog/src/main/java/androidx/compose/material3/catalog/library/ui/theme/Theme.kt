@@ -26,6 +26,7 @@ import androidx.compose.material.lightColors
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.catalog.library.model.ColorMode
+import androidx.compose.material3.catalog.library.model.FontScaleMode
 import androidx.compose.material3.catalog.library.model.TextDirection
 import androidx.compose.material3.catalog.library.model.Theme
 import androidx.compose.material3.catalog.library.model.ThemeMode
@@ -92,7 +93,11 @@ fun CatalogTheme(
         LocalDensity provides
             Density(
                 density = LocalDensity.current.density,
-                fontScale = theme.fontScale,
+                fontScale = if (theme.fontScaleMode == FontScaleMode.System) {
+                    LocalDensity.current.fontScale
+                } else {
+                    theme.fontScale
+                }
             )
     ) {
         // TODO: Remove M2 MaterialTheme when using only M3 components
