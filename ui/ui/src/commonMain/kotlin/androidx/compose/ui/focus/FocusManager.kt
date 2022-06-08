@@ -26,7 +26,9 @@ import androidx.compose.ui.focus.FocusStateImpl.Deactivated
 import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.unit.LayoutDirection
+import kotlin.jvm.JvmDefaultWithCompatibility
 
+@JvmDefaultWithCompatibility
 interface FocusManager {
     /**
      * Call this function to clear focus from the currently focused component, and set the focus to

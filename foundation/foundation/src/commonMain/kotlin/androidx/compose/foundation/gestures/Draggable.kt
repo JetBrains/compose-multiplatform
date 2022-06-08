@@ -52,11 +52,13 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.isActive
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * State of [draggable]. Allows for a granular control of how deltas are consumed by the user as
  * well as to write custom drag methods using [drag] suspend function.
  */
+@JvmDefaultWithCompatibility
 interface DraggableState {
     /**
      * Call this function to take control of drag logic.

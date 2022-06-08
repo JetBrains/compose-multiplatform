@@ -420,7 +420,7 @@ package androidx.compose.ui.graphics {
   public final class Float16Kt {
   }
 
-  public interface ImageBitmap {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface ImageBitmap {
     method public androidx.compose.ui.graphics.colorspace.ColorSpace getColorSpace();
     method public int getConfig();
     method public boolean getHasAlpha();
@@ -665,7 +665,7 @@ package androidx.compose.ui.graphics {
     property public final int NonZero;
   }
 
-  public interface PathMeasure {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface PathMeasure {
     method public float getLength();
     method public boolean getSegment(float startDistance, float stopDistance, androidx.compose.ui.graphics.Path destination, optional boolean startWithMoveTo);
     method public void setPath(androidx.compose.ui.graphics.Path? path, boolean forceClosed);

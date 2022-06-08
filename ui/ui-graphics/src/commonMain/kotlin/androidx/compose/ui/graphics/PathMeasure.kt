@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.graphics
 
+import kotlin.jvm.JvmDefaultWithCompatibility
+
 /**
  * Create an empty [PathMeasure] object. To uses this to measure the length of a path, and/or to
  * find the position and tangent along it, call [PathMeasure.setPath]. Note that once a path is
@@ -25,6 +27,7 @@ package androidx.compose.ui.graphics
  */
 expect fun PathMeasure(): PathMeasure
 
+@JvmDefaultWithCompatibility
 interface PathMeasure {
 
     /**

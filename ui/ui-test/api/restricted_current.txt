@@ -242,7 +242,7 @@ package androidx.compose.ui.test {
     method public static boolean performKeyPress(androidx.compose.ui.test.SemanticsNodeInteraction, android.view.KeyEvent keyEvent);
   }
 
-  public interface MainTestClock {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface MainTestClock {
     method public void advanceTimeBy(long milliseconds, optional boolean ignoreFrameDuration);
     method public void advanceTimeByFrame();
     method public void advanceTimeUntil(optional long timeoutMillis, kotlin.jvm.functions.Function0<java.lang.Boolean> condition);
@@ -322,7 +322,7 @@ package androidx.compose.ui.test {
     method public operator androidx.compose.ui.test.SemanticsNodeInteraction get(int index);
   }
 
-  public interface SemanticsNodeInteractionsProvider {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface SemanticsNodeInteractionsProvider {
     method public androidx.compose.ui.test.SemanticsNodeInteractionCollection onAllNodes(androidx.compose.ui.test.SemanticsMatcher matcher, optional boolean useUnmergedTree);
     method public androidx.compose.ui.test.SemanticsNodeInteraction onNode(androidx.compose.ui.test.SemanticsMatcher matcher, optional boolean useUnmergedTree);
   }
