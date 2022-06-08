@@ -29,6 +29,7 @@ import androidx.build.getSupportRootFolder
 import androidx.build.getTestConfigDirectory
 import androidx.build.hasAndroidTestSourceCode
 import androidx.build.hasBenchmarkPlugin
+import androidx.build.isPresubmitBuild
 import androidx.build.renameApkForTesting
 import com.android.build.api.artifact.Artifacts
 import com.android.build.api.artifact.SingleArtifact
@@ -77,6 +78,7 @@ fun Project.createTestConfigurationGenerationTask(
         task.testLoader.set(artifacts.getBuiltArtifactsLoader())
         task.outputXml.fileValue(File(getTestConfigDirectory(), xmlName))
         task.constrainedOutputXml.fileValue(File(getConstrainedTestConfigDirectory(), xmlName))
+        task.presubmit.set(isPresubmitBuild())
         // Disable work tests on < API 18: b/178127496
         if (path.startsWith(":work:")) {
             task.minSdk.set(maxOf(18, minSdk))
@@ -284,6 +286,7 @@ fun Project.createOrUpdateMediaTestConfigurationGenerationTask(
         )
         it.minSdk.set(minSdk)
         it.testRunner.set(testRunner)
+        it.presubmit.set(isPresubmitBuild())
         AffectedModuleDetector.configureTaskGuard(it)
     }
 }
@@ -331,6 +334,7 @@ private fun Project.configureMacrobenchmarkConfigTask(
             task.hasBenchmarkPlugin.set(this.hasBenchmarkPlugin())
             task.testRunner.set(testRunner)
             task.testProjectPath.set(this.path)
+            task.presubmit.set(isPresubmitBuild())
             val detector = AffectedModuleDetector.getInstance(project)
             task.affectedModuleDetectorSubset.set(
                 project.provider {

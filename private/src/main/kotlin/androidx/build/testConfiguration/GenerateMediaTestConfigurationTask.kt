@@ -17,7 +17,6 @@
 package androidx.build.testConfiguration
 
 import androidx.build.dependencyTracker.ProjectSubset
-import androidx.build.isPresubmitBuild
 import androidx.build.renameApkForTesting
 import com.android.build.api.variant.BuiltArtifacts
 import com.android.build.api.variant.BuiltArtifactsLoader
@@ -87,6 +86,9 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
 
     @get:Input
     abstract val testRunner: Property<String>
+
+    @get:Input
+    abstract val presubmit: Property<Boolean>
 
     @get:OutputFile
     abstract val clientPreviousServiceToT: RegularFileProperty
@@ -175,7 +177,7 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
             .isServicePrevious(isServicePrevious)
             .tag("androidx_unit_tests")
             .tag("media_compat")
-        val isPresubmit = isPresubmitBuild()
+        val isPresubmit = presubmit.get()
         configBuilder.isPostsubmit(!isPresubmit)
         when (affectedModuleDetectorSubset.get()) {
             ProjectSubset.DEPENDENT_PROJECTS -> {

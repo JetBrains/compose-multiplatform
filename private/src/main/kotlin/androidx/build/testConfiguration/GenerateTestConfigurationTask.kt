@@ -17,7 +17,6 @@
 package androidx.build.testConfiguration
 
 import androidx.build.dependencyTracker.ProjectSubset
-import androidx.build.isPresubmitBuild
 import androidx.build.renameApkForTesting
 import com.android.build.api.variant.BuiltArtifactsLoader
 import org.gradle.api.DefaultTask
@@ -76,6 +75,9 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
     @get:Input
     abstract val affectedModuleDetectorSubset: Property<ProjectSubset>
 
+    @get:Input
+    abstract val presubmit: Property<Boolean>
+
     @get:OutputFile
     abstract val outputXml: RegularFileProperty
 
@@ -112,7 +114,7 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
                 configBuilder.appApkName(appName)
             }
         }
-        val isPresubmit = isPresubmitBuild()
+        val isPresubmit = presubmit.get()
         configBuilder.isPostsubmit(!isPresubmit)
         // Will be using the constrained configs for all devices api 26 and below.
         // Don't attempt to remove APKs after testing. We can't remove the apk on API < 27 due to a
