@@ -36,7 +36,7 @@ import org.gradle.tooling.events.task.TaskExecutionResult
  * inputs/outputs declared and are running more often than necessary.
  */
 
-const val DISALLOW_TASK_EXECUTION_FLAG_NAME = "disallowExecution"
+const val DISALLOW_TASK_EXECUTION_VAR_NAME = "DISALLOW_TASK_EXECUTION"
 
 private const val ENABLE_FLAG_NAME = VERIFY_UP_TO_DATE
 
@@ -120,7 +120,10 @@ val ALLOW_RERUNNING_TASKS = setOf(
     // https://github.com/gradle/gradle/issues/17262
     ":doclava:compileJava",
     ":doclava:processResources",
-    ":doclava:jar"
+    ":doclava:jar",
+
+    // https://youtrack.jetbrains.com/issue/KT-49933
+    "generateProjectStructureMetadata"
 )
 
 // Additional tasks that are expected to be temporarily out-of-date after running once
@@ -229,8 +232,8 @@ abstract class TaskUpToDateValidator :
             if (!shouldEnable(rootProject)) {
                 return
             }
-            val validate = rootProject.providers.gradleProperty(DISALLOW_TASK_EXECUTION_FLAG_NAME)
-                .map { true }.orElse(false)
+            val validate = rootProject.providers
+                .environmentVariable(DISALLOW_TASK_EXECUTION_VAR_NAME).map { true }.orElse(false)
             // create listener for validating that any task that reran was expected to rerun
             val validatorProvider = rootProject.gradle.sharedServices
                 .registerIfAbsent(
