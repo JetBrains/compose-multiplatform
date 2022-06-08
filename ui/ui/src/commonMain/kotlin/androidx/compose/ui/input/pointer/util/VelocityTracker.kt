@@ -19,7 +19,6 @@ package androidx.compose.ui.input.pointer.util
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputChange
-import androidx.compose.ui.input.pointer.changedToDownIgnoreConsumed
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.abs
@@ -28,7 +27,6 @@ import kotlin.math.sqrt
 
 private const val AssumePointerMoveStoppedMilliseconds: Int = 40
 private const val HistorySize: Int = 20
-
 // TODO(b/204895043): Keep value in sync with VelocityPathFinder.HorizonMilliSeconds
 private const val HorizonMilliseconds: Int = 100
 private const val MinSampleSize: Int = 3
@@ -169,7 +167,6 @@ class VelocityTracker {
     private val samples: Array<PointAtTime?> = Array(HistorySize) { null }
     private var index: Int = 0
     private val useImpulse = true
-    internal var currentPointerPositionAccumulator = Offset.Zero
 
     /**
      * Adds a position as the given time to the tracker.
@@ -248,7 +245,6 @@ class VelocityTracker {
      */
     fun resetTracking() {
         samples.fill(element = null)
-        currentPointerPositionAccumulator = Offset.Zero
     }
 
     /**
@@ -338,44 +334,14 @@ class VelocityTracker {
  * For optimal tracking, this should be called for the DOWN event and all MOVE
  * events, including any touch-slop-captured MOVE event.
  *
- * Since Compose uses relative positions inside PointerInputChange, this should be
- * taken into consideration when using this method.
- *
  * @param event Pointer change to track.
  */
 fun VelocityTracker.addPointerInputChange(event: PointerInputChange) {
-
-    // Register down event as the starting point for the accumulator
-    if (event.changedToDownIgnoreConsumed()) {
-        currentPointerPositionAccumulator = event.position
-        resetTracking()
-    }
-
-    // To calculate delta, for each step we want to  do currentPosition - previousPosition.
-    // Initially the previous position is the previous position of the current event
-    var previousPointerPosition = event.previousPosition
     @OptIn(ExperimentalComposeUiApi::class)
     event.historical.fastForEach {
-        // Historical data happens within event.position and event.previousPosition
-        // That means, event.previousPosition < historical data < event.position
-        // Initially, the first delta will happen between the previousPosition and
-        // the first position in historical delta. For subsequent historical data, the
-        // deltas happen between themselves. That's why we need to update previousPointerPosition
-        // everytime.
-        val historicalDelta = it.position - previousPointerPosition
-        previousPointerPosition = it.position
-
-        // Update the current position with the historical delta and add it to the tracker
-        currentPointerPositionAccumulator += historicalDelta
-        addPosition(it.uptimeMillis, currentPointerPositionAccumulator)
+        addPosition(it.uptimeMillis, it.position)
     }
-
-    // For the last position in the event
-    // If there's historical data, the delta is event.position - lastHistoricalPoint
-    // If there's no historical data, the delta is event.position - event.previousPosition
-    val delta = event.position - previousPointerPosition
-    currentPointerPositionAccumulator += delta
-    addPosition(event.uptimeMillis, currentPointerPositionAccumulator)
+    addPosition(event.uptimeMillis, event.position)
 }
 
 private data class PointAtTime(val point: Offset, val time: Long)
@@ -383,7 +349,7 @@ private data class PointAtTime(val point: Offset, val time: Long)
 /**
  * A two dimensional velocity estimate.
  *
- * VelocityEstimates are computed by [VelocityTracker.getImpulseVelocity]. An
+ * VelocityEstimates are computed by [VelocityTracker.getVelocityEstimate]. An
  * estimate's [confidence] measures how well the velocity tracker's position
  * data fit a straight line, [durationMillis] is the time that elapsed between the
  * first and last position sample used to compute the velocity, and [offset]
