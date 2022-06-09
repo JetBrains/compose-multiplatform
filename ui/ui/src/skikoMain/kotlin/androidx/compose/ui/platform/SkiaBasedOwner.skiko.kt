@@ -121,12 +121,12 @@ internal class SkiaBasedOwner(
         properties = {}
     )
 
-    private val _focusManager: FocusManagerImpl = FocusManagerImpl().apply {
+    override val focusManager = FocusManagerImpl(
+        parent = platform.focusManager
+    ).apply {
         // TODO(demin): support RTL [onRtlPropertiesChanged]
         layoutDirection = LayoutDirection.Ltr
     }
-    override val focusManager: FocusManager
-        get() = _focusManager
 
     // TODO: Set the input mode. For now we don't support touch mode, (always in Key mode).
     private val _inputModeManager = InputModeManagerImpl(
@@ -160,7 +160,7 @@ internal class SkiaBasedOwner(
     override val root = LayoutNode().also {
         it.measurePolicy = RootMeasurePolicy
         it.modifier = semanticsModifier
-            .then(_focusManager.modifier)
+            .then(focusManager.modifier)
             .then(keyInputModifier)
             .then(
                 KeyInputModifier(
@@ -183,7 +183,6 @@ internal class SkiaBasedOwner(
     init {
         snapshotObserver.startObserving()
         root.attach(this)
-        _focusManager.takeFocus()
     }
 
     fun dispose() {
@@ -223,7 +222,7 @@ internal class SkiaBasedOwner(
 
     override var showLayoutBounds = false
 
-    override fun requestFocus() = true
+    override fun requestFocus() = platform.requestFocusForOwner()
 
     override fun onAttach(node: LayoutNode) = Unit
 

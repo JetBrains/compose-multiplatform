@@ -16,6 +16,8 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.semantics.SemanticsOwner
@@ -28,6 +30,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 // TODO(demin): make it public when we stabilize it after implementing it for uikit and js
 internal interface Platform {
     val windowInfo: WindowInfo
+    val focusManager: FocusManager
+    fun requestFocusForOwner(): Boolean
     val textInputService: PlatformTextInputService
     fun accessibilityController(owner: SemanticsOwner): AccessibilityController
     fun setPointerIcon(pointerIcon: PointerIcon)
@@ -41,6 +45,13 @@ internal interface Platform {
                 // (hidden textfield cursor, gray titlebar, etc)
                 isWindowFocused = true
             }
+
+            override val focusManager = object : FocusManager {
+                override fun clearFocus(force: Boolean) = Unit
+                override fun moveFocus(focusDirection: FocusDirection) = false
+            }
+
+            override fun requestFocusForOwner() = false
 
             override val textInputService = object : PlatformTextInputService {
                 override fun startInput(

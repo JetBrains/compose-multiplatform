@@ -16,17 +16,26 @@
 
 package androidx.compose.ui.awt
 
+import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalContext
+import androidx.compose.ui.ComposeScene
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.AwtCursor
 import androidx.compose.ui.input.pointer.PointerButtons
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
-import androidx.compose.ui.platform.DesktopPlatform
+import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.platform.AccessibilityControllerImpl
 import androidx.compose.ui.platform.Platform
 import androidx.compose.ui.platform.PlatformComponent
+import androidx.compose.ui.platform.PlatformInput
 import androidx.compose.ui.platform.WindowInfoImpl
+import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.window.WindowExceptionHandler
@@ -60,15 +69,8 @@ import javax.accessibility.AccessibleContext
 import javax.swing.SwingUtilities
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
-import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
-import androidx.compose.ui.ComposeScene
-import androidx.compose.ui.input.pointer.AwtCursor
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.PointerType
-import androidx.compose.ui.platform.PlatformInput
-import androidx.compose.ui.semantics.SemanticsOwner
 import java.awt.Cursor
+import org.jetbrains.skiko.hostOs
 
 internal class ComposeLayer {
     private var isDisposed = false
@@ -107,6 +109,39 @@ internal class ComposeLayer {
         override val windowInfo = WindowInfoImpl()
 
         override val textInputService = PlatformInput(_component)
+
+        override val focusManager = object : FocusManager {
+            override fun clearFocus(force: Boolean) {
+                val root = component.rootPane
+                root?.focusTraversalPolicy?.getDefaultComponent(root)?.requestFocusInWindow()
+            }
+
+            override fun moveFocus(focusDirection: FocusDirection): Boolean = when (focusDirection) {
+                FocusDirection.Next -> {
+                    val toFocus = _component.focusCycleRootAncestor?.let { root ->
+                        val policy = root.focusTraversalPolicy
+                        policy.getComponentAfter(root, _component)
+                            ?: policy.getDefaultComponent(root)
+                    }
+                    val hasFocus = toFocus?.hasFocus() == true
+                    !hasFocus && toFocus?.requestFocusInWindow(FocusEvent.Cause.TRAVERSAL_FORWARD) == true
+                }
+                FocusDirection.Previous -> {
+                    val toFocus = _component.focusCycleRootAncestor?.let { root ->
+                        val policy = root.focusTraversalPolicy
+                        policy.getComponentBefore(root, _component)
+                            ?: policy.getDefaultComponent(root)
+                    }
+                    val hasFocus = toFocus?.hasFocus() == true
+                    !hasFocus && toFocus?.requestFocusInWindow(FocusEvent.Cause.TRAVERSAL_BACKWARD) == true
+                }
+                else -> false
+            }
+        }
+
+        override fun requestFocusForOwner(): Boolean {
+            return component.hasFocus() || component.requestFocusInWindow()
+        }
     }
 
     internal val scene = ComposeScene(
@@ -473,7 +508,7 @@ private fun getLockingKeyStateSafe(
 
 private val MouseEvent.isMacOsCtrlClick
     get() = (
-            DesktopPlatform.Current == DesktopPlatform.MacOS &&
+            hostOs.isMacOS &&
                     ((modifiersEx and InputEvent.BUTTON1_DOWN_MASK) != 0) &&
                     ((modifiersEx and InputEvent.CTRL_DOWN_MASK) != 0)
             )

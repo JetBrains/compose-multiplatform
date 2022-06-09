@@ -33,6 +33,8 @@ import androidx.compose.runtime.CompositionLocalContext
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputEvent
@@ -250,6 +252,11 @@ class ComposeScene internal constructor(
         invalidateIfNeeded()
         if (owner.isFocusable) {
             focusedOwner = owner
+        }
+        if (isFocused) {
+            owner.focusManager.takeFocus()
+        } else {
+            owner.focusManager.releaseFocus()
         }
     }
 
@@ -522,6 +529,40 @@ class ComposeScene internal constructor(
     fun sendKeyEvent(event: ComposeKeyEvent): Boolean = postponeInvalidation {
         return focusedOwner?.sendKeyEvent(event) == true
     }
+
+    private var isFocused = true
+
+    /**
+     * Call this function to clear focus from the currently focused component, and set the focus to
+     * the root focus modifier.
+     */
+    @ExperimentalComposeUiApi
+    fun releaseFocus() {
+        list.forEach {
+            it.focusManager.releaseFocus()
+        }
+        isFocused = false
+    }
+
+    @ExperimentalComposeUiApi
+    fun requestFocus() {
+        list.forEach {
+            it.focusManager.takeFocus()
+        }
+        isFocused = true
+    }
+
+    /**
+     * Moves focus in the specified [direction][FocusDirection].
+     *
+     * If you are not satisfied with the default focus order, consider setting a custom order using
+     * [Modifier.focusProperties()][focusProperties].
+     *
+     * @return true if focus was moved successfully. false if the focused item is unchanged.
+     */
+    @ExperimentalComposeUiApi
+    fun moveFocus(focusDirection: FocusDirection): Boolean =
+        list.lastOrNull()?.focusManager?.moveFocus(focusDirection) ?: false
 }
 
 private class DefaultPointerStateTracker {
