@@ -1178,6 +1178,9 @@ package androidx.compose.ui.text.platform.extensions {
     method public static android.text.style.TtsSpan toSpan(androidx.compose.ui.text.VerbatimTtsAnnotation);
   }
 
+  public final class UrlAnnotationExtensions_androidKt {
+  }
+
 }
 
 package androidx.compose.ui.text.style {

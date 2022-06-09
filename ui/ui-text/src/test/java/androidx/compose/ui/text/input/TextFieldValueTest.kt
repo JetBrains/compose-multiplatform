@@ -24,6 +24,7 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.UrlAnnotation
 import androidx.compose.ui.text.VerbatimTtsAnnotation
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -174,6 +175,8 @@ class TextFieldValueTest {
             withAnnotation(VerbatimTtsAnnotation("verbatim1")) { append("4") }
             withAnnotation(tag = "Tag2", annotation = "Annotation2") { append("5") }
             withAnnotation(VerbatimTtsAnnotation("verbatim2")) { append("6") }
+            withAnnotation(UrlAnnotation("url1")) { append("7") }
+            withAnnotation(UrlAnnotation("url2")) { append("8") }
             withStyle(
                 SpanStyle(
                     color = Color.Red,
