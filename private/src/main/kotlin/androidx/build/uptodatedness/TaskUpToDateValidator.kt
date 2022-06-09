@@ -207,12 +207,17 @@ abstract class TaskUpToDateValidator :
             if (ALLOW_RERUNNING_TASKS.contains(taskPath)) {
                 return true
             }
-            val colonIndex = taskPath.lastIndexOf(":")
-            if (colonIndex >= 0) {
-                val taskName = taskPath.substring(colonIndex + 1)
-                if (ALLOW_RERUNNING_TASKS.contains(taskName)) {
-                    return true
-                }
+            val taskName = taskPath.substringAfterLast(":")
+            if (ALLOW_RERUNNING_TASKS.contains(taskName)) {
+                return true
+            }
+            if (taskName.startsWith("compile") && taskName.endsWith("KotlinMetadata")) {
+                // these tasks' up-to-date checks might flake.
+                // https://youtrack.jetbrains.com/issue/KT-52675
+                // We are not adding the task type to the DONT_TRY_RERUNNING_TASKS list because it
+                // is a common compilation task that is shared w/ other kotlin native compilations.
+                // (e.g. similar to the Exec task in Gradle)
+                return true
             }
             return false
         }
