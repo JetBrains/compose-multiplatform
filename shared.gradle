@@ -45,6 +45,8 @@ dependencies {
     // dependencies that aren't used by buildSrc directly but that we resolve here so that the
     // root project doesn't need to re-resolve them and their dependencies on every build
     cacheableRuntimeOnly(libs.hiltAndroidGradlePluginz)
+    // Needed for hiltAndroidGradlePluginz to workaround https://github.com/google/dagger/issues/3068
+    cacheableApi(libs.javapoet)
     // room kotlintestapp uses the ksp plugin but it does not publish a plugin marker yet
     cacheableApi(libs.kspGradlePluginz)
     cacheableApi(libs.japicmpPluginz)
