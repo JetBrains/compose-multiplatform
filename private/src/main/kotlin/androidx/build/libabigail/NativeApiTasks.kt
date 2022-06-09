@@ -19,6 +19,7 @@ package androidx.build.libabigail
 import androidx.build.addToBuildOnServer
 import androidx.build.addToCheckTask
 import androidx.build.checkapi.getRequiredCompatibilityApiLocation
+import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import java.io.File
@@ -85,6 +86,7 @@ object NativeApiTasks {
                 task.artifactNames.set(artifactNames)
                 task.builtApi.set(builtApiLocation)
                 task.checkedInApis.set(outputApiLocations)
+                task.cacheEvenIfNoOutputs()
                 // Even if our API files are up to date, we still want to make sure we haven't
                 // made any incompatible changes since last release
                 checkNativeApiRelease?.let { task.dependsOn(it) }
