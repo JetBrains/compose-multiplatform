@@ -154,7 +154,7 @@ class AnnotatedString internal constructor(
         } as List<Range<String>>
 
     /**
-     * Query all of the string annotations attached on this AnnotatedString.
+     * Query all of the [TtsAnnotation]s attached on this [AnnotatedString].
      *
      * @param start the start of the query range, inclusive.
      * @param end the end of the query range, exclusive.
@@ -167,6 +167,22 @@ class AnnotatedString internal constructor(
         annotations.fastFilter {
             it.item is TtsAnnotation && intersect(start, end, it.start, it.end)
         } as List<Range<TtsAnnotation>>
+
+    /**
+     * Query all of the [UrlAnnotation]s attached on this [AnnotatedString].
+     *
+     * @param start the start of the query range, inclusive.
+     * @param end the end of the query range, exclusive.
+     * @return a list of annotations stored in [Range].  Notice that All annotations that intersect
+     * with the range [start, end) will be returned. When [start] is bigger than [end], an empty
+     * list will be returned.
+     */
+    @ExperimentalTextApi
+    @Suppress("UNCHECKED_CAST")
+    fun getUrlAnnotations(start: Int, end: Int): List<Range<UrlAnnotation>> =
+        annotations.fastFilter {
+            it.item is UrlAnnotation && intersect(start, end, it.start, it.end)
+        } as List<Range<UrlAnnotation>>
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -343,7 +359,7 @@ class AnnotatedString internal constructor(
         /**
          * Set a [TtsAnnotation] for the given [range].
          *
-         * @param ttsAnnotation an object stores text to speech metadata that intended for the
+         * @param ttsAnnotation an object that stores text to speech metadata that intended for the
          * TTS engine.
          * @param start the inclusive starting offset of the range
          * @param end the exclusive end offset of the range
@@ -354,6 +370,23 @@ class AnnotatedString internal constructor(
         @Suppress("SetterReturnsThis")
         fun addTtsAnnotation(ttsAnnotation: TtsAnnotation, start: Int, end: Int) {
             annotations.add(MutableRange(ttsAnnotation, start, end))
+        }
+
+        /**
+         * Set a [UrlAnnotation] for the given [range]. URLs may be treated specially by screen
+         * readers, including being identified while reading text with an audio icon or being
+         * summarized in a links menu.
+         *
+         * @param urlAnnotation A [UrlAnnotation] object that stores the URL being linked to.
+         * @param start the inclusive starting offset of the range
+         * @param end the exclusive end offset of the range
+         * @see getStringAnnotations
+         * @sample androidx.compose.ui.text.samples.AnnotatedStringAddStringAnnotationSample
+         */
+        @ExperimentalTextApi
+        @Suppress("SetterReturnsThis")
+        fun addUrlAnnotation(urlAnnotation: UrlAnnotation, start: Int, end: Int) {
+            annotations.add(MutableRange(urlAnnotation, start, end))
         }
 
         /**
@@ -413,13 +446,33 @@ class AnnotatedString internal constructor(
          *
          * @sample androidx.compose.ui.text.samples.AnnotatedStringBuilderPushStringAnnotationSample
          *
-         * @param ttsAnnotation an object stores text to speech metadata that intended for the
+         * @param ttsAnnotation an object that stores text to speech metadata that intended for the
          * TTS engine.
          * @see getStringAnnotations
          * @see Range
          */
         fun pushTtsAnnotation(ttsAnnotation: TtsAnnotation): Int {
             MutableRange(item = ttsAnnotation, start = text.length).also {
+                styleStack.add(it)
+                annotations.add(it)
+            }
+            return styleStack.size - 1
+        }
+
+        /**
+         * Attach the given [UrlAnnotation] to any appended text until a corresponding [pop]
+         * is called.
+         *
+         * @sample androidx.compose.ui.text.samples.AnnotatedStringBuilderPushStringAnnotationSample
+         *
+         * @param urlAnnotation A [UrlAnnotation] object that stores the URL being linked to.
+         * @see getStringAnnotations
+         * @see Range
+         */
+        @Suppress("BuilderSetStyle")
+        @ExperimentalTextApi
+        fun pushUrlAnnotation(urlAnnotation: UrlAnnotation): Int {
+            MutableRange(item = urlAnnotation, start = text.length).also {
                 styleStack.add(it)
                 annotations.add(it)
             }
@@ -753,7 +806,8 @@ inline fun <R : Any> Builder.withAnnotation(
  * Pushes an [TtsAnnotation] to the [AnnotatedString.Builder], executes [block] and then pops the
  * annotation.
  *
- * @param ttsAnnotation an object stores text to speech metadata that intended for the TTS engine.
+ * @param ttsAnnotation an object that stores text to speech metadata that intended for the TTS
+ * engine.
  * @param block function to be executed
  *
  * @return result of the [block]
@@ -767,6 +821,31 @@ inline fun <R : Any> Builder.withAnnotation(
     crossinline block: Builder.() -> R
 ): R {
     val index = pushTtsAnnotation(ttsAnnotation)
+    return try {
+        block(this)
+    } finally {
+        pop(index)
+    }
+}
+
+/**
+ * Pushes an [UrlAnnotation] to the [AnnotatedString.Builder], executes [block] and then pops the
+ * annotation.
+ *
+ * @param urlAnnotation A [UrlAnnotation] object that stores the URL being linked to.
+ * @param block function to be executed
+ *
+ * @return result of the [block]
+ *
+ * @see AnnotatedString.Builder.pushStringAnnotation
+ * @see AnnotatedString.Builder.pop
+ */
+@ExperimentalTextApi
+inline fun <R : Any> Builder.withAnnotation(
+    urlAnnotation: UrlAnnotation,
+    crossinline block: Builder.() -> R
+): R {
+    val index = pushUrlAnnotation(urlAnnotation)
     return try {
         block(this)
     } finally {

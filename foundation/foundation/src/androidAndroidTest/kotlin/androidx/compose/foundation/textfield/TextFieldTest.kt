@@ -98,6 +98,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.UrlAnnotation
 import androidx.compose.ui.text.VerbatimTtsAnnotation
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
@@ -181,7 +182,9 @@ class TextFieldTest {
             ) {
                 BasicTextField(
                     value = state.value,
-                    modifier = Modifier.fillMaxSize().onFocusChanged { isFocused = it.isFocused },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .onFocusChanged { isFocused = it.isFocused },
                     onValueChange = { state.value = it }
                 )
             }
@@ -452,6 +455,8 @@ class TextFieldTest {
             withAnnotation(VerbatimTtsAnnotation("verbatim1")) { append("4") }
             withAnnotation(tag = "Tag2", annotation = "Annotation2") { append("5") }
             withAnnotation(VerbatimTtsAnnotation("verbatim2")) { append("6") }
+            withAnnotation(UrlAnnotation("url1")) { append("7") }
+            withAnnotation(UrlAnnotation("url2")) { append("8") }
             withStyle(
                 SpanStyle(
                     color = Color.Red,
@@ -515,7 +520,9 @@ class TextFieldTest {
                 value = "",
                 onValueChange = {},
                 textStyle = TextStyle(color = Color.White),
-                modifier = Modifier.size(10.dp, 20.dp).background(color = Color.White),
+                modifier = Modifier
+                    .size(10.dp, 20.dp)
+                    .background(color = Color.White),
                 cursorBrush = SolidColor(Color.Blue)
             )
         }
@@ -814,7 +821,9 @@ class TextFieldTest {
                     value = "test",
                     onValueChange = {},
                     textStyle = TextStyle(fontSize = 2.sp),
-                    modifier = Modifier.requiredHeight(100.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .requiredHeight(100.dp)
+                        .fillMaxWidth(),
                     decorationBox = {
                         // the core text field is at the very bottom
                         Column {
@@ -1034,7 +1043,9 @@ class TextFieldTest {
 
             CompositionLocalProvider(LocalDensity provides density) {
                 BasicTextField(
-                    modifier = Modifier.testTag(Tag).width(defaultWidth.dp / 2),
+                    modifier = Modifier
+                        .testTag(Tag)
+                        .width(defaultWidth.dp / 2),
                     value = "H",
                     onValueChange = { },
                     textStyle = textStyle,
@@ -1069,7 +1080,9 @@ class TextFieldTest {
 
             CompositionLocalProvider(LocalDensity provides density) {
                 BasicTextField(
-                    modifier = Modifier.testTag(Tag).width(defaultWidth.dp * 2),
+                    modifier = Modifier
+                        .testTag(Tag)
+                        .width(defaultWidth.dp * 2),
                     value = "H",
                     onValueChange = { },
                     textStyle = textStyle,
