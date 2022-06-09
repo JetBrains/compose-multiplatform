@@ -36,6 +36,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
@@ -312,6 +314,27 @@ class TextFieldSelectionManagerTest {
             hapticFeedback,
             times(1)
         ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
+    }
+
+    @Test
+    fun TextFieldSelectionManager_cursorDragObserver_onDrag_withVisualTransformation() {
+        // there is a placeholder after every other char in the original value
+        val offsetMapping = object : OffsetMapping {
+            override fun originalToTransformed(offset: Int) = 2 * offset
+            override fun transformedToOriginal(offset: Int) = offset / 2
+        }
+        manager.value = TextFieldValue(text = "H*e*l*l*o* *W*o*r*l*d", selection = TextRange(0, 0))
+        manager.offsetMapping = offsetMapping
+        manager.visualTransformation = VisualTransformation { original ->
+            TransformedText(
+                AnnotatedString(original.indices.map { original[it] }.joinToString("*")),
+                offsetMapping
+            )
+        }
+
+        manager.cursorDragObserver().onDrag(dragDistance)
+
+        assertThat(value.selection).isEqualTo(TextRange(dragOffset / 2, dragOffset / 2))
     }
 
     @Test
