@@ -310,9 +310,6 @@ private class ScrollingLogic(
         else -> Offset(0f, this)
     }
 
-    fun Float.toVelocity(): Velocity =
-        if (orientation == Horizontal) Velocity(this, 0f) else Velocity(0f, this)
-
     fun Offset.toFloat(): Float =
         if (orientation == Horizontal) this.x else this.y
 
@@ -372,14 +369,14 @@ private class ScrollingLogic(
         }
     }
 
-    suspend fun onDragStopped(axisVelocity: Float) {
+    suspend fun onDragStopped(initialVelocity: Velocity) {
         val preOverscrollConsumed =
             if (overscrollEffect != null && overscrollEffect.isEnabled) {
-                overscrollEffect.consumePreFling(axisVelocity.toVelocity()).toFloat()
+                overscrollEffect.consumePreFling(initialVelocity)
             } else {
-                0f
+                Velocity.Zero
             }
-        val velocity = (axisVelocity - preOverscrollConsumed).toVelocity()
+        val velocity = (initialVelocity - preOverscrollConsumed)
         val preConsumedByParent = nestedScrollDispatcher.value.dispatchPreFling(velocity)
         val available = velocity - preConsumedByParent
         val velocityLeft = doFlingAnimation(available)
@@ -390,7 +387,7 @@ private class ScrollingLogic(
             )
         val totalLeft = velocityLeft - consumedPost
         if (overscrollEffect != null && overscrollEffect.isEnabled) {
-            overscrollEffect.consumePostFling(totalLeft.toFloat().toVelocity())
+            overscrollEffect.consumePostFling(totalLeft)
         }
     }
 
@@ -428,10 +425,10 @@ private class ScrollDraggableState(
 ) : PointerAwareDraggableState, PointerAwareDragScope {
     var latestScrollScope: ScrollScope = NoOpScrollScope
 
-    override fun dragBy(pixels: Float, pointerPosition: Offset) {
+    override fun dragBy(pixels: Offset, pointerPosition: Offset) {
         with(scrollLogic.value) {
             with(latestScrollScope) {
-                dispatchScroll(pixels.toOffset(), pointerPosition, Drag)
+                dispatchScroll(pixels, pointerPosition, Drag)
             }
         }
     }
@@ -446,8 +443,8 @@ private class ScrollDraggableState(
         }
     }
 
-    override fun dispatchRawDelta(delta: Float) {
-        with(scrollLogic.value) { performRawScroll(delta.toOffset()) }
+    override fun dispatchRawDelta(delta: Offset) {
+        with(scrollLogic.value) { performRawScroll(delta) }
     }
 }
 
