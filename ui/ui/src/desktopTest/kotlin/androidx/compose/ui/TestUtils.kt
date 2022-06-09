@@ -22,17 +22,33 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
+import java.awt.AWTEvent
 import java.awt.Component
+import java.awt.EventQueue
 import java.awt.Image
+import java.awt.Toolkit
 import java.awt.Window
+import java.awt.event.InvocationEvent
 import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
 import java.awt.event.MouseWheelEvent
 import java.awt.image.BufferedImage
 import java.awt.image.MultiResolutionImage
+import java.lang.reflect.InvocationTargetException
+import java.lang.reflect.Method
+import java.util.Objects
+import java.util.concurrent.atomic.AtomicReference
 import javax.swing.Icon
 import javax.swing.ImageIcon
 import javax.swing.JFrame
+import javax.swing.SwingUtilities
+import kotlin.coroutines.resume
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.yield
+import org.jetbrains.annotations.NonNls
+import org.jetbrains.annotations.TestOnly
+import org.jetbrains.skiko.MainUIDispatcher
 
 fun testImage(color: Color): Painter = run {
     val bitmap = ImageBitmap(100, 100)
@@ -143,3 +159,23 @@ internal fun awtWheelEvent(isScrollByPages: Boolean = false) = MouseWheelEvent(
     1,
     0
 )
+
+fun Component.performClick() {
+    dispatchEvent(MouseEvent(this, MouseEvent.MOUSE_PRESSED, 0, 0,1, 1, 1, false, MouseEvent.BUTTON1))
+    dispatchEvent(MouseEvent(this, MouseEvent.MOUSE_RELEASED, 0, 0,1, 1, 1, false, MouseEvent.BUTTON1))
+}
+
+// TODO(demin): It seems this not-so-good synchronization
+//  doesn't cause flakiness in our window tests.
+//  But more robust solution will be to using something like UiUtil
+/**
+ * Wait until all scheduled tasks in Event Dispatch Thread are performed.
+ * New scheduled tasks in these tasks also will be performed
+ */
+suspend fun awaitEDT() {
+    // Most of the work usually is done after the first yield(), almost all of the work -
+    // after fourth yield()
+    repeat(100) {
+        yield()
+    }
+}

@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.ui.awaitEDT
 import java.awt.GraphicsEnvironment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -126,16 +127,8 @@ internal class WindowTestScope(
         if (useDelay) {
             delay(500)
         }
-        // TODO(demin): It seems this not-so-good synchronization
-        //  doesn't cause flakiness in our window tests.
-        //  But more robust solution will be to use something like
-        //  TestCoroutineDispatcher/FlushCoroutineDispatcher (but we can't use it in a pure form,
-        //  because there are Swing/system events that we don't control).
-        // Most of the work usually is done after the first yield(), almost all of the work -
-        // after fourth yield()
-        repeat(100) {
-            yield()
-        }
+
+        awaitEDT()
 
         Snapshot.sendApplyNotifications()
         for (recomposerInfo in Recomposer.runningRecomposers.value - initialRecomposers) {

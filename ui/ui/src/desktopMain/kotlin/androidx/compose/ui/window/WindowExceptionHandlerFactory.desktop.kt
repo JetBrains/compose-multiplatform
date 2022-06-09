@@ -16,7 +16,9 @@ object DefaultWindowExceptionHandlerFactory : WindowExceptionHandlerFactory {
         // invokeLater here to dispatch a blocking operation (showMessageDialog)
         SwingUtilities.invokeLater {
             JOptionPane.showMessageDialog(
-                window,
+                // if there was an error during window init, we can't use it as a parent,
+                // otherwise we will have two exceptions in the log
+                window.takeIf { it.isDisplayable },
                 throwable.message ?: "Unknown error", "Error",
                 JOptionPane.ERROR_MESSAGE
             )

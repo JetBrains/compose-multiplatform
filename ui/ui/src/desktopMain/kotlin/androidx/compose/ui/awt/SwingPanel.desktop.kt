@@ -20,18 +20,29 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateObserver
+import androidx.compose.ui.LayoutWithWorkaround
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusTarget
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.round
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Container
+import java.awt.event.FocusEvent
+import java.awt.event.FocusListener
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.JPanel
+import javax.swing.LayoutFocusTraversalPolicy
 import javax.swing.SwingUtilities
 
 val NoOpUpdate: Component.() -> Unit = {}
@@ -64,47 +75,158 @@ public fun <T : Component> SwingPanel(
 ) {
     val componentInfo = remember { ComponentInfo<T>() }
 
-    val container = LocalLayerContainer.current
+    val root = LocalLayerContainer.current
     val density = LocalDensity.current.density
+    val focusManager = LocalFocusManager.current
+    val focusSwitcher = remember { FocusSwitcher(componentInfo, focusManager) }
 
-    Layout(
-        content = {},
+    Box(
         modifier = modifier.onGloballyPositioned { childCoordinates ->
             val coordinates = childCoordinates.parentCoordinates!!
             val location = coordinates.localToWindow(Offset.Zero).round()
             val size = coordinates.size
-            componentInfo.layout.setBounds(
+            componentInfo.container.setBounds(
                 (location.x / density).toInt(),
                 (location.y / density).toInt(),
                 (size.width / density).toInt(),
                 (size.height / density).toInt()
             )
-            componentInfo.layout.validate()
-            componentInfo.layout.repaint()
-        },
-        measurePolicy = { _, _ ->
-            layout(0, 0) {}
+            componentInfo.container.validate()
+            componentInfo.container.repaint()
         }
-    )
+    ) {
+        focusSwitcher.Content()
+    }
 
     DisposableEffect(factory) {
-        componentInfo.factory = factory()
-        componentInfo.layout = JPanel().apply {
-            setLayout(BorderLayout(0, 0))
-            add(componentInfo.factory)
+        val focusListener = object : FocusListener {
+            override fun focusGained(e: FocusEvent) {
+                if (componentInfo.container.isParentOf(e.oppositeComponent)) {
+                    when (e.cause) {
+                        FocusEvent.Cause.TRAVERSAL_FORWARD -> focusSwitcher.moveForward()
+                        FocusEvent.Cause.TRAVERSAL_BACKWARD -> focusSwitcher.moveBackward()
+                        else -> Unit
+                    }
+                }
+            }
+
+            override fun focusLost(e: FocusEvent) = Unit
         }
-        componentInfo.updater = Updater(componentInfo.factory, update)
-        container.add(componentInfo.layout)
+        root.addFocusListener(focusListener)
+        componentInfo.component = factory()
+        componentInfo.container = JPanel().apply {
+            layout = BorderLayout(0, 0)
+            focusTraversalPolicy = object : LayoutFocusTraversalPolicy() {
+                override fun getComponentAfter(aContainer: Container?, aComponent: Component?): Component? {
+                    return if (aComponent == getLastComponent(aContainer)) {
+                        root
+                    } else {
+                        super.getComponentAfter(aContainer, aComponent)
+                    }
+                }
+
+                override fun getComponentBefore(aContainer: Container?, aComponent: Component?): Component? {
+                    return if (aComponent == getFirstComponent(aContainer)) {
+                        root
+                    } else {
+                        super.getComponentBefore(aContainer, aComponent)
+                    }
+                }
+            }
+            isFocusCycleRoot = true
+            add(componentInfo.component)
+        }
+        componentInfo.updater = Updater(componentInfo.component, update)
+        root.add(componentInfo.container)
         onDispose {
-            container.remove(componentInfo.layout)
+            root.remove(componentInfo.container)
             componentInfo.updater.dispose()
+            root.removeFocusListener(focusListener)
         }
     }
 
     SideEffect {
-        componentInfo.layout.setBackground(parseColor(background))
+        componentInfo.container.background = parseColor(background)
         componentInfo.updater.update = update
     }
+}
+
+private class FocusSwitcher<T : Component>(
+    private val info: ComponentInfo<T>,
+    private val focusManager: FocusManager
+) {
+    private val backwardRequester = FocusRequester()
+    private val forwardRequester = FocusRequester()
+    private var isRequesting = false
+
+    fun moveBackward() {
+        try {
+            isRequesting = true
+            backwardRequester.requestFocus()
+        } finally {
+            isRequesting = false
+        }
+        focusManager.moveFocus(FocusDirection.Previous)
+    }
+
+    fun moveForward() {
+        try {
+            isRequesting = true
+            forwardRequester.requestFocus()
+        } finally {
+            isRequesting = false
+        }
+        focusManager.moveFocus(FocusDirection.Next)
+    }
+
+    @Composable
+    fun Content() {
+        Box(
+            Modifier
+                .focusRequester(backwardRequester)
+                .onFocusChanged {
+                    if (it.isFocused && !isRequesting) {
+                        focusManager.clearFocus(force = true)
+                        info.container.focusTraversalPolicy
+                            .getFirstComponent(info.container)
+                            .requestFocus(FocusEvent.Cause.TRAVERSAL_FORWARD)
+                    }
+                }
+                .focusTarget()
+        )
+        Box(
+            Modifier
+                .focusRequester(forwardRequester)
+                .onFocusChanged {
+                    if (it.isFocused && !isRequesting) {
+                        focusManager.clearFocus(force = true)
+                        info.container.focusTraversalPolicy
+                            .getLastComponent(info.container)
+                            .requestFocus(FocusEvent.Cause.TRAVERSAL_BACKWARD)
+                    }
+                }
+                .focusTarget()
+        )
+    }
+}
+
+@Composable
+private fun Box(modifier: Modifier, content: @Composable () -> Unit = {}) {
+    LayoutWithWorkaround(
+        content = content,
+        modifier = modifier,
+        measurePolicy = { measurables, constraints ->
+            val placeables = measurables.map { it.measure(constraints) }
+            layout(
+                placeables.maxOfOrNull { it.width } ?: 0,
+                placeables.maxOfOrNull { it.height } ?: 0
+            ) {
+                placeables.forEach {
+                    it.place(0, 0)
+                }
+            }
+        }
+    )
 }
 
 private fun parseColor(color: Color): java.awt.Color {
@@ -117,8 +239,8 @@ private fun parseColor(color: Color): java.awt.Color {
 }
 
 private class ComponentInfo<T : Component> {
-    lateinit var layout: Container
-    lateinit var factory: T
+    lateinit var container: Container
+    lateinit var component: T
     lateinit var updater: Updater<T>
 }
 
