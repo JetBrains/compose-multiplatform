@@ -467,13 +467,15 @@ internal fun ColorScheme.applyTonalElevation(backgroundColor: Color, elevation: 
 }
 
 /**
- * Returns the [ColorScheme.surface] color with an alpha of the [ColorScheme.surfaceTint] color
- * overlaid on top of it.
  * Computes the surface tonal color at different elevation levels e.g. surface1 through surface5.
  *
  * @param elevation Elevation value used to compute alpha of the color overlay layer.
+ *
+ * @return the [ColorScheme.surface] color with an alpha of the [ColorScheme.surfaceTint] color
+ * overlaid on top of it.
+
  */
-internal fun ColorScheme.surfaceColorAtElevation(
+fun ColorScheme.surfaceColorAtElevation(
     elevation: Dp,
 ): Color {
     if (elevation == 0.dp) return surface
