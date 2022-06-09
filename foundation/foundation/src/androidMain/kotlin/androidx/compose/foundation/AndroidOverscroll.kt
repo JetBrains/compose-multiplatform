@@ -129,6 +129,9 @@ internal class AndroidEdgeEffectOverscrollEffect(
         pointerPosition: Offset?,
         source: NestedScrollSource
     ): Offset {
+        if (containerSize.isEmpty()) {
+            return Offset.Zero
+        }
         if (!scrollCycleInProgress) {
             stopOverscrollAnimation()
             scrollCycleInProgress = true
@@ -173,6 +176,9 @@ internal class AndroidEdgeEffectOverscrollEffect(
         pointerPosition: Offset?,
         source: NestedScrollSource
     ) {
+        if (containerSize.isEmpty()) {
+            return
+        }
         var needsInvalidation = false
         if (source == NestedScrollSource.Drag) {
             val pointer = pointerPosition ?: containerSize.center
@@ -193,6 +199,9 @@ internal class AndroidEdgeEffectOverscrollEffect(
     }
 
     override suspend fun consumePreFling(velocity: Velocity): Velocity {
+        if (containerSize.isEmpty()) {
+            return Velocity.Zero
+        }
         val consumedX = if (velocity.x > 0f && leftEffect.distanceCompat != 0f) {
             leftEffect.onAbsorbCompat(velocity.x.roundToInt())
             velocity.x
@@ -217,6 +226,9 @@ internal class AndroidEdgeEffectOverscrollEffect(
     }
 
     override suspend fun consumePostFling(velocity: Velocity) {
+        if (containerSize.isEmpty()) {
+            return
+        }
         scrollCycleInProgress = false
         if (velocity.x > 0) {
             leftEffect.onAbsorbCompat(velocity.x.roundToInt())
@@ -309,7 +321,10 @@ internal class AndroidEdgeEffectOverscrollEffect(
         )
 
     fun DrawScope.drawOverscroll() {
-        this.drawIntoCanvas { it ->
+        if (containerSize.isEmpty()) {
+            return
+        }
+        this.drawIntoCanvas {
             redrawSignal.value // <-- value read to redraw if needed
             val canvas = it.nativeCanvas
             var needsInvalidate = false
