@@ -24,6 +24,7 @@ import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.LayoutWithWorkaround
 import androidx.compose.ui.LocalComposeScene
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.LocalLayerContainer
@@ -151,7 +152,7 @@ private fun PopupLayout(
     var parentBounds by remember { mutableStateOf(IntRect.Zero) }
 
     // getting parent bounds
-    Layout(
+    LayoutWithWorkaround(
         content = {},
         modifier = Modifier.onGloballyPositioned { childCoordinates ->
             val coordinates = childCoordinates.parentCoordinates!!
@@ -178,7 +179,7 @@ private fun PopupLayout(
         )
         scene.attach(owner)
         val composition = owner.setContent(parent = parentComposition) {
-            Layout(
+            LayoutWithWorkaround(
                 content = content,
                 measurePolicy = { measurables, constraints ->
                     val width = constraints.maxWidth

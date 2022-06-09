@@ -21,13 +21,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.LayoutWithWorkaround
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -53,7 +53,7 @@ internal class UndecoratedWindowResizer(
     @Composable
     fun Content() {
         if (enabled) {
-            Layout(
+            LayoutWithWorkaround(
                 {
                     Side(Cursor.W_RESIZE_CURSOR, Side.Left)
                     Side(Cursor.E_RESIZE_CURSOR, Side.Right)
@@ -123,7 +123,7 @@ internal class UndecoratedWindowResizer(
     }
 
     @Composable
-    private fun Side(cursorId: Int, sides: Int) = Layout(
+    private fun Side(cursorId: Int, sides: Int) = LayoutWithWorkaround(
         {},
         Modifier.cursor(cursorId).resizeOnDrag(sides),
         measurePolicy = { _, constraints ->
