@@ -65,7 +65,8 @@ class DialogTest {
 
             fun createWindow() = ComposeDialog().apply {
                 size = Dimension(300, 200)
-
+                isResizable = true
+                isUndecorated = true
                 addWindowListener(object : WindowAdapter() {
                     override fun windowClosing(e: WindowEvent) {
                         isOpen = false

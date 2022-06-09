@@ -100,6 +100,17 @@ task runWindowApi(type: JavaExec) {
         compilation.runtimeDependencyFiles
 }
 
+task runLayout(type: JavaExec) {
+    dependsOn(":compose:desktop:desktop:jar")
+    main = "androidx.compose.desktop.examples.layout.Main_jvmKt"
+    def compilation = kotlin.jvm().compilations["main"]
+    systemProperty("skiko.rendering.laf.global", "true")
+    systemProperty("skiko.rendering.useScreenMenuBar", "true")
+    classpath =
+            compilation.output.allOutputs +
+                    compilation.runtimeDependencyFiles
+}
+
 task run {
     dependsOn("run1")
 }
