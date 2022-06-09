@@ -33,11 +33,6 @@ const val TEST_FAILURES_DO_NOT_FAIL_TEST_TASK = "androidx.ignoreTestFailures"
 const val DISPLAY_TEST_OUTPUT = "androidx.displayTestOutput"
 
 /**
- * Setting this property turns javac and kotlinc warnings into errors that fail the build.
- */
-const val ALL_WARNINGS_AS_ERRORS = "androidx.allWarningsAsErrors"
-
-/**
  * Setting this property changes "url" property in publishing maven artifact metadata
  */
 const val ALTERNATIVE_PROJECT_URL = "androidx.alternativeProjectUrl"
@@ -152,7 +147,6 @@ const val KMP_ENABLE_LINUX = "androidx.kmp.linux.enabled"
 const val KMP_ENABLE_NATIVE = "androidx.kmp.native.enabled"
 
 val ALL_ANDROIDX_PROPERTIES = setOf(
-    ALL_WARNINGS_AS_ERRORS,
     ALTERNATIVE_PROJECT_URL,
     VERSION_EXTRA_CHECK_ENABLED,
     VALIDATE_PROJECT_STRUCTURE,

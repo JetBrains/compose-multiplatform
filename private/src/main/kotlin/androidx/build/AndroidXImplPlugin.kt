@@ -263,7 +263,9 @@ class AndroidXImplPlugin : Plugin<Project> {
     ) {
         project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
             task.kotlinOptions.jvmTarget = "1.8"
-            project.configureJavaCompilationWarnings(task)
+            task.kotlinOptions.freeCompilerArgs += listOf(
+                "-Xskip-metadata-version-check"
+            )
         }
         project.afterEvaluate {
             val isAndroidProject = project.plugins.hasPlugin(LibraryPlugin::class.java) ||
@@ -929,30 +931,16 @@ private fun Project.configureTaskTimeouts() {
 private fun Project.configureJavaCompilationWarnings(androidXExtension: AndroidXExtension) {
     afterEvaluate {
         project.tasks.withType(JavaCompile::class.java).configureEach { task ->
-            if (hasProperty(ALL_WARNINGS_AS_ERRORS)) {
-                // If we're running a hypothetical test build confirming that tip-of-tree versions
-                // are compatible, then we're not concerned about warnings
-                if (!project.usingMaxDepVersions()) {
-                    task.options.compilerArgs.add("-Werror")
-                    task.options.compilerArgs.add("-Xlint:unchecked")
-                    if (androidXExtension.failOnDeprecationWarnings) {
-                        task.options.compilerArgs.add("-Xlint:deprecation")
-                    }
+            // If we're running a hypothetical test build confirming that tip-of-tree versions
+            // are compatible, then we're not concerned about warnings
+            if (!project.usingMaxDepVersions()) {
+                task.options.compilerArgs.add("-Xlint:unchecked")
+                if (androidXExtension.failOnDeprecationWarnings) {
+                    task.options.compilerArgs.add("-Xlint:deprecation")
                 }
             }
         }
     }
-}
-
-private fun Project.configureJavaCompilationWarnings(task: KotlinCompile) {
-    if (hasProperty(ALL_WARNINGS_AS_ERRORS) &&
-        !project.usingMaxDepVersions()
-    ) {
-        task.kotlinOptions.allWarningsAsErrors = true
-    }
-    task.kotlinOptions.freeCompilerArgs += listOf(
-        "-Xskip-metadata-version-check"
-    )
 }
 
 /**
