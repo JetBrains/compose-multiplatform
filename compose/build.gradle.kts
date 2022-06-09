@@ -170,6 +170,10 @@ tasks.register("runVsync") {
     dependsOnComposeTask(":compose:desktop:desktop:desktop-samples:runVsync")
 }
 
+tasks.register("runLayout") {
+    dependsOnComposeTask(":compose:desktop:desktop:desktop-samples:runLayout")
+}
+
 tasks.register("runMppJs") {
     dependsOnComposeTask(":compose:mpp:demo:jsRun")
 }
