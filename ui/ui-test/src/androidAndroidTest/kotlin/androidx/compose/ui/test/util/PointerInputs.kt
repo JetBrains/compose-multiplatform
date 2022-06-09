@@ -17,13 +17,19 @@
 package androidx.compose.ui.test.util
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.util.VelocityTracker
+import androidx.compose.ui.input.pointer.PointerButtons
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerEventType.Companion.Move
+import androidx.compose.ui.input.pointer.PointerEventType.Companion.Release
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
+import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
+import androidx.compose.ui.input.pointer.PointerType
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.unit.IntSize
 import com.google.common.truth.Truth.assertThat
 
@@ -31,8 +37,23 @@ data class DataPoint(
     val id: PointerId,
     val timestamp: Long,
     val position: Offset,
-    val down: Boolean
+    val down: Boolean,
+    val pointerType: PointerType,
+    val eventType: PointerEventType,
+    val buttons: PointerButtons,
+    val keyboardModifiers: PointerKeyboardModifiers,
 ) {
+    constructor(change: PointerInputChange, event: PointerEvent) : this(
+        change.id,
+        change.uptimeMillis,
+        change.position,
+        change.pressed,
+        change.type,
+        event.type,
+        event.buttons,
+        event.keyboardModifiers,
+    )
+
     val x get() = position.x
     val y get() = position.y
 }
@@ -52,9 +73,9 @@ class SinglePointerInputRecorder : PointerInputModifier {
     private val velocityTracker = VelocityTracker()
     val recordedVelocity get() = velocityTracker.calculateVelocity()
 
-    override val pointerInputFilter = RecordingFilter { changes ->
-        changes.forEach {
-            _events.add(DataPoint(it.id, it.uptimeMillis, it.position, it.pressed))
+    override val pointerInputFilter = RecordingFilter { event ->
+        event.changes.forEach {
+            _events.add(DataPoint(it, event))
             velocityTracker.addPosition(it.uptimeMillis, it.position)
         }
     }
@@ -77,14 +98,8 @@ class MultiPointerInputRecorder : PointerInputModifier {
     private val _events = mutableListOf<Event>()
     val events get() = _events as List<Event>
 
-    override val pointerInputFilter = RecordingFilter { changes ->
-        _events.add(
-            Event(
-                changes.map {
-                    DataPoint(it.id, it.uptimeMillis, it.position, it.pressed)
-                }
-            )
-        )
+    override val pointerInputFilter = RecordingFilter { event ->
+        _events.add(Event(event.changes.map { DataPoint(it, event) }))
     }
 }
 
@@ -94,7 +109,7 @@ class MultiPointerInputRecorder : PointerInputModifier {
  * (but really shouldn't).
  */
 class RecordingFilter(
-    private val record: (List<PointerInputChange>) -> Unit
+    private val record: (PointerEvent) -> Unit
 ) : PointerInputFilter() {
     override fun onPointerEvent(
         pointerEvent: PointerEvent,
@@ -102,7 +117,7 @@ class RecordingFilter(
         bounds: IntSize
     ) {
         if (pass == PointerEventPass.Initial) {
-            record(pointerEvent.changes)
+            record(pointerEvent)
         }
     }
 
@@ -149,8 +164,9 @@ fun SinglePointerInputRecorder.assertOnlyLastEventIsUp() {
 
 fun SinglePointerInputRecorder.assertUpSameAsLastMove() {
     check(events.isNotEmpty()) { "No events recorded" }
-    events.last().also {
-        downEvents.last().verify(it.timestamp, it.id, true, it.position)
+    events.last().let {
+        assertThat(it.eventType).isEqualTo(Release)
+        downEvents.last().verify(it.timestamp, it.id, true, it.position, it.pointerType, Move)
     }
 }
 
@@ -162,7 +178,11 @@ fun DataPoint.verify(
     expectedTimestamp: Long?,
     expectedId: PointerId?,
     expectedDown: Boolean,
-    expectedPosition: Offset
+    expectedPosition: Offset,
+    expectedPointerType: PointerType,
+    expectedEventType: PointerEventType,
+    expectedButtons: PointerButtons = PointerButtons(0),
+    expectedKeyboardModifiers: PointerKeyboardModifiers = PointerKeyboardModifiers(0),
 ) {
     if (expectedTimestamp != null) {
         assertThat(timestamp).isEqualTo(expectedTimestamp)
@@ -172,6 +192,10 @@ fun DataPoint.verify(
     }
     assertThat(down).isEqualTo(expectedDown)
     assertThat(position).isEqualTo(expectedPosition)
+    assertThat(pointerType).isEqualTo(expectedPointerType)
+    assertThat(eventType).isEqualTo(expectedEventType)
+    assertThat(buttons).isEqualTo(expectedButtons)
+    assertThat(keyboardModifiers).isEqualTo(expectedKeyboardModifiers)
 }
 
 /**

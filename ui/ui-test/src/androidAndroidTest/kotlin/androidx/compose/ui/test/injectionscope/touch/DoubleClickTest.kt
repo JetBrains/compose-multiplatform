@@ -21,6 +21,9 @@ import androidx.compose.testutils.TestViewConfiguration
 import androidx.compose.testutils.WithViewConfiguration
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEventType.Companion.Press
+import androidx.compose.ui.input.pointer.PointerEventType.Companion.Release
+import androidx.compose.ui.input.pointer.PointerType.Companion.Touch
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.TouchInjectionScope
@@ -123,13 +126,13 @@ class DoubleClickTest(private val config: TestConfig) {
         val t0 = events[0].timestamp
         val id0 = events[0].id
 
-        events[0].verify(t0 + 0, id0, true, position)
-        events[1].verify(t0 + eventPeriodMillis, id0, false, position)
+        events[0].verify(t0 + 0, id0, true, position, Touch, Press)
+        events[1].verify(t0 + eventPeriodMillis, id0, false, position, Touch, Release)
 
         val t1 = events[1].timestamp + expectedDelay
         val id1 = events[2].id
 
-        events[2].verify(t1 + 0, id1, true, position)
-        events[3].verify(t1 + eventPeriodMillis, id1, false, position)
+        events[2].verify(t1 + 0, id1, true, position, Touch, Press)
+        events[3].verify(t1 + eventPeriodMillis, id1, false, position, Touch, Release)
     }
 }
