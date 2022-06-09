@@ -32,11 +32,13 @@ import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.unit.IntSize
 import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.assertWithMessage
 
 data class DataPoint(
     val id: PointerId,
     val timestamp: Long,
     val position: Offset,
+    val scrollDelta: Offset,
     val down: Boolean,
     val pointerType: PointerType,
     val eventType: PointerEventType,
@@ -47,6 +49,7 @@ data class DataPoint(
         change.id,
         change.uptimeMillis,
         change.position,
+        change.scrollDelta,
         change.pressed,
         change.type,
         event.type,
@@ -174,6 +177,16 @@ fun SinglePointerInputRecorder.assertSinglePointer() {
     assertThat(events.map { it.id }.distinct()).hasSize(1)
 }
 
+fun SinglePointerInputRecorder.verifyEvents(vararg verifiers: DataPoint.() -> Unit) {
+    assertThat(events).hasSize(verifiers.size)
+    if (events.isNotEmpty()) {
+        assertTimestampsAreIncreasing()
+        events.zip(verifiers) { event, verification ->
+            verification.invoke(event)
+        }
+    }
+}
+
 fun DataPoint.verify(
     expectedTimestamp: Long?,
     expectedId: PointerId?,
@@ -181,21 +194,23 @@ fun DataPoint.verify(
     expectedPosition: Offset,
     expectedPointerType: PointerType,
     expectedEventType: PointerEventType,
+    expectedScrollDelta: Offset = Offset.Zero,
     expectedButtons: PointerButtons = PointerButtons(0),
     expectedKeyboardModifiers: PointerKeyboardModifiers = PointerKeyboardModifiers(0),
 ) {
     if (expectedTimestamp != null) {
-        assertThat(timestamp).isEqualTo(expectedTimestamp)
+        assertWithMessage("timestamp").that(timestamp).isEqualTo(expectedTimestamp)
     }
     if (expectedId != null) {
-        assertThat(id).isEqualTo(expectedId)
+        assertWithMessage("pointerId").that(id).isEqualTo(expectedId)
     }
-    assertThat(down).isEqualTo(expectedDown)
-    assertThat(position).isEqualTo(expectedPosition)
-    assertThat(pointerType).isEqualTo(expectedPointerType)
-    assertThat(eventType).isEqualTo(expectedEventType)
-    assertThat(buttons).isEqualTo(expectedButtons)
-    assertThat(keyboardModifiers).isEqualTo(expectedKeyboardModifiers)
+    assertWithMessage("isDown").that(down).isEqualTo(expectedDown)
+    assertWithMessage("position").that(position).isEqualTo(expectedPosition)
+    assertWithMessage("pointerType").that(pointerType).isEqualTo(expectedPointerType)
+    assertWithMessage("eventType").that(eventType).isEqualTo(expectedEventType)
+    assertWithMessage("scrollDelta").that(scrollDelta).isEqualTo(expectedScrollDelta)
+    assertWithMessage("buttonsDown").that(buttons).isEqualTo(expectedButtons)
+    assertWithMessage("keyModifiers").that(keyboardModifiers).isEqualTo(expectedKeyboardModifiers)
 }
 
 /**
