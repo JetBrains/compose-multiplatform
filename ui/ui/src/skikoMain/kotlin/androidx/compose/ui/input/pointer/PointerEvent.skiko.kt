@@ -28,6 +28,7 @@ fun SkikoPointerEventKind.toCompose() = when(this) {
     SkikoPointerEventKind.DOWN -> PointerEventType.Press
     SkikoPointerEventKind.MOVE -> PointerEventType.Move
     SkikoPointerEventKind.DRAG -> PointerEventType.Move
+    SkikoPointerEventKind.SCROLL -> PointerEventType.Scroll
     else -> PointerEventType.Unknown
 }
 

@@ -18,6 +18,7 @@
 import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 
 plugins {
     id("AndroidXPlugin")
@@ -29,7 +30,7 @@ AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
 
-    if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
+    if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block above
@@ -79,7 +80,7 @@ dependencies {
     }
 }
 
-if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
+if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     androidXComposeMultiplatform {
         android()
         desktop()
@@ -88,6 +89,16 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     }
 
     kotlin {
+        // linker-option need to run tests on macOS
+        macosX64 {
+            binaries.findTest(NativeBuildType.DEBUG).freeCompilerArgs +=
+                    ["-linker-option", "-framework", "-linker-option", "Metal"]
+        }
+        macosArm64 {
+            binaries.findTest(NativeBuildType.DEBUG).freeCompilerArgs +=
+                    ["-linker-option", "-framework", "-linker-option", "Metal"]
+        }
+
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block above
