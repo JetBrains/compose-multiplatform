@@ -71,7 +71,9 @@ annotation class ExperimentalAnimationApi
  * 2. scale: [scaleIn]
  * 3. slide: [slideIn], [slideInHorizontally], [slideInVertically]
  * 4. expand: [expandIn], [expandHorizontally], [expandVertically]
- * They can be combined using plus operator,  for example:
+ *
+ * [EnterTransition.None] can be used when no enter transition is desired.
+ * Different [EnterTransition]s can be combined using plus operator,  for example:
  *
  * @sample androidx.compose.animation.samples.SlideTransition
  *
@@ -142,7 +144,8 @@ sealed class EnterTransition {
  * 3. slide: [slideOut], [slideOutHorizontally], [slideOutVertically]
  * 4. shrink: [shrinkOut], [shrinkHorizontally], [shrinkVertically]
  *
- * They can be combined using plus operator, for example:
+ * [ExitTransition.None] can be used when no exit transition is desired.
+ * Different [ExitTransition]s can be combined using plus operator, for example:
  *
  * @sample androidx.compose.animation.samples.SlideTransition
  *
