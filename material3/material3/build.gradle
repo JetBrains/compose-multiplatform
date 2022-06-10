@@ -40,7 +40,7 @@ dependencies {
         implementation("androidx.compose.animation:animation-core:1.1.1")
         implementation("androidx.compose.foundation:foundation-layout:1.1.1")
         implementation("androidx.compose.ui:ui-util:1.0.0")
-        api("androidx.compose.foundation:foundation:1.2.0-rc01")
+        api(project(":compose:foundation:foundation"))
         api("androidx.compose.material:material-icons-core:1.0.2")
         api("androidx.compose.material:material-ripple:1.0.0")
         api("androidx.compose.runtime:runtime:1.0.1")
