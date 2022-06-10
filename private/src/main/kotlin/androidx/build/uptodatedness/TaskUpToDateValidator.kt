@@ -189,6 +189,11 @@ abstract class TaskUpToDateValidator :
                 // null list means the task already failed, so we'll skip emitting our error
                 return
             }
+            if (isCausedByAKlibChange(result)) {
+                // ignore these until this bug in the KMP plugin is fixed.
+                // see the method for details.
+                return
+            }
             if (!isAllowedToRerunTask(name)) {
                 throw GradleException(
                     "Ran two consecutive builds of the same tasks, and in the " +
@@ -204,6 +209,20 @@ abstract class TaskUpToDateValidator :
         // Tells whether to create a TaskUpToDateValidator listener
         private fun shouldEnable(project: Project): Boolean {
             return project.providers.gradleProperty(ENABLE_FLAG_NAME).isPresent
+        }
+
+        /**
+         * Currently, klibs are not reproducible, which means any task that depends on them
+         * might get invalidated at no fault of their own.
+         *
+         * https://youtrack.jetbrains.com/issue/KT-52741
+         */
+        private fun isCausedByAKlibChange(result: TaskExecutionResult): Boolean {
+            // the actual message looks something like:
+            // Input property 'rootSpec$1$3' file <some-path>.klib has changed
+            return result.executionReasons.orEmpty().any {
+                it.contains(".klib has changed")
+            }
         }
 
         private fun isAllowedToRerunTask(taskPath: String): Boolean {
