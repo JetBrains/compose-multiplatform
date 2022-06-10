@@ -28,6 +28,7 @@ android {
     defaultConfig {
         minSdkVersion 21
     }
+    namespace "androidx.compose.runtime.tracing"
 }
 
 dependencies {
