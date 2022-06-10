@@ -1,35 +1,9 @@
 // Baseline format: 1.0
-ParameterNameChange: androidx.compose.animation.core.Animatable#animateDecay(T, androidx.compose.animation.core.DecayAnimationSpec<T>, kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Animatable<T,V>,kotlin.Unit>, kotlin.coroutines.Continuation<? super androidx.compose.animation.core.AnimationResult<T,V>>) parameter #3:
-    Attempted to remove parameter name from parameter arg4 in androidx.compose.animation.core.Animatable.animateDecay
-ParameterNameChange: androidx.compose.animation.core.Animatable#animateTo(T, androidx.compose.animation.core.AnimationSpec<T>, T, kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Animatable<T,V>,kotlin.Unit>, kotlin.coroutines.Continuation<? super androidx.compose.animation.core.AnimationResult<T,V>>) parameter #4:
-    Attempted to remove parameter name from parameter arg5 in androidx.compose.animation.core.Animatable.animateTo
-ParameterNameChange: androidx.compose.animation.core.Animatable#snapTo(T, kotlin.coroutines.Continuation<? super kotlin.Unit>) parameter #1:
-    Attempted to remove parameter name from parameter arg2 in androidx.compose.animation.core.Animatable.snapTo
-ParameterNameChange: androidx.compose.animation.core.Animatable#stop(kotlin.coroutines.Continuation<? super kotlin.Unit>) parameter #0:
-    Attempted to remove parameter name from parameter arg1 in androidx.compose.animation.core.Animatable.stop
-ParameterNameChange: androidx.compose.animation.core.InfiniteAnimationPolicyKt#withInfiniteAnimationFrameMillis(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R>, kotlin.coroutines.Continuation<? super R>) parameter #1:
-    Attempted to remove parameter name from parameter arg2 in androidx.compose.animation.core.InfiniteAnimationPolicyKt.withInfiniteAnimationFrameMillis
-ParameterNameChange: androidx.compose.animation.core.InfiniteAnimationPolicyKt#withInfiniteAnimationFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R>, kotlin.coroutines.Continuation<? super R>) parameter #1:
-    Attempted to remove parameter name from parameter arg2 in androidx.compose.animation.core.InfiniteAnimationPolicyKt.withInfiniteAnimationFrameNanos
-ParameterNameChange: androidx.compose.animation.core.KeyframesSpec.KeyframesSpecConfig#setDelayMillis(int) parameter #0:
-    Attempted to remove parameter name from parameter arg1 in androidx.compose.animation.core.KeyframesSpec.KeyframesSpecConfig.setDelayMillis
-ParameterNameChange: androidx.compose.animation.core.KeyframesSpec.KeyframesSpecConfig#setDurationMillis(int) parameter #0:
-    Attempted to remove parameter name from parameter arg1 in androidx.compose.animation.core.KeyframesSpec.KeyframesSpecConfig.setDurationMillis
-ParameterNameChange: androidx.compose.animation.core.MutableTransitionState#setTargetState(S) parameter #0:
-    Attempted to remove parameter name from parameter arg1 in androidx.compose.animation.core.MutableTransitionState.setTargetState
-ParameterNameChange: androidx.compose.animation.core.SuspendAnimationKt#animate(androidx.compose.animation.core.TwoWayConverter<T,V>, T, T, T, androidx.compose.animation.core.AnimationSpec<T>, kotlin.jvm.functions.Function2<? super T,? super T,kotlin.Unit>, kotlin.coroutines.Continuation<? super kotlin.Unit>) parameter #6:
-    Attempted to remove parameter name from parameter arg7 in androidx.compose.animation.core.SuspendAnimationKt.animate
-ParameterNameChange: androidx.compose.animation.core.SuspendAnimationKt#animate(float, float, float, androidx.compose.animation.core.AnimationSpec<java.lang.Float>, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit>, kotlin.coroutines.Continuation<? super kotlin.Unit>) parameter #5:
-    Attempted to remove parameter name from parameter arg6 in androidx.compose.animation.core.SuspendAnimationKt.animate
-ParameterNameChange: androidx.compose.animation.core.SuspendAnimationKt#animateDecay(androidx.compose.animation.core.AnimationState<T,V>, androidx.compose.animation.core.DecayAnimationSpec<T>, boolean, kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.AnimationScope<T,V>,kotlin.Unit>, kotlin.coroutines.Continuation<? super kotlin.Unit>) parameter #4:
-    Attempted to remove parameter name from parameter arg5 in androidx.compose.animation.core.SuspendAnimationKt.animateDecay
-ParameterNameChange: androidx.compose.animation.core.SuspendAnimationKt#animateDecay(float, float, androidx.compose.animation.core.FloatDecayAnimationSpec, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit>, kotlin.coroutines.Continuation<? super kotlin.Unit>) parameter #4:
-    Attempted to remove parameter name from parameter arg5 in androidx.compose.animation.core.SuspendAnimationKt.animateDecay
-ParameterNameChange: androidx.compose.animation.core.SuspendAnimationKt#animateTo(androidx.compose.animation.core.AnimationState<T,V>, T, androidx.compose.animation.core.AnimationSpec<T>, boolean, kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.AnimationScope<T,V>,kotlin.Unit>, kotlin.coroutines.Continuation<? super kotlin.Unit>) parameter #5:
-    Attempted to remove parameter name from parameter arg6 in androidx.compose.animation.core.SuspendAnimationKt.animateTo
-
-
-RemovedMethod: androidx.compose.animation.core.StartOffset#StartOffset():
-    Removed constructor androidx.compose.animation.core.StartOffset()
-RemovedMethod: androidx.compose.animation.core.StartOffsetType#StartOffsetType():
-    Removed constructor androidx.compose.animation.core.StartOffsetType()
+RemovedDeprecatedMethod: androidx.compose.animation.core.InfiniteRepeatableSpec#InfiniteRepeatableSpec(androidx.compose.animation.core.DurationBasedAnimationSpec<T>, androidx.compose.animation.core.RepeatMode):
+    Removed deprecated method androidx.compose.animation.core.InfiniteRepeatableSpec.InfiniteRepeatableSpec(androidx.compose.animation.core.DurationBasedAnimationSpec<T>,androidx.compose.animation.core.RepeatMode)
+RemovedDeprecatedMethod: androidx.compose.animation.core.RepeatableSpec#RepeatableSpec(int, androidx.compose.animation.core.DurationBasedAnimationSpec<T>, androidx.compose.animation.core.RepeatMode):
+    Removed deprecated method androidx.compose.animation.core.RepeatableSpec.RepeatableSpec(int,androidx.compose.animation.core.DurationBasedAnimationSpec<T>,androidx.compose.animation.core.RepeatMode)
+RemovedDeprecatedMethod: androidx.compose.animation.core.VectorizedInfiniteRepeatableSpec#VectorizedInfiniteRepeatableSpec(androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V>, androidx.compose.animation.core.RepeatMode):
+    Removed deprecated method androidx.compose.animation.core.VectorizedInfiniteRepeatableSpec.VectorizedInfiniteRepeatableSpec(androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V>,androidx.compose.animation.core.RepeatMode)
+RemovedDeprecatedMethod: androidx.compose.animation.core.VectorizedRepeatableSpec#VectorizedRepeatableSpec(int, androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V>, androidx.compose.animation.core.RepeatMode):
+    Removed deprecated method androidx.compose.animation.core.VectorizedRepeatableSpec.VectorizedRepeatableSpec(int,androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V>,androidx.compose.animation.core.RepeatMode)

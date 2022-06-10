@@ -441,6 +441,8 @@ package androidx.compose.material3 {
   }
 
   public enum SnackbarDuration {
+    method public static androidx.compose.material3.SnackbarDuration valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.material3.SnackbarDuration[] values();
     enum_constant public static final androidx.compose.material3.SnackbarDuration Indefinite;
     enum_constant public static final androidx.compose.material3.SnackbarDuration Long;
     enum_constant public static final androidx.compose.material3.SnackbarDuration Short;
@@ -463,6 +465,8 @@ package androidx.compose.material3 {
   }
 
   public enum SnackbarResult {
+    method public static androidx.compose.material3.SnackbarResult valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.material3.SnackbarResult[] values();
     enum_constant public static final androidx.compose.material3.SnackbarResult ActionPerformed;
     enum_constant public static final androidx.compose.material3.SnackbarResult Dismissed;
   }
