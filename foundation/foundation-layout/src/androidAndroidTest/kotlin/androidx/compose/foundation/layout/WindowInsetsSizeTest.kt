@@ -108,11 +108,11 @@ class WindowInsetsSizeTest {
             androidx.core.graphics.Insets.of(25, 0, 0, 0)
         )
 
-        rule.runOnIdle {
+        rule.waitUntil {
             val view = findComposeView()
             val height = view.height
             val expectedSize = IntSize(15, height)
-            assertThat(coordinates.size).isEqualTo(expectedSize)
+            coordinates.size == expectedSize
         }
     }
 
@@ -157,11 +157,11 @@ class WindowInsetsSizeTest {
             androidx.core.graphics.Insets.of(0, 0, 0, 25)
         )
 
-        rule.runOnIdle {
+        rule.waitUntil {
             val view = findComposeView()
             val width = view.width
             val expectedSize = IntSize(width, 15)
-            assertThat(coordinates.size).isEqualTo(expectedSize)
+            coordinates.size == expectedSize
         }
     }
 
@@ -281,8 +281,8 @@ class WindowInsetsSizeTest {
             view.dispatchApplyWindowInsets(insets.toWindowInsets())
         }
 
-        rule.runOnIdle {
-            assertThat(coordinates.size).isEqualTo(IntSize(view.width, 10))
+        rule.waitUntil {
+            coordinates.size == IntSize(view.width, 10)
         }
     }
 
@@ -334,12 +334,12 @@ class WindowInsetsSizeTest {
         val insets = sendInsets(type, sentInsets)
         assertThat(insets.isConsumed)
 
-        rule.runOnIdle {
+        rule.waitUntil {
             val view = findComposeView()
             val width = view.width
             val height = view.height
             val expectedSize = expected(IntSize(width, height))
-            assertThat(coordinates.size).isEqualTo(expectedSize)
+            coordinates.size == expectedSize
         }
     }
 
