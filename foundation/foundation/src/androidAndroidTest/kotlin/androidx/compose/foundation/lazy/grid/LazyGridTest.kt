@@ -721,6 +721,26 @@ class LazyGridTest(
     }
 
     @Test
+    fun maxIntElements_withKey_startInMiddle() {
+        val itemSize = with(rule.density) { 15.toDp() }
+
+        rule.setContent {
+            LazyGrid(
+                cells = 1,
+                modifier = Modifier.size(itemSize),
+                state = LazyGridState(firstVisibleItemIndex = Int.MAX_VALUE / 2)
+            ) {
+                items(Int.MAX_VALUE, key = { it }) {
+                    Box(Modifier.size(itemSize).testTag("$it"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("${Int.MAX_VALUE / 2}")
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
     fun pointerInputScrollingIsAllowedWhenUserScrollingIsEnabled() {
         val itemSize = with(rule.density) { 30.toDp() }
         rule.setContentWithTestViewConfiguration {
