@@ -20,11 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntSize
 
 /**
- * Base class for entities in [LayoutNodeWrapper]. a [LayoutNodeEntity] is
+ * Base class for entities in [NodeCoordinator]. a [LayoutNodeEntity] is
  * a node in a linked list referenced from [EntityList].
  */
 internal open class LayoutNodeEntity<T : LayoutNodeEntity<T, M>, M : Modifier>(
-    val layoutNodeWrapper: LayoutNodeWrapper,
+    val coordinator: NodeCoordinator,
     val modifier: M
 ) {
     /**
@@ -37,13 +37,13 @@ internal open class LayoutNodeEntity<T : LayoutNodeEntity<T, M>, M : Modifier>(
      * Convenience access to [LayoutNode]
      */
     val layoutNode: LayoutNode
-        get() = layoutNodeWrapper.layoutNode
+        get() = coordinator.layoutNode
 
     /**
-     * Convenience access to [LayoutNodeWrapper.size]
+     * Convenience access to [NodeCoordinator.size]
      */
     val size: IntSize
-        get() = layoutNodeWrapper.size
+        get() = coordinator.size
 
     /**
      * `true` only when the entity is attached to the hierarchy.

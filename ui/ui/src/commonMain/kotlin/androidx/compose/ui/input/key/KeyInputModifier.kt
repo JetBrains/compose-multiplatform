@@ -29,7 +29,7 @@ import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.modifier.ProvidableModifierLocal
 import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.node.LayoutNodeWrapper
+import androidx.compose.ui.node.NodeCoordinator
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.platform.inspectable
 
@@ -129,6 +129,6 @@ internal class KeyInputModifier(
     }
 
     override fun onPlaced(coordinates: LayoutCoordinates) {
-        layoutNode = (coordinates as LayoutNodeWrapper).layoutNode
+        layoutNode = (coordinates as NodeCoordinator).layoutNode
     }
 }

@@ -26,7 +26,7 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.node.EntityList
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.node.LayoutNodeWrapper
+import androidx.compose.ui.node.NodeCoordinator
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.IntSize
@@ -104,7 +104,7 @@ class SemanticsNode internal constructor(
     /**
      * The size of the bounding box for this node, with no clipping applied
      */
-    val size: IntSize get() = findWrapperToGetBounds().size
+    val size: IntSize get() = findCoordinatorToGetBounds().size
 
     /**
      * The bounding box for this node relative to the root of this Compose hierarchy, with
@@ -114,7 +114,7 @@ class SemanticsNode internal constructor(
     val boundsInRoot: Rect
         get() {
             if (!layoutNode.isAttached) return Rect.Zero
-            return findWrapperToGetBounds().boundsInRoot()
+            return findCoordinatorToGetBounds().boundsInRoot()
         }
 
     /**
@@ -124,7 +124,7 @@ class SemanticsNode internal constructor(
     val positionInRoot: Offset
         get() {
             if (!layoutNode.isAttached) return Offset.Zero
-            return findWrapperToGetBounds().positionInRoot()
+            return findCoordinatorToGetBounds().positionInRoot()
         }
 
     /**
@@ -134,7 +134,7 @@ class SemanticsNode internal constructor(
     val boundsInWindow: Rect
         get() {
             if (!layoutNode.isAttached) return Rect.Zero
-            return findWrapperToGetBounds().boundsInWindow()
+            return findCoordinatorToGetBounds().boundsInWindow()
         }
 
     /**
@@ -143,7 +143,7 @@ class SemanticsNode internal constructor(
     val positionInWindow: Offset
         get() {
             if (!layoutNode.isAttached) return Offset.Zero
-            return findWrapperToGetBounds().positionInWindow()
+            return findCoordinatorToGetBounds().positionInWindow()
         }
 
     /**
@@ -151,7 +151,7 @@ class SemanticsNode internal constructor(
      * if the line is not provided.
      */
     fun getAlignmentLinePosition(alignmentLine: AlignmentLine): Int {
-        return findWrapperToGetBounds()[alignmentLine]
+        return findCoordinatorToGetBounds()[alignmentLine]
     }
 
     // CHILDREN
@@ -339,11 +339,11 @@ class SemanticsNode internal constructor(
      * of use cases it means that accessibility bounds will be equal to the clickable area.
      * Otherwise the outermost semantics will be used to report bounds, size and position.
      */
-    internal fun findWrapperToGetBounds(): LayoutNodeWrapper {
+    internal fun findCoordinatorToGetBounds(): NodeCoordinator {
         return if (unmergedConfig.isMergingSemanticsOfDescendants) {
-            (layoutNode.outerMergingSemantics ?: outerSemanticsEntity).layoutNodeWrapper
+            (layoutNode.outerMergingSemantics ?: outerSemanticsEntity).coordinator
         } else {
-            outerSemanticsEntity.layoutNodeWrapper
+            outerSemanticsEntity.coordinator
         }
     }
 
@@ -384,7 +384,7 @@ class SemanticsNode internal constructor(
                     isVirtual = true,
                     semanticsId =
                         if (role != null) roleFakeNodeId() else contentDescriptionFakeNodeId()
-                ).innerLayoutNodeWrapper,
+                ).innerCoordinator,
                 modifier = SemanticsModifierCore(
                     mergeDescendants = false,
                     clearAndSetSemantics = false,
@@ -403,20 +403,20 @@ class SemanticsNode internal constructor(
  * Returns the outermost semantics node on a LayoutNode.
  */
 internal val LayoutNode.outerSemantics: SemanticsEntity?
-    get() = outerLayoutNodeWrapper.nearestSemantics { true }
+    get() = outerCoordinator.nearestSemantics { true }
 
 internal val LayoutNode.outerMergingSemantics
-    get() = outerLayoutNodeWrapper.nearestSemantics {
+    get() = outerCoordinator.nearestSemantics {
         it.modifier.semanticsConfiguration.isMergingSemanticsOfDescendants
     }
 
 /**
- * Returns the nearest semantics wrapper starting from a LayoutNodeWrapper.
+ * Returns the nearest semantics wrapper starting from a NodeCoordinator.
  */
-internal inline fun LayoutNodeWrapper.nearestSemantics(
+internal inline fun NodeCoordinator.nearestSemantics(
     predicate: (SemanticsEntity) -> Boolean
 ): SemanticsEntity? {
-    var wrapper: LayoutNodeWrapper? = this
+    var wrapper: NodeCoordinator? = this
     while (wrapper != null && !wrapper.entities.has(EntityList.SemanticsEntityType)) {
         wrapper = wrapper.wrapped
     }

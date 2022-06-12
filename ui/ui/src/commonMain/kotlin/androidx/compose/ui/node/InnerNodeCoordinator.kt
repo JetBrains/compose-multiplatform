@@ -29,9 +29,9 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 
-internal class InnerPlaceable(
+internal class InnerNodeCoordinator(
     layoutNode: LayoutNode
-) : LayoutNodeWrapper(layoutNode) {
+) : NodeCoordinator(layoutNode) {
 
     private inner class LookaheadDelegateImpl(
         scope: LookaheadScope
@@ -114,10 +114,10 @@ internal class InnerPlaceable(
     ) {
         super.placeAt(position, zIndex, layerBlock)
 
-        // The wrapper only runs their placement block to obtain our position, which allows them
+        // The coordinator only runs their placement block to obtain our position, which allows them
         // to calculate the offset of an alignment line we have already provided a position for.
         // No need to place our wrapped as well (we might have actually done this already in
-        // get(line), to obtain the position of the alignment line the wrapper currently needs
+        // get(line), to obtain the position of the alignment line the coordinator currently needs
         // our position in order ot know how to offset the value we provided).
         if (isShallowPlacing) return
 
@@ -184,7 +184,7 @@ internal class InnerPlaceable(
                         if (!wasHit) {
                             continueHitTest = true
                         } else if (
-                            child.outerLayoutNodeWrapper.shouldSharePointerInputWithSiblings()
+                            child.outerCoordinator.shouldSharePointerInputWithSiblings()
                         ) {
                             hitTestResult.acceptHits()
                             continueHitTest = true

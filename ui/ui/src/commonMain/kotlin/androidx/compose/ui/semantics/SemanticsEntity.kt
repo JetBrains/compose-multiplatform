@@ -20,10 +20,10 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.node.EntityList
 import androidx.compose.ui.node.LayoutNodeEntity
-import androidx.compose.ui.node.LayoutNodeWrapper
+import androidx.compose.ui.node.NodeCoordinator
 
 internal class SemanticsEntity(
-    wrapped: LayoutNodeWrapper,
+    wrapped: NodeCoordinator,
     modifier: SemanticsModifier
 ) : LayoutNodeEntity<SemanticsEntity, SemanticsModifier>(wrapped, modifier) {
     val id: Int
@@ -35,7 +35,7 @@ internal class SemanticsEntity(
     fun collapsedSemanticsConfiguration(): SemanticsConfiguration {
         val next = next
         val nextSemantics = if (next == null) {
-            layoutNodeWrapper.wrapped?.nearestSemantics { true }
+            coordinator.wrapped?.nearestSemantics { true }
         } else {
             next.nearestSemantics { true }
         }
@@ -67,26 +67,26 @@ internal class SemanticsEntity(
             return Rect.Zero
         }
         if (!useMinimumTouchTarget) {
-            return layoutNodeWrapper.boundsInRoot()
+            return coordinator.boundsInRoot()
         }
 
-        return layoutNodeWrapper.touchBoundsInRoot()
+        return coordinator.touchBoundsInRoot()
     }
 
     internal inline fun nearestSemantics(
         predicate: (SemanticsEntity) -> Boolean
     ): SemanticsEntity? {
-        var layoutNodeWrapper: LayoutNodeWrapper? = layoutNodeWrapper
+        var coordinator: NodeCoordinator? = coordinator
         var next: SemanticsEntity? = this
-        while (layoutNodeWrapper != null) {
+        while (coordinator != null) {
             while (next != null) {
                 if (predicate(next)) {
                     return next
                 }
                 next = next.next
             }
-            layoutNodeWrapper = layoutNodeWrapper.wrapped
-            next = layoutNodeWrapper?.entities?.head(EntityList.SemanticsEntityType)
+            coordinator = coordinator.wrapped
+            next = coordinator?.entities?.head(EntityList.SemanticsEntityType)
         }
         return null
     }

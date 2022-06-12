@@ -2372,13 +2372,13 @@ package androidx.compose.ui.node {
   @kotlin.RequiresOptIn(message="This API is internal to library.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY, kotlin.annotation.AnnotationTarget.PROPERTY_GETTER, kotlin.annotation.AnnotationTarget.PROPERTY_SETTER}) public @interface InternalCoreApi {
   }
 
+  public final class LayoutModifierNodeCoordinatorKt {
+  }
+
   public final class LayoutNodeKt {
   }
 
   public final class LayoutNodeLayoutDelegateKt {
-  }
-
-  public final class ModifiedLayoutNodeKt {
   }
 
   public final class Ref<T> {

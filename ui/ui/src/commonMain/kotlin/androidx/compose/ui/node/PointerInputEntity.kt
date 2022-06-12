@@ -20,13 +20,13 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.pointer.PointerInputModifier
 
 internal class PointerInputEntity(
-    layoutNodeWrapper: LayoutNodeWrapper,
+    coordinator: NodeCoordinator,
     modifier: PointerInputModifier
-) : LayoutNodeEntity<PointerInputEntity, PointerInputModifier>(layoutNodeWrapper, modifier) {
+) : LayoutNodeEntity<PointerInputEntity, PointerInputModifier>(coordinator, modifier) {
 
     override fun onAttach() {
         super.onAttach()
-        modifier.pointerInputFilter.layoutCoordinates = layoutNodeWrapper
+        modifier.pointerInputFilter.layoutCoordinates = coordinator
         modifier.pointerInputFilter.isAttached = true
     }
 

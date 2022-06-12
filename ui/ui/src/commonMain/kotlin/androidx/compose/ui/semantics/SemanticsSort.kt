@@ -19,7 +19,7 @@ package androidx.compose.ui.semantics
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.node.LayoutNodeWrapper
+import androidx.compose.ui.node.NodeCoordinator
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
@@ -78,10 +78,10 @@ internal class NodeLocationHolder internal constructor(
     private val layoutDirection = subtreeRoot.layoutDirection
 
     init {
-        val subtreeRootWrapper = subtreeRoot.innerLayoutNodeWrapper
-        val nodeWrapper = node.findWrapperToGetBounds()
-        location = if (subtreeRootWrapper.isAttached && nodeWrapper.isAttached) {
-            subtreeRootWrapper.localBoundingBoxOf(nodeWrapper)
+        val subtreeRootCoordinator = subtreeRoot.innerCoordinator
+        val coordinator = node.findCoordinatorToGetBounds()
+        location = if (subtreeRootCoordinator.isAttached && coordinator.isAttached) {
+            subtreeRootCoordinator.localBoundingBoxOf(coordinator)
         } else {
             null
         }
@@ -127,14 +127,14 @@ internal class NodeLocationHolder internal constructor(
 
         // Find a child of each view with different screen bounds. If we get here, node and
         // other.node must be attached.
-        val view1Bounds = node.findWrapperToGetBounds().boundsInRoot()
-        val view2Bounds = other.node.findWrapperToGetBounds().boundsInRoot()
+        val view1Bounds = node.findCoordinatorToGetBounds().boundsInRoot()
+        val view2Bounds = other.node.findCoordinatorToGetBounds().boundsInRoot()
         val child1 = node.findNodeByPredicateTraversal {
-            val wrapper = it.findWrapperToGetBounds()
+            val wrapper = it.findCoordinatorToGetBounds()
             wrapper.isAttached && view1Bounds != wrapper.boundsInRoot()
         }
         val child2 = other.node.findNodeByPredicateTraversal {
-            val wrapper = it.findWrapperToGetBounds()
+            val wrapper = it.findCoordinatorToGetBounds()
             wrapper.isAttached && view2Bounds != wrapper.boundsInRoot()
         }
         // Compare the children recursively
@@ -177,8 +177,8 @@ internal fun LayoutNode.findNodeByPredicateTraversal(
 
 /**
  * If this node has semantics, we use the semantics wrapper to get bounds. Otherwise, we use
- * innerLayoutNodeWrapper because it seems the bounds after padding is the effective content.
+ * innerCoordinator because it seems the bounds after padding is the effective content.
  */
-internal fun LayoutNode.findWrapperToGetBounds(): LayoutNodeWrapper {
-    return (outerMergingSemantics ?: outerSemantics)?.layoutNodeWrapper ?: innerLayoutNodeWrapper
+internal fun LayoutNode.findCoordinatorToGetBounds(): NodeCoordinator {
+    return (outerMergingSemantics ?: outerSemantics)?.coordinator ?: innerCoordinator
 }

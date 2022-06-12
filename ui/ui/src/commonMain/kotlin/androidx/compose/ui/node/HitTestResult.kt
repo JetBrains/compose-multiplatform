@@ -28,7 +28,7 @@ import kotlin.math.sign
  * The List<T> interface should only be used after hit testing has completed.
  *
  * @see LayoutNode.hitTest
- * @see LayoutNodeWrapper.hitTest
+ * @see NodeCoordinator.hitTest
  * @see PointerInputEntity.hitTest
  */
 internal class HitTestResult<T> : List<T> {

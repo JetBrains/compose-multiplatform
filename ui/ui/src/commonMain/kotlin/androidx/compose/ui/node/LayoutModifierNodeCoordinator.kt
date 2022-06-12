@@ -35,14 +35,15 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
 @OptIn(ExperimentalComposeUiApi::class)
-internal class ModifiedLayoutNode(
-    override var wrapped: LayoutNodeWrapper,
+internal class LayoutModifierNodeCoordinator(
+    override var wrapped: NodeCoordinator,
     var modifier: LayoutModifier
-) : LayoutNodeWrapper(wrapped.layoutNode) {
+) : NodeCoordinator(wrapped.layoutNode) {
+
     private var lookAheadTransientLayoutModifier: IntermediateLayoutModifier? =
         modifier as? IntermediateLayoutModifier
 
-    // This is used by LayoutNode to mark LayoutNodeWrappers that are going to be reused
+    // This is used by LayoutNode to mark NodeCoordinators that are going to be reused
     // because they match the modifier instance.
     var toBeReusedForSameModifier = false
     override fun onInitialize() {
@@ -151,7 +152,7 @@ internal class ModifiedLayoutNode(
         performingMeasure(constraints) {
             with(modifier) {
                 measureResult = measure(wrapped, constraints)
-                this@ModifiedLayoutNode
+                this@LayoutModifierNodeCoordinator
             }
         }
         onMeasured()
@@ -185,10 +186,10 @@ internal class ModifiedLayoutNode(
         layerBlock: (GraphicsLayerScope.() -> Unit)?
     ) {
         super.placeAt(position, zIndex, layerBlock)
-        // The wrapper only runs their placement block to obtain our position, which allows them
+        // The coordinator only runs their placement block to obtain our position, which allows them
         // to calculate the offset of an alignment line we have already provided a position for.
         // No need to place our wrapped as well (we might have actually done this already in
-        // get(line), to obtain the position of the alignment line the wrapper currently needs
+        // get(line), to obtain the position of the alignment line the coordinator currently needs
         // our position in order ot know how to offset the value we provided).
         if (isShallowPlacing) return
         onPlaced()

@@ -19,7 +19,7 @@ package androidx.compose.ui.layout
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Matrix
-import androidx.compose.ui.node.LayoutNodeWrapper
+import androidx.compose.ui.node.NodeCoordinator
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 
@@ -177,11 +177,11 @@ fun LayoutCoordinates.findRootCoordinates(): LayoutCoordinates {
         root = parent
         parent = root.parentLayoutCoordinates
     }
-    var rootLayoutNodeWrapper = root as? LayoutNodeWrapper ?: return root
-    var parentLayoutNodeWrapper = rootLayoutNodeWrapper.wrappedBy
-    while (parentLayoutNodeWrapper != null) {
-        rootLayoutNodeWrapper = parentLayoutNodeWrapper
-        parentLayoutNodeWrapper = parentLayoutNodeWrapper.wrappedBy
+    var rootCoordinator = root as? NodeCoordinator ?: return root
+    var parentCoordinator = rootCoordinator.wrappedBy
+    while (parentCoordinator != null) {
+        rootCoordinator = parentCoordinator
+        parentCoordinator = parentCoordinator.wrappedBy
     }
-    return rootLayoutNodeWrapper
+    return rootCoordinator
 }

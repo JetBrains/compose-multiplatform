@@ -31,7 +31,7 @@ import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.toAndroidRect
-import androidx.compose.ui.node.InnerPlaceable
+import androidx.compose.ui.node.InnerNodeCoordinator
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
@@ -1265,7 +1265,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     ): SemanticsNode {
         val semanticsModifier = SemanticsModifierCore(mergeDescendants, false, properties)
         return SemanticsNode(
-            SemanticsEntity(InnerPlaceable(LayoutNode(semanticsId = id)), semanticsModifier),
+            SemanticsEntity(InnerNodeCoordinator(LayoutNode(semanticsId = id)), semanticsModifier),
             true
         )
     }

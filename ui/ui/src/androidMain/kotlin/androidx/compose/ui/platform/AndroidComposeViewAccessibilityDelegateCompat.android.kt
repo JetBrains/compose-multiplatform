@@ -570,9 +570,9 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         val wrapperToCheckTransparency = if (semanticsNode.isFake) {
             // when node is fake, its parent that is the original semantics node should define the
             // alpha value
-            semanticsNode.parent?.findWrapperToGetBounds()
+            semanticsNode.parent?.findCoordinatorToGetBounds()
         } else {
-            semanticsNode.findWrapperToGetBounds()
+            semanticsNode.findCoordinatorToGetBounds()
         }
         val isTransparent = wrapperToCheckTransparency?.isTransparent() ?: false
         info.isVisibleToUser = !isTransparent &&
@@ -1549,7 +1549,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             // The node below is not added to the tree; it's a wrapper around outer semantics to
             // use the methods available to the SemanticsNode
             val semanticsNode = SemanticsNode(wrapper, false)
-            val wrapperToCheckAlpha = semanticsNode.findWrapperToGetBounds()
+            val wrapperToCheckAlpha = semanticsNode.findCoordinatorToGetBounds()
 
             // Do not 'find' invisible nodes when exploring by touch. This will prevent us from
             // sending events for invisible nodes

@@ -3241,7 +3241,7 @@ internal fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = M
                 measurables: List<Measurable>,
                 constraints: Constraints
             ): MeasureResult =
-                innerLayoutNodeWrapper.layout(x2 - x, y2 - y) {
+                innerCoordinator.layout(x2 - x, y2 - y) {
                     measurables.forEach { it.measure(constraints).place(0, 0) }
                 }
         }

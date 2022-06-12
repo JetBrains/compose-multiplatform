@@ -28,7 +28,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.ComposeUiNode
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.node.LayoutNodeWrapper
+import androidx.compose.ui.node.NodeCoordinator
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalViewConfiguration
@@ -85,7 +85,7 @@ fun LookaheadLayout(
             set(layoutDirection, ComposeUiNode.SetLayoutDirection)
             set(viewConfiguration, ComposeUiNode.SetViewConfiguration)
             set(scope) { scope ->
-                scope.root = innerLayoutNodeWrapper
+                scope.root = innerCoordinator
             }
             init {
                 isLookaheadRoot = true
@@ -163,7 +163,7 @@ internal class LookaheadOnPlacedModifier(
 
 @OptIn(ExperimentalComposeUiApi::class)
 private class LookaheadLayoutScopeImpl : LookaheadLayoutScope {
-    var root: LayoutNodeWrapper? = null
+    var root: NodeCoordinator? = null
     override fun Modifier.onPlaced(
         onPlaced: (
             lookaheadScopeCoordinates: LookaheadLayoutCoordinates,

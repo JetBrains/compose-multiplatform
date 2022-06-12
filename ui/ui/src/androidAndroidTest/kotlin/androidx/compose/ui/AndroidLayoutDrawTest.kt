@@ -2778,7 +2778,7 @@ class AndroidLayoutDrawTest {
         assertSame(firstMeasurable, m)
     }
 
-    // LayoutNodeWrappers remain even when there are multiple for a modifier
+    // NodeCoordinators remain even when there are multiple for a modifier
     @Test
     fun replaceMultiImplementationModifier() {
         var color by mutableStateOf(Color.Red)

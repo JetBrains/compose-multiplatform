@@ -19,7 +19,7 @@ package androidx.compose.ui.layout
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.node.LayoutNodeLayoutDelegate
-import androidx.compose.ui.node.LayoutNodeWrapper
+import androidx.compose.ui.node.NodeCoordinator
 import androidx.compose.ui.node.LookaheadCapablePlaceable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
@@ -375,16 +375,16 @@ abstract class Placeable : Measured {
 
             /**
              * Configures [_coordinates] and [layoutDelegate] based on the [scope].
-             * When it is [LayoutNodeWrapper.isPlacingForAlignment], then [_coordinates] should
+             * When it is [NodeCoordinator.isPlacingForAlignment], then [_coordinates] should
              * be `null`, and when [coordinates] is accessed, it indicates that the placement
-             * should not be finalized. When [LayoutNodeWrapper.isShallowPlacing], then
+             * should not be finalized. When [NodeCoordinator.isShallowPlacing], then
              * [_coordinates] should be `null`, but we don't have to do anything else
              * to trigger relayout because shallow placing will replace again anyway.
              *
-             * [LayoutNodeWrapper.isPlacingForAlignment] will be set to true if its parent's
+             * [NodeCoordinator.isPlacingForAlignment] will be set to true if its parent's
              * value is `true`.
              *
-             * @return the value for [LayoutNodeWrapper.isPlacingForAlignment] that should
+             * @return the value for [NodeCoordinator.isPlacingForAlignment] that should
              * be set after completing the lambda.
              */
             private fun configureForPlacingForAlignment(
