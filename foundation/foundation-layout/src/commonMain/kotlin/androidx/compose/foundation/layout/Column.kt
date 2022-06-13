@@ -26,6 +26,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measured
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.platform.debugInspectorInfo
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * A layout composable that places its children in a vertical sequence. For a layout composable
@@ -119,6 +120,7 @@ internal fun columnMeasurePolicy(
  */
 @LayoutScopeMarker
 @Immutable
+@JvmDefaultWithCompatibility
 interface ColumnScope {
     /**
      * Size the element's height proportional to its [weight] relative to other weighted sibling
