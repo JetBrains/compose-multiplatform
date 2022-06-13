@@ -96,7 +96,7 @@ internal fun AndroidTextPaint.applySpanStyle(
     // setBrush draws the text with given Brush. ShaderBrush requires Size to
     // create a Shader. However, Size is unavailable at this stage of the layout.
     // Paragraph.paint will receive a proper Size after layout is completed.
-    setBrush(style.brush, Size.Unspecified)
+    setBrush(style.brush, Size.Unspecified, style.alpha)
     setShadow(style.shadow)
     setTextDecoration(style.textDecoration)
 

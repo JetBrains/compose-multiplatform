@@ -113,6 +113,16 @@ class TextStyleLayoutAttributesTest {
         ).isTrue()
     }
 
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun returns_true_for_brush_alpha_change() {
+        val brush = Brush.linearGradient(listOf(Color.Black, Color.White))
+        val style = TextStyle(brush = brush, alpha = 0.5f)
+        assertThat(
+            style.hasSameLayoutAffectingAttributes(TextStyle(brush = brush, alpha = 0.7f))
+        ).isTrue()
+    }
+
     @Test
     fun returns_true_for_shadow_change() {
         val style = TextStyle(shadow = Shadow(color = Color.Red))
@@ -326,6 +336,7 @@ class TextStyleLayoutAttributesTest {
         val knownProperties = listOf(
             getProperty("color"),
             getProperty("brush"),
+            getProperty("alpha"),
             getProperty("shadow"),
             getProperty("textDecoration"),
             getProperty("fontSize"),

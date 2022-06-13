@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextDecoration
 internal expect fun MultiParagraph.drawMultiParagraph(
     canvas: Canvas,
     brush: Brush,
+    alpha: Float = Float.NaN,
     shadow: Shadow? = null,
     decoration: TextDecoration? = null
 )

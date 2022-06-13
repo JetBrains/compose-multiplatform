@@ -239,13 +239,15 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
      * in order to set paragraph level styling such as line height, or text alignment please see
      * [ParagraphStyle].
      *
-     * @sample androidx.compose.ui.text.samples.SpanStyleSample
+     * @sample androidx.compose.ui.text.samples.SpanStyleBrushSample
      *
      * @sample androidx.compose.ui.text.samples.AnnotatedStringBuilderSample
      *
      * @param brush The brush to use when painting the text. If brush is given as null, it will be
      * treated as unspecified. It is equivalent to calling the alternative color constructor with
      * [Color.Unspecified]
+     * @param alpha Opacity to be applied to [brush] from 0.0f to 1.0f representing fully
+     * transparent to fully opaque respectively.
      * @param fontSize The size of glyphs (in logical pixels) to use when painting the text. This
      * may be [TextUnit.Unspecified] for inheriting from another [SpanStyle].
      * @param fontWeight The typeface thickness to use when painting the text (e.g., bold).
@@ -272,6 +274,7 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
     @ExperimentalTextApi
     constructor(
         brush: Brush?,
+        alpha: Float = Float.NaN,
         fontSize: TextUnit = TextUnit.Unspecified,
         fontWeight: FontWeight? = null,
         fontStyle: FontStyle? = null,
@@ -287,7 +290,7 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
         shadow: Shadow? = null,
         platformStyle: PlatformSpanStyle? = null
     ) : this(
-        textDrawStyle = TextDrawStyle.from(brush),
+        textDrawStyle = TextDrawStyle.from(brush, alpha),
         fontSize = fontSize,
         fontWeight = fontWeight,
         fontStyle = fontStyle,
@@ -315,6 +318,14 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalTextApi
     val brush: Brush? get() = this.textDrawStyle.brush
+
+    /**
+     * Opacity of text. This value is either provided along side Brush, or via alpha channel in
+     * color.
+     */
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalTextApi
+    val alpha: Float get() = this.textDrawStyle.alpha
 
     /**
      * Returns a new span style that is a combination of this style and the given [other] style.
@@ -442,6 +453,7 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
     @ExperimentalTextApi
     fun copy(
         brush: Brush?,
+        alpha: Float = this.alpha,
         fontSize: TextUnit = this.fontSize,
         fontWeight: FontWeight? = this.fontWeight,
         fontStyle: FontStyle? = this.fontStyle,
@@ -458,7 +470,7 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
         platformStyle: PlatformSpanStyle? = this.platformStyle
     ): SpanStyle {
         return SpanStyle(
-            textDrawStyle = TextDrawStyle.from(brush),
+            textDrawStyle = TextDrawStyle.from(brush, alpha),
             fontSize = fontSize,
             fontWeight = fontWeight,
             fontStyle = fontStyle,
@@ -512,6 +524,7 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
     override fun hashCode(): Int {
         var result = color.hashCode()
         result = 31 * result + brush.hashCode()
+        result = 31 * result + alpha.hashCode()
         result = 31 * result + fontSize.hashCode()
         result = 31 * result + (fontWeight?.hashCode() ?: 0)
         result = 31 * result + (fontStyle?.hashCode() ?: 0)
@@ -534,6 +547,7 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
         return "SpanStyle(" +
             "color=$color, " +
             "brush=$brush, " +
+            "alpha=$alpha, " +
             "fontSize=$fontSize, " +
             "fontWeight=$fontWeight, " +
             "fontStyle=$fontStyle, " +

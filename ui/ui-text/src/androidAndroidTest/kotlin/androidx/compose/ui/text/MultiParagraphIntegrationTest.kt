@@ -1513,6 +1513,45 @@ class MultiParagraphIntegrationTest {
             .isEqualToBitmap(multiParagraph2.bitmap(brush))
     }
 
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun multiParagraph_overridesAlphaDuringDraw() = with(defaultDensity) {
+        val fontSize = 20.sp
+        val fontSizeInPx = fontSize.toPx()
+        val brush = Brush.verticalGradient(listOf(Color.Blue, Color.Red))
+        val multiParagraph = simpleMultiParagraph(
+            text = buildAnnotatedString {
+                withStyle(ParagraphStyle(textAlign = TextAlign.Right)) {
+                    append("Lorem")
+                }
+                withStyle(ParagraphStyle()) {
+                    append("Ipsum")
+                }
+            },
+            style = TextStyle(
+                brush = brush,
+                alpha = 0.5f,
+                fontSize = fontSize
+            ),
+            width = fontSizeInPx * 5
+        ).apply { disableAntialias() }
+
+        val multiParagraph2 = simpleMultiParagraph(
+            text = buildAnnotatedString {
+                append("Lorem\n")
+                append("Ipsum")
+            },
+            style = TextStyle(
+                brush = brush,
+                fontSize = fontSize
+            ),
+            width = fontSizeInPx * 5
+        ).apply { disableAntialias() }
+
+        assertThat(multiParagraph.bitmap(brush))
+            .isEqualToBitmap(multiParagraph2.bitmap(brush, 0.5f))
+    }
+
     private fun MultiParagraph.disableAntialias() {
         paragraphInfoList.forEach {
             (it.paragraph as AndroidParagraph).textPaint.isAntiAlias = false

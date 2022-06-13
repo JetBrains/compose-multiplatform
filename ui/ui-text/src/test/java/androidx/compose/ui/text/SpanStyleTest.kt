@@ -69,6 +69,17 @@ class SpanStyleTest {
 
     @OptIn(ExperimentalTextApi::class)
     @Test
+    fun `constructor with customized brush and alpha`() {
+        val brush = Brush.linearGradient(colors = listOf(Color.Blue, Color.Red))
+
+        val style = SpanStyle(brush = brush, alpha = 0.3f)
+
+        assertThat(style.brush).isEqualTo(brush)
+        assertThat(style.alpha).isEqualTo(0.3f)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
     fun `constructor with gradient brush has unspecified color`() {
         val brush = Brush.linearGradient(colors = listOf(Color.Blue, Color.Red))
 
@@ -94,6 +105,16 @@ class SpanStyleTest {
         val style = SpanStyle(color = color)
 
         assertThat(style.color).isEqualTo(color)
+    }
+
+    @Test
+    fun `constructor with half-transparent color`() {
+        val color = Color.Red.copy(alpha = 0.5f)
+
+        val style = SpanStyle(color = color)
+
+        assertThat(style.color).isEqualTo(color)
+        assertThat(style.alpha).isWithin(1f / 256f).of(0.5f)
     }
 
     @Test
@@ -187,7 +208,7 @@ class SpanStyleTest {
     }
 
     @Test
-    fun `merge with other's color is null should use this' color`() {
+    fun `merge with other's color is null should use this color`() {
         val style = SpanStyle(color = Color.Red)
 
         val newSpanStyle = style.merge(SpanStyle(color = Color.Unspecified))
@@ -451,6 +472,36 @@ class SpanStyleTest {
 
         assertThat(mergedStyle.color).isEqualTo(Color.Unspecified)
         assertThat(mergedStyle.brush).isEqualTo(brush)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge brush with brush uses other's alpha`() {
+        val brush = Brush.linearGradient(listOf(Color.Blue, Color.Red))
+
+        val style = SpanStyle(brush = brush, alpha = 0.3f)
+        val otherStyle = SpanStyle(brush = brush, alpha = 0.6f)
+
+        val mergedStyle = style.merge(otherStyle)
+
+        assertThat(mergedStyle.color).isEqualTo(Color.Unspecified)
+        assertThat(mergedStyle.brush).isEqualTo(brush)
+        assertThat(mergedStyle.alpha).isEqualTo(0.6f)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge brush with brush uses current alpha if other's is NaN`() {
+        val brush = Brush.linearGradient(listOf(Color.Blue, Color.Red))
+
+        val style = SpanStyle(brush = brush, alpha = 0.3f)
+        val otherStyle = SpanStyle(brush = brush)
+
+        val mergedStyle = style.merge(otherStyle)
+
+        assertThat(mergedStyle.color).isEqualTo(Color.Unspecified)
+        assertThat(mergedStyle.brush).isEqualTo(brush)
+        assertThat(mergedStyle.alpha).isEqualTo(0.3f)
     }
 
     @Test

@@ -28,12 +28,13 @@ import androidx.compose.ui.util.fastForEach
 internal actual fun MultiParagraph.drawMultiParagraph(
     canvas: Canvas,
     brush: Brush,
+    alpha: Float,
     shadow: Shadow?,
     decoration: TextDecoration?
 ) {
     canvas.save()
     paragraphInfoList.fastForEach {
-        it.paragraph.paint(canvas, brush, shadow, decoration)
+        it.paragraph.paint(canvas, brush, alpha, shadow, decoration)
         canvas.translate(0f, it.paragraph.height)
     }
     canvas.restore()

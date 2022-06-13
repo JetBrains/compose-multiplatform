@@ -403,10 +403,11 @@ class MultiParagraph(
     fun paint(
         canvas: Canvas,
         brush: Brush,
+        alpha: Float = Float.NaN,
         shadow: Shadow? = null,
         decoration: TextDecoration? = null
     ) {
-        drawMultiParagraph(canvas, brush, shadow, decoration)
+        drawMultiParagraph(canvas, brush, alpha, shadow, decoration)
     }
 
     /** Returns path that enclose the given text range. */
