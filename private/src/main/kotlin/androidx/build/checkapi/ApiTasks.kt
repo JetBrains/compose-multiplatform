@@ -84,7 +84,7 @@ fun AndroidXExtension.shouldConfigureApiTasks(): Boolean {
 
     // If the project has an "api" directory, either because they used to track APIs or they
     // added one manually to force tracking (as recommended below), continue tracking APIs.
-    if (project.hasApiFileDirectory() && !shouldRelease()) {
+    if (project.hasApiFileDirectory() && !publish.shouldRelease()) {
         project.logger.error(
             "Project ${project.name} is not published, but has an existing API " +
                 "directory. Forcing API tasks enabled. Please migrate to runApiTasks=Yes."
@@ -92,7 +92,7 @@ fun AndroidXExtension.shouldConfigureApiTasks(): Boolean {
         return true
     }
 
-    if (!shouldRelease()) {
+    if (!publish.shouldRelease()) {
         project.logger.info(
             "Project ${project.name} is not published, ignoring API tasks. " +
                 "If you still want to track APIs, create an \"api\" directory in your project" +
