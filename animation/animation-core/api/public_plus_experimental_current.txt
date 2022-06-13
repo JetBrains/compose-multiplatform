@@ -67,6 +67,8 @@ package androidx.compose.animation.core {
   }
 
   public enum AnimationEndReason {
+    method public static androidx.compose.animation.core.AnimationEndReason valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.animation.core.AnimationEndReason[] values();
     enum_constant public static final androidx.compose.animation.core.AnimationEndReason BoundReached;
     enum_constant public static final androidx.compose.animation.core.AnimationEndReason Finished;
   }
@@ -394,7 +396,7 @@ package androidx.compose.animation.core {
 
   public final class InfiniteRepeatableSpec<T> implements androidx.compose.animation.core.AnimationSpec<T> {
     ctor public InfiniteRepeatableSpec(androidx.compose.animation.core.DurationBasedAnimationSpec<T> animation, optional androidx.compose.animation.core.RepeatMode repeatMode, optional long initialStartOffset);
-    method @Deprecated public androidx.compose.animation.core.InfiniteRepeatableSpec<T>! InfiniteRepeatableSpec(androidx.compose.animation.core.DurationBasedAnimationSpec<T> animation, optional androidx.compose.animation.core.RepeatMode repeatMode);
+    ctor @Deprecated public InfiniteRepeatableSpec(androidx.compose.animation.core.DurationBasedAnimationSpec<T> animation, optional androidx.compose.animation.core.RepeatMode repeatMode);
     method public androidx.compose.animation.core.DurationBasedAnimationSpec<T> getAnimation();
     method public long getInitialStartOffset();
     method public androidx.compose.animation.core.RepeatMode getRepeatMode();
@@ -450,13 +452,15 @@ package androidx.compose.animation.core {
   }
 
   public enum RepeatMode {
+    method public static androidx.compose.animation.core.RepeatMode valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.animation.core.RepeatMode[] values();
     enum_constant public static final androidx.compose.animation.core.RepeatMode Restart;
     enum_constant public static final androidx.compose.animation.core.RepeatMode Reverse;
   }
 
   @androidx.compose.runtime.Immutable public final class RepeatableSpec<T> implements androidx.compose.animation.core.FiniteAnimationSpec<T> {
     ctor public RepeatableSpec(int iterations, androidx.compose.animation.core.DurationBasedAnimationSpec<T> animation, optional androidx.compose.animation.core.RepeatMode repeatMode, optional long initialStartOffset);
-    method @Deprecated public androidx.compose.animation.core.RepeatableSpec<T>! RepeatableSpec(int iterations, androidx.compose.animation.core.DurationBasedAnimationSpec<T> animation, optional androidx.compose.animation.core.RepeatMode repeatMode);
+    ctor @Deprecated public RepeatableSpec(int iterations, androidx.compose.animation.core.DurationBasedAnimationSpec<T> animation, optional androidx.compose.animation.core.RepeatMode repeatMode);
     method public androidx.compose.animation.core.DurationBasedAnimationSpec<T> getAnimation();
     method public long getInitialStartOffset();
     method public int getIterations();
@@ -678,7 +682,7 @@ package androidx.compose.animation.core {
 
   public final class VectorizedInfiniteRepeatableSpec<V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.animation.core.VectorizedAnimationSpec<V> {
     ctor public VectorizedInfiniteRepeatableSpec(androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> animation, optional androidx.compose.animation.core.RepeatMode repeatMode, optional long initialStartOffset);
-    method @Deprecated public androidx.compose.animation.core.VectorizedInfiniteRepeatableSpec<V>! VectorizedInfiniteRepeatableSpec(androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> animation, optional androidx.compose.animation.core.RepeatMode repeatMode);
+    ctor @Deprecated public VectorizedInfiniteRepeatableSpec(androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> animation, optional androidx.compose.animation.core.RepeatMode repeatMode);
     method public long getDurationNanos(V initialValue, V targetValue, V initialVelocity);
     method public V getValueFromNanos(long playTimeNanos, V initialValue, V targetValue, V initialVelocity);
     method public V getVelocityFromNanos(long playTimeNanos, V initialValue, V targetValue, V initialVelocity);
@@ -698,7 +702,7 @@ package androidx.compose.animation.core {
 
   public final class VectorizedRepeatableSpec<V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.animation.core.VectorizedFiniteAnimationSpec<V> {
     ctor public VectorizedRepeatableSpec(int iterations, androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> animation, optional androidx.compose.animation.core.RepeatMode repeatMode, optional long initialStartOffset);
-    method @Deprecated public androidx.compose.animation.core.VectorizedRepeatableSpec<V>! VectorizedRepeatableSpec(int iterations, androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> animation, optional androidx.compose.animation.core.RepeatMode repeatMode);
+    ctor @Deprecated public VectorizedRepeatableSpec(int iterations, androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> animation, optional androidx.compose.animation.core.RepeatMode repeatMode);
     method public long getDurationNanos(V initialValue, V targetValue, V initialVelocity);
     method public V getValueFromNanos(long playTimeNanos, V initialValue, V targetValue, V initialVelocity);
     method public V getVelocityFromNanos(long playTimeNanos, V initialValue, V targetValue, V initialVelocity);

@@ -207,6 +207,8 @@ package androidx.compose.ui.autofill {
   }
 
   @androidx.compose.ui.ExperimentalComposeUiApi public enum AutofillType {
+    method public static androidx.compose.ui.autofill.AutofillType valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.ui.autofill.AutofillType[] values();
     enum_constant public static final androidx.compose.ui.autofill.AutofillType AddressAuxiliaryDetails;
     enum_constant public static final androidx.compose.ui.autofill.AutofillType AddressCountry;
     enum_constant public static final androidx.compose.ui.autofill.AutofillType AddressLocality;
@@ -646,7 +648,7 @@ package androidx.compose.ui.graphics.vector {
 
   public static final class ImageVector.Builder {
     ctor public ImageVector.Builder(optional String name, float defaultWidth, float defaultHeight, float viewportWidth, float viewportHeight, optional long tintColor, optional int tintBlendMode, optional boolean autoMirror);
-    method @Deprecated public androidx.compose.ui.graphics.vector.ImageVector.Builder! Builder(optional String name, float defaultWidth, float defaultHeight, float viewportWidth, float viewportHeight, optional long tintColor, optional int tintBlendMode);
+    ctor @Deprecated public ImageVector.Builder(optional String name, float defaultWidth, float defaultHeight, float viewportWidth, float viewportHeight, optional long tintColor, optional int tintBlendMode);
     method public androidx.compose.ui.graphics.vector.ImageVector.Builder addGroup(optional String name, optional float rotate, optional float pivotX, optional float pivotY, optional float scaleX, optional float scaleY, optional float translationX, optional float translationY, optional java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> clipPathData);
     method public androidx.compose.ui.graphics.vector.ImageVector.Builder addPath(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> pathData, optional int pathFillType, optional String name, optional androidx.compose.ui.graphics.Brush? fill, optional float fillAlpha, optional androidx.compose.ui.graphics.Brush? stroke, optional float strokeAlpha, optional float strokeLineWidth, optional int strokeLineCap, optional int strokeLineJoin, optional float strokeLineMiter, optional float trimPathStart, optional float trimPathEnd, optional float trimPathOffset);
     method public androidx.compose.ui.graphics.vector.ImageVector build();
@@ -1651,6 +1653,8 @@ package androidx.compose.ui.input.pointer {
   }
 
   public enum PointerEventPass {
+    method public static androidx.compose.ui.input.pointer.PointerEventPass valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.ui.input.pointer.PointerEventPass[] values();
     enum_constant public static final androidx.compose.ui.input.pointer.PointerEventPass Final;
     enum_constant public static final androidx.compose.ui.input.pointer.PointerEventPass Initial;
     enum_constant public static final androidx.compose.ui.input.pointer.PointerEventPass Main;
@@ -1735,7 +1739,7 @@ package androidx.compose.ui.input.pointer {
 
   @androidx.compose.runtime.Immutable public final class PointerInputChange {
     ctor public PointerInputChange(long id, long uptimeMillis, long position, boolean pressed, long previousUptimeMillis, long previousPosition, boolean previousPressed, boolean isInitiallyConsumed, optional int type, optional long scrollDelta);
-    method @Deprecated public androidx.compose.ui.input.pointer.PointerInputChange! PointerInputChange(long id, long uptimeMillis, long position, boolean pressed, long previousUptimeMillis, long previousPosition, boolean previousPressed, androidx.compose.ui.input.pointer.ConsumedData consumed, optional int type);
+    ctor @Deprecated public PointerInputChange(long id, long uptimeMillis, long position, boolean pressed, long previousUptimeMillis, long previousPosition, boolean previousPressed, androidx.compose.ui.input.pointer.ConsumedData consumed, optional int type);
     method public void consume();
     method public androidx.compose.ui.input.pointer.PointerInputChange copy(optional long id, optional long currentTime, optional long currentPosition, optional boolean currentPressed, optional long previousTime, optional long previousPosition, optional boolean previousPressed, optional int type, optional long scrollDelta);
     method @Deprecated public androidx.compose.ui.input.pointer.PointerInputChange copy(optional long id, optional long currentTime, optional long currentPosition, optional boolean currentPressed, optional long previousTime, optional long previousPosition, optional boolean previousPressed, androidx.compose.ui.input.pointer.ConsumedData consumed, optional int type, optional long scrollDelta);
@@ -2631,6 +2635,8 @@ package androidx.compose.ui.platform {
   }
 
   public enum TextToolbarStatus {
+    method public static androidx.compose.ui.platform.TextToolbarStatus valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.ui.platform.TextToolbarStatus[] values();
     enum_constant public static final androidx.compose.ui.platform.TextToolbarStatus Hidden;
     enum_constant public static final androidx.compose.ui.platform.TextToolbarStatus Shown;
   }
@@ -3175,6 +3181,8 @@ package androidx.compose.ui.semantics {
 package androidx.compose.ui.state {
 
   public enum ToggleableState {
+    method public static androidx.compose.ui.state.ToggleableState valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.ui.state.ToggleableState[] values();
     enum_constant public static final androidx.compose.ui.state.ToggleableState Indeterminate;
     enum_constant public static final androidx.compose.ui.state.ToggleableState Off;
     enum_constant public static final androidx.compose.ui.state.ToggleableState On;
@@ -3269,6 +3277,8 @@ package androidx.compose.ui.window {
   }
 
   public enum SecureFlagPolicy {
+    method public static androidx.compose.ui.window.SecureFlagPolicy valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.ui.window.SecureFlagPolicy[] values();
     enum_constant public static final androidx.compose.ui.window.SecureFlagPolicy Inherit;
     enum_constant public static final androidx.compose.ui.window.SecureFlagPolicy SecureOff;
     enum_constant public static final androidx.compose.ui.window.SecureFlagPolicy SecureOn;

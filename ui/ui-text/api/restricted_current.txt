@@ -1209,6 +1209,8 @@ package androidx.compose.ui.text.style {
   }
 
   public enum ResolvedTextDirection {
+    method public static androidx.compose.ui.text.style.ResolvedTextDirection valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.ui.text.style.ResolvedTextDirection[] values();
     enum_constant public static final androidx.compose.ui.text.style.ResolvedTextDirection Ltr;
     enum_constant public static final androidx.compose.ui.text.style.ResolvedTextDirection Rtl;
   }

@@ -393,6 +393,8 @@ package androidx.compose.runtime {
   }
 
   public enum Recomposer.State {
+    method public static androidx.compose.runtime.Recomposer.State valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.runtime.Recomposer.State[] values();
     enum_constant public static final androidx.compose.runtime.Recomposer.State Idle;
     enum_constant public static final androidx.compose.runtime.Recomposer.State Inactive;
     enum_constant public static final androidx.compose.runtime.Recomposer.State InactivePendingWork;

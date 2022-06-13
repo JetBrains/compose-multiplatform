@@ -320,6 +320,8 @@ package androidx.compose.ui.unit {
   }
 
   public enum LayoutDirection {
+    method public static androidx.compose.ui.unit.LayoutDirection valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.ui.unit.LayoutDirection[] values();
     enum_constant public static final androidx.compose.ui.unit.LayoutDirection Ltr;
     enum_constant public static final androidx.compose.ui.unit.LayoutDirection Rtl;
   }

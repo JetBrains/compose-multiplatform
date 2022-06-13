@@ -85,6 +85,8 @@ package androidx.compose.animation {
   }
 
   @androidx.compose.animation.ExperimentalAnimationApi public enum EnterExitState {
+    method public static androidx.compose.animation.EnterExitState valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.animation.EnterExitState[] values();
     enum_constant public static final androidx.compose.animation.EnterExitState PostExit;
     enum_constant public static final androidx.compose.animation.EnterExitState PreEnter;
     enum_constant public static final androidx.compose.animation.EnterExitState Visible;
