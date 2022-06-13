@@ -53,7 +53,7 @@ import androidx.compose.ui.unit.sp
 fun TextBrushDemo() {
     LazyColumn {
         item {
-            TagLine(tag = "Shader")
+            TagLine(tag = "Brush")
             BrushDemo()
         }
         item {
