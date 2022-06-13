@@ -46,8 +46,7 @@ class VelocityPathFinderCalculateDurationTest(private val config: TestConfig) {
         val requestedVelocity: Float,
         val expectedDurationMillis: Long? = null,
         val expectSuggestions: Boolean = false,
-        val expectedError: Regex? = if (expectSuggestions) errorWithSuggestions else null,
-        val tolerance: Float = 0.1f,
+        val expectedError: Regex? = if (expectSuggestions) errorWithSuggestions else null
     )
 
     companion object {
@@ -105,13 +104,11 @@ class VelocityPathFinderCalculateDurationTest(private val config: TestConfig) {
             TestConfig(Distance100, 0f, expectedDurationMillis = 200L),
             TestConfig(Distance100, 1f, expectedDurationMillis = 200L),
 
-            TestConfig(Distance100, 1999f, expectedDurationMillis = 200L,
-                    tolerance = 1f), // d > 100
+            TestConfig(Distance100, 1999f, expectedDurationMillis = 200L), // d > 100
             TestConfig(Distance100, 2000f, expectedDurationMillis = 100L), // d = 100
-            TestConfig(Distance100, 2480f, expectedDurationMillis = 80L,
-                    tolerance = 1f), // d ≈ 80.65
-            TestConfig(Distance100, 5000f, expectedError = errorWithSuggestions), // d = 40
-            TestConfig(Distance100, 5001f, expectedError = errorWithSuggestions), // d < 40
+            TestConfig(Distance100, 2480f, expectedDurationMillis = 80L), // d ≈ 80.65
+            TestConfig(Distance100, 5000f, expectedDurationMillis = 40L), // d = 40
+            TestConfig(Distance100, 5001f, expectSuggestions = true) // d < 40
         )
     }
 
@@ -143,7 +140,7 @@ class VelocityPathFinderCalculateDurationTest(private val config: TestConfig) {
         val velocityTracker = simulateSwipe(f, actualDuration)
         val velocity = velocityTracker.calculateVelocity()
 
-        assertThat(velocity.sum()).isWithin(config.tolerance).of(config.requestedVelocity)
+        assertThat(velocity.sum()).isWithin(.1f).of(config.requestedVelocity)
         if (config.requestedVelocity > 0) {
             // Direction of velocity of 0 is undefined, so any direction is correct
             velocity.toOffset().normalize().isAlmostEqualTo(config.end.normalize())
