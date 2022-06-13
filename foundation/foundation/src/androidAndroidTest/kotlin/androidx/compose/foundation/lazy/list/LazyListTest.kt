@@ -1508,6 +1508,28 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
     }
 
     @Test
+    fun maxIntElements_withKey_startInMiddle() {
+        val itemSize = with(rule.density) { 15.toDp() }
+
+        rule.setContent {
+            LazyColumnOrRow(
+                modifier = Modifier.requiredSize(itemSize),
+                state = LazyListState(firstVisibleItemIndex = Int.MAX_VALUE / 2)
+            ) {
+                items(Int.MAX_VALUE, key = { it }) {
+                    Box(
+                        Modifier
+                            .size(itemSize)
+                            .testTag("$it"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("${Int.MAX_VALUE / 2}")
+            .assertStartPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
     fun scrollingByExactlyTheItemSize_switchesTheFirstVisibleItem() {
         val itemSize = with(rule.density) { 30.toDp() }
         lateinit var state: LazyListState
