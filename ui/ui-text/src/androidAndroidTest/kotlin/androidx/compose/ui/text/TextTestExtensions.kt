@@ -43,6 +43,20 @@ fun Paragraph.bitmap(): Bitmap {
     return bitmap
 }
 
+@OptIn(ExperimentalTextApi::class)
+fun Paragraph.bitmap(
+    brush: Brush,
+    alpha: Float
+): Bitmap {
+    val bitmap = Bitmap.createBitmap(
+        width.toIntPx(),
+        height.toIntPx(),
+        Bitmap.Config.ARGB_8888
+    )
+    this.paint(androidx.compose.ui.graphics.Canvas(Canvas(bitmap)), brush, alpha)
+    return bitmap
+}
+
 /**
  * MultiParagraph creates Paragraphs to vertically layout. However, a Paragraph is an immutable
  * object that cannot be changed after its creation. Thus, Brush evaluation according to the total
@@ -52,7 +66,10 @@ fun Paragraph.bitmap(): Bitmap {
  * MultiParagraph.
  */
 @OptIn(ExperimentalTextApi::class)
-fun MultiParagraph.bitmap(brush: Brush? = null): Bitmap {
+fun MultiParagraph.bitmap(
+    brush: Brush? = null,
+    alpha: Float = Float.NaN
+): Bitmap {
     val width = paragraphInfoList.maxByOrNull { it.paragraph.width }?.paragraph?.width ?: 0f
     val bitmap = Bitmap.createBitmap(
         width.toIntPx(),
@@ -60,7 +77,7 @@ fun MultiParagraph.bitmap(brush: Brush? = null): Bitmap {
         Bitmap.Config.ARGB_8888
     )
     if (brush != null) {
-        this.paint(androidx.compose.ui.graphics.Canvas(Canvas(bitmap)), brush)
+        this.paint(androidx.compose.ui.graphics.Canvas(Canvas(bitmap)), brush, alpha)
     } else {
         this.paint(androidx.compose.ui.graphics.Canvas(Canvas(bitmap)))
     }

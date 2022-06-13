@@ -21,18 +21,23 @@ import android.text.style.CharacterStyle
 import android.text.style.UpdateAppearance
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.text.platform.setAlpha
 
 /**
  * A span that applies [ShaderBrush] to TextPaint after receiving a specified size
  */
 internal class ShaderBrushSpan(
-    val shaderBrush: ShaderBrush
+    val shaderBrush: ShaderBrush,
+    val alpha: Float
 ) : CharacterStyle(), UpdateAppearance {
     var size: Size? = null
 
     override fun updateDrawState(textPaint: TextPaint?) {
         if (textPaint != null) {
-            size?.let { textPaint.shader = shaderBrush.createShader(it) }
+            size?.let {
+                textPaint.shader = shaderBrush.createShader(it)
+            }
+            textPaint.setAlpha(alpha)
         }
     }
 }

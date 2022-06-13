@@ -1154,6 +1154,9 @@ package androidx.compose.ui.text.platform {
   public final class AndroidStringDelegate_androidKt {
   }
 
+  public final class AndroidTextPaint_androidKt {
+  }
+
   public final class Synchronization_jvmKt {
   }
 

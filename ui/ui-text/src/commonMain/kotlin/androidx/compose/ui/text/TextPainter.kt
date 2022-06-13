@@ -46,6 +46,7 @@ object TextPainter {
                 textLayoutResult.multiParagraph.paint(
                     canvas,
                     brush,
+                    textLayoutResult.layoutInput.style.alpha,
                     textLayoutResult.layoutInput.style.shadow,
                     textLayoutResult.layoutInput.style.textDecoration
                 )

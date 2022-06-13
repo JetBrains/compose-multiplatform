@@ -31,6 +31,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
+import kotlin.math.roundToInt
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -200,6 +201,54 @@ class AndroidTextPaintTest {
     }
 
     @Test
+    fun setColorBrush_with_alpha() {
+        val brush = SolidColor(Color.Red)
+        val size = Size.Unspecified
+        val alpha = 0.6f
+        val textPaint = defaultTextPaint
+        textPaint.setBrush(brush, size, alpha)
+
+        assertThat(textPaint.shader).isNull()
+        assertThat(textPaint.color).isEqualTo(Color.Red.copy(0.6f).toArgb())
+    }
+
+    @Test
+    fun setTransparentColorBrush_with_alpha_modulates() {
+        val brush = SolidColor(Color.Red.copy(0.8f))
+        val size = Size.Unspecified
+        val alpha = 0.6f
+        val textPaint = defaultTextPaint
+        textPaint.setBrush(brush, size, alpha)
+
+        assertThat(textPaint.shader).isNull()
+        assertThat(textPaint.color).isEqualTo(Color.Red.copy(0.48f).toArgb())
+    }
+
+    @Test
+    fun setBrush_with_tooHigh_alpha() {
+        val brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+        val size = Size(10f, 10f)
+        val alpha = 10e5f
+        val textPaint = defaultTextPaint
+        textPaint.setBrush(brush, size, alpha)
+
+        assertThat(textPaint.shader).isNotNull()
+        assertThat(textPaint.alpha).isEqualTo(255)
+    }
+
+    @Test
+    fun setBrush_with_tooLow_alpha() {
+        val brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+        val size = Size(10f, 10f)
+        val alpha = -10e5f
+        val textPaint = defaultTextPaint
+        textPaint.setBrush(brush, size, alpha)
+
+        assertThat(textPaint.shader).isNotNull()
+        assertThat(textPaint.alpha).isEqualTo(0)
+    }
+
+    @Test
     fun setUnspecifiedBrush_with_specified_size() {
         val brush = SolidColor(Color.Unspecified)
         val size = Size(10f, 10f)
@@ -227,6 +276,23 @@ class AndroidTextPaintTest {
         textPaint.setBrush(null, size)
 
         assertThat(textPaint.shader).isNull()
+    }
+
+    @Test
+    fun setBrush_with_alpha() {
+        val brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+        val size = Size(10f, 10f)
+        val alpha = 0.6f
+        val textPaint = defaultTextPaint
+        textPaint.setBrush(brush, size, alpha)
+
+        assertThat(textPaint.shader).isNotNull()
+        assertThat(textPaint.alpha).isEqualTo((255 * 0.6f).roundToInt())
+
+        textPaint.setBrush(null, size)
+
+        assertThat(textPaint.shader).isNull()
+        assertThat(textPaint.alpha).isEqualTo((255 * 0.6f).roundToInt())
     }
 
     @SdkSuppress(minSdkVersion = 29)

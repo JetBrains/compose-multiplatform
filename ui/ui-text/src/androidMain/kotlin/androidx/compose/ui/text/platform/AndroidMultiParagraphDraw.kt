@@ -32,16 +32,17 @@ import androidx.compose.ui.util.fastForEach
 internal actual fun MultiParagraph.drawMultiParagraph(
     canvas: Canvas,
     brush: Brush,
+    alpha: Float,
     shadow: Shadow?,
     decoration: TextDecoration?
 ) {
     canvas.save()
 
     if (paragraphInfoList.size <= 1) {
-        drawParagraphs(canvas, brush, shadow, decoration)
+        drawParagraphs(canvas, brush, alpha, shadow, decoration)
     } else {
         when (brush) {
-            is SolidColor -> drawParagraphs(canvas, brush, shadow, decoration)
+            is SolidColor -> drawParagraphs(canvas, brush, alpha, shadow, decoration)
             is ShaderBrush -> {
                 var height = 0f
                 var width = 0f
@@ -53,7 +54,7 @@ internal actual fun MultiParagraph.drawMultiParagraph(
                 val matrix = Matrix()
                 shader.getLocalMatrix(matrix)
                 paragraphInfoList.fastForEach {
-                    it.paragraph.paint(canvas, ShaderBrush(shader), shadow, decoration)
+                    it.paragraph.paint(canvas, ShaderBrush(shader), alpha, shadow, decoration)
                     canvas.translate(0f, it.paragraph.height)
                     matrix.setTranslate(0f, -it.paragraph.height)
                     shader.setLocalMatrix(matrix)
@@ -69,11 +70,12 @@ internal actual fun MultiParagraph.drawMultiParagraph(
 private fun MultiParagraph.drawParagraphs(
     canvas: Canvas,
     brush: Brush,
+    alpha: Float,
     shadow: Shadow?,
     decoration: TextDecoration?
 ) {
     paragraphInfoList.fastForEach {
-        it.paragraph.paint(canvas, brush, shadow, decoration)
+        it.paragraph.paint(canvas, brush, alpha, shadow, decoration)
         canvas.translate(0f, it.paragraph.height)
     }
 }
