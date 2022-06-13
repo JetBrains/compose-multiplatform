@@ -65,7 +65,7 @@ private fun Project.configureComponent(
     extension: AndroidXExtension,
     component: SoftwareComponent
 ) {
-    if (extension.shouldPublish() && component.isAndroidOrJavaReleaseComponent()) {
+    if (extension.publish.shouldPublish() && component.isAndroidOrJavaReleaseComponent()) {
         val androidxGroup = validateCoordinatesAndGetGroup(extension)
         val projectArchiveDir = File(
             getRepositoryDirectory(),
