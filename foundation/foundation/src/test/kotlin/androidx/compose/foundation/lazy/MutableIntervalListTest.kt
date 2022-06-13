@@ -211,6 +211,20 @@ class MutableIntervalListTest {
     }
 
     @Test
+    fun forEach_fromIndexIsInTheMiddleOfInterval() {
+        intervalList.addInterval(10, 0) // startIndex = 0
+        intervalList.addInterval(1, 1) // startIndex = 10
+        intervalList.addInterval(1, 2) // startIndex = 11
+        val intervals = mutableListOf<IntervalList.Interval<Int>>()
+
+        intervalList.forEach(fromIndex = 5, toIndex = 10) {
+            intervals.add(it)
+        }
+
+        assertThat(intervals.map { it.startIndex }).isEqualTo(listOf(0, 10))
+    }
+
+    @Test
     fun forEach_startLargerThanEndThrows() {
         addFiveSingleIntervals()
 
@@ -259,6 +273,18 @@ class MutableIntervalListTest {
             true
         }
         assertThat(wasException4).isTrue()
+    }
+
+    @Test
+    fun forEach_MAX_VALUE_size_andFromIndexIsInTheMiddle() {
+        intervalList.addInterval(Int.MAX_VALUE, 0)
+        val intervals = mutableListOf<IntervalList.Interval<Int>>()
+
+        intervalList.forEach(fromIndex = Int.MAX_VALUE / 2, toIndex = Int.MAX_VALUE - 1) {
+            intervals.add(it)
+        }
+
+        assertThat(intervals.map { it.startIndex }).isEqualTo(listOf(0))
     }
 
     private fun addFiveSingleIntervals() {

@@ -147,7 +147,7 @@ class MutableIntervalList<T> : IntervalList<T> {
         }
 
         var intervalIndex = intervals.binarySearch(fromIndex)
-        var itemIndex = fromIndex
+        var itemIndex = intervals[intervalIndex].startIndex
         while (itemIndex <= toIndex) {
             val interval = intervals[intervalIndex]
             block(interval)
