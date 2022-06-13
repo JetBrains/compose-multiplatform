@@ -132,7 +132,7 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
 
             @Suppress("UnstableApiUsage")
             extensions.findByType(AndroidComponentsExtension::class.java)!!.finalizeDsl {
-                val isPublished = androidxExtension()?.type == LibraryType.PUBLISHED_LIBRARY
+                val isPublished = androidxExtension()?.shouldPublish() ?: false
 
                 it.lint {
                     // Too many Kotlin features require synthetic accessors - we want to rely on R8 to
@@ -381,7 +381,7 @@ fun Project.configureComposeImplPluginForAndroidx() {
         val androidXExtension =
             project.extensions.findByType(AndroidXExtension::class.java)
         if (androidXExtension != null) {
-            if (androidXExtension.publish.shouldPublish()) {
+            if (androidXExtension.shouldPublish()) {
                 project.tasks.withType(KotlinCompile::class.java)
                     .configureEach { compile ->
                         compile.doFirst {

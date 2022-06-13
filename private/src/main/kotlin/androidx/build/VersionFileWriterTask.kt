@@ -69,7 +69,7 @@ fun Project.configureVersionFileWriter(
         writeVersionFile.configure {
             val group = findProperty("group") as String
             val artifactId = findProperty("name") as String
-            val version = if (androidXExtension.publish.shouldPublish()) {
+            val version = if (androidXExtension.shouldPublish()) {
                 version().toString()
             } else {
                 "0.0.0"
@@ -85,7 +85,7 @@ fun Project.configureVersionFileWriter(
             it.outputFile = artifactName
 
             // We only add version file if is a library that is publishing.
-            it.enabled = androidXExtension.publish.shouldPublish()
+            it.enabled = androidXExtension.shouldPublish()
         }
         val resources = library.sourceSets.getByName("main").resources
         resources.srcDirs(setOf(resources.srcDirs, File(buildDir, RESOURCE_DIRECTORY)))
