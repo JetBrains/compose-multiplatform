@@ -122,6 +122,8 @@ package androidx.compose.foundation.layout {
   }
 
   public enum IntrinsicSize {
+    method public static androidx.compose.foundation.layout.IntrinsicSize valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.foundation.layout.IntrinsicSize[] values();
     enum_constant public static final androidx.compose.foundation.layout.IntrinsicSize Max;
     enum_constant public static final androidx.compose.foundation.layout.IntrinsicSize Min;
   }

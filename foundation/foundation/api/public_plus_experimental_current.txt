@@ -125,6 +125,8 @@ package androidx.compose.foundation {
   }
 
   public enum MutatePriority {
+    method public static androidx.compose.foundation.MutatePriority valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.foundation.MutatePriority[] values();
     enum_constant public static final androidx.compose.foundation.MutatePriority Default;
     enum_constant public static final androidx.compose.foundation.MutatePriority PreventUserInput;
     enum_constant public static final androidx.compose.foundation.MutatePriority UserInput;
@@ -259,6 +261,8 @@ package androidx.compose.foundation.gestures {
   }
 
   public enum Orientation {
+    method public static androidx.compose.foundation.gestures.Orientation valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.foundation.gestures.Orientation[] values();
     enum_constant public static final androidx.compose.foundation.gestures.Orientation Horizontal;
     enum_constant public static final androidx.compose.foundation.gestures.Orientation Vertical;
   }
