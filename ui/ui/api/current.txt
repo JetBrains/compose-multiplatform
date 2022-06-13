@@ -1853,7 +1853,7 @@ package androidx.compose.ui.layout {
     property public abstract androidx.compose.ui.unit.LayoutDirection layoutDirection;
   }
 
-  public interface LayoutCoordinates {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface LayoutCoordinates {
     method public operator int get(androidx.compose.ui.layout.AlignmentLine alignmentLine);
     method public androidx.compose.ui.layout.LayoutCoordinates? getParentCoordinates();
     method public androidx.compose.ui.layout.LayoutCoordinates? getParentLayoutCoordinates();
