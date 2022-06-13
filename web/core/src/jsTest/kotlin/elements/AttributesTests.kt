@@ -65,6 +65,21 @@ class AttributesTests {
     }
 
     @Test
+    fun attrClassVarargArrayList() = runTest {
+        composition {
+            Div(attrs = {
+                classes("c1", "c2")
+                classes(listOf("c3", "c4"))
+                classes(classes = arrayOf("c5", "c6"))
+            })
+        }
+
+        with(nextChild()) {
+            assertEquals("c1 c2 c3 c4 c5 c6", getAttribute("class"))
+        }
+    }
+
+    @Test
     fun attrClassOverridesClassesCall() = runTest {
         composition {
             Div(attrs = {

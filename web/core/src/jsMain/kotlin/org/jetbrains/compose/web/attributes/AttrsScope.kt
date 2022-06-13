@@ -51,7 +51,15 @@ interface AttrsScope<TElement : Element> : EventsListenerScope {
      *
      *  `attr("class", ...)` overrides everything added using `classes(...)` calls
      */
-    fun classes(vararg classes: String)
+    fun classes(classes: Collection<String>)
+
+    /**
+     * [classes] adds all values passed as params to the element's classList.
+     *  This method acts cumulatively, that is, each call adds values to the classList.
+     *  In the ideology of Composable functions and their recomposition one just don't need to remove classes,
+     *  since if your classList is, for instance, condition-dependent, you can always just call this method conditionally.
+     */
+    fun classes(vararg classes: String) = classes(classes.asList())
 
     fun id(value: String) = attr(ID, value)
     fun hidden() = attr(HIDDEN, true.toString())
@@ -135,6 +143,16 @@ open class AttrsScopeBuilder<TElement : Element>(
     internal val propertyUpdates = mutableListOf<Pair<(Element, Any) -> Unit, Any>>()
     internal var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
     internal val classes: MutableList<String> = mutableListOf()
+
+    /**
+     * [classes] adds all values passed as params to the element's classList.
+     *  This method acts cumulatively, that is, each call adds values to the classList.
+     *  In the ideology of Composable functions and their recomposition one just don't need to remove classes,
+     *  since if your classList is, for instance, condition-dependent, you can always just call this method conditionally.
+     */
+    override fun classes(classes: Collection<String>) {
+        this.classes.addAll(classes)
+    }
 
     /**
      * [classes] adds all values passed as params to the element's classList.
