@@ -459,7 +459,7 @@ class AndroidXImplPlugin : Plugin<Project> {
         project.configureProjectForApiTasks(apiTaskConfig, extension)
 
         project.afterEvaluate {
-            if (extension.type.publish.shouldRelease()) {
+            if (extension.shouldRelease()) {
                 project.extra.set("publish", true)
             }
         }
@@ -673,7 +673,7 @@ class AndroidXImplPlugin : Plugin<Project> {
         }
 
         project.afterEvaluate {
-            if (androidXExtension.publish.shouldRelease()) {
+            if (androidXExtension.shouldRelease()) {
                 project.extra.set("publish", true)
             }
         }
@@ -804,7 +804,7 @@ class AndroidXImplPlugin : Plugin<Project> {
     // Task that creates a json file of a project's dependencies
     private fun Project.addCreateLibraryBuildInfoFileTask(extension: AndroidXExtension) {
         afterEvaluate {
-            if (extension.publish.shouldRelease()) {
+            if (extension.shouldRelease()) {
                 // Only generate build info files for published libraries.
                 val task = CreateLibraryBuildInfoFileTask.setup(project, extension)
 
@@ -871,7 +871,7 @@ private fun Project.hideJavadocTask() {
 private fun Project.addToProjectMap(extension: AndroidXExtension) {
     // TODO(alanv): Move this out of afterEvaluate
     afterEvaluate {
-        if (extension.publish.shouldRelease()) {
+        if (extension.shouldRelease()) {
             val group = extension.mavenGroup?.group
             if (group != null) {
                 val module = "$group:$name"
