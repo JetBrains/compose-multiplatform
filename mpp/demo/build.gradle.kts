@@ -141,7 +141,13 @@ if (System.getProperty("os.name") == "Mac OS X") {
     val target = sdkName.orEmpty().let {
         when {
             it.startsWith("iphoneos") -> Target.UIKIT_ARM64
-            it.startsWith("iphonesimulator") -> Target.UIKIT_X64
+            it.startsWith("iphonesimulator") -> {
+                if (System.getProperty("os.arch") == "aarch64") {
+                    Target.UIKIT_ARM64
+                } else {
+                    Target.UIKIT_X64
+                }
+            }
             else -> Target.UIKIT_X64
         }
     }
