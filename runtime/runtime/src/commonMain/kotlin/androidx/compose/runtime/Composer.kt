@@ -2350,6 +2350,9 @@ internal class ComposerImpl(
                 // Invoke the scope's composition function
                 firstInRange.scope.compose(this)
 
+                // We could have moved out of a provider so the provider cache is invalid.
+                providerCache = null
+
                 // Restore the parent of the reader to the previous parent
                 reader.restoreParent(parent)
             } else {
