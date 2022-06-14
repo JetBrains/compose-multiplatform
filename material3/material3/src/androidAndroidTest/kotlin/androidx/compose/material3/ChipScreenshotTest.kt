@@ -129,6 +129,7 @@ class ChipScreenshotTest {
     fun inputChip_lightTheme() {
         rule.setMaterialContent(lightColorScheme()) {
             InputChip(
+                selected = false,
                 onClick = {},
                 enabled = true,
                 modifier = Modifier.testTag(TestTag),
@@ -153,9 +154,38 @@ class ChipScreenshotTest {
     }
 
     @Test
+    fun inputChip_selected_lightTheme() {
+        rule.setMaterialContent(lightColorScheme()) {
+            InputChip(
+                selected = true,
+                onClick = {},
+                enabled = true,
+                modifier = Modifier.testTag(TestTag),
+                label = { Text("Input chip") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Search,
+                        contentDescription = "Localized Description",
+                        modifier = Modifier.requiredSize(InputChipDefaults.IconSize)
+                    )
+                },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Done,
+                        contentDescription = "Localized Description",
+                        modifier = Modifier.requiredSize(InputChipDefaults.IconSize)
+                    )
+                }
+            )
+        }
+        assertChipAgainstGolden("inputChip_selected_lightTheme")
+    }
+
+    @Test
     fun inputChip_withAvatar_lightTheme() {
         rule.setMaterialContent(lightColorScheme()) {
             InputChip(
+                selected = false,
                 onClick = {},
                 enabled = true,
                 modifier = Modifier.testTag(TestTag),
@@ -183,6 +213,7 @@ class ChipScreenshotTest {
     fun inputChip_darkTheme() {
         rule.setMaterialContent(darkColorScheme()) {
             InputChip(
+                selected = false,
                 onClick = {},
                 enabled = true,
                 modifier = Modifier.testTag(TestTag),
@@ -207,9 +238,38 @@ class ChipScreenshotTest {
     }
 
     @Test
-    fun inputChip_disabled_lightTheme() {
+    fun inputChip_selected_darkTheme() {
         rule.setMaterialContent(darkColorScheme()) {
             InputChip(
+                selected = true,
+                onClick = {},
+                enabled = true,
+                modifier = Modifier.testTag(TestTag),
+                label = { Text("Input chip") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Search,
+                        contentDescription = "Localized Description",
+                        modifier = Modifier.requiredSize(InputChipDefaults.IconSize)
+                    )
+                },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Done,
+                        contentDescription = "Localized Description",
+                        modifier = Modifier.requiredSize(InputChipDefaults.IconSize)
+                    )
+                }
+            )
+        }
+        assertChipAgainstGolden("inputChip_selected_darkTheme")
+    }
+
+    @Test
+    fun inputChip_disabled_lightTheme() {
+        rule.setMaterialContent(lightColorScheme()) {
+            InputChip(
+                selected = false,
                 onClick = {},
                 enabled = false,
                 modifier = Modifier.testTag(TestTag),
@@ -220,9 +280,24 @@ class ChipScreenshotTest {
     }
 
     @Test
+    fun inputChip_disabled_selected_lightTheme() {
+        rule.setMaterialContent(lightColorScheme()) {
+            InputChip(
+                selected = false,
+                onClick = {},
+                enabled = false,
+                modifier = Modifier.testTag(TestTag),
+                label = { Text("Input chip") }
+            )
+        }
+        assertChipAgainstGolden("inputChip_disabled_selected_lightTheme")
+    }
+
+    @Test
     fun inputChip_disabled_darkTheme() {
         rule.setMaterialContent(darkColorScheme()) {
             InputChip(
+                selected = false,
                 onClick = {},
                 enabled = false,
                 modifier = Modifier.testTag(TestTag),
@@ -230,6 +305,20 @@ class ChipScreenshotTest {
             )
         }
         assertChipAgainstGolden("inputChip_disabled_darkTheme")
+    }
+
+    @Test
+    fun inputChip_disabled_selected_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) {
+            InputChip(
+                selected = true,
+                onClick = {},
+                enabled = false,
+                modifier = Modifier.testTag(TestTag),
+                label = { Text("Input chip") }
+            )
+        }
+        assertChipAgainstGolden("inputChip_disabled_selected_darkTheme")
     }
 
     @Test

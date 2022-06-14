@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_92
+// VERSION: v0_101
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -26,35 +26,54 @@ internal object InputChipTokens {
     val ContainerShape = ShapeKeyTokens.CornerSmall
     val DisabledLabelTextColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledLabelTextOpacity = 0.38f
-    val DisabledOutlineColor = ColorSchemeKeyTokens.OnSurface
-    const val DisabledOutlineOpacity = 0.12f
+    val DisabledSelectedContainerColor = ColorSchemeKeyTokens.OnSurface
+    const val DisabledSelectedContainerOpacity = 0.12f
+    val DisabledUnselectedOutlineColor = ColorSchemeKeyTokens.OnSurface
+    const val DisabledUnselectedOutlineOpacity = 0.12f
     val DraggedContainerElevation = ElevationTokens.Level4
-    val DraggedLabelTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
-    val FocusLabelTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
-    val FocusOutlineColor = ColorSchemeKeyTokens.OnSurfaceVariant
-    val HoverLabelTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
-    val LabelTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val LabelTextFont = TypographyKeyTokens.LabelLarge
-    val OutlineColor = ColorSchemeKeyTokens.Outline
-    val OutlineWidth = 1.0.dp
-    val PressedLabelTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val SelectedContainerColor = ColorSchemeKeyTokens.SecondaryContainer
+    val SelectedDraggedLabelTextColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val SelectedFocusLabelTextColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val SelectedHoverLabelTextColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val SelectedLabelTextColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val SelectedOutlineWidth = 0.0.dp
+    val SelectedPressedLabelTextColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val UnselectedDraggedLabelTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedFocusLabelTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedFocusOutlineColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedHoverLabelTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedLabelTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedOutlineColor = ColorSchemeKeyTokens.Outline
+    val UnselectedOutlineWidth = 1.0.dp
+    val UnselectedPressedLabelTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val AvatarShape = ShapeKeyTokens.CornerFull
     val AvatarSize = 24.0.dp
     const val DisabledAvatarOpacity = 0.38f
     val DisabledLeadingIconColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledLeadingIconOpacity = 0.38f
-    val DraggedLeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
-    val FocusLeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
-    val HoverLeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
-    val LeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val LeadingIconSize = 18.0.dp
-    val PressedLeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val SelectedDraggedLeadingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val SelectedFocusLeadingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val SelectedHoverLeadingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val SelectedLeadingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val SelectedPressedLeadingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val UnselectedDraggedLeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedFocusLeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedHoverLeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedLeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedPressedLeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val DisabledTrailingIconColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledTrailingIconOpacity = 0.38f
-    val DraggedTrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
-    val FocusTrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
-    val HoverTrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
-    val PressedTrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
-    val TrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val SelectedDraggedTrailingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val SelectedFocusTrailingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val SelectedHoverTrailingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val SelectedPressedTrailingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val SelectedTrailingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
     val TrailingIconSize = 18.0.dp
+    val UnselectedDraggedTrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedFocusTrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedHoverTrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedPressedTrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedTrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
 }
