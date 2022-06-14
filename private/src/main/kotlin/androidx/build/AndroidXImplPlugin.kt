@@ -56,6 +56,7 @@ import com.android.build.gradle.internal.tasks.AnalyticsRecordingTask
 import com.android.build.gradle.internal.tasks.ListingFileRedirectTask
 import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion.VERSION_1_8
+import org.gradle.api.JavaVersion.VERSION_11
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -261,13 +262,18 @@ class AndroidXImplPlugin : Plugin<Project> {
         extension: AndroidXExtension,
         plugin: KotlinBasePluginWrapper
     ) {
-        project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
-            task.kotlinOptions.jvmTarget = "1.8"
-            task.kotlinOptions.freeCompilerArgs += listOf(
-                "-Xskip-metadata-version-check"
-            )
-        }
         project.afterEvaluate {
+            project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
+                if (extension.type.compilationTarget == CompilationTarget.HOST) {
+                    task.kotlinOptions.jvmTarget = "11"
+                } else {
+                    task.kotlinOptions.jvmTarget = "1.8"
+                }
+                task.kotlinOptions.freeCompilerArgs += listOf(
+                    "-Xskip-metadata-version-check"
+                )
+            }
+
             val isAndroidProject = project.plugins.hasPlugin(LibraryPlugin::class.java) ||
                 project.plugins.hasPlugin(AppPlugin::class.java)
             // Explicit API mode is broken for Android projects
@@ -434,9 +440,18 @@ class AndroidXImplPlugin : Plugin<Project> {
 
         // Force Java 1.8 source- and target-compatibility for all Java libraries.
         val javaExtension = project.extensions.getByType<JavaPluginExtension>()
-        javaExtension.apply {
-            sourceCompatibility = VERSION_1_8
-            targetCompatibility = VERSION_1_8
+        project.afterEvaluate {
+            if (extension.type.compilationTarget == CompilationTarget.HOST) {
+                javaExtension.apply {
+                    sourceCompatibility = VERSION_11
+                    targetCompatibility = VERSION_11
+                }
+            } else {
+                javaExtension.apply {
+                    sourceCompatibility = VERSION_1_8
+                    targetCompatibility = VERSION_1_8
+                }
+            }
         }
 
         project.configureJavaCompilationWarnings(extension)
