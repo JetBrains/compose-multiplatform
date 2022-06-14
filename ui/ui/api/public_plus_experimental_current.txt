@@ -2734,8 +2734,10 @@ package androidx.compose.ui.platform {
   }
 
   @androidx.compose.runtime.Stable public interface WindowInfo {
+    method @androidx.compose.ui.ExperimentalComposeUiApi public default int getKeyboardModifiers();
     method public boolean isWindowFocused();
     property public abstract boolean isWindowFocused;
+    property @androidx.compose.ui.ExperimentalComposeUiApi public default int keyboardModifiers;
   }
 
   public final class WindowInfoKt {

@@ -441,6 +441,10 @@ class ComposeScene internal constructor(
         return focusedOwner?.sendKeyEvent(event) == true
     }
 
+    internal fun setCurrentKeyboardModifiers(modifiers: PointerKeyboardModifiers) {
+        mainOwner?.setCurrentKeyboardModifiers(modifiers)
+    }
+
     internal fun onInputMethodEvent(event: Any) = this.onPlatformInputMethodEvent(event)
 }
 

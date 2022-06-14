@@ -209,6 +209,9 @@ expect fun PointerButtons.indexOfLastPressed(): Int
 @kotlin.jvm.JvmInline
 value class PointerKeyboardModifiers(internal val packedValue: NativePointerKeyboardModifiers)
 
+// helps initialize `WindowInfo.keyboardModifiers` with a non-null value
+internal expect fun EmptyPointerKeyboardModifiers(): PointerKeyboardModifiers
+
 /**
  * `true` when the Control key is pressed.
  */
