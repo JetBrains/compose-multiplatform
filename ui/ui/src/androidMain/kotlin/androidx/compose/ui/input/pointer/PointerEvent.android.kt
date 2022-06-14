@@ -113,6 +113,8 @@ actual class PointerEvent internal actual constructor(
     }
 }
 
+internal actual fun EmptyPointerKeyboardModifiers() = PointerKeyboardModifiers(0)
+
 actual val PointerButtons.isPrimaryPressed: Boolean
     get() = packedValue and (MotionEvent.BUTTON_PRIMARY or MotionEvent.BUTTON_STYLUS_PRIMARY) != 0
 
