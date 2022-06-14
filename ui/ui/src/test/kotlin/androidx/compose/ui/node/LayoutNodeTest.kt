@@ -2341,6 +2341,9 @@ private class MockOwner(
         layoutNode.markLayoutPending()
     }
 
+    override fun requestOnPositionedCallback(layoutNode: LayoutNode) {
+    }
+
     override fun onAttach(node: LayoutNode) {
         onAttachParams += node
     }
