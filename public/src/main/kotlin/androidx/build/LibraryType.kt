@@ -81,7 +81,6 @@ sealed class LibraryType(
         val SAMPLES = Samples()
         val LINT = Lint()
         val COMPILER_DAEMON = CompilerDaemon()
-        val COMPILER_DAEMON_TEST = CompilerDaemonTest()
         val COMPILER_PLUGIN = CompilerPlugin()
         val GRADLE_PLUGIN = GradlePlugin()
         val ANNOTATION_PROCESSOR = AnnotationProcessor()
@@ -126,12 +125,6 @@ sealed class LibraryType(
         Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = false,
         RunApiTasks.No("Compiler Daemon (Host-only)"),
-        CompilationTarget.HOST
-    )
-    class CompilerDaemonTest : LibraryType(
-        Publish.NONE,
-        sourceJars = false,
-        RunApiTasks.No("Compiler Daemon (Host-only) test"),
         CompilationTarget.HOST
     )
 
