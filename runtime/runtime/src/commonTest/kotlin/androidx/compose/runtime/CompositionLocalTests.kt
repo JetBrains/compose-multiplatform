@@ -18,11 +18,13 @@ package androidx.compose.runtime
 
 import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentHashMapOf
 import androidx.compose.runtime.mock.EmptyApplier
+import androidx.compose.runtime.mock.MockViewValidator
 import androidx.compose.runtime.mock.TestMonotonicFrameClock
 import androidx.compose.runtime.mock.Text
 import androidx.compose.runtime.mock.compositionTest
 import androidx.compose.runtime.mock.expectChanges
 import androidx.compose.runtime.mock.expectNoChanges
+import androidx.compose.runtime.mock.revalidate
 import androidx.compose.runtime.mock.validate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -46,6 +48,7 @@ val LocalSomeOtherIntComposition: CompositionLocal<Int> = LocalSomeOtherIntProvi
 // Create a static CompositionLocal with an int value
 val LocalSomeStaticInt = staticCompositionLocalOf { 40 }
 
+@Stable
 class CompositionLocalTests {
 
     @Composable
@@ -643,6 +646,51 @@ class CompositionLocalTests {
         advance()
         assertEquals(setOf(0, 0, 0), actualValues)
     }
+
+    @Test // Regression test for b/233064044
+    fun testRecomposeCacheInvalidation() = compositionTest {
+        var state = mutableStateOf(0)
+
+        compose {
+            CacheInvalidate(state)
+        }
+
+        validate {
+            this.CacheInvalidate(state)
+        }
+
+        state.value++
+        advance()
+
+        revalidate()
+    }
+}
+
+val cacheLocal = staticCompositionLocalOf { "Unset" }
+@Composable
+fun CacheInvalidate(state: State<Int>) {
+    Text("${state.value}")
+    Text(cacheLocal.current)
+    CacheInvalidateSet {
+        Text("${state.value}")
+        Text(cacheLocal.current)
+    }
+    Text(cacheLocal.current)
+}
+
+@Composable
+fun CacheInvalidateSet(content: @Composable () -> Unit) {
+    CompositionLocalProvider(cacheLocal provides "Set") {
+        content()
+    }
+}
+
+fun MockViewValidator.CacheInvalidate(state: State<Int>) {
+    Text("${state.value}")
+    Text("Unset")
+    Text("${state.value}")
+    Text("Set")
+    Text("Unset")
 }
 
 data class SomeData(val value: String = "default")
