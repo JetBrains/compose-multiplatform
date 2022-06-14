@@ -40,6 +40,7 @@ import androidx.compose.ui.background
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.padding
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.ComposeView
@@ -332,6 +333,46 @@ class OnGloballyPositionedTest {
 
         rule.runOnIdle {
             assertEquals(view.getYInWindow(), coordinates!!.positionInWindow().y)
+        }
+    }
+
+    @Test
+    fun onPositionedCalledWhenLayerChanged() {
+        var positionedLatch = CountDownLatch(1)
+        var coordinates: LayoutCoordinates? = null
+        var offsetX by mutableStateOf(0f)
+
+        rule.setContent {
+            Layout(
+                {},
+                modifier = Modifier.graphicsLayer {
+                    translationX = offsetX
+                }.onGloballyPositioned {
+                    coordinates = it
+                    positionedLatch.countDown()
+                }
+            ) { _, _ ->
+                layout(100, 200) {}
+            }
+        }
+
+        rule.waitForIdle()
+
+        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
+        positionedLatch = CountDownLatch(1)
+
+        rule.runOnIdle {
+            coordinates = null
+            offsetX = 5f
+        }
+
+        assertTrue(
+            "OnPositioned is not called when the container scrolled",
+            positionedLatch.await(1, TimeUnit.SECONDS)
+        )
+
+        rule.runOnIdle {
+            assertEquals(5f, coordinates!!.positionInRoot().x)
         }
     }
 

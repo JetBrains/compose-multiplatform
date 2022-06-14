@@ -271,6 +271,13 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
         }
 
     /**
+     * Request that [layoutNode] and children should call their position change callbacks.
+     */
+    fun requestOnPositionedCallback(layoutNode: LayoutNode) {
+        onPositionedDispatcher.onNodePositioned(layoutNode)
+    }
+
+    /**
      * @return true if the [LayoutNode] size has been changed.
      */
     private fun doLookaheadRemeasure(layoutNode: LayoutNode, constraints: Constraints?): Boolean {

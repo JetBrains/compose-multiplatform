@@ -167,6 +167,12 @@ internal interface Owner {
     )
 
     /**
+     * Called when graphics layers have changed the position of children and the
+     * OnGloballyPositionedModifiers must be called.
+     */
+    fun requestOnPositionedCallback(layoutNode: LayoutNode)
+
+    /**
      * Called by [LayoutNode] when it is attached to the view system and now has an owner.
      * This is used by [Owner] to track which nodes are associated with it. It will only be
      * called when [node] is not already attached to an owner.

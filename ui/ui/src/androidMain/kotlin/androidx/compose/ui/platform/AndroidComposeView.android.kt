@@ -803,6 +803,11 @@ internal class AndroidComposeView(context: Context) :
         }
     }
 
+    override fun requestOnPositionedCallback(layoutNode: LayoutNode) {
+        measureAndLayoutDelegate.requestOnPositionedCallback(layoutNode)
+        scheduleMeasureAndLayout()
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         trace("AndroidOwner:onMeasure") {
             if (!isAttachedToWindow) {
