@@ -19,8 +19,23 @@ configurations {
     // Because we cache the resolutions of these configurations, performance is faster when
     // artifacts are put into these configurations than when those artifacts are put into their
     // corresponding configuration.
-    cacheableApi
+    cacheableApi {
+        attributes {
+            attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.class, Usage.JAVA_RUNTIME));
+            attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.class, Category.LIBRARY));
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.class, LibraryElements.JAR));
+            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, Integer.parseInt(JavaVersion.current().getMajorVersion()));
+            attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, project.objects.named(GradlePluginApiVersion.class, GradleVersion.current().getVersion()));
+        }
+    }
     cacheableImplementation {
+        attributes {
+            attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.class, Usage.JAVA_RUNTIME));
+            attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.class, Category.LIBRARY));
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.class, LibraryElements.JAR));
+            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, Integer.parseInt(JavaVersion.current().getMajorVersion()));
+            attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, project.objects.named(GradlePluginApiVersion.class, GradleVersion.current().getVersion()));
+        }
         extendsFrom(project.configurations.cacheableApi)
     }
     cacheableRuntimeOnly
