@@ -54,11 +54,17 @@ import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.internal.lint.AndroidLintTask
 import com.android.build.gradle.internal.tasks.AnalyticsRecordingTask
 import com.android.build.gradle.internal.tasks.ListingFileRedirectTask
+import java.io.File
+import java.time.Duration
+import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 import org.gradle.api.GradleException
+import org.gradle.api.JavaVersion.VERSION_11
 import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.artifacts.repositories.IvyArtifactRepository
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginExtension
@@ -71,23 +77,18 @@ import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.io.File
-import java.time.Duration
-import java.util.Locale
-import java.util.concurrent.ConcurrentHashMap
-import org.gradle.api.artifacts.repositories.IvyArtifactRepository
-import org.gradle.kotlin.dsl.KotlinClosure1
-import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.targets.native.KotlinNativeHostTestRun
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.kotlin.gradle.testing.KotlinTaskTestRun
 
@@ -261,11 +262,17 @@ class AndroidXImplPlugin : Plugin<Project> {
         extension: AndroidXExtension,
         plugin: KotlinBasePluginWrapper
     ) {
-        project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
-            task.kotlinOptions.jvmTarget = "1.8"
-            task.kotlinOptions.freeCompilerArgs += listOf(
-                "-Xskip-metadata-version-check"
-            )
+        project.afterEvaluate {
+            project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
+                if (extension.type.compilationTarget == CompilationTarget.HOST) {
+                    task.kotlinOptions.jvmTarget = "11"
+                } else {
+                    task.kotlinOptions.jvmTarget = "1.8"
+                }
+                task.kotlinOptions.freeCompilerArgs += listOf(
+                    "-Xskip-metadata-version-check"
+                )
+            }
         }
         project.afterEvaluate {
             val isAndroidProject = project.plugins.hasPlugin(LibraryPlugin::class.java) ||
@@ -434,9 +441,19 @@ class AndroidXImplPlugin : Plugin<Project> {
 
         // Force Java 1.8 source- and target-compatibility for all Java libraries.
         val javaExtension = project.extensions.getByType<JavaPluginExtension>()
-        javaExtension.apply {
-            sourceCompatibility = VERSION_1_8
-            targetCompatibility = VERSION_1_8
+
+        project.afterEvaluate {
+            if (extension.type.compilationTarget == CompilationTarget.HOST) {
+                javaExtension.apply {
+                    sourceCompatibility = VERSION_11
+                    targetCompatibility = VERSION_11
+                }
+            } else {
+                javaExtension.apply {
+                    sourceCompatibility = VERSION_1_8
+                    targetCompatibility = VERSION_1_8
+                }
+            }
         }
 
         project.configureJavaCompilationWarnings(extension)
