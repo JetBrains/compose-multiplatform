@@ -350,7 +350,6 @@ private val intSizeDefaultSpring = spring(visibilityThreshold = IntSize.Visibili
 fun <T, V : AnimationVector> animateValueAsState(
     targetValue: T,
     typeConverter: TwoWayConverter<T, V>,
-    @Suppress("UNINITIALIZED_PARAMETER_WARNING") // b/235315629
     animationSpec: AnimationSpec<T> = remember {
         spring(visibilityThreshold = visibilityThreshold)
     },
