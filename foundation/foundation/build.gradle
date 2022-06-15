@@ -37,8 +37,8 @@ dependencies {
          */
         api("androidx.annotation:annotation:1.1.0")
         api("androidx.compose.animation:animation:1.1.1")
-        api(project(':compose:runtime:runtime'))
-        api(project(":compose:ui:ui"))
+        api("androidx.compose.runtime:runtime:1.2.0-rc01")
+        api("androidx.compose.ui:ui:1.2.0-rc01")
 
         implementation(libs.kotlinStdlibCommon)
         implementation(project(":compose:foundation:foundation-layout"))
