@@ -29,10 +29,22 @@ package androidx.compose.material3 {
   }
 
   public final class BottomAppBarDefaults {
-    method @androidx.compose.runtime.Composable public androidx.compose.material3.FloatingActionButtonElevation floatingActionButtonElevation(optional float defaultElevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation);
+    method @androidx.compose.runtime.Composable public void FloatingActionButton(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.ui.graphics.Shape shape, optional long containerColor, optional long contentColor, optional androidx.compose.material3.FloatingActionButtonElevation elevation, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method public androidx.compose.foundation.layout.PaddingValues getContentPadding();
+    method @androidx.compose.runtime.Composable public long getFloatingActionButtonContainerColor();
+    method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getFloatingActionButtonShape();
     property public final androidx.compose.foundation.layout.PaddingValues ContentPadding;
+    property @androidx.compose.runtime.Composable public final long FloatingActionButtonContainerColor;
+    property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape FloatingActionButtonShape;
     field public static final androidx.compose.material3.BottomAppBarDefaults INSTANCE;
+  }
+
+  public static final class BottomAppBarDefaults.FloatingActionButtonElevation implements androidx.compose.material3.FloatingActionButtonElevation {
+    method public androidx.compose.runtime.MutableState<androidx.compose.ui.unit.Dp> getElevation();
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.MutableState<androidx.compose.ui.unit.Dp> shadowElevation(androidx.compose.foundation.interaction.InteractionSource interactionSource);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.MutableState<androidx.compose.ui.unit.Dp> tonalElevation(androidx.compose.foundation.interaction.InteractionSource interactionSource);
+    property public final androidx.compose.runtime.MutableState<androidx.compose.ui.unit.Dp> elevation;
+    field public static final androidx.compose.material3.BottomAppBarDefaults.FloatingActionButtonElevation INSTANCE;
   }
 
   @androidx.compose.runtime.Stable public interface ButtonColors {

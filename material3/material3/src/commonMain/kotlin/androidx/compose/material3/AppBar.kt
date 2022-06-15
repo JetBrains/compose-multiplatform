@@ -25,6 +25,8 @@ import androidx.compose.animation.core.animateDecay
 import androidx.compose.animation.core.animateTo
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +38,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.BottomAppBarDefaults.FloatingActionButton
 import androidx.compose.material3.tokens.BottomAppBarTokens
+import androidx.compose.material3.tokens.FabSecondaryTokens
 import androidx.compose.material3.tokens.TopAppBarLargeTokens
 import androidx.compose.material3.tokens.TopAppBarMediumTokens
 import androidx.compose.material3.tokens.TopAppBarSmallCenteredTokens
@@ -59,6 +63,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -806,30 +811,75 @@ object BottomAppBarDefaults {
         end = BottomAppBarHorizontalPadding
     )
 
+    // Bottom App Bar FAB Defaults
     /**
      * Creates a [FloatingActionButtonElevation] that represents the default elevation of a
      * [FloatingActionButton] used for [BottomAppBar] in different states.
+     */
+    object FloatingActionButtonElevation :
+        androidx.compose.material3.FloatingActionButtonElevation {
+        val elevation = mutableStateOf(0.dp)
+
+        @Composable
+        override fun shadowElevation(interactionSource: InteractionSource) = elevation
+        @Composable
+        override fun tonalElevation(interactionSource: InteractionSource) = elevation
+    }
+
+    /** The color of a [BottomAppBar]'s [FloatingActionButton] */
+    val FloatingActionButtonContainerColor: Color @Composable get() =
+        FabSecondaryTokens.ContainerColor.toColor()
+
+    /** The shape of a [BottomAppBar]'s [FloatingActionButton] */
+    val FloatingActionButtonShape: Shape @Composable get() =
+        FabSecondaryTokens.ContainerShape.toShape()
+
+    /**
+     * The default [FloatingActionButton] for [BottomAppBar]
      *
-     * @param defaultElevation the elevation used when the [FloatingActionButton] has no other
-     * [Interaction]s.
-     * @param pressedElevation the elevation used when the [FloatingActionButton] is pressed.
-     * @param focusedElevation the elevation used when the [FloatingActionButton] is focused.
-     * @param hoveredElevation the elevation used when the [FloatingActionButton] is hovered.
+     * A [BottomAppBar]'s FAB follows a secondary color style, as well as an elevation of zero.
+     *
+     * @sample androidx.compose.material3.samples.BottomAppBarWithFAB
+     *
+     * @param onClick callback invoked when this FAB is clicked
+     * @param modifier [Modifier] to be applied to this FAB.
+     * @param interactionSource the [MutableInteractionSource] representing the stream of
+     * [Interaction]s for this FAB. You can create and pass in your own `remember`ed instance to
+     * observe [Interaction]s and customize the appearance / behavior of this FAB in different
+     * states.
+     * @param shape defines the shape of this FAB's container and shadow (when using [elevation])
+     * @param containerColor the color used for the background of this FAB. Use [Color.Transparent]
+     * to have no color.
+     * @param contentColor the preferred color for content inside this FAB. Defaults to either the
+     * matching content color for [containerColor], or to the current [LocalContentColor] if
+     * [containerColor] is not a color from the theme.
+     * @param elevation [FloatingActionButtonElevation] used to resolve the elevation for this FAB
+     * in different states. This controls the size of the shadow below the FAB. Additionally, when
+     * the container color is [ColorScheme.surface], this controls the amount of primary color
+     * applied as an overlay. See also: [Surface].
+     * @param content the content of this FAB - this is typically an [Icon].
      */
     @Composable
-    fun floatingActionButtonElevation(
-        defaultElevation: Dp = 0.dp,
-        pressedElevation: Dp = 0.dp,
-        focusedElevation: Dp = 0.dp,
-        hoveredElevation: Dp = 0.dp,
-    ): FloatingActionButtonElevation {
-        return FloatingActionButtonDefaults.elevation(
-            defaultElevation = defaultElevation,
-            pressedElevation = pressedElevation,
-            focusedElevation = focusedElevation,
-            hoveredElevation = hoveredElevation
+    fun FloatingActionButton(
+        onClick: () -> Unit,
+        modifier: Modifier = Modifier,
+        interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+        shape: Shape = FloatingActionButtonShape,
+        containerColor: Color = FloatingActionButtonContainerColor,
+        contentColor: Color = contentColorFor(containerColor),
+        elevation: androidx.compose.material3.FloatingActionButtonElevation =
+            FloatingActionButtonElevation,
+        content: @Composable () -> Unit,
+    ) = androidx.compose.material3.FloatingActionButton(
+            onClick = onClick,
+            modifier = modifier,
+            interactionSource = interactionSource,
+            shape = shape,
+            containerColor = containerColor,
+            contentColor = contentColor,
+            elevation = elevation,
+            content = content
         )
-    }
 }
 
 // Padding minus IconButton's min touch target expansion

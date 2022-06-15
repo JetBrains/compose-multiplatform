@@ -312,9 +312,8 @@ class AppBarScreenshotTest {
                         }
                     },
                     floatingActionButton = {
-                        FloatingActionButton(
-                            onClick = { /* do something */ },
-                            elevation = BottomAppBarDefaults.floatingActionButtonElevation()
+                        BottomAppBarDefaults.FloatingActionButton(
+                            onClick = { /* do something */ }
                         ) {
                             Icon(Icons.Filled.Add, "Localized description")
                         }
@@ -343,9 +342,8 @@ class AppBarScreenshotTest {
                         }
                     },
                     floatingActionButton = {
-                        FloatingActionButton(
-                            onClick = { /* do something */ },
-                            elevation = BottomAppBarDefaults.floatingActionButtonElevation()
+                        BottomAppBarDefaults.FloatingActionButton(
+                            onClick = { /* do something */ }
                         ) {
                             Icon(Icons.Filled.Add, "Localized description")
                         }
