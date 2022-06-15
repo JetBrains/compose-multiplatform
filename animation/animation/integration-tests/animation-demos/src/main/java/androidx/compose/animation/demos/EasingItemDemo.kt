@@ -17,9 +17,7 @@
 package androidx.compose.animation.demos
 
 import androidx.compose.animation.core.Easing
-import androidx.compose.animation.core.ExperimentalEasingApi
 
-@OptIn(ExperimentalEasingApi::class)
 enum class EasingItemDemo(val description: String, val function: Easing) {
 
     Ease("Ease", function = androidx.compose.animation.core.Ease),
