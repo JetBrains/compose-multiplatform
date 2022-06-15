@@ -1734,8 +1734,9 @@ private fun <T> takeNewGlobalSnapshot(
 }
 
 private fun <T> advanceGlobalSnapshot(block: (invalid: SnapshotIdSet) -> T): T {
-    val previousGlobalSnapshot = currentGlobalSnapshot.get()
+    var previousGlobalSnapshot = snapshotInitializer as GlobalSnapshot
     val result = sync {
+        previousGlobalSnapshot = currentGlobalSnapshot.get()
         takeNewGlobalSnapshot(previousGlobalSnapshot, block)
     }
 

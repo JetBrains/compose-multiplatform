@@ -29,8 +29,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlin.concurrent.thread
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlinx.coroutines.delay
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 @Stable
 @OptIn(InternalComposeApi::class)
@@ -162,5 +165,15 @@ class JvmCompositionTests {
 
         value = 2
         expectChanges()
+    }
+
+    private var count = 0
+    @BeforeTest fun saveSnapshotCount() {
+        count = Snapshot.openSnapshotCount()
+    }
+
+    @AfterTest fun checkSnapshotCount() {
+        val afterCount = Snapshot.openSnapshotCount()
+        assertEquals(count, afterCount, "A snapshot was left open after the test")
     }
 }
