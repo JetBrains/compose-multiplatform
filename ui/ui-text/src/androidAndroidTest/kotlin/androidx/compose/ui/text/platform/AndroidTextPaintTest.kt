@@ -295,6 +295,48 @@ class AndroidTextPaintTest {
         assertThat(textPaint.alpha).isEqualTo((255 * 0.6f).roundToInt())
     }
 
+    @Test
+    fun setBrush_with_alpha_only_alpha_changes() {
+        val brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+        val size = Size(10f, 10f)
+        val textPaint = defaultTextPaint
+        textPaint.setBrush(brush, size, 0.6f)
+
+        assertThat(textPaint.shader).isNotNull()
+        assertThat(textPaint.alpha).isEqualTo((255 * 0.6f).roundToInt())
+
+        textPaint.setBrush(brush, size, 0.8f)
+
+        assertThat(textPaint.shader).isNotNull()
+        assertThat(textPaint.alpha).isEqualTo((255 * 0.8f).roundToInt())
+    }
+
+    @Test
+    fun setShaderBrush_after_setColor() {
+        val brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+        val size = Size(10f, 10f)
+        val alpha = 0.6f
+        val textPaint = defaultTextPaint
+        textPaint.setColor(Color.Red)
+        textPaint.setBrush(brush, size, alpha)
+
+        assertThat(textPaint.shader).isNotNull()
+        assertThat(textPaint.alpha).isEqualTo((255 * 0.6f).roundToInt())
+    }
+
+    @Test
+    fun setColor_after_setShaderBrush() {
+        val brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+        val size = Size(10f, 10f)
+        val alpha = 0.6f
+        val textPaint = defaultTextPaint
+        textPaint.setBrush(brush, size, alpha)
+        textPaint.setColor(Color.Red)
+
+        assertThat(textPaint.shader).isNull()
+        assertThat(textPaint.color).isEqualTo(Color.Red.toArgb())
+    }
+
     @SdkSuppress(minSdkVersion = 29)
     @Test
     fun shadow_default_values() {
