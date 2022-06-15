@@ -71,6 +71,7 @@ internal class AndroidTextPaint(flags: Int, density: Float) : TextPaint(flags) {
             if (this.color != argbColor) {
                 this.color = argbColor
             }
+            this.shader = null
         }
     }
 
@@ -88,7 +89,7 @@ internal class AndroidTextPaint(flags: Int, density: Float) : TextPaint(flags) {
                 setColor(brush.value.modulate(alpha))
             }
             is ShaderBrush -> {
-                if (this.brush != brush || this.brushSize != size) {
+                if (this.shader == null || this.brush != brush || this.brushSize != size) {
                     if (size.isSpecified) {
                         this.brush = brush
                         this.brushSize = size
