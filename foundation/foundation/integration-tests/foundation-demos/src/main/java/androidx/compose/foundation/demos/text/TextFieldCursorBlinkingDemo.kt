@@ -34,10 +34,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import kotlin.random.Random
 import kotlinx.coroutines.delay
 
 @Preview
@@ -61,7 +61,7 @@ fun TextFieldCursorBlinkingDemo() {
         Item("Cursors don't blink when typing (fake typing)") {
             TypingCursorNeverBlinks()
         }
-        Item("Changing selection shows cursor (random)") {
+        Item("Changing selection shows cursor") {
             ChangingSelectionShowsCursor()
         }
     }
@@ -119,8 +119,7 @@ private fun RainbowCursor() {
     val color = remember { mutableStateOf(Red) }
     var shouldAnimate by remember { mutableStateOf(false) }
     LaunchedEffect(shouldAnimate) {
-        if (!shouldAnimate) return@LaunchedEffect
-        while (true) {
+        while (shouldAnimate) {
             Rainbow.forEach {
                 color.value = it
                 // we don't control the timer, but sync with the BasicText timer of 1s blinks
@@ -153,35 +152,47 @@ private fun GradientCursor() {
 @Composable
 fun TypingCursorNeverBlinks() {
     var text by remember { mutableStateOf("") }
-    LaunchedEffect(Unit) {
-        while (true) {
+    var animate by remember { mutableStateOf(false) }
+    LaunchedEffect(animate) {
+        while (animate) {
             text = ""
             listOf("Lorem ", "ipsum ", "was ", "here.").forEach { word ->
                 text += word
-                delay(400)
+                delay(500)
             }
         }
     }
     val textFieldValue = TextFieldValue(
         text = text,
-        selection = TextRange(text.length)
+        selection = TextRange(text.length),
     )
-    BasicTextField(value = textFieldValue, onValueChange = {})
+    BasicTextField(
+        value = textFieldValue,
+        onValueChange = {},
+        modifier = Modifier.onFocusChanged { animate = it.isFocused }
+    )
 }
 
 @Composable
+@Preview
 fun ChangingSelectionShowsCursor() {
-    var text = "Some longer text"
+    val text = "Some longer text that takes a while to cursor through"
     var selection by remember { mutableStateOf(TextRange(0)) }
     LaunchedEffect(text) {
         while (true) {
-            selection = TextRange(Random.nextInt(text.length))
-            delay(400)
+            selection = TextRange((selection.start + 1) % text.length)
+            delay(500)
         }
     }
     val textFieldValue = TextFieldValue(
         text = text,
         selection = selection
     )
-    BasicTextField(value = textFieldValue, onValueChange = {})
+    Column {
+        BasicTextField(
+            value = textFieldValue,
+            onValueChange = {},
+            textStyle = TextStyle.Default.copy(fontFamily = FontFamily.Monospace)
+        )
+    }
 }
