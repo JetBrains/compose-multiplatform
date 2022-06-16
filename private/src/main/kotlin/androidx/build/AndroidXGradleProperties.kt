@@ -124,6 +124,12 @@ const val VERIFY_UP_TO_DATE = "androidx.verifyUpToDate"
  */
 const val KMP_GITHUB_BUILD = "androidx.github.build"
 
+/**
+ * If true, don't require lint-checks project to exist.  This should only be set in
+ * integration tests, to allow them to save time by not configuring extra projects.
+ */
+const val ALLOW_MISSING_LINT_CHECKS_PROJECT = "androidx.allow.missing.lint"
+
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALTERNATIVE_PROJECT_URL,
     VERSION_EXTRA_CHECK_ENABLED,
@@ -148,7 +154,8 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     PLAYGROUND_DOKKA_BUILD_ID,
     PROFILE_YOURKIT_AGENT_PATH,
     KMP_GITHUB_BUILD,
-    ENABLED_KMP_TARGET_PLATFORMS
+    ENABLED_KMP_TARGET_PLATFORMS,
+    ALLOW_MISSING_LINT_CHECKS_PROJECT
 )
 
 /**
@@ -165,13 +172,13 @@ fun Project.getAlternativeProjectUrl(): String? =
  * (version is in format major.minor.patch-extra)
  */
 fun Project.isVersionExtraCheckEnabled(): Boolean =
-    (project.findProperty(VERSION_EXTRA_CHECK_ENABLED) as? String)?.toBoolean() ?: true
+    findBooleanProperty(VERSION_EXTRA_CHECK_ENABLED) ?: true
 
 /**
  * Validate the project structure against Jetpack guidelines
  */
 fun Project.isValidateProjectStructureEnabled(): Boolean =
-    (project.findProperty(VALIDATE_PROJECT_STRUCTURE) as? String)?.toBoolean() ?: true
+    findBooleanProperty(VALIDATE_PROJECT_STRUCTURE) ?: true
 
 /**
  * Validates that all properties passed by the user of the form "-Pandroidx.*" are not misspelled
@@ -199,9 +206,7 @@ fun Project.validateAllAndroidxArgumentsAreRecognized() {
  * results aren't considered build failures, and instead pass their test failures on via build
  * artifacts to be tracked and displayed on test dashboards in a different format
  */
-fun Project.isDisplayTestOutput(): Boolean =
-    (providers.gradleProperty(DISPLAY_TEST_OUTPUT).orNull)?.toBoolean()
-        ?: true
+fun Project.isDisplayTestOutput(): Boolean = findBooleanProperty(DISPLAY_TEST_OUTPUT) ?: true
 
 /**
  * Returns whether the project should write versioned API files, e.g. `1.1.0-alpha01.txt`.
@@ -211,7 +216,7 @@ fun Project.isDisplayTestOutput(): Boolean =
  * is `true`.
  */
 fun Project.isWriteVersionedApiFilesEnabled(): Boolean =
-    (project.findProperty(WRITE_VERSIONED_API_FILES) as? String)?.toBoolean() ?: true
+    findBooleanProperty(WRITE_VERSIONED_API_FILES) ?: true
 
 /**
  * Returns whether the project should generate documentation.
@@ -225,8 +230,17 @@ fun Project.isDocumentationEnabled(): Boolean {
 }
 
 /**
- * Returns whether the build is for checking forward compatibility across projets
+ * Returns whether the build is for checking forward compatibility across projects
  */
 fun Project.usingMaxDepVersions(): Boolean {
     return project.hasProperty(USE_MAX_DEP_VERSIONS)
 }
+
+/**
+ * Returns whether this is an integration test that is allowing lint checks to be skipped to
+ * save configuration time.
+ */
+fun Project.allowMissingLintProject() =
+    findBooleanProperty(ALLOW_MISSING_LINT_CHECKS_PROJECT) ?: false
+
+fun Project.findBooleanProperty(propName: String) = (findProperty(propName) as? String)?.toBoolean()
