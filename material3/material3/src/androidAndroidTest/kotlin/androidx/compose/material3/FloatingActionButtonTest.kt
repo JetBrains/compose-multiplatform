@@ -425,6 +425,9 @@ class FloatingActionButtonTest {
                     iconBounds.center.x + iconBounds.width / 2 + halfPadding,
                     textBounds.center.x - textBounds.width / 2 - halfPadding
                 )
+                // Assert that text and icon have 12.dp padding between them.
+                assertThat(textBounds.left - iconBounds.right)
+                    .isEqualTo(12.dp.roundToPx().toFloat())
             }
         }
     }
