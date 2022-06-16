@@ -44,36 +44,32 @@ fun ColorSchemeDemo() {
     ) {
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             Text("Surfaces", style = MaterialTheme.typography.bodyLarge)
-            ColorTile(
-                text = "On Background",
-                color = colorScheme.onBackground,
+            SurfaceColorSwatch(
+                surface = colorScheme.background,
+                surfaceText = "Background",
+                onSurface = colorScheme.onBackground,
+                onSurfaceText = "On Background"
             )
-            ColorTile(
-                text = "Background",
-                color = colorScheme.background,
+            Spacer(modifier = Modifier.height(16.dp))
+            SurfaceColorSwatch(
+                surface = colorScheme.surface,
+                surfaceText = "Surface",
+                onSurface = colorScheme.onSurface,
+                onSurfaceText = "On Surface"
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            SurfaceColorSwatch(
+                surface = colorScheme.surfaceVariant,
+                surfaceText = "Surface Variant",
+                onSurface = colorScheme.onSurfaceVariant,
+                onSurfaceText = "On Surface Variant"
             )
             Spacer(modifier = Modifier.height(16.dp))
             DoubleTile(
                 leftTile = {
                     ColorTile(
-                        text = "On Surface",
-                        color = colorScheme.onSurface,
-                    )
-                },
-                rightTile = {
-                    ColorTile(
-                        text = "On Surface Variant",
-                        color = colorScheme.onSurfaceVariant,
-                    )
-                },
-            )
-            ColorTile(text = "Surface", color = colorScheme.surface)
-            Spacer(modifier = Modifier.height(16.dp))
-            DoubleTile(
-                leftTile = {
-                    ColorTile(
-                        text = "Inverse Primary",
-                        color = colorScheme.inversePrimary,
+                        text = "Inverse Surface",
+                        color = colorScheme.inverseSurface,
                     )
                 },
                 rightTile = {
@@ -86,144 +82,127 @@ fun ColorSchemeDemo() {
             DoubleTile(
                 leftTile = {
                     ColorTile(
-                        text = "Surface Variant",
-                        color = colorScheme.surfaceVariant,
+                        text = "Inverse Primary",
+                        color = colorScheme.inversePrimary,
                     )
                 },
                 rightTile = {
-                    ColorTile(
-                        text = "Inverse Surface",
-                        color = colorScheme.inverseSurface,
-                    )
-                },
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            DoubleTile(
-                leftTile = {
                     ColorTile(
                         text = "Surface Tint",
                         color = colorScheme.surfaceTint,
                     )
                 },
-                rightTile = { Box(Modifier.fillMaxWidth()) },
             )
+            Spacer(modifier = Modifier.height(16.dp))
         }
         Spacer(modifier = Modifier.width(24.dp))
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             Text("Content", style = MaterialTheme.typography.bodyLarge)
-            DoubleTile(
-                leftTile = {
-                    ColorTile(
-                        text = "On Primary Container",
-                        color = colorScheme.onPrimaryContainer,
-                    )
-                },
-                rightTile = {
-                    ColorTile(
-                        text = "On Primary",
-                        color = colorScheme.onPrimary,
-                    )
-                },
-            )
-            DoubleTile(
-                leftTile = {
-                    ColorTile(
-                        text = "Primary Container",
-                        color = colorScheme.primaryContainer,
-                    )
-                },
-                rightTile = {
-                    ColorTile(
-                        text = "Primary",
-                        color = colorScheme.primary,
-                    )
-                },
-            )
+            ContentColorSwatch(
+                color = colorScheme.primary,
+                colorText = "Primary",
+                onColor = colorScheme.onPrimary,
+                onColorText = "On Primary",
+                colorContainer = colorScheme.primaryContainer,
+                colorContainerText = "Primary Container",
+                onColorContainer = colorScheme.onPrimaryContainer,
+                onColorContainerText = "On Primary Container")
             Spacer(modifier = Modifier.height(16.dp))
-            DoubleTile(
-                leftTile = {
-                    ColorTile(
-                        text = "On Secondary Container",
-                        color = colorScheme.onSecondaryContainer,
-                    )
-                },
-                rightTile = {
-                    ColorTile(
-                        text = "On Secondary",
-                        color = colorScheme.onSecondary,
-                    )
-                },
-            )
-            DoubleTile(
-                leftTile = {
-                    ColorTile(
-                        text = "Secondary Container",
-                        color = colorScheme.secondaryContainer,
-                    )
-                },
-                rightTile = {
-                    ColorTile(
-                        text = "Secondary",
-                        color = colorScheme.secondary,
-                    )
-                },
-            )
+            ContentColorSwatch(
+                color = colorScheme.secondary,
+                colorText = "Secondary",
+                onColor = colorScheme.onSecondary,
+                onColorText = "On Secondary",
+                colorContainer = colorScheme.secondaryContainer,
+                colorContainerText = "Secondary Container",
+                onColorContainer = colorScheme.onSecondaryContainer,
+                onColorContainerText = "On Secondary Container")
             Spacer(modifier = Modifier.height(16.dp))
-            DoubleTile(
-                leftTile = {
-                    ColorTile(
-                        text = "On Tertiary Container",
-                        color = colorScheme.onTertiaryContainer,
-                    )
-                },
-                rightTile = {
-                    ColorTile(
-                        text = "On Tertiary",
-                        color = colorScheme.onTertiary,
-                    )
-                },
-            )
-            DoubleTile(
-                leftTile = {
-                    ColorTile(
-                        text = "Tertiary Container",
-                        color = colorScheme.tertiaryContainer,
-                    )
-                },
-                rightTile = {
-                    ColorTile(
-                        text = "Tertiary",
-                        color = colorScheme.tertiary,
-                    )
-                },
-            )
+            ContentColorSwatch(
+                color = colorScheme.tertiary,
+                colorText = "Tertiary",
+                onColor = colorScheme.onTertiary,
+                onColorText = "On Tertiary",
+                colorContainer = colorScheme.tertiaryContainer,
+                colorContainerText = "Tertiary Container",
+                onColorContainer = colorScheme.onTertiaryContainer,
+                onColorContainerText = "On Tertiary Container")
+            Spacer(modifier = Modifier.height(16.dp))
+            ContentColorSwatch(
+                color = colorScheme.error,
+                colorText = "Error",
+                onColor = colorScheme.onError,
+                onColorText = "On Error",
+                colorContainer = colorScheme.errorContainer,
+                colorContainerText = "Error Container",
+                onColorContainer = colorScheme.onErrorContainer,
+                onColorContainerText = "On Error Container")
             Spacer(modifier = Modifier.height(16.dp))
             Text("Utility", style = MaterialTheme.typography.bodyLarge)
-            DoubleTile(
-                leftTile = {
-                    ColorTile(
-                        text = "On Error",
-                        color = colorScheme.onError,
-                    )
-                },
-                rightTile = {
-                    ColorTile(
-                        text = "Outline",
-                        color = colorScheme.outline,
-                    )
-                }
-            )
-            DoubleTile(
-                leftTile = {
-                    ColorTile(
-                        text = "Error",
-                        color = colorScheme.error,
-                    )
-                },
-                rightTile = { Box(Modifier.fillMaxWidth()) },
+            ColorTile(
+                text = "Outline",
+                color = colorScheme.outline,
             )
         }
     }
+}
+
+@Composable
+private fun SurfaceColorSwatch(
+    surface: Color,
+    surfaceText: String,
+    onSurface: Color,
+    onSurfaceText: String
+) {
+    ColorTile(
+        text = surfaceText,
+        color = surface,
+    )
+    ColorTile(
+        text = onSurfaceText,
+        color = onSurface,
+    )
+}
+
+@Composable
+private fun ContentColorSwatch(
+    color: Color,
+    colorText: String,
+    onColor: Color,
+    onColorText: String,
+    colorContainer: Color,
+    colorContainerText: String,
+    onColorContainer: Color,
+    onColorContainerText: String,
+) {
+    DoubleTile(
+        leftTile = {
+            ColorTile(
+                text = colorText,
+                color = color
+            )
+        },
+        rightTile = {
+            ColorTile(
+                text = onColorText,
+                color = onColor,
+            )
+        },
+    )
+    DoubleTile(
+        leftTile = {
+            ColorTile(
+                text = colorContainerText,
+                color = colorContainer,
+            )
+        },
+        rightTile = {
+            ColorTile(
+                text = onColorContainerText,
+                color = onColorContainer,
+            )
+        },
+    )
 }
 
 @Composable
