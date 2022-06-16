@@ -21,6 +21,7 @@ import com.android.build.api.dsl.Lint
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import java.io.File
 import java.util.Locale
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
@@ -141,10 +142,14 @@ private fun Project.setUpLintDebugIfNeeded() {
 }
 
 fun Project.configureLint(lint: Lint, extension: AndroidXExtension) {
-    project.dependencies.add(
-        "lintChecks",
-        project.rootProject.project(":lint-checks")
-    )
+    val lintChecksProject = project.rootProject.findProject(":lint-checks")
+        ?: if (allowMissingLintProject()) {
+            return
+        } else {
+            throw GradleException("Project :lint-checks does not exist")
+        }
+
+    project.dependencies.add("lintChecks", lintChecksProject)
 
     // The purpose of this specific project is to test that lint is running, so
     // it contains expected violations that we do not want to trigger a build failure
