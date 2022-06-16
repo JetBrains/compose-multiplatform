@@ -3042,9 +3042,11 @@ package androidx.compose.ui.window {
     method public boolean getDismissOnBackPress();
     method public boolean getDismissOnClickOutside();
     method public androidx.compose.ui.window.SecureFlagPolicy getSecurePolicy();
+    method public boolean getUsePlatformDefaultWidth();
     property public final boolean dismissOnBackPress;
     property public final boolean dismissOnClickOutside;
     property public final androidx.compose.ui.window.SecureFlagPolicy securePolicy;
+    property public final boolean usePlatformDefaultWidth;
   }
 
   public interface DialogWindowProvider {
@@ -3064,12 +3066,14 @@ package androidx.compose.ui.window {
     method public boolean getExcludeFromSystemGesture();
     method public boolean getFocusable();
     method public androidx.compose.ui.window.SecureFlagPolicy getSecurePolicy();
+    method public boolean getUsePlatformDefaultWidth();
     property public final boolean clippingEnabled;
     property public final boolean dismissOnBackPress;
     property public final boolean dismissOnClickOutside;
     property public final boolean excludeFromSystemGesture;
     property public final boolean focusable;
     property public final androidx.compose.ui.window.SecureFlagPolicy securePolicy;
+    property public final boolean usePlatformDefaultWidth;
   }
 
   public enum SecureFlagPolicy {

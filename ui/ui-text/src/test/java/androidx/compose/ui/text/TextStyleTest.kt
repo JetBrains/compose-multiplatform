@@ -148,6 +148,7 @@ class TextStyleTest {
         assertThat(style.color).isEqualTo(color)
     }
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `constructor with customized fontSize`() {
         val fontSize = 18.sp
