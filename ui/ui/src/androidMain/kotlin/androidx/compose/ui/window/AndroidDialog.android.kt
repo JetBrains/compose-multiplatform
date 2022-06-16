@@ -79,8 +79,6 @@ class DialogProperties @ExperimentalComposeUiApi constructor(
     val dismissOnBackPress: Boolean = true,
     val dismissOnClickOutside: Boolean = true,
     val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
-    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
-    @get:ExperimentalComposeUiApi
     val usePlatformDefaultWidth: Boolean = true
 ) {
     @OptIn(ExperimentalComposeUiApi::class)
@@ -95,7 +93,6 @@ class DialogProperties @ExperimentalComposeUiApi constructor(
         usePlatformDefaultWidth = true
     )
 
-    @OptIn(ExperimentalComposeUiApi::class)
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is DialogProperties) return false
@@ -108,7 +105,6 @@ class DialogProperties @ExperimentalComposeUiApi constructor(
         return true
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
     override fun hashCode(): Int {
         var result = dismissOnBackPress.hashCode()
         result = 31 * result + dismissOnClickOutside.hashCode()

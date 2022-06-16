@@ -69,7 +69,7 @@ import androidx.compose.ui.unit.Constraints
 // AndroidParagraphIntrinsics. Should we consider just having one TextLayout class which
 // implements Paragraph and ParagraphIntrinsics? it seems like all of these types are immutable
 // and have similar sets of responsibilities.
-@OptIn(InternalPlatformTextApi::class)
+@OptIn(InternalPlatformTextApi::class, ExperimentalTextApi::class)
 internal class AndroidParagraph(
     val paragraphIntrinsics: AndroidParagraphIntrinsics,
     val maxLines: Int,
