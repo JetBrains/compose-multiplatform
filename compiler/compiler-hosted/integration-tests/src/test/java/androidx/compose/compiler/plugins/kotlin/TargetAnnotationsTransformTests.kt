@@ -34,9 +34,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
         @Composable
         @ComposableTarget(applier = "UI")
         fun Test(%composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Test)<Text("...>:Test.kt")
           if (%changed !== 0 || !%composer.skipping) {
@@ -46,9 +43,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test(%composer, %changed or 0b0001)
-          }
-          if (isTraceInProgress()) {
-            traceEventEnd()
           }
         }
         """
@@ -68,9 +62,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
         @Composable
         @ComposableTarget(applier = "Vector")
         fun Test(%composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Test)<Circle...>:Test.kt")
           if (%changed !== 0 || !%composer.skipping) {
@@ -80,9 +71,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test(%composer, %changed or 0b0001)
-          }
-          if (isTraceInProgress()) {
-            traceEventEnd()
           }
         }
         """
@@ -100,9 +88,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
         """
         @Composable
         fun Test(%composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Test):Test.kt")
           if (%changed !== 0 || !%composer.skipping) {
@@ -111,9 +96,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test(%composer, %changed or 0b0001)
-          }
-          if (isTraceInProgress()) {
-            traceEventEnd()
           }
         }
         """
@@ -133,9 +115,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
         @Composable
         @ComposableInferredTarget(scheme = "[0[0]]")
         fun Test(content: Function2<Composer, Int, Unit>, %composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Test)<conten...>:Test.kt")
           val %dirty = %changed
@@ -149,9 +128,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test(content, %composer, %changed or 0b0001)
-          }
-          if (isTraceInProgress()) {
-            traceEventEnd()
           }
         }
         """
@@ -173,9 +149,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
         @Composable
         @ComposableInferredTarget(scheme = "[UI[_]]")
         fun Test(content: Function2<Composer, Int, Unit>, %composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Test)<Row>:Test.kt")
           if (%changed and 0b0001 !== 0 || !%composer.skipping) {
@@ -185,9 +158,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test(content, %composer, %changed or 0b0001)
-          }
-          if (isTraceInProgress()) {
-            traceEventEnd()
           }
         }
         internal object ComposableSingletons%TestKt {
@@ -219,9 +189,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
         @Composable
         @ComposableInferredTarget(scheme = "[UI[_]]")
         fun Test(content: Function2<Composer, Int, Unit>, %composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Test)<Inline...>:Test.kt")
           if (%changed and 0b0001 !== 0 || !%composer.skipping) {
@@ -240,9 +207,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test(content, %composer, %changed or 0b0001)
-          }
-          if (isTraceInProgress()) {
-            traceEventEnd()
           }
         }
         """
@@ -264,9 +228,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
         @Composable
         @ComposableTarget(applier = "UI")
         fun Test(%composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Test)<Wrappe...>:Test.kt")
           if (%changed !== 0 || !%composer.skipping) {
@@ -276,9 +237,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test(%composer, %changed or 0b0001)
-          }
-          if (isTraceInProgress()) {
-            traceEventEnd()
           }
         }
         internal object ComposableSingletons%TestKt {
@@ -311,9 +269,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
         @Composable
         @ComposableTarget(applier = "UI")
         fun Test(%composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Test)<Compos...>:Test.kt")
           if (%changed !== 0 || !%composer.skipping) {
@@ -327,9 +282,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test(%composer, %changed or 0b0001)
-          }
-          if (isTraceInProgress()) {
-            traceEventEnd()
           }
         }
         internal object ComposableSingletons%TestKt {
@@ -384,9 +336,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
         @Composable
         @ComposableInferredTarget(scheme = "[0[0]]")
         fun OpenCustom(content: CustomComposable, %composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(OpenCustom)<call()>:Test.kt")
           val %dirty = %changed
@@ -401,16 +350,10 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             OpenCustom(content, %composer, %changed or 0b0001)
           }
-          if (isTraceInProgress()) {
-            traceEventEnd()
-          }
         }
         @Composable
         @ComposableInferredTarget(scheme = "[UI[UI]]")
         fun ClosedCustom(content: CustomComposable, %composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(ClosedCustom)<Text("...>,<call()>:Test.kt")
           val %dirty = %changed
@@ -426,16 +369,10 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             ClosedCustom(content, %composer, %changed or 0b0001)
           }
-          if (isTraceInProgress()) {
-            traceEventEnd()
-          }
         }
         @Composable
         @ComposableTarget(applier = "UI")
         fun Test(%composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Test)<OpenCu...>,<Closed...>:Test.kt")
           if (%changed !== 0 || !%composer.skipping) {
@@ -443,9 +380,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
               @Composable
               @ComposableTarget(applier = "UI")
               override fun call(%composer: Composer?, %changed: Int) {
-                if (isTraceInProgress()) {
-                  traceEventStart(<>)
-                }
                 %composer = %composer.startRestartGroup(<>)
                 sourceInformation(%composer, "C(call)<Text("...>:Test.kt")
                 if (%changed and 0b0001 !== 0 || !%composer.skipping) {
@@ -456,9 +390,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
                 val tmp0_rcvr = <this>
                 %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
                   tmp0_rcvr.call(%composer, %changed or 0b0001)
-                }
-                if (isTraceInProgress()) {
-                  traceEventEnd()
                 }
               }
             }
@@ -467,9 +398,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
               @Composable
               @ComposableTarget(applier = "UI")
               override fun call(%composer: Composer?, %changed: Int) {
-                if (isTraceInProgress()) {
-                  traceEventStart(<>)
-                }
                 %composer = %composer.startRestartGroup(<>)
                 sourceInformation(%composer, "C(call)<Text("...>:Test.kt")
                 if (%changed and 0b0001 !== 0 || !%composer.skipping) {
@@ -480,9 +408,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
                 val tmp0_rcvr = <this>
                 %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
                   tmp0_rcvr.call(%composer, %changed or 0b0001)
-                }
-                if (isTraceInProgress()) {
-                  traceEventEnd()
                 }
               }
             }
@@ -492,9 +417,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test(%composer, %changed or 0b0001)
-          }
-          if (isTraceInProgress()) {
-            traceEventEnd()
           }
         }
         """
@@ -513,9 +435,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
         @Composable
         @ComposableInferredTarget(scheme = "[0[0]]")
         fun Test(content: Function2<Composer, Int, Unit?>, %composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Test)*<it()>:Test.kt")
           val %dirty = %changed
@@ -541,9 +460,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test(content, %composer, %changed or 0b0001)
-          }
-          if (isTraceInProgress()) {
-            traceEventEnd()
           }
         }
         """
@@ -603,9 +519,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
         @Composable
         @ComposableTarget(applier = "UI")
         fun Leaf(%composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Leaf):Test.kt")
           if (%changed !== 0 || !%composer.skipping) {
@@ -615,16 +528,10 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Leaf(%composer, %changed or 0b0001)
           }
-          if (isTraceInProgress()) {
-            traceEventEnd()
-          }
         }
         @Composable
         @ComposableInferredTarget(scheme = "[0[0]]")
         fun Wrapper(content: Function2<Composer, Int, Unit>, %composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Wrapper)<conten...>:Test.kt")
           val %dirty = %changed
@@ -639,16 +546,10 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Wrapper(content, %composer, %changed or 0b0001)
           }
-          if (isTraceInProgress()) {
-            traceEventEnd()
-          }
         }
         @Composable
         @ComposableInferredTarget(scheme = "[0[0][0][0][0][0][0][0]]")
         fun Optional(one: Function2<Composer, Int, Unit>?, two: Function2<Composer, Int, Unit>?, three: Function2<Composer, Int, Unit>?, four: Function2<Composer, Int, Unit>?, five: Function2<Composer, Int, Unit>?, six: Function2<Composer, Int, Unit>?, content: Function2<Composer, Int, Unit>, %composer: Composer?, %changed: Int, %default: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Optional)P(3,6,5,2,1,4)<one()>,<conten...>:Test.kt")
           val %dirty = %changed
@@ -766,16 +667,10 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Optional(one, two, three, four, five, six, content, %composer, %changed or 0b0001, %default)
           }
-          if (isTraceInProgress()) {
-            traceEventEnd()
-          }
         }
         @Composable
         @ComposableTarget(applier = "UI")
         fun UseOptional(%composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(UseOptional)<Option...>:Test.kt")
           if (%changed !== 0 || !%composer.skipping) {
@@ -785,9 +680,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             UseOptional(%composer, %changed or 0b0001)
-          }
-          if (isTraceInProgress()) {
-            traceEventEnd()
           }
         }
         internal object ComposableSingletons%TestKt {
@@ -951,9 +843,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
         @Composable
         @ComposableTarget(applier = "androidx.compose.ui.UiComposable")
         fun Test1(%composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Test1)<Layout...>:Test.kt")
           if (%changed !== 0 || !%composer.skipping) {
@@ -978,16 +867,10 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test1(%composer, %changed or 0b0001)
           }
-          if (isTraceInProgress()) {
-            traceEventEnd()
-          }
         }
         @Composable
         @ComposableInferredTarget(scheme = "[androidx.compose.ui.UiComposable[androidx.compose.ui.UiComposable]]")
         fun Test2(content: Function2<Composer, Int, Unit>, %composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Test2)<Layout...>:Test.kt")
           val %dirty = %changed
@@ -1007,16 +890,10 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test2(content, %composer, %changed or 0b0001)
           }
-          if (isTraceInProgress()) {
-            traceEventEnd()
-          }
         }
         @Composable
         @ComposableTarget(applier = "androidx.compose.ui.UiComposable")
         fun Test3(%composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Test3)<Test1(...>:Test.kt")
           if (%changed !== 0 || !%composer.skipping) {
@@ -1027,16 +904,10 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test3(%composer, %changed or 0b0001)
           }
-          if (isTraceInProgress()) {
-            traceEventEnd()
-          }
         }
         @Composable
         @ComposableTarget(applier = "androidx.compose.ui.UiComposable")
         fun Test4(%composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Test4)<BasicT...>:Test.kt")
           if (%changed !== 0 || !%composer.skipping) {
@@ -1049,9 +920,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test4(%composer, %changed or 0b0001)
           }
-          if (isTraceInProgress()) {
-            traceEventEnd()
-          }
         }
         val Local: ProvidableCompositionLocal<Int> = compositionLocalOf {
           0
@@ -1059,9 +927,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
         @Composable
         @ComposableInferredTarget(scheme = "[androidx.compose.ui.UiComposable[androidx.compose.ui.UiComposable]]")
         fun Test5(content: Function2<Composer, Int, Unit>, %composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Test5)<Compos...>:Test.kt")
           val %dirty = %changed
@@ -1084,16 +949,10 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test5(content, %composer, %changed or 0b0001)
           }
-          if (isTraceInProgress()) {
-            traceEventEnd()
-          }
         }
         @Composable
         @ComposableTarget(applier = "androidx.compose.ui.UiComposable")
         fun Test6(test: String, %composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Test6)<Compos...>:Test.kt")
           val %dirty = %changed
@@ -1116,15 +975,9 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test6(test, %composer, %changed or 0b0001)
           }
-          if (isTraceInProgress()) {
-            traceEventEnd()
-          }
         }
         @Composable
         fun T(value: String, %composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(T):Test.kt")
           if (%changed and 0b0001 !== 0 || !%composer.skipping) {
@@ -1133,9 +986,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             T(value, %composer, %changed or 0b0001)
-          }
-          if (isTraceInProgress()) {
-            traceEventEnd()
           }
         }
         """
@@ -1213,9 +1063,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
         @Composable
         @ComposableInferredTarget(scheme = "[UI[UI]]")
         fun Test(content: Function2<Composer, Int, Unit>, %composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Test)<rememb...>:Test.kt")
           val %dirty = %changed
@@ -1246,9 +1093,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test(content, %composer, %changed or 0b0001)
-          }
-          if (isTraceInProgress()) {
-            traceEventEnd()
           }
         }
         """
@@ -1305,9 +1149,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
         """
         @Composable
         fun Test(%composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Test)<Widget...>:Test.kt")
           if (%changed !== 0 || !%composer.skipping) {
@@ -1317,9 +1158,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test(%composer, %changed or 0b0001)
-          }
-          if (isTraceInProgress()) {
-            traceEventEnd()
           }
         }
         """,
@@ -1349,9 +1187,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
         @Composable
         @ComposableInferredTarget(scheme = "[UI[UI[UI]]]")
         fun Test(decorator: Function3<@[ParameterName(name = 'content')] Function2<Composer, Int, Unit>, Composer, Int, Unit>, %composer: Composer?, %changed: Int) {
-          if (isTraceInProgress()) {
-            traceEventStart(<>)
-          }
           %composer = %composer.startRestartGroup(<>)
           sourceInformation(%composer, "C(Test)<decora...>:Test.kt")
           val %dirty = %changed
@@ -1365,9 +1200,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
             Test(decorator, %composer, %changed or 0b0001)
-          }
-          if (isTraceInProgress()) {
-            traceEventEnd()
           }
         }
         internal object ComposableSingletons%TestKt {
@@ -1404,9 +1236,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
         expectedTransformed = """
             @Composable
             fun NFromFile(%composer: Composer?, %changed: Int) {
-              if (isTraceInProgress()) {
-                traceEventStart(<>)
-              }
               %composer = %composer.startRestartGroup(<>)
               sourceInformation(%composer, "C(NFromFile)<Open()>:Test.kt")
               if (%changed !== 0 || !%composer.skipping) {
@@ -1417,15 +1246,9 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
                 NFromFile(%composer, %changed or 0b0001)
               }
-              if (isTraceInProgress()) {
-                traceEventEnd()
-              }
             }
             @Composable
             fun NFromInference(%composer: Composer?, %changed: Int) {
-              if (isTraceInProgress()) {
-                traceEventStart(<>)
-              }
               %composer = %composer.startRestartGroup(<>)
               sourceInformation(%composer, "C(NFromInference)<N()>:Test.kt")
               if (%changed !== 0 || !%composer.skipping) {
@@ -1435,9 +1258,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
               }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
                 NFromInference(%composer, %changed or 0b0001)
-              }
-              if (isTraceInProgress()) {
-                traceEventEnd()
               }
             }
         """,
@@ -1471,9 +1291,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             @Composable
             @ComposableTarget(applier = "NComposable")
             fun InferN(%composer: Composer?, %changed: Int) {
-              if (isTraceInProgress()) {
-                traceEventStart(<>)
-              }
               %composer = %composer.startRestartGroup(<>)
               sourceInformation(%composer, "C(InferN)<N()>:Test.kt")
               if (%changed !== 0 || !%composer.skipping) {
@@ -1483,9 +1300,6 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
               }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
                 InferN(%composer, %changed or 0b0001)
-              }
-              if (isTraceInProgress()) {
-                traceEventEnd()
               }
             }
         """,
