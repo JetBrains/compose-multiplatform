@@ -96,6 +96,7 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
     val background: Color = Color.Unspecified,
     val textDecoration: TextDecoration? = null,
     val shadow: Shadow? = null,
+    @ExperimentalTextApi
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalTextApi val platformStyle: PlatformSpanStyle? = null
 ) {
@@ -315,6 +316,7 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
     /**
      * Brush to draw text. If not null, overrides [color].
      */
+    @ExperimentalTextApi
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalTextApi
     val brush: Brush? get() = this.textDrawStyle.brush
@@ -323,6 +325,7 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
      * Opacity of text. This value is either provided along side Brush, or via alpha channel in
      * color.
      */
+    @ExperimentalTextApi
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalTextApi
     val alpha: Float get() = this.textDrawStyle.alpha

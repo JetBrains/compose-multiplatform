@@ -159,6 +159,7 @@ class TextStyleTest {
         assertThat(style.color).isEqualTo(color)
     }
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `constructor with half-transparent color`() {
         val color = Color.Red.copy(alpha = 0.5f)
