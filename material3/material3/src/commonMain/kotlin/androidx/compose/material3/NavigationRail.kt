@@ -20,6 +20,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -45,12 +46,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -179,7 +183,7 @@ fun NavigationRailItem(
                 enabled = enabled,
                 role = Role.Tab,
                 interactionSource = interactionSource,
-                indication = rememberRipple(),
+                indication = null,
             )
             .size(width = NavigationRailItemWidth, height = NavigationRailItemHeight),
         contentAlignment = Alignment.Center
@@ -189,21 +193,46 @@ fun NavigationRailItem(
             animationSpec = tween(ItemAnimationDurationMillis)
         )
 
+        // The entire item is selectable, but only the indicator pill shows the ripple. To achieve
+        // this, we re-map the coordinates of the item's InteractionSource into the coordinates of
+        // the indicator.
+        val deltaOffset: Offset
+        with(LocalDensity.current) {
+            val itemWidth = NavigationRailItemWidth.roundToPx()
+            val indicatorWidth = NavigationRailTokens.ActiveIndicatorWidth.roundToPx()
+            deltaOffset = Offset((itemWidth - indicatorWidth).toFloat() / 2, 0f)
+        }
+        val offsetInteractionSource = remember(interactionSource, deltaOffset) {
+            MappedInteractionSource(interactionSource, deltaOffset)
+        }
+
+        val indicatorShape = if (label != null) {
+            NavigationRailTokens.ActiveIndicatorShape.toShape()
+        } else {
+            NavigationRailTokens.NoLabelActiveIndicatorShape.toShape()
+        }
+
+        // The indicator has a width-expansion animation which interferes with the timing of the
+        // ripple, which is why they are separate composables
+        val indicatorRipple = @Composable {
+            Box(
+                Modifier.layoutId(IndicatorRippleLayoutIdTag)
+                    .clip(indicatorShape)
+                    .indication(offsetInteractionSource, rememberRipple())
+            )
+        }
         val indicator = @Composable {
             Box(
                 Modifier.layoutId(IndicatorLayoutIdTag)
                     .background(
                         color = colors.indicatorColor.copy(alpha = animationProgress),
-                        shape = if (label != null) {
-                            NavigationRailTokens.ActiveIndicatorShape.toShape()
-                        } else {
-                            NavigationRailTokens.NoLabelActiveIndicatorShape.toShape()
-                        }
+                        shape = indicatorShape
                     )
             )
         }
 
         NavigationRailItemBaselineLayout(
+            indicatorRipple = indicatorRipple,
             indicator = indicator,
             icon = styledIcon,
             label = styledLabel,
@@ -306,6 +335,7 @@ private class DefaultNavigationRailItemColors(
 /**
  * Base layout for a [NavigationRailItem].
  *
+ * @param indicatorRipple indicator ripple for this item when it is selected
  * @param indicator indicator for this item when it is selected
  * @param icon icon for this item
  * @param label text label for this item
@@ -317,6 +347,7 @@ private class DefaultNavigationRailItemColors(
  */
 @Composable
 private fun NavigationRailItemBaselineLayout(
+    indicatorRipple: @Composable () -> Unit,
     indicator: @Composable () -> Unit,
     icon: @Composable () -> Unit,
     label: @Composable (() -> Unit)?,
@@ -324,6 +355,7 @@ private fun NavigationRailItemBaselineLayout(
     animationProgress: Float,
 ) {
     Layout({
+        indicatorRipple()
         if (animationProgress > 0) {
             indicator()
         }
@@ -349,6 +381,15 @@ private fun NavigationRailItemBaselineLayout(
         }
         val indicatorHeight = iconPlaceable.height + (indicatorVerticalPadding * 2).roundToPx()
 
+        val indicatorRipplePlaceable =
+            measurables
+                .first { it.layoutId == IndicatorRippleLayoutIdTag }
+                .measure(
+                    Constraints.fixed(
+                        width = totalIndicatorWidth,
+                        height = indicatorHeight
+                    )
+                )
         val indicatorPlaceable =
             measurables
                 .firstOrNull { it.layoutId == IndicatorLayoutIdTag }
@@ -371,11 +412,12 @@ private fun NavigationRailItemBaselineLayout(
             }
 
         if (label == null) {
-            placeIcon(iconPlaceable, indicatorPlaceable, constraints)
+            placeIcon(iconPlaceable, indicatorRipplePlaceable, indicatorPlaceable, constraints)
         } else {
             placeLabelAndIcon(
                 labelPlaceable!!,
                 iconPlaceable,
+                indicatorRipplePlaceable,
                 indicatorPlaceable,
                 constraints,
                 alwaysShowLabel,
@@ -386,11 +428,11 @@ private fun NavigationRailItemBaselineLayout(
 }
 
 /**
- * Places the provided [iconPlaceable], and possibly [indicatorPlaceable] if it exists, in the
- * center of the provided [constraints].
+ * Places the provided [Placeable]s in the center of the provided [constraints].
  */
 private fun MeasureScope.placeIcon(
     iconPlaceable: Placeable,
+    indicatorRipplePlaceable: Placeable,
     indicatorPlaceable: Placeable?,
     constraints: Constraints,
 ): MeasureResult {
@@ -400,6 +442,9 @@ private fun MeasureScope.placeIcon(
     val iconX = (width - iconPlaceable.width) / 2
     val iconY = (height - iconPlaceable.height) / 2
 
+    val rippleX = (width - indicatorRipplePlaceable.width) / 2
+    val rippleY = (height - indicatorRipplePlaceable.height) / 2
+
     return layout(width, height) {
         indicatorPlaceable?.let {
             val indicatorX = (width - it.width) / 2
@@ -407,12 +452,13 @@ private fun MeasureScope.placeIcon(
             it.placeRelative(indicatorX, indicatorY)
         }
         iconPlaceable.placeRelative(iconX, iconY)
+        indicatorRipplePlaceable.placeRelative(rippleX, rippleY)
     }
 }
 
 /**
- * Places the provided [labelPlaceable], [iconPlaceable], and [indicatorPlaceable] in the correct
- * position, depending on [alwaysShowLabel] and [animationProgress].
+ * Places the provided [Placeable]s in the correct position, depending on [alwaysShowLabel] and
+ * [animationProgress].
  *
  * When [alwaysShowLabel] is true, the positions do not move. The [iconPlaceable] will be placed
  * near the top of the item and the [labelPlaceable] will be placed near the bottom, according to
@@ -427,11 +473,12 @@ private fun MeasureScope.placeIcon(
  * When [animationProgress] is animating between these values, [iconPlaceable] and [labelPlaceable]
  * will be placed at a corresponding interpolated position.
  *
- * [indicatorPlaceable] will always be placed in such a way that it shares the same center as
- * [iconPlaceable].
+ * [indicatorRipplePlaceable] and [indicatorPlaceable] will always be placed in such a way that to
+ * share the same center as [iconPlaceable].
  *
  * @param labelPlaceable text label placeable inside this item
  * @param iconPlaceable icon placeable inside this item
+ * @param indicatorRipplePlaceable indicator ripple placeable inside this item
  * @param indicatorPlaceable indicator placeable inside this item, if it exists
  * @param constraints constraints of the item
  * @param alwaysShowLabel whether to always show the label for this item. If true, icon and label
@@ -444,6 +491,7 @@ private fun MeasureScope.placeIcon(
 private fun MeasureScope.placeLabelAndIcon(
     labelPlaceable: Placeable,
     iconPlaceable: Placeable,
+    indicatorRipplePlaceable: Placeable,
     indicatorPlaceable: Placeable?,
     constraints: Constraints,
     alwaysShowLabel: Boolean,
@@ -469,6 +517,8 @@ private fun MeasureScope.placeLabelAndIcon(
     val width = constraints.maxWidth
     val labelX = (width - labelPlaceable.width) / 2
     val iconX = (width - iconPlaceable.width) / 2
+    val rippleX = (width - indicatorRipplePlaceable.width) / 2
+    val rippleY = selectedIconY - IndicatorVerticalPaddingWithLabel.roundToPx()
 
     return layout(width, height) {
         indicatorPlaceable?.let {
@@ -480,8 +530,11 @@ private fun MeasureScope.placeLabelAndIcon(
             labelPlaceable.placeRelative(labelX, labelY + offset)
         }
         iconPlaceable.placeRelative(iconX, selectedIconY + offset)
+        indicatorRipplePlaceable.placeRelative(rippleX, rippleY + offset)
     }
 }
+
+private const val IndicatorRippleLayoutIdTag: String = "indicatorRipple"
 
 private const val IndicatorLayoutIdTag: String = "indicator"
 
