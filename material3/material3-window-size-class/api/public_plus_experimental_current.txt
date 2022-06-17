@@ -11,24 +11,25 @@ package androidx.compose.material3.windowsizeclass {
   public final class TestOnly_jvmKt {
   }
 
-  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class WindowHeightSizeClass {
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class WindowHeightSizeClass implements java.lang.Comparable<androidx.compose.material3.windowsizeclass.WindowHeightSizeClass> {
+    method public operator int compareTo(int other);
     field public static final androidx.compose.material3.windowsizeclass.WindowHeightSizeClass.Companion Companion;
   }
 
   public static final class WindowHeightSizeClass.Companion {
-    method public String getCompact();
-    method public String getExpanded();
-    method public String getMedium();
-    property public final String Compact;
-    property public final String Expanded;
-    property public final String Medium;
+    method public int getCompact();
+    method public int getExpanded();
+    method public int getMedium();
+    property public final int Compact;
+    property public final int Expanded;
+    property public final int Medium;
   }
 
   @androidx.compose.runtime.Immutable public final class WindowSizeClass {
-    method public String getHeightSizeClass();
-    method public String getWidthSizeClass();
-    property public final String heightSizeClass;
-    property public final String widthSizeClass;
+    method public int getHeightSizeClass();
+    method public int getWidthSizeClass();
+    property public final int heightSizeClass;
+    property public final int widthSizeClass;
     field public static final androidx.compose.material3.windowsizeclass.WindowSizeClass.Companion Companion;
   }
 
@@ -36,17 +37,18 @@ package androidx.compose.material3.windowsizeclass {
     method @androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi @org.jetbrains.annotations.TestOnly public androidx.compose.material3.windowsizeclass.WindowSizeClass calculateFromSize(long size);
   }
 
-  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class WindowWidthSizeClass {
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class WindowWidthSizeClass implements java.lang.Comparable<androidx.compose.material3.windowsizeclass.WindowWidthSizeClass> {
+    method public operator int compareTo(int other);
     field public static final androidx.compose.material3.windowsizeclass.WindowWidthSizeClass.Companion Companion;
   }
 
   public static final class WindowWidthSizeClass.Companion {
-    method public String getCompact();
-    method public String getExpanded();
-    method public String getMedium();
-    property public final String Compact;
-    property public final String Expanded;
-    property public final String Medium;
+    method public int getCompact();
+    method public int getExpanded();
+    method public int getMedium();
+    property public final int Compact;
+    property public final int Expanded;
+    property public final int Medium;
   }
 
 }
