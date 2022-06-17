@@ -19,7 +19,7 @@ The following software must be preinstalled:
 ### New project wizard
 
 Starting with the version 2020.3, Kotlin support in IDEA comes with the new project wizard,
-which create a Compose application automatically.
+which creates a Compose application automatically.
 
 Note that JDK must be at least JDK 11, and to use the native distribution
 packaging, JDK 15 or later must be used.
