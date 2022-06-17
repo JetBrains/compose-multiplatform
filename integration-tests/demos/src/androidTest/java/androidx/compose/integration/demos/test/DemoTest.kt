@@ -16,6 +16,7 @@
 
 package androidx.compose.integration.demos.test
 
+import android.content.Intent
 import androidx.compose.integration.demos.AllDemosCategory
 import androidx.compose.integration.demos.DemoActivity
 import androidx.compose.integration.demos.Tags
@@ -36,6 +37,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.runEmptyComposeUiTest
+import androidx.test.core.app.ActivityScenario
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.FlakyTest
@@ -92,6 +96,17 @@ class DemoTest {
         assertThat(
             SplitDemoCategories.sumOf { it.allLaunchableDemos().size }
         ).isEqualTo(AllButIgnoredDemos.allLaunchableDemos().size)
+    }
+
+    @Test
+    fun testPassingDemoNameDeeplinksForDemo() = runEmptyComposeUiTest {
+        val demo = AllButIgnoredDemos.allLaunchableDemos()[0]
+        val demoIntent = Intent(
+            ApplicationProvider.getApplicationContext(),
+            DemoActivity::class.java
+        ).apply { putExtra(DemoActivity.DEMO_NAME, demo.title) }
+        ActivityScenario.launch<DemoActivity>(demoIntent)
+        onNodeWithTag(Tags.AppBarTitle).assertTextEquals(demo.title)
     }
 
     @Test
@@ -252,7 +267,7 @@ class DemoTest {
     }
 }
 
-private val AllButIgnoredDemos =
+internal val AllButIgnoredDemos =
     AllDemosCategory.filter { path, demo ->
         demo.navigationTitle(path) !in ignoredDemos
     }
