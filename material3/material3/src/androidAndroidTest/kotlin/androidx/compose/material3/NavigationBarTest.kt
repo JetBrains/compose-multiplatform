@@ -19,6 +19,7 @@ package androidx.compose.material3
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.tokens.NavigationBarTokens
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,7 +60,6 @@ import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.compose.material3.tokens.NavigationBarTokens
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -174,17 +174,20 @@ class NavigationBarTest {
 
         rule.runOnIdleWithDensity {
             val totalWidth = parentCoords.size.width
+            val availableWidth =
+                totalWidth.toFloat() - (NavigationBarItemHorizontalPadding.toPx() * 3)
 
-            val expectedItemWidth = totalWidth / 4
-            val expectedItemHeight = NavigationBarTokens.ContainerHeight.roundToPx()
+            val expectedItemWidth = (availableWidth / 4)
+            val expectedItemHeight = NavigationBarTokens.ContainerHeight.toPx()
 
             Truth.assertThat(itemCoords.size).isEqualTo(4)
 
             itemCoords.forEach { (index, coord) ->
-                Truth.assertThat(coord.size.width).isEqualTo(expectedItemWidth)
-                Truth.assertThat(coord.size.height).isEqualTo(expectedItemHeight)
-                Truth.assertThat(coord.positionInWindow().x)
-                    .isEqualTo((expectedItemWidth * index).toFloat())
+                // Rounding differences for width can occur on smaller screens
+                Truth.assertThat(coord.size.width.toFloat()).isWithin(1f).of(expectedItemWidth)
+                Truth.assertThat(coord.size.height).isEqualTo(expectedItemHeight.toInt())
+                Truth.assertThat(coord.positionInWindow().x).isWithin(1f)
+                    .of((expectedItemWidth + NavigationBarItemHorizontalPadding.toPx()) * index)
             }
         }
     }
