@@ -33,6 +33,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -56,6 +58,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -68,13 +71,16 @@ fun ScreenSizeChangeDemo() {
     // A surface container using the 'background' color from the theme
     var state by remember { mutableStateOf(DisplayState.Tablet) }
     Box(
-        modifier = Modifier.fillMaxSize().background(Color.Black).clickable(
-            interactionSource = remember { MutableInteractionSource() },
-            indication = null
-        ) {
-            state =
-                if (state == DisplayState.Tablet) DisplayState.Compact else DisplayState.Tablet
-        },
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
+                state =
+                    if (state == DisplayState.Tablet) DisplayState.Compact else DisplayState.Tablet
+            },
         contentAlignment = Alignment.TopStart
     ) {
         Root(state)
@@ -115,14 +121,18 @@ fun SceneScope.Details(modifier: Modifier) {
                 Spacer(Modifier.weight(1f))
                 Icon(
                     Icons.Default.Delete,
-                    modifier = Modifier.padding(2.dp)
-                        .background(Color.White, RoundedCornerShape(3.dp)).padding(6.dp),
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .background(Color.White, RoundedCornerShape(3.dp))
+                        .padding(6.dp),
                     contentDescription = null
                 )
                 Icon(
                     Icons.Default.Menu,
-                    modifier = Modifier.padding(2.dp)
-                        .background(Color.White, RoundedCornerShape(3.dp)).padding(6.dp),
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .background(Color.White, RoundedCornerShape(3.dp))
+                        .padding(6.dp),
                     contentDescription = null
                 )
             }
@@ -136,11 +146,17 @@ fun SceneScope.Details(modifier: Modifier) {
 fun Root(state: DisplayState) {
     SceneHost {
         Row(
-            if (state == DisplayState.Compact) {
-                Modifier.requiredWidth(800.dp).fillMaxHeight()
-            } else {
-                Modifier.fillMaxSize()
-            }.sharedElement()
+            Modifier
+                .animateBounds(
+                    if (state == DisplayState.Compact) {
+                        Modifier
+                            .wrapContentSize(align = Alignment.TopStart, unbounded = true)
+                            .requiredWidth(800.dp)
+                            .fillMaxHeight()
+                    } else {
+                        Modifier.fillMaxSize()
+                    }
+                )
                 .background(Color(0xffeae7f2))
                 .padding(top = 10.dp, start = 10.dp, end = 10.dp)
         ) {
@@ -283,7 +299,9 @@ fun SceneScope.Card(cardData: MessageData, selected: Boolean = false) {
                 cardData.content,
                 fontSize = 13.sp,
                 color = Color.Gray,
-                modifier = Modifier.padding(start = 10.dp).animateSizeAndSkipToFinalLayout()
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .animateSizeAndSkipToFinalLayout()
             )
         }
     }
@@ -309,7 +327,9 @@ fun SceneScope.Message(messageData: MessageData) {
             messageData.content,
             fontSize = 13.sp,
             color = Color.Gray,
-            modifier = Modifier.padding(start = 10.dp).animateSizeAndSkipToFinalLayout()
+            modifier = Modifier
+                .padding(start = 10.dp)
+                .animateSizeAndSkipToFinalLayout()
         )
         Spacer(Modifier.size(10.dp))
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -341,16 +361,18 @@ fun SceneScope.Message(messageData: MessageData) {
 fun SceneScope.NavRail(state: DisplayState) {
     Column(
         Modifier
-            .then(
-                if (state == DisplayState.Tablet) Modifier.width(200.dp) else Modifier.width(
-                    IntrinsicSize.Min
-                )
+            .animateBounds(
+                if (state == DisplayState.Tablet)
+                    Modifier.width(200.dp)
+                else
+                    Modifier.width(IntrinsicSize.Min)
             )
             .padding(top = 20.dp, end = 5.dp)
     ) {
         Row(
             Modifier
-                .fillMaxWidth().animateSizeAndSkipToFinalLayout()
+                .fillMaxWidth()
+                .animateSizeAndSkipToFinalLayout()
                 .padding(5.dp), horizontalArrangement = Arrangement.SpaceBetween
         ) {
             if (state == DisplayState.Tablet) {
@@ -360,7 +382,9 @@ fun SceneScope.NavRail(state: DisplayState) {
                 imageVector = Icons.Outlined.Menu,
                 contentDescription = null,
                 tint = Color.Gray,
-                modifier = Modifier.width(40.dp).sharedElement()
+                modifier = Modifier
+                    .width(40.dp)
+                    .sharedElement()
             )
         }
         Spacer(modifier = Modifier.size(10.dp))
@@ -381,7 +405,10 @@ fun SceneScope.NavRail(state: DisplayState) {
             if (state == DisplayState.Tablet) {
                 Text(
                     "Compose",
-                    Modifier.padding(start = 30.dp),
+                    Modifier
+                        .padding(start = 30.dp)
+                        .clipToBounds()
+                        .wrapContentWidth(align = Alignment.CenterHorizontally, unbounded = true),
                     color = Color.Gray,
                     fontWeight = FontWeight.Bold
                 )
@@ -414,6 +441,8 @@ fun Item(state: DisplayState, icon: ImageVector, text: String, color: Color = Co
                 text,
                 Modifier
                     .weight(1f)
+                    .clipToBounds()
+                    .wrapContentWidth(align = Alignment.Start, unbounded = true)
                     .padding(start = 15.dp),
                 color = Color.Gray,
                 fontWeight = FontWeight.Bold,

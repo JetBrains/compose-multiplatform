@@ -36,85 +36,108 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.LookaheadLayout
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlin.math.max
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun LookaheadMeasurePlaceDemo() {
+fun LookaheadWithFlowRowDemo() {
     Column(
+        modifier = Modifier.padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         var isHorizontal by remember { mutableStateOf(true) }
-        Button(modifier = Modifier.padding(top = 20.dp, bottom = 20.dp),
-            onClick = { isHorizontal = !isHorizontal }) {
-            Text("Toggle")
-        }
-        Column(Modifier.background(Color(0xfffdedac), RoundedCornerShape(10)).padding(10.dp)) {
-            Text("Scene Host")
-            SceneHost(
-                Modifier.height(200.dp).fillMaxWidth().wrapContentSize(Alignment.CenterStart)
-            ) {
-                MyFlowRow {
-                    Box(
-                        Modifier.height(50.dp)
-                            .fillMaxWidth(if (isHorizontal) 0.4f else 1f)
-                            .sharedElement()
-                            .background(colors[0], RoundedCornerShape(10))
-                    )
-                    Box(
-                        Modifier.height(50.dp)
-                            .fillMaxWidth(if (isHorizontal) 0.2f else 0.4f)
-                            .sharedElement()
-                            .background(colors[1], RoundedCornerShape(10))
-                    )
-                    Box(
-                        Modifier.height(50.dp)
-                            .fillMaxWidth(if (isHorizontal) 0.2f else 0.4f)
-                            .sharedElement()
-                            .background(colors[2], RoundedCornerShape(10))
-                    )
-                }
-                Box(Modifier.size(if (isHorizontal) 200.dp else 100.dp))
-            }
+        Column(
+            Modifier
+                .background(Color(0xfffdedac), RoundedCornerShape(10))
+                .padding(10.dp)
+        ) {
+            Text("LookaheadLayout + Modifier.animateBounds")
+            LookaheadLayout(
+                measurePolicy = lookaheadMeasurePolicy,
+                content = {
+                    MyFlowRow(
+                        modifier = Modifier
+                            .height(200.dp)
+                            .fillMaxWidth()
+                            .wrapContentSize(Alignment.CenterStart)
+                    ) {
+                        Box(
+                            Modifier
+                                .height(50.dp)
+                                .animateBounds(
+                                    Modifier.fillMaxWidth(if (isHorizontal) 0.4f else 1f)
+                                )
+                                .background(colors[0], RoundedCornerShape(10))
+                        )
+                        Box(
+                            Modifier
+                                .height(50.dp)
+                                .animateBounds(
+                                    Modifier.fillMaxWidth(if (isHorizontal) 0.2f else 0.4f)
+                                )
+                                .background(colors[1], RoundedCornerShape(10))
+                        )
+                        Box(
+                            Modifier
+                                .height(50.dp)
+                                .animateBounds(
+                                    Modifier.fillMaxWidth(if (isHorizontal) 0.2f else 0.4f)
+                                )
+                                .background(colors[2], RoundedCornerShape(10))
+                        )
+                    }
+                    Box(Modifier.size(if (isHorizontal) 200.dp else 100.dp))
+                })
         }
 
         Spacer(Modifier.size(50.dp))
 
-        Column(Modifier.background(Color(0xfffdedac), RoundedCornerShape(10)).padding(10.dp)) {
+        Column(
+            Modifier
+                .background(Color(0xfffdedac), RoundedCornerShape(10))
+                .padding(10.dp)
+        ) {
             Text("Animating Width")
             MyFlowRow(
-                modifier = Modifier.height(200.dp).fillMaxWidth()
+                modifier = Modifier
+                    .height(200.dp)
+                    .fillMaxWidth()
                     .wrapContentSize(Alignment.CenterStart)
             ) {
                 Box(
-                    Modifier.height(50.dp)
+                    Modifier
+                        .height(50.dp)
                         .fillMaxWidth(animateFloatAsState(if (isHorizontal) 0.4f else 1f).value)
                         .background(colors[0], RoundedCornerShape(10))
                 )
                 Box(
-                    Modifier.height(50.dp)
+                    Modifier
+                        .height(50.dp)
                         .fillMaxWidth(animateFloatAsState(if (isHorizontal) 0.2f else 0.4f).value)
                         .background(colors[1], RoundedCornerShape(10))
                 )
                 Box(
-                    Modifier.height(50.dp)
+                    Modifier
+                        .height(50.dp)
                         .fillMaxWidth(animateFloatAsState(if (isHorizontal) 0.2f else 0.4f).value)
                         .background(colors[2], RoundedCornerShape(10))
                 )
             }
         }
-    }
-}
 
-fun printStack(tag: String) {
-    Thread.currentThread().stackTrace.forEach {
-        println("$tag, $it")
+        Button(modifier = Modifier.padding(top = 20.dp, bottom = 20.dp),
+            onClick = { isHorizontal = !isHorizontal }) {
+            Text("Toggle")
+        }
     }
 }
 
