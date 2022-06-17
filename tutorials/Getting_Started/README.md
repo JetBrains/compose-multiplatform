@@ -3,14 +3,14 @@
 ## What is covered
 
 In this tutorial we will create a simple desktop UI application
-using Compose Multiplatform UI framework.
+using the Compose Multiplatform UI framework.
 
 ## Prerequisites
 
  Compose for Desktop can produce applications for macOS, Linux and Windows platforms.
 So any of these platforms can be used for this tutorial.
 
-The following software has to be preinstalled:
+The following software must be preinstalled:
    * JDK 11 or later
    * IntelliJ IDEA Community Edition or Ultimate Edition 2020.3 or later (other editors could be used, but we assume you are using IntelliJ IDEA in this tutorial)
 
@@ -18,11 +18,11 @@ The following software has to be preinstalled:
 
 ### New project wizard
 
-Kotlin support in IDEA IDE starting with the version 2020.3 comes with the new project wizard
-capable to create a Compose application automatically.
+Starting with the version 2020.3, Kotlin support in IDEA comes with the new project wizard,
+which creates a Compose application automatically.
 
 Note that JDK must be at least JDK 11, and to use the native distribution
-packaging JDK 15 or later must be used.
+packaging, JDK 15 or later must be used.
 
 <img alt="Create new project 1" src="screen3.png" height="500" />
 
@@ -33,14 +33,15 @@ packaging JDK 15 or later must be used.
 ### IDE plugin
 
 Compose Multiplatform [IDEA plugin](https://plugins.jetbrains.com/plugin/16541-compose-multiplatform-ide-support)
-can simplify compose development by adding support for `@Preview` annotation on argument-less
-`@Composable` functions. One could see how particular composable function looks like
-directly in IDE panel. This plugin could also be discovered via plugins marketplace,
-just search for "Compose Multiplatform".
+can simplify compose development by adding support for the `@Preview` annotation on argument-less
+`@Composable` functions. You can see how a particular composable function looks
+directly in the IDE panel. This plugin can also be installed via the plugins marketplace.
+Just search for "Compose Multiplatform".
 
 ### Update the wizard plugin
 
-The Compose plugin version used in the wizard above may be not the last. Update the version of the plugin to the latest available by editing the `build.gradle.kts` file, finding and updating the version information as shown below. For the latest versions, see the [latest versions](https://github.com/JetBrains/compose-jb/releases) site and the [Kotlin](https://kotlinlang.org/) site.
+The Compose plugin version used in the wizard above might not be the latest. Update to the latest plugin version by editing the `build.gradle.kts` file and updating the version information as shown below. 
+For the latest versions, see the [latest versions](https://github.com/JetBrains/compose-jb/releases) site and the [Kotlin](https://kotlinlang.org/) site.
 ```
 plugins {
     kotlin("jvm") version "1.6.10"
@@ -48,15 +49,15 @@ plugins {
 }
 ```
 
-### Create new Compose project without the wizard
+### Create a new Compose project without the wizard
 
-It is also possible to create Compose project manually.
+It is also possible to create a Compose project manually.
 
-The recommended way of building Compose for Desktop projects is by using Gradle.
+The recommended way to build Compose for Desktop projects is with Gradle.
 JetBrains provides a simple way of building Compose for Desktop projects
 using a special Gradle plugin.
 
-One could clone an existing template for a [desktop](https://github.com/JetBrains/compose-jb/tree/master/templates/desktop-template) or
+You can clone an existing template for a [desktop](https://github.com/JetBrains/compose-jb/tree/master/templates/desktop-template) or
 [multiplatform](https://github.com/JetBrains/compose-jb/tree/master/templates/multiplatform-template) application, or create it from scratch.
 
 First create a new directory, named `sample`.
@@ -99,7 +100,7 @@ compose.desktop {
     }
 }
 ```
-Then create `src/main/kotlin/main.kt` and put the following code in there:
+Then create `src/main/kotlin/main.kt` and put the following code in it:
 ```kotlin
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -148,9 +149,9 @@ Open `build.gradle.kts` [as a project](https://www.jetbrains.com/help/idea/jetgr
 
 <img alt="New project" src="screen1.png" height="500" />
 
-After you download the Compose for Desktop dependencies from the Maven repositories your new project is ready
-to go. Open the Gradle toolbar on the right, and select `sample/Tasks/compose desktop/run`.
-The first run may take some time, but afterwards the following dialog will be shown:
+After you download the Compose for Desktop dependencies from the Maven repositories, your new project is ready
+to go. Open the Gradle toolbar on the right and select `sample/Tasks/compose desktop/run`.
+The first run may take some time. Afterwards, the following dialog will be shown:
 
 <img alt="Application running" src="screen2.gif" height="500" />
 
