@@ -1,4 +1,6 @@
 # Bug component: 489623
+file: ../material3/OWNERS
+
 clarabayarri@google.com
 popam@google.com
 andreykulikov@google.com
