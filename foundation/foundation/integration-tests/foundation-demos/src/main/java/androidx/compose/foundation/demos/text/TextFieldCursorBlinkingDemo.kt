@@ -16,6 +16,8 @@
 
 package androidx.compose.foundation.demos.text
 
+import androidx.compose.animation.Animatable
+import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
@@ -115,15 +117,12 @@ private fun RainbowCursor() {
         selection = TextRange(3)
     )
 
-    // don't animate each frame, as changing the brush resets the cursor timer
-    val color = remember { mutableStateOf(Red) }
+    val color = remember { Animatable(Red) }
     var shouldAnimate by remember { mutableStateOf(false) }
     LaunchedEffect(shouldAnimate) {
         while (shouldAnimate) {
             Rainbow.forEach {
-                color.value = it
-                // we don't control the timer, but sync with the BasicText timer of 1s blinks
-                delay(1000)
+                color.animateTo(it, TweenSpec(1_800))
             }
         }
     }
