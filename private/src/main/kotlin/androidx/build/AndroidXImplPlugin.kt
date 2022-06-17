@@ -85,8 +85,6 @@ import java.io.File
 import java.time.Duration
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
-import javax.inject.Inject
-import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.artifacts.repositories.IvyArtifactRepository
 import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.register
@@ -98,9 +96,7 @@ import org.jetbrains.kotlin.gradle.testing.KotlinTaskTestRun
  * A plugin which enables all of the Gradle customizations for AndroidX.
  * This plugin reacts to other plugins being added and adds required and optional functionality.
  */
-
-class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareComponentFactory) :
-    Plugin<Project> {
+class AndroidXImplPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         if (project.isRoot)
             throw Exception("Root project should use AndroidXRootImplPlugin instead")
@@ -127,7 +123,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         project.tasks.withType(Test::class.java) { task -> configureTestTask(project, task) }
 
         project.configureTaskTimeouts()
-        project.configureMavenArtifactUpload(extension, componentFactory)
+        project.configureMavenArtifactUpload(extension)
         project.configureExternalDependencyLicenseCheck()
         project.configureProjectStructureValidation(extension)
         project.configureProjectVersionValidation(extension)
@@ -276,16 +272,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                 task.kotlinOptions.freeCompilerArgs += listOf(
                     "-Xskip-metadata-version-check"
                 )
-            }
-
-            // If no one else is going to register a source jar, then we should.
-            // This cross-plugin hands-off logic shouldn't be necessary once we clean up sourceSet
-            // logic (b/235828421)
-            // If this is done outside of afterEvaluate, then we don't always get the right answer,
-            // but due to b/233089408 we don't currently have a way to test that.
-            if (!project.plugins.hasPlugin(LibraryPlugin::class.java) &&
-                !project.plugins.hasPlugin(JavaPlugin::class.java)) {
-                project.configureSourceJarForJava()
             }
 
             val isAndroidProject = project.plugins.hasPlugin(LibraryPlugin::class.java) ||
@@ -1085,11 +1071,7 @@ fun Project.validateProjectStructure(groupId: String) {
     // Project directory should match the Maven coordinate.
     val expectDir = shortGroupId.replace(".", File.separator) +
         "${File.separator}${project.name}"
-    // Canonical projectDir is needed because sometimes, at least in tests, on OSX, supportRoot
-    // starts with /var, and projectDir starts with /private/var (which are the same thing)
-    val canonicalProjectDir = project.projectDir.canonicalFile
-    val actualDir =
-        canonicalProjectDir.toRelativeString(project.getSupportRootFolder().canonicalFile)
+    val actualDir = project.projectDir.toRelativeString(project.getSupportRootFolder())
     if (expectDir != actualDir) {
         throw GradleException(
             "Invalid project structure! Expected $expectDir as project directory, found $actualDir"
