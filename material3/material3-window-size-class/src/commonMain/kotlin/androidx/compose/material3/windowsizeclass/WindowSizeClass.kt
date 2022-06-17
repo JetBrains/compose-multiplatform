@@ -89,22 +89,35 @@ class WindowSizeClass private constructor(
  */
 @Immutable
 @kotlin.jvm.JvmInline
-value class WindowWidthSizeClass private constructor(private val value: String) {
+value class WindowWidthSizeClass private constructor(private val value: Int) :
+    Comparable<WindowWidthSizeClass> {
+
+    override operator fun compareTo(other: WindowWidthSizeClass) = value.compareTo(other.value)
+
+    override fun toString(): String {
+        return "WindowWidthSizeClass." + when (this) {
+            Compact -> "Compact"
+            Medium -> "Medium"
+            Expanded -> "Expanded"
+            else -> ""
+        }
+    }
+
     companion object {
         /** Represents the majority of phones in portrait. */
-        val Compact = WindowWidthSizeClass("Compact")
+        val Compact = WindowWidthSizeClass(0)
 
         /**
          * Represents the majority of tablets in portrait and large unfolded inner displays in
          * portrait.
          */
-        val Medium = WindowWidthSizeClass("Medium")
+        val Medium = WindowWidthSizeClass(1)
 
         /**
          * Represents the majority of tablets in landscape and large unfolded inner displays in
          * landscape.
          */
-        val Expanded = WindowWidthSizeClass("Expanded")
+        val Expanded = WindowWidthSizeClass(2)
 
         /** Calculates the [WindowWidthSizeClass] for a given [width] */
         internal fun fromWidth(width: Dp): WindowWidthSizeClass {
@@ -129,16 +142,29 @@ value class WindowWidthSizeClass private constructor(private val value: String) 
  */
 @Immutable
 @kotlin.jvm.JvmInline
-value class WindowHeightSizeClass private constructor(private val value: String) {
+value class WindowHeightSizeClass private constructor(private val value: Int) :
+    Comparable<WindowHeightSizeClass> {
+
+    override operator fun compareTo(other: WindowHeightSizeClass) = value.compareTo(other.value)
+
+    override fun toString(): String {
+        return "WindowHeightSizeClass." + when (this) {
+            Compact -> "Compact"
+            Medium -> "Medium"
+            Expanded -> "Expanded"
+            else -> ""
+        }
+    }
+
     companion object {
         /** Represents the majority of phones in landscape */
-        val Compact = WindowHeightSizeClass("Compact")
+        val Compact = WindowHeightSizeClass(0)
 
         /** Represents the majority of tablets in landscape and majority of phones in portrait */
-        val Medium = WindowHeightSizeClass("Medium")
+        val Medium = WindowHeightSizeClass(1)
 
         /** Represents the majority of tablets in portrait */
-        val Expanded = WindowHeightSizeClass("Expanded")
+        val Expanded = WindowHeightSizeClass(2)
 
         /** Calculates the [WindowHeightSizeClass] for a given [height] */
         internal fun fromHeight(height: Dp): WindowHeightSizeClass {
