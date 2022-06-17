@@ -68,7 +68,7 @@ fun Svg(
     TagElement(
         elementBuilder = Svg,
         applyAttrs = {
-            viewBox?.let { attr("viewBox", it) }
+            viewBox?.let { viewBox(it) }
             attrs?.invoke(this)
         },
         content = content
@@ -85,7 +85,7 @@ fun ElementScope<SVGElement>.SvgA(
     TagElement(
         elementBuilder = A,
         applyAttrs = {
-            attr("href", href)
+            href(href)
             attrs?.invoke(this)
         },
         content = content
@@ -104,9 +104,9 @@ fun ElementScope<SVGElement>.Circle(
     TagElement(
         elementBuilder = Circle,
         applyAttrs = {
-            attr("cx", cx.toString())
-            attr("cy", cy.toString())
-            attr("r", r.toString())
+            cx(cx)
+            cy(cy)
+            r(r)
             attrs?.invoke(this)
         },
         content = content
@@ -126,9 +126,9 @@ fun ElementScope<SVGElement>.Circle(
     TagElement(
         elementBuilder = Circle,
         applyAttrs = {
-            attr("cx", cx.toString())
-            attr("cy", cy.toString())
-            attr("r", r.toString())
+            cx(cx)
+            cy(cy)
+            r(r)
             attrs?.invoke(this)
         },
         content = content
@@ -147,8 +147,8 @@ fun ElementScope<SVGElement>.SvgText(
     TagElement(
         elementBuilder = Text,
         applyAttrs = {
-            attr("x", x.toString())
-            attr("y", y.toString())
+            x(x)
+            y(y)
             attrs?.invoke(this)
         },
         content = {
@@ -167,8 +167,8 @@ fun ElementScope<SVGElement>.View(
     TagElement(
         elementBuilder = View,
         applyAttrs = {
-            attr("id", id)
-            attr("viewBox", viewBox)
+            id(id)
+            viewBox(viewBox)
             attrs?.invoke(this)
         },
         content = null
@@ -188,10 +188,10 @@ fun ElementScope<SVGElement>.Rect(
     TagElement(
         elementBuilder = Rect,
         applyAttrs = {
-            attr("x", x.toString())
-            attr("y", y.toString())
-            attr("width", width.toString())
-            attr("height", height.toString())
+            x(x)
+            y(y)
+            width(width)
+            height(height)
             attrs?.invoke(this)
         },
         content = content
@@ -211,10 +211,33 @@ fun ElementScope<SVGElement>.Rect(
     TagElement(
         elementBuilder = Rect,
         applyAttrs = {
-            attr("x", x.toString())
-            attr("y", y.toString())
-            attr("width", width.toString())
-            attr("height", height.toString())
+            x(x)
+            y(y)
+            width(width)
+            height(height)
+            attrs?.invoke(this)
+        },
+        content = content
+    )
+}
+
+@Composable
+@ExperimentalComposeWebSvgApi
+fun ElementScope<SVGElement>.Rect(
+    width: Number,
+    height: Number,
+    rx: Number,
+    transform: String,
+    attrs: AttrBuilderContext<SVGRectElement>? = null,
+    content: ContentBuilder<SVGRectElement>? = null
+) {
+    TagElement(
+        elementBuilder = Rect,
+        applyAttrs = {
+            width(width)
+            height(height)
+            rx(rx)
+            transform(transform)
             attrs?.invoke(this)
         },
         content = content
@@ -234,10 +257,10 @@ fun ElementScope<SVGElement>.Ellipse(
     TagElement(
         elementBuilder = Ellipse,
         applyAttrs = {
-            attr("cx", cx.toString())
-            attr("cy", cy.toString())
-            attr("rx", rx.toString())
-            attr("ry", ry.toString())
+            cx(cx)
+            cy(cy)
+            rx(rx)
+            ry(ry)
             attrs?.invoke(this)
         },
         content = content
@@ -257,10 +280,10 @@ fun ElementScope<SVGElement>.Ellipse(
     TagElement(
         elementBuilder = Ellipse,
         applyAttrs = {
-            attr("cx", cx.toString())
-            attr("cy", cy.toString())
-            attr("rx", rx.toString())
-            attr("ry", ry.toString())
+            cx(cx)
+            cy(cy)
+            rx(rx)
+            ry(ry)
             attrs?.invoke(this)
         },
         content = content
@@ -278,7 +301,7 @@ fun ElementScope<SVGElement>.Symbol(
     TagElement(
         elementBuilder = Symbol,
         applyAttrs = {
-            id?.let { attr("id", it) }
+            id?.let { id(it) }
             attrs?.invoke(this)
         },
         content = content
@@ -295,7 +318,7 @@ fun ElementScope<SVGElement>.Use(
     TagElement(
         elementBuilder = Use,
         applyAttrs = {
-            attr("href", href)
+            href(href)
             attrs?.invoke(this)
         },
         content = content
@@ -315,10 +338,10 @@ fun ElementScope<SVGElement>.Line(
     TagElement(
         elementBuilder = Line,
         applyAttrs = {
-            attr("x1", x1.toString())
-            attr("y1", y1.toString())
-            attr("x2", x2.toString())
-            attr("y2", y2.toString())
+            x1(x1)
+            y1(y1)
+            x2(x2)
+            y2(y2)
             attrs?.invoke(this)
         },
         content = content
@@ -338,10 +361,10 @@ fun ElementScope<SVGElement>.Line(
     TagElement(
         elementBuilder = Line,
         applyAttrs = {
-            attr("x1", x1.toString())
-            attr("y1", y1.toString())
-            attr("x2", x2.toString())
-            attr("y2", y2.toString())
+            x1(x1)
+            y1(y1)
+            x2(x2)
+            y2(y2)
             attrs?.invoke(this)
         },
         content = content
@@ -359,7 +382,7 @@ fun ElementScope<SVGElement>.ClipPath(
     TagElement(
         elementBuilder = ClipPath,
         applyAttrs = {
-            attr("id", id)
+            id(id)
             attrs?.invoke(this)
         },
         content = content
@@ -376,7 +399,7 @@ fun ElementScope<SVGElement>.Path(
     TagElement(
         elementBuilder = Path,
         applyAttrs = {
-            attr("d", d)
+            d(d)
             attrs?.invoke(this)
         },
         content = content
@@ -406,7 +429,7 @@ fun ElementScope<SVGElement>.Image(
     TagElement(
         elementBuilder = Image,
         applyAttrs = {
-            attr("href", href)
+            href(href)
             attrs?.invoke(this)
         },
         content = content
@@ -423,7 +446,7 @@ fun ElementScope<SVGElement>.Mask(
     TagElement(
         elementBuilder = Mask,
         applyAttrs = {
-           id?.let { attr("id", it) }
+           id?.let { id(it) }
            attrs?.invoke(this)
         },
         content = content
@@ -453,7 +476,7 @@ fun ElementScope<SVGElement>.Pattern(
     TagElement(
         elementBuilder = Pattern,
         applyAttrs = {
-            attr("id", id)
+            id(id)
             attrs?.invoke(this)
         },
         content = content
@@ -470,7 +493,7 @@ fun ElementScope<SVGElement>.Polygon(
     TagElement(
         elementBuilder = Polygon,
         applyAttrs = {
-            attr("points", points.toList().chunked(2).joinToString(" ") { it.joinToString(",") })
+            points(points.toList().chunked(2).joinToString(" ") { it.joinToString(",") })
             attrs?.invoke(this)
         },
         content = content
@@ -487,7 +510,7 @@ fun ElementScope<SVGElement>.Polyline(
     TagElement(
         elementBuilder = Polyline,
         applyAttrs = {
-            attr("points", points.toList().chunked(2).joinToString(" ") { it.joinToString(",") })
+            points(points.toList().chunked(2).joinToString(" ") { it.joinToString(",") })
             attrs?.invoke(this)
         },
         content = content
@@ -504,7 +527,7 @@ fun ElementScope<SVGElement>.TextPath(
     TagElement(
         elementBuilder = TextPath,
         applyAttrs = {
-            attr("href", href)
+            href(href)
             attrs?.invoke(this)
         },
         content = {
@@ -562,7 +585,7 @@ fun ElementScope<SVGElement>.LinearGradient(
     TagElement(
         elementBuilder = LinearGradient,
         applyAttrs = {
-            id?.let { attr("id", it) }
+            id?.let { id(it) }
             attrs?.invoke(this)
         },
         content = content
@@ -580,7 +603,7 @@ fun ElementScope<SVGElement>.RadialGradient(
     TagElement(
         elementBuilder = RadialGradient,
         applyAttrs = {
-            id?.let { attr("id", it) }
+            id?.let { id(it) }
             attrs?.invoke(this)
         },
         content = content
@@ -706,8 +729,8 @@ fun ElementScope<SVGElement>.Set(
     TagElement(
         elementBuilder = Set,
         applyAttrs = {
-            attr("attributeName", attributeName)
-            attr("to", to)
+            attributeName(attributeName)
+            to(to)
             attrs?.invoke(this)
         },
         content = content
