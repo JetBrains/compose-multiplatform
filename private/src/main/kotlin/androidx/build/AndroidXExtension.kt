@@ -215,10 +215,6 @@ open class AndroidXExtension(val project: Project) {
 
     var bypassCoordinateValidation = false
 
-    // This should only be set for self-tests like AndroidXRootPluginTest.  It allows, for example,
-    // the lint project to be missing without triggering an immediate error.
-    var looseStructureForSelfTestsOnly = false
-
     /**
      * Which KMP platforms are published by this project, as a list of artifact suffixes or an empty
      * list for non-KMP projects.
