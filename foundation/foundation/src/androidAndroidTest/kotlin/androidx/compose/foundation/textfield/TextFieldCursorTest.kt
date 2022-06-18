@@ -311,21 +311,20 @@ class TextFieldCursorTest {
 
         focusAndWait()
 
-        // cursor visible first 500 ms
+        // hide the cursor
         rule.mainClock.advanceTimeBy(500)
+        rule.mainClock.advanceTimeByFrame()
 
         // TODO(b/170298051) check here that cursor is visible when we have a way to control
         //  cursor position when sending a text
 
-        // change text field value
         rule.runOnIdle {
             textValue.value = textValue.value.copy(selection = TextRange(0))
         }
 
-        // cursor would have been invisible during next 500 ms if cursor blinks when selection
-        // changes.
-        // To prevent blinking when selection changes we restart animation when new symbol is typed.
-        rule.mainClock.advanceTimeBy(400)
+        // necessary for animation to start (shows cursor again)
+        rule.mainClock.advanceTimeByFrame()
+
         with(rule.density) {
             rule.onNode(hasSetTextAction())
                 .captureToImage()
