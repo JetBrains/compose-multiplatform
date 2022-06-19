@@ -22,6 +22,7 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
     val projectName = application.projectName
     val bundleIdPrefix = application.bundleIdPrefix
 
+    val taskDeleteUnavailableSimulator: TaskProvider<*> = configureDeleteUnavailableSimulatorTask()
     val taskInstallXcodeGen: TaskProvider<*> = configureInstallXcodeGenTask()
     val taskInstallIosDeploy: TaskProvider<*> = configureInstallIosDeployTask()
 
@@ -35,6 +36,7 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
                     projectName = projectName,
                     bundleIdPrefix = bundleIdPrefix,
                     taskInstallXcodeGen = taskInstallXcodeGen,
+                    taskDeleteUnavailableSimulator = taskDeleteUnavailableSimulator,
                     configurations = application.configurations,
                 )
             }

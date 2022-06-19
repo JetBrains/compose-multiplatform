@@ -22,6 +22,7 @@ fun Project.registerSimulatorTasks(
     projectName: String,
     bundleIdPrefix: String,
     taskInstallXcodeGen: TaskProvider<*>,
+    taskDeleteUnavailableSimulator: TaskProvider<*>,
     configurations: List<UiKitConfiguration>,
 ) {
     val xcodeProjectDir = getBuildIosDir(id).resolve("$projectName.xcodeproj")
@@ -35,6 +36,7 @@ fun Project.registerSimulatorTasks(
     )
 
     val taskCreateSimulator = tasks.composeIosTask<AbstractComposeIosTask>("iosSimulatorCreate$id") {
+        dependsOn(taskDeleteUnavailableSimulator)
         onlyIf { getSimctlListData().devices.map { it.value }.flatten().none { it.name == deviceName } }
         doFirst {
             val availableRuntimes = getSimctlListData().runtimes.filter { runtime ->
@@ -49,10 +51,10 @@ fun Project.registerSimulatorTasks(
     }
 
     val taskBootSimulator = tasks.composeIosTask<AbstractComposeIosTask>("iosSimulatorBoot$id") {
+        dependsOn(taskCreateSimulator)
         onlyIf {
             getSimctlListData().devices.map { it.value }.flatten().any { it.name == deviceName && it.booted.not() }
         }
-        dependsOn(taskCreateSimulator)
         doLast {
             val device = getSimctlListData().devices.map { it.value }.flatten().firstOrNull { it.name == deviceName }
                 ?: error("device '$deviceName' not found")
