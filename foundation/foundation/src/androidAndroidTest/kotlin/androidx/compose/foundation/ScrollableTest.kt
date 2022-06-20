@@ -1938,7 +1938,7 @@ class ScrollableTest {
 
         rule.onNodeWithTag("innerScrollable").performTouchInput {
             down(center)
-            moveBy(Offset(this.center.x + 100f, this.center.y))
+            moveBy(Offset(100f, 0f))
             up()
         }
 
