@@ -79,6 +79,15 @@ task run4(type: JavaExec) {
         compilation.runtimeDependencyFiles
 }
 
+task runMouseClicks(type: JavaExec) {
+    dependsOn(":compose:desktop:desktop:jar")
+    main = "androidx.compose.desktop.examples.mouseclicks.Main_jvmKt"
+    def compilation = kotlin.jvm().compilations["main"]
+    classpath =
+        compilation.output.allOutputs +
+        compilation.runtimeDependencyFiles
+}
+
 task runVsync(type: JavaExec) {
     dependsOn(":compose:desktop:desktop:jar")
     main = "androidx.compose.desktop.examples.vsynctest.Main_jvmKt"

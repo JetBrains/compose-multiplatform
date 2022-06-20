@@ -16,11 +16,15 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.compose.ui.ExperimentalComposeUiApi
+
+@OptIn(ExperimentalComposeUiApi::class)
 internal actual data class PointerInputEvent(
     val eventType: PointerEventType,
     actual val uptime: Long,
     actual val pointers: List<PointerInputEventData>,
     val buttons: PointerButtons = PointerButtons(0),
     val keyboardModifiers: PointerKeyboardModifiers = PointerKeyboardModifiers(0),
-    val nativeEvent: Any? = null
+    val nativeEvent: Any? = null,
+    val button: PointerButton? = null
 )

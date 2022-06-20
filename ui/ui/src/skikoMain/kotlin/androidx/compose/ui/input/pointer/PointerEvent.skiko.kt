@@ -16,8 +16,13 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.isAltPressed
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.isMetaPressed
+import androidx.compose.ui.input.key.isShiftPressed
 import org.jetbrains.skiko.SkikoPointerEventKind
-import org.jetbrains.skiko.SkikoGestureEventState
 import org.jetbrains.skiko.SkikoTouchEventKind
 
 internal actual typealias NativePointerButtons = Int
@@ -92,6 +97,7 @@ internal actual fun EmptyPointerKeyboardModifiers() = PointerKeyboardModifiers()
 /**
  * Describes a pointer input change event that has occurred at a particular point in time.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 actual data class PointerEvent internal constructor(
     /**
      * The changes.
@@ -118,7 +124,9 @@ actual data class PointerEvent internal constructor(
      * - there was a synthetic move event sent by compose on relayout
      * - there was a synthetic move event sent by compose when move is missing between two non-move events
      */
-    val nativeEvent: Any?
+    val nativeEvent: Any?,
+
+    internal val _button: PointerButton?
 ) {
     internal actual constructor(
         changes: List<PointerInputChange>,
@@ -128,7 +136,8 @@ actual data class PointerEvent internal constructor(
         internalPointerEvent?.buttons ?: PointerButtons(0),
         internalPointerEvent?.keyboardModifiers ?: PointerKeyboardModifiers(0),
         internalPointerEvent?.type ?: PointerEventType.Unknown,
-        internalPointerEvent?.nativeEvent
+        internalPointerEvent?.nativeEvent,
+        internalPointerEvent?.button
     )
 
     /**
@@ -139,8 +148,17 @@ actual data class PointerEvent internal constructor(
         buttons = PointerButtons(0),
         keyboardModifiers = PointerKeyboardModifiers(0),
         _type = PointerEventType.Unknown,
-        nativeEvent = null
+        nativeEvent = null,
+        _button = null
     )
+
+    /**
+     * Specifies the pointer button state of which was changed.
+     * It has value only when event's type is [PointerEventType.Press] or [PointerEventType.Release] and
+     * when button is applicable (only for Mouse and Stylus events).
+     */
+    @ExperimentalComposeUiApi
+    val button: PointerButton? = _button
 
     actual var type: PointerEventType = _type
         internal set

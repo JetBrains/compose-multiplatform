@@ -25,6 +25,7 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.AwtCursor
+import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.input.pointer.PointerButtons
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerIcon
@@ -437,8 +438,19 @@ private fun ComposeScene.onMouseEvent(
         type = PointerType.Mouse,
         buttons = event.buttons,
         keyboardModifiers = event.keyboardModifiers,
-        nativeEvent = event
+        nativeEvent = event,
+        button = event.getPointerButton()
     )
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+private fun MouseEvent.getPointerButton(): PointerButton? {
+    if (button == MouseEvent.NOBUTTON) return null
+    return when (button) {
+        MouseEvent.BUTTON2 -> PointerButton.Tertiary
+        MouseEvent.BUTTON3 -> PointerButton.Secondary
+        else -> PointerButton(button - 1)
+    }
 }
 
 @Suppress("ControlFlowWithEmptyBody")

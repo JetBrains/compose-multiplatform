@@ -22,6 +22,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.input.pointer.PointerButtons
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
@@ -187,7 +188,10 @@ class ImageComposeScene(
      * @param keyboardModifiers Contains the state of modifier keys, such as Shift, Control, and Alt,
      * as well as the state of the lock keys, such as Caps Lock and Num Lock.
      * @param nativeEvent The original native event.
+     * @param button Represents the index of a button which state changed in this event. It's null
+     * when there was no change of the buttons state or when button is not applicable (e.g. touch event).
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     fun sendPointerEvent(
         eventType: PointerEventType,
         position: Offset,
@@ -196,9 +200,10 @@ class ImageComposeScene(
         type: PointerType = PointerType.Mouse,
         buttons: PointerButtons? = null,
         keyboardModifiers: PointerKeyboardModifiers? = null,
-        nativeEvent: Any? = null
+        nativeEvent: Any? = null,
+        button: PointerButton? = null
     ): Unit = scene.sendPointerEvent(
-        eventType, position, scrollDelta, timeMillis, type, buttons, keyboardModifiers, nativeEvent
+        eventType, position, scrollDelta, timeMillis, type, buttons, keyboardModifiers, nativeEvent, button
     )
     /**
      * Send [KeyEvent] to the content.

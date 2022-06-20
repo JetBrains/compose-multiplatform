@@ -381,7 +381,8 @@ internal class SkiaBasedOwner(
                 PointerEventType.Unknown,
                 timeMillis,
                 pointers.map { it.toPointerInputEventData() },
-                if (isPressed) PointerButtons(isPrimaryPressed = true) else PointerButtons()
+                if (isPressed) PointerButtons(isPrimaryPressed = true) else PointerButtons(),
+                button = null
             )
         )
     }
