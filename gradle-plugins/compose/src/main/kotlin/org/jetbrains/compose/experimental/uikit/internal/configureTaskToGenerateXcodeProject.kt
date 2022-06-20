@@ -13,7 +13,7 @@ internal fun Project.configureTaskToGenerateXcodeProject(
     id: String,
     projectName: String,
     bundleIdPrefix: String,
-    teamId: String? = null,
+    getTeamId: () -> String? = { null },
     taskInstallXcodeGen: TaskProvider<*>,
 ): TaskProvider<AbstractComposeIosTask> = tasks.composeIosTask<AbstractComposeIosTask>("iosGenerateXcodeProject$id") {
     dependsOn(taskInstallXcodeGen)
@@ -26,7 +26,7 @@ internal fun Project.configureTaskToGenerateXcodeProject(
             options:
               bundleIdPrefix: $bundleIdPrefix
             settings:
-              ${if (teamId != null) "DEVELOPMENT_TEAM: \"$teamId\"" else ""}
+              ${if (getTeamId() != null) "DEVELOPMENT_TEAM: \"${getTeamId()}\"" else ""}
               CODE_SIGN_IDENTITY: "iPhone Developer"
               CODE_SIGN_STYLE: Automatic
               MARKETING_VERSION: "1.0"
