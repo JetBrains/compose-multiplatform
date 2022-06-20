@@ -144,9 +144,10 @@ internal fun InputEvent.verifyMouseEvent(
 internal fun InputEvent.verifyKeyEvent(
     expectedAction: Int,
     expectedKeyCode: Int,
-    expectedEventTime: Int = 0,
-    expectedDownTime: Int = 0,
-    expectedMetaState: Int = 0
+    expectedEventTime: Long = 0,
+    expectedDownTime: Long = 0,
+    expectedMetaState: Int = 0,
+    expectedRepeat: Int = 0,
 ) {
     if (this is KeyEvent) {
         assertWithMessage("action").that(action).isEqualTo(expectedAction)
@@ -154,6 +155,7 @@ internal fun InputEvent.verifyKeyEvent(
         assertWithMessage("eventTime").that(eventTime).isEqualTo(expectedEventTime)
         assertWithMessage("downTime").that(downTime).isEqualTo(expectedDownTime)
         assertWithMessage("metaState").that(metaState).isEqualTo(expectedMetaState)
+        assertWithMessage("repeat").that(repeatCount).isEqualTo(expectedRepeat)
     } else {
         throw AssertionError("A keyboard event must be of type KeyEvent, " +
             "not ${this::class.simpleName}")

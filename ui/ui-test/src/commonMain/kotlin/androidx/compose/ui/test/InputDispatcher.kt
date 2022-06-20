@@ -76,6 +76,17 @@ internal abstract class InputDispatcher(
          */
         var eventPeriodMillis = 16L
             internal set
+
+        /**
+         * The delay between a down event on a particular [Key] and the first repeat event on that
+         * same key.
+         */
+        const val InitialRepeatDelay = 500L
+
+        /**
+         * The interval between subsequent repeats (after the initial repeat) on a particular key.
+         */
+        const val SubsequentRepeatDelay = 50L
     }
 
     /**
@@ -160,13 +171,21 @@ internal abstract class InputDispatcher(
     /**
      * Increases the current event time by [durationMillis].
      *
+     * Depending on the [keyInputState], there may be repeat key events that need to be sent within
+     * the given duration. If there are, the clock will be forwarded until it is time for the repeat
+     * key event, the key event will be sent, and then the clock will be forwarded by the remaining
+     * duration.
+     *
      * @param durationMillis The duration of the delay. Must be positive
      */
     fun advanceEventTime(durationMillis: Long = eventPeriodMillis) {
         require(durationMillis >= 0) {
             "duration of a delay can only be positive, not $durationMillis"
         }
-        currentTime += durationMillis
+
+        val endTime = currentTime + durationMillis
+        keyInputState.sendRepeatKeysIfNeeded(endTime)
+        currentTime = endTime
     }
 
     /**
@@ -602,6 +621,56 @@ internal abstract class InputDispatcher(
     }
 
     /**
+     * Sends any and all repeat key events that are required between [currentTime] and [endTime].
+     *
+     * Mutates the value of [currentTime] in order to send each of the repeat events at exactly the
+     * time it should be sent.
+     *
+     * @param endTime All repeats set to occur before this time will be sent.
+     */
+    // TODO(b/236623354): Extend repeat key event support to [MainTestClock.advanceTimeBy].
+    private fun KeyInputState.sendRepeatKeysIfNeeded(endTime: Long) {
+
+        // Return if there is no key to repeat or if it is not yet time to repeat it.
+        if (repeatKey == null || endTime - downTime < InitialRepeatDelay) return
+
+        // Initial repeat
+        if (lastRepeatTime <= downTime) {
+            // Not yet had a repeat on this key, but it needs at least the initial one.
+            check(repeatCount == 0) {
+                "repeatCount should be reset to 0 when downTime updates"
+            }
+            repeatCount = 1
+
+            lastRepeatTime = downTime + InitialRepeatDelay
+            currentTime = lastRepeatTime
+
+            enqueueRepeat()
+        }
+
+        // Subsequent repeats
+        val numRepeats: Int = ((endTime - lastRepeatTime) / SubsequentRepeatDelay).toInt()
+
+        repeat(numRepeats) {
+            repeatCount += 1
+            lastRepeatTime += SubsequentRepeatDelay
+            currentTime = lastRepeatTime
+            enqueueRepeat()
+        }
+    }
+
+    /**
+     * Enqueues a key down event on the repeat key, if there is one. If the repeat key is null,
+     * an [IllegalStateException] is thrown.
+     */
+    private fun KeyInputState.enqueueRepeat() {
+        val repKey = checkNotNull(repeatKey) {
+            "A repeat key event cannot be sent if the repeat key is null."
+        }
+        keyInputState.enqueueDown(repKey)
+    }
+
+    /**
      * Sends all enqueued events and blocks while they are dispatched. If an exception is
      * thrown during the process, all events that haven't yet been dispatched will be dropped.
      */
@@ -716,18 +785,29 @@ internal class MouseInputState {
 internal class KeyInputState {
     private val downKeys: HashSet<Key> = hashSetOf()
 
-    var downTime: Long = 0
-    var capsLockOn: Boolean = false
-    var numLockOn: Boolean = false
-    var scrollLockOn: Boolean = false
+    var downTime = 0L
+    var repeatKey: Key? = null
+    var repeatCount = 0
+    var lastRepeatTime = downTime
+    var capsLockOn = false
+    var numLockOn = false
+    var scrollLockOn = false
 
     fun isKeyDown(key: Key): Boolean = downKeys.contains(key)
 
-    fun setKeyUp(key: Key) = downKeys.remove(key)
+    fun setKeyUp(key: Key) {
+        downKeys.remove(key)
+        if (key == repeatKey) {
+            repeatKey = null
+            repeatCount = 0
+        }
+    }
 
     fun setKeyDown(key: Key) {
-        updateLockKeys(key)
         downKeys.add(key)
+        repeatKey = key
+        repeatCount = 0
+        updateLockKeys(key)
     }
 
     /**
@@ -740,7 +820,7 @@ internal class KeyInputState {
      * lock will turn off immediately upon the next key down event (MacOS for example), whereas
      * other platforms (e.g. linux) wait for the next key up event before turning caps lock off.
      *
-     * This by calling this function whenever a lock key is pressed down, MacOS-like behaviour is
+     * By calling this function whenever a lock key is pressed down, MacOS-like behaviour is
      * achieved.
      */
     // TODO(Onadim): Investigate how lock key toggling is handled in Android, ChromeOS and Windows.
