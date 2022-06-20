@@ -919,7 +919,10 @@ internal class CompositionImpl(
     }
 
     internal fun removeDerivedStateObservation(state: DerivedState<*>) {
-        derivedStates.removeScope(state)
+        // remove derived state if it is not observed in other scopes
+        if (state !in observations) {
+            derivedStates.removeScope(state)
+        }
     }
 
     /**
