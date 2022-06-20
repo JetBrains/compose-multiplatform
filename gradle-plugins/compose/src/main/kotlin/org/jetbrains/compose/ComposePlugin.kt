@@ -126,7 +126,7 @@ class ComposePlugin : Plugin<Project> {
             project.tasks.withType(KotlinCompile::class.java) {
                 it.kotlinOptions.apply {
                     if (overrideDefaultJvmTarget) {
-                        if (jvmTarget.isBlank() || jvmTarget.toDouble() < 11) {
+                        if (jvmTarget.isNullOrBlank() || jvmTarget.toDouble() < 11) {
                             jvmTarget = "11"
                         }
                     }
