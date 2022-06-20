@@ -62,7 +62,6 @@ fun TextStyleBrushSample() {
             fontWeight = FontWeight.W800,
             fontStyle = FontStyle.Italic,
             letterSpacing = 0.5.em,
-            background = Color.LightGray,
             textDecoration = TextDecoration.Underline
         )
     )
