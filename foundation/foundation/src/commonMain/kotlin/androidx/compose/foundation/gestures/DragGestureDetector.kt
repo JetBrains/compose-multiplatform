@@ -79,63 +79,10 @@ suspend fun AwaitPointerEventScope.awaitTouchSlopOrCancellation(
     return awaitPointerSlopOrCancellation(
         pointerId,
         PointerType.Touch,
-        onTouchSlopReached
+        onPointerSlopReached = onTouchSlopReached,
+        pointerDirectionConfig = HorizontalPointerDirectionConfig,
+        triggerOnMainAxisSlop = false
     )
-}
-
-// TODO(demin): probably we can get rid of copy-paste and reuse awaitPointerSlopOrCancellation
-//  at the bottom of this file. We just need to change its interface:
-//  awaitPointerSlopOrCancellation(getDragValue: (Offset) -> Offset)
-internal suspend fun AwaitPointerEventScope.awaitPointerSlopOrCancellation(
-    pointerId: PointerId,
-    pointerType: PointerType,
-    onPointerSlopReached: (change: PointerInputChange, overSlop: Offset) -> Unit
-): PointerInputChange? {
-    if (currentEvent.isPointerUp(pointerId)) {
-        return null // The pointer has already been lifted, so the gesture is canceled
-    }
-    var offset = Offset.Zero
-    val touchSlop = viewConfiguration.pointerSlop(pointerType)
-
-    var pointer = pointerId
-
-    while (true) {
-        val event = awaitPointerEvent()
-        val dragEvent = event.changes.fastFirstOrNull { it.id == pointer } ?: return null
-        if (dragEvent.isConsumed) {
-            return null
-        } else if (dragEvent.changedToUpIgnoreConsumed()) {
-            val otherDown = event.changes.fastFirstOrNull { it.pressed }
-            if (otherDown == null) {
-                // This is the last "up"
-                return null
-            } else {
-                pointer = otherDown.id
-            }
-        } else {
-            offset += dragEvent.positionChange()
-            val distance = offset.getDistance()
-            var acceptedDrag = false
-            if (distance >= touchSlop) {
-                val touchSlopOffset = offset / distance * touchSlop
-                onPointerSlopReached(dragEvent, offset - touchSlopOffset)
-                if (dragEvent.isConsumed) {
-                    acceptedDrag = true
-                } else {
-                    offset = Offset.Zero
-                }
-            }
-
-            if (acceptedDrag) {
-                return dragEvent
-            } else {
-                awaitPointerEvent(PointerEventPass.Final)
-                if (dragEvent.isConsumed) {
-                    return null
-                }
-            }
-        }
-    }
 }
 
 /**
@@ -228,7 +175,8 @@ suspend fun PointerInputScope.detectDragGestures(
             do {
                 drag = awaitPointerSlopOrCancellation(
                     down.id,
-                    down.type
+                    down.type,
+                    triggerOnMainAxisSlop = false
                 ) { change, over ->
                     change.consume()
                     overSlop = over
@@ -334,8 +282,8 @@ suspend fun AwaitPointerEventScope.awaitVerticalTouchSlopOrCancellation(
 ) = awaitPointerSlopOrCancellation(
     pointerId = pointerId,
     pointerType = PointerType.Touch,
-    onPointerSlopReached = onTouchSlopReached,
-    getDragDirectionValue = { it.y }
+    onPointerSlopReached = { change, overSlop -> onTouchSlopReached(change, overSlop.y) },
+    pointerDirectionConfig = VerticalPointerDirectionConfig
 )
 
 internal suspend fun AwaitPointerEventScope.awaitVerticalPointerSlopOrCancellation(
@@ -345,8 +293,8 @@ internal suspend fun AwaitPointerEventScope.awaitVerticalPointerSlopOrCancellati
 ) = awaitPointerSlopOrCancellation(
     pointerId = pointerId,
     pointerType = pointerType,
-    onPointerSlopReached = onTouchSlopReached,
-    getDragDirectionValue = { it.y }
+    onPointerSlopReached = { change, overSlop -> onTouchSlopReached(change, overSlop.y) },
+    pointerDirectionConfig = VerticalPointerDirectionConfig
 )
 
 /**
@@ -481,8 +429,8 @@ suspend fun AwaitPointerEventScope.awaitHorizontalTouchSlopOrCancellation(
 ) = awaitPointerSlopOrCancellation(
     pointerId = pointerId,
     pointerType = PointerType.Touch,
-    onPointerSlopReached = onTouchSlopReached,
-    getDragDirectionValue = { it.x }
+    onPointerSlopReached = { change, overSlop -> onTouchSlopReached(change, overSlop.x) },
+    pointerDirectionConfig = HorizontalPointerDirectionConfig
 )
 
 internal suspend fun AwaitPointerEventScope.awaitHorizontalPointerSlopOrCancellation(
@@ -492,8 +440,8 @@ internal suspend fun AwaitPointerEventScope.awaitHorizontalPointerSlopOrCancella
 ) = awaitPointerSlopOrCancellation(
     pointerId = pointerId,
     pointerType = pointerType,
-    onPointerSlopReached = onPointerSlopReached,
-    getDragDirectionValue = { it.x }
+    onPointerSlopReached = { change, overSlop -> onPointerSlopReached(change, overSlop.x) },
+    pointerDirectionConfig = HorizontalPointerDirectionConfig
 )
 
 /**
@@ -669,37 +617,44 @@ private suspend inline fun AwaitPointerEventScope.awaitDragOrUp(
 }
 
 /**
- * Waits for drag motion along one axis based on [getDragDirectionValue] to pass pointer slop,
- * using [pointerId] as the pointer to examine. If [pointerId] is raised, another pointer
+ * Waits for drag motion along one axis based on [PointerDirectionConfig.mainAxisDelta] to pass
+ * pointer slop, using [pointerId] as the pointer to examine if [triggerOnMainAxisSlop] is true.
+ * Otherwise, it will wait slop to be crossed on any axis. If [pointerId] is raised, another pointer
  * from those that are down will be chosen to lead the gesture, and if none are down,
  * `null` is returned. If [pointerId] is not down when [awaitPointerSlopOrCancellation] is called,
  * then `null` is returned.
  *
  * When pointer slop is detected, [onPointerSlopReached] is called with the change and the distance
- * beyond the pointer slop. [getDragDirectionValue] should return the position change in the
- * direction of the drag axis. If [onPointerSlopReached] does not consume the position change,
- * pointer slop will not have been considered detected and the detection will continue or,
- * if it is consumed, the [PointerInputChange] that was consumed will be returned.
+ * beyond the pointer slop. [PointerDirectionConfig.mainAxisDelta] should return the position
+ * change in the direction of the drag axis. If [onPointerSlopReached] does not consume the
+ * position change, pointer slop will not have been considered detected and the detection will
+ * continue or, if it is consumed, the [PointerInputChange] that was consumed will be returned.
  *
  * This works with [awaitTouchSlopOrCancellation] for the other axis to ensure that only horizontal
  * or vertical dragging is done, but not both.
+ *
+ * [PointerDirectionConfig.offsetFromChanges] should return the offset considering x/y coordinates
+ * positioning and main/cross axis nomenclature. This means if the main axis is Y, we should add
+ * mainChange to the Y position of the resulting offset and vice versa.
  *
  * @return The [PointerInputChange] of the event that was consumed in [onPointerSlopReached] or
  * `null` if all pointers are raised or the position change was consumed by another gesture
  * detector.
  */
-private suspend inline fun AwaitPointerEventScope.awaitPointerSlopOrCancellation(
+internal suspend inline fun AwaitPointerEventScope.awaitPointerSlopOrCancellation(
     pointerId: PointerId,
     pointerType: PointerType,
-    onPointerSlopReached: (PointerInputChange, Float) -> Unit,
-    getDragDirectionValue: (Offset) -> Float
+    pointerDirectionConfig: PointerDirectionConfig = HorizontalPointerDirectionConfig,
+    triggerOnMainAxisSlop: Boolean = true,
+    onPointerSlopReached: (PointerInputChange, Offset) -> Unit,
 ): PointerInputChange? {
     if (currentEvent.isPointerUp(pointerId)) {
         return null // The pointer has already been lifted, so the gesture is canceled
     }
     val touchSlop = viewConfiguration.pointerSlop(pointerType)
     var pointer: PointerId = pointerId
-    var totalPositionChange = 0f
+    var totalMainPositionChange = 0f
+    var totalCrossPositionChange = 0f
 
     while (true) {
         val event = awaitPointerEvent()
@@ -717,11 +672,23 @@ private suspend inline fun AwaitPointerEventScope.awaitPointerSlopOrCancellation
         } else {
             val currentPosition = dragEvent.position
             val previousPosition = dragEvent.previousPosition
-            val positionChange = getDragDirectionValue(currentPosition) -
-                getDragDirectionValue(previousPosition)
-            totalPositionChange += positionChange
 
-            val inDirection = abs(totalPositionChange)
+            val mainPositionChange = pointerDirectionConfig.mainAxisDelta(currentPosition) -
+                pointerDirectionConfig.mainAxisDelta(previousPosition)
+
+            val crossPositionChange = pointerDirectionConfig.crossAxisDelta(currentPosition) -
+                pointerDirectionConfig.crossAxisDelta(previousPosition)
+            totalMainPositionChange += mainPositionChange
+            totalCrossPositionChange += crossPositionChange
+
+            val inDirection = if (triggerOnMainAxisSlop) {
+                abs(totalMainPositionChange)
+            } else {
+                pointerDirectionConfig.offsetFromChanges(
+                    totalMainPositionChange,
+                    totalCrossPositionChange
+                ).getDistance()
+            }
             if (inDirection < touchSlop) {
                 // verify that nothing else consumed the drag event
                 awaitPointerEvent(PointerEventPass.Final)
@@ -729,19 +696,72 @@ private suspend inline fun AwaitPointerEventScope.awaitPointerSlopOrCancellation
                     return null
                 }
             } else {
+                val postSlopOffset = if (triggerOnMainAxisSlop) {
+                    val finalMainPositionChange = totalMainPositionChange -
+                        (sign(totalMainPositionChange) * touchSlop)
+                    pointerDirectionConfig.offsetFromChanges(
+                        finalMainPositionChange,
+                        totalCrossPositionChange
+                    )
+                } else {
+                    val offset = pointerDirectionConfig.offsetFromChanges(
+                        totalMainPositionChange,
+                        totalCrossPositionChange
+                    )
+                    val touchSlopOffset = offset / inDirection * touchSlop
+                    offset - touchSlopOffset
+                }
+
                 onPointerSlopReached(
                     dragEvent,
-                    totalPositionChange - (sign(totalPositionChange) * touchSlop)
+                    postSlopOffset
                 )
                 if (dragEvent.isConsumed) {
                     return dragEvent
                 } else {
-                    totalPositionChange = 0f
+                    totalMainPositionChange = 0f
+                    totalCrossPositionChange = 0f
                 }
             }
         }
     }
 }
+
+/**
+ * Configures the calculations to convert offset to deltas in the Main and Cross Axis.
+ * [offsetFromChanges] will also change depending on implementation.
+ */
+internal interface PointerDirectionConfig {
+    fun mainAxisDelta(offset: Offset): Float
+    fun crossAxisDelta(offset: Offset): Float
+    fun offsetFromChanges(mainChange: Float, crossChange: Float): Offset
+}
+
+/**
+ * Used for monitoring changes on X axis.
+ */
+internal val HorizontalPointerDirectionConfig = object : PointerDirectionConfig {
+    override fun mainAxisDelta(offset: Offset): Float = offset.x
+    override fun crossAxisDelta(offset: Offset): Float = offset.y
+    override fun offsetFromChanges(mainChange: Float, crossChange: Float): Offset =
+        Offset(mainChange, crossChange)
+}
+
+/**
+ * Used for monitoring changes on Y axis.
+ */
+internal val VerticalPointerDirectionConfig = object : PointerDirectionConfig {
+    override fun mainAxisDelta(offset: Offset): Float = offset.y
+
+    override fun crossAxisDelta(offset: Offset): Float = offset.x
+
+    override fun offsetFromChanges(mainChange: Float, crossChange: Float): Offset =
+        Offset(crossChange, mainChange)
+}
+
+internal fun Orientation.toPointerDirectionConfig(): PointerDirectionConfig =
+    if (this == Orientation.Vertical) VerticalPointerDirectionConfig
+    else HorizontalPointerDirectionConfig
 
 private suspend fun PointerInputScope.awaitLongPressOrCancellation(
     initialDown: PointerInputChange
