@@ -44,7 +44,7 @@ val mainComponents =
 
 val iconsComponents =
     listOf(
-        ComposeComponent(":compose:material:material-icons-extended", supportedPlatforms = ComposePlatforms.JVM_BASED),
+        ComposeComponent(":compose:material:material-icons-extended"),
     )
 
 fun ComposePublishingTask.mainPublications() {
