@@ -3074,7 +3074,7 @@ internal class ComposerImpl(
             nodeIndex = 0
             invalidations.fastForEach { (scope, instances) ->
                 if (instances != null) {
-                    instances.forEach { instance ->
+                    instances.fastForEach { instance ->
                         tryImminentInvalidation(scope, instance)
                     }
                 } else {

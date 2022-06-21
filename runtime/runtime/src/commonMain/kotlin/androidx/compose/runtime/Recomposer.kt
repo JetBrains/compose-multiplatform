@@ -870,7 +870,7 @@ class Recomposer(
                     // Record write performed by a previous composition as if they happened during
                     // composition.
                     composition.prepareCompose {
-                        modifiedValues.forEach { composition.recordWriteOf(it) }
+                        modifiedValues.fastForEach { composition.recordWriteOf(it) }
                     }
                 }
                 composition.recompose()

@@ -112,7 +112,7 @@ class IdentityArraySetTest {
 
         // Make sure we've removed both items
         assertEquals(list.size - 2, set.size)
-        set.forEach { assertNotEquals(10, it.item) }
+        set.fastForEach { assertNotEquals(10, it.item) }
         assertNull(set.values[set.size])
         assertNull(set.values[set.size + 1])
     }
@@ -126,7 +126,7 @@ class IdentityArraySetTest {
             verifierSet.add(stuff)
         }
         assertEquals(100, set.size)
-        set.forEach { verifierSet.remove(it) }
+        set.fastForEach { verifierSet.remove(it) }
         assertEquals(0, verifierSet.size)
     }
 
@@ -165,7 +165,7 @@ class IdentityArraySetTest {
         assertEquals(initialSize - 1, set.size)
         assertTrue(removed)
         assertNull(set.values[set.size])
-        set.forEach { assertNotSame(value, it) }
+        set.fastForEach { assertNotSame(value, it) }
     }
 
     data class Stuff(val item: Int)
