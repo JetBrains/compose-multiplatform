@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CancellationException
 import kotlin.math.roundToInt
 
@@ -173,7 +174,9 @@ fun SwipeToDismiss(
     state: DismissState,
     modifier: Modifier = Modifier,
     directions: Set<DismissDirection> = setOf(EndToStart, StartToEnd),
-    dismissThresholds: (DismissDirection) -> ThresholdConfig = { FractionalThreshold(0.5f) },
+    dismissThresholds: (DismissDirection) -> ThresholdConfig = {
+        FixedThreshold(DISMISS_THRESHOLD)
+    },
     background: @Composable RowScope.() -> Unit,
     dismissContent: @Composable RowScope.() -> Unit
 ) = BoxWithConstraints(modifier) {
@@ -236,3 +239,5 @@ private fun getDismissDirection(from: DismissValue, to: DismissValue): DismissDi
         else -> null
     }
 }
+
+private val DISMISS_THRESHOLD = 56.dp

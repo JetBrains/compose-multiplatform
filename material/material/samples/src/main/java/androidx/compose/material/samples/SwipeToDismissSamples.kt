@@ -33,7 +33,6 @@ import androidx.compose.material.DismissValue.Default
 import androidx.compose.material.DismissValue.DismissedToEnd
 import androidx.compose.material.DismissValue.DismissedToStart
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
 import androidx.compose.material.SwipeToDismiss
@@ -94,9 +93,6 @@ fun SwipeToDismissListItems() {
                 state = dismissState,
                 modifier = Modifier.padding(vertical = 4.dp),
                 directions = setOf(StartToEnd, EndToStart),
-                dismissThresholds = { direction ->
-                    FractionalThreshold(if (direction == StartToEnd) 0.25f else 0.5f)
-                },
                 background = {
                     val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
                     val color by animateColorAsState(
