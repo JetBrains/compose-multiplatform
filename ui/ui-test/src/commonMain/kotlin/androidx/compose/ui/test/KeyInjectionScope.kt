@@ -47,6 +47,15 @@ private const val DefaultPauseDurationBetweenKeyPresses = 50L // milliseconds
  * All events sent by these methods are batched together and sent as a whole after
  * [performKeyInput] has executed its code block.
  *
+ * When a key is held down - i.e. the virtual clock is forwarded whilst the key is pressed down,
+ * repeat key down events will be sent. In a fashion consistent with Android's implementation, the
+ * first repeat key event will be sent after a key has been held down for 500ms. Subsequent repeat
+ * events will be sent at 50ms intervals, until the key is released or another key is pressed down.
+ *
+ * The sending of repeat key events is handled as an implicit side-effect of [advanceEventTime],
+ * which is called within the injection scope. As such, no repeat key events will be sent if
+ * [MainTestClock.advanceTimeBy] is used to advance the time.
+ *
  * @see InjectionScope
  */
 @ExperimentalTestApi

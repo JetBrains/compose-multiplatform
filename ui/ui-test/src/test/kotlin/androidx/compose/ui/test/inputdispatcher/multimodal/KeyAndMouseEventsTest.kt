@@ -61,37 +61,37 @@ class KeyAndMouseEventsTest : InputDispatcherTest() {
         private const val functionKeyMetaMask = KeyEvent.META_FUNCTION_ON
 
         private val leftCtrl = Key.CtrlLeft
-        private const val leftCtrlMetaMask = KeyEvent.META_CTRL_LEFT_ON
+        private const val leftCtrlMask = KeyEvent.META_CTRL_LEFT_ON or KeyEvent.META_CTRL_ON
         private val rightCtrl = Key.CtrlRight
-        private const val rightCtrlMetaMask = KeyEvent.META_CTRL_RIGHT_ON
+        private const val rightCtrlMask = KeyEvent.META_CTRL_RIGHT_ON or KeyEvent.META_CTRL_ON
 
         private val leftAlt = Key.AltLeft
-        private const val leftAltMetaMask = KeyEvent.META_ALT_LEFT_ON
+        private const val leftAltMask = KeyEvent.META_ALT_LEFT_ON or KeyEvent.META_ALT_ON
         private val rightAlt = Key.AltRight
-        private const val rightAltMetaMask = KeyEvent.META_ALT_RIGHT_ON
+        private const val rightAltMask = KeyEvent.META_ALT_RIGHT_ON or KeyEvent.META_ALT_ON
 
         private val leftMeta = Key.MetaLeft
-        private const val leftMetaMetaMask = KeyEvent.META_META_LEFT_ON
+        private const val leftMetaMask = KeyEvent.META_META_LEFT_ON or KeyEvent.META_META_ON
         private val rightMeta = Key.MetaRight
-        private const val rightMetaMetaMask = KeyEvent.META_META_RIGHT_ON
+        private const val rightMetaMask = KeyEvent.META_META_RIGHT_ON or KeyEvent.META_META_ON
 
         private val leftShift = Key.ShiftLeft
-        private const val leftShiftMetaMask = KeyEvent.META_SHIFT_LEFT_ON
+        private const val leftShiftMask = KeyEvent.META_SHIFT_LEFT_ON or KeyEvent.META_SHIFT_ON
         private val rightShift = Key.ShiftRight
-        private const val rightShiftMetaMask = KeyEvent.META_SHIFT_RIGHT_ON
+        private const val rightShiftMask = KeyEvent.META_SHIFT_RIGHT_ON or KeyEvent.META_SHIFT_ON
 
         private val capsLock = Key.CapsLock
-        private const val capsLockMetaMask = KeyEvent.META_CAPS_LOCK_ON
+        private const val capsLockMask = KeyEvent.META_CAPS_LOCK_ON
         private val numLock = Key.NumLock
-        private const val numLockMetaMask = KeyEvent.META_NUM_LOCK_ON
+        private const val numLockMask = KeyEvent.META_NUM_LOCK_ON
         private val scrollLock = Key.ScrollLock
-        private const val scrollLockMetaMask = KeyEvent.META_SCROLL_LOCK_ON
+        private const val scrollLockMask = KeyEvent.META_SCROLL_LOCK_ON
 
-        private const val allLockMasks = capsLockMetaMask or numLockMetaMask or scrollLockMetaMask
+        private const val allLockMasks = capsLockMask or numLockMask or scrollLockMask
 
-        private const val allMetaMasks = functionKeyMetaMask or leftCtrlMetaMask or
-            rightCtrlMetaMask or leftAltMetaMask or rightAltMetaMask or leftMetaMetaMask or
-            rightMetaMetaMask or leftShiftMetaMask or rightShiftMetaMask
+        private const val allMetaMasks = functionKeyMetaMask or leftCtrlMask or rightCtrlMask or
+            leftAltMask or rightAltMask or leftMetaMask or rightMetaMask or
+            leftShiftMask or rightShiftMask
 
         private const val allMasks = allLockMasks or allMetaMasks
     }
@@ -102,47 +102,47 @@ class KeyAndMouseEventsTest : InputDispatcherTest() {
 
     @Test
     fun leftCtrl_metaState_generatedCorrectly() =
-        verifyMetaKeyClickState(leftCtrl, leftCtrlMetaMask)
+        verifyMetaKeyClickState(leftCtrl, leftCtrlMask)
 
     @Test
     fun rightCtrl_metaState_generatedCorrectly() =
-        verifyMetaKeyClickState(rightCtrl, rightCtrlMetaMask)
+        verifyMetaKeyClickState(rightCtrl, rightCtrlMask)
 
     @Test
     fun leftAlt_metaState_generatedCorrectly() =
-        verifyMetaKeyClickState(leftAlt, leftAltMetaMask)
+        verifyMetaKeyClickState(leftAlt, leftAltMask)
 
     @Test
     fun rightAlt_metaState_generatedCorrectly() =
-        verifyMetaKeyClickState(rightAlt, rightAltMetaMask)
+        verifyMetaKeyClickState(rightAlt, rightAltMask)
 
     @Test
     fun leftMeta_metaState_generatedCorrectly() =
-        verifyMetaKeyClickState(leftMeta, leftMetaMetaMask)
+        verifyMetaKeyClickState(leftMeta, leftMetaMask)
 
     @Test
     fun rightMeta_metaState_generatedCorrectly() =
-        verifyMetaKeyClickState(rightMeta, rightMetaMetaMask)
+        verifyMetaKeyClickState(rightMeta, rightMetaMask)
 
     @Test
     fun leftShift_metaState_generatedCorrectly() =
-        verifyMetaKeyClickState(leftShift, leftShiftMetaMask)
+        verifyMetaKeyClickState(leftShift, leftShiftMask)
 
     @Test
     fun rightShift_metaState_generatedCorrectly() =
-        verifyMetaKeyClickState(rightShift, rightShiftMetaMask)
+        verifyMetaKeyClickState(rightShift, rightShiftMask)
 
     @Test
     fun capsLock_metaState_generatedCorrectly() =
-        verifyLockKeyClickState(capsLock, capsLockMetaMask)
+        verifyLockKeyClickState(capsLock, capsLockMask)
 
     @Test
     fun numLock_metaState_generatedCorrectly() =
-        verifyLockKeyClickState(numLock, numLockMetaMask)
+        verifyLockKeyClickState(numLock, numLockMask)
 
     @Test
     fun scrollLock_metaState_generatedCorrectly() =
-        verifyLockKeyClickState(scrollLock, scrollLockMetaMask)
+        verifyLockKeyClickState(scrollLock, scrollLockMask)
 
     @Test
     fun lockKeys_metaState_combinedCorrectly_inMousePress() {
