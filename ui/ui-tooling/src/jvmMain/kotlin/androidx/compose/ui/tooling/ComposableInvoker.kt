@@ -25,6 +25,7 @@ import kotlin.math.ceil
 /**
  * A utility object to invoke composable function by its name and containing class.
  */
+@Deprecated("Use androidx.compose.runtime.reflect.ComposableMethodInvoker instead")
 @ExperimentalComposeUiApi
 object ComposableInvoker {
 
@@ -56,7 +57,7 @@ object ComposableInvoker {
     }
 
     private inline fun <reified T> T.dup(count: Int): Array<T> {
-        return (0..count).map { this }.toTypedArray()
+        return (0 until count).map { this }.toTypedArray()
     }
 
     /**
@@ -71,7 +72,6 @@ object ComposableInvoker {
                 methodName,
                 *args.mapNotNull { it?.javaClass }.toTypedArray(),
                 Composer::class.java, // composer param
-                kotlin.Int::class.java, // key param
                 *kotlin.Int::class.java.dup(changedParams) // changed params
             )
         } catch (e: ReflectiveOperationException) {
@@ -97,7 +97,7 @@ object ComposableInvoker {
         "double" -> 0.toDouble()
         "float" -> 0.toFloat()
         "boolean" -> false
-        "char" -> '0'
+        "char" -> 0.toChar()
         else -> null
     }
 
@@ -155,7 +155,7 @@ object ComposableInvoker {
         return invoke(instance, *arguments)
     }
 
-    private const val SLOTS_PER_INT = 15
+    private const val SLOTS_PER_INT = 10
     private const val BITS_PER_INT = 31
 
     private fun changedParamCount(realValueParams: Int, thisParams: Int): Int {
