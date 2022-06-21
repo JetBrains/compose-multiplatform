@@ -77,11 +77,16 @@ internal actual val KeyEvent.isClick: Boolean
     get() = type == KeyUp && key.nativeKeyCode == VK_ENTER
 
 @Immutable @ExperimentalFoundationApi
+@Deprecated(
+    message = "Modifier.mouseClickable is deprecated and this MouseClickScope too. " +
+        "See Modifier.mouseClickable for replacement"
+)
 class MouseClickScope constructor(
     val buttons: PointerButtons,
     val keyboardModifiers: PointerKeyboardModifiers
 )
 
+@Suppress("DEPRECATION")
 @ExperimentalFoundationApi
 internal val EmptyClickContext = MouseClickScope(
     PointerButtons(0), PointerKeyboardModifiers(0)
@@ -93,11 +98,28 @@ internal val EmptyClickContext = MouseClickScope(
  *
  */
 @ExperimentalFoundationApi
+@Deprecated(
+    message = "Consider using Modifier.onClick to distinguish clicks with different buttons and keyboardModifiers",
+    replaceWith = ReplaceWith(
+        expression =
+        "Modifier.onClick(" +
+            "enabled = enabled,\n" +
+            "matcher = PointerMatcher.mouse(PointerButton.Primary), // add onClick for every required PointerButton\n" +
+            "keyboardModifiers = { true }, // e.g { isCtrlPressed }; Remove it to ignore keyboardModifiers\n" +
+            "onClick = { onClick() }\n" +
+            ")",
+        imports = arrayOf(
+            "androidx.compose.foundation.onClick",
+            "androidx.compose.foundation.PointerMatcher",
+            "androidx.compose.ui.input.pointer.PointerButton"
+        )
+    )
+)
 fun Modifier.mouseClickable(
     enabled: Boolean = true,
     onClickLabel: String? = null,
     role: Role? = null,
-    onClick: MouseClickScope.() -> Unit
+    @Suppress("DEPRECATION") onClick: MouseClickScope.() -> Unit
 ) = composed(
     factory = {
         val onClickState = rememberUpdatedState(onClick)
