@@ -19,6 +19,7 @@ package androidx.compose.ui.draw
 import android.graphics.Bitmap
 import android.os.Build
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.AtLeastSize
@@ -519,6 +520,8 @@ class ClipDrawTest {
         }
     }
 
+    // waitAndScreenShot() requires API level 26
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun takeScreenShot(size: Int): Bitmap {
         Assert.assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
         val bitmap = rule.waitAndScreenShot()
