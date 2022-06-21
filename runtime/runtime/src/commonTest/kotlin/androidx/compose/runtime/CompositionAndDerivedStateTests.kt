@@ -387,6 +387,54 @@ class CompositionAndDerivedStateTests {
     }
 
     @Test
+    fun observingDerivedStateInMultipleScopes() = compositionTest {
+        var observeInFirstScope by mutableStateOf(true)
+        var count by mutableStateOf(0)
+
+        compose {
+            val items by remember {
+                derivedStateOf {
+                    List(count) { it }
+                }
+            }
+
+            Linear {
+                if (observeInFirstScope) {
+                    Text("List of size ${items.size}")
+                }
+            }
+
+            Linear {
+                Text("List of size ${items.size}")
+            }
+        }
+
+        validate {
+            Linear {
+                Text("List of size 0")
+            }
+
+            Linear {
+                Text("List of size 0")
+            }
+        }
+
+        observeInFirstScope = false
+        advance()
+        count++
+        advance()
+
+        validate {
+            Linear {
+            }
+
+            Linear {
+                Text("List of size 1")
+            }
+        }
+    }
+
+    @Test
     fun changingTheDerivedStateInstanceShouldClearDependencies() = compositionTest {
         var reload by mutableStateOf(0)
 
