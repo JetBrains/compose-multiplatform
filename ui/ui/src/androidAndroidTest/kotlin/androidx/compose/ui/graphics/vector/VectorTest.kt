@@ -24,6 +24,7 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.os.Build
 import androidx.activity.ComponentActivity
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -690,6 +691,8 @@ class VectorTest {
             }
     }
 
+    // captureToImage() requires API level 26
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun takeScreenShot(width: Int, height: Int = width): Bitmap {
         val bitmap = rule.onRoot().captureToImage().asAndroidBitmap()
         Assert.assertEquals(width, bitmap.width)
