@@ -45,7 +45,7 @@ internal fun Modifier.cursor(
     val cursorAlpha = remember { Animatable(1f) }
     val isBrushSpecified = !(cursorBrush is SolidColor && cursorBrush.value.isUnspecified)
     if (state.hasFocus && value.selection.collapsed && isBrushSpecified) {
-        LaunchedEffect(cursorBrush, value.annotatedString, value.selection) {
+        LaunchedEffect(value.annotatedString, value.selection) {
             // ensure that the value is always 1f _this_ frame by calling snapTo
             cursorAlpha.snapTo(1f)
             // then start the cursor blinking on animation clock (500ms on to start)

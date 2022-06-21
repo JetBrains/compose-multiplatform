@@ -22,8 +22,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertPixelColor
 import androidx.compose.testutils.assertPixels
 import androidx.compose.testutils.assertShape
@@ -330,6 +332,40 @@ class TextFieldCursorTest {
                 .captureToImage()
                 .assertCursor(2.dp, this, cursorRect)
         }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun brushChanged_doesntResetTimer() {
+        var cursorBrush by mutableStateOf(SolidColor(cursorColor))
+        rule.setContent {
+            Box(Modifier.padding(boxPadding)) {
+                BasicTextField(
+                    value = "",
+                    onValueChange = {},
+                    textStyle = textStyle,
+                    modifier = textFieldModifier,
+                    cursorBrush = cursorBrush,
+                    onTextLayout = onTextLayout
+                )
+            }
+        }
+
+        focusAndWait()
+
+        rule.mainClock.advanceTimeBy(800)
+        cursorBrush = SolidColor(Color.Green)
+        rule.mainClock.advanceTimeByFrame()
+
+        rule.onNode(hasSetTextAction())
+            .captureToImage()
+            .assertShape(
+                density = rule.density,
+                shape = RectangleShape,
+                shapeColor = Color.White,
+                backgroundColor = Color.White,
+                shapeOverlapPixelCount = 0.0f
+            )
     }
 
     private fun focusAndWait() {
