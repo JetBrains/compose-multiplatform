@@ -138,7 +138,7 @@ fun LeadingIconTabs() {
         "Tab 3 with lots of text" to Icons.Filled.Favorite
     )
     Column {
-        TabRow(selectedTabIndex = state) {
+        ScrollableTabRow(selectedTabIndex = state) {
             titlesAndIcons.forEachIndexed { index, (title, icon) ->
                 LeadingIconTab(
                     text = { Text(title) },
