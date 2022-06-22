@@ -17,6 +17,7 @@
 package androidx.compose.ui.draw
 
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -348,6 +349,8 @@ class InvalidatingNotPlacedChildTest {
         }
     }
 
+    // captureToImage() requires API level 26
+    @RequiresApi(Build.VERSION_CODES.O)
     fun assertChangeWhileNotPlacedIsApplied(
         content: @Composable (State<Boolean>, State<Color>) -> Unit
     ) {
