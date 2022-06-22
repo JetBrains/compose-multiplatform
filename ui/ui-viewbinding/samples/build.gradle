@@ -28,7 +28,7 @@ dependencies {
 
     implementation(libs.kotlinStdlib)
     compileOnly(project(":annotation:annotation-sampled"))
-    implementation(project(":compose:runtime:runtime"))
+    implementation("androidx.compose.runtime:runtime:1.2.0-rc01")
     implementation(project(":compose:ui:ui"))
     implementation(project(":compose:ui:ui-viewbinding"))
     // Used when creating layouts that contain a FragmentContainerView

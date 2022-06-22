@@ -32,7 +32,7 @@ dependencies {
 
     api(project(":compose:ui:ui-unit"))
     implementation("androidx.compose.foundation:foundation:1.0.0")
-    implementation(project(":compose:runtime:runtime"))
+    implementation("androidx.compose.runtime:runtime:1.2.0-rc01")
     implementation(project(":compose:ui:ui-graphics"))
     implementation(project(":compose:ui:ui-util"))
 }
