@@ -27,6 +27,8 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.modulate
+import kotlin.math.roundToInt
 
 internal class AndroidTextPaint(flags: Int, density: Float) : TextPaint(flags) {
     init {
@@ -69,28 +71,44 @@ internal class AndroidTextPaint(flags: Int, density: Float) : TextPaint(flags) {
             if (this.color != argbColor) {
                 this.color = argbColor
             }
+            this.shader = null
         }
     }
 
-    fun setBrush(brush: Brush?, size: Size) {
-        if (brush == null) {
-            this.shader = null
-            return
-        }
-        if (this.brush != brush || this.brushSize != size) {
-            this.brush = brush
-            this.brushSize = size
-            when (brush) {
-                is SolidColor -> {
-                    this.shader = null
-                    setColor(brush.value)
-                }
-                is ShaderBrush -> {
+    fun setBrush(brush: Brush?, size: Size, alpha: Float = Float.NaN) {
+        when (brush) {
+            null -> {
+                this.shader = null
+                this.brush = null
+                this.brushSize = null
+            }
+            is SolidColor -> {
+                this.shader = null
+                this.brush = null
+                this.brushSize = null
+                setColor(brush.value.modulate(alpha))
+            }
+            is ShaderBrush -> {
+                if (this.shader == null || this.brush != brush || this.brushSize != size) {
                     if (size.isSpecified) {
-                        shader = brush.createShader(size)
+                        this.brush = brush
+                        this.brushSize = size
+                        this.shader = brush.createShader(size)
                     }
                 }
+                setAlpha(alpha)
             }
         }
+    }
+}
+
+/**
+ * Accepts an alpha value in the range [0f, 1f] then maps to an integer value
+ * in [0, 255] range.
+ */
+internal fun TextPaint.setAlpha(alpha: Float) {
+    if (!alpha.isNaN()) {
+        val alphaInt = alpha.coerceIn(0f, 1f).times(255).roundToInt()
+        setAlpha(alphaInt)
     }
 }

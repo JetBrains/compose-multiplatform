@@ -48,6 +48,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * Receiver scope for awaiting pointer events in a call to
@@ -59,6 +60,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * affect the next stage of the input processing pipeline.
  */
 @RestrictsSuspension
+@JvmDefaultWithCompatibility
 interface AwaitPointerEventScope : Density {
     /**
      * The measured size of the pointer input region. Input events will be reported with
@@ -127,6 +129,7 @@ interface AwaitPointerEventScope : Density {
 // gesture detectors as suspending extensions with a PointerInputScope receiver, also making this
 // interface implement CoroutineScope would be an invitation to break structured concurrency in
 // these extensions, leaving other launched coroutines running in the calling scope.
+@JvmDefaultWithCompatibility
 interface PointerInputScope : Density {
     /**
      * The measured size of the pointer input region. Input events will be reported with

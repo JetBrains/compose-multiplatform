@@ -12,7 +12,7 @@ package androidx.compose.animation.tooling {
     property public final Object value;
   }
 
-  public interface ComposeAnimation {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface ComposeAnimation {
     method public Object getAnimationObject();
     method public default String? getLabel();
     method public default java.util.Set<java.lang.Object> getStates();
@@ -24,6 +24,8 @@ package androidx.compose.animation.tooling {
   }
 
   public enum ComposeAnimationType {
+    method public static androidx.compose.animation.tooling.ComposeAnimationType valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.animation.tooling.ComposeAnimationType[] values();
     enum_constant public static final androidx.compose.animation.tooling.ComposeAnimationType ANIMATED_VALUE;
     enum_constant public static final androidx.compose.animation.tooling.ComposeAnimationType ANIMATED_VISIBILITY;
     enum_constant public static final androidx.compose.animation.tooling.ComposeAnimationType TRANSITION_ANIMATION;

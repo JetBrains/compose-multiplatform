@@ -59,6 +59,14 @@ fun LinearProgressIndicatorSample() {
 
 @Sampled
 @Composable
+fun IndeterminateLinearProgressIndicatorSample() {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        LinearProgressIndicator()
+    }
+}
+
+@Sampled
+@Composable
 fun CircularProgressIndicatorSample() {
     var progress by remember { mutableStateOf(0.1f) }
     val animatedProgress by animateFloatAsState(
@@ -76,5 +84,13 @@ fun CircularProgressIndicatorSample() {
         ) {
             Text("Increase")
         }
+    }
+}
+
+@Sampled
+@Composable
+fun IndeterminateCircularProgressIndicatorSample() {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        CircularProgressIndicator()
     }
 }

@@ -198,20 +198,21 @@ internal class AndroidInputDispatcher(
 
     @OptIn(ExperimentalComposeUiApi::class)
     fun KeyInputState.constructMetaState(): Int {
-        fun Key.isDown() = isKeyDown(this)
+
+        fun genState(key: Key, mask: Int) = if (isKeyDown(key)) mask else 0
 
         return (if (capsLockOn) KeyEvent.META_CAPS_LOCK_ON else 0) or
             (if (numLockOn) KeyEvent.META_NUM_LOCK_ON else 0) or
             (if (scrollLockOn) KeyEvent.META_SCROLL_LOCK_ON else 0) or
-            (if (Key.Function.isDown()) KeyEvent.META_FUNCTION_ON else 0) or
-            (if (Key.CtrlLeft.isDown()) KeyEvent.META_CTRL_LEFT_ON else 0) or
-            (if (Key.CtrlRight.isDown()) KeyEvent.META_CTRL_RIGHT_ON else 0) or
-            (if (Key.AltLeft.isDown()) KeyEvent.META_ALT_LEFT_ON else 0) or
-            (if (Key.AltRight.isDown()) KeyEvent.META_ALT_RIGHT_ON else 0) or
-            (if (Key.MetaLeft.isDown()) KeyEvent.META_META_LEFT_ON else 0) or
-            (if (Key.MetaRight.isDown()) KeyEvent.META_META_RIGHT_ON else 0) or
-            (if (Key.ShiftLeft.isDown()) KeyEvent.META_SHIFT_LEFT_ON else 0) or
-            (if (Key.ShiftRight.isDown()) KeyEvent.META_SHIFT_RIGHT_ON else 0)
+            genState(Key.Function, KeyEvent.META_FUNCTION_ON) or
+            genState(Key.CtrlLeft, KeyEvent.META_CTRL_LEFT_ON or KeyEvent.META_CTRL_ON) or
+            genState(Key.CtrlRight, KeyEvent.META_CTRL_RIGHT_ON or KeyEvent.META_CTRL_ON) or
+            genState(Key.AltLeft, KeyEvent.META_ALT_LEFT_ON or KeyEvent.META_ALT_ON) or
+            genState(Key.AltRight, KeyEvent.META_ALT_RIGHT_ON or KeyEvent.META_ALT_ON) or
+            genState(Key.MetaLeft, KeyEvent.META_META_LEFT_ON or KeyEvent.META_META_ON) or
+            genState(Key.MetaRight, KeyEvent.META_META_RIGHT_ON or KeyEvent.META_META_ON) or
+            genState(Key.ShiftLeft, KeyEvent.META_SHIFT_LEFT_ON or KeyEvent.META_SHIFT_ON) or
+            genState(Key.ShiftRight, KeyEvent.META_SHIFT_RIGHT_ON or KeyEvent.META_SHIFT_ON)
     }
 
     override fun KeyInputState.enqueueDown(key: Key) =
@@ -471,6 +472,7 @@ internal class AndroidInputDispatcher(
             eventTime = currentTime,
             action = action,
             code = keyCode,
+            repeat = repeatCount,
             metaState = metaState
         )
     }
@@ -483,6 +485,7 @@ internal class AndroidInputDispatcher(
         eventTime: Long,
         action: Int,
         code: Int,
+        repeat: Int,
         metaState: Int
     ) {
         synchronized(batchLock) {
@@ -492,6 +495,7 @@ internal class AndroidInputDispatcher(
                     "eventTime=$eventTime, " +
                     "action=$action, " +
                     "code=$code, " +
+                    "repeat=$repeat, " +
                     "metaState=$metaState)"
             }
 
@@ -500,7 +504,7 @@ internal class AndroidInputDispatcher(
                 /* eventTime = */ eventTime,
                 /* action = */ action,
                 /* code = */ code,
-                /* repeat = */ 0,
+                /* repeat = */ repeat,
                 /* metaState = */ metaState,
                 /* deviceId = */ KeyCharacterMap.VIRTUAL_KEYBOARD,
                 /* scancode = */ 0

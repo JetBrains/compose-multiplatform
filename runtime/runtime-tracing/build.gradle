@@ -33,8 +33,8 @@ android {
 dependencies {
     api("androidx.annotation:annotation:1.3.0")
     implementation(libs.kotlinStdlib)
-    implementation(projectOrArtifact(":compose:runtime:runtime"))
-    implementation(projectOrArtifact(":tracing:tracing-perfetto"))
+    implementation(project(":compose:runtime:runtime"))
+    implementation(project(":tracing:tracing-perfetto"))
     implementation("androidx.startup:startup-runtime:1.1.1")
     androidTestImplementation(libs.testExtJunit)
     androidTestImplementation(libs.testRunner)
@@ -55,4 +55,12 @@ androidx {
     mavenGroup = LibraryGroups.COMPOSE_RUNTIME
     inceptionYear = "2022"
     description = "Allows for additional tracing in a Compose app (e.g. tracing of Composables taking part in a Recomposition"
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
 }

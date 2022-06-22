@@ -6,10 +6,11 @@ package androidx.compose.ui.test {
     property public abstract A? activity;
   }
 
-  @androidx.compose.ui.test.ExperimentalTestApi public abstract sealed class AndroidComposeUiTestEnvironment<A extends androidx.activity.ComponentActivity> {
+  @androidx.compose.ui.test.ExperimentalTestApi public abstract class AndroidComposeUiTestEnvironment<A extends androidx.activity.ComponentActivity> {
+    ctor public AndroidComposeUiTestEnvironment();
     method protected abstract A? getActivity();
     method public final androidx.compose.ui.test.AndroidComposeUiTest<A> getTest();
-    method public <R> R! runTest(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.AndroidComposeUiTest<A>,? extends R> block);
+    method public final <R> R! runTest(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.AndroidComposeUiTest<A>,? extends R> block);
     property protected abstract A? activity;
     property public final androidx.compose.ui.test.AndroidComposeUiTest<A> test;
   }
@@ -34,11 +35,11 @@ package androidx.compose.ui.test {
   }
 
   public final class ComposeUiTest_androidKt {
-    method @androidx.compose.ui.test.ExperimentalTestApi public static <A extends androidx.activity.ComponentActivity> androidx.compose.ui.test.AndroidComposeUiTestEnvironment<A> AndroidComposeUiTestEnvironment(kotlin.jvm.functions.Function0<? extends A> activityProvider);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static inline <A extends androidx.activity.ComponentActivity> androidx.compose.ui.test.AndroidComposeUiTestEnvironment<A> AndroidComposeUiTestEnvironment(kotlin.jvm.functions.Function0<? extends A> activityProvider);
     method @androidx.compose.ui.test.ExperimentalTestApi public static <A extends androidx.activity.ComponentActivity> void runAndroidComposeUiTest(Class<A> activityClass, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.AndroidComposeUiTest<A>,kotlin.Unit> block);
     method @androidx.compose.ui.test.ExperimentalTestApi public static inline <reified A extends androidx.activity.ComponentActivity> void runAndroidComposeUiTest(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.AndroidComposeUiTest<A>,? extends kotlin.Unit> block);
     method @androidx.compose.ui.test.ExperimentalTestApi public static void runComposeUiTest(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.ComposeUiTest,kotlin.Unit> block);
-    method @androidx.compose.ui.test.ExperimentalTestApi public static void runComposeUiTestWithoutActivity(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.ComposeUiTest,kotlin.Unit> block);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void runEmptyComposeUiTest(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.ComposeUiTest,kotlin.Unit> block);
   }
 
   @androidx.compose.ui.test.ExperimentalTestApi public final class StateRestorationTester {
@@ -89,7 +90,7 @@ package androidx.compose.ui.test.junit4 {
   public final class AndroidSynchronization_androidKt {
   }
 
-  public interface ComposeContentTestRule extends androidx.compose.ui.test.junit4.ComposeTestRule {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface ComposeContentTestRule extends androidx.compose.ui.test.junit4.ComposeTestRule {
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
   }
 
@@ -99,7 +100,7 @@ package androidx.compose.ui.test.junit4 {
   public final class ComposeRootRegistry_androidKt {
   }
 
-  public interface ComposeTestRule extends org.junit.rules.TestRule androidx.compose.ui.test.SemanticsNodeInteractionsProvider {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface ComposeTestRule extends org.junit.rules.TestRule androidx.compose.ui.test.SemanticsNodeInteractionsProvider {
     method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public androidx.compose.ui.unit.Density getDensity();
     method public androidx.compose.ui.test.MainTestClock getMainClock();

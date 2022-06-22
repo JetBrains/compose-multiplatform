@@ -35,11 +35,13 @@ import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * Receiver scope for [detectTapGestures]'s `onPress` lambda. This offers
  * two methods to allow waiting for the press to be released.
  */
+@JvmDefaultWithCompatibility
 interface PressGestureScope : Density {
     /**
      * Waits for the press to be released before returning. If the gesture was canceled by

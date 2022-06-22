@@ -153,7 +153,7 @@ package androidx.compose.ui.text {
   public final class MultiParagraphKt {
   }
 
-  public interface Paragraph {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface Paragraph {
     method public androidx.compose.ui.text.style.ResolvedTextDirection getBidiRunDirection(int offset);
     method public androidx.compose.ui.geometry.Rect getBoundingBox(int offset);
     method public androidx.compose.ui.geometry.Rect getCursorRect(int offset);
@@ -1154,6 +1154,9 @@ package androidx.compose.ui.text.platform {
   public final class AndroidStringDelegate_androidKt {
   }
 
+  public final class AndroidTextPaint_androidKt {
+  }
+
   public final class Synchronization_jvmKt {
   }
 
@@ -1176,6 +1179,9 @@ package androidx.compose.ui.text.platform.extensions {
   public final class TtsAnnotationExtensions_androidKt {
     method public static android.text.style.TtsSpan toSpan(androidx.compose.ui.text.TtsAnnotation);
     method public static android.text.style.TtsSpan toSpan(androidx.compose.ui.text.VerbatimTtsAnnotation);
+  }
+
+  public final class UrlAnnotationExtensions_androidKt {
   }
 
 }
@@ -1203,6 +1209,8 @@ package androidx.compose.ui.text.style {
   }
 
   public enum ResolvedTextDirection {
+    method public static androidx.compose.ui.text.style.ResolvedTextDirection valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.ui.text.style.ResolvedTextDirection[] values();
     enum_constant public static final androidx.compose.ui.text.style.ResolvedTextDirection Ltr;
     enum_constant public static final androidx.compose.ui.text.style.ResolvedTextDirection Rtl;
   }

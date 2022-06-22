@@ -74,6 +74,16 @@ import org.junit.Test
 import android.view.KeyEvent as AndroidKeyEvent
 import android.view.KeyEvent.ACTION_DOWN as ActionDown
 import android.view.KeyEvent.KEYCODE_A as KeyCodeA
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Scaffold
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiObject2
 
 /**
  * This file lets DevRel track changes to snippets present in
@@ -273,6 +283,30 @@ private object InteropTestSnippet {
         // Check the new value
         Espresso.onView(withText("Hello Compose")).check(matches(isDisplayed()))
     }
+}
+
+@ExperimentalComposeUiApi
+@Composable
+fun UiAutomatorInteropTestSnippet() {
+    Scaffold(
+        // Enables for all composables in the hierarchy.
+        modifier = Modifier.semantics {
+            testTagsAsResourceId = true
+        }
+    ) { padding ->
+        // Modifier.testTag is accessible from UiAutomator for composables nested here.
+        LazyColumn(
+            modifier = Modifier
+                .testTag("myLazyColumn")
+                .padding(padding),
+        ) {
+            // content
+        }
+    }
+
+    val device = UiDevice.getInstance(getInstrumentation())
+    val lazyColumn: UiObject2 = device.findObject(By.res("myLazyColumn"))
+    // some interaction with the lazyColumn
 }
 
 private object TestingSnippets13 {

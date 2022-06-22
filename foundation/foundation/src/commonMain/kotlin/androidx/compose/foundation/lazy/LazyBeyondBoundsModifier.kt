@@ -17,9 +17,9 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.lazy.LazyListBeyondBoundsInfo.Interval
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.layout.BeyondBoundsLayout
 import androidx.compose.ui.layout.BeyondBoundsLayout.BeyondBoundsScope
 import androidx.compose.ui.layout.BeyondBoundsLayout.LayoutDirection.Companion.Above
@@ -32,7 +32,6 @@ import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.modifier.ProvidableModifierLocal
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.LayoutDirection.Ltr
 import androidx.compose.ui.unit.LayoutDirection.Rtl
@@ -41,24 +40,15 @@ import androidx.compose.ui.unit.LayoutDirection.Rtl
  * This modifier is used to measure and place additional items when the lazyList receives a
  * request to layout items beyond the visible bounds.
  */
+@Suppress("ComposableModifierFactory")
+@Composable
 internal fun Modifier.lazyListBeyondBoundsModifier(
     state: LazyListState,
     beyondBoundsInfo: LazyListBeyondBoundsInfo,
     reverseLayout: Boolean,
-) = composed(
-    "androidx.compose.foundation.lazy.LazyListBeyondBoundsModifier",
-    state,
-    beyondBoundsInfo,
-    reverseLayout,
-    debugInspectorInfo {
-        name = "lazyListBeyondBoundsModifier"
-        properties["state"] = state
-        properties["beyondBoundsInfo"] = beyondBoundsInfo
-        properties["reverseLayout"] = reverseLayout
-    }
-) {
+): Modifier {
     val layoutDirection = LocalLayoutDirection.current
-    remember(state, beyondBoundsInfo, reverseLayout, layoutDirection) {
+    return this then remember(state, beyondBoundsInfo, reverseLayout, layoutDirection) {
         LazyListBeyondBoundsModifierLocal(state, beyondBoundsInfo, reverseLayout, layoutDirection)
     }
 }

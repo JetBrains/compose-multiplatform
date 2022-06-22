@@ -4,6 +4,9 @@ package androidx.compose.foundation {
   public final class ActualJvmKt {
   }
 
+  public final class AndroidOverscrollKt {
+  }
+
   public final class BackgroundKt {
     method public static androidx.compose.ui.Modifier background(androidx.compose.ui.Modifier, long color, optional androidx.compose.ui.graphics.Shape shape);
     method public static androidx.compose.ui.Modifier background(androidx.compose.ui.Modifier, androidx.compose.ui.graphics.Brush brush, optional androidx.compose.ui.graphics.Shape shape, optional float alpha);
@@ -30,6 +33,9 @@ package androidx.compose.foundation {
 
   public final class CanvasKt {
     method @androidx.compose.runtime.Composable public static void Canvas(androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> onDraw);
+  }
+
+  public final class CheckScrollableContainerConstraintsKt {
   }
 
   public final class ClickableKt {
@@ -91,6 +97,8 @@ package androidx.compose.foundation {
   }
 
   public enum MutatePriority {
+    method public static androidx.compose.foundation.MutatePriority valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.foundation.MutatePriority[] values();
     enum_constant public static final androidx.compose.foundation.MutatePriority Default;
     enum_constant public static final androidx.compose.foundation.MutatePriority PreventUserInput;
     enum_constant public static final androidx.compose.foundation.MutatePriority UserInput;
@@ -100,6 +108,12 @@ package androidx.compose.foundation {
     ctor public MutatorMutex();
     method public suspend <R> Object? mutate(optional androidx.compose.foundation.MutatePriority priority, kotlin.jvm.functions.Function1<? super kotlin.coroutines.Continuation<? super R>,?> block, kotlin.coroutines.Continuation<? super R>);
     method public suspend <T, R> Object? mutateWith(T? receiver, optional androidx.compose.foundation.MutatePriority priority, kotlin.jvm.functions.Function2<? super T,? super kotlin.coroutines.Continuation<? super R>,?> block, kotlin.coroutines.Continuation<? super R>);
+  }
+
+  public final class OverscrollConfigurationKt {
+  }
+
+  public final class OverscrollKt {
   }
 
   public final class ProgressSemanticsKt {
@@ -147,9 +161,6 @@ package androidx.compose.foundation {
 
 package androidx.compose.foundation.gestures {
 
-  public final class AndroidOverScrollKt {
-  }
-
   public final class AndroidScrollable_androidKt {
   }
 
@@ -179,7 +190,7 @@ package androidx.compose.foundation.gestures {
     method @androidx.compose.runtime.Composable public static androidx.compose.foundation.gestures.DraggableState rememberDraggableState(kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onDelta);
   }
 
-  public interface DraggableState {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface DraggableState {
     method public void dispatchRawDelta(float delta);
     method public suspend Object? drag(optional androidx.compose.foundation.MutatePriority dragPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.DragScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
   }
@@ -197,14 +208,13 @@ package androidx.compose.foundation.gestures {
   }
 
   public enum Orientation {
+    method public static androidx.compose.foundation.gestures.Orientation valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.foundation.gestures.Orientation[] values();
     enum_constant public static final androidx.compose.foundation.gestures.Orientation Horizontal;
     enum_constant public static final androidx.compose.foundation.gestures.Orientation Vertical;
   }
 
-  public final class OverScrollConfigurationKt {
-  }
-
-  public interface PressGestureScope extends androidx.compose.ui.unit.Density {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface PressGestureScope extends androidx.compose.ui.unit.Density {
     method public suspend Object? awaitRelease(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public suspend Object? tryAwaitRelease(kotlin.coroutines.Continuation<? super java.lang.Boolean>);
   }
@@ -228,7 +238,7 @@ package androidx.compose.foundation.gestures {
     method public static androidx.compose.ui.Modifier scrollable(androidx.compose.ui.Modifier, androidx.compose.foundation.gestures.ScrollableState state, androidx.compose.foundation.gestures.Orientation orientation, optional boolean enabled, optional boolean reverseDirection, optional androidx.compose.foundation.gestures.FlingBehavior? flingBehavior, optional androidx.compose.foundation.interaction.MutableInteractionSource? interactionSource);
   }
 
-  public interface ScrollableState {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface ScrollableState {
     method public float dispatchRawDelta(float delta);
     method public boolean isScrollInProgress();
     method public suspend Object? scroll(optional androidx.compose.foundation.MutatePriority scrollPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
@@ -255,7 +265,7 @@ package androidx.compose.foundation.gestures {
     method public static suspend Object? detectTransformGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional boolean panZoomLock, kotlin.jvm.functions.Function4<? super androidx.compose.ui.geometry.Offset,? super androidx.compose.ui.geometry.Offset,? super java.lang.Float,? super java.lang.Float,kotlin.Unit> onGesture, kotlin.coroutines.Continuation<? super kotlin.Unit>);
   }
 
-  public interface TransformScope {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface TransformScope {
     method public void transformBy(optional float zoomChange, optional long panChange, optional float rotationChange);
   }
 
@@ -263,7 +273,7 @@ package androidx.compose.foundation.gestures {
     method public static androidx.compose.ui.Modifier transformable(androidx.compose.ui.Modifier, androidx.compose.foundation.gestures.TransformableState state, optional boolean lockRotationOnZoomPan, optional boolean enabled);
   }
 
-  public interface TransformableState {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface TransformableState {
     method public boolean isTransformInProgress();
     method public suspend Object? transform(optional androidx.compose.foundation.MutatePriority transformPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.TransformScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public abstract boolean isTransformInProgress;
@@ -406,10 +416,7 @@ package androidx.compose.foundation.lazy {
     method @Deprecated public static inline <T> void itemsIndexed(androidx.compose.foundation.lazy.LazyListScope, T![] items, optional kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,?>? key, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,? extends kotlin.Unit> itemContent);
   }
 
-  public final class LazyGridDeprecatedKt {
-  }
-
-  @androidx.compose.foundation.lazy.LazyScopeMarker @androidx.compose.runtime.Stable public interface LazyItemScope {
+  @androidx.compose.foundation.lazy.LazyScopeMarker @androidx.compose.runtime.Stable @kotlin.jvm.JvmDefaultWithCompatibility public interface LazyItemScope {
     method public androidx.compose.ui.Modifier fillParentMaxHeight(androidx.compose.ui.Modifier, optional float fraction);
     method public androidx.compose.ui.Modifier fillParentMaxSize(androidx.compose.ui.Modifier, optional float fraction);
     method public androidx.compose.ui.Modifier fillParentMaxWidth(androidx.compose.ui.Modifier, optional float fraction);
@@ -438,7 +445,7 @@ package androidx.compose.foundation.lazy {
   public final class LazyListKt {
   }
 
-  public interface LazyListLayoutInfo {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface LazyListLayoutInfo {
     method public default int getAfterContentPadding();
     method public default int getBeforeContentPadding();
     method public default androidx.compose.foundation.gestures.Orientation getOrientation();
@@ -465,7 +472,7 @@ package androidx.compose.foundation.lazy {
   public final class LazyListPinningModifierKt {
   }
 
-  @androidx.compose.foundation.lazy.LazyScopeMarker public interface LazyListScope {
+  @androidx.compose.foundation.lazy.LazyScopeMarker @kotlin.jvm.JvmDefaultWithCompatibility public interface LazyListScope {
     method public default void item(optional Object? key, optional Object? contentType, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,kotlin.Unit> content);
     method @Deprecated public void item(optional Object? key, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,? extends kotlin.Unit> content);
     method public default void items(int count, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,?>? key, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,?> contentType, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,kotlin.Unit> itemContent);

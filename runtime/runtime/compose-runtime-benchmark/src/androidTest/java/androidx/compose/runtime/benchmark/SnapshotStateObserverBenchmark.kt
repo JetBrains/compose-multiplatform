@@ -24,16 +24,16 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotStateObserver
-import androidx.test.filters.LargeTest
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.random.Random
+import org.junit.After
 import org.junit.Assume.assumeTrue
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -111,6 +111,36 @@ class SnapshotStateObserverBenchmark : ComposeBenchmarkBase() {
                         observeForNode(node)
                     }
                 }
+            }
+        }
+    }
+
+    @Test
+    fun deeplyNestedModelObservations() {
+        assumeTrue(Build.VERSION.SDK_INT != 29)
+        runOnUiThread {
+            val list = mutableListOf<Any>()
+            repeat(100) {
+                list += nodes[random.nextInt(ScopeCount)]
+            }
+
+            fun observeRecursive(index: Int) {
+                if (index == 100) return
+                val node = list[index]
+                stateObserver.observeReads(node, doNothing) {
+                    observeForNode(node)
+                    observeRecursive(index + 1)
+                }
+            }
+
+            benchmarkRule.measureRepeated {
+                runWithTimingDisabled {
+                    random = Random(0)
+                    nodes.forEach { node ->
+                        stateObserver.clear(node)
+                    }
+                }
+                observeRecursive(0)
             }
         }
     }

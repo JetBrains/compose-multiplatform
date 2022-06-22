@@ -19,10 +19,9 @@ package androidx.compose.ui.input.pointer.util
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputChange
-import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.unit.Velocity
+import androidx.compose.ui.util.fastForEach
 import kotlin.math.abs
-import kotlin.math.sign
 import kotlin.math.sqrt
 
 private const val AssumePointerMoveStoppedMilliseconds: Int = 40
@@ -32,141 +31,22 @@ private const val HorizonMilliseconds: Int = 100
 private const val MinSampleSize: Int = 3
 
 /**
- * Calculate the total impulse provided to the screen and the resulting velocity.
- *
- * The touchscreen is modeled as a physical object.
- * Initial condition is discussed below, but for now suppose that v(t=0) = 0
- *
- * The kinetic energy of the object at the release is E=0.5*m*v^2
- * Then vfinal = sqrt(2E/m). The goal is to calculate E.
- *
- * The kinetic energy at the release is equal to the total work done on the object by the finger.
- * The total work W is the sum of all dW along the path.
- *
- * dW = F*dx, where dx is the piece of path traveled.
- * Force is change of momentum over time, F = dp/dt = m dv/dt.
- * Then substituting:
- * dW = m (dv/dt) * dx = m * v * dv
- *
- * Summing along the path, we get:
- * W = sum(dW) = sum(m * v * dv) = m * sum(v * dv)
- * Since the mass stays constant, the equation for final velocity is:
- * vfinal = sqrt(2*sum(v * dv))
- *
- * Here,
- * dv : change of velocity = (v[i+1]-v[i])
- * dx : change of distance = (x[i+1]-x[i])
- * dt : change of time = (t[i+1]-t[i])
- * v : instantaneous velocity = dx/dt
- *
- * The final formula is:
- * vfinal = sqrt(2) * sqrt(sum((v[i]-v[i-1])*|v[i]|)) for all i
- * The absolute value is needed to properly account for the sign. If the velocity over a
- * particular segment descreases, then this indicates braking, which means that negative
- * work was done. So for two positive, but decreasing, velocities, this contribution would be
- * negative and will cause a smaller final velocity.
- *
- * Initial condition
- * There are two ways to deal with initial condition:
- * 1) Assume that v(0) = 0, which would mean that the screen is initially at rest.
- * This is not entirely accurate. We are only taking the past X ms of touch data, where X is
- * currently equal to 100. However, a touch event that created a fling probably lasted for longer
- * than that, which would mean that the user has already been interacting with the touchscreen
- * and it has probably already been moving.
- * 2) Assume that the touchscreen has already been moving at a certain velocity, calculate this
- * initial velocity and the equivalent energy, and start with this initial energy.
- * Consider an example where we have the following data, consisting of 3 points:
- *                 time: t0, t1, t2
- *                 x   : x0, x1, x2
- *                 v   :  0, v1, v2
- * Here is what will happen in each of these scenarios:
- * 1) By directly applying the formula above with the v(0) = 0 boundary condition, we will get
- * vfinal = sqrt(2*(|v1|*(v1-v0) + |v2|*(v2-v1))). This can be simplified since v0=0
- * vfinal = sqrt(2*(|v1|*v1 + |v2|*(v2-v1))) = sqrt(2*(v1^2 + |v2|*(v2 - v1)))
- * since velocity is a real number
- * 2) If we treat the screen as already moving, then it must already have an energy (per mass)
- * equal to 1/2*v1^2. Then the initial energy should be 1/2*v1*2, and only the second segment
- * will contribute to the total kinetic energy (since we can effectively consider that v0=v1).
- * This will give the following expression for the final velocity:
- * vfinal = sqrt(2*(1/2*v1^2 + |v2|*(v2-v1)))
- * This analysis can be generalized to an arbitrary number of samples.
- *
- *
- * Comparing the two equations above, we see that the only mathematical difference
- * is the factor of 1/2 in front of the first velocity term.
- * This boundary condition would allow for the "proper" calculation of the case when all of the
- * samples are equally spaced in time and distance, which should suggest a constant velocity.
- *
- * Note that approach 2) is sensitive to the proper ordering of the data in time, since
- * the boundary condition must be applied to the oldest sample to be accurate.
- */
-private fun kineticEnergyToVelocity(work: Float): Float {
-    return sign(work) * sqrt(2 * abs(work))
-}
-
-private class ImpulseCalculator {
-    private var work = 0f
-    private var previousT: Long? = null
-    private var previousX: Float? = null
-    private var initialCondition = true
-
-    /**
-     * Return the velocity, in pixels/second.
-     * Even though the input time is in milliseconds, we convert to second inside this function
-     * because it provides a more stable numerical behaviour.
-     */
-    fun getVelocity(): Float {
-        return kineticEnergyToVelocity(work)
-    }
-
-    fun addPosition(timeMillis: Long, x: Float) {
-        // t[i] is in milliseconds, but due to FP arithmetic, convert to seconds
-        val SecondsPerMs = 0.001f
-        if (previousT == null || previousX == null) {
-            previousT = timeMillis
-            previousX = x
-            // This is a first data point, nothing to compute here
-            return
-        }
-        if (timeMillis == previousT) {
-            previousX = x
-            // Should never happen, but for stability, skip this sample
-            return
-        }
-        val vprev = kineticEnergyToVelocity(work) // v[i-1]
-        val vcurr = (x - previousX!!) / (SecondsPerMs * (timeMillis - previousT!!)) // v[i]
-        work += (vcurr - vprev) * abs(vcurr)
-        if (initialCondition) {
-            work *= 0.5f
-            initialCondition = false
-        }
-        previousT = timeMillis
-        previousX = x
-    }
-
-    fun reset() {
-        work = 0f
-        previousT = null
-        previousX = null
-        initialCondition = true
-    }
-}
-
-/**
  * Computes a pointer's velocity.
  *
- * The input data is provided by calling [addPosition]. Adding data is cheap. Ensure that all data
- * for the gesture of interest is added.
+ * The input data is provided by calling [addPosition]. Adding data is cheap.
  *
- * To obtain a velocity, call [calculateVelocity]. This will
- * compute the velocity based on the data added so far. Only call this when
- * you need to use the velocity, since the computation is relatively expensive.
+ * To obtain a velocity, call [calculateVelocity] or [getVelocityEstimate]. This will
+ * compute the velocity based on the data added so far. Only call these when
+ * you need to use the velocity, as they are comparatively expensive.
+ *
+ * The quality of the velocity estimation will be better if more data points
+ * have been received.
  */
 class VelocityTracker {
+
     // Circular buffer; current sample at index.
     private val samples: Array<PointAtTime?> = Array(HistorySize) { null }
     private var index: Int = 0
-    private val useImpulse = true
 
     /**
      * Adds a position as the given time to the tracker.
@@ -175,6 +55,9 @@ class VelocityTracker {
      *
      * @see resetTracking
      */
+    // TODO(shepshapard): VelocityTracker needs to be updated to be passed vectors instead of
+    //   positions. For velocity tracking, the only thing that is important is the change in
+    //   position over time.
     fun addPosition(timeMillis: Long, position: Offset) {
         index = (index + 1) % HistorySize
         samples[index] = PointAtTime(position, timeMillis)
@@ -186,58 +69,8 @@ class VelocityTracker {
      * This can be expensive. Only call this when you need the velocity.
      */
     fun calculateVelocity(): Velocity {
-        if (useImpulse) {
-            return getImpulseVelocity()
-        }
-        val lsq2estimate = getLsq2VelocityEstimate().pixelsPerSecond
-        return Velocity(lsq2estimate.x, lsq2estimate.y)
-    }
-
-    private fun getImpulseVelocity(): Velocity {
-        var sampleCount = 0
-
-        // The sample at index is our newest sample.  If it is null, we have no samples so return.
-        val newestSample: PointAtTime = samples[index] ?: return Velocity(0f, 0f)
-
-        var previousSample: PointAtTime = newestSample
-
-        // Starting with the most recent PointAtTime sample, iterate backwards while
-        // the samples represent continuous motion.
-        val xCalculator = ImpulseCalculator()
-        val yCalculator = ImpulseCalculator()
-        var i: Int = index
-        do {
-            i = (i + 1) % HistorySize
-            val sample: PointAtTime = samples[i] ?: continue
-
-            val age = newestSample.time - sample.time
-            val delta = abs(sample.time - previousSample.time)
-            previousSample = newestSample
-            if (age > HorizonMilliseconds) {
-                continue // skip the old samples
-            }
-
-            if (delta > AssumePointerMoveStoppedMilliseconds) {
-                xCalculator.reset()
-                yCalculator.reset()
-            }
-
-            xCalculator.addPosition(-age, sample.point.x)
-            yCalculator.addPosition(-age, sample.point.y)
-
-            sampleCount += 1
-        } while (i != index && sampleCount < HistorySize)
-
-        if (sampleCount < MinSampleSize) {
-            // Compatibility behaviour: if we only have 2 points, return 0 velocity.
-            // Some tests needs this.
-            return Velocity(0f, 0f)
-        }
-
-        val xVelocity = xCalculator.getVelocity()
-        val yVelocity = yCalculator.getVelocity()
-
-        return Velocity(xVelocity, yVelocity)
+        val estimate = getVelocityEstimate().pixelsPerSecond
+        return Velocity(estimate.x, estimate.y)
     }
 
     /**
@@ -255,7 +88,7 @@ class VelocityTracker {
      *
      * Returns null if there is no data on which to base an estimate.
      */
-    private fun getLsq2VelocityEstimate(): VelocityEstimate {
+    private fun getVelocityEstimate(): VelocityEstimate {
         val x: MutableList<Float> = mutableListOf()
         val y: MutableList<Float> = mutableListOf()
         val time: MutableList<Float> = mutableListOf()

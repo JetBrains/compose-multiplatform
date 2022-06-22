@@ -16,6 +16,48 @@
 
 package androidx.compose.animation.demos
 
+import androidx.compose.animation.demos.fancy.AnimatedClockDemo
+import androidx.compose.animation.demos.fancy.AnimatedDotsDemo
+import androidx.compose.animation.demos.fancy.ChatScreen
+import androidx.compose.animation.demos.fancy.FlingGameDemo
+import androidx.compose.animation.demos.fancy.SpringChainDemo
+import androidx.compose.animation.demos.gesture.FancyScrollingDemo
+import androidx.compose.animation.demos.gesture.SpringBackScrollingDemo
+import androidx.compose.animation.demos.gesture.SwipeToDismissDemo
+import androidx.compose.animation.demos.layoutanimation.AnimateContentSizeDemo
+import androidx.compose.animation.demos.layoutanimation.AnimateEnterExitDemo
+import androidx.compose.animation.demos.layoutanimation.AnimateIncrementDecrementDemo
+import androidx.compose.animation.demos.layoutanimation.AnimatedContentWithContentKeyDemo
+import androidx.compose.animation.demos.layoutanimation.AnimatedPlacementDemo
+import androidx.compose.animation.demos.layoutanimation.AnimatedVisibilityDemo
+import androidx.compose.animation.demos.layoutanimation.AnimatedVisibilityLazyColumnDemo
+import androidx.compose.animation.demos.layoutanimation.NestedMenuDemo
+import androidx.compose.animation.demos.layoutanimation.ScaleEnterExitDemo
+import androidx.compose.animation.demos.layoutanimation.ScreenTransitionDemo
+import androidx.compose.animation.demos.layoutanimation.ShrineCartDemo
+import androidx.compose.animation.demos.lookahead.CraneDemo
+import androidx.compose.animation.demos.lookahead.LookaheadLayoutWithAlignmentLinesDemo
+import androidx.compose.animation.demos.lookahead.LookaheadMeasurePlaceDemo
+import androidx.compose.animation.demos.lookahead.LookaheadWithMovableContentDemo
+import androidx.compose.animation.demos.lookahead.ScreenSizeChangeDemo
+import androidx.compose.animation.demos.singlevalue.SingleValueAnimationDemo
+import androidx.compose.animation.demos.statetransition.CrossfadeDemo
+import androidx.compose.animation.demos.statetransition.DoubleTapToLikeDemo
+import androidx.compose.animation.demos.statetransition.GestureBasedAnimationDemo
+import androidx.compose.animation.demos.statetransition.InfiniteTransitionDemo
+import androidx.compose.animation.demos.statetransition.LoadingAnimationDemo
+import androidx.compose.animation.demos.statetransition.MultiDimensionalAnimationDemo
+import androidx.compose.animation.demos.statetransition.RepeatedRotationDemo
+import androidx.compose.animation.demos.suspendfun.InfiniteAnimationDemo
+import androidx.compose.animation.demos.suspendfun.SuspendAnimationDemo
+import androidx.compose.animation.demos.suspendfun.SuspendDoubleTapToLikeDemo
+import androidx.compose.animation.demos.vectorgraphics.AnimatedVectorGraphicsDemo
+import androidx.compose.animation.demos.visualaid.ColumnConfigurationDemo
+import androidx.compose.animation.demos.visualaid.EasingInfoDemo
+import androidx.compose.animation.demos.visualaid.RowConfigurationDemo
+import androidx.compose.animation.demos.visualinspection.AnimatedVisibilityContentSizeChange
+import androidx.compose.animation.demos.visualinspection.EnterExitCombination
+import androidx.compose.animation.demos.visualinspection.SlideInContentVariedSizes
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
 
@@ -54,6 +96,20 @@ val AnimationDemos = DemoCategory(
             )
         ),
         DemoCategory(
+            "\uD83E\uDD7C\uD83E\uDDD1\u200D\uD83D\uDD2C Lookahead Animation Demos",
+            listOf(
+                ComposableDemo("Crane Nested Shared Element") { CraneDemo() },
+                ComposableDemo("Screen Size Change Demo") { ScreenSizeChangeDemo() },
+                ComposableDemo("Lookahead With Movable Content") {
+                    LookaheadWithMovableContentDemo()
+                },
+                ComposableDemo("Lookahead With Alignment Lines") {
+                    LookaheadLayoutWithAlignmentLinesDemo()
+                },
+                ComposableDemo("Flow Row Lookahead") { LookaheadMeasurePlaceDemo() },
+            )
+        ),
+        DemoCategory(
             "Suspend Animation Demos",
             listOf(
                 ComposableDemo("Animated scrolling") { FancyScrollingDemo() },
@@ -77,11 +133,11 @@ val AnimationDemos = DemoCategory(
             "⛔ DO NOT ENTER ⛔",
             listOf(
                 ComposableDemo("AnimatedContent alignment/slideInto") {
-                    InspectionSlideInContentVariedSizes()
+                    SlideInContentVariedSizes()
                 },
-                ComposableDemo("Enter/ExitTransition Combo") { InspectionEnterExitCombination() },
+                ComposableDemo("Enter/ExitTransition Combo") { EnterExitCombination() },
                 ComposableDemo("AnimatedVisibility with Content Size Change") {
-                    InspectionAnimatedVisibilityContentSizeChange()
+                    AnimatedVisibilityContentSizeChange()
                 },
             )
         ),
@@ -101,7 +157,7 @@ val AnimationDemos = DemoCategory(
                 ComposableDemo("Animated clock") { AnimatedClockDemo() },
                 ComposableDemo("Animated dots") { AnimatedDotsDemo() },
                 ComposableDemo("Chat screen") { ChatScreen() },
-                ComposableDemo("Game of fling") { FlingGame() },
+                ComposableDemo("Game of fling") { FlingGameDemo() },
                 ComposableDemo("Spring chain") { SpringChainDemo() },
             )
         )

@@ -42,6 +42,21 @@ private fun nextId(): Int = nextId.also { nextId += 1 }
 
 // Components are ordered alphabetically by name.
 
+private val Badge =
+    Component(
+        id = nextId(),
+        name = "Badge",
+        description =
+        "A badge can contain dynamic information, such as the presence of a new " +
+            "notification or a number of pending requests. Badges can be icon only or contain " +
+            "a short text.",
+        // No badge icon
+        guidelinesUrl = "$ComponentGuidelinesUrl/badge",
+        docsUrl = "$DocsUrl#badge",
+        sourceUrl = "$Material3SourceUrl/Badge.kt",
+        examples = BadgeExamples
+    )
+
 private val BottomAppBars = Component(
     id = nextId(),
     name = "Bottom App Bar",
@@ -148,6 +163,17 @@ private val IconButtons = Component(
     examples = IconButtonExamples,
 )
 
+private val Lists = Component(
+    id = nextId(),
+    name = "Lists",
+    description = "Lists are continuous, vertical indexes of text or images.",
+    // No ListItem icon
+    tintIcon = true,
+    guidelinesUrl = "$ComponentGuidelinesUrl/list-item",
+    docsUrl = "$PackageSummaryUrl#listitem",
+    sourceUrl = "$Material3SourceUrl/ListItem.kt",
+    examples = ListsExamples,
+)
 private val Menus = Component(
     id = nextId(),
     name = "Menus",
@@ -288,6 +314,7 @@ private val TopAppBar = Component(
 
 /** Components for the catalog, ordered alphabetically by name. */
 val Components = listOf(
+    Badge,
     BottomAppBars,
     Buttons,
     Card,
@@ -297,6 +324,7 @@ val Components = listOf(
     ExtendedFloatingActionButton,
     FloatingActionButtons,
     IconButtons,
+    Lists,
     Menus,
     NavigationBar,
     NavigationDrawer,

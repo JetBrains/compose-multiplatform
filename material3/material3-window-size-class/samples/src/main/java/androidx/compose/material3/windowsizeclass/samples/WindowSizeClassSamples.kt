@@ -36,12 +36,12 @@ fun AndroidWindowSizeClassSample() {
                 // size changes, for example when the device is rotated, the value returned by
                 // calculateSizeClass will also change.
                 val windowSizeClass = calculateWindowSizeClass(this)
-                // Perform logic on the window size class to decide whether to show the top app bar.
-                val showTopAppBar = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
+                // Perform logic on the window size class to decide whether to use a nav rail.
+                val useNavRail = windowSizeClass.widthSizeClass > WindowWidthSizeClass.Compact
 
                 // MyScreen knows nothing about window size classes, and performs logic based on a
                 // Boolean flag.
-                MyScreen(showTopAppBar = showTopAppBar)
+                MyScreen(useNavRail = useNavRail)
             }
         }
     }
@@ -49,4 +49,4 @@ fun AndroidWindowSizeClassSample() {
 
 @Suppress("UNUSED_PARAMETER")
 @Composable
-private fun MyScreen(showTopAppBar: Boolean) {}
+private fun MyScreen(useNavRail: Boolean) {}

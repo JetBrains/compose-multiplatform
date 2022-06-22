@@ -69,6 +69,8 @@ fun PointerKeyboardModifiers(
     return PointerKeyboardModifiers(res)
 }
 
+internal actual fun EmptyPointerKeyboardModifiers() = PointerKeyboardModifiers()
+
 /**
  * Describes a pointer input change event that has occurred at a particular point in time.
  */

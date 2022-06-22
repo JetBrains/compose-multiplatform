@@ -26,13 +26,18 @@ import android.text.style.RelativeSizeSpan
 import android.text.style.ScaleXSpan
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
+import android.text.style.TtsSpan
 import android.text.style.TypefaceSpan
+import android.text.style.URLSpan
 import android.text.style.UnderlineSpan
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.UncachedFontFamilyResolver
+import androidx.compose.ui.text.UrlAnnotation
+import androidx.compose.ui.text.VerbatimTtsAnnotation
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -45,16 +50,17 @@ import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
+import androidx.compose.ui.text.withAnnotation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.common.truth.Truth
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth
 
 @OptIn(InternalTextApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -203,10 +209,13 @@ class AndroidAccessibilitySpannableStringTest {
             annotatedString.toAccessibilitySpannableString(density, resourceLoader)
 
         assertThat(spannableString).isInstanceOf(SpannableString::class.java)
-        Truth.assertThat(spannableString.getSpans(
-            0,
-            spannableString.length,
-            TypefaceSpan::class.java)).isEmpty()
+        Truth.assertThat(
+            spannableString.getSpans(
+                0,
+                spannableString.length,
+                TypefaceSpan::class.java
+            )
+        ).isEmpty()
     }
 
     @Test
@@ -286,6 +295,49 @@ class AndroidAccessibilitySpannableStringTest {
             BackgroundColorSpan::class, 5, 10
         ) {
             it.backgroundColor == backgroundColor.toArgb()
+        }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun toAccessibilitySpannableString_with_verbatimTtsAnnotation() {
+        val annotatedString = buildAnnotatedString {
+            append("hello")
+            withAnnotation(VerbatimTtsAnnotation("verbatim")) {
+                append("world")
+            }
+        }
+
+        val spannableString =
+            annotatedString.toAccessibilitySpannableString(density, resourceLoader)
+
+        assertThat(spannableString).isInstanceOf(SpannableString::class.java)
+        assertThat(spannableString).hasSpan(
+            TtsSpan::class, 5, 10
+        ) {
+            it.type == TtsSpan.TYPE_VERBATIM &&
+                it.args.getString(TtsSpan.ARG_VERBATIM) == "verbatim"
+        }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun toAccessibilitySpannableString_with_urlAnnotation() {
+        val annotatedString = buildAnnotatedString {
+            append("hello")
+            withAnnotation(UrlAnnotation("http://url.com")) {
+                append("world")
+            }
+        }
+
+        val spannableString =
+            annotatedString.toAccessibilitySpannableString(density, resourceLoader)
+
+        assertThat(spannableString).isInstanceOf(SpannableString::class.java)
+        assertThat(spannableString).hasSpan(
+            URLSpan::class, 5, 10
+        ) {
+            it.url == "http://url.com"
         }
     }
 

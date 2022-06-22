@@ -306,7 +306,11 @@ class ModifierLocalConsumerEntityTest {
             TODO("Not yet implemented")
         }
 
-        override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {}
+        override fun onRequestMeasure(
+            layoutNode: LayoutNode,
+            affectsLookahead: Boolean,
+            forceRequest: Boolean
+        ) {}
         override fun onAttach(node: LayoutNode) = node.forEachLayoutNodeWrapper { it.attach() }
         override fun onDetach(node: LayoutNode) = node.forEachLayoutNodeWrapper { it.detach() }
 
@@ -358,8 +362,16 @@ class ModifierLocalConsumerEntityTest {
 
         override fun createLayer(drawBlock: (Canvas) -> Unit, invalidateParentLayer: () -> Unit) =
             TODO("Not yet implemented")
-        override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) =
+        override fun onRequestRelayout(
+            layoutNode: LayoutNode,
+            affectsLookahead: Boolean,
+            forceRequest: Boolean
+        ) = TODO("Not yet implemented")
+
+        override fun requestOnPositionedCallback(layoutNode: LayoutNode) {
             TODO("Not yet implemented")
+        }
+
         override fun calculatePositionInWindow(localPosition: Offset) =
             TODO("Not yet implemented")
         override fun calculateLocalPosition(positionInWindow: Offset) =

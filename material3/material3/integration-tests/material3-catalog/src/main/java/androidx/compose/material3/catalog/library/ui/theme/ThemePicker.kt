@@ -38,6 +38,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.catalog.library.R
 import androidx.compose.material3.catalog.library.model.ColorMode
+import androidx.compose.material3.catalog.library.model.FontScaleMode
 import androidx.compose.material3.catalog.library.model.MaxFontScale
 import androidx.compose.material3.catalog.library.model.MinFontScale
 import androidx.compose.material3.catalog.library.model.TextDirection
@@ -199,15 +200,59 @@ fun ThemePicker(
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(horizontal = ThemePickerPadding)
             )
-            var fontScale by remember { mutableStateOf(theme.fontScale) }
-            FontScaleItem(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = ThemePickerPadding),
-                fontScale = fontScale,
-                onValueChange = { fontScale = it },
-                onValueChangeFinished = { onThemeChange(theme.copy(fontScale = fontScale)) }
-            )
+            Column {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(ThemePickerPadding)
+                ) {
+                    RadioButton(
+                        selected = theme.fontScaleMode == FontScaleMode.System,
+                        onClick = {
+                            onThemeChange(theme.copy(fontScaleMode = FontScaleMode.System))
+                        },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = MaterialTheme.colorScheme.primary,
+                            unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
+                    )
+                    Text(
+                        text = FontScaleMode.System.label,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(ThemePickerPadding)
+                ) {
+
+                    RadioButton(
+                        selected = theme.fontScaleMode == FontScaleMode.Custom,
+                        onClick = {
+                            onThemeChange(theme.copy(fontScaleMode = FontScaleMode.Custom))
+                        },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = MaterialTheme.colorScheme.primary,
+                            unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
+                    )
+                    Text(
+                        text = FontScaleMode.Custom.label,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                var fontScale by remember { mutableStateOf(theme.fontScale) }
+                FontScaleItem(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = ThemePickerPadding),
+                    enabled = theme.fontScaleMode == FontScaleMode.Custom,
+                    fontScale = fontScale,
+                    onValueChange = { fontScale = it },
+                    onValueChangeFinished = { onThemeChange(theme.copy(fontScale = fontScale)) }
+                )
+            }
         }
     }
 }
@@ -304,6 +349,7 @@ private fun TextDirectionItem(
 @Composable
 private fun FontScaleItem(
     modifier: Modifier = Modifier,
+    enabled: Boolean,
     fontScale: Float,
     fontScaleMin: Float = MinFontScale,
     fontScaleMax: Float = MaxFontScale,
@@ -313,6 +359,7 @@ private fun FontScaleItem(
     Column(modifier = modifier) {
         // TODO: Replace with M3 Slider when available
         Slider(
+            enabled = enabled,
             value = fontScale,
             onValueChange = onValueChange,
             onValueChangeFinished = onValueChangeFinished,

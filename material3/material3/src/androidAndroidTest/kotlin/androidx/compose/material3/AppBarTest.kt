@@ -754,13 +754,12 @@ class AppBarTest {
                 BottomAppBar(
                     icons = {},
                     floatingActionButton = {
-                        FloatingActionButton(
-                            onClick = { /* do something */ },
-                            elevation = BottomAppBarDefaults.floatingActionButtonElevation()
+                        BottomAppBarDefaults.FloatingActionButton(
+                            onClick = { /* do something */ }
                         ) {
-                            Icon(Icons.Filled.Add, "Localized description")
-                        }
-                    })
+                        Icon(Icons.Filled.Add, "Localized description")
+                    }
+                })
             }
             .assertHeightIsEqualTo(BottomAppBarTokens.ContainerHeight)
             .assertWidthIsEqualTo(rule.rootWidth())
@@ -804,10 +803,9 @@ class AppBarTest {
                 icons = {},
                 Modifier.testTag("bar"),
                 floatingActionButton = {
-                    FloatingActionButton(
+                    BottomAppBarDefaults.FloatingActionButton(
                         modifier = Modifier.testTag("FAB"),
                         onClick = { /* do something */ },
-                        elevation = BottomAppBarDefaults.floatingActionButtonElevation()
                     ) {
                         Icon(Icons.Filled.Add, "Localized description")
                     }

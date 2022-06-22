@@ -34,10 +34,12 @@ import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.modifier.ProvidableModifierLocal
 import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.platform.debugInspectorInfo
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * A [modifier][Modifier.Element] that can be used to observe focus state events.
  */
+@JvmDefaultWithCompatibility
 interface FocusEventModifier : Modifier.Element {
     /**
      * A callback that is called whenever the focus system raises events.

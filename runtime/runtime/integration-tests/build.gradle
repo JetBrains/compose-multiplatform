@@ -105,5 +105,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         incremental = false
+        freeCompilerArgs += "-Xcontext-receivers"
     }
 }

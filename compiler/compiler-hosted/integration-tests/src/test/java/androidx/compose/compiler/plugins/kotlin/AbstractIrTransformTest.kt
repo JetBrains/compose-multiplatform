@@ -31,6 +31,9 @@ import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.cli.jvm.config.addJvmClasspathRoots
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.config.JvmTarget
+import org.jetbrains.kotlin.config.LanguageFeature
+import org.jetbrains.kotlin.config.LanguageVersionSettings
+import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
 import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.konan.DeserializedKlibModuleOrigin
@@ -61,6 +64,8 @@ import org.jetbrains.kotlin.resolve.AnalyzingUtils
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedContainerSource
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import java.io.File
+import org.jetbrains.kotlin.backend.common.serialization.DescriptorByIdSignatureFinderImpl
+import org.jetbrains.kotlin.cli.jvm.config.configureJdkClasspathRoots
 
 @Suppress("LeakingThis")
 abstract class ComposeIrTransformTest : AbstractIrTransformTest() {
@@ -383,7 +388,9 @@ abstract class AbstractIrTransformTest : AbstractCodegenTest() {
         }
     }
 
-    inner class JvmCompilation : Compilation {
+    inner class JvmCompilation(
+        private val specificFeature: Set<LanguageFeature> = emptySet()
+    ) : Compilation {
         override val enabled: Boolean = true
 
         override fun compile(files: List<KtFile>): IrModuleFragment {
@@ -392,6 +399,10 @@ abstract class AbstractIrTransformTest : AbstractCodegenTest() {
             configuration.addJvmClasspathRoots(classPath)
             configuration.put(JVMConfigurationKeys.IR, true)
             configuration.put(JVMConfigurationKeys.JVM_TARGET, JvmTarget.JVM_1_8)
+            configuration.languageVersionSettings =
+                configuration.languageVersionSettings.setFeatures(specificFeature)
+
+            configuration.configureJdkClasspathRoots()
 
             val environment = KotlinCoreEnvironment.createForTests(
                 myTestRootDisposable, configuration, EnvironmentConfigFiles.JVM_CONFIG_FILES
@@ -426,6 +437,7 @@ abstract class AbstractIrTransformTest : AbstractCodegenTest() {
                 generatorContext.moduleDescriptor,
                 generatorContext.symbolTable,
                 generatorContext.irBuiltIns,
+                DescriptorByIdSignatureFinderImpl(generatorContext.moduleDescriptor, mangler),
                 extensions
             )
             val frontEndContext = object : TranslationPluginContext {
@@ -445,7 +457,8 @@ abstract class AbstractIrTransformTest : AbstractCodegenTest() {
                 generatorContext.symbolTable,
                 frontEndContext,
                 stubGenerator,
-                mangler
+                mangler,
+                true
             )
 
             generatorContext.moduleDescriptor.allDependencyModules.map {
@@ -515,3 +528,11 @@ abstract class AbstractIrTransformTest : AbstractCodegenTest() {
         KEEP_INFO_STRING, // truncates everything except for the `info` string
     }
 }
+
+internal fun LanguageVersionSettings.setFeatures(
+    features: Set<LanguageFeature>
+) = LanguageVersionSettingsImpl(
+    languageVersion = languageVersion,
+    apiVersion = apiVersion,
+    specificFeatures = features.associateWith { LanguageFeature.State.ENABLED }
+)

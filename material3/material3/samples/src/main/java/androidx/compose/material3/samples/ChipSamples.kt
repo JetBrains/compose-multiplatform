@@ -153,8 +153,10 @@ fun FilterChipWithLeadingIconSample() {
 @Sampled
 @Composable
 fun InputChipSample() {
+    var selected by remember { mutableStateOf(false) }
     InputChip(
-        onClick = { /* Do something! */ },
+        selected = selected,
+        onClick = { selected = !selected },
         label = { Text("Input Chip") },
         trailingIcon = {
             Icon(
@@ -170,8 +172,10 @@ fun InputChipSample() {
 @Sampled
 @Composable
 fun InputChipWithAvatarSample() {
+    var selected by remember { mutableStateOf(false) }
     InputChip(
-        onClick = { /* Do something! */ },
+        selected = selected,
+        onClick = { selected = !selected },
         label = { Text("Input Chip") },
         avatar = {
             Icon(
@@ -217,8 +221,8 @@ fun ChipGroupSingleLineSample() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
             repeat(9) { index ->
-                InputChip(
-                    modifier = Modifier.padding(horizontal = 8.dp),
+                AssistChip(
+                    modifier = Modifier.padding(horizontal = 4.dp),
                     onClick = { /* do something*/ },
                     label = { Text("Chip $index") }
                 )

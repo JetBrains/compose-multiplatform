@@ -27,6 +27,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Measured
 import androidx.compose.ui.platform.debugInspectorInfo
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * A layout composable that places its children in a horizontal sequence. For a layout composable
@@ -125,6 +126,7 @@ internal fun rowMeasurePolicy(
  */
 @LayoutScopeMarker
 @Immutable
+@JvmDefaultWithCompatibility
 interface RowScope {
     /**
      * Size the element's width proportional to its [weight] relative to other weighted sibling

@@ -634,7 +634,9 @@ private fun SemanticsNodeInteraction.requireSemantics(
 ) {
     val missingProperties = properties.filter { it !in node.config }
     if (missingProperties.isNotEmpty()) {
-        val msg = "${errorMessage()}, the node is missing [${missingProperties.joinToString()}]"
+        val msg = "${errorMessage()}, the node is missing [${
+            missingProperties.joinToString { it.name }
+        }]"
         throw AssertionError(buildGeneralErrorMessage(msg, selector, node))
     }
 }

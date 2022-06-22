@@ -104,7 +104,7 @@ class ScrollToIndexTest {
         rule.onNode(hasScrollToIndexAction()).assertDoesNotExist()
         expectError<AssertionError>(
             expectedMessage = "Failed to scroll to index 1, " +
-                "the node is missing \\[SemanticsPropertyKey: ScrollToIndex\\].*"
+                "the node is missing \\[ScrollToIndex\\].*"
         ) {
             rule.onNodeWithTag("tag").performScrollToIndex(1)
         }

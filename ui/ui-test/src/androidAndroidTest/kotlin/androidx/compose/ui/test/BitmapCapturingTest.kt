@@ -48,6 +48,7 @@ import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import kotlin.math.roundToInt
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -167,40 +168,6 @@ class BitmapCapturingTest(val config: TestConfig) {
             }
     }
 
-    // TODO(b/207491761): Move test to test-utils. It tests assertPixels(), not captureToImage()
-    @Test
-    fun assertWrongColor_expectException() {
-        composeCheckerboard()
-
-        expectError<AssertionError>(
-            expectedMessage = "Pixel\\(0, 0\\) expected to be " +
-                "Color\\(1.0, 1.0, 0.0, 1.0, .*\\), but was " +
-                "Color\\(1.0, 0.0, 0.0, 1.0, .*\\).*"
-        ) {
-            rule.onNodeWithTag(tagTopLeft)
-                .captureToImage()
-                .assertPixels(expectedSize = IntSize(100, 50)) {
-                    colorBottomRight // Assuming wrong color
-                }
-        }
-    }
-
-    // TODO(b/207491761): Move test to test-utils. It tests assertPixels(), not captureToImage()
-    @Test
-    fun assertWrongSize_expectException() {
-        composeCheckerboard()
-
-        expectError<AssertionError>(
-            expectedMessage = "Bitmap size is wrong! Expected '10 x 10' but got '100 x 50'.*"
-        ) {
-            rule.onNodeWithTag(tagTopLeft)
-                .captureToImage()
-                .assertPixels(expectedSize = IntSize(10, 10)) {
-                    colorBottomLeft
-                }
-        }
-    }
-
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.P) // b/163023027
     fun captureDialog_verifyBackground() {
@@ -252,6 +219,7 @@ class BitmapCapturingTest(val config: TestConfig) {
         }
     }
 
+    @Ignore("b/235839078")
     @Test
     fun capturePopup_verifyBackground_multiWindow() {
         setContent {

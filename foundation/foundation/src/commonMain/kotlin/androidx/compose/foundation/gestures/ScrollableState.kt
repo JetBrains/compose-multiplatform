@@ -23,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import kotlinx.coroutines.coroutineScope
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * An object representing something that can be scrolled. This interface is implemented by states
@@ -38,6 +39,7 @@ import kotlinx.coroutines.coroutineScope
  * @see androidx.compose.foundation.gestures.animateScrollBy
  * @see androidx.compose.foundation.gestures.scrollable
  */
+@JvmDefaultWithCompatibility
 interface ScrollableState {
     /**
      * Call this function to take control of scrolling and gain the ability to send scroll events

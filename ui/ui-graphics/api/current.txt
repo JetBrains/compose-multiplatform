@@ -239,7 +239,7 @@ package androidx.compose.ui.graphics {
     method public static androidx.compose.ui.graphics.ShaderBrush ShaderBrush(android.graphics.Shader shader);
   }
 
-  public interface Canvas {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface Canvas {
     method public void clipPath(androidx.compose.ui.graphics.Path path, optional int clipOp);
     method public default void clipRect(androidx.compose.ui.geometry.Rect rect, optional int clipOp);
     method public void clipRect(float left, float top, float right, float bottom, optional int clipOp);
@@ -417,7 +417,7 @@ package androidx.compose.ui.graphics {
   public final class Float16Kt {
   }
 
-  public interface ImageBitmap {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface ImageBitmap {
     method public androidx.compose.ui.graphics.colorspace.ColorSpace getColorSpace();
     method public int getConfig();
     method public boolean getHasAlpha();
@@ -604,7 +604,7 @@ package androidx.compose.ui.graphics {
     property public final int Stroke;
   }
 
-  public interface Path {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface Path {
     method public void addArc(androidx.compose.ui.geometry.Rect oval, float startAngleDegrees, float sweepAngleDegrees);
     method public void addArcRad(androidx.compose.ui.geometry.Rect oval, float startAngleRadians, float sweepAngleRadians);
     method public void addOval(androidx.compose.ui.geometry.Rect oval);
@@ -662,7 +662,7 @@ package androidx.compose.ui.graphics {
     property public final int NonZero;
   }
 
-  public interface PathMeasure {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface PathMeasure {
     method public float getLength();
     method public boolean getSegment(float startDistance, float stopDistance, androidx.compose.ui.graphics.Path destination, optional boolean startWithMoveTo);
     method public void setPath(androidx.compose.ui.graphics.Path? path, boolean forceClosed);
@@ -1136,7 +1136,7 @@ package androidx.compose.ui.graphics.drawscope {
   public final class CanvasDrawScopeKt {
   }
 
-  public interface ContentDrawScope extends androidx.compose.ui.graphics.drawscope.DrawScope {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface ContentDrawScope extends androidx.compose.ui.graphics.drawscope.DrawScope {
     method public void drawContent();
   }
 
@@ -1150,7 +1150,7 @@ package androidx.compose.ui.graphics.drawscope {
     property public abstract androidx.compose.ui.graphics.drawscope.DrawTransform transform;
   }
 
-  @androidx.compose.ui.graphics.drawscope.DrawScopeMarker public interface DrawScope extends androidx.compose.ui.unit.Density {
+  @androidx.compose.ui.graphics.drawscope.DrawScopeMarker @kotlin.jvm.JvmDefaultWithCompatibility public interface DrawScope extends androidx.compose.ui.unit.Density {
     method public void drawArc(androidx.compose.ui.graphics.Brush brush, float startAngle, float sweepAngle, boolean useCenter, optional long topLeft, optional long size, optional float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional int blendMode);
     method public void drawArc(long color, float startAngle, float sweepAngle, boolean useCenter, optional long topLeft, optional long size, optional float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional int blendMode);
     method public void drawCircle(androidx.compose.ui.graphics.Brush brush, optional float radius, optional long center, optional float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional int blendMode);
@@ -1209,7 +1209,7 @@ package androidx.compose.ui.graphics.drawscope {
   public abstract sealed class DrawStyle {
   }
 
-  @androidx.compose.ui.graphics.drawscope.DrawScopeMarker public interface DrawTransform {
+  @androidx.compose.ui.graphics.drawscope.DrawScopeMarker @kotlin.jvm.JvmDefaultWithCompatibility public interface DrawTransform {
     method public void clipPath(androidx.compose.ui.graphics.Path path, optional int clipOp);
     method public void clipRect(optional float left, optional float top, optional float right, optional float bottom, optional int clipOp);
     method public default long getCenter();

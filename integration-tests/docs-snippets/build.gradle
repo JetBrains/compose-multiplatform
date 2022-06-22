@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.espressoCore)
     implementation(libs.junit)
     implementation(libs.truth)
+    implementation(libs.testUiautomator)
 }
 
 androidx {

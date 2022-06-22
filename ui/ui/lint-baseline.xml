@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.3.0-alpha07" type="baseline" client="gradle" dependencies="false" name="AGP (7.3.0-alpha07)" variant="all" version="7.3.0-alpha07">
+<issues format="6" by="lint 7.4.0-alpha01" type="baseline" client="gradle" dependencies="false" name="AGP (7.4.0-alpha01)" variant="all" version="7.4.0-alpha01">
 
     <issue
         id="NewApi"
@@ -84,33 +84,6 @@
 
     <issue
         id="NewApi"
-        message="Call requires API level 29 (current min is 21): `android.os.Parcel#readBoolean`"
-        errorLine1="        parcel?.readBoolean()"
-        errorLine2="                ~~~~~~~~~~~">
-        <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/platform/DisposableSaveableStateRegistryTest.kt"/>
-    </issue>
-
-    <issue
-        id="NewApi"
-        message="Call requires API level 29 (current min is 21): `android.os.Parcel#readBoolean`"
-        errorLine1="        parcel?.readBoolean()"
-        errorLine2="                ~~~~~~~~~~~">
-        <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/platform/DisposableSaveableStateRegistryTest.kt"/>
-    </issue>
-
-    <issue
-        id="NewApi"
-        message="Call requires API level 29 (current min is 21): `android.os.Parcel#writeBoolean`"
-        errorLine1="        parcel.writeBoolean(true)"
-        errorLine2="               ~~~~~~~~~~~~">
-        <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/platform/DisposableSaveableStateRegistryTest.kt"/>
-    </issue>
-
-    <issue
-        id="NewApi"
         message="Call requires API level 26 (current min is 21): `captureToImage`"
         errorLine1="    fun SemanticsNodeInteraction.captureToBitmap() = captureToImage().asAndroidBitmap()"
         errorLine2="                                                     ~~~~~~~~~~~~~~">
@@ -143,6 +116,51 @@
         errorLine2="                                   ~~~~~~~~~~~~~~">
         <location
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/graphics/vector/VectorTest.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T, R> List&lt;T>.fastZipWithNext(transform: (T, T) -> R): List&lt;R> {"
+        errorLine2="                                   ~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/TempListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;S, T : S> List&lt;T>.fastReduce(operation: (acc: S, T) -> S): S {"
+        errorLine2="                                       ~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/TempListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T, K, V> List&lt;T>.fastAssociate(transform: (T) -> Pair&lt;K, V>): Map&lt;K, V> {"
+        errorLine2="                                      ~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/TempListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T, R, V> List&lt;T>.fastZip("
+        errorLine2="                                      ~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/TempListUtils.kt"/>
+    </issue>
+
+    <issue
+        id="BanInlineOptIn"
+        message="Inline functions cannot opt into experimental APIs."
+        errorLine1="internal inline fun &lt;T, R> List&lt;T>.fastMapNotNull(transform: (T) -> R?): List&lt;R> {"
+        errorLine2="                                   ~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/TempListUtils.kt"/>
     </issue>
 
     <issue

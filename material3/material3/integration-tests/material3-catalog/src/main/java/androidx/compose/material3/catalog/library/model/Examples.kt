@@ -63,6 +63,8 @@ import androidx.compose.material3.samples.FloatingActionButtonSample
 import androidx.compose.material3.samples.IconButtonSample
 import androidx.compose.material3.samples.IconTabs
 import androidx.compose.material3.samples.IconToggleButtonSample
+import androidx.compose.material3.samples.IndeterminateCircularProgressIndicatorSample
+import androidx.compose.material3.samples.IndeterminateLinearProgressIndicatorSample
 import androidx.compose.material3.samples.InputChipSample
 import androidx.compose.material3.samples.InputChipWithAvatarSample
 import androidx.compose.material3.samples.LargeFloatingActionButtonSample
@@ -70,11 +72,13 @@ import androidx.compose.material3.samples.LeadingIconTabs
 import androidx.compose.material3.samples.LinearProgressIndicatorSample
 import androidx.compose.material3.samples.MenuSample
 import androidx.compose.material3.samples.ModalNavigationDrawerSample
+import androidx.compose.material3.samples.NavigationBarItemWithBadge
 import androidx.compose.material3.samples.NavigationBarSample
 import androidx.compose.material3.samples.NavigationBarWithOnlySelectedLabelsSample
 import androidx.compose.material3.samples.NavigationRailBottomAlignSample
 import androidx.compose.material3.samples.NavigationRailSample
 import androidx.compose.material3.samples.NavigationRailWithOnlySelectedLabelsSample
+import androidx.compose.material3.samples.OneLineListItem
 import androidx.compose.material3.samples.OutlinedButtonSample
 import androidx.compose.material3.samples.OutlinedCardSample
 import androidx.compose.material3.samples.OutlinedIconButtonSample
@@ -114,7 +118,9 @@ import androidx.compose.material3.samples.TextFieldWithIcons
 import androidx.compose.material3.samples.TextFieldWithPlaceholder
 import androidx.compose.material3.samples.TextFieldWithSupportingText
 import androidx.compose.material3.samples.TextTabs
+import androidx.compose.material3.samples.ThreeLineListItem
 import androidx.compose.material3.samples.TriStateCheckboxSample
+import androidx.compose.material3.samples.TwoLineListItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -125,6 +131,17 @@ data class Example(
     val sourceUrl: String,
     val content: @Composable () -> Unit
 )
+
+private const val BadgeExampleDescription = "Badge examples"
+private const val BadgeExampleSourceUrl = "$SampleSourceUrl/BadgeSamples.kt"
+val BadgeExamples =
+    listOf(
+        Example(
+            name = ::NavigationBarItemWithBadge.name,
+            description = BadgeExampleDescription,
+            sourceUrl = BadgeExampleSourceUrl
+        ) { NavigationBarItemWithBadge() }
+    )
 
 private const val ButtonsExampleDescription = "Button examples"
 private const val ButtonsExampleSourceUrl = "$SampleSourceUrl/ButtonSamples.kt"
@@ -413,6 +430,32 @@ val FloatingActionButtonsExamples =
         ) { SmallFloatingActionButtonSample() }
     )
 
+private const val ListsExampleDescription = "List examples"
+private const val ListsExampleSourceUrl = "$SampleSourceUrl/ListSamples.kt"
+val ListsExamples = listOf(
+    Example(
+        name = ::OneLineListItem.name,
+        description = ListsExampleDescription,
+        sourceUrl = ListsExampleSourceUrl
+    ) {
+        OneLineListItem()
+    },
+    Example(
+        name = ::TwoLineListItem.name,
+        description = ListsExampleDescription,
+        sourceUrl = ListsExampleSourceUrl
+    ) {
+        TwoLineListItem()
+    },
+    Example(
+        name = ::ThreeLineListItem.name,
+        description = ListsExampleDescription,
+        sourceUrl = ListsExampleSourceUrl
+    ) {
+        ThreeLineListItem()
+    },
+)
+
 private const val IconButtonExampleDescription = "Icon button examples"
 private const val IconButtonExampleSourceUrl = "$SampleSourceUrl/IconButtonSamples.kt"
 val IconButtonExamples =
@@ -560,11 +603,25 @@ val ProgressIndicatorsExamples = listOf(
         LinearProgressIndicatorSample()
     },
     Example(
+        name = ::IndeterminateLinearProgressIndicatorSample.name,
+        description = ProgressIndicatorsExampleDescription,
+        sourceUrl = ProgressIndicatorsExampleSourceUrl
+    ) {
+        IndeterminateLinearProgressIndicatorSample()
+    },
+    Example(
         name = ::CircularProgressIndicatorSample.name,
         description = ProgressIndicatorsExampleDescription,
         sourceUrl = ProgressIndicatorsExampleSourceUrl
     ) {
         CircularProgressIndicatorSample()
+    },
+    Example(
+        name = ::IndeterminateCircularProgressIndicatorSample.name,
+        description = ProgressIndicatorsExampleDescription,
+        sourceUrl = ProgressIndicatorsExampleSourceUrl
+    ) {
+        IndeterminateCircularProgressIndicatorSample()
     }
 )
 
@@ -826,6 +883,9 @@ val TextFieldsExamples = listOf(
     // width. As a result, they grow horizontally if enough text is typed. To prevent this behavior
     // in Catalog app the code below restricts the width of every text field sample
     it.copy(content = {
-        Box(Modifier.wrapContentWidth().width(280.dp)) { it.content() }
+        Box(
+            Modifier
+                .wrapContentWidth()
+                .width(280.dp)) { it.content() }
     })
 }

@@ -69,7 +69,7 @@ import androidx.compose.ui.unit.Constraints
 // AndroidParagraphIntrinsics. Should we consider just having one TextLayout class which
 // implements Paragraph and ParagraphIntrinsics? it seems like all of these types are immutable
 // and have similar sets of responsibilities.
-@OptIn(InternalPlatformTextApi::class)
+@OptIn(InternalPlatformTextApi::class, ExperimentalTextApi::class)
 internal class AndroidParagraph(
     val paragraphIntrinsics: AndroidParagraphIntrinsics,
     val maxLines: Int,
@@ -152,7 +152,7 @@ internal class AndroidParagraph(
 
         // Brush is not fully realized on text until layout is complete and size information
         // is known. Brush can now be applied to the overall textpaint and all the spans.
-        textPaint.setBrush(style.brush, Size(width, height))
+        textPaint.setBrush(style.brush, Size(width, height), style.alpha)
         layout.getShaderBrushSpans().forEach { shaderBrushSpan ->
             shaderBrushSpan.size = Size(width, height)
         }
@@ -440,11 +440,12 @@ internal class AndroidParagraph(
     override fun paint(
         canvas: Canvas,
         brush: Brush,
+        alpha: Float,
         shadow: Shadow?,
         textDecoration: TextDecoration?
     ) {
         with(textPaint) {
-            setBrush(brush, Size(width, height))
+            setBrush(brush, Size(width, height), alpha)
             setShadow(shadow)
             setTextDecoration(textDecoration)
         }

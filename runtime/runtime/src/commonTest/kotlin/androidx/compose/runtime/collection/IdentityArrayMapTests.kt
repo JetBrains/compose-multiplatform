@@ -72,6 +72,24 @@ class IdentityArrayMapTests {
     }
 
     @Test
+    fun canRemoveKeys() {
+        val map = IdentityArrayMap<Key, Int>()
+        repeat(keys.size) {
+            map[keys[it]] = it
+        }
+        map.removeIf { key, _ -> key.value % 2 == 0 }
+        assertEquals(keys.size / 2, map.size)
+        for (i in 1 until keys.size step 2) {
+            assertEquals(i, map[keys[i]], "map key $i")
+        }
+        for (i in 0 until keys.size step 2) {
+            assertEquals(null, map[keys[i]], "map key $i")
+        }
+        map.removeIf { _, _ -> true }
+        assertEquals(0, map.size, "map is not empty after removing everything")
+    }
+
+    @Test
     fun canForEachKeysAndValues() {
         val map = IdentityArrayMap<Key, String>()
         repeat(100) {
@@ -119,5 +137,16 @@ class IdentityArrayMapTests {
             assertFalse(map.contains(key))
         }
         assertTrue(map.isEmpty())
+    }
+
+    @Test
+    fun canClear() {
+        val map = IdentityArrayMap<Key, String>()
+        repeat(16) {
+            map[keys[it]] = it.toString()
+        }
+        map.clear()
+        assertTrue(map.isEmpty())
+        assertEquals(0, map.size, "map size should be 0 after calling clear")
     }
 }

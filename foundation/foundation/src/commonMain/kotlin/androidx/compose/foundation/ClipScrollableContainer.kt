@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Rect
@@ -30,11 +31,17 @@ import androidx.compose.ui.unit.dp
  * Clips bounds of scrollable container on main axis while leaving space for background effects
  * (like shadows) on cross axis.
  *
- * @param isVertical whether container scrolls vertically
+ * @param orientation orientation of the scrolling
  */
 @ExperimentalFoundationApi
-fun Modifier.clipScrollableContainer(isVertical: Boolean) =
-    then(if (isVertical) VerticalScrollableClipModifier else HorizontalScrollableClipModifier)
+fun Modifier.clipScrollableContainer(orientation: Orientation) =
+    then(
+        if (orientation == Orientation.Vertical) {
+            VerticalScrollableClipModifier
+        } else {
+            HorizontalScrollableClipModifier
+        }
+    )
 
 /**
  * In the scrollable containers we want to clip the main axis sides in order to not display the
@@ -52,7 +59,7 @@ fun Modifier.clipScrollableContainer(isVertical: Boolean) =
  * user will need to have a larger unclipped area for some reason they can always add the needed
  * padding inside the scrollable area.
  */
-private val MaxSupportedElevation = 30.dp
+internal val MaxSupportedElevation = 30.dp
 
 private val HorizontalScrollableClipModifier = Modifier.clip(object : Shape {
     override fun createOutline(

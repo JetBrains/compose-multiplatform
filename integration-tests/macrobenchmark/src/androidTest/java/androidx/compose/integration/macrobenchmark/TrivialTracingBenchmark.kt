@@ -39,12 +39,12 @@ class TrivialTracingBenchmark {
     @get:Rule
     val benchmarkRule = MacrobenchmarkRule()
 
-    @RequiresApi(Build.VERSION_CODES.Q)
+    @RequiresApi(Build.VERSION_CODES.R) // TODO(234351579): Support API < 30
     @OptIn(ExperimentalMetricApi::class)
     @Test
     fun test_composable_names_present_in_trace() {
         val metrics = COMPOSABLE_NAMES.map { composableName ->
-            TraceSectionMetric("%$PACKAGE_NAME.$composableName %$FILE_NAME:% key=%")
+            TraceSectionMetric("%$PACKAGE_NAME.$composableName %$FILE_NAME:%")
         }
         benchmarkRule.measureRepeated(
             packageName = PACKAGE_NAME,

@@ -29,6 +29,10 @@ import androidx.compose.testutils.expectError
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEventType.Companion.Move
+import androidx.compose.ui.input.pointer.PointerEventType.Companion.Press
+import androidx.compose.ui.input.pointer.PointerEventType.Companion.Release
+import androidx.compose.ui.input.pointer.PointerType.Companion.Touch
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -262,15 +266,15 @@ class SendSwipeTest {
                 assertThat(events.size).isEqualTo(3)
 
                 // DOWN is in top left corner (0, 0)
-                events[0].verify(null, null, true, Offset(0f, 0f))
+                events[0].verify(null, null, true, Offset(0f, 0f), Touch, Press)
 
                 val t = events[0].timestamp + 1
                 val pointerId = events[0].id
 
                 // MOVE is in bottom right corner (box is 100x100, so corner is (99, 99))
-                events[1].verify(t, pointerId, true, Offset(99f, 99f))
+                events[1].verify(t, pointerId, true, Offset(99f, 99f), Touch, Move)
                 // UP is also in bottom right corner
-                events[2].verify(t, pointerId, false, Offset(99f, 99f))
+                events[2].verify(t, pointerId, false, Offset(99f, 99f), Touch, Release)
             }
         }
     }

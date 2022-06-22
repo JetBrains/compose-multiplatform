@@ -52,7 +52,7 @@ package androidx.compose.animation {
     method @Deprecated @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static void AnimatedVisibility(boolean visible, optional androidx.compose.ui.Modifier modifier, androidx.compose.animation.EnterTransition enter, androidx.compose.animation.ExitTransition exit, boolean initiallyVisible, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
-  public interface AnimatedVisibilityScope {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface AnimatedVisibilityScope {
     method @androidx.compose.animation.ExperimentalAnimationApi public default androidx.compose.ui.Modifier animateEnterExit(androidx.compose.ui.Modifier, optional androidx.compose.animation.EnterTransition enter, optional androidx.compose.animation.ExitTransition exit, optional String label);
     method @androidx.compose.animation.ExperimentalAnimationApi public androidx.compose.animation.core.Transition<androidx.compose.animation.EnterExitState> getTransition();
     property @androidx.compose.animation.ExperimentalAnimationApi public abstract androidx.compose.animation.core.Transition<androidx.compose.animation.EnterExitState> transition;
@@ -85,6 +85,8 @@ package androidx.compose.animation {
   }
 
   @androidx.compose.animation.ExperimentalAnimationApi public enum EnterExitState {
+    method public static androidx.compose.animation.EnterExitState valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.animation.EnterExitState[] values();
     enum_constant public static final androidx.compose.animation.EnterExitState PostExit;
     enum_constant public static final androidx.compose.animation.EnterExitState PreEnter;
     enum_constant public static final androidx.compose.animation.EnterExitState Visible;

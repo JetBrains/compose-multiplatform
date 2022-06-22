@@ -3579,6 +3579,70 @@ class ParagraphIntegrationTest {
         }
     }
 
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testDefaultSpanStyle_setBrushAlpha() {
+        with(defaultDensity) {
+            val text = "abc"
+            // FontSize doesn't matter here, but it should be big enough for bitmap comparison.
+            val fontSize = 100.sp
+            val fontSizeInPx = fontSize.toPx()
+            val paragraphWidth = fontSizeInPx * text.length
+            val brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+
+            val paragraphWithoutAlpha = simpleParagraph(
+                text = text,
+                style = TextStyle(fontSize = fontSize, brush = brush),
+                width = paragraphWidth
+            )
+
+            val paragraphWithAlpha = simpleParagraph(
+                text = text,
+                style = TextStyle(
+                    fontSize = fontSize,
+                    brush = brush,
+                    alpha = 0.5f
+                ),
+                width = paragraphWidth
+            )
+
+            assertThat(paragraphWithoutAlpha.bitmap())
+                .isNotEqualToBitmap(paragraphWithAlpha.bitmap())
+        }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testDefaultSpanStyle_overrideAlphaDuringDraw() {
+        with(defaultDensity) {
+            val text = "abc"
+            // FontSize doesn't matter here, but it should be big enough for bitmap comparison.
+            val fontSize = 100.sp
+            val fontSizeInPx = fontSize.toPx()
+            val paragraphWidth = fontSizeInPx * text.length
+            val brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+
+            val paragraphWithoutAlpha = simpleParagraph(
+                text = text,
+                style = TextStyle(fontSize = fontSize, brush = brush),
+                width = paragraphWidth
+            )
+
+            val paragraphWithAlpha = simpleParagraph(
+                text = text,
+                style = TextStyle(
+                    fontSize = fontSize,
+                    brush = brush,
+                    alpha = 0.5f
+                ),
+                width = paragraphWidth
+            )
+
+            assertThat(paragraphWithoutAlpha.bitmap(brush, 0.5f))
+                .isEqualToBitmap(paragraphWithAlpha.bitmap())
+        }
+    }
+
     @Test
     fun testGetPathForRange_singleLine() {
         with(defaultDensity) {

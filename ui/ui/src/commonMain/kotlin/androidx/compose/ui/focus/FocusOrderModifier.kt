@@ -19,6 +19,7 @@ package androidx.compose.ui.focus
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.LayoutDirection
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * A [modifier][Modifier.Element] that can be used to set a custom focus traversal order.
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.LayoutDirection
  * @see Modifier.focusOrder
  */
 @Deprecated("Use Modifier.focusProperties() instead")
+@JvmDefaultWithCompatibility
 interface FocusOrderModifier : Modifier.Element {
 
     /**

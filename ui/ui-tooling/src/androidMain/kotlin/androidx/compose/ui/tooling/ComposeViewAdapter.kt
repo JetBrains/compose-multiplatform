@@ -49,7 +49,6 @@ import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.platform.LocalFontLoader
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.text.font.createFontFamilyResolver
-import androidx.compose.ui.tooling.ComposableInvoker.invokeComposable
 import androidx.compose.ui.tooling.animation.PreviewAnimationClock
 import androidx.compose.ui.tooling.data.Group
 import androidx.compose.ui.tooling.data.SourceLocation
@@ -553,6 +552,7 @@ internal class ComposeViewAdapter : FrameLayout {
      * @param onCommit callback invoked after every commit of the preview composable.
      * @param onDraw callback invoked after every draw of the adapter. Only for test use.
      */
+    @Suppress("DEPRECATION")
     @OptIn(ExperimentalComposeUiApi::class)
     @VisibleForTesting
     internal fun init(
@@ -587,7 +587,7 @@ internal class ComposeViewAdapter : FrameLayout {
                 // class loads correctly.
                 val composable = {
                     try {
-                        invokeComposable(
+                        ComposableInvoker.invokeComposable(
                             className,
                             methodName,
                             composer,

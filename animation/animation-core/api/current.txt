@@ -46,7 +46,7 @@ package androidx.compose.animation.core {
     method @androidx.compose.runtime.Composable public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.runtime.State<T> animateValueAsState(T? targetValue, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, optional androidx.compose.animation.core.AnimationSpec<T> animationSpec, optional T? visibilityThreshold, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit>? finishedListener);
   }
 
-  public interface Animation<T, V extends androidx.compose.animation.core.AnimationVector> {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface Animation<T, V extends androidx.compose.animation.core.AnimationVector> {
     method public long getDurationNanos();
     method public T! getTargetValue();
     method public androidx.compose.animation.core.TwoWayConverter<T,V> getTypeConverter();
@@ -67,6 +67,8 @@ package androidx.compose.animation.core {
   }
 
   public enum AnimationEndReason {
+    method public static androidx.compose.animation.core.AnimationEndReason valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.animation.core.AnimationEndReason[] values();
     enum_constant public static final androidx.compose.animation.core.AnimationEndReason BoundReached;
     enum_constant public static final androidx.compose.animation.core.AnimationEndReason Finished;
   }
@@ -244,6 +246,74 @@ package androidx.compose.animation.core {
   }
 
   public final class EasingFunctionsKt {
+    method public static androidx.compose.animation.core.Easing getEase();
+    method public static androidx.compose.animation.core.Easing getEaseIn();
+    method public static androidx.compose.animation.core.Easing getEaseInBack();
+    method public static androidx.compose.animation.core.Easing getEaseInBounce();
+    method public static androidx.compose.animation.core.Easing getEaseInCirc();
+    method public static androidx.compose.animation.core.Easing getEaseInCubic();
+    method public static androidx.compose.animation.core.Easing getEaseInElastic();
+    method public static androidx.compose.animation.core.Easing getEaseInExpo();
+    method public static androidx.compose.animation.core.Easing getEaseInOut();
+    method public static androidx.compose.animation.core.Easing getEaseInOutBack();
+    method public static androidx.compose.animation.core.Easing getEaseInOutBounce();
+    method public static androidx.compose.animation.core.Easing getEaseInOutCirc();
+    method public static androidx.compose.animation.core.Easing getEaseInOutCubic();
+    method public static androidx.compose.animation.core.Easing getEaseInOutElastic();
+    method public static androidx.compose.animation.core.Easing getEaseInOutExpo();
+    method public static androidx.compose.animation.core.Easing getEaseInOutQuad();
+    method public static androidx.compose.animation.core.Easing getEaseInOutQuart();
+    method public static androidx.compose.animation.core.Easing getEaseInOutQuint();
+    method public static androidx.compose.animation.core.Easing getEaseInOutSine();
+    method public static androidx.compose.animation.core.Easing getEaseInQuad();
+    method public static androidx.compose.animation.core.Easing getEaseInQuart();
+    method public static androidx.compose.animation.core.Easing getEaseInQuint();
+    method public static androidx.compose.animation.core.Easing getEaseInSine();
+    method public static androidx.compose.animation.core.Easing getEaseOut();
+    method public static androidx.compose.animation.core.Easing getEaseOutBack();
+    method public static androidx.compose.animation.core.Easing getEaseOutBounce();
+    method public static androidx.compose.animation.core.Easing getEaseOutCirc();
+    method public static androidx.compose.animation.core.Easing getEaseOutCubic();
+    method public static androidx.compose.animation.core.Easing getEaseOutElastic();
+    method public static androidx.compose.animation.core.Easing getEaseOutExpo();
+    method public static androidx.compose.animation.core.Easing getEaseOutQuad();
+    method public static androidx.compose.animation.core.Easing getEaseOutQuart();
+    method public static androidx.compose.animation.core.Easing getEaseOutQuint();
+    method public static androidx.compose.animation.core.Easing getEaseOutSine();
+    property public static final androidx.compose.animation.core.Easing Ease;
+    property public static final androidx.compose.animation.core.Easing EaseIn;
+    property public static final androidx.compose.animation.core.Easing EaseInBack;
+    property public static final androidx.compose.animation.core.Easing EaseInBounce;
+    property public static final androidx.compose.animation.core.Easing EaseInCirc;
+    property public static final androidx.compose.animation.core.Easing EaseInCubic;
+    property public static final androidx.compose.animation.core.Easing EaseInElastic;
+    property public static final androidx.compose.animation.core.Easing EaseInExpo;
+    property public static final androidx.compose.animation.core.Easing EaseInOut;
+    property public static final androidx.compose.animation.core.Easing EaseInOutBack;
+    property public static final androidx.compose.animation.core.Easing EaseInOutBounce;
+    property public static final androidx.compose.animation.core.Easing EaseInOutCirc;
+    property public static final androidx.compose.animation.core.Easing EaseInOutCubic;
+    property public static final androidx.compose.animation.core.Easing EaseInOutElastic;
+    property public static final androidx.compose.animation.core.Easing EaseInOutExpo;
+    property public static final androidx.compose.animation.core.Easing EaseInOutQuad;
+    property public static final androidx.compose.animation.core.Easing EaseInOutQuart;
+    property public static final androidx.compose.animation.core.Easing EaseInOutQuint;
+    property public static final androidx.compose.animation.core.Easing EaseInOutSine;
+    property public static final androidx.compose.animation.core.Easing EaseInQuad;
+    property public static final androidx.compose.animation.core.Easing EaseInQuart;
+    property public static final androidx.compose.animation.core.Easing EaseInQuint;
+    property public static final androidx.compose.animation.core.Easing EaseInSine;
+    property public static final androidx.compose.animation.core.Easing EaseOut;
+    property public static final androidx.compose.animation.core.Easing EaseOutBack;
+    property public static final androidx.compose.animation.core.Easing EaseOutBounce;
+    property public static final androidx.compose.animation.core.Easing EaseOutCirc;
+    property public static final androidx.compose.animation.core.Easing EaseOutCubic;
+    property public static final androidx.compose.animation.core.Easing EaseOutElastic;
+    property public static final androidx.compose.animation.core.Easing EaseOutExpo;
+    property public static final androidx.compose.animation.core.Easing EaseOutQuad;
+    property public static final androidx.compose.animation.core.Easing EaseOutQuart;
+    property public static final androidx.compose.animation.core.Easing EaseOutQuint;
+    property public static final androidx.compose.animation.core.Easing EaseOutSine;
   }
 
   public final class EasingKt {
@@ -261,7 +331,7 @@ package androidx.compose.animation.core {
     method public <V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.VectorizedFiniteAnimationSpec<V> vectorize(androidx.compose.animation.core.TwoWayConverter<T,V> converter);
   }
 
-  public interface FloatAnimationSpec extends androidx.compose.animation.core.AnimationSpec<java.lang.Float> {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface FloatAnimationSpec extends androidx.compose.animation.core.AnimationSpec<java.lang.Float> {
     method public long getDurationNanos(float initialValue, float targetValue, float initialVelocity);
     method public default float getEndVelocity(float initialValue, float targetValue, float initialVelocity);
     method public float getValueFromNanos(long playTimeNanos, float initialValue, float targetValue, float initialVelocity);
@@ -320,7 +390,7 @@ package androidx.compose.animation.core {
 
   public final class InfiniteRepeatableSpec<T> implements androidx.compose.animation.core.AnimationSpec<T> {
     ctor public InfiniteRepeatableSpec(androidx.compose.animation.core.DurationBasedAnimationSpec<T> animation, optional androidx.compose.animation.core.RepeatMode repeatMode, optional long initialStartOffset);
-    method @Deprecated public androidx.compose.animation.core.InfiniteRepeatableSpec<T>! InfiniteRepeatableSpec(androidx.compose.animation.core.DurationBasedAnimationSpec<T> animation, optional androidx.compose.animation.core.RepeatMode repeatMode);
+    ctor @Deprecated public InfiniteRepeatableSpec(androidx.compose.animation.core.DurationBasedAnimationSpec<T> animation, optional androidx.compose.animation.core.RepeatMode repeatMode);
     method public androidx.compose.animation.core.DurationBasedAnimationSpec<T> getAnimation();
     method public long getInitialStartOffset();
     method public androidx.compose.animation.core.RepeatMode getRepeatMode();
@@ -373,13 +443,15 @@ package androidx.compose.animation.core {
   }
 
   public enum RepeatMode {
+    method public static androidx.compose.animation.core.RepeatMode valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.animation.core.RepeatMode[] values();
     enum_constant public static final androidx.compose.animation.core.RepeatMode Restart;
     enum_constant public static final androidx.compose.animation.core.RepeatMode Reverse;
   }
 
   @androidx.compose.runtime.Immutable public final class RepeatableSpec<T> implements androidx.compose.animation.core.FiniteAnimationSpec<T> {
     ctor public RepeatableSpec(int iterations, androidx.compose.animation.core.DurationBasedAnimationSpec<T> animation, optional androidx.compose.animation.core.RepeatMode repeatMode, optional long initialStartOffset);
-    method @Deprecated public androidx.compose.animation.core.RepeatableSpec<T>! RepeatableSpec(int iterations, androidx.compose.animation.core.DurationBasedAnimationSpec<T> animation, optional androidx.compose.animation.core.RepeatMode repeatMode);
+    ctor @Deprecated public RepeatableSpec(int iterations, androidx.compose.animation.core.DurationBasedAnimationSpec<T> animation, optional androidx.compose.animation.core.RepeatMode repeatMode);
     method public androidx.compose.animation.core.DurationBasedAnimationSpec<T> getAnimation();
     method public long getInitialStartOffset();
     method public int getIterations();
@@ -491,7 +563,7 @@ package androidx.compose.animation.core {
     property public final java.util.List<androidx.compose.animation.core.Transition<?>> transitions;
   }
 
-  public static interface Transition.Segment<S> {
+  @kotlin.jvm.JvmDefaultWithCompatibility public static interface Transition.Segment<S> {
     method public S! getInitialState();
     method public S! getTargetState();
     method public default infix boolean isTransitioningTo(S?, S? targetState);
@@ -557,7 +629,7 @@ package androidx.compose.animation.core {
     method public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.IntSize,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.unit.IntSize.Companion);
   }
 
-  public interface VectorizedAnimationSpec<V extends androidx.compose.animation.core.AnimationVector> {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface VectorizedAnimationSpec<V extends androidx.compose.animation.core.AnimationVector> {
     method public long getDurationNanos(V initialValue, V targetValue, V initialVelocity);
     method public default V getEndVelocity(V initialValue, V targetValue, V initialVelocity);
     method public V getValueFromNanos(long playTimeNanos, V initialValue, V targetValue, V initialVelocity);
@@ -578,7 +650,7 @@ package androidx.compose.animation.core {
     property public abstract float absVelocityThreshold;
   }
 
-  public interface VectorizedDurationBasedAnimationSpec<V extends androidx.compose.animation.core.AnimationVector> extends androidx.compose.animation.core.VectorizedFiniteAnimationSpec<V> {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface VectorizedDurationBasedAnimationSpec<V extends androidx.compose.animation.core.AnimationVector> extends androidx.compose.animation.core.VectorizedFiniteAnimationSpec<V> {
     method public int getDelayMillis();
     method public int getDurationMillis();
     method public default long getDurationNanos(V initialValue, V targetValue, V initialVelocity);
@@ -586,7 +658,7 @@ package androidx.compose.animation.core {
     property public abstract int durationMillis;
   }
 
-  public interface VectorizedFiniteAnimationSpec<V extends androidx.compose.animation.core.AnimationVector> extends androidx.compose.animation.core.VectorizedAnimationSpec<V> {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface VectorizedFiniteAnimationSpec<V extends androidx.compose.animation.core.AnimationVector> extends androidx.compose.animation.core.VectorizedAnimationSpec<V> {
     method public default boolean isInfinite();
     property public default boolean isInfinite;
   }
@@ -600,7 +672,7 @@ package androidx.compose.animation.core {
 
   public final class VectorizedInfiniteRepeatableSpec<V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.animation.core.VectorizedAnimationSpec<V> {
     ctor public VectorizedInfiniteRepeatableSpec(androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> animation, optional androidx.compose.animation.core.RepeatMode repeatMode, optional long initialStartOffset);
-    method @Deprecated public androidx.compose.animation.core.VectorizedInfiniteRepeatableSpec<V>! VectorizedInfiniteRepeatableSpec(androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> animation, optional androidx.compose.animation.core.RepeatMode repeatMode);
+    ctor @Deprecated public VectorizedInfiniteRepeatableSpec(androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> animation, optional androidx.compose.animation.core.RepeatMode repeatMode);
     method public long getDurationNanos(V initialValue, V targetValue, V initialVelocity);
     method public V getValueFromNanos(long playTimeNanos, V initialValue, V targetValue, V initialVelocity);
     method public V getVelocityFromNanos(long playTimeNanos, V initialValue, V targetValue, V initialVelocity);
@@ -620,7 +692,7 @@ package androidx.compose.animation.core {
 
   public final class VectorizedRepeatableSpec<V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.animation.core.VectorizedFiniteAnimationSpec<V> {
     ctor public VectorizedRepeatableSpec(int iterations, androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> animation, optional androidx.compose.animation.core.RepeatMode repeatMode, optional long initialStartOffset);
-    method @Deprecated public androidx.compose.animation.core.VectorizedRepeatableSpec<V>! VectorizedRepeatableSpec(int iterations, androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> animation, optional androidx.compose.animation.core.RepeatMode repeatMode);
+    ctor @Deprecated public VectorizedRepeatableSpec(int iterations, androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec<V> animation, optional androidx.compose.animation.core.RepeatMode repeatMode);
     method public long getDurationNanos(V initialValue, V targetValue, V initialVelocity);
     method public V getValueFromNanos(long playTimeNanos, V initialValue, V targetValue, V initialVelocity);
     method public V getVelocityFromNanos(long playTimeNanos, V initialValue, V targetValue, V initialVelocity);

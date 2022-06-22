@@ -28,7 +28,6 @@ import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.tooling.ComposableInvoker.invokeComposable
 
 /**
  * Activity used to run `@Composable` previews from Android Studio.
@@ -59,6 +58,7 @@ class PreviewActivity : ComponentActivity() {
         intent?.getStringExtra("composable")?.let { setComposableContent(it) }
     }
 
+    @Suppress("DEPRECATION")
     @OptIn(ExperimentalComposeUiApi::class)
     private fun setComposableContent(composableFqn: String) {
         Log.d(TAG, "PreviewActivity has composable $composableFqn")
@@ -71,7 +71,7 @@ class PreviewActivity : ComponentActivity() {
         }
         Log.d(TAG, "Previewing '$methodName' without a parameter provider.")
         setContent {
-            invokeComposable(
+            ComposableInvoker.invokeComposable(
                 className,
                 methodName,
                 currentComposer
@@ -86,6 +86,7 @@ class PreviewActivity : ComponentActivity() {
      * Otherwise, the content will display a FAB that changes the argument value on click, cycling
      * through all the values in the provider's sequence.
      */
+    @Suppress("DEPRECATION")
     @OptIn(ExperimentalComposeUiApi::class)
     private fun setParameterizedContent(
         className: String,
@@ -107,7 +108,7 @@ class PreviewActivity : ComponentActivity() {
 
                 Scaffold(
                     content = {
-                        invokeComposable(
+                        ComposableInvoker.invokeComposable(
                             className,
                             methodName,
                             currentComposer,
@@ -124,7 +125,7 @@ class PreviewActivity : ComponentActivity() {
             }
         } else {
             setContent {
-                invokeComposable(
+                ComposableInvoker.invokeComposable(
                     className,
                     methodName,
                     currentComposer,

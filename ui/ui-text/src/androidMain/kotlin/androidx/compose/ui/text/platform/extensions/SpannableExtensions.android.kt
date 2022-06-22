@@ -202,6 +202,7 @@ internal fun Spannable.setSpanStyles(
     }
 }
 
+@OptIn(ExperimentalTextApi::class)
 private fun Spannable.setSpanStyle(
     spanStyleRange: AnnotatedString.Range<SpanStyle>,
     density: Density,
@@ -217,7 +218,7 @@ private fun Spannable.setSpanStyle(
 
     setColor(style.color, start, end)
 
-    setBrush(style.brush, start, end)
+    setBrush(style.brush, style.alpha, start, end)
 
     setTextDecoration(style.textDecoration, start, end)
 
@@ -494,6 +495,7 @@ private fun Spannable.setBaselineShift(baselineShift: BaselineShift?, start: Int
 
 private fun Spannable.setBrush(
     brush: Brush?,
+    alpha: Float,
     start: Int,
     end: Int
 ) {
@@ -503,7 +505,7 @@ private fun Spannable.setBrush(
                 setColor(brush.value, start, end)
             }
             is ShaderBrush -> {
-                setSpan(ShaderBrushSpan(brush), start, end)
+                setSpan(ShaderBrushSpan(brush, alpha), start, end)
             }
         }
     }

@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.Pager
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
@@ -291,6 +290,15 @@ private object ListsSnippetsItemKeys {
     }
 }
 
+@Composable
+private fun ListsContentTypeSnippet() {
+    LazyColumn {
+        items(elements, contentType = { it.type }) {
+            // ...
+        }
+    }
+}
+
 // ========================
 // Fakes below
 // ========================
@@ -331,3 +339,6 @@ private fun ScrollToTopButton(onClick: () -> Unit = {}) = Unit
 private object MyAnalyticsService {
     fun sendScrolledPastFirstItemEvent() = Unit
 }
+
+private class ContentTypeElement(val type: Long)
+private val elements = listOf<ContentTypeElement>()

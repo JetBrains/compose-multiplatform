@@ -26,10 +26,12 @@ import androidx.compose.ui.input.pointer.PointerEventPass.Initial
 import androidx.compose.ui.input.pointer.PointerEventPass.Main
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.unit.IntSize
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * A [Modifier.Element] that can interact with pointer input.
  */
+@JvmDefaultWithCompatibility
 interface PointerInputModifier : Modifier.Element {
     val pointerInputFilter: PointerInputFilter
 }
@@ -206,6 +208,9 @@ expect fun PointerButtons.indexOfLastPressed(): Int
  */
 @kotlin.jvm.JvmInline
 value class PointerKeyboardModifiers(internal val packedValue: NativePointerKeyboardModifiers)
+
+// helps initialize `WindowInfo.keyboardModifiers` with a non-null value
+internal expect fun EmptyPointerKeyboardModifiers(): PointerKeyboardModifiers
 
 /**
  * `true` when the Control key is pressed.

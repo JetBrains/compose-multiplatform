@@ -111,6 +111,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.PointerIconDefaults
 import androidx.compose.ui.input.pointer.PointerIconService
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
+import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 import androidx.compose.ui.input.pointer.PositionCalculator
 import androidx.compose.ui.input.pointer.ProcessResult
 import androidx.compose.ui.input.rotary.RotaryScrollEvent
@@ -328,7 +329,6 @@ internal class AndroidComposeView(context: Context) :
     private val tmpPositionArray = intArrayOf(0, 0)
     private val viewToWindowMatrix = Matrix()
     private val windowToViewMatrix = Matrix()
-    private val tmpCalculationMatrix = Matrix()
 
     @VisibleForTesting
     internal var lastMatrixRecalculationAnimationTime = -1L
@@ -530,6 +530,23 @@ internal class AndroidComposeView(context: Context) :
         }
     }
 
+    private val matrixToWindow = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        CalculateMatrixToWindowApi29()
+    } else {
+        CalculateMatrixToWindowApi21()
+    }
+
+    /**
+     * Keyboard modifiers state might be changed when window is not focused, so window doesn't
+     * receive any key events.
+     * This flag is set when window focus changes. Then we can rely on it when handling the
+     * first movementEvent to get the actual keyboard modifiers state from it.
+     * After window gains focus, the first motionEvent.metaState (after focus gained) is used
+     * to update windowInfo.keyboardModifiers.
+     * See [onWindowFocusChanged] and [sendMotionEvent]
+     */
+    private var keyboardModifiersRequireUpdate = false
+
     init {
         setWillNotDraw(false)
         isFocusable = true
@@ -580,6 +597,7 @@ internal class AndroidComposeView(context: Context) :
 
     override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
         _windowInfo.isWindowFocused = hasWindowFocus
+        keyboardModifiersRequireUpdate = true
         super.onWindowFocusChanged(hasWindowFocus)
 
         if (hasWindowFocus) {
@@ -604,6 +622,7 @@ internal class AndroidComposeView(context: Context) :
         if (isFocused) {
             // Focus lies within the Compose hierarchy, so we dispatch the key event to the
             // appropriate place.
+            _windowInfo.keyboardModifiers = PointerKeyboardModifiers(event.metaState)
             sendKeyEvent(KeyEvent(event))
         } else {
             // This Owner has a focused child view, which is a view interop use case,
@@ -768,16 +787,39 @@ internal class AndroidComposeView(context: Context) :
         measureAndLayoutDelegate.forceMeasureTheSubtree(layoutNode)
     }
 
-    override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
-        if (measureAndLayoutDelegate.requestRemeasure(layoutNode, forceRequest)) {
+    override fun onRequestMeasure(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean,
+        forceRequest: Boolean
+    ) {
+        if (affectsLookahead) {
+            if (measureAndLayoutDelegate.requestLookaheadRemeasure(layoutNode, forceRequest)) {
+                scheduleMeasureAndLayout(layoutNode)
+            }
+        } else if (measureAndLayoutDelegate.requestRemeasure(layoutNode, forceRequest)) {
             scheduleMeasureAndLayout(layoutNode)
         }
     }
 
-    override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) {
-        if (measureAndLayoutDelegate.requestRelayout(layoutNode, forceRequest)) {
-            scheduleMeasureAndLayout()
+    override fun onRequestRelayout(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean,
+        forceRequest: Boolean
+    ) {
+        if (affectsLookahead) {
+            if (measureAndLayoutDelegate.requestLookaheadRelayout(layoutNode, forceRequest)) {
+                scheduleMeasureAndLayout()
+            }
+        } else {
+            if (measureAndLayoutDelegate.requestRelayout(layoutNode, forceRequest)) {
+                scheduleMeasureAndLayout()
+            }
         }
+    }
+
+    override fun requestOnPositionedCallback(layoutNode: LayoutNode) {
+        measureAndLayoutDelegate.requestOnPositionedCallback(layoutNode)
+        scheduleMeasureAndLayout()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -1035,7 +1077,7 @@ internal class AndroidComposeView(context: Context) :
      */
     private fun invalidateLayoutNodeMeasurement(node: LayoutNode) {
         measureAndLayoutDelegate.requestRemeasure(node)
-        node._children.forEach { invalidateLayoutNodeMeasurement(it) }
+        node.forEachChild { invalidateLayoutNodeMeasurement(it) }
     }
 
     /**
@@ -1043,7 +1085,7 @@ internal class AndroidComposeView(context: Context) :
      */
     private fun invalidateLayers(node: LayoutNode) {
         node.invalidateLayers()
-        node._children.forEach { invalidateLayers(it) }
+        node.forEachChild { invalidateLayers(it) }
     }
 
     override fun invalidateDescendants() {
@@ -1128,6 +1170,8 @@ internal class AndroidComposeView(context: Context) :
     override fun dispatchGenericMotionEvent(event: MotionEvent) = when (event.actionMasked) {
         ACTION_SCROLL -> when {
             event.isFromSource(SOURCE_ROTARY_ENCODER) -> handleRotaryEvent(event)
+            isBadMotionEvent(event) || !isAttachedToWindow ->
+                super.dispatchGenericMotionEvent(event)
             else -> handleMotionEvent(event).dispatchedToAPointerInputModifier
         }
         else -> super.dispatchGenericMotionEvent(event)
@@ -1148,7 +1192,7 @@ internal class AndroidComposeView(context: Context) :
                 hoverExitReceived = false
             }
         }
-        if (isBadMotionEvent(motionEvent)) {
+        if (isBadMotionEvent(motionEvent) || !isAttachedToWindow) {
             return false // Bad MotionEvent. Don't handle it.
         }
 
@@ -1258,6 +1302,10 @@ internal class AndroidComposeView(context: Context) :
     }
 
     private fun sendMotionEvent(motionEvent: MotionEvent): ProcessResult {
+        if (keyboardModifiersRequireUpdate) {
+            keyboardModifiersRequireUpdate = false
+            _windowInfo.keyboardModifiers = PointerKeyboardModifiers(motionEvent.metaState)
+        }
         val pointerInputEvent =
             motionEventAdapter.convertToPointerInputEvent(motionEvent, this)
         return if (pointerInputEvent != null) {
@@ -1436,8 +1484,7 @@ internal class AndroidComposeView(context: Context) :
     }
 
     private fun recalculateWindowViewTransforms() {
-        viewToWindowMatrix.reset()
-        transformMatrixToWindow(this, viewToWindowMatrix)
+        matrixToWindow.calculateMatrixToWindow(this, viewToWindowMatrix)
         viewToWindowMatrix.invertTo(windowToViewMatrix)
     }
 
@@ -1487,7 +1534,7 @@ internal class AndroidComposeView(context: Context) :
             removeCallbacks(sendHoverExitEvent)
             sendHoverExitEvent.run()
         }
-        if (isBadMotionEvent(event)) {
+        if (isBadMotionEvent(event) || !isAttachedToWindow) {
             return false // Bad MotionEvent. Don't handle it.
         }
         if (event.isFromSource(InputDevice.SOURCE_TOUCHSCREEN) &&
@@ -1525,10 +1572,10 @@ internal class AndroidComposeView(context: Context) :
     }
 
     private fun isBadMotionEvent(event: MotionEvent): Boolean {
-        return event.x.isNaN() ||
-            event.y.isNaN() ||
-            event.rawX.isNaN() ||
-            event.rawY.isNaN()
+        return !event.x.isFinite() ||
+            !event.y.isFinite() ||
+            !event.rawX.isFinite() ||
+            !event.rawY.isFinite()
     }
 
     private fun isPositionChanged(event: MotionEvent): Boolean {
@@ -1610,42 +1657,6 @@ internal class AndroidComposeView(context: Context) :
     override val isLifecycleInResumedState: Boolean
         get() = viewTreeOwners?.lifecycleOwner
             ?.lifecycle?.currentState == Lifecycle.State.RESUMED
-
-    private fun transformMatrixToWindow(view: View, matrix: Matrix) {
-        val parentView = view.parent
-        if (parentView is View) {
-            transformMatrixToWindow(parentView, matrix)
-            matrix.preTranslate(-view.scrollX.toFloat(), -view.scrollY.toFloat())
-            matrix.preTranslate(view.left.toFloat(), view.top.toFloat())
-        } else {
-            view.getLocationInWindow(tmpPositionArray)
-            matrix.preTranslate(-view.scrollX.toFloat(), -view.scrollY.toFloat())
-            matrix.preTranslate(tmpPositionArray[0].toFloat(), tmpPositionArray[1].toFloat())
-        }
-
-        val viewMatrix = view.matrix
-        if (!viewMatrix.isIdentity) {
-            matrix.preConcat(viewMatrix)
-        }
-    }
-
-    /**
-     * Like [android.graphics.Matrix.preConcat], for a Compose [Matrix] that accepts an [other]
-     * [android.graphics.Matrix].
-     */
-    private fun Matrix.preConcat(other: android.graphics.Matrix) {
-        tmpCalculationMatrix.setFrom(other)
-        preTransform(tmpCalculationMatrix)
-    }
-
-    /**
-     * Like [android.graphics.Matrix.preTranslate], for a Compose [Matrix]
-     */
-    private fun Matrix.preTranslate(x: Float, y: Float) {
-        tmpCalculationMatrix.reset()
-        tmpCalculationMatrix.translate(x, y)
-        preTransform(tmpCalculationMatrix)
-    }
 
     override fun shouldDelayChildPressedState(): Boolean = false
 
@@ -1804,4 +1815,82 @@ private fun dot(m1: Matrix, row: Int, m2: Matrix, column: Int): Float {
         m1[row, 1] * m2[1, column] +
         m1[row, 2] * m2[2, column] +
         m1[row, 3] * m2[3, column]
+}
+
+private interface CalculateMatrixToWindow {
+    /**
+     * Calculates the matrix from [view] to screen coordinates and returns the value in [matrix].
+     */
+    fun calculateMatrixToWindow(view: View, matrix: Matrix)
+}
+
+@RequiresApi(Build.VERSION_CODES.Q)
+private class CalculateMatrixToWindowApi29 : CalculateMatrixToWindow {
+    private val tmpMatrix = android.graphics.Matrix()
+    private val tmpPosition = IntArray(2)
+
+    @DoNotInline
+    override fun calculateMatrixToWindow(view: View, matrix: Matrix) {
+        tmpMatrix.reset()
+        view.transformMatrixToGlobal(tmpMatrix)
+        var parent = view.parent
+        var root = view
+        while (parent is View) {
+            root = parent
+            parent = root.parent
+        }
+        root.getLocationOnScreen(tmpPosition)
+        val (screenX, screenY) = tmpPosition
+        root.getLocationInWindow(tmpPosition)
+        val (windowX, windowY) = tmpPosition
+        tmpMatrix.postTranslate((windowX - screenX).toFloat(), (windowY - screenY).toFloat())
+        matrix.setFrom(tmpMatrix)
+    }
+}
+
+private class CalculateMatrixToWindowApi21 : CalculateMatrixToWindow {
+    private val tmpLocation = IntArray(2)
+    private val tmpMatrix = Matrix()
+
+    override fun calculateMatrixToWindow(view: View, matrix: Matrix) {
+        matrix.reset()
+        transformMatrixToWindow(view, matrix)
+    }
+
+    private fun transformMatrixToWindow(view: View, matrix: Matrix) {
+        val parentView = view.parent
+        if (parentView is View) {
+            transformMatrixToWindow(parentView, matrix)
+            matrix.preTranslate(-view.scrollX.toFloat(), -view.scrollY.toFloat())
+            matrix.preTranslate(view.left.toFloat(), view.top.toFloat())
+        } else {
+            val pos = tmpLocation
+            view.getLocationInWindow(pos)
+            matrix.preTranslate(-view.scrollX.toFloat(), -view.scrollY.toFloat())
+            matrix.preTranslate(pos[0].toFloat(), pos[1].toFloat())
+        }
+
+        val viewMatrix = view.matrix
+        if (!viewMatrix.isIdentity) {
+            matrix.preConcat(viewMatrix)
+        }
+    }
+
+    /**
+     * Like [android.graphics.Matrix.preConcat], for a Compose [Matrix] that accepts an [other]
+     * [android.graphics.Matrix].
+     */
+    private fun Matrix.preConcat(other: android.graphics.Matrix) {
+        tmpMatrix.setFrom(other)
+        preTransform(tmpMatrix)
+    }
+
+    /**
+     * Like [android.graphics.Matrix.preTranslate], for a Compose [Matrix]
+     */
+    private fun Matrix.preTranslate(x: Float, y: Float) {
+        tmpMatrix.reset()
+        tmpMatrix.translate(x, y)
+        preTransform(tmpMatrix)
+    }
 }

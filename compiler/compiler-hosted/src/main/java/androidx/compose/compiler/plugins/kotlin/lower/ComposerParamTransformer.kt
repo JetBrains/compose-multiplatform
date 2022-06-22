@@ -78,6 +78,7 @@ import org.jetbrains.kotlin.ir.util.explicitParameters
 import org.jetbrains.kotlin.ir.util.fileOrNull
 import org.jetbrains.kotlin.ir.util.findAnnotation
 import org.jetbrains.kotlin.ir.util.functions
+import org.jetbrains.kotlin.ir.util.getInlineClassUnderlyingType
 import org.jetbrains.kotlin.ir.util.isFakeOverride
 import org.jetbrains.kotlin.ir.util.isVararg
 import org.jetbrains.kotlin.ir.util.module
@@ -88,7 +89,6 @@ import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.load.java.JvmAbi
 import org.jetbrains.kotlin.platform.js.isJs
 import org.jetbrains.kotlin.platform.jvm.isJvm
-import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.multiplatform.findCompatibleExpectsForActual
 import org.jetbrains.kotlin.util.OperatorNameConventions
@@ -97,11 +97,10 @@ import org.jetbrains.kotlin.util.OperatorNameConventions
 class ComposerParamTransformer(
     context: IrPluginContext,
     symbolRemapper: DeepCopySymbolRemapper,
-    bindingTrace: BindingTrace,
     private val decoysEnabled: Boolean,
     metrics: ModuleMetrics,
 ) :
-    AbstractComposeLowering(context, symbolRemapper, bindingTrace, metrics),
+    AbstractComposeLowering(context, symbolRemapper, metrics),
     ModuleLoweringPass {
 
     /**
@@ -213,7 +212,8 @@ class ComposerParamTransformer(
                     it.putValueArgument(i, defaultArgumentFor(param))
                 }
             }
-            val realValueParams = valueArgumentsCount
+            val valueParams = valueArgumentsCount
+            val realValueParams = valueParams - ownerFn.contextReceiverParametersCount
             var argIndex = valueArgumentsCount
             it.putValueArgument(
                 argIndex++,
@@ -237,9 +237,9 @@ class ComposerParamTransformer(
             }
 
             // $default[n]
-            for (i in 0 until defaultParamCount(realValueParams)) {
+            for (i in 0 until defaultParamCount(valueParams)) {
                 val start = i * BITS_PER_INT
-                val end = min(start + BITS_PER_INT, realValueParams)
+                val end = min(start + BITS_PER_INT, valueParams)
                 if (argIndex < ownerFn.valueParameters.size) {
                     val bits = argumentsMissing
                         .toBooleanArray()
@@ -278,7 +278,7 @@ class ComposerParamTransformer(
         endOffset: Int = UNDEFINED_OFFSET
     ): IrExpression {
         val classSymbol = classOrNull
-        if (this !is IrSimpleType || hasQuestionMark || classSymbol?.owner?.isInline != true) {
+        if (this !is IrSimpleType || hasQuestionMark || !isInlineClassType()) {
             return if (isMarkedNullable()) {
                 IrConstImpl.constNull(startOffset, endOffset, context.irBuiltIns.nothingNType)
             } else {
@@ -294,8 +294,8 @@ class ComposerParamTransformer(
                 this
             )
         } else {
-            val ctor = classSymbol.constructors.first()
-            val underlyingType = getUnderlyingType(classSymbol.owner)
+            val ctor = classSymbol!!.constructors.first()
+            val underlyingType = getInlineClassUnderlyingType(classSymbol.owner)
 
             // TODO(lmr): We should not be calling the constructor here, but this seems like a
             //  reasonable interim solution.
@@ -355,7 +355,7 @@ class ComposerParamTransformer(
     private fun IrFunction.lambdaInvokeWithComposerParam(): IrFunction {
         val descriptor = descriptor
         val argCount = descriptor.valueParameters.size
-        val extraParams = composeSyntheticParamCount(argCount, hasDefaults = false)
+        val extraParams = composeSyntheticParamCount(argCount)
         val newFnClass = context.function(argCount + extraParams).owner
         val newInvoke = newFnClass.functions.first {
             it.name == OperatorNameConventions.INVOKE
@@ -435,6 +435,7 @@ class ComposerParamTransformer(
                     )
                 )
             }
+            fn.contextReceiverParametersCount = contextReceiverParametersCount
             fn.annotations = annotations.toList()
             fn.metadata = metadata
             fn.body = moveBodyTo(fn)?.copyWithNewTypeParams(this, fn)
@@ -546,7 +547,8 @@ class ComposerParamTransformer(
                 .zip(fn.explicitParameters)
                 .toMap()
 
-            val realParams = fn.valueParameters.size
+            val currentParams = fn.valueParameters.size
+            val realParams = currentParams - fn.contextReceiverParametersCount
 
             // $composer
             val composerParam = fn.addValueParameter {
@@ -568,7 +570,7 @@ class ComposerParamTransformer(
             // $default[n]
             if (oldFn.requiresDefaultParameter()) {
                 val defaults = KtxNameConventions.DEFAULT_PARAMETER.identifier
-                for (i in 0 until defaultParamCount(realParams)) {
+                for (i in 0 until defaultParamCount(currentParams)) {
                     fn.addValueParameter(
                         if (i == 0) defaults else "$defaults$i",
                         context.irBuiltIns.intType,

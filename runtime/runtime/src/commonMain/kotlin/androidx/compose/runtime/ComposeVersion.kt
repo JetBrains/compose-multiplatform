@@ -28,5 +28,5 @@ internal object ComposeVersion {
      * IMPORTANT: Whenever updating this value, please make sure to also update `versionTable` and
      * `minimumRuntimeVersionInt` in `VersionChecker.kt` of the compiler.
      */
-    const val version: Int = 6800
+    const val version: Int = 8000
 }

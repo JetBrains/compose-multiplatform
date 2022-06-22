@@ -51,7 +51,7 @@ internal class OnPositionedDispatcher {
         layoutNode.dispatchOnPositionedCallbacks()
         layoutNode.needsOnPositionedDispatch = false
 
-        layoutNode._children.forEach { child ->
+        layoutNode.forEachChild { child ->
             dispatchHierarchy(child)
         }
     }

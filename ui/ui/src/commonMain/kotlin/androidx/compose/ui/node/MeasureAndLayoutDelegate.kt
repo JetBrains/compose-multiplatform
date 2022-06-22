@@ -18,13 +18,14 @@ package androidx.compose.ui.node
 
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.layout.OnGloballyPositionedModifier
+import androidx.compose.ui.node.LayoutNode.LayoutState.Idle
 import androidx.compose.ui.node.LayoutNode.LayoutState.LayingOut
 import androidx.compose.ui.node.LayoutNode.LayoutState.Measuring
-import androidx.compose.ui.node.LayoutNode.LayoutState.Idle
+import androidx.compose.ui.node.LayoutNode.LayoutState.LookaheadLayingOut
+import androidx.compose.ui.node.LayoutNode.LayoutState.LookaheadMeasuring
 import androidx.compose.ui.node.LayoutNode.UsageByParent.InLayoutBlock
 import androidx.compose.ui.node.LayoutNode.UsageByParent.InMeasureBlock
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.util.fastForEach
 
 /**
  * Keeps track of [LayoutNode]s which needs to be remeasured or relaid out.
@@ -80,7 +81,9 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
      * during the previous measure/layout pass and they were already measured as part of it.
      * See [requestRemeasure] for more details.
      */
-    private val postponedMeasureRequests = mutableListOf<LayoutNode>()
+    private val postponedMeasureRequests = mutableVectorOf<LayoutNode>()
+
+    private val postponedLookaheadMeasureRequests = mutableVectorOf<LayoutNode>()
 
     private var rootConstraints: Constraints? = null
 
@@ -101,11 +104,59 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
             LayoutTreeConsistencyChecker(
                 root,
                 relayoutNodes,
-                postponedMeasureRequests
+                postponedMeasureRequests.asMutableList(),
+                postponedLookaheadMeasureRequests.asMutableList(),
             )
         } else {
             null
         }
+
+    /**
+     * Requests lookahead remeasure for this [layoutNode] and nodes affected by its measure result
+     *
+     * Note: This should only be called on a [LayoutNode] in the subtree defined in a
+     * LookaheadLayout. The caller is responsible for checking with [LayoutNode.mLookaheadScope]
+     * is valid (i.e. non-null) before calling this method.
+     *
+     * @return true if the [measureAndLayout] execution should be scheduled as a result
+     * of the request.
+     */
+    fun requestLookaheadRemeasure(layoutNode: LayoutNode, forced: Boolean = false): Boolean {
+        check(layoutNode.mLookaheadScope != null) {
+            "Error: requestLookaheadRemeasure cannot be called on a node outside" +
+                " LookaheadLayout"
+        }
+        return when (layoutNode.layoutState) {
+            LookaheadMeasuring -> {
+                // requestLookaheadRemeasure has already been called for this node or
+                // we're currently measuring it, let's swallow.
+                false
+            }
+            Measuring, LookaheadLayingOut, LayingOut -> {
+                // requestLookaheadRemeasure is currently laying out and it is incorrect to
+                // request lookahead remeasure now, let's postpone it.
+                postponedLookaheadMeasureRequests.add(layoutNode)
+                consistencyChecker?.assertConsistent()
+                false
+            }
+            Idle -> {
+                if (layoutNode.lookaheadMeasurePending && !forced) {
+                    false
+                } else {
+                    layoutNode.markLookaheadMeasurePending()
+                    layoutNode.markMeasurePending()
+                    if (layoutNode.isPlacedInLookahead == true ||
+                        layoutNode.canAffectParentInLookahead
+                    ) {
+                        if (layoutNode.parent?.lookaheadMeasurePending != true) {
+                            relayoutNodes.add(layoutNode)
+                        }
+                    }
+                    !duringMeasureLayout
+                }
+            }
+        }
+    }
 
     /**
      * Requests remeasure for this [layoutNode] and nodes affected by its measure result.
@@ -115,14 +166,14 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
      */
     fun requestRemeasure(layoutNode: LayoutNode, forced: Boolean = false): Boolean =
         when (layoutNode.layoutState) {
-            Measuring -> {
+            Measuring, LookaheadMeasuring -> {
                 // requestMeasure has already been called for this node or
                 // we're currently measuring it, let's swallow. example when it happens: we compose
                 // DataNode inside BoxWithConstraints, this calls onRequestMeasure on DataNode's
                 // parent, but this parent is BoxWithConstraints which is currently measuring.
                 false
             }
-            LayingOut -> {
+            LookaheadLayingOut, LayingOut -> {
                 // requestMeasure is currently laying out and it is incorrect to request remeasure
                 // now, let's postpone it.
                 postponedMeasureRequests.add(layoutNode)
@@ -145,6 +196,48 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
         }
 
     /**
+     * Requests lookahead relayout for this [layoutNode] and nodes affected by its position.
+     *
+     * @return true if the [measureAndLayout] execution should be scheduled as a result
+     * of the request.
+     */
+    fun requestLookaheadRelayout(layoutNode: LayoutNode, forced: Boolean = false): Boolean =
+        when (layoutNode.layoutState) {
+            LookaheadMeasuring, LookaheadLayingOut -> {
+                // Don't need to do anything else since the parent is already scheduled
+                // for a lookahead relayout (lookahead measure will trigger lookahead
+                // relayout), or lookahead layout is in process right now
+                consistencyChecker?.assertConsistent()
+                false
+            }
+            Measuring, LayingOut, Idle -> {
+                if ((layoutNode.lookaheadMeasurePending || layoutNode.lookaheadLayoutPending) &&
+                    !forced
+                ) {
+                    // Don't need to do anything else since the parent is already scheduled
+                    // for a lookahead relayout (lookahead measure will trigger lookahead
+                    // relayout)
+                    consistencyChecker?.assertConsistent()
+                    false
+                } else {
+                    // Mark both lookahead layout and layout as pending, as layout has a
+                    // dependency on lookahead layout.
+                    layoutNode.markLookaheadLayoutPending()
+                    layoutNode.markLayoutPending()
+                    if (layoutNode.isPlacedInLookahead == true) {
+                        val parent = layoutNode.parent
+                        if (parent?.lookaheadMeasurePending != true &&
+                            parent?.lookaheadLayoutPending != true
+                        ) {
+                            relayoutNodes.add(layoutNode)
+                        }
+                    }
+                    !duringMeasureLayout
+                }
+            }
+        }
+
+    /**
      * Requests relayout for this [layoutNode] and nodes affected by its position.
      *
      * @return true if the [measureAndLayout] execution should be scheduled as a result
@@ -152,7 +245,7 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
      */
     fun requestRelayout(layoutNode: LayoutNode, forced: Boolean = false): Boolean =
         when (layoutNode.layoutState) {
-            Measuring, LayingOut -> {
+            Measuring, LookaheadMeasuring, LookaheadLayingOut, LayingOut -> {
                 // don't need to do anything else since the parent is already scheduled
                 // for a relayout (measure will trigger relayout), or is laying out right now
                 consistencyChecker?.assertConsistent()
@@ -178,8 +271,36 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
         }
 
     /**
+     * Request that [layoutNode] and children should call their position change callbacks.
+     */
+    fun requestOnPositionedCallback(layoutNode: LayoutNode) {
+        onPositionedDispatcher.onNodePositioned(layoutNode)
+    }
+
+    /**
      * @return true if the [LayoutNode] size has been changed.
      */
+    private fun doLookaheadRemeasure(layoutNode: LayoutNode, constraints: Constraints?): Boolean {
+        if (layoutNode.mLookaheadScope == null) return false
+        val lookaheadSizeChanged = if (constraints != null) {
+            layoutNode.lookaheadRemeasure(constraints)
+        } else {
+            layoutNode.lookaheadRemeasure()
+        }
+
+        val parent = layoutNode.parent
+        if (lookaheadSizeChanged && parent != null) {
+            if (parent.mLookaheadScope == null) {
+                requestRemeasure(parent)
+            } else if (layoutNode.measuredByParentInLookahead == InMeasureBlock) {
+                requestLookaheadRemeasure(parent)
+            } else if (layoutNode.measuredByParentInLookahead == InLayoutBlock) {
+                requestLookaheadRelayout(parent)
+            }
+        }
+        return lookaheadSizeChanged
+    }
+
     private fun doRemeasure(layoutNode: LayoutNode, constraints: Constraints?): Boolean {
         val sizeChanged = if (constraints != null) {
             layoutNode.remeasure(constraints)
@@ -223,7 +344,13 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
             relayoutNodes.remove(layoutNode)
             // we don't check for the layoutState as even if the node doesn't need remeasure
             // it could be remeasured because the constraints changed.
+            val lookaheadSizeChanged = doLookaheadRemeasure(layoutNode, constraints)
             doRemeasure(layoutNode, constraints)
+            if ((lookaheadSizeChanged || layoutNode.lookaheadLayoutPending) &&
+                layoutNode.isPlacedInLookahead == true
+            ) {
+                layoutNode.lookaheadReplace()
+            }
             if (layoutNode.layoutPending && layoutNode.isPlaced) {
                 layoutNode.replace()
                 onPositionedDispatcher.onNodePositioned(layoutNode)
@@ -267,11 +394,22 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
         var sizeChanged = false
         if (layoutNode.isPlaced ||
             layoutNode.canAffectParent ||
-            layoutNode.alignmentLines.required
+            layoutNode.isPlacedInLookahead == true ||
+            layoutNode.canAffectParentInLookahead ||
+            layoutNode.alignmentLinesRequired
         ) {
-            if (layoutNode.measurePending) {
+            var lookaheadSizeChanged = false
+            if (layoutNode.lookaheadMeasurePending || layoutNode.measurePending) {
                 val constraints = if (layoutNode === root) rootConstraints!! else null
+                if (layoutNode.lookaheadMeasurePending) {
+                    lookaheadSizeChanged = doLookaheadRemeasure(layoutNode, constraints)
+                }
                 sizeChanged = doRemeasure(layoutNode, constraints)
+            }
+            if ((lookaheadSizeChanged || layoutNode.lookaheadLayoutPending) &&
+                layoutNode.isPlacedInLookahead == true
+            ) {
+                layoutNode.lookaheadReplace()
             }
             if (layoutNode.layoutPending && layoutNode.isPlaced) {
                 if (layoutNode === root) {
@@ -284,12 +422,20 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
             }
             // execute postponed `onRequestMeasure`
             if (postponedMeasureRequests.isNotEmpty()) {
-                postponedMeasureRequests.fastForEach {
+                postponedMeasureRequests.forEach {
                     if (it.isAttached) {
                         requestRemeasure(it)
                     }
                 }
                 postponedMeasureRequests.clear()
+            }
+            if (postponedLookaheadMeasureRequests.isNotEmpty()) {
+                postponedLookaheadMeasureRequests.forEach {
+                    if (it.isAttached) {
+                        requestLookaheadRemeasure(it)
+                    }
+                }
+                postponedLookaheadMeasureRequests.clear()
             }
         }
         return sizeChanged
@@ -312,7 +458,7 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
         // if this node is not yet measured this invocation shouldn't be needed.
         require(!layoutNode.measurePending)
 
-        layoutNode._children.forEach { child ->
+        layoutNode.forEachChild { child ->
             if (child.measurePending && relayoutNodes.remove(child)) {
                 remeasureAndRelayoutIfNeeded(child)
             }
@@ -358,5 +504,11 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
 
     private val LayoutNode.canAffectParent
         get() = measurePending &&
-            (measuredByParent == InMeasureBlock || alignmentLines.required)
+            (measuredByParent == InMeasureBlock ||
+                layoutDelegate.alignmentLinesOwner.alignmentLines.required)
+
+    private val LayoutNode.canAffectParentInLookahead
+        get() = lookaheadLayoutPending &&
+            (measuredByParentInLookahead == InMeasureBlock ||
+                layoutDelegate.lookaheadAlignmentLinesOwner?.alignmentLines?.required == true)
 }

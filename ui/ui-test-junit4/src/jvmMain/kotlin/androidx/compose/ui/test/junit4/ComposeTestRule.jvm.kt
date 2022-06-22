@@ -23,6 +23,7 @@ import androidx.compose.ui.test.MainTestClock
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.unit.Density
 import org.junit.rules.TestRule
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * A [TestRule] that allows you to test and control composables and applications using Compose.
@@ -49,6 +50,7 @@ import org.junit.rules.TestRule
  * Compose UI's setters (like [ComponentActivity.setContent][androidx.compose.ui.platform
  * .setContent]).
  */
+@JvmDefaultWithCompatibility
 interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
     /**
      * Current device screen's density.
@@ -150,6 +152,7 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
  * and set the content using one of Compose UI's setters (like [ComponentActivity
  * .setContent][androidx.activity.compose.setContent]).
  */
+@JvmDefaultWithCompatibility
 interface ComposeContentTestRule : ComposeTestRule {
     /**
      * Sets the given composable as a content of the current screen.

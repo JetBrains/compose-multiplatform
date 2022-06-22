@@ -948,9 +948,12 @@ class SliderTest {
                     RangeSlider(
                         values = 0f..0.5f,
                         onValueChange = {},
-                        modifier = Modifier.testTag(tag).weight(1f).onGloballyPositioned {
-                            sliderBounds = it.boundsInParent()
-                        }
+                        modifier = Modifier
+                            .testTag(tag)
+                            .weight(1f)
+                            .onGloballyPositioned {
+                                sliderBounds = it.boundsInParent()
+                            }
                     )
                     Spacer(Modifier.requiredSize(100.toDp()))
                 }
@@ -1038,7 +1041,7 @@ class SliderTest {
             ProgressBarRangeInfo(
                 5f,
                 0f..10f,
-                3
+                1
             )
         )
 
@@ -1046,7 +1049,7 @@ class SliderTest {
             ProgressBarRangeInfo(
                 10f,
                 5f..20f,
-                3,
+                2,
             )
         )
 
@@ -1057,9 +1060,9 @@ class SliderTest {
             .performSemanticsAction(SemanticsActions.SetProgress) { it(15f) }
 
         rule.onAllNodes(isFocusable(), true)[0]
-            .assertRangeInfoEquals(ProgressBarRangeInfo(10f, 0f..15f, 3))
+            .assertRangeInfoEquals(ProgressBarRangeInfo(10f, 0f..15f, 2))
 
         rule.onAllNodes(isFocusable(), true)[1]
-            .assertRangeInfoEquals(ProgressBarRangeInfo(15f, 10f..20f, 3))
+            .assertRangeInfoEquals(ProgressBarRangeInfo(15f, 10f..20f, 1))
     }
 }

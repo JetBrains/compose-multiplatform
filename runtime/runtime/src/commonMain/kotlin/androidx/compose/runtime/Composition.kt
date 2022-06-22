@@ -19,12 +19,12 @@ package androidx.compose.runtime
 
 import androidx.compose.runtime.collection.IdentityArrayMap
 import androidx.compose.runtime.collection.IdentityArraySet
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 import androidx.compose.runtime.collection.IdentityScopeMap
 import androidx.compose.runtime.snapshots.fastAll
 import androidx.compose.runtime.snapshots.fastAny
 import androidx.compose.runtime.snapshots.fastForEach
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * A composition object is usually constructed for you, and returned from an API that
@@ -400,6 +400,11 @@ internal class CompositionImpl(
     private val derivedStates = IdentityScopeMap<DerivedState<*>>()
 
     /**
+     * Used for testing. Returns dependencies of derived states that are currently observed.
+     */
+    internal val derivedStateDependencies get() = derivedStates.values.filterNotNull()
+
+    /**
      * A list of changes calculated by [Composer] to be applied to the [Applier] and the
      * [SlotTable] to reflect the result of composition. This is a list of lambdas that need to
      * be invoked in order to produce the desired effects.
@@ -674,12 +679,18 @@ internal class CompositionImpl(
             observations.removeValueIf { scope ->
                 scope in conditionallyInvalidatedScopes || invalidated?.let { scope in it } == true
             }
+            cleanUpDerivedStateObservations()
             conditionallyInvalidatedScopes.clear()
         } else {
             invalidated?.let {
                 observations.removeValueIf { scope -> scope in it }
+                cleanUpDerivedStateObservations()
             }
         }
+    }
+
+    private fun cleanUpDerivedStateObservations() {
+        derivedStates.removeValueIf { derivedValue -> derivedValue !in observations }
     }
 
     override fun recordReadOf(value: Any) {
@@ -691,6 +702,7 @@ internal class CompositionImpl(
 
                 // Record derived state dependency mapping
                 if (value is DerivedState<*>) {
+                    derivedStates.removeScope(value)
                     value.dependencies.forEach { dependency ->
                         derivedStates.add(dependency, value)
                     }
@@ -778,7 +790,7 @@ internal class CompositionImpl(
                 trace("Compose:unobserve") {
                     pendingInvalidScopes = false
                     observations.removeValueIf { scope -> !scope.valid }
-                    derivedStates.removeValueIf { derivedValue -> derivedValue !in observations }
+                    cleanUpDerivedStateObservations()
                 }
             }
         } finally {
@@ -904,6 +916,13 @@ internal class CompositionImpl(
 
     internal fun removeObservation(instance: Any, scope: RecomposeScopeImpl) {
         observations.remove(instance, scope)
+    }
+
+    internal fun removeDerivedStateObservation(state: DerivedState<*>) {
+        // remove derived state if it is not observed in other scopes
+        if (state !in observations) {
+            derivedStates.removeScope(state)
+        }
     }
 
     /**

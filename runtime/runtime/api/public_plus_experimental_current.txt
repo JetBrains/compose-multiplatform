@@ -24,7 +24,7 @@ package androidx.compose.runtime {
   public final class ActualJvm_jvmKt {
   }
 
-  public interface Applier<N> {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface Applier<N> {
     method public void clear();
     method public void down(N? node);
     method public N! getCurrent();
@@ -298,7 +298,7 @@ package androidx.compose.runtime {
   @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level.ERROR, message="This is internal API that may change frequently and without warning.") public @interface InternalComposeTracingApi {
   }
 
-  public interface MonotonicFrameClock extends kotlin.coroutines.CoroutineContext.Element {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface MonotonicFrameClock extends kotlin.coroutines.CoroutineContext.Element {
     method public default kotlin.coroutines.CoroutineContext.Key<?> getKey();
     method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R>);
     property public default kotlin.coroutines.CoroutineContext.Key<?> key;
@@ -415,6 +415,8 @@ package androidx.compose.runtime {
   }
 
   public enum Recomposer.State {
+    method public static androidx.compose.runtime.Recomposer.State valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.runtime.Recomposer.State[] values();
     enum_constant public static final androidx.compose.runtime.Recomposer.State Idle;
     enum_constant public static final androidx.compose.runtime.Recomposer.State Inactive;
     enum_constant public static final androidx.compose.runtime.Recomposer.State InactivePendingWork;
@@ -454,7 +456,7 @@ package androidx.compose.runtime {
   public final class SlotTableKt {
   }
 
-  public interface SnapshotMutationPolicy<T> {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface SnapshotMutationPolicy<T> {
     method public boolean equivalent(T? a, T? b);
     method public default T? merge(T? previous, T? current, T? applied);
   }
@@ -813,6 +815,18 @@ package androidx.compose.runtime.internal {
 
 }
 
+package androidx.compose.runtime.reflect {
+
+  public final class ComposableMethodInvokerKt {
+    method @kotlin.jvm.Throws(exceptionClasses=NoSuchMethodException::class) public static java.lang.reflect.Method getDeclaredComposableMethod(Class<?>, String methodName, Class<?>... args) throws java.lang.NoSuchMethodException;
+    method public static java.lang.reflect.Parameter![] getRealParameters(java.lang.reflect.Method);
+    method public static int getRealParametersCount(java.lang.reflect.Method);
+    method public static Object? invokeComposable(java.lang.reflect.Method, androidx.compose.runtime.Composer composer, Object? instance, java.lang.Object?... args);
+    method public static boolean isComposable(java.lang.reflect.Method);
+  }
+
+}
+
 package androidx.compose.runtime.snapshots {
 
   public final class ListUtilsKt {
@@ -998,7 +1012,7 @@ package androidx.compose.runtime.snapshots {
     method @Deprecated public void withNoObservations(kotlin.jvm.functions.Function0<kotlin.Unit> block);
   }
 
-  public interface StateObject {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface StateObject {
     method public androidx.compose.runtime.snapshots.StateRecord getFirstStateRecord();
     method public default androidx.compose.runtime.snapshots.StateRecord? mergeRecords(androidx.compose.runtime.snapshots.StateRecord previous, androidx.compose.runtime.snapshots.StateRecord current, androidx.compose.runtime.snapshots.StateRecord applied);
     method public void prependStateRecord(androidx.compose.runtime.snapshots.StateRecord value);
@@ -1022,7 +1036,7 @@ package androidx.compose.runtime.tooling {
     property public abstract boolean isEmpty;
   }
 
-  public interface CompositionGroup extends androidx.compose.runtime.tooling.CompositionData {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface CompositionGroup extends androidx.compose.runtime.tooling.CompositionData {
     method public Iterable<java.lang.Object> getData();
     method public default Object? getIdentity();
     method public Object getKey();

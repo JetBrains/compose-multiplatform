@@ -98,7 +98,7 @@ class ScrollToKeyTest {
         rule.onNode(hasScrollToKeyAction()).assertDoesNotExist()
         expectError<AssertionError>(
             expectedMessage = "Failed to scroll to the item identified by \"1\", " +
-                "the node is missing \\[SemanticsPropertyKey: ScrollToIndex\\].*"
+                "the node is missing \\[ScrollToIndex\\].*"
         ) {
             rule.onNodeWithTag("tag").performScrollToKey(1)
         }
@@ -115,7 +115,7 @@ class ScrollToKeyTest {
         rule.onNode(hasScrollToKeyAction()).assertDoesNotExist()
         expectError<AssertionError>(
             expectedMessage = "Failed to scroll to the item identified by \"1\", " +
-                "the node is missing \\[SemanticsPropertyKey: IndexForKey\\].*"
+                "the node is missing \\[IndexForKey\\].*"
         ) {
             rule.onNodeWithTag("tag").performScrollToKey(1)
         }

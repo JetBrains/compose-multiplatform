@@ -37,6 +37,7 @@ import com.android.tools.lint.detector.api.SourceCodeScanner
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiType
 import com.intellij.psi.impl.compiled.ClsMethodImpl
+import java.util.EnumSet
 import kotlinx.metadata.KmClassifier
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtDeclarationWithBody
@@ -45,7 +46,7 @@ import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtPropertyAccessor
 import org.jetbrains.kotlin.psi.KtUserType
-import org.jetbrains.kotlin.psi.psiUtil.containingClass
+import org.jetbrains.kotlin.psi.psiUtil.containingClassOrObject
 import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.UThisExpression
@@ -55,7 +56,6 @@ import org.jetbrains.uast.resolveToUElement
 import org.jetbrains.uast.toUElement
 import org.jetbrains.uast.tryResolve
 import org.jetbrains.uast.visitor.AbstractUastVisitor
-import java.util.EnumSet
 
 /**
  * [Detector] that checks functions returning Modifiers for consistency with guidelines.
@@ -90,16 +90,16 @@ class ModifierDeclarationDetector : Detector(), SourceCodeScanner {
 
             // Ignore properties in some cases
             if (source is KtProperty) {
-                // If this node is inside a class, ignore it.
-                if (source.containingClass() != null) return
+                // If this node is inside a class or object, ignore it.
+                if (source.containingClassOrObject != null) return
                 // If this node is a var, ignore it.
                 if (source.isVar) return
                 // If this node is a val with no getter, ignore it.
                 if (source.getter == null) return
             }
             if (source is KtPropertyAccessor) {
-                // If this node is inside a class, ignore it.
-                if (source.property.containingClass() != null) return
+                // If this node is inside a class or object, ignore it.
+                if (source.property.containingClassOrObject != null) return
                 // If this node is a getter on a var, ignore it.
                 if (source.property.isVar) return
             }

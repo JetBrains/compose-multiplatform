@@ -520,7 +520,26 @@ class SpannableExtensionsTest {
         )
 
         assertThat(spannable).hasSpan(ShaderBrushSpan::class, 0, text.length) {
-            it.shaderBrush == brush
+            it.shaderBrush == brush && it.alpha.isNaN()
+        }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun shaderBrush_shouldAdd_shaderBrushSpan_whenApplied_withSpecifiedAlpha() {
+        val text = "abcde abcde"
+        val brush = Brush.linearGradient(listOf(Color.Red, Color.Blue))
+        val spanStyle = SpanStyle(brush = brush, alpha = 0.6f)
+        val spannable = SpannableStringBuilder().apply { append(text) }
+        spannable.setSpanStyles(
+            contextTextStyle = TextStyle(),
+            spanStyles = listOf(AnnotatedString.Range(spanStyle, 0, text.length)),
+            density = Density(1f, 1f),
+            resolveTypeface = { _, _, _, _ -> Typeface.DEFAULT }
+        )
+
+        assertThat(spannable).hasSpan(ShaderBrushSpan::class, 0, text.length) {
+            it.shaderBrush == brush && it.alpha == 0.6f
         }
     }
 

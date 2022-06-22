@@ -137,6 +137,7 @@ import org.jetbrains.kotlin.ir.types.isDouble
 import org.jetbrains.kotlin.ir.types.isFloat
 import org.jetbrains.kotlin.ir.types.isInt
 import org.jetbrains.kotlin.ir.types.isLong
+import org.jetbrains.kotlin.ir.types.isMarkedNullable
 import org.jetbrains.kotlin.ir.types.isNothing
 import org.jetbrains.kotlin.ir.types.isNullableAny
 import org.jetbrains.kotlin.ir.types.isNullableNothing
@@ -152,7 +153,6 @@ import org.jetbrains.kotlin.ir.util.functions
 import org.jetbrains.kotlin.ir.util.getPropertyGetter
 import org.jetbrains.kotlin.ir.util.isLocal
 import org.jetbrains.kotlin.ir.util.isVararg
-import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.ir.util.properties
@@ -163,7 +163,6 @@ import org.jetbrains.kotlin.name.FqNameUnsafe
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.platform.js.isJs
 import org.jetbrains.kotlin.platform.jvm.isJvm
-import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 import org.jetbrains.kotlin.util.OperatorNameConventions
@@ -218,21 +217,39 @@ fun bitsForSlot(bits: Int, slot: Int): Int {
 fun defaultsParamIndex(index: Int): Int = index / BITS_PER_INT
 fun defaultsBitIndex(index: Int): Int = index.rem(BITS_PER_INT)
 
+/**
+ * The number of implicit ('this') parameters the function has.
+ *
+ * Note that extension and dispatch receiver params will not show up in [IrFunction.valueParameters]
+ * but context receiver parameter ([IrFunction.contextReceiverParametersCount]) will.
+ */
 val IrFunction.thisParamCount
-    get() = (
-        if (dispatchReceiverParameter != null) 1 else 0
-        ) + (
-        if (extensionReceiverParameter != null) 1 else 0
-        )
+    get() = contextReceiverParametersCount +
+        (if (dispatchReceiverParameter != null) 1 else 0) +
+        (if (extensionReceiverParameter != null) 1 else 0)
 
+/**
+ * Calculates the number of 'changed' params needed based on the function's parameters.
+ *
+ * @param realValueParams The number of params defined by the user, those that are not implicit
+ * (no extension or context receivers) or synthetic (no %composer, %changed or %defaults).
+ * @param thisParams The number of implicit params, i.e. [IrFunction.thisParamCount]
+ */
 fun changedParamCount(realValueParams: Int, thisParams: Int): Int {
-    if (realValueParams == 0) return 1
     val totalParams = realValueParams + thisParams
+    if (totalParams == 0) return 1 // There is always at least 1 changed param
     return ceil(
         totalParams.toDouble() / SLOTS_PER_INT.toDouble()
     ).toInt()
 }
 
+/**
+ * Calculates the number of 'changed' params needed based on the function's total amount of
+ * parameters.
+ *
+ * @param totalParamsIncludingThisParams The total number of parameter including implicit and
+ * synthetic ones.
+ */
 fun changedParamCountFromTotal(totalParamsIncludingThisParams: Int): Int {
     var realParams = totalParamsIncludingThisParams
     realParams-- // composer param
@@ -245,20 +262,24 @@ fun changedParamCountFromTotal(totalParamsIncludingThisParams: Int): Int {
     return changedParams
 }
 
-fun defaultParamCount(realValueParams: Int): Int {
+/**
+ * Calculates the number of 'defaults' params needed based on the function's parameters.
+ *
+ * @param valueParams The numbers of params, usually the size of [IrFunction.valueParameters].
+ * Which includes context receivers params, but not extension param nor synthetic params.
+ */
+fun defaultParamCount(valueParams: Int): Int {
     return ceil(
-        realValueParams.toDouble() / BITS_PER_INT.toDouble()
+        valueParams.toDouble() / BITS_PER_INT.toDouble()
     ).toInt()
 }
 
 fun composeSyntheticParamCount(
     realValueParams: Int,
     thisParams: Int = 0,
-    hasDefaults: Boolean = false
 ): Int {
     return 1 + // composer param
-        changedParamCount(realValueParams, thisParams) +
-        if (hasDefaults) defaultParamCount(realValueParams) else 0
+        changedParamCount(realValueParams, thisParams)
 }
 
 interface IrChangedBitMaskValue {
@@ -453,12 +474,11 @@ interface IrChangedBitMaskVariable : IrChangedBitMaskValue {
 class ComposableFunctionBodyTransformer(
     context: IrPluginContext,
     symbolRemapper: DeepCopySymbolRemapper,
-    bindingTrace: BindingTrace,
     metrics: ModuleMetrics,
     sourceInformationEnabled: Boolean,
     private val intrinsicRememberEnabled: Boolean
 ) :
-    AbstractComposeLowering(context, symbolRemapper, bindingTrace, metrics),
+    AbstractComposeLowering(context, symbolRemapper, metrics),
     FileLoweringPass,
     ModuleLoweringPass {
 
@@ -588,35 +608,6 @@ class ComposableFunctionBodyTransformer(
         getTopLevelFunctions(
             ComposeFqNames.fqNameFor(KtxNameConventions.SOURCEINFORMATIONMARKERSTART)
         ).map { it.owner }.first()
-    }
-
-    private val isTraceInProgressFunction by guardedLazy {
-        getTopLevelFunctions(
-            ComposeFqNames.fqNameFor(KtxNameConventions.IS_TRACE_IN_PROGRESS)
-        ).map { it.owner }.singleOrNull {
-            it.valueParameters.isEmpty()
-        }
-    }
-
-    private val traceEventStartFunction by guardedLazy {
-        getTopLevelFunctions(
-            ComposeFqNames.fqNameFor(KtxNameConventions.TRACE_EVENT_START)
-        ).map { it.owner }.singleOrNull {
-            it.valueParameters.map { p -> p.type } == listOf(
-                context.irBuiltIns.intType,
-                context.irBuiltIns.intType,
-                context.irBuiltIns.intType,
-                context.irBuiltIns.stringType
-            )
-        }
-    }
-
-    private val traceEventEndFunction by guardedLazy {
-        getTopLevelFunctions(
-            ComposeFqNames.fqNameFor(KtxNameConventions.TRACE_EVENT_END)
-        ).map { it.owner }.singleOrNull {
-            it.valueParameters.isEmpty()
-        }
     }
 
     private val sourceInformationMarkerEndFunction by guardedLazy {
@@ -1143,7 +1134,9 @@ class ComposableFunctionBodyTransformer(
             // NOTE: the unstable mask is indexed by valueParameter index, which is different
             // than the slotIndex but that is OKAY because we only care about defaults, which
             // also use the value parameter index.
-            val realParams = declaration.valueParameters.take(scope.realValueParamCount)
+            val realParams = declaration.valueParameters.take(
+                declaration.contextReceiverParametersCount + scope.realValueParamCount
+            )
             val unstableMask = realParams.map {
                 stabilityOf((it.varargElementType ?: it.type)).knownUnstable()
             }.toBooleanArray()
@@ -1181,7 +1174,6 @@ class ComposableFunctionBodyTransformer(
             body.startOffset,
             body.endOffset,
             listOfNotNull(
-                irTraceEventStart(irFunctionSourceKey(), declaration),
                 irStartRestartGroup(
                     body,
                     scope,
@@ -1613,8 +1605,10 @@ class ComposableFunctionBodyTransformer(
             )
         }
 
-        val parameterCount = function.symbol.descriptor.valueParameters.size
-        val changedIndex = numRealValueParameters + 1
+        val parameterCount = function.valueParameters.size
+        val contextParameterCount = function.contextReceiverParametersCount
+        val composerIndex = contextParameterCount + numRealValueParameters
+        val changedIndex = composerIndex + 1
         val defaultIndex = changedIndex + changedParamCount(
             numRealValueParameters,
             function.thisParamCount
@@ -1623,7 +1617,10 @@ class ComposableFunctionBodyTransformer(
         if (defaultParam == null) {
             require(parameterCount == defaultIndex) // param count is 1-based, index is 0-based
         } else {
-            require(parameterCount == defaultIndex + defaultParamCount(numRealValueParameters))
+            require(
+                parameterCount == defaultIndex +
+                    defaultParamCount(contextParameterCount + numRealValueParameters)
+            )
         }
 
         val lambda = IrFunctionImpl(
@@ -1687,7 +1684,7 @@ class ComposableFunctionBodyTransformer(
 
                         // new composer
                         putValueArgument(
-                            numRealValueParameters,
+                            composerIndex,
                             irGet(fn.valueParameters[0])
                         )
 
@@ -1720,7 +1717,6 @@ class ComposableFunctionBodyTransformer(
                     updateScopeFunction.symbol,
                     irLambda(lambda, updateScopeBlockType)
                 ),
-                irTraceEventEnd()
             )
         )
     }
@@ -1943,42 +1939,6 @@ class ComposableFunctionBodyTransformer(
             recordSourceParameter(it, 2, scope)
         }
     }
-
-    private fun irIsTraceInProgress(): IrExpression? =
-        isTraceInProgressFunction?.let { irCall(it) }
-
-    private fun irIfTraceInProgress(body: IrExpression): IrExpression? =
-        irIsTraceInProgress()?.let { isTraceInProgress ->
-            irIf(isTraceInProgress, body)
-        }
-
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
-    private fun irTraceEventStart(key: IrExpression, declaration: IrFunction): IrExpression? =
-        traceEventStartFunction?.let { traceEventStart ->
-            val startOffset = declaration.body!!.startOffset
-            val endOffset = declaration.body!!.endOffset
-
-            val name = declaration.kotlinFqName
-            val file = declaration.file.name
-            val line = declaration.file.fileEntry.getLineNumber(declaration.startOffset)
-            val traceInfo = "$name ($file:$line)" // TODO(174715171) decide on what to log
-            val dirty1 = irConst(-1) // placeholder TODO(228314276): implement
-            val dirty2 = irConst(-1) // placeholder TODO(228314276): implement
-
-            irIfTraceInProgress(
-                irCall(traceEventStart, startOffset, endOffset).also {
-                    it.putValueArgument(0, key)
-                    it.putValueArgument(1, dirty1)
-                    it.putValueArgument(2, dirty2)
-                    it.putValueArgument(3, irConst(traceInfo))
-                }
-            )
-        }
-
-    private fun irTraceEventEnd(): IrExpression? =
-        traceEventEndFunction?.let {
-            irIfTraceInProgress(irCall(it))
-        }
 
     private fun irSourceInformationMarkerEnd(
         element: IrElement,
@@ -2708,39 +2668,58 @@ class ComposableFunctionBodyTransformer(
 
         val ownerFn = expression.symbol.owner
         val numValueParams = ownerFn.valueParameters.size
+        val numContextParams = ownerFn.contextReceiverParametersCount
         val numDefaults: Int
         val numChanged: Int
         val numRealValueParams: Int
 
-        if (expression.isInvoke()) {
-            // in the case of an invoke, all of the parameters are going to be type parameter
-            // args which won't have special names. In this case, we know that the values cannot
+        val hasDefaults = ownerFn.valueParameters.any {
+            it.name == KtxNameConventions.DEFAULT_PARAMETER
+        }
+        if (!hasDefaults && expression.isInvoke()) {
+            // in the case of an invoke without any defaults, all of the parameters are going to
+            // be type parameter args which won't have special names.
+            // In this case, we know that the values cannot
             // be defaulted though, so we can calculate the number of real parameters based on
             // the total number of parameters
             numDefaults = 0
-            numChanged = changedParamCountFromTotal(numValueParams + ownerFn.thisParamCount)
+            numChanged = changedParamCountFromTotal(
+                // Subtracting context params from total since they are included in thisParams
+                numValueParams - numContextParams + ownerFn.thisParamCount
+            )
             numRealValueParams = numValueParams -
+                numContextParams -
                 1 - // composer param
                 numChanged
         } else {
-            val hasDefaults = ownerFn.valueParameters.any {
-                it.name == KtxNameConventions.DEFAULT_PARAMETER
-            }
-            numRealValueParams = ownerFn.valueParameters.indexOfLast {
+            // Context receiver params are value parameters and will precede real params, calculate
+            // the amount of real params by finding the index off the last real param (if any) and
+            // offsetting it by the amount of context receiver params.
+            val indexOfLastRealParam = ownerFn.valueParameters.indexOfLast {
                 !it.name.asString().startsWith('$')
-            } + 1
-            numDefaults = if (hasDefaults) defaultParamCount(numRealValueParams) else 0
+            }
+            numRealValueParams = if (indexOfLastRealParam != -1) {
+                (indexOfLastRealParam + 1) - numContextParams
+            } else {
+                0
+            }
+            numDefaults = if (hasDefaults) {
+                defaultParamCount(numContextParams + numRealValueParams)
+            } else {
+                0
+            }
             numChanged = changedParamCount(numRealValueParams, ownerFn.thisParamCount)
         }
 
         require(
+            numContextParams +
             numRealValueParams +
                 1 + // composer param
                 numChanged +
                 numDefaults == numValueParams
         )
 
-        val composerIndex = numRealValueParams
+        val composerIndex = numContextParams + numRealValueParams
         val changedArgIndex = composerIndex + 1
         val defaultArgIndex = changedArgIndex + numChanged
         val defaultArgs = (defaultArgIndex until numValueParams).map {
@@ -2755,9 +2734,10 @@ class ComposableFunctionBodyTransformer(
             }
         }
 
+        val contextMeta = mutableListOf<ParamMeta>()
         val paramMeta = mutableListOf<ParamMeta>()
 
-        for (index in 0 until numRealValueParams) {
+        for (index in 0 until numContextParams + numRealValueParams) {
             val arg = expression.getValueArgument(index)
             if (arg == null) {
                 val param = expression.symbol.owner.valueParameters[index]
@@ -2771,20 +2751,25 @@ class ComposableFunctionBodyTransformer(
                     continue
                 }
             }
-            val bitIndex = defaultsBitIndex(index)
-            val maskValue = if (hasDefaultArgs) defaultMasks[defaultsParamIndex(index)] else 0
-            val meta = paramMetaOf(arg, isProvided = maskValue and (0b1 shl bitIndex) == 0)
-
-            paramMeta.add(meta)
+            if (index < numContextParams) {
+                val meta = paramMetaOf(arg, isProvided = true)
+                contextMeta.add(meta)
+            } else {
+                val bitIndex = defaultsBitIndex(index)
+                val maskValue = if (hasDefaultArgs) defaultMasks[defaultsParamIndex(index)] else 0
+                val meta = paramMetaOf(arg, isProvided = maskValue and (0b1 shl bitIndex) == 0)
+                paramMeta.add(meta)
+            }
         }
 
         val extensionMeta = expression.extensionReceiver?.let { paramMetaOf(it, isProvided = true) }
         val dispatchMeta = expression.dispatchReceiver?.let { paramMetaOf(it, isProvided = true) }
 
         val changedParams = buildChangedParamsForCall(
-            paramMeta,
-            extensionMeta,
-            dispatchMeta
+            contextParams = contextMeta,
+            valueParams = paramMeta,
+            extensionParam = extensionMeta,
+            dispatchParam = dispatchMeta
         )
 
         changedParams.forEachIndexed { i, param ->
@@ -3081,13 +3066,17 @@ class ComposableFunctionBodyTransformer(
     }
 
     private fun buildChangedParamsForCall(
+        contextParams: List<ParamMeta>,
         valueParams: List<ParamMeta>,
         extensionParam: ParamMeta?,
         dispatchParam: ParamMeta?
     ): List<IrExpression> {
-        val allParams = listOfNotNull(extensionParam) + valueParams + listOfNotNull(dispatchParam)
+        val allParams = listOfNotNull(extensionParam) +
+            contextParams +
+            valueParams +
+            listOfNotNull(dispatchParam)
         // passing in 0 for thisParams since they should be included in the params list
-        val changedCount = changedParamCount(valueParams.size, allParams.size - valueParams.size)
+        val changedCount = changedParamCount(allParams.size, 0)
         val result = mutableListOf<IrExpression>()
         for (i in 0 until changedCount) {
             val start = i * SLOTS_PER_INT
@@ -3515,7 +3504,7 @@ class ComposableFunctionBodyTransformer(
             var realValueParamCount: Int = 0
                 private set
 
-            // slotCount will include the dispatchReceiver and extensionReceivers
+            // slotCount will include the dispatchReceiver, extensionReceivers and context receivers
             var slotCount: Int = 0
                 private set
 
@@ -3665,35 +3654,38 @@ class ComposableFunctionBodyTransformer(
                     }
                 }
                 slotCount = realValueParamCount
+                slotCount += function.contextReceiverParametersCount
                 if (function.extensionReceiverParameter != null) slotCount++
                 if (function.dispatchReceiverParameter != null) {
                     slotCount++
                 } else if (function.origin == IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA) {
                     slotCount++
                 }
-                changedParameter = if (composerParameter != null)
+                changedParameter = if (composerParameter != null) {
                     transformer.IrChangedBitMaskValueImpl(
                         changedParams,
                         slotCount
                     )
-                else
+                } else {
                     null
-                defaultParameter = if (defaultParams.isNotEmpty())
+                }
+                defaultParameter = if (defaultParams.isNotEmpty()) {
                     transformer.IrDefaultBitMaskValueImpl(
                         defaultParams,
-                        realValueParamCount
+                        function.contextReceiverParametersCount + realValueParamCount,
                     )
-                else
+                } else {
                     null
+                }
             }
 
             val isComposable = composerParameter != null
 
-            val allTrackedParams = listOfNotNull(
-                function.extensionReceiverParameter
-            ) + function.valueParameters.take(realValueParamCount) + listOfNotNull(
-                function.dispatchReceiverParameter
-            )
+            val allTrackedParams = listOfNotNull(function.extensionReceiverParameter) +
+                function.valueParameters.take(
+                    function.contextReceiverParametersCount + realValueParamCount
+                ) +
+                listOfNotNull(function.dispatchReceiverParameter)
 
             fun defaultIndexForSlotIndex(index: Int): Int {
                 return if (function.extensionReceiverParameter != null) index - 1 else index
@@ -4015,6 +4007,7 @@ class ComposableFunctionBodyTransformer(
 
         init {
             val actual = params.size
+            // passing in 0 for thisParams because slot count includes them
             val expected = changedParamCount(count, 0)
             require(actual == expected) {
                 "Function with $count params had $actual changed params but expected $expected"
@@ -4249,7 +4242,7 @@ inline fun <A, B, C> forEachWith(a: List<A>, b: List<B>, c: List<C>, fn: (A, B, 
 
 private fun IrType.isClassType(fqName: FqNameUnsafe, hasQuestionMark: Boolean? = null): Boolean {
     if (this !is IrSimpleType) return false
-    if (hasQuestionMark != null && this.hasQuestionMark != hasQuestionMark) return false
+    if (hasQuestionMark != null && this.isMarkedNullable() == hasQuestionMark) return false
     return classifier.isClassWithFqName(fqName)
 }
 private fun IrType.isNotNullClassType(fqName: FqNameUnsafe) =

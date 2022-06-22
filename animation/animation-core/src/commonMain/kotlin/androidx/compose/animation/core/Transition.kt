@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import kotlin.math.max
+import kotlin.jvm.JvmDefaultWithCompatibility
 import kotlin.jvm.JvmName
 
 /**
@@ -610,6 +611,7 @@ class Transition<S> @PublishedApi internal constructor(
      * transition. These states will be used to obtain the animation spec that will be used for this
      * transition from the child animations.
      */
+    @JvmDefaultWithCompatibility
     interface Segment<S> {
         /**
          * Initial state of a Transition Segment. This is the state that transition starts from.
@@ -645,7 +647,7 @@ class Transition<S> @PublishedApi internal constructor(
         val typeConverter: TwoWayConverter<T, V>,
         val label: String
     ) {
-        internal var data: DeferredAnimationData<T, V>? = null
+        internal var data: DeferredAnimationData<T, V>? by mutableStateOf(null)
 
         internal inner class DeferredAnimationData<T, V : AnimationVector>(
             val animation: Transition<S>.TransitionAnimationState<T, V>,

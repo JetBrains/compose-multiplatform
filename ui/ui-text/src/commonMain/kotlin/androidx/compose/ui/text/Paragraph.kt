@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlin.math.ceil
+import kotlin.jvm.JvmDefaultWithCompatibility
 
 internal const val DefaultMaxLines = Int.MAX_VALUE
 
@@ -38,6 +39,7 @@ internal const val DefaultMaxLines = Int.MAX_VALUE
  *
  * Paragraphs can be displayed on a [Canvas] using the [paint] method.
  */
+@JvmDefaultWithCompatibility
 interface Paragraph {
     /**
      * The amount of horizontal space this paragraph occupies.
@@ -250,6 +252,7 @@ interface Paragraph {
     fun paint(
         canvas: Canvas,
         brush: Brush,
+        alpha: Float = Float.NaN,
         shadow: Shadow? = null,
         textDecoration: TextDecoration? = null
     ) {

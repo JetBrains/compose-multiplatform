@@ -95,6 +95,8 @@ fun LinearProgressIndicator(
  *
  * ![Linear progress indicator image](https://developer.android.com/images/reference/androidx/compose/material3/linear-progress-indicator.png)
  *
+ * @sample androidx.compose.material3.samples.IndeterminateLinearProgressIndicatorSample
+ *
  * @param modifier the [Modifier] to be applied to this progress indicator
  * @param color color of this progress indicator
  * @param trackColor color of the track behind the indicator, visible when the progress has not
@@ -253,6 +255,8 @@ fun CircularProgressIndicator(
  * Progress indicators express an unspecified wait time or display the duration of a process.
  *
  * ![Circular progress indicator image](https://developer.android.com/images/reference/androidx/compose/material3/circular-progress-indicator.png)
+ *
+ * @sample androidx.compose.material3.samples.IndeterminateCircularProgressIndicatorSample
  *
  * @param modifier the [Modifier] to be applied to this progress indicator
  * @param color color of this progress indicator
