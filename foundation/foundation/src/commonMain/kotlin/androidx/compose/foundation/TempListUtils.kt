@@ -30,6 +30,7 @@ import kotlin.contracts.contract
  * access in an efficient way, and this method may actually be a lot slower. Only use for
  * collections that are created by code we control and are known to support random access.
  */
+@Suppress("BanInlineOptIn") // Treat Kotlin Contracts as non-experimental.
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T> List<T>.fastFilter(predicate: (T) -> Boolean): List<T> {
     contract { callsInPlace(predicate) }
@@ -52,6 +53,7 @@ internal inline fun <T> List<T>.fastFilter(predicate: (T) -> Boolean): List<T> {
  *
  * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
  */
+@Suppress("BanInlineOptIn") // Treat Kotlin Contracts as non-experimental.
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T, R> List<T>.fastFold(initial: R, operation: (acc: R, T) -> R): R {
     contract { callsInPlace(operation) }
@@ -71,6 +73,7 @@ internal inline fun <T, R> List<T>.fastFold(initial: R, operation: (acc: R, T) -
  * collections that are created by code we control and are known to support random access.
  */
 @OptIn(ExperimentalContracts::class)
+@Suppress("BanInlineOptIn") // Treat Kotlin Contracts as non-experimental.
 internal inline fun <T, R> List<T>.fastMapIndexedNotNull(
     transform: (index: Int, T) -> R?
 ): List<R> {
@@ -90,6 +93,7 @@ internal inline fun <T, R> List<T>.fastMapIndexedNotNull(
  * access in an efficient way, and this method may actually be a lot slower. Only use for
  * collections that are created by code we control and are known to support random access.
  */
+@Suppress("BanInlineOptIn") // Treat Kotlin Contracts as non-experimental.
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T, R : Comparable<R>> List<T>.fastMaxOfOrNull(selector: (T) -> R): R? {
     contract { callsInPlace(selector) }
