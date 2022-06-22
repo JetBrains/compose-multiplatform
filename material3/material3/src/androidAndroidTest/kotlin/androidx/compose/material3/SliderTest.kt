@@ -619,7 +619,7 @@ class SliderTest {
             slop = LocalViewConfiguration.current.touchSlop
             RangeSlider(
                 modifier = Modifier.testTag(tag),
-                values = state.value,
+                value = state.value,
                 onValueChange = { state.value = it }
             )
         }
@@ -653,7 +653,7 @@ class SliderTest {
             slop = LocalViewConfiguration.current.touchSlop
             RangeSlider(
                 modifier = Modifier.testTag(tag),
-                values = state.value,
+                value = state.value,
                 onValueChange = { state.value = it }
             )
         }
@@ -691,7 +691,7 @@ class SliderTest {
             slop = LocalViewConfiguration.current.touchSlop
             RangeSlider(
                 modifier = Modifier.testTag(tag),
-                values = state.value,
+                value = state.value,
                 onValueChange = { state.value = it }
             )
         }
@@ -727,7 +727,7 @@ class SliderTest {
         rule.setMaterialContent(lightColorScheme()) {
             RangeSlider(
                 modifier = Modifier.testTag(tag),
-                values = state.value,
+                value = state.value,
                 onValueChange = { state.value = it }
             )
         }
@@ -759,7 +759,7 @@ class SliderTest {
         rule.setMaterialContent(lightColorScheme()) {
             RangeSlider(
                 modifier = Modifier.testTag(tag),
-                values = state.value,
+                value = state.value,
                 onValueChange = { state.value = it },
                 valueRange = 0f..rangeEnd.value
             )
@@ -794,7 +794,7 @@ class SliderTest {
                 slop = LocalViewConfiguration.current.touchSlop
                 RangeSlider(
                     modifier = Modifier.testTag(tag),
-                    values = state.value,
+                    value = state.value,
                     onValueChange = { state.value = it }
                 )
             }
@@ -832,7 +832,7 @@ class SliderTest {
                 slop = LocalViewConfiguration.current.touchSlop
                 RangeSlider(
                     modifier = Modifier.testTag(tag),
-                    values = state.value,
+                    value = state.value,
                     onValueChange = { state.value = it }
                 )
             }
@@ -872,7 +872,7 @@ class SliderTest {
             slop = LocalViewConfiguration.current.touchSlop
             RangeSlider(
                 modifier = Modifier.testTag(tag),
-                values = state.value,
+                value = state.value,
                 onValueChange = { state.value = it }
             )
         }
@@ -908,7 +908,7 @@ class SliderTest {
             slop = LocalViewConfiguration.current.touchSlop
             RangeSlider(
                 modifier = Modifier.testTag(tag),
-                values = state.value,
+                value = state.value,
                 onValueChange = { state.value = it }
             )
         }
@@ -946,7 +946,7 @@ class SliderTest {
                 Row(Modifier.width(500.toDp())) {
                     Spacer(Modifier.requiredSize(100.toDp()))
                     RangeSlider(
-                        values = 0f..0.5f,
+                        value = 0f..0.5f,
                         onValueChange = {},
                         modifier = Modifier
                             .testTag(tag)
@@ -973,7 +973,7 @@ class SliderTest {
 
         rule.setMaterialContent(lightColorScheme()) {
             RangeSlider(
-                modifier = Modifier.testTag(tag), values = state.value,
+                modifier = Modifier.testTag(tag), value = state.value,
                 onValueChange = { state.value = it }
             )
         }
@@ -1026,7 +1026,7 @@ class SliderTest {
         // Slider with [0,5,10,15,20] possible values
         rule.setMaterialContent(lightColorScheme()) {
             RangeSlider(
-                modifier = Modifier.testTag(tag), values = state.value,
+                modifier = Modifier.testTag(tag), value = state.value,
                 steps = 3,
                 valueRange = 0f..20f,
                 onValueChange = { state.value = it },
