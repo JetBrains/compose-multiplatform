@@ -376,7 +376,7 @@ package androidx.compose.ui.focus {
     method public static androidx.compose.ui.Modifier onFocusEvent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusEvent);
   }
 
-  public interface FocusManager {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface FocusManager {
     method public void clearFocus(optional boolean force);
     method public boolean moveFocus(int focusDirection);
   }
@@ -1991,7 +1991,7 @@ package androidx.compose.ui.layout {
     property public abstract androidx.compose.ui.unit.LayoutDirection layoutDirection;
   }
 
-  public interface LayoutCoordinates {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface LayoutCoordinates {
     method public operator int get(androidx.compose.ui.layout.AlignmentLine alignmentLine);
     method public androidx.compose.ui.layout.LayoutCoordinates? getParentCoordinates();
     method public androidx.compose.ui.layout.LayoutCoordinates? getParentLayoutCoordinates();
@@ -2382,7 +2382,7 @@ package androidx.compose.ui.platform {
     property public final boolean showLayoutBounds;
   }
 
-  public interface AccessibilityManager {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface AccessibilityManager {
     method public long calculateRecommendedTimeoutMillis(long originalTimeoutMillis, optional boolean containsIcons, optional boolean containsText, optional boolean containsControls);
   }
 
@@ -2601,7 +2601,7 @@ package androidx.compose.ui.platform {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier testTag(androidx.compose.ui.Modifier, String tag);
   }
 
-  public interface TextToolbar {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface TextToolbar {
     method public androidx.compose.ui.platform.TextToolbarStatus getStatus();
     method public void hide();
     method public void showMenu(androidx.compose.ui.geometry.Rect rect, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onCopyRequested, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onPasteRequested, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onCutRequested, optional kotlin.jvm.functions.Function0<kotlin.Unit>? onSelectAllRequested);
@@ -3211,11 +3211,11 @@ package androidx.compose.ui.window {
     method public boolean getDismissOnBackPress();
     method public boolean getDismissOnClickOutside();
     method public androidx.compose.ui.window.SecureFlagPolicy getSecurePolicy();
-    method @androidx.compose.ui.ExperimentalComposeUiApi public boolean getUsePlatformDefaultWidth();
+    method public boolean getUsePlatformDefaultWidth();
     property public final boolean dismissOnBackPress;
     property public final boolean dismissOnClickOutside;
     property public final androidx.compose.ui.window.SecureFlagPolicy securePolicy;
-    property @androidx.compose.ui.ExperimentalComposeUiApi public final boolean usePlatformDefaultWidth;
+    property public final boolean usePlatformDefaultWidth;
   }
 
   public interface DialogWindowProvider {
@@ -3236,14 +3236,14 @@ package androidx.compose.ui.window {
     method public boolean getExcludeFromSystemGesture();
     method public boolean getFocusable();
     method public androidx.compose.ui.window.SecureFlagPolicy getSecurePolicy();
-    method @androidx.compose.ui.ExperimentalComposeUiApi public boolean getUsePlatformDefaultWidth();
+    method public boolean getUsePlatformDefaultWidth();
     property public final boolean clippingEnabled;
     property public final boolean dismissOnBackPress;
     property public final boolean dismissOnClickOutside;
     property public final boolean excludeFromSystemGesture;
     property public final boolean focusable;
     property public final androidx.compose.ui.window.SecureFlagPolicy securePolicy;
-    property @androidx.compose.ui.ExperimentalComposeUiApi public final boolean usePlatformDefaultWidth;
+    property public final boolean usePlatformDefaultWidth;
   }
 
   public enum SecureFlagPolicy {
