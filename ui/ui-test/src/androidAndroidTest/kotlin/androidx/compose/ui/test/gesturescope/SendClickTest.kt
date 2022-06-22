@@ -25,14 +25,14 @@ import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.test.ActivityWithActionBar
-import androidx.test.filters.MediumTest
-import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.click
+import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.util.ClickableTestBox
 import androidx.compose.ui.test.util.RecordingFilter
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -76,8 +76,8 @@ class SendClickTest(private val config: TestConfig) {
         private val componentIndex: Int,
         private val recordedClicks: MutableList<ClickData>
     ) : PointerInputModifier {
-        override val pointerInputFilter: PointerInputFilter = RecordingFilter { changes ->
-            changes.forEach {
+        override val pointerInputFilter: PointerInputFilter = RecordingFilter { event ->
+            event.changes.forEach {
                 if (it.changedToUp()) {
                     recordedClicks.add(ClickData(componentIndex, it.position))
                 }

@@ -19,6 +19,8 @@ package androidx.compose.ui.test.injectionscope.touch
 import android.os.SystemClock.sleep
 import androidx.compose.testutils.expectError
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEventType.Companion.Move
+import androidx.compose.ui.input.pointer.PointerType.Companion.Touch
 import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.TouchInjectionScope
 import androidx.compose.ui.test.injectionscope.touch.Common.performTouchInput
@@ -76,7 +78,8 @@ class MoveByTest {
 
                 t += eventPeriodMillis
                 assertThat(events[1].pointerCount).isEqualTo(1)
-                events[1].getPointer(0).verify(t, pointerId, true, downPosition1 + delta1)
+                events[1].getPointer(0)
+                    .verify(t, pointerId, true, downPosition1 + delta1, Touch, Move)
             }
         }
     }
@@ -101,13 +104,17 @@ class MoveByTest {
 
                 t += eventPeriodMillis
                 assertThat(events[2].pointerCount).isEqualTo(2)
-                events[2].getPointer(0).verify(t, pointerId1, true, downPosition1 + delta1)
-                events[2].getPointer(1).verify(t, pointerId2, true, downPosition2)
+                events[2].getPointer(0)
+                    .verify(t, pointerId1, true, downPosition1 + delta1, Touch, Move)
+                events[2].getPointer(1)
+                    .verify(t, pointerId2, true, downPosition2, Touch, Move)
 
                 t += eventPeriodMillis
                 assertThat(events[3].pointerCount).isEqualTo(2)
-                events[3].getPointer(0).verify(t, pointerId1, true, downPosition1 + delta1)
-                events[3].getPointer(1).verify(t, pointerId2, true, downPosition2 + delta2)
+                events[3].getPointer(0)
+                    .verify(t, pointerId1, true, downPosition1 + delta1, Touch, Move)
+                events[3].getPointer(1)
+                    .verify(t, pointerId2, true, downPosition2 + delta2, Touch, Move)
             }
         }
     }
@@ -134,8 +141,10 @@ class MoveByTest {
 
                 t += eventPeriodMillis
                 assertThat(events[2].pointerCount).isEqualTo(2)
-                events[2].getPointer(0).verify(t, pointerId1, true, downPosition1 + delta1)
-                events[2].getPointer(1).verify(t, pointerId2, true, downPosition2 + delta2)
+                events[2].getPointer(0)
+                    .verify(t, pointerId1, true, downPosition1 + delta1, Touch, Move)
+                events[2].getPointer(1)
+                    .verify(t, pointerId2, true, downPosition2 + delta2, Touch, Move)
             }
         }
     }

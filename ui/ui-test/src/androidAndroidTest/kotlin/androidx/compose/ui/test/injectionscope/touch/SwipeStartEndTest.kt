@@ -20,6 +20,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEventType.Companion.Press
+import androidx.compose.ui.input.pointer.PointerEventType.Companion.Release
+import androidx.compose.ui.input.pointer.PointerType.Companion.Touch
 import androidx.compose.ui.test.TouchInjectionScope
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -91,9 +94,9 @@ class SwipeStartEndTest(private val config: TestConfig) {
                 val id = events[0].id
 
                 // We start at `start`
-                events.first().verify(t0, id, true, start)
+                events.first().verify(t0, id, true, start, Touch, Press)
                 // We end at `end`
-                events.last().verify(t0 + config.duration, id, false, end)
+                events.last().verify(t0 + config.duration, id, false, end, Touch, Release)
                 // All events are evenly spaced in time
                 downEvents.hasSameTimeBetweenEvents()
                 // And the distance between each event is the same

@@ -19,6 +19,8 @@ package androidx.compose.ui.test.partialgesturescope
 import android.os.SystemClock.sleep
 import androidx.compose.testutils.expectError
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEventType.Companion.Release
+import androidx.compose.ui.input.pointer.PointerType.Companion.Touch
 import androidx.compose.ui.test.cancel
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -78,7 +80,7 @@ class SendUpTest {
                 val pointerId = events[0].getPointer(0).id
 
                 assertThat(events[1].pointerCount).isEqualTo(1)
-                events[1].getPointer(0).verify(t, pointerId, false, downPosition1)
+                events[1].getPointer(0).verify(t, pointerId, false, downPosition1, Touch, Release)
             }
         }
 
@@ -105,11 +107,11 @@ class SendUpTest {
                 val pointerId2 = events[1].getPointer(1).id
 
                 assertThat(events[2].pointerCount).isEqualTo(2)
-                events[2].getPointer(0).verify(t, pointerId1, false, downPosition1)
-                events[2].getPointer(1).verify(t, pointerId2, true, downPosition2)
+                events[2].getPointer(0).verify(t, pointerId1, false, downPosition1, Touch, Release)
+                events[2].getPointer(1).verify(t, pointerId2, true, downPosition2, Touch, Release)
 
                 assertThat(events[3].pointerCount).isEqualTo(1)
-                events[3].getPointer(0).verify(t, pointerId2, false, downPosition2)
+                events[3].getPointer(0).verify(t, pointerId2, false, downPosition2, Touch, Release)
             }
         }
 
