@@ -125,6 +125,7 @@ import kotlin.math.roundToInt
  * @param colors [TextFieldColors] that will be used to resolve the colors used for this text field
  * in different states. See [TextFieldDefaults.outlinedTextFieldColors].
  */
+@ExperimentalMaterial3Api
 @Composable
 fun OutlinedTextField(
     value: String,
@@ -267,6 +268,7 @@ fun OutlinedTextField(
  * @param colors [TextFieldColors] that will be used to resolve the colors used for this text field
  * in different states. See [TextFieldDefaults.outlinedTextFieldColors].
  */
+@ExperimentalMaterial3Api
 @Composable
 fun OutlinedTextField(
     value: TextFieldValue,
