@@ -40,8 +40,8 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         api("androidx.annotation:annotation:1.1.0")
 
         // when updating the runtime version please also update the runtime-saveable version
-        implementation("androidx.compose.runtime:runtime:1.2.0-rc01")
-        implementation("androidx.compose.runtime:runtime-saveable:1.2.0-rc01")
+        implementation("androidx.compose.runtime:runtime:1.2.0-rc02")
+        implementation("androidx.compose.runtime:runtime-saveable:1.2.0-rc02")
 
         implementation(project(":compose:ui:ui-util"))
         implementation(libs.kotlinStdlib)

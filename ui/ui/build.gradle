@@ -40,8 +40,8 @@ dependencies {
         implementation(libs.kotlinCoroutinesCore)
 
         // when updating the runtime version please also update the runtime-saveable version
-        implementation("androidx.compose.runtime:runtime:1.2.0-rc01")
-        api("androidx.compose.runtime:runtime-saveable:1.2.0-rc01")
+        implementation("androidx.compose.runtime:runtime:1.2.0-rc02")
+        api("androidx.compose.runtime:runtime-saveable:1.2.0-rc02")
 
         api(project(":compose:ui:ui-geometry"))
         api(project(":compose:ui:ui-graphics"))

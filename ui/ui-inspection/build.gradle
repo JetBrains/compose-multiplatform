@@ -33,7 +33,7 @@ dependencies {
     // thus all its transitive dependencies will be present too.
     compileOnly(libs.kotlinStdlib)
     compileOnly("androidx.inspection:inspection:1.0.0")
-    compileOnly("androidx.compose.runtime:runtime:1.2.0-rc01")
+    compileOnly("androidx.compose.runtime:runtime:1.2.0-rc02")
     compileOnly(project(":compose:ui:ui"))
     // we ignore its transitive dependencies, because ui-inspection should
     // depend on them as "compile-only" deps.

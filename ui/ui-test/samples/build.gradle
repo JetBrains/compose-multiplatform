@@ -34,7 +34,7 @@ dependencies {
     implementation(project(":compose:ui:ui-test"))
     implementation(project(":compose:ui:ui-test-junit4"))
 
-    implementation("androidx.compose.animation:animation:1.2.0-rc01")
+    implementation("androidx.compose.animation:animation:1.2.0-rc02")
     implementation("androidx.compose.material:material:1.1.0")
 }
 

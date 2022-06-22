@@ -32,7 +32,7 @@ dependencies {
 
     implementation("androidx.compose.foundation:foundation:1.0.0")
     implementation("androidx.compose.material:material:1.0.0")
-    implementation("androidx.compose.runtime:runtime:1.2.0-rc01")
+    implementation("androidx.compose.runtime:runtime:1.2.0-rc02")
     implementation(project(":compose:ui:ui"))
     implementation(project(":compose:ui:ui-text"))
 }
