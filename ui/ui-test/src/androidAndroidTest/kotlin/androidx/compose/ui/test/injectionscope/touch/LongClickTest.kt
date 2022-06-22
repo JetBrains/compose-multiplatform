@@ -25,6 +25,10 @@ import androidx.compose.testutils.WithViewConfiguration
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEventType.Companion.Move
+import androidx.compose.ui.input.pointer.PointerEventType.Companion.Press
+import androidx.compose.ui.input.pointer.PointerEventType.Companion.Release
+import androidx.compose.ui.input.pointer.PointerType.Companion.Touch
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.TouchInjectionScope
@@ -138,8 +142,9 @@ class LongClickTest(private val config: TestConfig) {
         events.dropLast(1).forEachIndexed { i, event ->
             // Don't check the timestamp
             val t = t0 + (expectedDuration * i / steps.toDouble()).roundToLong()
-            event.verify(t, id, true, position)
+            val type = if (i == 0) Press else Move
+            event.verify(t, id, true, position, Touch, type)
         }
-        events.last().verify(t0 + expectedDuration, id, false, position)
+        events.last().verify(t0 + expectedDuration, id, false, position, Touch, Release)
     }
 }
