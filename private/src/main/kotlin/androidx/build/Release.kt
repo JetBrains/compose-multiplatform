@@ -168,7 +168,7 @@ object Release {
             )
             return
         }
-        if (!extension.shouldRelease()) {
+        if (!extension.shouldRelease() && !isSnapshotBuild()) {
             project.logger.info(
                 "project ${project.name} isn't part of release, because its" +
                     " \"publish\" property is SNAPSHOT_ONLY, but it is not a snapshot build"
