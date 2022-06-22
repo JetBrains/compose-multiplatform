@@ -26,6 +26,7 @@ import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.matchers.assertThat
+import androidx.compose.ui.text.matchers.isZero
 import androidx.compose.ui.text.platform.AndroidParagraph
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextAlign
@@ -590,20 +591,21 @@ class MultiParagraphIntegrationTest {
         assertThat(paragraph.getLineForOffset(3)).isEqualTo(2)
     }
 
-    @Test(expected = java.lang.IllegalArgumentException::class)
-    fun getLineForOffset_negative_throw_exception() {
+    @Test
+    fun getLineForOffset_negative_returnsZero() {
         val text = "abc"
         val paragraph = simpleMultiParagraph(text = text)
 
-        paragraph.getLineForOffset(-1)
+        assertThat(paragraph.getLineForOffset(-1)).isZero()
     }
 
-    @Test(expected = java.lang.IllegalArgumentException::class)
-    fun getLineForOffset_larger_than_length_throw_exception() {
-        val text = "abc"
+    @Test
+    fun getLineForOffset_larger_than_length_returnsLastLine() {
+        val text = "abc\ndef"
         val paragraph = simpleMultiParagraph(text = text)
 
-        paragraph.getLineForOffset(text.length + 1)
+        assertThat(paragraph.getLineForOffset(text.length + 1))
+            .isEqualTo(1)
     }
 
     @Test

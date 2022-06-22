@@ -621,10 +621,10 @@ class MultiParagraph(
      * beyond the end of the text, you get the last line.
      */
     fun getLineForOffset(offset: Int): Int {
-        requireIndexInRangeInclusiveEnd(offset)
-
-        val paragraphIndex = if (offset == annotatedString.length) {
+        val paragraphIndex = if (offset >= annotatedString.length) {
             paragraphInfoList.lastIndex
+        } else if (offset < 0) {
+            0
         } else {
             findParagraphByIndex(paragraphInfoList, offset)
         }
