@@ -19,6 +19,7 @@ package androidx.compose.ui.draw
 import android.graphics.Bitmap
 import android.os.Build
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -373,6 +374,8 @@ class ShadowTest {
         }
     }
 
+    // waitAndScreenShot() requires API level 26
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun takeScreenShot(width: Int, height: Int = width): Bitmap {
         val bitmap = rule.waitAndScreenShot()
         assertEquals(width, bitmap.width)

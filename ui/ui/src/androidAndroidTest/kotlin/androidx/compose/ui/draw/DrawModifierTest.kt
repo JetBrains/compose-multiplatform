@@ -17,6 +17,7 @@
 package androidx.compose.ui.draw
 
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -629,5 +630,7 @@ class DrawModifierTest {
         }
     }
 
-    fun SemanticsNodeInteraction.captureToBitmap() = captureToImage().asAndroidBitmap()
+    // captureToImage() requires API level 26
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun SemanticsNodeInteraction.captureToBitmap() = captureToImage().asAndroidBitmap()
 }
