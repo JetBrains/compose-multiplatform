@@ -503,8 +503,35 @@ class CompositionAndDerivedStateTests {
 
         // Validate there are only 2 observed dependencies, one for intermediateState, one for itemValue
         val observed = (composition as? CompositionImpl)?.derivedStateDependencies ?: emptyList()
-        println(observed)
         assertEquals(2, observed.count())
+    }
+
+    @Test
+    fun changingDerivedStateShouldNotAccumulateConditionalScopes() = compositionTest {
+
+        var reload by mutableStateOf(0)
+
+        compose {
+            val derivedState = remember {
+                derivedStateOf {
+                    List(reload) { it }
+                }
+            }
+
+            if (reload % 2 == 0) {
+                Wrap {
+                    Text("${derivedState.value.size}")
+                }
+            }
+        }
+
+        reload++
+
+        advance()
+
+        val conditionalScopes = (composition as? CompositionImpl)?.conditionalScopes ?: emptyList()
+
+        assertEquals(0, conditionalScopes.count { it.isConditional })
     }
 }
 
