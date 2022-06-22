@@ -264,16 +264,16 @@ fun Slider(
  *
  * @sample androidx.compose.material3.samples.StepRangeSliderSample
  *
- * @param values current values of the RangeSlider. If either value is outside of [valueRange]
+ * @param value current values of the RangeSlider. If either value is outside of [valueRange]
  * provided, it will be coerced to this range.
  * @param onValueChange lambda in which values should be updated
  * @param modifier modifiers for the Range Slider layout
  * @param enabled whether or not component is enabled and can we interacted with or not
- * @param valueRange range of values that Range Slider values can take. Passed [values] will be
+ * @param valueRange range of values that Range Slider values can take. Passed [value] will be
  * coerced to this range
  * @param steps if greater than 0, specifies the amounts of discrete values, evenly distributed
  * between across the whole value range. If 0, range slider will behave as a continuous slider and
- * allow to choose any values from the range specified. Must not be negative.
+ * allow to choose any value from the range specified. Must not be negative.
  * @param onValueChangeFinished lambda to be invoked when value change has ended. This callback
  * shouldn't be used to update the range slider values (use [onValueChange] for that), but rather to
  * know when the user has completed selecting a new value by ending a drag or a click.
@@ -283,7 +283,7 @@ fun Slider(
 @Composable
 @ExperimentalMaterial3Api
 fun RangeSlider(
-    values: ClosedFloatingPointRange<Float>,
+    value: ClosedFloatingPointRange<Float>,
     onValueChange: (ClosedFloatingPointRange<Float>) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -298,7 +298,7 @@ fun RangeSlider(
 
     require(steps >= 0) { "steps should be >= 0" }
     val onValueChangeState = rememberUpdatedState<(ClosedFloatingPointRange<Float>) -> Unit> {
-        if (it != values) {
+        if (it != value) {
             onValueChange(it)
         }
     }
@@ -327,8 +327,8 @@ fun RangeSlider(
         fun scaleToOffset(userValue: Float) =
             scale(valueRange.start, valueRange.endInclusive, userValue, minPx, maxPx)
 
-        val rawOffsetStart = remember { mutableStateOf(scaleToOffset(values.start)) }
-        val rawOffsetEnd = remember { mutableStateOf(scaleToOffset(values.endInclusive)) }
+        val rawOffsetStart = remember { mutableStateOf(scaleToOffset(value.start)) }
+        val rawOffsetEnd = remember { mutableStateOf(scaleToOffset(value.endInclusive)) }
 
         val gestureEndAction = rememberUpdatedState<(Boolean) -> Unit> {
             onValueChangeFinished?.invoke()
@@ -337,14 +337,14 @@ fun RangeSlider(
         val onDrag = rememberUpdatedState<(Boolean, Float) -> Unit> { isStart, offset ->
             val offsetRange = if (isStart) {
                 rawOffsetStart.value = (rawOffsetStart.value + offset)
-                rawOffsetEnd.value = scaleToOffset(values.endInclusive)
+                rawOffsetEnd.value = scaleToOffset(value.endInclusive)
                 val offsetEnd = rawOffsetEnd.value
                 var offsetStart = rawOffsetStart.value.coerceIn(minPx, offsetEnd)
                 offsetStart = snapValueToTick(offsetStart, tickFractions, minPx, maxPx)
                 offsetStart..offsetEnd
             } else {
                 rawOffsetEnd.value = (rawOffsetEnd.value + offset)
-                rawOffsetStart.value = scaleToOffset(values.start)
+                rawOffsetStart.value = scaleToOffset(value.start)
                 val offsetStart = rawOffsetStart.value
                 var offsetEnd = rawOffsetEnd.value.coerceIn(offsetStart, maxPx)
                 offsetEnd = snapValueToTick(offsetEnd, tickFractions, minPx, maxPx)
@@ -367,8 +367,8 @@ fun RangeSlider(
             onDrag,
         )
         // The positions of the thumbs are dependant on each other.
-        val coercedStart = values.start.coerceIn(valueRange.start, values.endInclusive)
-        val coercedEnd = values.endInclusive.coerceIn(values.start, valueRange.endInclusive)
+        val coercedStart = value.start.coerceIn(valueRange.start, value.endInclusive)
+        val coercedEnd = value.endInclusive.coerceIn(value.start, valueRange.endInclusive)
         val fractionStart = calcFraction(valueRange.start, valueRange.endInclusive, coercedStart)
         val fractionEnd = calcFraction(valueRange.start, valueRange.endInclusive, coercedEnd)
         val startSteps = floor(steps * fractionEnd).toInt()

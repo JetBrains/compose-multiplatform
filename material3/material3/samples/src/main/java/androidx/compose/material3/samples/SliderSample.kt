@@ -65,7 +65,7 @@ fun RangeSliderSample() {
     Column {
         Text(text = sliderPosition.toString())
         RangeSlider(
-            values = sliderPosition,
+            value = sliderPosition,
             onValueChange = { sliderPosition = it },
             valueRange = 0f..100f,
             onValueChangeFinished = {
@@ -85,7 +85,7 @@ fun StepRangeSliderSample() {
         Text(text = sliderPosition.toString())
         RangeSlider(
             steps = 5,
-            values = sliderPosition,
+            value = sliderPosition,
             onValueChange = { sliderPosition = it },
             valueRange = 0f..100f,
             onValueChangeFinished = {
