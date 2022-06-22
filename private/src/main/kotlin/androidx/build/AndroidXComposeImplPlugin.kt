@@ -40,12 +40,12 @@ import org.gradle.api.tasks.ClasspathNormalizer
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.commonizer.util.transitiveClosure
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.tooling.core.withClosure
 
 const val composeSourceOption =
     "plugin:androidx.compose.compiler.plugins.kotlin:sourceInformation=true"
@@ -132,7 +132,7 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
 
             @Suppress("UnstableApiUsage")
             extensions.findByType(AndroidComponentsExtension::class.java)!!.finalizeDsl {
-                val isPublished = androidxExtension()?.type == LibraryType.PUBLISHED_LIBRARY
+                val isPublished = androidxExtension()?.shouldPublish() ?: false
 
                 it.lint {
                     // Too many Kotlin features require synthetic accessors - we want to rely on R8 to
@@ -381,7 +381,7 @@ fun Project.configureComposeImplPluginForAndroidx() {
         val androidXExtension =
             project.extensions.findByType(AndroidXExtension::class.java)
         if (androidXExtension != null) {
-            if (androidXExtension.publish.shouldPublish()) {
+            if (androidXExtension.shouldPublish()) {
                 project.tasks.withType(KotlinCompile::class.java)
                     .configureEach { compile ->
                         compile.doFirst {
@@ -418,7 +418,7 @@ private fun Project.configureLintForMultiplatformLibrary(
         val androidMain = multiplatformExtension.sourceSets.findByName("androidMain")
             ?: return@afterEvaluate
         // Get all the sourcesets androidMain transitively / directly depends on
-        val dependencies = transitiveClosure(androidMain, KotlinSourceSet::dependsOn)
+        val dependencies = androidMain.withClosure(KotlinSourceSet::dependsOn)
 
         /**
          * Helper function to add the missing sourcesets to this [VariantInputs]
@@ -467,4 +467,38 @@ private fun ConfigurableFileCollection.withChangesAllowed(
     disallowChanges.set(this, false)
     block()
     disallowChanges.set(this, true)
+}
+
+/**
+ * General purpose implementation of a transitive closure
+ * - Recursion free
+ * - Predictable amount of allocations
+ * - Handles loops and self references gracefully
+ * @param edges: Producer function from one node to all its children. This implementation can handle loops and self references gracefully.
+ * @return Note: No guarantees given about the order ot this [Set]
+ */
+public inline fun <reified T> transitiveClosure(seed: T, edges: T.() -> Iterable<T>): Set<T> {
+    // Fast path when initial edges are empty
+    val initialEdges = seed.edges()
+    if (initialEdges is Collection && initialEdges.isEmpty()) return emptySet()
+
+    val queue = deque<T>(initialEdges.count() * 2)
+    val results = mutableSetOf<T>()
+    queue.addAll(initialEdges)
+    while (queue.isNotEmpty()) {
+        // ArrayDeque implementation will optimize this call to 'removeFirst'
+        val resolved = queue.removeAt(0)
+        if (resolved != seed && results.add(resolved)) {
+            queue.addAll(resolved.edges())
+        }
+    }
+
+    return results.toSet()
+}
+
+@OptIn(ExperimentalStdlibApi::class)
+@PublishedApi
+internal inline fun <reified T> deque(initialSize: Int): MutableList<T> {
+    return if (KotlinVersion.CURRENT.isAtLeast(1, 4)) ArrayDeque(initialSize)
+    else ArrayList(initialSize)
 }

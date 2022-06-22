@@ -37,6 +37,7 @@ import androidx.build.studio.StudioTask
 import androidx.build.testConfiguration.addAppApkToTestConfigGeneration
 import androidx.build.testConfiguration.addToTestZips
 import androidx.build.testConfiguration.configureTestConfigGeneration
+import com.android.build.api.artifact.SingleArtifact
 import com.android.build.api.dsl.ManagedVirtualDevice
 import com.android.build.api.dsl.TestOptions
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
@@ -53,9 +54,9 @@ import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.internal.lint.AndroidLintTask
 import com.android.build.gradle.internal.tasks.AnalyticsRecordingTask
 import com.android.build.gradle.internal.tasks.ListingFileRedirectTask
-import com.android.build.gradle.tasks.BundleAar
 import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion.VERSION_1_8
+import org.gradle.api.JavaVersion.VERSION_11
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -81,17 +82,14 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.attribute.FileTime
 import java.time.Duration
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
-import org.apache.tools.zip.ZipEntry
-import org.apache.tools.zip.ZipFile
-import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.artifacts.repositories.IvyArtifactRepository
 import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.targets.native.KotlinNativeHostTestRun
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.kotlin.gradle.testing.KotlinTaskTestRun
 
 /**
@@ -264,11 +262,18 @@ class AndroidXImplPlugin : Plugin<Project> {
         extension: AndroidXExtension,
         plugin: KotlinBasePluginWrapper
     ) {
-        project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
-            task.kotlinOptions.jvmTarget = "1.8"
-            project.configureJavaCompilationWarnings(task)
-        }
         project.afterEvaluate {
+            project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
+                if (extension.type.compilationTarget == CompilationTarget.HOST) {
+                    task.kotlinOptions.jvmTarget = "11"
+                } else {
+                    task.kotlinOptions.jvmTarget = "1.8"
+                }
+                task.kotlinOptions.freeCompilerArgs += listOf(
+                    "-Xskip-metadata-version-check"
+                )
+            }
+
             val isAndroidProject = project.plugins.hasPlugin(LibraryPlugin::class.java) ||
                 project.plugins.hasPlugin(AppPlugin::class.java)
             // Explicit API mode is broken for Android projects
@@ -282,6 +287,7 @@ class AndroidXImplPlugin : Plugin<Project> {
             }
         }
         if (plugin is KotlinMultiplatformPluginWrapper) {
+            project.configureKonanDirectory()
             project.extensions.findByType<LibraryExtension>()?.apply {
                 configureAndroidLibraryWithMultiplatformPluginOptions()
             }
@@ -365,22 +371,17 @@ class AndroidXImplPlugin : Plugin<Project> {
         }
 
         // Remove the android:targetSdkVersion element from the manifest used for AARs.
-        project.tasks.withType(BundleAar::class.java).configureEach { task ->
-            task.doLast {
-                val aar = task.archiveFile.get().asFile
-                val tempDir = Files.createTempDirectory("${task.name}Unzip").toFile()
-                tempDir.deleteOnExit()
-
-                ZipFile(aar).use { aarFile ->
-                    aarFile.unzipTo(tempDir)
-                }
-                aar.delete()
-
-                val manifestFile = File(tempDir, "AndroidManifest.xml")
-                manifestFile.writeText(removeTargetSdkVersion(manifestFile.readText()))
-
-                tempDir.zipTo(aar)
-                tempDir.deleteRecursively()
+        project.extensions.getByType<LibraryAndroidComponentsExtension>().onVariants { variant ->
+            project.tasks.register(
+                variant.name + "AarManifestTransformer",
+                AarManifestTransformerTask::class.java
+            ).let { taskProvider ->
+                variant.artifacts.use(taskProvider)
+                    .wiredWithFiles(
+                        AarManifestTransformerTask::aarFile,
+                        AarManifestTransformerTask::updatedAarFile
+                    )
+                    .toTransform(SingleArtifact.AAR)
             }
         }
 
@@ -433,63 +434,24 @@ class AndroidXImplPlugin : Plugin<Project> {
         project.addToProjectMap(androidXExtension)
     }
 
-    private fun ZipFile.unzipTo(tempDir: File) {
-        entries.iterator().forEach { entry ->
-            if (entry.isDirectory) {
-                File(tempDir, entry.name).mkdirs()
-            } else {
-                val file = File(tempDir, entry.name)
-                file.parentFile.mkdirs()
-                getInputStream(entry).use { stream ->
-                    file.writeBytes(stream.readBytes())
-                }
-            }
-        }
-    }
-
-    private fun File.zipTo(outZip: File) {
-        ZipOutputStream(outZip.outputStream()).use { stream ->
-            listFiles()!!.forEach { file ->
-                stream.addFileRecursive(null, file)
-            }
-        }
-    }
-
-    private fun ZipOutputStream.addFileRecursive(parentPath: String?, file: File) {
-        val entryPath = if (parentPath != null) "$parentPath/${file.name}" else file.name
-        val entry = ZipEntry(file, entryPath)
-
-        // Reset creation time of entry to make it deterministic.
-        entry.time = 0
-        entry.creationTime = FileTime.fromMillis(0)
-
-        if (file.isFile) {
-            putNextEntry(entry)
-            file.inputStream().use { stream ->
-                stream.copyTo(this)
-            }
-            closeEntry()
-        } else if (file.isDirectory) {
-            val listFiles = file.listFiles()
-            if (!listFiles.isNullOrEmpty()) {
-                putNextEntry(entry)
-                closeEntry()
-                listFiles.forEach { containedFile ->
-                    addFileRecursive(entryPath, containedFile)
-                }
-            }
-        }
-    }
-
     private fun configureWithJavaPlugin(project: Project, extension: AndroidXExtension) {
         project.configureErrorProneForJava()
         project.configureSourceJarForJava()
 
         // Force Java 1.8 source- and target-compatibility for all Java libraries.
         val javaExtension = project.extensions.getByType<JavaPluginExtension>()
-        javaExtension.apply {
-            sourceCompatibility = VERSION_1_8
-            targetCompatibility = VERSION_1_8
+        project.afterEvaluate {
+            if (extension.type.compilationTarget == CompilationTarget.HOST) {
+                javaExtension.apply {
+                    sourceCompatibility = VERSION_11
+                    targetCompatibility = VERSION_11
+                }
+            } else {
+                javaExtension.apply {
+                    sourceCompatibility = VERSION_1_8
+                    targetCompatibility = VERSION_1_8
+                }
+            }
         }
 
         project.configureJavaCompilationWarnings(extension)
@@ -514,7 +476,7 @@ class AndroidXImplPlugin : Plugin<Project> {
         project.configureProjectForApiTasks(apiTaskConfig, extension)
 
         project.afterEvaluate {
-            if (extension.type.publish.shouldRelease()) {
+            if (extension.shouldRelease()) {
                 project.extra.set("publish", true)
             }
         }
@@ -728,7 +690,7 @@ class AndroidXImplPlugin : Plugin<Project> {
         }
 
         project.afterEvaluate {
-            if (androidXExtension.publish.shouldRelease()) {
+            if (androidXExtension.shouldRelease()) {
                 project.extra.set("publish", true)
             }
         }
@@ -738,6 +700,62 @@ class AndroidXImplPlugin : Plugin<Project> {
         sourceSets.findByName("main")!!.manifest.srcFile("src/androidMain/AndroidManifest.xml")
         sourceSets.findByName("androidTest")!!
             .manifest.srcFile("src/androidAndroidTest/AndroidManifest.xml")
+    }
+
+    /**
+     * Sets the konan distribution url to the prebuilts directory.
+     */
+    private fun Project.configureKonanDirectory() {
+        if (StudioType.isPlayground(this)) {
+            return // playground does not use prebuilts
+        }
+        overrideKotlinNativeCompilerRepository()
+        tasks.withType(KotlinNativeCompile::class.java).configureEach {
+            // use relative path so it doesn't affect gradle remote cache.
+            val relativePath = getKonanPrebuiltsFolder().relativeTo(rootProject.projectDir).path
+            it.kotlinOptions.freeCompilerArgs += listOf(
+                "-Xoverride-konan-properties=dependenciesUrl=file:$relativePath"
+            )
+        }
+    }
+
+    /**
+     * Until kotlin 1.7, we cannot set the repository URL where KMP plugin downloads the kotlin
+     * native compiler. This method implements a workaround for 1.6.21.
+     * We hijack the repository added by NativeCompilerDownloader to make it point to the konan
+     * prebuilts directory.
+     * After kotlin 1.7, we should use nativeBaseDownloadUrl property:
+     * https://github.com/JetBrains/kotlin/blob/025a21761b326767207b4a373593a3c2d24b8056/libraries/
+     *   tools/kotlin-gradle-plugin/src/common/kotlin/org/jetbrains/kotlin/gradle/plugin/
+     *   KotlinProperties.kt#L223
+     */
+    private fun Project.overrideKotlinNativeCompilerRepository() {
+        this.repositories.whenObjectAdded {
+            if (it is IvyArtifactRepository) {
+                if (it.url.host == "download.jetbrains.com" &&
+                    it.url.path.contains("kotlin/native/builds")
+                ) {
+                    val fileUrl = project.getKonanPrebuiltsFolder().resolve(
+                        "nativeCompilerPrebuilts"
+                    ).resolve(
+                        it.url.path.substringAfter("kotlin/native/builds/")
+                    ).canonicalFile
+                    check(fileUrl.exists()) {
+                        val konanVersion = getVersionByName("kotlinNative")
+                        """
+                        Missing kotlin native compiler prebuilt in $fileUrl. If you are updating
+                        kotlin version, please add the new compiler to the prebuilts/androidx/konan
+                        repository. You can download them by invoking the following script:
+
+                        ../../prebuilts/androidx/konan/download-native-compiler-prebuilts.sh $konanVersion
+
+                        Please don't forget to commit that version into the konan repository.
+                        """.trimIndent()
+                    }
+                    it.url = fileUrl.toURI()
+                }
+            }
+        }
     }
 
     private fun Project.configureKmpBuildOnServer() {
@@ -803,7 +821,7 @@ class AndroidXImplPlugin : Plugin<Project> {
     // Task that creates a json file of a project's dependencies
     private fun Project.addCreateLibraryBuildInfoFileTask(extension: AndroidXExtension) {
         afterEvaluate {
-            if (extension.publish.shouldRelease()) {
+            if (extension.shouldRelease()) {
                 // Only generate build info files for published libraries.
                 val task = CreateLibraryBuildInfoFileTask.setup(project, extension)
 
@@ -870,7 +888,7 @@ private fun Project.hideJavadocTask() {
 private fun Project.addToProjectMap(extension: AndroidXExtension) {
     // TODO(alanv): Move this out of afterEvaluate
     afterEvaluate {
-        if (extension.publish.shouldRelease()) {
+        if (extension.shouldRelease()) {
             val group = extension.mavenGroup?.group
             if (group != null) {
                 val module = "$group:$name"
@@ -928,30 +946,16 @@ private fun Project.configureTaskTimeouts() {
 private fun Project.configureJavaCompilationWarnings(androidXExtension: AndroidXExtension) {
     afterEvaluate {
         project.tasks.withType(JavaCompile::class.java).configureEach { task ->
-            if (hasProperty(ALL_WARNINGS_AS_ERRORS)) {
-                // If we're running a hypothetical test build confirming that tip-of-tree versions
-                // are compatible, then we're not concerned about warnings
-                if (!project.usingMaxDepVersions()) {
-                    task.options.compilerArgs.add("-Werror")
-                    task.options.compilerArgs.add("-Xlint:unchecked")
-                    if (androidXExtension.failOnDeprecationWarnings) {
-                        task.options.compilerArgs.add("-Xlint:deprecation")
-                    }
+            // If we're running a hypothetical test build confirming that tip-of-tree versions
+            // are compatible, then we're not concerned about warnings
+            if (!project.usingMaxDepVersions()) {
+                task.options.compilerArgs.add("-Xlint:unchecked")
+                if (androidXExtension.failOnDeprecationWarnings) {
+                    task.options.compilerArgs.add("-Xlint:deprecation")
                 }
             }
         }
     }
-}
-
-private fun Project.configureJavaCompilationWarnings(task: KotlinCompile) {
-    if (hasProperty(ALL_WARNINGS_AS_ERRORS) &&
-        !project.usingMaxDepVersions()
-    ) {
-        task.kotlinOptions.allWarningsAsErrors = true
-    }
-    task.kotlinOptions.freeCompilerArgs += listOf(
-        "-Xskip-metadata-version-check"
-    )
 }
 
 /**
@@ -1096,14 +1100,6 @@ fun AndroidXExtension.validateMavenVersion() {
         )
     }
 }
-
-/**
- * Removes the android:targetSdkVersion element from the [manifest].
- */
-fun removeTargetSdkVersion(manifest: String): String = manifest.replace(
-    "\\s*android:targetSdkVersion=\".+?\"".toRegex(),
-    ""
-)
 
 /**
  * Removes the line and column attributes from the [baseline].

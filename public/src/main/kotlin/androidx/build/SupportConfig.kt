@@ -84,6 +84,10 @@ fun Project.getAndroidJar(): FileCollection =
             File(
                 getSdkPath(),
                 "platforms/$COMPILE_SDK_VERSION/optional/android.car.jar"
-            )
+            ),
+            // Allow using optional android.test APIs
+            File(getSdkPath(), "platforms/$COMPILE_SDK_VERSION/optional/android.test.base.jar"),
+            File(getSdkPath(), "platforms/$COMPILE_SDK_VERSION/optional/android.test.mock.jar"),
+            File(getSdkPath(), "platforms/$COMPILE_SDK_VERSION/optional/android.test.runner.jar")
         )
     )

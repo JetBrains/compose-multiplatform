@@ -19,6 +19,7 @@ package androidx.build.libabigail
 import androidx.build.addToBuildOnServer
 import androidx.build.addToCheckTask
 import androidx.build.checkapi.getRequiredCompatibilityApiLocation
+import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import java.io.File
@@ -85,6 +86,7 @@ object NativeApiTasks {
                 task.artifactNames.set(artifactNames)
                 task.builtApi.set(builtApiLocation)
                 task.checkedInApis.set(outputApiLocations)
+                task.cacheEvenIfNoOutputs()
                 // Even if our API files are up to date, we still want to make sure we haven't
                 // made any incompatible changes since last release
                 checkNativeApiRelease?.let { task.dependsOn(it) }
@@ -102,23 +104,13 @@ object NativeApiTasks {
             task.outputApiLocations.set(outputApiLocations)
             task.dependsOn(generateNativeApi)
             // only allow updating the API files if there are no breaking changes from the last
-            // released version. If for whatever reason we want to ignore this,
-            // `ignoreBreakingChangesAndUpdateNativeApi` can be used.
-            checkNativeApiRelease?.let { task.dependsOn(it) }
-        }
-
-        // Identical to `updateNativeApi` but does not depend on `checkNativeApiRelease`
-        project.tasks.register(
-            "ignoreBreakingChangesAndUpdateNativeApi",
-            UpdateNativeApi::class.java
-        ) { task ->
-            task.group = apiGroup
-            task.description = "Updates the checked in API files to match source code API" +
-                "including breaking changes"
-            task.artifactNames.set(artifactNames)
-            task.inputApiLocation.set(builtApiLocation)
-            task.outputApiLocations.set(outputApiLocations)
-            task.dependsOn(generateNativeApi)
+            // released version. If for whatever reason we need to ignore this, the 'force' property
+            // can be used.
+            checkNativeApiRelease?.let { checkTask ->
+                if (!project.hasProperty("force")) {
+                    task.dependsOn(checkTask)
+                }
+            }
         }
 
         project.addToCheckTask(checkNativeApi)

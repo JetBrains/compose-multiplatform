@@ -112,6 +112,7 @@ abstract class DackkaTask @Inject constructor(
                 "sourceRoots" to listOf(sourcesDir.path),
                 "samples" to listOf(samplesDir.path, frameworkSamplesDir.path),
                 "classpath" to classPath,
+                "documentedVisibilities" to listOf("PUBLIC", "PROTECTED"),
                 "externalDocumentationLinks" to linksMap.map { (name, url) -> mapOf(
                     "url" to url,
                     "packageListUrl" to

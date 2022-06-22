@@ -15,7 +15,9 @@
  */
 package androidx.build.license
 
+import androidx.build.enforceKtlintVersion
 import androidx.build.getCheckoutRoot
+import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -23,7 +25,9 @@ import org.gradle.api.artifacts.ExternalDependency
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.artifacts.result.ResolvedArtifactResult
+import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.Usage
+import org.gradle.api.attributes.plugin.GradlePluginApiVersion
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Property
@@ -33,8 +37,8 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.named
+import org.gradle.util.GradleVersion
 import org.gradle.work.DisableCachingByDefault
-import java.io.File
 
 /**
  * This task creates a configuration for the project that has all of its external dependencies
@@ -116,7 +120,19 @@ fun Project.configureExternalDependencyLicenseCheck() {
                         Usage.USAGE_ATTRIBUTE,
                         project.objects.named<Usage>(Usage.JAVA_RUNTIME)
                     )
+                    it.attribute(
+                        Category.CATEGORY_ATTRIBUTE,
+                        project.objects.named<Category>(Category.LIBRARY)
+                    )
+                    it.attribute(
+                        GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
+                        project.objects.named<GradlePluginApiVersion>(
+                            GradleVersion.current().getVersion()
+                        )
+                    )
                 }
+                // workaround for b/234884534
+                project.enforceKtlintVersion(checkerConfig)
 
                 project
                     .configurations

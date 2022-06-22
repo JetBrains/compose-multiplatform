@@ -36,7 +36,7 @@ import org.gradle.tooling.events.task.TaskExecutionResult
  * inputs/outputs declared and are running more often than necessary.
  */
 
-const val DISALLOW_TASK_EXECUTION_FLAG_NAME = "disallowExecution"
+const val DISALLOW_TASK_EXECUTION_VAR_NAME = "DISALLOW_TASK_EXECUTION"
 
 private const val ENABLE_FLAG_NAME = VERIFY_UP_TO_DATE
 
@@ -48,6 +48,8 @@ private const val ENABLE_FLAG_NAME = VERIFY_UP_TO_DATE
 val ALLOW_RERUNNING_TASKS = setOf(
     "buildOnServer",
     "checkExternalLicenses",
+    // https://youtrack.jetbrains.com/issue/KT-52632
+    "commonizeNativeDistribution",
     "createDiffArchiveForAll",
     "externalNativeBuildDebug",
     "externalNativeBuildRelease",
@@ -118,7 +120,10 @@ val ALLOW_RERUNNING_TASKS = setOf(
     // https://github.com/gradle/gradle/issues/17262
     ":doclava:compileJava",
     ":doclava:processResources",
-    ":doclava:jar"
+    ":doclava:jar",
+
+    // https://youtrack.jetbrains.com/issue/KT-49933
+    "generateProjectStructureMetadata"
 )
 
 // Additional tasks that are expected to be temporarily out-of-date after running once
@@ -184,6 +189,11 @@ abstract class TaskUpToDateValidator :
                 // null list means the task already failed, so we'll skip emitting our error
                 return
             }
+            if (isCausedByAKlibChange(result)) {
+                // ignore these until this bug in the KMP plugin is fixed.
+                // see the method for details.
+                return
+            }
             if (!isAllowedToRerunTask(name)) {
                 throw GradleException(
                     "Ran two consecutive builds of the same tasks, and in the " +
@@ -201,16 +211,35 @@ abstract class TaskUpToDateValidator :
             return project.providers.gradleProperty(ENABLE_FLAG_NAME).isPresent
         }
 
+        /**
+         * Currently, klibs are not reproducible, which means any task that depends on them
+         * might get invalidated at no fault of their own.
+         *
+         * https://youtrack.jetbrains.com/issue/KT-52741
+         */
+        private fun isCausedByAKlibChange(result: TaskExecutionResult): Boolean {
+            // the actual message looks something like:
+            // Input property 'rootSpec$1$3' file <some-path>.klib has changed
+            return result.executionReasons.orEmpty().any {
+                it.contains(".klib has changed")
+            }
+        }
+
         private fun isAllowedToRerunTask(taskPath: String): Boolean {
             if (ALLOW_RERUNNING_TASKS.contains(taskPath)) {
                 return true
             }
-            val colonIndex = taskPath.lastIndexOf(":")
-            if (colonIndex >= 0) {
-                val taskName = taskPath.substring(colonIndex + 1)
-                if (ALLOW_RERUNNING_TASKS.contains(taskName)) {
-                    return true
-                }
+            val taskName = taskPath.substringAfterLast(":")
+            if (ALLOW_RERUNNING_TASKS.contains(taskName)) {
+                return true
+            }
+            if (taskName.startsWith("compile") && taskName.endsWith("KotlinMetadata")) {
+                // these tasks' up-to-date checks might flake.
+                // https://youtrack.jetbrains.com/issue/KT-52675
+                // We are not adding the task type to the DONT_TRY_RERUNNING_TASKS list because it
+                // is a common compilation task that is shared w/ other kotlin native compilations.
+                // (e.g. similar to the Exec task in Gradle)
+                return true
             }
             return false
         }
@@ -227,8 +256,8 @@ abstract class TaskUpToDateValidator :
             if (!shouldEnable(rootProject)) {
                 return
             }
-            val validate = rootProject.providers.gradleProperty(DISALLOW_TASK_EXECUTION_FLAG_NAME)
-                .map { true }.orElse(false)
+            val validate = rootProject.providers
+                .environmentVariable(DISALLOW_TASK_EXECUTION_VAR_NAME).map { true }.orElse(false)
             // create listener for validating that any task that reran was expected to rerun
             val validatorProvider = rootProject.gradle.sharedServices
                 .registerIfAbsent(
