@@ -683,6 +683,8 @@ class BoxWithConstraintsTest : LayoutTest() {
         assertTrue(latch.await(1, TimeUnit.SECONDS))
     }
 
+    // waitAndScreenShot() requires API level 26
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun takeScreenShot(size: Int): Bitmap {
         assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
         val bitmap = activityTestRule.waitAndScreenShot()
