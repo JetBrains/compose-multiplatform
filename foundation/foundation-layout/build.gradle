@@ -36,10 +36,10 @@ dependencies {
          */
 
         api("androidx.annotation:annotation:1.1.0")
-        api(project(":compose:ui:ui"))
+        api("androidx.compose.ui:ui:1.2.0-rc01")
         api("androidx.compose.ui:ui-unit:1.1.1")
 
-        implementation(project(":compose:runtime:runtime"))
+        implementation("androidx.compose.runtime:runtime:1.2.0-rc01")
         implementation("androidx.compose.ui:ui-util:1.0.0")
         implementation("androidx.core:core:1.7.0")
         implementation("androidx.compose.animation:animation-core:1.1.1")

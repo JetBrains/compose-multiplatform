@@ -1,4 +1,4 @@
-/*
+/*./material/material/build.gradle
  * Copyright 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,12 +34,12 @@ dependencies {
          * corresponding block below
          */
         api("androidx.compose.animation:animation-core:1.0.0")
-        api(project(":compose:foundation:foundation"))
+        api("androidx.compose.foundation:foundation:1.2.0-rc01")
         api(project(":compose:material:material-icons-core"))
         api(project(":compose:material:material-ripple"))
-        api(project(":compose:runtime:runtime"))
-        api(project(":compose:ui:ui:"))
-        api(project(":compose:ui:ui-text"))
+        api("androidx.compose.runtime:runtime:1.2.0-rc01")
+        api("androidx.compose.ui:ui:1.2.0-rc01")
+        api("androidx.compose.ui:ui-text:1.2.0-rc01")
 
         implementation(libs.kotlinStdlibCommon)
         implementation("androidx.compose.animation:animation:1.0.0")
