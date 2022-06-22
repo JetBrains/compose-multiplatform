@@ -32,6 +32,7 @@ import kotlin.contracts.contract
  * access in an efficient way, and this method may actually be a lot slower. Only use for
  * collections that are created by code we control and are known to support random access.
  */
+@Suppress("BanInlineOptIn")
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T, R> List<T>.fastZipWithNext(transform: (T, T) -> R): List<R> {
     contract { callsInPlace(transform) }
@@ -61,6 +62,7 @@ internal inline fun <T, R> List<T>.fastZipWithNext(transform: (T, T) -> R): List
  * @param [operation] function that takes current accumulator value and an element,
  * and calculates the next accumulator value.
  */
+@Suppress("BanInlineOptIn")
 @OptIn(ExperimentalContracts::class)
 internal inline fun <S, T : S> List<T>.fastReduce(operation: (acc: S, T) -> S): S {
     contract { callsInPlace(operation) }
@@ -84,6 +86,7 @@ internal inline fun <S, T : S> List<T>.fastReduce(operation: (acc: S, T) -> S): 
  * access in an efficient way, and this method may actually be a lot slower. Only use for
  * collections that are created by code we control and are known to support random access.
  */
+@Suppress("BanInlineOptIn")
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T, K, V> List<T>.fastAssociate(transform: (T) -> Pair<K, V>): Map<K, V> {
     contract { callsInPlace(transform) }
@@ -103,6 +106,7 @@ internal inline fun <T, K, V> List<T>.fastAssociate(transform: (T) -> Pair<K, V>
  * access in an efficient way, and this method may actually be a lot slower. Only use for
  * collections that are created by code we control and are known to support random access.
  */
+@Suppress("BanInlineOptIn")
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T, R, V> List<T>.fastZip(
     other: List<R>,
@@ -125,6 +129,7 @@ internal inline fun <T, R, V> List<T>.fastZip(
  * access in an efficient way, and this method may actually be a lot slower. Only use for
  * collections that are created by code we control and are known to support random access.
  */
+@Suppress("BanInlineOptIn")
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T, R> List<T>.fastMapNotNull(transform: (T) -> R?): List<R> {
     contract { callsInPlace(transform) }
