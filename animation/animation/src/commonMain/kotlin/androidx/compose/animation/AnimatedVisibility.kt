@@ -760,7 +760,7 @@ private fun <T> AnimatedEnterExitImpl(
     }
 }
 
-@OptIn(ExperimentalTransitionApi::class, ExperimentalAnimationApi::class)
+@ExperimentalAnimationApi
 @Composable
 private inline fun AnimatedEnterExitImpl(
     transition: Transition<EnterExitState>,
