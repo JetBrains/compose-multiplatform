@@ -126,10 +126,8 @@ import kotlinx.coroutines.launch
 fun TabRow(
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
-    containerColor: Color =
-        MaterialTheme.colorScheme.fromToken(PrimaryNavigationTabTokens.ContainerColor),
-    contentColor: Color =
-        MaterialTheme.colorScheme.fromToken(PrimaryNavigationTabTokens.ActiveLabelTextColor),
+    containerColor: Color = TabRowDefaults.Color,
+    contentColor: Color = TabRowDefaults.ContentColor,
     indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = @Composable { tabPositions ->
         TabRowDefaults.Indicator(
             Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
@@ -216,10 +214,8 @@ fun TabRow(
 fun ScrollableTabRow(
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
-    containerColor: Color =
-        MaterialTheme.colorScheme.fromToken(PrimaryNavigationTabTokens.ContainerColor),
-    contentColor: Color =
-        MaterialTheme.colorScheme.fromToken(PrimaryNavigationTabTokens.ActiveLabelTextColor),
+    containerColor: Color = TabRowDefaults.Color,
+    contentColor: Color = TabRowDefaults.ContentColor,
     edgePadding: Dp = ScrollableTabRowPadding,
     indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = @Composable { tabPositions ->
         TabRowDefaults.Indicator(
@@ -245,7 +241,8 @@ fun ScrollableTabRow(
             )
         }
         SubcomposeLayout(
-            Modifier.fillMaxWidth()
+            Modifier
+                .fillMaxWidth()
                 .wrapContentSize(align = Alignment.CenterStart)
                 .horizontalScroll(scrollState)
                 .selectableGroup()
@@ -345,6 +342,13 @@ class TabPosition internal constructor(val left: Dp, val width: Dp) {
  * Contains default implementations and values used for TabRow.
  */
 object TabRowDefaults {
+    /** Default color of a tab row. */
+    val Color: Color @Composable get() = PrimaryNavigationTabTokens.ContainerColor.toColor()
+
+    /** Default content color of a tab row. */
+    val ContentColor: Color @Composable get() =
+        PrimaryNavigationTabTokens.ActiveLabelTextColor.toColor()
+
     /**
      * Default [Divider], which will be positioned at the bottom of the [TabRow], underneath the
      * indicator.

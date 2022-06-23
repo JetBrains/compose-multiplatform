@@ -46,8 +46,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun Divider(
     modifier: Modifier = Modifier,
-    color: Color = DividerTokens.Color.toColor(),
-    thickness: Dp = DividerTokens.Thickness,
+    color: Color = DividerDefaults.Color,
+    thickness: Dp = DividerDefaults.Thickness,
     startIndent: Dp = 0.dp
 ) {
     val indentMod = if (startIndent.value != 0f) {
@@ -66,4 +66,13 @@ fun Divider(
             .height(targetThickness)
             .background(color = color)
     )
+}
+
+/** Default values for [Divider] */
+object DividerDefaults {
+    /** Default color of a divider. */
+    val Color: Color @Composable get() = DividerTokens.Color.toColor()
+
+    /** Default thickness of a divider. */
+    val Thickness: Dp = DividerTokens.Thickness
 }

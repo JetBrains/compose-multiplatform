@@ -200,7 +200,7 @@ fun FilledIconButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = FilledIconButtonTokens.ContainerShape.toShape(),
+    shape: Shape = IconButtonDefaults.FilledShape,
     colors: IconButtonColors = IconButtonDefaults.filledIconButtonColors(),
     content: @Composable () -> Unit
 ) = Surface(
@@ -261,7 +261,7 @@ fun FilledTonalIconButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = FilledIconButtonTokens.ContainerShape.toShape(),
+    shape: Shape = IconButtonDefaults.FilledShape,
     colors: IconButtonColors = IconButtonDefaults.filledTonalIconButtonColors(),
     content: @Composable () -> Unit
 ) = Surface(
@@ -319,7 +319,7 @@ fun FilledIconToggleButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = FilledIconButtonTokens.ContainerShape.toShape(),
+    shape: Shape = IconButtonDefaults.FilledShape,
     colors: IconToggleButtonColors = IconButtonDefaults.filledIconToggleButtonColors(),
     content: @Composable () -> Unit
 ) = Surface(
@@ -383,7 +383,7 @@ fun FilledTonalIconToggleButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = FilledIconButtonTokens.ContainerShape.toShape(),
+    shape: Shape = IconButtonDefaults.FilledShape,
     colors: IconToggleButtonColors = IconButtonDefaults.filledTonalIconToggleButtonColors(),
     content: @Composable () -> Unit
 ) = Surface(
@@ -448,7 +448,7 @@ fun OutlinedIconButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = OutlinedIconButtonTokens.ContainerShape.toShape(),
+    shape: Shape = IconButtonDefaults.OutlinedShape,
     border: BorderStroke? = IconButtonDefaults.outlinedIconButtonBorder(enabled),
     colors: IconButtonColors = IconButtonDefaults.outlinedIconButtonColors(),
     content: @Composable () -> Unit
@@ -510,7 +510,7 @@ fun OutlinedIconToggleButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = OutlinedIconButtonTokens.ContainerShape.toShape(),
+    shape: Shape = IconButtonDefaults.OutlinedShape,
     border: BorderStroke? = IconButtonDefaults.outlinedIconToggleButtonBorder(enabled, checked),
     colors: IconToggleButtonColors = IconButtonDefaults.outlinedIconToggleButtonColors(),
     content: @Composable () -> Unit
@@ -596,6 +596,13 @@ interface IconToggleButtonColors {
  * Contains the default values used by all icon button types.
  */
 object IconButtonDefaults {
+    /** Default shape for a filled icon button. */
+    val FilledShape: Shape @Composable get() = FilledIconButtonTokens.ContainerShape.toShape()
+
+    /** Default shape for an outlined icon button. */
+    val OutlinedShape: Shape @Composable get() =
+        OutlinedIconButtonTokens.ContainerShape.toShape()
+
     /**
      * Creates a [IconButtonColors] that represents the default colors used in a [IconButton].
      *

@@ -78,7 +78,7 @@ import kotlinx.coroutines.flow.collect
 @Composable
 fun Card(
     modifier: Modifier = Modifier,
-    shape: Shape = FilledCardTokens.ContainerShape.toShape(),
+    shape: Shape = CardDefaults.Shape,
     border: BorderStroke? = null,
     elevation: CardElevation = CardDefaults.cardElevation(),
     colors: CardColors = CardDefaults.cardColors(),
@@ -136,7 +136,7 @@ fun Card(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = FilledCardTokens.ContainerShape.toShape(),
+    shape: Shape = CardDefaults.Shape,
     border: BorderStroke? = null,
     elevation: CardElevation = CardDefaults.cardElevation(),
     colors: CardColors = CardDefaults.cardColors(),
@@ -186,7 +186,7 @@ fun Card(
 @Composable
 fun ElevatedCard(
     modifier: Modifier = Modifier,
-    shape: Shape = ElevatedCardTokens.ContainerShape.toShape(),
+    shape: Shape = CardDefaults.ElevatedShape,
     elevation: CardElevation = CardDefaults.elevatedCardElevation(),
     colors: CardColors = CardDefaults.elevatedCardColors(),
     content: @Composable ColumnScope.() -> Unit
@@ -236,7 +236,7 @@ fun ElevatedCard(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = ElevatedCardTokens.ContainerShape.toShape(),
+    shape: Shape = CardDefaults.ElevatedShape,
     elevation: CardElevation = CardDefaults.elevatedCardElevation(),
     colors: CardColors = CardDefaults.elevatedCardColors(),
     content: @Composable ColumnScope.() -> Unit
@@ -281,7 +281,7 @@ fun ElevatedCard(
 @Composable
 fun OutlinedCard(
     modifier: Modifier = Modifier,
-    shape: Shape = OutlinedCardTokens.ContainerShape.toShape(),
+    shape: Shape = CardDefaults.OutlinedShape,
     border: BorderStroke = CardDefaults.outlinedCardBorder(),
     elevation: CardElevation = CardDefaults.outlinedCardElevation(),
     colors: CardColors = CardDefaults.outlinedCardColors(),
@@ -333,7 +333,7 @@ fun OutlinedCard(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = OutlinedCardTokens.ContainerShape.toShape(),
+    shape: Shape = CardDefaults.OutlinedShape,
     border: BorderStroke = CardDefaults.outlinedCardBorder(enabled),
     elevation: CardElevation = CardDefaults.outlinedCardElevation(),
     colors: CardColors = CardDefaults.outlinedCardColors(),
@@ -420,6 +420,15 @@ interface CardColors {
  * Contains the default values used by all card types.
  */
 object CardDefaults {
+    // Shape Defaults
+    /** Default shape for a card. */
+    val Shape: Shape @Composable get() = FilledCardTokens.ContainerShape.toShape()
+
+    /** Default shape for an elevated card. */
+    val ElevatedShape: Shape @Composable get() = ElevatedCardTokens.ContainerShape.toShape()
+
+    /** Default shape for an outlined card. */
+    val OutlinedShape: Shape @Composable get() = OutlinedCardTokens.ContainerShape.toShape()
 
     /**
      * Creates a [CardElevation] that will animate between the provided values according to the

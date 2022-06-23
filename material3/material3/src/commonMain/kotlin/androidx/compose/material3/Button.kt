@@ -52,7 +52,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.flow.collect
 
 /**
  * <a href="https://m3.material.io/components/buttons/overview" class="external" target="_blank">Material Design button</a>.
@@ -107,7 +106,7 @@ fun Button(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
-    shape: Shape = FilledButtonTokens.ContainerShape.toShape(),
+    shape: Shape = ButtonDefaults.Shape,
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
@@ -134,10 +133,11 @@ fun Button(
         CompositionLocalProvider(LocalContentColor provides contentColor) {
             ProvideTextStyle(value = MaterialTheme.typography.labelLarge) {
                 Row(
-                    Modifier.defaultMinSize(
-                        minWidth = ButtonDefaults.MinWidth,
-                        minHeight = ButtonDefaults.MinHeight
-                    )
+                    Modifier
+                        .defaultMinSize(
+                            minWidth = ButtonDefaults.MinWidth,
+                            minHeight = ButtonDefaults.MinHeight
+                        )
                         .padding(contentPadding),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
@@ -199,7 +199,7 @@ fun ElevatedButton(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: ButtonElevation? = ButtonDefaults.elevatedButtonElevation(),
-    shape: Shape = ElevatedButtonTokens.ContainerShape.toShape(),
+    shape: Shape = ButtonDefaults.ElevatedShape,
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.elevatedButtonColors(),
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
@@ -269,7 +269,7 @@ fun FilledTonalButton(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: ButtonElevation? = ButtonDefaults.filledTonalButtonElevation(),
-    shape: Shape = FilledTonalButtonTokens.ContainerShape.toShape(),
+    shape: Shape = ButtonDefaults.FilledTonalShape,
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.filledTonalButtonColors(),
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
@@ -338,7 +338,7 @@ fun OutlinedButton(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: ButtonElevation? = null,
-    shape: Shape = OutlinedButtonTokens.ContainerShape.toShape(),
+    shape: Shape = ButtonDefaults.OutlinedShape,
     border: BorderStroke? = ButtonDefaults.outlinedButtonBorder,
     colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
@@ -409,7 +409,7 @@ fun TextButton(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: ButtonElevation? = null,
-    shape: Shape = TextButtonTokens.ContainerShape.toShape(),
+    shape: Shape = ButtonDefaults.TextShape,
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.textButtonColors(),
     contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
@@ -505,6 +505,22 @@ object ButtonDefaults {
      */
     // TODO(b/201344013): Make sure this value stays up to date until replaced with a token.
     val IconSpacing = 8.dp
+
+    // Shape Defaults
+    /** Default shape for a button. */
+    val Shape: Shape @Composable get() = FilledButtonTokens.ContainerShape.toShape()
+
+    /** Default shape for an elevated button. */
+    val ElevatedShape: Shape @Composable get() = ElevatedButtonTokens.ContainerShape.toShape()
+
+    /** Default shape for a filled tonal button. */
+    val FilledTonalShape: Shape @Composable get() = FilledTonalButtonTokens.ContainerShape.toShape()
+
+    /** Default shape for an outlined button. */
+    val OutlinedShape: Shape @Composable get() = OutlinedButtonTokens.ContainerShape.toShape()
+
+    /** Default shape for a text button. */
+    val TextShape: Shape @Composable get() = TextButtonTokens.ContainerShape.toShape()
 
     /**
      * Creates a [ButtonColors] that represents the default container and content colors used in a

@@ -16,6 +16,7 @@
 
 package androidx.compose.material3
 
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.tokens.ShapeKeyTokens
@@ -24,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 
 /**
@@ -51,7 +53,7 @@ import androidx.compose.ui.unit.dp
  * To learn more about shapes, see [Material Design shapes](https://m3.material.io/styles/shape/overview).
  *
  * @param extraSmall A shape style with 4 same-sized corners whose size are bigger than
- * [Shapes.None] and smaller than [Shapes.small]. By default autocomplete menu, select menu,
+ * [RectangleShape] and smaller than [Shapes.small]. By default autocomplete menu, select menu,
  * snackbars, standard menu, and text fields use this shape.
  * @param small A shape style with 4 same-sized corners whose size are bigger than
  * [Shapes.extraSmall] and smaller than [Shapes.medium]. By default chips use this shape.
@@ -61,24 +63,17 @@ import androidx.compose.ui.unit.dp
  * and smaller than [Shapes.extraLarge]. By default extended FABs, FABs, and navigation drawers use
  * this shape.
  * @param extraLarge A shape style with 4 same-sized corners whose size are bigger than
- * [Shapes.large] and smaller than [Shapes.Full]. By default large FABs use this shape.
+ * [Shapes.large] and smaller than [CircleShape]. By default large FABs use this shape.
  */
 @Immutable
 class Shapes(
-    val extraSmall: CornerBasedShape = ShapeTokens.CornerExtraSmall,
-    val small: CornerBasedShape = ShapeTokens.CornerSmall,
-    val medium: CornerBasedShape = ShapeTokens.CornerMedium,
-    val large: CornerBasedShape = ShapeTokens.CornerLarge,
-    val extraLarge: CornerBasedShape = ShapeTokens.CornerExtraLarge,
+    // Shapes None and Full are omitted as None is a RectangleShape and Full is a CircleShape.
+    val extraSmall: CornerBasedShape = ShapeDefaults.ExtraSmall,
+    val small: CornerBasedShape = ShapeDefaults.Small,
+    val medium: CornerBasedShape = ShapeDefaults.Medium,
+    val large: CornerBasedShape = ShapeDefaults.Large,
+    val extraLarge: CornerBasedShape = ShapeDefaults.ExtraLarge,
 ) {
-    companion object {
-        /** A shape with no rounded corners (a rectangle shape). */
-        val None = ShapeTokens.CornerNone
-
-        /** A shape with fully extended rounded corners (a circular shape). */
-        val Full = ShapeTokens.CornerFull
-    }
-
     /** Returns a copy of this Shapes, optionally overriding some of the values. */
     fun copy(
         extraSmall: CornerBasedShape = this.extraSmall,
@@ -124,6 +119,26 @@ class Shapes(
     }
 }
 
+/**
+ * Contains the default values used by [Shapes]
+ */
+object ShapeDefaults {
+    /** Extra small sized corner shape */
+    val ExtraSmall: CornerBasedShape = ShapeTokens.CornerExtraSmall
+
+    /** Small sized corner shape */
+    val Small: CornerBasedShape = ShapeTokens.CornerSmall
+
+    /** Medium sized corner shape */
+    val Medium: CornerBasedShape = ShapeTokens.CornerMedium
+
+    /** Large sized corner shape */
+    val Large: CornerBasedShape = ShapeTokens.CornerLarge
+
+    /** Extra large sized corner shape */
+    val ExtraLarge: CornerBasedShape = ShapeTokens.CornerExtraLarge
+}
+
 /** Helper function for component shape tokens. Used to grab the top values of a shape parameter. */
 internal fun CornerBasedShape.top(): CornerBasedShape {
     return copy(bottomStart = CornerSize(0.0.dp), bottomEnd = CornerSize(0.0.dp))
@@ -145,12 +160,12 @@ internal fun Shapes.fromToken(value: ShapeKeyTokens): Shape {
         ShapeKeyTokens.CornerExtraLargeTop -> extraLarge.top()
         ShapeKeyTokens.CornerExtraSmall -> extraSmall
         ShapeKeyTokens.CornerExtraSmallTop -> extraSmall.top()
-        ShapeKeyTokens.CornerFull -> Shapes.Full
+        ShapeKeyTokens.CornerFull -> CircleShape
         ShapeKeyTokens.CornerLarge -> large
         ShapeKeyTokens.CornerLargeEnd -> large.end()
         ShapeKeyTokens.CornerLargeTop -> large.top()
         ShapeKeyTokens.CornerMedium -> medium
-        ShapeKeyTokens.CornerNone -> Shapes.None
+        ShapeKeyTokens.CornerNone -> RectangleShape
         ShapeKeyTokens.CornerSmall -> small
     }
 }

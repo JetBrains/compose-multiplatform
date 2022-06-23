@@ -94,7 +94,7 @@ import kotlin.math.roundToInt
 @Composable
 fun NavigationRail(
     modifier: Modifier = Modifier,
-    containerColor: Color = NavigationRailTokens.ContainerColor.toColor(),
+    containerColor: Color = NavigationRailDefaults.ContainerColor,
     contentColor: Color = contentColorFor(containerColor),
     header: @Composable (ColumnScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
@@ -240,6 +240,12 @@ fun NavigationRailItem(
             animationProgress = animationProgress,
         )
     }
+}
+
+/** Defaults used in [NavigationRail] */
+object NavigationRailDefaults {
+    /** Default container color of a navigation rail. */
+    val ContainerColor: Color @Composable get() = NavigationRailTokens.ContainerColor.toColor()
 }
 
 /** Defaults used in [NavigationRailItem]. */

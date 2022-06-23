@@ -78,12 +78,12 @@ fun AlertDialog(
     icon: @Composable (() -> Unit)? = null,
     title: @Composable (() -> Unit)? = null,
     text: @Composable (() -> Unit)? = null,
-    shape: Shape = DialogTokens.ContainerShape.toShape(),
-    containerColor: Color = DialogTokens.ContainerColor.toColor(),
-    tonalElevation: Dp = DialogTokens.ContainerElevation,
-    iconContentColor: Color = DialogTokens.IconColor.toColor(),
-    titleContentColor: Color = DialogTokens.SubheadColor.toColor(),
-    textContentColor: Color = DialogTokens.SupportingTextColor.toColor(),
+    shape: Shape = AlertDialogDefaults.Shape,
+    containerColor: Color = AlertDialogDefaults.ContainerColor,
+    tonalElevation: Dp = AlertDialogDefaults.TonalElevation,
+    iconContentColor: Color = AlertDialogDefaults.IconContentColor,
+    titleContentColor: Color = AlertDialogDefaults.TitleContentColor,
+    textContentColor: Color = AlertDialogDefaults.TextContentColor,
     properties: DialogProperties = DialogProperties()
 ) {
     Dialog(
@@ -117,6 +117,29 @@ fun AlertDialog(
             textContentColor = textContentColor,
         )
     }
+}
+
+/**
+ * Contains default values used for [AlertDialog]
+ */
+object AlertDialogDefaults {
+    /** The default shape for alert dialogs */
+    val Shape: Shape @Composable get() = DialogTokens.ContainerShape.toShape()
+
+    /** The default container color for alert dialogs */
+    val ContainerColor: Color @Composable get() = DialogTokens.ContainerColor.toColor()
+
+    /** The default tonal elevation for alert dialogs */
+    val TonalElevation: Dp = DialogTokens.ContainerElevation
+
+    /** The default icon color for alert dialogs */
+    val IconContentColor: Color @Composable get() = DialogTokens.IconColor.toColor()
+
+    /** The default title color for alert dialogs */
+    val TitleContentColor: Color @Composable get() = DialogTokens.SubheadColor.toColor()
+
+    /** The default text color for alert dialogs */
+    val TextContentColor: Color @Composable get() = DialogTokens.SupportingTextColor.toColor()
 }
 
 private val ButtonsMainAxisSpacing = 8.dp
