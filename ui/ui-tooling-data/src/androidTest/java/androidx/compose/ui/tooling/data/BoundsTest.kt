@@ -28,10 +28,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
+import com.google.common.truth.Truth.assertThat
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -85,6 +87,35 @@ class BoundsTest : ToolingTest() {
                     Assert.assertTrue(boundingBoxes[index] in value - 1..value + 1)
                 }
             }
+        }
+    }
+
+    @Test
+    fun testBoundsWithoutParsingParameters() {
+        val lefts = mutableMapOf<String, Dp>()
+        val slotTableRecord = CompositionDataRecord.create()
+        show {
+            Inspectable(slotTableRecord) {
+                Box {
+                    Column(Modifier.padding(10.dp)) {
+                        Text("Hello", Modifier.padding(5.dp))
+                    }
+                }
+            }
+        }
+
+        activityTestRule.runOnUiThread {
+            slotTableRecord.store.first().mapTree<Any>({ _, context, _ ->
+                if (context.location?.sourceFile == "BoundsTest.kt") {
+                    with(Density(activityTestRule.activity)) {
+                        lefts[context.name!!] = context.bounds.left.toDp()
+                    }
+                }
+            })
+
+            assertThat(lefts["Box"]?.value).isWithin(1f).of(0f)
+            assertThat(lefts["Column"]?.value).isWithin(1f).of(10f)
+            assertThat(lefts["Text"]?.value).isWithin(0.5f).of(15f)
         }
     }
 

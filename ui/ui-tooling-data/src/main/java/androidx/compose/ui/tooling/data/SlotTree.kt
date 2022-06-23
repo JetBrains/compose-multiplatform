@@ -222,6 +222,25 @@ private class SourceInformationContext(
         }
         return null
     }
+
+    fun sourceLocation(callIndex: Int, parentContext: SourceInformationContext?): SourceLocation? {
+        var locationIndex = callIndex
+        if (locationIndex >= locations.size && repeatOffset >= 0 && repeatOffset < locations.size) {
+            locationIndex =
+                (callIndex - repeatOffset) % (locations.size - repeatOffset) + repeatOffset
+        }
+        if (locationIndex < locations.size) {
+            val location = locations[locationIndex]
+            return SourceLocation(
+                location.lineNumber ?: -1,
+                location.offset ?: -1,
+                location.length ?: -1,
+                sourceFile ?: parentContext?.sourceFile,
+                (if (sourceFile == null) parentContext?.packageHash else packageHash) ?: -1
+            )
+        }
+        return null
+    }
 }
 
 private val parametersInformationTokenizer = Regex("(\\d+)|,|[!P()]|:([^,!)]+)")
@@ -358,7 +377,7 @@ private fun parseParameters(parameters: String): List<Parameter> {
 @UiToolingDataApi
 private fun sourceInformationContextOf(
     information: String,
-    parent: SourceInformationContext?
+    parent: SourceInformationContext? = null
 ): SourceInformationContext? {
     var currentResult = tokenizer.find(information)
 
@@ -536,6 +555,160 @@ private fun boundsOfLayoutNode(node: LayoutInfo): IntRect {
     val right = left + size.width
     val bottom = top + size.height
     return IntRect(left = left, top = top, right = right, bottom = bottom)
+}
+
+@UiToolingDataApi
+private class CompositionCallStack<T>(
+    private val factory: (CompositionGroup, SourceContext, List<T>) -> T?,
+    private val contexts: MutableMap<String, Any?>
+) : SourceContext {
+    private val stack = ArrayDeque<CompositionGroup>()
+    private var currentCallIndex = 0
+
+    fun convert(group: CompositionGroup, callIndex: Int, out: MutableList<T>): IntRect {
+        val children = mutableListOf<T>()
+        var box = emptyBox
+        push(group)
+        var childCallIndex = 0
+        group.compositionGroups.forEach { child ->
+            box = box.union(convert(child, childCallIndex, children))
+            if (isCall(child)) {
+                childCallIndex++
+            }
+        }
+        box = (group.node as? LayoutInfo)?.let { boundsOfLayoutNode(it) } ?: box
+        currentCallIndex = callIndex
+        bounds = box
+        factory(group, this, children)?.let { out.add(it) }
+        pop()
+        return box
+    }
+
+    override val name: String?
+        get() {
+            val info = current.sourceInfo ?: return null
+            if (!info.startsWith("C(")) {
+                return null
+            }
+            val endIndex = info.indexOf(')')
+            return if (endIndex > 2) info.substring(2, endIndex) else null
+        }
+
+    override var bounds: IntRect = emptyBox
+        private set
+
+    override val location: SourceLocation?
+        get() {
+            val context = parentGroup(1)?.sourceInfo?.let { contextOf(it) } ?: return null
+            var parentContext: SourceInformationContext? = context
+            var index = 2
+            while (index < stack.size && parentContext?.sourceFile == null) {
+                parentContext = parentGroup(index++)?.sourceInfo?.let { contextOf(it) }
+            }
+            return context.sourceLocation(currentCallIndex, parentContext)
+        }
+
+    override val parameters: List<ParameterInformation>
+        get() {
+            val group = current
+            val context = group.sourceInfo?.let { contextOf(it) } ?: return emptyList()
+            val data = mutableListOf<Any?>()
+            data.addAll(group.data)
+            return extractParameterInfo(data, context)
+        }
+
+    override val depth: Int
+        get() = stack.size
+
+    private fun push(group: CompositionGroup) =
+        stack.addLast(group)
+
+    private fun pop() =
+        stack.removeLast()
+
+    private val current: CompositionGroup
+        get() = stack.last()
+
+    private fun parentGroup(parentDepth: Int): CompositionGroup? =
+        if (stack.size > parentDepth) stack[stack.size - parentDepth - 1] else null
+
+    private fun contextOf(information: String): SourceInformationContext? =
+        contexts.getOrPut(information) { sourceInformationContextOf(information) }
+            as? SourceInformationContext
+
+    private fun isCall(group: CompositionGroup): Boolean =
+        group.sourceInfo?.startsWith("C") ?: false
+}
+
+/**
+ * A cache of [SourceInformationContext] that optionally can be specified when using [mapTree].
+ */
+@UiToolingDataApi
+class ContextCache {
+    /**
+     * Clears the cache.
+     */
+    fun clear() {
+        contexts.clear()
+    }
+
+    internal val contexts = mutableMapOf<String, Any?>()
+}
+
+/**
+ * Context with data for creating group nodes.
+ *
+ * See the factory argument of [mapTree].
+ */
+@UiToolingDataApi
+interface SourceContext {
+    /**
+     * The name of the Composable or null if not applicable.
+     */
+    val name: String?
+
+    /**
+     * The bounds of the Composable if known.
+     */
+    val bounds: IntRect
+
+    /**
+     * The [SourceLocation] of where the Composable was called.
+     */
+    val location: SourceLocation?
+
+    /**
+     * The parameters of the Composable.
+     */
+    val parameters: List<ParameterInformation>
+
+    /**
+     * The current depth into the [CompositionGroup] tree.
+     */
+    val depth: Int
+}
+
+/**
+ * Return a tree of custom nodes for the slot table.
+ *
+ * The [factory] method will be called for every [CompositionGroup] in the slot tree and can be
+ * used to create custom nodes based on the passed arguments. The [SourceContext] argument gives
+ * access to additional information encoded in the [CompositionGroup.sourceInfo].
+ * A return of null from [factory] means that the entire subtree will be ignored.
+ *
+ * A [cache] can optionally be specified. If a client is calling [mapTree] multiple times,
+ * this can save some time if the values of [CompositionGroup.sourceInfo] are not unique.
+ */
+@UiToolingDataApi
+fun <T> CompositionData.mapTree(
+    factory: (CompositionGroup, SourceContext, List<T>) -> T?,
+    cache: ContextCache = ContextCache()
+): T? {
+    val group = compositionGroups.firstOrNull() ?: return null
+    val callStack = CompositionCallStack(factory, cache.contexts)
+    val out = mutableListOf<T>()
+    callStack.convert(group, 0, out)
+    return out.firstOrNull()
 }
 
 /**
