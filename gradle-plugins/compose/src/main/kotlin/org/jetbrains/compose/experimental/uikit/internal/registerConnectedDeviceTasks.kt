@@ -28,15 +28,17 @@ fun Project.registerConnectedDeviceTasks(
         id = id,
         projectName = projectName,
         bundleIdPrefix = bundleIdPrefix,
-        teamId = deploy.teamId ?: getLocalProperty(TEAM_ID_PROPERTY_KEY)
-        ?: error(
-            buildString {
-                appendLine("In local.properties (${localPropertiesFile.absolutePath})")
-                appendLine("Add property")
-                appendLine("$TEAM_ID_PROPERTY_KEY=***")
-                appendLine("Or set teamId in deploy with id: $id")
-            }
-        ),
+        getTeamId = {
+            deploy.teamId ?: getLocalProperty(TEAM_ID_PROPERTY_KEY)
+            ?: error(
+                buildString {
+                    appendLine("In local.properties (${localPropertiesFile.absolutePath})")
+                    appendLine("Add property")
+                    appendLine("$TEAM_ID_PROPERTY_KEY=***")
+                    appendLine("Or set teamId in deploy with id: $id")
+                }
+            )
+        },
         taskInstallXcodeGen = taskInstallXcodeGen,
     )
 
