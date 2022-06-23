@@ -32,7 +32,6 @@ android {
 }
 
 dependencies {
-    kotlinPlugin(projectOrArtifact(":compose:compiler:compiler"))
 
     androidTestImplementation(projectOrArtifact(":compose:ui:ui"))
     androidTestImplementation(projectOrArtifact(":compose:ui:ui-test-junit4"))

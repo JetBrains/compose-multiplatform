@@ -23,7 +23,6 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
 
     androidTestImplementation project(":compose:animation:animation-core")
     androidTestImplementation project(":benchmark:benchmark-junit4")

@@ -43,7 +43,6 @@ android {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
     implementation(libs.kotlinStdlib)
     implementation project(":compose:runtime:runtime")
     implementation project(":compose:foundation:foundation-layout")

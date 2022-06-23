@@ -6,7 +6,6 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin(project(":compose:compiler:compiler"))
 
     implementation(project(":compose:animation:animation:integration-tests:animation-demos"))
     implementation(project(":compose:foundation:foundation-layout:integration-tests:foundation-layout-demos"))
