@@ -406,6 +406,9 @@ package androidx.compose.ui.text {
     field public static final androidx.compose.ui.text.TextPainter INSTANCE;
   }
 
+  public final class TextPainterKt {
+  }
+
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class TextRange {
     method public operator boolean contains(long other);
     method public operator boolean contains(int offset);
