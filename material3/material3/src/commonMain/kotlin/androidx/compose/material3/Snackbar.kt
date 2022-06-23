@@ -94,11 +94,11 @@ fun Snackbar(
     action: @Composable (() -> Unit)? = null,
     dismissAction: @Composable (() -> Unit)? = null,
     actionOnNewLine: Boolean = false,
-    shape: Shape = SnackbarTokens.ContainerShape.toShape(),
-    containerColor: Color = SnackbarTokens.ContainerColor.toColor(),
-    contentColor: Color = SnackbarTokens.SupportingTextColor.toColor(),
-    actionContentColor: Color = SnackbarTokens.ActionLabelTextColor.toColor(),
-    dismissActionContentColor: Color = SnackbarTokens.IconColor.toColor(),
+    shape: Shape = SnackbarDefaults.Shape,
+    containerColor: Color = SnackbarDefaults.Color,
+    contentColor: Color = SnackbarDefaults.ContentColor,
+    actionContentColor: Color = SnackbarDefaults.ActionContentColor,
+    dismissActionContentColor: Color = SnackbarDefaults.DismissActionContentColor,
     content: @Composable () -> Unit
 ) {
     Surface(
@@ -196,12 +196,12 @@ fun Snackbar(
     snackbarData: SnackbarData,
     modifier: Modifier = Modifier,
     actionOnNewLine: Boolean = false,
-    shape: Shape = SnackbarTokens.ContainerShape.toShape(),
-    containerColor: Color = SnackbarTokens.ContainerColor.toColor(),
-    contentColor: Color = SnackbarTokens.SupportingTextColor.toColor(),
-    actionColor: Color = SnackbarTokens.ActionLabelTextColor.toColor(),
-    actionContentColor: Color = SnackbarTokens.ActionLabelTextColor.toColor(),
-    dismissActionContentColor: Color = SnackbarTokens.IconColor.toColor(),
+    shape: Shape = SnackbarDefaults.Shape,
+    containerColor: Color = SnackbarDefaults.Color,
+    contentColor: Color = SnackbarDefaults.ContentColor,
+    actionColor: Color = SnackbarDefaults.ActionColor,
+    actionContentColor: Color = SnackbarDefaults.ActionContentColor,
+    dismissActionContentColor: Color = SnackbarDefaults.DismissActionContentColor,
 ) {
     val actionLabel = snackbarData.visuals.actionLabel
     val actionComposable: (@Composable () -> Unit)? = if (actionLabel != null) {
@@ -396,6 +396,29 @@ private fun OneRowSnackbar(
             actionButtonPlaceable?.placeRelative(actionButtonPlaceX, actionButtonPlaceY)
         }
     }
+}
+
+/**
+ * Contains the default values used for [Snackbar].
+ */
+object SnackbarDefaults {
+    /** Default shape of a snackbar. */
+    val Shape: Shape @Composable get() = SnackbarTokens.ContainerShape.toShape()
+
+    /** Default color of a snackbar. */
+    val Color: Color @Composable get() = SnackbarTokens.ContainerColor.toColor()
+
+    /** Default content color of a snackbar. */
+    val ContentColor: Color @Composable get() = SnackbarTokens.SupportingTextColor.toColor()
+
+    /** Default action color of a snackbar. */
+    val ActionColor: Color @Composable get() = SnackbarTokens.ActionLabelTextColor.toColor()
+
+    /** Default action content color of a snackbar. */
+    val ActionContentColor: Color @Composable get() = SnackbarTokens.ActionLabelTextColor.toColor()
+
+    /** Default dismiss action content color of a snackbar. */
+    val DismissActionContentColor: Color @Composable get() = SnackbarTokens.IconColor.toColor()
 }
 
 private val ContainerMaxWidth = 600.dp
