@@ -5,8 +5,8 @@
   `./gradlew jsBrowserDevelopmentRun`
 
 ## Run on iOS simulator
-  `./gradlew iosDeployIPhone8Debug`
-  `./gradlew iosDeployIPadDebug`
+  `./gradlew iosDeployIPhone8Debug -i`
+  `./gradlew iosDeployIPadDebug -i`
 
 ## Prepare Xcode to launch on iOS device
 1) **Add your Apple ID.**  
@@ -29,8 +29,6 @@ After a successful launch on the device - you can delete this temporary project.
 Certificates will remain in login.keychain  
 
 ## Run on iOS device
- - set teamId in local.properties  
- - In build.gradle.kts  
-add block `connectedDevice("Device") {  }` to compose.experimental.uikit.application.deployConfigurations  
- - `./gradlew iosDeployDeviceRelease`  
+ - Change teamId build.gradle.kts, or set in local.properties    
+ - `./gradlew iosDeployDeviceRelease -i`  
  - During the build, you will be prompted to access login.keychain  

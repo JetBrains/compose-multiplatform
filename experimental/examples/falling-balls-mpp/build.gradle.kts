@@ -163,6 +163,11 @@ compose.experimental {
                 //Usage: ./gradlew iosDeployIPadDebug
                 device = IOSDevices.IPAD_MINI_6th_Gen
             }
+            connectedDevice("Device") {
+                //Usage: ./gradlew iosDeployDeviceDebug
+                // You can specify your teamId here, or in local.properties (compose.ios.teamId=***)
+                teamId = "JMS9FA69HB"
+            }
         }
     }
 }
