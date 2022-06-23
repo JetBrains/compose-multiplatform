@@ -319,7 +319,11 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         project.extensions.getByType<ApplicationAndroidComponentsExtension>().apply {
             onVariants { it.configureLicensePackaging() }
             finalizeDsl {
-                project.configureAndroidProjectForLint(it.lint, androidXExtension)
+                project.configureAndroidProjectForLint(
+                    it.lint,
+                    androidXExtension,
+                    isLibrary = false
+                )
             }
         }
     }
@@ -410,7 +414,9 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                 variant.enableUnitTest = false
             }
             onVariants { it.configureLicensePackaging() }
-            finalizeDsl { project.configureAndroidProjectForLint(it.lint, androidXExtension) }
+            finalizeDsl {
+                project.configureAndroidProjectForLint(it.lint, androidXExtension, isLibrary = true)
+            }
         }
 
         project.configurePublicResourcesStub(libraryExtension)
