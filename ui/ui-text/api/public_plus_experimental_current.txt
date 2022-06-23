@@ -464,6 +464,14 @@ package androidx.compose.ui.text {
     property public final long size;
   }
 
+  @androidx.compose.runtime.Immutable @androidx.compose.ui.text.ExperimentalTextApi public final class TextMeasurer {
+    ctor public TextMeasurer(androidx.compose.ui.text.font.FontFamily.Resolver fallbackFontFamilyResolver, androidx.compose.ui.unit.Density fallbackDensity, androidx.compose.ui.unit.LayoutDirection fallbackLayoutDirection, optional int cacheSize);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.text.TextLayoutResult measure(androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.text.TextStyle style, optional int overflow, optional boolean softWrap, optional int maxLines, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional long size, optional androidx.compose.ui.unit.LayoutDirection layoutDirection, optional androidx.compose.ui.unit.Density density, optional androidx.compose.ui.text.font.FontFamily.Resolver fontFamilyResolver, optional boolean skipCache);
+  }
+
+  public final class TextMeasurerKt {
+  }
+
   public final class TextPainter {
     method public void paint(androidx.compose.ui.graphics.Canvas canvas, androidx.compose.ui.text.TextLayoutResult textLayoutResult);
     field public static final androidx.compose.ui.text.TextPainter INSTANCE;

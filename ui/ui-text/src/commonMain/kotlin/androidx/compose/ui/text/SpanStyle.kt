@@ -546,6 +546,23 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
     }
 
     @OptIn(ExperimentalTextApi::class)
+    internal fun hashCodeLayoutAffectingAttributes(): Int {
+        var result = fontSize.hashCode()
+        result = 31 * result + (fontWeight?.hashCode() ?: 0)
+        result = 31 * result + (fontStyle?.hashCode() ?: 0)
+        result = 31 * result + (fontSynthesis?.hashCode() ?: 0)
+        result = 31 * result + (fontFamily?.hashCode() ?: 0)
+        result = 31 * result + (fontFeatureSettings?.hashCode() ?: 0)
+        result = 31 * result + letterSpacing.hashCode()
+        result = 31 * result + (baselineShift?.hashCode() ?: 0)
+        result = 31 * result + (textGeometricTransform?.hashCode() ?: 0)
+        result = 31 * result + (localeList?.hashCode() ?: 0)
+        result = 31 * result + background.hashCode()
+        result = 31 * result + (platformStyle?.hashCode() ?: 0)
+        return result
+    }
+
+    @OptIn(ExperimentalTextApi::class)
     override fun toString(): String {
         return "SpanStyle(" +
             "color=$color, " +
