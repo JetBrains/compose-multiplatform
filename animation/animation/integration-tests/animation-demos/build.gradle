@@ -6,8 +6,6 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin(project(":compose:compiler:compiler"))
-
     implementation(libs.kotlinStdlib)
 
     implementation(project(":compose:foundation:foundation-layout"))

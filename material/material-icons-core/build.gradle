@@ -33,7 +33,6 @@ if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block below
          */
-        kotlinPlugin(project(":compose:compiler:compiler"))
 
         api("androidx.compose.ui:ui:1.0.0")
         implementation("androidx.compose.runtime:runtime:1.1.1")

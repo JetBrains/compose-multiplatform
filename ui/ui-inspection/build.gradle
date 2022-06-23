@@ -26,7 +26,6 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
     implementation("androidx.annotation:annotation:1.1.0")
     // Following dependencies will be provided by inspected app itself
     // because compose:ui-inspector can be run only in app with compose:ui:ui
