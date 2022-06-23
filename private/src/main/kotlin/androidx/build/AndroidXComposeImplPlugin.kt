@@ -31,13 +31,13 @@ import java.io.File
 import kotlin.reflect.KFunction
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.tasks.ClasspathNormalizer
 import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -63,6 +63,10 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val f: KFunction<Unit> = Companion::applyAndConfigureKotlinPlugin
         project.extensions.add("applyAndConfigureKotlinPlugin", f)
+        val extension = project.extensions.create<AndroidXComposeExtension>(
+            "androidxCompose",
+            project
+        )
         project.plugins.all { plugin ->
             when (plugin) {
                 is LibraryPlugin -> {
@@ -78,7 +82,7 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
                     project.configureAndroidCommonOptions(app)
                 }
                 is KotlinBasePluginWrapper -> {
-                    project.configureComposeImplPluginForAndroidx()
+                    configureComposeCompilerPlugin(project, extension)
 
                     if (plugin is KotlinMultiplatformPluginWrapper) {
                         project.configureForMultiplatform()
@@ -312,46 +316,66 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
     }
 }
 
-fun Project.configureComposeImplPluginForAndroidx() {
+private const val COMPILER_PLUGIN_CONFIGURATION = "kotlinPlugin"
 
-    val conf = project.configurations.create("kotlinPlugin")
-    val kotlinPlugin = conf.incoming.artifactView { view ->
-        view.attributes { attributes ->
-            attributes.attribute(
-                Attribute.of("artifactType", String::class.java),
-                ArtifactTypeDefinition.JAR_TYPE
-            )
-        }
-    }.files
+private fun configureComposeCompilerPlugin(
+    project: Project,
+    extension: AndroidXComposeExtension
+) {
+    project.afterEvaluate {
+        // If a project has opted-out of Compose compiler plugin, don't add it
+        if (!extension.composeCompilerPluginEnabled) return@afterEvaluate
 
-    val isTipOfTreeComposeCompilerProvider = project.provider {
-        (!conf.isEmpty) && (conf.dependencies.first() !is ExternalModuleDependency)
-    }
-    val enableMetricsProvider = project.providers.gradleProperty(enableMetricsArg)
-    val enableReportsProvider = project.providers.gradleProperty(enableReportsArg)
+        val androidXExtension = project.extensions.findByType(AndroidXExtension::class.java)
+            ?: throw Exception("You have applied AndroidXComposePlugin without AndroidXPlugin")
+        val shouldPublish = androidXExtension.shouldPublish()
 
-    val libraryMetricsDirectory = project.rootProject.getLibraryMetricsDirectory()
-    val libraryReportsDirectory = project.rootProject.getLibraryReportsDirectory()
-    project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
-        // TODO(b/157230235): remove when this is enabled by default
-        compile.kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
-        compile.inputs.files({ kotlinPlugin })
-            .withPropertyName("composeCompilerExtension")
-            .withNormalizer(ClasspathNormalizer::class.java)
-        compile.onlyIf {
-            if (!kotlinPlugin.isEmpty) {
-                compile.kotlinOptions.freeCompilerArgs +=
-                    "-Xplugin=${kotlinPlugin.first()}"
+        // Create configuration that we'll use to load Compose compiler plugin
+        val configuration = project.configurations.create(COMPILER_PLUGIN_CONFIGURATION)
+        // Add Compose compiler plugin to kotlinPlugin configuration, making sure it works
+        // for Playground builds as well
+        project.dependencies.add(
+            COMPILER_PLUGIN_CONFIGURATION,
+            if (StudioType.isPlayground(project)) {
+                AndroidXPlaygroundRootImplPlugin.projectOrArtifact(
+                    project.rootProject,
+                    ":compose:compiler:compiler"
+                )
+            } else {
+                project.rootProject.findProject(":compose:compiler:compiler")!!
+            }
+        )
+        val kotlinPlugin = configuration.incoming.artifactView { view ->
+            view.attributes { attributes ->
+                attributes.attribute(
+                    Attribute.of("artifactType", String::class.java),
+                    ArtifactTypeDefinition.JAR_TYPE
+                )
+            }
+        }.files
 
-                val enableMetrics = (enableMetricsProvider.orNull == "true")
+        val enableMetricsProvider = project.providers.gradleProperty(enableMetricsArg)
+        val enableReportsProvider = project.providers.gradleProperty(enableReportsArg)
 
-                val enableReports = (enableReportsProvider.orNull == "true")
+        val libraryMetricsDirectory = project.rootProject.getLibraryMetricsDirectory()
+        val libraryReportsDirectory = project.rootProject.getLibraryReportsDirectory()
+        project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
+            // TODO(b/157230235): remove when this is enabled by default
+            compile.kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
 
-                // since metrics reports in compose compiler are a new feature, we only want to
-                // pass in this parameter for modules that are using the tip of tree compose
-                // compiler, or else we will run into an exception since the parameter will not
-                // be recognized.
-                if (isTipOfTreeComposeCompilerProvider.get() && enableMetrics) {
+            // Append inputs to KotlinCompile so tasks get invalidated if any of these values change
+            compile.inputs.files({ kotlinPlugin })
+                .withPropertyName("composeCompilerExtension")
+                .withNormalizer(ClasspathNormalizer::class.java)
+            compile.inputs.property("composeMetricsEnabled", enableMetricsProvider).optional(true)
+            compile.inputs.property("composeReportsEnabled", enableReportsProvider).optional(true)
+
+            // Gradle hack ahead, we use of absolute paths, but is OK here because we do it in
+            // doFirst which happens after Gradle task input snapshotting. AGP does the same.
+            compile.doFirst {
+                compile.kotlinOptions.freeCompilerArgs += "-Xplugin=${kotlinPlugin.first()}"
+
+                if (enableMetricsProvider.orNull == "true") {
                     val metricsDest = File(libraryMetricsDirectory, "compose")
                     compile.kotlinOptions.freeCompilerArgs +=
                         listOf(
@@ -359,12 +383,7 @@ fun Project.configureComposeImplPluginForAndroidx() {
                             "$composeMetricsOption=${metricsDest.absolutePath}"
                         )
                 }
-
-                // since metrics reports in compose compiler are a new feature, we only want to
-                // pass in this parameter for modules that are using the tip of tree compose
-                // compiler, or else we will run into an exception since the parameter will not
-                // be recognized.
-                if (isTipOfTreeComposeCompilerProvider.get() && enableReports) {
+                if ((enableReportsProvider.orNull == "true")) {
                     val reportsDest = File(libraryReportsDirectory, "compose")
                     compile.kotlinOptions.freeCompilerArgs +=
                         listOf(
@@ -372,25 +391,10 @@ fun Project.configureComposeImplPluginForAndroidx() {
                             "$composeReportsOption=${reportsDest.absolutePath}"
                         )
                 }
-            }
-            true
-        }
-    }
-
-    project.afterEvaluate {
-        val androidXExtension =
-            project.extensions.findByType(AndroidXExtension::class.java)
-        if (androidXExtension != null) {
-            if (androidXExtension.shouldPublish()) {
-                project.tasks.withType(KotlinCompile::class.java)
-                    .configureEach { compile ->
-                        compile.doFirst {
-                            if (!kotlinPlugin.isEmpty) {
-                                compile.kotlinOptions.freeCompilerArgs +=
-                                    listOf("-P", composeSourceOption)
-                            }
-                        }
-                    }
+                if (shouldPublish) {
+                    compile.kotlinOptions.freeCompilerArgs +=
+                        listOf("-P", composeSourceOption)
+                }
             }
         }
     }
