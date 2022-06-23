@@ -200,6 +200,13 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension) {
             fatal.add("VisibleForTests")
         }
 
+        // Broken in 7.4.0-alpha04 due to b/236262744
+        disable.add("CustomPermissionTypo")
+        disable.add("KnownPermissionError")
+        disable.add("PermissionNamingConvention")
+        disable.add("ReservedSystemPermission")
+        disable.add("SystemPermissionTypo")
+
         // Reenable after b/235251897 is resolved
         disable.add("IllegalExperimentalApiUsage")
 
