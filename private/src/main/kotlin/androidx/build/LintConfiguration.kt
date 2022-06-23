@@ -81,10 +81,14 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
 
     val lint = extensions.getByType<Lint>()
     // Support the lint standalone plugin case which, as yet, lacks AndroidComponents finalizeDsl
-    afterEvaluate { configureLint(lint, extension) }
+    afterEvaluate { configureLint(lint, extension, true) }
 }
 
-fun Project.configureAndroidProjectForLint(lint: Lint, extension: AndroidXExtension) {
+fun Project.configureAndroidProjectForLint(
+    lint: Lint,
+    extension: AndroidXExtension,
+    isLibrary: Boolean
+) {
     project.afterEvaluate {
         // makes sure that the lintDebug task will exist, so we can find it by name
         setUpLintDebugIfNeeded()
@@ -92,7 +96,7 @@ fun Project.configureAndroidProjectForLint(lint: Lint, extension: AndroidXExtens
     tasks.register("lintAnalyze") {
         it.enabled = false
     }
-    configureLint(lint, extension)
+    configureLint(lint, extension, isLibrary)
     tasks.named("lint").configure { task ->
         // We already run lintDebug, we don't need to run lint which lints the release variant
         task.enabled = false
@@ -141,7 +145,7 @@ private fun Project.setUpLintDebugIfNeeded() {
     }
 }
 
-fun Project.configureLint(lint: Lint, extension: AndroidXExtension) {
+fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: Boolean) {
     val lintChecksProject = project.rootProject.findProject(":lint-checks")
         ?: if (allowMissingLintProject()) {
             return
@@ -256,6 +260,7 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension) {
             // Only override if not set explicitly.
             // Some Kotlin projects may wish to disable this.
             if (
+                isLibrary &&
                 !disable.contains("SyntheticAccessor") &&
                 extension.type != LibraryType.SAMPLES
             ) {
