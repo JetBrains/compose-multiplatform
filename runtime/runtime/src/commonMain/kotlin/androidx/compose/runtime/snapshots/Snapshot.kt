@@ -473,6 +473,7 @@ sealed class Snapshot(
         /**
          * Passed [block] will be run with all the currently set snapshot read observers disabled.
          */
+        @Suppress("BanInlineOptIn") // Treat Kotlin Contracts as non-experimental.
         @OptIn(ExperimentalContracts::class)
         inline fun <T> withoutReadObservation(block: @DisallowComposableCalls () -> T): T {
             contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
