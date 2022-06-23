@@ -34,12 +34,12 @@ dependencies {
          * corresponding block below
          */
         api("androidx.compose.animation:animation-core:1.0.0")
-        api("androidx.compose.foundation:foundation:1.2.0-rc01")
+        api("androidx.compose.foundation:foundation:1.2.0-rc02")
         api(project(":compose:material:material-icons-core"))
         api(project(":compose:material:material-ripple"))
-        api("androidx.compose.runtime:runtime:1.2.0-rc01")
-        api("androidx.compose.ui:ui:1.2.0-rc01")
-        api("androidx.compose.ui:ui-text:1.2.0-rc01")
+        api("androidx.compose.runtime:runtime:1.2.0-rc02")
+        api("androidx.compose.ui:ui:1.2.0-rc02")
+        api("androidx.compose.ui:ui-text:1.2.0-rc02")
 
         implementation(libs.kotlinStdlibCommon)
         implementation("androidx.compose.animation:animation:1.0.0")
