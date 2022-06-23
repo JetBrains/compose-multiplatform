@@ -18,12 +18,21 @@ package androidx.compose.ui.window
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
+import androidx.compose.ui.createSkiaLayer
 import androidx.compose.ui.native.ComposeLayer
 import kotlinx.browser.document
 import org.w3c.dom.HTMLCanvasElement
 
 internal actual class ComposeWindow actual constructor(){
-    val layer = ComposeLayer()
+    val layer = ComposeLayer(
+        layer = createSkiaLayer(),
+        showSoftwareKeyboard = {
+            println("TODO showSoftwareKeyboard in JS")
+        },
+        hideSoftwareKeyboard = {
+            println("TODO hideSoftwareKeyboard in JS")
+        },
+    )
 
     val title: String
         get() = "TODO: get a title from SkiaWindow"

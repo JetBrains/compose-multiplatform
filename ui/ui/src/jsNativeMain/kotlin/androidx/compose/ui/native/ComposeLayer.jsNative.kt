@@ -36,14 +36,23 @@ import org.jetbrains.skiko.SkikoTouchEvent
 import org.jetbrains.skiko.SkikoTouchEventKind
 import androidx.compose.ui.unit.Constraints
 import org.jetbrains.skiko.currentNanoTime
-import androidx.compose.ui.createSkiaLayer
+import androidx.compose.ui.platform.SkiaTextInputService
 
-internal class ComposeLayer {
+internal class ComposeLayer(
+    internal val layer: SkiaLayer,
+    showSoftwareKeyboard: () -> Unit,
+    hideSoftwareKeyboard: () -> Unit,
+) {
     private var isDisposed = false
+    private val inputService = SkiaTextInputService(
+        showSoftwareKeyboard = showSoftwareKeyboard,
+        hideSoftwareKeyboard = hideSoftwareKeyboard
+    )
+    private val platform = object : Platform by Platform.Empty {
+        override val textInputService = inputService
+    }
 
-    internal val layer = createSkiaLayer()
-
-    inner class ComponentImpl : SkikoView, Platform by Platform.Empty {
+    inner class ComponentImpl : SkikoView, Platform by platform {
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
             val contentScale = layer.contentScale
             canvas.scale(contentScale, contentScale)
@@ -51,11 +60,15 @@ internal class ComposeLayer {
         }
 
         override fun onInputEvent(event: SkikoInputEvent) {
-            TODO("need scene.sendInputEvent")
+            inputService.sendInputEvent(event)
         }
 
         override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
-            TODO("need scene.sendKeyEvent")
+            println("need scene.sendKeyEvent")
+//            if (isDisposed) return
+//            if (scene.sendKeyEvent(ComposeKeyEvent(event))) {
+////                event.consume()
+//            }
         }
 
         @OptIn(ExperimentalComposeUiApi::class)

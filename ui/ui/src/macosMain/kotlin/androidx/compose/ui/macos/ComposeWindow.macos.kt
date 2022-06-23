@@ -18,6 +18,7 @@ package androidx.compose.ui.window
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
+import androidx.compose.ui.createSkiaLayer
 import androidx.compose.ui.native.ComposeLayer
 
 import platform.AppKit.*
@@ -26,8 +27,12 @@ import platform.Foundation.*
 import platform.CoreGraphics.*
 import kotlinx.cinterop.*
 
-internal actual class ComposeWindow actual constructor(){
-    val layer = ComposeLayer()
+internal actual class ComposeWindow actual constructor() {
+    val layer = ComposeLayer(
+        layer = createSkiaLayer(),
+        showSoftwareKeyboard = {},
+        hideSoftwareKeyboard = {},
+    )
 
     val title: String
         get() = "TODO: get a title from SkiaWindow"

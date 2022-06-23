@@ -35,10 +35,17 @@ fun myContent() {
     var selected by remember { mutableStateOf(false) }
     var clutz by remember { mutableStateOf(false) }
     var switched by remember { mutableStateOf(false) }
-    var text by remember { mutableStateOf("click for clipboard") }
+    var textFromClipboard by remember { mutableStateOf("click for clipboard") }
+    var textFieldState by remember { mutableStateOf("I am TextField") }
     val clipboard = LocalClipboardManager.current
     val uriHandler = LocalUriHandler.current
     Column {
+        TextField(
+            value = textFieldState,
+            onValueChange = {
+                textFieldState = it
+            }
+        )
         Box(
             modifier = Modifier
                 .padding(16.dp)
@@ -108,11 +115,11 @@ fun myContent() {
             Button(
                 modifier = Modifier.padding(16.dp),
                 onClick = {
-                    text = clipboard.getText()?.text ?: "clipboard is empty"
+                    textFromClipboard = clipboard.getText()?.text ?: "clipboard is empty"
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray)
             ) {
-                Text(text)
+                Text(textFromClipboard)
             }
         }
 

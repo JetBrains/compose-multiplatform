@@ -29,7 +29,7 @@ internal actual fun ContextMenuArea(
     manager: TextFieldSelectionManager,
     content: @Composable () -> Unit
 ) {
-    TODO("implement native ContextMenuArea")
+    content()
 }
 
 @Composable
@@ -37,6 +37,6 @@ internal actual fun ContextMenuArea(
     manager: SelectionManager,
     content: @Composable () -> Unit
 ) {
-    TODO("implement native ContextMenuArea")
+    content()
 }
 

@@ -18,9 +18,23 @@
 
 package androidx.compose.foundation.gestures
 
+import androidx.compose.foundation.fastFold
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEvent
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+
+@Composable
+internal actual fun platformScrollConfig(): ScrollConfig = JsConfig
+
+private object JsConfig : ScrollConfig {
+    override fun Density.calculateMouseWheelScroll(event: PointerEvent, bounds: IntSize): Offset =
+        event.changes.fastFold(Offset.Zero) { acc, c -> acc + c.scrollDelta } * -64.dp.toPx()
+}
+
+
 /*
 import androidx.compose.ui.input.mouse.MouseScrollOrientation
 import androidx.compose.ui.input.mouse.MouseScrollUnit
@@ -29,14 +43,6 @@ import androidx.compose.ui.platform.DesktopPlatform
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalDesktopPlatform
 */
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.dp
-import kotlin.math.sqrt
-
-@Composable
-internal actual fun platformScrollConfig(): ScrollConfig =
-    TODO("implement js platformScrollConfig")
-
 /*
 composed {
     val density = LocalDensity.current
