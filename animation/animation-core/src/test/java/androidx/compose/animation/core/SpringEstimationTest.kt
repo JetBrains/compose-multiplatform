@@ -16,6 +16,8 @@
 
 package androidx.compose.animation.core
 
+import android.os.Build
+import androidx.test.filters.SdkSuppress
 import junit.framework.TestCase.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,6 +47,7 @@ class SpringEstimationTest(private val m: Double, private val k: Double) {
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.N) // parallelStream() requires API level 24
     fun runTestCases() {
         val failedTestCaseResults = mutableListOf<TestCaseResult>()
 
