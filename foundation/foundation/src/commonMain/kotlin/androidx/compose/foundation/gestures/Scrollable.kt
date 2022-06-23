@@ -310,11 +310,17 @@ private class ScrollingLogic(
         else -> Offset(0f, this)
     }
 
+    fun Offset.singleAxisOffset(): Offset =
+        if (orientation == Horizontal) copy(y = 0f) else copy(x = 0f)
+
     fun Offset.toFloat(): Float =
         if (orientation == Horizontal) this.x else this.y
 
     fun Velocity.toFloat(): Float =
         if (orientation == Horizontal) this.x else this.y
+
+    fun Velocity.singleAxisVelocity(): Velocity =
+        if (orientation == Horizontal) copy(y = 0f) else copy(x = 0f)
 
     fun Velocity.update(newValue: Float): Velocity =
         if (orientation == Horizontal) copy(x = newValue) else copy(y = newValue)
@@ -328,12 +334,7 @@ private class ScrollingLogic(
         pointerPosition: Offset?,
         source: NestedScrollSource
     ): Offset {
-        val overscrollPreConsumed =
-            if (overscrollEffect != null && overscrollEffect.isEnabled) {
-                overscrollEffect.consumePreScroll(scrollDelta, pointerPosition, source)
-            } else {
-                Offset.Zero
-            }
+        val overscrollPreConsumed = overscrollPreConsumeDelta(scrollDelta, pointerPosition, source)
 
         val afterPreOverscroll = scrollDelta - overscrollPreConsumed
         val nestedScrollDispatcher = nestedScrollDispatcher.value
@@ -349,15 +350,43 @@ private class ScrollingLogic(
         val leftForParent = scrollAvailable - axisConsumed
         val parentConsumed = nestedScrollDispatcher
             .dispatchPostScroll(axisConsumed, leftForParent, source)
+
+        overscrollPostConsumeDelta(
+            scrollAvailable,
+            leftForParent - parentConsumed,
+            pointerPosition,
+            source
+        )
+        return leftForParent
+    }
+
+    fun overscrollPreConsumeDelta(
+        scrollDelta: Offset,
+        pointerPosition: Offset?,
+        source: NestedScrollSource
+    ): Offset {
+        return if (overscrollEffect != null && overscrollEffect.isEnabled) {
+            val overscrollAvailableDelta = scrollDelta.singleAxisOffset()
+            overscrollEffect.consumePreScroll(overscrollAvailableDelta, pointerPosition, source)
+        } else {
+            Offset.Zero
+        }
+    }
+
+    private fun overscrollPostConsumeDelta(
+        consumedByChain: Offset,
+        availableForOverscroll: Offset,
+        pointerPosition: Offset?,
+        source: NestedScrollSource
+    ) {
         if (overscrollEffect != null && overscrollEffect.isEnabled) {
             overscrollEffect.consumePostScroll(
-                scrollAvailable,
-                (leftForParent - parentConsumed),
+                consumedByChain.singleAxisOffset(),
+                availableForOverscroll.singleAxisOffset(),
                 pointerPosition,
                 source
             )
         }
-        return leftForParent
     }
 
     fun performRawScroll(scroll: Offset): Offset {
@@ -372,7 +401,9 @@ private class ScrollingLogic(
     suspend fun onDragStopped(initialVelocity: Velocity) {
         val preOverscrollConsumed =
             if (overscrollEffect != null && overscrollEffect.isEnabled) {
-                overscrollEffect.consumePreFling(initialVelocity)
+                val availableForOverscroll = initialVelocity.singleAxisVelocity()
+                val crossAxisRemainder = initialVelocity - availableForOverscroll
+                crossAxisRemainder + overscrollEffect.consumePreFling(availableForOverscroll)
             } else {
                 Velocity.Zero
             }
@@ -387,7 +418,7 @@ private class ScrollingLogic(
             )
         val totalLeft = velocityLeft - consumedPost
         if (overscrollEffect != null && overscrollEffect.isEnabled) {
-            overscrollEffect.consumePostFling(totalLeft)
+            overscrollEffect.consumePostFling(totalLeft.singleAxisVelocity())
         }
     }
 
