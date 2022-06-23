@@ -6,6 +6,11 @@ package androidx.compose.ui.tooling.data {
     property public java.util.List<androidx.compose.ui.tooling.data.ParameterInformation> parameters;
   }
 
+  @androidx.compose.ui.tooling.data.UiToolingDataApi public final class ContextCache {
+    ctor public ContextCache();
+    method public void clear();
+  }
+
   @androidx.compose.ui.tooling.data.UiToolingDataApi public abstract sealed class Group {
     method public final androidx.compose.ui.unit.IntRect getBox();
     method public final java.util.Collection<androidx.compose.ui.tooling.data.Group> getChildren();
@@ -74,6 +79,20 @@ package androidx.compose.ui.tooling.data {
   public final class SlotTreeKt {
     method @androidx.compose.ui.tooling.data.UiToolingDataApi public static androidx.compose.ui.tooling.data.Group asTree(androidx.compose.runtime.tooling.CompositionData);
     method @androidx.compose.ui.tooling.data.UiToolingDataApi public static String? getPosition(androidx.compose.ui.tooling.data.Group);
+    method @androidx.compose.ui.tooling.data.UiToolingDataApi public static <T> T? mapTree(androidx.compose.runtime.tooling.CompositionData, kotlin.jvm.functions.Function3<? super androidx.compose.runtime.tooling.CompositionGroup,? super androidx.compose.ui.tooling.data.SourceContext,? super java.util.List<? extends T>,? extends T> factory, optional androidx.compose.ui.tooling.data.ContextCache cache);
+  }
+
+  @androidx.compose.ui.tooling.data.UiToolingDataApi public interface SourceContext {
+    method public androidx.compose.ui.unit.IntRect getBounds();
+    method public int getDepth();
+    method public androidx.compose.ui.tooling.data.SourceLocation? getLocation();
+    method public String? getName();
+    method public java.util.List<androidx.compose.ui.tooling.data.ParameterInformation> getParameters();
+    property public abstract androidx.compose.ui.unit.IntRect bounds;
+    property public abstract int depth;
+    property public abstract androidx.compose.ui.tooling.data.SourceLocation? location;
+    property public abstract String? name;
+    property public abstract java.util.List<androidx.compose.ui.tooling.data.ParameterInformation> parameters;
   }
 
   @androidx.compose.ui.tooling.data.UiToolingDataApi public final class SourceLocation {
