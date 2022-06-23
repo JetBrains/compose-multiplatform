@@ -28,8 +28,6 @@ plugins {
 AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin(project(":compose:compiler:compiler"))
-
     if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the

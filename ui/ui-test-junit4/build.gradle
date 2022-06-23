@@ -34,7 +34,6 @@ android {
 }
 
 dependencies {
-    kotlinPlugin(project(":compose:compiler:compiler"))
 
     if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         api(project(":compose:ui:ui-test"))

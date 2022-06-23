@@ -27,7 +27,6 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin(project(":compose:compiler:compiler"))
 }
 
 kotlin {

@@ -36,7 +36,6 @@ IconGenerationTask.registerExtendedIconMainProject(
 apply from: "shared-dependencies.gradle"
 
 dependencies {
-    kotlinPlugin(project(":compose:compiler:compiler"))
 
     if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         /*

@@ -22,7 +22,6 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
 
     androidTestImplementation project(":compose:foundation:foundation")
     androidTestImplementation project(":compose:runtime:runtime")

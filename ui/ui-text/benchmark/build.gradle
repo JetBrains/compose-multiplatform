@@ -23,7 +23,6 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
     implementation project(":benchmark:benchmark-junit4")
     implementation project(":compose:runtime:runtime")
     implementation project(":compose:ui:ui-test-junit4")
