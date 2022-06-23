@@ -627,7 +627,8 @@ class AffectedModuleDetectorImpl constructor(
 
         val IGNORED_PATHS = setOf(
             "docs/",
-            "development/"
+            "development/",
+            "playground-common/"
         )
     }
 }
