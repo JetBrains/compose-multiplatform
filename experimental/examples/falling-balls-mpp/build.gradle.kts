@@ -167,7 +167,6 @@ compose.experimental {
                 //First need specify your teamId here, or in local.properties (compose.ios.teamId=***)
                 //teamId="***"
                 //Usage: ./gradlew iosDeployDeviceRelease
-                teamId = "JMS9FA69HB"
             }
         }
     }
