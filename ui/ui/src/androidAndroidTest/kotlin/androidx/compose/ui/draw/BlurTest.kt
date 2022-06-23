@@ -39,7 +39,9 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
+import androidx.test.filters.SmallTest
 import androidx.test.screenshot.matchers.MSSIMMatcher
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -55,6 +57,7 @@ class BlurTest {
     val rule = createComposeRule()
 
     @Test
+    @SmallTest
     fun testNoopBlur() {
         // If we are blurring with a 0 pixel radius and we are not clipping
         // the blurred result, this should return the default Modifier
@@ -135,6 +138,7 @@ class BlurTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.S)
     @Test
+    @MediumTest
     fun testRectBoundedBlur() {
         // Any bounded edge treatment should clip the underlying graphicsLayer and use
         // TileMode.Clamp in the corresponding BlurEffect
@@ -148,6 +152,7 @@ class BlurTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.S)
     @Test
+    @MediumTest
     fun testUnboundedBlur() {
         // Any unbounded edge treatment should not clip the underlying graphicsLayer and use
         // TileMode.Decal in the corresponding BlurEffect
@@ -161,6 +166,7 @@ class BlurTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.S)
     @Test
+    @MediumTest
     fun testCircleBoundedBlur() {
         testBlurEdgeTreatment(
             BlurredEdgeTreatment(CircleShape),
@@ -171,11 +177,13 @@ class BlurTest {
     }
 
     @Test
+    @SmallTest
     fun testRectangleBlurredEdgeTreatmentHasShape() {
         assertNotNull(BlurredEdgeTreatment.Rectangle.shape)
     }
 
     @Test
+    @SmallTest
     fun testUnboundedBlurredEdgeTreatmentDoesNotHaveShape() {
         assertNull(BlurredEdgeTreatment.Unbounded.shape)
     }
