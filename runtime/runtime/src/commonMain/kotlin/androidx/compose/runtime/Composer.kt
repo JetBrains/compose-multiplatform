@@ -1116,6 +1116,15 @@ private var compositionTracer: CompositionTracer? = null
 @ComposeCompilerApi
 fun isTraceInProgress(): Boolean = compositionTracer.let { it != null && it.isTraceInProgress() }
 
+@OptIn(InternalComposeTracingApi::class)
+@ComposeCompilerApi
+@Deprecated(
+    message = "Use the overload with \$dirty metadata instead",
+    ReplaceWith("traceEventStart(key, dirty1, dirty2, info)"),
+    DeprecationLevel.HIDDEN
+)
+fun traceEventStart(key: Int, info: String): Unit = traceEventStart(key, -1, -1, info)
+
 /**
  * Internal tracing API.
  *
