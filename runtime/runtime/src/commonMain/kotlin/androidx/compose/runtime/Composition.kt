@@ -405,6 +405,12 @@ internal class CompositionImpl(
     internal val derivedStateDependencies get() = derivedStates.values.filterNotNull()
 
     /**
+     * Used for testing. Returns the conditional scopes being tracked by the composer
+     */
+    internal val conditionalScopes: List<RecomposeScopeImpl> get() =
+        conditionallyInvalidatedScopes.toList()
+
+    /**
      * A list of changes calculated by [Composer] to be applied to the [Applier] and the
      * [SlotTable] to reflect the result of composition. This is a list of lambdas that need to
      * be invoked in order to produce the desired effects.
@@ -691,6 +697,7 @@ internal class CompositionImpl(
 
     private fun cleanUpDerivedStateObservations() {
         derivedStates.removeValueIf { derivedValue -> derivedValue !in observations }
+        conditionallyInvalidatedScopes.removeValueIf { scope -> !scope.isConditional }
     }
 
     override fun recordReadOf(value: Any) {
@@ -1108,5 +1115,18 @@ private fun <K : Any, V : Any> IdentityArrayMap<K, IdentityArraySet<V>?>.addValu
         this[key]?.add(value)
     } else {
         this[key] = IdentityArraySet<V>().also { it.add(value) }
+    }
+}
+
+/**
+ * This is provided natively in API 26 and this should be removed if 26 is made the lowest API
+ * level supported
+ */
+private inline fun <E> HashSet<E>.removeValueIf(predicate: (E) -> Boolean) {
+    val iter = iterator()
+    while (iter.hasNext()) {
+        if (predicate(iter.next())) {
+            iter.remove()
+        }
     }
 }
