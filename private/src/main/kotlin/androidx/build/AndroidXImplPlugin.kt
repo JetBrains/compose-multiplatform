@@ -256,7 +256,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                 )
             task.systemProperty(
                 "robolectric.dependency.dir",
-                robolectricDependencies.absolutePath
+                robolectricDependencies.relativeTo(project.projectDir)
             )
         }
     }
