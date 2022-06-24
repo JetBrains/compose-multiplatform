@@ -165,6 +165,23 @@ class SnapshotStateObserverBenchmark : ComposeBenchmarkBase() {
     }
 
     @Test
+    fun modelIncrementalClear() {
+        assumeTrue(Build.VERSION.SDK_INT != 29)
+        runOnUiThread {
+            benchmarkRule.measureRepeated {
+                for (i in 0 until nodes.size) {
+                    stateObserver.clearIf { node ->
+                        (node as Int) < i
+                    }
+                }
+                runWithTimingDisabled {
+                    setupObservations()
+                }
+            }
+        }
+    }
+
+    @Test
     fun notifyChanges() {
         assumeTrue(Build.VERSION.SDK_INT != 29)
         runOnUiThread {

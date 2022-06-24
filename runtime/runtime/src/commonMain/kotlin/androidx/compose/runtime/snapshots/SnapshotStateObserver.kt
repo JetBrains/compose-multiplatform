@@ -262,7 +262,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
          */
         fun clearScopeObservations(scope: Any) {
             val recordedValues = scopeToValues[scope] ?: return
-            recordedValues.forEach {
+            recordedValues.fastForEach {
                 valueToScopes.remove(it, scope)
             }
             scopeToValues.remove(scope)
@@ -271,9 +271,16 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
         /**
          * Remove observations in scopes matching [predicate].
          */
-        inline fun removeScopeIf(predicate: (scope: Any) -> Boolean) {
-            valueToScopes.removeValueIf(predicate)
-            scopeToValues.removeIf { scope, _ -> predicate(scope) }
+        fun removeScopeIf(predicate: (scope: Any) -> Boolean) {
+            scopeToValues.removeIf { scope, valueSet ->
+                val willRemove = predicate(scope)
+                if (willRemove) {
+                    valueSet.fastForEach {
+                        valueToScopes.remove(it, scope)
+                    }
+                }
+                willRemove
+            }
         }
 
         /**
