@@ -101,7 +101,7 @@ internal class IdentityArraySet<T : Any> : Set<T> {
     /**
      * Call [block] for all items in the set.
      */
-    inline fun forEach(block: (T) -> Unit) {
+    inline fun fastForEach(block: (T) -> Unit) {
         contract { callsInPlace(block) }
         for (i in 0 until size) {
             block(this[i])
