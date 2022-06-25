@@ -16,17 +16,20 @@
 
 package androidx.compose.ui.focus
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection.Companion.Next
 import androidx.compose.ui.focus.FocusDirection.Companion.Previous
+import androidx.compose.ui.focus.FocusRequester.Companion.Cancel
+import androidx.compose.ui.focus.FocusRequester.Companion.Default
 import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.Captured
 import androidx.compose.ui.focus.FocusStateImpl.Deactivated
 import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.internal.JvmDefaultWithCompatibility
+import androidx.compose.ui.unit.LayoutDirection
 
 @JvmDefaultWithCompatibility
 interface FocusManager {
@@ -133,20 +136,29 @@ internal class FocusManagerImpl(
 
         // Check if a custom focus traversal order is specified.
         val nextFocusRequester = source.customFocusSearch(focusDirection, layoutDirection)
-        if (nextFocusRequester != FocusRequester.Default) {
-            // TODO(b/175899786): We ideally need to check if the nextFocusRequester points to something
-            //  that is visible and focusable in the current mode (Touch/Non-Touch mode).
-            nextFocusRequester.requestFocus()
-            return true
-        }
 
-        return focusModifier.focusSearch(focusDirection, layoutDirection) { destination ->
-            if (destination == source) return@focusSearch false
-            checkNotNull(destination.parent) { "Move focus landed at the root." }
-            // If we found a potential next item, move focus to it.
-            destination.requestFocus()
-            true
-        }.let { foundNextItem -> foundNextItem || wrapAroundFocus(focusDirection) }
+        return when (nextFocusRequester) {
+            @OptIn(ExperimentalComposeUiApi::class)
+            Cancel -> false
+            Default -> {
+                val foundNextItem =
+                    focusModifier.focusSearch(focusDirection, layoutDirection) { destination ->
+                        if (destination == source) return@focusSearch false
+                        checkNotNull(destination.parent) { "Focus search landed at the root." }
+                        // If we found a potential next item, move focus to it.
+                        destination.requestFocus()
+                        true
+                    }
+                // If we didn't find a potential next item, try to wrap around.
+                foundNextItem || wrapAroundFocus(focusDirection)
+            }
+            else -> {
+                // TODO(b/175899786): We ideally need to check if the nextFocusRequester points to
+                //  something that is visible and focusable in the current mode (Touch/Non-Touch mode).
+                nextFocusRequester.requestFocus()
+                true
+            }
+        }
     }
 
     /**

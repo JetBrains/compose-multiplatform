@@ -231,3 +231,22 @@ fun FocusPropertiesSample() {
         )
     }
 }
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Sampled
+@Composable
+fun CancelFocusMoveSample() {
+    // If Box 2 is focused, pressing Up will not take focus to Box 1,
+    // But pressing Down will move focus to Box 3.
+    Column {
+        // Box 1.
+        Box(Modifier.focusTarget())
+        // Box 2.
+        Box(modifier = Modifier
+            .focusProperties { up = FocusRequester.Cancel }
+            .focusTarget()
+        )
+        // Box 3.
+        Box(Modifier.focusTarget())
+    }
+}
