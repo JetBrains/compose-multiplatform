@@ -349,6 +349,22 @@ package androidx.compose.foundation.gestures {
 
 }
 
+package androidx.compose.foundation.gestures.snapping {
+
+  public final class SnapFlingBehaviorKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static androidx.compose.foundation.gestures.FlingBehavior rememberSnapFlingBehavior(androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider snapLayoutInfoProvider, optional androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float> approachAnimationSpec, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> snapAnimationSpec);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.foundation.gestures.FlingBehavior snapFlingBehavior(androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider snapLayoutInfoProvider, androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float> approachAnimationSpec, androidx.compose.animation.core.AnimationSpec<java.lang.Float> snapAnimationSpec, androidx.compose.ui.unit.Density density, optional float shortSnapVelocityThreshold);
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi public interface SnapLayoutInfoProvider {
+    method public float calculateApproachOffset(float initialVelocity);
+    method public kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> calculateSnappingOffsetBounds();
+    method public float getSnapStepSize();
+    property public abstract float snapStepSize;
+  }
+
+}
+
 package androidx.compose.foundation.interaction {
 
   public interface DragInteraction extends androidx.compose.foundation.interaction.Interaction {

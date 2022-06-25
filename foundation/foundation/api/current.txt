@@ -296,6 +296,13 @@ package androidx.compose.foundation.gestures {
 
 }
 
+package androidx.compose.foundation.gestures.snapping {
+
+  public final class SnapFlingBehaviorKt {
+  }
+
+}
+
 package androidx.compose.foundation.interaction {
 
   public interface DragInteraction extends androidx.compose.foundation.interaction.Interaction {
