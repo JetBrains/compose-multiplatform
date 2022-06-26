@@ -5,6 +5,9 @@ A simple game powered by Compose Multiplatform
 ## Run native on MacOS
 `./gradlew runDebugExecutableMacosX64` (Works on Intel processors)
 
+## Run web assembly in browser
+`./gradlew jsBrowserDevelopmentRun`
+
 ## Run on iOS simulator
 `./gradlew iosDeployIPhone8Debug`
 `./gradlew iosDeployIPadDebug`
