@@ -40,6 +40,7 @@ import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.extra
+import org.jetbrains.kotlin.gradle.plugin.sources.CleanupStaleSourceSetMetadataEntriesService
 
 abstract class AndroidXRootImplPlugin : Plugin<Project> {
     @Suppress("UnstableApiUsage")
@@ -56,6 +57,7 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
     private fun Project.configureRootProject() {
         project.validateAllAndroidxArgumentsAreRecognized()
         tasks.register("listAndroidXProperties", ListAndroidXPropertiesTask::class.java)
+        this.disableKmpKlibCleanupService()
         setDependencyVersions()
         configureKtlintCheckFile()
         tasks.register(CheckExternalDependencyLicensesTask.TASK_NAME)
@@ -235,5 +237,36 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
         androidx.build.dependencies.kspVersion = getVersionByName("ksp")
         androidx.build.dependencies.agpVersion = getVersionByName("androidGradlePlugin")
         androidx.build.dependencies.guavaVersion = getVersionByName("guavaJre")
+    }
+
+    /**
+     * This function applies the workaround for b/236850628.
+     * There is a BuildService in KMP Gradle Plugin 1.7.0 that tries to cleanup unused klibs,
+     * which is over-eager and causes missing dependencies in the Studio UI. This function simply
+     * breaks the inputs of that cleanup function by intercepting the service creation and changing
+     * its parameters.
+     *
+     * That code is already removed in KMP main branch and we should be able to remove this
+     * workaround after updating to 1.7.20.
+     *
+     * see b/236850628#comment25 for more details.
+     */
+    private fun Project.disableKmpKlibCleanupService() {
+        project.gradle.sharedServices.registrations.whenObjectAdded { serviceRegistration ->
+            if (serviceRegistration.name == "cleanup-stale-sourceset-metadata") {
+                val params = serviceRegistration.parameters as
+                    CleanupStaleSourceSetMetadataEntriesService.Parameters
+                val tmpDirectory = project.layout.buildDirectory.dir("klib-cleanup-workaround")
+                params.projectStorageRoot.set(
+                    tmpDirectory.map { it.asFile }
+                )
+                params.projectStorageDirectories.set(emptyMap())
+                // make sure the store root is not changed afterwards. we don't need to set this
+                // for projectStorageDirectories as the files are deleted from projectStorageRoot,
+                // not projectStorageDirectories.
+                // https://github.com/JetBrains/kotlin/blob/47beef16f38ea315bf4d7d4d3faf34b0b952b613/libraries/tools/kotlin-gradle-plugin/src/common/kotlin/org/jetbrains/kotlin/gradle/plugin/sources/SourceSetMetadataStorageForIde.kt#L26
+                params.projectStorageRoot.disallowChanges()
+            }
+        }
     }
 }
