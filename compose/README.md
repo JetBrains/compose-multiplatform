@@ -35,6 +35,7 @@ androidx.compose.multiplatformEnabled=true
 # note that https://android.googlesource.com/platform/frameworks/support build doesn't work with jetbrains.compose.jsCompilerTestsEnabled)
 jetbrains.compose.jsCompilerTestsEnabled=true
 androidx.validateProjectStructure=false
+kotlin.js.webpack.major.version=4
 ```
 4. Open `compose` folder in Android Studio (not `compose/frameworks/support`)
 5. Download a custom Gradle 7.2 and specify it in `Settings -> Build, Execution, Deployment -> Build Tools -> Gradle` (because Android Studio will pick the wrong Gradle in the subproject instead of the Gradle in the root project)
