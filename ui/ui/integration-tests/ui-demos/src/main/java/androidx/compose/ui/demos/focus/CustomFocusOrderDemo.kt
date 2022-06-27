@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -34,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusRequester.Companion.Default
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
@@ -51,64 +53,60 @@ fun CustomFocusOrderDemo() {
     Column {
         Row {
             Text(
-                "Use the arrow keys to move focus left/right/up/down " +
-                    "and the tab and shift+tab key to move next/previous"
+                "Use the arrow keys to move focus left/right/up/down."
             )
         }
         Column(Modifier.fillMaxSize(), SpaceEvenly) {
             val (item1, item2, item3, item4) = remember { FocusRequester.createRefs() }
-            Row(Modifier.fillMaxWidth(), SpaceEvenly) {
-                FocusableText(
-                    text = "1",
-                    modifier = Modifier
-                        .focusRequester(item1)
-                        .focusProperties {
-                            next = item2
-                            right = item2
-                            down = item3
-                            previous = item4
-                        }
-                )
-                FocusableText(
-                    text = "2",
-                    modifier = Modifier
-                        .focusRequester(item2)
-                        .focusProperties {
-                            next = item3
-                            left = item1
-                            down = item4
-                            previous = item1
-                        }
-                )
+            var wrapAround by remember { mutableStateOf(false) }
+            Row {
+                Text("Wrap around focus search")
+                Switch(checked = wrapAround, onCheckedChange = { wrapAround = !wrapAround })
             }
             Row(Modifier.fillMaxWidth(), SpaceEvenly) {
-                FocusableText(
-                    text = "3",
-                    modifier = Modifier
-                        .focusRequester(item3)
-                        .focusProperties {
-                            next = item4
-                            right = item4
-                            up = item1
-                            previous = item2
-                        }
-                )
-                FocusableText(
-                    text = "4",
-                    modifier = Modifier
-                        .focusRequester(item4)
-                        .focusProperties {
-                            next = item1
-                            left = item3
-                            up = item2
-                            previous = item3
-                        }
-                )
-            }
-            DisposableEffect(Unit) {
-                item1.requestFocus()
-                onDispose { }
-            }
+                    FocusableText(
+                        text = "1",
+                        modifier = Modifier
+                            .focusRequester(item1)
+                            .focusProperties {
+                                left = if (wrapAround) item2 else Default
+                                up = if (wrapAround) item3 else Default
+                            }
+                    )
+                        FocusableText(
+                        text = "2",
+                        modifier = Modifier
+                            .focusRequester(item2)
+                            .focusProperties {
+                                right = if (wrapAround) item1 else Default
+                                up = if (wrapAround) item4 else Default
+                            }
+                    )
+                }
+                Row(Modifier.fillMaxWidth(), SpaceEvenly) {
+                    FocusableText(
+                        text = "3",
+                        modifier = Modifier
+                            .focusRequester(item3)
+                            .focusProperties {
+                                left = if (wrapAround) item4 else Default
+                                down = if (wrapAround) item1 else Default
+                            }
+                    )
+                    FocusableText(
+                        text = "4",
+                        modifier = Modifier
+                            .focusRequester(item4)
+                            .focusProperties {
+                                right = if (wrapAround) item3 else Default
+                                down = if (wrapAround) item2 else Default
+                            }
+                    )
+                }
+                DisposableEffect(Unit) {
+                    item1.requestFocus()
+                    onDispose { }
+                }
         }
     }
 }
