@@ -242,10 +242,6 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
         // Reenable after upgradingto 7.1.0-beta01
         disable.add("SupportAnnotationUsage")
 
-        // Broken when building with compileSdk 31, b/208451611
-        disable.add("VectorPath")
-        disable.add("InvalidVectorPath")
-
         // Provide stricter enforcement for project types intended to run on a device.
         if (extension.type.compilationTarget == CompilationTarget.DEVICE) {
             fatal.add("Assert")
