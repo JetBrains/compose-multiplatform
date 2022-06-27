@@ -600,7 +600,7 @@ private fun SliderImpl(
         val trackStrokeWidth: Float
         val widthDp: Dp
         with(LocalDensity.current) {
-            trackStrokeWidth = SliderTokens.ActiveTrackHeight.toPx()
+            trackStrokeWidth = TrackHeight.toPx()
             widthDp = width.toDp()
         }
 
@@ -680,8 +680,11 @@ private fun Track(
     thumbWidth: Dp,
     trackStrokeWidth: Float
 ) {
-    val thumbRadiusPx = with(LocalDensity.current) {
-        thumbWidth.toPx() / 2
+    val thumbRadiusPx: Float
+    val tickSize: Float
+    with(LocalDensity.current) {
+        thumbRadiusPx = thumbWidth.toPx() / 2
+        tickSize = TickSize.toPx()
     }
     val inactiveTrackColor = colors.trackColor(enabled, active = false)
     val activeTrackColor = colors.trackColor(enabled, active = true)
@@ -725,7 +728,7 @@ private fun Track(
                     },
                     PointMode.Points,
                     (if (outsideFraction) inactiveTickColor else activeTickColor).value,
-                    trackStrokeWidth,
+                    tickSize,
                     StrokeCap.Round
                 )
             }
@@ -1079,9 +1082,10 @@ private val ThumbHeight = SliderTokens.HandleHeight
 private val ThumbSize = DpSize(ThumbWidth, ThumbHeight)
 private val ThumbDefaultElevation = 1.dp
 private val ThumbPressedElevation = 6.dp
+private val TickSize = SliderTokens.TickMarksContainerSize
 
 // Internal to be referred to in tests
-internal val TrackHeight = 4.dp
+internal val TrackHeight = SliderTokens.InactiveTrackHeight
 private val SliderHeight = 48.dp
 private val SliderMinWidth = 144.dp // TODO: clarify min width
 private val DefaultSliderConstraints =
