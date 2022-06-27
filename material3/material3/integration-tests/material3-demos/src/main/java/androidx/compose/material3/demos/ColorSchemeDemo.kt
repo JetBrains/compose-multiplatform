@@ -139,9 +139,19 @@ fun ColorSchemeDemo() {
                 onColorContainerText = "On Error Container")
             Spacer(modifier = Modifier.height(16.dp))
             Text("Utility", style = MaterialTheme.typography.bodyLarge)
-            ColorTile(
-                text = "Outline",
-                color = colorScheme.outline,
+            DoubleTile(
+                leftTile = {
+                    ColorTile(
+                        text = "Outline",
+                        color = colorScheme.outline,
+                    )
+                },
+                rightTile = {
+                    ColorTile(
+                        text = "Outline Variant",
+                        color = colorScheme.outlineVariant,
+                    )
+                }
             )
         }
     }
