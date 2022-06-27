@@ -32,6 +32,10 @@ package androidx.compose.ui.test {
 
   public final class ComposeUiTestKt {
     method @androidx.compose.ui.test.ExperimentalTestApi public static void runComposeUiTest(optional kotlin.coroutines.CoroutineContext effectContext, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.ComposeUiTest,? extends kotlin.Unit> block);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void waitUntilAtLeastOneExists(androidx.compose.ui.test.ComposeUiTest, androidx.compose.ui.test.SemanticsMatcher matcher, optional long timeoutMillis);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void waitUntilDoesNotExist(androidx.compose.ui.test.ComposeUiTest, androidx.compose.ui.test.SemanticsMatcher matcher, optional long timeoutMillis);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void waitUntilExactlyOneExists(androidx.compose.ui.test.ComposeUiTest, androidx.compose.ui.test.SemanticsMatcher matcher, optional long timeoutMillis);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void waitUntilNodeCount(androidx.compose.ui.test.ComposeUiTest, androidx.compose.ui.test.SemanticsMatcher matcher, int count, optional long timeoutMillis);
   }
 
   public final class ComposeUiTest_androidKt {
@@ -70,6 +74,10 @@ package androidx.compose.ui.test.junit4 {
     method public void unregisterIdlingResource(androidx.compose.ui.test.IdlingResource idlingResource);
     method public void waitForIdle();
     method public void waitUntil(long timeoutMillis, kotlin.jvm.functions.Function0<java.lang.Boolean> condition);
+    method @androidx.compose.ui.test.ExperimentalTestApi public void waitUntilAtLeastOneExists(androidx.compose.ui.test.SemanticsMatcher matcher, long timeoutMillis);
+    method @androidx.compose.ui.test.ExperimentalTestApi public void waitUntilDoesNotExist(androidx.compose.ui.test.SemanticsMatcher matcher, long timeoutMillis);
+    method @androidx.compose.ui.test.ExperimentalTestApi public void waitUntilExactlyOneExists(androidx.compose.ui.test.SemanticsMatcher matcher, long timeoutMillis);
+    method @androidx.compose.ui.test.ExperimentalTestApi public void waitUntilNodeCount(androidx.compose.ui.test.SemanticsMatcher matcher, int count, long timeoutMillis);
     property public final A activity;
     property public final R activityRule;
     property public androidx.compose.ui.unit.Density density;
@@ -115,6 +123,10 @@ package androidx.compose.ui.test.junit4 {
     method public void unregisterIdlingResource(androidx.compose.ui.test.IdlingResource idlingResource);
     method public void waitForIdle();
     method public void waitUntil(optional long timeoutMillis, kotlin.jvm.functions.Function0<java.lang.Boolean> condition);
+    method @androidx.compose.ui.test.ExperimentalTestApi public void waitUntilAtLeastOneExists(androidx.compose.ui.test.SemanticsMatcher matcher, optional long timeoutMillis);
+    method @androidx.compose.ui.test.ExperimentalTestApi public void waitUntilDoesNotExist(androidx.compose.ui.test.SemanticsMatcher matcher, optional long timeoutMillis);
+    method @androidx.compose.ui.test.ExperimentalTestApi public void waitUntilExactlyOneExists(androidx.compose.ui.test.SemanticsMatcher matcher, optional long timeoutMillis);
+    method @androidx.compose.ui.test.ExperimentalTestApi public void waitUntilNodeCount(androidx.compose.ui.test.SemanticsMatcher matcher, int count, optional long timeoutMillis);
     property public abstract androidx.compose.ui.unit.Density density;
     property public abstract androidx.compose.ui.test.MainTestClock mainClock;
   }

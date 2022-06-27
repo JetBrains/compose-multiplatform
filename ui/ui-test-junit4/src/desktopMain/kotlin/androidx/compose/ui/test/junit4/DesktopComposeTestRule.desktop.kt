@@ -26,6 +26,10 @@ import androidx.compose.ui.test.MainTestClock
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
+import androidx.compose.ui.test.waitUntilAtLeastOneExists
+import androidx.compose.ui.test.waitUntilDoesNotExist
+import androidx.compose.ui.test.waitUntilExactlyOneExists
+import androidx.compose.ui.test.waitUntilNodeCount
 import androidx.compose.ui.unit.Density
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -88,6 +92,22 @@ class DesktopComposeTestRule private constructor(
 
     override fun waitUntil(timeoutMillis: Long, condition: () -> Boolean) =
         composeTest.waitUntil(timeoutMillis, condition)
+
+    @ExperimentalTestApi
+    override fun waitUntilNodeCount(matcher: SemanticsMatcher, count: Int, timeoutMillis: Long) =
+        composeTest.waitUntilNodeCount(matcher, count, timeoutMillis)
+
+    @ExperimentalTestApi
+    override fun waitUntilAtLeastOneExists(matcher: SemanticsMatcher, timeoutMillis: Long) =
+        composeTest.waitUntilAtLeastOneExists(matcher, timeoutMillis)
+
+    @ExperimentalTestApi
+    override fun waitUntilExactlyOneExists(matcher: SemanticsMatcher, timeoutMillis: Long) =
+        composeTest.waitUntilExactlyOneExists(matcher, timeoutMillis)
+
+    @ExperimentalTestApi
+    override fun waitUntilDoesNotExist(matcher: SemanticsMatcher, timeoutMillis: Long) =
+        composeTest.waitUntilDoesNotExist(matcher, timeoutMillis)
 
     override fun registerIdlingResource(idlingResource: IdlingResource) =
         composeTest.registerIdlingResource(idlingResource)
