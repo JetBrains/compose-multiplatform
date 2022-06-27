@@ -17,25 +17,8 @@ def BUILD_NUMBER = System.getenv("BUILD_NUMBER")
 switch (cacheSetting) {
     case "true":
     case "uplink": // legacy build cache
-        gradle.settingsEvaluated { settings ->
-            settings.buildCache {
-                remote(HttpBuildCache) {
-                    def osName = System.getProperty("os.name").toLowerCase()
-                    switch (osName) {
-                        case { it.contains("mac os x") }:
-                        case { it.contains("darwin") }:
-                        case { it.contains("osx") }:
-                            url = "http://gradle-remote-cache.uplink2.goog:999/cache/"
-                            break
-                        default:
-                            url = "http://gradle-remote-cache.uplink.goog:999/cache/"
-                            break
-                    }
-                    allowInsecureProtocol = true
-                    push = true
-                }
-            }
-        }
+        throw new Exception("You are using legacy USE_ANDROIDX_REMOTE_BUILD_CACHE=$cacheSetting " +
+            "type, please move to the new cache using http://go/androidx-dev#remote-build-cache")
         break
     case "gcp":
         gradle.settingsEvaluated { settings ->
