@@ -896,9 +896,17 @@ internal suspend fun BringIntoViewRequester.bringSelectionEndIntoView(
 
 @Composable
 private fun SelectionToolbarAndHandles(manager: TextFieldSelectionManager, show: Boolean) {
-    if (show) {
-        with(manager) {
-            state?.layoutResult?.value?.let {
+    with(manager) {
+        if (show) {
+            // First check whether the layoutResult belongs to the latest TextFieldValue.
+            // layoutResult is only updated once the composition finishes and layout phase begins.
+            // If layoutResult was not generated using the same content as the current value,
+            // we treat layoutResult as non-existent.
+            state?.layoutResult?.value?.takeIf {
+                // string equality check is much more expensive than length check.
+                // checking for length should be enough to prevent out of bounds errors.
+                it.multiParagraph.intrinsics.annotatedString.length == value.annotatedString.length
+            }?.let {
                 if (!value.selection.collapsed) {
                     val startOffset = offsetMapping.originalToTransformed(value.selection.start)
                     val endOffset = offsetMapping.originalToTransformed(value.selection.end)
@@ -931,8 +939,8 @@ private fun SelectionToolbarAndHandles(manager: TextFieldSelectionManager, show:
                     }
                 }
             }
-        }
-    } else manager.hideSelectionToolbar()
+        } else hideSelectionToolbar()
+    }
 }
 
 @Composable
