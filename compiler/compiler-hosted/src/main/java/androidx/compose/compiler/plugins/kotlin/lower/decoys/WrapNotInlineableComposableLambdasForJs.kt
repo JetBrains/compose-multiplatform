@@ -233,13 +233,18 @@ class WrapNotInlineableComposableLambdasForJs(
             }
 
             body = DeclarationIrBuilder(context, symbol).irBlockBody {
-                +createInvokeForComposableLambda(
+                val invoke = createInvokeForComposableLambda(
                     lambdaType = lambdaType,
                     dispatchReceiver = argument,
                     extensionReceiverParameterSymbol = extensionReceiverParameter?.symbol,
                     valueParameters = valueParameters,
                     arity = valueParameters.size + if (lambdaType.isExtensionFunctionType) 1 else 0
                 )
+                if (funExpr.function.returnType != context.irBuiltIns.unitType) {
+                    +irReturn(symbol, invoke)
+                } else {
+                    +invoke
+                }
             }
         }
 

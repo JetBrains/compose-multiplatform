@@ -45,7 +45,7 @@ dependencies {
 androidx {
     name = "Compose Runtime: Tracing"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    mavenVersion = LibraryVersions.COMPOSE_RUNTIME_TRACING
+    //mavenVersion = LibraryVersions.COMPOSE_RUNTIME_TRACING
     mavenGroup = LibraryGroups.COMPOSE_RUNTIME
     inceptionYear = "2022"
     description = "Additional tracing in Compose"

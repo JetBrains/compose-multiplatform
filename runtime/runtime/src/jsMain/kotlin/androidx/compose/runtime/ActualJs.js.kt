@@ -16,7 +16,10 @@
 
 package androidx.compose.runtime
 
+import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.runtime.snapshots.SnapshotContextElement
 import androidx.compose.runtime.snapshots.SnapshotMutableState
+import kotlin.coroutines.CoroutineContext
 import kotlinx.browser.window
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -143,3 +146,19 @@ internal actual fun <T> createSnapshotMutableState(
     value: T,
     policy: SnapshotMutationPolicy<T>
 ): SnapshotMutableState<T> = SnapshotMutableStateImpl(value, policy)
+
+annotation class NoOp
+actual typealias JvmDefaultWithCompatibility = NoOp
+
+@ExperimentalComposeApi
+internal actual class SnapshotContextElementImpl actual constructor(
+    private val snapshot: Snapshot
+) : SnapshotContextElement {
+
+    init {
+        error("provide SnapshotContextElementImpl when coroutines lib has necessary APIs")
+    }
+
+    override val key: CoroutineContext.Key<*>
+        get() = SnapshotContextElement
+}

@@ -16,7 +16,10 @@
 
 package androidx.compose.runtime
 
+import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.runtime.snapshots.SnapshotContextElement
 import androidx.compose.runtime.snapshots.SnapshotMutableState
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.yield
 import kotlin.native.identityHashCode
 import kotlin.system.getTimeNanos
@@ -139,4 +142,20 @@ internal actual class SnapshotThreadLocal<T> actual constructor() {
     actual fun set(value: T?) {
         this.value = value
     }
+}
+
+annotation class NoOp
+actual typealias JvmDefaultWithCompatibility = NoOp
+
+@ExperimentalComposeApi
+internal actual class SnapshotContextElementImpl actual constructor(
+    private val snapshot: Snapshot
+) : SnapshotContextElement {
+
+    init {
+        error("provide SnapshotContextElementImpl when coroutines lib has necessary APIs")
+    }
+
+    override val key: CoroutineContext.Key<*>
+        get() = SnapshotContextElement
 }

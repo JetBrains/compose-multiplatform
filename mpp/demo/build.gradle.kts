@@ -28,7 +28,7 @@ AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
-    kotlinNativeCompilerPluginClasspath(project(":compose:compiler:compiler-hosted"))
+    kotlinNativeCompilerPluginClasspath(project(":compose:compiler:compiler"))
 }
 
 val resourcesDir = "$buildDir/resources"

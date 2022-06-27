@@ -1,3 +1,5 @@
+package androidx.compose.ui.text.font
+
 /*
  * Copyright 2021 The Android Open Source Project
  *
@@ -14,21 +16,12 @@
  * limitations under the License.
  */
 
-import androidx.build.AndroidXComposePlugin
-
-plugins {
-    id("AndroidXPlugin")
-    id("AndroidXComposePlugin")
-    id("kotlin-multiplatform")
-}
-
-AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
-dependencies {
-    kotlinNativeCompilerPluginClasspath(project(":compose:compiler:compiler"))
-}
-
-androidXComposeMultiplatform {
-    desktop()
-    js()
-    darwin()
-}
+/**
+ * Do not do font synthesis on native
+ */
+internal actual fun FontSynthesis.synthesizeTypeface(
+    typeface: Any,
+    font: Font,
+    requestedWeight: FontWeight,
+    requestedStyle: FontStyle
+): Any = typeface

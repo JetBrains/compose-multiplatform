@@ -1,2 +1,2 @@
 config.client.mocha = config.client.mocha || {};
-config.client.mocha.timeout = 4000;
+config.client.mocha.timeout = 8000;

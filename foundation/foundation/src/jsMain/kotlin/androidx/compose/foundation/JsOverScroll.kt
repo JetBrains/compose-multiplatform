@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.gestures
+package androidx.compose.foundation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -25,30 +25,16 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.unit.Velocity
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal actual fun rememberOverScrollController(): OverScrollController {
+internal actual fun rememberOverscrollEffect(): OverscrollEffect {
     return remember {
-        DesktopEdgeEffectOverScrollController()
+        DesktopEdgeEffectOverscrollEffect()
     }
 }
 
-internal actual fun Modifier.overScroll(
-    overScrollController: OverScrollController
-): Modifier = Modifier
-
-private class DesktopEdgeEffectOverScrollController() : OverScrollController {
-
-    override fun release() {
-    }
-
-    override fun refreshContainerInfo(size: Size, isContentScrolls: Boolean) {
-        // nothing yet
-    }
-
-    override fun DrawScope.drawOverScroll() {}
-
-    override fun stopOverscrollAnimation(): Boolean = false
-
+@OptIn(ExperimentalFoundationApi::class)
+private class DesktopEdgeEffectOverscrollEffect() : OverscrollEffect {
     override fun consumePreScroll(
         scrollDelta: Offset,
         pointerPosition: Offset?,
@@ -57,16 +43,16 @@ private class DesktopEdgeEffectOverScrollController() : OverScrollController {
 
     override fun consumePostScroll(
         initialDragDelta: Offset,
-        overScrollDelta: Offset,
+        overscrollDelta: Offset,
         pointerPosition: Offset?,
         source: NestedScrollSource
-    ) {
-    }
+    ) {}
 
-    override fun consumePreFling(
-        velocity: Velocity
-    ): Velocity = Velocity.Zero
+    override suspend fun consumePreFling(velocity: Velocity): Velocity = Velocity.Zero
 
-    override fun consumePostFling(velocity: Velocity) {
-    }
+    override suspend fun consumePostFling(velocity: Velocity) {}
+
+    override var isEnabled = false
+    override val isInProgress = false
+    override val effectModifier = Modifier
 }

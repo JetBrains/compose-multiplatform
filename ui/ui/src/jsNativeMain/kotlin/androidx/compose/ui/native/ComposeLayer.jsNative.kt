@@ -87,6 +87,7 @@ internal class ComposeLayer(
                         nativeEvent = event
                     )
                 }
+                else -> {}
             }
         }
 
