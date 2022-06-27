@@ -460,11 +460,23 @@ object ButtonDefaults {
      * [OutlinedButton] buttons.
      *
      * - See [TextButtonContentPadding] for content padding used by [TextButton].
+     * - See [ButtonWithIconContentPadding] for content padding used by [Button] that contains [Icon].
      */
     // TODO(b/201343537): Use tokens.
     val ContentPadding =
         PaddingValues(
             start = ButtonHorizontalPadding,
+            top = ButtonVerticalPadding,
+            end = ButtonHorizontalPadding,
+            bottom = ButtonVerticalPadding
+        )
+
+    private val ButtonWithIconHorizontalStartPadding = 16.dp
+
+    /** The default content padding used by [Button] that contains an [Icon]. */
+    val ButtonWithIconContentPadding =
+        PaddingValues(
+            start = ButtonWithIconHorizontalStartPadding,
             top = ButtonVerticalPadding,
             end = ButtonHorizontalPadding,
             bottom = ButtonVerticalPadding
