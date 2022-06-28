@@ -49,12 +49,11 @@ tasks.withType(KotlinCompile).configureEach {
 
 androidx {
     name = "Compose Runtime: Tracing"
-    runApiTasks= new RunApiTasks.No("The API is still evolving") // TODO(b/231444429)
     publish = Publish.SNAPSHOT_AND_RELEASE
     mavenVersion = LibraryVersions.COMPOSE_RUNTIME_TRACING
     mavenGroup = LibraryGroups.COMPOSE_RUNTIME
     inceptionYear = "2022"
-    description = "Allows for additional tracing in a Compose app (e.g. tracing of Composables taking part in a Recomposition"
+    description = "Additional tracing in Compose"
 }
 
 tasks.withType(KotlinCompile).configureEach {
