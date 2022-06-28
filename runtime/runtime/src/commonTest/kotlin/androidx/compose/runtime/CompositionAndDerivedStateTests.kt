@@ -104,6 +104,37 @@ class CompositionAndDerivedStateTests {
     }
 
     @Test
+    fun onlyInvalidatesIfResultIsStructurallyDifferent() = compositionTest {
+        var a by mutableStateOf(mutableListOf(32), referentialEqualityPolicy())
+        var b by mutableStateOf(mutableListOf(10), referentialEqualityPolicy())
+        val answer by derivedStateOf { a + b }
+
+        compose {
+            Text("The answer is $answer")
+        }
+
+        validate {
+            Text("The answer is ${a + b}")
+        }
+
+        // A snapshot is necessary here otherwise the ui thread might see one changed but not
+        // the other. A snapshot ensures that both modifications will be seen together.
+        Snapshot.withMutableSnapshot {
+            a = mutableListOf(32)
+            b = mutableListOf(10)
+        }
+
+        // Change both to different instance should not result in a change.
+        expectNoChanges()
+        revalidate()
+
+        a = mutableListOf(32)
+        // Change just one should not result in a change.
+        expectNoChanges()
+        revalidate()
+    }
+
+    @Test
     fun onlyEvaluateDerivedStatesThatAreLive() = compositionTest {
         var a by mutableStateOf(11)
 
@@ -532,6 +563,134 @@ class CompositionAndDerivedStateTests {
         val conditionalScopes = (composition as? CompositionImpl)?.conditionalScopes ?: emptyList()
 
         assertEquals(0, conditionalScopes.count { it.isConditional })
+    }
+
+    @Test
+    fun derivedStateOfNestedChangesInvalidate() = compositionTest {
+        var a by mutableStateOf(31)
+        var b by mutableStateOf(10)
+        val transient by derivedStateOf { a + b }
+        val answer by derivedStateOf { transient - 1 }
+
+        compose {
+            Text("The answer is $answer")
+        }
+
+        validate {
+            Text("The answer is ${a + b - 1}")
+        }
+
+        a++
+        expectChanges()
+
+        b++
+        expectChanges()
+
+        revalidate()
+    }
+
+    @Test
+    fun derivedStateOfMutationPolicyDoesNotInvalidateNestedStates() = compositionTest {
+        var a by mutableStateOf(30)
+        var b by mutableStateOf(10)
+        val transient by derivedStateOf(structuralEqualityPolicy()) { (a + b) / 10 }
+        var invalidateCount = 0
+        val answer by derivedStateOf {
+            invalidateCount++
+            transient
+        }
+
+        compose {
+            Text("The answer is $answer")
+        }
+
+        validate {
+            Text("The answer is ${(a + b) / 10}")
+        }
+
+        assertEquals(1, invalidateCount)
+
+        a += 10
+        expectChanges()
+        assertEquals(2, invalidateCount)
+
+        b++
+        expectNoChanges()
+        assertEquals(2, invalidateCount)
+
+        revalidate()
+    }
+
+    @Test
+    fun derivedStateOfStructuralMutationPolicyDoesntRecompose() = compositionTest {
+        var a by mutableStateOf(30)
+        var b by mutableStateOf(10)
+        val answer by derivedStateOf(structuralEqualityPolicy()) {
+            listOf(a >= 30, b >= 10)
+        }
+        var compositionCount = 0
+
+        compose {
+            val remembered = rememberUpdatedState(answer)
+            Linear {
+                compositionCount++
+                Text("The answer is ${remembered.value}")
+            }
+        }
+
+        validate {
+            Linear {
+                Text("The answer is ${listOf(true, true)}")
+            }
+        }
+
+        assertEquals(1, compositionCount)
+
+        a++
+        expectNoChanges() // the equivalent list doesn't cause changes
+        assertEquals(1, compositionCount)
+
+        b++
+        expectNoChanges() // the equivalent list doesn't cause changes
+        assertEquals(1, compositionCount)
+
+        revalidate()
+    }
+
+    @Test
+    fun derivedStateOfReferencialMutationPolicyRecomposes() = compositionTest {
+        var a by mutableStateOf(30)
+        var b by mutableStateOf(10)
+        val answer by derivedStateOf(referentialEqualityPolicy()) {
+            listOf(a >= 30, b >= 10)
+        }
+        var compositionCount = 0
+
+        compose {
+            val remembered = rememberUpdatedState(answer)
+            Linear {
+                compositionCount++
+                Text("The answer is ${remembered.value}")
+            }
+        }
+
+        validate {
+            Linear {
+                Text("The answer is ${listOf(true, true)}")
+            }
+        }
+
+        assertEquals(1, compositionCount)
+
+        a++
+        expectNoChanges() // the equivalent list doesn't cause changes
+        assertEquals(2, compositionCount)
+
+        b++
+        expectNoChanges() // the equivalent list doesn't cause changes
+        assertEquals(3, compositionCount)
+
+        revalidate()
     }
 }
 
