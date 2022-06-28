@@ -303,3 +303,10 @@ package androidx.compose.foundation.layout {
 
 }
 
+package androidx.compose.foundation.layout.internal {
+
+  public final class JvmDefaultWithCompatibility_jvmKt {
+  }
+
+}
+

@@ -26,7 +26,7 @@ import androidx.compose.ui.input.pointer.PointerEventPass.Initial
 import androidx.compose.ui.input.pointer.PointerEventPass.Main
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.unit.IntSize
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 
 /**
  * A [Modifier.Element] that can interact with pointer input.

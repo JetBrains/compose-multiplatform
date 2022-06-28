@@ -17,7 +17,7 @@
 package androidx.compose.ui
 
 import androidx.compose.runtime.Stable
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 
 /**
  * An ordered, immutable collection of [modifier elements][Modifier.Element] that decorate or add

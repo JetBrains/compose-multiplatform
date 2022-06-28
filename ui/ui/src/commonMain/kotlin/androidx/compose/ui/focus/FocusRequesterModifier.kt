@@ -27,7 +27,7 @@ import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.modifier.ProvidableModifierLocal
 import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.platform.debugInspectorInfo
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 
 /**
  * A [modifier][Modifier.Element] that is used to pass in a [FocusRequester] that can be used to

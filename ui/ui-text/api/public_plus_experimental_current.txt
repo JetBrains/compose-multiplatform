@@ -1206,6 +1206,13 @@ package androidx.compose.ui.text.input {
 
 }
 
+package androidx.compose.ui.text.internal {
+
+  public final class JvmDefaultWithCompatibility_jvmKt {
+  }
+
+}
+
 package androidx.compose.ui.text.intl {
 
   public final class AndroidPlatformLocale_androidKt {

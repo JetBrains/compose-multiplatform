@@ -19,7 +19,7 @@ package androidx.compose.ui.graphics
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.colorspace.ColorSpace
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.graphics.internal.JvmDefaultWithCompatibility
 
 /**
  * Graphics object that represents a 2 dimensional array of pixel information represented

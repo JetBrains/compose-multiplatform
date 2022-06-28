@@ -25,7 +25,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.foundation.internal.JvmDefaultWithCompatibility
 
 /**
  * Receiver scope being used by the item content parameter of LazyColumn/Row.

@@ -396,6 +396,13 @@ package androidx.compose.foundation.interaction {
 
 }
 
+package androidx.compose.foundation.internal {
+
+  public final class JvmDefaultWithCompatibility_jvmKt {
+  }
+
+}
+
 package androidx.compose.foundation.lazy {
 
   public final class LazyBeyondBoundsModifierKt {

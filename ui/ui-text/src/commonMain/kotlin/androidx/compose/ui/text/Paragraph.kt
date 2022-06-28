@@ -30,7 +30,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlin.math.ceil
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.text.internal.JvmDefaultWithCompatibility
 
 internal const val DefaultMaxLines = Int.MAX_VALUE
 

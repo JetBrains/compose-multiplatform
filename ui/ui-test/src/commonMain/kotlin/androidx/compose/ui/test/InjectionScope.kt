@@ -20,7 +20,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.test.internal.JvmDefaultWithCompatibility
 
 /**
  * The receiver scope of all input injection lambdas offered in `ui-test`, such as

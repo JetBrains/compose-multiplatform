@@ -17,7 +17,7 @@
 package androidx.compose.ui.layout
 
 import androidx.compose.ui.unit.Constraints
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 
 /**
  * The receiver scope of a layout's measure lambda. The return value of the

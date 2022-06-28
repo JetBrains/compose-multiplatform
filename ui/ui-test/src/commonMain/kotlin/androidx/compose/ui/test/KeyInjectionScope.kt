@@ -18,7 +18,7 @@ package androidx.compose.ui.test
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.Key
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.test.internal.JvmDefaultWithCompatibility
 
 /**
  * Default duration of a key press in milliseconds (duration between key down and key up).

@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import kotlin.math.max
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.animation.core.internal.JvmDefaultWithCompatibility
 import kotlin.jvm.JvmName
 
 /**

@@ -516,3 +516,10 @@ package androidx.compose.ui.test.android {
 
 }
 
+package androidx.compose.ui.test.internal {
+
+  public final class JvmDefaultWithCompatibility_jvmKt {
+  }
+
+}
+

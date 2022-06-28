@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.platform
 
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 
 /**
  * Interface for managing accessibility.
