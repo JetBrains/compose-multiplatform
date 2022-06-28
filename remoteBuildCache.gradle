@@ -17,8 +17,9 @@ def BUILD_NUMBER = System.getenv("BUILD_NUMBER")
 switch (cacheSetting) {
     case "true":
     case "uplink": // legacy build cache
-        throw new Exception("You are using legacy USE_ANDROIDX_REMOTE_BUILD_CACHE=$cacheSetting " +
-            "type, please move to the new cache using http://go/androidx-dev#remote-build-cache")
+        logger.warn("\u001B[31m\nYou are using legacy USE_ANDROIDX_REMOTE_BUILD_CACHE=$cacheSetting " +
+            "type, this cache has been turned down, so you are *not* using a remote cache. " +
+            "Please move to the new cache using http://go/androidx-dev#remote-build-cache\u001B[0m\n")
         break
     case "gcp":
         gradle.settingsEvaluated { settings ->
