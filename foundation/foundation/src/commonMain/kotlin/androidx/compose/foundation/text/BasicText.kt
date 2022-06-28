@@ -85,10 +85,13 @@ fun BasicText(
 
     // NOTE(text-perf-review): potential bug. selectableId is regenerated here whenever text
     // changes, but it is only saved in the initial creation of TextState.
-    val selectableId =
+    val selectableId = if (selectionRegistrar == null) {
+        SelectionRegistrar.InvalidSelectableId
+    } else {
         rememberSaveable(text, selectionRegistrar, saver = selectionIdSaver(selectionRegistrar)) {
-            selectionRegistrar?.nextSelectableId() ?: SelectionRegistrar.InvalidSelectableId
+            selectionRegistrar.nextSelectableId()
         }
+    }
 
     val controller = remember {
         TextController(
@@ -184,10 +187,13 @@ fun BasicText(
 
     // NOTE(text-perf-review): potential bug. selectableId is regenerated here whenever text
     // changes, but it is only saved in the initial creation of TextState.
-    val selectableId =
+    val selectableId = if (selectionRegistrar == null) {
+        SelectionRegistrar.InvalidSelectableId
+    } else {
         rememberSaveable(text, selectionRegistrar, saver = selectionIdSaver(selectionRegistrar)) {
-            selectionRegistrar?.nextSelectableId() ?: SelectionRegistrar.InvalidSelectableId
+            selectionRegistrar.nextSelectableId()
         }
+    }
 
     val controller = remember {
         TextController(
