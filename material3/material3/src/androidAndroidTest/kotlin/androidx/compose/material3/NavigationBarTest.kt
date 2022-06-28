@@ -215,20 +215,16 @@ class NavigationBarTest {
         val itemBounds = rule.onNodeWithTag("item").getUnclippedBoundsInRoot()
         val iconBounds = rule.onNodeWithTag("icon", useUnmergedTree = true)
             .getUnclippedBoundsInRoot()
-        val textBounds = rule.onNodeWithText("ItemText").getUnclippedBoundsInRoot()
+        val textBounds = rule.onNodeWithText("ItemText", useUnmergedTree = true)
+            .getUnclippedBoundsInRoot()
 
-        // Distance from the bottom to the text baseline, and from the top of the icon to the
-        // top of the item
+        // Distance from the bottom of the item to the text bottom, and from the top of the icon to
+        // the top of the item
         val verticalPadding = NavigationBarItemVerticalPadding
 
-        // Relative position of the baseline to the top of text
-        val relativeTextBaseline = rule.onNodeWithText("ItemText").getLastBaselinePosition()
-        // Absolute y position of the text baseline
-        val absoluteTextBaseline = textBounds.top + relativeTextBaseline
-
         val itemBottom = itemBounds.height + itemBounds.top
-        // Text baseline should be `verticalPadding` from the bottom of the item
-        absoluteTextBaseline.assertIsEqualTo(itemBottom - verticalPadding)
+        // Text bottom should be `verticalPadding` from the bottom of the item
+        textBounds.bottom.assertIsEqualTo(itemBottom - verticalPadding)
 
         rule.onNodeWithTag("icon", useUnmergedTree = true)
             // The icon should be centered in the item

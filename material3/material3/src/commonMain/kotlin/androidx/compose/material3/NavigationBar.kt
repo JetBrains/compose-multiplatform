@@ -48,7 +48,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
@@ -503,9 +502,8 @@ private fun MeasureScope.placeLabelAndIcon(
 ): MeasureResult {
     val height = constraints.maxHeight
 
-    val baseline = labelPlaceable[LastBaseline]
     // Label should be `ItemVerticalPadding` from the bottom
-    val labelY = height - baseline - NavigationBarItemVerticalPadding.roundToPx()
+    val labelY = height - labelPlaceable.height - NavigationBarItemVerticalPadding.roundToPx()
 
     // Icon (when selected) should be `ItemVerticalPadding` from the top
     val selectedIconY = NavigationBarItemVerticalPadding.roundToPx()
