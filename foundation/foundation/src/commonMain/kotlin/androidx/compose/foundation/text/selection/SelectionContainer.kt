@@ -34,7 +34,7 @@ import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.util.fastForEach
 
 /**
- * Enables text selection for it's direct or indirection children.
+ * Enables text selection for it's direct or indirect children.
  *
  * @sample androidx.compose.foundation.samples.SelectionSample
  */
@@ -52,7 +52,7 @@ fun SelectionContainer(modifier: Modifier = Modifier, content: @Composable () ->
 }
 
 /**
- * Disables text selection for it's direct or indirection children. To use this, simply add this
+ * Disables text selection for it's direct or indirect children. To use this, simply add this
  * to wrap one or more text composables.
  *
  * @sample androidx.compose.foundation.samples.DisableSelectionSample
