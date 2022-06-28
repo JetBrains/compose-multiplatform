@@ -33,7 +33,9 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toPixelMap
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
@@ -448,6 +450,144 @@ class OverscrollTest {
         }
     }
 
+    @Test
+    fun horizontalOverscrollEnabled_verifyOverscrollReceivedSingleAxisValues() {
+        val controller = TestOverscrollEffect()
+        val scrollableState = ScrollableState { 0f }
+        rule.setOverscrollContentAndReturnViewConfig(
+            scrollableState = scrollableState,
+            overscrollEffect = controller
+        )
+
+        rule.runOnIdle {
+            // we passed isContentScrolls = 1, so initial draw must occur
+            assertThat(controller.drawCallsCount).isEqualTo(1)
+        }
+
+        rule.onNodeWithTag(boxTag).assertExists()
+
+        rule.onNodeWithTag(boxTag).performTouchInput {
+            swipeWithVelocity(
+                center,
+                Offset(centerX + 10800, centerY),
+                endVelocity = 30000f
+            )
+        }
+
+        rule.runOnIdle {
+            with(controller) {
+                // presented on consume pre scroll
+                assertSingleAxisValue(preScrollDelta.x, preScrollDelta.y)
+
+                // presented on consume post scroll
+                assertSingleAxisValue(lastOverscrollDelta.x, lastOverscrollDelta.y)
+                assertSingleAxisValue(lastInitialDragDelta.x, lastInitialDragDelta.y)
+
+                // presented on pre fling
+                assertSingleAxisValue(preFlingVelocity.x, preFlingVelocity.y)
+
+                // presented on post fling
+                assertSingleAxisValue(lastVelocity.x, lastVelocity.y)
+            }
+        }
+    }
+
+    @Test
+    fun verticalOverscrollEnabled_verifyOverscrollReceivedSingleAxisValues() {
+        val controller = TestOverscrollEffect()
+        val scrollableState = ScrollableState { 0f }
+        rule.setOverscrollContentAndReturnViewConfig(
+            scrollableState = scrollableState,
+            overscrollEffect = controller,
+            orientation = Orientation.Vertical
+        )
+
+        rule.runOnIdle {
+            // we passed isContentScrolls = 1, so initial draw must occur
+            assertThat(controller.drawCallsCount).isEqualTo(1)
+        }
+
+        rule.onNodeWithTag(boxTag).assertExists()
+
+        rule.onNodeWithTag(boxTag).performTouchInput {
+            swipeWithVelocity(
+                center,
+                Offset(centerX, centerY + 10800),
+                endVelocity = 30000f
+            )
+        }
+
+        rule.runOnIdle {
+            with(controller) {
+                // presented on consume pre scroll
+                assertSingleAxisValue(preScrollDelta.y, preScrollDelta.x)
+
+                // presented on consume post scroll
+                assertSingleAxisValue(lastOverscrollDelta.y, lastOverscrollDelta.x)
+                assertSingleAxisValue(lastInitialDragDelta.y, lastInitialDragDelta.x)
+
+                // presented on pre fling
+                assertSingleAxisValue(preFlingVelocity.y, preFlingVelocity.x)
+
+                // presented on post fling
+                assertSingleAxisValue(lastVelocity.y, lastVelocity.x)
+            }
+        }
+    }
+
+    @Test
+    fun verticalOverscrollEnabled_notTriggered_verifyCrossAxisIsCorrectlyPropagated() {
+        val controller = TestOverscrollEffect()
+        val inspectableConnection = InspectableConnection()
+        rule.setOverscrollContentAndReturnViewConfig(
+            scrollableState = ScrollableState { 0f },
+            overscrollEffect = controller,
+            orientation = Orientation.Vertical,
+            inspectableConnection = inspectableConnection
+        )
+
+        rule.onNodeWithTag(boxTag).assertExists()
+
+        rule.onNodeWithTag(boxTag).performTouchInput {
+            down(center)
+            moveBy(Offset(100f, 100f))
+            up()
+        }
+
+        rule.runOnIdle {
+            assertThat(inspectableConnection.preScrollOffset.x).isEqualTo(100f)
+        }
+    }
+
+    @Test
+    fun horizontalOverscrollEnabled_notTriggered_verifyCrossAxisIsCorrectlyPropagated() {
+        val controller = TestOverscrollEffect()
+        val inspectableConnection = InspectableConnection()
+        rule.setOverscrollContentAndReturnViewConfig(
+            scrollableState = ScrollableState { 0f },
+            overscrollEffect = controller,
+            orientation = Orientation.Horizontal,
+            inspectableConnection = inspectableConnection
+        )
+
+        rule.onNodeWithTag(boxTag).assertExists()
+
+        rule.onNodeWithTag(boxTag).performTouchInput {
+            down(center)
+            moveBy(Offset(100f, 100f))
+            up()
+        }
+
+        rule.runOnIdle {
+            assertThat(inspectableConnection.preScrollOffset.y).isEqualTo(100f)
+        }
+    }
+
+    private fun assertSingleAxisValue(mainAxis: Float, crossAxis: Float) {
+        assertThat(abs(mainAxis)).isGreaterThan(0)
+        assertThat(crossAxis).isEqualTo(0)
+    }
+
     class TestOverscrollEffect(
         private val consumePreCycles: Boolean = false,
         var animationRunning: Boolean = false
@@ -592,12 +732,14 @@ private fun ComposeContentTestRule.setOverscrollContentAndReturnViewConfig(
     scrollableState: ScrollableState,
     overscrollEffect: OverscrollEffect,
     flingBehavior: FlingBehavior? = null,
-    reverseDirection: Boolean = false
+    reverseDirection: Boolean = false,
+    orientation: Orientation = Orientation.Horizontal,
+    inspectableConnection: NestedScrollConnection = NoOpConnection
 ): ViewConfiguration {
     var viewConfiguration: ViewConfiguration? = null
     setContent {
         viewConfiguration = LocalViewConfiguration.current
-        Box {
+        Box(Modifier.nestedScroll(inspectableConnection)) {
             Box(
                 Modifier
                     .testTag("box")
@@ -605,7 +747,7 @@ private fun ComposeContentTestRule.setOverscrollContentAndReturnViewConfig(
                     .overscroll(overscrollEffect)
                     .scrollable(
                         state = scrollableState,
-                        orientation = Orientation.Horizontal,
+                        orientation = orientation,
                         overscrollEffect = overscrollEffect,
                         flingBehavior = flingBehavior ?: ScrollableDefaults.flingBehavior(),
                         reverseDirection = reverseDirection
@@ -624,5 +766,16 @@ private fun ImageBitmap.assertHasNoColor(color: Color) {
                 "Pixel at [$x,$y] was equal to $color"
             ).that(pixel[x, y]).isNotEqualTo(color)
         }
+    }
+}
+
+private val NoOpConnection = object : NestedScrollConnection {}
+
+private class InspectableConnection : NestedScrollConnection {
+    var preScrollOffset = Offset.Zero
+
+    override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+        preScrollOffset += available
+        return Offset.Zero
     }
 }
