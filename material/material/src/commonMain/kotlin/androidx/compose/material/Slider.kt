@@ -163,7 +163,14 @@ fun Slider(
         modifier
             .minimumTouchTargetSize()
             .requiredSizeIn(minWidth = ThumbRadius * 2, minHeight = ThumbRadius * 2)
-            .sliderSemantics(value, enabled, onValueChange, valueRange, steps)
+            .sliderSemantics(
+                value,
+                enabled,
+                onValueChange,
+                onValueChangeFinished,
+                valueRange,
+                steps
+            )
             .focusable(enabled, interactionSource)
     ) {
         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
@@ -407,6 +414,7 @@ fun RangeSlider(
             coercedStart,
             enabled,
             { value -> onValueChangeState.value.invoke(value..coercedEnd) },
+            onValueChangeFinished,
             valueRange.start..coercedEnd,
             startSteps
         )
@@ -414,6 +422,7 @@ fun RangeSlider(
             coercedEnd,
             enabled,
             { value -> onValueChangeState.value.invoke(coercedStart..value) },
+            onValueChangeFinished,
             coercedStart..valueRange.endInclusive,
             endSteps
         )
@@ -842,6 +851,7 @@ private fun Modifier.sliderSemantics(
     value: Float,
     enabled: Boolean,
     onValueChange: (Float) -> Unit,
+    onValueChangeFinished: (() -> Unit)? = null,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     steps: Int = 0
 ): Modifier {
@@ -874,6 +884,7 @@ private fun Modifier.sliderSemantics(
                     false
                 } else {
                     onValueChange(resolvedValue)
+                    onValueChangeFinished?.invoke()
                     true
                 }
             }
