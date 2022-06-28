@@ -18,6 +18,10 @@ package androidx.compose.foundation.lazy.list
 
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.AutoTestFrameClock
+import androidx.compose.foundation.composeViewSwipeDown
+import androidx.compose.foundation.composeViewSwipeLeft
+import androidx.compose.foundation.composeViewSwipeRight
+import androidx.compose.foundation.composeViewSwipeUp
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollableDefaults
@@ -179,6 +183,22 @@ open class BaseLazyListTestWithOrientation(private val orientation: Orientation)
         y = if (!vertical) 0.dp else offset,
         density = rule.density
     )
+
+    fun composeViewSwipeForward() {
+        if (orientation == Orientation.Vertical) {
+            composeViewSwipeUp()
+        } else {
+            composeViewSwipeLeft()
+        }
+    }
+
+    fun composeViewSwipeBackward() {
+        if (orientation == Orientation.Vertical) {
+            composeViewSwipeDown()
+        } else {
+            composeViewSwipeRight()
+        }
+    }
 
     @Composable
     fun LazyColumnOrRow(
