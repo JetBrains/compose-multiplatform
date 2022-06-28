@@ -74,7 +74,6 @@ import kotlinx.coroutines.flow.collect
  * @param colors [CardColors] that will be used to resolve the colors used for this card in
  * different states. See [CardDefaults.cardColors].
  */
-@ExperimentalMaterial3Api
 @Composable
 fun Card(
     modifier: Modifier = Modifier,
@@ -182,7 +181,6 @@ fun Card(
  * @param colors [CardColors] that will be used to resolve the color(s) used for this card in
  * different states. See [CardDefaults.elevatedCardElevation].
  */
-@ExperimentalMaterial3Api
 @Composable
 fun ElevatedCard(
     modifier: Modifier = Modifier,
@@ -277,7 +275,6 @@ fun ElevatedCard(
  * @param colors [CardColors] that will be used to resolve the color(s) used for this card in
  * different states. See [CardDefaults.outlinedCardColors].
  */
-@ExperimentalMaterial3Api
 @Composable
 fun OutlinedCard(
     modifier: Modifier = Modifier,
