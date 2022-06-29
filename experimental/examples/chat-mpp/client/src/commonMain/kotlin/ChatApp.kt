@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import kotlinx.datetime.*
 
 val myUser = User("Me")
 val friends = listOf(User("Alex"), User("Lily"), User("Sam"))
