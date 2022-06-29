@@ -30,7 +30,8 @@ class FoundationIssueRegistry : IssueRegistry() {
     override val api = 13
     override val minApi = CURRENT_API
     override val issues get() = listOf(
-        LazyLayoutStateReadInCompositionDetector.FrequentlyChangedStateReadInComposition
+        LazyLayoutStateReadInCompositionDetector.FrequentlyChangedStateReadInComposition,
+        NonLambdaOffsetModifierDetector.UseOfNonLambdaOverload
     )
     override val vendor = Vendor(
         vendorName = "Jetpack Compose",
