@@ -73,6 +73,7 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.runtime)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
             }
         }
 
