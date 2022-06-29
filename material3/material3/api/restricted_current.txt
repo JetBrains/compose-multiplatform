@@ -343,6 +343,9 @@ package androidx.compose.material3 {
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> contentColor(boolean enabled, boolean checked);
   }
 
+  public final class IncludeFontPaddingHelper_androidKt {
+  }
+
   @androidx.compose.runtime.Stable public interface ListItemColors {
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> containerColor(boolean enabled);
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> headlineColor(boolean enabled);

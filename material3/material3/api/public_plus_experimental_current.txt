@@ -484,6 +484,9 @@ package androidx.compose.material3 {
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> contentColor(boolean enabled, boolean checked);
   }
 
+  public final class IncludeFontPaddingHelper_androidKt {
+  }
+
   @androidx.compose.material3.ExperimentalMaterial3Api public final class InputChipDefaults {
     method public float getAvatarSize();
     method public float getHeight();
