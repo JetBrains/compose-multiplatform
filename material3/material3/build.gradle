@@ -80,6 +80,8 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     androidXComposeMultiplatform {
         android()
         desktop()
+        darwin()
+        js()
     }
 
     kotlin {
@@ -112,9 +114,13 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
             }
 
-            desktopMain.dependencies {
-                implementation(libs.kotlinStdlib)
+            skikoMain {
+                dependsOn(commonMain)
             }
+
+            desktopMain.dependsOn(skikoMain)
+            jsMain.dependsOn(skikoMain)
+            nativeMain.dependsOn(skikoMain)
 
             // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
             //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top

@@ -60,6 +60,13 @@ dependencies {
 }
 
 if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
+    androidXComposeMultiplatform {
+        android()
+        desktop()
+        darwin()
+        js()
+    }
+
     kotlin {
         /*
          * When updating dependencies, make sure to make an analogous update in the
