@@ -8,8 +8,8 @@ import kotlin.random.Random
 
 data class Message(
     val user: User,
-    val time: String,
-    val text: String
+    val timeMs: Long,
+    val text: String,
 )
 
 data class User(
