@@ -33,6 +33,7 @@ import androidx.compose.foundation.text.selection.isSelectionHandleInVisibleBoun
 import androidx.compose.foundation.text.selection.textFieldMagnifier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
@@ -234,6 +235,7 @@ internal fun CoreTextField(
         )
     }
     state.update(
+        value.annotatedString,
         visualText,
         textStyle,
         softWrap,
@@ -653,7 +655,7 @@ internal enum class HandleState {
 
 /**
  * Indicates which handle is being dragged when the user is dragging on a text field handle.
- * @see TextFieldState.draggingHandle
+ * @see TextFieldState.handleState
  */
 internal enum class Handle {
     Cursor,
@@ -705,7 +707,23 @@ internal class TextFieldState(
      * position using the [TextFieldValue.selection] value which corresponds to the text directly,
      * and therefore does not require the translation.
      */
-    var layoutResult: TextLayoutResultProxy? by mutableStateOf(null)
+    private val layoutResultState: MutableState<TextLayoutResultProxy?> = mutableStateOf(null)
+    var layoutResult: TextLayoutResultProxy?
+        get() = layoutResultState.value
+        set(value) {
+            layoutResultState.value = value
+            isLayoutResultStale = false
+        }
+
+    /**
+     * [textDelegate] keeps a reference to the visually transformed text that is visible to the
+     * user. TextFieldState needs to have access to the underlying value that is not transformed
+     * while making comparisons that test whether the user input actually changed.
+     *
+     * This field contains the real value that is passed by the user before it was visually
+     * transformed.
+     */
+    var untransformedText: AnnotatedString? = null
 
     /**
      * The gesture detector state, to indicate whether current state is selection, cursor
@@ -749,6 +767,16 @@ internal class TextFieldState(
      */
     var showCursorHandle by mutableStateOf(false)
 
+    /**
+     * TextFieldState holds both TextDelegate and layout result. However, these two values are not
+     * updated at the same time. TextDelegate is updated during composition according to new
+     * arguments while layoutResult is updated during layout phase. Therefore, [layoutResult] might
+     * not indicate the result of [textDelegate] at a given time during composition. This variable
+     * indicates whether layout result is lacking behind the latest TextDelegate.
+     */
+    var isLayoutResultStale: Boolean = true
+        private set
+
     private val keyboardActionRunner: KeyboardActionRunner = KeyboardActionRunner()
 
     /**
@@ -759,7 +787,7 @@ internal class TextFieldState(
     private var onValueChangeOriginal: (TextFieldValue) -> Unit = {}
 
     val onValueChange: (TextFieldValue) -> Unit = {
-        if (it.text != textDelegate.text.text) {
+        if (it.text != untransformedText?.text) {
             // Text has been changed, enter the HandleState.None and hide the cursor handle.
             handleState = HandleState.None
         }
@@ -775,6 +803,7 @@ internal class TextFieldState(
     val selectionPaint: Paint = Paint()
 
     fun update(
+        untransformedText: AnnotatedString,
         visualText: AnnotatedString,
         textStyle: TextStyle,
         softWrap: Boolean,
@@ -791,8 +820,9 @@ internal class TextFieldState(
             this.keyboardActions = keyboardActions
             this.focusManager = focusManager
         }
+        this.untransformedText = untransformedText
 
-        textDelegate = updateTextDelegate(
+        val newTextDelegate = updateTextDelegate(
             current = textDelegate,
             text = visualText,
             style = textStyle,
@@ -801,6 +831,9 @@ internal class TextFieldState(
             fontFamilyResolver = fontFamilyResolver,
             placeholders = emptyList(),
         )
+
+        if (textDelegate !== newTextDelegate) isLayoutResultStale = true
+        textDelegate = newTextDelegate
     }
 }
 
@@ -898,15 +931,9 @@ internal suspend fun BringIntoViewRequester.bringSelectionEndIntoView(
 private fun SelectionToolbarAndHandles(manager: TextFieldSelectionManager, show: Boolean) {
     with(manager) {
         if (show) {
-            // First check whether the layoutResult belongs to the latest TextFieldValue.
-            // layoutResult is only updated once the composition finishes and layout phase begins.
-            // If layoutResult was not generated using the same content as the current value,
-            // we treat layoutResult as non-existent.
-            state?.layoutResult?.value?.takeIf {
-                // string equality check is much more expensive than length check.
-                // checking for length should be enough to prevent out of bounds errors.
-                it.multiParagraph.intrinsics.annotatedString.length == value.annotatedString.length
-            }?.let {
+            // Check whether text layout result became stale. A stale text layout might be
+            // completely unrelated to current TextFieldValue, causing offset errors.
+            state?.layoutResult?.value?.takeIf { !(state?.isLayoutResultStale ?: true) }?.let {
                 if (!value.selection.collapsed) {
                     val startOffset = offsetMapping.originalToTransformed(value.selection.start)
                     val endOffset = offsetMapping.originalToTransformed(value.selection.end)
