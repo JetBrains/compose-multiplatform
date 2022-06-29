@@ -311,7 +311,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             }
         }
         if (plugin is KotlinMultiplatformPluginWrapper) {
-            project.configureKonanDirectory()
+            //project.configureKonanDirectory()
             project.extensions.findByType<LibraryExtension>()?.apply {
                 configureAndroidLibraryWithMultiplatformPluginOptions()
             }
