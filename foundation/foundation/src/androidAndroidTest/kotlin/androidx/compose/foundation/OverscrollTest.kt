@@ -555,7 +555,29 @@ class OverscrollTest {
         }
 
         rule.runOnIdle {
-            assertThat(inspectableConnection.preScrollOffset.x).isEqualTo(100f)
+            assertThat(inspectableConnection.preScrollOffset.x).isEqualTo(0f)
+        }
+    }
+
+    @Test
+    fun verticalOverscrollEnabled_notTriggered_verifyCrossAxisVelocityIsCorrectlyPropagated() {
+        val controller = TestOverscrollEffect()
+        val inspectableConnection = InspectableConnection()
+        rule.setOverscrollContentAndReturnViewConfig(
+            scrollableState = ScrollableState { 0f },
+            overscrollEffect = controller,
+            orientation = Orientation.Vertical,
+            inspectableConnection = inspectableConnection
+        )
+
+        rule.onNodeWithTag(boxTag).assertExists()
+
+        rule.onNodeWithTag(boxTag).performTouchInput {
+            swipeWithVelocity(center, center + Offset(100f, 100f), endVelocity = 1000f)
+        }
+
+        rule.runOnIdle {
+            assertThat(inspectableConnection.preScrollVelocity.x).isEqualTo(0)
         }
     }
 
@@ -579,7 +601,31 @@ class OverscrollTest {
         }
 
         rule.runOnIdle {
-            assertThat(inspectableConnection.preScrollOffset.y).isEqualTo(100f)
+            assertThat(inspectableConnection.preScrollOffset.y).isEqualTo(0f)
+        }
+    }
+
+    @Test
+    fun horizontalOverscrollEnabled_notTriggered_verifyCrossAxisVelocityIsCorrectlyPropagated() {
+        val controller = TestOverscrollEffect()
+        val inspectableConnection = InspectableConnection()
+        rule.setOverscrollContentAndReturnViewConfig(
+            scrollableState = ScrollableState { 0f },
+            overscrollEffect = controller,
+            orientation = Orientation.Horizontal,
+            inspectableConnection = inspectableConnection
+        )
+
+        rule.onNodeWithTag(boxTag).assertExists()
+
+        rule.onNodeWithTag(boxTag).performTouchInput {
+            rule.onNodeWithTag(boxTag).performTouchInput {
+                swipeWithVelocity(center, center + Offset(100f, 100f), endVelocity = 1000f)
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(inspectableConnection.preScrollVelocity.y).isEqualTo(0)
         }
     }
 
@@ -773,9 +819,16 @@ private val NoOpConnection = object : NestedScrollConnection {}
 
 private class InspectableConnection : NestedScrollConnection {
     var preScrollOffset = Offset.Zero
+    var preScrollVelocity = Velocity.Zero
 
     override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
         preScrollOffset += available
         return Offset.Zero
+    }
+
+    override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+        preScrollVelocity += consumed
+        preScrollVelocity += available
+        return Velocity.Zero
     }
 }
