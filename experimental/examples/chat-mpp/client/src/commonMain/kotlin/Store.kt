@@ -10,6 +10,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 
+interface Store {
+    fun send(action: Action)
+    val stateFlow: StateFlow<State>
+    val state get() = stateFlow.value
+}
+
 fun CoroutineScope.createStore(): Store {
     val mutableStateFlow = MutableStateFlow(State())
     val channel: Channel<Action> = Channel(Channel.UNLIMITED)

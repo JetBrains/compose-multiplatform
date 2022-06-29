@@ -18,13 +18,7 @@ fun chatReducer(state: State, action: Action): State =
     when (action) {
         is Action.SendMessage -> {
             state.copy(
-                messages = state.messages + action.message
+                messages = (state.messages + action.message).takeLast(100)
             )
         }
     }
-
-interface Store {
-    fun send(action: Action)
-    val stateFlow: StateFlow<State>
-    val state get() = stateFlow.value
-}

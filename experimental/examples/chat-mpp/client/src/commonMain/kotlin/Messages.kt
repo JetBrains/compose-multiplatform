@@ -44,7 +44,7 @@ internal inline fun Messages(messages: List<Message>) {
         state = listState,
     ) {
         messages.forEach { message ->
-            item(key = message) {
+            item(key = message.id) {
                 ChatMessage(isMyMessage = message.user == myUser, message)
             }
         }
