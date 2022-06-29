@@ -254,30 +254,34 @@ private fun ScaffoldLayout(
             val snackbarHeight = snackbarPlaceables.fastMaxBy { it.height }?.height ?: 0
 
             val fabPlaceables =
-                subcompose(ScaffoldLayoutContent.Fab, fab).mapNotNull { measurable ->
-                    measurable.measure(looseConstraints).takeIf { it.height != 0 && it.width != 0 }
+                subcompose(ScaffoldLayoutContent.Fab, fab).fastMap { measurable ->
+                    measurable.measure(looseConstraints)
                 }
 
             val fabPlacement = if (fabPlaceables.isNotEmpty()) {
-                val fabWidth = fabPlaceables.fastMaxBy { it.width }!!.width
-                val fabHeight = fabPlaceables.fastMaxBy { it.height }!!.height
+                val fabWidth = fabPlaceables.fastMaxBy { it.width }?.width ?: 0
+                val fabHeight = fabPlaceables.fastMaxBy { it.height }?.height ?: 0
                 // FAB distance from the left of the layout, taking into account LTR / RTL
-                val fabLeftOffset = if (fabPosition == FabPosition.End) {
-                    if (layoutDirection == LayoutDirection.Ltr) {
-                        layoutWidth - FabSpacing.roundToPx() - fabWidth
+                if (fabWidth != 0 && fabHeight != 0) {
+                    val fabLeftOffset = if (fabPosition == FabPosition.End) {
+                        if (layoutDirection == LayoutDirection.Ltr) {
+                            layoutWidth - FabSpacing.roundToPx() - fabWidth
+                        } else {
+                            FabSpacing.roundToPx()
+                        }
                     } else {
-                        FabSpacing.roundToPx()
+                        (layoutWidth - fabWidth) / 2
                     }
-                } else {
-                    (layoutWidth - fabWidth) / 2
-                }
 
-                FabPlacement(
-                    isDocked = isFabDocked,
-                    left = fabLeftOffset,
-                    width = fabWidth,
-                    height = fabHeight
-                )
+                    FabPlacement(
+                        isDocked = isFabDocked,
+                        left = fabLeftOffset,
+                        width = fabWidth,
+                        height = fabHeight
+                    )
+                } else {
+                    null
+                }
             } else {
                 null
             }
@@ -334,10 +338,8 @@ private fun ScaffoldLayout(
                 it.place(0, layoutHeight - bottomBarHeight)
             }
             // Explicitly not using placeRelative here as `leftOffset` already accounts for RTL
-            fabPlacement?.let { placement ->
-                fabPlaceables.fastForEach {
-                    it.place(placement.left, layoutHeight - fabOffsetFromBottom!!)
-                }
+            fabPlaceables.fastForEach {
+                it.place(fabPlacement?.left ?: 0, layoutHeight - (fabOffsetFromBottom ?: 0))
             }
         }
     }
