@@ -33,6 +33,7 @@ internal actual fun TextActual(
                 when (size.unitType) {
                     TextUnitType.Em -> fontSize(size.value.em)
                     TextUnitType.Sp -> fontSize(size.value.px)
+                    else -> fontSize(size.value.px)
                 }
             }
 
