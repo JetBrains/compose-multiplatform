@@ -17,6 +17,7 @@
 package androidx.compose.material
 
 import android.os.Build
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,7 +28,9 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
@@ -40,6 +43,7 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -414,6 +418,66 @@ class ScaffoldTest {
         rule.runOnIdle {
             assertThat(fabPlacement).isEqualTo(null)
             assertThat(fabPlacement).isEqualTo(null)
+        }
+    }
+
+    @Test
+    fun scaffold_geometry_animated_fabSize() {
+        val fabTestTag = "FAB TAG"
+        lateinit var showFab: MutableState<Boolean>
+        var actualFabSize: IntSize = IntSize.Zero
+        var actualFabPlacement: FabPlacement? = null
+        rule.setContent {
+            showFab = remember { mutableStateOf(true) }
+            val animatedFab = @Composable {
+                AnimatedVisibility(visible = showFab.value) {
+                    FloatingActionButton(
+                        modifier = Modifier.onGloballyPositioned { positioned ->
+                            actualFabSize = positioned.size
+                        }.testTag(fabTestTag),
+                        onClick = {}
+                    ) {
+                        Icon(Icons.Filled.Favorite, null)
+                    }
+                }
+            }
+            Scaffold(
+                floatingActionButton = animatedFab,
+                floatingActionButtonPosition = FabPosition.End,
+                bottomBar = {
+                    actualFabPlacement = LocalFabPlacement.current
+                }
+            ) {
+                Text("body")
+            }
+        }
+
+        val fabNode = rule.onNodeWithTag(fabTestTag)
+
+        fabNode.assertIsDisplayed()
+
+        rule.runOnIdle {
+            assertThat(actualFabPlacement?.width).isEqualTo(actualFabSize.width)
+            assertThat(actualFabPlacement?.height).isEqualTo(actualFabSize.height)
+            actualFabSize = IntSize.Zero
+            actualFabPlacement = null
+            showFab.value = false
+        }
+
+        fabNode.assertDoesNotExist()
+
+        rule.runOnIdle {
+            assertThat(actualFabPlacement).isNull()
+            actualFabSize = IntSize.Zero
+            actualFabPlacement = null
+            showFab.value = true
+        }
+
+        fabNode.assertIsDisplayed()
+
+        rule.runOnIdle {
+            assertThat(actualFabPlacement?.width).isEqualTo(actualFabSize.width)
+            assertThat(actualFabPlacement?.height).isEqualTo(actualFabSize.height)
         }
     }
 
