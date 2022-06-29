@@ -1,3 +1,5 @@
+# Chat example app
+
 ## Run on Android:
 - connect device or emulator
 - `./gradlew android:installDebug`

@@ -74,6 +74,7 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation(compose.runtime)
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3")
             }
         }
 
@@ -89,7 +90,7 @@ kotlin {
             kotlin.srcDirs("src/jvmMain/kotlin")
             dependencies {
                 api("androidx.appcompat:appcompat:1.4.1")
-                api("androidx.core:core-ktx:1.7.0")
+//                api("androidx.core:core-ktx:1.7.0")
             }
         }
 
@@ -129,18 +130,6 @@ kotlin {
 compose.desktop {
     application {
         mainClass = "Main_desktopKt"
-
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "Chat"
-            packageVersion = "1.0.0"
-
-            windows {
-                menuGroup = "Compose Examples"
-                // see https://wixtoolset.org/documentation/manual/v3/howtos/general/generate_guids.html
-                upgradeUuid = "18159995-d967-4CD2-8885-77BFA97CFA9F"
-            }
-        }
     }
 }
 
@@ -198,7 +187,6 @@ afterEvaluate {
     }
 }
 
-
 // TODO: remove when https://youtrack.jetbrains.com/issue/KT-50778 fixed
 project.tasks.withType(org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile::class.java).configureEach {
     kotlinOptions.freeCompilerArgs += listOf(
@@ -207,11 +195,11 @@ project.tasks.withType(org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile::class.ja
 }
 
 android {
-    compileSdkVersion(31)
+    compileSdk = 31
 
     defaultConfig {
-        minSdkVersion(21)
-        targetSdkVersion(31)
+        minSdk = 21
+        targetSdk = 31
     }
 
     compileOptions {

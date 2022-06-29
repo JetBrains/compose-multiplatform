@@ -1,8 +1,4 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
-    // this is necessary to avoid the plugins to be loaded multiple times
-    // in each subproject's classloader
     kotlin("jvm") apply false
     kotlin("multiplatform") apply false
     kotlin("android") apply false
@@ -11,16 +7,10 @@ plugins {
     id("org.jetbrains.compose") apply false
 }
 
-subprojects {
+allprojects {
     repositories {
         google()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    }
-
-    plugins.withId("org.jetbrains.kotlin.multiplatform") {
-        tasks.withType<KotlinCompile> {
-            kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
-        }
     }
 }
