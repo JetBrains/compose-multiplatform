@@ -16,7 +16,6 @@ import java.util.*
 
 @Composable
 internal actual fun VideoPlayerImpl(url: String, width: Int, height: Int) {
-    println("Video player for $url")
     NativeDiscovery().discover()
     val mediaPlayerComponent = remember {
         // see https://github.com/caprica/vlcj/issues/887#issuecomment-503288294 for why we're using CallbackMediaPlayerComponent for macOS.
@@ -27,8 +26,7 @@ internal actual fun VideoPlayerImpl(url: String, width: Int, height: Int) {
         }
     }
     SideEffect {
-        val ok = mediaPlayerComponent.mediaPlayer().media().play(url)
-        println("play gave $ok")
+        mediaPlayerComponent.mediaPlayer().media().play(url)
     }
     return SwingPanel(
         background = Color.Transparent,
