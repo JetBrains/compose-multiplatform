@@ -61,8 +61,6 @@ kotlin {
                     "-linker-option", "-framework", "-linker-option", "CoreText",
                     "-linker-option", "-framework", "-linker-option", "CoreGraphics"
                 )
-                // TODO: the current compose binary surprises LLVM, so disable checks for now.
-                freeCompilerArgs += "-Xdisable-phases=VerifyBitcode"
             }
         }
     }
@@ -90,7 +88,6 @@ kotlin {
             kotlin.srcDirs("src/jvmMain/kotlin")
             dependencies {
                 api("androidx.appcompat:appcompat:1.4.1")
-//                api("androidx.core:core-ktx:1.7.0")
             }
         }
 
@@ -158,15 +155,6 @@ compose.experimental {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
-}
-
-kotlin {
-    targets.withType<KotlinNativeTarget> {
-        binaries.all {
-            // TODO: the current compose binary surprises LLVM, so disable checks for now.
-            freeCompilerArgs += "-Xdisable-phases=VerifyBitcode"
-        }
-    }
 }
 
 compose.desktop.nativeApplication {
