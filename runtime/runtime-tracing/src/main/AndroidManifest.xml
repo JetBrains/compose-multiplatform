@@ -31,8 +31,7 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="androidx.compose.runtime.tracing">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application>
         <provider
