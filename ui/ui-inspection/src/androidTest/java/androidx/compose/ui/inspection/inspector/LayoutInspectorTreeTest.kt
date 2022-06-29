@@ -114,7 +114,7 @@ class LayoutInspectorTreeTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<TestActivity>()
 
-    private val fontFamily = Font(androidx.compose.ui.text.font.test.R.font.sample_font)
+    private val fontFamily = Font(androidx.testutils.fonts.R.font.sample_font)
         .toFontFamily()
 
     @Before

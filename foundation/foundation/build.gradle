@@ -56,7 +56,7 @@ dependencies {
         testImplementation(libs.mockitoKotlin)
 
         androidTestImplementation(project(":compose:test-utils"))
-        androidTestImplementation(project(":compose:ui:ui-test-font"))
+        androidTestImplementation(project(":internal-testutils-fonts"))
         androidTestImplementation(project(":test:screenshot:screenshot"))
         androidTestImplementation(project(":internal-testutils-runtime"))
         androidTestImplementation(libs.testUiautomator)
@@ -126,7 +126,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
             androidAndroidTest.dependencies {
                 implementation(project(":compose:test-utils"))
-                implementation(project(":compose:ui:ui-test-font"))
+                implementation(project(":internal-testutils-fonts"))
                 implementation(project(":test:screenshot:screenshot"))
                 implementation(project(":internal-testutils-runtime"))
                 implementation("androidx.activity:activity-compose:1.3.1")

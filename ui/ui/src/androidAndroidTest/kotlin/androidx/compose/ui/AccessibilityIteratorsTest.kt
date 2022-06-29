@@ -434,7 +434,7 @@ class AccessibilityIteratorsTest {
                     style = TextStyle(
                         fontSize = fontSize,
                         fontFamily = Font(
-                            resId = androidx.compose.ui.text.font.test.R.font.sample_font,
+                            resId = androidx.testutils.R.font.sample_font,
                             weight = FontWeight.Normal,
                             style = FontStyle.Normal
                         ).toFontFamily()
