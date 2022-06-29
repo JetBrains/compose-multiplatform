@@ -21,7 +21,7 @@ val mainComponents =
     listOf(
         ComposeComponent(":compose:animation:animation"),
         ComposeComponent(":compose:animation:animation-core"),
-        ComposeComponent(":compose:animation:animation-graphics", supportedPlatforms = ComposePlatforms.JVM_BASED),
+        ComposeComponent(":compose:animation:animation-graphics"),
         ComposeComponent(":compose:foundation:foundation"),
         ComposeComponent(":compose:foundation:foundation-layout"),
         ComposeComponent(":compose:material:material"),
@@ -39,7 +39,7 @@ val mainComponents =
         ComposeComponent(":compose:ui:ui-tooling", supportedPlatforms = ComposePlatforms.JVM_BASED),
         ComposeComponent(":compose:ui:ui-tooling-preview", supportedPlatforms = ComposePlatforms.JVM_BASED),
         ComposeComponent(":compose:ui:ui-unit"),
-        ComposeComponent(":compose:ui:ui-util", supportedPlatforms = ComposePlatforms.ALL),
+        ComposeComponent(":compose:ui:ui-util"),
     )
 
 val iconsComponents =
