@@ -1,5 +1,3 @@
-import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -14,9 +12,3 @@ fun main() =
     ) {
         ChatApp()
     }
-
-@Preview
-@Composable
-fun GamePreview() {
-    ChatApp()
-}
