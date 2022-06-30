@@ -729,6 +729,14 @@ internal constructor(
     }
 
     @OptIn(ExperimentalTextApi::class)
+    internal fun hashCodeLayoutAffectingAttributes(): Int {
+        var result = spanStyle.hashCodeLayoutAffectingAttributes()
+        result = 31 * result + paragraphStyle.hashCode()
+        result = 31 * result + (platformStyle?.hashCode() ?: 0)
+        return result
+    }
+
+    @OptIn(ExperimentalTextApi::class)
     override fun toString(): String {
         return "TextStyle(" +
             "color=$color, " +

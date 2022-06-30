@@ -23,6 +23,7 @@ val TextDemos = DemoCategory(
     "Text",
     listOf(
         ComposableDemo("Static text") { TextDemo() },
+        ComposableDemo("Canvas") { DrawTextDemo() },
         ComposableDemo("Brush") { TextBrushDemo() },
         ComposableDemo("Ellipsize") { EllipsizeDemo() },
         ComposableDemo("Typeface") { TypefaceDemo() },

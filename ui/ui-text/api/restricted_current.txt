@@ -398,9 +398,15 @@ package androidx.compose.ui.text {
     property public final long size;
   }
 
+  public final class TextMeasurerKt {
+  }
+
   public final class TextPainter {
     method public void paint(androidx.compose.ui.graphics.Canvas canvas, androidx.compose.ui.text.TextLayoutResult textLayoutResult);
     field public static final androidx.compose.ui.text.TextPainter INSTANCE;
+  }
+
+  public final class TextPainterKt {
   }
 
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class TextRange {
