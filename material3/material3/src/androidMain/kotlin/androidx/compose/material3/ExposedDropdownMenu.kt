@@ -25,6 +25,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.internal.ExposedDropdownMenuPopup
@@ -317,6 +319,7 @@ object ExposedDropdownMenuDefaults {
      * @param containerColor the container color for this text field
      * @param cursorColor the cursor color for this text field
      * @param errorCursorColor the cursor color for this text field when in error state
+     * @param selectionColors the colors used when the input text of this text field is selected
      * @param focusedIndicatorColor the indicator color for this text field when focused
      * @param unfocusedIndicatorColor the indicator color for this text field when not focused
      * @param disabledIndicatorColor the indicator color for this text field when disabled
@@ -345,6 +348,7 @@ object ExposedDropdownMenuDefaults {
         containerColor: Color = FilledAutocompleteTokens.TextFieldContainerColor.toColor(),
         cursorColor: Color = FilledAutocompleteTokens.TextFieldCaretColor.toColor(),
         errorCursorColor: Color = FilledAutocompleteTokens.TextFieldErrorFocusCaretColor.toColor(),
+        selectionColors: TextSelectionColors = LocalTextSelectionColors.current,
         focusedIndicatorColor: Color =
             FilledAutocompleteTokens.TextFieldFocusActiveIndicatorColor.toColor(),
         unfocusedIndicatorColor: Color =
@@ -386,6 +390,7 @@ object ExposedDropdownMenuDefaults {
             disabledTextColor = disabledTextColor,
             cursorColor = cursorColor,
             errorCursorColor = errorCursorColor,
+            selectionColors = selectionColors,
             focusedIndicatorColor = focusedIndicatorColor,
             unfocusedIndicatorColor = unfocusedIndicatorColor,
             errorIndicatorColor = errorIndicatorColor,
@@ -417,6 +422,7 @@ object ExposedDropdownMenuDefaults {
      * @param containerColor the container color for this text field
      * @param cursorColor the cursor color for this text field
      * @param errorCursorColor the cursor color for this text field when in error state
+     * @param selectionColors the colors used when the input text of this text field is selected
      * @param focusedBorderColor the border color for this text field when focused
      * @param unfocusedBorderColor the border color for this text field when not focused
      * @param disabledBorderColor the border color for this text field when disabled
@@ -445,6 +451,7 @@ object ExposedDropdownMenuDefaults {
         cursorColor: Color = OutlinedAutocompleteTokens.TextFieldCaretColor.toColor(),
         errorCursorColor: Color =
             OutlinedAutocompleteTokens.TextFieldErrorFocusCaretColor.toColor(),
+        selectionColors: TextSelectionColors = LocalTextSelectionColors.current,
         focusedBorderColor: Color = OutlinedAutocompleteTokens.TextFieldFocusOutlineColor.toColor(),
         unfocusedBorderColor: Color = OutlinedAutocompleteTokens.TextFieldOutlineColor.toColor(),
         disabledBorderColor: Color =
@@ -484,6 +491,7 @@ object ExposedDropdownMenuDefaults {
             disabledTextColor = disabledTextColor,
             cursorColor = cursorColor,
             errorCursorColor = errorCursorColor,
+            selectionColors = selectionColors,
             focusedBorderColor = focusedBorderColor,
             unfocusedBorderColor = unfocusedBorderColor,
             errorBorderColor = errorBorderColor,
