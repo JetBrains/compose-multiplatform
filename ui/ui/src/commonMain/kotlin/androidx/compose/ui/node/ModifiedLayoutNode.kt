@@ -27,10 +27,9 @@ import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.layout.IntermediateLayoutModifier
 import androidx.compose.ui.layout.LayoutModifier
-import androidx.compose.ui.layout.MeasureResult
-import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.LookaheadScope
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -40,9 +39,6 @@ internal class ModifiedLayoutNode(
     override var wrapped: LayoutNodeWrapper,
     var modifier: LayoutModifier
 ) : LayoutNodeWrapper(wrapped.layoutNode) {
-    override val measureScope: MeasureScope
-        get() = wrapped.measureScope
-
     private var lookAheadTransientLayoutModifier: IntermediateLayoutModifier? =
         modifier as? IntermediateLayoutModifier
 
@@ -66,7 +62,7 @@ internal class ModifiedLayoutNode(
         override fun measure(constraints: Constraints): Placeable =
             performingMeasure(constraints) {
                 with(modifier) {
-                    measureScope.measure(
+                    measure(
                         // This allows `measure` calls in the modifier to be redirected to
                         // calling lookaheadMeasure in wrapped.
                         wrapped.lookaheadDelegate!!, constraints
@@ -82,22 +78,22 @@ internal class ModifiedLayoutNode(
 
         override fun minIntrinsicWidth(height: Int): Int =
             with(modifierFromState()) {
-                measureScope.minIntrinsicWidth(wrapped.lookaheadDelegate!!, height)
+                minIntrinsicWidth(wrapped.lookaheadDelegate!!, height)
             }
 
         override fun maxIntrinsicWidth(height: Int): Int =
             with(modifierFromState()) {
-                measureScope.maxIntrinsicWidth(wrapped.lookaheadDelegate!!, height)
+                maxIntrinsicWidth(wrapped.lookaheadDelegate!!, height)
             }
 
         override fun minIntrinsicHeight(width: Int): Int =
             with(modifierFromState()) {
-                measureScope.minIntrinsicHeight(wrapped.lookaheadDelegate!!, width)
+                minIntrinsicHeight(wrapped.lookaheadDelegate!!, width)
             }
 
         override fun maxIntrinsicHeight(width: Int): Int =
             with(modifierFromState()) {
-                measureScope.maxIntrinsicHeight(wrapped.lookaheadDelegate!!, width)
+                maxIntrinsicHeight(wrapped.lookaheadDelegate!!, width)
             }
     }
 
@@ -154,7 +150,7 @@ internal class ModifiedLayoutNode(
     override fun measure(constraints: Constraints): Placeable {
         performingMeasure(constraints) {
             with(modifier) {
-                measureResult = measureScope.measure(wrapped, constraints)
+                measureResult = measure(wrapped, constraints)
                 this@ModifiedLayoutNode
             }
         }
@@ -164,23 +160,23 @@ internal class ModifiedLayoutNode(
 
     override fun minIntrinsicWidth(height: Int): Int {
         return with(modifierFromState()) {
-            measureScope.minIntrinsicWidth(wrapped, height)
+            minIntrinsicWidth(wrapped, height)
         }
     }
 
     override fun maxIntrinsicWidth(height: Int): Int =
         with(modifierFromState()) {
-            measureScope.maxIntrinsicWidth(wrapped, height)
+            maxIntrinsicWidth(wrapped, height)
         }
 
     override fun minIntrinsicHeight(width: Int): Int =
         with(modifierFromState()) {
-            measureScope.minIntrinsicHeight(wrapped, width)
+            minIntrinsicHeight(wrapped, width)
         }
 
     override fun maxIntrinsicHeight(width: Int): Int =
         with(modifierFromState()) {
-            measureScope.maxIntrinsicHeight(wrapped, width)
+            maxIntrinsicHeight(wrapped, width)
         }
 
     override fun placeAt(
@@ -198,7 +194,8 @@ internal class ModifiedLayoutNode(
         onPlaced()
         PlacementScope.executeWithRtlMirroringValues(
             measuredSize.width,
-            measureScope.layoutDirection
+            layoutDirection,
+            this
         ) {
             measureResult.placeChildren()
         }
@@ -273,8 +270,10 @@ private fun LookaheadCapablePlaceable.calculateAlignmentAndPlaceChildAsNeeded(
     }
     // Place our wrapped to obtain their position inside ourselves.
     child.isShallowPlacing = true
+    isPlacingForAlignment = true
     replace()
     child.isShallowPlacing = false
+    isPlacingForAlignment = false
     return if (alignmentLine is HorizontalAlignmentLine) {
         positionInWrapped + child.position.y
     } else {

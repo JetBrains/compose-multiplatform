@@ -40,12 +40,11 @@ import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.LookaheadLayoutCoordinatesImpl
+import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
-import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.layout.findRoot
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.semantics.SemanticsEntity
@@ -63,19 +62,27 @@ import androidx.compose.ui.unit.plus
  * Measurable and Placeable type that has a position.
  */
 internal abstract class LayoutNodeWrapper(
-    internal val layoutNode: LayoutNode
+    override val layoutNode: LayoutNode
 ) : LookaheadCapablePlaceable(), Measurable, LayoutCoordinates, OwnerScope,
         (Canvas) -> Unit {
 
     internal open val wrapped: LayoutNodeWrapper? get() = null
     internal var wrappedBy: LayoutNodeWrapper? = null
 
-    /**
-     * The scope used to measure the wrapped. InnerPlaceables are using the MeasureScope
-     * of the LayoutNode. For fewer allocations, everything else is reusing the measure scope of
-     * their wrapped.
-     */
-    abstract val measureScope: MeasureScope
+    override val layoutDirection: LayoutDirection
+        get() = layoutNode.layoutDirection
+
+    override val density: Float
+        get() = layoutNode.density.density
+
+    override val fontScale: Float
+        get() = layoutNode.density.fontScale
+
+    override val parent: LookaheadCapablePlaceable?
+        get() = wrappedBy
+
+    override val coordinates: LayoutCoordinates
+        get() = this
 
     // Size exposed to LayoutCoordinates.
     final override val size: IntSize get() = measuredSize
@@ -217,7 +224,7 @@ internal abstract class LayoutNodeWrapper(
                  * ParentData provided through the parentData node will override the data provided
                  * through a modifier.
                  */
-                measureScope.modifyParentData(next.parentData)
+                modifyParentData(next.parentData)
             }
         }
 
@@ -291,6 +298,8 @@ internal abstract class LayoutNodeWrapper(
         onLayerBlockUpdated(layerBlock)
         if (this.position != position) {
             this.position = position
+            layoutNode.layoutDelegate.measurePassDelegate
+                .notifyChildrenUsingCoordinatesWhilePlacing()
             val layer = layer
             if (layer != null) {
                 layer.move(position)
@@ -1166,6 +1175,14 @@ internal abstract class LayoutNodeWrapper(
                     wrapper.updateLayerParameters()
                     if (!tmpLayerPositionalProperties.hasSameValuesAs(layerPositionalProperties)) {
                         val layoutNode = wrapper.layoutNode
+                        val layoutDelegate = layoutNode.layoutDelegate
+                        if (layoutDelegate.childrenAccessingCoordinatesDuringPlacement > 0) {
+                            if (layoutDelegate.coordinatesAccessedDuringPlacement) {
+                                layoutNode.requestRelayout()
+                            }
+                            layoutDelegate.measurePassDelegate
+                                .notifyChildrenUsingCoordinatesWhilePlacing()
+                        }
                         layoutNode.owner?.requestOnPositionedCallback(layoutNode)
                     }
                 }

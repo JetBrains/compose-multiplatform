@@ -18,24 +18,30 @@ package androidx.compose.ui.node
 
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.LookaheadLayoutCoordinatesImpl
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.LookaheadScope
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 
 /**
  * This is the base class for LayoutNodeWrapper and LookaheadDelegate. The common
  * functionalities between the two are extracted here.
  */
-internal abstract class LookaheadCapablePlaceable : Placeable() {
+internal abstract class LookaheadCapablePlaceable : Placeable(), MeasureScope {
     abstract val position: IntOffset
     abstract val child: LookaheadCapablePlaceable?
+    abstract val parent: LookaheadCapablePlaceable?
     abstract val hasMeasureResult: Boolean
+    abstract val layoutNode: LayoutNode
+    abstract val coordinates: LayoutCoordinates
     final override fun get(alignmentLine: AlignmentLine): Int {
         if (!hasMeasureResult) return AlignmentLine.Unspecified
         val measuredPosition = calculateAlignmentLine(alignmentLine)
@@ -55,6 +61,15 @@ internal abstract class LookaheadCapablePlaceable : Placeable() {
     internal abstract val measureResult: MeasureResult
     internal abstract fun replace()
     abstract val alignmentLinesOwner: AlignmentLinesOwner
+
+    /**
+     * Used to indicate that this placement pass is for the purposes of calculating an
+     * alignment line. If it is, then
+     * [LayoutNodeLayoutDelegate.coordinatesAccessedDuringPlacement] will be changed
+     * when [Placeable.PlacementScope.coordinates] is accessed to indicate that the placement
+     * is not finalized and must be run again.
+     */
+    internal var isPlacingForAlignment = false
 
     protected fun LayoutNodeWrapper.invalidateAlignmentLinesFromPositionChange() {
         if (wrapped?.layoutNode != layoutNode) {
@@ -79,6 +94,18 @@ internal abstract class LookaheadDelegate(
         get() = _measureResult ?: error(
             "LookaheadDelegate has not been measured yet when measureResult is requested."
         )
+    override val layoutDirection: LayoutDirection
+        get() = wrapper.layoutDirection
+    override val density: Float
+        get() = wrapper.density
+    override val fontScale: Float
+        get() = wrapper.fontScale
+    override val parent: LookaheadCapablePlaceable?
+        get() = wrapper.wrappedBy?.lookaheadDelegate
+    override val layoutNode: LayoutNode
+        get() = wrapper.layoutNode
+    override val coordinates: LayoutCoordinates
+        get() = lookaheadLayoutCoordinates
 
     val lookaheadLayoutCoordinates = LookaheadLayoutCoordinatesImpl(this)
     override val alignmentLinesOwner: AlignmentLinesOwner
@@ -122,6 +149,8 @@ internal abstract class LookaheadDelegate(
     ) {
         if (this.position != position) {
             this.position = position
+            layoutNode.layoutDelegate.lookaheadPassDelegate
+                ?.notifyChildrenUsingCoordinatesWhilePlacing()
             wrapper.invalidateAlignmentLinesFromPositionChange()
         }
         if (isShallowPlacing) return
@@ -131,7 +160,8 @@ internal abstract class LookaheadDelegate(
     protected open fun placeChildren() {
         PlacementScope.executeWithRtlMirroringValues(
             measureResult.width,
-            wrapper.measureScope.layoutDirection
+            wrapper.layoutDirection,
+            this
         ) {
             measureResult.placeChildren()
         }

@@ -24,17 +24,14 @@ import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PaintingStyle
 import androidx.compose.ui.layout.AlignmentLine
-import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.LookaheadScope
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 
 internal class InnerPlaceable(
     layoutNode: LayoutNode
-) : LayoutNodeWrapper(layoutNode), Density by layoutNode.measureScope {
-
-    override val measureScope get() = layoutNode.measureScope
+) : LayoutNodeWrapper(layoutNode) {
 
     private inner class LookaheadDelegateImpl(
         scope: LookaheadScope
@@ -48,7 +45,7 @@ internal class InnerPlaceable(
                     it.measuredByParentInLookahead = LayoutNode.UsageByParent.NotUsed
                 }
                 val measureResult = with(layoutNode.measurePolicy) {
-                    layoutNode.measureScope.measure(
+                    measure(
                         layoutNode.childLookaheadMeasurables,
                         constraints
                     )
@@ -92,7 +89,7 @@ internal class InnerPlaceable(
         }
 
         measureResult = with(layoutNode.measurePolicy) {
-            layoutNode.measureScope.measure(layoutNode.childMeasurables, constraints)
+            measure(layoutNode.childMeasurables, constraints)
         }
         onMeasured()
         return this

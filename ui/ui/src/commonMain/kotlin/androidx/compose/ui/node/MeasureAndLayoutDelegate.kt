@@ -252,7 +252,7 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
                 false
             }
             Idle -> {
-                if ((layoutNode.measurePending || layoutNode.layoutPending) && !forced) {
+                if (!forced && (layoutNode.measurePending || layoutNode.layoutPending)) {
                     // don't need to do anything else since the parent is already scheduled
                     // for a relayout (measure will trigger relayout), or is laying out right now
                     consistencyChecker?.assertConsistent()

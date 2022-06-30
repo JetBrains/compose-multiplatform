@@ -2203,6 +2203,7 @@ package androidx.compose.ui.layout {
 
   public abstract static class Placeable.PlacementScope {
     ctor public Placeable.PlacementScope();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.layout.LayoutCoordinates? getCoordinates();
     method protected abstract androidx.compose.ui.unit.LayoutDirection getParentLayoutDirection();
     method protected abstract int getParentWidth();
     method public final void place(androidx.compose.ui.layout.Placeable, int x, int y, optional float zIndex);
@@ -2213,6 +2214,7 @@ package androidx.compose.ui.layout {
     method public final void placeRelativeWithLayer(androidx.compose.ui.layout.Placeable, int x, int y, optional float zIndex, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit> layerBlock);
     method public final void placeWithLayer(androidx.compose.ui.layout.Placeable, int x, int y, optional float zIndex, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit> layerBlock);
     method public final void placeWithLayer(androidx.compose.ui.layout.Placeable, long position, optional float zIndex, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit> layerBlock);
+    property @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.layout.LayoutCoordinates? coordinates;
     property protected abstract androidx.compose.ui.unit.LayoutDirection parentLayoutDirection;
     property protected abstract int parentWidth;
   }

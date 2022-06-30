@@ -323,7 +323,7 @@ internal class AndroidComposeView(context: Context) :
     override val hasPendingMeasureOrLayout
         get() = measureAndLayoutDelegate.hasPendingMeasureOrLayout
 
-    private var globalPosition: IntOffset = IntOffset.Zero
+    private var globalPosition: IntOffset = IntOffset(Int.MAX_VALUE, Int.MAX_VALUE)
 
     private val tmpPositionArray = intArrayOf(0, 0)
     private val viewToWindowMatrix = Matrix()
@@ -884,9 +884,13 @@ internal class AndroidComposeView(context: Context) :
     private fun updatePositionCacheAndDispatch() {
         var positionChanged = false
         getLocationOnScreen(tmpPositionArray)
-        if (globalPosition.x != tmpPositionArray[0] || globalPosition.y != tmpPositionArray[1]) {
+        val (globalX, globalY) = globalPosition
+        if (globalX != tmpPositionArray[0] || globalY != tmpPositionArray[1]) {
             globalPosition = IntOffset(tmpPositionArray[0], tmpPositionArray[1])
-            positionChanged = true
+            if (globalX != Int.MAX_VALUE && globalY != Int.MAX_VALUE) {
+                positionChanged = true
+                root.layoutDelegate.measurePassDelegate.notifyChildrenUsingCoordinatesWhilePlacing()
+            }
         }
         measureAndLayoutDelegate.dispatchOnPositionedCallbacks(forceDispatch = positionChanged)
     }

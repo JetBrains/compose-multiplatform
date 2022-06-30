@@ -855,10 +855,10 @@ class LayoutNodeTest {
             translationX = 5f
             translationY = 2f
         }
-        parent.outerLayoutNodeWrapper.measureScope
+        parent.outerLayoutNodeWrapper
             .measure(listOf(parent.outerLayoutNodeWrapper), Constraints())
         child.outerLayoutNodeWrapper
-            .measureScope.measure(listOf(child.outerLayoutNodeWrapper), Constraints())
+            .measure(listOf(child.outerLayoutNodeWrapper), Constraints())
         parent.place(0, 0)
         child.place(0, 0)
 
@@ -883,10 +883,10 @@ class LayoutNodeTest {
         child.modifier = Modifier.graphicsLayer {
             rotationZ = 90f
         }
-        parent.outerLayoutNodeWrapper.measureScope
+        parent.outerLayoutNodeWrapper
             .measure(listOf(parent.outerLayoutNodeWrapper), Constraints())
         child.outerLayoutNodeWrapper
-            .measureScope.measure(listOf(child.outerLayoutNodeWrapper), Constraints())
+            .measure(listOf(child.outerLayoutNodeWrapper), Constraints())
         parent.place(0, 0)
         child.place(0, 0)
 
@@ -911,10 +911,10 @@ class LayoutNodeTest {
         child.modifier = Modifier.graphicsLayer {
             scaleX = 0f
         }
-        parent.outerLayoutNodeWrapper.measureScope
+        parent.outerLayoutNodeWrapper
             .measure(listOf(parent.outerLayoutNodeWrapper), Constraints())
         child.outerLayoutNodeWrapper
-            .measureScope.measure(listOf(child.outerLayoutNodeWrapper), Constraints())
+            .measure(listOf(child.outerLayoutNodeWrapper), Constraints())
         parent.place(0, 0)
         child.place(0, 0)
 
@@ -966,12 +966,12 @@ class LayoutNodeTest {
             scaleY = 2f
             transformOrigin = TransformOrigin(0f, 0f)
         }
-        parent.outerLayoutNodeWrapper.measureScope
+        parent.outerLayoutNodeWrapper
             .measure(listOf(parent.outerLayoutNodeWrapper), Constraints())
         child1.outerLayoutNodeWrapper
-            .measureScope.measure(listOf(child1.outerLayoutNodeWrapper), Constraints())
+            .measure(listOf(child1.outerLayoutNodeWrapper), Constraints())
         child2.outerLayoutNodeWrapper
-            .measureScope.measure(listOf(child2.outerLayoutNodeWrapper), Constraints())
+            .measure(listOf(child2.outerLayoutNodeWrapper), Constraints())
         parent.place(0, 0)
         child1.place(100, 200)
         child2.place(5, 11)

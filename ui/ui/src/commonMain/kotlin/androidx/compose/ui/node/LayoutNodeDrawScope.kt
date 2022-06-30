@@ -60,8 +60,8 @@ internal class LayoutNodeDrawScope(
         val previousDrawEntity = this.drawEntity
         this.drawEntity = drawEntity
         canvasDrawScope.draw(
-            layoutNodeWrapper.measureScope,
-            layoutNodeWrapper.measureScope.layoutDirection,
+            layoutNodeWrapper,
+            layoutNodeWrapper.layoutDirection,
             canvas,
             size,
             block
