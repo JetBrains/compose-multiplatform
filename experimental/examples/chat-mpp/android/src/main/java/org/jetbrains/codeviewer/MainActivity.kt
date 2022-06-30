@@ -1,4 +1,4 @@
-package org.jetbrains.codeviewer
+package org.jetbrains.chat
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
