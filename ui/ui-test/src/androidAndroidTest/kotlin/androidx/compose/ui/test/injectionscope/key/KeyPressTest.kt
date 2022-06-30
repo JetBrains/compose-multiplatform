@@ -28,6 +28,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.util.TestTextField
 import androidx.compose.ui.test.util.TestTextField.Tag
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import org.junit.Before
 import org.junit.Rule
@@ -69,6 +70,7 @@ class KeyPressTest {
         rule.assertTyped("abb")
     }
 
+    @FlakyTest(bugId = 236864049)
     @Test
     fun pressingNumberKeys_typesNumberChars() {
         rule.performKeyInput { pressKey(Key.One) }
