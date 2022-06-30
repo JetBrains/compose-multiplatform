@@ -136,55 +136,6 @@ internal class KeyInjectionScopeImpl(
 }
 
 /**
- * Depresses each of the given [keys] sequentially, with [pauseDurationMillis] milliseconds
- * separating each successive call to [KeyInjectionScope.keyDown].
- *
- * If [keys] contains any duplicate elements, an [IllegalArgumentException] will be thrown.
- * If any of the given [keys] is already down, an [IllegalStateException] will be thrown.
- *
- * @param keys The keys to be depressed.
- * @param pauseDurationMillis The duration separating each key down event in milliseconds.
- */
-// TODO(b/234011835): Refactor this and all functions that take List<Keys> to use vararg instead.
-@ExperimentalTestApi
-fun KeyInjectionScope.keysDown(
-    keys: List<Key>,
-    pauseDurationMillis: Long = DefaultPauseDurationBetweenKeyPressesMillis
-) {
-    require(keys.size == keys.distinct().size) {
-        "List of keys must not contain any duplicates."
-    }
-    keys.forEachIndexed { idx: Int, key: Key ->
-        if (idx != 0) advanceEventTime(pauseDurationMillis)
-        keyDown(key)
-    }
-}
-
-/**
- * Releases each of the given [keys] sequentially, with [pauseDurationMillis] milliseconds
- * separating each successive call to [KeyInjectionScope.keyUp].
- *
- * If [keys] contains any duplicate elements, an [IllegalArgumentException] will be thrown.
- * If any of the given [keys] is not down, an [IllegalStateException] will be thrown.
- *
- * @param keys The keys to be released.
- * @param pauseDurationMillis The duration separating each key up event in milliseconds.
- */
-@ExperimentalTestApi
-fun KeyInjectionScope.keysUp(
-    keys: List<Key>,
-    pauseDurationMillis: Long = DefaultPauseDurationBetweenKeyPressesMillis
-) {
-    require(keys.size == keys.distinct().size) {
-        "List of keys must not contain any duplicates."
-    }
-    keys.forEachIndexed { idx: Int, key: Key ->
-        if (idx != 0) advanceEventTime(pauseDurationMillis)
-        keyUp(key)
-    }
-}
-
-/**
  * Holds down the given [key] for the given [pressDurationMillis] by sending a key down event,
  * advancing the event time and sending a key up event.
  *
@@ -204,144 +155,70 @@ fun KeyInjectionScope.pressKey(
 }
 
 /**
- * Presses the given [key] the given number of [times], for [pressDurationMillis] milliseconds each
- * time. Pauses for [pauseDurationMillis] milliseconds in between each key press.
- *
- * If the given [key] is already down an [IllegalStateException] is thrown.
- *
- * @param key The key to be pressed.
- * @param times The number of times to press the given key.
- * @param pressDurationMillis The length of time for which to hold each key press.
- * @param pauseDurationMillis The duration of the pause in between presses.
- */
-@ExperimentalTestApi
-fun KeyInjectionScope.pressKey(
-    key: Key,
-    times: Int,
-    pressDurationMillis: Long = DefaultKeyPressDurationMillis,
-    pauseDurationMillis: Long = DefaultPauseDurationBetweenKeyPressesMillis
-) = (0 until times).forEach { idx ->
-    if (idx != 0) advanceEventTime(pauseDurationMillis)
-    pressKey(key, pressDurationMillis)
-}
-
-/**
- * Holds down the key each of the given [keys] for the given [pressDurationMillis] in sequence, with
- * [pauseDurationMillis] milliseconds between each press.
- *
- * If one of the keys is already down, an [IllegalStateException] will be thrown.
- *
- * @param keys The list of keys to be pressed down.
- * @param pressDurationMillis Duration of press in milliseconds.
- * @param pauseDurationMillis The duration between presses.
- */
-@ExperimentalTestApi
-fun KeyInjectionScope.pressKeys(
-    keys: List<Key>,
-    pressDurationMillis: Long = DefaultKeyPressDurationMillis,
-    pauseDurationMillis: Long = DefaultPauseDurationBetweenKeyPressesMillis
-) = keys.forEachIndexed { idx: Int, key: Key ->
-    if (idx != 0) advanceEventTime(pauseDurationMillis)
-    pressKey(key, pressDurationMillis)
-}
-
-/**
  * Executes the keyboard sequence specified in the given [block], whilst holding down the
- * given [key]. This key must not be used within the [block]. Waits for [pauseDurationMillis]
- * milliseconds after pressing the [key] down before it injects the [block]. Waits for the same
- * duration after injecting the [block] before it releases the [key].
+ * given [key]. This key must not be used within the [block].
  *
  * If the given [key] is already down, an [IllegalStateException] will be thrown.
  *
  * @param key The key to be held down during injection of the [block].
- * @param pauseDurationMillis The pause after the initial key down and before the final key up.
  * @param block Sequence of KeyInjectionScope methods to be injected with the given key down.
  */
 @ExperimentalTestApi
-fun KeyInjectionScope.withKeyDown(
-    key: Key,
-    pauseDurationMillis: Long = DefaultPauseDurationBetweenKeyPressesMillis,
-    block: KeyInjectionScope.() -> Unit
-) {
+fun KeyInjectionScope.withKeyDown(key: Key, block: KeyInjectionScope.() -> Unit) {
     keyDown(key)
-    advanceEventTime(pauseDurationMillis)
     block.invoke(this)
-    advanceEventTime(pauseDurationMillis)
     keyUp(key)
 }
 
 /**
  * Executes the keyboard sequence specified in the given [block], whilst holding down the each of
- * the given [keys]. These keys must not be used within the [block]. Waits for [pauseDurationMillis]
- * milliseconds in between each key down and each key up event.
+ * the given [keys]. Each of the [keys] will be pressed down and released simultaneously.
+ * These keys must not be used within the [block].
  *
- * If [keys] contains any duplicate elements, an [IllegalArgumentException] will be thrown.
  * If any of the given [keys] are already down, an [IllegalStateException] will be thrown.
  *
  * @param keys List of keys to be held down during injection of the [block].
- * @param pauseDurationMillis The pause in milliseconds between each key down and key up event.
  * @param block Sequence of KeyInjectionScope methods to be injected with the given keys down.
  */
 @ExperimentalTestApi
-fun KeyInjectionScope.withKeysDown(
-    keys: List<Key>,
-    pauseDurationMillis: Long = DefaultPauseDurationBetweenKeyPressesMillis,
-    block: KeyInjectionScope.() -> Unit
-) {
-    keysDown(keys, pauseDurationMillis)
-    advanceEventTime(pauseDurationMillis)
+// TODO(b/234011835): Refactor this and all functions that take List<Keys> to use vararg instead.
+fun KeyInjectionScope.withKeysDown(keys: List<Key>, block: KeyInjectionScope.() -> Unit) {
+    keys.forEach { keyDown(it) }
     block.invoke(this)
-    advanceEventTime(pauseDurationMillis)
-    keysUp(keys, pauseDurationMillis)
+    keys.forEach { keyUp(it) }
 }
 
 /**
  * Executes the keyboard sequence specified in the given [block], in between presses to the
  * given [key]. This key can also be used within the [block], as long as it is not down at the end
- * of the block. There will be [pauseDurationMillis] milliseconds after the initial press and before
- * the final press.
+ * of the block.
  *
  * If the given [key] is already down, an [IllegalStateException] will be thrown.
  *
  * @param key The key to be toggled around the injection of the [block].
- * @param pauseDurationMillis The pause after the initial and before the final key presses.
  * @param block Sequence of KeyInjectionScope methods to be injected with the given key down.
  */
 @ExperimentalTestApi
-fun KeyInjectionScope.withKeyToggled(
-    key: Key,
-    pauseDurationMillis: Long = DefaultPauseDurationBetweenKeyPressesMillis,
-    block: KeyInjectionScope.() -> Unit
-) {
+fun KeyInjectionScope.withKeyToggled(key: Key, block: KeyInjectionScope.() -> Unit) {
     pressKey(key)
-    advanceEventTime(pauseDurationMillis)
     block.invoke(this)
-    advanceEventTime(pauseDurationMillis)
     pressKey(key)
 }
 
 /**
  * Executes the keyboard sequence specified in the given [block], in between presses to the
- * given [keys]. These keys can also be used within the [block], as long as they are not down at
- * the end of the block. There will be [pauseDurationMillis] milliseconds after the initial press
- * and before the final press.
+ * given [keys]. Each of the [keys] will be toggled simultaneously.These keys can also be used
+ * within the [block], as long as they are not down at the end of the block.
  *
  * If any of the given [keys] are already down, an [IllegalStateException] will be thrown.
  *
  * @param keys The keys to be toggled around the injection of the [block].
- * @param pauseDurationMillis The pause after the initial and before the final key presses.
  * @param block Sequence of KeyInjectionScope methods to be injected with the given keys down.
  */
 @ExperimentalTestApi
-fun KeyInjectionScope.withKeysToggled(
-    keys: List<Key>,
-    pauseDurationMillis: Long = DefaultPauseDurationBetweenKeyPressesMillis,
-    block: KeyInjectionScope.() -> Unit
-) {
+fun KeyInjectionScope.withKeysToggled(keys: List<Key>, block: KeyInjectionScope.() -> Unit) {
     pressKeys(keys)
-    advanceEventTime(pauseDurationMillis)
     block.invoke(this)
-    advanceEventTime(pauseDurationMillis)
     pressKeys(keys)
 }
 
@@ -404,3 +281,18 @@ val KeyInjectionScope.isMetaDown: Boolean
 @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
 val KeyInjectionScope.isShiftDown: Boolean
     get() = isKeyDown(Key.ShiftLeft) || isKeyDown(Key.ShiftRight)
+
+/**
+ * Holds down the key each of the given [keys] for [DefaultKeyPressDurationMillis] in sequence, with
+ * [DefaultPauseDurationBetweenKeyPressesMillis] between each press.
+ *
+ * If one of the keys is already down, an [IllegalStateException] will be thrown.
+ *
+ * @param keys The list of keys to be pressed down.
+ */
+@ExperimentalTestApi
+private fun KeyInjectionScope.pressKeys(keys: List<Key>) =
+    keys.forEachIndexed { idx: Int, key: Key ->
+        if (idx != 0) advanceEventTime(DefaultPauseDurationBetweenKeyPressesMillis)
+        pressKey(key, DefaultKeyPressDurationMillis)
+    }

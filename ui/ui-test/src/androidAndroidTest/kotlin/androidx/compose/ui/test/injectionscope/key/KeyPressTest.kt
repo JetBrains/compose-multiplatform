@@ -18,7 +18,6 @@ package androidx.compose.ui.test.injectionscope.key
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.KeyInjectionScope
 import androidx.compose.ui.test.injectionscope.key.Common.assertTyped
@@ -27,17 +26,15 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.pressKey
-import androidx.compose.ui.test.pressKeys
 import androidx.compose.ui.test.util.TestTextField
 import androidx.compose.ui.test.util.TestTextField.Tag
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 /**
- * Tests if [KeyInjectionScope.pressKey] and [KeyInjectionScope.pressKeys] work.
+ * Tests if [KeyInjectionScope.pressKey] works.
  */
 @LargeTest
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
@@ -73,27 +70,10 @@ class KeyPressTest {
     }
 
     @Test
-    fun typeAlphabet_withPressKeys() {
-        rule.performKeyInput {
-            pressKeys((Key.A.nativeKeyCode..Key.Z.nativeKeyCode).map { Key(it) }.toList())
-        }
-        rule.assertTyped(('a'..'z').joinToString(separator = ""))
-    }
-
-    @Test
     fun pressingNumberKeys_typesNumberChars() {
         rule.performKeyInput { pressKey(Key.One) }
         rule.performKeyInput { pressKey(Key.Two) }
         rule.assertTyped("12")
-    }
-
-    @FlakyTest(bugId = 236950171)
-    @Test
-    fun pressKeyMultipleTimes_pressesKey_correctNumberOfTimes() {
-        rule.performKeyInput {
-            pressKey(Key.A, 10)
-        }
-        rule.assertTyped((1..10).joinToString(separator = "") { "a" })
     }
 
     @Test
