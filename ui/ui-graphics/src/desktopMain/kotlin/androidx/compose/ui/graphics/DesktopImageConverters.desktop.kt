@@ -176,15 +176,21 @@ private class PainterImage(
         // optimizations to avoid unnecessary rasterizations
         when (painter) {
             is BufferedImagePainter -> painter.image
-            is BitmapPainter -> asBitmap(width, height).toAwtImage()
-            else -> asBitmap(
-                (width * density.density).roundToInt(),
-                (height * density.density).roundToInt()
-            ).toAwtImage()
+            else -> asBitmap(width, height).toAwtImage()
         }
     }
 
-    override fun getResolutionVariants() = listOf(defaultImage)
+    private val scaledImage by lazy {
+        asBitmap(
+            (width * density.density).roundToInt(),
+            (height * density.density).roundToInt()
+        ).toAwtImage()
+    }
+
+    override fun getResolutionVariants() = when (painter) {
+        is BufferedImagePainter, is BitmapPainter -> listOf(defaultImage) // raster images
+        else -> listOf(defaultImage, scaledImage) // vector images
+    }
 }
 
 // TODO(demin): should we optimize toAwtImage/toBitmap? Currently we convert colors according to the
