@@ -464,9 +464,24 @@ package androidx.compose.ui.text {
     property public final long size;
   }
 
+  @androidx.compose.runtime.Immutable @androidx.compose.ui.text.ExperimentalTextApi public final class TextMeasurer {
+    ctor public TextMeasurer(androidx.compose.ui.text.font.FontFamily.Resolver fallbackFontFamilyResolver, androidx.compose.ui.unit.Density fallbackDensity, androidx.compose.ui.unit.LayoutDirection fallbackLayoutDirection, optional int cacheSize);
+    method @androidx.compose.runtime.Stable public androidx.compose.ui.text.TextLayoutResult measure(androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.text.TextStyle style, optional int overflow, optional boolean softWrap, optional int maxLines, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional long size, optional androidx.compose.ui.unit.LayoutDirection layoutDirection, optional androidx.compose.ui.unit.Density density, optional androidx.compose.ui.text.font.FontFamily.Resolver fontFamilyResolver, optional boolean skipCache);
+  }
+
+  public final class TextMeasurerKt {
+  }
+
   public final class TextPainter {
     method public void paint(androidx.compose.ui.graphics.Canvas canvas, androidx.compose.ui.text.TextLayoutResult textLayoutResult);
     field public static final androidx.compose.ui.text.TextPainter INSTANCE;
+  }
+
+  public final class TextPainterKt {
+    method @androidx.compose.ui.text.ExperimentalTextApi public static void drawText(androidx.compose.ui.graphics.drawscope.DrawScope, androidx.compose.ui.text.TextMeasurer textMeasurer, androidx.compose.ui.text.AnnotatedString text, optional long topLeft, optional androidx.compose.ui.text.TextStyle style, optional int overflow, optional boolean softWrap, optional int maxLines, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional long size);
+    method @androidx.compose.ui.text.ExperimentalTextApi public static void drawText(androidx.compose.ui.graphics.drawscope.DrawScope, androidx.compose.ui.text.TextMeasurer textMeasurer, String text, optional long topLeft, optional androidx.compose.ui.text.TextStyle style, optional int overflow, optional boolean softWrap, optional int maxLines, optional long size);
+    method @androidx.compose.ui.text.ExperimentalTextApi public static void drawText(androidx.compose.ui.graphics.drawscope.DrawScope, androidx.compose.ui.text.TextLayoutResult textLayoutResult, optional long color, optional long topLeft, optional float alpha, optional androidx.compose.ui.graphics.Shadow? shadow, optional androidx.compose.ui.text.style.TextDecoration? textDecoration);
+    method @androidx.compose.ui.text.ExperimentalTextApi public static void drawText(androidx.compose.ui.graphics.drawscope.DrawScope, androidx.compose.ui.text.TextLayoutResult textLayoutResult, androidx.compose.ui.graphics.Brush brush, optional long topLeft, optional float alpha, optional androidx.compose.ui.graphics.Shadow? shadow, optional androidx.compose.ui.text.style.TextDecoration? textDecoration);
   }
 
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class TextRange {

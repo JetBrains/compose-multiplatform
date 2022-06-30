@@ -3196,6 +3196,14 @@ package androidx.compose.ui.state {
 
 }
 
+package androidx.compose.ui.text {
+
+  public final class TextMeasurerHelperKt {
+    method @androidx.compose.runtime.Composable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.TextMeasurer rememberTextMeasurer(optional androidx.compose.ui.text.font.FontFamily.Resolver fontFamilyResolver, optional androidx.compose.ui.unit.Density density, optional androidx.compose.ui.unit.LayoutDirection layoutDirection, optional int cacheSize);
+  }
+
+}
+
 package androidx.compose.ui.text.input {
 
   public final class CursorAnchorInfoBuilderKt {

@@ -3014,6 +3014,13 @@ package androidx.compose.ui.state {
 
 }
 
+package androidx.compose.ui.text {
+
+  public final class TextMeasurerHelperKt {
+  }
+
+}
+
 package androidx.compose.ui.text.input {
 
   public final class CursorAnchorInfoBuilderKt {
