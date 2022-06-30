@@ -48,7 +48,7 @@ internal inline fun Messages(messages: List<Message>) {
                 ChatMessage(isMyMessage = message.user == myUser, message)
             }
         }
-//        items(messages) { message -> //TODO not working in JS
+//        items(messages, key = { it.id }) { message -> //TODO not working in JS
 //            ChatMessage(isMyMessage = message.user == myUser, message)
 //        }
     }
