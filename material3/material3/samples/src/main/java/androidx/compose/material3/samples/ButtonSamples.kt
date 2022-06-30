@@ -65,7 +65,10 @@ fun TextButtonSample() {
 @Sampled
 @Composable
 fun ButtonWithIconSample() {
-    Button(onClick = { /* Do something! */ }) {
+    Button(
+        onClick = { /* Do something! */ },
+        contentPadding = ButtonDefaults.ButtonWithIconContentPadding
+    ) {
         Icon(
             Icons.Filled.Favorite,
             contentDescription = "Localized description",
