@@ -151,6 +151,7 @@ import kotlin.math.roundToInt
  * @param colors [TextFieldColors] that will be used to resolve the colors used for this text field
  * in different states. See [TextFieldDefaults.textFieldColors].
  */
+@ExperimentalMaterial3Api
 @Composable
 fun TextField(
     value: String,
@@ -283,6 +284,7 @@ fun TextField(
  * @param colors [TextFieldColors] that will be used to resolve the colors used for this text field
  * in different states. See [TextFieldDefaults.textFieldColors].
  */
+@ExperimentalMaterial3Api
 @Composable
 fun TextField(
     value: TextFieldValue,

@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.dp
  * See [TextFieldDefaults.outlinedTextFieldColors] for the default colors used in
  * [OutlinedTextField].
  */
+@ExperimentalMaterial3Api
 @Stable
 interface TextFieldColors {
     /**
@@ -154,6 +155,7 @@ interface TextFieldColors {
 /**
  * Contains the default values used by [TextField] and [OutlinedTextField].
  */
+@ExperimentalMaterial3Api
 @Immutable
 object TextFieldDefaults {
     /** Default shape for an outlined text field. */
@@ -337,6 +339,7 @@ object TextFieldDefaults {
      * @param placeholderColor the placeholder color for this text field
      * @param disabledPlaceholderColor the placeholder color for this text field when disabled
      */
+    @ExperimentalMaterial3Api
     @Composable
     fun textFieldColors(
         textColor: Color = FilledTextFieldTokens.InputColor.toColor(),
@@ -424,6 +427,7 @@ object TextFieldDefaults {
      * @param placeholderColor the placeholder color for this text field
      * @param disabledPlaceholderColor the placeholder color for this text field when disabled
      */
+    @ExperimentalMaterial3Api
     @Composable
     fun outlinedTextFieldColors(
         textColor: Color = OutlinedTextFieldTokens.InputColor.toColor(),
@@ -670,6 +674,7 @@ object TextFieldDefaults {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Immutable
 private class DefaultTextFieldColors(
     private val textColor: Color,
@@ -852,6 +857,7 @@ private class DefaultTextFieldColors(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun animateBorderStrokeAsState(
     enabled: Boolean,
