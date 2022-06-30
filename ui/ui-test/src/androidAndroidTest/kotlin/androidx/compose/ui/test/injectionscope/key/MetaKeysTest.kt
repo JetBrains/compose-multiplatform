@@ -32,7 +32,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.pressKey
-import androidx.compose.ui.test.pressKeys
 import androidx.compose.ui.test.util.TestTextField
 import androidx.compose.ui.test.util.TestTextField.Tag
 import androidx.compose.ui.test.withKeyDown
@@ -114,7 +113,10 @@ class MetaKeysTest {
     fun lettersTyped_withShiftDown_areUppercase() {
         rule.performKeyInput {
             pressKey(Key.A)
-            withKeyDown(Key.ShiftLeft) { pressKeys(listOf(Key.A, Key.B)) }
+            withKeyDown(Key.ShiftLeft) {
+                pressKey(Key.A)
+                pressKey(Key.B)
+            }
             pressKey(Key.B)
         }
         rule.assertTyped("aABb")

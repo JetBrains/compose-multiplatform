@@ -24,7 +24,6 @@ import androidx.compose.ui.test.KeyInjectionScope
 import androidx.compose.ui.test.injectionscope.key.Common.assertTyped
 import androidx.compose.ui.test.injectionscope.key.Common.performKeyInput
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.keysUp
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.util.TestTextField
@@ -90,28 +89,5 @@ class KeyUpTest {
             keyDown(Key.A)
         }
         rule.assertTyped("a")
-    }
-
-    @Test
-    fun keysAreUp_after_keysUp() {
-        rule.performKeyInput {
-            keyDown(Key.A)
-            keyDown(Key.Enter)
-        }
-        rule.performKeyInput {
-            keysUp(listOf(Key.A, Key.Enter))
-            assertFalse(isKeyDown(Key.A))
-            assertFalse(isKeyDown(Key.Enter))
-        }
-    }
-
-    @Test
-    fun duplicates_inKeysDown_throwIllegalStateException() {
-        rule.performKeyInput { keyDown(Key.A) }
-        expectError<IllegalArgumentException>(
-            expectedMessage = "List of keys must not contain any duplicates."
-        ) {
-            rule.performKeyInput { keysUp(listOf(Key.A, Key.A)) }
-        }
     }
 }

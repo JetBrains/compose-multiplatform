@@ -26,7 +26,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.pressKey
-import androidx.compose.ui.test.pressKeys
 import androidx.compose.ui.test.util.TestTextField
 import androidx.compose.ui.test.util.TestTextField.Tag
 import androidx.compose.ui.test.withKeyToggled
@@ -91,7 +90,10 @@ class LockKeysTest {
     fun lettersTyped_withCapsLockOn_areUppercase() {
         rule.performKeyInput {
             pressKey(Key.A)
-            withKeyToggled(Key.CapsLock) { pressKeys(listOf(Key.A, Key.B)) }
+            withKeyToggled(Key.CapsLock) {
+                pressKey(Key.A)
+                pressKey(Key.B)
+            }
             pressKey(Key.B)
         }
 
@@ -102,10 +104,14 @@ class LockKeysTest {
     fun withKeyToggled_turnsCapsLockOff_ifCapsLockAlreadyOn() {
         rule.performKeyInput {
             pressKey(Key.CapsLock)
-            pressKeys(listOf(Key.A, Key.B))
-            withKeyToggled(Key.CapsLock) { pressKeys(listOf(Key.A, Key.B)) }
-            pressKeys(listOf(Key.A, Key.B))
-        }
+            pressKey(Key.A)
+            pressKey(Key.B)
+            withKeyToggled(Key.CapsLock) {
+                pressKey(Key.A)
+                pressKey(Key.B)
+            }
+            pressKey(Key.A)
+            pressKey(Key.B) }
 
         rule.assertTyped("ABabAB")
     }
@@ -114,7 +120,10 @@ class LockKeysTest {
     fun numPadKeysPressed_withNumLockToggled_areNumbers() {
         rule.performKeyInput {
             pressKey(Key.NumPad0)
-            withKeyToggled(Key.NumLock) { pressKeys(listOf(Key.NumPad1, Key.NumPad0)) }
+            withKeyToggled(Key.NumLock) {
+                pressKey(Key.NumPad1)
+                pressKey(Key.NumPad0)
+            }
             pressKey(Key.NumPad1)
         }
 
@@ -125,8 +134,11 @@ class LockKeysTest {
     fun withKeyToggled_turnsNumLockOff_ifNumLockAlreadyOn() {
         rule.performKeyInput {
             pressKey(Key.NumLock)
-            pressKeys(listOf(Key.NumPad0, Key.NumPad1))
-            withKeyToggled(Key.NumLock) { pressKey(Key.NumPad0) }
+            pressKey(Key.NumPad0)
+            pressKey(Key.NumPad1)
+            withKeyToggled(Key.NumLock) {
+                pressKey(Key.NumPad0)
+            }
         }
 
         rule.assertTyped("01")
