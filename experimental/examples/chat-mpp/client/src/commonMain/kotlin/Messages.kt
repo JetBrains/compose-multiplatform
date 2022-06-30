@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 internal inline fun Messages(messages: List<Message>) {
     val listState = rememberLazyListState()
     if (messages.isNotEmpty()) {
-        LaunchedEffect(messages.last().id) {
+        LaunchedEffect(messages.last()) {
             listState.animateScrollToItem(messages.lastIndex, scrollOffset = 2)
         }
     }
