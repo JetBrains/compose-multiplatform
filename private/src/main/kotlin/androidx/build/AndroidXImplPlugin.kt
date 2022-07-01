@@ -105,6 +105,11 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         if (project.isRoot)
             throw Exception("Root project should use AndroidXRootImplPlugin instead")
         val extension = project.extensions.create<AndroidXExtension>(EXTENSION_NAME, project)
+
+        project.extensions.create<AndroidXMultiplatformExtension>(
+            AndroidXMultiplatformExtension.EXTENSION_NAME,
+            project
+        )
         // Perform different actions based on which plugins have been applied to the project.
         // Many of the actions overlap, ex. API tracking.
         project.plugins.all { plugin ->
@@ -134,6 +139,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         project.registerProjectOrArtifact()
 
         project.configurations.create("samples")
+        project.validateMultiplatformPluginHasNotBeenApplied()
     }
 
     private fun Project.registerProjectOrArtifact() {
@@ -1099,6 +1105,14 @@ fun Project.validateProjectStructure(groupId: String) {
     if (expectDir != actualDir) {
         throw GradleException(
             "Invalid project structure! Expected $expectDir as project directory, found $actualDir"
+        )
+    }
+}
+
+fun Project.validateMultiplatformPluginHasNotBeenApplied() {
+    if (plugins.hasPlugin(KotlinMultiplatformPluginWrapper::class.java)) {
+        throw GradleException(
+            "The Kotlin multiplatform plugin should only be applied by the AndroidX plugin."
         )
     }
 }
