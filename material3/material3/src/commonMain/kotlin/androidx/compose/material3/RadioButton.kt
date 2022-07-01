@@ -70,7 +70,6 @@ import androidx.compose.ui.unit.dp
  * @param colors [RadioButtonColors] that will be used to resolve the color used for this radio
  * button in different states. See [RadioButtonDefaults.colors].
  */
-@ExperimentalMaterial3Api
 @Composable
 fun RadioButton(
     selected: Boolean,
