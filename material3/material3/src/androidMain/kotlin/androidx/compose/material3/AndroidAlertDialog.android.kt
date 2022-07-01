@@ -68,7 +68,6 @@ import androidx.compose.ui.window.DialogProperties
  * @param textContentColor the content color used for the text.
  * @param properties typically platform specific properties to further configure the dialog.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlertDialog(
     onDismissRequest: () -> Unit,
