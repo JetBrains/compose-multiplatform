@@ -24,6 +24,7 @@ import androidx.build.license.CheckExternalDependencyLicensesTask
 import androidx.build.playground.VerifyPlaygroundGradleConfigurationTask
 import androidx.build.studio.StudioTask.Companion.registerStudioTask
 import androidx.build.testConfiguration.registerOwnersServiceTasks
+import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import androidx.build.uptodatedness.TaskUpToDateValidator
 import com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
 import com.android.build.gradle.AppPlugin
@@ -82,6 +83,7 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
             BUILD_ON_SERVER_TASK,
             BuildOnServerTask::class.java
         )
+        buildOnServerTask.cacheEvenIfNoOutputs()
         buildOnServerTask.distributionDirectory = getDistributionDirectory()
         buildOnServerTask.repositoryDirectory = getRepositoryDirectory()
         buildOnServerTask.buildId = getBuildId()

@@ -23,12 +23,13 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
-import org.gradle.work.DisableCachingByDefault
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
+import org.gradle.api.tasks.CacheableTask
+
 /**
  * Task for building all of Androidx libraries and documentation
  *
@@ -36,7 +37,7 @@ import java.util.zip.ZipInputStream
  * produce artifacts that we want to build on server builds
  * When BuildOnServer executes, it double-checks that all expected artifacts were built
  */
-@DisableCachingByDefault(because = "Doesn't benefit from cache")
+@CacheableTask
 open class BuildOnServerTask : DefaultTask() {
 
     init {
