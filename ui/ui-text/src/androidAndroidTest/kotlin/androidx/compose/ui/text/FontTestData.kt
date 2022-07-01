@@ -19,7 +19,7 @@ package androidx.compose.ui.text
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.test.R
+import androidx.testutils.fonts.R
 
 class FontTestData {
     @OptIn(ExperimentalTextApi::class)

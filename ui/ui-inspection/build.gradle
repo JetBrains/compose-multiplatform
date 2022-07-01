@@ -50,7 +50,7 @@ dependencies {
     androidTestImplementation(project(":compose:ui:ui"))
     androidTestImplementation(project(":compose:ui:ui-util"))
     androidTestImplementation(project(":compose:ui:ui-test-junit4"))
-    androidTestImplementation(project(":compose:ui:ui-test-font"))
+    androidTestImplementation(project(":internal-testutils-fonts"))
     androidTestImplementation(project(":compose:material:material"))
     androidTestImplementation(project(":inspection:inspection-testing"))
     androidTestImplementation("androidx.activity:activity-compose:1.3.1")
