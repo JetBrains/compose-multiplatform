@@ -103,14 +103,3 @@ sourceSets {
 ### Module `compose.web.widgets` (Deprecated)
 It provides a collection of Composable components (based on compose.web.core) which try to conform to the API and behaviour of some widgets from Jetpack Compose UI:
 `Column`, `Row`, etc.
-
-## Important notes
-
-#### Kotlin MPP gradle plugin needs to be applied
-``` kotlin
-plugins {
-    kotlin("multiplatform")
-    id("org.jetbrains.compose")
-}
-```
-Compose for Web can be used only with kotlin multiplatform plugin applied. Otherwise, Compose plugin won't be configured properly. 
