@@ -26,6 +26,7 @@ import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,6 +37,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -53,7 +55,9 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -749,6 +753,50 @@ class ScrollTest(private val config: Config) {
             }
         }
         rule.waitForIdle()
+    }
+
+    @Test
+    fun scrollStateMaxValue_changesOnResize_beforePlacement() {
+        val maxScrollValues = mutableListOf<Int>()
+
+        rule.setContent {
+            val scrollState = rememberScrollState()
+
+            DisposableEffect(scrollState) {
+                maxScrollValues += scrollState.maxValue
+                onDispose {}
+            }
+
+            with(LocalDensity.current) {
+                CompositionLocalProvider(LocalLayoutDirection provides config.layoutDirection) {
+                    Box(
+                        Modifier
+                            .size(100.toDp())
+                            // This callback is invoked after the measure pass but before the
+                            // placement pass. The initial max value should have been set by
+                            // this time.
+                            .onSizeChanged {
+                                maxScrollValues += scrollState.maxValue
+                            }
+                            .then(
+                                when (config.orientation) {
+                                    Vertical -> Modifier.verticalScroll(scrollState)
+                                    Horizontal -> Modifier.horizontalScroll(scrollState)
+                                }
+                            )
+                    ) {
+                        Spacer(Modifier.size(100.toDp()))
+                    }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(maxScrollValues).containsExactly(
+                Int.MAX_VALUE,
+                0
+            ).inOrder()
+        }
     }
 
     /**
