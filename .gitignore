@@ -18,4 +18,4 @@ build/
 .cxx
 
 # Ignoring the persistant lockfile until kotlin.js vulnerabilities are fixed
-yarn.lock
+# yarn.lock # but absent yarn.lock leads to inconsistent builds on CI, so let's keep it
