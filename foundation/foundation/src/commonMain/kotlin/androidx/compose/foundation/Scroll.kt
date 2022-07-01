@@ -349,8 +349,12 @@ private data class ScrollingLayoutModifier(
         val scrollWidth = placeable.width - width
         val side = if (isVertical) scrollHeight else scrollWidth
         overscrollEffect.isEnabled = side != 0
+        // The max value must be updated before returning from the measure block so that any other
+        // chained RemeasurementModifiers that try to perform scrolling based on the new
+        // measurements inside onRemeasured are able to scroll to the new max based on the newly-
+        // measured size.
+        scrollerState.maxValue = side
         return layout(width, height) {
-            scrollerState.maxValue = side
             val scroll = scrollerState.value.coerceIn(0, side)
             val absScroll = if (isReversed) scroll - side else -scroll
             val xOffset = if (isVertical) 0 else absScroll
