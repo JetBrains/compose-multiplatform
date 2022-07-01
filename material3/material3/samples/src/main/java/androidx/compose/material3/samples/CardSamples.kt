@@ -34,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Sampled
 @Composable
 fun CardSample() {
@@ -58,7 +57,6 @@ fun ClickableCardSample() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Sampled
 @Composable
 fun ElevatedCardSample() {
@@ -82,7 +80,6 @@ fun ClickableElevatedCardSample() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Sampled
 @Composable
 fun OutlinedCardSample() {
