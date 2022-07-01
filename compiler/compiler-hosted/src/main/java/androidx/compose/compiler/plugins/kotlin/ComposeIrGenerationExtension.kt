@@ -31,10 +31,8 @@ import androidx.compose.compiler.plugins.kotlin.lower.DurableFunctionKeyTransfor
 import androidx.compose.compiler.plugins.kotlin.lower.LiveLiteralTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.WrapJsComposableLambdaLowering
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.CreateDecoysTransformer
-import androidx.compose.compiler.plugins.kotlin.lower.decoys.FixComposableLambdaCalls
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.RecordDecoySignaturesTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.SubstituteDecoyCallsTransformer
-import androidx.compose.compiler.plugins.kotlin.lower.decoys.WrapNotInlineableComposableLambdasForJs
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.serialization.DeclarationTable
@@ -81,12 +79,6 @@ class ComposeIrGenerationExtension(
                 moduleFragment.name.asString(),
                 pluginContext
             )
-        }
-
-        if(pluginContext.platform.isJs()) {
-            WrapNotInlineableComposableLambdasForJs(
-                pluginContext, symbolRemapper, metrics
-            ).lower(moduleFragment)
         }
 
         ClassStabilityTransformer(
@@ -195,14 +187,6 @@ class ComposeIrGenerationExtension(
                 metrics,
                 mangler!!
             ).lower(moduleFragment)
-
-            if (pluginContext.platform.isJs()) {
-                FixComposableLambdaCalls(
-                    pluginContext,
-                    symbolRemapper,
-                    metrics,
-                ).lower(moduleFragment)
-            }
         }
 
         if (isKlibTarget) {

@@ -16,10 +16,8 @@
 
 package androidx.compose.runtime
 
-import androidx.compose.runtime.internal.ComposableLambda
-
 actual internal fun invokeComposable(composer: Composer, composable: @Composable () -> Unit) {
-    composable.unsafeCast<ComposableLambda>().invoke(composer, 1)
+    composable.unsafeCast<Function2<Any, Int, Unit>>().invoke(composer, 1)
 }
 
 actual internal fun <T> invokeComposableForResult(
