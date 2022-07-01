@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Clear
@@ -189,6 +190,28 @@ class TextFieldScreenshotTest {
         }
 
         assertAgainstGolden("filled_textField_textColor_customTextColor")
+    }
+
+    @Test
+    fun textField_textSelectionColor_customColors() {
+        rule.setMaterialContent(lightColorScheme()) {
+            val text = "Hello, world!"
+            TextField(
+                value = TextFieldValue(text = text, selection = TextRange(0, text.length)),
+                onValueChange = {},
+                modifier = Modifier.requiredWidth(280.dp).testTag(TextFieldTag),
+                colors = TextFieldDefaults.textFieldColors(
+                    // We can only test the background color because popups, which includes the
+                    // selection handles, do not appear in screenshots
+                    selectionColors = TextSelectionColors(
+                        handleColor = Color.Black,
+                        backgroundColor = Color.Green,
+                    )
+                )
+            )
+        }
+
+        assertAgainstGolden("filled_textField_textSelectionColor_customColors")
     }
 
     @Test

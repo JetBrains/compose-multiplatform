@@ -54,7 +54,7 @@ import org.junit.runner.RunWith
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-class MaterialTextSelectionColorsScreenshotTest {
+class TextSelectionColorsScreenshotTest {
 
     @get:Rule
     val rule = createComposeRule()
