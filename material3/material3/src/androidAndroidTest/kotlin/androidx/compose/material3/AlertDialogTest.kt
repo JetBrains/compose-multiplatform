@@ -251,12 +251,12 @@ class AlertDialogTest {
         rule.onNodeWithTag(ConfirmButtonTestTag)
             // Confirm button should be 24dp from the right.
             .assertLeftPositionInRootIsEqualTo(dialogBounds.right - 24.dp - confirmBtBounds.width)
-            // Buttons should be 18dp from the bottom (test button default height is 48dp).
-            .assertTopPositionInRootIsEqualTo(dialogBounds.bottom - 18.dp - 48.dp)
+            // Buttons should be 24dp from the bottom (test button default height is 48dp).
+            .assertTopPositionInRootIsEqualTo(dialogBounds.bottom - 24.dp - 48.dp)
 
         // Check the measurements between the components.
         (confirmBtBounds.top - textBounds.bottom).assertIsEqualTo(
-            18.dp,
+            24.dp,
             "padding between the text and the button"
         )
         (confirmBtBounds.top).assertIsEqualTo(dismissBtBounds.top, "dialog buttons top alignment")
@@ -309,11 +309,11 @@ class AlertDialogTest {
         rule.onNodeWithTag(DismissButtonTestTag)
             // Dismiss button should be 24dp from the right.
             .assertLeftPositionInRootIsEqualTo(dialogBounds.right - 24.dp - dismissBtBounds.width)
-            // Buttons should be 18dp from the bottom (test button default height is 48dp).
-            .assertTopPositionInRootIsEqualTo(dialogBounds.bottom - 18.dp - 48.dp)
+            // Buttons should be 24dp from the bottom (test button default height is 48dp).
+            .assertTopPositionInRootIsEqualTo(dialogBounds.bottom - 24.dp - 48.dp)
 
         (dismissBtBounds.top - textBounds.bottom).assertIsEqualTo(
-            18.dp,
+            24.dp,
             "padding between the text and the button"
         )
     }
@@ -365,11 +365,11 @@ class AlertDialogTest {
         rule.onNodeWithTag(DismissButtonTestTag)
             // Dismiss button should be 24dp from the right.
             .assertLeftPositionInRootIsEqualTo(dialogBounds.right - 24.dp - dismissBtBounds.width)
-            // Buttons should be 18dp from the bottom (test button default height is 48dp).
-            .assertTopPositionInRootIsEqualTo(dialogBounds.bottom - 18.dp - 48.dp)
+            // Buttons should be 24dp from the bottom (test button default height is 48dp).
+            .assertTopPositionInRootIsEqualTo(dialogBounds.bottom - 24.dp - 48.dp)
 
         (dismissBtBounds.top - textBounds.bottom).assertIsEqualTo(
-            18.dp,
+            24.dp,
             "padding between the text and the button"
         )
     }
