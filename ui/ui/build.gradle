@@ -96,7 +96,7 @@ dependencies {
         androidTestImplementation(project(":compose:foundation:foundation-layout"))
         androidTestImplementation(project(":compose:material:material"))
         androidTestImplementation(project(":compose:test-utils"))
-        androidTestImplementation(project(":compose:ui:ui-test-font"))
+        androidTestImplementation(project(":internal-testutils-fonts"))
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
         androidTestImplementation(project(":test:screenshot:screenshot"))
         androidTestImplementation("androidx.recyclerview:recyclerview:1.1.0")
@@ -188,7 +188,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.mockitoCore)
                 implementation(libs.mockitoKotlin)
                 implementation(project(":compose:ui:ui-test-junit4"))
-                implementation(project(":compose:ui:ui-test-font"))
+                implementation(project(":internal-testutils-fonts"))
                 implementation(project(":compose:test-utils"))
             }
 
@@ -213,7 +213,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":compose:foundation:foundation-layout"))
                 implementation(project(":compose:material:material"))
                 implementation(project(":compose:test-utils"))
-                implementation(project(":compose:ui:ui-test-font"))
+                implementation(project(":internal-testutils-fonts"))
                 implementation(project(":compose:ui:ui-test-junit4"))
                 implementation(project(":test:screenshot:screenshot"))
                 implementation("androidx.recyclerview:recyclerview:1.1.0")

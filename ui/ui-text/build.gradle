@@ -48,7 +48,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         implementation("androidx.core:core:1.7.0")
         implementation('androidx.collection:collection:1.0.0')
 
-        testImplementation(project(":compose:ui:ui-test-font"))
+        testImplementation(project(":internal-testutils-fonts"))
         testImplementation(libs.testRules)
         testImplementation(libs.testRunner)
         testImplementation(libs.junit)
@@ -58,7 +58,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         testImplementation(libs.kotlinTest)
         testImplementation(libs.mockitoKotlin)
 
-        androidTestImplementation(project(":compose:ui:ui-test-font"))
+        androidTestImplementation(project(":internal-testutils-fonts"))
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
         androidTestImplementation(libs.testCore)
         androidTestImplementation(libs.testRules)
@@ -137,7 +137,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             //  level dependencies block instead:
             //  `dependencies { testImplementation(libs.robolectric) }`
             androidTest.dependencies {
-                implementation(project(":compose:ui:ui-test-font"))
+                implementation(project(":internal-testutils-fonts"))
                 implementation(libs.testRules)
                 implementation(libs.testRunner)
                 implementation(libs.junit)
@@ -150,7 +150,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
             androidAndroidTest.dependencies {
                 implementation(project(":compose:ui:ui-test-junit4"))
-                implementation(project(":compose:ui:ui-test-font"))
+                implementation(project(":internal-testutils-fonts"))
                 implementation(libs.testRules)
                 implementation(libs.testRunner)
                 implementation(libs.espressoCore)
@@ -168,7 +168,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.skikoCurrentOs)
                 implementation(project(":compose:foundation:foundation"))
                 implementation(project(":compose:ui:ui-test-junit4"))
-                implementation(project(":compose:ui:ui-test-font"))
+                implementation(project(":internal-testutils-fonts"))
             }
         }
     }
