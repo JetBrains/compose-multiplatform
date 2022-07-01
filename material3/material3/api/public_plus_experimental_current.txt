@@ -668,7 +668,7 @@ package androidx.compose.material3 {
   }
 
   public final class RadioButtonKt {
-    method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void RadioButton(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit>? onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material3.RadioButtonColors colors);
+    method @androidx.compose.runtime.Composable public static void RadioButton(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit>? onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material3.RadioButtonColors colors);
   }
 
   public final class ScaffoldKt {
