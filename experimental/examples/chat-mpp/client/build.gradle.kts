@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 import org.jetbrains.compose.experimental.dsl.IOSDevices
 
 plugins {
-    id("com.android.library")
+    id("com.android.application")
     kotlin("multiplatform")
     id("org.jetbrains.compose")
 }
@@ -88,6 +88,7 @@ kotlin {
             kotlin.srcDirs("src/jvmMain/kotlin")
             dependencies {
                 api("androidx.appcompat:appcompat:1.4.1")
+                implementation("androidx.activity:activity-compose:1.4.0")
             }
         }
 
