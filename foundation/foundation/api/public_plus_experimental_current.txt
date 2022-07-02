@@ -779,6 +779,9 @@ package androidx.compose.foundation.lazy.layout {
   public final class LazyLayoutPrefetcher_androidKt {
   }
 
+  public final class LazyNearestItemsRangeKt {
+  }
+
   public final class Lazy_androidKt {
     method @androidx.compose.foundation.ExperimentalFoundationApi public static Object getDefaultLazyLayoutKey(int index);
   }

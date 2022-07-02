@@ -18,16 +18,14 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.layout.IntervalList
+import androidx.compose.foundation.lazy.layout.calculateNearestItemsRange
 import androidx.compose.foundation.lazy.layout.getDefaultLazyLayoutKey
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.runtime.structuralEqualityPolicy
 
 @ExperimentalFoundationApi
 @Composable
@@ -37,21 +35,14 @@ internal fun rememberItemProvider(
 ): LazyListItemProvider {
     val latestContent = rememberUpdatedState(content)
 
-    // mutableState + LaunchedEffect below are used instead of derivedStateOf to ensure that update
-    // of derivedState in return expr will only happen after the state value has been changed.
     val nearestItemsRangeState = remember(state) {
-        mutableStateOf(
-            Snapshot.withoutReadObservation {
-                // State read is observed in composition, causing it to recompose 1 additional time.
-                calculateNearestItemsRange(state.firstVisibleItemIndex)
-            }
-        )
-    }
-    LaunchedEffect(nearestItemsRangeState) {
-        snapshotFlow { calculateNearestItemsRange(state.firstVisibleItemIndex) }
-            // MutableState's SnapshotMutationPolicy will make sure the provider is only
-            // recreated when the state is updated with a new range.
-            .collect { nearestItemsRangeState.value = it }
+        derivedStateOf(structuralEqualityPolicy()) {
+            calculateNearestItemsRange(
+                slidingWindowSize = NearestItemsSlidingWindowSize,
+                extraItemCount = NearestItemsExtraItemCount,
+                firstVisibleItem = state.firstVisibleItemIndex
+            )
+        }
     }
 
     return remember(nearestItemsRangeState) {
@@ -108,7 +99,7 @@ internal class LazyListItemProviderImpl(
 
     override val headerIndexes: List<Int> get() = itemsSnapshot.value.headerIndexes
 
-    override val itemCount get() = itemsSnapshot.value.itemsCount
+     override val itemCount get() = itemsSnapshot.value.itemsCount
 
     override fun getKey(index: Int) = itemsSnapshot.value.getKey(index)
 
@@ -157,26 +148,12 @@ internal fun generateKeyToIndexMap(
 }
 
 /**
- * Returns a range of indexes which contains at least [ExtraItemsNearTheSlidingWindow] items near
- * the first visible item. It is optimized to return the same range for small changes in the
- * firstVisibleItem value so we do not regenerate the map on each scroll.
- */
-private fun calculateNearestItemsRange(firstVisibleItem: Int): IntRange {
-    val slidingWindowStart = VisibleItemsSlidingWindowSize *
-        (firstVisibleItem / VisibleItemsSlidingWindowSize)
-
-    val start = maxOf(slidingWindowStart - ExtraItemsNearTheSlidingWindow, 0)
-    val end = slidingWindowStart + VisibleItemsSlidingWindowSize + ExtraItemsNearTheSlidingWindow
-    return start until end
-}
-
-/**
  * We use the idea of sliding window as an optimization, so user can scroll up to this number of
  * items until we have to regenerate the key to index map.
  */
-private val VisibleItemsSlidingWindowSize = 30
+private const val NearestItemsSlidingWindowSize = 30
 
 /**
  * The minimum amount of items near the current first visible item we want to have mapping for.
  */
-private val ExtraItemsNearTheSlidingWindow = 100
+private const val NearestItemsExtraItemCount = 100
