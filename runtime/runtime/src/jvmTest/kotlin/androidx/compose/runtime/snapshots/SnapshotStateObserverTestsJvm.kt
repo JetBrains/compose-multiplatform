@@ -178,6 +178,7 @@ class SnapshotStateObserverTestsJvm {
         val stateObserver = SnapshotStateObserver { it() }
         try {
             stateObserver.start()
+            Snapshot.notifyObjectsInitialized()
 
             val observer = object : (Any) -> Unit {
                 override fun invoke(affected: Any) {
@@ -194,11 +195,10 @@ class SnapshotStateObserverTestsJvm {
                     }
                 }
             }
-
-            state.value++
+            // read with 0
             observer.readWithObservation()
-
-            Snapshot.notifyObjectsInitialized()
+            // increase to 1
+            state.value++
             Snapshot.sendApplyNotifications()
 
             assertEquals(1, changes)
