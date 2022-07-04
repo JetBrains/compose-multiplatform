@@ -2,22 +2,22 @@
 
 ## Run on Android:
 - connect device or emulator
-- `./gradlew android:installDebug`
+- `./gradlew installDebug`
 - open app
 
 ## Run on Desktop jvm
-  `./gradlew client:run`
+  `./gradlew run`
 
 ## Run native on MacOS
-  `./gradlew client:runDebugExecutableMacosX64` (Works on Intel processors)
+  `./gradlew runDebugExecutableMacosX64` (Works on Intel processors)
 
 ## Run web assembly in browser
-  `./gradlew client:jsBrowserDevelopmentRun`
+  `./gradlew jsBrowserDevelopmentRun`
 
 ## Run on iOS simulator
-  `./gradlew client:iosDeployIPhone8Debug`
-  `./gradlew client:iosDeployIPadDebug`
+  `./gradlew iosDeployIPhone8Debug`
+  `./gradlew iosDeployIPadDebug`
 
 ## Run on iOS device
 - Read about iOS target in [falling-balls-mpp/README.md](../falling-balls-mpp/README.md)
-- `./gradlew client:iosDeployDeviceRelease`
+- `./gradlew iosDeployDeviceRelease`

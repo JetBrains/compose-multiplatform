@@ -21,5 +21,3 @@ pluginManagement {
 }
 
 rootProject.name = "chat-mpp"
-include(":client")
-include(":android")
