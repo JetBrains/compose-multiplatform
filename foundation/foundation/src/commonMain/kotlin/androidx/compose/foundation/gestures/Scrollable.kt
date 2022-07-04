@@ -330,10 +330,11 @@ private class ScrollingLogic(
     fun Offset.reverseIfNeeded(): Offset = if (reverseDirection) this * -1f else this
 
     fun ScrollScope.dispatchScroll(
-        scrollDelta: Offset,
+        availableDelta: Offset,
         pointerPosition: Offset?,
         source: NestedScrollSource
     ): Offset {
+        val scrollDelta = availableDelta.singleAxisOffset()
         val overscrollPreConsumed = overscrollPreConsumeDelta(scrollDelta, pointerPosition, source)
 
         val afterPreOverscroll = scrollDelta - overscrollPreConsumed
@@ -342,15 +343,16 @@ private class ScrollingLogic(
             .dispatchPreScroll(afterPreOverscroll, source)
 
         val scrollAvailable = afterPreOverscroll - preConsumedByParent
-
         // Consume on a single axis
         val axisConsumed =
             scrollBy(scrollAvailable.reverseIfNeeded().toFloat()).toOffset().reverseIfNeeded()
 
         val leftForParent = scrollAvailable - axisConsumed
-        val parentConsumed = nestedScrollDispatcher
-            .dispatchPostScroll(axisConsumed, leftForParent, source)
-
+        val parentConsumed = nestedScrollDispatcher.dispatchPostScroll(
+            axisConsumed,
+            leftForParent,
+            source
+        )
         overscrollPostConsumeDelta(
             scrollAvailable,
             leftForParent - parentConsumed,
@@ -366,8 +368,7 @@ private class ScrollingLogic(
         source: NestedScrollSource
     ): Offset {
         return if (overscrollEffect != null && overscrollEffect.isEnabled) {
-            val overscrollAvailableDelta = scrollDelta.singleAxisOffset()
-            overscrollEffect.consumePreScroll(overscrollAvailableDelta, pointerPosition, source)
+            overscrollEffect.consumePreScroll(scrollDelta, pointerPosition, source)
         } else {
             Offset.Zero
         }
@@ -381,8 +382,8 @@ private class ScrollingLogic(
     ) {
         if (overscrollEffect != null && overscrollEffect.isEnabled) {
             overscrollEffect.consumePostScroll(
-                consumedByChain.singleAxisOffset(),
-                availableForOverscroll.singleAxisOffset(),
+                consumedByChain,
+                availableForOverscroll,
                 pointerPosition,
                 source
             )
@@ -399,26 +400,26 @@ private class ScrollingLogic(
     }
 
     suspend fun onDragStopped(initialVelocity: Velocity) {
+        val availableVelocity = initialVelocity.singleAxisVelocity()
         val preOverscrollConsumed =
             if (overscrollEffect != null && overscrollEffect.isEnabled) {
-                val availableForOverscroll = initialVelocity.singleAxisVelocity()
-                val crossAxisRemainder = initialVelocity - availableForOverscroll
-                crossAxisRemainder + overscrollEffect.consumePreFling(availableForOverscroll)
+                overscrollEffect.consumePreFling(availableVelocity)
             } else {
                 Velocity.Zero
             }
-        val velocity = (initialVelocity - preOverscrollConsumed)
-        val preConsumedByParent = nestedScrollDispatcher.value.dispatchPreFling(velocity)
+        val velocity = (availableVelocity - preOverscrollConsumed)
+        val preConsumedByParent = nestedScrollDispatcher
+            .value.dispatchPreFling(velocity)
         val available = velocity - preConsumedByParent
         val velocityLeft = doFlingAnimation(available)
         val consumedPost =
             nestedScrollDispatcher.value.dispatchPostFling(
-                available - velocityLeft,
+                (available - velocityLeft),
                 velocityLeft
             )
         val totalLeft = velocityLeft - consumedPost
         if (overscrollEffect != null && overscrollEffect.isEnabled) {
-            overscrollEffect.consumePostFling(totalLeft.singleAxisVelocity())
+            overscrollEffect.consumePostFling(totalLeft)
         }
     }
 
