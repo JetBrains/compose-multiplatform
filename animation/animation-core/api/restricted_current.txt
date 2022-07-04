@@ -434,6 +434,7 @@ package androidx.compose.animation.core {
   public static final class KeyframesSpec.KeyframesSpecConfig<T> {
     ctor public KeyframesSpec.KeyframesSpecConfig();
     method public infix androidx.compose.animation.core.KeyframesSpec.KeyframeEntity<T> at(T?, int timeStamp);
+    method public infix androidx.compose.animation.core.KeyframesSpec.KeyframeEntity<T> atFraction(T?, float fraction);
     method public int getDelayMillis();
     method public int getDurationMillis();
     method public void setDelayMillis(int);
