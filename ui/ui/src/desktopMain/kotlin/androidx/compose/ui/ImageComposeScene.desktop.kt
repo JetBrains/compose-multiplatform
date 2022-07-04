@@ -31,6 +31,7 @@ import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import kotlin.coroutines.CoroutineContext
@@ -146,6 +147,12 @@ class ImageComposeScene(
         }
 
     /**
+     * Returns true if there are pending recompositions, renders or dispatched tasks.
+     * Can be called from any thread.
+     */
+    fun hasInvalidations() = scene.hasInvalidations()
+
+    /**
      * Update the composition with the content described by the [content] composable. After this
      * has been called the changes to produce the initial composition has been calculated and
      * applied to the composition.
@@ -156,6 +163,11 @@ class ImageComposeScene(
      */
     fun setContent(content: @Composable () -> Unit): Unit =
         scene.setContent(content = content)
+
+    /**
+     * Returns the current content size
+     */
+    val contentSize: IntSize get() = scene.contentSize
 
     /**
      * Render the current content into an image. [nanoTime] will be used to drive all

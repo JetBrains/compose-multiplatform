@@ -28,29 +28,29 @@ import androidx.compose.ui.geometry.Offset
  *  @param onExit The callback invoked when pointer leaves the component
  */
 @ExperimentalComposeUiApi
+@Deprecated(
+    "Use onPointerEvent or hoverable",
+    replaceWith = ReplaceWith("onPointerEvent(PointerEventType.Move) {\n" +
+        "        onMove(it.changes.first().position)\n" +
+        "    }\n" +
+        "    .onPointerEvent(PointerEventType.Enter) {\n" +
+        "        onEnter()\n" +
+        "    }\n" +
+        "    .onPointerEvent(PointerEventType.Exit) {\n" +
+        "        onExit()\n" +
+        "    }", "androidx.compose.ui.input.pointer.onPointerEvent")
+)
 fun Modifier.pointerMoveFilter(
     onMove: (position: Offset) -> Boolean = { false },
     onExit: () -> Boolean = { false },
     onEnter: () -> Boolean = { false },
-): Modifier = pointerInput(onMove, onExit, onEnter) {
-    awaitPointerEventScope {
-        while (true) {
-            val event = awaitPointerEvent()
-            val consumed = when (event.type) {
-                PointerEventType.Move -> {
-                    onMove(event.changes.first().position)
-                }
-                PointerEventType.Enter -> {
-                    onEnter()
-                }
-                PointerEventType.Exit -> {
-                    onExit()
-                }
-                else -> false
-            }
-            if (consumed) {
-                event.changes.forEach { it.consume() }
-            }
-        }
+): Modifier = this
+    .onPointerEvent(PointerEventType.Move) {
+        onMove(it.changes.first().position)
     }
-}
+    .onPointerEvent(PointerEventType.Enter) {
+        onEnter()
+    }
+    .onPointerEvent(PointerEventType.Exit) {
+        onExit()
+    }
