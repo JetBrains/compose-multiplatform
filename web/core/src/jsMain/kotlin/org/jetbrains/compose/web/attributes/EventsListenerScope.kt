@@ -1,5 +1,7 @@
 package org.jetbrains.compose.web.attributes
 
+// if you change API for this interface, note that there is a link to this file in this tutorial: https://github.com/JetBrains/compose-jb/blob/master/tutorials/Web/Events_Handling/README.md#other-event-handlers
+
 import androidx.compose.web.events.SyntheticDragEvent
 import androidx.compose.web.events.SyntheticEvent
 import androidx.compose.web.events.SyntheticMouseEvent
