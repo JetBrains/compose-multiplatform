@@ -24,7 +24,8 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.drawscope.DrawTransform
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.isUnspecified
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.style.TextDecoration
@@ -141,7 +142,12 @@ fun DrawScope.drawText(
         density = this
     )
 
-    drawText(textLayoutResult, topLeft = topLeft)
+    withTransform({
+        translate(topLeft.x, topLeft.y)
+        clip(textLayoutResult)
+    }) {
+        textLayoutResult.multiParagraph.paint(drawContext.canvas)
+    }
 }
 
 /**
@@ -198,11 +204,11 @@ fun DrawScope.drawText(
         density = this
     )
 
-    translate(topLeft.x, topLeft.y) {
-        TextPainter.paint(
-            canvas = this.drawContext.canvas,
-            textLayoutResult = textLayoutResult
-        )
+    withTransform({
+        translate(topLeft.x, topLeft.y)
+        clip(textLayoutResult)
+    }) {
+        textLayoutResult.multiParagraph.paint(drawContext.canvas)
     }
 }
 
@@ -234,42 +240,29 @@ fun DrawScope.drawText(
     val newShadow = shadow ?: textLayoutResult.layoutInput.style.shadow
     val newTextDecoration = textDecoration ?: textLayoutResult.layoutInput.style.textDecoration
 
-    // if text layout was created using brush, and [color] is unspecified, we should treat this
-    // like drawText(brush) call
-    val style = if (textLayoutResult.layoutInput.style.brush != null && color.isUnspecified) {
-        textLayoutResult.layoutInput.style.copy(
-            brush = textLayoutResult.layoutInput.style.brush,
-            alpha = if (!alpha.isNaN()) alpha else textLayoutResult.layoutInput.style.alpha,
-            shadow = newShadow,
-            textDecoration = newTextDecoration
-        )
-    } else {
-        val newColor = color.takeOrElse { textLayoutResult.layoutInput.style.color }.modulate(alpha)
-        textLayoutResult.layoutInput.style.copy(
-            color = newColor,
-            shadow = newShadow,
-            textDecoration = newTextDecoration
-        )
-    }
-
-    translate(topLeft.x, topLeft.y) {
-        TextPainter.paint(
-            canvas = this.drawContext.canvas,
-            textLayoutResult = textLayoutResult.copy(
-                TextLayoutInput(
-                    text = textLayoutResult.layoutInput.text,
-                    style = style,
-                    placeholders = textLayoutResult.layoutInput.placeholders,
-                    maxLines = textLayoutResult.layoutInput.maxLines,
-                    softWrap = textLayoutResult.layoutInput.softWrap,
-                    overflow = textLayoutResult.layoutInput.overflow,
-                    density = textLayoutResult.layoutInput.density,
-                    layoutDirection = textLayoutResult.layoutInput.layoutDirection,
-                    fontFamilyResolver = textLayoutResult.layoutInput.fontFamilyResolver,
-                    constraints = textLayoutResult.layoutInput.constraints,
-                )
+    withTransform({
+        translate(topLeft.x, topLeft.y)
+        clip(textLayoutResult)
+    }) {
+        // if text layout was created using brush, and [color] is unspecified, we should treat this
+        // like drawText(brush) call
+        val brush = textLayoutResult.layoutInput.style.brush
+        if (brush != null && color.isUnspecified) {
+            textLayoutResult.multiParagraph.paint(
+                drawContext.canvas,
+                brush,
+                if (!alpha.isNaN()) alpha else textLayoutResult.layoutInput.style.alpha,
+                newShadow,
+                newTextDecoration
             )
-        )
+        } else {
+            textLayoutResult.multiParagraph.paint(
+                drawContext.canvas,
+                color.takeOrElse { textLayoutResult.layoutInput.style.color }.modulate(alpha),
+                newShadow,
+                newTextDecoration
+            )
+        }
     }
 }
 
@@ -301,30 +294,28 @@ fun DrawScope.drawText(
     val newShadow = shadow ?: textLayoutResult.layoutInput.style.shadow
     val newTextDecoration = textDecoration ?: textLayoutResult.layoutInput.style.textDecoration
 
-    val style = textLayoutResult.layoutInput.style.copy(
-        brush = brush,
-        alpha = if (!alpha.isNaN()) alpha else textLayoutResult.layoutInput.style.alpha,
-        shadow = newShadow,
-        textDecoration = newTextDecoration
-    )
+    withTransform({
+        translate(topLeft.x, topLeft.y)
+        clip(textLayoutResult)
+    }) {
+        textLayoutResult.multiParagraph.paint(
+            drawContext.canvas,
+            brush,
+            if (!alpha.isNaN()) alpha else textLayoutResult.layoutInput.style.alpha,
+            newShadow,
+            newTextDecoration
+        )
+    }
+}
 
-    translate(topLeft.x, topLeft.y) {
-        TextPainter.paint(
-            canvas = this.drawContext.canvas,
-            textLayoutResult = textLayoutResult.copy(
-                TextLayoutInput(
-                    text = textLayoutResult.layoutInput.text,
-                    style = style,
-                    placeholders = textLayoutResult.layoutInput.placeholders,
-                    maxLines = textLayoutResult.layoutInput.maxLines,
-                    softWrap = textLayoutResult.layoutInput.softWrap,
-                    overflow = textLayoutResult.layoutInput.overflow,
-                    density = textLayoutResult.layoutInput.density,
-                    layoutDirection = textLayoutResult.layoutInput.layoutDirection,
-                    fontFamilyResolver = textLayoutResult.layoutInput.fontFamilyResolver,
-                    constraints = textLayoutResult.layoutInput.constraints,
-                )
-            )
+private fun DrawTransform.clip(textLayoutResult: TextLayoutResult) {
+    if (textLayoutResult.hasVisualOverflow &&
+        textLayoutResult.layoutInput.overflow == TextOverflow.Clip) {
+        clipRect(
+            left = 0f,
+            top = 0f,
+            right = textLayoutResult.size.width.toFloat(),
+            bottom = textLayoutResult.size.height.toFloat()
         )
     }
 }

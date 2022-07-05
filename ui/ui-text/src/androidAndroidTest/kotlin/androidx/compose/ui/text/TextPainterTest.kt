@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.matchers.assertThat
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -327,6 +328,71 @@ class TextPainterTest {
         }
 
         assertThat(bitmap).isEqualToBitmap(bitmap2)
+    }
+
+    @Test
+    fun drawTextClipsTheContent_ifOverflowIsClip() {
+        val measurer = textMeasurer()
+        // constrain the width, height is ignored
+        val textLayoutResult = measurer.measure(
+            text = longText,
+            style = TextStyle(
+                fontFamily = fontFamilyMeasureFont,
+                fontSize = 14.sp
+            ),
+            softWrap = false,
+            overflow = TextOverflow.Clip,
+            size = IntSize(200, 200)
+        )
+
+        val bitmap = draw(400f, 200f) {
+            drawText(textLayoutResult)
+        }
+        val croppedBitmap = Bitmap.createBitmap(bitmap, 200, 0, 200, 200)
+
+        // cropped part should be empty
+        assertThat(croppedBitmap).isEqualToBitmap(Bitmap.createBitmap(
+            200,
+            200,
+            Bitmap.Config.ARGB_8888))
+    }
+
+    @Test
+    fun drawTextDoesNotClipTheContent_ifOverflowIsVisible() {
+        val measurer = textMeasurer()
+        // constrain the width, height is ignored
+        val textLayoutResult = measurer.measure(
+            text = longText,
+            style = TextStyle(
+                fontFamily = fontFamilyMeasureFont,
+                fontSize = 14.sp
+            ),
+            softWrap = false,
+            overflow = TextOverflow.Clip,
+            size = IntSize(400, 200)
+        )
+
+        val textLayoutResultNoClip = measurer.measure(
+            text = longText,
+            style = TextStyle(
+                fontFamily = fontFamilyMeasureFont,
+                fontSize = 14.sp
+            ),
+            softWrap = false,
+            overflow = TextOverflow.Visible,
+            size = IntSize(200, 200)
+        )
+
+        val bitmap = draw(400f, 200f) {
+            drawText(textLayoutResult)
+        }
+
+        val bitmapNoClip = draw(400f, 200f) {
+            drawText(textLayoutResultNoClip)
+        }
+
+        // cropped part should be empty
+        assertThat(bitmap).isEqualToBitmap(bitmapNoClip)
     }
 
     private fun textMeasurer(
