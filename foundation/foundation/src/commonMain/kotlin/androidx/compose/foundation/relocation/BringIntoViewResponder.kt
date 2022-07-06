@@ -25,9 +25,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.modifier.ProvidableModifierLocal
 import androidx.compose.ui.platform.debugInspectorInfo
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 
 /**
@@ -43,9 +41,6 @@ import kotlinx.coroutines.launch
  *    [calculateRectForParent].
  * 2. Performing any scroll or other layout adjustments needed to ensure the requested rectangle is
  *    brought into view in [bringChildIntoView].
- *
- * Here is a sample defining a custom [BringIntoViewResponder]:
- * @sample androidx.compose.foundation.samples.BringIntoViewResponderSample
  *
  * Here is a sample where a composable is brought into view:
  * @sample androidx.compose.foundation.samples.BringIntoViewSample
@@ -97,7 +92,6 @@ interface BringIntoViewResponder {
  * that the item is visible on screen. See [BringIntoViewResponder] for more details about how
  * this mechanism works.
  *
- * @sample androidx.compose.foundation.samples.BringIntoViewResponderSample
  * @sample androidx.compose.foundation.samples.BringIntoViewSample
  *
  * @see BringIntoViewRequester
@@ -138,56 +132,6 @@ private class BringIntoViewResponderModifier(
         get() = this
 
     /**
-     * Stores the rectangle and coroutine [Job] of the newest request to be handled by
-     * [bringChildIntoView].
-     *
-     * This property is not guarded by a lock since requests should only be made on the main thread.
-     *
-     * ## Request queuing
-     *
-     * When multiple requests are received concurrently, i.e. a new request comes in before the
-     * previous one finished, they are put in a queue. The queue is implicit – this property only
-     * stores a reference to the tail of the queue. The head of the queue is the oldest request that
-     * hasn't finished executing yet. Each subsequent request in the queue waits for the previous
-     * request to finish by [joining][Job.join] on its [Job]. When the oldest request finishes (or
-     * is cancelled), it is "removed" from the queue by simply returning from [bringChildIntoView].
-     * This completes its job, which resumes the next request, and makes that the new "head". When
-     * the last request finishes it "clears" the queue by setting this property to null.
-     *
-     * ## Interruption
-     *
-     * There is one case not covered above: If a request comes in for a rectangle that is
-     * not [fully-overlapped][completelyOverlaps] by the previous request, the new request will
-     * "interrupt" all previous requests and indirectly remove them from the queue. The reason only
-     * overlapping requests are queued is because if rectangle A contains rectangle B, then when A
-     * is fully on screen, then B is also fully on screen. By satisfying A first, both A and B can
-     * be satisfied in a single call to the [BringIntoViewResponder]. If B were to interrupt A, A
-     * might never be fully brought into view (see b/216790855).
-     *
-     * Interruption works by immediately dispatching the new request to the
-     * [BringIntoViewResponder]. Note that this class does not actually cancel the previously-
-     * running request's [Job] – the responder is responsible for cancelling any in-progress request
-     * and immediately start handling the new one. In particular, if the responder is using
-     * Compose's animation, the animation will handle cancellation itself and preserve velocity.
-     * When the previously-running request is cancelled, its job will complete and the next request
-     * in the queue will try to run. However, it will see that another request was already
-     * dispatched, and return early, completing its job as well. Etc etc until all requests that
-     * were received before the interrupting one have returned from their [bringChildIntoView]
-     * calls.
-     *
-     * The way a request determines if it's been interrupted is by comparing the previous request
-     * to the value of [newestDispatchedRequest]. [newestDispatchedRequest] is only set just before
-     * the [BringIntoViewResponder] is called.
-     */
-    private var newestReceivedRequest: Pair<Rect, Job>? = null
-
-    /**
-     * The last queued request to have been sent to the [BringIntoViewResponder], or null if no
-     * requests are in progress.
-     */
-    private var newestDispatchedRequest: Pair<Rect, Job>? = null
-
-    /**
      * Responds to a child's request by first converting [boundsProvider] into this node's [LayoutCoordinates]
      * and then, concurrently, calling the [responder] and the [parent] to handle the request.
      */
@@ -195,76 +139,17 @@ private class BringIntoViewResponderModifier(
         childCoordinates: LayoutCoordinates,
         boundsProvider: () -> Rect?
     ) {
-        coroutineScope {
-            val layoutCoordinates = layoutCoordinates ?: return@coroutineScope
-            if (!childCoordinates.isAttached) return@coroutineScope
-            // TODO(b/241591211) Read the request's bounds lazily in case they change.
-            val localRect = layoutCoordinates.localRectOf(
-                sourceCoordinates = childCoordinates,
-                rect = boundsProvider() ?: return@coroutineScope
-            )
-
-            // Immediately make this request the tail of the queue, before suspending, so that
-            // any requests that come in while suspended will join on this one.
-            // Note that this job is not the caller's job, since coroutineScope introduces a child
-            // job.
-            // For more information about how requests are queued, see the kdoc on newestRequest.
-            val requestJob = coroutineContext.job
-            val thisRequest = Pair(localRect, requestJob)
-            val previousRequest = newestReceivedRequest
-            newestReceivedRequest = thisRequest
-
-            try {
-                // In the simplest case there are no ongoing requests, so just dispatch.
-                if (previousRequest == null ||
-                    // If there's an ongoing request but it won't satisfy this request, then
-                    // interrupt it.
-                    !previousRequest.first.completelyOverlaps(localRect)
-                ) {
-                    dispatchRequest(thisRequest, layoutCoordinates)
-                    return@coroutineScope
-                }
-
-                // The previous request completely overlaps this one, so wait for it to finish since
-                // it will probably satisfy this request.
-                // Note that even if the previous request fails or is cancelled, join will return
-                // normally. It could be cancelled either because a newer job interrupted it, or
-                // because the caller/sender of that request was cancelled.
-                previousRequest.second.join()
-
-                // If a newer request interrupted this one while we were waiting, then it will have
-                // already dispatched so we should consider this request cancelled and not dispatch.
-                if (newestDispatchedRequest === previousRequest) {
-                    // Any requests queued up previously to us have finished, and nothing new came
-                    // in while we were waiting.
-                    dispatchRequest(thisRequest, layoutCoordinates)
-                }
-            } finally {
-                // Only the last job in the queue should clear the dispatched request, since if
-                // there's another job waiting to start it needs to know what the last dispatched
-                // request was.
-                if (newestDispatchedRequest === newestReceivedRequest) {
-                    newestDispatchedRequest = null
-                }
-                // Only the last job in the queue should clear the queue.
-                if (newestReceivedRequest === thisRequest) {
-                    newestReceivedRequest = null
-                }
-            }
+        @Suppress("NAME_SHADOWING")
+        fun localRect(): Rect? {
+            // Either coordinates can become detached at any time, so we have to check before every
+            // calculation.
+            val layoutCoordinates = layoutCoordinates ?: return null
+            val childCoordinates = childCoordinates.takeIf { it.isAttached } ?: return null
+            val rect = boundsProvider() ?: return null
+            return layoutCoordinates.localRectOf(childCoordinates, rect)
         }
-    }
 
-    /**
-     * Marks [request] as the [newestDispatchedRequest] and then dispatches it to both the
-     * [responder] and the [parent].
-     */
-    private suspend fun dispatchRequest(
-        request: Pair<Rect, Job>,
-        layoutCoordinates: LayoutCoordinates
-    ) {
-        newestDispatchedRequest = request
-        val localRect = request.first
-        val parentRect = responder.calculateRectForParent(localRect)
+        val parentRect = { localRect()?.let(responder::calculateRectForParent) }
 
         coroutineScope {
             // For the item to be visible, if needs to be in the viewport of all its
@@ -274,17 +159,18 @@ private class BringIntoViewResponderModifier(
             // parent, or parent before the child).
             launch {
                 // Bring the requested Child into this parent's view.
-                // TODO(b/241591211) Read the request's bounds lazily in case they change.
-                responder.bringChildIntoView { localRect }
+                responder.bringChildIntoView(::localRect)
             }
 
-            // TODO I think this needs to be in launch, since if the parent is cancelled (this
-            //  throws a CE) due to animation interruption, the child should continue animating.
-            // TODO(b/241591211) Read the request's bounds lazily in case they change.
-            parent.bringChildIntoView(layoutCoordinates) { parentRect }
+            // Launch this as well so that if the parent is cancelled (this throws a CE) due to
+            // animation interruption, the child continues animating. If we just call
+            // bringChildIntoView directly without launching, if that function throws a
+            // CancellationException, it will cancel this coroutineScope, which will also cancel the
+            // responder's coroutine.
+            launch {
+                parent.bringChildIntoView(layoutCoordinates ?: return@launch, parentRect)
+            }
         }
-        // Don't try to null out newestDispatchedRequest here, bringChildIntoView will take care of
-        // that.
     }
 }
 

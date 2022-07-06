@@ -168,6 +168,9 @@ package androidx.compose.foundation.gestures {
   public final class AndroidScrollable_androidKt {
   }
 
+  public final class ContentInViewModifierKt {
+  }
+
   public final class DragGestureDetectorKt {
     method public static suspend Object? awaitDragOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>);
     method public static suspend Object? awaitHorizontalDragOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>);

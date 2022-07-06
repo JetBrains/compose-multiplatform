@@ -155,7 +155,7 @@ class ScrollableFocusableInteractionTest(
     }
 
     @Test
-    fun scrollsFocusedFocusableIntoView_whenPartiallyInViewAndBecomesMoreHidden() {
+    fun doesNotScrollFocusedFocusableIntoView_whenPartiallyInViewAndBecomesMoreHidden() {
         var viewportSize by mutableStateOf(95.toDp())
 
         rule.setContent {
@@ -179,13 +179,13 @@ class ScrollableFocusableInteractionTest(
 
         rule.onNodeWithTag(focusableTag)
             .assertScrollAxisPositionInRootIsEqualTo(
-                if (reverseScrolling) (-5).toDp() else 81.toDp()
+                if (reverseScrolling) (-5 - 4).toDp() else 90.toDp()
             )
             .assertIsDisplayed()
     }
 
     @Test
-    fun scrollsFocusedFocusableIntoView_whenPartiallyInViewAndBecomesFullyHidden() {
+    fun doesNotScrollFocusedFocusableIntoView_whenPartiallyInViewAndBecomesFullyHidden() {
         var viewportSize by mutableStateOf(95.toDp())
 
         rule.setContent {
@@ -208,9 +208,11 @@ class ScrollableFocusableInteractionTest(
 
         rule.onNodeWithTag(focusableTag)
             .assertScrollAxisPositionInRootIsEqualTo(
-                if (reverseScrolling) (-5).toDp() else 80.toDp()
+                // When reversing scrolling, shrinking the viewport will move the child as well by
+                // the amount it shrunk – 5px.
+                if (reverseScrolling) (-5 - 5).toDp() else 90.toDp()
             )
-            .assertIsDisplayed()
+            .assertIsNotDisplayed()
     }
 
     @Test
@@ -346,7 +348,6 @@ class ScrollableFocusableInteractionTest(
         // Expand the viewport back to its original size to bring the focusable back into view.
         viewportSize = 100.toDp()
         rule.waitForIdle()
-        Thread.sleep(2000)
 
         // Shrink the viewport again, this should trigger another scroll animation to keep the
         // scrollable in view.
@@ -365,12 +366,8 @@ class ScrollableFocusableInteractionTest(
         rule.setContent {
             ScrollableRowOrColumn(viewportSize) {
                 // Put a focusable just out of view.
-                if (!reverseScrolling) {
-                    Spacer(Modifier.size(gapSize))
-                }
-                TestFocusable(10.toDp(), focusRequester)
-                if (reverseScrolling) {
-                    Spacer(Modifier.size(gapSize))
+                WithSpacerBefore(size = gapSize) {
+                    TestFocusable(10.toDp(), focusRequester)
                 }
             }
         }

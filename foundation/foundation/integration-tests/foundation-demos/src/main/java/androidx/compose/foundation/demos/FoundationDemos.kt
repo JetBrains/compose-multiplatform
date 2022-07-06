@@ -24,8 +24,6 @@ import androidx.compose.foundation.demos.relocation.BringNestedIntoViewDemo
 import androidx.compose.foundation.demos.relocation.BringRectangleIntoViewDemo
 import androidx.compose.foundation.demos.relocation.RequestRectangleOnScreenDemo
 import androidx.compose.foundation.demos.snapping.SnappingDemos
-import androidx.compose.foundation.samples.BringIntoViewResponderSample
-import androidx.compose.foundation.samples.BringPartOfComposableIntoViewSample
 import androidx.compose.foundation.samples.CanScrollSample
 import androidx.compose.foundation.samples.ControlledScrollableRowSample
 import androidx.compose.foundation.samples.CustomTouchSlopSample
@@ -37,9 +35,7 @@ import androidx.compose.integration.demos.common.DemoCategory
 
 private val RelocationDemos = listOf(
     ComposableDemo("Bring Into View") { BringIntoViewDemo() },
-    /** This gives [BringPartOfComposableIntoViewSample] some explanation text. */
     ComposableDemo("Bring Rectangle Into View") { BringRectangleIntoViewDemo() },
-    /** This gives [BringIntoViewResponderSample] some explanation text. */
     ComposableDemo("Custom responder") { BringIntoViewResponderDemo() },
     ComposableDemo("Request Rectangle On Screen") { RequestRectangleOnScreenDemo() },
     ComposableDemo("Android view interop") { BringIntoViewAndroidInteropDemo() },
