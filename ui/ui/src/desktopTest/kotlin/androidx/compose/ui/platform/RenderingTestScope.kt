@@ -97,6 +97,12 @@ internal class RenderingTestScope(
         onRender.await()
     }
 
+    suspend fun skipRenders() {
+        repeat(1000) {
+            yield()
+        }
+    }
+
     suspend fun hasRenders(): Boolean {
         onRender = CompletableDeferred()
         // repeat multiple times because rendering can be dispatched on the next frames

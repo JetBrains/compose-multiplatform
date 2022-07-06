@@ -262,18 +262,21 @@ internal class SkiaBasedOwner(
             requestDraw?.invoke()
         }
         measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
-
-        // Don't use mainOwner.root.width here, as it strictly coerced by [constraints]
-        contentSize = IntSize(
-            root.children.maxOfOrNull { it.outerCoordinator.measuredWidth } ?: 0,
-            root.children.maxOfOrNull { it.outerCoordinator.measuredHeight } ?: 0,
-        )
+        contentSize = computeContentSize()
     }
 
     override fun measureAndLayout(layoutNode: LayoutNode, constraints: Constraints) {
         measureAndLayoutDelegate.measureAndLayout(layoutNode, constraints)
+        pointerPositionUpdater.needUpdate()
         measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
+        contentSize = computeContentSize()
     }
+
+    // Don't use mainOwner.root.width here, as it strictly coerced by [constraints]
+    private fun computeContentSize() = IntSize(
+        root.children.maxOfOrNull { it.outerCoordinator.measuredWidth } ?: 0,
+        root.children.maxOfOrNull { it.outerCoordinator.measuredHeight } ?: 0,
+    )
 
     override fun forceMeasureTheSubtree(layoutNode: LayoutNode) {
         measureAndLayoutDelegate.forceMeasureTheSubtree(layoutNode)
