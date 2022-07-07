@@ -28,6 +28,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.coroutines.CoroutineContext
+import kotlin.test.assertNotNull
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -279,6 +280,39 @@ class FlowAdapterTest {
 
         rule.runOnIdle {
             assertThat(realValue).isEqualTo("updated")
+        }
+    }
+
+    @Test // Regression test for 232007227
+    fun updatingTheInstanceOfAStateFlow() {
+        class Car(val model: String)
+        class Person(val name: String, val car: MutableStateFlow<Car>)
+
+        val people = mutableListOf<MutableStateFlow<Person?>>(
+            MutableStateFlow(Person("Ford", MutableStateFlow(Car("Model T")))),
+            MutableStateFlow(Person("Musk", MutableStateFlow(Car("Model 3"))))
+        )
+
+        var carValue: Any? = null
+
+        rule.setContent {
+            for (index in (0 until people.size)) {
+                val person = people[index].collectAsState().value
+                if (person != null) {
+                    val car = person.car.collectAsState().value
+                    carValue = car
+                } else {
+                    carValue = null
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            people[0].value = null
+        }
+
+        rule.runOnIdle {
+            assertNotNull(carValue)
         }
     }
 }
