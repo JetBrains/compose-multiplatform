@@ -92,19 +92,23 @@ fun ItemRow(index: Int) {
     }
     Column(Modifier.fillMaxWidth()) {
         Text("Row #${index + 1}", Modifier.padding(horizontal = 8.dp))
-        LazyRow {
-            items(25) { colIdx ->
-                Column(
-                    Modifier
-                        .padding(8.dp)
-                        .size(96.dp, 144.dp)) {
-                    Box(
+        key(index) {
+
+            LazyRow {
+                items(25) { colIdx ->
+                    Column(
                         Modifier
-                            .fillMaxWidth()
-                            .weight(0.75f)
-                            .background(Color(0xFF999999))
-                    )
-                    Text("Item #$colIdx")
+                            .padding(8.dp)
+                            .size(96.dp, 144.dp)
+                    ) {
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .weight(0.75f)
+                                .background(Color(0xFF999999))
+                        )
+                        Text("Item #$colIdx")
+                    }
                 }
             }
         }
@@ -120,8 +124,6 @@ class ComposeItemRow @JvmOverloads constructor(
 
     @Composable
     override fun Content() {
-        key(index) {
-            ItemRow(index)
-        }
+        ItemRow(index)
     }
 }
