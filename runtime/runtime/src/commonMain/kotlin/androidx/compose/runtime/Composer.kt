@@ -1126,8 +1126,9 @@ fun isTraceInProgress(): Boolean = compositionTracer.let { it != null && it.isTr
  */
 @OptIn(InternalComposeTracingApi::class)
 @ComposeCompilerApi
-fun traceEventStart(key: Int, dirty1: Int, dirty2: Int, info: String): Unit =
-    compositionTracer?.traceEventStart(key, dirty1, dirty2, info) ?: Unit
+fun traceEventStart(key: Int, dirty1: Int, dirty2: Int, info: String) {
+    compositionTracer?.traceEventStart(key, dirty1, dirty2, info)
+}
 
 /**
  * Internal tracing API.
@@ -1136,7 +1137,9 @@ fun traceEventStart(key: Int, dirty1: Int, dirty2: Int, info: String): Unit =
  */
 @OptIn(InternalComposeTracingApi::class)
 @ComposeCompilerApi
-fun traceEventEnd(): Unit = compositionTracer?.traceEventEnd() ?: Unit
+fun traceEventEnd() {
+    compositionTracer?.traceEventEnd()
+}
 
 /**
  * A Compose internal function. DO NOT call directly.
