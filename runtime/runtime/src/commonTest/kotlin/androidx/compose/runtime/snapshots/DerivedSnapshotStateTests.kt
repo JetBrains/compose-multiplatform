@@ -201,9 +201,8 @@ class DerivedSnapshotStateTests {
             assertEquals(0, result)
             // 1 for derived, 1 for state
             assertEquals(2, readStates.size)
-            // NOTE: the first calculation will cause two reads of all dependencies: one for the
-            // calculation, and one for the hash calculation, 3 reads total
-            assertEquals(3, readCount)
+            // 1 for derived, 1 for state
+            assertEquals(2, readCount)
             assertEquals(true, readStates.contains(state))
             assertEquals(true, readStates.contains(derived))
         } finally {

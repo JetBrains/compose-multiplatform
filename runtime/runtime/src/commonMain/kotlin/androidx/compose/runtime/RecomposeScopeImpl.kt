@@ -261,8 +261,12 @@ internal class RecomposeScopeImpl(
         if (
             instances.isNotEmpty() &&
             instances.all { instance ->
-                instance is DerivedState<*> &&
-                    trackedDependencies[instance] == instance.currentValue
+                instance is DerivedState<*> && instance.let {
+                    @Suppress("UNCHECKED_CAST")
+                    it as DerivedState<Any?>
+                    val policy = it.policy ?: structuralEqualityPolicy()
+                    policy.equivalent(it.currentValue, trackedDependencies[it])
+                }
             }
         )
             return false
