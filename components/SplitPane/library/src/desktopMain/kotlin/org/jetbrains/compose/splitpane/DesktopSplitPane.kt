@@ -19,10 +19,16 @@ internal actual fun SplitPane(
     isHorizontal: Boolean,
     splitPaneState: SplitPaneState,
     minimalSizesConfiguration: MinimalSizes,
-    first: @Composable () -> Unit,
-    second: @Composable () -> Unit,
+    first: (@Composable () -> Unit)?,
+    second: (@Composable () -> Unit)?,
     splitter: Splitter
 ) {
+    if (first == null || second == null) {
+        first?.let { Box(modifier) { it() } }
+        second?.let { Box(modifier) { it() } }
+        return
+    }
+    
     Layout(
         {
             Box {
