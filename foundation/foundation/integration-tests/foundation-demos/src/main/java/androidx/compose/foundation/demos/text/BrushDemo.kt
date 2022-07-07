@@ -177,21 +177,11 @@ fun MultiParagraphBrush() {
     Text(
         buildAnnotatedString {
             withStyle(ParagraphStyle(textAlign = TextAlign.Right)) {
-                append(
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum" +
-                        " rhoncus est volutpat venenatis. Fusce semper, sapien ut venenatis" +
-                        " pellentesque, lorem dui aliquam sapien, non pharetra diam neque " +
-                        "id mi"
-                )
+                append(loremIpsum(wordCount = 29))
             }
 
             withStyle(ParagraphStyle(textAlign = TextAlign.Left)) {
-                append(
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum" +
-                        " rhoncus est volutpat venenatis. Fusce semper, sapien ut venenatis" +
-                        " pellentesque, lorem dui aliquam sapien, non pharetra diam neque " +
-                        "id mi"
-                )
+                append(loremIpsum(wordCount = 29))
             }
         },
         style = TextStyle(
@@ -217,10 +207,7 @@ fun AnimatedBrush() {
         )
     )
     Text(
-        text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum" +
-            " rhoncus est volutpat venenatis. Fusce semper, sapien ut venenatis" +
-            " pellentesque, lorem dui aliquam sapien, non pharetra diam neque " +
-            "id mi",
+        text = loremIpsum(wordCount = 29),
         style = TextStyle(
             brush = Brush.radialGradient(
                 *RainbowStops.zip(RainbowColors).toTypedArray(),
