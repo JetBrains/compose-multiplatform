@@ -58,7 +58,8 @@ val TextDemos = DemoCategory(
                     DialogInputFieldDemo(onNavigateUp)
                 },
                 ComposableDemo("Inside scrollable") { TextFieldsInScrollableDemo() },
-                ComposableDemo("Cursor configuration") { TextFieldCursorBlinkingDemo() }
+                ComposableDemo("Cursor configuration") { TextFieldCursorBlinkingDemo() },
+                ComposableDemo("Full-screen field") { FullScreenTextFieldDemo() },
             )
         ),
         ComposableDemo("Text Accessibility") { TextAccessibilityDemo() }

@@ -130,10 +130,7 @@ fun DrawTextLongString() {
 
         drawText(
             textMeasurer,
-            text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin fringilla " +
-                "laoreet aliquam. Aliquam ut nisl aliquet, laoreet tellus quis, sagittis enim. " +
-                "Sed sem dolor, tempus blandit purus suscipit, convallis tincidunt purus. Donec " +
-                "mattis placerat arcu sed consectetur. Pellentesque eu turpis lacus.",
+            text = loremIpsum(wordCount = 41),
             topLeft = Offset(padding, padding),
             style = TextStyle(fontSize = fontSize6),
             overflow = TextOverflow.Visible,
@@ -220,7 +217,8 @@ fun DrawTextAndAnimateColor() {
         Canvas(
             Modifier
                 .fillMaxWidth()
-                .height(100.dp)) {
+                .height(100.dp)
+        ) {
             drawRect(brush = Brush.linearGradient(RainbowColors))
             val padding = 16.dp.toPx()
 

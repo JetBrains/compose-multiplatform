@@ -27,9 +27,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-private val LongText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam pellentesque" +
-    " arcu quis diam malesuada pulvinar. In id condimentum metus. Suspendisse potenti. " +
-    "Praesent arcu tortor, ultrices ut vehicula sit amet, accumsan id sem."
+private val LongText = loremIpsum(wordCount = 32)
 
 @Preview
 @Composable
