@@ -443,6 +443,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.State<T> collectAsState(kotlinx.coroutines.flow.StateFlow<? extends T>, optional kotlin.coroutines.CoroutineContext context);
     method @androidx.compose.runtime.Composable public static <T extends R, R> androidx.compose.runtime.State<R> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, R? initial, optional kotlin.coroutines.CoroutineContext context);
     method public static <T> androidx.compose.runtime.State<T> derivedStateOf(kotlin.jvm.functions.Function0<? extends T> calculation);
+    method public static <T> androidx.compose.runtime.State<T> derivedStateOf(androidx.compose.runtime.SnapshotMutationPolicy<T> policy, kotlin.jvm.functions.Function0<? extends T> calculation);
     method public static inline operator <T> T! getValue(androidx.compose.runtime.State<? extends T>, Object? thisObj, kotlin.reflect.KProperty<?> property);
     method public static <T> androidx.compose.runtime.snapshots.SnapshotStateList<T> mutableStateListOf();
     method public static <T> androidx.compose.runtime.snapshots.SnapshotStateList<T> mutableStateListOf(T?... elements);
@@ -468,6 +469,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.State<T> collectAsState(kotlinx.coroutines.flow.StateFlow<? extends T>, optional kotlin.coroutines.CoroutineContext context);
     method @androidx.compose.runtime.Composable public static <T extends R, R> androidx.compose.runtime.State<R> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, R? initial, optional kotlin.coroutines.CoroutineContext context);
     method public static <T> androidx.compose.runtime.State<T> derivedStateOf(kotlin.jvm.functions.Function0<? extends T> calculation);
+    method public static <T> androidx.compose.runtime.State<T> derivedStateOf(androidx.compose.runtime.SnapshotMutationPolicy<T> policy, kotlin.jvm.functions.Function0<? extends T> calculation);
     method public static inline operator <T> T! getValue(androidx.compose.runtime.State<? extends T>, Object? thisObj, kotlin.reflect.KProperty<?> property);
     method public static <T> androidx.compose.runtime.snapshots.SnapshotStateList<T> mutableStateListOf();
     method public static <T> androidx.compose.runtime.snapshots.SnapshotStateList<T> mutableStateListOf(T?... elements);
@@ -493,6 +495,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.State<T> collectAsState(kotlinx.coroutines.flow.StateFlow<? extends T>, optional kotlin.coroutines.CoroutineContext context);
     method @androidx.compose.runtime.Composable public static <T extends R, R> androidx.compose.runtime.State<R> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, R? initial, optional kotlin.coroutines.CoroutineContext context);
     method public static <T> androidx.compose.runtime.State<T> derivedStateOf(kotlin.jvm.functions.Function0<? extends T> calculation);
+    method public static <T> androidx.compose.runtime.State<T> derivedStateOf(androidx.compose.runtime.SnapshotMutationPolicy<T> policy, kotlin.jvm.functions.Function0<? extends T> calculation);
     method public static inline operator <T> T! getValue(androidx.compose.runtime.State<? extends T>, Object? thisObj, kotlin.reflect.KProperty<?> property);
     method public static <T> androidx.compose.runtime.snapshots.SnapshotStateList<T> mutableStateListOf();
     method public static <T> androidx.compose.runtime.snapshots.SnapshotStateList<T> mutableStateListOf(T?... elements);
@@ -518,6 +521,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.State<T> collectAsState(kotlinx.coroutines.flow.StateFlow<? extends T>, optional kotlin.coroutines.CoroutineContext context);
     method @androidx.compose.runtime.Composable public static <T extends R, R> androidx.compose.runtime.State<R> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, R? initial, optional kotlin.coroutines.CoroutineContext context);
     method public static <T> androidx.compose.runtime.State<T> derivedStateOf(kotlin.jvm.functions.Function0<? extends T> calculation);
+    method public static <T> androidx.compose.runtime.State<T> derivedStateOf(androidx.compose.runtime.SnapshotMutationPolicy<T> policy, kotlin.jvm.functions.Function0<? extends T> calculation);
     method public static inline operator <T> T! getValue(androidx.compose.runtime.State<? extends T>, Object? thisObj, kotlin.reflect.KProperty<?> property);
     method public static <T> androidx.compose.runtime.snapshots.SnapshotStateList<T> mutableStateListOf();
     method public static <T> androidx.compose.runtime.snapshots.SnapshotStateList<T> mutableStateListOf(T?... elements);
@@ -543,6 +547,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.State<T> collectAsState(kotlinx.coroutines.flow.StateFlow<? extends T>, optional kotlin.coroutines.CoroutineContext context);
     method @androidx.compose.runtime.Composable public static <T extends R, R> androidx.compose.runtime.State<R> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, R? initial, optional kotlin.coroutines.CoroutineContext context);
     method public static <T> androidx.compose.runtime.State<T> derivedStateOf(kotlin.jvm.functions.Function0<? extends T> calculation);
+    method public static <T> androidx.compose.runtime.State<T> derivedStateOf(androidx.compose.runtime.SnapshotMutationPolicy<T> policy, kotlin.jvm.functions.Function0<? extends T> calculation);
     method public static inline operator <T> T! getValue(androidx.compose.runtime.State<? extends T>, Object? thisObj, kotlin.reflect.KProperty<?> property);
     method public static <T> androidx.compose.runtime.snapshots.SnapshotStateList<T> mutableStateListOf();
     method public static <T> androidx.compose.runtime.snapshots.SnapshotStateList<T> mutableStateListOf(T?... elements);

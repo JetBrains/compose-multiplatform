@@ -17,7 +17,10 @@
 package androidx.compose.runtime.snapshots
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.referentialEqualityPolicy
+import androidx.compose.runtime.structuralEqualityPolicy
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -435,6 +438,108 @@ class SnapshotStateObserverTestsCommon {
             }
         }
         assertEquals(0, changes)
+    }
+
+    @Test
+    fun derivedStateOfInvalidatesObserver() {
+        var changes = 0
+
+        runSimpleTest { stateObserver, state ->
+            val derivedState = derivedStateOf { state.value }
+
+            stateObserver.observeReads("scope", { changes++ }) {
+                // read
+                derivedState.value
+            }
+        }
+        assertEquals(1, changes)
+    }
+
+    @Test
+    fun derivedStateOfReferentialChangeDoesNotInvalidateObserver() {
+        var changes = 0
+
+        runSimpleTest { stateObserver, _ ->
+            val state = mutableStateOf(mutableListOf(42), referentialEqualityPolicy())
+            val derivedState = derivedStateOf { state.value }
+
+            stateObserver.observeReads("scope", { changes++ }) {
+                // read
+                derivedState.value
+            }
+
+            state.value = mutableListOf(42)
+        }
+        assertEquals(0, changes)
+    }
+
+    @Test
+    fun nestedDerivedStateOfInvalidatesObserver() {
+        var changes = 0
+
+        runSimpleTest { stateObserver, state ->
+            val derivedState = derivedStateOf { state.value }
+            val derivedState2 = derivedStateOf { derivedState.value }
+
+            stateObserver.observeReads("scope", { changes++ }) {
+                // read
+                derivedState2.value
+            }
+        }
+        assertEquals(1, changes)
+    }
+
+    @Test
+    fun derivedStateOfWithReferentialMutationPolicy() {
+        var changes = 0
+
+        runSimpleTest { stateObserver, _ ->
+            val state = mutableStateOf(mutableListOf(1), referentialEqualityPolicy())
+            val derivedState = derivedStateOf(referentialEqualityPolicy()) { state.value }
+
+            stateObserver.observeReads("scope", { changes++ }) {
+                // read
+                derivedState.value
+            }
+
+            state.value = mutableListOf(1)
+        }
+        assertEquals(1, changes)
+    }
+
+    @Test
+    fun derivedStateOfWithStructuralMutationPolicy() {
+        var changes = 0
+
+        runSimpleTest { stateObserver, _ ->
+            val state = mutableStateOf(mutableListOf(1), referentialEqualityPolicy())
+            val derivedState = derivedStateOf(structuralEqualityPolicy()) { state.value }
+
+            stateObserver.observeReads("scope", { changes++ }) {
+                // read
+                derivedState.value
+            }
+
+            state.value = mutableListOf(1)
+        }
+        assertEquals(0, changes)
+    }
+
+    @Test
+    fun readingDerivedStateAndDependencyInvalidates() {
+        var changes = 0
+
+        runSimpleTest { stateObserver, state ->
+            val derivedState = derivedStateOf { state.value >= 0 }
+
+            stateObserver.observeReads("scope", { changes++ }) {
+                // read derived state
+                derivedState.value
+                // read dependency
+                state.value
+            }
+        }
+        assertEquals(1, changes)
     }
 
     private fun runSimpleTest(
