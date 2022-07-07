@@ -26,31 +26,44 @@ actual suspend fun loadResourceAnimatedImage(path: String): AnimatedImage {
 
 @Composable
 actual fun AnimatedImage.animate(): ImageBitmap {
-    val transition = rememberInfiniteTransition()
-    val frameIndex by transition.animateValue(
-        initialValue = 0,
-        targetValue = codec.frameCount - 1,
-        Int.VectorConverter,
-        animationSpec = infiniteRepeatable(
-            animation = keyframes {
-                durationMillis = 0
-                for ((index, frame) in codec.framesInfo.withIndex()) {
-                    index at durationMillis
-                    val frameDuration = calcFrameDuration(frame)
-
-                    durationMillis += frameDuration
-                }
+    when (codec.frameCount) {
+        0 -> return ImageBitmap(0, 0) // No frames at all
+        1 -> {
+            // Just one frame, no animation
+            val bitmap = remember(codec) { Bitmap().apply { allocPixels(codec.imageInfo) } }
+            remember(bitmap) {
+                codec.readPixels(bitmap, 0)
             }
-        )
-    )
+            return bitmap.asComposeImageBitmap()
+        }
+        else -> {
+            val transition = rememberInfiniteTransition()
+            val frameIndex by transition.animateValue(
+                initialValue = 0,
+                targetValue = codec.frameCount - 1,
+                Int.VectorConverter,
+                animationSpec = infiniteRepeatable(
+                    animation = keyframes {
+                        durationMillis = 0
+                        for ((index, frame) in codec.framesInfo.withIndex()) {
+                            index at durationMillis
+                            val frameDuration = calcFrameDuration(frame)
 
-    val bitmap = remember(codec) { Bitmap().apply { allocPixels(codec.imageInfo) } }
+                            durationMillis += frameDuration
+                        }
+                    }
+                )
+            )
 
-    remember(bitmap, frameIndex) {
-        codec.readPixels(bitmap, frameIndex)
+            val bitmap = remember(codec) { Bitmap().apply { allocPixels(codec.imageInfo) } }
+
+            remember(bitmap, frameIndex) {
+                codec.readPixels(bitmap, frameIndex)
+            }
+
+            return bitmap.asComposeImageBitmap()
+        }
     }
-
-    return bitmap.asComposeImageBitmap()
 }
 
 private fun calcFrameDuration(frame: AnimationFrameInfo): Int {
