@@ -20,6 +20,7 @@ configurations {
     // artifacts are put into these configurations than when those artifacts are put into their
     // corresponding configuration.
     cacheableApi {
+        canBeConsumed = false // not directly used to satisfy a project dependency
         attributes {
             attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.class, Usage.JAVA_RUNTIME));
             attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.class, Category.LIBRARY));
@@ -29,6 +30,7 @@ configurations {
         }
     }
     cacheableImplementation {
+        canBeConsumed = false // not directly used to satisfy a project dependency
         attributes {
             attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.class, Usage.JAVA_RUNTIME));
             attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.class, Category.LIBRARY));
@@ -38,7 +40,9 @@ configurations {
         }
         extendsFrom(project.configurations.cacheableApi)
     }
-    cacheableRuntimeOnly
+    cacheableRuntimeOnly {
+        canBeConsumed = false // not directly used to satisfy a project dependency
+    }
 }
 
 dependencies {
