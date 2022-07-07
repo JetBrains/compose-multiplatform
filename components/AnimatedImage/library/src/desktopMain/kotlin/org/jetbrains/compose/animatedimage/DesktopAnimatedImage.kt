@@ -27,7 +27,7 @@ actual suspend fun loadResourceAnimatedImage(path: String): AnimatedImage {
 @Composable
 actual fun AnimatedImage.animate(): ImageBitmap {
     when (codec.frameCount) {
-        0 -> return ImageBitmap(0, 0) // No frames at all
+        0 -> return ImageBitmap.Blank // No frames at all
         1 -> {
             // Just one frame, no animation
             val bitmap = remember(codec) { Bitmap().apply { allocPixels(codec.imageInfo) } }
