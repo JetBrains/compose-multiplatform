@@ -48,7 +48,7 @@ internal actual fun SplitPane(
     ) { measurables, constraints ->
         with(minimalSizesConfiguration) {
             val firstMinSizePx = firstPlaceableMinimalSize.value * density
-            val secondMinSizePx = firstPlaceableMinimalSize.value * density
+            val secondMinSizePx = secondPlaceableMinimalSize.value * density
 
             with(splitPaneState) {
                 val constrainedMin = constraints.minByDirection(isHorizontal) + firstMinSizePx
