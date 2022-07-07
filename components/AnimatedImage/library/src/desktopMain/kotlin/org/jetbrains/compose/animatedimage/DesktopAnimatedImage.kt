@@ -10,7 +10,7 @@ import org.jetbrains.skia.Codec
 import java.net.MalformedURLException
 import java.net.URL
 
-private const val DEFAULT_FRAME_DURATION = 50
+private const val DEFAULT_FRAME_DURATION = 100
 
 actual class AnimatedImage(val codec: Codec)
 
@@ -67,14 +67,9 @@ actual fun AnimatedImage.animate(): ImageBitmap {
 }
 
 private fun calcFrameDuration(frame: AnimationFrameInfo): Int {
-    var frameDuration = frame.duration
-
     // If the frame does not contain information about a duration, set a reasonable constant duration
-    if (frameDuration == 0) {
-        frameDuration = DEFAULT_FRAME_DURATION
-    }
-
-    return frameDuration
+    val frameDuration = frame.duration
+    return if (frameDuration == 0) DEFAULT_FRAME_DURATION else frameDuration
 }
 
 /**
