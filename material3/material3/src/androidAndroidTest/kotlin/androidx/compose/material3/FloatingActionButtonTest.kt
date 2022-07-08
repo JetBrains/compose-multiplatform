@@ -420,6 +420,11 @@ class FloatingActionButtonTest {
 
                 assertWithinOnePixel(buttonBounds.center.y, iconBounds.center.y)
                 assertWithinOnePixel(buttonBounds.center.y, textBounds.center.y)
+
+                // Assert expanded fab icon has 16.dp of padding.
+                assertThat(iconBounds.left - buttonBounds.left)
+                    .isEqualTo(16.dp.roundToPx().toFloat())
+
                 val halfPadding = 6.dp.roundToPx().toFloat()
                 assertWithinOnePixel(
                     iconBounds.center.x + iconBounds.width / 2 + halfPadding,

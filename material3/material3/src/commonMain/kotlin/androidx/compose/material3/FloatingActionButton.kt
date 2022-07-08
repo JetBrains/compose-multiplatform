@@ -30,6 +30,7 @@ import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -275,7 +276,7 @@ fun ExtendedFloatingActionButton(
     content: @Composable RowScope.() -> Unit,
 ) {
     FloatingActionButton(
-        modifier = modifier.sizeIn(minWidth = ExtendedFabMinimumWidth),
+        modifier = modifier,
         onClick = onClick,
         interactionSource = interactionSource,
         shape = shape,
@@ -284,7 +285,10 @@ fun ExtendedFloatingActionButton(
         elevation = elevation,
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = ExtendedFabTextPadding),
+            modifier = Modifier
+                .sizeIn(minWidth = ExtendedFabMinimumWidth)
+                .padding(horizontal = ExtendedFabTextPadding),
+            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
             content = content,
         )
@@ -338,9 +342,7 @@ fun ExtendedFloatingActionButton(
     elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
 ) {
     FloatingActionButton(
-        modifier = modifier.sizeIn(
-            minWidth = if (expanded) ExtendedFabMinimumWidth else FabPrimaryTokens.ContainerWidth
-        ),
+        modifier = modifier,
         onClick = onClick,
         interactionSource = interactionSource,
         shape = shape,
@@ -348,12 +350,18 @@ fun ExtendedFloatingActionButton(
         contentColor = contentColor,
         elevation = elevation,
     ) {
-        val startPadding = if (expanded) ExtendedFabPrimaryTokens.IconSize / 2 else 0.dp
+        val startPadding = if (expanded) ExtendedFabStartIconPadding else 0.dp
         val endPadding = if (expanded) ExtendedFabTextPadding else 0.dp
 
         Row(
-            modifier = Modifier.padding(start = startPadding, end = endPadding),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier
+                .sizeIn(
+                    minWidth = if (expanded) ExtendedFabMinimumWidth
+                    else FabPrimaryTokens.ContainerWidth
+                )
+                .padding(start = startPadding, end = endPadding),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = if (expanded) Arrangement.Start else Arrangement.Center
         ) {
             icon()
             AnimatedVisibility(
@@ -362,7 +370,7 @@ fun ExtendedFloatingActionButton(
                 exit = ExtendedFabCollapseAnimation,
             ) {
                 Row {
-                    Spacer(Modifier.width(ExtendedFabIconPadding))
+                    Spacer(Modifier.width(ExtendedFabEndIconPadding))
                     text()
                 }
             }
@@ -578,7 +586,9 @@ private class DefaultFloatingActionButtonElevation(
     }
 }
 
-private val ExtendedFabIconPadding = 12.dp
+private val ExtendedFabStartIconPadding = 16.dp
+
+private val ExtendedFabEndIconPadding = 12.dp
 
 private val ExtendedFabTextPadding = 20.dp
 
