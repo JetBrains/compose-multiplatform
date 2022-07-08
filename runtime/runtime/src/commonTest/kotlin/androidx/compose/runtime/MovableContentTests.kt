@@ -1027,6 +1027,104 @@ class MovableContentTests {
         expectUnused()
     }
 
+    @Test // Regression test for 230830644
+    fun deferredSubcompose_conditional() = compositionTest {
+        var subcompose by mutableStateOf(false)
+        var lastPrivateState: State<Int> = mutableStateOf(0)
+
+        val content = movableContentOf {
+            lastPrivateState = remember { mutableStateOf(0) }
+            Text("Movable content")
+        }
+
+        compose {
+            Text("Main content start")
+            if (!subcompose) {
+                content()
+            }
+            Text("Main content end")
+            if (subcompose) {
+                DeferredSubcompose {
+                    Text("Sub-composed content start")
+                    content()
+                    Text("Sub-composed content end")
+                }
+            }
+        }
+
+        validate {
+            Text("Main content start")
+            if (!subcompose) {
+                Text("Movable content")
+            }
+            Text("Main content end")
+            if (subcompose) {
+                DeferredSubcompose {
+                    Text("Sub-composed content start")
+                    Text("Movable content")
+                    Text("Sub-composed content end")
+                }
+            }
+        }
+
+        val expectedState = lastPrivateState
+        subcompose = true
+        expectChanges()
+        revalidate()
+
+        assertEquals(expectedState, lastPrivateState)
+    }
+
+    @Test // Regression test for 230830644
+    fun deferredSubcompose_conditional_and_invalid() = compositionTest {
+        var subcompose by mutableStateOf(false)
+        var lastPrivateState: State<Int> = mutableStateOf(0)
+        var state by mutableStateOf("one")
+
+        val content = movableContentOf {
+            lastPrivateState = remember { mutableStateOf(0) }
+            Text("Movable content state: $state")
+        }
+
+        compose {
+            Text("Main content start")
+            if (!subcompose) {
+                content()
+            }
+            Text("Main content end")
+            if (subcompose) {
+                DeferredSubcompose {
+                    Text("Sub-composed content start")
+                    content()
+                    Text("Sub-composed content end")
+                }
+            }
+        }
+
+        validate {
+            Text("Main content start")
+            if (!subcompose) {
+                Text("Movable content state: $state")
+            }
+            Text("Main content end")
+            if (subcompose) {
+                DeferredSubcompose {
+                    Text("Sub-composed content start")
+                    Text("Movable content state: $state")
+                    Text("Sub-composed content end")
+                }
+            }
+        }
+
+        val expectedState = lastPrivateState
+        subcompose = true
+        state = "two"
+        expectChanges()
+        revalidate()
+
+        assertEquals(expectedState, lastPrivateState)
+    }
+
     @Test
     fun movableContentParameters_One() = compositionTest {
         val data = mutableStateOf(0)
@@ -1421,8 +1519,26 @@ private fun Subcompose(content: @Composable () -> Unit) {
     }
 }
 
+@Composable
+private fun DeferredSubcompose(content: @Composable () -> Unit) {
+    val host = View().also { it.name = "DeferredSubcompose" }
+    ComposeNode<View, ViewApplier>(factory = { host }, update = { })
+    val parent = rememberCompositionContext()
+    val composition = remember { Composition(ViewApplier(host), parent) }
+    SideEffect {
+        composition.setContent(content)
+    }
+    DisposableEffect(Unit) {
+        onDispose { composition.dispose() }
+    }
+}
+
 private fun MockViewValidator.Subcompose(content: MockViewValidator.() -> Unit) {
     view("SubcomposeHost", content)
+}
+
+private fun MockViewValidator.DeferredSubcompose(content: MockViewValidator.() -> Unit) {
+    view("DeferredSubcompose", content)
 }
 
 class RememberedObject : RememberObserver {
