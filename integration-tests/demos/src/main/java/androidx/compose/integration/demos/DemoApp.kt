@@ -220,6 +220,7 @@ private fun DisplayDemoCategory(category: DemoCategory, onNavigate: (Demo) -> Un
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Suppress("ComposableLambdaParameterNaming", "ComposableLambdaParameterPosition")
 @Composable
 private fun DemoAppBar(
