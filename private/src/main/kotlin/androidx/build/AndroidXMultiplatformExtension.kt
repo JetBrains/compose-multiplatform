@@ -95,23 +95,36 @@ open class AndroidXMultiplatformExtension(val project: Project) {
         } else { null }
     }
 
+    /**
+     * Configures all ios targets supported by AndroidX.
+     */
     @JvmOverloads
-    fun iosArm32(
+    fun ios(
         block: Action<KotlinNativeTarget>? = null
-    ): KotlinNativeTarget? {
-        return if (project.enableMac()) {
-            kotlinExtension.iosArm32().also {
-                block?.execute(it)
-            }
-        } else { null }
+    ): List<KotlinNativeTarget> {
+        return listOfNotNull(
+            iosX64(block),
+            iosArm64(block),
+            iosSimulatorArm64(block)
+        )
     }
-
     @JvmOverloads
     fun iosX64(
         block: Action<KotlinNativeTarget>? = null
     ): KotlinNativeTarget? {
         return if (project.enableMac()) {
             kotlinExtension.iosX64().also {
+                block?.execute(it)
+            }
+        } else { null }
+    }
+
+    @JvmOverloads
+    fun iosSimulatorArm64(
+        block: Action<KotlinNativeTarget>? = null
+    ): KotlinNativeTarget? {
+        return if (project.enableMac()) {
+            kotlinExtension.iosSimulatorArm64().also {
                 block?.execute(it)
             }
         } else { null }
