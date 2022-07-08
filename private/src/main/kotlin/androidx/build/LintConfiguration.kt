@@ -19,6 +19,7 @@ package androidx.build
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import com.android.build.api.dsl.Lint
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
+import com.android.build.gradle.internal.lint.AndroidLintTask
 import java.io.File
 import java.util.Locale
 import org.gradle.api.GradleException
@@ -169,6 +170,17 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
         task.usesService(
             task.project.gradle.sharedServices.registrations.getByName(LINT_SERVICE_NAME).service
         )
+    }
+
+    tasks.withType(AndroidLintTask::class.java).configureEach { task ->
+        // Remove the lint and column attributes from generated lint baseline XML.
+        if (task.name.startsWith("updateLintBaseline")) {
+            task.doLast {
+                task.outputs.files.find { it.name == "lint-baseline.xml" }?.let { file ->
+                    file.writeText(removeLineAndColumnAttributes(file.readText()))
+                }
+            }
+        }
     }
 
     // Lint is configured entirely in finalizeDsl so that individual projects cannot easily
