@@ -32,11 +32,6 @@ package androidx.compose.material3 {
   public final class AppBarKt {
     method @androidx.compose.runtime.Composable public static void BottomAppBar(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> icons, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit>? floatingActionButton, optional long containerColor, optional long contentColor, optional float tonalElevation, optional androidx.compose.foundation.layout.PaddingValues contentPadding);
     method @androidx.compose.runtime.Composable public static void BottomAppBar(optional androidx.compose.ui.Modifier modifier, optional long containerColor, optional long contentColor, optional float tonalElevation, optional androidx.compose.foundation.layout.PaddingValues contentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static void CenterAlignedTopAppBar(kotlin.jvm.functions.Function0<kotlin.Unit> title, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit> navigationIcon, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> actions, optional androidx.compose.material3.TopAppBarColors colors, optional androidx.compose.material3.TopAppBarScrollBehavior? scrollBehavior);
-    method @androidx.compose.runtime.Composable public static void LargeTopAppBar(kotlin.jvm.functions.Function0<kotlin.Unit> title, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit> navigationIcon, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> actions, optional androidx.compose.material3.TopAppBarColors colors, optional androidx.compose.material3.TopAppBarScrollBehavior? scrollBehavior);
-    method @androidx.compose.runtime.Composable public static void MediumTopAppBar(kotlin.jvm.functions.Function0<kotlin.Unit> title, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit> navigationIcon, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> actions, optional androidx.compose.material3.TopAppBarColors colors, optional androidx.compose.material3.TopAppBarScrollBehavior? scrollBehavior);
-    method @androidx.compose.runtime.Composable public static void SmallTopAppBar(kotlin.jvm.functions.Function0<kotlin.Unit> title, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit> navigationIcon, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> actions, optional androidx.compose.material3.TopAppBarColors colors, optional androidx.compose.material3.TopAppBarScrollBehavior? scrollBehavior);
-    method @androidx.compose.runtime.Composable public static androidx.compose.material3.TopAppBarScrollState rememberTopAppBarScrollState(optional float initialOffsetLimit, optional float initialOffset, optional float initialContentOffset);
   }
 
   public final class BadgeDefaults {
@@ -693,10 +688,10 @@ package androidx.compose.material3 {
   }
 
   @androidx.compose.runtime.Stable public interface TopAppBarColors {
-    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> actionIconContentColor(float scrollFraction);
-    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> containerColor(float scrollFraction);
-    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> navigationIconContentColor(float scrollFraction);
-    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> titleContentColor(float scrollFraction);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> actionIconContentColor(float colorTransitionFraction);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> containerColor(float colorTransitionFraction);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> navigationIconContentColor(float colorTransitionFraction);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> titleContentColor(float colorTransitionFraction);
   }
 
   public final class TopAppBarDefaults {
@@ -705,34 +700,6 @@ package androidx.compose.material3 {
     method @androidx.compose.runtime.Composable public androidx.compose.material3.TopAppBarColors mediumTopAppBarColors(optional long containerColor, optional long scrolledContainerColor, optional long navigationIconContentColor, optional long titleContentColor, optional long actionIconContentColor);
     method @androidx.compose.runtime.Composable public androidx.compose.material3.TopAppBarColors smallTopAppBarColors(optional long containerColor, optional long scrolledContainerColor, optional long navigationIconContentColor, optional long titleContentColor, optional long actionIconContentColor);
     field public static final androidx.compose.material3.TopAppBarDefaults INSTANCE;
-  }
-
-  @androidx.compose.runtime.Stable public interface TopAppBarScrollBehavior {
-    method public androidx.compose.ui.input.nestedscroll.NestedScrollConnection getNestedScrollConnection();
-    method public float getScrollFraction();
-    method public androidx.compose.material3.TopAppBarScrollState getState();
-    property public abstract androidx.compose.ui.input.nestedscroll.NestedScrollConnection nestedScrollConnection;
-    property public abstract float scrollFraction;
-    property public abstract androidx.compose.material3.TopAppBarScrollState state;
-  }
-
-  @androidx.compose.runtime.Stable public final class TopAppBarScrollState {
-    ctor public TopAppBarScrollState(float offsetLimit, float offset, float contentOffset);
-    method public float getContentOffset();
-    method public float getOffset();
-    method public float getOffsetLimit();
-    method public void setContentOffset(float);
-    method public void setOffset(float);
-    method public void setOffsetLimit(float);
-    property public final float contentOffset;
-    property public final float offset;
-    property public final float offsetLimit;
-    field public static final androidx.compose.material3.TopAppBarScrollState.Companion Companion;
-  }
-
-  public static final class TopAppBarScrollState.Companion {
-    method public androidx.compose.runtime.saveable.Saver<androidx.compose.material3.TopAppBarScrollState,?> getSaver();
-    property public final androidx.compose.runtime.saveable.Saver<androidx.compose.material3.TopAppBarScrollState,?> Saver;
   }
 
   public final class TouchTargetKt {
