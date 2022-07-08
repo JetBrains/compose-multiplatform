@@ -631,7 +631,7 @@ private class ContentInViewModifier(
         // soon be _more_ visible, so don't scroll.
         if (!containerShrunk) return
 
-        val focusedChild = focusedChild ?: return
+        val focusedChild = focusedChild?.takeIf { it.isAttached } ?: return
         val focusedBounds = coordinates.localBoundingBoxOf(focusedChild, clipBounds = false)
 
         // In order to check if we need to scroll to bring the focused child into view, it's not
