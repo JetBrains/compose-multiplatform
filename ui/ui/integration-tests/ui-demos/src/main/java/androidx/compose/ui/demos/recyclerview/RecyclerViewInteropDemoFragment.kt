@@ -28,12 +28,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -66,6 +66,8 @@ abstract class AbstractInteropDemoFragment(val interopOn: Boolean) :
     }
 
     inner class MainAdapter : RecyclerView.Adapter<MainAdapter.ViewHolder>() {
+        private val rowStates = mutableMapOf<Int, LazyListState>()
+
         inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val itemRow: ComposeItemRow = itemView.findViewById(R.id.itemRow)
         }
@@ -76,7 +78,9 @@ abstract class AbstractInteropDemoFragment(val interopOn: Boolean) :
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val state = rowStates.getOrPut(position) { LazyListState() }
             holder.itemRow.index = position
+            holder.itemRow.rowState = state
         }
 
         override fun getItemCount(): Int = 50
@@ -84,7 +88,7 @@ abstract class AbstractInteropDemoFragment(val interopOn: Boolean) :
 }
 
 @Composable
-fun ItemRow(index: Int) {
+fun ItemRow(index: Int, state: LazyListState) {
     DisposableEffect(Unit) {
         println("ItemRow $index composed")
 
@@ -92,23 +96,21 @@ fun ItemRow(index: Int) {
     }
     Column(Modifier.fillMaxWidth()) {
         Text("Row #${index + 1}", Modifier.padding(horizontal = 8.dp))
-        key(index) {
 
-            LazyRow {
-                items(25) { colIdx ->
-                    Column(
+        LazyRow(state = state) {
+            items(25) { colIdx ->
+                Column(
+                    Modifier
+                        .padding(8.dp)
+                        .size(96.dp, 144.dp)
+                ) {
+                    Box(
                         Modifier
-                            .padding(8.dp)
-                            .size(96.dp, 144.dp)
-                    ) {
-                        Box(
-                            Modifier
-                                .fillMaxWidth()
-                                .weight(0.75f)
-                                .background(Color(0xFF999999))
-                        )
-                        Text("Item #$colIdx")
-                    }
+                            .fillMaxWidth()
+                            .weight(0.75f)
+                            .background(Color(0xFF999999))
+                    )
+                    Text("Item #$colIdx")
                 }
             }
         }
@@ -121,9 +123,10 @@ class ComposeItemRow @JvmOverloads constructor(
     defStyle: Int = 0
 ) : AbstractComposeView(context, attrs, defStyle) {
     var index by mutableStateOf(0)
+    var rowState: LazyListState? by mutableStateOf(null)
 
     @Composable
     override fun Content() {
-        ItemRow(index)
+        ItemRow(index, rowState!!)
     }
 }
