@@ -19,6 +19,7 @@ package androidx.compose.ui.window
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.ui.createSkiaLayer
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.native.ComposeLayer
 
 import platform.AppKit.*
@@ -32,6 +33,7 @@ internal actual class ComposeWindow actual constructor() {
         layer = createSkiaLayer(),
         showSoftwareKeyboard = {},
         hideSoftwareKeyboard = {},
+        getTopLeftOffset = { Offset.Zero },
     )
 
     val title: String

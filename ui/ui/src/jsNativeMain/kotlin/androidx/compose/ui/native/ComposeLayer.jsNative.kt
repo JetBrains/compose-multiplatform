@@ -21,6 +21,8 @@ import androidx.compose.ui.ComposeScene
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.focus.focusRect
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.input.pointer.toCompose
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.platform.Platform
@@ -42,6 +44,7 @@ internal class ComposeLayer(
     internal val layer: SkiaLayer,
     showSoftwareKeyboard: () -> Unit,
     hideSoftwareKeyboard: () -> Unit,
+    private val getTopLeftOffset: () -> Offset,
 ) {
     private var isDisposed = false
     private val inputService = SkiaTextInputService(
@@ -81,7 +84,7 @@ internal class ComposeLayer(
                     scene.sendPointerEvent(
                         eventType = event.kind.toCompose(),
                         // TODO: account for the proper density.
-                        position = Offset(event.x.toFloat(), event.y.toFloat()), // * density,
+                        position = Offset(event.x.toFloat(), event.y.toFloat()) - getTopLeftOffset(), // * density,
                         timeMillis = currentMillis(),
                         type = PointerType.Touch,
                         nativeEvent = event
@@ -96,7 +99,7 @@ internal class ComposeLayer(
             scene.sendPointerEvent(
                 eventType = event.kind.toCompose(),
                 // TODO: account for the proper density.
-                position = Offset(event.x.toFloat(), event.y.toFloat()), // * density,
+                position = Offset(event.x.toFloat(), event.y.toFloat()) - getTopLeftOffset(), // * density,
                 timeMillis = currentMillis(),
                 type = PointerType.Mouse,
                 nativeEvent = event
@@ -125,8 +128,12 @@ internal class ComposeLayer(
         isDisposed = true
     }
 
-    internal fun setSize(width: Int, height: Int) {
+    fun setSize(width: Int, height: Int) {
         scene.constraints = Constraints(maxWidth = width, maxHeight = height)
+    }
+
+    fun getActiveFocusRect():Rect? {
+        return scene.mainOwner?.focusManager?.getActiveFocusModifier()?.focusRect()
     }
 
     fun setContent(
