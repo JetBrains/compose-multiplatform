@@ -220,6 +220,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         assertTrue(info.isHeading)
         assertTrue(info.isClickable)
         assertTrue(info.isVisibleToUser)
+        assertTrue(info.isImportantForAccessibility)
     }
 
     @Test
