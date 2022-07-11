@@ -31,6 +31,7 @@ import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.DefaultCameraDistance
 import androidx.compose.ui.graphics.GraphicsLayerScope
+import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.ReusableGraphicsLayerScope
 import androidx.compose.ui.graphics.TransformOrigin
@@ -717,6 +718,43 @@ internal abstract class LayoutNodeWrapper(
         return ancestorToLocal(commonAncestor, position)
     }
 
+    override fun transformFrom(sourceCoordinates: LayoutCoordinates, matrix: Matrix) {
+        val layoutNodeWrapper = sourceCoordinates.toWrapper()
+        val commonAncestor = findCommonAncestor(layoutNodeWrapper)
+
+        matrix.reset()
+        // Transform from the source to the common ancestor
+        layoutNodeWrapper.transformToAncestor(commonAncestor, matrix)
+        // Transform from the common ancestor to this
+        transformFromAncestor(commonAncestor, matrix)
+    }
+
+    private fun transformToAncestor(ancestor: LayoutNodeWrapper, matrix: Matrix) {
+        var wrapper = this
+        while (wrapper != ancestor) {
+            wrapper.layer?.transform(matrix)
+            val position = wrapper.position
+            if (position != IntOffset.Zero) {
+                tmpMatrix.reset()
+                tmpMatrix.translate(position.x.toFloat(), position.y.toFloat())
+                matrix.timesAssign(tmpMatrix)
+            }
+            wrapper = wrapper.wrappedBy!!
+        }
+    }
+
+    private fun transformFromAncestor(ancestor: LayoutNodeWrapper, matrix: Matrix) {
+        if (ancestor != this) {
+            wrappedBy!!.transformFromAncestor(ancestor, matrix)
+            if (position != IntOffset.Zero) {
+                tmpMatrix.reset()
+                tmpMatrix.translate(-position.x.toFloat(), -position.y.toFloat())
+                matrix.timesAssign(tmpMatrix)
+            }
+            layer?.inverseTransform(matrix)
+        }
+    }
+
     override fun localBoundingBoxOf(
         sourceCoordinates: LayoutCoordinates,
         clipBounds: Boolean
@@ -1138,6 +1176,10 @@ internal abstract class LayoutNodeWrapper(
         }
         private val graphicsLayerScope = ReusableGraphicsLayerScope()
         private val tmpLayerPositionalProperties = LayerPositionalProperties()
+
+        // Used for matrix calculations. It should not be used for anything that could lead to
+        // reentrancy.
+        private val tmpMatrix = Matrix()
 
         /**
          * Hit testing specifics for pointer input.

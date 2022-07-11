@@ -21,6 +21,7 @@ package androidx.compose.ui.layout
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.node.LayoutNodeWrapper
 import androidx.compose.ui.node.LookaheadDelegate
 import androidx.compose.ui.unit.IntSize
@@ -106,6 +107,10 @@ internal class LookaheadLayoutCoordinatesImpl(val lookaheadDelegate: LookaheadDe
         sourceCoordinates: LayoutCoordinates,
         clipBounds: Boolean
     ): Rect = wrapper.localBoundingBoxOf(sourceCoordinates, clipBounds)
+
+    override fun transformFrom(sourceCoordinates: LayoutCoordinates, matrix: Matrix) {
+        wrapper.transformFrom(sourceCoordinates, matrix)
+    }
 
     override fun get(alignmentLine: AlignmentLine): Int = wrapper.get(alignmentLine)
 }
