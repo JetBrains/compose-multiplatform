@@ -36,14 +36,14 @@ class RoundRectTest {
             bottomLeft = CornerRadius.Zero
         )
 
-        assertFalse(roundRect.contains(Offset(1.0f, 1.0f)))
-        assertFalse(roundRect.contains(Offset(1.1f, 1.1f)))
-        assertTrue(roundRect.contains(Offset(1.15f, 1.15f)))
-        assertFalse(roundRect.contains(Offset(2.0f, 1.0f)))
-        assertFalse(roundRect.contains(Offset(1.93f, 1.07f)))
-        assertFalse(roundRect.contains(Offset(1.97f, 1.7f)))
-        assertTrue(roundRect.contains(Offset(1.7f, 1.97f)))
-        assertTrue(roundRect.contains(Offset(1.0f, 1.99f)))
+        assertFalse(Offset(1.0f, 1.0f) in roundRect)
+        assertFalse(Offset(1.1f, 1.1f) in roundRect)
+        assertTrue(Offset(1.15f, 1.15f) in roundRect)
+        assertFalse(Offset(2.0f, 1.0f) in roundRect)
+        assertFalse(Offset(1.93f, 1.07f) in roundRect)
+        assertFalse(Offset(1.97f, 1.7f) in roundRect)
+        assertTrue(Offset(1.7f, 1.97f) in roundRect)
+        assertTrue(Offset(1.0f, 1.99f) in roundRect)
     }
 
     @Test
@@ -56,14 +56,14 @@ class RoundRectTest {
             bottomLeft = CornerRadius.Zero
         )
 
-        assertFalse(roundRect.contains(Offset(1.0f, 1.0f)))
-        assertFalse(roundRect.contains(Offset(1.1f, 1.1f)))
-        assertTrue(roundRect.contains(Offset(1.15f, 1.15f)))
-        assertFalse(roundRect.contains(Offset(2.0f, 1.0f)))
-        assertFalse(roundRect.contains(Offset(1.93f, 1.07f)))
-        assertFalse(roundRect.contains(Offset(1.97f, 1.7f)))
-        assertTrue(roundRect.contains(Offset(1.7f, 1.97f)))
-        assertTrue(roundRect.contains(Offset(1.0f, 1.99f)))
+        assertFalse(Offset(1.0f, 1.0f) in roundRect)
+        assertFalse(Offset(1.1f, 1.1f) in roundRect)
+        assertTrue(Offset(1.15f, 1.15f) in roundRect)
+        assertFalse(Offset(2.0f, 1.0f) in roundRect)
+        assertFalse(Offset(1.93f, 1.07f) in roundRect)
+        assertFalse(Offset(1.97f, 1.7f) in roundRect)
+        assertTrue(Offset(1.7f, 1.97f) in roundRect)
+        assertTrue(Offset(1.0f, 1.99f) in roundRect)
     }
 
     @Test
