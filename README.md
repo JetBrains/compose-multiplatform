@@ -62,4 +62,4 @@ Preview functionality (check your application UI without building/running it) fo
        
 ## Getting latest version of Compose Multiplatform ##
 
-See https://github.com/JetBrains/compose-jb/tags for the latest build number.
+See https://github.com/JetBrains/compose-jb/releases/latest for the latest stable release or https://github.com/JetBrains/compose-jb/releases for all stable and dev releases.
