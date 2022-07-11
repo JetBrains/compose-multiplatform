@@ -48,17 +48,20 @@ import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlin.math.roundToLong
 import kotlin.system.measureNanoTime
 import kotlinx.coroutines.flow.filterNotNull
@@ -76,6 +79,10 @@ fun DrawTextDemo() {
         item {
             TagLine(tag = "Draw text long string")
             DrawTextLongString()
+        }
+        item {
+            TagLine(tag = "Draw text center in a circle")
+            DrawTextCenter()
         }
         item {
             TagLine(tag = "Draw text AnnotatedString")
@@ -136,6 +143,77 @@ fun DrawTextLongString() {
             overflow = TextOverflow.Visible,
             size = IntSize((size.width - 2 * padding).toInt(), (size.height - 2 * padding).toInt())
         )
+    }
+}
+
+@Suppress("DEPRECATION")
+@Composable
+fun DrawTextCenter() {
+    val textMeasurer = rememberTextMeasurer()
+    var includeFontPadding by remember { mutableStateOf(true) }
+    var drawLines by remember { mutableStateOf(true) }
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Checkbox(checked = includeFontPadding, onCheckedChange = { includeFontPadding = it })
+        Text(text = "Include font padding")
+    }
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Checkbox(checked = drawLines, onCheckedChange = { drawLines = it })
+        Text(text = "Draw alignment lines")
+    }
+
+    Canvas(
+        Modifier
+            .fillMaxWidth()
+            .height(200.dp)
+    ) {
+        drawRect(color = Color.Gray)
+        val radius = 80.dp
+
+        drawCircle(Color.Red, radius = radius.toPx())
+
+        val textLayoutResult = textMeasurer.measure(
+            AnnotatedString("Hello, World!"),
+            style = TextStyle(
+                color = Color.White,
+                fontSize = 24.sp,
+                textAlign = TextAlign.Center,
+                platformStyle = PlatformTextStyle(includeFontPadding = includeFontPadding)
+            ),
+            size = IntSize((radius * 2).roundToPx(), (radius * 2).roundToPx())
+        )
+
+        drawText(
+            textLayoutResult,
+            topLeft = center - Offset(
+                textLayoutResult.size.width / 2f,
+                textLayoutResult.size.height / 2f
+            )
+        )
+
+        if (drawLines) {
+            drawLine(
+                Color.Black,
+                start = Offset(0f, center.y - textLayoutResult.size.height / 2f),
+                end = Offset(size.width, center.y - textLayoutResult.size.height / 2f),
+                strokeWidth = 1.dp.toPx()
+            )
+
+            drawLine(
+                Color.Black,
+                start = Offset(0f, center.y + textLayoutResult.size.height / 2f),
+                end = Offset(size.width, center.y + textLayoutResult.size.height / 2f),
+                strokeWidth = 1.dp.toPx()
+            )
+
+            drawLine(
+                Color.Black,
+                start = Offset(0f, center.y),
+                end = Offset(size.width, center.y),
+                strokeWidth = 1.dp.toPx()
+            )
+        }
     }
 }
 
