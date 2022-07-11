@@ -18,6 +18,10 @@ package androidx.compose.runtime
 
 import androidx.compose.runtime.internal.ThreadMap
 import androidx.compose.runtime.internal.emptyThreadMap
+import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.runtime.snapshots.SnapshotContextElement
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.ThreadContextElement
 
 internal actual typealias AtomicReference<V> = java.util.concurrent.atomic.AtomicReference<V>
 
@@ -91,3 +95,22 @@ internal actual class AtomicInt actual constructor(value: Int) {
 }
 
 internal actual fun ensureMutable(it: Any) { /* NOTHING */ }
+
+/**
+ * Implementation of [SnapshotContextElement] that enters a single given snapshot when updating
+ * the thread context of a resumed coroutine.
+ */
+@ExperimentalComposeApi
+internal actual class SnapshotContextElementImpl actual constructor(
+    private val snapshot: Snapshot
+) : SnapshotContextElement, ThreadContextElement<Snapshot?> {
+    override val key: CoroutineContext.Key<*>
+        get() = SnapshotContextElement
+
+    override fun updateThreadContext(context: CoroutineContext): Snapshot? =
+        snapshot.unsafeEnter()
+
+    override fun restoreThreadContext(context: CoroutineContext, oldState: Snapshot?) {
+        snapshot.unsafeLeave(oldState)
+    }
+}
