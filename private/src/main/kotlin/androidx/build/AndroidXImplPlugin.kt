@@ -51,7 +51,6 @@ import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.TestExtension
 import com.android.build.gradle.TestPlugin
 import com.android.build.gradle.TestedExtension
-import com.android.build.gradle.internal.lint.AndroidLintTask
 import com.android.build.gradle.internal.tasks.AnalyticsRecordingTask
 import com.android.build.gradle.internal.tasks.ListingFileRedirectTask
 import org.gradle.api.GradleException
@@ -380,17 +379,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                         "top-level source directory for libraries, use \"java\" instead: " +
                         mainKotlinSrcDir.path
                 )
-            }
-        }
-
-        // Remove the lint and column attributes from generated lint baseline XML.
-        project.tasks.withType(AndroidLintTask::class.java).configureEach { task ->
-            if (task.name.startsWith("updateLintBaseline")) {
-                task.doLast {
-                    task.outputs.files.find { it.name == "lint-baseline.xml" }?.let { file ->
-                        file.writeText(removeLineAndColumnAttributes(file.readText()))
-                    }
-                }
             }
         }
 
