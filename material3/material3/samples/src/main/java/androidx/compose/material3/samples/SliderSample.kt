@@ -27,6 +27,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 
 @Sampled
 @Composable
@@ -34,7 +37,10 @@ fun SliderSample() {
     var sliderPosition by remember { mutableStateOf(0f) }
     Column {
         Text(text = sliderPosition.toString())
-        Slider(value = sliderPosition, onValueChange = { sliderPosition = it })
+        Slider(
+            modifier = Modifier.semantics { contentDescription = "Localized Description" },
+            value = sliderPosition,
+            onValueChange = { sliderPosition = it })
     }
 }
 
@@ -45,6 +51,7 @@ fun StepsSliderSample() {
     Column {
         Text(text = sliderPosition.toString())
         Slider(
+            modifier = Modifier.semantics { contentDescription = "Localized Description" },
             value = sliderPosition,
             onValueChange = { sliderPosition = it },
             valueRange = 0f..100f,
@@ -65,6 +72,7 @@ fun RangeSliderSample() {
     Column {
         Text(text = sliderPosition.toString())
         RangeSlider(
+            modifier = Modifier.semantics { contentDescription = "Localized Description" },
             value = sliderPosition,
             onValueChange = { sliderPosition = it },
             valueRange = 0f..100f,
@@ -84,6 +92,7 @@ fun StepRangeSliderSample() {
     Column {
         Text(text = sliderPosition.toString())
         RangeSlider(
+            modifier = Modifier.semantics { contentDescription = "Localized Description" },
             steps = 5,
             value = sliderPosition,
             onValueChange = { sliderPosition = it },
