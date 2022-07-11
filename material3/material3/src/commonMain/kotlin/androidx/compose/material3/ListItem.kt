@@ -358,6 +358,7 @@ private fun trailingContent(
 /**
  * Contains the default values used by list items.
  */
+@ExperimentalMaterial3Api
 object ListItemDefaults {
     /** The default shape of a list item */
     val Shape: Shape @Composable get() = ListTokens.ListItemContainerShape.toShape()
@@ -422,6 +423,7 @@ object ListItemDefaults {
  * - See [ListItemDefaults.colors] for the default colors used in a [ListItem].
  */
 @Stable
+@ExperimentalMaterial3Api
 interface ListItemColors {
 
     /** The container color of this [ListItem] based on enabled state */
@@ -450,6 +452,7 @@ interface ListItemColors {
 }
 
 /** Default [ListItemColors] implementation. */
+@ExperimentalMaterial3Api
 @Immutable
 private class DefaultListItemColors(
     private val containerColor: Color,
