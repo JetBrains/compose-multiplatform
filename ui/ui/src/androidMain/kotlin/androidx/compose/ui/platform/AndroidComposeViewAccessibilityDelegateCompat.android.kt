@@ -431,6 +431,12 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 
         info.packageName = view.context.packageName
 
+        // This property exists to distinguish semantically meaningful nodes from purely structural
+        // or decorative UI elements. In Compose, LayoutNodes without semantics are simply omitted
+        // from the AccessibilityNodeInfo tree. Therefore, every AccessibilityNodeInfo qualifies as
+        // "important".
+        info.isImportantForAccessibility = true
+
         semanticsNode.replacedChildrenSortedByBounds.fastForEach { child ->
             if (currentSemanticsNodes.contains(child.id)) {
                 val holder = view.androidViewsHandler.layoutNodeToHolder[child.layoutNode]
