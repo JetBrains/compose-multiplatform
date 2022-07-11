@@ -62,6 +62,19 @@ open class AndroidXMultiplatformExtension(val project: Project) {
         } else { null }
     }
 
+    /**
+     * Configures all mac targets supported by AndroidX.
+     */
+    @JvmOverloads
+    fun mac(
+        block: Action<KotlinNativeTarget>? = null
+    ): List<KotlinNativeTarget> {
+        return listOfNotNull(
+            macosX64(block),
+            macosArm64(block)
+        )
+    }
+
     @JvmOverloads
     fun macosX64(
         block: Action<KotlinNativeTarget>? = null
@@ -128,6 +141,15 @@ open class AndroidXMultiplatformExtension(val project: Project) {
                 block?.execute(it)
             }
         } else { null }
+    }
+
+    @JvmOverloads
+    fun linux(
+        block: Action<KotlinNativeTarget>? = null
+    ): List<KotlinNativeTarget> {
+        return listOfNotNull(
+            linuxX64(block),
+        )
     }
 
     @JvmOverloads
