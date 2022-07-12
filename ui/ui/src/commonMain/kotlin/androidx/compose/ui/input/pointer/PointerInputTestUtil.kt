@@ -16,12 +16,14 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
 
 // TODO(shepshapard): Document.
 
+@OptIn(ExperimentalComposeUiApi::class)
 internal fun down(
     id: Long,
     durationMillis: Long = 0L,
@@ -33,12 +35,14 @@ internal fun down(
         durationMillis,
         Offset(x, y),
         true,
+        pressure = 1f,
         durationMillis,
         Offset(x, y),
         false,
         isInitiallyConsumed = false
     )
 
+@OptIn(ExperimentalComposeUiApi::class)
 internal fun PointerInputChange.moveTo(durationMillis: Long, x: Float = 0f, y: Float = 0f) =
     PointerInputChange(
         id = this.id,
@@ -47,10 +51,12 @@ internal fun PointerInputChange.moveTo(durationMillis: Long, x: Float = 0f, y: F
         previousPosition = position,
         uptimeMillis = durationMillis,
         pressed = true,
+        pressure = 1f,
         position = Offset(x, y),
         isInitiallyConsumed = false
     )
 
+@OptIn(ExperimentalComposeUiApi::class)
 internal fun PointerInputChange.moveBy(durationMillis: Long, dx: Float = 0f, dy: Float = 0f) =
     PointerInputChange(
         id = this.id,
@@ -59,10 +65,12 @@ internal fun PointerInputChange.moveBy(durationMillis: Long, dx: Float = 0f, dy:
         previousPosition = position,
         uptimeMillis = uptimeMillis + durationMillis,
         pressed = true,
+        pressure = 1f,
         position = Offset(position.x + dx, position.y + dy),
         isInitiallyConsumed = false
     )
 
+@OptIn(ExperimentalComposeUiApi::class)
 internal fun PointerInputChange.up(durationMillis: Long) =
     PointerInputChange(
         id = this.id,
@@ -71,6 +79,7 @@ internal fun PointerInputChange.up(durationMillis: Long) =
         previousPosition = position,
         uptimeMillis = durationMillis,
         pressed = false,
+        pressure = 1f,
         position = position,
         isInitiallyConsumed = false
     )

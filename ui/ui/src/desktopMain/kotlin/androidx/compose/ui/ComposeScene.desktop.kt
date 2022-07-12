@@ -68,6 +68,7 @@ internal actual fun pointerInputEvent(
                 position,
                 position,
                 isMousePressed,
+                pressure = 1.0f,
                 type,
                 scrollDelta = scrollDelta
             )
