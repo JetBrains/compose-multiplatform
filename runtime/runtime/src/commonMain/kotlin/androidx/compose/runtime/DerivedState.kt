@@ -18,6 +18,7 @@
 @file:JvmMultifileClass
 package androidx.compose.runtime
 
+import androidx.compose.runtime.collection.IdentityArrayMap
 import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentList
 import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentListOf
 import androidx.compose.runtime.snapshots.Snapshot
@@ -50,7 +51,7 @@ internal interface DerivedState<T> : State<T> {
      * The [dependencies] list can be used to determine when a [StateObject] appears in the apply
      * observer set, if the state could affect value of this derived state.
      */
-    val dependencies: Set<StateObject>
+    val dependencies: Array<Any?>
 
     /**
      * Mutation policy that controls how changes are handled after state dependencies update.
@@ -77,7 +78,7 @@ private class DerivedSnapshotState<T>(
             val Unset = Any()
         }
 
-        var dependencies: HashMap<StateObject, Int>? = null
+        var dependencies: IdentityArrayMap<StateObject, Int>? = null
         var result: Any? = Unset
         var resultHash: Int = 0
 
@@ -99,9 +100,9 @@ private class DerivedSnapshotState<T>(
             val dependencies = sync { dependencies }
             if (dependencies != null) {
                 notifyObservers(derivedState) {
-                    for ((stateObject, readLevel) in dependencies.entries) {
+                    dependencies.forEach { stateObject, readLevel ->
                         if (readLevel != 1) {
-                            continue
+                            return@forEach
                         }
 
                         if (stateObject is DerivedSnapshotState<*>) {
@@ -140,9 +141,9 @@ private class DerivedSnapshotState<T>(
             // for correct invalidation later
             if (forceDependencyReads) {
                 notifyObservers(this) {
-                    val dependencies = readable.dependencies ?: emptyMap()
+                    val dependencies = readable.dependencies
                     val invalidationNestedLevel = calculationBlockNestedLevel.get() ?: 0
-                    for ((dependency, nestedLevel) in dependencies) {
+                    dependencies?.forEach { dependency, nestedLevel ->
                         calculationBlockNestedLevel.set(nestedLevel + invalidationNestedLevel)
                         snapshot.readObserver?.invoke(dependency)
                     }
@@ -153,7 +154,7 @@ private class DerivedSnapshotState<T>(
         }
         val nestedCalculationLevel = calculationBlockNestedLevel.get() ?: 0
 
-        val newDependencies = HashMap<StateObject, Int>()
+        val newDependencies = IdentityArrayMap<StateObject, Int>()
         val result = notifyObservers(this) {
             calculationBlockNestedLevel.set(nestedCalculationLevel + 1)
 
@@ -218,18 +219,23 @@ private class DerivedSnapshotState<T>(
             // value is used instead which doesn't notify. This allow the read observer to read the
             // value and only update the cache once.
             Snapshot.current.readObserver?.invoke(this)
-            return currentValue
+            return first.withCurrent {
+                @Suppress("UNCHECKED_CAST")
+                currentRecord(it, Snapshot.current, true, calculation).result as T
+            }
         }
 
     override val currentValue: T
         get() = first.withCurrent {
             @Suppress("UNCHECKED_CAST")
-            currentRecord(it, Snapshot.current, true, calculation).result as T
+            currentRecord(it, Snapshot.current, false, calculation).result as T
         }
 
-    override val dependencies: Set<StateObject>
+    override val dependencies: Array<Any?>
         get() = first.withCurrent {
-            currentRecord(it, Snapshot.current, false, calculation).dependencies?.keys ?: emptySet()
+            val record = currentRecord(it, Snapshot.current, false, calculation)
+            @Suppress("UNCHECKED_CAST")
+            record.dependencies?.keys ?: emptyArray()
         }
 
     override fun toString(): String = first.withCurrent {
