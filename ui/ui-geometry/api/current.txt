@@ -32,7 +32,7 @@ package androidx.compose.ui.geometry {
 
   public final class MutableRect {
     ctor public MutableRect(float left, float top, float right, float bottom);
-    method public boolean contains(long offset);
+    method public operator boolean contains(long offset);
     method public float getBottom();
     method public inline float getHeight();
     method public float getLeft();
@@ -105,7 +105,7 @@ package androidx.compose.ui.geometry {
     method public float component2();
     method public float component3();
     method public float component4();
-    method public boolean contains(long offset);
+    method public operator boolean contains(long offset);
     method public androidx.compose.ui.geometry.Rect copy(float left, float top, float right, float bottom);
     method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect deflate(float delta);
     method public float getBottom();
@@ -180,7 +180,7 @@ package androidx.compose.ui.geometry {
     method public long component6-kKHJgLs();
     method public long component7-kKHJgLs();
     method public long component8-kKHJgLs();
-    method public boolean contains(long point);
+    method public operator boolean contains(long point);
     method public androidx.compose.ui.geometry.RoundRect copy-MDFrsts(float left, float top, float right, float bottom, long topLeftCornerRadius, long topRightCornerRadius, long bottomRightCornerRadius, long bottomLeftCornerRadius);
     method public float getBottom();
     method public long getBottomLeftCornerRadius();

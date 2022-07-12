@@ -244,7 +244,7 @@ data class Rect(
      * Rectangles include their top and left edges but exclude their bottom and
      * right edges.
      */
-    fun contains(offset: Offset): Boolean {
+    operator fun contains(offset: Offset): Boolean {
         return offset.x >= left && offset.x < right && offset.y >= top && offset.y < bottom
     }
 
