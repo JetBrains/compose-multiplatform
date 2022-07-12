@@ -38,7 +38,7 @@ import androidx.annotation.DoNotInline
 import androidx.annotation.IntRange
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
-import androidx.annotation.VisibleForTesting.PRIVATE
+import androidx.annotation.VisibleForTesting.Companion.PRIVATE
 import androidx.collection.ArraySet
 import androidx.collection.SparseArrayCompat
 import androidx.compose.ui.ExperimentalComposeUiApi
