@@ -22,6 +22,7 @@ import android.os.Looper
 import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotStateObserver
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -46,7 +47,7 @@ class SnapshotStateObserverBenchmark : ComposeBenchmarkBase() {
     private val doNothing: (Any) -> Unit = { _ -> }
 
     private lateinit var stateObserver: SnapshotStateObserver
-    private val models: List<MutableState<Any>> = List(StateCount) { mutableStateOf(0) }
+    private val models: List<MutableState<Int>> = List(StateCount) { mutableStateOf(0) }
     private val nodes: List<Any> = List(ScopeCount) { it }
     private lateinit var random: Random
 
@@ -110,6 +111,40 @@ class SnapshotStateObserverBenchmark : ComposeBenchmarkBase() {
                     list.forEach { node ->
                         observeForNode(node)
                     }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun derivedStateObservation() {
+        runOnUiThread {
+            val node = Any()
+            val states = models.take(3)
+            val derivedState = derivedStateOf {
+                states[0].value + states[1].value + states[2].value
+            }
+
+            stateObserver.observeReads(node, doNothing) {
+                // read derived state a few times
+                repeat(10) {
+                    derivedState.value
+                }
+            }
+
+            benchmarkRule.measureRepeated {
+                stateObserver.observeReads(node, doNothing) {
+                    // read derived state a few times
+                    repeat(10) {
+                        derivedState.value
+                    }
+                }
+
+                runWithTimingDisabled {
+                    states.forEach {
+                        it.value += 1
+                    }
+                    Snapshot.sendApplyNotifications()
                 }
             }
         }
