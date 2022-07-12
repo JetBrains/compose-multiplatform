@@ -69,10 +69,21 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import java.lang.reflect.Method
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.DecayAnimation
+import androidx.compose.animation.core.InfiniteTransition
+import androidx.compose.animation.core.TargetBasedAnimation
+import kotlin.reflect.KClass
+import kotlin.reflect.safeCast
 
 private const val TOOLS_NS_URI = "http://schemas.android.com/tools"
 private const val DESIGN_INFO_METHOD = "getDesignInfo"
 private const val UPDATE_TRANSITION_FUNCTION_NAME = "updateTransition"
+private const val ANIMATED_CONTENT = "AnimatedContent"
+private const val ANIMATED_VISIBILITY = "AnimatedVisibility"
+private const val ANIMATE_VALUE_AS_STATE = "animateValueAsState"
+private const val REMEMBER = "remember"
+private const val SIZE_ANIMATION_MODIFIER = "androidx.compose.animation.SizeAnimationModifier"
 
 private val emptyContent: @Composable () -> Unit = @Composable {}
 
@@ -263,6 +274,119 @@ internal class ComposeViewAdapter : FrameLayout {
         )
     }
 
+    /** Find first data with type [T] within all remember calls. */
+    private inline fun <reified T> Collection<Group>.findRememberCall(): List<T> {
+        val rememberCalls = mapNotNull { it.firstOrNull { call -> call.name == "remember" } }
+        return rememberCalls.mapNotNull {
+            it.data.firstOrNull { data ->
+                data is T
+            } as? T
+        }
+    }
+
+    /** Search for animations with type [T]. */
+    private open class Search<T : Any>(val trackAnimation: (Any) -> Unit) {
+        val animations = mutableSetOf<T>()
+        open fun parse(treeWithLocation: Collection<Group>) {}
+        fun hasAnimations() = animations.isNotEmpty()
+        fun track() {
+            animations.forEach { trackAnimation(it) }
+        }
+    }
+
+    /** Search for animations with type [T]. */
+    private open class RememberSearch<T : Any>(
+        private val clazz: KClass<T>,
+        trackAnimation: (Any) -> Unit
+    ) : Search<T>(trackAnimation) {
+        override fun parse(treeWithLocation: Collection<Group>) {
+            animations.addAll(treeWithLocation.findRememberCallWithType(clazz).toSet())
+        }
+
+        protected fun <T : Any> Collection<Group>.findRememberCallWithType(clazz: KClass<T>):
+            List<T> {
+            val rememberCalls = filter { call -> call.name == REMEMBER }
+            return rememberCalls.mapNotNull {
+                clazz.safeCast(
+                    it.data.firstOrNull { data -> data?.javaClass?.kotlin == clazz })
+            }
+        }
+    }
+
+    /** Search for animateXAsState() and animateValueAsState() animations. */
+    private inner class AnimateXAsStateSearch(trackAnimation: (Any) -> Unit) :
+        Search<Animatable<*, *>>(trackAnimation) {
+        override fun parse(treeWithLocation: Collection<Group>) {
+            // How "animateXAsState" calls organized:
+            // Group with name "animateXAsState", for example animateDpAsState, animateIntAsState
+            //    children
+            //    * Group with name "animateValueAsState"
+            //          children
+            //          * Group with name "remember" and data with type Animatable
+            //
+            // To distinguish Animatable within "animateXAsState" calls from other Animatables,
+            // first "animateValueAsState" calls are found.
+            //  Find Animatable within "animateValueAsState" call.
+            animations.addAll(
+                treeWithLocation.filter { call -> call.name == ANIMATE_VALUE_AS_STATE }
+                    .mapNotNull { animateValue ->
+                        animateValue.children.findRememberCall<Animatable<*, *>>().firstOrNull()
+                    }.toSet()
+            )
+        }
+    }
+
+    /** Search for animateContentSize() animations. */
+    private class AnimateContentSizeSearch(trackAnimation: (Any) -> Unit) :
+        Search<Any>(trackAnimation) {
+        override fun parse(treeWithLocation: Collection<Group>) {
+            animations.addAll(treeWithLocation.filter { call -> call.name == REMEMBER }.mapNotNull {
+                // SizeAnimationModifier is currently private.
+                it.data.firstOrNull { data ->
+                    data?.javaClass?.name == SIZE_ANIMATION_MODIFIER
+                }
+            }.toSet())
+        }
+    }
+
+    /** Search for updateTransition() animations. */
+    private inner class TransitionSearch(trackAnimation: (Any) -> Unit) :
+        Search<Transition<Any>>(trackAnimation) {
+        override fun parse(treeWithLocation: Collection<Group>) {
+            // Find `updateTransition` calls.
+            animations.addAll(treeWithLocation.filter { it.name == UPDATE_TRANSITION_FUNCTION_NAME }
+                .findRememberCall())
+        }
+    }
+
+    /** Search for AnimatedVisibility animations. */
+    private inner class AnimatedVisibilitySearch(trackAnimation: (Any) -> Unit) :
+        Search<Transition<Any>>(trackAnimation) {
+        override fun parse(treeWithLocation: Collection<Group>) {
+            // Find `AnimatedVisibility` calls.
+            // Then, find the underlying `updateTransition` it uses.
+            animations.addAll(treeWithLocation.filter { it.name == ANIMATED_VISIBILITY }
+                .mapNotNull {
+                    it.children.firstOrNull { updateTransitionCall ->
+                        updateTransitionCall.name == UPDATE_TRANSITION_FUNCTION_NAME
+                    }
+                }.findRememberCall())
+        }
+    }
+
+    /** Search for AnimatedContent animations. */
+    private inner class AnimatedContentSearch(trackAnimation: (Any) -> Unit) :
+        Search<Transition<Any>>(trackAnimation) {
+        override fun parse(treeWithLocation: Collection<Group>) {
+            animations.addAll(treeWithLocation.filter { it.name == ANIMATED_CONTENT }
+                .mapNotNull {
+                    it.children.firstOrNull { updateTransitionCall ->
+                        updateTransitionCall.name == UPDATE_TRANSITION_FUNCTION_NAME
+                    }
+                }.findRememberCall())
+        }
+    }
+
     /**
      * Processes the recorded slot table and re-generates the [viewInfos] attribute.
      */
@@ -285,8 +409,7 @@ internal class ComposeViewAdapter : FrameLayout {
 
         processViewInfos()
         if (composableName.isNotEmpty()) {
-            // TODO(b/160126628): support other APIs, e.g. animate
-            findAndTrackTransitions()
+            findAndTrackAnimations()
             if (lookForDesignInfoProviders) {
                 findDesignInfoProviders()
             }
@@ -299,75 +422,59 @@ internal class ComposeViewAdapter : FrameLayout {
     }
 
     /**
-     * Finds all the transition animations defined in the Compose tree where the root is the
+     * Finds all animations defined in the Compose tree where the root is the
      * `@Composable` being previewed. We only return animations defined in the user code, i.e.
      * the ones we've got source information for.
      */
     @Suppress("UNCHECKED_CAST")
-    private fun findAndTrackTransitions() {
-        @Suppress("UNCHECKED_CAST")
-        fun List<Group>.findTransitionObjects(): List<Transition<Any>> {
-            val rememberCalls = mapNotNull { it.firstOrNull { call -> call.name == "remember" } }
-            return rememberCalls.mapNotNull {
-                it.data.firstOrNull { data ->
-                    data is Transition<*>
-                } as? Transition<Any>
-            }
+    private fun findAndTrackAnimations() {
+        val slotTrees = slotTableRecord.store.map { it.asTree() }
+        val transitionSearch = TransitionSearch { clock.trackTransition(it as Transition<Any>) }
+        val animatedContentSearch =
+            AnimatedContentSearch { clock.trackAnimatedContent(it as Transition<*>) }
+        val animatedVisibilitySearch = AnimatedVisibilitySearch {
+            clock.trackAnimatedVisibility(it as Transition<Any>, ::requestLayout)
         }
 
-        val slotTrees = slotTableRecord.store.map { it.asTree() }
-        val transitions = mutableSetOf<Transition<Any>>()
-        val animatedVisibilityParentTransitions = mutableSetOf<Transition<Any>>()
-        val animatedContentParentTransitions = mutableSetOf<Transition<Any>>()
+        val search = listOf(
+            transitionSearch,
+            animatedVisibilitySearch,
+            animatedContentSearch,
+            AnimateXAsStateSearch { clock.trackAnimateXAsState(it as Animatable<*, *>) },
+            AnimateContentSizeSearch { clock.trackAnimateContentSize(it) },
+            RememberSearch(TargetBasedAnimation::class) {
+                clock.trackTargetBasedAnimations(it as TargetBasedAnimation<*, *>)
+            },
+            RememberSearch(DecayAnimation::class) {
+                clock.trackDecayAnimations(it as DecayAnimation<*, *>)
+            },
+            RememberSearch(InfiniteTransition::class) {
+                clock.trackInfiniteTransition(it as InfiniteTransition)
+            }
+        )
+
         // Check all the slot tables, since some animations might not be present in the same
         // table as the one containing the `@Composable` being previewed, e.g. when they're
         // defined using sub-composition.
         slotTrees.forEach { tree ->
-            transitions.addAll(
-                // Find `updateTransition` calls in the user code, i.e. when source location is
-                // known.
-                tree.findAll { it.name == UPDATE_TRANSITION_FUNCTION_NAME && it.location != null }
-                    .findTransitionObjects()
-            )
-            // Find `AnimatedVisibility` calls in the user code, i.e. when source location is
-            // known. Then, find the underlying `updateTransition` it uses.
-            animatedVisibilityParentTransitions.addAll(
-                tree.findAll {
-                    it.name == "AnimatedVisibility" && it.location != null
-                }.mapNotNull {
-                    it.children.firstOrNull { updateTransitionCall ->
-                        updateTransitionCall.name == UPDATE_TRANSITION_FUNCTION_NAME
-                    }
-                }.findTransitionObjects()
-            )
-
-            animatedContentParentTransitions.addAll(
-                tree.findAll {
-                    it.name == "AnimatedContent" && it.location != null
-                }.mapNotNull {
-                    it.children.firstOrNull { updateTransitionCall ->
-                        updateTransitionCall.name == UPDATE_TRANSITION_FUNCTION_NAME
-                    }
-                }.findTransitionObjects()
-            )
+            val treeWithLocation = tree.findAll { it.location != null }
+            search.forEach { it.parse(treeWithLocation) }
 
             // Remove all AnimatedVisibility parent transitions from the transitions list,
             // otherwise we'd duplicate them in the Android Studio Animation Preview because we
             // will track them separately.
-            transitions.removeAll(animatedVisibilityParentTransitions)
+            transitionSearch.animations.removeAll(animatedVisibilitySearch.animations)
 
             // Remove all AnimatedContent parent transitions from the transitions list, so we can
             // ignore these animations while support is not added to Animation Preview.
-            transitions.removeAll(animatedContentParentTransitions)
+            transitionSearch.animations.removeAll(animatedContentSearch.animations)
         }
 
-        hasAnimations = transitions.isNotEmpty() || animatedVisibilityParentTransitions.isNotEmpty()
+        hasAnimations = search.any { it.hasAnimations() }
+
         // Make the `PreviewAnimationClock` track all the transitions found.
         if (::clock.isInitialized) {
-            transitions.forEach { clock.trackTransition(it) }
-            animatedVisibilityParentTransitions.forEach {
-                clock.trackAnimatedVisibility(it, ::requestLayout)
-            }
+            search.forEach { it.track() }
         }
     }
 

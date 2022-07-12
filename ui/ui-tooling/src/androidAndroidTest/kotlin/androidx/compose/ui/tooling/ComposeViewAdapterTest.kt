@@ -154,17 +154,8 @@ class ComposeViewAdapterTest {
     }
 
     @Test
-    fun animatedContentIsIgnored() {
-        assertRendersCorrectly(
-            "androidx.compose.ui.tooling.TestAnimationPreviewKt",
-            "AnimatedContentPreview"
-        )
-
-        activityTestRule.runOnUiThread {
-            // Verify that this composable has no animations, since we should ignore
-            // AnimatedContent animations
-            assertFalse(composeViewAdapter.hasAnimations())
-        }
+    fun animatedContentIsSubscribed() {
+        checkUnsupportedIsSubscribed("AnimatedContentPreview", listOf("AnimatedContent"))
     }
 
     @Test
@@ -175,6 +166,66 @@ class ComposeViewAdapterTest {
     @Test
     fun transitionAnimationsWithSubcomposition() {
         checkTransitionIsSubscribed("CheckBoxScaffoldPreview", "checkBoxAnim")
+    }
+
+    @Test
+    fun animateXAsStateIsSubscribed() {
+        checkUnsupportedIsSubscribed(
+            "AnimateAsStatePreview",
+            listOf("animateValueAsState", "animateValueAsState")
+        )
+    }
+
+    @Test
+    fun animateContentSizeIsSubscribed() {
+        checkUnsupportedIsSubscribed("AnimateContentSizePreview", listOf("animateContentSize"))
+    }
+
+    @Test
+    fun crossFadeIsSubscribed() {
+        checkTransitionIsSubscribed("CrossFadePreview", "String")
+    }
+
+    @Test
+    fun targetBasedAnimationIsSubscribed() {
+        checkUnsupportedIsSubscribed("TargetBasedAnimationPreview", listOf("TargetBasedAnimation"))
+    }
+
+    @Test
+    fun decayAnimationIsSubscribed() {
+        checkUnsupportedIsSubscribed("DecayAnimationPreview", listOf("DecayAnimation"))
+    }
+
+    @Test
+    fun infiniteTransitionIsSubscribed() {
+        checkUnsupportedIsSubscribed("InfiniteTransitionPreview", listOf("InfiniteTransition"))
+    }
+
+    private fun checkUnsupportedIsSubscribed(preview: String, labels: List<String>) {
+        val clock = PreviewAnimationClock()
+
+        activityTestRule.runOnUiThread {
+            composeViewAdapter.init(
+                "androidx.compose.ui.tooling.TestAnimationPreviewKt",
+                preview
+            )
+            composeViewAdapter.clock = clock
+            assertFalse(composeViewAdapter.hasAnimations())
+            assertTrue(clock.trackedTransitions.isEmpty())
+        }
+
+        waitFor("Composable to have animations", 1, TimeUnit.SECONDS) {
+            // Handle the case where onLayout was called too soon. Calling requestLayout will
+            // make sure onLayout will be called again.
+            composeViewAdapter.requestLayout()
+            composeViewAdapter.hasAnimations()
+        }
+
+        activityTestRule.runOnUiThread {
+            assertEquals(labels, clock.trackedUnsupported.map { it.label }.sortedBy { it })
+            assertEquals(0, clock.trackedTransitions.size)
+            assertEquals(0, clock.trackedAnimatedVisibility.size)
+        }
     }
 
     @OptIn(InternalAnimationApi::class)

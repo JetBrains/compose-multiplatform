@@ -24,7 +24,29 @@ import kotlin.jvm.JvmDefaultWithCompatibility
  * with it.
  */
 public enum class ComposeAnimationType {
-    TRANSITION_ANIMATION, ANIMATED_VALUE, ANIMATED_VISIBILITY
+    TRANSITION_ANIMATION, ANIMATED_VALUE, ANIMATED_VISIBILITY,
+    /** `Animatable` compose animation. */
+    ANIMATABLE,
+    /** `animateContentSize` compose animation. */
+    ANIMATE_CONTENT_SIZE,
+    /**
+     * `animateXAsState` animations, for example `animateDpAsState`, `animateIntAsState`.
+     * Includes `animateValueAsState`.
+     */
+    ANIMATE_X_AS_STATE,
+    /** `AnimatedContent` animation. */
+    ANIMATED_CONTENT,
+    /** `DecayAnimation` animation. */
+    DECAY_ANIMATION,
+    /** `rememberInfiniteTransition` animation. */
+    INFINITE_TRANSITION,
+    /** `TargetBasedAnimation` animation. */
+    TARGET_BASED_ANIMATION,
+    /**
+     * Detected animation without a support - only [ComposeAnimation.label] and
+     * [ComposeAnimation.type] are provided.
+     */
+    UNSUPPORTED
 }
 
 /**
