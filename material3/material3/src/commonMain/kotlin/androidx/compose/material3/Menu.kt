@@ -42,7 +42,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
@@ -182,7 +181,8 @@ internal fun DropdownMenuItemContent(
             }
             CompositionLocalProvider(LocalContentColor provides colors.textColor(enabled).value) {
                 Box(
-                    Modifier.weight(1f)
+                    Modifier
+                        .weight(1f)
                         .padding(
                             start = if (leadingIcon != null) {
                                 DropdownMenuItemHorizontalPadding
@@ -243,15 +243,14 @@ object MenuDefaults {
             .copy(alpha = MenuTokens.ListItemDisabledLeadingIconOpacity),
         disabledTrailingIconColor: Color = MenuTokens.ListItemDisabledTrailingIconColor.toColor()
             .copy(alpha = MenuTokens.ListItemDisabledTrailingIconOpacity),
-    ): MenuItemColors =
-        DefaultMenuItemColors(
-            textColor = textColor,
-            leadingIconColor = leadingIconColor,
-            trailingIconColor = trailingIconColor,
-            disabledTextColor = disabledTextColor,
-            disabledLeadingIconColor = disabledLeadingIconColor,
-            disabledTrailingIconColor = disabledTrailingIconColor,
-        )
+    ): MenuItemColors = MenuItemColors(
+        textColor = textColor,
+        leadingIconColor = leadingIconColor,
+        trailingIconColor = trailingIconColor,
+        disabledTextColor = disabledTextColor,
+        disabledLeadingIconColor = disabledLeadingIconColor,
+        disabledTrailingIconColor = disabledTrailingIconColor,
+    )
 
     /**
      * Default padding used for [DropdownMenuItem].
@@ -260,39 +259,6 @@ object MenuDefaults {
         horizontal = DropdownMenuItemHorizontalPadding,
         vertical = 0.dp
     )
-}
-
-/**
- * Represents the text and icon colors used in a menu item at different states.
- *
- * - See [MenuDefaults.itemColors] for the default colors used in a [DropdownMenuItemContent].
- */
-@Stable
-interface MenuItemColors {
-
-    /**
-     * Represents the text color for a menu item, depending on its [enabled] state.
-     *
-     * @param enabled whether the menu item is enabled
-     */
-    @Composable
-    fun textColor(enabled: Boolean): State<Color>
-
-    /**
-     * Represents the leading icon color for a menu item, depending on its [enabled] state.
-     *
-     * @param enabled whether the menu item is enabled
-     */
-    @Composable
-    fun leadingIconColor(enabled: Boolean): State<Color>
-
-    /**
-     * Represents the trailing icon color for a menu item, depending on its [enabled] state.
-     *
-     * @param enabled whether the menu item is enabled
-     */
-    @Composable
-    fun trailingIconColor(enabled: Boolean): State<Color>
 }
 
 internal fun calculateTransformOrigin(
@@ -395,37 +361,53 @@ internal data class DropdownMenuPositionProvider(
     }
 }
 
-/** Default [MenuItemColors] implementation. */
+/**
+ * Represents the text and icon colors used in a menu item at different states.
+ *
+ * - See [MenuDefaults.itemColors] for the default colors used in a [DropdownMenuItemContent].
+ */
 @Immutable
-private class DefaultMenuItemColors(
+class MenuItemColors internal constructor(
     private val textColor: Color,
     private val leadingIconColor: Color,
     private val trailingIconColor: Color,
     private val disabledTextColor: Color,
     private val disabledLeadingIconColor: Color,
     private val disabledTrailingIconColor: Color,
-) : MenuItemColors {
-
+) {
+    /**
+     * Represents the text color for a menu item, depending on its [enabled] state.
+     *
+     * @param enabled whether the menu item is enabled
+     */
     @Composable
-    override fun textColor(enabled: Boolean): State<Color> {
+    internal fun textColor(enabled: Boolean): State<Color> {
         return rememberUpdatedState(if (enabled) textColor else disabledTextColor)
     }
 
+    /**
+     * Represents the leading icon color for a menu item, depending on its [enabled] state.
+     *
+     * @param enabled whether the menu item is enabled
+     */
     @Composable
-    override fun leadingIconColor(enabled: Boolean): State<Color> {
+    internal fun leadingIconColor(enabled: Boolean): State<Color> {
         return rememberUpdatedState(if (enabled) leadingIconColor else disabledLeadingIconColor)
     }
 
+    /**
+     * Represents the trailing icon color for a menu item, depending on its [enabled] state.
+     *
+     * @param enabled whether the menu item is enabled
+     */
     @Composable
-    override fun trailingIconColor(enabled: Boolean): State<Color> {
+    internal fun trailingIconColor(enabled: Boolean): State<Color> {
         return rememberUpdatedState(if (enabled) trailingIconColor else disabledTrailingIconColor)
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || this::class != other::class) return false
-
-        other as DefaultMenuItemColors
+        if (other == null || other !is MenuItemColors) return false
 
         if (textColor != other.textColor) return false
         if (leadingIconColor != other.leadingIconColor) return false

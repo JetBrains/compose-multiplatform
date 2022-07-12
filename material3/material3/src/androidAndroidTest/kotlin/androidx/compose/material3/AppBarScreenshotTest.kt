@@ -315,7 +315,7 @@ class AppBarScreenshotTest {
                         FloatingActionButton(
                             onClick = { /* do something */ },
                             containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-                            elevation = BottomAppBarDefaults.BottomAppBarFabElevation
+                            elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
                         ) {
                             Icon(Icons.Filled.Add, "Localized description")
                         }
@@ -347,7 +347,7 @@ class AppBarScreenshotTest {
                         FloatingActionButton(
                             onClick = { /* do something */ },
                             containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-                            elevation = BottomAppBarDefaults.BottomAppBarFabElevation
+                            elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
                         ) {
                             Icon(Icons.Filled.Add, "Localized description")
                         }

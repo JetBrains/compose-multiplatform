@@ -187,7 +187,7 @@ fun TextField(
         BasicTextField(
             value = value,
             modifier = modifier
-                .background(colors.containerColor(enabled).value, shape)
+                .background(colors.containerColor().value, shape)
                 .indicatorLine(enabled, isError, interactionSource, colors)
                 .defaultMinSize(
                     minWidth = TextFieldDefaults.MinWidth,
@@ -322,7 +322,7 @@ fun TextField(
         BasicTextField(
             value = value,
             modifier = modifier
-                .background(colors.containerColor(enabled).value, shape)
+                .background(colors.containerColor().value, shape)
                 .indicatorLine(enabled, isError, interactionSource, colors)
                 .defaultMinSize(
                     minWidth = TextFieldDefaults.MinWidth,
@@ -385,7 +385,9 @@ internal fun TextFieldLayout(
         content = {
             if (leading != null) {
                 Box(
-                    modifier = Modifier.layoutId(LeadingId).then(IconDefaultSizeModifier),
+                    modifier = Modifier
+                        .layoutId(LeadingId)
+                        .then(IconDefaultSizeModifier),
                     contentAlignment = Alignment.Center
                 ) {
                     leading()
@@ -393,7 +395,9 @@ internal fun TextFieldLayout(
             }
             if (trailing != null) {
                 Box(
-                    modifier = Modifier.layoutId(TrailingId).then(IconDefaultSizeModifier),
+                    modifier = Modifier
+                        .layoutId(TrailingId)
+                        .then(IconDefaultSizeModifier),
                     contentAlignment = Alignment.Center
                 ) {
                     trailing()
@@ -417,13 +421,21 @@ internal fun TextFieldLayout(
                 }
             )
             if (placeholder != null) {
-                placeholder(Modifier.layoutId(PlaceholderId).then(padding))
+                placeholder(
+                    Modifier
+                        .layoutId(PlaceholderId)
+                        .then(padding))
             }
             if (label != null) {
-                Box(Modifier.layoutId(LabelId).then(padding)) { label() }
+                Box(
+                    Modifier
+                        .layoutId(LabelId)
+                        .then(padding)) { label() }
             }
             Box(
-                modifier = Modifier.layoutId(TextFieldId).then(padding),
+                modifier = Modifier
+                    .layoutId(TextFieldId)
+                    .then(padding),
                 propagateMinConstraints = true,
             ) {
                 textField()

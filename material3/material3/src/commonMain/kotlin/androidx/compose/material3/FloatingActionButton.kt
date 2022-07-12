@@ -383,43 +383,6 @@ fun ExtendedFloatingActionButton(
 }
 
 /**
- * Represents the tonal and shadow elevation for a floating action button in different states.
- *
- * See [FloatingActionButtonDefaults.elevation] for the default elevation used in a
- * [FloatingActionButton] and [ExtendedFloatingActionButton].
- */
-@Stable
-interface FloatingActionButtonElevation {
-    /**
-     * Represents the tonal elevation used in a floating action button, depending on
-     * [interactionSource]. This should typically be the same value as the [shadowElevation].
-     *
-     * Tonal elevation is used to apply a color shift to the surface to give the it higher emphasis.
-     * When surface's color is [ColorScheme.surface], a higher the elevation will result in a darker
-     * color in light theme and lighter color in dark theme.
-     *
-     * See [shadowElevation] which controls the elevation of the shadow drawn around the FAB.
-     *
-     * @param interactionSource the [InteractionSource] for this floating action button
-     */
-    @Composable
-    fun tonalElevation(interactionSource: InteractionSource): State<Dp>
-
-    /**
-     * Represents the shadow elevation used in a floating action button, depending on
-     * [interactionSource]. This should typically be the same value as the [tonalElevation].
-     *
-     * Shadow elevation is used to apply a shadow around the FAB to give it higher emphasis.
-     *
-     * See [tonalElevation] which controls the elevation with a color shift to the surface.
-     *
-     * @param interactionSource the [InteractionSource] for this floating action button
-     */
-    @Composable
-    fun shadowElevation(interactionSource: InteractionSource): State<Dp>
-}
-
-/**
  * Contains the default values used by [FloatingActionButton]
  */
 object FloatingActionButtonDefaults {
@@ -461,21 +424,12 @@ object FloatingActionButtonDefaults {
         pressedElevation: Dp = FabPrimaryTokens.PressedContainerElevation,
         focusedElevation: Dp = FabPrimaryTokens.FocusContainerElevation,
         hoveredElevation: Dp = FabPrimaryTokens.HoverContainerElevation,
-    ): FloatingActionButtonElevation {
-        return remember(
-            defaultElevation,
-            pressedElevation,
-            focusedElevation,
-            hoveredElevation,
-        ) {
-            DefaultFloatingActionButtonElevation(
-                defaultElevation = defaultElevation,
-                pressedElevation = pressedElevation,
-                focusedElevation = focusedElevation,
-                hoveredElevation = hoveredElevation,
-            )
-        }
-    }
+    ): FloatingActionButtonElevation = FloatingActionButtonElevation(
+        defaultElevation = defaultElevation,
+        pressedElevation = pressedElevation,
+        focusedElevation = focusedElevation,
+        hoveredElevation = hoveredElevation,
+    )
 
     /**
      * Use this to create a [FloatingActionButton] with a lowered elevation for less emphasis. Use
@@ -493,40 +447,56 @@ object FloatingActionButtonDefaults {
         pressedElevation: Dp = FabPrimaryTokens.LoweredPressedContainerElevation,
         focusedElevation: Dp = FabPrimaryTokens.LoweredFocusContainerElevation,
         hoveredElevation: Dp = FabPrimaryTokens.LoweredHoverContainerElevation,
-    ): FloatingActionButtonElevation {
-        return remember(
-            defaultElevation,
-            pressedElevation,
-            focusedElevation,
-            hoveredElevation,
-        ) {
-            DefaultFloatingActionButtonElevation(
-                defaultElevation = defaultElevation,
-                pressedElevation = pressedElevation,
-                focusedElevation = focusedElevation,
-                hoveredElevation = hoveredElevation,
-            )
-        }
-    }
+    ): FloatingActionButtonElevation = FloatingActionButtonElevation(
+        defaultElevation = defaultElevation,
+        pressedElevation = pressedElevation,
+        focusedElevation = focusedElevation,
+        hoveredElevation = hoveredElevation,
+    )
+
+    /**
+     * Use this to create a [FloatingActionButton] that represents the default elevation of a
+     * [FloatingActionButton] used for [BottomAppBar] in different states.
+     *
+     * @param defaultElevation the elevation used when the [FloatingActionButton] has no other
+     * [Interaction]s.
+     * @param pressedElevation the elevation used when the [FloatingActionButton] is pressed.
+     * @param focusedElevation the elevation used when the [FloatingActionButton] is focused.
+     * @param hoveredElevation the elevation used when the [FloatingActionButton] is hovered.
+     */
+    fun bottomAppBarFabElevation(
+        defaultElevation: Dp = 0.dp,
+        pressedElevation: Dp = 0.dp,
+        focusedElevation: Dp = 0.dp,
+        hoveredElevation: Dp = 0.dp
+    ): FloatingActionButtonElevation = FloatingActionButtonElevation(
+        defaultElevation,
+        pressedElevation,
+        focusedElevation,
+        hoveredElevation
+    )
 }
 
 /**
- * Default [FloatingActionButtonElevation] implementation.
+ * Represents the tonal and shadow elevation for a floating action button in different states.
+ *
+ * See [FloatingActionButtonDefaults.elevation] for the default elevation used in a
+ * [FloatingActionButton] and [ExtendedFloatingActionButton].
  */
 @Stable
-private class DefaultFloatingActionButtonElevation(
+ open class FloatingActionButtonElevation internal constructor(
     private val defaultElevation: Dp,
     private val pressedElevation: Dp,
     private val focusedElevation: Dp,
     private val hoveredElevation: Dp,
-) : FloatingActionButtonElevation {
+) {
     @Composable
-    override fun shadowElevation(interactionSource: InteractionSource): State<Dp> {
+    internal fun shadowElevation(interactionSource: InteractionSource): State<Dp> {
         return animateElevation(interactionSource = interactionSource)
     }
 
     @Composable
-    override fun tonalElevation(interactionSource: InteractionSource): State<Dp> {
+    internal fun tonalElevation(interactionSource: InteractionSource): State<Dp> {
         return animateElevation(interactionSource = interactionSource)
     }
 
@@ -587,6 +557,26 @@ private class DefaultFloatingActionButtonElevation(
             )
         }
         return animatable.asState()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || other !is FloatingActionButtonElevation) return false
+
+        if (defaultElevation != other.defaultElevation) return false
+        if (pressedElevation != other.pressedElevation) return false
+        if (focusedElevation != other.focusedElevation) return false
+        if (hoveredElevation != other.hoveredElevation) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = defaultElevation.hashCode()
+        result = 31 * result + pressedElevation.hashCode()
+        result = 31 * result + focusedElevation.hashCode()
+        result = 31 * result + hoveredElevation.hashCode()
+        return result
     }
 }
 

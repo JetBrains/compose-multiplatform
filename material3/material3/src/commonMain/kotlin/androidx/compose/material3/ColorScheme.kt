@@ -607,6 +607,7 @@ internal val LocalColorScheme = staticCompositionLocalOf { lightColorScheme() }
 internal const val DisabledAlpha = 0.38f
 
 /** Converts a color token key to the local color scheme provided by the theme */
+@ReadOnlyComposable
 @Composable
 internal fun ColorSchemeKeyTokens.toColor(): Color {
     return MaterialTheme.colorScheme.fromToken(this)

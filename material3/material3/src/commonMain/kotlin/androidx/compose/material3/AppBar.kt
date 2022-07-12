@@ -27,7 +27,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
-import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,10 +48,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
@@ -441,67 +438,6 @@ interface TopAppBarScrollBehavior {
     val nestedScrollConnection: NestedScrollConnection
 }
 
-/**
- * Represents the colors used by a top app bar in different states.
- *
- * Each app bar has their own default implementation available in [TopAppBarDefaults], such as
- * [TopAppBarDefaults.smallTopAppBarColors] for [SmallTopAppBar].
- */
-@Stable
-interface TopAppBarColors {
-    /**
-     * Represents the container color used for the top app bar.
-     *
-     * A [colorTransitionFraction] provides a percentage value that can be used to generate a color.
-     * Usually, an app bar implementation will pass in a [colorTransitionFraction] read from
-     * the [TopAppBarState.collapsedFraction] or the [TopAppBarState.overlappedFraction].
-     *
-     * @param colorTransitionFraction a `0.0` to `1.0` value that represents a color transition
-     * percentage
-     */
-    @Composable
-    fun containerColor(colorTransitionFraction: Float): State<Color>
-
-    /**
-     * Represents the content color used for the top app bar's navigation icon.
-     *
-     * A [colorTransitionFraction] provides a percentage value that can be used to generate a color.
-     * Usually, an app bar implementation will pass in a [colorTransitionFraction] read from
-     * the [TopAppBarState.collapsedFraction] or the [TopAppBarState.overlappedFraction].
-     *
-     * @param colorTransitionFraction a `0.0` to `1.0` value that represents a color transition
-     * percentage
-     */
-    @Composable
-    fun navigationIconContentColor(colorTransitionFraction: Float): State<Color>
-
-    /**
-     * Represents the content color used for the top app bar's title.
-     *
-     * A [colorTransitionFraction] provides a percentage value that can be used to generate a color.
-     * Usually, an app bar implementation will pass in a [colorTransitionFraction] read from
-     * the [TopAppBarState.collapsedFraction] or the [TopAppBarState.overlappedFraction].
-     *
-     * @param colorTransitionFraction a `0.0` to `1.0` value that represents a color transition
-     * percentage
-     */
-    @Composable
-    fun titleContentColor(colorTransitionFraction: Float): State<Color>
-
-    /**
-     * Represents the content color used for the top app bar's action icons.
-     *
-     * A [colorTransitionFraction] provides a percentage value that can be used to generate a color.
-     * Usually, an app bar implementation will pass in a [colorTransitionFraction] read from
-     * the [TopAppBarState.collapsedFraction] or the [TopAppBarState.overlappedFraction].
-     *
-     * @param colorTransitionFraction a `0.0` to `1.0` value that represents a color transition
-     * percentage
-     */
-    @Composable
-    fun actionIconContentColor(colorTransitionFraction: Float): State<Color>
-}
-
 /** Contains default values used for the top app bar implementations. */
 object TopAppBarDefaults {
 
@@ -526,23 +462,14 @@ object TopAppBarDefaults {
         navigationIconContentColor: Color = TopAppBarSmallTokens.LeadingIconColor.toColor(),
         titleContentColor: Color = TopAppBarSmallTokens.HeadlineColor.toColor(),
         actionIconContentColor: Color = TopAppBarSmallTokens.TrailingIconColor.toColor(),
-    ): TopAppBarColors {
-        return remember(
+    ): TopAppBarColors =
+        TopAppBarColors(
             containerColor,
             scrolledContainerColor,
             navigationIconContentColor,
             titleContentColor,
             actionIconContentColor
-        ) {
-            AnimatingTopAppBarColors(
-                containerColor,
-                scrolledContainerColor,
-                navigationIconContentColor,
-                titleContentColor,
-                actionIconContentColor
-            )
-        }
-    }
+        )
 
     /**
      * Creates a [TopAppBarColors] for center aligned top app bars. The default implementation
@@ -565,23 +492,14 @@ object TopAppBarDefaults {
         navigationIconContentColor: Color = TopAppBarSmallCenteredTokens.LeadingIconColor.toColor(),
         titleContentColor: Color = TopAppBarSmallCenteredTokens.HeadlineColor.toColor(),
         actionIconContentColor: Color = TopAppBarSmallCenteredTokens.TrailingIconColor.toColor(),
-    ): TopAppBarColors {
-        return remember(
+    ): TopAppBarColors =
+        TopAppBarColors(
             containerColor,
             scrolledContainerColor,
             navigationIconContentColor,
             titleContentColor,
             actionIconContentColor
-        ) {
-            AnimatingTopAppBarColors(
-                containerColor,
-                scrolledContainerColor,
-                navigationIconContentColor,
-                titleContentColor,
-                actionIconContentColor
-            )
-        }
-    }
+        )
 
     /**
      * Creates a [TopAppBarColors] for medium top app bars. The default implementation interpolates
@@ -605,23 +523,14 @@ object TopAppBarDefaults {
         navigationIconContentColor: Color = TopAppBarMediumTokens.LeadingIconColor.toColor(),
         titleContentColor: Color = TopAppBarMediumTokens.HeadlineColor.toColor(),
         actionIconContentColor: Color = TopAppBarMediumTokens.TrailingIconColor.toColor(),
-    ): TopAppBarColors {
-        return remember(
+    ): TopAppBarColors =
+        TopAppBarColors(
             containerColor,
             scrolledContainerColor,
             navigationIconContentColor,
             titleContentColor,
             actionIconContentColor
-        ) {
-            InterpolatingTopAppBarColors(
-                containerColor,
-                scrolledContainerColor,
-                navigationIconContentColor,
-                titleContentColor,
-                actionIconContentColor
-            )
-        }
-    }
+        )
 
     /**
      * Creates a [TopAppBarColors] for large top app bars. The default implementation interpolates
@@ -645,23 +554,14 @@ object TopAppBarDefaults {
         navigationIconContentColor: Color = TopAppBarLargeTokens.LeadingIconColor.toColor(),
         titleContentColor: Color = TopAppBarLargeTokens.HeadlineColor.toColor(),
         actionIconContentColor: Color = TopAppBarLargeTokens.TrailingIconColor.toColor(),
-    ): TopAppBarColors {
-        return remember(
+    ): TopAppBarColors =
+        TopAppBarColors(
             containerColor,
             scrolledContainerColor,
             navigationIconContentColor,
             titleContentColor,
             actionIconContentColor
-        ) {
-            InterpolatingTopAppBarColors(
-                containerColor,
-                scrolledContainerColor,
-                navigationIconContentColor,
-                titleContentColor,
-                actionIconContentColor
-            )
-        }
-    }
+        )
 
     /**
      * Returns a pinned [TopAppBarScrollBehavior] that tracks nested-scroll callbacks and
@@ -874,21 +774,6 @@ object BottomAppBarDefaults {
         end = BottomAppBarHorizontalPadding
     )
 
-    // Bottom App Bar FAB Defaults
-    /**
-     * Creates a [FloatingActionButtonElevation] that represents the default elevation of a
-     * [FloatingActionButton] used for [BottomAppBar] in different states.
-     */
-    object BottomAppBarFabElevation : FloatingActionButtonElevation {
-        private val elevation = mutableStateOf(0.dp)
-
-        @Composable
-        override fun shadowElevation(interactionSource: InteractionSource) = elevation
-
-        @Composable
-        override fun tonalElevation(interactionSource: InteractionSource) = elevation
-    }
-
     /** The color of a [BottomAppBar]'s [FloatingActionButton] */
     val bottomAppBarFabColor: Color
         @Composable get() =
@@ -940,7 +825,14 @@ private fun SingleRowTopAppBar(
     // This may potentially animate or interpolate a transition between the container-color and the
     // container's scrolled-color according to the app bar's scroll state.
     val colorTransitionFraction = scrollBehavior?.state?.overlappedFraction ?: 0f
-    val appBarContainerColor by colors.containerColor(colorTransitionFraction)
+    val fraction = if (colorTransitionFraction > 0.01f) 1f else 0f
+    val appBarContainerColor by animateColorAsState(
+        targetValue = colors.containerColor(fraction),
+        animationSpec = tween(
+            durationMillis = TopAppBarAnimationDurationMillis,
+            easing = LinearOutSlowInEasing
+        )
+    )
 
     // Wrap the given actions in a Row.
     val actionsRow = @Composable {
@@ -973,10 +865,9 @@ private fun SingleRowTopAppBar(
         TopAppBarLayout(
             modifier = Modifier,
             heightPx = height,
-            navigationIconContentColor =
-            colors.navigationIconContentColor(colorTransitionFraction).value,
-            titleContentColor = colors.titleContentColor(colorTransitionFraction).value,
-            actionIconContentColor = colors.actionIconContentColor(colorTransitionFraction).value,
+            navigationIconContentColor = colors.navigationIconContentColor,
+            titleContentColor = colors.titleContentColor,
+            actionIconContentColor = colors.actionIconContentColor,
             title = title,
             titleTextStyle = titleTextStyle,
             titleAlpha = 1f,
@@ -1042,7 +933,7 @@ private fun TwoRowsTopAppBar(
     // This will potentially animate or interpolate a transition between the container color and the
     // container's scrolled color according to the app bar's scroll state.
     val colorTransitionFraction = scrollBehavior?.state?.collapsedFraction ?: 0f
-    val appBarContainerColor by colors.containerColor(colorTransitionFraction)
+    val appBarContainerColor by rememberUpdatedState(colors.containerColor(colorTransitionFraction))
 
     // Wrap the given actions in a Row.
     val actionsRow = @Composable {
@@ -1074,10 +965,10 @@ private fun TwoRowsTopAppBar(
                 modifier = Modifier,
                 heightPx = pinnedHeightPx,
                 navigationIconContentColor =
-                colors.navigationIconContentColor(colorTransitionFraction).value,
-                titleContentColor = colors.titleContentColor(colorTransitionFraction).value,
+                colors.navigationIconContentColor,
+                titleContentColor = colors.titleContentColor,
                 actionIconContentColor =
-                colors.actionIconContentColor(colorTransitionFraction).value,
+                colors.actionIconContentColor,
                 title = smallTitle,
                 titleTextStyle = smallTitleTextStyle,
                 titleAlpha = 1f - titleAlpha,
@@ -1093,10 +984,10 @@ private fun TwoRowsTopAppBar(
                 heightPx = maxHeightPx - pinnedHeightPx + (scrollBehavior?.state?.heightOffset
                     ?: 0f),
                 navigationIconContentColor =
-                colors.navigationIconContentColor(colorTransitionFraction).value,
-                titleContentColor = colors.titleContentColor(colorTransitionFraction).value,
+                colors.navigationIconContentColor,
+                titleContentColor = colors.titleContentColor,
                 actionIconContentColor =
-                colors.actionIconContentColor(colorTransitionFraction).value,
+                colors.actionIconContentColor,
                 title = title,
                 titleTextStyle = titleTextStyle,
                 titleAlpha = titleAlpha,
@@ -1262,96 +1153,60 @@ private fun TopAppBarLayout(
 }
 
 /**
- * A [TopAppBarColors] implementation that animates the container color according to the top app
- * bar scroll state.
- *
- * This default implementation does not animate the leading, headline, or trailing colors.
+ * Represents the colors used by a top app bar in different states.
+ * This implementation animates the container color according to the top app bar scroll state. It
+ * does not animate the leading, headline, or trailing colors.
  */
 @Stable
-private class AnimatingTopAppBarColors(
+class TopAppBarColors internal constructor(
     private val containerColor: Color,
     private val scrolledContainerColor: Color,
-    navigationIconContentColor: Color,
-    titleContentColor: Color,
-    actionIconContentColor: Color
-) : TopAppBarColors {
+    internal val navigationIconContentColor: Color,
+    internal val titleContentColor: Color,
+    internal val actionIconContentColor: Color,
+) {
 
-    // In this TopAppBarColors implementation, the following colors never change their value as the
-    // app bar collapses.
-    private val navigationIconColorState: State<Color> = mutableStateOf(navigationIconContentColor)
-    private val titleColorState: State<Color> = mutableStateOf(titleContentColor)
-    private val actionIconColorState: State<Color> = mutableStateOf(actionIconContentColor)
-
+    /**
+     * Represents the container color used for the top app bar.
+     *
+     * A [colorTransitionFraction] provides a percentage value that can be used to generate a color.
+     * Usually, an app bar implementation will pass in a [colorTransitionFraction] read from
+     * the [TopAppBarState.collapsedFraction] or the [TopAppBarState.overlappedFraction].
+     *
+     * @param colorTransitionFraction a `0.0` to `1.0` value that represents a color transition
+     * percentage
+     */
     @Composable
-    override fun containerColor(colorTransitionFraction: Float): State<Color> {
-        return animateColorAsState(
-            // Check if fraction is slightly over zero to overcome float precision issues.
-            targetValue = if (colorTransitionFraction > 0.01f) {
-                scrolledContainerColor
-            } else {
-                containerColor
-            },
-            animationSpec = tween(
-                durationMillis = TopAppBarAnimationDurationMillis,
-                easing = LinearOutSlowInEasing
-            )
+    internal fun containerColor(colorTransitionFraction: Float): Color {
+        return lerp(
+            containerColor,
+            scrolledContainerColor,
+            FastOutLinearInEasing.transform(colorTransitionFraction)
         )
     }
 
-    @Composable
-    override fun navigationIconContentColor(colorTransitionFraction: Float): State<Color> =
-        navigationIconColorState
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || other !is TopAppBarColors) return false
 
-    @Composable
-    override fun titleContentColor(colorTransitionFraction: Float): State<Color> = titleColorState
+        if (containerColor != other.containerColor) return false
+        if (scrolledContainerColor != other.scrolledContainerColor) return false
+        if (navigationIconContentColor != other.navigationIconContentColor) return false
+        if (titleContentColor != other.titleContentColor) return false
+        if (actionIconContentColor != other.actionIconContentColor) return false
 
-    @Composable
-    override fun actionIconContentColor(colorTransitionFraction: Float): State<Color> =
-        actionIconColorState
-}
-
-/**
- * A [TopAppBarColors] implementation that interpolates the container color according to the top
- * app bar scroll state percentage.
- *
- * This default implementation does not interpolate the leading, headline, or trailing colors.
- */
-@Stable
-private class InterpolatingTopAppBarColors(
-    private val containerColor: Color,
-    private val scrolledContainerColor: Color,
-    navigationIconContentColor: Color,
-    titleContentColor: Color,
-    actionIconContentColor: Color
-) : TopAppBarColors {
-
-    // In this TopAppBarColors implementation, the following colors never change their value as the
-    // app bar collapses.
-    private val navigationIconColorState: State<Color> = mutableStateOf(navigationIconContentColor)
-    private val titleColorState: State<Color> = mutableStateOf(titleContentColor)
-    private val actionIconColorState: State<Color> = mutableStateOf(actionIconContentColor)
-
-    @Composable
-    override fun containerColor(colorTransitionFraction: Float): State<Color> {
-        return rememberUpdatedState(
-            lerp(
-                containerColor,
-                scrolledContainerColor,
-                FastOutLinearInEasing.transform(colorTransitionFraction)
-            )
-        )
+        return true
     }
 
-    @Composable
-    override fun navigationIconContentColor(colorTransitionFraction: Float): State<Color> =
-        navigationIconColorState
+    override fun hashCode(): Int {
+        var result = containerColor.hashCode()
+        result = 31 * result + scrolledContainerColor.hashCode()
+        result = 31 * result + navigationIconContentColor.hashCode()
+        result = 31 * result + titleContentColor.hashCode()
+        result = 31 * result + actionIconContentColor.hashCode()
 
-    @Composable
-    override fun titleContentColor(colorTransitionFraction: Float): State<Color> = titleColorState
-
-    @Composable
-    override fun actionIconContentColor(colorTransitionFraction: Float): State<Color> =
-        actionIconColorState
+        return result
+    }
 }
 
 /**

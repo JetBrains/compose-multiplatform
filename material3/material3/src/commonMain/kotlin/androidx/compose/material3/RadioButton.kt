@@ -32,7 +32,6 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.tokens.RadioButtonTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -128,25 +127,6 @@ fun RadioButton(
 }
 
 /**
- * Represents the color used by a [RadioButton] in different states.
- *
- * See [RadioButtonDefaults.colors] for the default implementation that follows Material
- * specifications.
- */
-@Stable
-interface RadioButtonColors {
-    /**
-     * Represents the main color used to draw the outer and inner circles, depending on whether
-     * the [RadioButton] is [enabled] / [selected].
-     *
-     * @param enabled whether the [RadioButton] is enabled
-     * @param selected whether the [RadioButton] is selected
-     */
-    @Composable
-    fun radioColor(enabled: Boolean, selected: Boolean): State<Color>
-}
-
-/**
  * Defaults used in [RadioButton].
  */
 object RadioButtonDefaults {
@@ -171,35 +151,36 @@ object RadioButtonDefaults {
         disabledUnselectedColor: Color = RadioButtonTokens.DisabledUnselectedIconColor
             .toColor()
             .copy(alpha = RadioButtonTokens.DisabledUnselectedIconOpacity)
-    ): RadioButtonColors {
-        return remember(
-            selectedColor,
-            unselectedColor,
-            disabledSelectedColor,
-            disabledUnselectedColor
-        ) {
-            DefaultRadioButtonColors(
-                selectedColor,
-                unselectedColor,
-                disabledSelectedColor,
-                disabledUnselectedColor
-            )
-        }
-    }
+    ): RadioButtonColors = RadioButtonColors(
+        selectedColor,
+        unselectedColor,
+        disabledSelectedColor,
+        disabledUnselectedColor
+    )
 }
 
 /**
- * Default [RadioButtonColors] implementation.
+ * Represents the color used by a [RadioButton] in different states.
+ *
+ * See [RadioButtonDefaults.colors] for the default implementation that follows Material
+ * specifications.
  */
 @Immutable
-private class DefaultRadioButtonColors(
+class RadioButtonColors internal constructor(
     private val selectedColor: Color,
     private val unselectedColor: Color,
     private val disabledSelectedColor: Color,
     private val disabledUnselectedColor: Color
-) : RadioButtonColors {
+) {
+    /**
+     * Represents the main color used to draw the outer and inner circles, depending on whether
+     * the [RadioButton] is [enabled] / [selected].
+     *
+     * @param enabled whether the [RadioButton] is enabled
+     * @param selected whether the [RadioButton] is selected
+     */
     @Composable
-    override fun radioColor(enabled: Boolean, selected: Boolean): State<Color> {
+    internal fun radioColor(enabled: Boolean, selected: Boolean): State<Color> {
         val target = when {
             enabled && selected -> selectedColor
             enabled && !selected -> unselectedColor
@@ -218,9 +199,7 @@ private class DefaultRadioButtonColors(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || this::class != other::class) return false
-
-        other as DefaultRadioButtonColors
+        if (other == null || other !is RadioButtonColors) return false
 
         if (selectedColor != other.selectedColor) return false
         if (unselectedColor != other.unselectedColor) return false

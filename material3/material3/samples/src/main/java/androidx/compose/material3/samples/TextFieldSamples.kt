@@ -372,7 +372,7 @@ fun CustomTextFieldBasedOnDecorationBox() {
             onValueChange = onValueChange,
             modifier = modifier
                 .background(
-                    color = colors.containerColor(enabled).value,
+                    color = MaterialTheme.colorScheme.surfaceVariant,
                     shape = RoundedCornerShape(
                         topStart = 4.0.dp,
                         topEnd = 4.0.dp,

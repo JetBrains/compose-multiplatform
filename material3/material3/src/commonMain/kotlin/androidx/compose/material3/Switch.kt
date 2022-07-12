@@ -40,7 +40,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -166,52 +165,6 @@ fun Switch(
             thumbContent = thumbContent,
         )
     }
-}
-
-/**
- * Represents the colors used by a [Switch] in different states
- *
- * See [SwitchDefaults.colors] for the default implementation that follows Material
- * specifications.
- */
-@Stable
-interface SwitchColors {
-
-    /**
-     * Represents the color used for the switch's thumb, depending on [enabled] and [checked].
-     *
-     * @param enabled whether the [Switch] is enabled or not
-     * @param checked whether the [Switch] is checked or not
-     */
-    @Composable
-    fun thumbColor(enabled: Boolean, checked: Boolean): State<Color>
-
-    /**
-     * Represents the color used for the switch's track, depending on [enabled] and [checked].
-     *
-     * @param enabled whether the [Switch] is enabled or not
-     * @param checked whether the [Switch] is checked or not
-     */
-    @Composable
-    fun trackColor(enabled: Boolean, checked: Boolean): State<Color>
-
-    /**
-     * Represents the color used for the switch's border, depending on [enabled] and [checked].
-     *
-     * @param enabled whether the [Switch] is enabled or not
-     * @param checked whether the [Switch] is checked or not
-     */
-    @Composable
-    fun borderColor(enabled: Boolean, checked: Boolean): State<Color>
-
-    /**
-     * Represents the content color passed to the icon if used
-     *
-     * @param enabled whether the [Switch] is enabled or not
-     * @param checked whether the [Switch] is checked or not
-     */
-    @Composable
-    fun iconColor(enabled: Boolean, checked: Boolean): State<Color>
 }
 
 @Composable
@@ -356,7 +309,7 @@ object SwitchDefaults {
         disabledUncheckedIconColor: Color = SwitchTokens.DisabledUnselectedIconColor.toColor()
             .copy(alpha = SwitchTokens.DisabledUnselectedIconOpacity)
             .compositeOver(MaterialTheme.colorScheme.surface),
-    ): SwitchColors = DefaultSwitchColors(
+    ): SwitchColors = SwitchColors(
         checkedThumbColor = checkedThumbColor,
         checkedTrackColor = checkedTrackColor,
         checkedBorderColor = checkedBorderColor,
@@ -382,10 +335,13 @@ object SwitchDefaults {
 }
 
 /**
- * Default [SwitchColors] implementation.
+ * Represents the colors used by a [Switch] in different states
+ *
+ * See [SwitchDefaults.colors] for the default implementation that follows Material
+ * specifications.
  */
 @Immutable
-private class DefaultSwitchColors(
+class SwitchColors internal constructor(
     private val checkedThumbColor: Color,
     private val checkedTrackColor: Color,
     private val checkedBorderColor: Color,
@@ -402,9 +358,15 @@ private class DefaultSwitchColors(
     private val disabledUncheckedTrackColor: Color,
     private val disabledUncheckedBorderColor: Color,
     private val disabledUncheckedIconColor: Color
-) : SwitchColors {
+) {
+    /**
+     * Represents the color used for the switch's thumb, depending on [enabled] and [checked].
+     *
+     * @param enabled whether the [Switch] is enabled or not
+     * @param checked whether the [Switch] is checked or not
+     */
     @Composable
-    override fun thumbColor(enabled: Boolean, checked: Boolean): State<Color> {
+    internal fun thumbColor(enabled: Boolean, checked: Boolean): State<Color> {
         return rememberUpdatedState(
             if (enabled) {
                 if (checked) checkedThumbColor else uncheckedThumbColor
@@ -414,8 +376,14 @@ private class DefaultSwitchColors(
         )
     }
 
+    /**
+     * Represents the color used for the switch's track, depending on [enabled] and [checked].
+     *
+     * @param enabled whether the [Switch] is enabled or not
+     * @param checked whether the [Switch] is checked or not
+     */
     @Composable
-    override fun trackColor(enabled: Boolean, checked: Boolean): State<Color> {
+    internal fun trackColor(enabled: Boolean, checked: Boolean): State<Color> {
         return rememberUpdatedState(
             if (enabled) {
                 if (checked) checkedTrackColor else uncheckedTrackColor
@@ -425,8 +393,14 @@ private class DefaultSwitchColors(
         )
     }
 
+    /**
+     * Represents the color used for the switch's border, depending on [enabled] and [checked].
+     *
+     * @param enabled whether the [Switch] is enabled or not
+     * @param checked whether the [Switch] is checked or not
+     */
     @Composable
-    override fun borderColor(enabled: Boolean, checked: Boolean): State<Color> {
+    internal fun borderColor(enabled: Boolean, checked: Boolean): State<Color> {
         return rememberUpdatedState(
             if (enabled) {
                 if (checked) checkedBorderColor else uncheckedBorderColor
@@ -436,8 +410,14 @@ private class DefaultSwitchColors(
         )
     }
 
+    /**
+     * Represents the content color passed to the icon if used
+     *
+     * @param enabled whether the [Switch] is enabled or not
+     * @param checked whether the [Switch] is checked or not
+     */
     @Composable
-    override fun iconColor(enabled: Boolean, checked: Boolean): State<Color> {
+    internal fun iconColor(enabled: Boolean, checked: Boolean): State<Color> {
         return rememberUpdatedState(
             if (enabled) {
                 if (checked) checkedIconColor else uncheckedIconColor
@@ -449,9 +429,7 @@ private class DefaultSwitchColors(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || this::class != other::class) return false
-
-        other as DefaultSwitchColors
+        if (other == null || other !is SwitchColors) return false
 
         if (checkedThumbColor != other.checkedThumbColor) return false
         if (checkedTrackColor != other.checkedTrackColor) return false

@@ -55,7 +55,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -456,7 +455,7 @@ object SliderDefaults {
 
         disabledInactiveTickColor: Color = SliderTokens.TickMarksDisabledContainerColor.toColor()
             .copy(alpha = SliderTokens.TickMarksDisabledContainerOpacity)
-    ): SliderColors = DefaultSliderColors(
+    ): SliderColors = SliderColors(
         thumbColor = thumbColor,
         activeTrackColor = activeTrackColor,
         activeTickColor = activeTickColor,
@@ -468,50 +467,6 @@ object SliderDefaults {
         disabledInactiveTrackColor = disabledInactiveTrackColor,
         disabledInactiveTickColor = disabledInactiveTickColor
     )
-}
-
-/**
- * Represents the colors used by a [Slider] and its parts in different states
- *
- * See [SliderDefaults.colors] for the default implementation that follows Material
- * specifications.
- */
-@Stable
-interface SliderColors {
-
-    /**
-     * Represents the color used for the slider's thumb, depending on [enabled].
-     *
-     * @param enabled whether the [Slider] is enabled or not
-     */
-    @Composable
-    fun thumbColor(enabled: Boolean): State<Color>
-
-    /**
-     * Represents the color used for the slider's track, depending on [enabled] and [active].
-     *
-     * Active part is filled with progress, so if sliders progress is 30% out of 100%, left (or
-     * right in RTL) 30% of the track will be active, while the rest is inactive.
-     *
-     * @param enabled whether the [Slider] is enabled or not
-     * @param active whether the part of the track is active of not
-     */
-    @Composable
-    fun trackColor(enabled: Boolean, active: Boolean): State<Color>
-
-    /**
-     * Represents the color used for the slider's tick which is the dot separating steps, if
-     * they are set on the slider, depending on [enabled] and [active].
-     *
-     * Active tick is the tick that is in the part of the track filled with progress, so if
-     * sliders progress is 30% out of 100%, left (or right in RTL) 30% of the track and the ticks
-     * in this 30% will be active, the rest is not active.
-     *
-     * @param enabled whether the [Slider] is enabled or not
-     * @param active whether the part of the track this tick is in is active of not
-     */
-    @Composable
-    fun tickColor(enabled: Boolean, active: Boolean): State<Color>
 }
 
 @Composable
@@ -675,7 +630,8 @@ private fun BoxScope.SliderThumb(
     Box(
         Modifier
             .padding(start = offset)
-            .align(Alignment.CenterStart)) {
+            .align(Alignment.CenterStart)
+    ) {
         val interactions = remember { mutableStateListOf<Interaction>() }
         LaunchedEffect(interactionSource) {
             interactionSource.interactions.collect { interaction ->
@@ -1047,7 +1003,7 @@ private class RangeSliderLogic(
 }
 
 @Immutable
-private class DefaultSliderColors(
+class SliderColors internal constructor(
     private val thumbColor: Color,
     private val activeTrackColor: Color,
     private val activeTickColor: Color,
@@ -1058,15 +1014,15 @@ private class DefaultSliderColors(
     private val disabledActiveTickColor: Color,
     private val disabledInactiveTrackColor: Color,
     private val disabledInactiveTickColor: Color
-) : SliderColors {
+) {
 
     @Composable
-    override fun thumbColor(enabled: Boolean): State<Color> {
+    internal fun thumbColor(enabled: Boolean): State<Color> {
         return rememberUpdatedState(if (enabled) thumbColor else disabledThumbColor)
     }
 
     @Composable
-    override fun trackColor(enabled: Boolean, active: Boolean): State<Color> {
+    internal fun trackColor(enabled: Boolean, active: Boolean): State<Color> {
         return rememberUpdatedState(
             if (enabled) {
                 if (active) activeTrackColor else inactiveTrackColor
@@ -1077,7 +1033,7 @@ private class DefaultSliderColors(
     }
 
     @Composable
-    override fun tickColor(enabled: Boolean, active: Boolean): State<Color> {
+    internal fun tickColor(enabled: Boolean, active: Boolean): State<Color> {
         return rememberUpdatedState(
             if (enabled) {
                 if (active) activeTickColor else inactiveTickColor
@@ -1089,9 +1045,7 @@ private class DefaultSliderColors(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || this::class != other::class) return false
-
-        other as DefaultSliderColors
+        if (other == null || other !is SliderColors) return false
 
         if (thumbColor != other.thumbColor) return false
         if (activeTrackColor != other.activeTrackColor) return false
