@@ -33,6 +33,7 @@ import androidx.compose.ui.test.performTextInputSelection
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.TextRange
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -112,6 +113,7 @@ class CoreTextFieldSelectionContentChangeTest {
     }
 
     @Test
+    @FlakyTest(bugId = 238875392)
     fun whenSelectedTextIsRemoved_addedLater_SelectionRemains() {
         val textFieldValue = mutableStateOf("Hello")
         rule.setContent {
