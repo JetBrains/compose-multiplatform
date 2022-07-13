@@ -26,6 +26,9 @@ internal class SemanticsEntity(
     wrapped: LayoutNodeWrapper,
     modifier: SemanticsModifier
 ) : LayoutNodeEntity<SemanticsEntity, SemanticsModifier>(wrapped, modifier) {
+    val id: Int
+        get() = layoutNode.semanticsId
+
     private val useMinimumTouchTarget: Boolean
         get() = modifier.semanticsConfiguration.getOrNull(SemanticsActions.OnClick) != null
 
@@ -56,7 +59,7 @@ internal class SemanticsEntity(
     }
 
     override fun toString(): String {
-        return "${super.toString()} id: ${modifier.id} config: ${modifier.semanticsConfiguration}"
+        return "${super.toString()} semanticsId: $id config: ${modifier.semanticsConfiguration}"
     }
 
     fun touchBoundsInRoot(): Rect {

@@ -52,6 +52,7 @@ import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.platform.simpleIdentityToString
 import androidx.compose.ui.semantics.SemanticsEntity
+import androidx.compose.ui.semantics.SemanticsModifierCore.Companion.generateSemanticsId
 import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -74,7 +75,9 @@ internal class LayoutNode(
     // virtual nodes will be treated as the direct children of the virtual node parent.
     // This whole concept will be replaced with a proper subcomposition logic which allows to
     // subcompose multiple times into the same LayoutNode and define offsets.
-    private val isVirtual: Boolean = false
+    private val isVirtual: Boolean = false,
+    // The unique semantics ID that is used by all semantics modifiers attached to this LayoutNode.
+    override val semanticsId: Int = generateSemanticsId()
 ) : Remeasurement, OwnerScope, LayoutInfo, ComposeUiNode,
     Owner.OnLayoutCompletedListener {
 

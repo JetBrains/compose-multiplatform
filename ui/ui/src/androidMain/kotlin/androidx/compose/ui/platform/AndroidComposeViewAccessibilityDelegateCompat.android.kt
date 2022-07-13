@@ -1558,7 +1558,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             ) {
                 val androidView = view.androidViewsHandler.layoutNodeToHolder[wrapper.layoutNode]
                 if (androidView == null) {
-                    virtualViewId = semanticsNodeIdToAccessibilityVirtualNodeId(wrapper.modifier.id)
+                    virtualViewId =
+                        semanticsNodeIdToAccessibilityVirtualNodeId(wrapper.layoutNode.semanticsId)
                 }
             }
         }
@@ -1719,7 +1720,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     ?.isMergingSemanticsOfDescendants == true
             }?.outerSemantics?.let { semanticsWrapper = it }
         }
-        val id = semanticsWrapper.modifier.id
+        val id = semanticsWrapper.layoutNode.semanticsId
         if (!subtreeChangedSemanticsNodesIds.add(id)) {
             return
         }

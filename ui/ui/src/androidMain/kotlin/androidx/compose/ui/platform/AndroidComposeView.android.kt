@@ -189,7 +189,6 @@ internal class AndroidComposeView(context: Context) :
         private set
 
     private val semanticsModifier = SemanticsModifierCore(
-        id = SemanticsModifierCore.generateSemanticsId(),
         mergeDescendants = false,
         clearAndSetSemantics = false,
         properties = {}

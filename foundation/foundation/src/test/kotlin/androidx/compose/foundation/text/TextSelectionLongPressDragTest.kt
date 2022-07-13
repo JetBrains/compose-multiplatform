@@ -23,6 +23,7 @@ import androidx.compose.foundation.text.selection.SelectionRegistrarImpl
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.TextLayoutInput
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -68,6 +69,7 @@ class TextSelectionLongPressDragTest {
     private lateinit var gesture: TextDragObserver
     private lateinit var layoutCoordinates: LayoutCoordinates
     private lateinit var state: TextState
+    private lateinit var fontFamilyResolver: FontFamily.Resolver
 
     @Before
     fun setup() {
@@ -76,8 +78,15 @@ class TextSelectionLongPressDragTest {
         layoutCoordinates = mock {
             on { isAttached } doReturn true
         }
+        fontFamilyResolver = mock()
 
-        state = TextState(mock(), selectableId)
+        val delegate = TextDelegate(
+            text = AnnotatedString(""),
+            style = TextStyle(),
+            density = Density(1.0f),
+            fontFamilyResolver = fontFamilyResolver
+        )
+        state = TextState(delegate, selectableId)
         state.layoutCoordinates = layoutCoordinates
         state.layoutResult = TextLayoutResult(
             TextLayoutInput(
