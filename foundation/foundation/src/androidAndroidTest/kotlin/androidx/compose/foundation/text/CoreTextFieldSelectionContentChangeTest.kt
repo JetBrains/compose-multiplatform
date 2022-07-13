@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithTag
@@ -126,9 +127,14 @@ class CoreTextFieldSelectionContentChangeTest {
         val textNode = rule.onNodeWithTag(Tag)
         textNode.performTouchInput { longClick() }
         textNode.performTextInputSelection(TextRange(0, 4))
+
         textFieldValue.value = ""
         rule.waitForIdle()
+
+        textNode.assertTextEquals("")
+
         textFieldValue.value = "Hello"
+        rule.waitForIdle()
 
         val expected = TextRange(0, 4)
         val actual = textNode.fetchSemanticsNode().config
