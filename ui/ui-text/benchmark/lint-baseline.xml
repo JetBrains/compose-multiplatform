@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.3.0-alpha08" type="baseline" client="gradle" dependencies="false" name="AGP (7.3.0-alpha08)" variant="all" version="7.3.0-alpha08">
+<issues format="6" by="lint 7.4.0-alpha08" type="baseline" client="gradle" dependencies="false" name="AGP (7.4.0-alpha08)" variant="all" version="7.4.0-alpha08">
 
     <issue
         id="SoonBlockedPrivateApi"
-        message="Reflective access to freeTextLayoutCaches will throw an exception when targeting API 32 and above"
+        message="Reflective access to freeTextLayoutCaches will throw an exception when targeting API 33 and above"
         errorLine1="            val freeCaches = Canvas::class.java.getDeclaredMethod(&quot;freeTextLayoutCaches&quot;)"
         errorLine2="                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
