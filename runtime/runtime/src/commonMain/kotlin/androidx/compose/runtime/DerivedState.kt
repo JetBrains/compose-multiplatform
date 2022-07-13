@@ -19,13 +19,12 @@
 package androidx.compose.runtime
 
 import androidx.compose.runtime.collection.IdentityArrayMap
-import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentList
-import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentListOf
+import androidx.compose.runtime.collection.MutableVector
+import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.StateObject
 import androidx.compose.runtime.snapshots.StateRecord
 import androidx.compose.runtime.snapshots.current
-import androidx.compose.runtime.snapshots.fastForEach
 import androidx.compose.runtime.snapshots.newWritableRecord
 import androidx.compose.runtime.snapshots.sync
 import androidx.compose.runtime.snapshots.withCurrent
@@ -60,10 +59,6 @@ internal interface DerivedState<T> : State<T> {
      */
     val policy: SnapshotMutationPolicy<T>?
 }
-
-private typealias DerivedStateObservers = Pair<(DerivedState<*>) -> Unit, (DerivedState<*>) -> Unit>
-
-private val derivedStateObservers = SnapshotThreadLocal<PersistentList<DerivedStateObservers>>()
 
 private val calculationBlockNestedLevel = SnapshotThreadLocal<Int>()
 
@@ -266,16 +261,6 @@ private class DerivedSnapshotState<T>(
     }
 }
 
-private inline fun <R> notifyObservers(derivedState: DerivedState<*>, block: () -> R): R {
-    val observers = derivedStateObservers.get() ?: persistentListOf()
-    observers.fastForEach { (start, _) -> start(derivedState) }
-    return try {
-        block()
-    } finally {
-        observers.fastForEach { (_, done) -> done(derivedState) }
-    }
-}
-
 /**
  * Creates a [State] object whose [State.value] is the result of [calculation]. The result of
  * calculation will be cached in such a way that calling [State.value] repeatedly will not cause
@@ -313,6 +298,20 @@ fun <T> derivedStateOf(
     calculation: () -> T,
 ): State<T> = DerivedSnapshotState(calculation, policy)
 
+private typealias DerivedStateObservers = Pair<(DerivedState<*>) -> Unit, (DerivedState<*>) -> Unit>
+
+private val derivedStateObservers = SnapshotThreadLocal<MutableVector<DerivedStateObservers>>()
+
+private inline fun <R> notifyObservers(derivedState: DerivedState<*>, block: () -> R): R {
+    val observers = derivedStateObservers.get() ?: MutableVector(0)
+    observers.forEach { (start, _) -> start(derivedState) }
+    return try {
+        block()
+    } finally {
+        observers.forEach { (_, done) -> done(derivedState) }
+    }
+}
+
 /**
  * Observe the recalculations performed by any derived state that is recalculated during the
  * execution of [block]. [start] is called before a calculation starts and [done] is called
@@ -327,15 +326,15 @@ internal fun <R> observeDerivedStateRecalculations(
     done: (derivedState: State<*>) -> Unit,
     block: () -> R
 ) {
-    val previous = derivedStateObservers.get()
+    val observers = derivedStateObservers.get() ?: mutableVectorOf<DerivedStateObservers>().also {
+        derivedStateObservers.set(it)
+    }
+
+    val observer = start to done
     try {
-        derivedStateObservers.set(
-            (derivedStateObservers.get() ?: persistentListOf()).add(
-                start to done
-            )
-        )
+        observers.add(observer)
         block()
     } finally {
-        derivedStateObservers.set(previous)
+        observers.removeAt(observers.lastIndex)
     }
 }
