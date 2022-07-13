@@ -19,7 +19,7 @@ package androidx.compose.ui.layout
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.util.fastMap
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 
 /**
  * Defines the measure and layout behavior of a [Layout]. [Layout] and [MeasurePolicy] are the way

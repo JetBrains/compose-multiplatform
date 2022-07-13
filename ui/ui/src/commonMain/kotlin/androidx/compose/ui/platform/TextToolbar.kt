@@ -17,7 +17,7 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.ui.geometry.Rect
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 
 /**
  * Interface for text-related toolbar.

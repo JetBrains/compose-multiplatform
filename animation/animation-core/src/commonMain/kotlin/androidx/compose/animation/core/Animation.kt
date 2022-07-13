@@ -16,7 +16,7 @@
 
 package androidx.compose.animation.core
 
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.animation.core.internal.JvmDefaultWithCompatibility
 
 /**
  * This interface provides a convenient way to query from an [VectorizedAnimationSpec] or

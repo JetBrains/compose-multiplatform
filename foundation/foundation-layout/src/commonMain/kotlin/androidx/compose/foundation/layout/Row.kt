@@ -27,7 +27,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Measured
 import androidx.compose.ui.platform.debugInspectorInfo
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.foundation.layout.internal.JvmDefaultWithCompatibility
 
 /**
  * A layout composable that places its children in a horizontal sequence. For a layout composable

@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.test
 
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.test.internal.JvmDefaultWithCompatibility
 
 /**
  * Represents a resource of an application under test which can cause asynchronous background

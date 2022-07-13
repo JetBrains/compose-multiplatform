@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.test
 
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.test.internal.JvmDefaultWithCompatibility
 
 /**
  * Provides the main entry point into testing.

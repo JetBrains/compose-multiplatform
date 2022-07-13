@@ -24,7 +24,7 @@ import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.test.internal.JvmDefaultWithCompatibility
 
 /**
  * The receiver scope of the touch input injection lambda from [performTouchInput].

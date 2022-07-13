@@ -52,7 +52,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.isActive
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.foundation.internal.JvmDefaultWithCompatibility
 
 /**
  * State of [draggable]. Allows for a granular control of how deltas are consumed by the user as

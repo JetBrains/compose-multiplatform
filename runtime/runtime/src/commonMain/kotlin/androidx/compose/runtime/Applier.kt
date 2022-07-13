@@ -16,7 +16,7 @@
 
 package androidx.compose.runtime
 
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.runtime.internal.JvmDefaultWithCompatibility
 
 /**
  * An Applier is responsible for applying the tree-based operations that get emitted during a

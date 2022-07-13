@@ -18,7 +18,7 @@ package androidx.compose.runtime
 
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.runtime.internal.JvmDefaultWithCompatibility
 
 /**
  * Provides a time source for display frames and the ability to perform an action on the next frame.

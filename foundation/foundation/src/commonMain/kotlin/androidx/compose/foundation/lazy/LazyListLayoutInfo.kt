@@ -18,7 +18,7 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.ui.unit.IntSize
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.foundation.internal.JvmDefaultWithCompatibility
 
 /**
  * Contains useful information about the currently displayed layout state of lazy lists like

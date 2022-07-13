@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.center
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.graphics.internal.JvmDefaultWithCompatibility
 
 /**
  * Simultaneously translate the [DrawScope] coordinate space by [left] and [top] as well as modify

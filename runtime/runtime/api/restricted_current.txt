@@ -756,6 +756,9 @@ package androidx.compose.runtime.internal {
     property public abstract String file;
   }
 
+  public final class JvmDefaultWithCompatibility_jvmKt {
+  }
+
   @androidx.compose.runtime.ComposeCompilerApi @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.RUNTIME) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget.CLASS) public @interface LiveLiteralFileInfo {
     method public abstract String file();
     property public abstract String file;
