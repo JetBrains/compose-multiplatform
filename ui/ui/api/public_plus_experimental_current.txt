@@ -1887,6 +1887,13 @@ package androidx.compose.ui.input.rotary {
 
 }
 
+package androidx.compose.ui.internal {
+
+  public final class JvmDefaultWithCompatibility_jvmKt {
+  }
+
+}
+
 package androidx.compose.ui.layout {
 
   @androidx.compose.runtime.Immutable public abstract sealed class AlignmentLine {

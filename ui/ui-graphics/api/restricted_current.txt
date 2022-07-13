@@ -1316,6 +1316,13 @@ package androidx.compose.ui.graphics.drawscope {
 
 }
 
+package androidx.compose.ui.graphics.internal {
+
+  public final class JvmDefaultWithCompatibility_jvmKt {
+  }
+
+}
+
 package androidx.compose.ui.graphics.painter {
 
   public final class BitmapPainter extends androidx.compose.ui.graphics.painter.Painter {
