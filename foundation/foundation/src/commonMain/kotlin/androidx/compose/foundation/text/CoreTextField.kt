@@ -310,12 +310,15 @@ internal fun CoreTextField(
         if (!it.isFocused) manager.deselect()
     }
 
-    // Workaround for b/230536793. We don't get an explicit focus blur event when the text field is
-    // removed from the composition entirely.
-    DisposableEffect(state) {
-        onDispose {
-            if (state.hasFocus) {
-                onBlur(state)
+    // Hide the keyboard if made disabled or read-only while focused (b/237308379).
+    if (enabled && !readOnly) {
+        // Workaround for b/230536793. We don't get an explicit focus blur event when the text field
+        // is removed from the composition entirely.
+        DisposableEffect(state) {
+            onDispose {
+                if (state.hasFocus) {
+                    onBlur(state)
+                }
             }
         }
     }

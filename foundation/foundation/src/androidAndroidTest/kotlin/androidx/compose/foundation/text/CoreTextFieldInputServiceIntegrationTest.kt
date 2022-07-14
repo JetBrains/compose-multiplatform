@@ -266,6 +266,54 @@ class CoreTextFieldInputServiceIntegrationTest {
         rule.runOnIdle { assertThat(platformTextInputService.keyboardShown).isFalse() }
     }
 
+    @Test
+    fun keyboardHiddenWhenFieldChangedToDisabled() {
+        // Arrange.
+        val focusRequester = FocusRequester()
+        var enabled by mutableStateOf(true)
+        setContent {
+            CoreTextField(
+                value = TextFieldValue("Hello"),
+                onValueChange = {},
+                modifier = Modifier.focusRequester(focusRequester),
+                enabled = enabled
+            )
+        }
+        // Request focus and wait for keyboard.
+        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle { assertThat(platformTextInputService.keyboardShown).isTrue() }
+
+        // Act.
+        enabled = false
+
+        // Assert.
+        rule.runOnIdle { assertThat(platformTextInputService.keyboardShown).isFalse() }
+    }
+
+    @Test
+    fun keyboardHiddenWhenFieldChangedToReadOnly() {
+        // Arrange.
+        val focusRequester = FocusRequester()
+        var readOnly by mutableStateOf(false)
+        setContent {
+            CoreTextField(
+                value = TextFieldValue("Hello"),
+                onValueChange = {},
+                modifier = Modifier.focusRequester(focusRequester),
+                readOnly = readOnly
+            )
+        }
+        // Request focus and wait for keyboard.
+        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle { assertThat(platformTextInputService.keyboardShown).isTrue() }
+
+        // Act.
+        readOnly = true
+
+        // Assert.
+        rule.runOnIdle { assertThat(platformTextInputService.keyboardShown).isFalse() }
+    }
+
     private fun setContent(content: @Composable () -> Unit) {
         rule.setContent {
             focusManager = LocalFocusManager.current
