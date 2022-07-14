@@ -193,7 +193,7 @@ fun IconToggleButton(
  * button in different states. See [IconButtonDefaults.filledIconButtonColors].
  * @param content the content of this icon button, typically an [Icon]
  */
-@ExperimentalMaterial3Api
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilledIconButton(
     onClick: () -> Unit,
@@ -254,7 +254,7 @@ fun FilledIconButton(
  * button in different states. See [IconButtonDefaults.filledIconButtonColors].
  * @param content the content of this icon button, typically an [Icon]
  */
-@ExperimentalMaterial3Api
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilledTonalIconButton(
     onClick: () -> Unit,
@@ -311,7 +311,7 @@ fun FilledTonalIconButton(
  * button in different states. See [IconButtonDefaults.filledIconToggleButtonColors].
  * @param content the content of this icon button, typically an [Icon]
  */
-@ExperimentalMaterial3Api
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilledIconToggleButton(
     checked: Boolean,
@@ -375,7 +375,7 @@ fun FilledIconToggleButton(
  * button in different states. See [IconButtonDefaults.filledIconToggleButtonColors].
  * @param content the content of this icon button, typically an [Icon]
  */
-@ExperimentalMaterial3Api
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilledTonalIconToggleButton(
     checked: Boolean,
@@ -441,7 +441,7 @@ fun FilledTonalIconToggleButton(
  * button in different states. See [IconButtonDefaults.outlinedIconButtonColors].
  * @param content the content of this icon button, typically an [Icon]
  */
-@ExperimentalMaterial3Api
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OutlinedIconButton(
     onClick: () -> Unit,
@@ -502,7 +502,7 @@ fun OutlinedIconButton(
  * button in different states. See [IconButtonDefaults.outlinedIconToggleButtonColors].
  * @param content the content of this icon button, typically an [Icon]
  */
-@ExperimentalMaterial3Api
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OutlinedIconToggleButton(
     checked: Boolean,
