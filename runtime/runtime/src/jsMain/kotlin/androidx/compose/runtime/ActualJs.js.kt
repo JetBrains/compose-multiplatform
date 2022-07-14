@@ -147,9 +147,6 @@ internal actual fun <T> createSnapshotMutableState(
     policy: SnapshotMutationPolicy<T>
 ): SnapshotMutableState<T> = SnapshotMutableStateImpl(value, policy)
 
-annotation class NoOp
-actual typealias JvmDefaultWithCompatibility = NoOp
-
 @ExperimentalComposeApi
 internal actual class SnapshotContextElementImpl actual constructor(
     private val snapshot: Snapshot

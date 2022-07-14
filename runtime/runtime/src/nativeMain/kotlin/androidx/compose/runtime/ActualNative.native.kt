@@ -144,9 +144,6 @@ internal actual class SnapshotThreadLocal<T> actual constructor() {
     }
 }
 
-annotation class NoOp
-actual typealias JvmDefaultWithCompatibility = NoOp
-
 @ExperimentalComposeApi
 internal actual class SnapshotContextElementImpl actual constructor(
     private val snapshot: Snapshot

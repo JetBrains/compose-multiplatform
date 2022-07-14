@@ -83,6 +83,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 api("androidx.annotation:annotation:1.1.0")
             }
 
+            jsNativeMain.dependsOn(commonMain)
+            jsMain.dependsOn(jsNativeMain)
+            nativeMain.dependsOn(jsNativeMain)
+
             commonTest.dependencies {
                 implementation(kotlin("test-junit"))
             }

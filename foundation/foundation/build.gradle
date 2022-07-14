@@ -130,8 +130,9 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                     implementation(libs.kotlinStdlib)
                 }
             }
-            jsMain.dependsOn(skikoMain)
-            nativeMain.dependsOn(skikoMain)
+            jsNativeMain.dependsOn(skikoMain)
+            jsMain.dependsOn(jsNativeMain)
+            nativeMain.dependsOn(jsNativeMain)
 
             commonTest {
                 dependencies {

@@ -129,6 +129,11 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                     implementation(libs.kotlinStdlibJs)
                 }
             }
+
+            jsNativeMain.dependsOn(commonMain)
+            jsMain.dependsOn(jsNativeMain)
+            nativeMain.dependsOn(jsNativeMain)
+
             jvmTest.dependencies {
                 implementation(libs.kotlinTestJunit)
                 implementation(libs.kotlinCoroutinesTest)
