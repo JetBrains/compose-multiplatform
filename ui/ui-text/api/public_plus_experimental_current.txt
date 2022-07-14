@@ -987,6 +987,9 @@ package androidx.compose.ui.text.input {
   public final class GapBufferKt {
   }
 
+  public final class GapBuffer_jvmKt {
+  }
+
   @kotlin.jvm.JvmInline public final value class ImeAction {
     field public static final androidx.compose.ui.text.input.ImeAction.Companion Companion;
   }
