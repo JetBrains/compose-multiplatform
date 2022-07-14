@@ -17,7 +17,7 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- Spoken description of indeterminate state of a tri-state checkbox -->
-    <string name="indeterminate">Neither checked nor unchecked</string>
+    <string name="indeterminate">Partially checked</string>
     <!-- Spoken description of on state of a switch -->
     <string name="on">On</string>
     <!-- Spoken description of off state of a switch -->
