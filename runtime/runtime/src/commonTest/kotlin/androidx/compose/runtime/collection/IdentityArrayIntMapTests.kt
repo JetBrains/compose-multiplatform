@@ -46,6 +46,16 @@ class IdentityArrayIntMapTests {
     }
 
     @Test
+    fun addReturnsWhetherValueWasAdded() {
+        val map = IdentityArrayIntMap()
+        val key1 = Any()
+
+        assertEquals(-1, map.add(key1, 0))
+        assertEquals(0, map.add(key1, 0))
+        assertEquals(0, map.add(key1, 1))
+    }
+
+    @Test
     fun canRemoveValues() {
         val map = IdentityArrayIntMap()
         val keys = Array<Any>(100) { Any() }
