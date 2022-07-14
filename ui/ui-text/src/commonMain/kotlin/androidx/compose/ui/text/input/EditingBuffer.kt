@@ -50,13 +50,19 @@ class EditingBuffer(
      * The inclusive selection start offset
      */
     internal var selectionStart = selection.min
-        private set
+        private set(value) {
+            require(value >= 0) { "Cannot set selectionStart to a negative value: $value" }
+            field = value
+        }
 
     /**
      * The exclusive selection end offset
      */
     internal var selectionEnd = selection.max
-        private set
+        private set(value) {
+            require(value >= 0) { "Cannot set selectionEnd to a negative value: $value" }
+            field = value
+        }
 
     /**
      * The inclusive composition start offset

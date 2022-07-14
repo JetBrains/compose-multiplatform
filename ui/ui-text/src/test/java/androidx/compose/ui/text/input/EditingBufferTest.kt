@@ -19,6 +19,7 @@ package androidx.compose.ui.text.input
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.matchers.assertThat
 import com.google.common.truth.Truth.assertThat
+import kotlin.test.assertFailsWith
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -27,7 +28,7 @@ import org.junit.runners.JUnit4
 class EditingBufferTest {
 
     @Test
-    fun test_insert() {
+    fun insert() {
         val eb = EditingBuffer("", TextRange.Zero)
 
         eb.replace(0, 0, "A")
@@ -62,7 +63,7 @@ class EditingBufferTest {
     }
 
     @Test
-    fun test_delete() {
+    fun delete() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
         eb.replace(0, 1, "")
@@ -98,7 +99,7 @@ class EditingBufferTest {
     }
 
     @Test
-    fun test_setSelection() {
+    fun setSelection() {
         val eb = EditingBuffer("ABCDE", TextRange(0, 3))
         assertThat(eb).hasChars("ABCDE")
         assertThat(eb.cursor).isEqualTo(-1)
@@ -136,8 +137,24 @@ class EditingBufferTest {
         assertThat(eb.compositionEnd).isEqualTo(-1)
     }
 
+    @Test fun setSelection_throws_whenNegativeStart() {
+        val eb = EditingBuffer("ABCDE", TextRange.Zero)
+
+        assertFailsWith<IndexOutOfBoundsException> {
+            eb.setSelection(-1, 0)
+        }
+    }
+
+    @Test fun setSelection_throws_whenNegativeEnd() {
+        val eb = EditingBuffer("ABCDE", TextRange.Zero)
+
+        assertFailsWith<IndexOutOfBoundsException> {
+            eb.setSelection(0, -1)
+        }
+    }
+
     @Test
-    fun test_setCompostion_and_cancelComposition() {
+    fun setCompostion_and_cancelComposition() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
         eb.setComposition(0, 5) // Make all text as composition
@@ -178,7 +195,7 @@ class EditingBufferTest {
     }
 
     @Test
-    fun test_setCompostion_and_commitComposition() {
+    fun setCompostion_and_commitComposition() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
         eb.setComposition(0, 5) // Make all text as composition
@@ -219,7 +236,7 @@ class EditingBufferTest {
     }
 
     @Test
-    fun test_setCursor_and_get_cursor() {
+    fun setCursor_and_get_cursor() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
         eb.cursor = 1
@@ -251,7 +268,7 @@ class EditingBufferTest {
     }
 
     @Test
-    fun test_delete_preceding_cursor_no_composition() {
+    fun delete_preceding_cursor_no_composition() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
         eb.delete(1, 2)
@@ -261,7 +278,7 @@ class EditingBufferTest {
     }
 
     @Test
-    fun test_delete_trailing_cursor_no_composition() {
+    fun delete_trailing_cursor_no_composition() {
         val eb = EditingBuffer("ABCDE", TextRange(3))
 
         eb.delete(1, 2)
@@ -271,7 +288,7 @@ class EditingBufferTest {
     }
 
     @Test
-    fun test_delete_preceding_selection_no_composition() {
+    fun delete_preceding_selection_no_composition() {
         val eb = EditingBuffer("ABCDE", TextRange(0, 1))
 
         eb.delete(1, 2)
@@ -282,7 +299,7 @@ class EditingBufferTest {
     }
 
     @Test
-    fun test_delete_trailing_selection_no_composition() {
+    fun delete_trailing_selection_no_composition() {
         val eb = EditingBuffer("ABCDE", TextRange(4, 5))
 
         eb.delete(1, 2)
@@ -293,7 +310,7 @@ class EditingBufferTest {
     }
 
     @Test
-    fun test_delete_covered_cursor() {
+    fun delete_covered_cursor() {
         // AB[]CDE
         val eb = EditingBuffer("ABCDE", TextRange(2, 2))
 
@@ -305,7 +322,7 @@ class EditingBufferTest {
     }
 
     @Test
-    fun test_delete_covered_selection() {
+    fun delete_covered_selection() {
         // A[BC]DE
         val eb = EditingBuffer("ABCDE", TextRange(1, 3))
 
@@ -317,7 +334,7 @@ class EditingBufferTest {
     }
 
     @Test
-    fun test_delete_intersects_first_half_of_selection() {
+    fun delete_intersects_first_half_of_selection() {
         // AB[CD]E
         val eb = EditingBuffer("ABCDE", TextRange(2, 4))
 
@@ -329,7 +346,7 @@ class EditingBufferTest {
     }
 
     @Test
-    fun test_delete_intersects_second_half_of_selection() {
+    fun delete_intersects_second_half_of_selection() {
         // A[BCD]EFG
         val eb = EditingBuffer("ABCDEFG", TextRange(1, 4))
 
@@ -341,7 +358,7 @@ class EditingBufferTest {
     }
 
     @Test
-    fun test_delete_preceding_composition_no_intersection() {
+    fun delete_preceding_composition_no_intersection() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
         eb.setComposition(1, 2)
@@ -354,7 +371,7 @@ class EditingBufferTest {
     }
 
     @Test
-    fun test_delete_trailing_composition_no_intersection() {
+    fun delete_trailing_composition_no_intersection() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
         eb.setComposition(3, 4)
@@ -367,7 +384,7 @@ class EditingBufferTest {
     }
 
     @Test
-    fun test_delete_preceding_composition_intersection() {
+    fun delete_preceding_composition_intersection() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
         eb.setComposition(1, 3)
@@ -380,7 +397,7 @@ class EditingBufferTest {
     }
 
     @Test
-    fun test_delete_trailing_composition_intersection() {
+    fun delete_trailing_composition_intersection() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
         eb.setComposition(3, 5)
@@ -393,7 +410,7 @@ class EditingBufferTest {
     }
 
     @Test
-    fun test_delete_composition_contains_delrange() {
+    fun delete_composition_contains_delrange() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
         eb.setComposition(2, 5)
@@ -406,7 +423,7 @@ class EditingBufferTest {
     }
 
     @Test
-    fun test_delete_delrange_contains_composition() {
+    fun delete_delrange_contains_composition() {
         val eb = EditingBuffer("ABCDE", TextRange.Zero)
 
         eb.setComposition(3, 4)

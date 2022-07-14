@@ -107,7 +107,15 @@ class EditProcessor {
      * @return the [TextFieldValue] representation of the final buffer state.
      */
     fun apply(editCommands: List<EditCommand>): TextFieldValue {
-        editCommands.fastForEach { it.applyTo(mBuffer) }
+        var lastCommand: EditCommand? = null
+        try {
+            editCommands.fastForEach {
+                lastCommand = it
+                it.applyTo(mBuffer)
+            }
+        } catch (e: Exception) {
+            throw RuntimeException(generateBatchErrorMessage(editCommands, lastCommand), e)
+        }
 
         val newState = TextFieldValue(
             annotatedString = mBuffer.toAnnotatedString(),
@@ -123,4 +131,21 @@ class EditProcessor {
      * Returns the current state of the internal editing buffer as a [TextFieldValue].
      */
     fun toTextFieldValue(): TextFieldValue = mBufferState
+
+    private fun generateBatchErrorMessage(
+        editCommands: List<EditCommand>,
+        failedCommand: EditCommand?,
+    ): String = buildString {
+        appendLine(
+            "Error while applying EditCommand batch to buffer (" +
+                "length=${mBuffer.length}, " +
+                "composition=${mBuffer.composition}, " +
+                "selection=${mBuffer.selection}):"
+        )
+        @Suppress("ListIterator")
+        editCommands.joinTo(this, separator = "\n") {
+            val prefix = if (failedCommand === it) " > " else "   "
+            prefix + it.toStringForLog()
+        }
+    }
 }

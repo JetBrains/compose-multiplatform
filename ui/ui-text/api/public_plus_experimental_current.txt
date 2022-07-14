@@ -960,6 +960,7 @@ package androidx.compose.ui.text.input {
 
   public interface EditCommand {
     method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
+    method public default String toStringForLog();
   }
 
   public final class EditCommandKt {
