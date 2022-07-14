@@ -543,6 +543,39 @@ class SnapshotStateObserverTestsCommon {
     }
 
     @Test
+    fun readingDerivedStateWithDependencyChangeInvalidates() {
+        var changes = 0
+
+        runSimpleTest { stateObserver, state ->
+            val state2 = mutableStateOf(false)
+            val derivedState = derivedStateOf {
+                if (state2.value) {
+                    state.value
+                } else {
+                    null
+                }
+            }
+            val onChange: (String) -> Unit = { changes++ }
+
+            stateObserver.observeReads("scope", onChange) {
+                // read derived state
+                derivedState.value
+            }
+
+            state2.value = true
+            // advance snapshot
+            Snapshot.sendApplyNotifications()
+            Snapshot.notifyObjectsInitialized()
+
+            stateObserver.observeReads("scope", onChange) {
+                // read derived state
+                derivedState.value
+            }
+        }
+        assertEquals(2, changes)
+    }
+
+    @Test
     fun readingDerivedStateConditionallyInvalidatesBothScopes() {
         var changes = 0
 
@@ -559,6 +592,9 @@ class SnapshotStateObserverTestsCommon {
             stateObserver.observeReads("other scope", onChange) {
                 derivedState.value
             }
+
+            // advance snapshot to invalidate reads
+            Snapshot.notifyObjectsInitialized()
 
             // stop observing state in other scope
             stateObserver.observeReads("other scope", onChange) {
