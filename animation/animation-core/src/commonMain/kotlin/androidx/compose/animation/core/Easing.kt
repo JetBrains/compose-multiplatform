@@ -102,6 +102,12 @@ class CubicBezierEasing(
     private val d: Float
 ) : Easing {
 
+    init {
+        require(!a.isNaN() && !b.isNaN() && !c.isNaN() && !d.isNaN()) {
+            "Parameters to CubicBezierEasing cannot be NaN. Actual parameters are: $a, $b, $c, $d."
+        }
+    }
+
     private fun evaluateCubic(a: Float, b: Float, m: Float): Float {
         return 3 * a * (1 - m) * (1 - m) * m +
             3 * b * (1 - m) * /*    */ m * m +
