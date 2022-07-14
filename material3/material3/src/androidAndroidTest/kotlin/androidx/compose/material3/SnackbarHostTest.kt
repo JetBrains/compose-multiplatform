@@ -134,7 +134,7 @@ class SnackbarHostTest {
         val job2 = scope.launch {
             val result = hostState.showSnackbar(
                 message = "1",
-                actionLabel = "do not press"
+                actionLabel = null
             )
             Truth.assertThat(result).isEqualTo(SnackbarResult.Dismissed)
         }
