@@ -30,6 +30,7 @@ dependencies {
 
     compileOnly(project(":annotation:annotation-sampled"))
 
+    implementation("androidx.activity:activity-compose:1.5.0")
     implementation("androidx.compose.animation:animation:1.0.0")
     implementation("androidx.compose.foundation:foundation:1.0.0")
     implementation("androidx.compose.foundation:foundation-layout:1.0.0")
