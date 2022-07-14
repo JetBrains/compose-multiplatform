@@ -46,7 +46,7 @@ dependencies {
         api(project(":compose:ui:ui-graphics"))
         api(project(":compose:ui:ui-text"))
         api(project(":compose:ui:ui-unit"))
-        api("androidx.annotation:annotation:1.1.0")
+        api(project(":annotation:annotation"))
 
         // This has stub APIs for access to legacy Android APIs, so we don't want
         // any dependency on this module.
@@ -146,7 +146,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 // This has stub APIs for access to legacy Android APIs, so we don't want
                 // any dependency on this module.
                 compileOnly(project(":compose:ui:ui-android-stubs"))
-                api("androidx.annotation:annotation:1.1.0")
+                api(project(":annotation:annotation"))
                 implementation("androidx.autofill:autofill:1.0.0")
                 implementation(libs.kotlinCoroutinesAndroid)
 
