@@ -98,7 +98,7 @@ fun TextFieldWithIcons() {
     TextField(
         value = text,
         onValueChange = { text = it },
-        placeholder = { Text("placeholder") },
+        label = { Text("Label") },
         leadingIcon = { Icon(Icons.Filled.Favorite, contentDescription = "Localized description") },
         trailingIcon = { Icon(Icons.Filled.Info, contentDescription = "Localized description") }
     )

@@ -34,6 +34,7 @@ import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
@@ -125,6 +126,45 @@ class NavigationRailTest {
             .assertIsSelected()
             .assertIsNotEnabled()
             .assertHasClickAction()
+    }
+
+    @Test
+    fun navigationRailItem_clearsSemanticsOfIcon_whenLabelIsPresent() {
+        rule.setMaterialContent(lightColorScheme()) {
+            NavigationRail {
+                NavigationRailItem(
+                    modifier = Modifier.testTag("item1"),
+                    icon = {
+                        Icon(Icons.Filled.Favorite, "Favorite")
+                    },
+                    label = {
+                        Text("Favorite")
+                    },
+                    selected = true,
+                    alwaysShowLabel = false,
+                    onClick = {}
+                )
+                NavigationRailItem(
+                    modifier = Modifier.testTag("item2"),
+                    icon = {
+                        Icon(Icons.Filled.Favorite, "Favorite")
+                    },
+                    label = {
+                        Text("Favorite")
+                    },
+                    selected = false,
+                    alwaysShowLabel = false,
+                    onClick = {}
+                )
+            }
+        }
+
+        val node1 = rule.onNodeWithTag("item1").fetchSemanticsNode()
+        val node2 = rule.onNodeWithTag("item2").fetchSemanticsNode()
+
+        Truth.assertThat(node1.config.getOrNull(SemanticsProperties.ContentDescription)).isNull()
+        Truth.assertThat(node2.config.getOrNull(SemanticsProperties.ContentDescription))
+            .isEqualTo(listOf("Favorite"))
     }
 
     @Test

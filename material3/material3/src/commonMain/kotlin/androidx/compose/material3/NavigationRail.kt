@@ -55,6 +55,7 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainWidth
@@ -163,7 +164,11 @@ fun NavigationRailItem(
 ) {
     val styledIcon = @Composable {
         val iconColor by colors.iconColor(selected = selected)
-        CompositionLocalProvider(LocalContentColor provides iconColor, content = icon)
+        // If there's a label, don't have a11y services repeat the icon description.
+        val clearSemantics = alwaysShowLabel || selected
+        Box(modifier = if (clearSemantics) Modifier.clearAndSetSemantics {} else Modifier) {
+            CompositionLocalProvider(LocalContentColor provides iconColor, content = icon)
+        }
     }
 
     val styledLabel: @Composable (() -> Unit)? = label?.let {

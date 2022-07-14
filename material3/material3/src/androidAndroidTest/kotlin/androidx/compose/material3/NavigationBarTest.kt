@@ -32,6 +32,7 @@ import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
@@ -57,6 +58,7 @@ import androidx.compose.ui.unit.width
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -123,6 +125,45 @@ class NavigationBarTest {
             .assertIsSelected()
             .assertIsNotEnabled()
             .assertHasClickAction()
+    }
+
+    @Test
+    fun navigationBarItem_clearsSemanticsOfIcon_whenLabelIsPresent() {
+        rule.setMaterialContent(lightColorScheme()) {
+            NavigationBar {
+                NavigationBarItem(
+                    modifier = Modifier.testTag("item1"),
+                    icon = {
+                        Icon(Icons.Filled.Favorite, "Favorite")
+                    },
+                    label = {
+                        Text("Favorite")
+                    },
+                    selected = true,
+                    alwaysShowLabel = false,
+                    onClick = {}
+                )
+                NavigationBarItem(
+                    modifier = Modifier.testTag("item2"),
+                    icon = {
+                        Icon(Icons.Filled.Favorite, "Favorite")
+                    },
+                    label = {
+                        Text("Favorite")
+                    },
+                    selected = false,
+                    alwaysShowLabel = false,
+                    onClick = {}
+                )
+            }
+        }
+
+        val node1 = rule.onNodeWithTag("item1").fetchSemanticsNode()
+        val node2 = rule.onNodeWithTag("item2").fetchSemanticsNode()
+
+        assertThat(node1.config.getOrNull(SemanticsProperties.ContentDescription)).isNull()
+        assertThat(node2.config.getOrNull(SemanticsProperties.ContentDescription))
+            .isEqualTo(listOf("Favorite"))
     }
 
     @Test
