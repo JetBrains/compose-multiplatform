@@ -256,6 +256,13 @@ class PartialGapBuffer(var text: String) {
      * @param text a text to replace
      */
     fun replace(start: Int, end: Int, text: String) {
+        require(start <= end) {
+            "start index must be less than or equal to end index: $start > $end"
+        }
+        require(start >= 0) {
+            "start must be non-negative, but was $start"
+        }
+
         val buffer = buffer
         if (buffer == null) { // First time to create gap buffer
             val charArray = CharArray(maxOf(BUF_SIZE, text.length + 2 * SURROUNDING_SIZE))
@@ -280,9 +287,9 @@ class PartialGapBuffer(var text: String) {
 
             this.buffer = GapBuffer(
                 charArray,
-                leftCopyCount + text.length, // gap start
-                charArray.size - rightCopyCount
-            ) // gap end
+                initGapStart = leftCopyCount + text.length,
+                initGapEnd = charArray.size - rightCopyCount
+            )
             bufStart = start - leftCopyCount
             bufEnd = end + rightCopyCount
             return

@@ -27,6 +27,7 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.reset
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
+import kotlin.test.assertFailsWith
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -297,5 +298,40 @@ class EditProcessorTest {
         assertThat(processor.mBufferState.text).isEqualTo(newValue.text)
         assertThat(processor.mBufferState.composition).isEqualTo(composition)
         assertThat(processor.mBufferState.selection).isEqualTo(newSelection)
+    }
+
+    @Test
+    fun throwsDescriptiveMessage_whenCommandFailsInBatch() {
+        fun invalidCommand(index: Int) = object : EditCommand {
+            override fun applyTo(buffer: EditingBuffer) {
+                throw RuntimeException("Better luck next time")
+            }
+
+            override fun toStringForLog(): String = "InvalidCommand(index=$index)"
+        }
+
+        val processor = EditProcessor().apply {
+            mBuffer.replace(0, 0, "hello world")
+            mBuffer.setSelection(0, 5)
+            mBuffer.setComposition(5, 7)
+        }
+        val batch = listOf(
+            CommitTextCommand("ab", 0),
+            invalidCommand(42),
+            SetSelectionCommand(0, 2),
+        )
+
+        val error = assertFailsWith<RuntimeException> {
+            processor.apply(batch)
+        }
+
+        assertThat(error).hasMessageThat().isEqualTo(
+            "Error while applying EditCommand batch to buffer " +
+                "(length=11, composition=null, selection=TextRange(5, 5)):\n" +
+                "   CommitTextCommand(text.length=2, newCursorPosition=0)\n" +
+                " > InvalidCommand(index=42)\n" +
+                "   SetSelectionCommand(start=0, end=2)"
+        )
+        assertThat(error).hasCauseThat().hasMessageThat().isEqualTo("Better luck next time")
     }
 }
