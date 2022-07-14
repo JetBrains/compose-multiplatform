@@ -53,7 +53,13 @@ class PermanentNavigationDrawerTest {
         rule.setMaterialContent(lightColorScheme()) {
             PermanentNavigationDrawer(
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag("content"))
+                    PermanentDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("content")
+                        )
+                    }
                 },
                 content = {}
             )
@@ -69,7 +75,13 @@ class PermanentNavigationDrawerTest {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 PermanentNavigationDrawer(
                     drawerContent = {
-                        Box(Modifier.fillMaxSize().testTag("content"))
+                        PermanentDrawerSheet {
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .testTag("content")
+                            )
+                        }
                     },
                     content = {}
                 )
@@ -87,7 +99,13 @@ class PermanentNavigationDrawerTest {
         rule.setMaterialContent(lightColorScheme()) {
             PermanentNavigationDrawer(
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag("content"))
+                    PermanentDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("content")
+                        )
+                    }
                 },
                 content = {}
             )
@@ -104,7 +122,13 @@ class PermanentNavigationDrawerTest {
         rule.setMaterialContent(lightColorScheme()) {
             PermanentNavigationDrawer(
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag("navigationDrawerTag"))
+                    PermanentDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("navigationDrawerTag")
+                        )
+                    }
                 },
                 content = {}
             )
