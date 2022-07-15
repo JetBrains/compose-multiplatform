@@ -171,6 +171,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public static void sourceInformationMarkerStart(androidx.compose.runtime.Composer composer, int key, String sourceInformation);
     method @androidx.compose.runtime.ComposeCompilerApi public static void traceEventEnd();
     method @androidx.compose.runtime.ComposeCompilerApi public static void traceEventStart(int key, int dirty1, int dirty2, String info);
+    method @Deprecated @androidx.compose.runtime.ComposeCompilerApi public static void traceEventStart(int key, String info);
   }
 
   public interface Composition {
