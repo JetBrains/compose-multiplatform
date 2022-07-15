@@ -257,7 +257,9 @@ class AndroidAccessibilityTest {
         // We temporary send Switch role as a separate fake node
         val switchRoleNode = toggleableNode.replacedChildren.last()
         val switchRoleNodeInfo = provider.createAccessibilityNodeInfo(switchRoleNode.id)!!
-        assertEquals("android.widget.Switch", switchRoleNodeInfo.className)
+        assertEquals("android.view.View", switchRoleNodeInfo.className)
+// TODO(aelias)
+        // assertEquals("Switch", switchRoleNodeInfo.roleDescription)
 
         val stateDescription = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {

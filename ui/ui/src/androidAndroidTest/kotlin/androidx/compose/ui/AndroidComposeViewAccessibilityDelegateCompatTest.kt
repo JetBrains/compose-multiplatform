@@ -361,7 +361,16 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             role = Role.Switch
         }
         accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
-        assertEquals("android.widget.Switch", info.className)
+        assertEquals("android.view.View", info.className)
+    }
+
+    @Test
+    fun testPopulateAccessibilityNodeInfoProperties_switchRoleDescription() {
+        val semanticsNode = createSemanticsNodeWithProperties(1, true) {
+            role = Role.Switch
+        }
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, semanticsNode)
+        assertEquals("Switch", info.roleDescription)
     }
 
     @Test
