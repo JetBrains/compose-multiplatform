@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
@@ -158,13 +157,6 @@ fun InputChipSample() {
         selected = selected,
         onClick = { selected = !selected },
         label = { Text("Input Chip") },
-        trailingIcon = {
-            Icon(
-                Icons.Filled.Close,
-                contentDescription = "Localized description",
-                Modifier.size(InputChipDefaults.IconSize)
-            )
-        }
     )
 }
 
@@ -182,13 +174,6 @@ fun InputChipWithAvatarSample() {
                 Icons.Filled.Person,
                 contentDescription = "Localized description",
                 Modifier.size(InputChipDefaults.AvatarSize)
-            )
-        },
-        trailingIcon = {
-            Icon(
-                Icons.Filled.Close,
-                contentDescription = "Localized description",
-                Modifier.size(InputChipDefaults.IconSize)
             )
         }
     )
