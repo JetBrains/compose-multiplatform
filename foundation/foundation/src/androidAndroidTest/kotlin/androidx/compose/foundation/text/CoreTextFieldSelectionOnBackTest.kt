@@ -46,7 +46,6 @@ import androidx.compose.ui.text.input.TextInputService
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -73,7 +72,6 @@ class CoreTextFieldSelectionOnBackTest {
         )
     )
 
-    @Ignore // b/209063017
     @Test
     fun whenBackPressed_andReleased_coreTextFieldClearsSelection() {
         val results = mutableListOf<TextFieldValue>()
@@ -100,6 +98,7 @@ class CoreTextFieldSelectionOnBackTest {
         textNode.performKeyPress(backKeyUp)
         val expected = TextRange(3, 3)
         rule.waitForIdle()
+        rule.waitUntil { results.last().selection.collapsed }
         assertThat(results.last().selection).isEqualTo(expected)
     }
 
