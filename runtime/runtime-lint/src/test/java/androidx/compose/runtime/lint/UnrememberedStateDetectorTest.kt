@@ -31,13 +31,13 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 
 /**
- * Test for [UnrememberedMutableStateDetector].
+ * Test for [UnrememberedStateDetector].
  */
-class UnrememberedMutableStateDetectorTest : LintDetectorTest() {
-    override fun getDetector(): Detector = UnrememberedMutableStateDetector()
+class UnrememberedStateDetectorTest : LintDetectorTest() {
+    override fun getDetector(): Detector = UnrememberedStateDetector()
 
     override fun getIssues(): MutableList<Issue> =
-        mutableListOf(UnrememberedMutableStateDetector.UnrememberedMutableState)
+        mutableListOf(UnrememberedStateDetector.UnrememberedState)
 
     @Test
     fun notRemembered() {
@@ -53,18 +53,21 @@ class UnrememberedMutableStateDetectorTest : LintDetectorTest() {
                     val foo = mutableStateOf(0)
                     val bar = mutableStateListOf<Int>()
                     val baz = mutableStateMapOf<Int, Float>()
+                    val derived = derivedStateOf { foo.value }
                 }
 
                 val lambda = @Composable {
                     val foo = mutableStateOf(0)
                     val bar = mutableStateListOf<Int>()
                     val baz = mutableStateMapOf<Int, Float>()
+                    val derived = derivedStateOf { foo.value }
                 }
 
                 val lambda2: @Composable () -> Unit = {
                     val foo = mutableStateOf(0)
                     val bar = mutableStateListOf<Int>()
                     val baz = mutableStateMapOf<Int, Float>()
+                    val derived = derivedStateOf { foo.value }
                 }
 
                 @Composable
@@ -76,11 +79,13 @@ class UnrememberedMutableStateDetectorTest : LintDetectorTest() {
                         val foo = mutableStateOf(0)
                         val bar = mutableStateListOf<Int>()
                         val baz = mutableStateMapOf<Int, Float>()
+                        val derived = derivedStateOf { foo.value }
                     })
                     LambdaParameter {
                         val foo = mutableStateOf(0)
                         val bar = mutableStateListOf<Int>()
                         val baz = mutableStateMapOf<Int, Float>()
+                        val derived = derivedStateOf { foo.value }
                     }
                 }
 
@@ -89,12 +94,14 @@ class UnrememberedMutableStateDetectorTest : LintDetectorTest() {
                         val foo = mutableStateOf(0)
                         val bar = mutableStateListOf<Int>()
                         val baz = mutableStateMapOf<Int, Float>()
+                        val derived = derivedStateOf { foo.value }
                     }
 
                     val localLambda2: @Composable () -> Unit = {
                         val foo = mutableStateOf(0)
                         val bar = mutableStateListOf<Int>()
                         val baz = mutableStateMapOf<Int, Float>()
+                        val derived = derivedStateOf { foo.value }
                     }
                 }
 
@@ -104,6 +111,7 @@ class UnrememberedMutableStateDetectorTest : LintDetectorTest() {
                         val foo = mutableStateOf(0)
                         val bar = mutableStateListOf<Int>()
                         val baz = mutableStateMapOf<Int, Float>()
+                        val derived = derivedStateOf { foo.value }
                     }
                 }
             """
@@ -125,70 +133,94 @@ src/androidx/compose/runtime/foo/{.kt:9: Error: Creating a state object during c
 src/androidx/compose/runtime/foo/{.kt:10: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
                     val baz = mutableStateMapOf<Int, Float>()
                               ~~~~~~~~~~~~~~~~~
-src/androidx/compose/runtime/foo/{.kt:14: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
-                    val foo = mutableStateOf(0)
-                              ~~~~~~~~~~~~~~
+src/androidx/compose/runtime/foo/{.kt:11: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+                    val derived = derivedStateOf { foo.value }
+                                  ~~~~~~~~~~~~~~
 src/androidx/compose/runtime/foo/{.kt:15: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
-                    val bar = mutableStateListOf<Int>()
-                              ~~~~~~~~~~~~~~~~~~
-src/androidx/compose/runtime/foo/{.kt:16: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
-                    val baz = mutableStateMapOf<Int, Float>()
-                              ~~~~~~~~~~~~~~~~~
-src/androidx/compose/runtime/foo/{.kt:20: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
                     val foo = mutableStateOf(0)
                               ~~~~~~~~~~~~~~
-src/androidx/compose/runtime/foo/{.kt:21: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+src/androidx/compose/runtime/foo/{.kt:16: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
                     val bar = mutableStateListOf<Int>()
                               ~~~~~~~~~~~~~~~~~~
-src/androidx/compose/runtime/foo/{.kt:22: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+src/androidx/compose/runtime/foo/{.kt:17: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
                     val baz = mutableStateMapOf<Int, Float>()
                               ~~~~~~~~~~~~~~~~~
-src/androidx/compose/runtime/foo/{.kt:31: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+src/androidx/compose/runtime/foo/{.kt:18: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+                    val derived = derivedStateOf { foo.value }
+                                  ~~~~~~~~~~~~~~
+src/androidx/compose/runtime/foo/{.kt:22: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+                    val foo = mutableStateOf(0)
+                              ~~~~~~~~~~~~~~
+src/androidx/compose/runtime/foo/{.kt:23: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+                    val bar = mutableStateListOf<Int>()
+                              ~~~~~~~~~~~~~~~~~~
+src/androidx/compose/runtime/foo/{.kt:24: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+                    val baz = mutableStateMapOf<Int, Float>()
+                              ~~~~~~~~~~~~~~~~~
+src/androidx/compose/runtime/foo/{.kt:25: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+                    val derived = derivedStateOf { foo.value }
+                                  ~~~~~~~~~~~~~~
+src/androidx/compose/runtime/foo/{.kt:34: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
                         val foo = mutableStateOf(0)
                                   ~~~~~~~~~~~~~~
-src/androidx/compose/runtime/foo/{.kt:32: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+src/androidx/compose/runtime/foo/{.kt:35: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
                         val bar = mutableStateListOf<Int>()
                                   ~~~~~~~~~~~~~~~~~~
-src/androidx/compose/runtime/foo/{.kt:33: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
-                        val baz = mutableStateMapOf<Int, Float>()
-                                  ~~~~~~~~~~~~~~~~~
 src/androidx/compose/runtime/foo/{.kt:36: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
-                        val foo = mutableStateOf(0)
-                                  ~~~~~~~~~~~~~~
+                        val baz = mutableStateMapOf<Int, Float>()
+                                  ~~~~~~~~~~~~~~~~~
 src/androidx/compose/runtime/foo/{.kt:37: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
-                        val bar = mutableStateListOf<Int>()
-                                  ~~~~~~~~~~~~~~~~~~
-src/androidx/compose/runtime/foo/{.kt:38: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
-                        val baz = mutableStateMapOf<Int, Float>()
-                                  ~~~~~~~~~~~~~~~~~
-src/androidx/compose/runtime/foo/{.kt:44: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+                        val derived = derivedStateOf { foo.value }
+                                      ~~~~~~~~~~~~~~
+src/androidx/compose/runtime/foo/{.kt:40: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
                         val foo = mutableStateOf(0)
                                   ~~~~~~~~~~~~~~
-src/androidx/compose/runtime/foo/{.kt:45: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+src/androidx/compose/runtime/foo/{.kt:41: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
                         val bar = mutableStateListOf<Int>()
                                   ~~~~~~~~~~~~~~~~~~
-src/androidx/compose/runtime/foo/{.kt:46: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+src/androidx/compose/runtime/foo/{.kt:42: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
                         val baz = mutableStateMapOf<Int, Float>()
                                   ~~~~~~~~~~~~~~~~~
+src/androidx/compose/runtime/foo/{.kt:43: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+                        val derived = derivedStateOf { foo.value }
+                                      ~~~~~~~~~~~~~~
+src/androidx/compose/runtime/foo/{.kt:49: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+                        val foo = mutableStateOf(0)
+                                  ~~~~~~~~~~~~~~
 src/androidx/compose/runtime/foo/{.kt:50: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
-                        val foo = mutableStateOf(0)
-                                  ~~~~~~~~~~~~~~
-src/androidx/compose/runtime/foo/{.kt:51: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
                         val bar = mutableStateListOf<Int>()
                                   ~~~~~~~~~~~~~~~~~~
+src/androidx/compose/runtime/foo/{.kt:51: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+                        val baz = mutableStateMapOf<Int, Float>()
+                                  ~~~~~~~~~~~~~~~~~
 src/androidx/compose/runtime/foo/{.kt:52: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+                        val derived = derivedStateOf { foo.value }
+                                      ~~~~~~~~~~~~~~
+src/androidx/compose/runtime/foo/{.kt:56: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+                        val foo = mutableStateOf(0)
+                                  ~~~~~~~~~~~~~~
+src/androidx/compose/runtime/foo/{.kt:57: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+                        val bar = mutableStateListOf<Int>()
+                                  ~~~~~~~~~~~~~~~~~~
+src/androidx/compose/runtime/foo/{.kt:58: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
                         val baz = mutableStateMapOf<Int, Float>()
                                   ~~~~~~~~~~~~~~~~~
 src/androidx/compose/runtime/foo/{.kt:59: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+                        val derived = derivedStateOf { foo.value }
+                                      ~~~~~~~~~~~~~~
+src/androidx/compose/runtime/foo/{.kt:66: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
                         val foo = mutableStateOf(0)
                                   ~~~~~~~~~~~~~~
-src/androidx/compose/runtime/foo/{.kt:60: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+src/androidx/compose/runtime/foo/{.kt:67: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
                         val bar = mutableStateListOf<Int>()
                                   ~~~~~~~~~~~~~~~~~~
-src/androidx/compose/runtime/foo/{.kt:61: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+src/androidx/compose/runtime/foo/{.kt:68: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
                         val baz = mutableStateMapOf<Int, Float>()
                                   ~~~~~~~~~~~~~~~~~
-24 errors, 0 warnings
+src/androidx/compose/runtime/foo/{.kt:69: Error: Creating a state object during composition without using remember [UnrememberedMutableState]
+                        val derived = derivedStateOf { foo.value }
+                                      ~~~~~~~~~~~~~~
+32 errors, 0 warnings
             """
             )
     }
@@ -210,6 +242,7 @@ src/androidx/compose/runtime/foo/{.kt:61: Error: Creating a state object during 
                         val test = "test"
                         mutableStateMapOf<Int, Float>()
                     }
+                    val derived = remember { derivedStateOf { foo.value } }
                 }
 
                 val lambda = @Composable {
@@ -219,6 +252,7 @@ src/androidx/compose/runtime/foo/{.kt:61: Error: Creating a state object during 
                         val test = "test"
                         mutableStateMapOf<Int, Float>()
                     }
+                    val derived = remember { derivedStateOf { foo.value } }
                 }
 
                 val lambda2: @Composable () -> Unit = {
@@ -228,6 +262,7 @@ src/androidx/compose/runtime/foo/{.kt:61: Error: Creating a state object during 
                         val test = "test"
                         mutableStateMapOf<Int, Float>()
                     }
+                    val derived = remember { derivedStateOf { foo.value } }
                 }
 
                 @Composable
@@ -242,6 +277,7 @@ src/androidx/compose/runtime/foo/{.kt:61: Error: Creating a state object during 
                             val test = "test"
                             mutableStateMapOf<Int, Float>()
                         }
+                        val derived = remember { derivedStateOf { foo.value } }
                     })
                     LambdaParameter {
                         val foo = remember { mutableStateOf(0) }
@@ -250,6 +286,7 @@ src/androidx/compose/runtime/foo/{.kt:61: Error: Creating a state object during 
                             val test = "test"
                             mutableStateMapOf<Int, Float>()
                         }
+                        val derived = remember { derivedStateOf { foo.value } }
                     }
                 }
 
@@ -261,6 +298,7 @@ src/androidx/compose/runtime/foo/{.kt:61: Error: Creating a state object during 
                             val test = "test"
                             mutableStateMapOf<Int, Float>()
                         }
+                        val derived = remember { derivedStateOf { foo.value } }
                     }
 
                     val localLambda2: @Composable () -> Unit = {
@@ -270,6 +308,7 @@ src/androidx/compose/runtime/foo/{.kt:61: Error: Creating a state object during 
                             val test = "test"
                             mutableStateMapOf<Int, Float>()
                         }
+                        val derived = remember { derivedStateOf { foo.value } }
                     }
                 }
             """
@@ -295,18 +334,21 @@ src/androidx/compose/runtime/foo/{.kt:61: Error: Creating a state object during 
                     val foo = mutableStateOf(0)
                     val bar = mutableStateListOf<Int>()
                     val baz = mutableStateMapOf<Int, Float>()
+                    val derived = derivedStateOf { foo.value }
                 }
 
                 val lambda = {
                     val foo = mutableStateOf(0)
                     val bar = mutableStateListOf<Int>()
                     val baz = mutableStateMapOf<Int, Float>()
+                    val derived = derivedStateOf { foo.value }
                 }
 
                 val lambda2: () -> Unit = {
                     val foo = mutableStateOf(0)
                     val bar = mutableStateListOf<Int>()
                     val baz = mutableStateMapOf<Int, Float>()
+                    val derived = derivedStateOf { foo.value }
                 }
 
                 fun LambdaParameter(content: () -> Unit) {}
@@ -316,11 +358,13 @@ src/androidx/compose/runtime/foo/{.kt:61: Error: Creating a state object during 
                         val foo = mutableStateOf(0)
                         val bar = mutableStateListOf<Int>()
                         val baz = mutableStateMapOf<Int, Float>()
+                        val derived = derivedStateOf { foo.value }
                     })
                     LambdaParameter {
                         val foo = mutableStateOf(0)
                         val bar = mutableStateListOf<Int>()
                         val baz = mutableStateMapOf<Int, Float>()
+                        val derived = derivedStateOf { foo.value }
                     }
                 }
 
@@ -329,12 +373,14 @@ src/androidx/compose/runtime/foo/{.kt:61: Error: Creating a state object during 
                         val foo = mutableStateOf(0)
                         val bar = mutableStateListOf<Int>()
                         val baz = mutableStateMapOf<Int, Float>()
+                        val derived = derivedStateOf { foo.value }
                     }
 
                     val localLambda2: () -> Unit = {
                         val foo = mutableStateOf(0)
                         val bar = mutableStateListOf<Int>()
                         val baz = mutableStateMapOf<Int, Float>()
+                        val derived = derivedStateOf { foo.value }
                     }
                 }
 
@@ -343,12 +389,14 @@ src/androidx/compose/runtime/foo/{.kt:61: Error: Creating a state object during 
                         val foo = mutableStateOf(0)
                         val bar = mutableStateListOf<Int>()
                         val baz = mutableStateMapOf<Int, Float>()
+                        val derived = derivedStateOf { foo.value }
                     }
 
                     val localObject = object {
                         val foo = mutableStateOf(0)
                         val bar = mutableStateListOf<Int>()
                         val baz = mutableStateMapOf<Int, Float>()
+                        val derived = derivedStateOf { foo.value }
                     }
                 }
 
@@ -358,6 +406,7 @@ src/androidx/compose/runtime/foo/{.kt:61: Error: Creating a state object during 
                         val foo = mutableStateOf(0)
                         val bar = mutableStateListOf<Int>()
                         val baz = mutableStateMapOf<Int, Float>()
+                        val derived = derivedStateOf { foo.value }
                     }
                 }
             """

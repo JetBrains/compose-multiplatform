@@ -34,14 +34,16 @@ import org.jetbrains.uast.UCallExpression
 import java.util.EnumSet
 
 /**
- * [Detector] that checks `mutableStateOf`, `mutableStateListOf`, and `mutableStateMapOf` calls to
- * make sure that if they are called inside a Composable body, they are `remember`ed.
+ * [Detector] that checks `derivedStateOf`, `mutableStateOf`, `mutableStateListOf`,
+ * and `mutableStateMapOf` calls to make sure that if they are called inside a Composable body,
+ * they are `remember`ed.
  */
-class UnrememberedMutableStateDetector : Detector(), SourceCodeScanner {
+class UnrememberedStateDetector : Detector(), SourceCodeScanner {
     override fun getApplicableMethodNames(): List<String> = listOf(
+        Names.Runtime.DerivedStateOf.shortName,
         Names.Runtime.MutableStateOf.shortName,
         Names.Runtime.MutableStateListOf.shortName,
-        Names.Runtime.MutableStateMapOf.shortName,
+        Names.Runtime.MutableStateMapOf.shortName
     )
 
     override fun visitMethodCall(context: JavaContext, node: UCallExpression, method: PsiMethod) {
@@ -49,7 +51,7 @@ class UnrememberedMutableStateDetector : Detector(), SourceCodeScanner {
 
         if (node.isNotRemembered()) {
             context.report(
-                UnrememberedMutableState,
+                UnrememberedState,
                 node,
                 context.getNameLocation(node),
                 "Creating a state object during composition without using `remember`"
@@ -58,8 +60,8 @@ class UnrememberedMutableStateDetector : Detector(), SourceCodeScanner {
     }
 
     companion object {
-        val UnrememberedMutableState = Issue.create(
-            "UnrememberedMutableState",
+        val UnrememberedState = Issue.create(
+            "UnrememberedMutableState", // Left as previous id for backwards compatibility
             "Creating a state object during composition without using `remember`",
             "State objects created during composition need to be `remember`ed, otherwise " +
                 "they will be recreated during recomposition, and lose their state. Either hoist " +
@@ -67,7 +69,7 @@ class UnrememberedMutableStateDetector : Detector(), SourceCodeScanner {
                 "state in a call to `remember`.",
             Category.CORRECTNESS, 3, Severity.ERROR,
             Implementation(
-                UnrememberedMutableStateDetector::class.java,
+                UnrememberedStateDetector::class.java,
                 EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
             )
         )

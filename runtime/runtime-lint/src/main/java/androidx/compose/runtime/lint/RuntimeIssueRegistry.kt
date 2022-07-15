@@ -40,7 +40,7 @@ class RuntimeIssueRegistry : IssueRegistry() {
         MutableCollectionMutableStateDetector.MutableCollectionMutableState,
         ProduceStateDetector.ProduceStateDoesNotAssignValue,
         RememberDetector.RememberReturnType,
-        UnrememberedMutableStateDetector.UnrememberedMutableState
+        UnrememberedStateDetector.UnrememberedState
     )
     override val vendor = Vendor(
         vendorName = "Jetpack Compose",
