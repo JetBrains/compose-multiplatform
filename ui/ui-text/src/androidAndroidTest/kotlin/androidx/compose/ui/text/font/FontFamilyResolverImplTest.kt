@@ -621,19 +621,24 @@ class FontFamilyResolverImplTest {
     @Test
     fun androidFontResolveInterceptor_affectsTheFontWeight() {
         initializeSubject(AndroidFontResolveInterceptor(accessibilityFontWeightAdjustment))
+
+        val typefaceLoader = AsyncTestTypefaceLoader()
+
+        val w700Font = BlockingFauxFont(typefaceLoader, Typeface.DEFAULT, weight = FontWeight.W700)
         val fontFamily = FontFamily(
-            FontTestData.FONT_400_REGULAR,
-            FontTestData.FONT_500_REGULAR,
-            FontTestData.FONT_600_REGULAR,
-            FontTestData.FONT_700_REGULAR,
-            FontTestData.FONT_800_REGULAR
+            BlockingFauxFont(typefaceLoader, Typeface.DEFAULT, weight = FontWeight.W400),
+            BlockingFauxFont(typefaceLoader, Typeface.DEFAULT, weight = FontWeight.W500),
+            BlockingFauxFont(typefaceLoader, Typeface.DEFAULT, weight = FontWeight.W600),
+            w700Font,
+            BlockingFauxFont(typefaceLoader, Typeface.DEFAULT, weight = FontWeight.W800),
+            BlockingFauxFont(typefaceLoader, Typeface.DEFAULT, weight = FontWeight.W900),
         )
-        val typeface = resolveAsTypeface(
+        resolveAsTypeface(
             fontFamily = fontFamily,
             fontWeight = FontWeight.W400
         )
 
-        assertThat(typeface).hasWeightAndStyle(FontWeight.W700, FontStyle.Normal)
+        assertThat(typefaceLoader.blockingRequests).containsExactly(w700Font)
     }
 
     @Test
