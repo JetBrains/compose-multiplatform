@@ -8,7 +8,6 @@ import androidx.compose.material.Surface
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
-import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.arkivanov.mvikotlin.timetravel.store.TimeTravelStoreFactory
 import example.todo.common.database.DefaultTodoSharedDatabase
 import example.todo.common.database.TodoDatabaseDriver

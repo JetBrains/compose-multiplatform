@@ -1,10 +1,11 @@
 package example.todo.common.root.integration
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.router.RouterState
-import com.arkivanov.decompose.router.pop
-import com.arkivanov.decompose.router.push
-import com.arkivanov.decompose.router.router
+import com.arkivanov.decompose.router.stack.ChildStack
+import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
@@ -50,14 +51,17 @@ class TodoRootComponent internal constructor(
         }
     )
 
-    private val router =
-        router<Configuration, Child>(
+    private val navigation = StackNavigation<Configuration>()
+
+    private val stack =
+        childStack(
+            source = navigation,
             initialConfiguration = Configuration.Main,
             handleBackButton = true,
             childFactory = ::createChild
         )
 
-    override val routerState: Value<RouterState<*, Child>> = router.state
+    override val childStack: Value<ChildStack<*, Child>> = stack
 
     private fun createChild(configuration: Configuration, componentContext: ComponentContext): Child =
         when (configuration) {
@@ -67,12 +71,12 @@ class TodoRootComponent internal constructor(
 
     private fun onMainOutput(output: TodoMain.Output): Unit =
         when (output) {
-            is TodoMain.Output.Selected -> router.push(Configuration.Edit(itemId = output.id))
+            is TodoMain.Output.Selected -> navigation.push(Configuration.Edit(itemId = output.id))
         }
 
     private fun onEditOutput(output: TodoEdit.Output): Unit =
         when (output) {
-            is TodoEdit.Output.Finished -> router.pop()
+            is TodoEdit.Output.Finished -> navigation.pop()
         }
 
     private sealed class Configuration : Parcelable {

@@ -51,7 +51,7 @@ class TodoRootTest {
             todoEdit = { _, itemId, output -> TodoEditFake(itemId, output) }
         )
 
-    private val TodoRoot.activeChild: Child get() = routerState.value.activeChild.instance
+    private val TodoRoot.activeChild: Child get() = childStack.value.active.instance
 
     private val Child.component: Any
         get() =
