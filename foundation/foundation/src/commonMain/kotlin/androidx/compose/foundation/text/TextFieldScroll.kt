@@ -96,7 +96,7 @@ internal fun Modifier.textFieldScroll(
     val cursorOffset = scrollerPosition.getOffsetToFollow(textFieldValue.selection)
     scrollerPosition.previousSelection = textFieldValue.selection
 
-    val transformedText = visualTransformation.filter(textFieldValue.annotatedString)
+    val transformedText = visualTransformation.filterWithValidation(textFieldValue.annotatedString)
 
     val layout = when (orientation) {
         Orientation.Vertical ->

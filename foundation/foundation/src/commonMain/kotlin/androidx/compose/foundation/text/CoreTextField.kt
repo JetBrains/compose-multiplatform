@@ -210,7 +210,7 @@ internal fun CoreTextField(
 
     // State
     val transformedText = remember(value, visualTransformation) {
-        val transformed = visualTransformation.filter(value.annotatedString)
+        val transformed = visualTransformation.filterWithValidation(value.annotatedString)
         value.composition?.let {
             TextFieldDelegate.applyCompositionDecoration(it, transformed)
         } ?: transformed
