@@ -59,9 +59,11 @@ import androidx.compose.ui.layout.OnPlacedModifier
 import androidx.compose.ui.layout.OnRemeasuredModifier
 import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.modifier.modifierLocalOf
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.util.fastAll
@@ -210,6 +212,33 @@ object ScrollableDefaults {
     @ExperimentalFoundationApi
     fun overscrollEffect(): OverscrollEffect {
         return rememberOverscrollEffect()
+    }
+
+    /**
+     * Used to determine the value of `reverseDirection` parameter of [Modifier.scrollable]
+     * in scrollable layouts.
+     *
+     * @param layoutDirection current layout direction (e.g. from [LocalLayoutDirection])
+     * @param orientation orientation of scroll
+     * @param reverseScrolling whether scrolling direction should be reversed
+     *
+     * @return `true` if scroll direction should be reversed, `false` otherwise.
+     */
+    @ExperimentalFoundationApi
+    fun reverseDirection(
+        layoutDirection: LayoutDirection,
+        orientation: Orientation,
+        reverseScrolling: Boolean
+    ): Boolean {
+        // A finger moves with the content, not with the viewport. Therefore,
+        // always reverse once to have "natural" gesture that goes reversed to layout
+        var reverseDirection = !reverseScrolling
+        // But if rtl and horizontal, things move the other way around
+        val isRtl = layoutDirection == LayoutDirection.Rtl
+        if (isRtl && orientation != Orientation.Vertical) {
+            reverseDirection = !reverseDirection
+        }
+        return reverseDirection
     }
 }
 
