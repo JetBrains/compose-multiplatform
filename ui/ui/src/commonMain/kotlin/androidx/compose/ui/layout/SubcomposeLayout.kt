@@ -571,6 +571,7 @@ internal class LayoutNodeSubcompositionsState(
             val node = root.foldedChildren[reusableNodesSectionStart]
             val nodeState = nodeToNodeState[node]!!
             nodeState.active = true
+            nodeState.forceRecompose = true
             Snapshot.sendApplyNotifications()
             node
         }
