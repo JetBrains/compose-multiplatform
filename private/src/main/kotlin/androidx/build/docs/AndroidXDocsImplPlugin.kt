@@ -18,6 +18,8 @@ package androidx.build.docs
 
 import androidx.build.SupportConfig
 import androidx.build.dackka.DackkaTask
+import androidx.build.dackka.GenerateMetadataTask
+import androidx.build.dackka.MetadataEntry
 import androidx.build.dependencies.KOTLIN_VERSION
 import androidx.build.doclava.DacOptions
 import androidx.build.doclava.DoclavaTask
@@ -52,8 +54,10 @@ import org.gradle.api.attributes.Usage
 import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.RegularFile
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.JavaBasePlugin
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.PathSensitive
@@ -80,7 +84,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
     lateinit var samplesSourcesConfiguration: Configuration
     lateinit var dependencyClasspath: FileCollection
 
-    @get:javax.inject.Inject
+    @get:Inject
     abstract val archiveOperations: ArchiveOperations
 
     override fun apply(project: Project) {
@@ -353,10 +357,19 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             dependencies.add(project.dependencies.create(project.getLibraryByName("dackka")))
         }
 
+        val generateMetadataTask = project.tasks.register(
+            "generateMetadata",
+            GenerateMetadataTask::class.java
+        ) { task ->
+            task.metadataEntries.set(gatherMetadataEntries())
+            task.destinationFile.set(getMetadataRegularFile(project))
+        }
+
         val dackkaTask = project.tasks.register("dackkaDocs", DackkaTask::class.java) { task ->
             task.apply {
                 dependsOn(unzipDocsTask)
                 dependsOn(unzipSamplesTask)
+                dependsOn(generateMetadataTask)
 
                 description = "Generates reference documentation using a Google devsite Dokka" +
                     " plugin. Places docs in $generatedDocsDir"
@@ -372,10 +385,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
                 excludedPackages = hiddenPackages.toSet()
                 excludedPackagesForJava = hiddenPackagesJava
                 excludedPackagesForKotlin = emptySet()
-
-                // TODO(b/239095864): replace this placeholder file with a dynamically generated one
-                libraryMetadataFile = project.rootProject.layout.projectDirectory
-                    .file("buildSrc/SampleLibraryMetadata.json")
+                libraryMetadataFile.set(getMetadataRegularFile(project))
 
                 // TODO(b/223712700): change to `true` once bug is resolved
                 showLibraryMetadata = false
@@ -663,6 +673,12 @@ abstract class SourcesVariantRule : ComponentMetadataRule {
     }
 }
 
+/**
+ * Location of the library metadata JSON file that's used by Dackka, represented as a [RegularFile]
+ */
+private fun getMetadataRegularFile(project: Project): Provider<RegularFile> =
+    project.layout.buildDirectory.file("SampleLibraryMetadata.json")
+
 private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
 
 // List of packages to exclude from both Java and Kotlin refdoc generation
@@ -682,3 +698,42 @@ private val hiddenPackages = listOf(
 private val hiddenPackagesJava = setOf(
     "androidx.*compose.*"
 )
+
+/**
+ * Converts AndroidX library and path data to a list of [MetadataEntry].
+ *
+ * TODO(b/239095864) replace static data with dynamically generated data from libraries
+ */
+private fun gatherMetadataEntries(): List<MetadataEntry> {
+    val pagingCompose = MetadataEntry(
+        groupId = "androidx.paging",
+        artifactId = "paging-compose",
+        releaseNotesUrl = "https://developer.android.com/jetpack/androidx/releases/paging",
+        sourceDir = "paging/compose"
+    )
+    val pagingRuntime = MetadataEntry(
+        groupId = "androidx.paging",
+        artifactId = "paging-runtime",
+        releaseNotesUrl = "https://developer.android.com/jetpack/androidx/releases/paging",
+        sourceDir = "paging"
+    )
+    val pagingRxJava2 = MetadataEntry(
+        groupId = "androidx.paging",
+        artifactId = "paging-rxjava2",
+        releaseNotesUrl = "https://developer.android.com/jetpack/androidx/releases/paging",
+        sourceDir = "paging/rxjava2"
+    )
+    val pagingRxJava3 = MetadataEntry(
+        groupId = "androidx.paging",
+        artifactId = "paging-rxjava3",
+        releaseNotesUrl = "https://developer.android.com/jetpack/androidx/releases/paging",
+        sourceDir = "paging/rxjava3"
+    )
+
+    return listOf(
+        pagingCompose,
+        pagingRuntime,
+        pagingRxJava2,
+        pagingRxJava3,
+    )
+}
