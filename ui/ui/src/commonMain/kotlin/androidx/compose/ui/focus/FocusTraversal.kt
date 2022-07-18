@@ -35,7 +35,7 @@ import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.input.key.KeyInputModifier
-import androidx.compose.ui.layout.findRoot
+import androidx.compose.ui.layout.findRootCoordinates
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.LayoutDirection.Ltr
 import androidx.compose.ui.unit.LayoutDirection.Rtl
@@ -184,7 +184,7 @@ internal fun FocusModifier.findActiveParent(): FocusModifier? = parent?.let {
  * FocusModifier has not had a layout.
  */
 internal fun FocusModifier.focusRect(): Rect = layoutNodeWrapper?.let {
-    it.findRoot().localBoundingBoxOf(it, clipBounds = false)
+    it.findRootCoordinates().localBoundingBoxOf(it, clipBounds = false)
 } ?: Rect.Zero
 
 /**
