@@ -226,9 +226,6 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
         disable.add("ReservedSystemPermission")
         disable.add("SystemPermissionTypo")
 
-        // Reenable after b/235251897 is resolved
-        disable.add("IllegalExperimentalApiUsage")
-
         // Disable dependency checks that suggest to change them. We want libraries to be
         // intentional with their dependency version bumps.
         disable.add("KtxExtensionAvailable")
