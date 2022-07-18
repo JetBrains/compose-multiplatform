@@ -406,6 +406,33 @@ class RemeasureWithIntrinsicsTest {
                 shapeColor = Color.Red
             )
     }
+
+    @Test
+    fun introducingChildIntrinsicsViaModifierWhenParentUsedIntrinsicSizes() {
+        var childModifier by mutableStateOf(Modifier as Modifier)
+
+        rule.setContent {
+            LayoutUsingIntrinsics() {
+                Box(
+                    Modifier
+                        .testTag("child")
+                        .then(childModifier)
+                )
+            }
+        }
+
+        rule.onNodeWithTag("child")
+            .assertWidthIsEqualTo(0.dp)
+            .assertHeightIsEqualTo(0.dp)
+
+        rule.runOnIdle {
+            childModifier = Modifier.withIntrinsics(30.dp, 20.dp)
+        }
+
+        rule.onNodeWithTag("child")
+            .assertWidthIsEqualTo(30.dp)
+            .assertHeightIsEqualTo(20.dp)
+    }
 }
 
 @Composable
