@@ -33,6 +33,7 @@ internal actual fun AnnotatedString.transform(
     val transitions = sortedSetOf(0, text.length)
     collectRangeTransitions(spanStyles, transitions)
     collectRangeTransitions(paragraphStyles, transitions)
+    collectRangeTransitions(annotations, transitions)
 
     var resultStr = ""
     val offsetMap = mutableMapOf(0 to 0)
@@ -66,8 +67,8 @@ internal actual fun AnnotatedString.transform(
  * @param ranges The list of AnnotatedString.Range
  * @param target The output list
  */
-private fun <T> collectRangeTransitions(
-    ranges: List<Range<T>>,
+private fun collectRangeTransitions(
+    ranges: List<Range<*>>,
     target: SortedSet<Int>
 ) {
     ranges.fastFold(target) { acc, range ->
