@@ -60,12 +60,12 @@ dependencies {
 
         implementation("androidx.core:core:1.5.0")
         implementation('androidx.collection:collection:1.0.0')
-        implementation("androidx.customview:customview-poolingcontainer:1.0.0-rc01")
-        implementation("androidx.savedstate:savedstate-ktx:1.2.0-rc01")
+        implementation(project(":customview:customview-poolingcontainer"))
+        implementation("androidx.savedstate:savedstate-ktx:1.2.0")
         implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
         implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
         implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
-        implementation("androidx.profileinstaller:profileinstaller:1.2.0-rc01")
+        implementation(project(":profileinstaller:profileinstaller"))
 
         testImplementation(libs.testRules)
         testImplementation(libs.testRunner)
@@ -151,8 +151,8 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation("androidx.autofill:autofill:1.0.0")
                 implementation(libs.kotlinCoroutinesAndroid)
 
-                implementation("androidx.customview:customview-poolingcontainer:1.0.0-rc01")
-                implementation("androidx.savedstate:savedstate-ktx:1.2.0-rc01")
+                implementation(project(":customview:customview-poolingcontainer"))
+                implementation("androidx.savedstate:savedstate-ktx:1.2.0")
                 implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
                 implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
                 implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
