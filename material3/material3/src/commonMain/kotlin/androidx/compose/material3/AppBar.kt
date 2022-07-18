@@ -24,6 +24,9 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDecay
 import androidx.compose.animation.core.animateTo
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -428,6 +431,14 @@ interface TopAppBarScrollBehavior {
     val state: TopAppBarState
 
     /**
+     * Indicates whether the top app bar is pinned.
+     *
+     * A pinned app bar will stay fixed in place when content is scrolled and will not react to any
+     * drag gestures.
+     */
+    val isPinned: Boolean
+
+    /**
      * A [NestedScrollConnection] that should be attached to a [Modifier.nestedScroll] in order to
      * keep track of the scroll events.
      */
@@ -661,7 +672,7 @@ object TopAppBarDefaults {
      * updates its [TopAppBarState.contentOffset] accordingly.
      *
      * @param state the state object to be used to control or observe the top app bar's scroll
-     * state. See also [rememberTopAppBarScrollState] to create a state that is remembered across
+     * state. See also [rememberTopAppBarState] to create a state that is remembered across
      * compositions.
      * @param canScroll a callback used to determine whether scroll events are to be handled by this
      * pinned [TopAppBarScrollBehavior]
@@ -678,7 +689,7 @@ object TopAppBarDefaults {
      * immediately appear when the content is pulled down.
      *
      * @param state the state object to be used to control or observe the top app bar's scroll
-     * state. See also [rememberTopAppBarScrollState] to create a state that is remembered across
+     * state. See also [rememberTopAppBarState] to create a state that is remembered across
      * compositions.
      * @param canScroll a callback used to determine whether scroll events are to be
      * handled by this [EnterAlwaysScrollBehavior]
@@ -702,7 +713,7 @@ object TopAppBarDefaults {
      * the scrollable content. See also [androidx.compose.animation.rememberSplineBasedDecay] for a
      * default [DecayAnimationSpec] that can be used with this behavior.
      * @param state the state object to be used to control or observe the top app bar's scroll
-     * state. See also [rememberTopAppBarScrollState] to create a state that is remembered across
+     * state. See also [rememberTopAppBarState] to create a state that is remembered across
      * compositions.
      * @param canScroll a callback used to determine whether scroll events are to be
      * handled by this [ExitUntilCollapsedScrollBehavior]
@@ -732,7 +743,7 @@ object TopAppBarDefaults {
  */
 @ExperimentalMaterial3Api
 @Composable
-fun rememberTopAppBarScrollState(
+fun rememberTopAppBarState(
     initialHeightOffsetLimit: Float = -Float.MAX_VALUE,
     initialHeightOffset: Float = 0f,
     initialContentOffset: Float = 0f
@@ -750,7 +761,7 @@ fun rememberTopAppBarScrollState(
  * A state object that can be hoisted to control and observe the top app bar state. The state is
  * read and updated by a [TopAppBarScrollBehavior] implementation.
  *
- * In most cases, this state will be created via [rememberTopAppBarScrollState].
+ * In most cases, this state will be created via [rememberTopAppBarState].
  *
  * @param initialHeightOffsetLimit the initial value for [TopAppBarState.heightOffsetLimit]
  * @param initialHeightOffset the initial value for [TopAppBarState.heightOffset]
@@ -773,12 +784,19 @@ class TopAppBarState(
     var heightOffsetLimit by mutableStateOf(initialHeightOffsetLimit)
 
     /**
-     * The top app bar's current height offset in pixels. The height offset is applied to the fixed
+     * The top app bar's current height offset in pixels. This height offset is applied to the fixed
      * height of the app bar to control the displayed height when content is being scrolled.
      *
-     * This value is intended to be coerced between zero and [heightOffsetLimit].
+     * Updates to the [heightOffset] value are coerced between zero and [heightOffsetLimit].
      */
-    var heightOffset by mutableStateOf(initialHeightOffset)
+    var heightOffset: Float
+        get() = _heightOffset.value
+        set(newOffset) {
+            _heightOffset.value = newOffset.coerceIn(
+                minimumValue = heightOffsetLimit,
+                maximumValue = 0f
+            )
+        }
 
     /**
      * The total offset of the content scrolled under the top app bar.
@@ -837,6 +855,8 @@ class TopAppBarState(
             }
         )
     }
+
+    private var _heightOffset = mutableStateOf(initialHeightOffset)
 }
 
 /** Contains default values used for the bottom app bar implementations. */
@@ -987,11 +1007,22 @@ private fun SingleRowTopAppBar(
             content = actions
         )
     }
+
+    // Set up support for resizing the top app bar when vertically dragging the bar itself.
+    val appBarDragModifier = Modifier.draggable(
+        orientation = Orientation.Vertical,
+        state = rememberDraggableState { delta ->
+            if (scrollBehavior != null && !scrollBehavior.isPinned) {
+                scrollBehavior.state.heightOffset = scrollBehavior.state.heightOffset + delta
+            }
+        }
+    )
+
     // Compose a Surface with a TopAppBarLayout content.
     // The surface's background color is animated as specified above.
     // The height of the app bar is determined by subtracting the bar's height offset from the
     // app bar's defined constant height value (i.e. the ContainerHeight token).
-    Surface(modifier = modifier, color = appBarContainerColor) {
+    Surface(modifier = modifier.then(appBarDragModifier), color = appBarContainerColor) {
         val height = LocalDensity.current.run {
             TopAppBarSmallTokens.ContainerHeight.toPx() + (scrollBehavior?.state?.heightOffset
                 ?: 0f)
@@ -1083,7 +1114,18 @@ private fun TwoRowsTopAppBar(
     // Hide the bottom row title semantics when the top title semantics are active.
     val hideTopRowSemantics = colorTransitionFraction < 0.5f
     val hideBottomRowSemantics = !hideTopRowSemantics
-    Surface(modifier = modifier, color = appBarContainerColor) {
+
+    // Set up support for resizing the top app bar when vertically dragging the bar itself.
+    val appBarDragModifier = Modifier.draggable(
+        orientation = Orientation.Vertical,
+        state = rememberDraggableState { delta ->
+            if (scrollBehavior != null && !scrollBehavior.isPinned) {
+                scrollBehavior.state.heightOffset = scrollBehavior.state.heightOffset + delta
+            }
+        }
+    )
+
+    Surface(modifier = modifier.then(appBarDragModifier), color = appBarContainerColor) {
         Column {
             TopAppBarLayout(
                 modifier = Modifier,
@@ -1381,6 +1423,7 @@ private class PinnedScrollBehavior(
     override var state: TopAppBarState,
     val canScroll: () -> Boolean = { true }
 ) : TopAppBarScrollBehavior {
+    override val isPinned: Boolean = true
     override var nestedScrollConnection =
         object : NestedScrollConnection {
             override fun onPostScroll(
@@ -1416,17 +1459,15 @@ private class EnterAlwaysScrollBehavior(
     override var state: TopAppBarState,
     val canScroll: () -> Boolean = { true }
 ) : TopAppBarScrollBehavior {
+    override val isPinned: Boolean = false
     override var nestedScrollConnection =
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 if (!canScroll()) return Offset.Zero
-                val newOffset = (state.heightOffset + available.y)
-                val coerced =
-                    newOffset.coerceIn(minimumValue = state.heightOffsetLimit, maximumValue = 0f)
-                return if (newOffset == coerced) {
-                    // Nothing coerced, meaning we're in the middle of top app bar collapse or
-                    // expand.
-                    state.heightOffset = coerced
+                val prevHeightOffset = state.heightOffset
+                state.heightOffset = state.heightOffset + available.y
+                return if (prevHeightOffset != state.heightOffset) {
+                    // We're in the middle of top app bar collapse or expand.
                     // Consume only the scroll on the Y axis.
                     available.copy(x = 0f)
                 } else {
@@ -1448,10 +1489,7 @@ private class EnterAlwaysScrollBehavior(
                         state.contentOffset = 0f
                     }
                 }
-                state.heightOffset = (state.heightOffset + consumed.y).coerceIn(
-                    minimumValue = state.heightOffsetLimit,
-                    maximumValue = 0f
-                )
+                state.heightOffset = state.heightOffset + consumed.y
                 return Offset.Zero
             }
         }
@@ -1478,19 +1516,17 @@ private class ExitUntilCollapsedScrollBehavior(
     val decayAnimationSpec: DecayAnimationSpec<Float>,
     val canScroll: () -> Boolean = { true }
 ) : TopAppBarScrollBehavior {
+    override val isPinned: Boolean = false
     override var nestedScrollConnection =
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 // Don't intercept if scrolling down.
                 if (!canScroll() || available.y > 0f) return Offset.Zero
 
-                val newOffset = (state.heightOffset + available.y)
-                val coerced =
-                    newOffset.coerceIn(minimumValue = state.heightOffsetLimit, maximumValue = 0f)
-                return if (newOffset == coerced) {
-                    // Nothing coerced, meaning we're in the middle of top app bar collapse or
-                    // expand.
-                    state.heightOffset = coerced
+                val prevHeightOffset = state.heightOffset
+                state.heightOffset = state.heightOffset + available.y
+                return if (prevHeightOffset != state.heightOffset) {
+                    // We're in the middle of top app bar collapse or expand.
                     // Consume only the scroll on the Y axis.
                     available.copy(x = 0f)
                 } else {
@@ -1509,10 +1545,7 @@ private class ExitUntilCollapsedScrollBehavior(
                 if (available.y < 0f || consumed.y < 0f) {
                     // When scrolling up, just update the state's height offset.
                     val oldHeightOffset = state.heightOffset
-                    state.heightOffset = (state.heightOffset + consumed.y).coerceIn(
-                        minimumValue = state.heightOffsetLimit,
-                        maximumValue = 0f
-                    )
+                    state.heightOffset = state.heightOffset + consumed.y
                     return Offset(0f, state.heightOffset - oldHeightOffset)
                 }
 
@@ -1526,10 +1559,7 @@ private class ExitUntilCollapsedScrollBehavior(
                     // Adjust the height offset in case the consumed delta Y is less than what was
                     // recorded as available delta Y in the pre-scroll.
                     val oldHeightOffset = state.heightOffset
-                    state.heightOffset = (state.heightOffset + available.y).coerceIn(
-                        minimumValue = state.heightOffsetLimit,
-                        maximumValue = 0f
-                    )
+                    state.heightOffset = state.heightOffset + available.y
                     return Offset(0f, state.heightOffset - oldHeightOffset)
                 }
                 return Offset.Zero
@@ -1572,11 +1602,7 @@ private suspend fun onTopBarFling(
             .animateDecay(decayAnimationSpec) {
                 val delta = value - lastValue
                 val initialHeightOffset = scrollBehavior.state.heightOffset
-                scrollBehavior.state.heightOffset =
-                    (initialHeightOffset + delta).coerceIn(
-                        minimumValue = scrollBehavior.state.heightOffsetLimit,
-                        maximumValue = 0f
-                    )
+                scrollBehavior.state.heightOffset = initialHeightOffset + delta
                 val consumed = abs(initialHeightOffset - scrollBehavior.state.heightOffset)
                 lastValue = value
                 remainingVelocity = this.velocity
