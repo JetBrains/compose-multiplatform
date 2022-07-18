@@ -121,10 +121,19 @@ fun LayoutCoordinates.boundsInRoot(): Rect =
 fun LayoutCoordinates.boundsInWindow(): Rect {
     val root = findRoot()
     val bounds = boundsInRoot()
-    val topLeft = root.localToWindow(Offset(bounds.left, bounds.top))
-    val topRight = root.localToWindow(Offset(bounds.right, bounds.top))
-    val bottomRight = root.localToWindow(Offset(bounds.right, bounds.bottom))
-    val bottomLeft = root.localToWindow(Offset(bounds.left, bounds.bottom))
+    val rootWidth = root.size.width.toFloat()
+    val rootHeight = root.size.height.toFloat()
+    val boundsLeft = bounds.left.coerceIn(0f, rootWidth)
+    val boundsTop = bounds.top.coerceIn(0f, rootHeight)
+    val boundsRight = bounds.right.coerceIn(0f, rootWidth)
+    val boundsBottom = bounds.bottom.coerceIn(0f, rootHeight)
+    if (boundsLeft == boundsRight || boundsTop == boundsBottom) {
+        return Rect.Zero
+    }
+    val topLeft = root.localToWindow(Offset(boundsLeft, boundsTop))
+    val topRight = root.localToWindow(Offset(boundsRight, boundsTop))
+    val bottomRight = root.localToWindow(Offset(boundsRight, boundsBottom))
+    val bottomLeft = root.localToWindow(Offset(boundsLeft, boundsBottom))
     val left = minOf(topLeft.x, topRight.x, bottomLeft.x, bottomRight.x)
     val top = minOf(topLeft.y, topRight.y, bottomLeft.y, bottomRight.y)
     val right = maxOf(topLeft.x, topRight.x, bottomLeft.x, bottomRight.x)
