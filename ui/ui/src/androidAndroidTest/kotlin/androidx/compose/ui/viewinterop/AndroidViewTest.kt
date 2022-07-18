@@ -17,6 +17,8 @@
 package androidx.compose.ui.viewinterop
 
 import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
@@ -33,6 +35,7 @@ import android.widget.TextView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -45,8 +48,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertPixels
+import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
@@ -272,7 +277,10 @@ class AndroidViewTest {
             }
         }
         rule.setContent {
-            AndroidView({ frameLayout }, Modifier.testTag("view").background(color = Color.Blue))
+            AndroidView({ frameLayout },
+                Modifier
+                    .testTag("view")
+                    .background(color = Color.Blue))
         }
 
         rule.onNodeWithTag("view").captureToImage().assertPixels(IntSize(size, size)) {
@@ -356,9 +364,11 @@ class AndroidViewTest {
             CompositionLocalProvider(LocalDensity provides density) {
                 AndroidView(
                     { FrameLayout(it) },
-                    Modifier.requiredSize(size).onGloballyPositioned {
-                        assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
-                    }
+                    Modifier
+                        .requiredSize(size)
+                        .onGloballyPositioned {
+                            assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
+                        }
                 )
             }
         }
@@ -566,7 +576,11 @@ class AndroidViewTest {
         val sizeDp = with(rule.density) { size.toDp() }
         rule.setContent {
             Column {
-                Box(Modifier.size(sizeDp).background(Color.Blue).testTag("box"))
+                Box(
+                    Modifier
+                        .size(sizeDp)
+                        .background(Color.Blue)
+                        .testTag("box"))
                 AndroidView(factory = { SurfaceView(it) })
             }
         }
@@ -616,6 +630,40 @@ class AndroidViewTest {
         rule.runOnIdle { screen = "screen1" }
         rule.runOnIdle {
             assertThat(result).isEqualTo("testValue")
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun androidView_noClip() {
+        rule.setContent {
+            Box(Modifier.fillMaxSize().background(Color.White)) {
+                with(LocalDensity.current) {
+                    Box(Modifier.requiredSize(150.toDp()).testTag("box")) {
+                        Box(
+                            Modifier.size(100.toDp(), 100.toDp()).align(AbsoluteAlignment.TopLeft)
+                        ) {
+                            AndroidView(factory = { context ->
+                                object : View(context) {
+                                    init {
+                                        clipToOutline = false
+                                    }
+
+                                    override fun onDraw(canvas: Canvas) {
+                                        val paint = Paint()
+                                        paint.color = Color.Blue.toArgb()
+                                        paint.style = Paint.Style.FILL
+                                        canvas.drawRect(0f, 0f, 150f, 150f, paint)
+                                    }
+                                }
+                            })
+                        }
+                    }
+                }
+            }
+        }
+        rule.onNodeWithTag("box").captureToImage().assertPixels(IntSize(150, 150)) {
+            Color.Blue
         }
     }
 
