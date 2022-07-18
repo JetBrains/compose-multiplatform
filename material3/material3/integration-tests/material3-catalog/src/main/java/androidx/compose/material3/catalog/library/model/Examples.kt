@@ -31,6 +31,7 @@ import androidx.compose.material3.samples.ButtonSample
 import androidx.compose.material3.samples.ButtonWithIconSample
 import androidx.compose.material3.samples.CardSample
 import androidx.compose.material3.samples.CheckboxSample
+import androidx.compose.material3.samples.CheckboxWithTextSample
 import androidx.compose.material3.samples.ChipGroupSingleLineSample
 import androidx.compose.material3.samples.CircularProgressIndicatorSample
 import androidx.compose.material3.samples.ClickableCardSample
@@ -235,6 +236,13 @@ val CheckboxesExamples = listOf(
         sourceUrl = CheckboxesExampleSourceUrl
     ) {
         CheckboxSample()
+    },
+    Example(
+        name = ::CheckboxWithTextSample.name,
+        description = CheckboxesExampleDescription,
+        sourceUrl = CheckboxesExampleSourceUrl
+    ) {
+        CheckboxWithTextSample()
     },
     Example(
         name = ::TriStateCheckboxSample.name,
@@ -886,6 +894,7 @@ val TextFieldsExamples = listOf(
         Box(
             Modifier
                 .wrapContentWidth()
-                .width(280.dp)) { it.content() }
+                .width(280.dp)
+        ) { it.content() }
     })
 }
