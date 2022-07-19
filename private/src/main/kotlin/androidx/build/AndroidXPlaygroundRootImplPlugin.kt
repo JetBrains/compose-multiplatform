@@ -16,10 +16,7 @@
 
 package androidx.build
 
-import androidx.build.dependencyTracker.DependencyTracker
-import androidx.build.dependencyTracker.ProjectGraph
 import androidx.build.gradle.isRoot
-import androidx.build.playground.FindAffectedModulesTask
 import groovy.xml.DOMBuilder
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -62,14 +59,6 @@ class AndroidXPlaygroundRootImplPlugin : Plugin<Project> {
         GradleTransformWorkaround.maybeApply(rootProject)
         rootProject.subprojects {
             configureSubProject(it)
-        }
-
-        rootProject.tasks.register(
-            "findAffectedModules",
-            FindAffectedModulesTask::class.java
-        ) { task ->
-            task.projectGraph = ProjectGraph(rootProject)
-            task.dependencyTracker = DependencyTracker(rootProject, task.logger)
         }
     }
 
