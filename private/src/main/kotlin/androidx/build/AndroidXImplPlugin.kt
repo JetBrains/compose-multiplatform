@@ -301,6 +301,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                 project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
                     // Workaround for https://youtrack.jetbrains.com/issue/KT-37652
                     if (task.name.endsWith("TestKotlin")) return@configureEach
+                    if (task.name.endsWith("TestKotlinJvm")) return@configureEach
                     task.kotlinOptions.freeCompilerArgs += listOf("-Xexplicit-api=strict")
                 }
             }
