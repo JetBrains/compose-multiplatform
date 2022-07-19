@@ -64,7 +64,11 @@ import kotlin.math.max
  *
  * ![Checkbox image](https://developer.android.com/images/reference/androidx/compose/material3/checkbox.png)
  *
+ * Simple Checkbox sample:
  * @sample androidx.compose.material3.samples.CheckboxSample
+ *
+ * Combined Checkbox with Text sample:
+ * @sample androidx.compose.material3.samples.CheckboxWithTextSample
  *
  * @see [TriStateCheckbox] if you require support for an indeterminate state.
  *
@@ -313,7 +317,10 @@ private fun CheckboxImpl(
     val checkColor = colors.checkmarkColor(value)
     val boxColor = colors.boxColor(enabled, value)
     val borderColor = colors.borderColor(enabled, value)
-    Canvas(modifier.wrapContentSize(Alignment.Center).requiredSize(CheckboxSize)) {
+    Canvas(
+        modifier
+            .wrapContentSize(Alignment.Center)
+            .requiredSize(CheckboxSize)) {
         val strokeWidthPx = floor(StrokeWidth.toPx())
         drawBox(
             boxColor = boxColor.value,
