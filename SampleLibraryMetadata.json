@@ -1,0 +1,26 @@
+[
+  {
+    "groupId": "androidx.paging",
+    "artifactId": "paging-compose",
+    "releaseNotesUrl": "https://developer.android.com/jetpack/androidx/releases/paging",
+    "sourceDir": "paging/compose"
+  },
+  {
+    "groupId": "androidx.paging",
+    "artifactId": "paging-runtime",
+    "releaseNotesUrl": "https://developer.android.com/jetpack/androidx/releases/paging",
+    "sourceDir": "paging"
+  },
+  {
+    "groupId": "androidx.paging",
+    "artifactId": "paging-rxjava2",
+    "releaseNotesUrl": "https://developer.android.com/jetpack/androidx/releases/paging",
+    "sourceDir": "paging/rxjava2"
+  },
+  {
+    "groupId": "androidx.paging",
+    "artifactId": "paging-rxjava3",
+    "releaseNotesUrl": "https://developer.android.com/jetpack/androidx/releases/paging",
+    "sourceDir": "paging/rxjava3"
+  }
+]

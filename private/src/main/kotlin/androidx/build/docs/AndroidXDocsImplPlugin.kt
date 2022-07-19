@@ -16,7 +16,6 @@
 
 package androidx.build.docs
 
-import androidx.build.enforceKtlintVersion
 import androidx.build.SupportConfig
 import androidx.build.dackka.DackkaTask
 import androidx.build.dependencies.KOTLIN_VERSION
@@ -25,6 +24,7 @@ import androidx.build.doclava.DoclavaTask
 import androidx.build.doclava.GENERATE_DOCS_CONFIG
 import androidx.build.doclava.createGenerateSdkApiTask
 import androidx.build.dokka.Dokka
+import androidx.build.enforceKtlintVersion
 import androidx.build.getAndroidJar
 import androidx.build.getBuildId
 import androidx.build.getCheckoutRoot
@@ -372,6 +372,13 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
                 excludedPackages = hiddenPackages.toSet()
                 excludedPackagesForJava = hiddenPackagesJava
                 excludedPackagesForKotlin = emptySet()
+
+                // TODO(b/239095864): replace this placeholder file with a dynamically generated one
+                libraryMetadataFile = project.rootProject.layout.projectDirectory
+                    .file("buildSrc/SampleLibraryMetadata.json")
+
+                // TODO(b/223712700): change to `true` once bug is resolved
+                showLibraryMetadata = false
             }
         }
 
