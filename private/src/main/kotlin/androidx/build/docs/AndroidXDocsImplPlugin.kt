@@ -180,8 +180,8 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             val localVar = archiveOperations
             task.from(
                 sources.elements.map { jars ->
-                    jars.map {
-                        localVar.zipTree(it).matching {
+                    jars.map { jar ->
+                        localVar.zipTree(jar).matching {
                             // Filter out files that documentation tools cannot process.
                             it.exclude("**/*.MF")
                             it.exclude("**/*.aidl")
@@ -427,9 +427,9 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             task.dependsOn(unzipSamplesTask)
 
             val androidJar = project.getAndroidJar()
-            val dokkaClasspath = project.provider({
+            val dokkaClasspath = project.provider {
                 project.files(androidJar).plus(dependencyClasspath)
-            })
+            }
             // DokkaTask tries to resolve DokkaTask#classpath right away for jars that might not
             // be there yet. Delay the setting of this property to before we run the task.
             task.inputs.files(androidJar, dependencyClasspath)

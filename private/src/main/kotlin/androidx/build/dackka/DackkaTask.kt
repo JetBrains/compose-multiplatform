@@ -101,9 +101,9 @@ abstract class DackkaTask @Inject constructor(
     private fun computeArguments(): File {
 
         // path comes with colons but dokka json expects an ArrayList
-        val classPath = dependenciesClasspath.asPath.split(':').toMutableList<String>()
+        val classPath = dependenciesClasspath.asPath.split(':').toMutableList()
 
-        var linksConfiguration = ""
+        val linksConfiguration = ""
         val linksMap = mapOf(
             "coroutinesCore"
                 to "https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core",
@@ -138,8 +138,8 @@ abstract class DackkaTask @Inject constructor(
             )
         @Suppress("UNCHECKED_CAST")
         if (includes.isNotEmpty())
-            ((jsonMap["sourceSets"]as List<*>).single() as MutableMap<String, Any>)
-            .put("includes", includes)
+            ((jsonMap["sourceSets"]as List<*>).single() as MutableMap<String, Any>)["includes"] =
+                includes
 
         val json = JSONObject(jsonMap)
         val outputFile = File.createTempFile("dackkaArgs", ".json")
@@ -163,7 +163,6 @@ abstract class DackkaTask @Inject constructor(
     }
 }
 
-@Suppress("UnstableApiUsage")
 interface DackkaParams : WorkParameters {
     val args: ListProperty<String>
     val classpath: SetProperty<File>
@@ -174,7 +173,6 @@ interface DackkaParams : WorkParameters {
     var showLibraryMetadata: Boolean
 }
 
-@Suppress("UnstableApiUsage")
 fun runDackkaWithArgs(
     classpath: FileCollection,
     argsFile: File,
@@ -187,7 +185,7 @@ fun runDackkaWithArgs(
 ) {
     val workQueue = workerExecutor.noIsolation()
     workQueue.submit(DackkaWorkAction::class.java) { parameters ->
-        parameters.args.set(listOf(argsFile.getPath(), "-loggingLevel", "WARN"))
+        parameters.args.set(listOf(argsFile.path, "-loggingLevel", "WARN"))
         parameters.classpath.set(classpath)
         parameters.excludedPackages.set(excludedPackages)
         parameters.excludedPackagesForJava.set(excludedPackagesForJava)
@@ -197,7 +195,6 @@ fun runDackkaWithArgs(
     }
 }
 
-@Suppress("UnstableApiUsage")
 abstract class DackkaWorkAction @Inject constructor(
     private val execOperations: ExecOperations
 ) : WorkAction<DackkaParams> {
