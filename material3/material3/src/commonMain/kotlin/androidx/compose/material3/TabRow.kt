@@ -126,8 +126,8 @@ import kotlinx.coroutines.launch
 fun TabRow(
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
-    containerColor: Color = TabRowDefaults.Color,
-    contentColor: Color = TabRowDefaults.ContentColor,
+    containerColor: Color = TabRowDefaults.containerColor,
+    contentColor: Color = TabRowDefaults.contentColor,
     indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = @Composable { tabPositions ->
         TabRowDefaults.Indicator(
             Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
@@ -214,8 +214,8 @@ fun TabRow(
 fun ScrollableTabRow(
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
-    containerColor: Color = TabRowDefaults.Color,
-    contentColor: Color = TabRowDefaults.ContentColor,
+    containerColor: Color = TabRowDefaults.containerColor,
+    contentColor: Color = TabRowDefaults.contentColor,
     edgePadding: Dp = ScrollableTabRowPadding,
     indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = @Composable { tabPositions ->
         TabRowDefaults.Indicator(
@@ -343,10 +343,11 @@ class TabPosition internal constructor(val left: Dp, val width: Dp) {
  */
 object TabRowDefaults {
     /** Default color of a tab row. */
-    val Color: Color @Composable get() = PrimaryNavigationTabTokens.ContainerColor.toColor()
+    val containerColor: Color @Composable get() =
+        PrimaryNavigationTabTokens.ContainerColor.toColor()
 
     /** Default content color of a tab row. */
-    val ContentColor: Color @Composable get() =
+    val contentColor: Color @Composable get() =
         PrimaryNavigationTabTokens.ActiveLabelTextColor.toColor()
 
     /**

@@ -94,8 +94,8 @@ fun FloatingActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = FloatingActionButtonDefaults.Shape,
-    containerColor: Color = FloatingActionButtonDefaults.ContainerColor,
+    shape: Shape = FloatingActionButtonDefaults.shape,
+    containerColor: Color = FloatingActionButtonDefaults.containerColor,
     contentColor: Color = contentColorFor(containerColor),
     elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
     content: @Composable () -> Unit,
@@ -162,8 +162,8 @@ fun SmallFloatingActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = FloatingActionButtonDefaults.SmallShape,
-    containerColor: Color = FloatingActionButtonDefaults.ContainerColor,
+    shape: Shape = FloatingActionButtonDefaults.smallShape,
+    containerColor: Color = FloatingActionButtonDefaults.containerColor,
     contentColor: Color = contentColorFor(containerColor),
     elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
     content: @Composable () -> Unit,
@@ -214,8 +214,8 @@ fun LargeFloatingActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = FloatingActionButtonDefaults.LargeShape,
-    containerColor: Color = FloatingActionButtonDefaults.ContainerColor,
+    shape: Shape = FloatingActionButtonDefaults.largeShape,
+    containerColor: Color = FloatingActionButtonDefaults.containerColor,
     contentColor: Color = contentColorFor(containerColor),
     elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
     content: @Composable () -> Unit,
@@ -269,8 +269,8 @@ fun ExtendedFloatingActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = FloatingActionButtonDefaults.ExtendedFabShape,
-    containerColor: Color = FloatingActionButtonDefaults.ContainerColor,
+    shape: Shape = FloatingActionButtonDefaults.extendedFabShape,
+    containerColor: Color = FloatingActionButtonDefaults.containerColor,
     contentColor: Color = contentColorFor(containerColor),
     elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
     content: @Composable RowScope.() -> Unit,
@@ -336,8 +336,8 @@ fun ExtendedFloatingActionButton(
     modifier: Modifier = Modifier,
     expanded: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = FloatingActionButtonDefaults.ExtendedFabShape,
-    containerColor: Color = FloatingActionButtonDefaults.ContainerColor,
+    shape: Shape = FloatingActionButtonDefaults.extendedFabShape,
+    containerColor: Color = FloatingActionButtonDefaults.containerColor,
     contentColor: Color = contentColorFor(containerColor),
     elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
 ) {
@@ -419,26 +419,26 @@ interface FloatingActionButtonElevation {
  * Contains the default values used by [FloatingActionButton]
  */
 object FloatingActionButtonDefaults {
-    /** Default shape for a floating action button. */
-    val Shape: Shape @Composable get() = FabPrimaryTokens.ContainerShape.toShape()
-
-    /** Default shape for a small floating action button. */
-    val SmallShape: Shape @Composable get() = FabPrimarySmallTokens.ContainerShape.toShape()
-
-    /** Default shape for a large floating action button. */
-    val LargeShape: Shape @Composable get() = FabPrimaryLargeTokens.ContainerShape.toShape()
-
-    /** Default shape for an extended floating action button. */
-    val ExtendedFabShape: Shape @Composable get() =
-        ExtendedFabPrimaryTokens.ContainerShape.toShape()
-
-    /** Default container color for a floating action button. */
-    val ContainerColor: Color @Composable get() = FabPrimaryTokens.ContainerColor.toColor()
-
     /**
      * The recommended size of the icon inside a [LargeFloatingActionButton].
      */
     val LargeIconSize = FabPrimaryLargeTokens.IconSize
+
+    /** Default shape for a floating action button. */
+    val shape: Shape @Composable get() = FabPrimaryTokens.ContainerShape.toShape()
+
+    /** Default shape for a small floating action button. */
+    val smallShape: Shape @Composable get() = FabPrimarySmallTokens.ContainerShape.toShape()
+
+    /** Default shape for a large floating action button. */
+    val largeShape: Shape @Composable get() = FabPrimaryLargeTokens.ContainerShape.toShape()
+
+    /** Default shape for an extended floating action button. */
+    val extendedFabShape: Shape @Composable get() =
+        ExtendedFabPrimaryTokens.ContainerShape.toShape()
+
+    /** Default container color for a floating action button. */
+    val containerColor: Color @Composable get() = FabPrimaryTokens.ContainerColor.toColor()
 
     /**
      * Creates a [FloatingActionButtonElevation] that represents the elevation of a

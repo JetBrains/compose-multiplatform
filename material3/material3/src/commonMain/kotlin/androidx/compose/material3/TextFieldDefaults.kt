@@ -167,10 +167,10 @@ interface TextFieldColors {
 @Immutable
 object TextFieldDefaults {
     /** Default shape for an outlined text field. */
-    val OutlinedShape: Shape @Composable get() = OutlinedTextFieldTokens.ContainerShape.toShape()
+    val outlinedShape: Shape @Composable get() = OutlinedTextFieldTokens.ContainerShape.toShape()
 
     /** Default shape for a filled text field. */
-    val FilledShape: Shape @Composable get() = FilledTextFieldTokens.ContainerShape.toShape()
+    val filledShape: Shape @Composable get() = FilledTextFieldTokens.ContainerShape.toShape()
 
     /**
      * The default min width applied for a [TextField] and [OutlinedTextField].
