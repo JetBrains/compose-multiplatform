@@ -220,8 +220,8 @@ fun ElevatedAssistChip(
  * This filter chip is applied with a flat style. If you want an elevated style, use the
  * [ElevatedFilterChip].
  *
- * Tapping on a filter chip selects it, and in case a [selectedIcon] is provided (e.g. a checkmark),
- * it's appended to the starting edge of the chip's label, drawn instead of any given [leadingIcon].
+ * Tapping on a filter chip toggles its selection state. A selection state [leadingIcon] can be
+ * provided (e.g. a checkmark) to be appended at the starting edge of the chip's label.
  *
  * Example of a flat FilterChip with a trailing icon:
  * @sample androidx.compose.material3.samples.FilterChipSample
@@ -236,9 +236,9 @@ fun ElevatedAssistChip(
  * @param enabled controls the enabled state of this chip. When `false`, this component will not
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
- * @param leadingIcon optional icon at the start of the chip, preceding the [label] text
- * @param selectedIcon optional icon at the start of the chip, preceding the [label] text, which is
- * displayed when the chip is selected, instead of any given [leadingIcon]
+ * @param leadingIcon optional icon at the start of the chip, preceding the [label] text. When
+ * [selected] is true, this icon may visually indicate that the chip is selected (for example, via a
+ * checkmark icon).
  * @param trailingIcon optional icon at the end of the chip
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
  * for this chip. You can create and pass in your own `remember`ed instance to observe
@@ -263,7 +263,6 @@ fun FilterChip(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     leadingIcon: @Composable (() -> Unit)? = null,
-    selectedIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: SelectableChipElevation? = FilterChipDefaults.filterChipElevation(),
@@ -277,7 +276,7 @@ fun FilterChip(
     enabled = enabled,
     label = label,
     labelTextStyle = MaterialTheme.typography.fromToken(FilterChipTokens.LabelTextFont),
-    leadingIcon = if (selected) selectedIcon else leadingIcon,
+    leadingIcon = leadingIcon,
     avatar = null,
     trailingIcon = trailingIcon,
     elevation = elevation,
@@ -304,8 +303,8 @@ fun FilterChip(
  * This filter chip is applied with an elevated style. If you want a flat style, use the
  * [FilterChip].
  *
- * Tapping on a filter chip selects it, and in case a [selectedIcon] is provided (e.g. a checkmark),
- * it's appended to the starting edge of the chip's label, drawn instead of any given [leadingIcon].
+ * Tapping on a filter chip toggles its selection state. A selection state [leadingIcon] can be
+ * provided (e.g. a checkmark) to be appended at the starting edge of the chip's label.
  *
  * Example of an elevated FilterChip with a trailing icon:
  * @sample androidx.compose.material3.samples.ElevatedFilterChipSample
@@ -317,9 +316,9 @@ fun FilterChip(
  * @param enabled controls the enabled state of this chip. When `false`, this component will not
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
- * @param leadingIcon optional icon at the start of the chip, preceding the [label] text
- * @param selectedIcon optional icon at the start of the chip, preceding the [label] text, which is
- * displayed when the chip is selected, instead of any given [leadingIcon]
+ * @param leadingIcon optional icon at the start of the chip, preceding the [label] text. When
+ * [selected] is true, this icon may visually indicate that the chip is selected (for example, via a
+ * checkmark icon).
  * @param trailingIcon optional icon at the end of the chip
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
  * for this chip. You can create and pass in your own `remember`ed instance to observe
@@ -344,7 +343,6 @@ fun ElevatedFilterChip(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     leadingIcon: @Composable (() -> Unit)? = null,
-    selectedIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: SelectableChipElevation? = FilterChipDefaults.elevatedFilterChipElevation(),
@@ -358,7 +356,7 @@ fun ElevatedFilterChip(
     enabled = enabled,
     label = label,
     labelTextStyle = MaterialTheme.typography.fromToken(FilterChipTokens.LabelTextFont),
-    leadingIcon = if (selected) selectedIcon else leadingIcon,
+    leadingIcon = leadingIcon,
     avatar = null,
     trailingIcon = trailingIcon,
     elevation = elevation,
