@@ -189,7 +189,7 @@ internal data class ComputedStyle(
         shadow = spanStyle.shadow
     )
 
-    private fun toSkTextStyle(fontFamilyResolver: FontFamily.Resolver): SkTextStyle {
+    fun toSkTextStyle(fontFamilyResolver: FontFamily.Resolver): SkTextStyle {
         val res = SkTextStyle()
         if (color != Color.Unspecified) {
             res.color = color.toArgb()
