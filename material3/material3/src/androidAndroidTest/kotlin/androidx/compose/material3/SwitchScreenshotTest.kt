@@ -188,7 +188,7 @@ class SwitchScreenshotTest {
             .performTouchInput { move(); up() }
 
         rule.waitForIdle()
-        rule.mainClock.advanceTimeBy(milliseconds = 96)
+        rule.mainClock.advanceTimeBy(milliseconds = 100)
 
         // Ripples are drawn on the RenderThread, not the main (UI) thread, so we can't wait for
         // synchronization. Instead just wait until after the ripples are finished animating.
@@ -217,7 +217,7 @@ class SwitchScreenshotTest {
             .performTouchInput { move(); up() }
 
         rule.waitForIdle()
-        rule.mainClock.advanceTimeBy(milliseconds = 96)
+        rule.mainClock.advanceTimeBy(milliseconds = 100)
 
         // Ripples are drawn on the RenderThread, not the main (UI) thread, so we can't wait for
         // synchronization. Instead just wait until after the ripples are finished animating.
