@@ -545,7 +545,6 @@ val macExtraPlistKeys: String
         </dict>
       </array>
     """
-"""
 ```
 
 2. Use `java.awt.Desktop` to set up a URI handler:
