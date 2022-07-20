@@ -73,8 +73,8 @@ import kotlin.math.max
 fun LinearProgressIndicator(
     progress: Float,
     modifier: Modifier = Modifier,
-    color: Color = ProgressIndicatorDefaults.LinearColor,
-    trackColor: Color = ProgressIndicatorDefaults.LinearTrackColor,
+    color: Color = ProgressIndicatorDefaults.linearColor,
+    trackColor: Color = ProgressIndicatorDefaults.linearTrackColor,
 ) {
     Canvas(
         modifier
@@ -105,8 +105,8 @@ fun LinearProgressIndicator(
 @Composable
 fun LinearProgressIndicator(
     modifier: Modifier = Modifier,
-    color: Color = ProgressIndicatorDefaults.LinearColor,
-    trackColor: Color = ProgressIndicatorDefaults.LinearTrackColor,
+    color: Color = ProgressIndicatorDefaults.linearColor,
+    trackColor: Color = ProgressIndicatorDefaults.linearTrackColor,
 ) {
     val infiniteTransition = rememberInfiniteTransition()
     // Fractional position of the 'head' and 'tail' of the two lines drawn, i.e. if the head is 0.8
@@ -230,7 +230,7 @@ private fun DrawScope.drawLinearIndicatorTrack(
 fun CircularProgressIndicator(
     progress: Float,
     modifier: Modifier = Modifier,
-    color: Color = ProgressIndicatorDefaults.CircularColor,
+    color: Color = ProgressIndicatorDefaults.circularColor,
     strokeWidth: Dp = ProgressIndicatorDefaults.CircularStrokeWidth
 ) {
     val stroke = with(LocalDensity.current) {
@@ -265,7 +265,7 @@ fun CircularProgressIndicator(
 @Composable
 fun CircularProgressIndicator(
     modifier: Modifier = Modifier,
-    color: Color = ProgressIndicatorDefaults.CircularColor,
+    color: Color = ProgressIndicatorDefaults.circularColor,
     strokeWidth: Dp = ProgressIndicatorDefaults.CircularStrokeWidth
 ) {
     val stroke = with(LocalDensity.current) {
@@ -398,15 +398,15 @@ private fun DrawScope.drawIndeterminateCircularIndicator(
  */
 object ProgressIndicatorDefaults {
     /** Default color for a linear progress indicator. */
-    val LinearColor: Color @Composable get() =
+    val linearColor: Color @Composable get() =
         LinearProgressIndicatorTokens.ActiveIndicatorColor.toColor()
 
     /** Default color for a circular progress indicator. */
-    val CircularColor: Color @Composable get() =
+    val circularColor: Color @Composable get() =
         CircularProgressIndicatorTokens.ActiveIndicatorColor.toColor()
 
     /** Default track color for a linear progress indicator. */
-    val LinearTrackColor: Color @Composable get() =
+    val linearTrackColor: Color @Composable get() =
         LinearProgressIndicatorTokens.TrackColor.toColor()
 
     /** Default stroke width for a circular progress indicator. */

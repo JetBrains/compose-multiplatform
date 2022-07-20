@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun Divider(
     modifier: Modifier = Modifier,
-    color: Color = DividerDefaults.Color,
+    color: Color = DividerDefaults.color,
     thickness: Dp = DividerDefaults.Thickness,
     startIndent: Dp = 0.dp
 ) {
@@ -70,9 +70,9 @@ fun Divider(
 
 /** Default values for [Divider] */
 object DividerDefaults {
-    /** Default color of a divider. */
-    val Color: Color @Composable get() = DividerTokens.Color.toColor()
-
     /** Default thickness of a divider. */
     val Thickness: Dp = DividerTokens.Thickness
+
+    /** Default color of a divider. */
+    val color: Color @Composable get() = DividerTokens.Color.toColor()
 }

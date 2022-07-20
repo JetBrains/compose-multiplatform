@@ -173,7 +173,7 @@ fun TextField(
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = TextFieldDefaults.FilledShape,
+    shape: Shape = TextFieldDefaults.filledShape,
     colors: TextFieldColors = TextFieldDefaults.textFieldColors()
 ) {
     // If color is not provided via the text style, use content color as a default
@@ -308,7 +308,7 @@ fun TextField(
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = TextFieldDefaults.FilledShape,
+    shape: Shape = TextFieldDefaults.filledShape,
     colors: TextFieldColors = TextFieldDefaults.textFieldColors()
 ) {
     // If color is not provided via the text style, use content color as a default

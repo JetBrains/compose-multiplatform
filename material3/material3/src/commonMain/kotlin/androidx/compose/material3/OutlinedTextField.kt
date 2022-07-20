@@ -147,7 +147,7 @@ fun OutlinedTextField(
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = TextFieldDefaults.OutlinedShape,
+    shape: Shape = TextFieldDefaults.outlinedShape,
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
 ) {
     // If color is not provided via the text style, use content color as a default
@@ -292,7 +292,7 @@ fun OutlinedTextField(
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = TextFieldDefaults.OutlinedShape,
+    shape: Shape = TextFieldDefaults.outlinedShape,
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
 ) {
     // If color is not provided via the text style, use content color as a default
