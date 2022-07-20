@@ -936,6 +936,126 @@ class SnapshotTests {
         }
     }
 
+    @Test
+    fun testNestedWithinTransparentSnapshotDisposedCorrectly() {
+        val outerSnapshot = TransparentObserverSnapshot(
+            previousSnapshot = currentSnapshot(),
+            specifiedReadObserver = null,
+            mergeParentObservers = false,
+            ownsPreviousSnapshot = false
+        )
+
+        try {
+            outerSnapshot.enter {
+                val innerSnapshot = outerSnapshot.takeNestedSnapshot()
+
+                try {
+                    innerSnapshot.enter { }
+                } finally {
+                    innerSnapshot.dispose()
+                }
+            }
+        } finally {
+            outerSnapshot.dispose()
+        }
+    }
+
+    @Test
+    fun testNestedWithinTransparentMutableSnapshotDisposedCorrectly() {
+        val outerSnapshot = TransparentObserverMutableSnapshot(
+            previousSnapshot = currentSnapshot() as? MutableSnapshot,
+            specifiedReadObserver = null,
+            specifiedWriteObserver = null,
+            mergeParentObservers = false,
+            ownsPreviousSnapshot = false
+        )
+
+        try {
+            outerSnapshot.enter {
+                val innerSnapshot = outerSnapshot.takeNestedSnapshot()
+
+                try {
+                    innerSnapshot.enter { }
+                } finally {
+                    innerSnapshot.dispose()
+                }
+            }
+        } finally {
+            outerSnapshot.dispose()
+        }
+    }
+
+    @Test
+    fun testTransparentSnapshotMergedWithNestedReadObserver() {
+        var outerChanges = 0
+        var innerChanges = 0
+        val state by mutableStateOf(0)
+
+        val outerSnapshot = TransparentObserverSnapshot(
+            previousSnapshot = currentSnapshot(),
+            specifiedReadObserver = { outerChanges++ },
+            mergeParentObservers = false,
+            ownsPreviousSnapshot = false
+        )
+
+        try {
+            outerSnapshot.enter {
+                val innerSnapshot = outerSnapshot.takeNestedSnapshot(
+                    readObserver = { innerChanges++ }
+                )
+
+                try {
+                    innerSnapshot.enter {
+                        state // read
+                    }
+                } finally {
+                    innerSnapshot.dispose()
+                }
+            }
+        } finally {
+            outerSnapshot.dispose()
+        }
+
+        assertEquals(1, outerChanges)
+        assertEquals(1, innerChanges)
+    }
+
+    @Test
+    fun testTransparentMutableSnapshotMergedWithNestedReadObserver() {
+        var outerChanges = 0
+        var innerChanges = 0
+        val state by mutableStateOf(0)
+
+        val outerSnapshot = TransparentObserverMutableSnapshot(
+            previousSnapshot = currentSnapshot() as? MutableSnapshot,
+            specifiedReadObserver = { outerChanges++ },
+            specifiedWriteObserver = null,
+            mergeParentObservers = false,
+            ownsPreviousSnapshot = false
+        )
+
+        try {
+            outerSnapshot.enter {
+                val innerSnapshot = outerSnapshot.takeNestedSnapshot(
+                    readObserver = { innerChanges++ }
+                )
+
+                try {
+                    innerSnapshot.enter {
+                        state // read
+                    }
+                } finally {
+                    innerSnapshot.dispose()
+                }
+            }
+        } finally {
+            outerSnapshot.dispose()
+        }
+
+        assertEquals(1, outerChanges)
+        assertEquals(1, innerChanges)
+    }
+
     private var count = 0
 
     @BeforeTest
