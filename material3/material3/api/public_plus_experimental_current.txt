@@ -540,7 +540,6 @@ package androidx.compose.material3 {
   }
 
   public final class MenuDefaults {
-    method @androidx.compose.runtime.Composable public void Divider(optional androidx.compose.ui.Modifier modifier, optional long color, optional float thickness);
     method public androidx.compose.foundation.layout.PaddingValues getDropdownMenuItemContentPadding();
     method @androidx.compose.runtime.Composable public androidx.compose.material3.MenuItemColors itemColors(optional long textColor, optional long leadingIconColor, optional long trailingIconColor, optional long disabledTextColor, optional long disabledLeadingIconColor, optional long disabledTrailingIconColor);
     property public final androidx.compose.foundation.layout.PaddingValues DropdownMenuItemContentPadding;
@@ -864,7 +863,6 @@ package androidx.compose.material3 {
   }
 
   public final class TabRowDefaults {
-    method @androidx.compose.runtime.Composable public void Divider(optional androidx.compose.ui.Modifier modifier, optional float thickness, optional long color);
     method @androidx.compose.runtime.Composable public void Indicator(optional androidx.compose.ui.Modifier modifier, optional float height, optional long color);
     method @androidx.compose.runtime.Composable public long getContainerColor();
     method @androidx.compose.runtime.Composable public long getContentColor();

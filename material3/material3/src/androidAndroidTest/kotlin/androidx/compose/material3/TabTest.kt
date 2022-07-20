@@ -294,7 +294,7 @@ class TabTest {
             val titles = listOf("TAB 1", "TAB 2")
             val tabRowHeight = 100.dp
 
-            val divider = @Composable { TabRowDefaults.Divider(Modifier.testTag("divider")) }
+            val divider = @Composable { Divider(Modifier.testTag("divider")) }
 
             Box(Modifier.testTag("tabRow")) {
                 TabRow(
@@ -532,7 +532,7 @@ class TabTest {
             val titles = listOf("TAB 1", "TAB 2")
             val tabRowHeight = 100.dp
 
-            val divider = @Composable { TabRowDefaults.Divider(Modifier.testTag("divider")) }
+            val divider = @Composable { Divider(Modifier.testTag("divider")) }
 
             Box(Modifier.testTag("tabRow")) {
                 ScrollableTabRow(
