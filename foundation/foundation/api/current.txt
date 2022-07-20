@@ -47,6 +47,7 @@ package androidx.compose.foundation {
   }
 
   public final class ClipScrollableContainerKt {
+    method public static androidx.compose.ui.Modifier clipScrollableContainer(androidx.compose.ui.Modifier, androidx.compose.foundation.gestures.Orientation orientation);
   }
 
   public final class DarkThemeKt {
