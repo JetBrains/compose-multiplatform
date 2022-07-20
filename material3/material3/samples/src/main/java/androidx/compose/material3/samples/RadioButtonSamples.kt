@@ -35,6 +35,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
 @Sampled
@@ -42,15 +44,20 @@ import androidx.compose.ui.unit.dp
 fun RadioButtonSample() {
     // We have two radio buttons and only one can be selected
     var state by remember { mutableStateOf(true) }
-    // Note that Modifier.selectableGroup() is essential to ensure correct accessibility behavior
+    // Note that Modifier.selectableGroup() is essential to ensure correct accessibility behavior.
+    // We also set a content description for this sample, but note that a RadioButton would usually
+    // be part of a higher level component, such as a raw with text, and that component would need
+    // to provide an appropriate content description. See RadioGroupSample.
     Row(Modifier.selectableGroup()) {
         RadioButton(
             selected = state,
-            onClick = { state = true }
+            onClick = { state = true },
+            modifier = Modifier.semantics { contentDescription = "Localized Description" }
         )
         RadioButton(
             selected = !state,
-            onClick = { state = false }
+            onClick = { state = false },
+            modifier = Modifier.semantics { contentDescription = "Localized Description" }
         )
     }
 }
