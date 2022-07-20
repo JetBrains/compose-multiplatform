@@ -112,7 +112,7 @@ fun AssistChip(
     trailingIcon: @Composable (() -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: ChipElevation? = AssistChipDefaults.assistChipElevation(),
-    shape: Shape = AssistChipDefaults.Shape,
+    shape: Shape = AssistChipDefaults.shape,
     border: ChipBorder? = AssistChipDefaults.assistChipBorder(),
     colors: ChipColors = AssistChipDefaults.assistChipColors()
 ) = Chip(
@@ -184,7 +184,7 @@ fun ElevatedAssistChip(
     trailingIcon: @Composable (() -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: ChipElevation? = AssistChipDefaults.elevatedAssistChipElevation(),
-    shape: Shape = AssistChipDefaults.Shape,
+    shape: Shape = AssistChipDefaults.shape,
     border: ChipBorder? = null,
     colors: ChipColors = AssistChipDefaults.elevatedAssistChipColors()
 ) = Chip(
@@ -267,7 +267,7 @@ fun FilterChip(
     trailingIcon: @Composable (() -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: SelectableChipElevation? = FilterChipDefaults.filterChipElevation(),
-    shape: Shape = FilterChipDefaults.Shape,
+    shape: Shape = FilterChipDefaults.shape,
     border: SelectableChipBorder? = FilterChipDefaults.filterChipBorder(),
     colors: SelectableChipColors = FilterChipDefaults.filterChipColors()
 ) = SelectableChip(
@@ -348,7 +348,7 @@ fun ElevatedFilterChip(
     trailingIcon: @Composable (() -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: SelectableChipElevation? = FilterChipDefaults.elevatedFilterChipElevation(),
-    shape: Shape = FilterChipDefaults.Shape,
+    shape: Shape = FilterChipDefaults.shape,
     border: SelectableChipBorder? = null,
     colors: SelectableChipColors = FilterChipDefaults.elevatedFilterChipColors()
 ) = SelectableChip(
@@ -433,7 +433,7 @@ fun InputChip(
     trailingIcon: @Composable (() -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: SelectableChipElevation? = InputChipDefaults.inputChipElevation(),
-    shape: Shape = InputChipDefaults.Shape,
+    shape: Shape = InputChipDefaults.shape,
     border: SelectableChipBorder? = InputChipDefaults.inputChipBorder(),
     colors: SelectableChipColors = InputChipDefaults.inputChipColors()
 ) {
@@ -529,7 +529,7 @@ fun SuggestionChip(
     icon: @Composable (() -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: ChipElevation? = SuggestionChipDefaults.suggestionChipElevation(),
-    shape: Shape = SuggestionChipDefaults.Shape,
+    shape: Shape = SuggestionChipDefaults.shape,
     border: ChipBorder? = SuggestionChipDefaults.suggestionChipBorder(),
     colors: ChipColors = SuggestionChipDefaults.suggestionChipColors()
 ) = Chip(
@@ -598,7 +598,7 @@ fun ElevatedSuggestionChip(
     icon: @Composable (() -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: ChipElevation? = SuggestionChipDefaults.elevatedSuggestionChipElevation(),
-    shape: Shape = SuggestionChipDefaults.Shape,
+    shape: Shape = SuggestionChipDefaults.shape,
     border: ChipBorder? = null,
     colors: ChipColors = SuggestionChipDefaults.elevatedSuggestionChipColors()
 ) = Chip(
@@ -829,9 +829,6 @@ interface SelectableChipBorder {
  */
 @ExperimentalMaterial3Api
 object AssistChipDefaults {
-    /** Default shape of an assist chip. */
-    val Shape: Shape @Composable get() = AssistChipTokens.ContainerShape.toShape()
-
     /**
      * The height applied for an assist chip.
      * Note that you can override it by applying Modifier.height directly on a chip.
@@ -1024,6 +1021,9 @@ object AssistChipDefaults {
             )
         }
     }
+
+    /** Default shape of an assist chip. */
+    val shape: Shape @Composable get() = AssistChipTokens.ContainerShape.toShape()
 }
 
 /**
@@ -1031,9 +1031,6 @@ object AssistChipDefaults {
  */
 @ExperimentalMaterial3Api
 object FilterChipDefaults {
-    /** Default shape of a filter chip. */
-    val Shape: Shape @Composable get() = FilterChipTokens.ContainerShape.toShape()
-
     /**
      * The height applied for a filter chip.
      * Note that you can override it by applying Modifier.height directly on a chip.
@@ -1269,6 +1266,9 @@ object FilterChipDefaults {
             )
         }
     }
+
+    /** Default shape of a filter chip. */
+    val shape: Shape @Composable get() = FilterChipTokens.ContainerShape.toShape()
 }
 
 /**
@@ -1276,9 +1276,6 @@ object FilterChipDefaults {
  */
 @ExperimentalMaterial3Api
 object InputChipDefaults {
-    /** Default shape of an input chip. */
-    val Shape: Shape @Composable get() = InputChipTokens.ContainerShape.toShape()
-
     /**
      * The height applied for an input chip.
      * Note that you can override it by applying Modifier.height directly on a chip.
@@ -1430,6 +1427,9 @@ object InputChipDefaults {
             )
         }
     }
+
+    /** Default shape of an input chip. */
+    val shape: Shape @Composable get() = InputChipTokens.ContainerShape.toShape()
 }
 
 /**
@@ -1437,9 +1437,6 @@ object InputChipDefaults {
  */
 @ExperimentalMaterial3Api
 object SuggestionChipDefaults {
-    /** Default shape of a suggestion chip. */
-    val Shape: Shape @Composable get() = SuggestionChipTokens.ContainerShape.toShape()
-
     /**
      * The height applied for a suggestion chip.
      * Note that you can override it by applying Modifier.height directly on a chip.
@@ -1626,6 +1623,9 @@ object SuggestionChipDefaults {
             )
         }
     }
+
+    /** Default shape of a suggestion chip. */
+    val shape: Shape @Composable get() = SuggestionChipTokens.ContainerShape.toShape()
 }
 
 @ExperimentalMaterial3Api

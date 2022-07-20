@@ -814,8 +814,10 @@ class AppBarTest {
                 BottomAppBar(
                     icons = {},
                     floatingActionButton = {
-                        BottomAppBarDefaults.FloatingActionButton(
-                            onClick = { /* do something */ }
+                        FloatingActionButton(
+                            onClick = { /* do something */ },
+                            containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+                            elevation = BottomAppBarDefaults.BottomAppBarFabElevation
                         ) {
                             Icon(Icons.Filled.Add, "Localized description")
                         }
@@ -863,9 +865,11 @@ class AppBarTest {
                 icons = {},
                 Modifier.testTag("bar"),
                 floatingActionButton = {
-                    BottomAppBarDefaults.FloatingActionButton(
-                        modifier = Modifier.testTag("FAB"),
+                    FloatingActionButton(
                         onClick = { /* do something */ },
+                        modifier = Modifier.testTag("FAB"),
+                        containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+                        elevation = BottomAppBarDefaults.BottomAppBarFabElevation
                     ) {
                         Icon(Icons.Filled.Add, "Localized description")
                     }
