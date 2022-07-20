@@ -93,12 +93,16 @@ fun FilterChipSample() {
         selected = selected,
         onClick = { selected = !selected },
         label = { Text("Filter chip") },
-        selectedIcon = {
-            Icon(
-                imageVector = Icons.Filled.Done,
-                contentDescription = "Localized Description",
-                modifier = Modifier.size(FilterChipDefaults.IconSize)
-            )
+        leadingIcon = if (selected) {
+            {
+                Icon(
+                    imageVector = Icons.Filled.Done,
+                    contentDescription = "Localized Description",
+                    modifier = Modifier.size(FilterChipDefaults.IconSize)
+                )
+            }
+        } else {
+            null
         }
     )
 }
@@ -112,12 +116,16 @@ fun ElevatedFilterChipSample() {
         selected = selected,
         onClick = { selected = !selected },
         label = { Text("Filter chip") },
-        selectedIcon = {
-            Icon(
-                imageVector = Icons.Filled.Done,
-                contentDescription = "Localized Description",
-                modifier = Modifier.size(FilterChipDefaults.IconSize)
-            )
+        leadingIcon = if (selected) {
+            {
+                Icon(
+                    imageVector = Icons.Filled.Done,
+                    contentDescription = "Localized Description",
+                    modifier = Modifier.size(FilterChipDefaults.IconSize)
+                )
+            }
+        } else {
+            null
         }
     )
 }
@@ -131,19 +139,22 @@ fun FilterChipWithLeadingIconSample() {
         selected = selected,
         onClick = { selected = !selected },
         label = { Text("Filter chip") },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Filled.Home,
-                contentDescription = "Localized description",
-                modifier = Modifier.size(FilterChipDefaults.IconSize)
-            )
-        },
-        selectedIcon = {
-            Icon(
-                imageVector = Icons.Filled.Done,
-                contentDescription = "Localized Description",
-                modifier = Modifier.size(FilterChipDefaults.IconSize)
-            )
+        leadingIcon = if (selected) {
+            {
+                Icon(
+                    imageVector = Icons.Filled.Done,
+                    contentDescription = "Localized Description",
+                    modifier = Modifier.size(FilterChipDefaults.IconSize)
+                )
+            }
+        } else {
+            {
+                Icon(
+                    imageVector = Icons.Filled.Home,
+                    contentDescription = "Localized description",
+                    modifier = Modifier.size(FilterChipDefaults.IconSize)
+                )
+            }
         }
     )
 }
