@@ -54,7 +54,6 @@ import androidx.compose.ui.semantics.scrollBy
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.verticalScrollAxisRange
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.LayoutDirection
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
@@ -286,17 +285,11 @@ private fun Modifier.scroll(
         val orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal
         val scrolling = Modifier.scrollable(
             orientation = orientation,
-            reverseDirection = run {
-                // A finger moves with the content, not with the viewport. Therefore,
-                // always reverse once to have "natural" gesture that goes reversed to layout
-                var reverseDirection = !reverseScrolling
-                // But if rtl and horizontal, things move the other way around
-                val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-                if (isRtl && !isVertical) {
-                    reverseDirection = !reverseDirection
-                }
-                reverseDirection
-            },
+            reverseDirection = ScrollableDefaults.reverseDirection(
+                LocalLayoutDirection.current,
+                orientation,
+                reverseScrolling
+            ),
             enabled = isScrollable,
             interactionSource = state.internalInteractionSource,
             flingBehavior = flingBehavior,
