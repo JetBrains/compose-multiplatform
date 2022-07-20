@@ -123,7 +123,7 @@ fun Switch(
     DisposableEffect(checked) {
         if (offset.targetValue != targetValue) {
             scope.launch {
-                offset.animateTo(targetValue)
+                offset.animateTo(targetValue, AnimationSpec)
             }
         }
         onDispose { }
@@ -134,12 +134,7 @@ fun Switch(
         if (onCheckedChange != null) {
             Modifier.toggleable(
                 value = checked,
-                onValueChange = { value: Boolean ->
-                    onCheckedChange(value)
-                    scope.launch {
-                        offset.animateTo(valueToOffset(value), AnimationSpec)
-                    }
-                },
+                onValueChange = onCheckedChange,
                 enabled = enabled,
                 role = Role.Switch,
                 interactionSource = interactionSource,

@@ -296,6 +296,27 @@ class SwitchTest {
             .assertLeftPositionInRootIsEqualTo(8.dp)
     }
 
+    @Test
+    fun switch_constantState_doesNotAnimate() {
+        rule.setMaterialContent(lightColorScheme()) {
+            val spacer = @Composable { Spacer(Modifier.size(16.dp).testTag("spacer")) }
+            Switch(
+                modifier = Modifier.testTag(defaultSwitchTag),
+                checked = false,
+                thumbContent = spacer,
+                onCheckedChange = {},
+            )
+        }
+
+        rule.onNodeWithTag(defaultSwitchTag)
+            .performTouchInput {
+                click(center)
+            }
+
+        rule.onNodeWithTag("spacer", useUnmergedTree = true)
+            .assertLeftPositionInRootIsEqualTo(8.dp)
+    }
+
     // regression test for b/191375128
     @Test
     fun switch_stateRestoration_stateChangeWhileSaved() {
