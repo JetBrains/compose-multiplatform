@@ -224,7 +224,6 @@ object ScrollableDefaults {
      *
      * @return `true` if scroll direction should be reversed, `false` otherwise.
      */
-    @ExperimentalFoundationApi
     fun reverseDirection(
         layoutDirection: LayoutDirection,
         orientation: Orientation,
