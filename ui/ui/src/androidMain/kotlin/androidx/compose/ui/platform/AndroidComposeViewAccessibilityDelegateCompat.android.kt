@@ -387,6 +387,15 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         info: AccessibilityNodeInfoCompat,
         semanticsNode: SemanticsNode
     ) {
+        val isUnmergedLeafNode =
+            !semanticsNode.isFake &&
+            semanticsNode.replacedChildren.isEmpty() &&
+            semanticsNode.layoutNode.findClosestParentNode {
+                it.outerSemantics
+                    ?.collapsedSemanticsConfiguration()
+                    ?.isMergingSemanticsOfDescendants == true
+            } == null
+
         // set classname
         info.className = ClassName
         val role = semanticsNode.unmergedConfig.getOrNull(SemanticsProperties.Role)
@@ -403,21 +412,13 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         Role.Image -> "android.widget.ImageView"
                         else -> null
                     }
-                    if (role != Role.Image) {
+                    // Images are often minor children of larger widgets, so we only want to
+                    // announce the Image role when the image itself is focusable.
+                    if (role != Role.Image ||
+                        isUnmergedLeafNode ||
+                        semanticsNode.unmergedConfig.isMergingSemanticsOfDescendants
+                    ) {
                         info.className = className
-                    } else {
-                        // If ancestor of the image is a merging container (e.g. IconButton), we
-                        // don't want to announce Image role to avoid "Favorite, Image, Button"
-                        val ancestor = semanticsNode.layoutNode.findClosestParentNode { parent ->
-                            parent.outerSemantics
-                                ?.collapsedSemanticsConfiguration()
-                                ?.isMergingSemanticsOfDescendants == true
-                        }
-                        if (ancestor == null ||
-                            semanticsNode.unmergedConfig.isMergingSemanticsOfDescendants
-                        ) {
-                            info.className = className
-                        }
                     }
                 }
             }
@@ -520,10 +521,6 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             info.contentDescription = semanticsNode.unmergedConfig.getOrNull(
                 SemanticsProperties.ContentDescription
             )?.firstOrNull()
-        }
-
-        if (semanticsNode.unmergedConfig.isMergingSemanticsOfDescendants) {
-            info.isScreenReaderFocusable = true
         }
 
         // Map testTag to resourceName if testTagsAsResourceId == true (which can be set by an ancestor)
@@ -919,6 +916,13 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 labelToActionId.put(virtualViewId, currentLabelToActionId)
             }
         }
+
+        val isSpeakingNode = info.contentDescription != null || info.text != null ||
+            info.hintText != null || info.stateDescription != null || info.isCheckable
+
+        info.isScreenReaderFocusable =
+            semanticsNode.unmergedConfig.isMergingSemanticsOfDescendants ||
+            isUnmergedLeafNode && isSpeakingNode
     }
 
     /** Set the error text for this node */
