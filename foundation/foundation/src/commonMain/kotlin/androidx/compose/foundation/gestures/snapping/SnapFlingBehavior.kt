@@ -60,6 +60,9 @@ import kotlin.math.sign
  * If the velocity is not high enough, we'll perform the same algorithm, but use [snapAnimationSpec]
  * to do so.
  *
+ * Please refer to the sample to learn how to use this API.
+ * @sample androidx.compose.foundation.samples.SnapFlingBehaviorSample
+ *
  * @param snapLayoutInfoProvider The information about the layout being snapped.
  * @param approachAnimationSpec The animation spec used to approach the target offset.
  * @param snapAnimationSpec The animation spec used to finally snap to the correct bound.
