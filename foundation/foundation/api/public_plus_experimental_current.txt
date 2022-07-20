@@ -37,7 +37,7 @@ package androidx.compose.foundation {
   }
 
   public final class CheckScrollableContainerConstraintsKt {
-    method @androidx.compose.foundation.ExperimentalFoundationApi public static void checkScrollableContainerConstraints(long constraints, androidx.compose.foundation.gestures.Orientation orientation);
+    method public static void checkScrollableContainerConstraints(long constraints, androidx.compose.foundation.gestures.Orientation orientation);
   }
 
   public final class ClickableKt {
