@@ -45,6 +45,8 @@ import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.rememberDialogState
 import java.awt.event.KeyEvent
 import androidx.compose.ui.window.Dialog as CoreDialog
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.type
 
 /**
  * Alert dialog is a Dialog which interrupts the user with urgent information, details or actions.
@@ -208,7 +210,7 @@ object PopupAlertDialogProvider : AlertDialogProvider {
             focusable = true,
             onDismissRequest = onDismissRequest,
             onKeyEvent = {
-                if (it.awtEventOrNull?.keyCode == KeyEvent.VK_ESCAPE) {
+                if (it.type == KeyEventType.KeyDown && it.awtEventOrNull?.keyCode == KeyEvent.VK_ESCAPE) {
                     onDismissRequest()
                     true
                 } else {

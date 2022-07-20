@@ -28,6 +28,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.awtEventOrNull
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
@@ -105,7 +107,7 @@ fun DropdownMenu(
             onDismissRequest = onDismissRequest,
             popupPositionProvider = popupPositionProvider,
             onKeyEvent = {
-                if (it.awtEventOrNull?.keyCode == KeyEvent.VK_ESCAPE) {
+                if (it.type == KeyEventType.KeyDown && it.awtEventOrNull?.keyCode == KeyEvent.VK_ESCAPE) {
                     onDismissRequest()
                     true
                 } else {

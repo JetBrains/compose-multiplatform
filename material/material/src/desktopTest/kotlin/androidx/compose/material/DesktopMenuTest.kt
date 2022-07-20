@@ -16,6 +16,17 @@
 
 package androidx.compose.material
 
+import androidx.compose.material.internal.keyEvent
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performKeyPress
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
@@ -23,12 +34,17 @@ import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import com.google.common.truth.Truth.assertThat
+import org.junit.Assert
+import org.junit.Rule
 import org.junit.runners.JUnit4
 import org.junit.runner.RunWith
 import org.junit.Test
 
 @RunWith(JUnit4::class)
 class DesktopMenuTest {
+
+    @get:Rule
+    val rule = createComposeRule()
 
     val windowSize = IntSize(100, 100)
     val anchorPosition = IntOffset(10, 10)
@@ -66,5 +82,34 @@ class DesktopMenuTest {
         )
 
         assertThat(position).isEqualTo(IntOffset(10, 0))
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    @Test
+    fun `pressing ESC button invokes onDismissRequest`() {
+        var dismissCount = 0
+        rule.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
+                DropdownMenu(true, onDismissRequest = {
+                    dismissCount++
+                }, modifier = Modifier.testTag("dropDownMenu")) {
+                    DropdownMenuItem({}) { Text("item1") }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("dropDownMenu")
+            .performKeyPress(keyEvent(Key.Escape, KeyEventType.KeyDown))
+
+        rule.runOnIdle {
+            Assert.assertEquals(1, dismissCount)
+        }
+
+        rule.onNodeWithTag("dropDownMenu")
+            .performKeyPress(keyEvent(Key.Escape, KeyEventType.KeyUp))
+
+        rule.runOnIdle {
+            Assert.assertEquals(1, dismissCount)
+        }
     }
 }

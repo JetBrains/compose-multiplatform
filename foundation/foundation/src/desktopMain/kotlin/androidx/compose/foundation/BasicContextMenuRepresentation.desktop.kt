@@ -37,7 +37,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
@@ -76,7 +78,7 @@ class DefaultContextMenuRepresentation(
                 onDismissRequest = { state.status = ContextMenuState.Status.Closed },
                 popupPositionProvider = rememberCursorPositionProvider(),
                 onKeyEvent = {
-                    if (it.key == Key.Escape) {
+                    if (it.type == KeyEventType.KeyDown && it.key == Key.Escape) {
                         state.status = ContextMenuState.Status.Closed
                         true
                     } else {
