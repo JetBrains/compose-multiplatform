@@ -49,6 +49,7 @@ import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.tooling.LocalInspectionTables
@@ -60,6 +61,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.inspection.compose.flatten
 import androidx.compose.ui.inspection.testdata.TestActivity
 import androidx.compose.ui.layout.GraphicLayerInfo
+import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -888,6 +890,30 @@ class LayoutInspectorTreeTest {
         assertThat(inlineParameters.parameters[1].name).isEqualTo("fontSize")
         assertThat(inlineParameters.parameters[1].value?.javaClass).isEqualTo(TextUnit::class.java)
         assertThat(inlineParameters.parameters).hasSize(2)
+    }
+
+    @Test
+    fun testRemember() {
+        val slotTableRecord = CompositionDataRecord.create()
+
+        // Regression test for: b/235526153
+        // The method: SubCompositionRoots.remember had code like this:
+        //   group.data.filterIsInstance<Ref<ViewRootForInspector>>().singleOrNull()?.value
+        // which would cause a ClassCastException if the data contained a Ref to something
+        // else than a ViewRootForInspector instance. This would crash the app.
+        show {
+            Inspectable(slotTableRecord) {
+                rememberCompositionContext()
+                val stringReference = remember { Ref<String>() }
+                stringReference.value = "Hello"
+            }
+        }
+        val androidComposeView = findAndroidComposeView()
+        androidComposeView.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
+        val builder = LayoutInspectorTree()
+        builder.hideSystemNodes = false
+        builder.includeAllParameters = false
+        builder.convert(androidComposeView)
     }
 
     @Suppress("SameParameterValue")
