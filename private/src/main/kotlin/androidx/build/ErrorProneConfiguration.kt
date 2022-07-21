@@ -139,7 +139,6 @@ private fun JavaCompile.configureWithErrorProne() {
             "-Xep:JavaUtilDate:OFF",
             "-Xep:UnrecognisedJavadocTag:OFF",
             "-Xep:ObjectEqualsForPrimitives:OFF",
-            "-Xep:UnnecessaryParentheses:OFF",
             "-Xep:DoNotCallSuggester:OFF",
             "-Xep:EqualsNull:OFF",
             "-Xep:MalformedInlineTag:OFF",
@@ -202,7 +201,7 @@ private fun JavaCompile.configureWithErrorProne() {
             // "-Xep:StringSplitter:ERROR", // disabled with upgrade to 2.14.0
             "-Xep:ReferenceEquality:ERROR",
             "-Xep:AssertionFailureIgnored:ERROR",
-            // "-Xep:UnnecessaryParentheses:ERROR", // disabled with upgrade to 2.14.0
+            "-Xep:UnnecessaryParentheses:ERROR",
             "-Xep:EqualsGetClass:ERROR",
             // "-Xep:UnusedVariable:ERROR", // disabled with upgrade to 2.14.0
             // "-Xep:UnusedMethod:ERROR", // disabled with upgrade to 2.14.0
