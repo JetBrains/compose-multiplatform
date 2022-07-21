@@ -15,7 +15,7 @@ interface SplitPaneScope {
 
     /**
      * Set up first composable item if SplitPane, for [HorizontalSplitPane] it will be
-     * Right part, for [VerticalSplitPane] it will be Top part
+     * Left part, for [VerticalSplitPane] it will be Top part
      * @param minSize a minimal size of composable item.
      * For [HorizontalSplitPane] it will be minimal width, for [VerticalSplitPane] it wil be minimal Heights.
      * In this context minimal mean that this composable item could not be smaller than specified value.
@@ -28,7 +28,7 @@ interface SplitPaneScope {
 
     /**
      * Set up second composable item if SplitPane.
-     * For [HorizontalSplitPane] it will be Left part, for [VerticalSplitPane] it will be Bottom part
+     * For [HorizontalSplitPane] it will be Right part, for [VerticalSplitPane] it will be Bottom part
      * @param minSize a minimal size of composable item.
      * For [HorizontalSplitPane] it will be minimal width, for [VerticalSplitPane] it wil be minimal Heights.
      * In this context minimal mean that this composable item could not be smaller than specified value.
