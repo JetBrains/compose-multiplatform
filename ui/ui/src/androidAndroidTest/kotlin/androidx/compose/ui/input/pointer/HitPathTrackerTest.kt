@@ -28,6 +28,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
@@ -3753,6 +3754,12 @@ private class MockOwner(
                 drawBlock: (Canvas) -> Unit,
                 invalidateParentLayer: () -> Unit
             ) {
+            }
+
+            override fun transform(matrix: Matrix) {
+            }
+
+            override fun inverseTransform(matrix: Matrix) {
             }
 
             override fun mapOffset(point: Offset, inverse: Boolean) = point

@@ -232,6 +232,14 @@ internal class SkiaLayer(
         canvas.restore()
     }
 
+    override fun transform(matrix: Matrix) {
+        matrix.timesAssign(getMatrix(inverse = false))
+    }
+
+    override fun inverseTransform(matrix: Matrix) {
+        matrix.timesAssign(getMatrix(inverse = true))
+    }
+
     private fun performDrawLayer(canvas: Canvas, bounds: Rect) {
         if (alpha > 0) {
             if (shadowElevation > 0) {

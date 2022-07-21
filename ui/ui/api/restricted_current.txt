@@ -1871,6 +1871,7 @@ package androidx.compose.ui.layout {
     method public long localPositionOf(androidx.compose.ui.layout.LayoutCoordinates sourceCoordinates, long relativeToSource);
     method public long localToRoot(long relativeToLocal);
     method public long localToWindow(long relativeToLocal);
+    method public default void transformFrom(androidx.compose.ui.layout.LayoutCoordinates sourceCoordinates, float[] matrix);
     method public long windowToLocal(long relativeToWindow);
     property public abstract boolean isAttached;
     property public abstract androidx.compose.ui.layout.LayoutCoordinates? parentCoordinates;
