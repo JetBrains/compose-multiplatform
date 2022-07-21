@@ -37,6 +37,7 @@ val mainComponents =
         ComposeComponent(":compose:ui:ui-test-junit4", supportedPlatforms = ComposePlatforms.JVM_BASED),
         ComposeComponent(":compose:ui:ui-text"),
         ComposeComponent(":compose:ui:ui-tooling", supportedPlatforms = ComposePlatforms.JVM_BASED),
+        ComposeComponent(":compose:ui:ui-tooling-data", supportedPlatforms = ComposePlatforms.JVM_BASED),
         ComposeComponent(":compose:ui:ui-tooling-preview", supportedPlatforms = ComposePlatforms.JVM_BASED),
         ComposeComponent(":compose:ui:ui-unit"),
         ComposeComponent(":compose:ui:ui-util"),
@@ -50,11 +51,6 @@ val iconsComponents =
 fun ComposePublishingTask.mainPublications() {
     publish(":compose:compiler:compiler", publications = listOf("Maven"))
     publish(":compose:compiler:compiler-hosted", publications = listOf("Maven"))
-    publish(
-        ":compose:ui:ui-tooling-data",
-        onlyWithPlatforms = setOf(ComposePlatforms.AndroidRelease, ComposePlatforms.AndroidDebug),
-        publications = listOf("Maven")
-    )
 
     publish(
         ":compose:desktop:desktop",
