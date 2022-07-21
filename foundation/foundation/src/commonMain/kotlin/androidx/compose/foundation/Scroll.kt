@@ -321,7 +321,6 @@ private data class ScrollingLayoutModifier(
     val isVertical: Boolean,
     val overscrollEffect: OverscrollEffect
 ) : LayoutModifier {
-    @OptIn(ExperimentalFoundationApi::class)
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
