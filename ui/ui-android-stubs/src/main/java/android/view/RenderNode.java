@@ -29,7 +29,7 @@ import androidx.annotation.Nullable;
  * Stubs for RenderNode on M-P devices.
  */
 public class RenderNode {
-    @SuppressWarnings("UnusedVariable")
+    @SuppressWarnings("unused")
     private RenderNode(String name, View owningView) {
     }
 
