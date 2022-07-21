@@ -706,6 +706,10 @@ internal class LayoutNodeLayoutDelegate(
 
         // Lookahead remeasurement with the given constraints.
         fun remeasure(constraints: Constraints): Boolean {
+            val parent = layoutNode.parent
+            @Suppress("Deprecation")
+            layoutNode.canMultiMeasure = layoutNode.canMultiMeasure ||
+                (parent != null && parent.canMultiMeasure)
             if (layoutNode.lookaheadMeasurePending || lookaheadConstraints != constraints) {
                 lookaheadConstraints = constraints
                 alignmentLines.usedByModifierMeasurement = false
