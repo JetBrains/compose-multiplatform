@@ -144,9 +144,10 @@ class PointerInputEventProcessorTest {
             previousEvents += PointerInputEventData(
                 id = PointerId(index.toLong()),
                 uptime = index.toLong(),
-                position = Offset(offset.x + index, offset.y + index),
                 positionOnScreen = Offset(offset.x + index, offset.y + index),
+                position = Offset(offset.x + index, offset.y + index),
                 down = true,
+                pressure = 1.0f,
                 type = pointerType
             )
             val data = previousEvents.map {

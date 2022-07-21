@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import kotlin.math.max
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.animation.core.internal.JvmDefaultWithCompatibility
 import kotlin.jvm.JvmName
 
 /**
@@ -507,10 +507,15 @@ class Transition<S> @PublishedApi internal constructor(
 
         internal fun onPlayTimeChanged(playTimeNanos: Long, durationScale: Float) {
             val playTime =
-                if (durationScale == 0f) {
-                    animation.durationNanos
+                if (durationScale > 0f) {
+                    val scaledTime = (playTimeNanos - offsetTimeNanos) / durationScale
+                    check(!scaledTime.isNaN()) {
+                        "Duration scale adjusted time is NaN. Duration scale: $durationScale," +
+                            "playTimeNanos: $playTimeNanos, offsetTimeNanos: $offsetTimeNanos"
+                    }
+                    scaledTime.toLong()
                 } else {
-                    ((playTimeNanos - offsetTimeNanos) / durationScale).toLong()
+                    animation.durationNanos
                 }
             value = animation.getValueFromNanos(playTime)
             velocityVector = animation.getVelocityVectorFromNanos(playTime)

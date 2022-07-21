@@ -30,6 +30,7 @@ import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -61,6 +62,7 @@ class TwoDimensionalFocusTraversalTest(param: Param) {
         fun initParameters() = listOf(Param(Left), Param(Right), Param(Up), Param(Down))
     }
 
+    @FlakyTest(bugId = 233373546)
     @OptIn(ExperimentalComposeUiApi::class)
     @Test
     fun movesFocusAmongSiblingsDeepInTheFocusHierarchy() {

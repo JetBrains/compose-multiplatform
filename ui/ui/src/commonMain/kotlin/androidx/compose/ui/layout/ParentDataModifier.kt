@@ -18,7 +18,7 @@ package androidx.compose.ui.layout
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Density
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 
 /**
  * A [Modifier] that provides data to the parent [Layout]. This can be read from within the

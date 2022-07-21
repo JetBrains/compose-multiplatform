@@ -279,9 +279,9 @@ fun ListItem(
 @ExperimentalMaterial3Api
 private fun ListItem(
     modifier: Modifier = Modifier,
-    shape: Shape = ListItemDefaults.Shape,
-    containerColor: Color = ListItemDefaults.ContainerColor,
-    contentColor: Color = ListItemDefaults.ContentColor,
+    shape: Shape = ListItemDefaults.shape,
+    containerColor: Color = ListItemDefaults.containerColor,
+    contentColor: Color = ListItemDefaults.contentColor,
     tonalElevation: Dp = ListItemDefaults.Elevation,
     shadowElevation: Dp = ListItemDefaults.Elevation,
     content: @Composable RowScope.() -> Unit,
@@ -358,18 +358,19 @@ private fun trailingContent(
 /**
  * Contains the default values used by list items.
  */
+@ExperimentalMaterial3Api
 object ListItemDefaults {
-    /** The default shape of a list item */
-    val Shape: Shape @Composable get() = ListTokens.ListItemContainerShape.toShape()
-
     /** The default elevation of a list item */
     val Elevation: Dp = ListTokens.ListItemContainerElevation
 
+    /** The default shape of a list item */
+    val shape: Shape @Composable get() = ListTokens.ListItemContainerShape.toShape()
+
     /** The container color of a list item */
-    val ContainerColor: Color @Composable get() = ListTokens.ListItemContainerColor.toColor()
+    val containerColor: Color @Composable get() = ListTokens.ListItemContainerColor.toColor()
 
     /** The content color of a list item */
-    val ContentColor: Color @Composable get() = ListTokens.ListItemLabelTextColor.toColor()
+    val contentColor: Color @Composable get() = ListTokens.ListItemLabelTextColor.toColor()
 
     /**
      * Creates a [ListItemColors] that represents the default container and content colors used in a
@@ -422,6 +423,7 @@ object ListItemDefaults {
  * - See [ListItemDefaults.colors] for the default colors used in a [ListItem].
  */
 @Stable
+@ExperimentalMaterial3Api
 interface ListItemColors {
 
     /** The container color of this [ListItem] based on enabled state */
@@ -450,6 +452,7 @@ interface ListItemColors {
 }
 
 /** Default [ListItemColors] implementation. */
+@ExperimentalMaterial3Api
 @Immutable
 private class DefaultListItemColors(
     private val containerColor: Color,

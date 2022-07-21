@@ -223,17 +223,17 @@ class RectTest {
     fun `rect contains`() {
         val rect = Rect(100f, 10f, 200f, 300f)
         val offset = Offset(177f, 288f)
-        assertTrue(rect.contains(offset))
+        assertTrue(offset in rect)
     }
 
     @Test
     fun `rect does not contain`() {
         val rect = Rect(100f, 10f, 200f, 300f)
         val offset1 = Offset(201f, 150f)
-        assertFalse(rect.contains(offset1))
+        assertFalse(offset1 in rect)
 
         val offset2 = Offset(200f, 301f)
-        assertFalse(rect.contains(offset2))
+        assertFalse(offset2 in rect)
     }
 
     @Test

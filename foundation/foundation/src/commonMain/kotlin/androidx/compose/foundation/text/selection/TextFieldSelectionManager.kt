@@ -429,7 +429,9 @@ internal class TextFieldSelectionManager(
 
             state?.layoutResult?.value?.let { layoutResult ->
                 currentDragPosition = dragBeginPosition + dragTotalDistance
-                val offset = layoutResult.getOffsetForPosition(currentDragPosition!!)
+                val offset = offsetMapping.transformedToOriginal(
+                    layoutResult.getOffsetForPosition(currentDragPosition!!)
+                )
 
                 val newSelection = TextRange(offset, offset)
 

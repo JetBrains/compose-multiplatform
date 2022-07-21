@@ -68,7 +68,6 @@ import androidx.compose.ui.window.DialogProperties
  * @param textContentColor the content color used for the text.
  * @param properties typically platform specific properties to further configure the dialog.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlertDialog(
     onDismissRequest: () -> Unit,
@@ -78,12 +77,12 @@ fun AlertDialog(
     icon: @Composable (() -> Unit)? = null,
     title: @Composable (() -> Unit)? = null,
     text: @Composable (() -> Unit)? = null,
-    shape: Shape = DialogTokens.ContainerShape.toShape(),
-    containerColor: Color = DialogTokens.ContainerColor.toColor(),
-    tonalElevation: Dp = DialogTokens.ContainerElevation,
-    iconContentColor: Color = DialogTokens.IconColor.toColor(),
-    titleContentColor: Color = DialogTokens.SubheadColor.toColor(),
-    textContentColor: Color = DialogTokens.SupportingTextColor.toColor(),
+    shape: Shape = AlertDialogDefaults.shape,
+    containerColor: Color = AlertDialogDefaults.containerColor,
+    tonalElevation: Dp = AlertDialogDefaults.TonalElevation,
+    iconContentColor: Color = AlertDialogDefaults.iconContentColor,
+    titleContentColor: Color = AlertDialogDefaults.titleContentColor,
+    textContentColor: Color = AlertDialogDefaults.textContentColor,
     properties: DialogProperties = DialogProperties()
 ) {
     Dialog(
@@ -117,6 +116,29 @@ fun AlertDialog(
             textContentColor = textContentColor,
         )
     }
+}
+
+/**
+ * Contains default values used for [AlertDialog]
+ */
+object AlertDialogDefaults {
+    /** The default shape for alert dialogs */
+    val shape: Shape @Composable get() = DialogTokens.ContainerShape.toShape()
+
+    /** The default container color for alert dialogs */
+    val containerColor: Color @Composable get() = DialogTokens.ContainerColor.toColor()
+
+    /** The default icon color for alert dialogs */
+    val iconContentColor: Color @Composable get() = DialogTokens.IconColor.toColor()
+
+    /** The default title color for alert dialogs */
+    val titleContentColor: Color @Composable get() = DialogTokens.SubheadColor.toColor()
+
+    /** The default text color for alert dialogs */
+    val textContentColor: Color @Composable get() = DialogTokens.SupportingTextColor.toColor()
+
+    /** The default tonal elevation for alert dialogs */
+    val TonalElevation: Dp = DialogTokens.ContainerElevation
 }
 
 private val ButtonsMainAxisSpacing = 8.dp

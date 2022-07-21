@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_92
+// VERSION: v0_103
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -37,8 +37,10 @@ internal object ColorLightTokens {
     val OnTertiary = PaletteTokens.Tertiary100
     val OnTertiaryContainer = PaletteTokens.Tertiary10
     val Outline = PaletteTokens.NeutralVariant50
+    val OutlineVariant = PaletteTokens.NeutralVariant80
     val Primary = PaletteTokens.Primary40
     val PrimaryContainer = PaletteTokens.Primary90
+    val Scrim = PaletteTokens.Neutral0
     val Secondary = PaletteTokens.Secondary40
     val SecondaryContainer = PaletteTokens.Secondary90
     val Surface = PaletteTokens.Neutral99

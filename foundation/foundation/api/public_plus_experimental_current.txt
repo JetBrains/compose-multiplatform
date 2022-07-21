@@ -285,6 +285,7 @@ package androidx.compose.foundation.gestures {
   public final class ScrollableDefaults {
     method @androidx.compose.runtime.Composable public androidx.compose.foundation.gestures.FlingBehavior flingBehavior();
     method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public androidx.compose.foundation.OverscrollEffect overscrollEffect();
+    method @androidx.compose.foundation.ExperimentalFoundationApi public boolean reverseDirection(androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.foundation.gestures.Orientation orientation, boolean reverseScrolling);
     field public static final androidx.compose.foundation.gestures.ScrollableDefaults INSTANCE;
   }
 
@@ -447,6 +448,13 @@ package androidx.compose.foundation.interaction {
 
   public final class PressInteractionKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<java.lang.Boolean> collectIsPressedAsState(androidx.compose.foundation.interaction.InteractionSource);
+  }
+
+}
+
+package androidx.compose.foundation.internal {
+
+  public final class JvmDefaultWithCompatibility_jvmKt {
   }
 
 }
@@ -777,6 +785,9 @@ package androidx.compose.foundation.lazy.layout {
   }
 
   public final class LazyLayoutPrefetcher_androidKt {
+  }
+
+  public final class LazyNearestItemsRangeKt {
   }
 
   public final class Lazy_androidKt {

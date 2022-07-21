@@ -18,6 +18,7 @@ package androidx.compose.foundation.lazy.list
 
 import android.os.Build
 import androidx.compose.foundation.AutoTestFrameClock
+import androidx.compose.foundation.VelocityTrackerCalculationThreshold
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
@@ -26,6 +27,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
@@ -36,6 +38,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.savePointerInputEvents
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -57,6 +60,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
@@ -83,6 +88,7 @@ import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.test.filters.LargeTest
@@ -92,6 +98,7 @@ import com.google.common.truth.IntegerSubject
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import java.util.concurrent.CountDownLatch
+import kotlin.math.abs
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -1921,6 +1928,58 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
 
         rule.onNodeWithTag("10")
             .assertStartPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun assertVelocityCalculationIsSimilar_witHistoricalValues() {
+        // arrange
+        val tracker = VelocityTracker()
+        var velocity = Velocity.Zero
+        val capturingScrollConnection = object : NestedScrollConnection {
+            override suspend fun onPreFling(available: Velocity): Velocity {
+                velocity += available
+                return Velocity.Zero
+            }
+        }
+        rule.setContent {
+            Box(modifier = Modifier
+                .background(Color.Yellow)
+                .nestedScroll(capturingScrollConnection)
+                .fillMaxWidth()
+                .pointerInput(Unit) {
+                    savePointerInputEvents(tracker, this)
+                }) {
+                LazyColumnOrRow {
+                    items(200) {
+                        Box(modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .padding(8.dp)
+                            .background(Color.Blue))
+                    }
+                }
+            }
+        }
+
+        // act
+        composeViewSwipeForward()
+
+        // assert
+        rule.runOnIdle {
+            val diff = abs((velocity - tracker.calculateVelocity()).y)
+            assertThat(diff).isLessThan(VelocityTrackerCalculationThreshold)
+        }
+        tracker.resetTracking()
+        velocity = Velocity.Zero
+
+        // act
+        composeViewSwipeBackward()
+
+        // assert
+        rule.runOnIdle {
+            val diff = abs((velocity - tracker.calculateVelocity()).y)
+            assertThat(diff).isLessThan(VelocityTrackerCalculationThreshold)
+        }
     }
 
     // ********************* END OF TESTS *********************

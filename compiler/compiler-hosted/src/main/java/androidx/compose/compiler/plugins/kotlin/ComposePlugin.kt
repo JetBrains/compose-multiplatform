@@ -204,7 +204,7 @@ class ComposeComponentRegistrar : ComponentRegistrar {
             project: Project,
             configuration: CompilerConfiguration
         ) {
-            val KOTLIN_VERSION_EXPECTATION = "1.7.0"
+            val KOTLIN_VERSION_EXPECTATION = "1.7.10"
             KotlinCompilerVersion.getVersion()?.let { version ->
                 val suppressKotlinVersionCheck = configuration.get(
                     ComposeConfiguration.SUPPRESS_KOTLIN_VERSION_COMPATIBILITY_CHECK,
@@ -291,6 +291,7 @@ class ComposeComponentRegistrar : ComponentRegistrar {
             IrGenerationExtension.registerExtension(
                 project,
                 ComposeIrGenerationExtension(
+                    configuration = configuration,
                     liveLiteralsEnabled = liveLiteralsEnabled,
                     liveLiteralsV2Enabled = liveLiteralsV2Enabled,
                     generateFunctionKeyMetaClasses = generateFunctionKeyMetaClasses,

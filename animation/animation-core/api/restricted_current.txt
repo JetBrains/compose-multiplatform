@@ -744,3 +744,10 @@ package androidx.compose.animation.core {
 
 }
 
+package androidx.compose.animation.core.internal {
+
+  public final class JvmDefaultWithCompatibility_jvmKt {
+  }
+
+}
+

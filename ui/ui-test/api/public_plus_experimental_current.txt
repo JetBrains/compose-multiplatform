@@ -266,15 +266,11 @@ package androidx.compose.ui.test {
     method @androidx.compose.ui.test.ExperimentalTestApi public static boolean isFnDown(androidx.compose.ui.test.KeyInjectionScope);
     method @androidx.compose.ui.test.ExperimentalTestApi public static boolean isMetaDown(androidx.compose.ui.test.KeyInjectionScope);
     method @androidx.compose.ui.test.ExperimentalTestApi public static boolean isShiftDown(androidx.compose.ui.test.KeyInjectionScope);
-    method @androidx.compose.ui.test.ExperimentalTestApi public static void keysDown(androidx.compose.ui.test.KeyInjectionScope, java.util.List<androidx.compose.ui.input.key.Key> keys, optional long pauseDuration);
-    method @androidx.compose.ui.test.ExperimentalTestApi public static void keysUp(androidx.compose.ui.test.KeyInjectionScope, java.util.List<androidx.compose.ui.input.key.Key> keys, optional long pauseDuration);
-    method @androidx.compose.ui.test.ExperimentalTestApi public static void pressKey(androidx.compose.ui.test.KeyInjectionScope, long key, optional long pressDuration);
-    method @androidx.compose.ui.test.ExperimentalTestApi public static void pressKey(androidx.compose.ui.test.KeyInjectionScope, long key, int times, optional long pressDuration, optional long pauseDuration);
-    method @androidx.compose.ui.test.ExperimentalTestApi public static void pressKeys(androidx.compose.ui.test.KeyInjectionScope, java.util.List<androidx.compose.ui.input.key.Key> keys, optional long pressDuration, optional long pauseDuration);
-    method @androidx.compose.ui.test.ExperimentalTestApi public static void withKeyDown(androidx.compose.ui.test.KeyInjectionScope, long key, optional long pauseDuration, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.KeyInjectionScope,kotlin.Unit> block);
-    method @androidx.compose.ui.test.ExperimentalTestApi public static void withKeyToggled(androidx.compose.ui.test.KeyInjectionScope, long key, optional long pauseDuration, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.KeyInjectionScope,kotlin.Unit> block);
-    method @androidx.compose.ui.test.ExperimentalTestApi public static void withKeysDown(androidx.compose.ui.test.KeyInjectionScope, java.util.List<androidx.compose.ui.input.key.Key> keys, optional long pauseDuration, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.KeyInjectionScope,kotlin.Unit> block);
-    method @androidx.compose.ui.test.ExperimentalTestApi public static void withKeysToggled(androidx.compose.ui.test.KeyInjectionScope, java.util.List<androidx.compose.ui.input.key.Key> keys, optional long pauseDuration, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.KeyInjectionScope,kotlin.Unit> block);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void pressKey(androidx.compose.ui.test.KeyInjectionScope, long key, optional long pressDurationMillis);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void withKeyDown(androidx.compose.ui.test.KeyInjectionScope, long key, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.KeyInjectionScope,kotlin.Unit> block);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void withKeyToggled(androidx.compose.ui.test.KeyInjectionScope, long key, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.KeyInjectionScope,kotlin.Unit> block);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void withKeysDown(androidx.compose.ui.test.KeyInjectionScope, java.util.List<androidx.compose.ui.input.key.Key> keys, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.KeyInjectionScope,kotlin.Unit> block);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void withKeysToggled(androidx.compose.ui.test.KeyInjectionScope, java.util.List<androidx.compose.ui.input.key.Key> keys, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.KeyInjectionScope,kotlin.Unit> block);
   }
 
   public final class KeyInputHelpersKt {
@@ -516,6 +512,13 @@ package androidx.compose.ui.test {
 package androidx.compose.ui.test.android {
 
   public final class WindowCapture_androidKt {
+  }
+
+}
+
+package androidx.compose.ui.test.internal {
+
+  public final class JvmDefaultWithCompatibility_jvmKt {
   }
 
 }

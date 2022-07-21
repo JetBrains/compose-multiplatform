@@ -154,6 +154,10 @@ androidx {
     legacyDisableKotlinStrictApiMode = true
 }
 
+androidxCompose {
+    composeCompilerPluginEnabled = false
+}
+
 android {
     namespace "androidx.compose.ui.graphics"
 }

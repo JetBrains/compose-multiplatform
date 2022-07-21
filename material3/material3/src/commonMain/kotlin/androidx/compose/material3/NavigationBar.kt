@@ -48,7 +48,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
@@ -93,9 +92,9 @@ import kotlin.math.roundToInt
 @Composable
 fun NavigationBar(
     modifier: Modifier = Modifier,
-    containerColor: Color = NavigationBarTokens.ContainerColor.toColor(),
+    containerColor: Color = NavigationBarDefaults.containerColor,
     contentColor: Color = MaterialTheme.colorScheme.contentColorFor(containerColor),
-    tonalElevation: Dp = NavigationBarTokens.ContainerElevation,
+    tonalElevation: Dp = NavigationBarDefaults.Elevation,
     content: @Composable RowScope.() -> Unit
 ) {
     Surface(
@@ -241,8 +240,18 @@ fun RowScope.NavigationBarItem(
     }
 }
 
+/** Defaults used in [NavigationBar]. */
+object NavigationBarDefaults {
+    /** Default elevation for a navigation bar. */
+    val Elevation: Dp = NavigationBarTokens.ContainerElevation
+
+    /** Default color for a navigation bar. */
+    val containerColor: Color @Composable get() = NavigationBarTokens.ContainerColor.toColor()
+}
+
 /** Defaults used in [NavigationBarItem]. */
 object NavigationBarItemDefaults {
+
     /**
      * Creates a [NavigationBarItemColors] with the provided colors according to the Material
      * specification.
@@ -493,9 +502,8 @@ private fun MeasureScope.placeLabelAndIcon(
 ): MeasureResult {
     val height = constraints.maxHeight
 
-    val baseline = labelPlaceable[LastBaseline]
     // Label should be `ItemVerticalPadding` from the bottom
-    val labelY = height - baseline - NavigationBarItemVerticalPadding.roundToPx()
+    val labelY = height - labelPlaceable.height - NavigationBarItemVerticalPadding.roundToPx()
 
     // Icon (when selected) should be `ItemVerticalPadding` from the top
     val selectedIconY = NavigationBarItemVerticalPadding.roundToPx()

@@ -360,13 +360,6 @@ class ChipTest {
                         "Filter chip",
                         Modifier.testTag(TestChipTag)
                     )
-                },
-                selectedIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.Done,
-                        contentDescription = "Localized Description",
-                        modifier = Modifier.size(FilterChipDefaults.IconSize)
-                    )
                 })
         }
 
@@ -395,7 +388,7 @@ class ChipTest {
                         Modifier.testTag(TestChipTag)
                     )
                 },
-                selectedIcon = {
+                leadingIcon = {
                     Icon(
                         imageVector = Icons.Filled.Done,
                         contentDescription = "Localized Description",

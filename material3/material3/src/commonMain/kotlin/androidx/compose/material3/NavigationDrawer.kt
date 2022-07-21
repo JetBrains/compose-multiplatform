@@ -37,7 +37,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.tokens.NavigationDrawerTokens
-import androidx.compose.material3.tokens.PaletteTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
@@ -50,6 +49,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
@@ -261,9 +261,9 @@ fun ModalNavigationDrawer(
     modifier: Modifier = Modifier,
     drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
     gesturesEnabled: Boolean = true,
-    drawerShape: Shape = NavigationDrawerTokens.ContainerShape.toShape(),
+    drawerShape: Shape = DrawerDefaults.shape,
     drawerTonalElevation: Dp = DrawerDefaults.ModalDrawerElevation,
-    drawerContainerColor: Color = NavigationDrawerTokens.ContainerColor.toColor(),
+    drawerContainerColor: Color = DrawerDefaults.containerColor,
     drawerContentColor: Color = contentColorFor(drawerContainerColor),
     scrimColor: Color = DrawerDefaults.scrimColor,
     content: @Composable () -> Unit
@@ -354,9 +354,9 @@ fun NavigationDrawer(
     modifier: Modifier = Modifier,
     drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
     gesturesEnabled: Boolean = true,
-    drawerShape: Shape = NavigationDrawerTokens.ContainerShape.toShape(),
+    drawerShape: Shape = DrawerDefaults.shape,
     drawerTonalElevation: Dp = DrawerDefaults.ModalDrawerElevation,
-    drawerContainerColor: Color = NavigationDrawerTokens.ContainerColor.toColor(),
+    drawerContainerColor: Color = DrawerDefaults.containerColor,
     drawerContentColor: Color = contentColorFor(drawerContainerColor),
     scrimColor: Color = DrawerDefaults.scrimColor,
     content: @Composable () -> Unit
@@ -411,7 +411,7 @@ fun DismissibleNavigationDrawer(
     modifier: Modifier = Modifier,
     drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
     gesturesEnabled: Boolean = true,
-    drawerShape: Shape = Shapes.None,
+    drawerShape: Shape = RectangleShape,
     drawerTonalElevation: Dp = DrawerDefaults.DismissibleDrawerElevation,
     drawerContainerColor: Color = MaterialTheme.colorScheme.surface,
     drawerContentColor: Color = contentColorFor(drawerContainerColor),
@@ -510,7 +510,7 @@ fun DismissibleNavigationDrawer(
 fun PermanentNavigationDrawer(
     drawerContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
-    drawerShape: Shape = Shapes.None,
+    drawerShape: Shape = RectangleShape,
     drawerTonalElevation: Dp = DrawerDefaults.PermanentDrawerElevation,
     drawerContainerColor: Color = MaterialTheme.colorScheme.surface,
     drawerContentColor: Color = contentColorFor(drawerContainerColor),
@@ -543,7 +543,6 @@ fun PermanentNavigationDrawer(
  */
 @ExperimentalMaterial3Api
 object DrawerDefaults {
-
     /**
      * Default Elevation for drawer container in the [ModalNavigationDrawer] as specified in the
      * Material specification.
@@ -562,9 +561,15 @@ object DrawerDefaults {
      */
     val DismissibleDrawerElevation = NavigationDrawerTokens.StandardContainerElevation
 
+    /** Default shape for a navigation drawer. */
+    val shape: Shape @Composable get() = NavigationDrawerTokens.ContainerShape.toShape()
+
+    /** Default color of the scrim that obscures content when the drawer is open */
     val scrimColor: Color
-        @Composable
-        get() = PaletteTokens.NeutralVariant0.copy(alpha = NavigationDrawerTokens.ScrimOpacity)
+        @Composable get() = MaterialTheme.colorScheme.scrim.copy(.32f)
+
+    /** Default container color for a navigation drawer */
+    val containerColor: Color @Composable get() = NavigationDrawerTokens.ContainerColor.toColor()
 }
 
 /**

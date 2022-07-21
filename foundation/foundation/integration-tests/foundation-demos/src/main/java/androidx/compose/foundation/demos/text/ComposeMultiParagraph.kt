@@ -29,8 +29,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 
-val lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas fermentum non" +
-    " diam sed pretium."
+val lorem = loremIpsum(wordCount = 14)
 
 @Preview
 @Composable

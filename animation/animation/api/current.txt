@@ -103,3 +103,10 @@ package androidx.compose.animation {
 
 }
 
+package androidx.compose.animation.internal {
+
+  public final class JvmDefaultWithCompatibility_jvmKt {
+  }
+
+}
+

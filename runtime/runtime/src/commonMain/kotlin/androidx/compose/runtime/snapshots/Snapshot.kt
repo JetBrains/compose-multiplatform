@@ -28,7 +28,7 @@ import androidx.compose.runtime.synchronized
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.runtime.internal.JvmDefaultWithCompatibility
 
 /**
  * A snapshot of the values return by mutable states and other state objects. All state object
@@ -215,8 +215,8 @@ sealed class Snapshot(
 
     /**
      * Notify the snapshot that all objects created in this snapshot to this point should be
-     * considered initialized. If any state object is are modified passed this point it will
-     * appear as modified in the snapshot and any applicable snapshot write observer will be
+     * considered initialized. If any state object is modified after this point it will
+     * appear as modified in the snapshot. Any applicable snapshot write observer will be
      * called for the object and the object will be part of the a set of mutated objects sent to
      * any applicable snapshot apply observer.
      *
@@ -473,6 +473,7 @@ sealed class Snapshot(
         /**
          * Passed [block] will be run with all the currently set snapshot read observers disabled.
          */
+        @Suppress("BanInlineOptIn") // Treat Kotlin Contracts as non-experimental.
         @OptIn(ExperimentalContracts::class)
         inline fun <T> withoutReadObservation(block: @DisallowComposableCalls () -> T): T {
             contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }

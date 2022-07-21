@@ -27,6 +27,7 @@ import kotlin.contracts.contract
  * access in an efficient way, and this method may actually be a lot slower. Only use for
  * collections that are created by code we control and are known to support random access.
  */
+@Suppress("BanInlineOptIn") // Treat Kotlin Contracts as non-experimental.
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T> List<T>.fastForEach(action: (T) -> Unit) {
     contract { callsInPlace(action) }
@@ -57,6 +58,7 @@ internal fun <T> List<T>.fastToSet(): Set<T> = HashSet<T>(size).also { set ->
  * access in an efficient way, and this method may actually be a lot slower. Only use for
  * collections that are created by code we control and are known to support random access.
  */
+@Suppress("BanInlineOptIn") // Treat Kotlin Contracts as non-experimental.
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T> List<T>.fastForEachIndexed(action: (Int, T) -> Unit) {
     contract { callsInPlace(action) }
@@ -74,6 +76,7 @@ internal inline fun <T> List<T>.fastForEachIndexed(action: (Int, T) -> Unit) {
  * access in an efficient way, and this method may actually be a lot slower. Only use for
  * collections that are created by code we control and are known to support random access.
  */
+@Suppress("BanInlineOptIn") // Treat Kotlin Contracts as non-experimental.
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T, R> List<T>.fastMap(transform: (T) -> R): List<R> {
     contract { callsInPlace(transform) }
@@ -84,6 +87,7 @@ internal inline fun <T, R> List<T>.fastMap(transform: (T) -> R): List<R> {
     return target
 }
 
+@Suppress("BanInlineOptIn") // Treat Kotlin Contracts as non-experimental.
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T> List<T>.fastAny(predicate: (T) -> Boolean): Boolean {
     contract { callsInPlace(predicate) }
@@ -100,6 +104,7 @@ internal inline fun <T> List<T>.fastAny(predicate: (T) -> Boolean): Boolean {
  * access in an efficient way, and this method may actually be a lot slower. Only use for
  * collections that are created by code we control and are known to support random access.
  */
+@Suppress("BanInlineOptIn") // Treat Kotlin Contracts as non-experimental.
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T> List<T>.fastAll(predicate: (T) -> Boolean): Boolean {
     contract { callsInPlace(predicate) }
@@ -107,6 +112,7 @@ internal inline fun <T> List<T>.fastAll(predicate: (T) -> Boolean): Boolean {
     return true
 }
 
+@Suppress("BanInlineOptIn") // Treat Kotlin Contracts as non-experimental.
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T, K> List<T>.fastGroupBy(
     keySelector: (T) -> K
@@ -199,6 +205,7 @@ private fun <T> Appendable.appendElement(element: T, transform: ((T) -> CharSequ
  * access in an efficient way, and this method may actually be a lot slower. Only use for
  * collections that are created by code we control and are known to support random access.
  */
+@Suppress("BanInlineOptIn") // Treat Kotlin Contracts as non-experimental.
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T, R> List<T>.fastMapNotNull(transform: (T) -> R?): List<R> {
     contract { callsInPlace(transform) }
@@ -218,6 +225,7 @@ internal inline fun <T, R> List<T>.fastMapNotNull(transform: (T) -> R?): List<R>
  * access in an efficient way, and this method may actually be a lot slower. Only use for
  * collections that are created by code we control and are known to support random access.
  */
+@Suppress("BanInlineOptIn") // Treat Kotlin Contracts as non-experimental.
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T> List<T>.fastFilterIndexed(predicate: (index: Int, T) -> Boolean): List<T> {
     contract { callsInPlace(predicate) }

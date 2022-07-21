@@ -398,9 +398,15 @@ package androidx.compose.ui.text {
     property public final long size;
   }
 
+  public final class TextMeasurerKt {
+  }
+
   public final class TextPainter {
     method public void paint(androidx.compose.ui.graphics.Canvas canvas, androidx.compose.ui.text.TextLayoutResult textLayoutResult);
     field public static final androidx.compose.ui.text.TextPainter INSTANCE;
+  }
+
+  public final class TextPainterKt {
   }
 
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class TextRange {
@@ -840,6 +846,7 @@ package androidx.compose.ui.text.input {
 
   public interface EditCommand {
     method public void applyTo(androidx.compose.ui.text.input.EditingBuffer buffer);
+    method public default String toStringForLog();
   }
 
   public final class EditCommandKt {
@@ -865,6 +872,9 @@ package androidx.compose.ui.text.input {
   }
 
   public final class GapBufferKt {
+  }
+
+  public final class GapBuffer_jvmKt {
   }
 
   @kotlin.jvm.JvmInline public final value class ImeAction {
@@ -1082,6 +1092,13 @@ package androidx.compose.ui.text.input {
   public static final class VisualTransformation.Companion {
     method public androidx.compose.ui.text.input.VisualTransformation getNone();
     property public final androidx.compose.ui.text.input.VisualTransformation None;
+  }
+
+}
+
+package androidx.compose.ui.text.internal {
+
+  public final class JvmDefaultWithCompatibility_jvmKt {
   }
 
 }

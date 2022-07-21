@@ -58,7 +58,8 @@ abstract class AbstractInteropDemoFragment(val interopOn: Boolean) :
         super.onViewCreated(view, savedInstanceState)
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.adapter = MainAdapter()
-        recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        recyclerView.layoutManager =
+            LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         if (!interopOn) {
             recyclerView.isPoolingContainer = false
         }
@@ -93,7 +94,10 @@ fun ItemRow(index: Int) {
         Text("Row #${index + 1}", Modifier.padding(horizontal = 8.dp))
         LazyRow {
             items(25) { colIdx ->
-                Column(Modifier.padding(8.dp).size(96.dp, 144.dp)) {
+                Column(
+                    Modifier
+                        .padding(8.dp)
+                        .size(96.dp, 144.dp)) {
                     Box(
                         Modifier
                             .fillMaxWidth()

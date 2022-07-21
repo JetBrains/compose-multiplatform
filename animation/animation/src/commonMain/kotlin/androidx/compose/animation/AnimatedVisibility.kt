@@ -50,7 +50,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMaxBy
 import kotlinx.coroutines.flow.collect
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.animation.internal.JvmDefaultWithCompatibility
 
 /**
  * [AnimatedVisibility] composable animates the appearance and disappearance of its content, as
@@ -760,7 +760,7 @@ private fun <T> AnimatedEnterExitImpl(
     }
 }
 
-@OptIn(ExperimentalTransitionApi::class, ExperimentalAnimationApi::class)
+@ExperimentalAnimationApi
 @Composable
 private inline fun AnimatedEnterExitImpl(
     transition: Transition<EnterExitState>,

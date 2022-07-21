@@ -27,6 +27,7 @@ import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.InternalComposeUiApi
+import androidx.compose.ui.UiComposable
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.Owner
 import androidx.lifecycle.Lifecycle
@@ -170,6 +171,7 @@ abstract class AbstractComposeView @JvmOverloads constructor(
      * whichever comes first.
      */
     @Composable
+    @UiComposable
     abstract fun Content()
 
     /**

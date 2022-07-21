@@ -19,6 +19,7 @@ package androidx.compose.ui.input.pointer
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.fastMapNotNull
@@ -48,7 +49,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 
 /**
  * Receiver scope for awaiting pointer events in a call to
@@ -472,6 +473,7 @@ internal class SuspendingPointerInputFilter(
         }
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun onCancel() {
         // Synthesize a cancel event for whatever state we previously saw, if one is applicable.
         // A cancel event is one where all previously down pointers are now up, the change in
@@ -487,6 +489,7 @@ internal class SuspendingPointerInputFilter(
                 position = old.position,
                 uptimeMillis = old.uptimeMillis,
                 pressed = false,
+                pressure = old.pressure,
                 previousPosition = old.position,
                 previousUptimeMillis = old.uptimeMillis,
                 previousPressed = old.pressed,

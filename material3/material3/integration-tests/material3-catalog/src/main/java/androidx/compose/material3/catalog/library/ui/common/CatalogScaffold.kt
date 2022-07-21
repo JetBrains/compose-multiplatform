@@ -38,7 +38,7 @@ import androidx.compose.material3.catalog.library.util.SourceUrl
 import androidx.compose.material3.catalog.library.util.TermsUrl
 import androidx.compose.material3.catalog.library.util.openUrl
 import androidx.compose.material3.contentColorFor
-import androidx.compose.material3.rememberTopAppBarScrollState
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
@@ -94,7 +94,7 @@ fun CatalogScaffold(
         ) {
             val context = LocalContext.current
             val scrollBehavior =
-                TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarScrollState())
+                TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
             Scaffold(
                 topBar = {
                     CatalogTopAppBar(

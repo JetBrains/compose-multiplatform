@@ -18,18 +18,32 @@ package androidx.compose.ui.text.input
 
 import androidx.compose.ui.text.InternalTextApi
 
+/**
+ * Like [toCharArray] but copies the entire source string.
+ * Workaround for compiler error when giving [toCharArray] above default parameters.
+ */
 private fun String.toCharArray(
     destination: CharArray,
-    destinationOffset: Int = 0,
-    startIndex: Int = 0,
-    endIndex: Int = this.length
-) {
-    var index = startIndex
-    while (index < endIndex) {
-        destination[destinationOffset + index - startIndex] = this[index]
-        index++
-    }
-}
+    destinationOffset: Int
+) = toCharArray(destination, destinationOffset, startIndex = 0, endIndex = this.length)
+
+/**
+ * Copies characters from this [String] into [destination].
+ *
+ * Platform-specific implementations should use native functions for performing this operation if
+ * they exist, since they will likely be more efficient than copying each character individually.
+ *
+ * @param destination The [CharArray] to copy into.
+ * @param destinationOffset The index in [destination] to start copying to.
+ * @param startIndex The index in `this` of the first character to copy from (inclusive).
+ * @param endIndex The index in `this` of the last character to copy from (exclusive).
+ */
+internal expect fun String.toCharArray(
+    destination: CharArray,
+    destinationOffset: Int,
+    startIndex: Int,
+    endIndex: Int
+)
 
 /**
  * The gap buffer implementation
@@ -242,6 +256,13 @@ class PartialGapBuffer(var text: String) {
      * @param text a text to replace
      */
     fun replace(start: Int, end: Int, text: String) {
+        require(start <= end) {
+            "start index must be less than or equal to end index: $start > $end"
+        }
+        require(start >= 0) {
+            "start must be non-negative, but was $start"
+        }
+
         val buffer = buffer
         if (buffer == null) { // First time to create gap buffer
             val charArray = CharArray(maxOf(BUF_SIZE, text.length + 2 * SURROUNDING_SIZE))
@@ -266,9 +287,9 @@ class PartialGapBuffer(var text: String) {
 
             this.buffer = GapBuffer(
                 charArray,
-                leftCopyCount + text.length, // gap start
-                charArray.size - rightCopyCount
-            ) // gap end
+                initGapStart = leftCopyCount + text.length,
+                initGapEnd = charArray.size - rightCopyCount
+            )
             bufStart = start - leftCopyCount
             bufEnd = end + rightCopyCount
             return

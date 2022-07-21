@@ -231,7 +231,7 @@ class SliderScreenshotTest {
             Box(wrap.testTag(wrapperTestTag)) {
                 var position by remember { mutableStateOf(30f..70f) }
                 RangeSlider(
-                    values = position,
+                    value = position,
                     valueRange = 0f..100f,
                     onValueChange = { position = it }, steps = 9,
                     colors = SliderDefaults.colors(

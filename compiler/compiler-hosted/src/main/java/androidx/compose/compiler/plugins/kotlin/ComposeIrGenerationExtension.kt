@@ -29,6 +29,7 @@ import androidx.compose.compiler.plugins.kotlin.lower.DurableKeyVisitor
 import androidx.compose.compiler.plugins.kotlin.lower.KlibAssignableParamTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.DurableFunctionKeyTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.LiveLiteralTransformer
+import androidx.compose.compiler.plugins.kotlin.lower.WrapJsComposableLambdaLowering
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.CreateDecoysTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.RecordDecoySignaturesTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.SubstituteDecoyCallsTransformer
@@ -37,6 +38,8 @@ import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.serialization.DeclarationTable
 import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureSerializer
 import org.jetbrains.kotlin.backend.common.serialization.signature.PublicIdSignatureComputer
+import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsGlobalDeclarationTable
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsManglerIr
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
@@ -44,6 +47,7 @@ import org.jetbrains.kotlin.platform.js.isJs
 import org.jetbrains.kotlin.platform.jvm.isJvm
 
 class ComposeIrGenerationExtension(
+    private val configuration: CompilerConfiguration,
     @Suppress("unused") private val liveLiteralsEnabled: Boolean = false,
     @Suppress("unused") private val liveLiteralsV2Enabled: Boolean = false,
     private val generateFunctionKeyMetaClasses: Boolean = false,
@@ -61,6 +65,11 @@ class ComposeIrGenerationExtension(
     ) {
         val isKlibTarget = !pluginContext.platform.isJvm()
         VersionChecker(pluginContext).check()
+
+        // Input check.  This should always pass, else something is horribly wrong upstream.
+        // Necessary because oftentimes the issue is upstream (compiler bug, prior plugin, etc)
+        if (configuration.getBoolean(JVMConfigurationKeys.VALIDATE_IR))
+            validateIr(moduleFragment, pluginContext.irBuiltIns)
 
         // create a symbol remapper to be used across all transforms
         val symbolRemapper = ComposableSymbolRemapper()
@@ -188,6 +197,15 @@ class ComposeIrGenerationExtension(
             ).lower(moduleFragment)
         }
 
+        if (pluginContext.platform.isJs()) {
+            WrapJsComposableLambdaLowering(
+                pluginContext,
+                symbolRemapper,
+                metrics,
+                idSignatureBuilder!!
+            ).lower(moduleFragment)
+        }
+
         if (generateFunctionKeyMetaClasses) {
             functionKeyTransformer.realizeKeyMetaAnnotations(moduleFragment)
         } else {
@@ -200,5 +218,9 @@ class ComposeIrGenerationExtension(
         if (reportsDestination != null) {
             metrics.saveReportsTo(reportsDestination)
         }
+
+        // Verify that our transformations didn't break something
+        if (configuration.getBoolean(JVMConfigurationKeys.VALIDATE_IR))
+            validateIr(moduleFragment, pluginContext.irBuiltIns)
     }
 }

@@ -24,7 +24,6 @@ import androidx.compose.ui.test.KeyInjectionScope
 import androidx.compose.ui.test.injectionscope.key.Common.assertTyped
 import androidx.compose.ui.test.injectionscope.key.Common.performKeyInput
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.keysDown
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.util.TestTextField
@@ -107,23 +106,5 @@ class KeyDownTest {
             keyDown(Key.Semicolon)
         }
         rule.assertTyped(":")
-    }
-
-    @Test
-    fun downedKeys_areDown() {
-        rule.performKeyInput {
-            keysDown(listOf(Key.A, Key.Enter))
-            assertTrue(isKeyDown(Key.A))
-            assertTrue(isKeyDown(Key.Enter))
-        }
-    }
-
-    @Test
-    fun duplicates_inKeysDown_throwIllegalStateException() {
-        expectError<IllegalArgumentException>(
-            expectedMessage = "List of keys must not contain any duplicates."
-        ) {
-            rule.performKeyInput { keysDown(listOf(Key.A, Key.A)) }
-        }
     }
 }

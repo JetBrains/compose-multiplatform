@@ -123,7 +123,7 @@ fun Switch(
     DisposableEffect(checked) {
         if (offset.targetValue != targetValue) {
             scope.launch {
-                offset.animateTo(targetValue)
+                offset.animateTo(targetValue, AnimationSpec)
             }
         }
         onDispose { }
@@ -134,12 +134,7 @@ fun Switch(
         if (onCheckedChange != null) {
             Modifier.toggleable(
                 value = checked,
-                onValueChange = { value: Boolean ->
-                    onCheckedChange(value)
-                    scope.launch {
-                        offset.animateTo(valueToOffset(value), AnimationSpec)
-                    }
-                },
+                onValueChange = onCheckedChange,
                 enabled = enabled,
                 role = Role.Switch,
                 interactionSource = interactionSource,
@@ -257,7 +252,8 @@ private fun BoxScope.SwitchImpl(
     }
 
     val trackShape = SwitchTokens.TrackShape.toShape()
-    val modifier = Modifier.align(Alignment.Center)
+    val modifier = Modifier
+        .align(Alignment.Center)
         .width(SwitchWidth)
         .height(SwitchHeight)
         .border(
@@ -337,20 +333,20 @@ object SwitchDefaults {
         uncheckedTrackColor: Color = SwitchTokens.UnselectedTrackColor.toColor(),
         uncheckedBorderColor: Color = SwitchTokens.UnselectedFocusTrackOutlineColor.toColor(),
         uncheckedIconColor: Color = SwitchTokens.UnselectedIconColor.toColor(),
-        disabledCheckedThumbColor: Color = checkedThumbColor
+        disabledCheckedThumbColor: Color = SwitchTokens.DisabledSelectedHandleColor.toColor()
             .copy(alpha = SwitchTokens.DisabledSelectedHandleOpacity)
             .compositeOver(MaterialTheme.colorScheme.surface),
-        disabledCheckedTrackColor: Color = checkedTrackColor
+        disabledCheckedTrackColor: Color = SwitchTokens.DisabledSelectedTrackColor.toColor()
             .copy(alpha = SwitchTokens.DisabledTrackOpacity)
             .compositeOver(MaterialTheme.colorScheme.surface),
         disabledCheckedBorderColor: Color = Color.Transparent,
         disabledCheckedIconColor: Color = SwitchTokens.DisabledSelectedIconColor.toColor()
             .copy(alpha = SwitchTokens.DisabledSelectedIconOpacity)
             .compositeOver(MaterialTheme.colorScheme.surface),
-        disabledUncheckedThumbColor: Color = uncheckedThumbColor
-            .copy(alpha = SwitchTokens.DisabledSelectedHandleOpacity)
+        disabledUncheckedThumbColor: Color = SwitchTokens.DisabledUnselectedHandleColor.toColor()
+            .copy(alpha = SwitchTokens.DisabledUnselectedHandleOpacity)
             .compositeOver(MaterialTheme.colorScheme.surface),
-        disabledUncheckedTrackColor: Color = uncheckedTrackColor
+        disabledUncheckedTrackColor: Color = SwitchTokens.DisabledUnselectedTrackColor.toColor()
             .copy(alpha = SwitchTokens.DisabledTrackOpacity)
             .compositeOver(MaterialTheme.colorScheme.surface),
         disabledUncheckedBorderColor: Color =

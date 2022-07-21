@@ -1022,7 +1022,7 @@ package androidx.compose.runtime.tooling {
     property public abstract boolean isEmpty;
   }
 
-  public interface CompositionGroup extends androidx.compose.runtime.tooling.CompositionData {
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface CompositionGroup extends androidx.compose.runtime.tooling.CompositionData {
     method public Iterable<java.lang.Object> getData();
     method public default Object? getIdentity();
     method public Object getKey();

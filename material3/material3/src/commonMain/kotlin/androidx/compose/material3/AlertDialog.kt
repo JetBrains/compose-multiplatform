@@ -215,10 +215,10 @@ internal fun AlertDialogFlowRow(
 }
 
 // Paddings for each of the dialog's parts.
-private val DialogPadding = PaddingValues(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 18.dp)
+private val DialogPadding = PaddingValues(all = 24.dp)
 private val IconPadding = PaddingValues(bottom = 16.dp)
 private val TitlePadding = PaddingValues(bottom = 16.dp)
-private val TextPadding = PaddingValues(bottom = 18.dp)
+private val TextPadding = PaddingValues(bottom = 24.dp)
 
 private val MinWidth = 280.dp
 private val MaxWidth = 560.dp

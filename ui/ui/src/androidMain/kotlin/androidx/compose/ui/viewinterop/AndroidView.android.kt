@@ -167,6 +167,10 @@ internal class ViewFactoryHolder<T : View>(
 
     override val viewRoot: View get() = this
 
+    init {
+        clipChildren = false
+    }
+
     var factory: ((Context) -> T)? = null
         set(value) {
             field = value

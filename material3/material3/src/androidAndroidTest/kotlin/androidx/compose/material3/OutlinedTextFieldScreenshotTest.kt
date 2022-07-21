@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Clear
@@ -53,6 +54,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@OptIn(ExperimentalMaterial3Api::class)
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
@@ -194,6 +196,28 @@ class OutlinedTextFieldScreenshotTest {
         }
 
         assertAgainstGolden("outlined_textField_textColor_customTextColor")
+    }
+
+    @Test
+    fun outlinedTextField_textSelectionColor_customColors() {
+        rule.setMaterialContent(lightColorScheme()) {
+            val text = "Hello, world!"
+            OutlinedTextField(
+                value = TextFieldValue(text = text, selection = TextRange(0, text.length)),
+                onValueChange = {},
+                modifier = Modifier.requiredWidth(280.dp).testTag(TextFieldTag),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    // We can only test the background color because popups, which includes the
+                    // selection handles, do not appear in screenshots
+                    selectionColors = TextSelectionColors(
+                        handleColor = Color.Black,
+                        backgroundColor = Color.Green,
+                    )
+                )
+            )
+        }
+
+        assertAgainstGolden("outlined_textField_textSelectionColor_customColors")
     }
 
     @Test

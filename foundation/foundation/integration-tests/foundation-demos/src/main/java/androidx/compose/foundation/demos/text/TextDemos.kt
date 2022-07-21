@@ -23,6 +23,7 @@ val TextDemos = DemoCategory(
     "Text",
     listOf(
         ComposableDemo("Static text") { TextDemo() },
+        ComposableDemo("Canvas") { DrawTextDemo() },
         ComposableDemo("Brush") { TextBrushDemo() },
         ComposableDemo("Ellipsize") { EllipsizeDemo() },
         ComposableDemo("Typeface") { TypefaceDemo() },
@@ -57,7 +58,8 @@ val TextDemos = DemoCategory(
                     DialogInputFieldDemo(onNavigateUp)
                 },
                 ComposableDemo("Inside scrollable") { TextFieldsInScrollableDemo() },
-                ComposableDemo("Cursor configuration") { TextFieldCursorBlinkingDemo() }
+                ComposableDemo("Cursor configuration") { TextFieldCursorBlinkingDemo() },
+                ComposableDemo("Full-screen field") { FullScreenTextFieldDemo() },
             )
         ),
         ComposableDemo("Text Accessibility") { TextAccessibilityDemo() }

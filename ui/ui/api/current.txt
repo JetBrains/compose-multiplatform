@@ -1741,6 +1741,13 @@ package androidx.compose.ui.input.rotary {
 
 }
 
+package androidx.compose.ui.internal {
+
+  public final class JvmDefaultWithCompatibility_jvmKt {
+  }
+
+}
+
 package androidx.compose.ui.layout {
 
   @androidx.compose.runtime.Immutable public abstract sealed class AlignmentLine {
@@ -2223,7 +2230,7 @@ package androidx.compose.ui.platform {
     ctor public AbstractComposeView(android.content.Context context, optional android.util.AttributeSet? attrs, optional int defStyleAttr);
     ctor public AbstractComposeView(android.content.Context context, optional android.util.AttributeSet? attrs);
     ctor public AbstractComposeView(android.content.Context context);
-    method @androidx.compose.runtime.Composable public abstract void Content();
+    method @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public abstract void Content();
     method public final void createComposition();
     method public final void disposeComposition();
     method public final boolean getHasComposition();
@@ -2974,6 +2981,13 @@ package androidx.compose.ui.state {
 
   public final class ToggleableStateKt {
     method public static androidx.compose.ui.state.ToggleableState ToggleableState(boolean value);
+  }
+
+}
+
+package androidx.compose.ui.text {
+
+  public final class TextMeasurerHelperKt {
   }
 
 }

@@ -22,7 +22,6 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin(project(":compose:compiler:compiler"))
 
     debugImplementation(project(":compose:ui:ui-test-manifest"))
 

@@ -53,14 +53,13 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun ScrollableFocusedChildDemo() {
     val resizableState = remember { ResizableState() }
@@ -70,10 +69,6 @@ fun ScrollableFocusedChildDemo() {
             "Click on the blue boxes to give them focus. Drag the handles around the black box " +
                 "to change its size. Try adjusting size while the box inside the resizable area " +
                 "is focused, and while it's not focused."
-        )
-        Text(
-            "Resizing by dragging handle quickly is broken due to b/220119990.",
-            fontStyle = FontStyle.Italic
         )
 
         Row {

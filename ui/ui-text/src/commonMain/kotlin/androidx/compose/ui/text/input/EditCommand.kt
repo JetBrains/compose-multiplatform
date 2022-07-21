@@ -31,6 +31,13 @@ interface EditCommand {
      * Apply the command on the editing buffer.
      */
     fun applyTo(buffer: EditingBuffer)
+
+    /**
+     * Generate a description of the command that is suitable for logging – this should not include
+     * any user-entered text, which may be sensitive.
+     */
+    // Do not return toString() by default, since that might contain sensitive text.
+    fun toStringForLog(): String = this::class.simpleName ?: "{anonymous EditCommand}"
 }
 
 /**
@@ -102,6 +109,9 @@ class CommitTextCommand(
     override fun toString(): String {
         return "CommitTextCommand(text='$text', newCursorPosition=$newCursorPosition)"
     }
+
+    override fun toStringForLog(): String =
+        "CommitTextCommand(text.length=${text.length}, newCursorPosition=$newCursorPosition)"
 }
 
 /**
@@ -155,6 +165,8 @@ class SetComposingRegionCommand(
     override fun toString(): String {
         return "SetComposingRegionCommand(start=$start, end=$end)"
     }
+
+    override fun toStringForLog(): String = toString()
 }
 
 /**
@@ -235,6 +247,9 @@ class SetComposingTextCommand(
     override fun toString(): String {
         return "SetComposingTextCommand(text='$text', newCursorPosition=$newCursorPosition)"
     }
+
+    override fun toStringForLog(): String =
+        "SetComposingTextCommand(text.length=${text.length}, newCursorPosition=$newCursorPosition)"
 }
 
 /**
@@ -294,6 +309,8 @@ class DeleteSurroundingTextCommand(
         return "DeleteSurroundingTextCommand(lengthBeforeCursor=$lengthBeforeCursor, " +
             "lengthAfterCursor=$lengthAfterCursor)"
     }
+
+    override fun toStringForLog(): String = toString()
 }
 
 /**
@@ -375,6 +392,8 @@ class DeleteSurroundingTextInCodePointsCommand(
         return "DeleteSurroundingTextInCodePointsCommand(lengthBeforeCursor=$lengthBeforeCursor, " +
             "lengthAfterCursor=$lengthAfterCursor)"
     }
+
+    override fun toStringForLog(): String = toString()
 }
 
 /**
@@ -421,6 +440,8 @@ class SetSelectionCommand(
     override fun toString(): String {
         return "SetSelectionCommand(start=$start, end=$end)"
     }
+
+    override fun toStringForLog(): String = toString()
 }
 
 /**
@@ -442,6 +463,8 @@ class FinishComposingTextCommand : EditCommand {
     override fun toString(): String {
         return "FinishComposingTextCommand()"
     }
+
+    override fun toStringForLog(): String = toString()
 }
 
 /**
@@ -482,6 +505,8 @@ class BackspaceCommand : EditCommand {
     override fun toString(): String {
         return "BackspaceCommand()"
     }
+
+    override fun toStringForLog(): String = toString()
 }
 
 /**
@@ -536,6 +561,8 @@ class MoveCursorCommand(
     override fun toString(): String {
         return "MoveCursorCommand(amount=$amount)"
     }
+
+    override fun toStringForLog(): String = toString()
 }
 
 /**
@@ -553,6 +580,8 @@ class DeleteAllCommand : EditCommand {
     override fun toString(): String {
         return "DeleteAllCommand()"
     }
+
+    override fun toStringForLog(): String = toString()
 }
 
 /**

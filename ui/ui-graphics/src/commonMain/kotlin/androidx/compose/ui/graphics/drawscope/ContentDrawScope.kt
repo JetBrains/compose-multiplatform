@@ -15,7 +15,7 @@
  */
 package androidx.compose.ui.graphics.drawscope
 
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.graphics.internal.JvmDefaultWithCompatibility
 
 /**
  * Receiver scope for drawing content into a layout, where the content can

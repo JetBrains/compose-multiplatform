@@ -31,8 +31,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.ripple.rememberRipple
@@ -58,6 +57,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
@@ -94,7 +94,7 @@ import kotlin.math.roundToInt
 @Composable
 fun NavigationRail(
     modifier: Modifier = Modifier,
-    containerColor: Color = NavigationRailTokens.ContainerColor.toColor(),
+    containerColor: Color = NavigationRailDefaults.ContainerColor,
     contentColor: Color = contentColorFor(containerColor),
     header: @Composable (ColumnScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
@@ -105,8 +105,9 @@ fun NavigationRail(
         modifier = modifier,
     ) {
         Column(
-            Modifier.fillMaxHeight()
-                .width(NavigationRailTokens.ContainerWidth)
+            Modifier
+                .fillMaxHeight()
+                .widthIn(min = NavigationRailTokens.ContainerWidth)
                 .padding(vertical = NavigationRailVerticalPadding)
                 .selectableGroup(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -185,7 +186,8 @@ fun NavigationRailItem(
                 interactionSource = interactionSource,
                 indication = null,
             )
-            .size(width = NavigationRailItemWidth, height = NavigationRailItemHeight),
+            .height(height = NavigationRailItemHeight)
+            .widthIn(min = NavigationRailItemWidth),
         contentAlignment = Alignment.Center
     ) {
         val animationProgress: Float by animateFloatAsState(
@@ -216,14 +218,16 @@ fun NavigationRailItem(
         // ripple, which is why they are separate composables
         val indicatorRipple = @Composable {
             Box(
-                Modifier.layoutId(IndicatorRippleLayoutIdTag)
+                Modifier
+                    .layoutId(IndicatorRippleLayoutIdTag)
                     .clip(indicatorShape)
                     .indication(offsetInteractionSource, rememberRipple())
             )
         }
         val indicator = @Composable {
             Box(
-                Modifier.layoutId(IndicatorLayoutIdTag)
+                Modifier
+                    .layoutId(IndicatorLayoutIdTag)
                     .background(
                         color = colors.indicatorColor.copy(alpha = animationProgress),
                         shape = indicatorShape
@@ -240,6 +244,12 @@ fun NavigationRailItem(
             animationProgress = animationProgress,
         )
     }
+}
+
+/** Defaults used in [NavigationRail] */
+object NavigationRailDefaults {
+    /** Default container color of a navigation rail. */
+    val ContainerColor: Color @Composable get() = NavigationRailTokens.ContainerColor.toColor()
 }
 
 /** Defaults used in [NavigationRailItem]. */
@@ -364,7 +374,8 @@ private fun NavigationRailItemBaselineLayout(
 
         if (label != null) {
             Box(
-                Modifier.layoutId(LabelLayoutIdTag)
+                Modifier
+                    .layoutId(LabelLayoutIdTag)
                     .alpha(if (alwaysShowLabel) 1f else animationProgress)
             ) { label() }
         }
@@ -436,7 +447,13 @@ private fun MeasureScope.placeIcon(
     indicatorPlaceable: Placeable?,
     constraints: Constraints,
 ): MeasureResult {
-    val width = constraints.maxWidth
+    val width = constraints.constrainWidth(
+        maxOf(
+            iconPlaceable.width,
+            indicatorRipplePlaceable.width,
+            indicatorPlaceable?.width ?: 0
+        )
+    )
     val height = constraints.maxHeight
 
     val iconX = (width - iconPlaceable.width) / 2
@@ -513,8 +530,13 @@ private fun MeasureScope.placeLabelAndIcon(
     // The interpolated fraction of iconDistance that all placeables need to move based on
     // animationProgress, since the icon is higher in the selected state.
     val offset = (iconDistance * (1 - animationProgress)).roundToInt()
-
-    val width = constraints.maxWidth
+    val width = constraints.constrainWidth(
+        maxOf(
+            iconPlaceable.width,
+            labelPlaceable.width,
+            indicatorPlaceable?.width ?: 0
+        )
+    )
     val labelX = (width - labelPlaceable.width) / 2
     val iconX = (width - iconPlaceable.width) / 2
     val rippleX = (width - indicatorRipplePlaceable.width) / 2

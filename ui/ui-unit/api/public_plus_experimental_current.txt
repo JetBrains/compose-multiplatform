@@ -413,3 +413,10 @@ package androidx.compose.ui.unit {
 
 }
 
+package androidx.compose.ui.unit.internal {
+
+  public final class JvmDefaultWithCompatibility_jvmKt {
+  }
+
+}
+

@@ -47,10 +47,13 @@ private const val RereadingFlag = 0x20
  * [Composer.startRestartGroup] and is used to track how to restart the group.
  */
 internal class RecomposeScopeImpl(
-    var composition: CompositionImpl?
+    composition: CompositionImpl?
 ) : ScopeUpdateScope, RecomposeScope {
 
     private var flags: Int = 0
+
+    var composition: CompositionImpl? = composition
+        private set
 
     /**
      * An anchor to the location in the slot table that start the group associated with this
@@ -150,6 +153,24 @@ internal class RecomposeScopeImpl(
         composition?.invalidate(this, value) ?: InvalidationResult.IGNORED
 
     /**
+     * Release the recompose scope. This is called when the recompose scope has been removed by the
+     * compostion because the part of the composition it was tracking was removed.
+     */
+    fun release() {
+        composition = null
+        trackedInstances = null
+        trackedDependencies = null
+    }
+
+    /**
+     * Called when the data tracked by this recompose scope moves to a different composition when
+     * for example, the movable content it is part of has moved.
+     */
+    fun adoptedBy(composition: CompositionImpl) {
+        this.composition = composition
+    }
+
+    /**
      * Invalidate the group which will cause [composition] to request this scope be recomposed.
      *
      * Unlike [invalidateForResult], this method is thread safe and calls the thread safe
@@ -240,8 +261,12 @@ internal class RecomposeScopeImpl(
         if (
             instances.isNotEmpty() &&
             instances.all { instance ->
-                instance is DerivedState<*> &&
-                    trackedDependencies[instance] == instance.currentValue
+                instance is DerivedState<*> && instance.let {
+                    @Suppress("UNCHECKED_CAST")
+                    it as DerivedState<Any?>
+                    val policy = it.policy ?: structuralEqualityPolicy()
+                    policy.equivalent(it.currentValue, trackedDependencies[it])
+                }
             }
         )
             return false

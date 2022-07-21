@@ -1,0 +1,11 @@
+// Signature format: 4.0
+package androidx.compose.runtime.tracing {
+
+  public final class TracingInitializer implements androidx.startup.Initializer<kotlin.Unit> {
+    ctor public TracingInitializer();
+    method public void create(android.content.Context context);
+    method public java.util.List<java.lang.Class<? extends androidx.startup.Initializer<?>>> dependencies();
+  }
+
+}
+

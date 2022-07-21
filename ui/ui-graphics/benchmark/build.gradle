@@ -23,8 +23,6 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
-
     implementation project(":compose:foundation:foundation")
     implementation project(":compose:runtime:runtime")
     implementation project(":compose:benchmark-utils")

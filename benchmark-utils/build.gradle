@@ -22,8 +22,6 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
-
     api("androidx.activity:activity:1.2.0")
     api(project(":compose:test-utils"))
     api(project(":benchmark:benchmark-junit4"))

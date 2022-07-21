@@ -38,7 +38,7 @@ import androidx.annotation.DoNotInline
 import androidx.annotation.IntRange
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
-import androidx.annotation.VisibleForTesting.PRIVATE
+import androidx.annotation.VisibleForTesting.Companion.PRIVATE
 import androidx.collection.ArraySet
 import androidx.collection.SparseArrayCompat
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -430,6 +430,12 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
 
         info.packageName = view.context.packageName
+
+        // This property exists to distinguish semantically meaningful nodes from purely structural
+        // or decorative UI elements. In Compose, LayoutNodes without semantics are simply omitted
+        // from the AccessibilityNodeInfo tree. Therefore, every AccessibilityNodeInfo qualifies as
+        // "important".
+        info.isImportantForAccessibility = true
 
         semanticsNode.replacedChildrenSortedByBounds.fastForEach { child ->
             if (currentSemanticsNodes.contains(child.id)) {

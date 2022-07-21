@@ -46,7 +46,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.unit.Dp
-import kotlinx.coroutines.flow.collect
 
 /**
  * <a href="https://m3.material.io/components/cards/overview" class="external" target="_blank">Material Design filled card</a>.
@@ -74,11 +73,10 @@ import kotlinx.coroutines.flow.collect
  * @param colors [CardColors] that will be used to resolve the colors used for this card in
  * different states. See [CardDefaults.cardColors].
  */
-@ExperimentalMaterial3Api
 @Composable
 fun Card(
     modifier: Modifier = Modifier,
-    shape: Shape = FilledCardTokens.ContainerShape.toShape(),
+    shape: Shape = CardDefaults.shape,
     border: BorderStroke? = null,
     elevation: CardElevation = CardDefaults.cardElevation(),
     colors: CardColors = CardDefaults.cardColors(),
@@ -136,7 +134,7 @@ fun Card(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = FilledCardTokens.ContainerShape.toShape(),
+    shape: Shape = CardDefaults.shape,
     border: BorderStroke? = null,
     elevation: CardElevation = CardDefaults.cardElevation(),
     colors: CardColors = CardDefaults.cardColors(),
@@ -182,11 +180,10 @@ fun Card(
  * @param colors [CardColors] that will be used to resolve the color(s) used for this card in
  * different states. See [CardDefaults.elevatedCardElevation].
  */
-@ExperimentalMaterial3Api
 @Composable
 fun ElevatedCard(
     modifier: Modifier = Modifier,
-    shape: Shape = ElevatedCardTokens.ContainerShape.toShape(),
+    shape: Shape = CardDefaults.elevatedShape,
     elevation: CardElevation = CardDefaults.elevatedCardElevation(),
     colors: CardColors = CardDefaults.elevatedCardColors(),
     content: @Composable ColumnScope.() -> Unit
@@ -236,7 +233,7 @@ fun ElevatedCard(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = ElevatedCardTokens.ContainerShape.toShape(),
+    shape: Shape = CardDefaults.elevatedShape,
     elevation: CardElevation = CardDefaults.elevatedCardElevation(),
     colors: CardColors = CardDefaults.elevatedCardColors(),
     content: @Composable ColumnScope.() -> Unit
@@ -277,11 +274,10 @@ fun ElevatedCard(
  * @param colors [CardColors] that will be used to resolve the color(s) used for this card in
  * different states. See [CardDefaults.outlinedCardColors].
  */
-@ExperimentalMaterial3Api
 @Composable
 fun OutlinedCard(
     modifier: Modifier = Modifier,
-    shape: Shape = OutlinedCardTokens.ContainerShape.toShape(),
+    shape: Shape = CardDefaults.outlinedShape,
     border: BorderStroke = CardDefaults.outlinedCardBorder(),
     elevation: CardElevation = CardDefaults.outlinedCardElevation(),
     colors: CardColors = CardDefaults.outlinedCardColors(),
@@ -333,7 +329,7 @@ fun OutlinedCard(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = OutlinedCardTokens.ContainerShape.toShape(),
+    shape: Shape = CardDefaults.outlinedShape,
     border: BorderStroke = CardDefaults.outlinedCardBorder(enabled),
     elevation: CardElevation = CardDefaults.outlinedCardElevation(),
     colors: CardColors = CardDefaults.outlinedCardColors(),
@@ -420,6 +416,15 @@ interface CardColors {
  * Contains the default values used by all card types.
  */
 object CardDefaults {
+    // shape Defaults
+    /** Default shape for a card. */
+    val shape: Shape @Composable get() = FilledCardTokens.ContainerShape.toShape()
+
+    /** Default shape for an elevated card. */
+    val elevatedShape: Shape @Composable get() = ElevatedCardTokens.ContainerShape.toShape()
+
+    /** Default shape for an outlined card. */
+    val outlinedShape: Shape @Composable get() = OutlinedCardTokens.ContainerShape.toShape()
 
     /**
      * Creates a [CardElevation] that will animate between the provided values according to the

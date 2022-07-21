@@ -23,6 +23,7 @@ import androidx.compose.material3.tokens.BadgeTokens
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -103,7 +104,7 @@ class BadgeTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun badge_noContent_shape() {
-        var shape = Shapes.None
+        var shape = RectangleShape
         var errorColor = Color.Unspecified
         rule.setMaterialContent(lightColorScheme()) {
             shape = BadgeTokens.Shape.toShape()

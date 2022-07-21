@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.graphics
 
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.graphics.internal.JvmDefaultWithCompatibility
 
 /**
  * Create an empty [PathMeasure] object. To uses this to measure the length of a path, and/or to

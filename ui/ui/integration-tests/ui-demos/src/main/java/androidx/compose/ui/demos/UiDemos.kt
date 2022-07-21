@@ -40,6 +40,7 @@ import androidx.compose.ui.demos.focus.NestedLazyListFocusSearchDemo
 import androidx.compose.ui.demos.focus.TwoDimensionalFocusSearchDemo
 import androidx.compose.ui.demos.gestures.ButtonMetaStateDemo
 import androidx.compose.ui.demos.gestures.DetectTapGesturesDemo
+import androidx.compose.ui.demos.gestures.DetectTapPressureGesturesDemo
 import androidx.compose.ui.demos.gestures.DoubleTapGestureFilterDemo
 import androidx.compose.ui.demos.gestures.DoubleTapInTapDemo
 import androidx.compose.ui.demos.gestures.DragAndScaleGestureFilterDemo
@@ -85,6 +86,7 @@ private val GestureDemos = DemoCategory(
             listOf(
                 ComposableDemo("Press Indication") { PressIndicatorGestureFilterDemo() },
                 ComposableDemo("Tap") { DetectTapGesturesDemo() },
+                ComposableDemo("Pressure Tap") { DetectTapPressureGesturesDemo() },
                 ComposableDemo("Double Tap") { DoubleTapGestureFilterDemo() },
                 ComposableDemo("Long Press") { LongPressGestureDetectorDemo() },
                 ComposableDemo("Scroll") { ScrollGestureFilterDemo() },

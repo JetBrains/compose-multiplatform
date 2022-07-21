@@ -56,14 +56,17 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.size
 import androidx.compose.ui.zIndex
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
@@ -1295,6 +1298,42 @@ class LazyGridTest(
             .assertCrossAxisSizeIsEqualTo(30.dp)
             .assertMainAxisStartPositionInRootIsEqualTo(32.dp)
             .assertCrossAxisStartPositionInRootIsEqualTo(30.dp)
+    }
+
+    @Test
+    fun spacingsLargerThanLayoutSize() {
+        val items = (1..2).map { it.toString() }
+
+        val spacing = with(rule.density) { 5.toDp() }
+        val itemSize = with(rule.density) { 50.toDp() }
+
+        rule.setContent {
+            LazyGrid(
+                cells = GridCells.Fixed(2),
+                modifier = Modifier.axisSize(0.dp, itemSize),
+                crossAxisSpacedBy = spacing
+            ) {
+                items(items) {
+                    Spacer(Modifier.size(itemSize).testTag(it))
+                }
+            }
+        }
+
+        val bounds1 = rule.onNodeWithTag("1")
+            .assertExists()
+            .getBoundsInRoot()
+
+        assertThat(bounds1.top).isEqualTo(0.dp)
+        assertThat(bounds1.left).isEqualTo(0.dp)
+        assertThat(bounds1.size).isEqualTo(DpSize(0.dp, 0.dp))
+
+        val bounds2 = rule.onNodeWithTag("2")
+            .assertExists()
+            .getBoundsInRoot()
+
+        assertThat(bounds2.top).isEqualTo(0.dp)
+        assertThat(bounds2.left).isEqualTo(0.dp)
+        assertThat(bounds2.size).isEqualTo(DpSize(0.dp, 0.dp))
     }
 }
 

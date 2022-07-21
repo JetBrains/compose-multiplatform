@@ -92,6 +92,9 @@ import kotlin.math.ln
  * top of [errorContainer].
  * @property outline Subtle color used for boundaries. Outline color role adds contrast for
  * accessibility purposes.
+ * @property outlineVariant Utility color used for boundaries for decorative elements when strong
+ * contrast is not required.
+ * @property scrim Color of a scrim that obscures content.
  */
 @Stable
 class ColorScheme(
@@ -122,6 +125,8 @@ class ColorScheme(
     errorContainer: Color,
     onErrorContainer: Color,
     outline: Color,
+    outlineVariant: Color,
+    scrim: Color,
 ) {
     var primary by mutableStateOf(primary, structuralEqualityPolicy())
         internal set
@@ -177,6 +182,10 @@ class ColorScheme(
         internal set
     var outline by mutableStateOf(outline, structuralEqualityPolicy())
         internal set
+    var outlineVariant by mutableStateOf(outlineVariant, structuralEqualityPolicy())
+        internal set
+    var scrim by mutableStateOf(scrim, structuralEqualityPolicy())
+        internal set
 
     /** Returns a copy of this ColorScheme, optionally overriding some of the values. */
     fun copy(
@@ -207,6 +216,8 @@ class ColorScheme(
         errorContainer: Color = this.errorContainer,
         onErrorContainer: Color = this.onErrorContainer,
         outline: Color = this.outline,
+        outlineVariant: Color = this.outlineVariant,
+        scrim: Color = this.scrim,
     ): ColorScheme =
         ColorScheme(
             primary = primary,
@@ -236,6 +247,8 @@ class ColorScheme(
             errorContainer = errorContainer,
             onErrorContainer = onErrorContainer,
             outline = outline,
+            outlineVariant = outlineVariant,
+            scrim = scrim,
         )
 
     override fun toString(): String {
@@ -267,6 +280,8 @@ class ColorScheme(
             "errorContainer=$errorContainer" +
             "onErrorContainer=$onErrorContainer" +
             "outline=$outline" +
+            "outlineVariant=$outlineVariant" +
+            "scrim=$scrim" +
             ")"
     }
 }
@@ -302,6 +317,8 @@ fun lightColorScheme(
     errorContainer: Color = ColorLightTokens.ErrorContainer,
     onErrorContainer: Color = ColorLightTokens.OnErrorContainer,
     outline: Color = ColorLightTokens.Outline,
+    outlineVariant: Color = ColorLightTokens.OutlineVariant,
+    scrim: Color = ColorLightTokens.Scrim,
 ): ColorScheme =
     ColorScheme(
         primary = primary,
@@ -331,6 +348,8 @@ fun lightColorScheme(
         errorContainer = errorContainer,
         onErrorContainer = onErrorContainer,
         outline = outline,
+        outlineVariant = outlineVariant,
+        scrim = scrim,
     )
 
 /**
@@ -364,6 +383,8 @@ fun darkColorScheme(
     errorContainer: Color = ColorDarkTokens.ErrorContainer,
     onErrorContainer: Color = ColorDarkTokens.OnErrorContainer,
     outline: Color = ColorDarkTokens.Outline,
+    outlineVariant: Color = ColorDarkTokens.OutlineVariant,
+    scrim: Color = ColorDarkTokens.Scrim,
 ): ColorScheme =
     ColorScheme(
         primary = primary,
@@ -393,6 +414,8 @@ fun darkColorScheme(
         errorContainer = errorContainer,
         onErrorContainer = onErrorContainer,
         outline = outline,
+        outlineVariant = outlineVariant,
+        scrim = scrim,
     )
 
 /**
@@ -525,6 +548,8 @@ internal fun ColorScheme.updateColorSchemeFrom(other: ColorScheme) {
     errorContainer = other.errorContainer
     onErrorContainer = other.onErrorContainer
     outline = other.outline
+    outlineVariant = other.outlineVariant
+    scrim = other.scrim
 }
 
 /**
@@ -553,8 +578,10 @@ internal fun ColorScheme.fromToken(value: ColorSchemeKeyTokens): Color {
         ColorSchemeKeyTokens.OnTertiary -> onTertiary
         ColorSchemeKeyTokens.OnTertiaryContainer -> onTertiaryContainer
         ColorSchemeKeyTokens.Outline -> outline
+        ColorSchemeKeyTokens.OutlineVariant -> outlineVariant
         ColorSchemeKeyTokens.Primary -> primary
         ColorSchemeKeyTokens.PrimaryContainer -> primaryContainer
+        ColorSchemeKeyTokens.Scrim -> scrim
         ColorSchemeKeyTokens.Secondary -> secondary
         ColorSchemeKeyTokens.SecondaryContainer -> secondaryContainer
         ColorSchemeKeyTokens.Surface -> surface
