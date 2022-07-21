@@ -32,6 +32,7 @@ object TestLambdas {
     val inlinedParameter = { o: IntOffset ->
         o.x * 2
     }
+    val unnamed: (Int, Int) -> Float = { _, _ -> 0f }
 
     /**
      * This inline function will appear at a line numbers
