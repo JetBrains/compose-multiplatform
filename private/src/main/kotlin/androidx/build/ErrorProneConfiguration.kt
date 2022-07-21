@@ -131,7 +131,6 @@ private fun JavaCompile.configureWithErrorProne() {
             // Consider re-enabling the following checks. Disabled as part of
             // error-prone upgrade
             "-Xep:InlineMeSuggester:OFF",
-            "-Xep:UnusedVariable:OFF",
             "-Xep:UnusedMethod:OFF",
             "-Xep:NarrowCalculation:OFF",
             "-Xep:LongDoubleConversion:OFF",
@@ -203,7 +202,7 @@ private fun JavaCompile.configureWithErrorProne() {
             "-Xep:AssertionFailureIgnored:ERROR",
             "-Xep:UnnecessaryParentheses:ERROR",
             "-Xep:EqualsGetClass:ERROR",
-            // "-Xep:UnusedVariable:ERROR", // disabled with upgrade to 2.14.0
+            "-Xep:UnusedVariable:ERROR",
             // "-Xep:UnusedMethod:ERROR", // disabled with upgrade to 2.14.0
             "-Xep:UndefinedEquals:ERROR",
             "-Xep:ThreadLocalUsage:ERROR",
