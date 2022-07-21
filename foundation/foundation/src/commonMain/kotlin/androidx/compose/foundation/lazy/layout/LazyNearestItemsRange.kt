@@ -16,19 +16,48 @@
 
 package androidx.compose.foundation.lazy.layout
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.structuralEqualityPolicy
+
+/**
+ * Calculate and memoize range of indexes which contains at least [extraItemCount] items near
+ * the first visible item. It is optimized to return the same range for small changes in the
+ * firstVisibleItem value so we do not regenerate the map on each scroll.
+ *
+ * @param firstVisibleItemIndex Provider of the first item index currently visible on screen.
+ * @param slidingWindowSize Number items user can scroll up to this number of items until we have to
+ * regenerate item mapping.
+ * @param extraItemCount  The minimum amount of items near the first visible item we want
+ * to have mapping for.
+ * @return range of indexes with items near current the first visible position.
+ */
+@ExperimentalFoundationApi
+@Composable
+fun rememberLazyNearestItemsRangeState(
+    firstVisibleItemIndex: () -> Int,
+    slidingWindowSize: () -> Int,
+    extraItemCount: () -> Int
+): State<IntRange> =
+    remember(firstVisibleItemIndex, slidingWindowSize, extraItemCount) {
+        derivedStateOf(structuralEqualityPolicy()) {
+            calculateNearestItemsRange(
+                firstVisibleItemIndex(),
+                slidingWindowSize(),
+                extraItemCount()
+            )
+        }
+    }
+
 /**
  * Returns a range of indexes which contains at least [extraItemCount] items near
  * the first visible item. It is optimized to return the same range for small changes in the
- * [firstVisibleItem] value so we do not regenerate the map on each scroll.
- *
- * It uses the idea of sliding window as an optimization, so user can scroll up to this number of
- * items until we have to regenerate the key to index map.
- *
- * @param firstVisibleItem currently visible item
- * @param slidingWindowSize size of the sliding window for the nearest item calculation
- * @param extraItemCount minimum amount of items near the first item we want to have mapping for.
+ * firstVisibleItem value so we do not regenerate the map on each scroll.
  */
-internal fun calculateNearestItemsRange(
+private fun calculateNearestItemsRange(
     firstVisibleItem: Int,
     slidingWindowSize: Int,
     extraItemCount: Int

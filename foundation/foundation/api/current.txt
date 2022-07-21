@@ -449,7 +449,7 @@ package androidx.compose.foundation.lazy {
   public final class LazyListItemPlacementAnimatorKt {
   }
 
-  public final class LazyListItemProviderImplKt {
+  public final class LazyListItemProviderKt {
   }
 
   public final class LazyListKt {
@@ -584,7 +584,7 @@ package androidx.compose.foundation.lazy.grid {
   public final class LazyGridItemPlacementAnimatorKt {
   }
 
-  public final class LazyGridItemProviderImplKt {
+  public final class LazyGridItemProviderKt {
   }
 
   @androidx.compose.foundation.lazy.grid.LazyGridScopeMarker @androidx.compose.runtime.Stable public sealed interface LazyGridItemScope {
@@ -675,6 +675,9 @@ package androidx.compose.foundation.lazy.grid {
 package androidx.compose.foundation.lazy.layout {
 
   public final class IntervalListKt {
+  }
+
+  public final class LazyLayoutItemProviderKt {
   }
 
   public final class LazyLayoutKt {

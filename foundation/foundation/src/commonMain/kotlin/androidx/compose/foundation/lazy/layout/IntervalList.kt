@@ -31,7 +31,7 @@ import androidx.compose.runtime.collection.mutableVectorOf
  * @param T type of values each interval contains in [Interval.value].
  */
 @ExperimentalFoundationApi
-sealed interface IntervalList<T> {
+sealed interface IntervalList<out T> {
 
     /**
      * The total amount of items in all the intervals.
@@ -69,7 +69,7 @@ sealed interface IntervalList<T> {
      *
      * @see get
      */
-    class Interval<T> internal constructor(
+    class Interval<out T> internal constructor(
         /**
          * The index of the first item in the interval.
          */

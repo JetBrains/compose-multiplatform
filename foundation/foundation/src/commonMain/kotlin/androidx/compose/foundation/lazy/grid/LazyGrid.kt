@@ -75,7 +75,7 @@ internal fun LazyGrid(
 ) {
     val overscrollEffect = ScrollableDefaults.overscrollEffect()
 
-    val itemProvider = rememberItemProvider(state, content)
+    val itemProvider = rememberLazyGridItemProvider(state, content)
 
     val scope = rememberCoroutineScope()
     val placementAnimator = remember(state, isVertical) {
