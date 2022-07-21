@@ -56,7 +56,7 @@ class SystemGestureExclusionTest {
      * Make sure that when an exclusion rect using the bounds of a layout is used, the
      * gesture should not be consumed by the system.
      */
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     @Test
     fun excludeBounds() {
         val composeView = setComposeContent {
@@ -75,7 +75,7 @@ class SystemGestureExclusionTest {
      * Make sure that when an exclusion rect using a supplied rect, the
      * gesture should not be consumed by the system.
      */
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     @Test
     fun excludeRect() {
         val composeView = setComposeContent {
@@ -92,7 +92,7 @@ class SystemGestureExclusionTest {
         }
     }
 
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     @Test
     fun removeWhenModifierRemovedBounds() {
         var setExclusion by mutableStateOf(true)
@@ -113,7 +113,7 @@ class SystemGestureExclusionTest {
         }
     }
 
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     @Test
     fun removeWhenModifierRemovedRect() {
         var setExclusion by mutableStateOf(true)
@@ -136,7 +136,7 @@ class SystemGestureExclusionTest {
         }
     }
 
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     @Test
     fun excludeMultipleBounds() {
         val composeView = setComposeContent {
@@ -170,7 +170,7 @@ class SystemGestureExclusionTest {
         }
     }
 
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     @Test
     fun removeOneOfMultiple() {
         var setExclusion by mutableStateOf(true)
@@ -191,7 +191,7 @@ class SystemGestureExclusionTest {
         }
     }
 
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     @Test
     fun replaceWithEmptyRect() {
         var useEmpty by mutableStateOf(false)
