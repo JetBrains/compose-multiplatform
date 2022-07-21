@@ -16,8 +16,6 @@
 
 package androidx.build
 
-import groovy.lang.Closure
-
 /**
  * LibraryType represents the purpose and type of a library, whether it is a conventional library,
  * a set of samples showing how to use a conventional library, a set of lint rules for using a
@@ -58,18 +56,11 @@ import groovy.lang.Closure
  *
  */
 sealed class LibraryType(
-    publish: Publish = Publish.NONE,
+    val publish: Publish = Publish.NONE,
     val sourceJars: Boolean = false,
     val checkApi: RunApiTasks = RunApiTasks.No("Unknown Library Type"),
-    val compilationTarget: CompilationTarget = CompilationTarget.DEVICE,
-    configurePublish: PublishExtension.() -> Unit = {
-        android = publish
-    }
+    val compilationTarget: CompilationTarget = CompilationTarget.DEVICE
 ) {
-    val publishExtension = PublishExtension().apply {
-        configurePublish()
-    }
-
     val name: String
         get() = javaClass.simpleName
 
@@ -88,18 +79,8 @@ sealed class LibraryType(
         val ANNOTATION_PROCESSOR_UTILS = AnnotationProcessorUtils()
         val OTHER_CODE_PROCESSOR = OtherCodeProcessor()
         val IDE_PLUGIN = IdePlugin()
+        val KMP_LIBRARY = KmpLibrary()
         val UNSET = Unset()
-
-        /**
-         * groovy sugar for creating KMP library. Works reasonably well without sugar in kotlin / .kts
-         */
-        @JvmStatic
-        fun kmpLibrary(closure: Closure<PublishExtension>): KmpLibrary {
-            val library = KmpLibrary {}
-            closure.delegate = library.publishExtension
-            closure.call()
-            return library
-        }
     }
     open class PublishedLibrary : LibraryType(
         publish = Publish.SNAPSHOT_AND_RELEASE,
@@ -174,8 +155,8 @@ sealed class LibraryType(
         // Android Studio, rather than by a client of the library, but also a host-side component.
         compilationTarget = CompilationTarget.DEVICE
     )
-    class KmpLibrary(configurePublish: PublishExtension.() -> Unit) : LibraryType(
-        configurePublish = configurePublish,
+    class KmpLibrary : LibraryType(
+        publish = Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = true,
         checkApi = RunApiTasks.Yes(),
         compilationTarget = CompilationTarget.DEVICE

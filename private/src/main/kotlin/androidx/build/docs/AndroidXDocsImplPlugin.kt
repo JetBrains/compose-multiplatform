@@ -16,7 +16,6 @@
 
 package androidx.build.docs
 
-import androidx.build.enforceKtlintVersion
 import androidx.build.SupportConfig
 import androidx.build.dackka.DackkaTask
 import androidx.build.dependencies.KOTLIN_VERSION
@@ -25,6 +24,7 @@ import androidx.build.doclava.DoclavaTask
 import androidx.build.doclava.GENERATE_DOCS_CONFIG
 import androidx.build.doclava.createGenerateSdkApiTask
 import androidx.build.dokka.Dokka
+import androidx.build.enforceKtlintVersion
 import androidx.build.getAndroidJar
 import androidx.build.getBuildId
 import androidx.build.getCheckoutRoot
@@ -180,8 +180,8 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             val localVar = archiveOperations
             task.from(
                 sources.elements.map { jars ->
-                    jars.map {
-                        localVar.zipTree(it).matching {
+                    jars.map { jar ->
+                        localVar.zipTree(jar).matching {
                             // Filter out files that documentation tools cannot process.
                             it.exclude("**/*.MF")
                             it.exclude("**/*.aidl")
@@ -372,6 +372,13 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
                 excludedPackages = hiddenPackages.toSet()
                 excludedPackagesForJava = hiddenPackagesJava
                 excludedPackagesForKotlin = emptySet()
+
+                // TODO(b/239095864): replace this placeholder file with a dynamically generated one
+                libraryMetadataFile = project.rootProject.layout.projectDirectory
+                    .file("buildSrc/SampleLibraryMetadata.json")
+
+                // TODO(b/223712700): change to `true` once bug is resolved
+                showLibraryMetadata = false
             }
         }
 
@@ -420,9 +427,9 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             task.dependsOn(unzipSamplesTask)
 
             val androidJar = project.getAndroidJar()
-            val dokkaClasspath = project.provider({
+            val dokkaClasspath = project.provider {
                 project.files(androidJar).plus(dependencyClasspath)
-            })
+            }
             // DokkaTask tries to resolve DokkaTask#classpath right away for jars that might not
             // be there yet. Delay the setting of this property to before we run the task.
             task.inputs.files(androidJar, dependencyClasspath)

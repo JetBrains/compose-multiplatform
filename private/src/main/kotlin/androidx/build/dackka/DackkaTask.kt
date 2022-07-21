@@ -16,14 +16,18 @@
 
 package androidx.build.dackka
 
+import java.io.File
+import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
@@ -34,8 +38,6 @@ import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 import org.gradle.workers.WorkerExecutor
 import org.json.JSONObject
-import java.io.File
-import javax.inject.Inject
 
 @CacheableTask
 abstract class DackkaTask @Inject constructor(
@@ -46,7 +48,7 @@ abstract class DackkaTask @Inject constructor(
     @get:Classpath
     abstract val dackkaClasspath: ConfigurableFileCollection
 
-    // Classpath containing dependencys of libraries needed to resolve types in docs
+    // Classpath containing dependencies of libraries needed to resolve types in docs
     @get:[InputFiles Classpath]
     lateinit var dependenciesClasspath: FileCollection
 
@@ -82,14 +84,26 @@ abstract class DackkaTask @Inject constructor(
     @Input
     lateinit var excludedPackagesForKotlin: Set<String>
 
+    /**
+     * These two variables control displaying of additional metadata in the refdocs.
+     *
+     * LIBRARY_METADATA_FILE: file containing artifactID and other metadata
+     * SHOW_LIBRARY_METADATA: set to "true" to display the data
+     */
+    @get:[InputFile PathSensitive(PathSensitivity.NONE)]
+    lateinit var libraryMetadataFile: RegularFile
+
+    @Input
+    var showLibraryMetadata: Boolean = false
+
     // Documentation for Dackka command line usage and arguments can be found at
     // https://kotlin.github.io/dokka/1.6.0/user_guide/cli/usage/
     private fun computeArguments(): File {
 
         // path comes with colons but dokka json expects an ArrayList
-        val classPath = dependenciesClasspath.asPath.split(':').toMutableList<String>()
+        val classPath = dependenciesClasspath.asPath.split(':').toMutableList()
 
-        var linksConfiguration = ""
+        val linksConfiguration = ""
         val linksMap = mapOf(
             "coroutinesCore"
                 to "https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core",
@@ -124,8 +138,8 @@ abstract class DackkaTask @Inject constructor(
             )
         @Suppress("UNCHECKED_CAST")
         if (includes.isNotEmpty())
-            ((jsonMap["sourceSets"]as List<*>).single() as MutableMap<String, Any>)
-            .put("includes", includes)
+            ((jsonMap["sourceSets"]as List<*>).single() as MutableMap<String, Any>)["includes"] =
+                includes
 
         val json = JSONObject(jsonMap)
         val outputFile = File.createTempFile("dackkaArgs", ".json")
@@ -137,26 +151,28 @@ abstract class DackkaTask @Inject constructor(
     @TaskAction
     fun generate() {
         runDackkaWithArgs(
-            dackkaClasspath,
-            computeArguments(),
-            workerExecutor,
-            excludedPackages,
-            excludedPackagesForJava,
-            excludedPackagesForKotlin,
+            classpath = dackkaClasspath,
+            argsFile = computeArguments(),
+            workerExecutor = workerExecutor,
+            excludedPackages = excludedPackages,
+            excludedPackagesForJava = excludedPackagesForJava,
+            excludedPackagesForKotlin = excludedPackagesForKotlin,
+            libraryMetadataFile = libraryMetadataFile,
+            showLibraryMetadata = showLibraryMetadata,
         )
     }
 }
 
-@Suppress("UnstableApiUsage")
 interface DackkaParams : WorkParameters {
     val args: ListProperty<String>
     val classpath: SetProperty<File>
     val excludedPackages: ListProperty<String>
     val excludedPackagesForJava: ListProperty<String>
     val excludedPackagesForKotlin: ListProperty<String>
+    var libraryMetadataFile: RegularFile
+    var showLibraryMetadata: Boolean
 }
 
-@Suppress("UnstableApiUsage")
 fun runDackkaWithArgs(
     classpath: FileCollection,
     argsFile: File,
@@ -164,18 +180,21 @@ fun runDackkaWithArgs(
     excludedPackages: Set<String>,
     excludedPackagesForJava: Set<String>,
     excludedPackagesForKotlin: Set<String>,
+    libraryMetadataFile: RegularFile,
+    showLibraryMetadata: Boolean,
 ) {
     val workQueue = workerExecutor.noIsolation()
     workQueue.submit(DackkaWorkAction::class.java) { parameters ->
-        parameters.args.set(listOf(argsFile.getPath(), "-loggingLevel", "WARN"))
+        parameters.args.set(listOf(argsFile.path, "-loggingLevel", "WARN"))
         parameters.classpath.set(classpath)
         parameters.excludedPackages.set(excludedPackages)
         parameters.excludedPackagesForJava.set(excludedPackagesForJava)
         parameters.excludedPackagesForKotlin.set(excludedPackagesForKotlin)
+        parameters.libraryMetadataFile = libraryMetadataFile
+        parameters.showLibraryMetadata = showLibraryMetadata
     }
 }
 
-@Suppress("UnstableApiUsage")
 abstract class DackkaWorkAction @Inject constructor(
     private val execOperations: ExecOperations
 ) : WorkAction<DackkaParams> {
@@ -184,8 +203,11 @@ abstract class DackkaWorkAction @Inject constructor(
             it.mainClass.set("org.jetbrains.dokka.MainKt")
             it.args = parameters.args.get()
             it.classpath(parameters.classpath.get())
+
             // b/183989795 tracks moving these away from an environment variables
             it.environment("DEVSITE_TENANT", "androidx")
+            it.environment("LIBRARY_METADATA_FILE", parameters.libraryMetadataFile.toString())
+            it.environment("SHOW_LIBRARY_METADATA", parameters.showLibraryMetadata)
 
             if (parameters.excludedPackages.get().isNotEmpty())
                 it.environment(

@@ -168,7 +168,7 @@ object Release {
             )
             return
         }
-        if (!extension.shouldRelease()) {
+        if (!extension.shouldRelease() && !isSnapshotBuild()) {
             project.logger.info(
                 "project ${project.name} isn't part of release, because its" +
                     " \"publish\" property is SNAPSHOT_ONLY, but it is not a snapshot build"
@@ -346,7 +346,7 @@ val AndroidXExtension.publishedArtifacts: List<Artifact>
         )
 
         // Add platform-specific artifacts, if necessary.
-        artifacts += availablePublishPlatforms.map { suffix ->
+        artifacts += publishPlatforms.map { suffix ->
             Artifact(
                 mavenGroup = groupString,
                 projectName = "${project.name}-$suffix",
@@ -357,12 +357,12 @@ val AndroidXExtension.publishedArtifacts: List<Artifact>
         return artifacts
     }
 
-private val AndroidXExtension.availablePublishPlatforms: List<String>
+private val AndroidXExtension.publishPlatforms: List<String>
     get() {
         val declaredTargets = project.multiplatformExtension?.targets?.asMap?.keys?.map {
             it.lowercase()
         } ?: emptySet()
-        return publishPlatforms.intersect(declaredTargets.toSet()).toList()
+        return declaredTargets.toList()
     }
 
 /**
