@@ -74,14 +74,10 @@ private class LazyListItemProviderImpl(
     LazyLayoutItemProvider by LazyLayoutItemProvider(
         intervals = intervals,
         nearestItemsRange = nearestItemsRange,
-        itemContent = itemContentProvider(itemScope)
+        itemContent = { interval: LazyListIntervalContent, index: Int ->
+            interval.item.invoke(itemScope, index)
+        }
     )
-
-// Workaround for compiler crash
-private fun itemContentProvider(itemScope: LazyItemScope) =
-    @Composable { interval: LazyListIntervalContent, index: Int ->
-        interval.item.invoke(itemScope, index)
-    }
 
 /**
  * We use the idea of sliding window as an optimization, so user can scroll up to this number of
