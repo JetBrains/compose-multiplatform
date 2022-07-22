@@ -169,7 +169,8 @@ void computeInlineRanges(
     InlineRange *ranges = nullptr;
     for (int i=0; i<variableCount; i++) {
         jvmtiLocalVariableEntry *variable = &variables[i];
-        if (strncmp("$i$f$", variable->name, 5) == 0) {
+        char* name = variable->name;
+        if (name != nullptr && strncmp("$i$f$", name, 5) == 0) {
             if (ranges == nullptr) {
                 jvmti->Allocate(sizeof(InlineRange) * (variableCount-i), (unsigned char **)&ranges);
             }
