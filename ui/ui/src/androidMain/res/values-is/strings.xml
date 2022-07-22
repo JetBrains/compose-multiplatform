@@ -17,7 +17,8 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="indeterminate" msgid="2486394087603402002">"Hvorki merkt né afmerkt"</string>
+    <!-- no translation found for indeterminate (7933458017204019916) -->
+    <skip />
     <string name="on" msgid="8655164131929253426">"Kveikt"</string>
     <string name="off" msgid="875452955155264703">"Slökkt"</string>
     <string name="selected" msgid="6043586758067023">"Valið"</string>
