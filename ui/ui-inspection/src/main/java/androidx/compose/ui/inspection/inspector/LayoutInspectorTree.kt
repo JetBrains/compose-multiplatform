@@ -553,13 +553,10 @@ class LayoutInspectorTree {
                 .flatMap { config -> config.map { RawParameter(it.key.name, it.value) } }
         )
 
-        node.mergedSemantics.addAll(
-            modifierInfo.asSequence()
-                .map { it.modifier }
-                .filterIsInstance<SemanticsModifier>()
-                .map { it.id }
-                .flatMap { semanticsMap[it].orEmpty() }
-        )
+        val mergedSemantics = semanticsMap.get(layoutInfo.semanticsId)
+        if (mergedSemantics != null) {
+            node.mergedSemantics.addAll(mergedSemantics)
+        }
 
         node.id = modifierInfo.asSequence()
             .map { it.extra }

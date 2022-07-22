@@ -1335,7 +1335,6 @@ class LayoutNodeTest {
     fun hitTestSemantics_pointerInMinimumTouchTarget_pointerInputFilterHit() {
         val semanticsConfiguration = SemanticsConfiguration()
         val semanticsModifier = object : SemanticsModifier {
-            override val id: Int = 1
             override val semanticsConfiguration: SemanticsConfiguration = semanticsConfiguration
         }
         val layoutNode =
@@ -1358,7 +1357,6 @@ class LayoutNodeTest {
     fun hitTestSemantics_pointerInMinimumTouchTarget_pointerInputFilterHit_nestedNodes() {
         val semanticsConfiguration = SemanticsConfiguration()
         val semanticsModifier = object : SemanticsModifier {
-            override val id: Int = 1
             override val semanticsConfiguration: SemanticsConfiguration = semanticsConfiguration
         }
         val outerNode = LayoutNode(0, 0, 1, 1).apply { attach(MockOwner()) }
@@ -1377,11 +1375,9 @@ class LayoutNodeTest {
     fun hitTestSemantics_pointerInMinimumTouchTarget_closestHit() {
         val semanticsConfiguration = SemanticsConfiguration()
         val semanticsModifier1 = object : SemanticsModifier {
-            override val id: Int = 1
             override val semanticsConfiguration: SemanticsConfiguration = semanticsConfiguration
         }
         val semanticsModifier2 = object : SemanticsModifier {
-            override val id: Int = 1
             override val semanticsConfiguration: SemanticsConfiguration = semanticsConfiguration
         }
         val layoutNode1 = LayoutNode(0, 0, 5, 5, semanticsModifier1, DpSize(48.dp, 48.dp))
@@ -1439,11 +1435,9 @@ class LayoutNodeTest {
     fun hitTestSemantics_pointerInMinimumTouchTarget_closestHitWithOverlap() {
         val semanticsConfiguration = SemanticsConfiguration()
         val semanticsModifier1 = object : SemanticsModifier {
-            override val id: Int = 1
             override val semanticsConfiguration: SemanticsConfiguration = semanticsConfiguration
         }
         val semanticsModifier2 = object : SemanticsModifier {
-            override val id: Int = 1
             override val semanticsConfiguration: SemanticsConfiguration = semanticsConfiguration
         }
         val layoutNode1 = LayoutNode(0, 0, 5, 5, semanticsModifier1, DpSize(48.dp, 48.dp))

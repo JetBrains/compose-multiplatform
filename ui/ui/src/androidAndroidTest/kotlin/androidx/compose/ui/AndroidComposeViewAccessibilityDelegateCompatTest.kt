@@ -904,7 +904,6 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         val nodes = SemanticsOwner(
             LayoutNode().also {
                 it.modifier = SemanticsModifierCore(
-                    id = SemanticsModifierCore.generateSemanticsId(),
                     mergeDescendants = false,
                     clearAndSetSemantics = false,
                     properties = {}
@@ -1264,9 +1263,9 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         mergeDescendants: Boolean,
         properties: (SemanticsPropertyReceiver.() -> Unit)
     ): SemanticsNode {
-        val semanticsModifier = SemanticsModifierCore(id, mergeDescendants, false, properties)
+        val semanticsModifier = SemanticsModifierCore(mergeDescendants, false, properties)
         return SemanticsNode(
-            SemanticsEntity(InnerPlaceable(LayoutNode()), semanticsModifier),
+            SemanticsEntity(InnerPlaceable(LayoutNode(semanticsId = id)), semanticsModifier),
             true
         )
     }

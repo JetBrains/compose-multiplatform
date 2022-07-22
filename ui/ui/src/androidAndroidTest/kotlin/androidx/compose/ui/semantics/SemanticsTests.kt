@@ -70,7 +70,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
 import kotlin.math.max
 
 @MediumTest
@@ -91,16 +90,6 @@ class SemanticsTests {
         isDebugInspectorInfoEnabled = false
     }
 
-    private fun executeUpdateBlocking(updateFunction: () -> Unit) {
-        val latch = CountDownLatch(1)
-        rule.runOnUiThread {
-            updateFunction()
-            latch.countDown()
-        }
-
-        latch.await()
-    }
-
     @Test
     fun unchangedSemanticsDoesNotCauseRelayout() {
         val layoutCounter = Counter(0)
@@ -115,6 +104,22 @@ class SemanticsTests {
         rule.runOnIdle { recomposeForcer.value++ }
 
         rule.runOnIdle { assertEquals(1, layoutCounter.count) }
+    }
+
+    @Test
+    fun valueSemanticsAreEqual() {
+        assertEquals(
+            Modifier.semantics {
+                text = AnnotatedString("text")
+                contentDescription = "foo"
+                popup()
+            },
+            Modifier.semantics {
+                text = AnnotatedString("text")
+                contentDescription = "foo"
+                popup()
+            }
+        )
     }
 
     @Test
@@ -533,6 +538,12 @@ class SemanticsTests {
 
         val isAfter = mutableStateOf(false)
 
+        val content: @Composable () -> Unit = {
+            SimpleTestLayout {
+                nodeCount++
+            }
+        }
+
         rule.setContent {
             SimpleTestLayout(
                 Modifier.testTag(TestTag).semantics {
@@ -543,12 +554,9 @@ class SemanticsTests {
                             return@onClick true
                         }
                     )
-                }
-            ) {
-                SimpleTestLayout {
-                    nodeCount++
-                }
-            }
+                },
+                content = content
+            )
         }
 
         // This isn't the important part, just makes sure everything is behaving as expected

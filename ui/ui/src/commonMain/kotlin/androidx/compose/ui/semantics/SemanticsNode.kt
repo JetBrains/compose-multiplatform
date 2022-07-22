@@ -64,7 +64,6 @@ class SemanticsNode internal constructor(
     private var fakeNodeParent: SemanticsNode? = null
 
     internal val unmergedConfig = outerSemanticsEntity.collapsedSemanticsConfiguration()
-    val id: Int = outerSemanticsEntity.modifier.id
 
     /**
      * The [LayoutInfo] that this is associated with.
@@ -80,6 +79,8 @@ class SemanticsNode internal constructor(
      * The [LayoutNode] that this is associated with.
      */
     internal val layoutNode: LayoutNode = outerSemanticsEntity.layoutNode
+
+    val id: Int = layoutNode.semanticsId
 
     // GEOMETRY
 
@@ -379,9 +380,12 @@ class SemanticsNode internal constructor(
     ): SemanticsNode {
         val fakeNode = SemanticsNode(
             outerSemanticsEntity = SemanticsEntity(
-                wrapped = LayoutNode(isVirtual = true).innerLayoutNodeWrapper,
+                wrapped = LayoutNode(
+                    isVirtual = true,
+                    semanticsId =
+                        if (role != null) roleFakeNodeId() else contentDescriptionFakeNodeId()
+                ).innerLayoutNodeWrapper,
                 modifier = SemanticsModifierCore(
-                    if (role != null) this.roleFakeNodeId() else contentDescriptionFakeNodeId(),
                     mergeDescendants = false,
                     clearAndSetSemantics = false,
                     properties = properties
