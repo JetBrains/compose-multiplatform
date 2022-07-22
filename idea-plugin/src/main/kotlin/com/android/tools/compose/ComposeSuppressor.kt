@@ -13,29 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jetbrains.compose.inspections
+package com.android.tools.compose
 
+import com.android.tools.idea.flags.StudioFlags
 import com.intellij.codeInspection.InspectionSuppressor
 import com.intellij.codeInspection.SuppressQuickFix
 import com.intellij.psi.PsiElement
-import org.jetbrains.compose.desktop.ide.preview.isComposableFunction
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.lexer.KtTokens
-import org.jetbrains.kotlin.psi.KtNamedFunction
 
 /**
  * Suppress inspection that require composable function names to start with a lower case letter.
  */
 class ComposeSuppressor : InspectionSuppressor {
-    override fun isSuppressedFor(element: PsiElement, toolId: String): Boolean {
-        return toolId == "FunctionName" &&
-                element.language == KotlinLanguage.INSTANCE &&
-                element.node.elementType == KtTokens.IDENTIFIER &&
-                element.parent.let { it is KtNamedFunction && it.isComposableFunction() }
-    }
+  override fun isSuppressedFor(element: PsiElement, toolId: String): Boolean {
+    return StudioFlags.COMPOSE_EDITOR_SUPPORT.get() &&
+           toolId == "FunctionName" &&
+           element.language == KotlinLanguage.INSTANCE &&
+           element.node.elementType == KtTokens.IDENTIFIER &&
+           element.parent.isComposableFunction()
+  }
 
-    override fun getSuppressActions(element: PsiElement?, toolId: String): Array<SuppressQuickFix> {
-        return SuppressQuickFix.EMPTY_ARRAY
-    }
+  override fun getSuppressActions(element: PsiElement?, toolId: String): Array<SuppressQuickFix> {
+    return SuppressQuickFix.EMPTY_ARRAY
+  }
 }
 

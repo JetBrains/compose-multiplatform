@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.5.10"
-    id("org.jetbrains.intellij") version "1.12.0"
+    id("org.jetbrains.kotlin.jvm") version "1.8.10"
+    id("org.jetbrains.intellij") version "1.13.3"
     id("org.jetbrains.changelog") version "1.3.1"
 }
 
@@ -12,18 +12,30 @@ val projectProperties = ProjectProperties(project)
 group = "org.jetbrains.compose.desktop.ide"
 version = projectProperties.deployVersion
 
+sourceSets {
+    main {
+        java.srcDir("src/main/kotlin")
+    }
+}
+
 repositories {
     mavenCentral()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 dependencies {
     implementation("org.jetbrains.compose:preview-rpc")
+    implementation("org.jetbrains.compose.compiler:compiler-hosted:1.4.0")
 }
 
 intellij {
     pluginName.set("Compose Multiplatform IDE Support")
     type.set(projectProperties.platformType)
-    version.set(projectProperties.platformVersion)
+    if (projectProperties.platformVersion == "local") {
+        localPath.set(projectProperties.platformPath)   
+    } else {
+        version.set(projectProperties.platformVersion)
+    }
     downloadSources.set(projectProperties.platformDownloadSources)
     updateSinceUntilBuild.set(false)
 
@@ -42,18 +54,22 @@ tasks.buildSearchableOptions {
 }
 
 tasks {
-    // Set the compatibility versions to 1.8
     withType<JavaCompile> {
-        sourceCompatibility = "11"
-        targetCompatibility = "11"
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
     }
     withType<KotlinJvmCompile> {
-        kotlinOptions.jvmTarget = "11"
+        kotlinOptions.jvmTarget = "17"
+        kotlinOptions.freeCompilerArgs += listOf("-Xopt-in=org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction")
     }
 
     publishPlugin {
         token.set(System.getenv("IDE_PLUGIN_PUBLISH_TOKEN"))
         channels.set(projectProperties.pluginChannels)
+    }
+    
+    runIde {
+        maxHeapSize = "2g"
     }
 
     runPluginVerifier {
@@ -65,12 +81,13 @@ class ProjectProperties(private val project: Project) {
     val deployVersion get() = stringProperty("deploy.version")
     val platformType get() = stringProperty("platform.type")
     val platformVersion get() = stringProperty("platform.version")
+    val platformPath get() = stringProperty("platform.path")
     val platformDownloadSources get() = stringProperty("platform.download.sources").toBoolean()
     val pluginChannels get() = listProperty("plugin.channels")
     val pluginVerifierIdeVersions get() = listProperty("plugin.verifier.ide.versions")
 
     private fun stringProperty(key: String): String =
-        project.findProperty(key)!!.toString()
+        project.findProperty(key)?.toString() ?: error("Cannot find property $key")
     private fun listProperty(key: String): List<String> =
         stringProperty(key).split(",").map { it.trim() }
 }
