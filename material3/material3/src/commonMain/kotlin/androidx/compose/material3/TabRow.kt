@@ -134,7 +134,7 @@ fun TabRow(
         )
     },
     divider: @Composable () -> Unit = @Composable {
-        TabRowDefaults.Divider()
+        Divider()
     },
     tabs: @Composable () -> Unit
 ) {
@@ -223,7 +223,7 @@ fun ScrollableTabRow(
         )
     },
     divider: @Composable () -> Unit = @Composable {
-        TabRowDefaults.Divider()
+        Divider()
     },
     tabs: @Composable () -> Unit
 ) {
@@ -349,25 +349,6 @@ object TabRowDefaults {
     /** Default content color of a tab row. */
     val contentColor: Color @Composable get() =
         PrimaryNavigationTabTokens.ActiveLabelTextColor.toColor()
-
-    /**
-     * Default [Divider], which will be positioned at the bottom of the [TabRow], underneath the
-     * indicator.
-     *
-     * @param modifier modifier for the divider's layout
-     * @param thickness thickness of the divider
-     * @param color color of the divider
-     */
-    @Composable
-    fun Divider(
-        modifier: Modifier = Modifier,
-        thickness: Dp = PrimaryNavigationTabTokens.DividerHeight,
-        color: Color =
-            MaterialTheme.colorScheme.fromToken(PrimaryNavigationTabTokens.DividerColor)
-    ) {
-        androidx.compose.material3.Divider(
-            modifier = modifier, thickness = thickness, color = color)
-    }
 
     /**
      * Default indicator, which will be positioned at the bottom of the [TabRow], on top of the
