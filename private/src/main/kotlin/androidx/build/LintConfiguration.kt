@@ -216,6 +216,9 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
             fatal.add("VisibleForTests")
         }
 
+        // Reenable after b/238892319 is resolved
+        disable.add("NotificationPermission")
+
         // Broken in 7.4.0-alpha04 due to b/236262744
         disable.add("CustomPermissionTypo")
         disable.add("KnownPermissionError")
