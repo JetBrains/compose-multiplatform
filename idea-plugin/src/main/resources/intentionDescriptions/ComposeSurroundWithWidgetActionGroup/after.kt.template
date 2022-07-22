@@ -1,0 +1,8 @@
+@Composable
+fun NewsStory() {
+    Container {
+        Text("A day in Shark Fin Cove")
+        Text("Davenport, California")
+        Text("December 2018")
+    }
+}

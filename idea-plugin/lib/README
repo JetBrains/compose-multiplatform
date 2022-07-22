@@ -1,0 +1,3 @@
+compiler-hosted-1.1.0-SNAPSHOT.jar
+ -This file comes form https://androidx.dev/snapshots/builds/7722085/artifacts
+ -It is meant to be a temporary solution until we figure out how to bundle compose-compiler in Studio properly.

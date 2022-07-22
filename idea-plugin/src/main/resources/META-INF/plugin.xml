@@ -7,8 +7,6 @@
         IDE support for developing
         <a href="https://www.jetbrains.com/lp/compose/">Compose for Desktop</a>
         applications.
-        The main feature at the moment is IDE preview of composable functions
-        marked by @Preview annotation.
         ]]>
 
     </description>
@@ -20,7 +18,105 @@
     <depends>com.intellij.gradle</depends>
     <depends>org.jetbrains.kotlin</depends>
 
+    <extensions defaultExtensionNs="org.jetbrains.kotlin">
+        <storageComponentContainerContributor implementation="com.android.tools.compose.ComposableCallChecker"/>
+        <storageComponentContainerContributor implementation="com.android.tools.compose.ComposableDeclarationChecker"/>
+        <diagnosticSuppressor implementation="com.android.tools.compose.ComposeDiagnosticSuppressor"/>
+        <quickFixContributor implementation="com.android.tools.compose.intentions.ComposeDelegateStateImportFixContributor"/>
+        <quickFixContributor implementation="com.android.tools.compose.intentions.ComposeUnresolvedFunctionFixContributor"/>
+        <additionalExtractableAnalyser implementation="com.android.tools.compose.ComposableFunctionExtractableAnalyser"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="org.jetbrains.kotlin.extensions.internal">
+        <typeResolutionInterceptorExtension implementation="com.android.tools.compose.ComposePluginTypeResolutionInterceptorExtension"/>
+    </extensions>
+
     <extensions defaultExtensionNs="com.intellij">
+        <dependencySupport coordinate="androidx.compose.runtime:runtime" kind="java" displayName="Jetpack Compose"/>
+
+        <annotator
+                language="kotlin"
+                implementationClass="com.android.tools.compose.ComposableAnnotator"/>
+        <additionalTextAttributes scheme="Default" file="colorschemes/IdeComposableAnnotatorColorSchemeDefault.xml"/>
+        <colorSettingsPage implementation="com.android.tools.compose.ComposeColorSettingsPage"/>
+
+        <intentionAction>
+            <className>com.android.tools.compose.intentions.ComposeSurroundWithWidgetActionGroup</className>
+            <category>Compose Desktop</category>
+        </intentionAction>
+
+        <intentionAction>
+            <className>com.android.tools.compose.intentions.ComposeCreatePreviewAction</className>
+            <category>Compose Desktop</category>
+        </intentionAction>
+
+        <intentionAction>
+            <className>com.android.tools.compose.intentions.ComposeUnwrapAction</className>
+            <category>Compose Desktop</category>
+        </intentionAction>
+
+        <intentionAction>
+            <className>com.android.tools.compose.intentions.ComposeWrapModifiersAction</className>
+            <category>Compose Desktop</category>
+        </intentionAction>
+
+        <lang.foldingBuilder language="kotlin" implementationClass="com.android.tools.compose.ComposeFoldingBuilder"/>
+
+        <codeCompletionConfigurable instance="com.android.tools.compose.ComposeCodeCompletionConfigurable"/>
+        <codeStyleSettingsProvider implementation="com.android.tools.compose.settings.ComposeFormattingCodeStyleSettingsProvider"/>
+
+        <completion.contributor language="kotlin"
+                                id="ComposeCompletionContributor"
+                                implementationClass="com.android.tools.compose.code.completion.ComposeCompletionContributor"
+                                order="first, before KotlinCompletionContributor"/>
+
+        <completion.contributor language="kotlin"
+                                id="ComposeAlignmentCompletionContributor"
+                                implementationClass="com.android.tools.compose.code.completion.ComposeImplementationsCompletionContributor"
+                                order="first, before KotlinCompletionContributor"/>
+
+        <completion.contributor language="kotlin"
+                                implementationClass="com.android.tools.compose.code.completion.ComposeModifierCompletionContributor"
+                                order="first, before ComposeCompletionContributor"/>
+        <completion.contributor language="JSON"
+                                id="MotionSceneCompletionContributor"
+                                implementationClass="com.android.tools.compose.code.completion.constraintlayout.ConstraintLayoutJsonCompletionContributor"
+                                order="first, before JsonCompletionContributor"/>
+
+        <weigher key="completion"
+                 implementationClass="com.android.tools.compose.code.completion.ComposeCompletionWeigher"
+                 id="android.compose"
+                 order="first"/>
+
+        <lang.inspectionSuppressor language="kotlin" implementationClass="com.android.tools.compose.ComposeSuppressor"/>
+
+        <postFormatProcessor implementation="com.android.tools.compose.formatting.ComposePostFormatProcessor"/>
+
+        <automaticRenamerFactory implementation="com.android.tools.compose.ComposableElementAutomaticRenamerFactory"/>
+
+        <debugger.positionManagerFactory implementation="com.android.tools.compose.debug.ComposePositionManagerFactory"/>
+        <debuggerClassFilterProvider implementation="com.android.tools.compose.debug.ComposeDebuggerClassesFilterProvider"/>
+        <xdebugger.settings implementation="com.android.tools.compose.debug.ComposeDebuggerSettings"/>
+        <debugger.compoundRendererProvider id="SnapshotMutableStateImplRenderer"
+                                           implementation="com.android.tools.compose.debug.render.SnapshotMutableStateImplRendererProvider"
+                                           order="first"/>
+
+        <debugger.compoundRendererProvider id="DerivedSnapshotStateRenderer"
+                                           implementation="com.android.tools.compose.debug.render.DerivedSnapshotStateRendererProvider"
+                                           order="first"/>
+
+        <debugger.compoundRendererProvider id="ComposeStateObjectListRenderer"
+                                           implementation="com.android.tools.compose.debug.render.ComposeStateObjectListRendererProvider"
+                                           order="first"/>
+
+        <debugger.compoundRendererProvider id="ComposeStateObjectMapRenderer"
+                                           implementation="com.android.tools.compose.debug.render.ComposeStateObjectMapRendererProvider"
+                                           order="first"/>
+
+        <debugger.compoundRendererProvider id="KotlinMapEntryRenderer"
+                                           implementation="com.android.tools.compose.debug.render.KotlinMapEntryRenderer"
+                                           order="first"/>
+        
         <runLineMarkerContributor
                 language="kotlin"
                 implementationClass="org.jetbrains.compose.desktop.ide.preview.PreviewRunLineMarkerContributor"/>
@@ -36,9 +132,7 @@
                 factoryClass="org.jetbrains.compose.desktop.ide.preview.PreviewToolWindow"
                 id="Desktop Preview" doNotActivateOnStart="true"
                 anchor="right" />
-
-        <lang.inspectionSuppressor language="kotlin" implementationClass="org.jetbrains.compose.inspections.ComposeSuppressor"/>
-
+        
         <notificationGroup id="Compose MPP Notifications" displayType="BALLOON"/>
 
         <editorFloatingToolbarProvider implementation="org.jetbrains.compose.desktop.ide.preview.PreviewFloatingToolbarProvider"/>

@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
 
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.5.10"
-    id("org.jetbrains.intellij") version "1.6.0"
+    id("org.jetbrains.kotlin.jvm") version "1.6.21"
+    id("org.jetbrains.intellij") version "1.7.0"
     id("org.jetbrains.changelog") version "1.3.1"
 }
 
@@ -18,6 +18,7 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.compose:preview-rpc")
+    implementation(files("lib/compiler-hosted-1.1.0-SNAPSHOT.jar"))
 }
 
 intellij {
@@ -47,7 +48,7 @@ tasks {
         targetCompatibility = "1.8"
     }
     withType<KotlinJvmCompile> {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
     }
 
     publishPlugin {
@@ -58,6 +59,10 @@ tasks {
     patchPluginXml {
         sinceBuild.set(projectProperties.pluginSinceBuild)
         untilBuild.set(projectProperties.pluginUntilBuild)
+    }
+    
+    runIde {
+        maxHeapSize = "2g"
     }
 
     runPluginVerifier {

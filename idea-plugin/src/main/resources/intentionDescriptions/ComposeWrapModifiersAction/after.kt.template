@@ -1,0 +1,7 @@
+@Composable
+fun NewsStory() {
+    Modifier
+        .padding(padding)
+        .clickable(onClick = onClick)
+        .fillMaxWidth()
+}
