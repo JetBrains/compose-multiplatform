@@ -19,8 +19,10 @@
 
 package androidx.compose.integration.docs.tooling
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -61,6 +63,45 @@ private fun ToolingSnippetLocalInspectionMode() {
     } else {
         // Show this text in the app:
         Text("Hello $name!")
+    }
+}
+
+private class ToolingSnippetMultipreviewDefinition {
+    @Preview(
+        name = "small font",
+        group = "font scales",
+        fontScale = 0.5f
+    )
+    @Preview(
+        name = "large font",
+        group = "font scales",
+        fontScale = 1.5f
+    )
+    annotation class FontScalePreviews
+}
+
+private class ToolingSnippetMultipreviewUsage {
+    @FontScalePreviews
+    @Composable
+    fun HelloWorldPreview() {
+        Text("Hello World")
+    }
+}
+
+private class ToolingSnippetMultipreviewCombine {
+    @Preview(
+        name = "dark theme",
+        group = "themes",
+        uiMode = UI_MODE_NIGHT_YES
+    )
+    @FontScalePreviews
+    @DevicePreviews
+    annotation class CompletePreviews
+
+    @CompletePreviews
+    @Composable
+    fun HelloWorldPreview() {
+        MyTheme { Surface { Text("Hello world") } }
     }
 }
 
@@ -145,6 +186,12 @@ private object R {
         const val greetings = 1
     }
 }
+
+private annotation class FontScalePreviews
+private annotation class DevicePreviews
+
+@Composable
+private fun MyTheme(content: @Composable () -> Unit) {}
 
 /*
  * Fakes needed for snippets to build:
