@@ -16,8 +16,8 @@
 package com.android.tools.compose.code.completion
 
 import com.android.tools.compose.ComposeLibraryNamespace
-import com.android.tools.compose.isComposeEnabled
 import com.android.tools.idea.flags.StudioFlags
+import com.android.tools.modules.*
 import com.intellij.codeInsight.completion.CompletionContributor
 import com.intellij.codeInsight.completion.CompletionInitializationContext
 import com.intellij.codeInsight.completion.CompletionParameters
@@ -95,7 +95,7 @@ class ComposeModifierCompletionContributor : CompletionContributor() {
 
   override fun fillCompletionVariants(parameters: CompletionParameters, resultSet: CompletionResultSet) {
     val element = parameters.position
-    if (!StudioFlags.COMPOSE_EDITOR_SUPPORT.get() || !isComposeEnabled(element) || parameters.originalFile !is KtFile) {
+    if (!StudioFlags.COMPOSE_EDITOR_SUPPORT.get() || !element.inComposeModule() || parameters.originalFile !is KtFile) {
       return
     }
 
@@ -241,8 +241,8 @@ class ComposeModifierCompletionContributor : CompletionContributor() {
     val elementOnWhichMethodCalled: KtExpression = parent.safeAs<KtNameReferenceExpression>()?.getReceiverExpression() ?: return false
     // Case Modifier.align().%this%, modifier.%this%
     val fqName = elementOnWhichMethodCalled.resolveToCall(BodyResolveMode.PARTIAL)?.getReturnType()?.fqName ?:
-    // Case Modifier.%this%
-    elementOnWhichMethodCalled.safeAs<KtNameReferenceExpression>()?.resolve().safeAs<KtClass>()?.fqName
+                 // Case Modifier.%this%
+                 elementOnWhichMethodCalled.safeAs<KtNameReferenceExpression>()?.resolve().safeAs<KtClass>()?.fqName
     return fqName?.asString() == modifierFqName
   }
 

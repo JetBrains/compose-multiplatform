@@ -15,22 +15,27 @@
  */
 package com.android.tools.compose.debug
 
-import com.intellij.debugger.*
-import com.intellij.debugger.engine.*
-import com.intellij.debugger.engine.evaluation.*
-import com.intellij.debugger.jdi.*
-import com.intellij.debugger.requests.*
-import com.intellij.openapi.application.*
-import com.intellij.openapi.fileTypes.*
-import com.intellij.util.*
-import com.intellij.xdebugger.frame.*
-import com.sun.jdi.*
-import com.sun.jdi.request.*
-import org.jetbrains.kotlin.fileClasses.*
-import org.jetbrains.kotlin.idea.*
-import org.jetbrains.kotlin.idea.debugger.*
-import org.jetbrains.kotlin.load.kotlin.*
-import org.jetbrains.kotlin.psi.*
+import com.intellij.debugger.MultiRequestPositionManager
+import com.intellij.debugger.NoDataException
+import com.intellij.debugger.SourcePosition
+import com.intellij.debugger.engine.DebugProcess
+import com.intellij.debugger.engine.DebugProcessImpl
+import com.intellij.debugger.engine.PositionManagerWithMultipleStackFrames
+import com.intellij.debugger.engine.evaluation.EvaluationContext
+import com.intellij.debugger.jdi.StackFrameProxyImpl
+import com.intellij.debugger.requests.ClassPrepareRequestor
+import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.fileTypes.FileType
+import com.intellij.util.ThreeState
+import com.intellij.xdebugger.frame.XStackFrame
+import com.sun.jdi.Location
+import com.sun.jdi.ReferenceType
+import com.sun.jdi.request.ClassPrepareRequest
+import org.jetbrains.kotlin.fileClasses.JvmFileClassUtil
+import org.jetbrains.kotlin.idea.KotlinFileType
+import org.jetbrains.kotlin.idea.debugger.KotlinPositionManager
+import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
+import org.jetbrains.kotlin.psi.KtFile
 
 /**
  * A PositionManager capable of setting breakpoints inside of ComposableSingleton lambdas.

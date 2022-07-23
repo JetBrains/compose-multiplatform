@@ -16,6 +16,7 @@
 
 package com.android.tools.compose
 
+import com.android.tools.modules.*
 import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.diagnostics.Diagnostic
@@ -46,7 +47,7 @@ class ComposeDiagnosticSuppressor : DiagnosticSuppressor {
   }
 
   override fun isSuppressed(diagnostic: Diagnostic, bindingContext: BindingContext?): Boolean {
-    if (!isComposeEnabled(diagnostic.psiElement)) return false
+      if (!diagnostic.psiElement.inComposeModule()) return false
     if (diagnostic.factory == Errors.NON_SOURCE_ANNOTATION_ON_INLINED_LAMBDA_EXPRESSION) {
       for (entry in (
         diagnostic.psiElement.parent as KtAnnotatedExpression

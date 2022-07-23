@@ -5,8 +5,23 @@
 
 package com.android.tools.modules
 
-import com.intellij.openapi.module.Module
+import com.android.tools.compose.*
+import com.intellij.openapi.module.*
+import com.intellij.openapi.roots.*
 import com.intellij.psi.*
+import com.intellij.psi.search.*
+import com.intellij.psi.util.*
+import org.jetbrains.kotlin.idea.util.*
 
-fun PsiElement.inComposeModule() = true
-fun Module.isComposeModule() = true
+fun PsiElement.inComposeModule() = module?.isComposeModule() ?: false
+fun Module.isComposeModule(): Boolean {
+    return CachedValuesManager.getManager(project).getCachedValue(this) {
+        val javaPsiFacade = JavaPsiFacade.getInstance(this.project)
+        val value = COMPOSABLE_FQ_NAMES.any {
+            javaPsiFacade.findClass(it, GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(this)) != null
+        }
+        val rootModificationTracker = ProjectRootModificationTracker.getInstance(project)
+        CachedValueProvider.Result.create(value, rootModificationTracker)
+    }
+} 
+    

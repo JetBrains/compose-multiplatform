@@ -28,8 +28,6 @@ import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.supertypes
 
-fun isComposeEnabled(element: PsiElement): Boolean = element.inComposeModule() ?: false
-
 fun isModifierChainLongerThanTwo(element: KtElement): Boolean {
   if (element.getChildrenOfType<KtDotQualifiedExpression>().isNotEmpty()) {
     val fqName = element.resolveToCall(BodyResolveMode.PARTIAL)?.getReturnType()?.fqName?.asString()

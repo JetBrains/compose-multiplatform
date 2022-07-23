@@ -15,6 +15,7 @@
  */
 package com.android.tools.compose
 
+import com.android.tools.modules.*
 import com.intellij.lang.ASTNode
 import com.intellij.lang.folding.CustomFoldingBuilder
 import com.intellij.lang.folding.FoldingDescriptor
@@ -33,7 +34,7 @@ import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
  */
 class ComposeFoldingBuilder : CustomFoldingBuilder() {
   override fun buildLanguageFoldRegions(descriptors: MutableList<FoldingDescriptor>, root: PsiElement, document: Document, quick: Boolean) {
-    if (root !is KtFile || DumbService.isDumb(root.project) || !isComposeEnabled(root)) {
+    if (root !is KtFile || DumbService.isDumb(root.project) || !root.inComposeModule()) {
       return
     }
 

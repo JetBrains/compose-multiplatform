@@ -22,8 +22,8 @@ import com.android.tools.compose.COMPOSE_ARRANGEMENT
 import com.android.tools.compose.COMPOSE_ARRANGEMENT_HORIZONTAL
 import com.android.tools.compose.COMPOSE_ARRANGEMENT_VERTICAL
 import com.android.tools.compose.isClassOrExtendsClass
-import com.android.tools.compose.isComposeEnabled
 import com.android.tools.idea.flags.StudioFlags
+import com.android.tools.modules.*
 import com.intellij.codeInsight.completion.CompletionContributor
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionResultSet
@@ -67,7 +67,7 @@ class ComposeImplementationsCompletionContributor : CompletionContributor() {
 
   override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
     val elementToComplete = parameters.position
-    if (!StudioFlags.COMPOSE_EDITOR_SUPPORT.get() || !isComposeEnabled(elementToComplete) || parameters.originalFile !is KtFile) {
+    if (!StudioFlags.COMPOSE_EDITOR_SUPPORT.get() || !elementToComplete.inComposeModule() || parameters.originalFile !is KtFile) {
       return
     }
     val elementToCompleteTypeFqName = elementToComplete.argumentTypeFqName ?: elementToComplete.propertyTypeFqName

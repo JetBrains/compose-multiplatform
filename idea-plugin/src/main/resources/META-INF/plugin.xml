@@ -25,6 +25,7 @@
         <quickFixContributor implementation="com.android.tools.compose.intentions.ComposeDelegateStateImportFixContributor"/>
         <quickFixContributor implementation="com.android.tools.compose.intentions.ComposeUnresolvedFunctionFixContributor"/>
         <additionalExtractableAnalyser implementation="com.android.tools.compose.ComposableFunctionExtractableAnalyser"/>
+        <irGenerationExtension implementation="com.android.tools.compose.ComposePluginIrGenerationExtension"/>
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.kotlin.extensions.internal">

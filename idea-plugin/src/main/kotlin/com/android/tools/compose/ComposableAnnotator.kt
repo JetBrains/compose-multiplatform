@@ -16,6 +16,7 @@
 
 package com.android.tools.compose
 
+import com.android.tools.modules.*
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
@@ -57,10 +58,11 @@ class ComposableAnnotator : Annotator {
         // AnnotationHolder.currentAnnotationSession applies to a single file.
         var canContainComposable = holder.currentAnnotationSession.getUserData(CAN_CONTAIN_COMPOSABLE_KEY)
         if (canContainComposable == null) {
-          // isComposeEnabled doesn't work for library sources, we check all kt library sources files. File check only once on opening.
-            canContainComposable = isComposeEnabled(element) ||
-                                 (element.containingFile.virtualFile != null &&
-                                  ProjectFileIndex.getInstance(element.project).isInLibrarySource(element.containingFile.virtualFile))
+            // isComposeEnabled doesn't work for library sources, we check all kt library sources files. File check only once on opening.
+            canContainComposable = element.inComposeModule() ||
+                    (element.containingFile.virtualFile != null &&
+                            ProjectFileIndex.getInstance(element.project)
+                                .isInLibrarySource(element.containingFile.virtualFile))
             holder.currentAnnotationSession.putUserData(CAN_CONTAIN_COMPOSABLE_KEY, canContainComposable)
         }
 

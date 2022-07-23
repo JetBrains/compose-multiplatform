@@ -15,9 +15,9 @@
  */
 package com.android.tools.compose.formatting
 
-import com.android.tools.compose.isComposeEnabled
 import com.android.tools.compose.isModifierChainLongerThanTwo
 import com.android.tools.compose.settings.ComposeCustomCodeStyleSettings
+import com.android.tools.modules.*
 import com.intellij.application.options.CodeStyle
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.util.TextRange
@@ -42,9 +42,9 @@ class ComposePostFormatProcessor : PostFormatProcessor {
 
   private fun isAvailable(psiElement: PsiElement, settings: CodeStyleSettings): Boolean {
     return psiElement.containingFile is KtFile &&
-           isComposeEnabled(psiElement) &&
-           !DumbService.isDumb(psiElement.project) &&
-           settings.getCustomSettings(ComposeCustomCodeStyleSettings::class.java).USE_CUSTOM_FORMATTING_FOR_MODIFIERS
+            psiElement.inComposeModule() &&
+            !DumbService.isDumb(psiElement.project) &&
+            settings.getCustomSettings(ComposeCustomCodeStyleSettings::class.java).USE_CUSTOM_FORMATTING_FOR_MODIFIERS
   }
 
   override fun processElement(source: PsiElement, settings: CodeStyleSettings): PsiElement {
