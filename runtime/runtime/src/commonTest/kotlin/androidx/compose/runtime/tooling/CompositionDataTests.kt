@@ -232,4 +232,22 @@ class CompositionDataTests {
             }
         }
     }
+
+    @Test
+    fun canFindAGroupInCompositionData() {
+        val slots = SlotTable().also {
+            it.write { writer ->
+                writer.insert {
+                    writer.group(0) {
+                        repeat(10) { index ->
+                            writer.group(100 + index) { }
+                        }
+                    }
+                }
+            }
+        }
+
+        val identity = slots.compositionGroups.first().compositionGroups.drop(5).first().identity
+        assertEquals(identity, slots.find(identity!!)?.identity)
+    }
 }
