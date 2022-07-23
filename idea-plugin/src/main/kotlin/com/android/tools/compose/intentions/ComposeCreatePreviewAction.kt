@@ -19,6 +19,7 @@ import com.android.tools.compose.COMPOSABLE_FQ_NAMES
 import com.android.tools.compose.ComposeBundle
 import com.android.tools.compose.ComposeLibraryNamespace
 import com.android.tools.compose.isComposableAnnotation
+import com.android.tools.compose.fqNameMatches
 import com.android.tools.idea.flags.StudioFlags
 import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.openapi.editor.Editor
