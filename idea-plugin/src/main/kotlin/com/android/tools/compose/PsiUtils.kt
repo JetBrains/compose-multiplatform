@@ -26,12 +26,6 @@ import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.resolve.*
 import org.jetbrains.kotlin.resolve.lazy.*
 
-fun KtAnnotationEntry.fqNameMatches(fqName: String): Boolean {
-  // For inspiration, see IDELightClassGenerationSupport.KtUltraLightSupportImpl.findAnnotation in the Kotlin plugin.
-  val shortName = shortName?.asString() ?: return false
-  return fqName.endsWith(shortName) && fqName == getQualifiedName()
-}
-
 fun KtAnnotationEntry.getQualifiedName(): String? {
   return analyze(BodyResolveMode.PARTIAL).get(BindingContext.ANNOTATION, this)?.fqName?.asString()
 }
@@ -62,11 +56,11 @@ fun PsiElement.isComposableFunction(): Boolean {
   }
 }
 
-fun PsiElement.isComposableAnnotation():Boolean {
-  if (this !is KtAnnotationEntry) return false
-  val fqName = this.getQualifiedName() ?: return false
-  return COMPOSABLE_FQ_NAMES.any { it == fqName }
-}
+fun PsiElement.isComposableAnnotation():Boolean =
+  when (this) {
+      is KtAnnotationEntry -> this.fqNameMatches(COMPOSABLE_FQ_NAMES)
+    else -> false
+  }
 
 fun PsiElement.isInsideComposableCode(): Boolean {
   // TODO: also handle composable lambdas.

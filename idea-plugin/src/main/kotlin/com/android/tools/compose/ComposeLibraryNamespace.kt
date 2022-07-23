@@ -15,9 +15,6 @@
  */
 package com.android.tools.compose
 
-import org.jetbrains.kotlin.name.*
-
-private const val UI_PACKAGE = "androidx.ui"
 private const val COMPOSE_PACKAGE = "androidx.compose.ui"
 
 /** Preview element name */
@@ -45,53 +42,14 @@ val COMPOSABLE_FQ_NAMES = setOf(
 enum class ComposeLibraryNamespace(
   val packageName: String,
   /** Package containing the API preview definitions. Elements here will be referenced by the user. */
-  val apiPreviewPackage: String = "$packageName.tooling.preview",
-  /** Package containing the preview implementation. Elements in this package are for use of tooling only. */
-  val implementationPreviewPackage: String = apiPreviewPackage
+  val apiPreviewPackage: String = "$packageName.tooling.preview"
 ) {
-  ANDROIDX_COMPOSE(COMPOSE_PACKAGE),
-
-  /** New namespace where the API and implementation are split in two separate packages */
-  ANDROIDX_COMPOSE_WITH_API(COMPOSE_PACKAGE, implementationPreviewPackage = "${COMPOSE_PACKAGE}.tooling");
-
-  /**
-   * Name of the `ComposeViewAdapter` object that is used by the preview surface to hold
-   * the previewed `@Composable`s.
-   */
-  val composableAdapterName: String = "$implementationPreviewPackage.ComposeViewAdapter"
+  ANDROIDX_COMPOSE(COMPOSE_PACKAGE);
 
   val composeModifierClassName: String = "$packageName.Modifier"
 
   /** Only composables with this annotations will be rendered to the surface. */
   val previewAnnotationName = "$apiPreviewPackage.$COMPOSE_PREVIEW_ANNOTATION_NAME"
 
-  /** Same as [previewAnnotationName] but in [FqName] form. */
-  val previewAnnotationNameFqName = FqName(previewAnnotationName)
-
-  /** Annotation FQN for `Preview` annotated parameters. */
-  val previewParameterAnnotationName = "$apiPreviewPackage.PreviewParameter"
-
-  /** FqName of @Composable function that loads a string resource. **/
-  val stringResourceFunctionFqName = "$packageName.res.stringResource"
-
-  /** FqName of the Devices class for its corresponding `@Preview` parameter. */
-  val composeDevicesClassName = "$apiPreviewPackage.Devices"
-
-  val previewActivityName = "$implementationPreviewPackage.PreviewActivity"
 }
-
-/** Only composables with this annotations will be rendered to the surface. */
-@JvmField
-val COMPOSE_VIEW_ADAPTER_FQNS = setOf(ComposeLibraryNamespace.ANDROIDX_COMPOSE.composableAdapterName,
-                                      ComposeLibraryNamespace.ANDROIDX_COMPOSE_WITH_API.composableAdapterName)
-
-/** FQNs for the `@Preview` annotation. Only composables with this annotations will be rendered to the surface. */
-@JvmField
-val PREVIEW_ANNOTATION_FQNS = setOf(ComposeLibraryNamespace.ANDROIDX_COMPOSE.previewAnnotationName,
-                                    ComposeLibraryNamespace.ANDROIDX_COMPOSE_WITH_API.previewAnnotationName)
-
-/** Annotations FQNs for `Preview` annotated parameters. */
-@JvmField
-val PREVIEW_PARAMETER_FQNS = setOf(ComposeLibraryNamespace.ANDROIDX_COMPOSE.previewParameterAnnotationName,
-                                   ComposeLibraryNamespace.ANDROIDX_COMPOSE_WITH_API.previewParameterAnnotationName)
 
