@@ -38,7 +38,7 @@ fun NavigationBarSample() {
     NavigationBar {
         items.forEachIndexed { index, item ->
             NavigationBarItem(
-                icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
+                icon = { Icon(Icons.Filled.Favorite, contentDescription = item) },
                 label = { Text(item) },
                 selected = selectedItem == index,
                 onClick = { selectedItem = index }
@@ -55,7 +55,7 @@ fun NavigationBarWithOnlySelectedLabelsSample() {
     NavigationBar {
         items.forEachIndexed { index, item ->
             NavigationBarItem(
-                icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
+                icon = { Icon(Icons.Filled.Favorite, contentDescription = item) },
                 label = { Text(item) },
                 selected = selectedItem == index,
                 onClick = { selectedItem = index },
