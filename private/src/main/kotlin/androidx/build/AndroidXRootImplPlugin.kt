@@ -18,6 +18,7 @@ package androidx.build
 
 import androidx.build.AndroidXImplPlugin.Companion.ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.AndroidXImplPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
+import androidx.build.buildInfo.CreateAggregateLibraryBuildInfoFileTask
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gradle.isRoot
 import androidx.build.license.CheckExternalDependencyLicensesTask

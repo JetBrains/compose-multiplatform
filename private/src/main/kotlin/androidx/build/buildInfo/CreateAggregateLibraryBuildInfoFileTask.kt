@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.build
+package androidx.build.buildInfo
 
+import androidx.build.getDistributionDirectory
 import androidx.build.jetpad.LibraryBuildInfoFile
 import com.google.gson.Gson
 import org.gradle.api.DefaultTask
