@@ -2953,7 +2953,14 @@ internal class ComposerImpl(
                         }
                     }
                 } else {
-                    val nodesToInsert = from.slotTable.collectNodesFrom(from.anchor)
+                    // If the state was already removed from the from table then it will have a
+                    // state recorded in the recomposer, retrieve that now if we can. If not the
+                    // state is still in its original location, recompose over it there.
+                    val resolvedState = parentContext.movableContentStateResolve(from)
+                    val fromTable = resolvedState?.slotTable ?: from.slotTable
+                    val fromAnchor = resolvedState?.slotTable?.anchor(0) ?: from.anchor
+                    val nodesToInsert = fromTable.collectNodesFrom(fromAnchor)
+
                     // Insert nodes if necessary
                     if (nodesToInsert.isNotEmpty()) {
                         record { applier, _, _ ->
@@ -2965,24 +2972,30 @@ internal class ComposerImpl(
                                 applier.insertTopDown(base + i, node)
                             }
                         }
-                        val group = slotTable.anchorIndex(anchor)
-                        updateNodeCount(
-                            group,
-                            updatedNodeCount(group) + nodesToInsert.size
-                        )
+                        if (to.slotTable == slotTable) {
+                            // Inserting the content into the current slot table then we need to
+                            // update the virtual node counts. Otherwise, we are inserting into
+                            // a new slot table which is being created, not updated, so the virtual
+                            // node counts do not need to be updated.
+                            val group = slotTable.anchorIndex(anchor)
+                            updateNodeCount(
+                                group,
+                                updatedNodeCount(group) + nodesToInsert.size
+                            )
+                        }
                     }
 
                     // Copy the slot table into the anchor location
                     record { _, slots, _ ->
-                        val state = parentContext.movableContentStateResolve(from)
+                        val state = resolvedState ?: parentContext.movableContentStateResolve(from)
                             ?: composeRuntimeError("Could not resolve state for movable content")
 
                         // The slot table contains the movable content group plus the group
                         // containing the movable content's table which then contains the actual
                         // state to be inserted. The state is at index 2 in the table (for the
-                        // to groups) and is inserted into the provider group at offset 1 from the
+                        // two groups) and is inserted into the provider group at offset 1 from the
                         // current location.
-                        val anchors = slots.moveIntoGroupFrom(1, state.slotTable, 1)
+                        val anchors = slots.moveIntoGroupFrom(1, state.slotTable, 2)
 
                         // For all the anchors that moved, if the anchor is tracking a recompose
                         // scope, update it to reference its new composer.
@@ -2997,12 +3010,9 @@ internal class ComposerImpl(
                         }
                     }
 
-                    // Recompose over the moved content.
-                    val fromTable = from.slotTable
-
                     fromTable.read { reader ->
                         withReader(reader) {
-                            val newLocation = fromTable.anchorIndex(from.anchor)
+                            val newLocation = fromTable.anchorIndex(fromAnchor)
                             reader.reposition(newLocation)
                             writersReaderDelta = newLocation
                             val offsetChanges = mutableListOf<Change>()
@@ -3457,7 +3467,7 @@ internal class ComposerImpl(
             // another insert. If the nested movable content ends up being removed this is reported
             // during that recomposition so there is no need to look at child movable content here.
             return if (reader.hasMark(group)) {
-                @Suppress("UNCHECKED_CAST")
+                @Suppress("UNCHECKED_CAST") // The mark is only used when this cast is valid.
                 val value = reader.groupObjectKey(group) as MovableContent<Any?>
                 val parameter = reader.groupGet(group, 0)
                 val anchor = reader.anchor(group)
@@ -3479,9 +3489,28 @@ internal class ComposerImpl(
                 record { _, slots, _ ->
                     val slotTable = SlotTable()
 
+                    // Write a table that as if it was written by a calling
+                    // invokeMovableContentLambda because this might be removed from the
+                    // composition before the new composition can be composed to receive it. When
+                    // the new composition receives the state it must recompose over the state by
+                    // calling invokeMovableContentLambda.
                     slotTable.write { writer ->
                         writer.beginInsert()
+
+                        // This is the prefix created by invokeMovableContentLambda
+                        writer.startGroup(movableContentKey, value)
+                        writer.markGroup()
+                        writer.update(parameter)
+
+                        // Move the content into current location
                         slots.moveTo(anchor, 1, writer)
+
+                        // skip the group that was just inserted.
+                        writer.skipGroup()
+
+                        // End the group that represents the call to invokeMovableContentLambda
+                        writer.endGroup()
+
                         writer.endInsert()
                     }
                     val state = MovableContentState(slotTable)

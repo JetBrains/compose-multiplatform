@@ -45,7 +45,9 @@ open class View {
 
     fun addAt(index: Int, view: View) {
         if (view.parent != null) {
-            error("View named $name already has a parent")
+            error(
+                "Inserting a view named ${view.name} already has a parent into a view named $name"
+            )
         }
         view.parent = this
         children.add(index, view)
