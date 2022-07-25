@@ -29,7 +29,7 @@ dependencies {
 
     compileOnly(project(":annotation:annotation-sampled"))
 
-    implementation("androidx.compose.runtime:runtime:1.2.0-rc02")
+    implementation("androidx.compose.runtime:runtime:1.2.0")
     implementation(project(":compose:ui:ui"))
     implementation(project(":compose:ui:ui-unit"))
     implementation(project(":compose:foundation:foundation"))

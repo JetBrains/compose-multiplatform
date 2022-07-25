@@ -39,7 +39,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
         api "androidx.annotation:annotation:1.1.0"
 
-        api("androidx.compose.runtime:runtime:1.2.0-rc02")
+        api("androidx.compose.runtime:runtime:1.2.0")
         api(project(":compose:ui:ui"))
 
         androidTestImplementation project(":compose:ui:ui-test-junit4")
@@ -76,7 +76,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
                 api "androidx.annotation:annotation:1.1.0"
 
-                api("androidx.compose.runtime:runtime:1.2.0-rc02")
+                api("androidx.compose.runtime:runtime:1.2.0")
                 api(project(":compose:ui:ui"))
             }
             jvmMain.dependencies {
