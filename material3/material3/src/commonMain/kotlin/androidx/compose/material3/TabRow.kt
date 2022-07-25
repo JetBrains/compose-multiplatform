@@ -25,8 +25,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
@@ -148,11 +148,19 @@ fun TabRow(
             val tabMeasurables = subcompose(TabSlots.Tabs, tabs)
             val tabCount = tabMeasurables.size
             val tabWidth = (tabRowWidth / tabCount)
-            val tabPlaceables = tabMeasurables.map {
-                it.measure(constraints.copy(minWidth = tabWidth, maxWidth = tabWidth))
+            val tabRowHeight = tabMeasurables.fold(initial = 0) { max, curr ->
+                maxOf(curr.maxIntrinsicHeight(tabWidth), max)
             }
 
-            val tabRowHeight = tabPlaceables.maxByOrNull { it.height }?.height ?: 0
+            val tabPlaceables = tabMeasurables.map {
+                it.measure(
+                    constraints.copy(
+                        minWidth = tabWidth,
+                        maxWidth = tabWidth,
+                        minHeight = tabRowHeight
+                    )
+                )
+            }
 
             val tabPositions = List(tabCount) { index ->
                 TabPosition(tabWidth.toDp() * index, tabWidth.toDp())
@@ -250,16 +258,19 @@ fun ScrollableTabRow(
         ) { constraints ->
             val minTabWidth = ScrollableTabRowMinimumTabWidth.roundToPx()
             val padding = edgePadding.roundToPx()
-            val tabConstraints = constraints.copy(minWidth = minTabWidth)
 
-            val tabPlaceables = subcompose(TabSlots.Tabs, tabs)
+            val tabMeasurables = subcompose(TabSlots.Tabs, tabs)
+
+            val layoutHeight = tabMeasurables.fold(initial = 0) { curr, measurable ->
+                maxOf(curr, measurable.maxIntrinsicHeight(Constraints.Infinity))
+            }
+
+            val tabConstraints = constraints.copy(minWidth = minTabWidth, minHeight = layoutHeight)
+            val tabPlaceables = tabMeasurables
                 .map { it.measure(tabConstraints) }
 
-            var layoutWidth = padding * 2
-            var layoutHeight = 0
-            tabPlaceables.forEach {
-                layoutWidth += it.width
-                layoutHeight = maxOf(layoutHeight, it.height)
+            val layoutWidth = tabPlaceables.fold(initial = padding * 2) { curr, measurable ->
+                curr + measurable.width
             }
 
             // Position the children.
