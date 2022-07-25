@@ -42,18 +42,20 @@ internal fun rememberLazyListItemProvider(
 ): LazyListItemProvider {
     val latestContent = rememberUpdatedState(content)
     val nearestItemsRangeState = rememberLazyNearestItemsRangeState(
-        firstVisibleItemIndex = remember(state) { { state.firstVisibleItemIndex } },
+        firstVisibleItemIndex = { state.firstVisibleItemIndex },
         slidingWindowSize = { NearestItemsSlidingWindowSize },
         extraItemCount = { NearestItemsExtraItemCount }
     )
 
     return remember(nearestItemsRangeState) {
+        val itemScope = LazyItemScopeImpl()
         val itemProviderState = derivedStateOf {
             val listScope = LazyListScopeImpl().apply(latestContent.value)
             LazyListItemProviderImpl(
                 listScope.intervals,
                 nearestItemsRangeState.value,
                 listScope.headerIndexes,
+                itemScope
             )
         }
         object : LazyListItemProvider,
@@ -69,7 +71,7 @@ private class LazyListItemProviderImpl(
     intervals: IntervalList<LazyListIntervalContent>,
     nearestItemsRange: IntRange,
     override val headerIndexes: List<Int>,
-    override val itemScope: LazyItemScopeImpl = LazyItemScopeImpl()
+    override val itemScope: LazyItemScopeImpl
 ) : LazyListItemProvider,
     LazyLayoutItemProvider by LazyLayoutItemProvider(
         intervals = intervals,
