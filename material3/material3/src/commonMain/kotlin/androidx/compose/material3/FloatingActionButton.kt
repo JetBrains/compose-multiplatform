@@ -56,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -305,6 +306,9 @@ fun ExtendedFloatingActionButton(
  *
  * The other extended floating action button overload is for FABs without an icon.
  *
+ * Default content description for accessibility is extended from the extended fabs icon. For custom
+ * behavior, you can provide your own via [Modifier.semantics].
+ *
  * @sample androidx.compose.material3.samples.ExtendedFloatingActionButtonSample
  * @sample androidx.compose.material3.samples.AnimatedExtendedFloatingActionButtonSample
  *
@@ -369,7 +373,7 @@ fun ExtendedFloatingActionButton(
                 enter = ExtendedFabExpandAnimation,
                 exit = ExtendedFabCollapseAnimation,
             ) {
-                Row {
+                Row(Modifier.clearAndSetSemantics {}) {
                     Spacer(Modifier.width(ExtendedFabEndIconPadding))
                     text()
                 }
