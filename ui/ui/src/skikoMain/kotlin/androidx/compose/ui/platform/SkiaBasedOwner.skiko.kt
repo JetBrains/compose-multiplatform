@@ -37,9 +37,11 @@ import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.asComposeCanvas
+import androidx.compose.ui.input.InputMode
 import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.InputModeManagerImpl
 import androidx.compose.ui.input.InputMode.Companion.Keyboard
+import androidx.compose.ui.input.InputMode.Companion.Touch
 import androidx.compose.ui.input.key.Key.Companion.Back
 import androidx.compose.ui.input.key.Key.Companion.DirectionCenter
 import androidx.compose.ui.input.key.Key.Companion.Tab
@@ -132,11 +134,19 @@ internal class SkiaBasedOwner(
     private val _inputModeManager = InputModeManagerImpl(
         initialInputMode = Keyboard,
         onRequestInputModeChange = {
-            // TODO: Change the input mode programmatically. For now we just return true if the
-            //  requested input mode is Keyboard mode.
-            it == Keyboard
+            if (it == Touch || it == Keyboard) {
+                setInputMode(it)
+                true
+            } else {
+                false
+            }
         }
     )
+
+    private fun setInputMode(inputMode: InputMode) {
+        _inputModeManager.inputMode = inputMode
+    }
+
     override val inputModeManager: InputModeManager
         get() = _inputModeManager
 
@@ -149,6 +159,7 @@ internal class SkiaBasedOwner(
             val focusDirection = getFocusDirection(it)
             if (focusDirection == null || it.type != KeyDown) return@KeyInputModifier false
 
+            inputModeManager.requestInputMode(Keyboard)
             // Consume the key event if we moved focus.
             focusManager.moveFocus(focusDirection)
         },
@@ -361,6 +372,9 @@ internal class SkiaBasedOwner(
         event: PointerInputEvent,
         isInBounds: Boolean = true
     ): ProcessResult {
+        if (event.button != null) {
+            inputModeManager.requestInputMode(Touch)
+        }
         return pointerInputEventProcessor.process(
             event,
             this,

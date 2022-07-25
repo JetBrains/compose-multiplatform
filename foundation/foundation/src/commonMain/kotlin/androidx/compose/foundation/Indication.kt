@@ -16,6 +16,8 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.foundation.interaction.FocusInteraction
+import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
@@ -30,7 +32,11 @@ import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.debugInspectorInfo
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 
 /**
  * Indication represents visual effects that occur when certain interactions happens. For
@@ -106,8 +112,18 @@ fun Modifier.indication(
     indication: Indication?
 ) = composed(
     factory = {
+        val inputModeManager = LocalInputModeManager.current
+        val filteredInteractionSource = remember(interactionSource) {
+            // When in Touch mode, skip the Focus interaction - its indication should not be drawn
+            object : InteractionSource {
+                override val interactions: Flow<Interaction> = interactionSource.interactions.filter {
+                    !(inputModeManager.inputMode == InputMode.Touch && it is FocusInteraction.Focus)
+                }
+            }
+        }
+
         val resolvedIndication = indication ?: NoIndication
-        val instance = resolvedIndication.rememberUpdatedInstance(interactionSource)
+        val instance = resolvedIndication.rememberUpdatedInstance(filteredInteractionSource)
         remember(instance) {
             IndicationModifier(instance)
         }

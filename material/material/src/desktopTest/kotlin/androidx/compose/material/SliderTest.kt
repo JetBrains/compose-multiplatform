@@ -29,6 +29,10 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performKeyPress
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.material.internal.keyEvent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performTouchInput
 import kotlin.math.roundToInt
 import org.junit.Assert
 import org.junit.Rule
@@ -261,6 +265,29 @@ class SliderTest {
         rule.onRoot().performKeyPress(keyEvent(Key.Home, KeyEventType.KeyUp))
         rule.runOnIdle {
             Assert.assertEquals(0f, state.value)
+        }
+    }
+
+    @Test
+    fun `Slider should request focus on Tap`() {
+        var hasFocus = false
+        rule.setContent {
+            Slider(
+                value = 0.1f,
+                onValueChange = {},
+                modifier = Modifier.onFocusChanged {
+                    hasFocus = it.isFocused
+                }.testTag("slider")
+            )
+        }
+
+        rule.onNodeWithTag("slider").performTouchInput {
+            down(Offset(10f, 5f))
+            up()
+        }
+
+        rule.runOnIdle {
+            Assert.assertEquals(true, hasFocus)
         }
     }
 }

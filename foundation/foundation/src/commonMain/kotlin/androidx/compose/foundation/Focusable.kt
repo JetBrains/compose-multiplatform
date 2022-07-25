@@ -202,6 +202,8 @@ fun Modifier.focusGroup(): Modifier {
 
 // TODO: b/202856230 - consider either making this / a similar API public, or add a parameter to
 //  focusable to configure this behavior.
+// Consider using Modifier.focusable instead when the goal is only to prevent drawing the Focus indication in Touch mode
+// Modifier.indication prevents drawing the Focus indication in Touch mode under the hood.
 /**
  * [focusable] but only when not in touch mode - when [LocalInputModeManager] is
  * not [InputMode.Touch]

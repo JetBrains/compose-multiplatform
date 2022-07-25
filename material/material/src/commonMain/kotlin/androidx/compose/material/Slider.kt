@@ -70,6 +70,8 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.lerp
 import androidx.compose.ui.graphics.Color
@@ -168,6 +170,7 @@ fun Slider(
     }
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
 
+    val focusRequester = remember { FocusRequester() }
     BoxWithConstraints(
         modifier
             .minimumTouchTargetSize()
@@ -180,6 +183,7 @@ fun Slider(
                 valueRange,
                 steps
             )
+            .focusRequester(focusRequester)
             .focusable(enabled, interactionSource)
             .slideOnKeyEvents(enabled, steps, valueRange, value, isRtl, onValueChangeState)
     ) {
@@ -216,6 +220,7 @@ fun Slider(
         val gestureEndAction = rememberUpdatedState<(Float) -> Unit> { velocity: Float ->
             val current = rawOffset.value
             val target = snapValueToTick(current, tickFractions, minPx, maxPx)
+            focusRequester.requestFocus()
             if (current != target) {
                 scope.launch {
                     animateToTarget(draggableState, current, target, velocity)

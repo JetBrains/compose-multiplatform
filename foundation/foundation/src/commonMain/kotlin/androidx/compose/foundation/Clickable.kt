@@ -32,6 +32,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
@@ -101,6 +103,13 @@ fun Modifier.clickable(
     )
 }
 
+@Composable
+internal fun focusRequesterAndModifier(): Pair<FocusRequester, Modifier> {
+    val focusRequester = remember { FocusRequester() }
+    return focusRequester to Modifier.focusRequester(focusRequester)
+
+}
+
 /**
  * Configure component to receive clicks via input or accessibility "click" event.
  *
@@ -151,6 +160,7 @@ fun Modifier.clickable(
         }
         val centreOffset = remember { mutableStateOf(Offset.Zero) }
 
+        val (focusRequester, focusRequesterModifier) = focusRequesterAndModifier()
         val gesture = Modifier.pointerInput(interactionSource, enabled) {
             centreOffset.value = size.center.toOffset()
             detectTapAndPress(
@@ -164,9 +174,16 @@ fun Modifier.clickable(
                         )
                     }
                 },
-                onTap = { if (enabled) onClickState.value.invoke() }
+                onTap = {
+                    if (enabled) {
+                        focusRequester.requestFocus()
+                        onClickState.value.invoke()
+                    }
+                }
             )
         }
+
+
         Modifier
             .then(
                 remember {
@@ -180,6 +197,7 @@ fun Modifier.clickable(
                     }
                 }
             )
+            .then(focusRequesterModifier)
             .genericClickableWithoutGesture(
                 gestureModifiers = gesture,
                 interactionSource = interactionSource,
@@ -337,17 +355,24 @@ fun Modifier.combinedClickable(
         }
         val centreOffset = remember { mutableStateOf(Offset.Zero) }
 
+        val (focusRequester, focusRequesterModifier) = focusRequesterAndModifier()
         val gesture =
             Modifier.pointerInput(interactionSource, hasLongClick, hasDoubleClick, enabled) {
                 centreOffset.value = size.center.toOffset()
                 detectTapGestures(
                     onDoubleTap = if (hasDoubleClick && enabled) {
-                        { onDoubleClickState.value?.invoke() }
+                        {
+                            focusRequester.requestFocus()
+                            onDoubleClickState.value?.invoke()
+                        }
                     } else {
                         null
                     },
                     onLongPress = if (hasLongClick && enabled) {
-                        { onLongClickState.value?.invoke() }
+                        {
+                            focusRequester.requestFocus()
+                            onLongClickState.value?.invoke()
+                        }
                     } else {
                         null
                     },
@@ -361,7 +386,12 @@ fun Modifier.combinedClickable(
                             )
                         }
                     },
-                    onTap = { if (enabled) onClickState.value.invoke() }
+                    onTap = {
+                        if (enabled) {
+                            focusRequester.requestFocus()
+                            onClickState.value.invoke()
+                        }
+                    }
                 )
             }
         Modifier
@@ -376,7 +406,7 @@ fun Modifier.combinedClickable(
                         }
                     }
                 }
-            )
+            ).then(focusRequesterModifier)
             .genericClickableWithoutGesture(
                 gestureModifiers = gesture,
                 interactionSource = interactionSource,
@@ -560,6 +590,6 @@ internal fun Modifier.genericClickableWithoutGesture(
         .detectPressAndClickFromKey()
         .indication(interactionSource, indication)
         .hoverable(enabled = enabled, interactionSource = interactionSource)
-        .focusableInNonTouchMode(enabled = enabled, interactionSource = interactionSource)
+        .focusable(enabled = enabled, interactionSource = interactionSource)
         .then(gestureModifiers)
 }

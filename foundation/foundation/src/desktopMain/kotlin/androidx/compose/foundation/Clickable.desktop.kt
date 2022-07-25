@@ -125,11 +125,13 @@ fun Modifier.mouseClickable(
         val onClickState = rememberUpdatedState(onClick)
         val centreOffset = remember { mutableStateOf(Offset.Zero) }
         val currentKeyPressInteractions = remember { mutableMapOf<Key, PressInteraction.Press>() }
+        val (focusRequester, focusRequesterModifier) = focusRequesterAndModifier()
         val gesture = if (enabled) {
             Modifier.pointerInput(Unit) {
                 centreOffset.value = size.center.toOffset()
                 detectTapWithContext(
                     onTap = { down, _ ->
+                        focusRequester.requestFocus()
                         onClickState.value.invoke(
                             MouseClickScope(
                                 down.buttons,
@@ -143,6 +145,7 @@ fun Modifier.mouseClickable(
             Modifier
         }
         Modifier
+            .then(focusRequesterModifier)
             .genericClickableWithoutGesture(
                 gestureModifiers = gesture,
                 interactionSource = remember { MutableInteractionSource() },
