@@ -264,16 +264,9 @@ internal class AndroidParagraph(
      * Returns the bounding box as Rect of the character for given character offset. Rect includes
      * the top, bottom, left and right of a character.
      */
-    // TODO:(qqd) Implement RTL case.
     override fun getBoundingBox(offset: Int): Rect {
-        val left = layout.getPrimaryHorizontal(offset)
-        val right = layout.getPrimaryHorizontal(offset + 1)
-
-        val line = layout.getLineForOffset(offset)
-        val top = layout.getLineTop(line)
-        val bottom = layout.getLineBottom(line)
-
-        return Rect(top = top, bottom = bottom, left = left, right = right)
+        val rectF = layout.getBoundingBox(offset)
+        return with(rectF) { Rect(left = left, top = top, right = right, bottom = bottom) }
     }
 
     /**
