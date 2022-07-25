@@ -103,15 +103,6 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
         val createArchiveTask = Release.getGlobalFullZipTask(this)
         buildOnServerTask.dependsOn(createArchiveTask)
 
-        buildOnServerTask.dependsOn(
-            tasks.register(
-                "saveSystemStats",
-                SaveSystemStatsTask::class.java
-            ) { task ->
-                task.outputFile.set(File(project.getDistributionDirectory(), "system_stats.txt"))
-            }
-        )
-
         extra.set("projects", ConcurrentHashMap<String, String>())
         subprojects { project ->
             project.afterEvaluate {
