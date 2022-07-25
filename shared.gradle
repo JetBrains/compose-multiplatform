@@ -53,6 +53,8 @@ dependencies {
         exclude(group:"net.java.dev.msv", module:"xsdlib")
     }
     cacheableApi(libs.androidGradlePluginz)
+    // AGP has removes dependency on json-simple in http://b/239967984, so add explicitly
+    cacheableImplementation(libs.jsonSimple)
     cacheableImplementation(libs.dexMemberList)
     cacheableApi(libs.kotlinGradlePluginz)
     cacheableImplementation(gradleApi())
