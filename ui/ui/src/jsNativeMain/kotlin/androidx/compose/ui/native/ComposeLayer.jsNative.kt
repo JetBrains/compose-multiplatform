@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.focusRect
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.toCompose
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.platform.Platform
@@ -67,11 +68,8 @@ internal class ComposeLayer(
         }
 
         override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
-            println("need scene.sendKeyEvent")
-//            if (isDisposed) return
-//            if (scene.sendKeyEvent(ComposeKeyEvent(event))) {
-////                event.consume()
-//            }
+            if (isDisposed) return
+            scene.sendKeyEvent(KeyEvent(event))
         }
 
         @OptIn(ExperimentalComposeUiApi::class)

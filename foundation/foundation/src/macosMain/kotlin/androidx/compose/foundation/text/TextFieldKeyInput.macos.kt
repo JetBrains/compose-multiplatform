@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,11 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.ui.input.key.KeyEvent
+import org.jetbrains.skiko.*
 
 actual val KeyEvent.isTypedEvent: Boolean
-    get() = TODO("implement native KeyEvent.isTypedEvent")
+    get() = nativeKeyEvent.kind == SkikoKeyboardEventKind.DOWN
+        && nativeKeyEvent.platform?.isPrintable() == true
+
+private fun SkikoPlatformKeyboardEvent.isPrintable(): Boolean =
+    !characters().isNullOrEmpty()

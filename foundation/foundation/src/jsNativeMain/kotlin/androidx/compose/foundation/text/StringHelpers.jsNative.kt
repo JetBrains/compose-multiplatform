@@ -16,12 +16,18 @@
 
 package androidx.compose.foundation.text
 
-import androidx.compose.ui.input.key.KeyEvent
-import org.jetbrains.skiko.*
+private const val MIN_SUPPLEMENTARY_CODE_POINT: Int = 0x10000
 
-actual val KeyEvent.isTypedEvent: Boolean
-    get() = nativeKeyEvent.kind == SkikoKeyboardEventKind.DOWN &&
-        nativeKeyEvent.platform?.isPrintable() == true
+internal actual fun StringBuilder.appendCodePointX(codePoint: Int): StringBuilder = apply {
+    appendCodePoint(codePoint)
+}
 
-private fun SkikoPlatformKeyboardEvent.isPrintable(): Boolean =
-    charCode != 0
+// Copy from https://github.com/JetBrains/kotlin/blob/7cd306950aad852e006715067435a4bbd9cd40d2/kotlin-native/runtime/src/main/kotlin/generated/_StringUppercase.kt#L26
+private fun StringBuilder.appendCodePoint(codePoint: Int) {
+    if (codePoint < MIN_SUPPLEMENTARY_CODE_POINT) {
+        append(codePoint.toChar())
+    } else {
+        append(Char.MIN_HIGH_SURROGATE + ((codePoint - 0x10000) shr 10))
+        append(Char.MIN_LOW_SURROGATE + (codePoint and 0x3ff))
+    }
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.text
 
-internal actual fun StringBuilder.appendCodePointX(codePoint: Int): StringBuilder =
-    TODO("Implement native StringBuilder.appendCodePointX")
-    // TODO: there is an appendCodePoint in K/N stdlib, but it is internal.
-    // this.appendCodePoint(codePoint)
+import androidx.compose.ui.input.key.KeyEvent
+
+actual val KeyEvent.isTypedEvent: Boolean
+    get() = false // on UIKit physical keyboard not handled as text input
