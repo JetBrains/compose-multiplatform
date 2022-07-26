@@ -23,14 +23,25 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.awtEventOrNull
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.input.InputModeManager
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -75,6 +86,7 @@ import java.awt.event.KeyEvent
  * tapping outside the menu's bounds
  * @param offset [DpOffset] to be added to the position of the menu
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Suppress("ModifierParameter")
 @Composable
 fun DropdownMenu(
@@ -102,19 +114,19 @@ fun DropdownMenu(
             transformOriginState.value = calculateTransformOrigin(parentBounds, menuBounds)
         }
 
+        var focusManager: FocusManager? by mutableStateOf(null)
+        var inputModeManager: InputModeManager? by mutableStateOf(null)
         Popup(
             focusable = focusable,
             onDismissRequest = onDismissRequest,
             popupPositionProvider = popupPositionProvider,
             onKeyEvent = {
-                if (it.type == KeyEventType.KeyDown && it.awtEventOrNull?.keyCode == KeyEvent.VK_ESCAPE) {
-                    onDismissRequest()
-                    true
-                } else {
-                    false
-                }
+                handlePopupOnKeyEvent(it, onDismissRequest, focusManager!!, inputModeManager!!)
             },
         ) {
+            focusManager = LocalFocusManager.current
+            inputModeManager = LocalInputModeManager.current
+
             DropdownMenuContent(
                 expandedStates = expandedStates,
                 transformOriginState = transformOriginState,
@@ -160,6 +172,35 @@ fun DropdownMenuItem(
     )
 }
 
+@ExperimentalComposeUiApi
+private fun handlePopupOnKeyEvent(
+    keyEvent: androidx.compose.ui.input.key.KeyEvent,
+    onDismissRequest: () -> Unit,
+    focusManager: FocusManager,
+    inputModeManager: InputModeManager
+): Boolean {
+    return if (keyEvent.type == KeyEventType.KeyDown && keyEvent.awtEventOrNull?.keyCode == KeyEvent.VK_ESCAPE) {
+        onDismissRequest()
+        true
+    } else if (keyEvent.type == KeyEventType.KeyDown) {
+        when (keyEvent.key) {
+            Key.DirectionDown -> {
+                inputModeManager.requestInputMode(InputMode.Keyboard)
+                focusManager.moveFocus(FocusDirection.Next)
+                true
+            }
+            Key.DirectionUp -> {
+                inputModeManager.requestInputMode(InputMode.Keyboard)
+                focusManager.moveFocus(FocusDirection.Previous)
+                true
+            }
+            else -> false
+        }
+    } else {
+        false
+    }
+}
+
 /**
  *
  * A [CursorDropdownMenu] behaves similarly to [Popup] and will use the current position of the mouse
@@ -173,6 +214,7 @@ fun DropdownMenuItem(
  * @param onDismissRequest Called when the user requests to dismiss the menu, such as by
  * tapping outside the menu's bounds
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Suppress("ModifierParameter")
 @Composable
 fun CursorDropdownMenu(
@@ -188,19 +230,20 @@ fun CursorDropdownMenu(
     if (expandedStates.currentState || expandedStates.targetState) {
         val transformOriginState = remember { mutableStateOf(TransformOrigin.Center) }
 
+        var focusManager: FocusManager? by mutableStateOf(null)
+        var inputModeManager: InputModeManager? by mutableStateOf(null)
+
         Popup(
             focusable = focusable,
             onDismissRequest = onDismissRequest,
             popupPositionProvider = rememberCursorPositionProvider(),
             onKeyEvent = {
-                if (it.awtEventOrNull?.keyCode == KeyEvent.VK_ESCAPE) {
-                    onDismissRequest()
-                    true
-                } else {
-                    false
-                }
+                handlePopupOnKeyEvent(it, onDismissRequest, focusManager!!, inputModeManager!!)
             },
         ) {
+            focusManager = LocalFocusManager.current
+            inputModeManager = LocalInputModeManager.current
+
             DropdownMenuContent(
                 expandedStates = expandedStates,
                 transformOriginState = transformOriginState,
@@ -273,3 +316,4 @@ internal data class DesktopDropdownMenuPositionProvider(
         return IntOffset(x, y)
     }
 }
+

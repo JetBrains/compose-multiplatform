@@ -56,6 +56,8 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -76,14 +78,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.pointer.isAltPressed
 import androidx.compose.ui.input.pointer.isCtrlPressed
@@ -95,13 +100,16 @@ import androidx.compose.ui.input.pointer.isTertiaryPressed
 import androidx.compose.ui.input.key.isMetaPressed
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerIconDefaults
 import androidx.compose.ui.input.pointer.isBackPressed
 import androidx.compose.ui.input.pointer.isForwardPressed
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.Placeholder
@@ -482,6 +490,33 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
             value = amount.value / 100f,
             onValueChange = { amount.value = (it * 100) }
         )
+        val dropDownMenuExpanded = remember { mutableStateOf(false) }
+        Button(onClick = { dropDownMenuExpanded.value = true }) {
+            Text("Expand Menu")
+        }
+        DropdownMenu(
+            expanded = dropDownMenuExpanded.value,
+            onDismissRequest = {
+                dropDownMenuExpanded.value = false
+                println("OnDismissRequest")
+            }
+        ) {
+            DropdownMenuItem(modifier = Modifier, onClick = {
+                println("Item 1 clicked")
+            }) {
+                Text("Item 1")
+            }
+            DropdownMenuItem(modifier = Modifier, onClick = {
+                println("Item 2 clicked")
+            }) {
+                Text("Item 2")
+            }
+            DropdownMenuItem(modifier = Modifier, onClick = {
+                println("Item 3 clicked")
+            }) {
+                Text("Item 3")
+            }
+        }
         TextField(
             value = amount.value.toString(),
             onValueChange = { amount.value = it.toFloatOrNull() ?: 42f },
@@ -518,9 +553,9 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
                         else -> false
                     }
                 }.focusRequester(focusItem1)
-                .focusProperties {
-                    next = focusItem2
-                }
+                    .focusProperties {
+                        next = focusItem2
+                    }
             )
         }
 
@@ -558,12 +593,16 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
             )
         }
 
-        Box(modifier = Modifier.size(150.dp).background(Color.Gray).pointerHoverIcon(
-            if (isCtrlPressed.value) PointerIconDefaults.Hand else PointerIconDefaults.Default
-        )) {
-            Box(modifier = Modifier.offset(20.dp, 20.dp).size(100.dp).background(Color.Blue).pointerHoverIcon(
-                if (isCtrlPressed.value) PointerIconDefaults.Crosshair else PointerIconDefaults.Text,
-            )) {
+        Box(
+            modifier = Modifier.size(150.dp).background(Color.Gray).pointerHoverIcon(
+                if (isCtrlPressed.value) PointerIconDefaults.Hand else PointerIconDefaults.Default
+            )
+        ) {
+            Box(
+                modifier = Modifier.offset(20.dp, 20.dp).size(100.dp).background(Color.Blue).pointerHoverIcon(
+                    if (isCtrlPressed.value) PointerIconDefaults.Crosshair else PointerIconDefaults.Text,
+                )
+            ) {
                 Text("pointerHoverIcon test with Ctrl")
             }
         }

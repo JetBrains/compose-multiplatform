@@ -35,13 +35,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
@@ -73,19 +79,38 @@ class DefaultContextMenuRepresentation(
     override fun Representation(state: ContextMenuState, items: List<ContextMenuItem>) {
         val isOpen = state.status is ContextMenuState.Status.Open
         if (isOpen) {
+            var focusManager: FocusManager? by mutableStateOf(null)
+            var inputModeManager: InputModeManager? by mutableStateOf(null)
             Popup(
                 focusable = true,
                 onDismissRequest = { state.status = ContextMenuState.Status.Closed },
                 popupPositionProvider = rememberCursorPositionProvider(),
                 onKeyEvent = {
-                    if (it.type == KeyEventType.KeyDown && it.key == Key.Escape) {
-                        state.status = ContextMenuState.Status.Closed
-                        true
+                    if (it.type == KeyEventType.KeyDown) {
+                        when (it.key) {
+                            Key.Escape -> {
+                                state.status = ContextMenuState.Status.Closed
+                                true
+                            }
+                            Key.DirectionDown -> {
+                                inputModeManager!!.requestInputMode(InputMode.Keyboard)
+                                focusManager!!.moveFocus(FocusDirection.Next)
+                                true
+                            }
+                            Key.DirectionUp -> {
+                                inputModeManager!!.requestInputMode(InputMode.Keyboard)
+                                focusManager!!.moveFocus(FocusDirection.Previous)
+                                true
+                            }
+                            else -> false
+                        }
                     } else {
                         false
                     }
                 },
             ) {
+                focusManager = LocalFocusManager.current
+                inputModeManager = LocalInputModeManager.current
                 Column(
                     modifier = Modifier
                         .shadow(8.dp)

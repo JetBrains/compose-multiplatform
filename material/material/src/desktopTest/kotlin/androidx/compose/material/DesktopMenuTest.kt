@@ -112,4 +112,68 @@ class DesktopMenuTest {
             Assert.assertEquals(1, dismissCount)
         }
     }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    @Test
+    fun `navigate DropDownMenu using arrows`() {
+        var item1Clicked = 0
+        var item2Clicked = 0
+        var item3Clicked = 0
+
+        rule.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
+                DropdownMenu(true, onDismissRequest = {},
+                    modifier = Modifier.testTag("dropDownMenu")) {
+                    DropdownMenuItem({
+                        item1Clicked++
+                    }) { Text("item1") }
+                    DropdownMenuItem({
+                        item2Clicked++
+                    }) { Text("item2") }
+                    DropdownMenuItem({
+                        item3Clicked++
+                    }) { Text("item3") }
+                }
+            }
+        }
+
+        fun performKeyDownAndUp(key: Key) {
+            rule.onNodeWithTag("dropDownMenu").apply {
+                performKeyPress(keyEvent(key, KeyEventType.KeyDown))
+                performKeyPress(keyEvent(key, KeyEventType.KeyUp))
+            }
+        }
+
+        fun assertClicksCount(i1: Int, i2: Int, i3: Int) {
+            rule.runOnIdle {
+                assertThat(item1Clicked).isEqualTo(i1)
+                assertThat(item2Clicked).isEqualTo(i2)
+                assertThat(item3Clicked).isEqualTo(i3)
+            }
+        }
+
+        performKeyDownAndUp(Key.DirectionDown)
+        performKeyDownAndUp(Key.Enter)
+        assertClicksCount(1, 0, 0)
+
+        performKeyDownAndUp(Key.DirectionUp)
+        performKeyDownAndUp(Key.Enter)
+        assertClicksCount(1, 0, 1)
+
+        performKeyDownAndUp(Key.DirectionUp)
+        performKeyDownAndUp(Key.Enter)
+        assertClicksCount(1, 1, 1)
+
+        performKeyDownAndUp(Key.DirectionDown)
+        performKeyDownAndUp(Key.Enter)
+        assertClicksCount(1, 1, 2)
+
+        performKeyDownAndUp(Key.DirectionDown)
+        performKeyDownAndUp(Key.Enter)
+        assertClicksCount(2, 1, 2)
+
+        performKeyDownAndUp(Key.DirectionDown)
+        performKeyDownAndUp(Key.Enter)
+        assertClicksCount(2, 2, 2)
+    }
 }
