@@ -17,7 +17,6 @@
 package androidx.build.dackka
 
 import java.io.File
-import java.io.Serializable
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
@@ -54,30 +53,9 @@ abstract class GenerateMetadataTask : DefaultTask() {
     /**
      * Converts a list of [MetadataEntry] objects into a list of maps.
      */
-    @OptIn(ExperimentalStdlibApi::class)
     private fun generateJsonMapping(
-        metadata: ListProperty<MetadataEntry>
+        metadataEntries: ListProperty<MetadataEntry>
     ): List<Map<String, String>> {
-        return buildList {
-            metadata.get().forEach { entry ->
-                val map = mapOf(
-                    "groupId" to entry.groupId,
-                    "artifactId" to entry.artifactId,
-                    "releaseNotesUrl" to entry.releaseNotesUrl,
-                    "sourceDir" to entry.sourceDir
-                )
-                add(map)
-            }
-        }
+        return metadataEntries.get().map { it.toMap() }
     }
 }
-
-/**
- * Helper data class to store the metadata information for each library/path.
- */
-data class MetadataEntry(
-    val groupId: String,
-    val artifactId: String,
-    val releaseNotesUrl: String,
-    val sourceDir: String,
-) : Serializable
