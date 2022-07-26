@@ -233,7 +233,7 @@ class LazyScrollAccessibilityTest(private val config: TestConfig) {
     private fun verifyNodeInfoScrollActions(expectForward: Boolean, expectBackward: Boolean) {
         val nodeInfo = rule.onNodeWithTag(scrollerTag).withSemanticsNode {
             rule.runOnUiThread {
-                accessibilityNodeProvider.createAccessibilityNodeInfo(id)
+                accessibilityNodeProvider.createAccessibilityNodeInfo(id)!!
             }
         }
 
