@@ -149,75 +149,77 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
     companion object {
         const val TASK_NAME = "createLibraryBuildInfoFiles"
 
-        fun setup(project: Project, extension: AndroidXExtension):
-            TaskProvider<CreateLibraryBuildInfoFileTask> {
-                return project.tasks.register(
-                    TASK_NAME,
-                    CreateLibraryBuildInfoFileTask::class.java
-                ) { task ->
-                    val group = project.group.toString()
-                    val name = project.name.toString()
-                    task.outputFile.set(
-                        File(
-                            project.getBuildInfoDirectory(),
-                            "${group}_${name}_build_info.txt"
-                        )
+        fun setup(
+            project: Project,
+            extension: AndroidXExtension
+        ): TaskProvider<CreateLibraryBuildInfoFileTask> {
+            return project.tasks.register(
+                TASK_NAME,
+                CreateLibraryBuildInfoFileTask::class.java
+            ) { task ->
+                val group = project.group.toString()
+                val name = project.name.toString()
+                task.outputFile.set(
+                    File(
+                        project.getBuildInfoDirectory(),
+                        "${group}_${name}_build_info.txt"
                     )
-                    task.artifactId.set(name)
-                    task.groupId.set(group)
-                    task.version.set(project.version.toString())
-                    task.kotlinVersion.set(project.getKotlinPluginVersion())
-                    task.projectDir.set(
-                        project.projectDir.absolutePath.removePrefix(
-                            project.getSupportRootFolder().absolutePath
-                        )
+                )
+                task.artifactId.set(name)
+                task.groupId.set(group)
+                task.version.set(project.version.toString())
+                task.kotlinVersion.set(project.getKotlinPluginVersion())
+                task.projectDir.set(
+                    project.projectDir.absolutePath.removePrefix(
+                        project.getSupportRootFolder().absolutePath
                     )
-                    task.commit.set(
-                        project.provider {
-                            project.getFrameworksSupportCommitShaAtHead()
-                        }
-                    )
-                    task.groupIdRequiresSameVersion.set(extension.mavenGroup?.requireSameVersion)
-                    task.groupZipPath.set(project.getGroupZipPath())
-                    task.projectZipPath.set(project.getProjectZipPath())
+                )
+                task.commit.set(
+                    project.provider {
+                        project.getFrameworksSupportCommitShaAtHead()
+                    }
+                )
+                task.groupIdRequiresSameVersion.set(extension.mavenGroup?.requireSameVersion)
+                task.groupZipPath.set(project.getGroupZipPath())
+                task.projectZipPath.set(project.getProjectZipPath())
 
-                    // Note:
-                    // `project.projectDir.toString().removePrefix(project.rootDir.toString())`
-                    // does not work because the project rootDir is not guaranteed to be a
-                    // substring of the projectDir
-                    task.projectSpecificDirectory.set(
-                        project.projectDir.absolutePath.removePrefix(
-                            project.getSupportRootFolder().absolutePath
-                        )
+                // Note:
+                // `project.projectDir.toString().removePrefix(project.rootDir.toString())`
+                // does not work because the project rootDir is not guaranteed to be a
+                // substring of the projectDir
+                task.projectSpecificDirectory.set(
+                    project.projectDir.absolutePath.removePrefix(
+                        project.getSupportRootFolder().absolutePath
                     )
-                    task.dependencyList.set(project.provider {
-                        val libraryDependencies = HashSet<LibraryBuildInfoFile.Dependency>()
-                        project.configurations.filter {
-                            it.name == "releaseRuntimeElements"
-                        }.forEach { configuration ->
-                            configuration.allDependencies.forEach { dep ->
-                                // Only consider androidx dependencies
-                                if (dep.group != null &&
-                                    dep.group.toString().startsWith("androidx.") &&
-                                    !dep.group.toString().startsWith("androidx.test")
-                                ) {
-                                    val androidXPublishedDependency =
-                                        LibraryBuildInfoFile.Dependency()
-                                    androidXPublishedDependency.artifactId = dep.name.toString()
-                                    androidXPublishedDependency.groupId = dep.group.toString()
-                                    androidXPublishedDependency.version = dep.version.toString()
-                                    androidXPublishedDependency.isTipOfTree =
-                                        dep is ProjectDependency
-                                    libraryDependencies.add(androidXPublishedDependency)
-                                }
+                )
+                task.dependencyList.set(project.provider {
+                    val libraryDependencies = HashSet<LibraryBuildInfoFile.Dependency>()
+                    project.configurations.filter {
+                        it.name == "releaseRuntimeElements"
+                    }.forEach { configuration ->
+                        configuration.allDependencies.forEach { dep ->
+                            // Only consider androidx dependencies
+                            if (dep.group != null &&
+                                dep.group.toString().startsWith("androidx.") &&
+                                !dep.group.toString().startsWith("androidx.test")
+                            ) {
+                                val androidXPublishedDependency =
+                                    LibraryBuildInfoFile.Dependency()
+                                androidXPublishedDependency.artifactId = dep.name.toString()
+                                androidXPublishedDependency.groupId = dep.group.toString()
+                                androidXPublishedDependency.version = dep.version.toString()
+                                androidXPublishedDependency.isTipOfTree =
+                                    dep is ProjectDependency
+                                libraryDependencies.add(androidXPublishedDependency)
                             }
                         }
-                        ArrayList(libraryDependencies).sortedWith(
-                            compareBy({ it.groupId }, { it.artifactId }, { it.version })
-                        )
-                    })
-                }
+                    }
+                    ArrayList(libraryDependencies).sortedWith(
+                        compareBy({ it.groupId }, { it.artifactId }, { it.version })
+                    )
+                })
             }
+        }
 
         /* For androidx release notes, the most common use case is to track and publish the last sha
          * of the build that is released.  Thus, we use frameworks/support to get the sha
@@ -231,15 +233,15 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
             )
             val commitList: List<Commit> =
                 gitClient
-                .getGitLog(
-                    GitCommitRange(
-                        fromExclusive = "",
-                        untilInclusive = "HEAD",
-                        n = 1
-                    ),
-                    keepMerges = true,
-                    fullProjectDir = getSupportRootFolder()
-                )
+                    .getGitLog(
+                        GitCommitRange(
+                            fromExclusive = "",
+                            untilInclusive = "HEAD",
+                            n = 1
+                        ),
+                        keepMerges = true,
+                        fullProjectDir = getSupportRootFolder()
+                    )
             if (commitList.isEmpty()) {
                 throw RuntimeException("Failed to find git commit for HEAD!")
             }
