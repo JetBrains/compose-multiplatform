@@ -24,10 +24,10 @@ import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.TaskProvider
 import org.gradle.work.DisableCachingByDefault
 
 /**
@@ -114,7 +114,7 @@ abstract class CreateAggregateLibraryBuildInfoFileTask : DefaultTask() {
 }
 
 fun Project.addTaskToAggregateBuildInfoFileTask(
-    task: TaskProvider<CreateLibraryBuildInfoFileTask>
+    task: Provider<CreateLibraryBuildInfoFileTask>
 ) {
     rootProject.tasks.named(CREATE_AGGREGATE_BUILD_INFO_FILES_TASK).configure {
         val aggregateLibraryBuildInfoFileTask = it as CreateAggregateLibraryBuildInfoFileTask

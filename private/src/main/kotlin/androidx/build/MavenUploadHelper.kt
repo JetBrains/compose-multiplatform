@@ -46,6 +46,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPom
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.publish.maven.internal.publication.MavenPublicationInternal
 import org.gradle.api.publish.maven.tasks.GenerateMavenPom
 import org.gradle.api.publish.tasks.GenerateModuleMetadata
 import org.gradle.kotlin.dsl.configure
@@ -349,6 +350,12 @@ private fun Project.replaceBaseMultiplatformPublication(
                             return (kotlinComponent as ComponentWithVariants).variants
                         }
                     })
+                }
+
+                // mark original publication as an alias, so we do not try to publish it.
+                pubs.named("kotlinMultiplatform").configure {
+                    it as MavenPublicationInternal
+                    it.isAlias = true
                 }
             }
         }

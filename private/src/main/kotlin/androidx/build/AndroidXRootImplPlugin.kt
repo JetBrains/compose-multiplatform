@@ -16,6 +16,7 @@
 
 package androidx.build
 
+import androidx.build.AndroidXImplPlugin.Companion.CREATE_LIBRARY_BUILD_INFO_FILES_TASK
 import androidx.build.AndroidXImplPlugin.Companion.ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.AndroidXImplPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.buildInfo.CreateAggregateLibraryBuildInfoFileTask
@@ -26,8 +27,8 @@ import androidx.build.license.CheckExternalDependencyLicensesTask
 import androidx.build.playground.VerifyPlaygroundGradleConfigurationTask
 import androidx.build.studio.StudioTask.Companion.registerStudioTask
 import androidx.build.testConfiguration.registerOwnersServiceTasks
-import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import androidx.build.uptodatedness.TaskUpToDateValidator
+import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
@@ -94,7 +95,7 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
             )
         )
         buildOnServerTask.dependsOn(
-            tasks.register(AndroidXImplPlugin.CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
+            tasks.register(CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
         )
 
         VerifyPlaygroundGradleConfigurationTask.createIfNecessary(project)?.let {

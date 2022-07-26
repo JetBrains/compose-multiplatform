@@ -27,20 +27,25 @@ import androidx.build.gitclient.Commit
 import androidx.build.gitclient.GitClient
 import androidx.build.gitclient.GitCommitRange
 import androidx.build.jetpad.LibraryBuildInfoFile
+import com.google.common.annotations.VisibleForTesting
 import com.google.gson.GsonBuilder
 import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.internal.artifacts.ivyservice.projectmodule.ProjectComponentPublication
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.internal.publication.MavenPublicationInternal
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.kotlin.dsl.configure
 import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 
@@ -253,29 +258,55 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
     }
 }
 
-// Task that creates a json file of a project's dependencies
-fun Project.addCreateLibraryBuildInfoFileTask(extension: AndroidXExtension) {
-    afterEvaluate {
-        if (extension.shouldRelease()) {
-            // Only generate build info files for published libraries.
-            val task = CreateLibraryBuildInfoFileTask.setup(
-                project,
-                extension.mavenGroup,
-                VariantPublishPlan(
-                    artifactId = project.name.toString(),
-                    dependencies = project.provider {
-                        val config = project.configurations.findByName("releaseRuntimeElements")
-                        config?.allDependencies.orEmpty().toList()
-                    }),
-                project.provider {
-                    project.getFrameworksSupportCommitShaAtHead()
+// Tasks that create a json files of a project's variant's dependencies
+fun Project.addCreateLibraryBuildInfoFileTasks(extension: AndroidXExtension) {
+    extension.ifReleasing {
+        configure<PublishingExtension> {
+            // Unfortunately, dependency information is only available through internal API
+            // (See https://github.com/gradle/gradle/issues/21345).
+            publications.withType(MavenPublicationInternal::class.java).configureEach { mavenPub ->
+                // Ideally we would be able to inspect each publication after initial configuration
+                // without using afterEvaluate, but there is not a clean gradle API for doing
+                // that (see https://github.com/gradle/gradle/issues/21424)
+                afterEvaluate {
+                    // java-gradle-plugin creates marker publications that are aliases of the
+                    // main publication.  We do not track these aliases.
+                    if (!mavenPub.isAlias) {
+                        createTaskForComponent(mavenPub, extension.mavenGroup, mavenPub.artifactId)
+                    }
                 }
-            )
-
-            rootProject.tasks.named(CreateLibraryBuildInfoFileTask.TASK_NAME).configure {
-                it.dependsOn(task)
             }
-            addTaskToAggregateBuildInfoFileTask(task)
         }
     }
 }
+
+private fun Project.createTaskForComponent(
+    pub: ProjectComponentPublication,
+    libraryGroup: LibraryGroup?,
+    artifactId: String
+) {
+    val task: TaskProvider<CreateLibraryBuildInfoFileTask> =
+        CreateLibraryBuildInfoFileTask.setup(
+            project = project,
+            mavenGroup = libraryGroup,
+            variant = VariantPublishPlan(
+                artifactId = artifactId,
+                taskSuffix = computeTaskSuffix(artifactId),
+                dependencies = project.provider {
+                    pub.component?.usages?.flatMap { it.dependencies }.orEmpty()
+                }
+            ),
+            shaProvider = project.provider {
+                project.getFrameworksSupportCommitShaAtHead()
+            }
+        )
+
+    rootProject.tasks.named(CreateLibraryBuildInfoFileTask.TASK_NAME)
+        .configure { it.dependsOn(task) }
+    addTaskToAggregateBuildInfoFileTask(task)
+}
+
+// For examples, see CreateLibraryBuildInfoFileTaskTest
+@VisibleForTesting
+fun computeTaskSuffix(artifactId: String) = artifactId.split("-").drop(1)
+    .joinToString("") { word -> word.replaceFirstChar { it.uppercase() } }
