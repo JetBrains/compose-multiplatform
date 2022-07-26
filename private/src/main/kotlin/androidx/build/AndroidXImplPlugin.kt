@@ -25,8 +25,7 @@ import androidx.build.SupportConfig.COMPILE_SDK_VERSION
 import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.SupportConfig.TARGET_SDK_VERSION
-import androidx.build.buildInfo.CreateAggregateLibraryBuildInfoFileTask
-import androidx.build.buildInfo.CreateLibraryBuildInfoFileTask
+import androidx.build.buildInfo.addCreateLibraryBuildInfoFileTask
 import androidx.build.checkapi.JavaApiTaskConfig
 import androidx.build.checkapi.KmpApiTaskConfig
 import androidx.build.checkapi.LibraryApiTaskConfig
@@ -839,39 +838,10 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         }
     }
 
-    // Task that creates a json file of a project's dependencies
-    private fun Project.addCreateLibraryBuildInfoFileTask(extension: AndroidXExtension) {
-        afterEvaluate {
-            if (extension.shouldRelease()) {
-                // Only generate build info files for published libraries.
-                val task = CreateLibraryBuildInfoFileTask.setup(project, extension)
-
-                rootProject.tasks.named(CreateLibraryBuildInfoFileTask.TASK_NAME).configure {
-                    it.dependsOn(task)
-                }
-                addTaskToAggregateBuildInfoFileTask(task)
-            }
-        }
-    }
-
-    private fun Project.addTaskToAggregateBuildInfoFileTask(
-        task: TaskProvider<CreateLibraryBuildInfoFileTask>
-    ) {
-        rootProject.tasks.named(CREATE_AGGREGATE_BUILD_INFO_FILES_TASK).configure {
-            val aggregateLibraryBuildInfoFileTask: CreateAggregateLibraryBuildInfoFileTask = it
-                as CreateAggregateLibraryBuildInfoFileTask
-            aggregateLibraryBuildInfoFileTask.dependsOn(task)
-            aggregateLibraryBuildInfoFileTask.libraryBuildInfoFiles.add(
-                task.flatMap { task -> task.outputFile }
-            )
-        }
-    }
-
     companion object {
         const val BUILD_TEST_APKS_TASK = "buildTestApks"
         const val CHECK_RELEASE_READY_TASK = "checkReleaseReady"
         const val CREATE_LIBRARY_BUILD_INFO_FILES_TASK = "createLibraryBuildInfoFiles"
-        const val CREATE_AGGREGATE_BUILD_INFO_FILES_TASK = "createAggregateBuildInfoFiles"
         const val GENERATE_TEST_CONFIGURATION_TASK = "GenerateTestConfiguration"
         const val ZIP_TEST_CONFIGS_WITH_APKS_TASK = "zipTestConfigsWithApks"
         const val ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK = "zipConstrainedTestConfigsWithApks"
