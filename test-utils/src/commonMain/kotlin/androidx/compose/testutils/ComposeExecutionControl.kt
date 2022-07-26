@@ -132,7 +132,7 @@ fun ComposeExecutionControl.assertLastRecomposeHadChanges() {
 }
 
 /**
- * Asserts that last recomposition had no some changes.
+ * Asserts that last recomposition had no changes.
  */
 fun ComposeExecutionControl.assertLastRecomposeHadNoChanges() {
     assertLastRecomposeResult(expectingChanges = false)
@@ -167,7 +167,7 @@ fun ComposeExecutionControl.recomposeAssertHadChanges() {
 }
 
 /**
- * Performs recomposition and asserts that there were some pending changes.
+ * Performs recomposition and asserts that there were no pending changes.
  *
  * @throws AssertionError if recomposition has pending changes.
  */
