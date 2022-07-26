@@ -108,7 +108,7 @@ fun AnimatedExtendedFloatingActionButtonSample() {
             ExtendedFloatingActionButton(
                 onClick = { /* do something */ },
                 expanded = expandedFab,
-                icon = { Icon(Icons.Filled.Add, "Add") },
+                icon = { Icon(Icons.Filled.Add, "Localized Description") },
                 text = { Text(text = "Extended FAB") },
             )
         },
