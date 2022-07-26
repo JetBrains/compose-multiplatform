@@ -184,7 +184,7 @@ fun ScaffoldWithCustomSnackbar() {
         override val withDismissAction: Boolean
             get() = false
         override val duration: SnackbarDuration
-            get() = SnackbarDuration.Long
+            get() = SnackbarDuration.Indefinite
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
