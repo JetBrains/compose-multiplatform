@@ -87,6 +87,11 @@ open class TextInputService(private val platformTextInputService: PlatformTextIn
      * There is no guarantee that the keyboard will be shown. The software keyboard or
      * system service may silently ignore this request.
      */
+    @Deprecated(
+        message = "Use SoftwareKeyboardController.showSoftwareKeyboard or " +
+            "TextInputSession.showSoftwareKeyboard instead.",
+        replaceWith = ReplaceWith("textInputSession.showSoftwareKeyboard()")
+    )
     // TODO(b/183448615) @InternalTextApi
     fun showSoftwareKeyboard() {
         if (_currentInputSession.get() != null) {
@@ -97,6 +102,11 @@ open class TextInputService(private val platformTextInputService: PlatformTextIn
     /**
      * Hide onscreen keyboard.
      */
+    @Deprecated(
+        message = "Use SoftwareKeyboardController.hideSoftwareKeyboard or " +
+            "TextInputSession.hideSoftwareKeyboard instead.",
+        replaceWith = ReplaceWith("textInputSession.hideSoftwareKeyboard()")
+    )
     // TODO(b/183448615) @InternalTextApi
     fun hideSoftwareKeyboard(): Unit = platformTextInputService.hideSoftwareKeyboard()
 }
