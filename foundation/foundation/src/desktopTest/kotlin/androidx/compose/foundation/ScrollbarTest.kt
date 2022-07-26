@@ -42,13 +42,13 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.InternalTestApi
-import androidx.compose.ui.test.TouchInjectionScope
+import androidx.compose.ui.test.MouseInjectionScope
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.DesktopComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
@@ -75,8 +75,8 @@ class ScrollbarTest {
             }
             rule.awaitIdle()
 
-            rule.onNodeWithTag("scrollbar").performTouchInput {
-                instantSwipe(start = Offset(0f, 25f), end = Offset(0f, 50f))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                instantDrag(start = Offset(0f, 25f), end = Offset(0f, 50f))
             }
             rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-50.dp)
@@ -90,8 +90,8 @@ class ScrollbarTest {
                 TestBox(size = 100.dp, childSize = 20.dp, childCount = 1, scrollbarWidth = 10.dp)
             }
             rule.awaitIdle()
-            rule.onNodeWithTag("scrollbar").performTouchInput {
-                instantSwipe(start = Offset(0f, 25f), end = Offset(0f, 50f))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                instantDrag(start = Offset(0f, 25f), end = Offset(0f, 50f))
             }
             rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
@@ -106,14 +106,14 @@ class ScrollbarTest {
             }
             rule.awaitIdle()
 
-            rule.onNodeWithTag("scrollbar").performTouchInput {
-                instantSwipe(start = Offset(0f, 25f), end = Offset(0f, 500f))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                instantDrag(start = Offset(0f, 25f), end = Offset(0f, 500f))
             }
             rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-100.dp)
 
-            rule.onNodeWithTag("scrollbar").performTouchInput {
-                instantSwipe(start = Offset(0f, 99f), end = Offset(0f, -500f))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                instantDrag(start = Offset(0f, 99f), end = Offset(0f, -500f))
             }
             rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
@@ -128,8 +128,8 @@ class ScrollbarTest {
             }
             rule.awaitIdle()
 
-            rule.onNodeWithTag("scrollbar").performTouchInput {
-                instantSwipe(start = Offset(10f, 25f), end = Offset(0f, 50f))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                instantDrag(start = Offset(10f, 25f), end = Offset(0f, 50f))
             }
             rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
@@ -144,11 +144,12 @@ class ScrollbarTest {
             }
             rule.awaitIdle()
 
-            rule.onNodeWithTag("scrollbar").performTouchInput {
-                down(Offset(10f, 25f))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                moveTo(Offset(10f, 25f))
+                press()
                 moveBy(Offset(0f, 50f))
                 moveBy(Offset(0f, -50f))
-                up()
+                release()
             }
             rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
@@ -161,13 +162,13 @@ class ScrollbarTest {
 //        ...
 //        rule.performMouseMove(0, 25)
 //        rule.mainClock.advanceTimeByFrame()
-//        down(Offset(0f, 25f))
+//        press(Offset(0f, 25f))
 //        rule.mainClock.advanceTimeByFrame()
 //        moveTo(Offset(0f, 30f))
 //        rule.mainClock.advanceTimeByFrame()
 //        moveTo(Offset(0f, 50f))
 //        rule.mainClock.advanceTimeByFrame()
-//        up()
+//        release()
 //        ...
 //    }
 
@@ -227,8 +228,8 @@ class ScrollbarTest {
             rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-100.dp)
 
-            rule.onNodeWithTag("scrollbar").performTouchInput {
-                instantSwipe(start = Offset(0f, 99f), end = Offset(0f, -500f))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                instantDrag(start = Offset(0f, 99f), end = Offset(0f, -500f))
             }
             rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
@@ -243,8 +244,9 @@ class ScrollbarTest {
             }
             rule.awaitIdle()
 
-            rule.onNodeWithTag("scrollbar").performTouchInput {
-                down(Offset(0f, 26f))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                moveTo(Offset(0f, 26f))
+                press()
             }
 
             tryUntilSucceeded {
@@ -262,8 +264,9 @@ class ScrollbarTest {
             }
             rule.awaitIdle()
 
-            rule.onNodeWithTag("scrollbar").performTouchInput {
-                down(Offset(0f, 99f))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                moveTo(Offset(0f, 99f))
+                press()
             }
 
             tryUntilSucceeded {
@@ -294,8 +297,8 @@ class ScrollbarTest {
             isContentVisible.value = true
             rule.awaitIdle()
 
-            rule.onNodeWithTag("scrollbar").performTouchInput {
-                instantSwipe(start = Offset(0f, 25f), end = Offset(0f, 500f))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                instantDrag(start = Offset(0f, 25f), end = Offset(0f, 500f))
             }
             rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-100.dp)
@@ -321,8 +324,8 @@ class ScrollbarTest {
             }
             rule.awaitIdle()
 
-            rule.onNodeWithTag("scrollbar").performTouchInput {
-                instantSwipe(start = Offset(0f, 0f), end = Offset(0f, 11f))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                instantDrag(start = Offset(0f, 0f), end = Offset(0f, 11f))
             }
             rule.awaitIdle()
             assertEquals(2, state.firstVisibleItemIndex)
@@ -350,8 +353,8 @@ class ScrollbarTest {
             }
             rule.awaitIdle()
 
-            rule.onNodeWithTag("scrollbar").performTouchInput {
-                instantSwipe(start = Offset(0f, 99f), end = Offset(0f, 88f))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                instantDrag(start = Offset(0f, 99f), end = Offset(0f, 88f))
             }
             rule.awaitIdle()
             assertEquals(2, state.firstVisibleItemIndex)
@@ -378,8 +381,8 @@ class ScrollbarTest {
             }
             rule.awaitIdle()
 
-            rule.onNodeWithTag("scrollbar").performTouchInput {
-                instantSwipe(start = Offset(0f, 0f), end = Offset(0f, 26f))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                instantDrag(start = Offset(0f, 0f), end = Offset(0f, 26f))
             }
             rule.awaitIdle()
             assertEquals(5, state.firstVisibleItemIndex)
@@ -406,15 +409,15 @@ class ScrollbarTest {
             }
             rule.awaitIdle()
 
-            rule.onNodeWithTag("scrollbar").performTouchInput {
-                instantSwipe(start = Offset(0f, 0f), end = Offset(0f, 10000f))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                instantDrag(start = Offset(0f, 0f), end = Offset(0f, 10000f))
             }
             rule.awaitIdle()
             assertEquals(15, state.firstVisibleItemIndex)
             assertEquals(0, state.firstVisibleItemScrollOffset)
 
-            rule.onNodeWithTag("scrollbar").performTouchInput {
-                instantSwipe(start = Offset(0f, 99f), end = Offset(0f, -10000f))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                instantDrag(start = Offset(0f, 99f), end = Offset(0f, -10000f))
             }
             rule.awaitIdle()
             assertEquals(0, state.firstVisibleItemIndex)
@@ -431,8 +434,8 @@ class ScrollbarTest {
                 )
             }
             rule.awaitIdle()
-            rule.onNodeWithTag("scrollbar").performTouchInput {
-                instantSwipe(start = Offset(0f, 25f), end = Offset(0f, 50f))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                instantDrag(start = Offset(0f, 25f), end = Offset(0f, 50f))
             }
             rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
@@ -553,10 +556,11 @@ class ScrollbarTest {
         }
     }
 
-    private fun TouchInjectionScope.instantSwipe(start: Offset, end: Offset) {
-        down(start)
+    private fun MouseInjectionScope.instantDrag(start: Offset, end: Offset) {
+        moveTo(start)
+        press()
         moveTo(end)
-        up()
+        release()
     }
 
     @Composable

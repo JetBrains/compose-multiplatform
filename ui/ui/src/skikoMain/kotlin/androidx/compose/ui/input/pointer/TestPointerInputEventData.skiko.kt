@@ -22,6 +22,7 @@ import androidx.compose.ui.geometry.Offset
 /**
  * This exposes PointerInputEventData for testing purposes.
  */
+@Deprecated("Will be removed in Compose 1.3")
 @InternalComposeUiApi
 class TestPointerInputEventData(
     val id: PointerId,

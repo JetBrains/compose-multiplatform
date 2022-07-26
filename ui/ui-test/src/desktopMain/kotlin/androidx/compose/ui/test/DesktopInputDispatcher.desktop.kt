@@ -23,8 +23,15 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.TestPointerInputEventData
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.nativeKeyCode
+import androidx.compose.ui.input.key.nativeKeyLocation
+import androidx.compose.ui.input.pointer.PointerButton
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.SkiaRootForTest
+import java.awt.Component
 
 internal actual fun createInputDispatcher(
     testContext: TestContext,
@@ -35,22 +42,42 @@ internal actual fun createInputDispatcher(
 
 internal class DesktopInputDispatcher(
     testContext: TestContext,
-    val root: SkiaRootForTest
-) : InputDispatcher(testContext, root) {
-    companion object {
-        var gesturePointerId = 0L
-    }
-
-    private var isMousePressed = false
-
-    private var batchedEvents = mutableListOf<List<TestPointerInputEventData>>()
+    private val root: SkiaRootForTest
+) : InputDispatcher(
+    testContext,
+    root,
+    exitHoverOnPress = false,
+    moveOnScroll = false,
+) {
+    private val scene get() = root.scene
+    private var batchedEvents = mutableListOf<() -> Unit>()
 
     override fun PartialGesture.enqueueDown(pointerId: Int) {
-        isMousePressed = true
-        enqueueEvent(pointerInputEvent(isMousePressed))
+        val position = lastPositions[pointerId]!!
+        val timeMillis = downTime
+        enqueue {
+            scene.sendPointerEvent(
+                PointerEventType.Press,
+                position = position,
+                type = PointerType.Touch,
+                timeMillis = timeMillis
+            )
+        }
     }
     override fun PartialGesture.enqueueMove() {
-        enqueueEvent(pointerInputEvent(isMousePressed))
+        val position = Offset(
+            lastPositions.values.map { it.x }.average().toFloat(),
+            lastPositions.values.map { it.y }.average().toFloat(),
+        )
+        val timeMillis = downTime
+        enqueue {
+            scene.sendPointerEvent(
+                PointerEventType.Move,
+                position = position,
+                type = PointerType.Touch,
+                timeMillis = timeMillis
+            )
+        }
     }
 
     override fun PartialGesture.enqueueMoves(
@@ -62,83 +89,131 @@ internal class DesktopInputDispatcher(
     }
 
     override fun PartialGesture.enqueueUp(pointerId: Int) {
-        isMousePressed = false
-        enqueueEvent(pointerInputEvent(isMousePressed))
-        gesturePointerId += 1
+        val position = lastPositions[pointerId]!!
+        val timeMillis = downTime
+        enqueue {
+            scene.sendPointerEvent(
+                PointerEventType.Release,
+                position = position,
+                type = PointerType.Touch,
+                timeMillis = timeMillis
+            )
+        }
     }
 
     override fun PartialGesture.enqueueCancel() {
-        println("PartialGesture.sendCancel")
+        // desktop don't have cancel events as Android does
     }
 
     override fun MouseInputState.enqueuePress(buttonId: Int) {
-        TODO("Not yet implemented")
+        val position = lastPosition
+        val timeMillis = downTime
+        enqueue {
+            scene.sendPointerEvent(
+                PointerEventType.Press,
+                position = position,
+                type = PointerType.Mouse,
+                timeMillis = timeMillis,
+                button = PointerButton(buttonId)
+            )
+        }
     }
 
     override fun MouseInputState.enqueueMove() {
-        TODO("Not yet implemented")
+        val position = lastPosition
+        val timeMillis = downTime
+        enqueue {
+            scene.sendPointerEvent(
+                PointerEventType.Move,
+                position = position,
+                type = PointerType.Mouse,
+                timeMillis = timeMillis
+            )
+        }
     }
 
     override fun MouseInputState.enqueueRelease(buttonId: Int) {
-        TODO("Not yet implemented")
+        val position = lastPosition
+        val timeMillis = downTime
+        enqueue {
+            scene.sendPointerEvent(
+                PointerEventType.Release,
+                position = position,
+                type = PointerType.Mouse,
+                timeMillis = timeMillis,
+                button = PointerButton(buttonId)
+            )
+        }
     }
 
     override fun MouseInputState.enqueueEnter() {
-        TODO("Not yet implemented")
+        val position = lastPosition
+        val timeMillis = downTime
+        enqueue {
+            scene.sendPointerEvent(
+                PointerEventType.Enter,
+                position = position,
+                type = PointerType.Mouse,
+                timeMillis = timeMillis
+            )
+        }
     }
 
     override fun MouseInputState.enqueueExit() {
-        TODO("Not yet implemented")
+        val position = lastPosition
+        val timeMillis = downTime
+        enqueue {
+            scene.sendPointerEvent(
+                PointerEventType.Exit,
+                position = position,
+                type = PointerType.Mouse,
+                timeMillis = timeMillis
+            )
+        }
     }
 
     override fun MouseInputState.enqueueCancel() {
-        TODO("Not yet implemented")
+        // desktop don't have cancel events as Android does
     }
 
     @OptIn(ExperimentalTestApi::class)
     override fun MouseInputState.enqueueScroll(delta: Float, scrollWheel: ScrollWheel) {
-        TODO("Not yet implemented")
+        val position = lastPosition
+        val timeMillis = downTime
+        enqueue {
+            scene.sendPointerEvent(
+                PointerEventType.Scroll,
+                position = position,
+                type = PointerType.Mouse,
+                timeMillis = timeMillis,
+                scrollDelta = if (scrollWheel == ScrollWheel.Vertical) Offset(0f, delta) else Offset(delta, 0f)
+            )
+        }
     }
 
     // TODO(b/233199964): Implement key injection for desktop
+    //  don't forget to change DefaultPointerStateTracker.keyboardModifiers when we press modifiers
     override fun KeyInputState.enqueueDown(key: Key) = TODO("Not yet implemented")
 
     // TODO(b/233199964): Implement key injection for desktop
     override fun KeyInputState.enqueueUp(key: Key) = TODO("Not yet implemented")
 
     override fun RotaryInputState.enqueueRotaryScrollHorizontally(horizontalScrollPixels: Float) {
-        TODO("Not yet implemented")
+        // desktop don't have rotary events as Android Wear does
     }
 
     override fun RotaryInputState.enqueueRotaryScrollVertically(verticalScrollPixels: Float) {
-        TODO("Not yet implemented")
+        // desktop don't have rotary events as Android Wear does
     }
 
-    private fun enqueueEvent(event: List<TestPointerInputEventData>) {
-        batchedEvents.add(event)
-    }
-
-    private fun PartialGesture.pointerInputEvent(down: Boolean): List<TestPointerInputEventData> {
-        val time = currentTime
-        val offset = lastPositions[lastPositions.keys.sorted()[0]]!!
-        val event = listOf(
-            TestPointerInputEventData(
-                PointerId(gesturePointerId),
-                time,
-                offset,
-                down
-            )
-        )
-        return event
+    private fun enqueue(action: () -> Unit) {
+        batchedEvents.add(action)
     }
 
     override fun flush() {
         val copy = batchedEvents.toList()
         batchedEvents.clear()
-        copy.forEach {
-            val eventTime = it.first().uptime
-            root.processPointerInput(eventTime, it)
-        }
+        copy.forEach { it() }
     }
 
     override fun onDispose() {

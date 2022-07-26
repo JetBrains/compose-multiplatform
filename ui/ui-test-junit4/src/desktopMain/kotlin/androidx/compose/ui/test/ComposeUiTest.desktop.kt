@@ -19,7 +19,6 @@ package androidx.compose.ui.test
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.ComposeScene
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.InfiniteAnimationPolicy
 import androidx.compose.ui.semantics.SemanticsNode
@@ -28,6 +27,9 @@ import androidx.compose.ui.test.junit4.UncaughtExceptionHandler
 import androidx.compose.ui.test.junit4.isOnUiThread
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.ImeOptions
+import androidx.compose.ui.text.input.PlatformTextInputService
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -46,10 +48,34 @@ actual fun runComposeUiTest(block: ComposeUiTest.() -> Unit) {
 
 @InternalTestApi
 @ExperimentalTestApi
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class DesktopComposeUiTest : ComposeUiTest {
 
     override val density = Density(1f, 1f)
+
+    private val textInputService = object : PlatformTextInputService {
+        var onEditCommand: ((List<EditCommand>) -> Unit)? = null
+        var onImeActionPerformed: ((ImeAction) -> Unit)? = null
+
+        override fun startInput(
+            value: TextFieldValue,
+            imeOptions: ImeOptions,
+            onEditCommand: (List<EditCommand>) -> Unit,
+            onImeActionPerformed: (ImeAction) -> Unit
+        ) {
+            this.onEditCommand = onEditCommand
+            this.onImeActionPerformed = onImeActionPerformed
+        }
+
+        override fun stopInput() {
+            this.onEditCommand = null
+            this.onImeActionPerformed = null
+        }
+
+        override fun showSoftwareKeyboard() = Unit
+        override fun hideSoftwareKeyboard() = Unit
+        override fun updateState(oldValue: TextFieldValue?, newValue: TextFieldValue) = Unit
+    }
 
     private val coroutineDispatcher = UnconfinedTestDispatcher()
     private val testScope = TestScope(coroutineDispatcher)
@@ -96,6 +122,7 @@ class DesktopComposeUiTest : ComposeUiTest {
     }
 
     private fun createUi() = ComposeScene(
+        textInputService = textInputService,
         density = density,
         coroutineContext = coroutineContext,
         invalidate = { }
@@ -189,11 +216,19 @@ class DesktopComposeUiTest : ComposeUiTest {
 
     private inner class DesktopTestOwner : TestOwner {
         override fun sendTextInputCommand(node: SemanticsNode, command: List<EditCommand>) {
-            TODO()
+            runOnIdle {
+                val onEditCommand = textInputService.onEditCommand
+                    ?: throw IllegalStateException("No input session started. Missing a focus?")
+                onEditCommand(command)
+            }
         }
 
         override fun sendImeAction(node: SemanticsNode, actionSpecified: ImeAction) {
-            TODO()
+            runOnIdle {
+                val onImeActionPerformed = textInputService.onImeActionPerformed
+                    ?: throw IllegalStateException("No input session started. Missing a focus?")
+                onImeActionPerformed.invoke(actionSpecified)
+            }
         }
 
         override fun <T> runOnUiThread(action: () -> T): T {

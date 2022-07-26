@@ -17,5 +17,5 @@
 package androidx.compose.ui.test
 
 internal actual fun printToLog(tag: String, message: String) {
-    TODO()
+    println("$tag: $message")
 }

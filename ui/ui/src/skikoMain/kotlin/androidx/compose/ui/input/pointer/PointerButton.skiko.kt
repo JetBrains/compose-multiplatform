@@ -19,8 +19,9 @@ package androidx.compose.ui.input.pointer
 import androidx.compose.ui.ExperimentalComposeUiApi
 import kotlin.jvm.JvmInline
 
+// TODO replace MouseButton by this class after we upstream it
+
 @JvmInline
-@ExperimentalComposeUiApi
 /**
  * Represents the index of a pointer button.
  * See [PointerEvent.button], where [PointerButton] is used.
@@ -35,22 +36,17 @@ value class PointerButton(val index: Int) {
     }
 }
 
-@ExperimentalComposeUiApi
 val PointerButton?.isPrimary: Boolean
     get() { return this == PointerButton.Primary }
 
-@ExperimentalComposeUiApi
 val PointerButton?.isSecondary: Boolean
     get() { return this == PointerButton.Secondary }
 
-@ExperimentalComposeUiApi
 val PointerButton?.isTertiary: Boolean
     get() { return this == PointerButton.Tertiary }
 
-@ExperimentalComposeUiApi
 val PointerButton?.isBack: Boolean
     get() { return this == PointerButton.Back }
 
-@ExperimentalComposeUiApi
 val PointerButton?.isForward: Boolean
     get() { return this == PointerButton.Forward }

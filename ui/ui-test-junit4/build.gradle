@@ -139,6 +139,14 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.truth)
                 implementation(libs.skiko)
             }
+
+            desktopTest.dependencies {
+                implementation(project(":compose:foundation:foundation"))
+                implementation(libs.truth)
+                implementation(libs.junit)
+                implementation(libs.skikoCurrentOs)
+                implementation(libs.kotlinCoroutinesSwing)
+            }
         }
     }
 

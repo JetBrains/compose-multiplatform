@@ -44,6 +44,7 @@ fun SkikoTouchEventKind.toCompose() = when(this) {
     else -> PointerEventType.Unknown
 }
 
+// TODO(https://github.com/JetBrains/compose-jb/issues/2184) support more buttons
 /**
  * Creates [PointerButtons] with the specified state of the pressed buttons.
  */
@@ -260,3 +261,30 @@ actual val PointerKeyboardModifiers.isScrollLockOn: Boolean
 
 actual val PointerKeyboardModifiers.isNumLockOn: Boolean
     get() = (packedValue and KeyboardModifierMasks.NumLockOn) != 0
+
+@OptIn(ExperimentalComposeUiApi::class)
+internal fun PointerButtons.copyFor(
+    button: PointerButton,
+    pressed: Boolean
+): PointerButtons = when (button) {
+    PointerButton.Primary -> copy(isPrimaryPressed = pressed)
+    PointerButton.Secondary -> copy(isSecondaryPressed = pressed)
+    PointerButton.Tertiary -> copy(isTertiaryPressed = pressed)
+    PointerButton.Forward -> copy(isForwardPressed = pressed)
+    PointerButton.Back -> copy(isBackPressed = pressed)
+    else -> copy()
+}
+
+internal fun PointerButtons.copy(
+    isPrimaryPressed: Boolean = this.isPrimaryPressed,
+    isSecondaryPressed: Boolean = this.isSecondaryPressed,
+    isTertiaryPressed: Boolean = this.isTertiaryPressed,
+    isBackPressed: Boolean = this.isBackPressed,
+    isForwardPressed: Boolean = this.isForwardPressed
+): PointerButtons = PointerButtons(
+    isPrimaryPressed,
+    isSecondaryPressed,
+    isTertiaryPressed,
+    isBackPressed,
+    isForwardPressed,
+)

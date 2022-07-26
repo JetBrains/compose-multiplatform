@@ -35,6 +35,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerId
@@ -43,6 +45,7 @@ import androidx.compose.ui.input.pointer.PointerInputEventData
 import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.areAnyPressed
+import androidx.compose.ui.input.pointer.copyFor
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AccessibilityController
 import androidx.compose.ui.platform.Platform
@@ -57,6 +60,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toIntRect
 import androidx.compose.ui.synchronized
+import androidx.compose.ui.text.input.PlatformTextInputService
 import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.Volatile
 import kotlinx.coroutines.CoroutineScope
@@ -113,6 +117,31 @@ class ComposeScene internal constructor(
     ) : this(
         coroutineContext,
         Platform.Empty,
+        density,
+        invalidate
+    )
+
+    /**
+     * Constructs [ComposeScene]
+     *
+     * @param textInputService Platform specific text input service
+     * @param coroutineContext Context which will be used to launch effects ([LaunchedEffect],
+     * [rememberCoroutineScope]) and run recompositions.
+     * @param density Initial density of the content which will be used to convert [dp] units.
+     * @param invalidate Callback which will be called when the content need to be recomposed or
+     * rerendered. If you draw your content using [render] method, in this callback you should
+     * schedule the next [render] in your rendering loop.
+     */
+    constructor(
+        textInputService: PlatformTextInputService,
+        coroutineContext: CoroutineContext = Dispatchers.Unconfined,
+        density: Density = Density(1f),
+        invalidate: () -> Unit = {}
+    ) : this(
+        coroutineContext,
+        object : Platform by Platform.Empty {
+            override val textInputService: PlatformTextInputService get() = textInputService
+        },
         density,
         invalidate
     )
@@ -326,6 +355,7 @@ class ComposeScene internal constructor(
         composition?.dispose()
         mainOwner?.dispose()
         val mainOwner = SkiaBasedOwner(
+            this,
             platform,
             pointerPositionUpdater,
             density,
@@ -415,7 +445,6 @@ class ComposeScene internal constructor(
      * @param button Represents the index of a button which state changed in this event. It's null
      * when there was no change of the buttons state or when button is not applicable (e.g. touch event).
      */
-    @OptIn(ExperimentalComposeUiApi::class)
     fun sendPointerEvent(
         eventType: PointerEventType,
         position: Offset,
@@ -427,7 +456,7 @@ class ComposeScene internal constructor(
         nativeEvent: Any? = null,
         button: PointerButton? = null
     ): Unit = postponeInvalidation {
-        defaultPointerStateTracker.onPointerEvent(eventType)
+        defaultPointerStateTracker.onPointerEvent(button, eventType)
 
         val actualButtons = buttons ?: defaultPointerStateTracker.buttons
         val actualKeyboardModifiers =
@@ -504,6 +533,9 @@ class ComposeScene internal constructor(
         // - move from one point of the window to another (owner == lastMoveOwner): Move
         // - move from one popup to another (owner != lastMoveOwner): [Popup 1] Exit, [Popup 2] Enter
 
+        // TODO(demin) How it should behave for touch?
+        //  We need to decide whether we need Enter/Exit events
+        //  See also HitPathTracker, where we do a similar conversion of Move into Enter/Exit
         if (owner != lastMoveOwner) {
             lastMoveOwner?.processPointerInput(
                 event.copy(eventType = PointerEventType.Exit),
@@ -572,10 +604,10 @@ class ComposeScene internal constructor(
 }
 
 private class DefaultPointerStateTracker {
-    fun onPointerEvent(eventType: PointerEventType) {
+    fun onPointerEvent(button: PointerButton?, eventType: PointerEventType) {
         when (eventType) {
-            PointerEventType.Press -> buttons = PointerButtons(isPrimaryPressed = true)
-            PointerEventType.Release -> buttons = PointerButtons()
+            PointerEventType.Press -> buttons = buttons.copyFor(button ?: PointerButton.Primary, pressed = true)
+            PointerEventType.Release -> buttons = buttons.copyFor(button ?: PointerButton.Primary, pressed = false)
         }
     }
 

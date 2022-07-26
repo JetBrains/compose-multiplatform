@@ -20,6 +20,7 @@ package androidx.compose.ui.test
 
 // TODO: use constants instead of literals
 
+// TODO replace it by common PointerButton, when we upstream it
 @ExperimentalTestApi
 @JvmInline
 actual value class MouseButton(val buttonId: Int) {
@@ -28,16 +29,16 @@ actual value class MouseButton(val buttonId: Int) {
         /**
          * The left mouse button
          */
-        actual val Primary = MouseButton(1)
+        actual val Primary = MouseButton(0)
 
         /**
          * The right mouse button
          */
-        actual val Secondary = MouseButton(2)
+        actual val Secondary = MouseButton(1)
 
         /**
          * The middle mouse button
          */
-        actual val Tertiary = MouseButton(4)
+        actual val Tertiary = MouseButton(2)
     }
 }

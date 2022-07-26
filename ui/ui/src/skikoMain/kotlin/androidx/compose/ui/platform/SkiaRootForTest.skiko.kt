@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.platform
 
+import androidx.compose.ui.ComposeScene
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.input.pointer.TestPointerInputEventData
 import androidx.compose.ui.node.RootForTest
@@ -27,10 +28,17 @@ import androidx.compose.ui.node.RootForTest
 @InternalComposeUiApi
 interface SkiaRootForTest : RootForTest {
     /**
+     * The [ComposeScene] which contains this root
+     */
+    val scene: ComposeScene get() = throw UnsupportedOperationException("SkiaRootForTest.scene is not implemented")
+
+    /**
      * Process pointer event
      *
      * [timeMillis] time when the pointer event occurred
      * [pointers] state of all pointers
      */
+    @Suppress("DEPRECATION")
+    @Deprecated("Don't send events directly to root. Send events to [scene]. Will be removed in Compose 1.3")
     fun processPointerInput(timeMillis: Long, pointers: List<TestPointerInputEventData>)
 }

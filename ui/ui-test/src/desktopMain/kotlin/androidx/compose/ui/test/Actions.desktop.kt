@@ -16,9 +16,9 @@
 
 package androidx.compose.ui.test
 
+@OptIn(ExperimentalTestApi::class)
 internal actual fun SemanticsNodeInteraction.performClickImpl(): SemanticsNodeInteraction {
-    // TODO: Replace with performMouseInput when desktop has a mouse implementation
-    return performTouchInput {
+    return performMouseInput {
         click()
     }
 }
