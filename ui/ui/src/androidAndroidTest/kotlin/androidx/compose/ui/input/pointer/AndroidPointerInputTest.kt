@@ -63,7 +63,7 @@ import androidx.compose.ui.gesture.PointerProperties
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.findRoot
+import androidx.compose.ui.layout.findRootCoordinates
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onPlaced
@@ -828,7 +828,7 @@ class AndroidPointerInputTest {
         scrollDelta: Offset = Offset.Zero
     ) {
         rule.runOnUiThread {
-            val root = layoutCoordinates.findRoot()
+            val root = layoutCoordinates.findRootCoordinates()
             val pos = root.localPositionOf(layoutCoordinates, offset)
             val event = MotionEvent(
                 0,
@@ -855,7 +855,7 @@ class AndroidPointerInputTest {
         vararg actions: Int
     ) {
         rule.runOnUiThread {
-            val root = layoutCoordinates.findRoot()
+            val root = layoutCoordinates.findRootCoordinates()
             val pos = root.localPositionOf(layoutCoordinates, offset)
             val androidComposeView = findAndroidComposeView(container) as AndroidComposeView
 
@@ -886,7 +886,7 @@ class AndroidPointerInputTest {
         offset: Offset = Offset.Zero
     ) {
         rule.runOnUiThread {
-            val root = layoutCoordinates.findRoot()
+            val root = layoutCoordinates.findRootCoordinates()
             val pos = root.localPositionOf(layoutCoordinates, offset)
             val event = MotionEvent(
                 0,
@@ -1536,7 +1536,7 @@ class AndroidPointerInputTest {
         // Exit followed by a different device should send the exit
         dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_ENTER)
         rule.runOnUiThread {
-            val root = coords.findRoot()
+            val root = coords.findRootCoordinates()
             val pos = root.localPositionOf(coords, Offset.Zero)
             val androidComposeView = findAndroidComposeView(container) as AndroidComposeView
             val exit = MotionEvent(

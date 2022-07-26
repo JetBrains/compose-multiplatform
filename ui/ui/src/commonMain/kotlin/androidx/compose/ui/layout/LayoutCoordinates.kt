@@ -120,13 +120,13 @@ fun LayoutCoordinates.positionInWindow(): Offset = localToWindow(Offset.Zero)
  * The boundaries of this layout inside the root composable.
  */
 fun LayoutCoordinates.boundsInRoot(): Rect =
-    findRoot().localBoundingBoxOf(this)
+    findRootCoordinates().localBoundingBoxOf(this)
 
 /**
  * The boundaries of this layout relative to the window's origin.
  */
 fun LayoutCoordinates.boundsInWindow(): Rect {
-    val root = findRoot()
+    val root = findRootCoordinates()
     val bounds = boundsInRoot()
     val rootWidth = root.size.width.toFloat()
     val rootHeight = root.size.height.toFloat()
@@ -165,10 +165,12 @@ fun LayoutCoordinates.boundsInParent(): Rect =
         ?: Rect(0f, 0f, size.width.toFloat(), size.height.toFloat())
 
 /**
- * Returns the [LayoutCoordinates] of the root layout element in the hierarchy. This will have
- * the size of the entire compose UI.
+ * Walks up the [LayoutCoordinates] hierarchy to find the [LayoutCoordinates] whose
+ * [LayoutCoordinates.parentCoordinates] is `null` and returns it. If
+ * [LayoutCoordinates.isAttached], this will have the size of the
+ * [ComposeView][androidx.compose.ui.platform.ComposeView].
  */
-internal fun LayoutCoordinates.findRoot(): LayoutCoordinates {
+fun LayoutCoordinates.findRootCoordinates(): LayoutCoordinates {
     var root = this
     var parent = root.parentLayoutCoordinates
     while (parent != null) {
