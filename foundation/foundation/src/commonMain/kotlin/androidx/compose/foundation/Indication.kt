@@ -115,11 +115,11 @@ fun Modifier.indication(
         val inputModeManager = LocalInputModeManager.current
         val filteredInteractionSource = remember(interactionSource) {
             // When in Touch mode, skip the Focus interaction - its indication should not be drawn
-            object : InteractionSource {
-                override val interactions: Flow<Interaction> = interactionSource.interactions.filter {
+            TempInteractionSource(
+                interactionSource.interactions.filter {
                     !(inputModeManager.inputMode == InputMode.Touch && it is FocusInteraction.Focus)
                 }
-            }
+            )
         }
 
         val resolvedIndication = indication ?: NoIndication
@@ -200,3 +200,5 @@ private class IndicationModifier(
         }
     }
 }
+
+private class TempInteractionSource(override val interactions: Flow<Interaction>):InteractionSource
