@@ -18,12 +18,14 @@ package androidx.compose.ui.text.font.testutils
 
 import android.content.Context
 import android.graphics.Typeface
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.AndroidFont
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontLoadingStrategy.Companion.Async
 import androidx.compose.ui.text.font.FontLoadingStrategy.Companion.Blocking
 import androidx.compose.ui.text.font.FontLoadingStrategy.Companion.OptionalLocal
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import com.google.common.truth.Truth
 import kotlinx.coroutines.CompletableDeferred
@@ -131,36 +133,39 @@ class AsyncTestTypefaceLoader : AndroidFont.TypefaceLoader {
     }
 }
 
+@OptIn(ExperimentalTextApi::class)
 class AsyncFauxFont(
     typefaceLoader: AsyncTestTypefaceLoader,
     override val weight: FontWeight = FontWeight.Normal,
     override val style: FontStyle = FontStyle.Normal,
-    val name: String = "AsyncFauxFont"
-) : AndroidFont(Async, typefaceLoader) {
+    private val name: String = "AsyncFauxFont"
+) : AndroidFont(Async, typefaceLoader, FontVariation.Settings(weight, style)) {
     override fun toString(): String {
         return "$name[$weight, $style]"
     }
 }
 
+@OptIn(ExperimentalTextApi::class)
 class OptionalFauxFont(
     typefaceLoader: AsyncTestTypefaceLoader,
     internal val typeface: Typeface?,
     override val weight: FontWeight = FontWeight.Normal,
     override val style: FontStyle = FontStyle.Normal,
-    val name: String = "OptionalFauxFont"
-) : AndroidFont(OptionalLocal, typefaceLoader) {
+    private val name: String = "OptionalFauxFont"
+) : AndroidFont(OptionalLocal, typefaceLoader, FontVariation.Settings(weight, style)) {
     override fun toString(): String {
         return "$name[$weight, $style]"
     }
 }
 
+@OptIn(ExperimentalTextApi::class)
 class BlockingFauxFont(
     typefaceLoader: AsyncTestTypefaceLoader,
     internal val typeface: Typeface,
     override val weight: FontWeight = FontWeight.Normal,
     override val style: FontStyle = FontStyle.Normal,
-    val name: String = "BlockingFauxFont"
-) : AndroidFont(Blocking, typefaceLoader) {
+    private val name: String = "BlockingFauxFont"
+) : AndroidFont(Blocking, typefaceLoader, FontVariation.Settings(weight, style)) {
     override fun toString(): String {
         return "$name[$weight, $style]"
     }
