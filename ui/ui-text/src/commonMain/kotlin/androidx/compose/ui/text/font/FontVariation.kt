@@ -61,6 +61,19 @@ object FontVariation {
 
             needsDensity = this.settings.fastAny { it.needsDensity }
         }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is Settings) return false
+
+            if (settings != other.settings) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            return settings.hashCode()
+        }
     }
 
     /**

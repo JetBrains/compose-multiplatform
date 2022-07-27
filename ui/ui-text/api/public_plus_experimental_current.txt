@@ -714,7 +714,7 @@ package androidx.compose.ui.text.font {
   }
 
   public final class DeviceFontFamilyNameFontKt {
-    method @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(String familyName, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
+    method @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(String familyName, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional androidx.compose.ui.text.font.FontVariation.Settings variationSettings);
   }
 
   public abstract sealed class FileBasedFontFamily extends androidx.compose.ui.text.font.FontFamily {

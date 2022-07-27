@@ -191,17 +191,18 @@ private class AndroidAssetFont constructor(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as AndroidAssetFont
+        if (other !is AndroidAssetFont) return false
 
         if (path != other.path) return false
+        if (variationSettings != other.variationSettings) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return path.hashCode()
+        var result = path.hashCode()
+        result = 31 * result + variationSettings.hashCode()
+        return result
     }
 }
 
