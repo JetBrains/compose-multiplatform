@@ -49,6 +49,7 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.LineHeightStyle.Trim
 import androidx.compose.ui.text.style.TextOverflow
@@ -431,5 +432,21 @@ private fun TextWithLineHeight(
                 softWrap = !singleLine
             )
         }
+        Spacer(Modifier.padding(16.dp))
+
+        Column(Modifier.width(width)) {
+            var textFieldValue by remember(text) { mutableStateOf(TextFieldValue(text)) }
+
+            TextFieldWithMetrics(
+                value = textFieldValue,
+                onValueChange = {
+                    textFieldValue = it
+                },
+                style = style,
+                maxLines = maxLines,
+                softWrap = !singleLine
+            )
+        }
+        Spacer(Modifier.padding(16.dp))
     }
 }

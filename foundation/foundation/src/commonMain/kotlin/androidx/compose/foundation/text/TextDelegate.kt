@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrain
 import kotlin.math.ceil
+import kotlin.math.roundToInt
 
 /**
  * An object that paints text onto a [Canvas].
@@ -106,14 +107,14 @@ class TextDelegate(
      *
      * Valid only after [layout] has been called.
      */
-    val minIntrinsicWidth: Int get() = ceil(nonNullIntrinsics.minIntrinsicWidth).toInt()
+    val minIntrinsicWidth: Int get() = nonNullIntrinsics.minIntrinsicWidth.ceilToIntPx()
 
     /**
      * The width at which increasing the width of the text no longer decreases the height.
      *
      * Valid only after [layout] has been called.
      */
-    val maxIntrinsicWidth: Int get() = ceil(nonNullIntrinsics.maxIntrinsicWidth).toInt()
+    val maxIntrinsicWidth: Int get() = nonNullIntrinsics.maxIntrinsicWidth.ceilToIntPx()
 
     init {
         check(maxLines > 0)
@@ -230,8 +231,8 @@ class TextDelegate(
                     ),
                     size = constraints.constrain(
                         IntSize(
-                            ceil(multiParagraph.width).toInt(),
-                            ceil(multiParagraph.height).toInt()
+                            multiParagraph.width.ceilToIntPx(),
+                            multiParagraph.height.ceilToIntPx()
                         )
                     )
                 )
@@ -245,8 +246,8 @@ class TextDelegate(
 
         val size = constraints.constrain(
             IntSize(
-                ceil(multiParagraph.width).toInt(),
-                ceil(multiParagraph.height).toInt()
+                multiParagraph.width.ceilToIntPx(),
+                multiParagraph.height.ceilToIntPx()
             )
         )
 
@@ -291,3 +292,5 @@ class TextDelegate(
         }
     }
 }
+
+internal fun Float.ceilToIntPx(): Int = ceil(this).roundToInt()

@@ -1099,6 +1099,9 @@ package androidx.compose.foundation.text {
   public final class StringHelpers_jvmKt {
   }
 
+  public final class TextDelegateKt {
+  }
+
   public final class TextFieldCursorKt {
   }
 
