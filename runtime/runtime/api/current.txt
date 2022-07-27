@@ -120,11 +120,13 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public void endReplaceableGroup();
     method @androidx.compose.runtime.ComposeCompilerApi public androidx.compose.runtime.ScopeUpdateScope? endRestartGroup();
     method @androidx.compose.runtime.ComposeCompilerApi public void endReusableGroup();
+    method @androidx.compose.runtime.ComposeCompilerApi public void endToMarker(int marker);
     method public androidx.compose.runtime.Applier<?> getApplier();
     method @org.jetbrains.annotations.TestOnly public kotlin.coroutines.CoroutineContext getApplyCoroutineContext();
     method @org.jetbrains.annotations.TestOnly public androidx.compose.runtime.ControlledComposition getComposition();
     method public androidx.compose.runtime.tooling.CompositionData getCompositionData();
     method public int getCompoundKeyHash();
+    method public int getCurrentMarker();
     method public boolean getDefaultsInvalid();
     method public boolean getInserting();
     method public androidx.compose.runtime.RecomposeScope? getRecomposeScope();
@@ -151,6 +153,7 @@ package androidx.compose.runtime {
     property @org.jetbrains.annotations.TestOnly public abstract androidx.compose.runtime.ControlledComposition composition;
     property public abstract androidx.compose.runtime.tooling.CompositionData compositionData;
     property public abstract int compoundKeyHash;
+    property public abstract int currentMarker;
     property public abstract boolean defaultsInvalid;
     property public abstract boolean inserting;
     property public abstract androidx.compose.runtime.RecomposeScope? recomposeScope;

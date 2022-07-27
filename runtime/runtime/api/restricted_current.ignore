@@ -1,0 +1,5 @@
+// Baseline format: 1.0
+AddedAbstractMethod: androidx.compose.runtime.Composer#endToMarker(int):
+    Added method androidx.compose.runtime.Composer.endToMarker(int)
+AddedAbstractMethod: androidx.compose.runtime.Composer#getCurrentMarker():
+    Added method androidx.compose.runtime.Composer.getCurrentMarker()

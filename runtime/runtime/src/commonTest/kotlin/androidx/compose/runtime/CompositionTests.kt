@@ -3232,6 +3232,130 @@ class CompositionTests {
         advance()
         assertEquals(state, functionInstance())
     }
+
+    @Test
+    fun testNonLocalReturn_CM1_RetFunc_FalseTrue() = compositionTest {
+        var condition by mutableStateOf(false)
+
+        compose {
+            test_CM1_RetFun(condition)
+        }
+
+        validate {
+            this.test_CM1_RetFun(condition)
+        }
+
+        condition = true
+
+        expectChanges()
+
+        revalidate()
+    }
+
+    @Test
+    fun testNonLocalReturn_CM1_RetFunc_TrueFalse() = compositionTest {
+        var condition by mutableStateOf(true)
+
+        compose {
+            test_CM1_RetFun(condition)
+        }
+
+        validate {
+            this.test_CM1_RetFun(condition)
+        }
+
+        condition = false
+
+        expectChanges()
+
+        revalidate()
+    }
+
+    @Test
+    fun test_CM1_CCM1_RetFun_FalseTrue() = compositionTest {
+        var condition by mutableStateOf(false)
+
+        compose {
+            test_CM1_CCM1_RetFun(condition)
+        }
+
+        validate {
+            this.test_CM1_CCM1_RetFun(condition)
+        }
+
+        condition = true
+
+        expectChanges()
+
+        revalidate()
+    }
+
+    @Test
+    fun test_CM1_CCM1_RetFun_TrueFalse() = compositionTest {
+        var condition by mutableStateOf(true)
+
+        compose {
+            test_CM1_CCM1_RetFun(condition)
+        }
+
+        validate {
+            this.test_CM1_CCM1_RetFun(condition)
+        }
+
+        condition = false
+
+        expectChanges()
+
+        revalidate()
+    }
+}
+
+@Composable
+fun test_CM1_RetFun(condition: Boolean) {
+    Text("Root - before")
+    M1 {
+        Text("M1 - before")
+        if (condition) return
+        Text("M1 - after")
+    }
+    Text("Root - after")
+}
+
+fun MockViewValidator.test_CM1_RetFun(condition: Boolean) {
+    Text("Root - before")
+    Text("M1 - before")
+    if (condition) return
+    Text("M1 - after")
+    Text("Root - after")
+}
+
+@Composable
+fun test_CM1_CCM1_RetFun(condition: Boolean) {
+    Text("Root - before")
+    M1 {
+        Text("M1 - begin")
+        if (condition) {
+            Text("if - begin")
+            M1 {
+                Text("In CCM1")
+                return@test_CM1_CCM1_RetFun
+            }
+        }
+        Text("M1 - end")
+    }
+    Text("Root - end")
+}
+
+fun MockViewValidator.test_CM1_CCM1_RetFun(condition: Boolean) {
+    Text("Root - before")
+    Text("M1 - begin")
+    if (condition) {
+        Text("if - begin")
+        Text("In CCM1")
+        return
+    }
+    Text("M1 - end")
+    Text("Root - end")
 }
 
 var functionInstance: () -> Int = { 0 }
@@ -3392,3 +3516,15 @@ fun <T> MutableList<T>.swap(a: T, b: T) {
     set(aIndex, b)
     set(bIndex, a)
 }
+
+@Composable
+private inline fun InlineWrapper(content: @Composable () -> Unit) = content()
+
+@Composable
+private inline fun M1(content: @Composable () -> Unit) = InlineWrapper { content() }
+
+@Composable
+private inline fun M2(content: @Composable () -> Unit) = M1 { content() }
+
+@Composable
+private inline fun M3(content: @Composable () -> Unit) = M2 { content() }
