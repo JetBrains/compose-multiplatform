@@ -118,11 +118,8 @@ internal class PointerInputEventProcessor(val root: LayoutNode) {
      * new pointers.
      */
     fun processCancel() {
-        if (!isProcessing) {
-            // Processing currently does not support reentrancy.
-            pointerInputChangeEventProducer.clear()
-            hitPathTracker.processCancel()
-        }
+        pointerInputChangeEventProducer.clear()
+        hitPathTracker.processCancel()
     }
 }
 
