@@ -43,6 +43,7 @@ import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -87,17 +88,17 @@ class DefaultContextMenuRepresentation(
                 popupPositionProvider = rememberCursorPositionProvider(),
                 onKeyEvent = {
                     if (it.type == KeyEventType.KeyDown) {
-                        when (it.key) {
-                            Key.Escape -> {
+                        when (it.key.nativeKeyCode) {
+                            java.awt.event.KeyEvent.VK_ESCAPE -> {
                                 state.status = ContextMenuState.Status.Closed
                                 true
                             }
-                            Key.DirectionDown -> {
+                            java.awt.event.KeyEvent.VK_DOWN  -> {
                                 inputModeManager!!.requestInputMode(InputMode.Keyboard)
                                 focusManager!!.moveFocus(FocusDirection.Next)
                                 true
                             }
-                            Key.DirectionUp -> {
+                            java.awt.event.KeyEvent.VK_UP -> {
                                 inputModeManager!!.requestInputMode(InputMode.Keyboard)
                                 focusManager!!.moveFocus(FocusDirection.Previous)
                                 true

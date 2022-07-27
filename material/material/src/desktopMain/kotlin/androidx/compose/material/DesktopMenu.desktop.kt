@@ -183,13 +183,13 @@ private fun handlePopupOnKeyEvent(
         onDismissRequest()
         true
     } else if (keyEvent.type == KeyEventType.KeyDown) {
-        when (keyEvent.key) {
-            Key.DirectionDown -> {
+        when {
+            keyEvent.isDirectionDown -> {
                 inputModeManager.requestInputMode(InputMode.Keyboard)
                 focusManager.moveFocus(FocusDirection.Next)
                 true
             }
-            Key.DirectionUp -> {
+            keyEvent.isDirectionUp -> {
                 inputModeManager.requestInputMode(InputMode.Keyboard)
                 focusManager.moveFocus(FocusDirection.Previous)
                 true

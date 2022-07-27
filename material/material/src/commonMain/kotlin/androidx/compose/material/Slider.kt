@@ -285,39 +285,39 @@ private fun Modifier.slideOnKeyEvents(
         // the delta has to be discrete. In this case, 1% of the valueRange seems to make sense.
         val actualSteps = if (steps > 0) steps + 1 else 100
         val delta = rangeLength / actualSteps
-        when (it.key) {
-            Key.DirectionUp -> {
+        when {
+            it.isDirectionUp -> {
                 onValueChangeState.value((value + delta).coerceIn(valueRange))
                 true
             }
-            Key.DirectionDown -> {
+            it.isDirectionDown -> {
                 onValueChangeState.value((value - delta).coerceIn(valueRange))
                 true
             }
-            Key.DirectionRight -> {
+            it.isDirectionRight -> {
                 val sign = if (isRtl) -1 else 1
                 onValueChangeState.value((value + sign * delta).coerceIn(valueRange))
                 true
             }
-            Key.DirectionLeft -> {
+            it.isDirectionLeft -> {
                 val sign = if (isRtl) -1 else 1
                 onValueChangeState.value((value - sign * delta).coerceIn(valueRange))
                 true
             }
-            Key.Home -> {
+            it.isHome -> {
                 onValueChangeState.value(valueRange.start)
                 true
             }
-            Key.MoveEnd -> {
+            it.isMoveEnd -> {
                 onValueChangeState.value(valueRange.endInclusive)
                 true
             }
-            Key.PageUp -> {
+            it.isPgUp -> {
                 val page = (actualSteps / 10).coerceIn(1, 10)
                 onValueChangeState.value((value - page * delta).coerceIn(valueRange))
                 true
             }
-            Key.PageDown -> {
+            it.isPgDn -> {
                 val page = (actualSteps / 10).coerceIn(1, 10)
                 onValueChangeState.value((value + page * delta).coerceIn(valueRange))
                 true
