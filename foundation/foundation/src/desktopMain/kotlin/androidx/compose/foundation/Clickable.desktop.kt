@@ -18,13 +18,20 @@ package androidx.compose.foundation
 
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType.Companion.KeyDown
 import androidx.compose.ui.input.key.KeyEventType.Companion.KeyUp
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.nativeKeyCode
@@ -40,6 +47,8 @@ import androidx.compose.ui.input.pointer.isOutOfBounds
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.center
+import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.util.fastAll
 import java.awt.event.KeyEvent.VK_ENTER
 import kotlinx.coroutines.coroutineScope
@@ -51,14 +60,18 @@ internal actual fun isComposeRootInScrollableContainer(): () -> Boolean = { fals
 internal actual val TapIndicationDelay: Long = 0L
 
 /**
- * Whether the specified [KeyEvent] represents a user intent to perform a click.
- * (eg. When you press Enter on a focused button, it should perform a click).
+ * Whether the specified [KeyEvent] should trigger a press for a clickable component, i.e. whether
+ * it is associated with a press of the enter key.
+ */
+internal actual val KeyEvent.isPress: Boolean
+    get() = type == KeyDown && key.nativeKeyCode == VK_ENTER
+
+/**
+ * Whether the specified [KeyEvent] should trigger a click for a clickable component, i.e. whether
+ * it is associated with a release of the enter key.
  */
 internal actual val KeyEvent.isClick: Boolean
-    get() = type == KeyUp && when (key.nativeKeyCode) {
-        VK_ENTER -> true
-        else -> false
-    }
+    get() = type == KeyUp && key.nativeKeyCode == VK_ENTER
 
 @Immutable @ExperimentalFoundationApi
 class MouseClickScope constructor(
@@ -85,8 +98,11 @@ fun Modifier.mouseClickable(
 ) = composed(
     factory = {
         val onClickState = rememberUpdatedState(onClick)
+        val centreOffset = remember { mutableStateOf(Offset.Zero) }
+        val currentKeyPressInteractions = remember { mutableMapOf<Key, PressInteraction.Press>() }
         val gesture = if (enabled) {
             Modifier.pointerInput(Unit) {
+                centreOffset.value = size.center.toOffset()
                 detectTapWithContext(
                     onTap = { down, _ ->
                         onClickState.value.invoke(
@@ -104,13 +120,16 @@ fun Modifier.mouseClickable(
         Modifier
             .genericClickableWithoutGesture(
                 gestureModifiers = gesture,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                indicationScope = rememberCoroutineScope(),
+                keyClickOffset = centreOffset,
                 enabled = enabled,
                 onClickLabel = onClickLabel,
+                currentKeyPressInteractions = currentKeyPressInteractions,
                 role = role,
                 onLongClickLabel = null,
                 onLongClick = null,
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() },
                 onClick = { onClick(EmptyClickContext) }
             )
     },
