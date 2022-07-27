@@ -55,6 +55,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 @Sampled
@@ -66,7 +67,7 @@ fun TextTabs() {
         TabRow(selectedTabIndex = state) {
             titles.forEachIndexed { index, title ->
                 Tab(
-                    text = { Text(title) },
+                    text = { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) },
                     selected = state == index,
                     onClick = { state = index }
                 )
@@ -114,7 +115,7 @@ fun TextAndIconTabs() {
         TabRow(selectedTabIndex = state) {
             titlesAndIcons.forEachIndexed { index, (title, icon) ->
                 Tab(
-                    text = { Text(title) },
+                    text = { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) },
                     icon = { Icon(icon, contentDescription = null) },
                     selected = state == index,
                     onClick = { state = index }

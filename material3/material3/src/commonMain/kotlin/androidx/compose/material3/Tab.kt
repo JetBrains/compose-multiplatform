@@ -308,7 +308,9 @@ private fun TabBaselineLayout(
         {
             if (text != null) {
                 Box(
-                    Modifier.layoutId("text").padding(horizontal = HorizontalTextPadding)
+                    Modifier
+                        .layoutId("text")
+                        .padding(horizontal = HorizontalTextPadding)
                 ) { text() }
             }
             if (icon != null) {
@@ -330,11 +332,17 @@ private fun TabBaselineLayout(
 
         val tabWidth = max(textPlaceable?.width ?: 0, iconPlaceable?.width ?: 0)
 
-        val tabHeight = if (textPlaceable != null && iconPlaceable != null) {
+        val specHeight = if (textPlaceable != null && iconPlaceable != null) {
             LargeTabHeight
         } else {
             SmallTabHeight
         }.roundToPx()
+
+        val tabHeight = max(
+            specHeight,
+            (iconPlaceable?.height ?: 0) + (textPlaceable?.height ?: 0) +
+                IconDistanceFromBaseline.roundToPx()
+        )
 
         val firstBaseline = textPlaceable?.get(FirstBaseline)
         val lastBaseline = textPlaceable?.get(LastBaseline)
