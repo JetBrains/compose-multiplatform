@@ -24,6 +24,12 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.modifier.ModifierLocalConsumer
+import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.platform.inspectable
 import androidx.compose.ui.semantics.Role
@@ -215,6 +221,14 @@ fun Modifier.triStateToggleable(
         properties["onClick"] = onClick
     }
 ) {
+    fun Modifier.detectToggleFromKey() = this.onKeyEvent {
+        if (enabled && it.isToggle) {
+            onClick()
+            true
+        } else {
+            false
+        }
+    }
     clickable(
         interactionSource = interactionSource,
         indication = indication,
@@ -223,5 +237,11 @@ fun Modifier.triStateToggleable(
         onClick = onClick
     ).semantics {
         this.toggleableState = state
-    }
+    }.detectToggleFromKey()
 }
+
+/**
+ * Whether the specified [KeyEvent] represents a user intent to perform a toggle.
+ * (eg. When you press Space on a focused checkbox, it should perform a toggle).
+ */
+internal expect val KeyEvent.isToggle: Boolean
