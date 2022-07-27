@@ -19,7 +19,6 @@ package androidx.build.docs
 import androidx.build.SupportConfig
 import androidx.build.dackka.DackkaTask
 import androidx.build.dackka.GenerateMetadataTask
-import androidx.build.dackka.MetadataEntry
 import androidx.build.dependencies.KOTLIN_VERSION
 import androidx.build.doclava.DacOptions
 import androidx.build.doclava.DoclavaTask
@@ -46,6 +45,8 @@ import org.gradle.api.Task
 import org.gradle.api.artifacts.ComponentMetadataContext
 import org.gradle.api.artifacts.ComponentMetadataRule
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.component.ComponentArtifactIdentifier
+import org.gradle.api.artifacts.result.ResolvedArtifactResult
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.DocsType
@@ -143,7 +144,8 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             unzippedSamplesSources,
             unzipSamplesTask,
             dependencyClasspath,
-            buildOnServer
+            buildOnServer,
+            docsSourcesConfiguration,
         )
         configureDokka(
             project,
@@ -349,7 +351,8 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
         unzippedSamplesSources: File,
         unzipSamplesTask: TaskProvider<Sync>,
         dependencyClasspath: FileCollection,
-        buildOnServer: TaskProvider<*>
+        buildOnServer: TaskProvider<*>,
+        docsConfiguration: Configuration
     ) {
         val generatedDocsDir = project.file("${project.buildDir}/dackkaDocs")
 
@@ -361,7 +364,20 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             "generateMetadata",
             GenerateMetadataTask::class.java
         ) { task ->
-            task.metadataEntries.set(gatherMetadataEntries())
+
+            @Suppress("UnstableApiUsage") // getResolvedArtifacts() is marked @Incubating
+            val artifacts = docsConfiguration.incoming.artifacts.resolvedArtifacts
+            task.getArtifactIds().set(
+
+                /**
+                 * Transforms the Set of [ResolvedArtifactResult] objects to a List of
+                 * [ComponentArtifactIdentifier] objects.
+                 *
+                 * This follows the guidance from
+                 * https://docs.gradle.org/7.5/userguide/more_about_tasks.html.
+                 */
+                artifacts.map { result -> result.map { it.id } }
+            )
             task.destinationFile.set(getMetadataRegularFile(project))
         }
 
@@ -698,42 +714,3 @@ private val hiddenPackages = listOf(
 private val hiddenPackagesJava = setOf(
     "androidx.*compose.*"
 )
-
-/**
- * Converts AndroidX library and path data to a list of [MetadataEntry].
- *
- * TODO(b/239095864) replace static data with dynamically generated data from libraries
- */
-private fun gatherMetadataEntries(): List<MetadataEntry> {
-    val pagingCompose = MetadataEntry(
-        groupId = "androidx.paging",
-        artifactId = "paging-compose",
-        releaseNotesUrl = "https://developer.android.com/jetpack/androidx/releases/paging",
-        sourceDir = "paging/compose"
-    )
-    val pagingRuntime = MetadataEntry(
-        groupId = "androidx.paging",
-        artifactId = "paging-runtime",
-        releaseNotesUrl = "https://developer.android.com/jetpack/androidx/releases/paging",
-        sourceDir = "paging"
-    )
-    val pagingRxJava2 = MetadataEntry(
-        groupId = "androidx.paging",
-        artifactId = "paging-rxjava2",
-        releaseNotesUrl = "https://developer.android.com/jetpack/androidx/releases/paging",
-        sourceDir = "paging/rxjava2"
-    )
-    val pagingRxJava3 = MetadataEntry(
-        groupId = "androidx.paging",
-        artifactId = "paging-rxjava3",
-        releaseNotesUrl = "https://developer.android.com/jetpack/androidx/releases/paging",
-        sourceDir = "paging/rxjava3"
-    )
-
-    return listOf(
-        pagingCompose,
-        pagingRuntime,
-        pagingRxJava2,
-        pagingRxJava3,
-    )
-}
