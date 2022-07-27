@@ -1089,6 +1089,41 @@ class SemanticsTests {
     }
 
     @Test
+    fun testChildrenSortedByBounds_sameOffset_differentSize() {
+        val child1 = "child1"
+        val child2 = "child2"
+        rule.setContent {
+            Box(
+                Modifier.testTag(TestTag)
+            ) {
+                SimpleTestLayout(
+                    Modifier
+                        .requiredSize(100.dp)
+                        .offset(x = 50.dp, y = 0.dp)
+                        .semantics { testTag = child1 }
+                ) {}
+                SimpleTestLayout(
+                    Modifier.requiredSize(50.dp)
+                    .offset(x = 50.dp, y = 0.dp)
+                    .semantics { testTag = child2 }
+                ) {}
+            }
+        }
+
+        // Size should not be a factor.  z-order or placement order should break the tie instead.
+        val root = rule.onNodeWithTag(TestTag).fetchSemanticsNode("can't find node $TestTag")
+        assertEquals(2, root.replacedChildrenSortedByBounds.size)
+        assertEquals(
+            child2,
+            root.replacedChildrenSortedByBounds[0].config.getOrNull(SemanticsProperties.TestTag)
+        )
+        assertEquals(
+            child1,
+            root.replacedChildrenSortedByBounds[1].config.getOrNull(SemanticsProperties.TestTag)
+        )
+    }
+
+    @Test
     fun testChildrenSortedByBounds_vertical_subcompose() {
         val child1 = "child1"
         val child2 = "child2"
