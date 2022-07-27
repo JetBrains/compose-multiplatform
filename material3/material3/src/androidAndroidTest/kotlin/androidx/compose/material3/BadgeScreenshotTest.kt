@@ -51,6 +51,7 @@ class BadgeScreenshotTest {
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL3)
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun lightTheme_noContent() {
         composeTestRule.setMaterialContent(lightColorScheme()) {
@@ -69,6 +70,7 @@ class BadgeScreenshotTest {
         )
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun darkTheme_noContent() {
         composeTestRule.setMaterialContent(darkColorScheme()) {
@@ -87,6 +89,7 @@ class BadgeScreenshotTest {
         )
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun lightTheme_withContent() {
         composeTestRule.setMaterialContent(lightColorScheme()) {
@@ -105,6 +108,7 @@ class BadgeScreenshotTest {
         )
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun darkTheme_withContent() {
         composeTestRule.setMaterialContent(darkColorScheme()) {
