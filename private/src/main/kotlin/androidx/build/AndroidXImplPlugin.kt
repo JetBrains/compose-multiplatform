@@ -55,12 +55,19 @@ import com.android.build.gradle.TestPlugin
 import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.internal.tasks.AnalyticsRecordingTask
 import com.android.build.gradle.internal.tasks.ListingFileRedirectTask
+import java.io.File
+import java.time.Duration
+import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Inject
 import org.gradle.api.GradleException
-import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.JavaVersion.VERSION_11
+import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.artifacts.repositories.IvyArtifactRepository
+import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginExtension
@@ -73,25 +80,18 @@ import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.io.File
-import java.time.Duration
-import java.util.Locale
-import java.util.concurrent.ConcurrentHashMap
-import javax.inject.Inject
-import org.gradle.api.component.SoftwareComponentFactory
-import org.gradle.api.artifacts.repositories.IvyArtifactRepository
-import org.gradle.kotlin.dsl.KotlinClosure1
-import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.targets.native.KotlinNativeHostTestRun
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.kotlin.gradle.testing.KotlinTaskTestRun
 
@@ -869,7 +869,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         const val CREATE_LIBRARY_BUILD_INFO_FILES_TASK = "createLibraryBuildInfoFiles"
         const val CREATE_AGGREGATE_BUILD_INFO_FILES_TASK = "createAggregateBuildInfoFiles"
         const val GENERATE_TEST_CONFIGURATION_TASK = "GenerateTestConfiguration"
-        const val REPORT_LIBRARY_METRICS_TASK = "reportLibraryMetrics"
         const val ZIP_TEST_CONFIGS_WITH_APKS_TASK = "zipTestConfigsWithApks"
         const val ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK = "zipConstrainedTestConfigsWithApks"
 
