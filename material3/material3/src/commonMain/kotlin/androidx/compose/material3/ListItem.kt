@@ -18,6 +18,7 @@ package androidx.compose.material3
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.heightIn
@@ -81,14 +82,13 @@ fun ListItem(
     if (overlineText == null && supportingText == null) {
         // One-Line List Item
         ListItem(
-            modifier = modifier
-                .heightIn(min = ListTokens.ListItemContainerHeight)
-                .padding(
-                    vertical = ListItemVerticalPadding,
-                    horizontal = ListItemHorizontalPadding
-                ),
+            modifier = modifier,
+            containerColor = colors.containerColor(enabled = true).value,
+            contentColor = colors.headlineColor(enabled = true).value,
             tonalElevation = tonalElevation,
             shadowElevation = shadowElevation,
+            minHeight = ListTokens.ListItemContainerHeight,
+            paddingValues = PaddingValues(ListItemHorizontalPadding, ListItemVerticalPadding)
         ) {
             if (leadingContent != null) {
                 leadingContent(
@@ -119,14 +119,13 @@ fun ListItem(
     } else if (overlineText == null) {
         // Two-Line List Item
         ListItem(
-            modifier = modifier
-                .heightIn(min = TwoLineListItemContainerHeight)
-                .padding(
-                    vertical = ListItemVerticalPadding,
-                    horizontal = ListItemHorizontalPadding
-                ),
+            modifier = modifier,
+            containerColor = colors.containerColor(enabled = true).value,
+            contentColor = colors.headlineColor(enabled = true).value,
             tonalElevation = tonalElevation,
             shadowElevation = shadowElevation,
+            minHeight = TwoLineListItemContainerHeight,
+            paddingValues = PaddingValues(ListItemHorizontalPadding, ListItemVerticalPadding)
         ) {
             if (leadingContent != null) {
                 leadingContent(
@@ -164,14 +163,13 @@ fun ListItem(
     } else if (supportingText == null) {
         // Two-Line List Item
         ListItem(
-            modifier = modifier
-                .heightIn(min = TwoLineListItemContainerHeight)
-                .padding(
-                    vertical = ListItemVerticalPadding,
-                    horizontal = ListItemHorizontalPadding
-                ),
+            modifier = modifier,
+            containerColor = colors.containerColor(enabled = true).value,
+            contentColor = colors.headlineColor(enabled = true).value,
             tonalElevation = tonalElevation,
             shadowElevation = shadowElevation,
+            minHeight = TwoLineListItemContainerHeight,
+            paddingValues = PaddingValues(ListItemHorizontalPadding, ListItemVerticalPadding)
         ) {
             if (leadingContent != null) {
                 leadingContent(
@@ -209,14 +207,16 @@ fun ListItem(
     } else {
         // Three-Line List Item
         ListItem(
-            modifier = modifier
-                .heightIn(min = ThreeLineListItemContainerHeight)
-                .padding(
-                    vertical = ListItemThreeLineVerticalPadding,
-                    horizontal = ListItemHorizontalPadding
-                ),
+            modifier = modifier,
+            containerColor = colors.containerColor(enabled = true).value,
+            contentColor = colors.headlineColor(enabled = true).value,
             tonalElevation = tonalElevation,
             shadowElevation = shadowElevation,
+            minHeight = ThreeLineListItemContainerHeight,
+            paddingValues = PaddingValues(
+                ListItemHorizontalPadding,
+                ListItemThreeLineVerticalPadding
+            )
         ) {
             if (leadingContent != null) {
                 leadingContent(
@@ -284,6 +284,8 @@ private fun ListItem(
     contentColor: Color = ListItemDefaults.contentColor,
     tonalElevation: Dp = ListItemDefaults.Elevation,
     shadowElevation: Dp = ListItemDefaults.Elevation,
+    minHeight: Dp,
+    paddingValues: PaddingValues,
     content: @Composable RowScope.() -> Unit,
 ) {
     Surface(
@@ -294,7 +296,12 @@ private fun ListItem(
         tonalElevation = tonalElevation,
         shadowElevation = shadowElevation,
     ) {
-        Row(content = content)
+        Row(
+            modifier = Modifier
+            .heightIn(min = minHeight)
+            .padding(paddingValues),
+            content = content
+        )
     }
 }
 
