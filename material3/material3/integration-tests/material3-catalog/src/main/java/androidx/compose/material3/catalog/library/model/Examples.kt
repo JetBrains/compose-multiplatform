@@ -103,6 +103,8 @@ import androidx.compose.material3.samples.SimpleOutlinedTextFieldSample
 import androidx.compose.material3.samples.SimpleSmallTopAppBar
 import androidx.compose.material3.samples.SimpleTextFieldSample
 import androidx.compose.material3.samples.SliderSample
+import androidx.compose.material3.samples.SliderWithCustomThumbSample
+import androidx.compose.material3.samples.SliderWithCustomTrackAndThumb
 import androidx.compose.material3.samples.SmallFloatingActionButtonSample
 import androidx.compose.material3.samples.StepRangeSliderSample
 import androidx.compose.material3.samples.StepsSliderSample
@@ -683,6 +685,20 @@ val SlidersExamples = listOf(
     ) {
         StepRangeSliderSample()
     },
+    Example(
+        name = ::SliderWithCustomThumbSample.name,
+        description = SlidersExampleDescription,
+        sourceUrl = SlidersExampleSourceUrl
+    ) {
+        SliderWithCustomThumbSample()
+    },
+    Example(
+        name = ::SliderWithCustomTrackAndThumb.name,
+        description = SlidersExampleDescription,
+        sourceUrl = SlidersExampleSourceUrl
+    ) {
+        SliderWithCustomTrackAndThumb()
+    }
 )
 
 private const val SnackbarsExampleDescription = "Snackbars examples"
