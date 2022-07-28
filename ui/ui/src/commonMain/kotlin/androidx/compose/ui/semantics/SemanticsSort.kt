@@ -124,16 +124,6 @@ internal class NodeLocationHolder internal constructor(
         if (topDifference != 0f) {
             return if (topDifference < 0) -1 else 1
         }
-        // Break tie by height.
-        val heightDifference = location.height - other.location.height
-        if (heightDifference != 0f) {
-            return if (heightDifference < 0) 1 else -1
-        }
-        // Break tie by width.
-        val widthDifference = location.width - other.location.width
-        if (widthDifference != 0f) {
-            return if (widthDifference < 0) 1 else -1
-        }
 
         // Find a child of each view with different screen bounds. If we get here, node and
         // other.node must be attached.
