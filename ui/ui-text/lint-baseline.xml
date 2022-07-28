@@ -43,7 +43,7 @@
         errorLine1="@OptIn(InternalPlatformTextApi::class, ExperimentalTextApi::class)"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/AndroidParagraph.android.kt"/>
+            file="src/androidMain/kotlin/androidx/compose/ui/text/AndroidParagraph.android.kt"/>
     </issue>
 
     <issue
@@ -52,7 +52,7 @@
         errorLine1="@OptIn(InternalPlatformTextApi::class)"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/AndroidParagraph.android.kt"/>
+            file="src/androidMain/kotlin/androidx/compose/ui/text/AndroidParagraph.android.kt"/>
     </issue>
 
     <issue
@@ -61,7 +61,7 @@
         errorLine1="@OptIn(InternalPlatformTextApi::class)"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/AndroidParagraph.android.kt"/>
+            file="src/androidMain/kotlin/androidx/compose/ui/text/AndroidParagraph.android.kt"/>
     </issue>
 
     <issue

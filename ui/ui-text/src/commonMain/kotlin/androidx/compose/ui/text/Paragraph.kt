@@ -40,7 +40,7 @@ internal const val DefaultMaxLines = Int.MAX_VALUE
  * Paragraphs can be displayed on a [Canvas] using the [paint] method.
  */
 @JvmDefaultWithCompatibility
-interface Paragraph {
+sealed interface Paragraph {
     /**
      * The amount of horizontal space this paragraph occupies.
      */

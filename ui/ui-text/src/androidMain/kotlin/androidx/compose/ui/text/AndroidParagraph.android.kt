@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.text.platform
+package androidx.compose.ui.text
 
+import java.util.Locale as JavaLocale
 import android.text.Spanned
 import android.text.TextUtils
 import androidx.annotation.VisibleForTesting
@@ -29,13 +30,6 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.Paragraph
-import androidx.compose.ui.text.ParagraphIntrinsics
-import androidx.compose.ui.text.Placeholder
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.android.InternalPlatformTextApi
 import androidx.compose.ui.text.android.LayoutCompat.ALIGN_CENTER
 import androidx.compose.ui.text.android.LayoutCompat.ALIGN_LEFT
@@ -49,18 +43,16 @@ import androidx.compose.ui.text.android.LayoutCompat.JUSTIFICATION_MODE_INTER_WO
 import androidx.compose.ui.text.android.TextLayout
 import androidx.compose.ui.text.android.selection.WordBoundary
 import androidx.compose.ui.text.android.style.PlaceholderSpan
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.createFontFamilyResolver
+import androidx.compose.ui.text.platform.AndroidParagraphIntrinsics
+import androidx.compose.ui.text.platform.AndroidTextPaint
+import androidx.compose.ui.text.platform.isIncludeFontPaddingEnabled
 import androidx.compose.ui.text.platform.style.ShaderBrushSpan
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.Density
-import java.util.Locale as JavaLocale
-import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.ceilToInt
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
 
 /**
  * Android specific implementation for [Paragraph]
@@ -496,71 +488,3 @@ private fun TextLayout.numberOfLinesThatFitMaxHeight(maxHeight: Int): Int {
     }
     return lineCount
 }
-
-@Suppress("DEPRECATION")
-@Deprecated(
-    "Font.ResourceLoader is deprecated, instead pass FontFamily.Resolver",
-    replaceWith = ReplaceWith(
-        "ActualParagraph(text, style, spanStyles, placeholders, " +
-            "maxLines, ellipsis, width, density, fontFamilyResolver)"
-    ),
-)
-internal actual fun ActualParagraph(
-    text: String,
-    style: TextStyle,
-    spanStyles: List<AnnotatedString.Range<SpanStyle>>,
-    placeholders: List<AnnotatedString.Range<Placeholder>>,
-    maxLines: Int,
-    ellipsis: Boolean,
-    width: Float,
-    density: Density,
-    @Suppress("DEPRECATION") resourceLoader: Font.ResourceLoader
-): Paragraph = AndroidParagraph(
-    AndroidParagraphIntrinsics(
-        text = text,
-        style = style,
-        placeholders = placeholders,
-        spanStyles = spanStyles,
-        fontFamilyResolver = createFontFamilyResolver(resourceLoader),
-        density = density
-    ),
-    maxLines,
-    ellipsis,
-    Constraints(maxWidth = width.ceilToInt())
-)
-
-internal actual fun ActualParagraph(
-    text: String,
-    style: TextStyle,
-    spanStyles: List<AnnotatedString.Range<SpanStyle>>,
-    placeholders: List<AnnotatedString.Range<Placeholder>>,
-    maxLines: Int,
-    ellipsis: Boolean,
-    constraints: Constraints,
-    density: Density,
-    fontFamilyResolver: FontFamily.Resolver
-): Paragraph = AndroidParagraph(
-    AndroidParagraphIntrinsics(
-        text = text,
-        style = style,
-        placeholders = placeholders,
-        spanStyles = spanStyles,
-        fontFamilyResolver = fontFamilyResolver,
-        density = density
-    ),
-    maxLines,
-    ellipsis,
-    constraints
-)
-
-internal actual fun ActualParagraph(
-    paragraphIntrinsics: ParagraphIntrinsics,
-    maxLines: Int,
-    ellipsis: Boolean,
-    constraints: Constraints
-): Paragraph = AndroidParagraph(
-    paragraphIntrinsics as AndroidParagraphIntrinsics,
-    maxLines,
-    ellipsis,
-    constraints
-)

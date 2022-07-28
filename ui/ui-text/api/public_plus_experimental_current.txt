@@ -4,6 +4,9 @@ package androidx.compose.ui.text {
   public final class ActualAtomicReferenceJvmKt {
   }
 
+  public final class AndroidParagraph_androidKt {
+  }
+
   public final class AndroidTextStyle_androidKt {
     method @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.PlatformParagraphStyle lerp(androidx.compose.ui.text.PlatformParagraphStyle start, androidx.compose.ui.text.PlatformParagraphStyle stop, float fraction);
     method @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.PlatformSpanStyle lerp(androidx.compose.ui.text.PlatformSpanStyle start, androidx.compose.ui.text.PlatformSpanStyle stop, float fraction);
@@ -169,7 +172,7 @@ package androidx.compose.ui.text {
   public final class MultiParagraphKt {
   }
 
-  @kotlin.jvm.JvmDefaultWithCompatibility public interface Paragraph {
+  @kotlin.jvm.JvmDefaultWithCompatibility public sealed interface Paragraph {
     method public androidx.compose.ui.text.style.ResolvedTextDirection getBidiRunDirection(int offset);
     method public androidx.compose.ui.geometry.Rect getBoundingBox(int offset);
     method public androidx.compose.ui.geometry.Rect getCursorRect(int offset);
