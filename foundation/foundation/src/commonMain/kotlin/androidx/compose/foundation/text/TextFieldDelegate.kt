@@ -141,9 +141,21 @@ internal class TextFieldDelegate {
         private fun onEditCommand(
             ops: List<EditCommand>,
             editProcessor: EditProcessor,
-            onValueChange: (TextFieldValue) -> Unit
+            onValueChange: (TextFieldValue) -> Unit,
+            session: TextInputSession?
         ) {
-            onValueChange(editProcessor.apply(ops))
+            val newValue = editProcessor.apply(ops)
+
+            // Android: Some IME calls getTextBeforeCursor API just after the setComposingText. The
+            // getTextBeforeCursor may return the text without a text set by setComposingText
+            // because the text field state in the application code is updated on the next time
+            // composition. On the other hand, some IME gets confused and cancel the composition
+            // because the text set by setComposingText is not available.
+            // To avoid this problem, update the state in the TextInputService to the latest
+            // plausible state. When the real state comes, the TextInputService will compare and
+            // update the state if it is modified by developers.
+            session?.updateState(null, newValue)
+            onValueChange(newValue)
         }
 
         /**
@@ -188,12 +200,14 @@ internal class TextFieldDelegate {
             onValueChange: (TextFieldValue) -> Unit,
             onImeActionPerformed: (ImeAction) -> Unit
         ): TextInputSession {
-            return textInputService.startInput(
+            var session: TextInputSession? = null
+            session = textInputService.startInput(
                 value = value,
                 imeOptions = imeOptions,
-                onEditCommand = { onEditCommand(it, editProcessor, onValueChange) },
+                onEditCommand = { onEditCommand(it, editProcessor, onValueChange, session) },
                 onImeActionPerformed = onImeActionPerformed
             )
+            return session
         }
 
         /**
