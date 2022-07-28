@@ -18,6 +18,7 @@ package androidx.compose.material3
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.tokens.NavigationDrawerTokens
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -113,6 +114,27 @@ class PermanentNavigationDrawerTest {
 
         rule.onNodeWithTag("content")
             .assertWidthIsEqualTo(NavigationDrawerTokens.ContainerWidth)
+    }
+
+    @Test
+    fun permanentNavigationDrawer_testCustomWidth() {
+        rule.setMaterialContent(lightColorScheme()) {
+            PermanentNavigationDrawer(
+                drawerContent = {
+                    PermanentDrawerSheet(modifier = Modifier.width(260.dp)) {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("content")
+                        )
+                    }
+                },
+                content = {}
+            )
+        }
+
+        rule.onNodeWithTag("content")
+            .assertWidthIsEqualTo(260.dp)
     }
 
     @Test
