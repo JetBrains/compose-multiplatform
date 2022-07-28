@@ -2204,4 +2204,69 @@ class ClickableTest {
             assertThat(interactions.last()).isInstanceOf(PressInteraction.Release::class.java)
         }
     }
+
+    @Test
+    @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    fun clickableTest_interruptedClick_emitsCancelIndication() {
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
+        val interactionSource = MutableInteractionSource()
+        val focusRequester = FocusRequester()
+        val enabled = mutableStateOf(true)
+        lateinit var scope: CoroutineScope
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box(Modifier.padding(10.dp)) {
+                BasicText("ClickableText",
+                    modifier = Modifier
+                        .testTag("clickable")
+                        .focusRequester(focusRequester)
+                        .clickable(
+                            interactionSource = interactionSource,
+                            indication = null,
+                            enabled = enabled.value
+                        ) {}
+                )
+            }
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        val interactions = mutableListOf<Interaction>()
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        val clickableNode = rule.onNodeWithTag("clickable")
+
+        clickableNode.performKeyInput { keyDown(Key.Enter) }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+        }
+
+        enabled.value = false
+
+        clickableNode.assertIsNotEnabled()
+
+        rule.runOnIdle {
+            // Filter out focus interactions.
+            val pressInteractions = interactions.filterIsInstance<PressInteraction>()
+            assertThat(pressInteractions).hasSize(2)
+            assertThat(pressInteractions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(pressInteractions.last()).isInstanceOf(PressInteraction.Cancel::class.java)
+        }
+
+        // Key releases should not result in interactions.
+        clickableNode.performKeyInput { keyUp(Key.Enter) }
+
+        // Make sure nothing has changed.
+        rule.runOnIdle {
+            val pressInteractions = interactions.filterIsInstance<PressInteraction>()
+            assertThat(pressInteractions).hasSize(2)
+            assertThat(pressInteractions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(pressInteractions.last()).isInstanceOf(PressInteraction.Cancel::class.java)
+        }
+    }
 }

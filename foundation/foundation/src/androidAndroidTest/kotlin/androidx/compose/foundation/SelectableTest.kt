@@ -48,6 +48,7 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.isSelectable
@@ -998,6 +999,72 @@ class SelectableTest {
             assertThat(interactions).hasSize(2)
             assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
             assertThat(interactions.last()).isInstanceOf(PressInteraction.Release::class.java)
+        }
+    }
+
+    @Test
+    @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    fun selectableTest_interruptedClick_emitsCancelIndication() {
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
+        val interactionSource = MutableInteractionSource()
+        val focusRequester = FocusRequester()
+        val enabled = mutableStateOf(true)
+        lateinit var scope: CoroutineScope
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box(Modifier.padding(10.dp)) {
+                BasicText("SelectableText",
+                    modifier = Modifier
+                        .testTag("selectable")
+                        .focusRequester(focusRequester)
+                        .selectable(
+                            selected = true,
+                            interactionSource = interactionSource,
+                            indication = null,
+                            enabled = enabled.value
+                        ) {}
+                )
+            }
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        val interactions = mutableListOf<Interaction>()
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        val selectableNode = rule.onNodeWithTag("selectable")
+
+        selectableNode.performKeyInput { keyDown(Key.Enter) }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+        }
+
+        enabled.value = false
+
+        selectableNode.assertIsNotEnabled()
+
+        rule.runOnIdle {
+            // Filter out focus interactions.
+            val pressInteractions = interactions.filterIsInstance<PressInteraction>()
+            assertThat(pressInteractions).hasSize(2)
+            assertThat(pressInteractions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(pressInteractions.last()).isInstanceOf(PressInteraction.Cancel::class.java)
+        }
+
+        // Key releases should not result in interactions.
+        selectableNode.performKeyInput { keyUp(Key.Enter) }
+
+        // Make sure nothing has changed.
+        rule.runOnIdle {
+            val pressInteractions = interactions.filterIsInstance<PressInteraction>()
+            assertThat(pressInteractions).hasSize(2)
+            assertThat(pressInteractions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(pressInteractions.last()).isInstanceOf(PressInteraction.Cancel::class.java)
         }
     }
 }

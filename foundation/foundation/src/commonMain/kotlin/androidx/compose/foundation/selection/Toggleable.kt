@@ -259,7 +259,12 @@ private fun Modifier.toggleableImpl(
     }
     val onClickState = rememberUpdatedState(onClick)
     if (enabled) {
-        PressedInteractionSourceDisposableEffect(interactionSource, pressedInteraction)
+        PressedInteractionSourceDisposableEffect(
+            interactionSource,
+            pressedInteraction,
+            // TODO(b/240261333): Replace empty map with map of keys to press interactions.
+            mutableMapOf()
+        )
     }
     val isRootInScrollableContainer = isComposeRootInScrollableContainer()
     val isToggleableInScrollableContainer = remember { mutableStateOf(true) }
