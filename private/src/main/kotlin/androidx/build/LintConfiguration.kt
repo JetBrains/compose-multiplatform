@@ -177,7 +177,9 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
         if (task.name.startsWith("updateLintBaseline")) {
             task.doLast {
                 task.outputs.files.find { it.name == "lint-baseline.xml" }?.let { file ->
-                    file.writeText(removeLineAndColumnAttributes(file.readText()))
+                    if (file.exists()) {
+                        file.writeText(removeLineAndColumnAttributes(file.readText()))
+                    }
                 }
             }
         }
