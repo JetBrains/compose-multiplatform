@@ -303,7 +303,7 @@ class AppBarScreenshotTest {
         composeTestRule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(BottomAppBarTestTag)) {
                 BottomAppBar(
-                    icons = {
+                    actions = {
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(
                                 imageVector = Icons.Filled.Menu,
@@ -335,7 +335,7 @@ class AppBarScreenshotTest {
         composeTestRule.setMaterialContent(darkColorScheme()) {
             Box(Modifier.testTag(BottomAppBarTestTag)) {
                 BottomAppBar(
-                    icons = {
+                    actions = {
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(
                                 imageVector = Icons.Filled.Menu,
