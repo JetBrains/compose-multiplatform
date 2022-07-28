@@ -126,11 +126,14 @@ internal fun Spannable.setLineHeight(
 ) {
     val resolvedLineHeight = resolveLineHeightInPx(lineHeight, contextFontSize, density)
     if (!resolvedLineHeight.isNaN()) {
+        // in order to handle empty lines (including empty text) better, change endIndex so that
+        // it won't apply trimLastLineBottom rule
+        val endIndex = if (isEmpty() || last() == '\n') length + 1 else length
         setSpan(
             span = LineHeightStyleSpan(
                 lineHeight = resolvedLineHeight,
                 startIndex = 0,
-                endIndex = length,
+                endIndex = endIndex,
                 trimFirstLineTop = lineHeightStyle.trim.isTrimFirstLineTop(),
                 trimLastLineBottom = lineHeightStyle.trim.isTrimLastLineBottom(),
                 topPercentage = lineHeightStyle.alignment.topPercentage

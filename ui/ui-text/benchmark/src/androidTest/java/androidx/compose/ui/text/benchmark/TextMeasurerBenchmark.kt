@@ -55,7 +55,7 @@ class TextMeasurerBenchmark(
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "length={0} type={1} alphabet={2}")
-        fun initParameters(): List<Array<Any>> = cartesian(
+        fun initParameters(): List<Array<Any?>> = cartesian(
             arrayOf(8, 32, 128, 512),
             arrayOf(TextType.PlainText, TextType.StyledText),
             arrayOf(Alphabet.Latin, Alphabet.Cjk)

@@ -218,7 +218,7 @@ fun List<Array<Any>>.cartesian(vararg array: Any): List<Array<Any>> {
 /**
  * Creates a cartesian product of the given arrays.
  */
-fun cartesian(vararg arrays: Array<Any>): List<Array<Any>> {
+fun cartesian(vararg arrays: Array<Any?>): List<Array<Any?>> {
     return arrays.fold(listOf(arrayOf())) { acc, list ->
         // add items from the current list
         // to each list that was accumulated

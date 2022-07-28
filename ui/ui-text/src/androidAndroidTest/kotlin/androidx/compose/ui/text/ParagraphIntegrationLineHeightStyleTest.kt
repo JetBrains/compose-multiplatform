@@ -840,11 +840,55 @@ class ParagraphIntegrationLineHeightStyleTest {
         }
     }
 
+    @Test
+    fun lastLineEmptyTextHasSameLineHeightAsNonEmptyText() {
+        assertEmptyLineMetrics("", "a")
+        assertEmptyLineMetrics("\n", "a\na")
+        assertEmptyLineMetrics("a\n", "a\na")
+        assertEmptyLineMetrics("\na", "a\na")
+        assertEmptyLineMetrics("\na\na", "a\na\na")
+        assertEmptyLineMetrics("a\na\n", "a\na\na")
+    }
+
+    private fun assertEmptyLineMetrics(textWithEmptyLine: String, textWithoutEmptyLine: String) {
+        val textStyle = TextStyle(
+            lineHeightStyle = LineHeightStyle(
+                trim = Trim.None,
+                alignment = Alignment.Proportional
+            ),
+            platformStyle = @Suppress("DEPRECATION") PlatformTextStyle(
+                includeFontPadding = false
+            )
+        )
+
+        val paragraphWithEmptyLastLine = simpleParagraph(
+            text = textWithEmptyLine,
+            style = textStyle
+        ) as AndroidParagraph
+
+        val otherParagraph = simpleParagraph(
+            text = textWithoutEmptyLine,
+            style = textStyle
+        ) as AndroidParagraph
+
+        with(paragraphWithEmptyLastLine) {
+            for (line in 0 until lineCount) {
+                assertThat(height).isEqualTo(otherParagraph.height)
+                assertThat(getLineTop(line)).isEqualTo(otherParagraph.getLineTop(line))
+                assertThat(getLineBottom(line)).isEqualTo(otherParagraph.getLineBottom(line))
+                assertThat(getLineHeight(line)).isEqualTo(otherParagraph.getLineHeight(line))
+                assertThat(getLineAscent(line)).isEqualTo(otherParagraph.getLineAscent(line))
+                assertThat(getLineDescent(line)).isEqualTo(otherParagraph.getLineDescent(line))
+                assertThat(getLineBaseline(line)).isEqualTo(otherParagraph.getLineBaseline(line))
+            }
+        }
+    }
+
     private fun singleLineParagraph(
         lineHeightTrim: Trim,
         lineHeightAlignment: Alignment,
+        text: String = "AAA"
     ): AndroidParagraph {
-        val text = "AAA"
         val textStyle = TextStyle(
             lineHeightStyle = LineHeightStyle(
                 trim = lineHeightTrim,
