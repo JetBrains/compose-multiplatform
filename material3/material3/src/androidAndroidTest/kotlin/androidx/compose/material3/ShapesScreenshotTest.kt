@@ -29,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -45,7 +44,6 @@ import org.junit.runner.RunWith
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@OptIn(ExperimentalTestApi::class, ExperimentalMaterial3Api::class)
 class ShapesScreenshotTest {
 
     @get:Rule
@@ -57,25 +55,28 @@ class ShapesScreenshotTest {
     @Test
     fun shapes() {
         rule.setMaterialContent(lightColorScheme()) {
-            Box(Modifier.semantics(mergeDescendants = true) {}.testTag(Tag)) {
+            Box(
+                Modifier
+                    .semantics(mergeDescendants = true) {}
+                    .testTag(Tag)) {
                 val shapes = MaterialTheme.shapes
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.verticalScroll(rememberScrollState()),
                 ) {
-                    Button(shape = RectangleShape, onClick = {}) { Text("None") }
+                    Button(onClick = {}, shape = RectangleShape) { Text("None") }
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(shape = shapes.extraSmall, onClick = {}) { Text("Extra  Small") }
+                    Button(onClick = {}, shape = shapes.extraSmall) { Text("Extra  Small") }
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(shape = shapes.small, onClick = {}) { Text("Small") }
+                    Button(onClick = {}, shape = shapes.small) { Text("Small") }
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(shape = shapes.medium, onClick = {}) { Text("Medium") }
+                    Button(onClick = {}, shape = shapes.medium) { Text("Medium") }
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(shape = shapes.large, onClick = {}) { Text("Large") }
+                    Button(onClick = {}, shape = shapes.large) { Text("Large") }
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(shape = shapes.extraLarge, onClick = {}) { Text("Extra Large") }
+                    Button(onClick = {}, shape = shapes.extraLarge) { Text("Extra Large") }
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(shape = CircleShape, onClick = {}) { Text("Full") }
+                    Button(onClick = {}, shape = CircleShape) { Text("Full") }
                 }
             }
         }

@@ -38,18 +38,18 @@ fun ShapeDemo() {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.verticalScroll(rememberScrollState()),
     ) {
-        Button(shape = RectangleShape, onClick = {}) { Text("None") }
+        Button(onClick = {}, shape = RectangleShape) { Text("None") }
         Spacer(modifier = Modifier.height(16.dp))
-        Button(shape = shapes.extraSmall, onClick = {}) { Text("Extra  Small") }
+        Button(onClick = {}, shape = shapes.extraSmall) { Text("Extra  Small") }
         Spacer(modifier = Modifier.height(16.dp))
-        Button(shape = shapes.small, onClick = {}) { Text("Small") }
+        Button(onClick = {}, shape = shapes.small) { Text("Small") }
         Spacer(modifier = Modifier.height(16.dp))
-        Button(shape = shapes.medium, onClick = {}) { Text("Medium") }
+        Button(onClick = {}, shape = shapes.medium) { Text("Medium") }
         Spacer(modifier = Modifier.height(16.dp))
-        Button(shape = shapes.large, onClick = {}) { Text("Large") }
+        Button(onClick = {}, shape = shapes.large) { Text("Large") }
         Spacer(modifier = Modifier.height(16.dp))
-        Button(shape = shapes.extraLarge, onClick = {}) { Text("Extra Large") }
+        Button(onClick = {}, shape = shapes.extraLarge) { Text("Extra Large") }
         Spacer(modifier = Modifier.height(16.dp))
-        Button(shape = CircleShape, onClick = {}) { Text("Full") }
+        Button(onClick = {}, shape = CircleShape) { Text("Full") }
     }
 }

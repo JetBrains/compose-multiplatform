@@ -65,21 +65,21 @@ import androidx.compose.ui.unit.Dp
  * @param modifier the [Modifier] to be applied to this card
  * @param shape defines the shape of this card's container, border (when [border] is not null), and
  * shadow (when using [elevation])
- * @param border the border to draw around the container of this card
+ * @param colors [CardColors] that will be used to resolve the colors used for this card in
+ * different states. See [CardDefaults.cardColors].
  * @param elevation [CardElevation] used to resolve the elevation for this card in different states.
  * This controls the size of the shadow below the card. Additionally, when the container color is
  * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See also:
  * [Surface].
- * @param colors [CardColors] that will be used to resolve the colors used for this card in
- * different states. See [CardDefaults.cardColors].
+ * @param border the border to draw around the container of this card
  */
 @Composable
 fun Card(
     modifier: Modifier = Modifier,
     shape: Shape = CardDefaults.shape,
-    border: BorderStroke? = null,
-    elevation: CardElevation = CardDefaults.cardElevation(),
     colors: CardColors = CardDefaults.cardColors(),
+    elevation: CardElevation = CardDefaults.cardElevation(),
+    border: BorderStroke? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Surface(
@@ -114,18 +114,19 @@ fun Card(
  * @param enabled controls the enabled state of this card. When `false`, this component will not
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this card. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this card in different states.
  * @param shape defines the shape of this card's container, border (when [border] is not null), and
  * shadow (when using [elevation])
- * @param border the border to draw around the container of this card
+ * @param colors [CardColors] that will be used to resolve the color(s) used for this card in
+ * different states. See [CardDefaults.cardColors].
  * @param elevation [CardElevation] used to resolve the elevation for this card in different states.
  * This controls the size of the shadow below the card. Additionally, when the container color is
  * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See also:
  * [Surface].
- * @param colors [CardColors] that will be used to resolve the color(s) used for this card in
- * different states. See [CardDefaults.cardColors].
+ * @param border the border to draw around the container of this card
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this card. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this card in different states.
+ *
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -133,11 +134,11 @@ fun Card(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = CardDefaults.shape,
-    border: BorderStroke? = null,
-    elevation: CardElevation = CardDefaults.cardElevation(),
     colors: CardColors = CardDefaults.cardColors(),
+    elevation: CardElevation = CardDefaults.cardElevation(),
+    border: BorderStroke? = null,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable ColumnScope.() -> Unit
 ) {
     Surface(
@@ -173,19 +174,19 @@ fun Card(
  *
  * @param modifier the [Modifier] to be applied to this card
  * @param shape defines the shape of this card's container and shadow (when using [elevation])
+ * @param colors [CardColors] that will be used to resolve the color(s) used for this card in
+ * different states. See [CardDefaults.elevatedCardElevation].
  * @param elevation [CardElevation] used to resolve the elevation for this card in different states.
  * This controls the size of the shadow below the card. Additionally, when the container color is
  * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See also:
  * [Surface].
- * @param colors [CardColors] that will be used to resolve the color(s) used for this card in
- * different states. See [CardDefaults.elevatedCardElevation].
  */
 @Composable
 fun ElevatedCard(
     modifier: Modifier = Modifier,
     shape: Shape = CardDefaults.elevatedShape,
-    elevation: CardElevation = CardDefaults.elevatedCardElevation(),
     colors: CardColors = CardDefaults.elevatedCardColors(),
+    elevation: CardElevation = CardDefaults.elevatedCardElevation(),
     content: @Composable ColumnScope.() -> Unit
 ) = Card(
     modifier = modifier,
@@ -215,16 +216,16 @@ fun ElevatedCard(
  * @param enabled controls the enabled state of this card. When `false`, this component will not
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this card. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this card in different states.
  * @param shape defines the shape of this card's container and shadow (when using [elevation])
+ * @param colors [CardColors] that will be used to resolve the color(s) used for this card in
+ * different states. See [CardDefaults.elevatedCardElevation].
  * @param elevation [CardElevation] used to resolve the elevation for this card in different states.
  * This controls the size of the shadow below the card. Additionally, when the container color is
  * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See also:
  * [Surface].
- * @param colors [CardColors] that will be used to resolve the color(s) used for this card in
- * different states. See [CardDefaults.elevatedCardElevation].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this card. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this card in different states.
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -232,20 +233,20 @@ fun ElevatedCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = CardDefaults.elevatedShape,
-    elevation: CardElevation = CardDefaults.elevatedCardElevation(),
     colors: CardColors = CardDefaults.elevatedCardColors(),
+    elevation: CardElevation = CardDefaults.elevatedCardElevation(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable ColumnScope.() -> Unit
 ) = Card(
     onClick = onClick,
     modifier = modifier,
     enabled = enabled,
-    interactionSource = interactionSource,
     shape = shape,
-    border = null,
-    elevation = elevation,
     colors = colors,
+    elevation = elevation,
+    border = null,
+    interactionSource = interactionSource,
     content = content
 )
 
@@ -266,28 +267,28 @@ fun ElevatedCard(
  * @param modifier the [Modifier] to be applied to this card
  * @param shape defines the shape of this card's container, border (when [border] is not null), and
  * shadow (when using [elevation])
- * @param border the border to draw around the container of this card
+ * @param colors [CardColors] that will be used to resolve the color(s) used for this card in
+ * different states. See [CardDefaults.outlinedCardColors].
  * @param elevation [CardElevation] used to resolve the elevation for this card in different states.
  * This controls the size of the shadow below the card. Additionally, when the container color is
  * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See also:
  * [Surface].
- * @param colors [CardColors] that will be used to resolve the color(s) used for this card in
- * different states. See [CardDefaults.outlinedCardColors].
+ * @param border the border to draw around the container of this card
  */
 @Composable
 fun OutlinedCard(
     modifier: Modifier = Modifier,
     shape: Shape = CardDefaults.outlinedShape,
-    border: BorderStroke = CardDefaults.outlinedCardBorder(),
-    elevation: CardElevation = CardDefaults.outlinedCardElevation(),
     colors: CardColors = CardDefaults.outlinedCardColors(),
+    elevation: CardElevation = CardDefaults.outlinedCardElevation(),
+    border: BorderStroke = CardDefaults.outlinedCardBorder(),
     content: @Composable ColumnScope.() -> Unit
 ) = Card(
     modifier = modifier,
     shape = shape,
-    border = border,
-    elevation = elevation,
     colors = colors,
+    elevation = elevation,
+    border = border,
     content = content
 )
 
@@ -309,18 +310,18 @@ fun OutlinedCard(
  * @param enabled controls the enabled state of this card. When `false`, this component will not
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this card. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this card in different states.
  * @param shape defines the shape of this card's container, border (when [border] is not null), and
  * shadow (when using [elevation])
- * @param border the border to draw around the container of this card
+ * @param colors [CardColors] that will be used to resolve the color(s) used for this card in
+ * different states. See [CardDefaults.outlinedCardColors].
  * @param elevation [CardElevation] used to resolve the elevation for this card in different states.
  * This controls the size of the shadow below the card. Additionally, when the container color is
  * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See also:
  * [Surface].
- * @param colors [CardColors] that will be used to resolve the color(s) used for this card in
- * different states. See [CardDefaults.outlinedCardColors].
+ * @param border the border to draw around the container of this card
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this card. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this card in different states.
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -328,21 +329,21 @@ fun OutlinedCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = CardDefaults.outlinedShape,
-    border: BorderStroke = CardDefaults.outlinedCardBorder(enabled),
-    elevation: CardElevation = CardDefaults.outlinedCardElevation(),
     colors: CardColors = CardDefaults.outlinedCardColors(),
+    elevation: CardElevation = CardDefaults.outlinedCardElevation(),
+    border: BorderStroke = CardDefaults.outlinedCardBorder(enabled),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable ColumnScope.() -> Unit
 ) = Card(
     onClick = onClick,
     modifier = modifier,
     enabled = enabled,
-    interactionSource = interactionSource,
     shape = shape,
-    border = border,
-    elevation = elevation,
     colors = colors,
+    elevation = elevation,
+    border = border,
+    interactionSource = interactionSource,
     content = content
 )
 

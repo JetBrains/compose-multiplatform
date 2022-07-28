@@ -83,20 +83,20 @@ import androidx.compose.ui.unit.dp
  * @param enabled controls the enabled state of this button. When `false`, this component will not
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this button. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this button in different states.
+ * @param shape defines the shape of this button's container, border (when [border] is not null),
+ * and shadow (when using [elevation])
+ * @param colors [ButtonColors] that will be used to resolve the colors for this button in different
+ * states. See [ButtonDefaults.buttonColors].
  * @param elevation [ButtonElevation] used to resolve the elevation for this button in different
  * states. This controls the size of the shadow below the button. Additionally, when the container
  * color is [ColorScheme.surface], this controls the amount of primary color applied as an overlay.
  * See [ButtonElevation.shadowElevation] and [ButtonElevation.tonalElevation].
- * @param shape defines the shape of this button's container, border (when [border] is not null),
- * and shadow (when using [elevation])
  * @param border the border to draw around the container of this button
- * @param colors [ButtonColors] that will be used to resolve the colors for this button in different
- * states. See [ButtonDefaults.buttonColors].
  * @param contentPadding the spacing values to apply internally between the container and the
  * content
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this button. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this button in different states.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,31 +104,29 @@ fun Button(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
     shape: Shape = ButtonDefaults.shape,
-    border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
+    elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
+    border: BorderStroke? = null,
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit
 ) {
     val containerColor = colors.containerColor(enabled).value
     val contentColor = colors.contentColor(enabled).value
     val shadowElevation = elevation?.shadowElevation(enabled, interactionSource)?.value ?: 0.dp
     val tonalElevation = elevation?.tonalElevation(enabled, interactionSource)?.value ?: 0.dp
-
-    // TODO(b/202880001): Apply shadow color from token (will not be possibly any time soon, if ever).
     Surface(
         onClick = onClick,
         modifier = modifier,
+        enabled = enabled,
         shape = shape,
         color = containerColor,
         contentColor = contentColor,
         tonalElevation = tonalElevation,
         shadowElevation = shadowElevation,
         border = border,
-        interactionSource = interactionSource,
-        enabled = enabled,
+        interactionSource = interactionSource
     ) {
         CompositionLocalProvider(LocalContentColor provides contentColor) {
             ProvideTextStyle(value = MaterialTheme.typography.labelLarge) {
@@ -177,44 +175,44 @@ fun Button(
  * @param enabled controls the enabled state of this button. When `false`, this component will not
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this button. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this button in different states.
+ * @param shape defines the shape of this button's container, border (when [border] is not null),
+ * and shadow (when using [elevation])
+ * @param colors [ButtonColors] that will be used to resolve the colors for this button in different
+ * states. See [ButtonDefaults.elevatedButtonColors].
  * @param elevation [ButtonElevation] used to resolve the elevation for this button in different
  * states. This controls the size of the shadow below the button. Additionally, when the container
  * color is [ColorScheme.surface], this controls the amount of primary color applied as an overlay.
  * See [ButtonDefaults.elevatedButtonElevation].
- * @param shape defines the shape of this button's container, border (when [border] is not null),
- * and shadow (when using [elevation])
  * @param border the border to draw around the container of this button
- * @param colors [ButtonColors] that will be used to resolve the colors for this button in different
- * states. See [ButtonDefaults.elevatedButtonColors].
  * @param contentPadding the spacing values to apply internally between the container and the
  * content
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this button. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this button in different states.
  */
 @Composable
 fun ElevatedButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    elevation: ButtonElevation? = ButtonDefaults.elevatedButtonElevation(),
     shape: Shape = ButtonDefaults.elevatedShape,
-    border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.elevatedButtonColors(),
+    elevation: ButtonElevation? = ButtonDefaults.elevatedButtonElevation(),
+    border: BorderStroke? = null,
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit
 ) =
     Button(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
-        interactionSource = interactionSource,
-        elevation = elevation,
         shape = shape,
-        border = border,
         colors = colors,
+        elevation = elevation,
+        border = border,
         contentPadding = contentPadding,
+        interactionSource = interactionSource,
         content = content
     )
 
@@ -248,43 +246,43 @@ fun ElevatedButton(
  * @param enabled controls the enabled state of this button. When `false`, this component will not
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this button. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this button in different states.
+ * @param shape defines the shape of this button's container, border (when [border] is not null),
+ * and shadow (when using [elevation])
+ * @param colors [ButtonColors] that will be used to resolve the colors for this button in different
+ * states. See [ButtonDefaults.filledTonalButtonColors].
  * @param elevation [ButtonElevation] used to resolve the elevation for this button in different
  * states. This controls the size of the shadow below the button. Additionally, when the container
  * color is [ColorScheme.surface], this controls the amount of primary color applied as an overlay.
- * @param shape defines the shape of this button's container, border (when [border] is not null),
- * and shadow (when using [elevation])
  * @param border the border to draw around the container of this button
- * @param colors [ButtonColors] that will be used to resolve the colors for this button in different
- * states. See [ButtonDefaults.filledTonalButtonColors].
  * @param contentPadding the spacing values to apply internally between the container and the
  * content
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this button. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this button in different states.
  */
 @Composable
 fun FilledTonalButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    elevation: ButtonElevation? = ButtonDefaults.filledTonalButtonElevation(),
     shape: Shape = ButtonDefaults.filledTonalShape,
-    border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.filledTonalButtonColors(),
+    elevation: ButtonElevation? = ButtonDefaults.filledTonalButtonElevation(),
+    border: BorderStroke? = null,
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit
 ) =
     Button(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
-        interactionSource = interactionSource,
-        elevation = elevation,
         shape = shape,
-        border = border,
         colors = colors,
+        elevation = elevation,
+        border = border,
         contentPadding = contentPadding,
+        interactionSource = interactionSource,
         content = content
     )
 
@@ -317,43 +315,43 @@ fun FilledTonalButton(
  * @param enabled controls the enabled state of this button. When `false`, this component will not
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this button. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this button in different states.
+ * @param shape defines the shape of this button's container, border (when [border] is not null),
+ * and shadow (when using [elevation]).
+ * @param colors [ButtonColors] that will be used to resolve the colors for this button in different
+ * states. See [ButtonDefaults.outlinedButtonColors].
  * @param elevation [ButtonElevation] used to resolve the elevation for this button in different
  * states. This controls the size of the shadow below the button. Additionally, when the container
  * color is [ColorScheme.surface], this controls the amount of primary color applied as an overlay.
- * @param shape defines the shape of this button's container, border (when [border] is not null),
- * and shadow (when using [elevation]).
  * @param border the border to draw around the container of this button. Pass `null` for no border.
- * @param colors [ButtonColors] that will be used to resolve the colors for this button in different
- * states. See [ButtonDefaults.outlinedButtonColors].
  * @param contentPadding the spacing values to apply internally between the container and the
  * content
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this button. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this button in different states.
  */
 @Composable
 fun OutlinedButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    elevation: ButtonElevation? = null,
     shape: Shape = ButtonDefaults.outlinedShape,
-    border: BorderStroke? = ButtonDefaults.outlinedButtonBorder,
     colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
+    elevation: ButtonElevation? = null,
+    border: BorderStroke? = ButtonDefaults.outlinedButtonBorder,
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit
 ) =
     Button(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
-        interactionSource = interactionSource,
-        elevation = elevation,
         shape = shape,
-        border = border,
         colors = colors,
+        elevation = elevation,
+        border = border,
         contentPadding = contentPadding,
+        interactionSource = interactionSource,
         content = content
     )
 
@@ -386,45 +384,45 @@ fun OutlinedButton(
  * @param enabled controls the enabled state of this button. When `false`, this component will not
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this button. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this button in different states.
+ * @param shape defines the shape of this button's container, border (when [border] is not null),
+ * and shadow (when using [elevation])
+ * @param colors [ButtonColors] that will be used to resolve the colors for this button in different
+ * states. See [ButtonDefaults.textButtonColors].
  * @param elevation [ButtonElevation] used to resolve the elevation for this button in different
  * states. This controls the size of the shadow below the button. Additionally, when the container
  * color is [ColorScheme.surface], this controls the amount of primary color applied as an overlay.
  * A TextButton typically has no elevation, and the default value is `null`. See [ElevatedButton]
  * for a button with elevation.
- * @param shape defines the shape of this button's container, border (when [border] is not null),
- * and shadow (when using [elevation])
  * @param border the border to draw around the container of this button
- * @param colors [ButtonColors] that will be used to resolve the colors for this button in different
- * states. See [ButtonDefaults.textButtonColors].
  * @param contentPadding the spacing values to apply internally between the container and the
  * content
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this button. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this button in different states.
  */
 @Composable
 fun TextButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    elevation: ButtonElevation? = null,
     shape: Shape = ButtonDefaults.textShape,
-    border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.textButtonColors(),
+    elevation: ButtonElevation? = null,
+    border: BorderStroke? = null,
     contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit
 ) =
     Button(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
-        interactionSource = interactionSource,
-        elevation = elevation,
         shape = shape,
-        border = border,
         colors = colors,
+        elevation = elevation,
+        border = border,
         contentPadding = contentPadding,
+        interactionSource = interactionSource,
         content = content
     )
 
@@ -448,11 +446,7 @@ fun TextButton(
  */
 object ButtonDefaults {
 
-    // TODO(b/201344013): Make sure these values stay up to date until replaced with tokens.
     private val ButtonHorizontalPadding = 24.dp
-
-    // TODO(b/202453316): There is no current vertical padding in the spec.
-    // Instead, the height is const 40dp, and the content is vertically center-aligned.
     private val ButtonVerticalPadding = 8.dp
 
     /**
@@ -462,7 +456,6 @@ object ButtonDefaults {
      * - See [TextButtonContentPadding] for content padding used by [TextButton].
      * - See [ButtonWithIconContentPadding] for content padding used by [Button] that contains [Icon].
      */
-    // TODO(b/201343537): Use tokens.
     val ContentPadding =
         PaddingValues(
             start = ButtonHorizontalPadding,
@@ -482,7 +475,6 @@ object ButtonDefaults {
             bottom = ButtonVerticalPadding
         )
 
-    // TODO(b/201344013): Make sure these values stay up to date until replaced with tokens.
     private val TextButtonHorizontalPadding = 12.dp
 
     /** The default content padding used by [TextButton] */
@@ -498,24 +490,20 @@ object ButtonDefaults {
      * The default min width applied for all buttons. Note that you can override it by applying
      * Modifier.widthIn directly on the button composable.
      */
-    // TODO(b/202453316): Make sure this value stays up to date until replaced with a token.
     val MinWidth = 58.dp
 
     /**
      * The default min height applied for all buttons. Note that you can override it by applying
      * Modifier.heightIn directly on the button composable.
      */
-    // TODO(b/202453316): Make sure this value stays up to date until replaced with a token.
     val MinHeight = 40.dp
 
     /** The default size of the icon when used inside any button. */
-    // TODO(b/201344013): Make sure this value stays up to date until replaced with a token.
-    val IconSize = 18.dp
+    val IconSize = FilledButtonTokens.IconSize
 
     /**
      * The default size of the spacing between an icon and a text when they used inside any button.
      */
-    // TODO(b/201344013): Make sure this value stays up to date until replaced with a token.
     val IconSpacing = 8.dp
 
     /** Default shape for a button. */

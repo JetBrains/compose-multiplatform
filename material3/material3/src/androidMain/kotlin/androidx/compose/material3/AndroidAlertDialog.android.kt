@@ -60,12 +60,12 @@ import androidx.compose.ui.window.DialogProperties
  * @param shape defines the shape of this dialog's container
  * @param containerColor the color used for the background of this dialog. Use [Color.Transparent]
  * to have no color.
- * @param tonalElevation when [containerColor] is [ColorScheme.surface], a translucent primary color
- * overlay is applied on top of the container. A higher tonal elevation value will result in a
- * darker color in light theme and lighter color in dark theme. See also: [Surface].
  * @param iconContentColor the content color used for the icon.
  * @param titleContentColor the content color used for the title.
  * @param textContentColor the content color used for the text.
+ * @param tonalElevation when [containerColor] is [ColorScheme.surface], a translucent primary color
+ * overlay is applied on top of the container. A higher tonal elevation value will result in a
+ * darker color in light theme and lighter color in dark theme. See also: [Surface].
  * @param properties typically platform specific properties to further configure the dialog.
  */
 @Composable
@@ -79,10 +79,10 @@ fun AlertDialog(
     text: @Composable (() -> Unit)? = null,
     shape: Shape = AlertDialogDefaults.shape,
     containerColor: Color = AlertDialogDefaults.containerColor,
-    tonalElevation: Dp = AlertDialogDefaults.TonalElevation,
     iconContentColor: Color = AlertDialogDefaults.iconContentColor,
     titleContentColor: Color = AlertDialogDefaults.titleContentColor,
     textContentColor: Color = AlertDialogDefaults.textContentColor,
+    tonalElevation: Dp = AlertDialogDefaults.TonalElevation,
     properties: DialogProperties = DialogProperties()
 ) {
     Dialog(

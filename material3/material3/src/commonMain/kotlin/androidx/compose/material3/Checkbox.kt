@@ -79,11 +79,11 @@ import kotlin.math.max
  * @param enabled controls the enabled state of this checkbox. When `false`, this component will not
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
+ * @param colors [CheckboxColors] that will be used to resolve the colors used for this checkbox in
+ * different states. See [CheckboxDefaults.colors].
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
  * for this checkbox. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this checkbox in different states.
- * @param colors [CheckboxColors] that will be used to resolve the colors used for this checkbox in
- * different states. See [CheckboxDefaults.colors].
  */
 @Composable
 fun Checkbox(
@@ -91,18 +91,18 @@ fun Checkbox(
     onCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    colors: CheckboxColors = CheckboxDefaults.colors()
+    colors: CheckboxColors = CheckboxDefaults.colors(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     TriStateCheckbox(
         state = ToggleableState(checked),
         onClick = if (onCheckedChange != null) {
             { onCheckedChange(!checked) }
         } else null,
-        interactionSource = interactionSource,
+        modifier = modifier,
         enabled = enabled,
         colors = colors,
-        modifier = modifier
+        interactionSource = interactionSource
     )
 }
 
@@ -127,11 +127,11 @@ fun Checkbox(
  * @param enabled controls the enabled state of this checkbox. When `false`, this component will not
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
+ * @param colors [CheckboxColors] that will be used to resolve the colors used for this checkbox in
+ * different states. See [CheckboxDefaults.colors].
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
  * for this checkbox. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this checkbox in different states.
- * @param colors [CheckboxColors] that will be used to resolve the colors used for this checkbox in
- * different states. See [CheckboxDefaults.colors].
  */
 @Composable
 fun TriStateCheckbox(
@@ -139,8 +139,8 @@ fun TriStateCheckbox(
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    colors: CheckboxColors = CheckboxDefaults.colors()
+    colors: CheckboxColors = CheckboxDefaults.colors(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     val toggleableModifier =
         if (onClick != null) {
@@ -320,7 +320,8 @@ private fun CheckboxImpl(
     Canvas(
         modifier
             .wrapContentSize(Alignment.Center)
-            .requiredSize(CheckboxSize)) {
+            .requiredSize(CheckboxSize)
+    ) {
         val strokeWidthPx = floor(StrokeWidth.toPx())
         drawBox(
             boxColor = boxColor.value,

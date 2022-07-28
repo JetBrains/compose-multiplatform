@@ -64,11 +64,11 @@ import androidx.compose.ui.unit.dp
  * @param enabled controls the enabled state of this radio button. When `false`, this component will
  * not respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
+ * @param colors [RadioButtonColors] that will be used to resolve the color used for this radio
+ * button in different states. See [RadioButtonDefaults.colors].
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
  * for this radio button. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this radio button in different states.
- * @param colors [RadioButtonColors] that will be used to resolve the color used for this radio
- * button in different states. See [RadioButtonDefaults.colors].
  */
 @Composable
 fun RadioButton(
@@ -76,8 +76,8 @@ fun RadioButton(
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    colors: RadioButtonColors = RadioButtonDefaults.colors()
+    colors: RadioButtonColors = RadioButtonDefaults.colors(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     val dotRadius = animateDpAsState(
         targetValue = if (selected) RadioButtonDotSize / 2 else 0.dp,
