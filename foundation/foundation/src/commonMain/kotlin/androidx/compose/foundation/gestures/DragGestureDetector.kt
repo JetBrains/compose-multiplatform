@@ -149,10 +149,16 @@ suspend fun AwaitPointerEventScope.awaitDragOrCancellation(
  * Gesture detector that waits for pointer down and touch slop in any direction and then
  * calls [onDrag] for each drag event. It follows the touch slop detection of
  * [awaitTouchSlopOrCancellation] but will consume the position change automatically
- * once the touch slop has been crossed. [onDragStart] will be called when touch slop in passed
- * with the last known pointer position provided. [onDragEnd] is called after all pointers are up
- * and [onDragCancel] is called if another gesture has consumed pointer input, canceling this
- * gesture.
+ * once the touch slop has been crossed.
+ *
+ * [onDragStart] called when the touch slop has been passed and includes an [Offset] representing
+ * the last known pointer position relative to the containing element. The [Offset] can be outside
+ * the actual bounds of the element itself meaning the numbers can be negative or larger than the
+ * element bounds if the touch target is smaller than the
+ * [ViewConfiguration.minimumTouchTargetSize].
+ *
+ * [onDragEnd] is called after all pointers are up and [onDragCancel] is called if another gesture
+ * has consumed pointer input, canceling this gesture.
  *
  * Example Usage:
  * @sample androidx.compose.foundation.samples.DetectDragGesturesSample
@@ -202,10 +208,17 @@ suspend fun PointerInputScope.detectDragGestures(
 
 /**
  * Gesture detector that waits for pointer down and long press, after which it calls [onDrag] for
- * each drag event. [onDragStart] will be called when long press in detected with the last known
- * pointer position provided. [onDragEnd] is called after all pointers are up and [onDragCancel] is
- * called if another gesture has consumed pointer input, canceling this gesture. This function
- * will automatically consume all the position change after the long press.
+ * each drag event.
+ *
+ * [onDragStart] called when a long press is detected and includes an [Offset] representing
+ * the last known pointer position relative to the containing element. The [Offset] can be outside
+ * the actual bounds of the element itself meaning the numbers can be negative or larger than the
+ * element bounds if the touch target is smaller than the
+ * [ViewConfiguration.minimumTouchTargetSize].
+ *
+ * [onDragEnd] is called after all pointers are up and [onDragCancel] is called if another gesture
+ * has consumed pointer input, canceling this gesture. This function will automatically consume all
+ * the position change after the long press.
  *
  * Example Usage:
  * @sample androidx.compose.foundation.samples.DetectDragWithLongPressGesturesSample
@@ -354,10 +367,16 @@ suspend fun AwaitPointerEventScope.awaitVerticalDragOrCancellation(
  * Gesture detector that waits for pointer down and touch slop in the vertical direction and then
  * calls [onVerticalDrag] for each vertical drag event. It follows the touch slop detection of
  * [awaitVerticalTouchSlopOrCancellation], but will consume the position change automatically
- * once the touch slop has been crossed. [onDragStart] will be called when
- * touch slop in passed with the last known pointer position provided. [onDragEnd] is called
- * after all pointers are up and [onDragCancel] is called if another gesture has consumed pointer
- * input, canceling this gesture.
+ * once the touch slop has been crossed.
+ *
+ * [onDragStart] called when the touch slop has been passed and includes an [Offset] representing
+ * the last known pointer position relative to the containing element. The [Offset] can be outside
+ * the actual bounds of the element itself meaning the numbers can be negative or larger than the
+ * element bounds if the touch target is smaller than the
+ * [ViewConfiguration.minimumTouchTargetSize].
+ *
+ * [onDragEnd] is called after all pointers are up and [onDragCancel] is called if another gesture
+ * has consumed pointer input, canceling this gesture.
  *
  * This gesture detector will coordinate with [detectHorizontalDragGestures] and
  * [awaitHorizontalTouchSlopOrCancellation] to ensure only vertical or horizontal dragging
@@ -498,10 +517,16 @@ suspend fun AwaitPointerEventScope.awaitHorizontalDragOrCancellation(
  * Gesture detector that waits for pointer down and touch slop in the horizontal direction and
  * then calls [onHorizontalDrag] for each horizontal drag event. It follows the touch slop
  * detection of [awaitHorizontalTouchSlopOrCancellation], but will consume the position change
- * automatically once the touch slop has been crossed. [onDragStart] will be called when touch
- * slop in passed with the last known pointer position provided. [onDragEnd] is called after all
- * pointers are up and [onDragCancel] is called if another gesture has consumed pointer input,
- * canceling this gesture.
+ * automatically once the touch slop has been crossed.
+ *
+ * [onDragStart] called when the touch slop has been passed and includes an [Offset] representing
+ * the last known pointer position relative to the containing element. The [Offset] can be outside
+ * the actual bounds of the element itself meaning the numbers can be negative or larger than the
+ * element bounds if the touch target is smaller than the
+ * [ViewConfiguration.minimumTouchTargetSize].
+ *
+ * [onDragEnd] is called after all pointers are up and [onDragCancel] is called if another gesture
+ * has consumed pointer input, canceling this gesture.
  *
  * This gesture detector will coordinate with [detectVerticalDragGestures] and
  * [awaitVerticalTouchSlopOrCancellation] to ensure only vertical or horizontal dragging is locked,
