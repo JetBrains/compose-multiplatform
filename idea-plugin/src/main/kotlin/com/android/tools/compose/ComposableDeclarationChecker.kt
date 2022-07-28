@@ -39,6 +39,7 @@ import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtPropertyAccessor
 import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
+import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.types.KotlinType
 
 class ComposableDeclarationChecker : DeclarationChecker, StorageComponentContainerContributor {
@@ -47,7 +48,6 @@ class ComposableDeclarationChecker : DeclarationChecker, StorageComponentContain
     platform: TargetPlatform,
     moduleDescriptor: ModuleDescriptor
   ) {
-    if (!platform.isJvm()) return
     container.useInstance(this)
   }
 

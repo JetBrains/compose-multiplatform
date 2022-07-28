@@ -34,8 +34,8 @@ class ComposeColorSettingsPage : ColorSettingsPage {
     override fun getAdditionalHighlightingTagToDescriptorMap(): MutableMap<String,
             TextAttributesKey> {
         val attributes = HashMap<String, TextAttributesKey>()
-        attributes[ComposableAnnotator.COMPOSABLE_CALL_TEXT_ATTRIBUTES_NAME] =
-          ComposableAnnotator.COMPOSABLE_CALL_TEXT_ATTRIBUTES_KEY
+        attributes[ComposableHighlighter.COMPOSABLE_CALL_TEXT_ATTRIBUTES_NAME] =
+            ComposableHighlighter.COMPOSABLE_CALL_TEXT_ATTRIBUTES_KEY
         attributes["ANNOTATION"] = KotlinHighlightingColors.ANNOTATION
         attributes["KEYWORD"] = KotlinHighlightingColors.KEYWORD
         attributes["FUNCTION_DECLARATION"] = KotlinHighlightingColors.FUNCTION_DECLARATION
@@ -50,7 +50,7 @@ class ComposeColorSettingsPage : ColorSettingsPage {
     override fun getAttributeDescriptors(): Array<AttributesDescriptor> {
         // TODO: this needs to be localized.
         return arrayOf(AttributesDescriptor("Calls to @Compose functions",
-                                            ComposableAnnotator.COMPOSABLE_CALL_TEXT_ATTRIBUTES_KEY))
+            ComposableHighlighter.COMPOSABLE_CALL_TEXT_ATTRIBUTES_KEY))
     }
 
     override fun getColorDescriptors(): Array<ColorDescriptor> {

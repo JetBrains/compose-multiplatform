@@ -26,6 +26,7 @@
         <quickFixContributor implementation="com.android.tools.compose.intentions.ComposeUnresolvedFunctionFixContributor"/>
         <additionalExtractableAnalyser implementation="com.android.tools.compose.ComposableFunctionExtractableAnalyser"/>
         <irGenerationExtension implementation="com.android.tools.compose.ComposePluginIrGenerationExtension"/>
+        <highlighterExtension implementation="com.android.tools.compose.ComposableHighlighter"/>
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.kotlin.extensions.internal">
@@ -34,10 +35,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <dependencySupport coordinate="androidx.compose.runtime:runtime" kind="java" displayName="Jetpack Compose"/>
-
-        <annotator
-                language="kotlin"
-                implementationClass="com.android.tools.compose.ComposableAnnotator"/>
+        
         <additionalTextAttributes scheme="Default" file="colorschemes/IdeComposableAnnotatorColorSchemeDefault.xml"/>
         <colorSettingsPage implementation="com.android.tools.compose.ComposeColorSettingsPage"/>
 
