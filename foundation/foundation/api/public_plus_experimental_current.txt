@@ -1141,6 +1141,9 @@ package androidx.compose.foundation.text {
   public final class UndoManager_jvmKt {
   }
 
+  public final class ValidatingOffsetMappingKt {
+  }
+
 }
 
 package androidx.compose.foundation.text.selection {

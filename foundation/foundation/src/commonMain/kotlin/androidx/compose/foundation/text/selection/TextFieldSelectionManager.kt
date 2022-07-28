@@ -23,6 +23,7 @@ import androidx.compose.foundation.text.InternalFoundationTextApi
 import androidx.compose.foundation.text.TextDragObserver
 import androidx.compose.foundation.text.TextFieldState
 import androidx.compose.foundation.text.UndoManager
+import androidx.compose.foundation.text.ValidatingEmptyOffsetMappingIdentity
 import androidx.compose.foundation.text.detectDownAndDragGesturesWithObserver
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -67,7 +68,7 @@ internal class TextFieldSelectionManager(
     /**
      * The current [OffsetMapping] for text field.
      */
-    internal var offsetMapping: OffsetMapping = OffsetMapping.Identity
+    internal var offsetMapping: OffsetMapping = ValidatingEmptyOffsetMappingIdentity
 
     /**
      * Called when the input service updates the values in [TextFieldValue].
@@ -369,15 +370,17 @@ internal class TextFieldSelectionManager(
 
                 state?.layoutResult?.value?.let { layoutResult ->
                     currentDragPosition = dragBeginPosition + dragTotalDistance
-                    val startOffset = if (isStartHandle)
+                    val startOffset = if (isStartHandle) {
                         layoutResult.getOffsetForPosition(currentDragPosition!!)
-                    else
+                    } else {
                         offsetMapping.originalToTransformed(value.selection.start)
+                    }
 
-                    val endOffset = if (isStartHandle)
+                    val endOffset = if (isStartHandle) {
                         offsetMapping.originalToTransformed(value.selection.end)
-                    else
+                    } else {
                         layoutResult.getOffsetForPosition(currentDragPosition!!)
+                    }
 
                     updateSelection(
                         value = value,
