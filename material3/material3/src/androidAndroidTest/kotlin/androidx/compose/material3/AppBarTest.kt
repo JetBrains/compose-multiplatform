@@ -812,7 +812,7 @@ class AppBarTest {
         rule
             .setMaterialContentForSizeAssertions {
                 BottomAppBar(
-                    icons = {},
+                    actions = {},
                     floatingActionButton = {
                         FloatingActionButton(
                             onClick = { /* do something */ },
@@ -862,7 +862,7 @@ class AppBarTest {
     fun bottomAppBarWithFAB_default_positioning() {
         rule.setMaterialContent(lightColorScheme()) {
             BottomAppBar(
-                icons = {},
+                actions = {},
                 Modifier.testTag("bar"),
                 floatingActionButton = {
                     FloatingActionButton(

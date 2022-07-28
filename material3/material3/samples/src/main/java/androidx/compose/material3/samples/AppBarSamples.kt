@@ -430,7 +430,7 @@ fun SimpleBottomAppBar() {
 @Composable
 fun BottomAppBarWithFAB() {
     BottomAppBar(
-        icons = {
+        actions = {
             IconButton(onClick = { /* doSomething() */ }) {
                 Icon(Icons.Filled.Check, contentDescription = "Localized description")
             }

@@ -308,7 +308,7 @@ fun LargeTopAppBar(
  *
  * Also see [NavigationBar].
  *
- * @param icons the icon content of this BottomAppBar. The default layout here is a [Row],
+ * @param actions the icon content of this BottomAppBar. The default layout here is a [Row],
  * so content inside will be placed horizontally.
  * @param modifier the [Modifier] to be applied to this BottomAppBar
  * @param floatingActionButton optional floating action button at the end of this BottomAppBar
@@ -324,7 +324,7 @@ fun LargeTopAppBar(
  */
 @Composable
 fun BottomAppBar(
-    icons: @Composable RowScope.() -> Unit,
+    actions: @Composable RowScope.() -> Unit,
     modifier: Modifier = Modifier,
     floatingActionButton: @Composable (() -> Unit)? = null,
     containerColor: Color = BottomAppBarDefaults.containerColor,
@@ -338,7 +338,7 @@ fun BottomAppBar(
     tonalElevation = tonalElevation,
     contentPadding = contentPadding
 ) {
-    icons()
+    actions()
     if (floatingActionButton != null) {
         Spacer(Modifier.weight(1f, true))
         Box(
