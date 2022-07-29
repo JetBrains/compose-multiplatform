@@ -12,8 +12,8 @@
       android:pathData="M11.5,11h1v3h-1z"/>
   <path
       android:fillColor="@android:color/white"
-      android:pathData="M9.6724,9.5808l0.7071,-0.7071l2.1213,2.1213l-0.7071,0.7071z"/>
+      android:pathData="M9.672,9.581l0.707,-0.707l2.121,2.121l-0.707,0.707z"/>
   <path
       android:fillColor="@android:color/white"
-      android:pathData="M12.2081,11.7123l-0.7071,-0.7071l2.1213,-2.1213l0.7071,0.7071z"/>
+      android:pathData="M12.208,11.712l-0.707,-0.707l2.121,-2.121l0.707,0.707z"/>
 </vector>

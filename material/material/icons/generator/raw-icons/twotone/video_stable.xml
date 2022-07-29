@@ -6,7 +6,7 @@
     android:tint="?attr/colorControlNormal">
   <path
       android:fillColor="@android:color/white"
-      android:pathData="M7.0627,13.3186l1.3204,-4.9261l8.5579,2.2939l-1.3204,4.9261z"
+      android:pathData="M7.063,13.319l1.32,-4.926l8.558,2.294l-1.32,4.926z"
       android:strokeAlpha="0.3"
       android:fillAlpha="0.3"/>
   <path
