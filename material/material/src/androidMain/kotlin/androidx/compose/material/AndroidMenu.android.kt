@@ -70,7 +70,6 @@ import androidx.compose.ui.window.PopupProperties
  * tapping outside the menu's bounds
  * @param offset [DpOffset] to be added to the position of the menu
  */
-@Suppress("ModifierParameter")
 @Composable
 fun DropdownMenu(
     expanded: Boolean,
