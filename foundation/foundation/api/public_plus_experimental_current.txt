@@ -853,6 +853,22 @@ package androidx.compose.foundation.lazy.layout {
 
 }
 
+package androidx.compose.foundation.lazy.staggeredgrid {
+
+  public final class LazyStaggeredGridDslKt {
+  }
+
+  public final class LazyStaggeredGridItemProviderKt {
+  }
+
+  public final class LazyStaggeredGridKt {
+  }
+
+  public final class LazyStaggeredGridMeasureKt {
+  }
+
+}
+
 package androidx.compose.foundation.relocation {
 
   public final class BringIntoViewKt {
