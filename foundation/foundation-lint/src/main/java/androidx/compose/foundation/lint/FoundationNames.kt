@@ -31,4 +31,10 @@ object FoundationNames {
             val LazyGridState = Name(PackageName, "LazyGridState")
         }
     }
+
+    object Layout {
+        val PackageName = Package(FoundationNames.PackageName, "layout")
+        val Offset = Name(PackageName, "offset")
+        val AbsoluteOffset = Name(PackageName, "absoluteOffset")
+    }
 }
