@@ -21,6 +21,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
@@ -105,6 +106,7 @@ import androidx.compose.ui.text.input.TextInputSession
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
@@ -539,6 +541,9 @@ internal fun CoreTextField(
             // Modifiers applied directly to the internal input field implementation. In general,
             // these will most likely include draw, layout and IME related modifiers.
             val coreTextFieldModifier = Modifier
+                // min height is set for maxLines == 1 in order to prevent text cuts for single line
+                // TextFields
+                .heightIn(min = state.minHeightForSingleLineField)
                 .maxLinesHeight(maxLines, textStyle)
                 .textFieldScroll(
                     scrollerPosition,
@@ -574,6 +579,18 @@ internal fun CoreTextField(
                                 state.layoutResult = TextLayoutResultProxy(result)
                                 onTextLayout(result)
                             }
+
+                            // calculate the min height for single line text to prevent text cuts.
+                            // for single line text maxLines puts in max height constraint based on
+                            // constant characters therefore if the user enters a character that is
+                            // longer (i.e. emoji or a tall script) the text is cut
+                            state.minHeightForSingleLineField = with(density) {
+                                when (maxLines) {
+                                    1 -> result.getLineBottom(0).ceilToIntPx()
+                                    else -> 0
+                                }.toDp()
+                            }
+
                             return layout(
                                 width = width,
                                 height = height,
@@ -695,6 +712,11 @@ internal class TextFieldState(
      * state observation during onDraw callback will make it work.
      */
     var hasFocus by mutableStateOf(false)
+
+    /**
+     * Set to a non-zero value for single line TextFields in order to prevent text cuts.
+     */
+    var minHeightForSingleLineField by mutableStateOf(0.dp)
 
     /** The last layout coordinates for the Text's layout, used by selection */
     var layoutCoordinates: LayoutCoordinates? = null

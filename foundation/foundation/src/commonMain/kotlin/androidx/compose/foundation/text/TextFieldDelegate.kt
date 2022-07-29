@@ -41,8 +41,6 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import kotlin.math.ceil
-import kotlin.math.roundToInt
 import kotlin.jvm.JvmStatic
 
 // visible for testing
@@ -77,10 +75,8 @@ internal fun computeSizeForDefaultText(
         fontFamilyResolver = fontFamilyResolver,
         constraints = Constraints()
     )
-    return IntSize(paragraph.minIntrinsicWidth.toIntPx(), paragraph.height.toIntPx())
+    return IntSize(paragraph.minIntrinsicWidth.ceilToIntPx(), paragraph.height.ceilToIntPx())
 }
-
-private fun Float.toIntPx(): Int = ceil(this).roundToInt()
 
 @OptIn(InternalFoundationTextApi::class)
 internal class TextFieldDelegate {
