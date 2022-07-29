@@ -81,11 +81,11 @@ import kotlinx.coroutines.launch
  * @param enabled controls the enabled state of this switch. When `false`, this component will not
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
+ * @param colors [SwitchColors] that will be used to resolve the colors used for this switch in
+ * different states. See [SwitchDefaults.colors].
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
  * for this switch. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this switch in different states.
- * @param colors [SwitchColors] that will be used to resolve the colors used for this switch in
- * different states. See [SwitchDefaults.colors].
  */
 @Composable
 @Suppress("ComposableLambdaParameterNaming", "ComposableLambdaParameterPosition")
@@ -95,8 +95,8 @@ fun Switch(
     modifier: Modifier = Modifier,
     thumbContent: (@Composable () -> Unit)? = null,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: SwitchColors = SwitchDefaults.colors(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val uncheckedThumbDiameter = if (thumbContent == null) {
         UncheckedThumbDiameter

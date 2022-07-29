@@ -74,9 +74,6 @@ import androidx.compose.ui.unit.dp
  *
  * @param onClick called when this FAB is clicked
  * @param modifier the [Modifier] to be applied to this FAB
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this FAB. You can create and pass in your own `remember`ed instance to observe [Interaction]s
- * and customize the appearance / behavior of this FAB in different states.
  * @param shape defines the shape of this FAB's container and shadow (when using [elevation])
  * @param containerColor the color used for the background of this FAB. Use [Color.Transparent] to
  * have no color.
@@ -87,6 +84,9 @@ import androidx.compose.ui.unit.dp
  * different states. This controls the size of the shadow below the FAB. Additionally, when the
  * container color is [ColorScheme.surface], this controls the amount of primary color applied as an
  * overlay. See also: [Surface].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this FAB. You can create and pass in your own `remember`ed instance to observe [Interaction]s
+ * and customize the appearance / behavior of this FAB in different states.
  * @param content the content of this FAB, typically an [Icon]
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,11 +94,11 @@ import androidx.compose.ui.unit.dp
 fun FloatingActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = FloatingActionButtonDefaults.shape,
     containerColor: Color = FloatingActionButtonDefaults.containerColor,
     contentColor: Color = contentColorFor(containerColor),
     elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit,
 ) {
     Surface(
