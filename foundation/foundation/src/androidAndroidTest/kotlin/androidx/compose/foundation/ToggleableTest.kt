@@ -24,6 +24,7 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.selection.triStateToggleable
@@ -41,6 +42,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -68,6 +70,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -924,5 +927,365 @@ class ToggleableTest {
 
         toggleableNode.performKeyInput { keyUp(Key.Enter) }
         rule.runOnIdle { assertThat(toggled).isTrue() }
+    }
+
+    @Test
+    @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    fun toggleableTest_enterKey_emitsIndication() {
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
+        val interactionSource = MutableInteractionSource()
+        val focusRequester = FocusRequester()
+        lateinit var scope: CoroutineScope
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box(Modifier.padding(10.dp)) {
+                BasicText("ToggleableText",
+                    modifier = Modifier
+                        .testTag("toggleable")
+                        .focusRequester(focusRequester)
+                        .toggleable(
+                            value = false,
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {}
+                )
+            }
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        val interactions = mutableListOf<Interaction>()
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.onNodeWithTag("toggleable").performKeyInput { keyDown(Key.Enter) }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+        }
+
+        rule.onNodeWithTag("toggleable").performKeyInput { keyUp(Key.Enter) }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions.last()).isInstanceOf(PressInteraction.Release::class.java)
+        }
+    }
+
+    @Test
+    @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    fun toggleableTest_numPadEnterKey_emitsIndication() {
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
+        val interactionSource = MutableInteractionSource()
+        val focusRequester = FocusRequester()
+        lateinit var scope: CoroutineScope
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box(Modifier.padding(10.dp)) {
+                BasicText("ToggleableText",
+                    modifier = Modifier
+                        .testTag("toggleable")
+                        .focusRequester(focusRequester)
+                        .toggleable(
+                            value = false,
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {}
+                )
+            }
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        val interactions = mutableListOf<Interaction>()
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.onNodeWithTag("toggleable").performKeyInput { keyDown(Key.NumPadEnter) }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+        }
+
+        rule.onNodeWithTag("toggleable").performKeyInput { keyUp(Key.NumPadEnter) }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions.last()).isInstanceOf(PressInteraction.Release::class.java)
+        }
+    }
+
+    @Test
+    @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    fun toggleableTest_dpadCenter_emitsIndication() {
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
+        val interactionSource = MutableInteractionSource()
+        val focusRequester = FocusRequester()
+        lateinit var scope: CoroutineScope
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box(Modifier.padding(10.dp)) {
+                BasicText("ToggleableText",
+                    modifier = Modifier
+                        .testTag("toggleable")
+                        .focusRequester(focusRequester)
+                        .toggleable(
+                            value = false,
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {}
+                )
+            }
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.waitForIdle()
+
+        val interactions = mutableListOf<Interaction>()
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.onNodeWithTag("toggleable").performKeyInput { keyDown(Key.DirectionCenter) }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+        }
+
+        rule.onNodeWithTag("toggleable").performKeyInput { keyUp(Key.DirectionCenter) }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions.last()).isInstanceOf(PressInteraction.Release::class.java)
+        }
+    }
+
+    @Test
+    @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    fun toggleableTest_otherKey_doesNotEmitIndication() {
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
+        val interactionSource = MutableInteractionSource()
+        val focusRequester = FocusRequester()
+        lateinit var scope: CoroutineScope
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box(Modifier.padding(10.dp)) {
+                BasicText("ToggleableText",
+                    modifier = Modifier
+                        .testTag("toggleable")
+                        .focusRequester(focusRequester)
+                        .toggleable(
+                            value = false,
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {}
+                )
+            }
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        val interactions = mutableListOf<Interaction>()
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.onNodeWithTag("toggleable").performKeyInput { pressKey(Key.Spacebar) }
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+    }
+
+    @Test
+    @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    fun toggleableTest_doubleEnterKey_emitsFurtherInteractions() {
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
+        val interactionSource = MutableInteractionSource()
+        val focusRequester = FocusRequester()
+        lateinit var scope: CoroutineScope
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box(Modifier.padding(10.dp)) {
+                BasicText("ToggleableText",
+                    modifier = Modifier
+                        .testTag("toggleable")
+                        .focusRequester(focusRequester)
+                        .toggleable(
+                            value = false,
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {}
+                )
+            }
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        val interactions = mutableListOf<Interaction>()
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        val toggleableNode = rule.onNodeWithTag("toggleable")
+
+        toggleableNode.performKeyInput { pressKey(Key.Enter) }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions[0]).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions[1]).isInstanceOf(PressInteraction.Release::class.java)
+        }
+
+        toggleableNode.performKeyInput { keyDown(Key.Enter) }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(3)
+            assertThat(interactions[0]).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions[1]).isInstanceOf(PressInteraction.Release::class.java)
+            assertThat(interactions[2]).isInstanceOf(PressInteraction.Press::class.java)
+        }
+
+        toggleableNode.performKeyInput { keyUp(Key.Enter) }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(4)
+            assertThat(interactions[0]).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions[1]).isInstanceOf(PressInteraction.Release::class.java)
+            assertThat(interactions[2]).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions[3]).isInstanceOf(PressInteraction.Release::class.java)
+        }
+    }
+
+    @Test
+    @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    fun toggleableTest_repeatKeyEvents_doNotEmitFurtherInteractions() {
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
+        val interactionSource = MutableInteractionSource()
+        val focusRequester = FocusRequester()
+        lateinit var scope: CoroutineScope
+        var repeatCounter = 0
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box(Modifier.padding(10.dp)) {
+                BasicText("ToggleableText",
+                    modifier = Modifier
+                        .testTag("toggleable")
+                        .focusRequester(focusRequester)
+                        .onKeyEvent {
+                            if (it.nativeKeyEvent.repeatCount != 0)
+                                repeatCounter++
+                            false
+                        }
+                        .toggleable(
+                            value = false,
+                            interactionSource = interactionSource,
+                            indication = null,
+                        ) {}
+                )
+            }
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        val interactions = mutableListOf<Interaction>()
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.onNodeWithTag("toggleable").performKeyInput {
+            keyDown(Key.Enter)
+
+            advanceEventTime(500) // First repeat
+            advanceEventTime(50) // Second repeat
+        }
+
+        rule.runOnIdle {
+            // Ensure that expected number of repeats occurred and did not cause press interactions.
+            assertThat(repeatCounter).isEqualTo(2)
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+        }
+
+        rule.onNodeWithTag("toggleable").performKeyInput { keyUp(Key.Enter) }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions.last()).isInstanceOf(PressInteraction.Release::class.java)
+        }
+    }
+
+    @Test
+    @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    fun toggleableTest_interruptedClick_emitsCancelIndication() {
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
+        val interactionSource = MutableInteractionSource()
+        val focusRequester = FocusRequester()
+        val enabled = mutableStateOf(true)
+        lateinit var scope: CoroutineScope
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box(Modifier.padding(10.dp)) {
+                BasicText("ToggleableText",
+                    modifier = Modifier
+                        .testTag("toggleable")
+                        .focusRequester(focusRequester)
+                        .toggleable(
+                            value = false,
+                            interactionSource = interactionSource,
+                            indication = null,
+                            enabled = enabled.value
+                        ) {}
+                )
+            }
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        val interactions = mutableListOf<Interaction>()
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        val toggleableNode = rule.onNodeWithTag("toggleable")
+
+        toggleableNode.performKeyInput { keyDown(Key.Enter) }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+        }
+
+        enabled.value = false
+
+        toggleableNode.assertIsNotEnabled()
+
+        rule.runOnIdle {
+            // Filter out focus interactions.
+            val pressInteractions = interactions.filterIsInstance<PressInteraction>()
+            assertThat(pressInteractions).hasSize(2)
+            assertThat(pressInteractions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(pressInteractions.last()).isInstanceOf(PressInteraction.Cancel::class.java)
+        }
+
+        // Key releases should not result in interactions.
+        toggleableNode.performKeyInput { keyUp(Key.Enter) }
+
+        // Make sure nothing has changed.
+        rule.runOnIdle {
+            val pressInteractions = interactions.filterIsInstance<PressInteraction>()
+            assertThat(pressInteractions).hasSize(2)
+            assertThat(pressInteractions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(pressInteractions.last()).isInstanceOf(PressInteraction.Cancel::class.java)
+        }
     }
 }
