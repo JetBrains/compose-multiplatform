@@ -136,11 +136,12 @@ import kotlinx.coroutines.launch
  * @param onValueChangeFinished called when value change has ended. This should not be used to
  * update the slider value (use [onValueChange] instead), but rather to know when the user has
  * completed selecting a new value by ending a drag or a click.
+ * @param colors [SliderColors] that will be used to resolve the colors used for this slider in
+ * different states. See [SliderDefaults.colors].
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
  * for this slider. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this slider in different states.
- * @param colors [SliderColors] that will be used to resolve the colors used for this slider in
- * different states. See [SliderDefaults.colors].
+
  */
 // TODO(b/229979132): Add m.io link
 @Composable
@@ -153,8 +154,8 @@ fun Slider(
     /*@IntRange(from = 0)*/
     steps: Int = 0,
     onValueChangeFinished: (() -> Unit)? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    colors: SliderColors = SliderDefaults.colors()
+    colors: SliderColors = SliderDefaults.colors(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     require(steps >= 0) { "steps should be >= 0" }
 
@@ -409,61 +410,62 @@ object SliderDefaults {
      * right in RTL) 30% of the track will be active, while the rest is inactive.
      *
      * @param thumbColor thumb color when enabled
-     * @param disabledThumbColor thumb colors when disabled
      * @param activeTrackColor color of the track in the part that is "active", meaning that the
      * thumb is ahead of it
-     * @param inactiveTrackColor color of the track in the part that is "inactive", meaning that the
-     * thumb is before it
-     * @param disabledActiveTrackColor color of the track in the "active" part when the Slider is
-     * disabled
-     * @param disabledInactiveTrackColor color of the track in the "inactive" part when the
-     * Slider is disabled
      * @param activeTickColor colors to be used to draw tick marks on the active track, if `steps`
      * is specified
+     * @param inactiveTrackColor color of the track in the part that is "inactive", meaning that the
+     * thumb is before it
      * @param inactiveTickColor colors to be used to draw tick marks on the inactive track, if
      * `steps` are specified on the Slider is specified
+     * @param disabledThumbColor thumb colors when disabled
+     * @param disabledActiveTrackColor color of the track in the "active" part when the Slider is
+     * disabled
      * @param disabledActiveTickColor colors to be used to draw tick marks on the active track
      * when Slider is disabled and when `steps` are specified on it
+     * @param disabledInactiveTrackColor color of the track in the "inactive" part when the
+     * Slider is disabled
      * @param disabledInactiveTickColor colors to be used to draw tick marks on the inactive part
      * of the track when Slider is disabled and when `steps` are specified on it
      */
     @Composable
     fun colors(
         thumbColor: Color = SliderTokens.HandleColor.toColor(),
+        activeTrackColor: Color = SliderTokens.ActiveTrackColor.toColor(),
+        activeTickColor: Color = SliderTokens.TickMarksActiveContainerColor
+            .toColor()
+            .copy(alpha = SliderTokens.TickMarksActiveContainerOpacity),
+        inactiveTrackColor: Color = SliderTokens.InactiveTrackColor.toColor(),
+        inactiveTickColor: Color = SliderTokens.TickMarksInactiveContainerColor.toColor()
+            .copy(alpha = SliderTokens.TickMarksInactiveContainerOpacity),
         disabledThumbColor: Color = SliderTokens.DisabledHandleColor
             .toColor()
             .copy(alpha = SliderTokens.DisabledHandleOpacity)
             .compositeOver(MaterialTheme.colorScheme.surface),
-        activeTrackColor: Color = SliderTokens.ActiveTrackColor.toColor(),
-        inactiveTrackColor: Color = SliderTokens.InactiveTrackColor.toColor(),
         disabledActiveTrackColor: Color =
             SliderTokens.DisabledActiveTrackColor
                 .toColor()
                 .copy(alpha = SliderTokens.DisabledActiveTrackOpacity),
+        disabledActiveTickColor: Color = SliderTokens.TickMarksDisabledContainerColor
+            .toColor()
+            .copy(alpha = SliderTokens.TickMarksDisabledContainerOpacity),
         disabledInactiveTrackColor: Color =
             SliderTokens.DisabledInactiveTrackColor
                 .toColor()
                 .copy(alpha = SliderTokens.DisabledInactiveTrackOpacity),
-        activeTickColor: Color = SliderTokens.TickMarksActiveContainerColor
-            .toColor()
-            .copy(alpha = SliderTokens.TickMarksActiveContainerOpacity),
-        inactiveTickColor: Color = SliderTokens.TickMarksInactiveContainerColor.toColor()
-            .copy(alpha = SliderTokens.TickMarksInactiveContainerOpacity),
-        disabledActiveTickColor: Color = SliderTokens.TickMarksDisabledContainerColor
-            .toColor()
-            .copy(alpha = SliderTokens.TickMarksDisabledContainerOpacity),
+
         disabledInactiveTickColor: Color = SliderTokens.TickMarksDisabledContainerColor.toColor()
             .copy(alpha = SliderTokens.TickMarksDisabledContainerOpacity)
     ): SliderColors = DefaultSliderColors(
         thumbColor = thumbColor,
-        disabledThumbColor = disabledThumbColor,
         activeTrackColor = activeTrackColor,
-        inactiveTrackColor = inactiveTrackColor,
-        disabledActiveTrackColor = disabledActiveTrackColor,
-        disabledInactiveTrackColor = disabledInactiveTrackColor,
         activeTickColor = activeTickColor,
+        inactiveTrackColor = inactiveTrackColor,
         inactiveTickColor = inactiveTickColor,
+        disabledThumbColor = disabledThumbColor,
+        disabledActiveTrackColor = disabledActiveTrackColor,
         disabledActiveTickColor = disabledActiveTickColor,
+        disabledInactiveTrackColor = disabledInactiveTrackColor,
         disabledInactiveTickColor = disabledInactiveTickColor
     )
 }
@@ -1047,14 +1049,14 @@ private class RangeSliderLogic(
 @Immutable
 private class DefaultSliderColors(
     private val thumbColor: Color,
-    private val disabledThumbColor: Color,
     private val activeTrackColor: Color,
-    private val inactiveTrackColor: Color,
-    private val disabledActiveTrackColor: Color,
-    private val disabledInactiveTrackColor: Color,
     private val activeTickColor: Color,
+    private val inactiveTrackColor: Color,
     private val inactiveTickColor: Color,
+    private val disabledThumbColor: Color,
+    private val disabledActiveTrackColor: Color,
     private val disabledActiveTickColor: Color,
+    private val disabledInactiveTrackColor: Color,
     private val disabledInactiveTickColor: Color
 ) : SliderColors {
 
@@ -1092,14 +1094,14 @@ private class DefaultSliderColors(
         other as DefaultSliderColors
 
         if (thumbColor != other.thumbColor) return false
-        if (disabledThumbColor != other.disabledThumbColor) return false
         if (activeTrackColor != other.activeTrackColor) return false
-        if (inactiveTrackColor != other.inactiveTrackColor) return false
-        if (disabledActiveTrackColor != other.disabledActiveTrackColor) return false
-        if (disabledInactiveTrackColor != other.disabledInactiveTrackColor) return false
         if (activeTickColor != other.activeTickColor) return false
+        if (inactiveTrackColor != other.inactiveTrackColor) return false
         if (inactiveTickColor != other.inactiveTickColor) return false
+        if (disabledThumbColor != other.disabledThumbColor) return false
+        if (disabledActiveTrackColor != other.disabledActiveTrackColor) return false
         if (disabledActiveTickColor != other.disabledActiveTickColor) return false
+        if (disabledInactiveTrackColor != other.disabledInactiveTrackColor) return false
         if (disabledInactiveTickColor != other.disabledInactiveTickColor) return false
 
         return true
@@ -1107,14 +1109,14 @@ private class DefaultSliderColors(
 
     override fun hashCode(): Int {
         var result = thumbColor.hashCode()
-        result = 31 * result + disabledThumbColor.hashCode()
         result = 31 * result + activeTrackColor.hashCode()
-        result = 31 * result + inactiveTrackColor.hashCode()
-        result = 31 * result + disabledActiveTrackColor.hashCode()
-        result = 31 * result + disabledInactiveTrackColor.hashCode()
         result = 31 * result + activeTickColor.hashCode()
+        result = 31 * result + inactiveTrackColor.hashCode()
         result = 31 * result + inactiveTickColor.hashCode()
+        result = 31 * result + disabledThumbColor.hashCode()
+        result = 31 * result + disabledActiveTrackColor.hashCode()
         result = 31 * result + disabledActiveTickColor.hashCode()
+        result = 31 * result + disabledInactiveTrackColor.hashCode()
         result = 31 * result + disabledInactiveTickColor.hashCode()
         return result
     }
