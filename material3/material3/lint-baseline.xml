@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 7.4.0-alpha08" type="baseline" client="gradle" dependencies="false" name="AGP (7.4.0-alpha08)" variant="all" version="7.4.0-alpha08">
+
+    <issue
+        id="IllegalExperimentalApiUsage"
+        message="`Experimental` and `RequiresOptIn` APIs may only be used within the same-version group where they were defined."
+        errorLine1="@OptIn(ExperimentalTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/material3/IncludeFontPaddingHelper.android.kt"/>
+    </issue>
+
+</issues>
