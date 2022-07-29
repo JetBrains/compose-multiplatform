@@ -27,12 +27,14 @@ import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.isClick
 import androidx.compose.foundation.isComposeRootInScrollableContainer
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalReadScope
@@ -262,7 +264,7 @@ private fun Modifier.toggleableImpl(
         PressedInteractionSourceDisposableEffect(
             interactionSource,
             pressedInteraction,
-            // TODO(b/240261333): Replace empty map with map of keys to press interactions.
+            // TODO(b/240683336): Replace empty map with map of keys to press interactions.
             mutableMapOf()
         )
     }
@@ -286,6 +288,16 @@ private fun Modifier.toggleableImpl(
             onTap = { if (enabled) onClickState.value.invoke() }
         )
     }
+
+    fun Modifier.detectPressAndClickFromKey() = onKeyEvent { keyEvent ->
+        if (enabled && keyEvent.isClick) {
+            onClick()
+            true
+        } else {
+            false
+        }
+    }
+
     this
         .then(
             remember {
@@ -300,6 +312,7 @@ private fun Modifier.toggleableImpl(
             }
         )
         .then(semantics)
+        .detectPressAndClickFromKey()
         .indication(interactionSource, indication)
         .hoverable(enabled = enabled, interactionSource = interactionSource)
         .focusableInNonTouchMode(enabled = enabled, interactionSource = interactionSource)

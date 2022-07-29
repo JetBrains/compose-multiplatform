@@ -34,11 +34,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.first
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -63,6 +65,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
@@ -71,7 +74,6 @@ import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.junit.After
 import org.junit.Before
@@ -94,6 +96,7 @@ class ToggleableTest {
     @After
     fun after() {
         isDebugInspectorInfoEnabled = false
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(true)
     }
 
     @Test
@@ -809,5 +812,117 @@ class ToggleableTest {
             .performTouchInput {
                 click(position = Offset(-1f, -1f))
             }.assertIsOn()
+    }
+
+    @Test
+    @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
+    fun toggleableTest_clickWithEnterKey() {
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
+        val focusRequester = FocusRequester()
+        var toggled by mutableStateOf(false)
+        rule.setContent {
+            BasicText(
+                "ToggleableText",
+                modifier = Modifier
+                    .testTag("toggleable")
+                    .focusRequester(focusRequester)
+                    .toggleable(value = toggled) { toggled = it }
+            )
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        val toggleableNode = rule.onNodeWithTag("toggleable")
+        rule.runOnIdle { assertThat(toggled).isFalse() }
+
+        toggleableNode.performKeyInput { keyDown(Key.Enter) }
+        rule.runOnIdle { assertThat(toggled).isFalse() }
+
+        toggleableNode.performKeyInput { keyUp(Key.Enter) }
+        rule.runOnIdle { assertThat(toggled).isTrue() }
+    }
+
+    @Test
+    @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
+    fun toggleableTest_clickWithNumPadEnterKey() {
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
+        val focusRequester = FocusRequester()
+        var toggled by mutableStateOf(false)
+        rule.setContent {
+            BasicText(
+                "ToggleableText",
+                modifier = Modifier
+                    .testTag("toggleable")
+                    .focusRequester(focusRequester)
+                    .toggleable(value = toggled) { toggled = it }
+            )
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        val toggleableNode = rule.onNodeWithTag("toggleable")
+        rule.runOnIdle { assertThat(toggled).isFalse() }
+
+        toggleableNode.performKeyInput { keyDown(Key.NumPadEnter) }
+        rule.runOnIdle { assertThat(toggled).isFalse() }
+
+        toggleableNode.performKeyInput { keyUp(Key.NumPadEnter) }
+        rule.runOnIdle { assertThat(toggled).isTrue() }
+    }
+
+    @Test
+    @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
+    fun toggleableTest_clickWithDpadCenter() {
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
+        val focusRequester = FocusRequester()
+        var toggled by mutableStateOf(false)
+        rule.setContent {
+            BasicText(
+                "ToggleableText",
+                modifier = Modifier
+                    .testTag("toggleable")
+                    .focusRequester(focusRequester)
+                    .toggleable(value = toggled) { toggled = it }
+            )
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        val toggleableNode = rule.onNodeWithTag("toggleable")
+        rule.runOnIdle { assertThat(toggled).isFalse() }
+
+        toggleableNode.performKeyInput { keyDown(Key.DirectionCenter) }
+        rule.runOnIdle { assertThat(toggled).isFalse() }
+
+        toggleableNode.performKeyInput { keyUp(Key.DirectionCenter) }
+        rule.runOnIdle { assertThat(toggled).isTrue() }
+    }
+
+    @Test
+    @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
+    fun toggleableTest_clickWithEnterKey_triStateToggleable() {
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
+        val focusRequester = FocusRequester()
+        var toggled by mutableStateOf(false)
+        rule.setContent {
+            BasicText(
+                "ToggleableText",
+                modifier = Modifier
+                    .testTag("toggleable")
+                    .focusRequester(focusRequester)
+                    .triStateToggleable(ToggleableState(toggled)) { toggled = !toggled }
+            )
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        val toggleableNode = rule.onNodeWithTag("toggleable")
+        rule.runOnIdle { assertThat(toggled).isFalse() }
+
+        toggleableNode.performKeyInput { keyDown(Key.Enter) }
+        rule.runOnIdle { assertThat(toggled).isFalse() }
+
+        toggleableNode.performKeyInput { keyUp(Key.Enter) }
+        rule.runOnIdle { assertThat(toggled).isTrue() }
     }
 }
