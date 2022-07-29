@@ -144,11 +144,11 @@ fun NavigationRail(
  * @param label optional text label for this item
  * @param alwaysShowLabel whether to always show the label for this item. If false, the label will
  * only be shown when this item is selected.
+ * @param colors [NavigationRailItemColors] that will be used to resolve the colors used for this
+ * item in different states. See [NavigationRailItemDefaults.colors].
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
  * for this item. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this item in different states.
- * @param colors [NavigationRailItemColors] that will be used to resolve the colors used for this
- * item in different states. See [NavigationRailItemDefaults.colors].
  */
 @Composable
 fun NavigationRailItem(
@@ -159,8 +159,8 @@ fun NavigationRailItem(
     enabled: Boolean = true,
     label: @Composable (() -> Unit)? = null,
     alwaysShowLabel: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: NavigationRailItemColors = NavigationRailItemDefaults.colors(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val styledIcon = @Composable {
         val iconColor by colors.iconColor(selected = selected)
@@ -264,19 +264,19 @@ object NavigationRailItemDefaults {
      * specification.
      *
      * @param selectedIconColor the color to use for the icon when the item is selected.
-     * @param unselectedIconColor the color to use for the icon when the item is unselected.
      * @param selectedTextColor the color to use for the text label when the item is selected.
-     * @param unselectedTextColor the color to use for the text label when the item is unselected.
      * @param indicatorColor the color to use for the indicator when the item is selected.
+     * @param unselectedIconColor the color to use for the icon when the item is unselected.
+     * @param unselectedTextColor the color to use for the text label when the item is unselected.
      * @return the resulting [NavigationRailItemColors] used for [NavigationRailItem]
      */
     @Composable
     fun colors(
         selectedIconColor: Color = NavigationRailTokens.ActiveIconColor.toColor(),
-        unselectedIconColor: Color = NavigationRailTokens.InactiveIconColor.toColor(),
         selectedTextColor: Color = NavigationRailTokens.ActiveLabelTextColor.toColor(),
-        unselectedTextColor: Color = NavigationRailTokens.InactiveLabelTextColor.toColor(),
         indicatorColor: Color = NavigationRailTokens.ActiveIndicatorColor.toColor(),
+        unselectedIconColor: Color = NavigationRailTokens.InactiveIconColor.toColor(),
+        unselectedTextColor: Color = NavigationRailTokens.InactiveLabelTextColor.toColor(),
     ): NavigationRailItemColors = remember(
         selectedIconColor,
         unselectedIconColor,
@@ -321,10 +321,10 @@ interface NavigationRailItemColors {
 @Stable
 private class DefaultNavigationRailItemColors(
     private val selectedIconColor: Color,
-    private val unselectedIconColor: Color,
     private val selectedTextColor: Color,
-    private val unselectedTextColor: Color,
     private val selectedIndicatorColor: Color,
+    private val unselectedIconColor: Color,
+    private val unselectedTextColor: Color,
 ) : NavigationRailItemColors {
     @Composable
     override fun iconColor(selected: Boolean): State<Color> {
