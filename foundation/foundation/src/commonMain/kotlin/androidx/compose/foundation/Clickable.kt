@@ -136,17 +136,20 @@ fun Modifier.clickable(
     factory = {
         val onClickState = rememberUpdatedState(onClick)
         val pressedInteraction = remember { mutableStateOf<PressInteraction.Press?>(null) }
+        val currentKeyPressInteractions = remember { mutableMapOf<Key, PressInteraction.Press>() }
         if (enabled) {
-            PressedInteractionSourceDisposableEffect(interactionSource, pressedInteraction)
+            PressedInteractionSourceDisposableEffect(
+                interactionSource,
+                pressedInteraction,
+                currentKeyPressInteractions
+            )
         }
         val isRootInScrollableContainer = isComposeRootInScrollableContainer()
         val isClickableInScrollableContainer = remember { mutableStateOf(true) }
         val delayPressInteraction = rememberUpdatedState {
             isClickableInScrollableContainer.value || isRootInScrollableContainer()
         }
-
         val centreOffset = remember { mutableStateOf(Offset.Zero) }
-        val currentKeyPressInteractions = remember { mutableMapOf<Key, PressInteraction.Press>() }
 
         val gesture = Modifier.pointerInput(interactionSource, enabled) {
             centreOffset.value = size.center.toOffset()
@@ -308,6 +311,7 @@ fun Modifier.combinedClickable(
         val hasLongClick = onLongClick != null
         val hasDoubleClick = onDoubleClick != null
         val pressedInteraction = remember { mutableStateOf<PressInteraction.Press?>(null) }
+        val currentKeyPressInteractions = remember { mutableMapOf<Key, PressInteraction.Press>() }
         if (enabled) {
             // Handles the case where a long click causes a null onLongClick lambda to be passed,
             // so we can cancel the existing press.
@@ -320,7 +324,11 @@ fun Modifier.combinedClickable(
                     }
                 }
             }
-            PressedInteractionSourceDisposableEffect(interactionSource, pressedInteraction)
+            PressedInteractionSourceDisposableEffect(
+                interactionSource,
+                pressedInteraction,
+                currentKeyPressInteractions
+            )
         }
         val isRootInScrollableContainer = isComposeRootInScrollableContainer()
         val isClickableInScrollableContainer = remember { mutableStateOf(true) }
@@ -328,7 +336,6 @@ fun Modifier.combinedClickable(
             isClickableInScrollableContainer.value || isRootInScrollableContainer()
         }
         val centreOffset = remember { mutableStateOf(Offset.Zero) }
-        val currentKeyPressInteractions = remember { mutableMapOf<Key, PressInteraction.Press>() }
 
         val gesture =
             Modifier.pointerInput(interactionSource, hasLongClick, hasDoubleClick, enabled) {
@@ -402,7 +409,8 @@ fun Modifier.combinedClickable(
 @Composable
 internal fun PressedInteractionSourceDisposableEffect(
     interactionSource: MutableInteractionSource,
-    pressedInteraction: MutableState<PressInteraction.Press?>
+    pressedInteraction: MutableState<PressInteraction.Press?>,
+    currentKeyPressInteractions: MutableMap<Key, PressInteraction.Press>
 ) {
     DisposableEffect(interactionSource) {
         onDispose {
@@ -411,6 +419,10 @@ internal fun PressedInteractionSourceDisposableEffect(
                 interactionSource.tryEmit(interaction)
                 pressedInteraction.value = null
             }
+            currentKeyPressInteractions.values.forEach {
+                interactionSource.tryEmit(PressInteraction.Cancel(it))
+            }
+            currentKeyPressInteractions.clear()
         }
     }
 }
