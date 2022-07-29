@@ -49,7 +49,15 @@ object Names {
             val PackageName = Package("androidx.compose.ui.layout")
             val ParentDataModifier = Name(PackageName, "ParentDataModifier")
         }
+
+        object Pointer {
+            val PackageName = Package(Ui.PackageName, "input.pointer")
+            val PointerInputScope = Name(PackageName, "PointerInputScope")
+            val PointerInputScopeModifier = Name(PackageName, "pointerInput")
+            val AwaitPointerEventScope = Name(PackageName, "awaitPointerEventScope")
+        }
     }
+
     object UiGraphics {
         val PackageName = Package("androidx.compose.ui.graphics")
         val Color = Name(PackageName, "Color")

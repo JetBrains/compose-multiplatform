@@ -72,12 +72,11 @@ fun SpringBackScrollingDemo() {
         val gesture = Modifier.pointerInput(Unit) {
             coroutineScope {
                 while (true) {
-                    val pointerId = awaitPointerEventScope {
-                        awaitFirstDown().id
-                    }
                     val velocityTracker = VelocityTracker()
+                    var latestVelocityX = 0f
                     mutatorMutex.mutate(MutatePriority.UserInput) {
                         awaitPointerEventScope {
+                            val pointerId = awaitFirstDown().id
                             horizontalDrag(pointerId) {
                                 scrollPosition += it.positionChange().x
                                 velocityTracker.addPosition(
@@ -86,17 +85,17 @@ fun SpringBackScrollingDemo() {
                                 )
                             }
                         }
+                        latestVelocityX = velocityTracker.calculateVelocity().x
                     }
-                    val velocity = velocityTracker.calculateVelocity().x
                     // Now finger lifted, get fling going
                     launch {
                         mutatorMutex.mutate {
-                            animation = AnimationState(scrollPosition, velocity)
+                            animation = AnimationState(scrollPosition, latestVelocityX)
                             val target = exponentialDecay<Float>()
-                                .calculateTargetValue(scrollPosition, velocity)
+                                .calculateTargetValue(scrollPosition, latestVelocityX)
                             val springBackTarget: Float = calculateSpringBackTarget(
                                 target,
-                                velocity,
+                                latestVelocityX,
                                 itemWidth.value
                             )
 

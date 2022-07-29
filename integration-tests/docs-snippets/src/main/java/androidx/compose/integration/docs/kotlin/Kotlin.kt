@@ -270,14 +270,15 @@ private object KotlinSnippet16 {
                 coroutineScope {
                     while (true) {
                         // Wait for the user to tap on the screen
-                        val offset = awaitPointerEventScope {
-                            awaitFirstDown().position
-                        }
-                        // Launch a new coroutine to asynchronously animate to where
-                        // the user tapped on the screen
-                        launch {
-                            // Animate to the pressed position
-                            animatedOffset.animateTo(offset)
+                        awaitPointerEventScope {
+                            val offset = awaitFirstDown().position
+
+                            // Launch a new coroutine to asynchronously animate to where
+                            // the user tapped on the screen
+                            launch {
+                                // Animate to the pressed position
+                                animatedOffset.animateTo(offset)
+                            }
                         }
                     }
                 }

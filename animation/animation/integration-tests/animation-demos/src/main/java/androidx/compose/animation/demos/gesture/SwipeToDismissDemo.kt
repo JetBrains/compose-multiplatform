@@ -89,12 +89,10 @@ private fun Modifier.swipeToDismiss(index: Int): Modifier = composed {
     this.pointerInput(Unit) {
         coroutineScope {
             while (true) {
-                val pointerId = awaitPointerEventScope {
-                    awaitFirstDown().id
-                }
                 height.value = size.height
                 val velocityTracker = VelocityTracker()
                 awaitPointerEventScope {
+                    val pointerId = awaitFirstDown().id
                     verticalDrag(pointerId) {
                         launch {
                             animatedOffset.snapTo(
