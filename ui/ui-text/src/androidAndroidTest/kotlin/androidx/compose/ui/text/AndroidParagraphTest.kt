@@ -1101,6 +1101,28 @@ AndroidParagraphTest {
     }
 
     @Test
+    fun testEllipsis_whenHeightAllowsForZeroLines_doesEllipsis() {
+        with(defaultDensity) {
+            val text = "This is a text"
+            val fontSize = 30.sp
+            val paragraph = simpleParagraph(
+                text = text,
+                ellipsis = true,
+                style = TextStyle(
+                    fontFamily = basicFontFamily,
+                    fontSize = fontSize
+                ),
+                width = 4 * fontSize.toPx(),
+                height = fontSize.toPx() / 4
+            )
+
+            assertThat(paragraph.didExceedMaxLines).isTrue()
+            assertThat(paragraph.lineCount).isEqualTo(1)
+            assertThat(paragraph.isEllipsisApplied(paragraph.lineCount - 1)).isTrue()
+        }
+    }
+
+    @Test
     fun testEllipsis_withSpans_withLimitedHeight_doesEllipsis() {
         with(defaultDensity) {
             val text = "This is a text"
@@ -1123,7 +1145,6 @@ AndroidParagraphTest {
             assertThat(paragraph.isEllipsisApplied(paragraph.lineCount - 1)).isTrue()
         }
     }
-
     @Test
     fun testSpanStyle_fontSize_appliedOnTextPaint() {
         with(defaultDensity) {

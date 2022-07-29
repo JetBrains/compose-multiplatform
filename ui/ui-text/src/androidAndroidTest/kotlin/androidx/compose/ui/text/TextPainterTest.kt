@@ -358,6 +358,39 @@ class TextPainterTest {
     }
 
     @Test
+    fun drawTextClipsTheContent_ifOverflowIsEllipsis_ifLessThanOneLineFits() {
+        val measurer = textMeasurer()
+        with(defaultDensity) {
+            val fontSize = 20.sp
+            val height = fontSize.toPx().ceilToInt() / 2
+            val textLayoutResult = measurer.measure(
+                text = longText,
+                style = TextStyle(
+                    fontFamily = fontFamilyMeasureFont,
+                    fontSize = fontSize
+                ),
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis,
+                size = IntSize(200, height)
+            )
+
+            val bitmap = draw(200f, 200f) {
+                drawText(textLayoutResult)
+            }
+            val croppedBitmap = Bitmap.createBitmap(bitmap, 0, height, 200, 200 - height)
+
+            // cropped part should be empty
+            assertThat(croppedBitmap).isEqualToBitmap(
+                Bitmap.createBitmap(
+                    200,
+                    200 - height,
+                    Bitmap.Config.ARGB_8888
+                )
+            )
+        }
+    }
+
+    @Test
     fun drawTextDoesNotClipTheContent_ifOverflowIsVisible() {
         val measurer = textMeasurer()
         // constrain the width, height is ignored

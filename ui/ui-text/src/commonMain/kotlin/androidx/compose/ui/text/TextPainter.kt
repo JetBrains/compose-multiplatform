@@ -47,7 +47,7 @@ object TextPainter {
     @OptIn(ExperimentalTextApi::class)
     fun paint(canvas: Canvas, textLayoutResult: TextLayoutResult) {
         val needClipping = textLayoutResult.hasVisualOverflow &&
-            textLayoutResult.layoutInput.overflow == TextOverflow.Clip
+            textLayoutResult.layoutInput.overflow != TextOverflow.Visible
         if (needClipping) {
             val width = textLayoutResult.size.width.toFloat()
             val height = textLayoutResult.size.height.toFloat()
@@ -310,7 +310,7 @@ fun DrawScope.drawText(
 
 private fun DrawTransform.clip(textLayoutResult: TextLayoutResult) {
     if (textLayoutResult.hasVisualOverflow &&
-        textLayoutResult.layoutInput.overflow == TextOverflow.Clip) {
+        textLayoutResult.layoutInput.overflow != TextOverflow.Visible) {
         clipRect(
             left = 0f,
             top = 0f,
