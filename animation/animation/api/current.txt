@@ -29,7 +29,8 @@ package androidx.compose.animation {
   }
 
   public final class CrossfadeKt {
-    method @androidx.compose.runtime.Composable public static <T> void Crossfade(T? targetState, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.core.FiniteAnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static <T> void Crossfade(T? targetState, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.core.FiniteAnimationSpec<java.lang.Float> animationSpec, optional String label, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
+    method @Deprecated @androidx.compose.runtime.Composable public static <T> void Crossfade(T? targetState, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.core.FiniteAnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super T,? extends kotlin.Unit> content);
   }
 
   public final class EnterExitTransitionKt {
@@ -74,7 +75,8 @@ package androidx.compose.animation {
 
   public final class SingleValueAnimationKt {
     method public static androidx.compose.animation.core.Animatable<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D> Animatable(long initialValue);
-    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> animateColorAsState(long targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.graphics.Color> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Color,kotlin.Unit>? finishedListener);
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> animateColorAsState(long targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.graphics.Color> animationSpec, optional String label, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Color,kotlin.Unit>? finishedListener);
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<? extends androidx.compose.ui.graphics.Color>! animateColorAsState(long targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.graphics.Color> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Color,? extends kotlin.Unit>? finishedListener);
   }
 
   public final class SplineBasedDecayKt {
