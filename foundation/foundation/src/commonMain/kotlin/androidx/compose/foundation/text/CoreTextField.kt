@@ -844,6 +844,7 @@ internal class TextFieldState(
         this.keyboardActionRunner.apply {
             this.keyboardActions = keyboardActions
             this.focusManager = focusManager
+            this.inputSession = this@TextFieldState.inputSession
         }
         this.untransformedText = untransformedText
 

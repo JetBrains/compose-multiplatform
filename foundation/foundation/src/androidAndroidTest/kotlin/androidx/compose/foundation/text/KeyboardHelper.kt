@@ -76,7 +76,7 @@ class KeyboardHelper(
         }
     }
 
-    private fun isSoftwareKeyboardShown(): Boolean {
+    fun isSoftwareKeyboardShown(): Boolean {
         return if (Build.VERSION.SDK_INT >= 30) {
             isSoftwareKeyboardShownWithInsets()
         } else {
