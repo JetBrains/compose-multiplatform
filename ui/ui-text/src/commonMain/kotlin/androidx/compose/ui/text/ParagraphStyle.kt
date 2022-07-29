@@ -56,17 +56,13 @@ private val DefaultLineHeight = TextUnit.Unspecified
  * @see TextStyle
  */
 @Immutable
-class ParagraphStyle @ExperimentalTextApi constructor(
+class ParagraphStyle constructor(
     val textAlign: TextAlign? = null,
     val textDirection: TextDirection? = null,
     val lineHeight: TextUnit = TextUnit.Unspecified,
     val textIndent: TextIndent? = null,
-    @ExperimentalTextApi
-    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
-    @get:ExperimentalTextApi val platformStyle: PlatformParagraphStyle? = null,
-    @ExperimentalTextApi
-    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
-    @get:ExperimentalTextApi val lineHeightStyle: LineHeightStyle? = null
+    val platformStyle: PlatformParagraphStyle? = null,
+    val lineHeightStyle: LineHeightStyle? = null
 ) {
 
     /**
@@ -90,7 +86,6 @@ class ParagraphStyle @ExperimentalTextApi constructor(
      * @see SpanStyle
      * @see TextStyle
      */
-    @OptIn(ExperimentalTextApi::class)
     constructor(
         textAlign: TextAlign? = null,
         textDirection: TextDirection? = null,
@@ -120,7 +115,6 @@ class ParagraphStyle @ExperimentalTextApi constructor(
      *
      * If the given paragraph style is null, returns this paragraph style.
      */
-    @OptIn(ExperimentalTextApi::class)
     @Stable
     fun merge(other: ParagraphStyle? = null): ParagraphStyle {
         if (other == null) return this
@@ -139,7 +133,6 @@ class ParagraphStyle @ExperimentalTextApi constructor(
         )
     }
 
-    @OptIn(ExperimentalTextApi::class)
     private fun mergePlatformStyle(other: PlatformParagraphStyle?): PlatformParagraphStyle? {
         if (platformStyle == null) return other
         if (other == null) return platformStyle
@@ -152,7 +145,6 @@ class ParagraphStyle @ExperimentalTextApi constructor(
     @Stable
     operator fun plus(other: ParagraphStyle): ParagraphStyle = this.merge(other)
 
-    @OptIn(ExperimentalTextApi::class)
     fun copy(
         textAlign: TextAlign? = this.textAlign,
         textDirection: TextDirection? = this.textDirection,
@@ -169,7 +161,6 @@ class ParagraphStyle @ExperimentalTextApi constructor(
         )
     }
 
-    @ExperimentalTextApi
     fun copy(
         textAlign: TextAlign? = this.textAlign,
         textDirection: TextDirection? = this.textDirection,
@@ -188,7 +179,6 @@ class ParagraphStyle @ExperimentalTextApi constructor(
         )
     }
 
-    @OptIn(ExperimentalTextApi::class)
     override operator fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ParagraphStyle) return false
@@ -203,7 +193,6 @@ class ParagraphStyle @ExperimentalTextApi constructor(
         return true
     }
 
-    @OptIn(ExperimentalTextApi::class)
     override fun hashCode(): Int {
         var result = textAlign?.hashCode() ?: 0
         result = 31 * result + (textDirection?.hashCode() ?: 0)
@@ -214,7 +203,6 @@ class ParagraphStyle @ExperimentalTextApi constructor(
         return result
     }
 
-    @OptIn(ExperimentalTextApi::class)
     override fun toString(): String {
         return "ParagraphStyle(" +
             "textAlign=$textAlign, " +
@@ -240,7 +228,6 @@ class ParagraphStyle @ExperimentalTextApi constructor(
  * between [start] and [stop]. The interpolation can be extrapolated beyond 0.0 and
  * 1.0, so negative values and values greater than 1.0 are valid.
  */
-@OptIn(ExperimentalTextApi::class)
 @Stable
 fun lerp(start: ParagraphStyle, stop: ParagraphStyle, fraction: Float): ParagraphStyle {
     return ParagraphStyle(
@@ -265,7 +252,6 @@ fun lerp(start: ParagraphStyle, stop: ParagraphStyle, fraction: Float): Paragrap
     )
 }
 
-@OptIn(ExperimentalTextApi::class)
 private fun lerpPlatformStyle(
     start: PlatformParagraphStyle?,
     stop: PlatformParagraphStyle?,
@@ -277,7 +263,6 @@ private fun lerpPlatformStyle(
     return lerp(startNonNull, stopNonNull, fraction)
 }
 
-@OptIn(ExperimentalTextApi::class)
 internal fun resolveParagraphStyleDefaults(
     style: ParagraphStyle,
     direction: LayoutDirection
