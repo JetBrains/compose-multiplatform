@@ -15,29 +15,33 @@
  */
 package com.android.tools.compose.code.completion.constraintlayout
 
-/**
- * Describes a string that may be automatically inserted when selecting an autocomplete option.
- */
-internal sealed class InsertionFormat(
-  val insertableString: String
-)
-
-/**
- * Inserts the string after the auto-completed value.
- *
- * The caret will be moved to the position marked by the '|' character.
- */
-internal class LiteralWithCaretFormat(literalFormat: String) : InsertionFormat(literalFormat)
-
-/**
- * Inserts the string after the auto-complete value.
- *
- * It will insert a new line as if it was done by an ENTER keystroke, marked by the '\n' character.
- *
- * Note that it will only apply the new line on the first '\n' character.
- */
-internal class LiteralNewLineFormat(literalFormat: String) : InsertionFormat(literalFormat)
+import com.android.tools.compose.completion.inserthandler.LiteralNewLineFormat
+import com.android.tools.compose.completion.inserthandler.LiteralWithCaretFormat
+import com.android.tools.compose.completion.inserthandler.LiveTemplateFormat
 
 internal val JsonStringValueTemplate = LiteralWithCaretFormat(": '|',")
 
+internal val JsonNumericValueTemplate = LiteralWithCaretFormat(": |,")
+
 internal val JsonNewObjectTemplate = LiteralNewLineFormat(": {\n}")
+
+internal val JsonStringArrayTemplate = LiteralWithCaretFormat(": ['|'],")
+
+internal val JsonObjectArrayTemplate = LiteralNewLineFormat(": [{\n}],")
+
+internal val ConstrainAnchorTemplate = LiveTemplateFormat(": ['<>', '<>', <0>],")
+
+internal val ClearAllTemplate = LiteralWithCaretFormat(
+  literalFormat = ": ['${ClearOption.Constraints}', '${ClearOption.Dimensions}', '${ClearOption.Transforms}'],"
+)
+
+/**
+ * Returns a [LiveTemplateFormat] that contains a template for a Json array with numeric type, where the size of the array is given by
+ * [count] and the user may edit each of the values in the array using Live Templates.
+ *
+ * E.g.: For [count] = 3, returns the template: `": [0, 0, 0],"`, where every value may be changed by the user.
+ */
+internal fun buildJsonNumberArrayTemplate(count: Int): LiveTemplateFormat {
+  val times = count.coerceAtLeast(1)
+  return LiveTemplateFormat(": [" + "<0>, ".repeat(times).removeSuffix(", ") + "],")
+}

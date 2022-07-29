@@ -19,6 +19,7 @@ import com.intellij.debugger.PositionManager
 import com.intellij.debugger.PositionManagerFactory
 import com.intellij.debugger.engine.DebugProcess
 import org.jetbrains.kotlin.idea.debugger.KotlinPositionManager
+import org.jetbrains.kotlin.idea.debugger.KotlinPositionManagerFactory
 
 class ComposePositionManagerFactory : PositionManagerFactory() {
   override fun createPositionManager(process: DebugProcess): PositionManager {

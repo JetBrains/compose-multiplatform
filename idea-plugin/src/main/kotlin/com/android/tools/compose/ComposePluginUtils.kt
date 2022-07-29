@@ -31,7 +31,7 @@ import org.jetbrains.kotlin.types.typeUtil.supertypes
 fun isModifierChainLongerThanTwo(element: KtElement): Boolean {
   if (element.getChildrenOfType<KtDotQualifiedExpression>().isNotEmpty()) {
     val fqName = element.resolveToCall(BodyResolveMode.PARTIAL)?.getReturnType()?.fqName?.asString()
-    if (fqName == ComposeLibraryNamespace.ANDROIDX_COMPOSE.composeModifierClassName) {
+    if (fqName == COMPOSE_MODIFIER_FQN) {
       return true
     }
   }

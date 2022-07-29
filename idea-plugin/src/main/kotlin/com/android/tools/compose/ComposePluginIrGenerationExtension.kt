@@ -17,6 +17,8 @@
 package com.android.tools.compose
 
 import androidx.compose.compiler.plugins.kotlin.ComposeIrGenerationExtension
+import androidx.compose.compiler.plugins.kotlin.IncompatibleComposeRuntimeVersionException
+import com.intellij.openapi.progress.ProcessCanceledException
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
@@ -27,7 +29,13 @@ class ComposePluginIrGenerationExtension : IrGenerationExtension {
   override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
     try {
         ComposeIrGenerationExtension(reportsDestination = null,
-                                     metricsDestination = null).generate(moduleFragment, pluginContext);
+                                     metricsDestination = null,
+                                     generateFunctionKeyMetaClasses = true,
+                                     intrinsicRememberEnabled = false).generate(moduleFragment, pluginContext);
+    } catch (e : ProcessCanceledException) {
+      // From ProcessCanceledException javadoc: "Usually, this exception should not be caught, swallowed, logged, or handled in any way.
+      // Instead, it should be rethrown so that the infrastructure can handle it correctly."
+      throw e;
     } catch (t : Throwable) {
       t.printStackTrace()
     }

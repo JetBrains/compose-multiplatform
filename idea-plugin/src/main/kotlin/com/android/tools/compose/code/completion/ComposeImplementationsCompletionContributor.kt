@@ -96,8 +96,8 @@ class ComposeImplementationsCompletionContributor : CompletionContributor() {
   }
 
   private fun getKotlinClass(project: Project, classFqName: String): KtClassOrObject? {
-    return KotlinFullClassNameIndex
-      .getInstance().get(classFqName, project, project.allScope())
+    return KotlinFullClassNameIndex.getInstance()
+      .get(classFqName, project, project.allScope())
       .firstOrNull()
       .safeAs<KtClassOrObject>()
   }

@@ -29,10 +29,19 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.ListPopup
 import com.intellij.openapi.ui.popup.PopupStep
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep
+import com.intellij.openapi.util.TextRange
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.prevLeaf
+import com.intellij.refactoring.suggested.endOffset
+import com.intellij.refactoring.suggested.startOffset
 import com.intellij.ui.popup.list.ListPopupImpl
-import org.jetbrains.kotlin.idea.codeInsight.surroundWith.statement.KotlinStatementSurroundDescriptor
+import org.jetbrains.kotlin.idea.core.util.CodeInsightUtils
+import org.jetbrains.kotlin.idea.util.isLineBreak
+import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtNamedFunction
 
 /**
  * Intention action that includes [ComposeSurroundWithBoxAction], [ComposeSurroundWithRowAction], [ComposeSurroundWithColumnAction].
@@ -77,6 +86,58 @@ class ComposeSurroundWithWidgetActionGroup :
 }
 
 /**
+ * Finds the first [KtCallExpression] at the given offset stopping if it finds any [KtNamedFunction] so it does not
+ * exit the `Composable`.
+ */
+private fun PsiFile.findParentCallExpression(offset: Int): PsiElement? =
+  PsiTreeUtil.findElementOfClassAtOffsetWithStopSet(this, offset, KtCallExpression::class.java,
+                                                    false, KtNamedFunction::class.java)
+
+/**
+ * Finds the nearest surroundable [PsiElement] starting at the given offset and looking at the parents. If the offset is at
+ * the end of a line, this method might look in the immediately previous offset.
+ */
+private fun findNearestSurroundableElement(file: PsiFile, offset: Int): PsiElement? {
+  val nearestElement = file.findElementAt(offset)?.let {
+    if (it.isLineBreak()) {
+      file.findParentCallExpression(it.prevLeaf(true)?.startOffset ?: (offset - 1))
+    }
+    else it
+  } ?: return null
+
+  return file.findParentCallExpression(nearestElement.startOffset)
+}
+
+/**
+ * Finds the [TextRange] to surround based on the current [editor] selection. It returns null if there is no block that
+ * can be selected.
+ */
+fun findSurroundingSelectionRange(file: PsiFile, editor: Editor): TextRange? {
+  if (!editor.selectionModel.hasSelection()) return null
+
+  // We try to select full call elements to avoid the selection falling in the middle of, for example, a string.
+  // This way, selecting the middle of two strings would still wrap the parent calls like for the following example:
+  //
+  // Text("Hello <selection>world!")
+  // Button(...)
+  // Text("By</selection>e")
+  //
+  // Would wrap the three elements instead of just the Button.
+  val startSelectionOffset = findNearestSurroundableElement(file, editor.selectionModel.selectionStart)?.startOffset ?: Int.MAX_VALUE
+  val endSelectionOffset = findNearestSurroundableElement(file, editor.selectionModel.selectionEnd)?.endOffset ?: -1
+
+  val statements = CodeInsightUtils.findElements(file,
+                                                 minOf(editor.selectionModel.selectionStart, startSelectionOffset),
+                                                 maxOf(editor.selectionModel.selectionEnd, endSelectionOffset),
+                                                 CodeInsightUtils.ElementKind.EXPRESSION)
+    .filter { it.isInsideComposableCode() }
+  if (statements.isNotEmpty()) {
+    return TextRange.create(statements.minOf { it.startOffset }, statements.maxOf { it.endOffset })
+  }
+  return null
+}
+
+/**
  * Surrounds selected statements inside a @Composable function with a widget.
  *
  * @see intentionDescriptions/ComposeSurroundWithWidgetActionGroup/before.kt.template
@@ -87,26 +148,31 @@ abstract class ComposeSurroundWithWidgetAction : IntentionAction, HighPriorityAc
 
   override fun startInWriteAction(): Boolean = true
 
-  override fun isAvailable(project: Project, editor: Editor?, file: PsiFile?): Boolean {
-    when {
-      !StudioFlags.COMPOSE_EDITOR_SUPPORT.get() -> return false
-      file == null || editor == null -> return false
-      !file.isWritable || file !is KtFile || !editor.selectionModel.hasSelection() -> return false
-      else -> {
-        val element = file.findElementAt(editor.caretModel.offset) ?: return false
-        if (!element.isInsideComposableCode()) return false
+  private fun findSurroundableRange(file: PsiFile, editor: Editor): TextRange? = if (editor.selectionModel.hasSelection()) {
+    findSurroundingSelectionRange(file, editor)
+  }
+  else {
+    findNearestSurroundableElement(file, editor.caretModel.offset)?.textRange
+  }
 
-        val statements = KotlinStatementSurroundDescriptor()
-          .getElementsToSurround(file, editor.selectionModel.selectionStart, editor.selectionModel.selectionEnd)
-
-        return statements.isNotEmpty()
-      }
-    }
+  override fun isAvailable(project: Project, editor: Editor?, file: PsiFile?): Boolean = when {
+      !StudioFlags.COMPOSE_EDITOR_SUPPORT.get() -> false
+      file == null || editor == null -> false
+      !file.isWritable || file !is KtFile -> false
+      else -> findSurroundableRange(file, editor) != null
   }
 
   protected abstract fun getTemplate(): TemplateImpl?
 
   override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
+    if (editor == null || file == null) return
+
+    val surroundRange = findSurroundableRange(file, editor) ?: return
+    // Extend the selection if it does not match the inferred range
+    if (editor.selectionModel.selectionStart != surroundRange.startOffset ||
+      editor.selectionModel.selectionEnd != surroundRange.endOffset) {
+      editor.selectionModel.setSelection(surroundRange.startOffset, surroundRange.endOffset)
+    }
     InvokeTemplateAction(getTemplate(), editor, project, HashSet()).perform()
   }
 

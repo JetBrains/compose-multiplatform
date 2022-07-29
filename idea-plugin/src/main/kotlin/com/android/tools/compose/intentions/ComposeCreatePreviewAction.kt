@@ -16,8 +16,8 @@
 package com.android.tools.compose.intentions
 
 import com.android.tools.compose.COMPOSABLE_FQ_NAMES
+import com.android.tools.compose.COMPOSE_PREVIEW_ANNOTATION_FQN
 import com.android.tools.compose.ComposeBundle
-import com.android.tools.compose.ComposeLibraryNamespace
 import com.android.tools.compose.isComposableAnnotation
 import com.android.tools.compose.fqNameMatches
 import com.android.tools.idea.flags.StudioFlags
@@ -74,8 +74,7 @@ class ComposeCreatePreviewAction : IntentionAction {
     if (editor == null || file == null) return
     val composableAnnotationEntry = getComposableAnnotationEntry(editor, file) ?: return
     val composableFunction = composableAnnotationEntry.parentOfType<KtFunction>() ?: return
-    val previewAnnotationEntry = KtPsiFactory(project).createAnnotationEntry(
-      "@" + ComposeLibraryNamespace.ANDROIDX_COMPOSE.previewAnnotationName)
+    val previewAnnotationEntry = KtPsiFactory(project).createAnnotationEntry("@${COMPOSE_PREVIEW_ANNOTATION_FQN}")
 
     ShortenReferences.DEFAULT.process(composableFunction.addAnnotationEntry(previewAnnotationEntry))
   }

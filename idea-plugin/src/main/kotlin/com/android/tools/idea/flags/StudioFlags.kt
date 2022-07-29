@@ -14,6 +14,7 @@ object StudioFlags {
     val COMPOSE_COMPLETION_PRESENTATION = Flag(true)
     val COMPOSE_COMPLETION_WEIGHER = Flag(true)
     val COMPOSE_STATE_OBJECT_CUSTOM_RENDERER = Flag(true)
+    val COMPOSE_CONSTRAINTLAYOUT_COMPLETION = Flag(true)
 }
 
 class Flag<T>(val value: T) {

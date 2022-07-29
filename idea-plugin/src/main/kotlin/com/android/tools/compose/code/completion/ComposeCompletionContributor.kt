@@ -302,7 +302,7 @@ class ComposeCompletionWeigher : CompletionWeigher() {
 
 private fun InsertionContext.getNextElementIgnoringWhitespace(): PsiElement? {
   val elementAtCaret = file.findElementAt(editor.caretModel.offset) ?: return null
-  return elementAtCaret.getNextSiblingIgnoringWhitespace(true)
+  return elementAtCaret.getNextSiblingIgnoringWhitespace(true) ?: return null
 }
 
 private fun InsertionContext.isNextElementOpenCurlyBrace() = getNextElementIgnoringWhitespace()?.text?.startsWith("{") == true

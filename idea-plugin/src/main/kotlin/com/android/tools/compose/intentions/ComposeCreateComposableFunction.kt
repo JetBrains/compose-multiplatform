@@ -42,6 +42,7 @@ import org.jetbrains.kotlin.psi.KtSimpleNameExpression
 import org.jetbrains.kotlin.psi.psiUtil.getQualifiedExpressionForSelectorOrThis
 import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
 import org.jetbrains.kotlin.types.Variance
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 
 class ComposeUnresolvedFunctionFixContributor : QuickFixContributor {
@@ -83,7 +84,7 @@ private class ComposeUnresolvedFunctionFixFactory : KotlinSingleIntentionActionF
     // Composable function usually starts with uppercase first letter.
     if (name.isBlank() || !name[0].isUpperCase()) return null
 
-    val ktCreateCallableFromUsageFix = CreateCallableFromUsageFix(unresolvedCall) { listOfNotNull(createNewComposeFunctionInfo(name, unresolvedCall)) }
+    val ktCreateCallableFromUsageFix = CreateCallableFromUsageFix(unresolvedCall) { listOfNotNull(createNewComposeFunctionInfo(name, it)) }
 
     // Since CreateCallableFromUsageFix is no longer an 'open' class, we instead use delegation to customize the text.
     return object : IntentionAction by ktCreateCallableFromUsageFix {

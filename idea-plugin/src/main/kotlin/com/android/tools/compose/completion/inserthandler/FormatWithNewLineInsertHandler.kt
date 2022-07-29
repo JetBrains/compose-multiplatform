@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 The Android Open Source Project
+ * Copyright (C) 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.tools.compose.code.completion.constraintlayout
+package com.android.tools.compose.completion.inserthandler
 
 import com.intellij.codeInsight.completion.InsertHandler
 import com.intellij.codeInsight.completion.InsertionContext
@@ -27,45 +27,12 @@ import com.intellij.openapi.editor.actions.EditorActionUtil
 import com.intellij.psi.PsiDocumentManager
 
 /**
- * An [InsertHandler] to handle [InsertionFormat].
+ * Handles insertions of an [InsertionFormat], applying new a line at the `\n` character.
  *
- * The [InsertionFormat] object needs to be present in [LookupElement.getObject] to be handled here.
+ * Applies the new line with [IdeActions.ACTION_EDITOR_ENTER] and moves the caret at the end of the new line.
  */
-internal object InsertionFormatHandler : InsertHandler<LookupElement> {
+class FormatWithNewLineInsertHandler(private val format: InsertionFormat) : InsertHandler<LookupElement> {
   override fun handleInsert(context: InsertionContext, item: LookupElement) {
-    val format = item.`object` as? InsertionFormat ?: return
-    when (format) {
-      is LiteralWithCaretFormat -> handleCaretInsertion(context, format)
-      is LiteralNewLineFormat -> handleNewLineInsertion(context, format)
-    }
-  }
-
-  /**
-   * Handles insertions of [LiteralWithCaretFormat], moving the caret at the position specified by the '|' character.
-   */
-  private fun handleCaretInsertion(context: InsertionContext, format: LiteralWithCaretFormat) {
-    with(context) {
-      val isMoveCaret = format.insertableString.contains('|')
-      val stringToInsert = format.insertableString.replace("|", "")
-
-      // Insert the string without the reserved character: |
-      EditorModificationUtil.insertStringAtCaret(editor, stringToInsert, false, true)
-      PsiDocumentManager.getInstance(project).commitDocument(document)
-
-      // Move caret to the position indicated by '|'
-      EditorActionUtil.moveCaretToLineEnd(editor, false, true)
-      if (isMoveCaret && stringToInsert.isNotEmpty()) {
-        val caretPosition = format.insertableString.indexOf('|').coerceAtLeast(0)
-        EditorModificationUtil.moveCaretRelatively(editor, caretPosition - stringToInsert.length)
-      }
-    }
-  }
-
-  /**
-   * Handles insertions of [LiteralNewLineFormat], applying the new line with the [IdeActions.ACTION_EDITOR_ENTER] and moving the caret at
-   * the end of the new line.
-   */
-  private fun handleNewLineInsertion(context: InsertionContext, format: LiteralNewLineFormat) {
     val literal = format.insertableString
     with(context) {
       val newLineOffset = literal.indexOf('\n')

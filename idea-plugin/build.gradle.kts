@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.compose:preview-rpc")
-    implementation(files("lib/compiler-hosted-1.1.0-SNAPSHOT.jar"))
+    implementation(files("lib/compiler-hosted-1.2.0-SNAPSHOT.jar"))
 }
 
 intellij {

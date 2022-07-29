@@ -26,7 +26,7 @@ import com.intellij.openapi.components.Storage
 @State(name = "ComposeSettings", storages = [Storage("composeSettings.xml")])
 class ComposeSettings : SimplePersistentStateComponent<ComposeSettingsState>(ComposeSettingsState()) {
   companion object {
-    fun getInstance(): ComposeSettings = ApplicationManager.getApplication().getService(ComposeSettings::class.java)
+    fun getInstance() = ApplicationManager.getApplication().getService(ComposeSettings::class.java)
   }
 }
 

@@ -15,27 +15,47 @@
  */
 package com.android.tools.compose.code.completion.constraintlayout
 
+import com.android.tools.compose.code.completion.constraintlayout.provider.AnchorablesProvider
+import com.android.tools.compose.code.completion.constraintlayout.provider.ClearOptionsProvider
+import com.android.tools.compose.code.completion.constraintlayout.provider.ConstraintIdsProvider
+import com.android.tools.compose.code.completion.constraintlayout.provider.ConstraintSetFieldsProvider
+import com.android.tools.compose.code.completion.constraintlayout.provider.ConstraintSetNamesProvider
+import com.android.tools.compose.code.completion.constraintlayout.provider.ConstraintsProvider
+import com.android.tools.compose.code.completion.constraintlayout.provider.EnumValuesCompletionProvider
+import com.android.tools.compose.code.completion.constraintlayout.provider.KeyFrameChildFieldsCompletionProvider
+import com.android.tools.compose.code.completion.constraintlayout.provider.KeyFramesFieldsProvider
+import com.android.tools.compose.code.completion.constraintlayout.provider.OnSwipeFieldsProvider
+import com.android.tools.compose.code.completion.constraintlayout.provider.TransitionFieldsProvider
+import com.android.tools.idea.flags.StudioFlags
+import com.android.tools.modules.inComposeModule
 import com.intellij.codeInsight.completion.CompletionContributor
 import com.intellij.codeInsight.completion.CompletionParameters
-import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.CompletionType
-import com.intellij.codeInsight.lookup.LookupElementBuilder
-import com.intellij.json.JsonElementTypes
-import com.intellij.json.psi.JsonObject
-import com.intellij.json.psi.JsonProperty
-import com.intellij.json.psi.JsonReferenceExpression
-import com.intellij.openapi.util.Key
-import com.intellij.patterns.PlatformPatterns
-import com.intellij.patterns.PsiElementPattern
-import com.intellij.psi.PsiElement
-import com.intellij.psi.SmartPointerManager
-import com.intellij.psi.SmartPsiElementPointer
-import com.intellij.util.ProcessingContext
-import org.jetbrains.kotlin.psi.psiUtil.getChildOfType
-import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
-import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
-import org.jetbrains.kotlin.psi.psiUtil.getTopmostParentOfType
+import com.intellij.json.JsonLanguage
+import com.intellij.json.psi.JsonStringLiteral
+
+internal const val BASE_DEPTH_FOR_LITERAL_IN_PROPERTY = 2
+
+internal const val BASE_DEPTH_FOR_NAME_IN_PROPERTY_OBJECT = BASE_DEPTH_FOR_LITERAL_IN_PROPERTY + BASE_DEPTH_FOR_LITERAL_IN_PROPERTY
+
+/** Depth for a literal of a property of the list of ConstraintSets. With respect to the ConstraintSets root element. */
+private const val CONSTRAINT_SET_LIST_PROPERTY_DEPTH = BASE_DEPTH_FOR_LITERAL_IN_PROPERTY + BASE_DEPTH_FOR_LITERAL_IN_PROPERTY
+
+/** Depth for a literal of a property of a ConstraintSet. With respect to the ConstraintSets root element. */
+private const val CONSTRAINT_SET_PROPERTY_DEPTH = CONSTRAINT_SET_LIST_PROPERTY_DEPTH + BASE_DEPTH_FOR_LITERAL_IN_PROPERTY
+
+/** Depth for a literal of a property of a Transition. With respect to the Transitions root element. */
+private const val TRANSITION_PROPERTY_DEPTH = CONSTRAINT_SET_PROPERTY_DEPTH
+
+/** Depth for a literal of a property of a Constraints block. With respect to the ConstraintSets root element. */
+internal const val CONSTRAINT_BLOCK_PROPERTY_DEPTH = CONSTRAINT_SET_PROPERTY_DEPTH + BASE_DEPTH_FOR_LITERAL_IN_PROPERTY
+
+/** Depth for a literal of a property of an OnSwipe block. With respect to the Transitions root element. */
+internal const val ONSWIPE_PROPERTY_DEPTH = TRANSITION_PROPERTY_DEPTH + BASE_DEPTH_FOR_LITERAL_IN_PROPERTY
+
+/** Depth for a literal of a property of a KeyFrames block. With respect to the Transitions root element. */
+internal const val KEYFRAMES_PROPERTY_DEPTH = ONSWIPE_PROPERTY_DEPTH
 
 /**
  * [CompletionContributor] for the JSON5 format supported in ConstraintLayout-Compose (and MotionLayout).
@@ -45,111 +65,154 @@ import org.jetbrains.kotlin.psi.psiUtil.getTopmostParentOfType
  */
 class ConstraintLayoutJsonCompletionContributor : CompletionContributor() {
   init {
+    // region ConstraintSets
     extend(
       CompletionType.BASIC,
-      jsonPropertyName().withConstraintSetsParentAtLevel(6),
+      // Complete field names in ConstraintSets
+      jsonPropertyName().withConstraintSetsParentAtLevel(CONSTRAINT_SET_PROPERTY_DEPTH),
+      ConstraintSetFieldsProvider
+    )
+    extend(
+      CompletionType.BASIC,
+      // Complete constraints field names (width, height, start, end, etc.)
+      jsonPropertyName().withConstraintSetsParentAtLevel(CONSTRAINT_BLOCK_PROPERTY_DEPTH),
+      ConstraintsProvider
+    )
+    extend(
+      CompletionType.BASIC,
+      // Complete ConstraintSet names in Extends keyword
+      jsonStringValue()
+        .withPropertyParentAtLevel(BASE_DEPTH_FOR_LITERAL_IN_PROPERTY, KeyWords.Extends),
+      ConstraintSetNamesProvider
+    )
+    extend(
+      CompletionType.BASIC,
+      // Complete IDs on special anchors, they take a single string value
+      jsonStringValue()
+        .withPropertyParentAtLevel(BASE_DEPTH_FOR_LITERAL_IN_PROPERTY, SpecialAnchor.values().map { it.keyWord }),
       ConstraintIdsProvider
     )
+    extend(
+      CompletionType.BASIC,
+      // Complete IDs in the constraint array (first position)
+      jsonStringValue()
+        // First element in the array, ie: there is no PsiElement preceding the desired one at this level
+        .withParent(psiElement<JsonStringLiteral>().atIndexOfJsonArray(0))
+        .insideConstraintArray(),
+      ConstraintIdsProvider
+    )
+    extend(
+      CompletionType.BASIC,
+      // Complete anchors in the constraint array (second position)
+      jsonStringValue()
+        // Second element in the array, ie: there is one PsiElement preceding the desired one at this level
+        .withParent(psiElement<JsonStringLiteral>().atIndexOfJsonArray(1))
+        .insideConstraintArray(),
+      AnchorablesProvider
+    )
+    extend(
+      CompletionType.BASIC,
+      // Complete a clear option within the 'clear' array
+      jsonStringValue()
+        .insideClearArray(),
+      ClearOptionsProvider
+    )
+    extend(
+      CompletionType.BASIC,
+      // Complete non-numeric dimension values for width & height
+      jsonStringValue()
+        .withPropertyParentAtLevel(BASE_DEPTH_FOR_LITERAL_IN_PROPERTY, Dimension.values().map { it.keyWord }),
+      EnumValuesCompletionProvider(DimBehavior::class)
+    )
+    extend(
+      CompletionType.BASIC,
+      // Complete Visibility mode values
+      jsonStringValue()
+        .withPropertyParentAtLevel(BASE_DEPTH_FOR_LITERAL_IN_PROPERTY, KeyWords.Visibility),
+      EnumValuesCompletionProvider(VisibilityMode::class)
+    )
+    //endregion
+
+    //region Transitions
+    extend(
+      CompletionType.BASIC,
+      // Complete fields of a Transition block
+      jsonPropertyName()
+        .withTransitionsParentAtLevel(TRANSITION_PROPERTY_DEPTH),
+      TransitionFieldsProvider
+    )
+    extend(
+      CompletionType.BASIC,
+      // Complete existing ConstraintSet names for `from` and `to` Transition properties
+      jsonStringValue()
+        .withPropertyParentAtLevel(BASE_DEPTH_FOR_LITERAL_IN_PROPERTY, listOf(TransitionField.From.keyWord, TransitionField.To.keyWord))
+        .withTransitionsParentAtLevel(TRANSITION_PROPERTY_DEPTH),
+      // TODO(b/207030860): Guarantee that provided names for 'from' or 'to' are distinct from each other,
+      //  ie: both shouldn't reference the same ConstraintSet
+      ConstraintSetNamesProvider
+    )
+    extend(
+      CompletionType.BASIC,
+      // Complete fields of a KeyFrames block
+      jsonPropertyName()
+        .withPropertyParentAtLevel(BASE_DEPTH_FOR_NAME_IN_PROPERTY_OBJECT, TransitionField.KeyFrames.keyWord)
+        .withTransitionsParentAtLevel(KEYFRAMES_PROPERTY_DEPTH),
+      KeyFramesFieldsProvider
+    )
+    extend(
+      CompletionType.BASIC,
+      // Complete fields of an OnSwipe block
+      jsonPropertyName()
+        .withPropertyParentAtLevel(BASE_DEPTH_FOR_NAME_IN_PROPERTY_OBJECT, TransitionField.OnSwipe.keyWord)
+        .withTransitionsParentAtLevel(ONSWIPE_PROPERTY_DEPTH),
+      OnSwipeFieldsProvider
+    )
+    extend(
+      CompletionType.BASIC,
+      // Complete the possible IDs for the OnSwipe `anchor` property
+      jsonStringValue()
+        .withPropertyParentAtLevel(BASE_DEPTH_FOR_LITERAL_IN_PROPERTY, OnSwipeField.AnchorId.keyWord),
+      ConstraintIdsProvider
+    )
+    extend(
+      CompletionType.BASIC,
+      // Complete the known values for the OnSwipe `side` property
+      jsonStringValue()
+        .withPropertyParentAtLevel(BASE_DEPTH_FOR_LITERAL_IN_PROPERTY, OnSwipeField.Side.keyWord),
+      EnumValuesCompletionProvider(OnSwipeSide::class)
+    )
+    extend(
+      CompletionType.BASIC,
+      // Complete the known values for the OnSwipe `direction` property
+      jsonStringValue()
+        .withPropertyParentAtLevel(BASE_DEPTH_FOR_LITERAL_IN_PROPERTY, OnSwipeField.Direction.keyWord),
+      EnumValuesCompletionProvider(OnSwipeDirection::class)
+    )
+    extend(
+      CompletionType.BASIC,
+      // Complete the known values for the OnSwipe `mode` property
+      jsonStringValue()
+        .withPropertyParentAtLevel(BASE_DEPTH_FOR_LITERAL_IN_PROPERTY, OnSwipeField.Mode.keyWord),
+      EnumValuesCompletionProvider(OnSwipeMode::class)
+    )
+    extend(
+      CompletionType.BASIC,
+      // Complete the fields for any of the possible KeyFrames children
+      jsonPropertyName()
+        // A level deeper considering the array surrounding the object
+        .withPropertyParentAtLevel(BASE_DEPTH_FOR_NAME_IN_PROPERTY_OBJECT + 1, KeyFrameField.values().map { it.keyWord }),
+      KeyFrameChildFieldsCompletionProvider
+    )
+    //endregion
   }
-}
 
-/**
- * [SmartPsiElementPointer] to the [JsonProperty] corresponding to the ConstraintSets property.
- */
-private typealias ConstraintSetsPropertyPointer = SmartPsiElementPointer<JsonProperty>
-
-private val constraintSetsPropertyKey =
-  Key.create<ConstraintSetsPropertyPointer>("compose.json.autocomplete.constraint.sets.property")
-
-/**
- * Completion provider that looks for the 'ConstraintSets' declaration and caches it, provides useful functions for inheritors that want to
- * provide completions based con the contents of the 'ConstraintSets' [JsonProperty].
- */
-private abstract class ConstraintSetCompletionProvider : CompletionProvider<CompletionParameters>() {
-  final override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet) {
-    val setsProperty = if (context[constraintSetsPropertyKey] != null) {
-      context[constraintSetsPropertyKey]!!
+  override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
+    if (!StudioFlags.COMPOSE_CONSTRAINTLAYOUT_COMPLETION.get() ||
+        parameters.position.inComposeModule() != true ||
+        parameters.position.language != JsonLanguage.INSTANCE) {
+      // TODO(b/207030860): Allow in other contexts once the syntax is supported outside Compose
+      return
     }
-    else {
-      parameters.position.getTopmostParentOfType<JsonObject>()?.getChildrenOfType<JsonProperty>()?.firstOrNull {
-        it.name == KeyWords.ConstraintSets
-      }?.let {
-        val pointer = SmartPointerManager.createPointer(it)
-        context.put(constraintSetsPropertyKey, pointer)
-        return@let pointer
-      }
-    }
-    addCompletions(setsProperty, parameters, result)
+    super.fillCompletionVariants(parameters, result)
   }
-
-  /**
-   * Inheritors should implement this function that may pass a reference to the ConstraintSets property.
-   */
-  abstract fun addCompletions(
-    constraintSetsProperty: ConstraintSetsPropertyPointer?,
-    parameters: CompletionParameters,
-    result: CompletionResultSet
-  )
-
-  /**
-   * Returns the available constraint IDs for the given [constraintSetName], this is done by reading all IDs in all ConstraintSets and
-   * subtracting the IDs already present in [constraintSetName].
-   */
-  protected fun ConstraintSetsPropertyPointer.findConstraintIdsForSet(constraintSetName: String): List<String> {
-    val availableNames = mutableSetOf(KeyWords.Extends)
-    val usedNames = mutableSetOf<String>()
-    this.element?.getChildOfType<JsonObject>()?.getChildrenOfType<JsonProperty>()?.forEach { cSetProperty ->
-      cSetProperty.getChildOfType<JsonObject>()?.getChildrenOfType<JsonProperty>()?.forEach { constraintNameProperty ->
-        if (cSetProperty.name == constraintSetName) {
-          usedNames.add(constraintNameProperty.name)
-        }
-        else {
-          availableNames.add(constraintNameProperty.name)
-        }
-      }
-    }
-    availableNames.removeAll(usedNames)
-    return availableNames.toList()
-  }
-}
-
-/**
- * Provides options to autocomplete constraint IDs for constraint set declarations, based on the IDs already defined by the user in other
- * constraint sets.
- */
-private object ConstraintIdsProvider : ConstraintSetCompletionProvider() {
-  override fun addCompletions(constraintSetsProperty: SmartPsiElementPointer<JsonProperty>?,
-                              parameters: CompletionParameters,
-                              result: CompletionResultSet) {
-    val parentName = parameters.position.getParentOfType<JsonProperty>(true)?.getParentOfType<JsonProperty>(true)?.name
-    if (constraintSetsProperty != null && parentName != null) {
-      constraintSetsProperty.findConstraintIdsForSet(parentName).forEach {
-        val template = if (it == KeyWords.Extends) JsonStringValueTemplate else JsonNewObjectTemplate
-        result.addLookupElement(name = it, tailText = null, template)
-      }
-    }
-  }
-}
-
-private fun jsonPropertyName() = PlatformPatterns.psiElement(JsonElementTypes.IDENTIFIER)
-
-private inline fun <reified T : PsiElement> psiElement() = PlatformPatterns.psiElement(T::class.java)
-
-private fun PsiElementPattern<*, *>.withPropertyParentAtLevel(level: Int, name: String) =
-  this.withSuperParent(level, psiElement<JsonProperty>().withChild(psiElement<JsonReferenceExpression>().withText(name)))
-
-private fun PsiElementPattern<*, *>.withConstraintSetsParentAtLevel(level: Int) = withPropertyParentAtLevel(level, "ConstraintSets")
-
-private fun CompletionResultSet.addLookupElement(name: String, tailText: String? = null, format: InsertionFormat? = null) {
-  var lookupBuilder = if (format == null) {
-    LookupElementBuilder.create(name)
-  }
-  else {
-    LookupElementBuilder.create(format, name).withInsertHandler(InsertionFormatHandler)
-  }
-  lookupBuilder = lookupBuilder.withCaseSensitivity(false)
-  if (tailText != null) {
-    lookupBuilder = lookupBuilder.withTailText(tailText, true)
-  }
-  addElement(lookupBuilder)
 }

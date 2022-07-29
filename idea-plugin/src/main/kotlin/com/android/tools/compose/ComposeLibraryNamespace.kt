@@ -15,14 +15,20 @@
  */
 package com.android.tools.compose
 
-private const val COMPOSE_PACKAGE = "androidx.compose.ui"
+const val COMPOSE_UI_PACKAGE = "androidx.compose.ui"
+const val COMPOSE_UI_TOOLING_PACKAGE = "$COMPOSE_UI_PACKAGE.tooling"
+const val COMPOSE_UI_TOOLING_PREVIEW_PACKAGE = "$COMPOSE_UI_TOOLING_PACKAGE.preview"
 
 /** Preview element name */
 const val COMPOSE_PREVIEW_ANNOTATION_NAME = "Preview"
+const val COMPOSE_PREVIEW_ANNOTATION_FQN = "$COMPOSE_UI_TOOLING_PREVIEW_PACKAGE.$COMPOSE_PREVIEW_ANNOTATION_NAME"
+const val COMPOSE_PREVIEW_PARAMETER_ANNOTATION_FQN = "$COMPOSE_UI_TOOLING_PREVIEW_PACKAGE.PreviewParameter"
+const val COMPOSE_PREVIEW_ACTIVITY_FQN = "$COMPOSE_UI_TOOLING_PACKAGE.PreviewActivity"
+const val COMPOSE_VIEW_ADAPTER_FQN = "$COMPOSE_UI_TOOLING_PACKAGE.ComposeViewAdapter"
 
 const val COMPOSABLE_ANNOTATION_NAME = "Composable"
 
-const val COMPOSE_ALIGNMENT = "${COMPOSE_PACKAGE}.Alignment"
+const val COMPOSE_ALIGNMENT = "${COMPOSE_UI_PACKAGE}.Alignment"
 const val COMPOSE_ALIGNMENT_HORIZONTAL = "${COMPOSE_ALIGNMENT}.Horizontal"
 const val COMPOSE_ALIGNMENT_VERTICAL = "${COMPOSE_ALIGNMENT}.Vertical"
 
@@ -30,26 +36,10 @@ const val COMPOSE_ARRANGEMENT = "androidx.compose.foundation.layout.Arrangement"
 const val COMPOSE_ARRANGEMENT_HORIZONTAL = "${COMPOSE_ARRANGEMENT}.Horizontal"
 const val COMPOSE_ARRANGEMENT_VERTICAL = "${COMPOSE_ARRANGEMENT}.Vertical"
 
+const val COMPOSE_MODIFIER_FQN = "$COMPOSE_UI_PACKAGE.Modifier"
+const val COMPOSE_STRING_RESOURCE_FQN = "$COMPOSE_UI_PACKAGE.res.stringResource"
+
 val COMPOSABLE_FQ_NAMES = setOf(
   "androidx.compose.$COMPOSABLE_ANNOTATION_NAME",
   "androidx.compose.runtime.$COMPOSABLE_ANNOTATION_NAME"
 )
-
-/**
- * Represents the Jetpack Compose library package name. The compose libraries will move from
- * `androidx.ui` to `androidx.compose` and this enum encapsulates the naming for the uses in tools.
- */
-enum class ComposeLibraryNamespace(
-  val packageName: String,
-  /** Package containing the API preview definitions. Elements here will be referenced by the user. */
-  val apiPreviewPackage: String = "$packageName.tooling.preview"
-) {
-  ANDROIDX_COMPOSE(COMPOSE_PACKAGE);
-
-  val composeModifierClassName: String = "$packageName.Modifier"
-
-  /** Only composables with this annotations will be rendered to the surface. */
-  val previewAnnotationName = "$apiPreviewPackage.$COMPOSE_PREVIEW_ANNOTATION_NAME"
-
-}
-

@@ -402,7 +402,8 @@ fun ResolvedCall<*>.isReadOnlyComposableInvocation(): Boolean {
   if (this is VariableAsFunctionResolvedCall) {
     return false
   }
-  return when (val candidateDescriptor = candidateDescriptor) {
+  val candidateDescriptor = candidateDescriptor
+  return when (candidateDescriptor) {
     is ValueParameterDescriptor -> false
     is LocalVariableDescriptor -> false
     is PropertyDescriptor -> {

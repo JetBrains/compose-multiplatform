@@ -15,7 +15,7 @@
  */
 package com.android.tools.compose.code.completion
 
-import com.android.tools.compose.ComposeLibraryNamespace
+import com.android.tools.compose.COMPOSE_MODIFIER_FQN
 import com.android.tools.idea.flags.StudioFlags
 import com.android.tools.modules.*
 import com.intellij.codeInsight.completion.CompletionContributor
@@ -23,6 +23,7 @@ import com.intellij.codeInsight.completion.CompletionInitializationContext
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.InsertionContext
+import com.intellij.codeInsight.completion.PrefixMatcher
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementDecorator
@@ -85,13 +86,9 @@ import org.jetbrains.kotlin.utils.addToStdlib.safeAs
  *
  * Moves extension functions for method called on modifier [isMethodCalledOnModifier] up in the completion list.
  *
- * @see ComposeLibraryNamespace.ANDROIDX_COMPOSE.composeModifierClassName
+ * @see COMPOSE_MODIFIER_FQN
  */
 class ComposeModifierCompletionContributor : CompletionContributor() {
-
-  companion object {
-    private val modifierFqName = ComposeLibraryNamespace.ANDROIDX_COMPOSE.composeModifierClassName
-  }
 
   override fun fillCompletionVariants(parameters: CompletionParameters, resultSet: CompletionResultSet) {
     val element = parameters.position
@@ -109,10 +106,10 @@ class ComposeModifierCompletionContributor : CompletionContributor() {
 
     val nameExpression = createNameExpression(element)
 
-    val extensionFunctions = getExtensionFunctionsForModifier(nameExpression, element)
+    val extensionFunctions = getExtensionFunctionsForModifier(nameExpression, element, resultSet.prefixMatcher)
 
     ProgressManager.checkCanceled()
-    val (returnsModifier, others) = extensionFunctions.partition { it.returnType?.fqName?.asString() == modifierFqName }
+    val (returnsModifier, others) = extensionFunctions.partition { it.returnType?.fqName?.asString() == COMPOSE_MODIFIER_FQN }
     val lookupElementFactory = createLookupElementFactory(nameExpression, parameters)
 
     val isNewModifier = !isMethodCalledOnImportedModifier && element.parentOfType<KtDotQualifiedExpression>() == null
@@ -171,7 +168,7 @@ class ComposeModifierCompletionContributor : CompletionContributor() {
     val basicLookupElementFactory = BasicLookupElementFactory(nameExpression.project, insertHandler)
 
     return LookupElementFactory(
-      basicLookupElementFactory,  receiverTypes,
+      basicLookupElementFactory, receiverTypes,
       callTypeAndReceiver.callType, inDescriptor, CollectRequiredTypesContextVariablesProvider()
     )
   }
@@ -182,17 +179,19 @@ class ComposeModifierCompletionContributor : CompletionContributor() {
   private fun createNameExpression(originalElement: PsiElement): KtSimpleNameExpression {
     val originalFile = originalElement.containingFile.safeAs<KtFile>()!!
 
-    val file = KtPsiFactory(originalFile.project).createAnalyzableFile("temp.kt", "val x = $modifierFqName.call", originalFile)
+    val file = KtPsiFactory(originalFile.project).createAnalyzableFile("temp.kt", "val x = $COMPOSE_MODIFIER_FQN.call", originalFile)
     return file.getChildOfType<KtProperty>()!!.getChildOfType<KtDotQualifiedExpression>()!!.lastChild as KtSimpleNameExpression
   }
 
-  private fun getExtensionFunctionsForModifier(nameExpression: KtSimpleNameExpression,
-                                               originalPosition: PsiElement): Collection<CallableDescriptor> {
+  private fun getExtensionFunctionsForModifier(
+    nameExpression: KtSimpleNameExpression,
+    originalPosition: PsiElement,
+    prefixMatcher: PrefixMatcher
+  ): Collection<CallableDescriptor> {
     val file = nameExpression.containingFile as KtFile
     val searchScope = getResolveScope(file)
     val resolutionFacade = file.getResolutionFacade()
-
-    val bindingContext = nameExpression.analyze(BodyResolveMode.PARTIAL_WITH_DIAGNOSTICS)
+    val bindingContext = nameExpression.analyze(BodyResolveMode.PARTIAL_FOR_COMPLETION)
 
     val callTypeAndReceiver = CallTypeAndReceiver.detect(nameExpression)
     fun isVisible(descriptor: DeclarationDescriptor): Boolean {
@@ -204,13 +203,16 @@ class ComposeModifierCompletionContributor : CompletionContributor() {
     }
 
     val indicesHelper = KotlinIndicesHelper(resolutionFacade, searchScope, ::isVisible, file = file)
-    return indicesHelper.getCallableTopLevelExtensions(callTypeAndReceiver, nameExpression, bindingContext, null) { true }
+
+    val nameFilter = { name: String -> prefixMatcher.prefixMatches(name) }
+    return indicesHelper.getCallableTopLevelExtensions(callTypeAndReceiver, nameExpression, bindingContext, null, nameFilter)
   }
 
   private val PsiElement.isModifierProperty: Boolean
     get() {
-      val property = contextOfType<KtProperty>() ?: return false
-      return property.type()?.fqName?.asString() == modifierFqName
+      // Case val myModifier:Modifier = <caret>
+      val property = parent?.parent?.safeAs<KtProperty>() ?: return false
+      return property.type()?.fqName?.asString() == COMPOSE_MODIFIER_FQN
     }
 
   private val PsiElement.isModifierArgument: Boolean
@@ -229,7 +231,7 @@ class ComposeModifierCompletionContributor : CompletionContributor() {
         callee.valueParameters.getOrNull(argumentIndex)?.type()?.fqName
       }
 
-      return argumentTypeFqName?.asString() == modifierFqName
+      return argumentTypeFqName?.asString() == COMPOSE_MODIFIER_FQN
     }
 
   /**
@@ -243,7 +245,7 @@ class ComposeModifierCompletionContributor : CompletionContributor() {
     val fqName = elementOnWhichMethodCalled.resolveToCall(BodyResolveMode.PARTIAL)?.getReturnType()?.fqName ?:
                  // Case Modifier.%this%
                  elementOnWhichMethodCalled.safeAs<KtNameReferenceExpression>()?.resolve().safeAs<KtClass>()?.fqName
-    return fqName?.asString() == modifierFqName
+    return fqName?.asString() == COMPOSE_MODIFIER_FQN
   }
 
   /**
@@ -280,14 +282,15 @@ class ComposeModifierCompletionContributor : CompletionContributor() {
 
     override fun handleInsert(context: InsertionContext) {
       val psiDocumentManager = PsiDocumentManager.getInstance(context.project)
-      if (insertModifier) {
+      // Compose plugin inserts Modifier if completion character is '\n', doesn't happened with '\t'. Looks like a bug.
+      if (insertModifier && context.completionChar != '\n') {
         context.document.insertString(context.startOffset, callOnModifierObject)
         context.offsetMap.addOffset(CompletionInitializationContext.START_OFFSET, context.startOffset + callOnModifierObject.length)
         psiDocumentManager.commitAllDocuments()
         psiDocumentManager.doPostponedOperationsAndUnblockDocument(context.document)
       }
       val ktFile = context.file as KtFile
-      val modifierDescriptor = ktFile.resolveImportReference(FqName(modifierFqName)).singleOrNull()
+      val modifierDescriptor = ktFile.resolveImportReference(FqName(COMPOSE_MODIFIER_FQN)).singleOrNull()
       modifierDescriptor?.let { ImportInsertHelper.getInstance(context.project).importDescriptor(ktFile, it) }
       psiDocumentManager.commitAllDocuments()
       psiDocumentManager.doPostponedOperationsAndUnblockDocument(context.document)
