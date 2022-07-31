@@ -19,9 +19,9 @@
     <depends>org.jetbrains.kotlin</depends>
 
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
-        <storageComponentContainerContributor implementation="com.android.tools.compose.ComposableCallChecker"/>
-        <storageComponentContainerContributor implementation="com.android.tools.compose.ComposableDeclarationChecker"/>
-        <diagnosticSuppressor implementation="com.android.tools.compose.ComposeDiagnosticSuppressor"/>
+        <storageComponentContainerContributor implementation="androidx.compose.compiler.plugins.kotlin.ComposableCallChecker"/>
+        <storageComponentContainerContributor implementation="androidx.compose.compiler.plugins.kotlin.ComposableDeclarationChecker"/>
+        <diagnosticSuppressor implementation="androidx.compose.compiler.plugins.kotlin.ComposeDiagnosticSuppressor"/>
         <quickFixContributor implementation="com.android.tools.compose.intentions.ComposeDelegateStateImportFixContributor"/>
         <quickFixContributor implementation="com.android.tools.compose.intentions.ComposeUnresolvedFunctionFixContributor"/>
         <additionalExtractableAnalyser implementation="com.android.tools.compose.ComposableFunctionExtractableAnalyser"/>
@@ -34,6 +34,11 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
+        <projectService serviceInterface="org.jetbrains.kotlin.idea.kdoc.KDocLinkResolutionService"
+                        serviceImplementation="com.android.tools.compose.ComposeKDocLinkResolutionService"
+                        overrides="true"
+        />
+
         <dependencySupport coordinate="androidx.compose.runtime:runtime" kind="java" displayName="Jetpack Compose"/>
         
         <additionalTextAttributes scheme="Default" file="colorschemes/IdeComposableAnnotatorColorSchemeDefault.xml"/>
