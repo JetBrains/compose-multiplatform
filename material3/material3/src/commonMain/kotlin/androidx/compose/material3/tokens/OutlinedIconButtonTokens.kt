@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_93
+// VERSION: v0_103
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -25,8 +25,10 @@ internal object OutlinedIconButtonTokens {
     val ContainerSize = 40.0.dp
     val DisabledColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledOpacity = 0.38f
-    val DisabledOutlineColor = ColorSchemeKeyTokens.OnSurface
-    const val DisabledOutlineOpacity = 0.12f
+    val DisabledSelectedContainerColor = ColorSchemeKeyTokens.OnSurface
+    const val DisabledSelectedContainerOpacity = 0.12f
+    val DisabledUnselectedOutlineColor = ColorSchemeKeyTokens.OnSurface
+    const val DisabledUnselectedOutlineOpacity = 0.12f
     val Size = 24.0.dp
     val SelectedContainerColor = ColorSchemeKeyTokens.InverseSurface
     val SelectedFocusColor = ColorSchemeKeyTokens.InverseOnSurface

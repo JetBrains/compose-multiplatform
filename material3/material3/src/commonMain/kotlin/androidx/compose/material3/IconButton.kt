@@ -852,7 +852,7 @@ object IconButtonDefaults {
             LocalContentColor.current
         } else {
             LocalContentColor.current
-                .copy(alpha = OutlinedIconButtonTokens.DisabledOutlineOpacity)
+                .copy(alpha = OutlinedIconButtonTokens.DisabledUnselectedOutlineOpacity)
         }
         return remember(color) {
             BorderStroke(OutlinedIconButtonTokens.UnselectedOutlineWidth, color)
