@@ -26,6 +26,7 @@ import androidx.build.gitclient.GitClient
 import androidx.build.gitclient.GitCommitRange
 import androidx.build.jetpad.LibraryBuildInfoFile
 import com.google.gson.GsonBuilder
+import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
@@ -37,13 +38,22 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.work.DisableCachingByDefault
-import java.io.File
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 
 /**
  * This task generates a library build information file containing the artifactId, groupId, and
  * version of public androidx dependencies and release checklist of the library for consumption
  * by the Jetpack Release Service (JetPad).
+ *
+ * Example:
+ * If this task is configured
+ * - for a project with group name "myGroup"
+ * - on a variant with artifactId "myArtifact",
+ * - and root project outDir is "out"
+ * - and environment variable DIST_DIR is not set
+ *
+ * then the build info file will be written to
+ * "out/dist/build-info/myGroup_myArtifact_build_info.txt"
  */
 @DisableCachingByDefault(because = "uses git sha as input")
 abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
@@ -84,8 +94,7 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
     abstract val projectZipPath: Property<String>
 
     @get:Input
-    val dependencyList: ListProperty<LibraryBuildInfoFile.Dependency> =
-        project.objects.listProperty(LibraryBuildInfoFile.Dependency::class.java)
+    abstract val dependencyList: ListProperty<LibraryBuildInfoFile.Dependency>
 
     /**
      * the local project directory without the full framework/support root directory path
