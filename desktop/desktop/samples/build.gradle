@@ -52,6 +52,17 @@ task run1(type: JavaExec) {
         compilation.runtimeDependencyFiles
 }
 
+task run1rtl(type: JavaExec) {
+    dependsOn(":compose:desktop:desktop:jar")
+    main = "androidx.compose.desktop.examples.example1.Main_jvmKt"
+    systemProperty("skiko.fps.enabled", "true")
+    systemProperty("user.language", "ar") // arabic language for rtl
+    def compilation = kotlin.jvm().compilations["main"]
+    classpath =
+            compilation.output.allOutputs +
+                    compilation.runtimeDependencyFiles
+}
+
 task run2(type: JavaExec) {
     dependsOn(":compose:desktop:desktop:jar")
     main = "androidx.compose.desktop.examples.example2.Main_jvmKt"

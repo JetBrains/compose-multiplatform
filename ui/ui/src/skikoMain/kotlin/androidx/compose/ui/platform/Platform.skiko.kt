@@ -26,11 +26,15 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.LayoutDirection
 
 // TODO(demin): make it public when we stabilize it after implementing it for uikit and js
 internal interface Platform {
     val windowInfo: WindowInfo
     val focusManager: FocusManager
+    val layoutDirection: LayoutDirection
+        get() = LayoutDirection.Ltr
+
     fun requestFocusForOwner(): Boolean
     val textInputService: PlatformTextInputService
     fun accessibilityController(owner: SemanticsOwner): AccessibilityController

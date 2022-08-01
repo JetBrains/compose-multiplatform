@@ -114,8 +114,7 @@ internal class SkiaBasedOwner(
 
     override var density by mutableStateOf(density)
 
-    // TODO(demin): support RTL
-    override val layoutDirection: LayoutDirection = LayoutDirection.Ltr
+    override val layoutDirection: LayoutDirection = platform.layoutDirection
 
     override val sharedDrawScope = LayoutNodeDrawScope()
 
@@ -128,8 +127,7 @@ internal class SkiaBasedOwner(
     override val focusManager = FocusManagerImpl(
         parent = platform.focusManager
     ).apply {
-        // TODO(demin): support RTL [onRtlPropertiesChanged]
-        layoutDirection = LayoutDirection.Ltr
+        layoutDirection = platform.layoutDirection
     }
 
     // TODO: Set the input mode. For now we don't support touch mode, (always in Key mode).

@@ -19,8 +19,10 @@ package androidx.compose.ui.window
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import java.awt.Component
+import java.awt.ComponentOrientation
 import java.awt.GraphicsConfiguration
 import java.awt.GraphicsEnvironment
+import java.util.Locale
 
 // TODO(demin): detect OS fontScale
 //  font size can be changed on Windows 10 in Settings - Ease of Access,
@@ -43,7 +45,14 @@ private val GraphicsConfiguration.density: Density get() = Density(
     fontScale = 1f
 )
 
-internal val GlobalLayoutDirection get() = LayoutDirection.Ltr
+internal val GlobalLayoutDirection get() = Locale.getDefault().layoutDirection
 
-@Suppress("unused")
-internal val Component.layoutDirection: LayoutDirection get() = LayoutDirection.Ltr
+internal val Component.layoutDirection: LayoutDirection
+    get() = this.locale.layoutDirection
+
+internal val Locale.layoutDirection: LayoutDirection
+    get() = if (ComponentOrientation.getOrientation(this).isLeftToRight) {
+        LayoutDirection.Ltr
+    } else {
+        LayoutDirection.Rtl
+    }
