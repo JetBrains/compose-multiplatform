@@ -275,7 +275,9 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
     ) {
         project.afterEvaluate {
             project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
-                if (extension.type.compilationTarget == CompilationTarget.HOST) {
+                if (extension.type.compilationTarget == CompilationTarget.HOST &&
+                    extension.type != LibraryType.ANNOTATION_PROCESSOR_UTILS
+                ) {
                     task.kotlinOptions.jvmTarget = "11"
                 } else {
                     task.kotlinOptions.jvmTarget = "1.8"
@@ -458,7 +460,9 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         // Force Java 1.8 source- and target-compatibility for all Java libraries.
         val javaExtension = project.extensions.getByType<JavaPluginExtension>()
         project.afterEvaluate {
-            if (extension.type.compilationTarget == CompilationTarget.HOST) {
+            if (extension.type.compilationTarget == CompilationTarget.HOST &&
+                extension.type != LibraryType.ANNOTATION_PROCESSOR_UTILS
+            ) {
                 javaExtension.apply {
                     sourceCompatibility = VERSION_11
                     targetCompatibility = VERSION_11
