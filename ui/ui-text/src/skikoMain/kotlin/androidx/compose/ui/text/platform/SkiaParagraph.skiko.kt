@@ -15,25 +15,27 @@
  */
 package androidx.compose.ui.text.platform
 
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.Canvas
+import org.jetbrains.skia.Font as SkFont
+import org.jetbrains.skia.FontStyle as SkFontStyle
+import org.jetbrains.skia.paragraph.Alignment as SkAlignment
+import org.jetbrains.skia.paragraph.DecorationLineStyle as SkDecorationLineStyle
+import org.jetbrains.skia.paragraph.DecorationStyle as SkDecorationStyle
+import org.jetbrains.skia.paragraph.Direction as SkDirection
+import org.jetbrains.skia.paragraph.Paragraph as SkParagraph
+import org.jetbrains.skia.paragraph.Shadow as SkShadow
+import org.jetbrains.skia.paragraph.TextStyle as SkTextStyle
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.asSkiaPath
 import androidx.compose.ui.graphics.isSpecified
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.text.AnnotatedString.Range
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.SkiaParagraph
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.ceilToInt
 import androidx.compose.ui.text.font.Font
@@ -52,32 +54,17 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.isSpecified
+import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.sp
 import org.jetbrains.skia.Paint
-import org.jetbrains.skia.paragraph.Alignment as SkAlignment
 import org.jetbrains.skia.paragraph.BaselineMode
-import org.jetbrains.skia.paragraph.Direction as SkDirection
-import org.jetbrains.skia.paragraph.LineMetrics
-import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
 import org.jetbrains.skia.paragraph.PlaceholderAlignment
 import org.jetbrains.skia.paragraph.PlaceholderStyle
-import org.jetbrains.skia.paragraph.RectHeightMode
-import org.jetbrains.skia.paragraph.RectWidthMode
 import org.jetbrains.skia.paragraph.StrutStyle
 import org.jetbrains.skia.paragraph.TextBox
-import kotlin.math.floor
-import org.jetbrains.skia.Rect as SkRect
-import org.jetbrains.skia.paragraph.Paragraph as SkParagraph
-import org.jetbrains.skia.paragraph.TextStyle as SkTextStyle
-import org.jetbrains.skia.FontStyle as SkFontStyle
-import org.jetbrains.skia.Font as SkFont
-import org.jetbrains.skia.paragraph.DecorationLineStyle as SkDecorationLineStyle
-import org.jetbrains.skia.paragraph.DecorationStyle as SkDecorationStyle
-import org.jetbrains.skia.paragraph.Shadow as SkShadow
 
 private val DefaultFontSize = 16.sp
 
@@ -147,278 +134,6 @@ internal actual fun ActualParagraph(
     ellipsis,
     constraints
 )
-
-internal class SkiaParagraph(
-    intrinsics: ParagraphIntrinsics,
-    val maxLines: Int,
-    val ellipsis: Boolean,
-    val constraints: Constraints
-) : Paragraph {
-
-    private val ellipsisChar = if (ellipsis) "\u2026" else ""
-
-    private val paragraphIntrinsics = intrinsics as SkiaParagraphIntrinsics
-
-    private val layouter = paragraphIntrinsics.layouter()
-
-    /**
-     * Paragraph isn't always immutable, it could be changed via [paint] method without
-     * rerunning layout
-     */
-    private var para = layouter.layoutParagraph(
-        width = width,
-        maxLines = maxLines,
-        ellipsis = ellipsisChar
-    )
-
-    init {
-        para.layout(width)
-    }
-
-    private val text: String
-        get() = paragraphIntrinsics.text
-
-    override val width: Float
-        get() = constraints.maxWidth.toFloat()
-
-    override val height: Float
-        get() = para.height
-
-    override val minIntrinsicWidth: Float
-        get() = paragraphIntrinsics.minIntrinsicWidth
-
-    override val maxIntrinsicWidth: Float
-        get() = paragraphIntrinsics.maxIntrinsicWidth
-
-    override val firstBaseline: Float
-        get() = lineMetrics.firstOrNull()?.run { baseline.toFloat() } ?: 0f
-
-    override val lastBaseline: Float
-        get() = lineMetrics.lastOrNull()?.run { baseline.toFloat() } ?: 0f
-
-    override val didExceedMaxLines: Boolean
-        get() = para.didExceedMaxLines()
-
-    override val lineCount: Int
-        // workaround for https://bugs.chromium.org/p/skia/issues/detail?id=11321
-        get() = if (text == "") {
-            1
-        } else {
-            para.lineNumber.toInt()
-        }
-
-    override val placeholderRects: List<Rect?>
-        get() =
-            para.rectsForPlaceholders.map {
-                it.rect.toComposeRect()
-            }
-
-    override fun getPathForRange(start: Int, end: Int): Path {
-        val boxes = para.getRectsForRange(
-            start,
-            end,
-            RectHeightMode.MAX,
-            RectWidthMode.MAX
-        )
-        val path = Path()
-        for (b in boxes) {
-            path.asSkiaPath().addRect(b.rect)
-        }
-        return path
-    }
-
-    override fun getCursorRect(offset: Int): Rect {
-        val horizontal = getHorizontalPosition(offset, true)
-        val line = lineMetricsForOffset(offset)!!
-
-        return Rect(
-            horizontal,
-            (line.baseline - line.ascent).toFloat(),
-            horizontal,
-            (line.baseline + line.descent).toFloat()
-        )
-    }
-
-    override fun getLineLeft(lineIndex: Int): Float =
-        lineMetrics.getOrNull(lineIndex)?.left?.toFloat() ?: 0f
-
-    override fun getLineRight(lineIndex: Int): Float =
-        lineMetrics.getOrNull(lineIndex)?.right?.toFloat() ?: 0f
-
-    override fun getLineTop(lineIndex: Int) =
-        lineMetrics.getOrNull(lineIndex)?.let { line ->
-            floor((line.baseline - line.ascent).toFloat())
-        } ?: 0f
-
-    override fun getLineBottom(lineIndex: Int) =
-        lineMetrics.getOrNull(lineIndex)?.let { line ->
-            floor((line.baseline + line.descent).toFloat())
-        } ?: 0f
-
-    private fun lineMetricsForOffset(offset: Int): LineMetrics? {
-        val metrics = lineMetrics
-        for (line in metrics) {
-            if (offset < line.endIncludingNewline) {
-                return line
-            }
-        }
-        if (metrics.isEmpty()) {
-            return null
-        }
-        return metrics.last()
-    }
-
-    override fun getLineHeight(lineIndex: Int) = lineMetrics[lineIndex].height.toFloat()
-
-    override fun getLineWidth(lineIndex: Int) = lineMetrics[lineIndex].width.toFloat()
-
-    override fun getLineStart(lineIndex: Int) = lineMetrics[lineIndex].startIndex.toInt()
-
-    override fun getLineEnd(lineIndex: Int, visibleEnd: Boolean) =
-        if (visibleEnd) {
-            val metrics = lineMetrics[lineIndex]
-            // workarounds for https://bugs.chromium.org/p/skia/issues/detail?id=11321 :(
-            // we are waiting for fixes
-            if (lineIndex > 0 && metrics.startIndex < lineMetrics[lineIndex - 1].endIndex) {
-                metrics.endIndex.toInt()
-            } else if (
-                metrics.startIndex < text.length &&
-                text[metrics.startIndex.toInt()] == '\n'
-            ) {
-                metrics.startIndex.toInt()
-            } else {
-                metrics.endExcludingWhitespaces.toInt()
-            }
-        } else {
-            lineMetrics[lineIndex].endIndex.toInt()
-        }
-
-    override fun isLineEllipsized(lineIndex: Int) = false
-
-    override fun getLineForOffset(offset: Int) =
-        lineMetricsForOffset(offset)?.run { lineNumber.toInt() }
-            ?: 0
-
-    override fun getLineForVerticalPosition(vertical: Float): Int {
-        return 0
-    }
-
-    override fun getHorizontalPosition(offset: Int, usePrimaryDirection: Boolean): Float {
-        val prevBox = getBoxBackwardByOffset(offset)
-        val nextBox = getBoxForwardByOffset(offset)
-        return when {
-            prevBox == null && nextBox == null -> 0f
-            prevBox == null -> nextBox!!.cursorHorizontalPosition(true)
-            nextBox == null -> prevBox.cursorHorizontalPosition()
-            nextBox.direction == prevBox.direction -> nextBox.cursorHorizontalPosition(true)
-            // BiDi transition offset, we need to resolve ambiguity with usePrimaryDirection
-            // for details see comment for MultiParagraph.getHorizontalPosition
-            usePrimaryDirection -> prevBox.cursorHorizontalPosition()
-            else -> nextBox.cursorHorizontalPosition(true)
-        }
-    }
-
-    // workaround for https://bugs.chromium.org/p/skia/issues/detail?id=11321 :(
-    private val lineMetrics: Array<LineMetrics>
-        get() = if (text == "") {
-            val height = layouter.defaultHeight.toDouble()
-            arrayOf(
-                LineMetrics(
-                    0, 0, 0, 0, true,
-                    height, 0.0, height, height, 0.0, 0.0, height, 0
-                )
-            )
-        } else {
-            @Suppress("UNCHECKED_CAST", "USELESS_CAST")
-            para.lineMetrics as Array<LineMetrics>
-        }
-
-    private fun getBoxForwardByOffset(offset: Int): TextBox? {
-        var to = offset + 1
-        while (to <= text.length) {
-            val box = para.getRectsForRange(
-                offset, to,
-                RectHeightMode.STRUT, RectWidthMode.TIGHT
-            ).firstOrNull()
-            if (box != null) {
-                return box
-            }
-            to += 1
-        }
-        return null
-    }
-
-    private fun getBoxBackwardByOffset(offset: Int, end: Int = offset): TextBox? {
-        var from = offset - 1
-        while (from >= 0) {
-            val box = para.getRectsForRange(
-                from, end,
-                RectHeightMode.STRUT, RectWidthMode.TIGHT
-            ).firstOrNull()
-            when {
-                (box == null) -> from -= 1
-                (text.get(from) == '\n') -> {
-                    val bottom = box.rect.bottom + box.rect.bottom - box.rect.top
-                    val rect = SkRect(0f, box.rect.bottom, 0f, bottom)
-                    return TextBox(rect, box.direction)
-                }
-                else -> return box
-            }
-        }
-        return null
-    }
-
-    override fun getParagraphDirection(offset: Int): ResolvedTextDirection =
-        paragraphIntrinsics.textDirection
-
-    override fun getBidiRunDirection(offset: Int): ResolvedTextDirection =
-        when (getBoxForwardByOffset(offset)?.direction) {
-            org.jetbrains.skia.paragraph.Direction.RTL -> ResolvedTextDirection.Rtl
-            org.jetbrains.skia.paragraph.Direction.LTR -> ResolvedTextDirection.Ltr
-            null -> ResolvedTextDirection.Ltr
-        }
-
-    override fun getOffsetForPosition(position: Offset): Int {
-        return para.getGlyphPositionAtCoordinate(position.x, position.y).position
-    }
-
-    override fun getBoundingBox(offset: Int): Rect {
-        val box = getBoxForwardByOffset(offset) ?: getBoxBackwardByOffset(offset, text.length)!!
-        return box.rect.toComposeRect()
-    }
-
-    override fun getWordBoundary(offset: Int): TextRange {
-        return when {
-            (text[offset].isLetterOrDigit()) -> para.getWordBoundary(offset).let {
-                TextRange(it.start, it.end)
-            }
-            (text.getOrNull(offset - 1)?.isLetterOrDigit() ?: false) ->
-                para.getWordBoundary(offset - 1).let {
-                    TextRange(it.start, it.end)
-                }
-            else -> TextRange(offset, offset)
-        }
-    }
-
-    // TODO(b/229518449): Implement an alternative to paint function that takes a brush.
-    override fun paint(
-        canvas: Canvas,
-        color: Color,
-        shadow: Shadow?,
-        textDecoration: TextDecoration?
-    ) {
-        para = layouter.layoutParagraph(
-            width = width,
-            maxLines = maxLines,
-            ellipsis = ellipsisChar,
-            color = color,
-            shadow = shadow,
-            textDecoration = textDecoration
-        )
-
-        para.paint(canvas.nativeCanvas, 0.0f, 0.0f)
-    }
-}
 
 private fun fontSizeInHierarchy(density: Density, base: Float, other: TextUnit): Float {
     return when {
