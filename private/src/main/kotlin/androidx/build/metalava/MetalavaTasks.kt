@@ -22,6 +22,7 @@ import androidx.build.addToCheckTask
 import androidx.build.checkapi.ApiBaselinesLocation
 import androidx.build.checkapi.ApiLocation
 import androidx.build.checkapi.getRequiredCompatibilityApiLocation
+import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.java.JavaCompileInputs
 import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import com.android.build.gradle.tasks.ProcessLibraryManifest
@@ -59,6 +60,7 @@ object MetalavaTasks {
                 task.manifestPath.set(processManifest.manifestOutputFile)
             }
             applyInputs(javaCompileInputs, task)
+            AffectedModuleDetector.configureTaskGuard(task)
             // If we will be updating the api lint baselines, then we should do that before
             // using it to validate the generated api
             task.mustRunAfter("updateApiLintBaseline")
@@ -82,6 +84,7 @@ object MetalavaTasks {
                 task.bootClasspath = javaCompileInputs.bootClasspath
                 task.cacheEvenIfNoOutputs()
                 task.dependsOn(generateApi)
+                AffectedModuleDetector.configureTaskGuard(task)
             }
 
             ignoreApiChanges = project.tasks.register(
@@ -126,6 +129,7 @@ object MetalavaTasks {
                 checkApiRelease?.let {
                     task.dependsOn(checkApiRelease)
                 }
+                AffectedModuleDetector.configureTaskGuard(task)
             }
 
         val regenerateOldApis = project.tasks.register(
@@ -159,6 +163,7 @@ object MetalavaTasks {
             // developer updates an API, if backwards compatibility checks are enabled in the
             // library, then we want to check that the changes are backwards compatible.
             checkApiRelease?.let { task.dependsOn(it) }
+            AffectedModuleDetector.configureTaskGuard(task)
         }
 
         // ignoreApiChanges depends on the output of this task for the "current" API surface.

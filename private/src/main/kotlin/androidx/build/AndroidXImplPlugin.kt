@@ -54,6 +54,7 @@ import com.android.build.gradle.TestExtension
 import com.android.build.gradle.TestPlugin
 import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.internal.tasks.AnalyticsRecordingTask
+import com.android.build.gradle.internal.tasks.ListingFileRedirectTask
 import java.io.File
 import java.time.Duration
 import java.util.Locale
@@ -184,6 +185,8 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
     }
 
     private fun configureTestTask(project: Project, task: Test) {
+        AffectedModuleDetector.configureTaskGuard(task)
+
         // Robolectric 1.7 increased heap size requirements, see b/207169653.
         task.maxHeapSize = "3g"
 
@@ -670,6 +673,9 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             if (!testApk || project.hasAndroidTestSourceCode()) {
                 addToTestZips(project, packageTask)
             }
+        }
+        project.tasks.withType(ListingFileRedirectTask::class.java).forEach {
+            AffectedModuleDetector.configureTaskGuard(it)
         }
     }
 
