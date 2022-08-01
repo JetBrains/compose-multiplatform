@@ -353,7 +353,7 @@ class TabPosition internal constructor(val left: Dp, val width: Dp) {
  * Contains default implementations and values used for TabRow.
  */
 object TabRowDefaults {
-    /** Default color of a tab row. */
+    /** Default container color of a tab row. */
     val containerColor: Color @Composable get() =
         PrimaryNavigationTabTokens.ContainerColor.toColor()
 
