@@ -161,7 +161,7 @@ fun RowScope.NavigationBarItem(
     val styledIcon = @Composable {
         val iconColor by colors.iconColor(selected = selected)
         // If there's a label, don't have a11y services repeat the icon description.
-        val clearSemantics = alwaysShowLabel || selected
+        val clearSemantics = label != null && (alwaysShowLabel || selected)
         Box(modifier = if (clearSemantics) Modifier.clearAndSetSemantics {} else Modifier) {
             CompositionLocalProvider(LocalContentColor provides iconColor, content = icon)
         }

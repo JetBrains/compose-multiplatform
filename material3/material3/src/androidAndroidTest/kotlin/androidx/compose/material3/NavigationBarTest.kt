@@ -128,7 +128,7 @@ class NavigationBarTest {
     }
 
     @Test
-    fun navigationBarItem_clearsSemanticsOfIcon_whenLabelIsPresent() {
+    fun navigationBarItem_clearsIconSemantics_whenLabelIsPresent() {
         rule.setMaterialContent(lightColorScheme()) {
             NavigationBar {
                 NavigationBarItem(
@@ -155,14 +155,25 @@ class NavigationBarTest {
                     alwaysShowLabel = false,
                     onClick = {}
                 )
+                NavigationBarItem(
+                    modifier = Modifier.testTag("item3"),
+                    icon = {
+                        Icon(Icons.Filled.Favorite, "Favorite")
+                    },
+                    selected = false,
+                    onClick = {}
+                )
             }
         }
 
         val node1 = rule.onNodeWithTag("item1").fetchSemanticsNode()
         val node2 = rule.onNodeWithTag("item2").fetchSemanticsNode()
+        val node3 = rule.onNodeWithTag("item3").fetchSemanticsNode()
 
         assertThat(node1.config.getOrNull(SemanticsProperties.ContentDescription)).isNull()
         assertThat(node2.config.getOrNull(SemanticsProperties.ContentDescription))
+            .isEqualTo(listOf("Favorite"))
+        assertThat(node3.config.getOrNull(SemanticsProperties.ContentDescription))
             .isEqualTo(listOf("Favorite"))
     }
 
