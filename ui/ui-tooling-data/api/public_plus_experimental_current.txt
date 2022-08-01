@@ -78,6 +78,7 @@ package androidx.compose.ui.tooling.data {
 
   public final class SlotTreeKt {
     method @androidx.compose.ui.tooling.data.UiToolingDataApi public static androidx.compose.ui.tooling.data.Group asTree(androidx.compose.runtime.tooling.CompositionData);
+    method @androidx.compose.ui.tooling.data.UiToolingDataApi public static java.util.List<androidx.compose.ui.tooling.data.ParameterInformation> findParameters(androidx.compose.runtime.tooling.CompositionGroup, optional androidx.compose.ui.tooling.data.ContextCache? cache);
     method @androidx.compose.ui.tooling.data.UiToolingDataApi public static String? getPosition(androidx.compose.ui.tooling.data.Group);
     method @androidx.compose.ui.tooling.data.UiToolingDataApi public static <T> T? mapTree(androidx.compose.runtime.tooling.CompositionData, kotlin.jvm.functions.Function3<? super androidx.compose.runtime.tooling.CompositionGroup,? super androidx.compose.ui.tooling.data.SourceContext,? super java.util.List<? extends T>,? extends T> factory, optional androidx.compose.ui.tooling.data.ContextCache cache);
   }
