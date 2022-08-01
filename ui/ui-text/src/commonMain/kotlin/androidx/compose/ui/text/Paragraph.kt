@@ -40,7 +40,7 @@ internal const val DefaultMaxLines = Int.MAX_VALUE
  * Paragraphs can be displayed on a [Canvas] using the [paint] method.
  */
 @JvmDefaultWithCompatibility
-sealed interface Paragraph {
+expect sealed interface Paragraph {
     /**
      * The amount of horizontal space this paragraph occupies.
      */
@@ -255,11 +255,7 @@ sealed interface Paragraph {
         alpha: Float = Float.NaN,
         shadow: Shadow? = null,
         textDecoration: TextDecoration? = null
-    ) {
-        throw UnsupportedOperationException(
-            "Using brush for painting the paragraph is a separate functionality that " +
-                "is not supported on this platform")
-    }
+    )
 }
 
 /**

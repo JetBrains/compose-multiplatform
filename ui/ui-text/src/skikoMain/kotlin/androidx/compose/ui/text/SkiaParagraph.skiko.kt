@@ -17,6 +17,7 @@
 package androidx.compose.ui.text
 
 import org.jetbrains.skia.Rect as SkRect
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
@@ -306,5 +307,18 @@ internal class SkiaParagraph(
         )
 
         para.paint(canvas.nativeCanvas, 0.0f, 0.0f)
+    }
+
+    @ExperimentalTextApi
+    override fun paint(
+        canvas: Canvas,
+        brush: Brush,
+        alpha: Float,
+        shadow: Shadow?,
+        textDecoration: TextDecoration?
+    ) {
+        throw UnsupportedOperationException(
+            "Using brush for painting the paragraph is a separate functionality that " +
+                "is not supported on this platform")
     }
 }

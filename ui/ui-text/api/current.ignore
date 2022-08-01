@@ -61,3 +61,13 @@ AddedFinal: androidx.compose.ui.text.Paragraph#isLineEllipsized(int):
     Method androidx.compose.ui.text.Paragraph.isLineEllipsized has added 'final' qualifier
 AddedFinal: androidx.compose.ui.text.Paragraph#paint(androidx.compose.ui.graphics.Canvas, long, androidx.compose.ui.graphics.Shadow, androidx.compose.ui.text.style.TextDecoration):
     Method androidx.compose.ui.text.Paragraph.paint has added 'final' qualifier
+
+
+DefaultValueChange: androidx.compose.ui.text.Paragraph#getLineEnd(int, boolean) parameter #1:
+    Attempted to remove default value from parameter visibleEnd in androidx.compose.ui.text.Paragraph.getLineEnd
+DefaultValueChange: androidx.compose.ui.text.Paragraph#paint(androidx.compose.ui.graphics.Canvas, long, androidx.compose.ui.graphics.Shadow, androidx.compose.ui.text.style.TextDecoration) parameter #1:
+    Attempted to remove default value from parameter color in androidx.compose.ui.text.Paragraph.paint
+DefaultValueChange: androidx.compose.ui.text.Paragraph#paint(androidx.compose.ui.graphics.Canvas, long, androidx.compose.ui.graphics.Shadow, androidx.compose.ui.text.style.TextDecoration) parameter #2:
+    Attempted to remove default value from parameter shadow in androidx.compose.ui.text.Paragraph.paint
+DefaultValueChange: androidx.compose.ui.text.Paragraph#paint(androidx.compose.ui.graphics.Canvas, long, androidx.compose.ui.graphics.Shadow, androidx.compose.ui.text.style.TextDecoration) parameter #3:
+    Attempted to remove default value from parameter textDecoration in androidx.compose.ui.text.Paragraph.paint
