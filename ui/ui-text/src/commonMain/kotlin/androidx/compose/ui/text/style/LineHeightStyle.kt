@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.text.style
 
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.PlatformParagraphStyle
 
 /**
@@ -189,23 +190,26 @@ class LineHeightStyle(
 
     /**
      * Defines how to align the line in the space provided by the line height.
+     *
+     * @param topRatio the ratio of ascent to ascent+descent in percentage. Valid values are
+     * integers between 0f (inclusive) to 1f (inclusive).
      */
     @kotlin.jvm.JvmInline
-    value class Alignment private constructor(internal val topPercentage: Int) {
+    value class Alignment @ExperimentalTextApi constructor(internal val topRatio: Float) {
 
         init {
-            check(topPercentage in 0..100 || topPercentage == -1) {
-                "topRatio should be in [0..100] range or -1"
+            check(topRatio in 0f..1f || topRatio == -1f) {
+                "topRatio should be in [0..1] range or -1"
             }
         }
 
         override fun toString(): String {
-            return when (topPercentage) {
-                Top.topPercentage -> "LineHeightStyle.Alignment.Top"
-                Center.topPercentage -> "LineHeightStyle.Alignment.Center"
-                Proportional.topPercentage -> "LineHeightStyle.Alignment.Proportional"
-                Bottom.topPercentage -> "LineHeightStyle.Alignment.Bottom"
-                else -> "LineHeightStyle.Alignment(topPercentage = $topPercentage)"
+            return when (topRatio) {
+                Top.topRatio -> "LineHeightStyle.Alignment.Top"
+                Center.topRatio -> "LineHeightStyle.Alignment.Center"
+                Proportional.topRatio -> "LineHeightStyle.Alignment.Proportional"
+                Bottom.topRatio -> "LineHeightStyle.Alignment.Bottom"
+                else -> "LineHeightStyle.Alignment(topPercentage = $topRatio)"
             }
         }
 
@@ -231,7 +235,8 @@ class LineHeightStyle(
              * +--------+
              * </pre>
              */
-            val Top = Alignment(topPercentage = 0)
+            @OptIn(ExperimentalTextApi::class)
+            val Top = Alignment(topRatio = 0f)
 
             /**
              * Align the line to the center of the space reserved for the line. This configuration
@@ -251,7 +256,8 @@ class LineHeightStyle(
              * +--------+
              * </pre>
              */
-            val Center = Alignment(topPercentage = 50)
+            @OptIn(ExperimentalTextApi::class)
+            val Center = Alignment(topRatio = 0.5f)
 
             /**
              * Align the line proportional to the ascent and descent values of the line. For example
@@ -259,7 +265,8 @@ class LineHeightStyle(
              * will be distributed as 8 units to top, and 2 units to the bottom of the line. This is
              * the default behavior.
              */
-            val Proportional = Alignment(topPercentage = -1)
+            @OptIn(ExperimentalTextApi::class)
+            val Proportional = Alignment(topRatio = -1f)
 
             /**
              * Align the line to the bottom of the space reserved for that line. This means that all
@@ -282,7 +289,8 @@ class LineHeightStyle(
              * +--------+
              * </pre>
              */
-            val Bottom = Alignment(topPercentage = 100)
+            @OptIn(ExperimentalTextApi::class)
+            val Bottom = Alignment(topRatio = 1f)
         }
     }
 }
