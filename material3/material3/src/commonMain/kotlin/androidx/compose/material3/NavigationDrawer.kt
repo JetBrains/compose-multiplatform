@@ -317,37 +317,6 @@ fun ModalNavigationDrawer(
     }
 }
 
-@Composable
-@ExperimentalMaterial3Api
-@Deprecated(
-    "NavigationDrawer has been renamed to ModalNavigationDrawer to better specify " +
-        "its modal nature", replaceWith = ReplaceWith(
-        "ModalNavigationDrawer(drawerContent,\n" +
-            "        modifier,\n" +
-            "        drawerState,\n" +
-            "        gesturesEnabled,\n" +
-            "        scrimColor,\n" +
-            "        content)"
-    )
-)
-fun NavigationDrawer(
-    drawerContent: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
-    gesturesEnabled: Boolean = true,
-    scrimColor: Color = DrawerDefaults.scrimColor,
-    content: @Composable () -> Unit
-) {
-    ModalNavigationDrawer(
-        drawerContent,
-        modifier,
-        drawerState,
-        gesturesEnabled,
-        scrimColor,
-        content
-    )
-}
-
 /**
  * <a href="https://m3.material.io/components/navigation-drawer/overview" class="external" target="_blank">Material Design navigation drawer</a>.
  *
