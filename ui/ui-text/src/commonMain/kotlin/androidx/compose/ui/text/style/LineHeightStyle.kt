@@ -17,7 +17,6 @@
 package androidx.compose.ui.text.style
 
 import androidx.compose.ui.text.PlatformParagraphStyle
-import androidx.compose.ui.text.ExperimentalTextApi
 
 /**
  * The configuration for line height such as alignment of the line in the provided line height,
@@ -35,7 +34,6 @@ import androidx.compose.ui.text.ExperimentalTextApi
  * bottom of the last line should be trimmed or not. This feature is available only when
  * [PlatformParagraphStyle.includeFontPadding] is false.
  */
-@ExperimentalTextApi
 class LineHeightStyle(
     val alignment: Alignment,
     val trim: Trim
@@ -81,7 +79,6 @@ class LineHeightStyle(
      * [PlatformParagraphStyle.includeFontPadding] is false.
      */
     @kotlin.jvm.JvmInline
-    @ExperimentalTextApi
     value class Trim private constructor(private val value: Int) {
 
         override fun toString(): String {
@@ -194,7 +191,6 @@ class LineHeightStyle(
      * Defines how to align the line in the space provided by the line height.
      */
     @kotlin.jvm.JvmInline
-    @ExperimentalTextApi
     value class Alignment private constructor(internal val topPercentage: Int) {
 
         init {

@@ -44,7 +44,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -65,7 +64,6 @@ private fun Float.format(digits: Int = 2) = "%.${digits}f".format(this)
 private val FontSize = 60.sp
 
 @Preview
-@OptIn(ExperimentalTextApi::class)
 @Composable
 fun TextLineHeightDemo() {
     Column(
@@ -173,7 +171,6 @@ private fun LineHeightConfiguration(
     }
 }
 
-@OptIn(ExperimentalTextApi::class)
 @Composable
 private fun LineHeightStyleConfiguration(
     lineHeightStyleEnabled: MutableState<Boolean>,
@@ -195,7 +192,6 @@ private fun LineHeightStyleConfiguration(
     }
 }
 
-@OptIn(ExperimentalTextApi::class)
 @Composable
 private fun LineHeightAlignmentOptions(
     lineHeightAlignment: MutableState<LineHeightStyle.Alignment>,
@@ -236,7 +232,6 @@ private fun LineHeightAlignmentOptions(
     }
 }
 
-@OptIn(ExperimentalTextApi::class)
 @Composable
 private fun LineHeightTrimOptions(
     lineHeightTrim: MutableState<Trim>,
@@ -363,7 +358,6 @@ private fun SnappingSlider(
 }
 
 @Suppress("DEPRECATION")
-@OptIn(ExperimentalTextApi::class)
 @Composable
 private fun TextWithLineHeight(
     lineHeightEnabled: Boolean,
