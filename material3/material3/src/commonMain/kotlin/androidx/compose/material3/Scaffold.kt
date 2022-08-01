@@ -220,7 +220,6 @@ private fun ScaffoldLayout(
 /**
  * The possible positions for a [FloatingActionButton] attached to a [Scaffold].
  */
-// TODO(b/200553810): Mark as experimental
 @ExperimentalMaterial3Api
 @kotlin.jvm.JvmInline
 value class FabPosition internal constructor(@Suppress("unused") private val value: Int) {
