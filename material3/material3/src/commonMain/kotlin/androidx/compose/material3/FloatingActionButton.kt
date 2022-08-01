@@ -600,12 +600,12 @@ private val ExtendedFabMinimumWidth = 80.dp
 
 private val ExtendedFabCollapseAnimation = fadeOut(
     animationSpec = tween(
-        durationMillis = MotionTokens.Duration100DurationMs.toInt(),
+        durationMillis = MotionTokens.DurationShort2.toInt(),
         easing = MotionTokens.EasingLinearCubicBezier,
     )
 ) + shrinkHorizontally(
     animationSpec = tween(
-        durationMillis = MotionTokens.Duration500DurationMs.toInt(),
+        durationMillis = MotionTokens.DurationLong2.toInt(),
         easing = MotionTokens.EasingEmphasizedCubicBezier,
     ),
     shrinkTowards = Alignment.Start,
@@ -613,13 +613,13 @@ private val ExtendedFabCollapseAnimation = fadeOut(
 
 private val ExtendedFabExpandAnimation = fadeIn(
     animationSpec = tween(
-        durationMillis = MotionTokens.Duration200DurationMs.toInt(),
-        delayMillis = MotionTokens.Duration100DurationMs.toInt(),
+        durationMillis = MotionTokens.DurationShort4.toInt(),
+        delayMillis = MotionTokens.DurationShort2.toInt(),
         easing = MotionTokens.EasingLinearCubicBezier,
     ),
 ) + expandHorizontally(
     animationSpec = tween(
-        durationMillis = MotionTokens.Duration500DurationMs.toInt(),
+        durationMillis = MotionTokens.DurationLong2.toInt(),
         easing = MotionTokens.EasingEmphasizedCubicBezier,
     ),
     expandFrom = Alignment.Start,
