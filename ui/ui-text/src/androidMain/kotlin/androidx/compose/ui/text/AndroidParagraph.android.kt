@@ -191,11 +191,12 @@ internal class AndroidParagraph(
                 // The line index of the PlaceholderSpan. In the case where PlaceholderSpan is
                 // truncated due to maxLines limitation. It will return the index of last line.
                 val line = layout.getLineForOffset(start)
+                val exceedsMaxLines = line >= maxLines
                 val isPlaceholderSpanEllipsized = layout.getLineEllipsisCount(line) > 0 &&
                     end > layout.getLineEllipsisOffset(line)
                 val isPlaceholderSpanTruncated = end > layout.getLineEnd(line)
                 // This Placeholder is ellipsized or truncated, return null instead.
-                if (isPlaceholderSpanEllipsized || isPlaceholderSpanTruncated) {
+                if (isPlaceholderSpanEllipsized || isPlaceholderSpanTruncated || exceedsMaxLines) {
                     return@map null
                 }
 
