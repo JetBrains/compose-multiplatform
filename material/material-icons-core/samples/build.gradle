@@ -32,7 +32,7 @@ dependencies {
 
     implementation(project(":compose:material:material"))
     implementation(project(":compose:material:material-icons-core"))
-    implementation("androidx.compose.runtime:runtime:1.2.0-rc02")
+    implementation("androidx.compose.runtime:runtime:1.2.0")
 }
 
 androidx {
