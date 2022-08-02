@@ -196,9 +196,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         }
         task.inputs.property("ignoreFailures", ignoreFailures)
 
-        // Robolectric 1.7 increased heap size requirements, see b/207169653.
-        task.maxHeapSize = "3g"
-
         val xmlReportDestDir = project.getHostTestResultDirectory()
         val archiveName = "${project.path}:${task.name}.zip"
         if (project.isDisplayTestOutput()) {
@@ -575,6 +572,16 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
 
         testOptions.animationsDisabled = true
         testOptions.unitTests.isReturnDefaultValues = true
+        testOptions.unitTests.all { task ->
+            // https://github.com/robolectric/robolectric/issues/7456
+            task.jvmArgs = listOf(
+                "--add-opens=java.base/java.lang=ALL-UNNAMED",
+                "--add-opens=java.base/java.util=ALL-UNNAMED",
+                "--add-opens=java.base/java.io=ALL-UNNAMED",
+            )
+            // Robolectric 1.7 increased heap size requirements, see b/207169653.
+            task.maxHeapSize = "3g"
+        }
         testOptions.configureVirtualDevices()
 
         // Include resources in Robolectric tests as a workaround for b/184641296 and
