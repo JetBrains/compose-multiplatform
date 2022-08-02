@@ -185,6 +185,7 @@ fun Badge(
 }
 
 /** Default values used for [Badge] implementations. */
+@ExperimentalMaterial3Api
 object BadgeDefaults {
     /** Default container color for a badge. */
     val containerColor: Color @Composable get() = BadgeTokens.Color.toColor()

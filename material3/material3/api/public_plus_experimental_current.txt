@@ -54,7 +54,7 @@ package androidx.compose.material3 {
     field public static final androidx.compose.material3.AssistChipDefaults INSTANCE;
   }
 
-  public final class BadgeDefaults {
+  @androidx.compose.material3.ExperimentalMaterial3Api public final class BadgeDefaults {
     method @androidx.compose.runtime.Composable public long getContainerColor();
     property @androidx.compose.runtime.Composable public final long containerColor;
     field public static final androidx.compose.material3.BadgeDefaults INSTANCE;
