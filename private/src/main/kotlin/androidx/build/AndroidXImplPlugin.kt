@@ -678,6 +678,8 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                 addToTestZips(project, packageTask)
             }
         }
+        // This task needs to be guarded by AffectedModuleDetector due to guarding test
+        // APK building above. It can only be removed if we stop using AMD for test APKs.
         project.tasks.withType(ListingFileRedirectTask::class.java).forEach {
             AffectedModuleDetector.configureTaskGuard(it)
         }
