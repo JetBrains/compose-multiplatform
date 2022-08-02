@@ -16,17 +16,19 @@
 
 package androidx.build.buildInfo
 
+import androidx.build.buildInfo.CreateAggregateLibraryBuildInfoFileTask.Companion.CREATE_AGGREGATE_BUILD_INFO_FILES_TASK
 import androidx.build.getDistributionDirectory
 import androidx.build.jetpad.LibraryBuildInfoFile
 import com.google.gson.Gson
+import java.io.File
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.work.DisableCachingByDefault
-import java.io.File
-import java.util.ArrayList
 
 /**
  * Task for a json file of all dependencies for each artifactId
@@ -104,5 +106,20 @@ abstract class CreateAggregateLibraryBuildInfoFileTask : DefaultTask() {
         if (!jsonFileIsValid(outputFile, artifactList)) {
             throw RuntimeException("JSON written to $outputFile was invalid.")
         }
+    }
+
+    companion object {
+        const val CREATE_AGGREGATE_BUILD_INFO_FILES_TASK = "createAggregateBuildInfoFiles"
+    }
+}
+
+fun Project.addTaskToAggregateBuildInfoFileTask(
+    task: TaskProvider<CreateLibraryBuildInfoFileTask>
+) {
+    rootProject.tasks.named(CREATE_AGGREGATE_BUILD_INFO_FILES_TASK).configure {
+        val aggregateLibraryBuildInfoFileTask = it as CreateAggregateLibraryBuildInfoFileTask
+        aggregateLibraryBuildInfoFileTask.libraryBuildInfoFiles.add(
+            task.flatMap { task -> task.outputFile }
+        )
     }
 }

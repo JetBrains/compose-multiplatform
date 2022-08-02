@@ -19,6 +19,7 @@ package androidx.build
 import androidx.build.AndroidXImplPlugin.Companion.ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.AndroidXImplPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.buildInfo.CreateAggregateLibraryBuildInfoFileTask
+import androidx.build.buildInfo.CreateAggregateLibraryBuildInfoFileTask.Companion.CREATE_AGGREGATE_BUILD_INFO_FILES_TASK
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gradle.isRoot
 import androidx.build.license.CheckExternalDependencyLicensesTask
@@ -88,7 +89,7 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
         buildOnServerTask.buildId = getBuildId()
         buildOnServerTask.dependsOn(
             tasks.register(
-                AndroidXImplPlugin.CREATE_AGGREGATE_BUILD_INFO_FILES_TASK,
+                CREATE_AGGREGATE_BUILD_INFO_FILES_TASK,
                 CreateAggregateLibraryBuildInfoFileTask::class.java
             )
         )

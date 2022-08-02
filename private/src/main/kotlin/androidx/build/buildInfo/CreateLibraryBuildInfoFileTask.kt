@@ -17,6 +17,8 @@
 package androidx.build.buildInfo
 
 import androidx.build.AndroidXExtension
+import androidx.build.LibraryGroup
+import androidx.build.buildInfo.CreateLibraryBuildInfoFileTask.Companion.getFrameworksSupportCommitShaAtHead
 import androidx.build.getBuildInfoDirectory
 import androidx.build.getGroupZipPath
 import androidx.build.getProjectZipPath
@@ -29,9 +31,11 @@ import com.google.gson.GsonBuilder
 import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
@@ -160,21 +164,23 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
 
         fun setup(
             project: Project,
-            extension: AndroidXExtension
+            mavenGroup: LibraryGroup?,
+            variant: VariantPublishPlan,
+            shaProvider: Provider<String>
         ): TaskProvider<CreateLibraryBuildInfoFileTask> {
             return project.tasks.register(
-                TASK_NAME,
+                TASK_NAME + variant.taskSuffix,
                 CreateLibraryBuildInfoFileTask::class.java
             ) { task ->
                 val group = project.group.toString()
-                val name = project.name.toString()
+                val artifactId = variant.artifactId
                 task.outputFile.set(
                     File(
                         project.getBuildInfoDirectory(),
-                        "${group}_${name}_build_info.txt"
+                        "${group}_${artifactId}_build_info.txt"
                     )
                 )
-                task.artifactId.set(name)
+                task.artifactId.set(artifactId)
                 task.groupId.set(group)
                 task.version.set(project.version.toString())
                 task.kotlinVersion.set(project.getKotlinPluginVersion())
@@ -183,12 +189,8 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
                         project.getSupportRootFolder().absolutePath
                     )
                 )
-                task.commit.set(
-                    project.provider {
-                        project.getFrameworksSupportCommitShaAtHead()
-                    }
-                )
-                task.groupIdRequiresSameVersion.set(extension.mavenGroup?.requireSameVersion)
+                task.commit.set(shaProvider)
+                task.groupIdRequiresSameVersion.set(mavenGroup?.requireSameVersion)
                 task.groupZipPath.set(project.getGroupZipPath())
                 task.projectZipPath.set(project.getProjectZipPath())
 
@@ -201,39 +203,31 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
                         project.getSupportRootFolder().absolutePath
                     )
                 )
-                task.dependencyList.set(project.provider {
-                    val libraryDependencies = HashSet<LibraryBuildInfoFile.Dependency>()
-                    project.configurations.filter {
-                        it.name == "releaseRuntimeElements"
-                    }.forEach { configuration ->
-                        configuration.allDependencies.forEach { dep ->
-                            // Only consider androidx dependencies
-                            if (dep.group != null &&
-                                dep.group.toString().startsWith("androidx.") &&
-                                !dep.group.toString().startsWith("androidx.test")
-                            ) {
-                                val androidXPublishedDependency =
-                                    LibraryBuildInfoFile.Dependency()
-                                androidXPublishedDependency.artifactId = dep.name.toString()
-                                androidXPublishedDependency.groupId = dep.group.toString()
-                                androidXPublishedDependency.version = dep.version.toString()
-                                androidXPublishedDependency.isTipOfTree =
-                                    dep is ProjectDependency
-                                libraryDependencies.add(androidXPublishedDependency)
-                            }
-                        }
-                    }
-                    ArrayList(libraryDependencies).sortedWith(
-                        compareBy({ it.groupId }, { it.artifactId }, { it.version })
-                    )
-                })
+
+                // lazily compute the task dependency list based on the variant dependencies.
+                task.dependencyList.set(variant.dependencies.map { it.asBuildInfoDependencies() })
             }
         }
+
+        fun List<Dependency>.asBuildInfoDependencies() =
+            filter { it.group.isAndroidXDependency() }.map {
+                LibraryBuildInfoFile.Dependency().apply {
+                    this.artifactId = it.name.toString()
+                    this.groupId = it.group.toString()
+                    this.version = it.version.toString()
+                    this.isTipOfTree = it is ProjectDependency
+                }
+            }.toHashSet().sortedWith(
+                compareBy({ it.groupId }, { it.artifactId }, { it.version })
+            )
+
+        private fun String?.isAndroidXDependency() =
+            this != null && startsWith("androidx.") && !startsWith("androidx.test")
 
         /* For androidx release notes, the most common use case is to track and publish the last sha
          * of the build that is released.  Thus, we use frameworks/support to get the sha
          */
-        private fun Project.getFrameworksSupportCommitShaAtHead(): String {
+        fun Project.getFrameworksSupportCommitShaAtHead(): String {
             val gitClient = GitClient.create(
                 project.getSupportRootFolder(),
                 logger,
@@ -255,6 +249,33 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
                 throw RuntimeException("Failed to find git commit for HEAD!")
             }
             return commitList.first().sha
+        }
+    }
+}
+
+// Task that creates a json file of a project's dependencies
+fun Project.addCreateLibraryBuildInfoFileTask(extension: AndroidXExtension) {
+    afterEvaluate {
+        if (extension.shouldRelease()) {
+            // Only generate build info files for published libraries.
+            val task = CreateLibraryBuildInfoFileTask.setup(
+                project,
+                extension.mavenGroup,
+                VariantPublishPlan(
+                    artifactId = project.name.toString(),
+                    dependencies = project.provider {
+                        val config = project.configurations.findByName("releaseRuntimeElements")
+                        config?.allDependencies.orEmpty().toList()
+                    }),
+                project.provider {
+                    project.getFrameworksSupportCommitShaAtHead()
+                }
+            )
+
+            rootProject.tasks.named(CreateLibraryBuildInfoFileTask.TASK_NAME).configure {
+                it.dependsOn(task)
+            }
+            addTaskToAggregateBuildInfoFileTask(task)
         }
     }
 }
