@@ -71,6 +71,17 @@ internal class AnimatedVisibilityComposeAnimation(parent: Transition<Any>, paren
 }
 
 /**
+ * [ComposeAnimation] of type [ComposeAnimationType.UNSUPPORTED].
+ */
+internal class UnsupportedComposeAnimation(
+    override val label: String?
+) : ComposeAnimation {
+    override val type = ComposeAnimationType.UNSUPPORTED
+    override val animationObject: Any = 0
+    override val states = emptySet<Int>()
+}
+
+/**
  * Represents the states of [AnimatedVisibilityComposeAnimation]s.
  */
 @JvmInline
