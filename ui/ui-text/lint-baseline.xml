@@ -478,4 +478,13 @@
             file="../../../text/text/src/main/java/androidx/compose/ui/text/android/selection/WordBoundary.kt"/>
     </issue>
 
+    <issue
+        id="ListIterator"
+        message="Creating an unnecessary Iterator to iterate through a List"
+        errorLine1="        paragraphStyles.sortedBy { it.start }.fastForEach { paragraphStyle ->"
+        errorLine2="                        ~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/ui/text/AnnotatedString.kt"/>
+    </issue>
+
 </issues>
