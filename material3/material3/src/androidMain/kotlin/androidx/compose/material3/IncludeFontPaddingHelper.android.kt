@@ -16,12 +16,10 @@
 
 package androidx.compose.material3
 
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 
 // TODO(b/237588251) remove this once the default includeFontPadding is false
-@OptIn(ExperimentalTextApi::class)
 @Suppress("DEPRECATION")
 internal actual fun copyAndSetFontPadding(
     style: TextStyle,
