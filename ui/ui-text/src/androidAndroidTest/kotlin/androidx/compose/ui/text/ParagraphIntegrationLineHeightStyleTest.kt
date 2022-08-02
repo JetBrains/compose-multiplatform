@@ -19,7 +19,6 @@ package androidx.compose.ui.text
 import android.graphics.Paint.FontMetricsInt
 import androidx.compose.ui.text.android.style.lineHeight
 import androidx.compose.ui.text.font.toFontFamily
-import androidx.compose.ui.text.platform.AndroidParagraph
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.LineHeightStyle.Trim
 import androidx.compose.ui.text.style.LineHeightStyle.Alignment

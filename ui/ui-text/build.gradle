@@ -48,7 +48,6 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         implementation("androidx.core:core:1.7.0")
         implementation('androidx.collection:collection:1.0.0')
 
-        testImplementation(project(":internal-testutils-fonts"))
         testImplementation(libs.testRules)
         testImplementation(libs.testRunner)
         testImplementation(libs.junit)
@@ -124,6 +123,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 dependsOn(jvmMain)
             }
 
+            androidMain {
+                dependsOn(commonMain)
+            }
+
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
                 implementation("androidx.core:core:1.7.0")
@@ -168,7 +171,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.skikoCurrentOs)
                 implementation(project(":compose:foundation:foundation"))
                 implementation(project(":compose:ui:ui-test-junit4"))
-                implementation(project(":internal-testutils-fonts"))
             }
         }
     }
