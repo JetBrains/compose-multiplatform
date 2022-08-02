@@ -185,8 +185,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
     }
 
     private fun configureTestTask(project: Project, task: Test) {
-        AffectedModuleDetector.configureTaskGuard(task)
-
         // Robolectric 1.7 increased heap size requirements, see b/207169653.
         task.maxHeapSize = "3g"
 
