@@ -17,44 +17,19 @@
 package androidx.compose.foundation.selection
 
 import androidx.compose.foundation.Indication
-import androidx.compose.foundation.PressedInteractionSourceDisposableEffect
 import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.focusableInNonTouchMode
-import androidx.compose.foundation.gestures.ModifierLocalScrollableContainer
-import androidx.compose.foundation.gestures.detectTapAndPress
-import androidx.compose.foundation.handlePressInteraction
-import androidx.compose.foundation.hoverable
-import androidx.compose.foundation.indication
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
-import androidx.compose.foundation.isClick
-import androidx.compose.foundation.isComposeRootInScrollableContainer
-import androidx.compose.foundation.isPress
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.modifier.ModifierLocalConsumer
-import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.platform.inspectable
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.disabled
-import androidx.compose.ui.semantics.onClick
-import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
-import androidx.compose.ui.unit.center
-import androidx.compose.ui.unit.toOffset
-import kotlinx.coroutines.launch
 
 /**
  * Configure component to make it toggleable via input and accessibility events
@@ -89,13 +64,13 @@ fun Modifier.toggleable(
         properties["onValueChange"] = onValueChange
     }
 ) {
-    toggleableImpl(
-        state = ToggleableState(value),
-        onClick = { onValueChange(!value) },
+    Modifier.toggleable(
+        value = value,
+        interactionSource = remember { MutableInteractionSource() },
+        indication = LocalIndication.current,
         enabled = enabled,
         role = role,
-        interactionSource = remember { MutableInteractionSource() },
-        indication = LocalIndication.current
+        onValueChange = onValueChange
     )
 }
 
@@ -138,18 +113,17 @@ fun Modifier.toggleable(
         properties["enabled"] = enabled
         properties["role"] = role
         properties["onValueChange"] = onValueChange
-    },
-    factory = {
-        toggleableImpl(
-            state = ToggleableState(value),
-            onClick = { onValueChange(!value) },
-            enabled = enabled,
-            role = role,
-            interactionSource = interactionSource,
-            indication = indication
-        )
     }
-)
+) {
+    Modifier.triStateToggleable(
+        state = ToggleableState(value),
+        enabled = enabled,
+        interactionSource = interactionSource,
+        indication = indication,
+        role = role,
+        onClick = { onValueChange(!value) }
+    )
+}
 
 /**
  * Configure component to make it toggleable via input and accessibility events with three
@@ -187,13 +161,13 @@ fun Modifier.triStateToggleable(
         properties["onClick"] = onClick
     }
 ) {
-    toggleableImpl(
-        state,
-        enabled,
-        role,
-        remember { MutableInteractionSource() },
-        LocalIndication.current,
-        onClick
+    Modifier.triStateToggleable(
+        state = state,
+        interactionSource = remember { MutableInteractionSource() },
+        indication = LocalIndication.current,
+        enabled = enabled,
+        role = role,
+        onClick = onClick
     )
 }
 
@@ -239,112 +213,15 @@ fun Modifier.triStateToggleable(
         properties["interactionSource"] = interactionSource
         properties["indication"] = indication
         properties["onClick"] = onClick
-    },
-    factory = {
-        toggleableImpl(state, enabled, role, interactionSource, indication, onClick)
     }
-)
-
-@Suppress("ModifierInspectorInfo")
-private fun Modifier.toggleableImpl(
-    state: ToggleableState,
-    enabled: Boolean,
-    role: Role? = null,
-    interactionSource: MutableInteractionSource,
-    indication: Indication?,
-    onClick: () -> Unit
-): Modifier = composed {
-    val pressedInteraction = remember { mutableStateOf<PressInteraction.Press?>(null) }
-    val currentKeyPressInteractions = remember { mutableMapOf<Key, PressInteraction.Press>() }
-    // TODO(pavlis): Handle multiple states for Semantics
-    val semantics = Modifier.semantics(mergeDescendants = true) {
-        if (role != null) {
-            this.role = role
-        }
+) {
+    clickable(
+        interactionSource = interactionSource,
+        indication = indication,
+        enabled = enabled,
+        role = role,
+        onClick = onClick
+    ).semantics {
         this.toggleableState = state
-
-        onClick(action = { onClick(); true })
-        if (!enabled) {
-            disabled()
-        }
     }
-    val onClickState = rememberUpdatedState(onClick)
-    if (enabled) {
-        PressedInteractionSourceDisposableEffect(
-            interactionSource,
-            pressedInteraction,
-            currentKeyPressInteractions
-        )
-    }
-    val isRootInScrollableContainer = isComposeRootInScrollableContainer()
-    val isToggleableInScrollableContainer = remember { mutableStateOf(true) }
-    val delayPressInteraction = rememberUpdatedState {
-        isToggleableInScrollableContainer.value || isRootInScrollableContainer()
-    }
-    val keyClickOffset = remember { mutableStateOf(Offset.Zero) }
-    val indicationScope = rememberCoroutineScope()
-
-    val gestures = Modifier.pointerInput(interactionSource, enabled) {
-        keyClickOffset.value = size.center.toOffset()
-        detectTapAndPress(
-            onPress = { offset ->
-                if (enabled) {
-                    handlePressInteraction(
-                        offset,
-                        interactionSource,
-                        pressedInteraction,
-                        delayPressInteraction
-                    )
-                }
-            },
-            onTap = { if (enabled) onClickState.value.invoke() }
-        )
-    }
-
-    fun Modifier.detectPressAndClickFromKey() = onKeyEvent { keyEvent ->
-        when {
-            enabled && keyEvent.isPress -> {
-                // If the key already exists in the map, keyEvent is a repeat event.
-                // We ignore it as we only want to emit an interaction for the initial key press.
-                if (!currentKeyPressInteractions.containsKey(keyEvent.key)) {
-                    val press = PressInteraction.Press(keyClickOffset.value)
-                    currentKeyPressInteractions[keyEvent.key] = press
-                    indicationScope.launch { interactionSource.emit(press) }
-                    true
-                } else {
-                    false
-                }
-            }
-            enabled && keyEvent.isClick -> {
-                currentKeyPressInteractions.remove(keyEvent.key)?.let {
-                    indicationScope.launch {
-                        interactionSource.emit(PressInteraction.Release(it))
-                    }
-                }
-                onClick()
-                true
-            }
-            else -> false
-        }
-    }
-
-    this
-        .then(
-            remember {
-                object : ModifierLocalConsumer {
-                    override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) {
-                        with(scope) {
-                            isToggleableInScrollableContainer.value =
-                                ModifierLocalScrollableContainer.current
-                        }
-                    }
-                }
-            }
-        )
-        .then(semantics)
-        .detectPressAndClickFromKey()
-        .indication(interactionSource, indication)
-        .hoverable(enabled = enabled, interactionSource = interactionSource)
-        .focusableInNonTouchMode(enabled = enabled, interactionSource = interactionSource)
-        .then(gestures)
 }
