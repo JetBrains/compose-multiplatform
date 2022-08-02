@@ -544,10 +544,9 @@ internal fun Modifier.genericClickableWithoutGesture(
                 }
             }
             enabled && keyEvent.isClick -> {
-                val press = currentKeyPressInteractions.remove(keyEvent.key)
-                if (press != null) {
+                currentKeyPressInteractions.remove(keyEvent.key)?.let {
                     indicationScope.launch {
-                        interactionSource.emit(PressInteraction.Release(press))
+                        interactionSource.emit(PressInteraction.Release(it))
                     }
                 }
                 onClick()
