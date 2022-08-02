@@ -61,7 +61,6 @@ abstract class GenerateMetadataTask : DefaultTask() {
             val entry = MetadataEntry(
                 groupId = componentId.group,
                 artifactId = componentId.module,
-                releaseNotesUrl = generateReleaseNotesUrl(componentId.group),
                 sourceDir = "TBD/SOURCE/DIR" // TODO: fetch from JAR file
             )
             entries.add(entry)
@@ -81,12 +80,5 @@ abstract class GenerateMetadataTask : DefaultTask() {
         metadataEntries: List<MetadataEntry>
     ): List<Map<String, String>> {
         return metadataEntries.map { it.toMap() }
-    }
-
-    // TODO move to MetadataEntry + write test after MetadataEntry refactor
-    private fun generateReleaseNotesUrl(group: String): String {
-        // Example: androidx.arch.core => arch-core
-        val library = group.removePrefix("androidx.").replace(".", "-")
-        return "https://developer.android.com/jetpack/androidx/releases/$library"
     }
 }

@@ -24,7 +24,6 @@ import java.io.Serializable
 data class MetadataEntry(
     val groupId: String,
     val artifactId: String,
-    val releaseNotesUrl: String,
     val sourceDir: String,
 ) : Serializable {
 
@@ -37,8 +36,13 @@ data class MetadataEntry(
         return mapOf(
             "groupId" to groupId,
             "artifactId" to artifactId,
-            "releaseNotesUrl" to releaseNotesUrl,
+            "releaseNotesUrl" to generateReleaseNotesUrl(),
             "sourceDir" to sourceDir
         )
+    }
+
+    private fun generateReleaseNotesUrl(): String {
+        val library = groupId.removePrefix("androidx.").replace(".", "-")
+        return "https://developer.android.com/jetpack/androidx/releases/$library"
     }
 }
