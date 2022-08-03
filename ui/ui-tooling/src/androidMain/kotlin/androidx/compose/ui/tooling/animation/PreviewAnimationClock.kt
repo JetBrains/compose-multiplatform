@@ -119,6 +119,7 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
         private val lock = Any()
 
         fun trackAnimation(animation: T, label: String) {
+            if (!UnsupportedComposeAnimation.apiAvailable) return
             synchronized(lock) {
                 if (animations.contains(animation)) {
                     if (DEBUG) {
@@ -133,9 +134,10 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
                 Log.d(TAG, "Animation $animation is now tracked")
             }
 
-            val composeAnimation = UnsupportedComposeAnimation(label)
-            trackedUnsupported.add(composeAnimation)
-            notifySubscribe(composeAnimation)
+            UnsupportedComposeAnimation.create(label)?.let {
+                trackedUnsupported.add(it)
+                notifySubscribe(it)
+            }
         }
 
         fun clear() {
