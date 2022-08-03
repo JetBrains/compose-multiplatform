@@ -133,7 +133,7 @@ internal abstract class DokkaPartialDocsTask @Inject constructor(
 
     private fun buildSourceSets(): List<SourceSet> {
         val targets = when (val kotlinExtension = project.the<KotlinProjectExtension>()) {
-            is KotlinSingleTargetExtension -> listOf(kotlinExtension.target)
+            is KotlinSingleTargetExtension<*> -> listOf(kotlinExtension.target)
             is KotlinMultiplatformExtension -> kotlinExtension.targets
             else -> error("unsupported kotlin extension")
         }
