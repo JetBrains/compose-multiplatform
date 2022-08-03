@@ -41,6 +41,7 @@ import androidx.compose.testutils.assertNoPendingChanges
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
 import androidx.compose.testutils.doFramesUntilNoChangesPending
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -276,6 +277,7 @@ class ListRemeasureTestCase(
 
     private lateinit var listState: LazyListState
     private lateinit var view: View
+    private lateinit var motionEventHelper: MotionEventHelper
     private var touchSlop: Float = 0f
     private var scrollBy: Int = 0
 
@@ -292,6 +294,7 @@ class ListRemeasureTestCase(
             5
         }
         view = LocalView.current
+        if (!::motionEventHelper.isInitialized) motionEventHelper = MotionEventHelper(view)
         touchSlop = LocalViewConfiguration.current.touchSlop
         listState = rememberLazyListState()
         content(listState)
@@ -308,8 +311,8 @@ class ListRemeasureTestCase(
         }
         if (usePointerInput) {
             val size = if (isVertical) view.measuredHeight else view.measuredWidth
-            sendEvent(MotionEvent.ACTION_DOWN, size / 2f)
-            sendEvent(MotionEvent.ACTION_MOVE, touchSlop)
+            motionEventHelper.sendEvent(MotionEvent.ACTION_DOWN, (size / 2f).toSingleAxisOffset())
+            motionEventHelper.sendEvent(MotionEvent.ACTION_MOVE, touchSlop.toSingleAxisOffset())
         }
         assertEquals(0, listState.firstVisibleItemIndex)
         assertEquals(0, listState.firstVisibleItemScrollOffset)
@@ -317,7 +320,8 @@ class ListRemeasureTestCase(
 
     fun toggle() {
         if (usePointerInput) {
-            sendEvent(MotionEvent.ACTION_MOVE, -scrollBy.toFloat())
+            motionEventHelper
+                .sendEvent(MotionEvent.ACTION_MOVE, -scrollBy.toFloat().toSingleAxisOffset())
         } else {
             runBlocking {
                 listState.scrollBy(scrollBy.toFloat())
@@ -329,25 +333,35 @@ class ListRemeasureTestCase(
         assertEquals(0, listState.firstVisibleItemIndex)
         assertEquals(scrollBy, listState.firstVisibleItemScrollOffset)
         if (usePointerInput) {
-            sendEvent(MotionEvent.ACTION_UP, 0f)
+            motionEventHelper.sendEvent(MotionEvent.ACTION_UP, Offset.Zero)
         }
     }
 
-    private var time = 0L
-    private var lastCoord: Float? = null
+    private fun Float.toSingleAxisOffset(): Offset =
+        Offset(x = if (isVertical) 0f else this, y = if (isVertical) this else 0f)
+}
 
-    private fun sendEvent(
+data class ListItem(val index: Int)
+
+/**
+ * Helper for dispatching simple [MotionEvent]s to a [view] for use in scrolling benchmarks.
+ */
+class MotionEventHelper(private val view: View) {
+    private var time = 0L
+    private var lastCoord: Offset? = null
+
+    fun sendEvent(
         action: Int,
-        delta: Float
+        delta: Offset
     ) {
         time += 10L
 
-        val coord = delta + (lastCoord ?: 0f)
+        val coord = delta + (lastCoord ?: Offset.Zero)
 
-        if (action == MotionEvent.ACTION_UP) {
-            lastCoord = null
+        lastCoord = if (action == MotionEvent.ACTION_UP) {
+            null
         } else {
-            lastCoord = coord
+            coord
         }
 
         val locationOnScreen = IntArray(2) { 0 }
@@ -361,8 +375,8 @@ class ListRemeasureTestCase(
             arrayOf(MotionEvent.PointerProperties()),
             arrayOf(
                 MotionEvent.PointerCoords().apply {
-                    this.x = locationOnScreen[0] + if (!isVertical) coord else 1f
-                    this.y = locationOnScreen[1] + if (isVertical) coord else 1f
+                    x = locationOnScreen[0] + coord.x.coerceAtLeast(1f)
+                    y = locationOnScreen[1] + coord.y.coerceAtLeast(1f)
                 }
             ),
             0,
@@ -380,5 +394,3 @@ class ListRemeasureTestCase(
         view.dispatchTouchEvent(motionEvent)
     }
 }
-
-data class ListItem(val index: Int)
