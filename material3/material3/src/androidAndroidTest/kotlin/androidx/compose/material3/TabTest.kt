@@ -100,10 +100,10 @@ class TabTest {
         rule.setMaterialContent(lightColorScheme()) {
             TabRow(0) {
                 Tab(
-                    text = { Text("Text") },
-                    modifier = Modifier.testTag("tab"),
                     selected = true,
-                    onClick = {}
+                    onClick = {},
+                    modifier = Modifier.testTag("tab"),
+                    text = { Text("Text") }
                 )
             }
         }
@@ -124,11 +124,11 @@ class TabTest {
         rule.setMaterialContent(lightColorScheme()) {
             Box {
                 Tab(
-                    enabled = false,
-                    text = { Text("Text") },
-                    modifier = Modifier.testTag("tab"),
                     selected = true,
-                    onClick = {}
+                    onClick = {},
+                    modifier = Modifier.testTag("tab"),
+                    enabled = false,
+                    text = { Text("Text") }
                 )
             }
         }
@@ -145,11 +145,11 @@ class TabTest {
         rule.setMaterialContent(lightColorScheme()) {
             TabRow(0) {
                 LeadingIconTab(
+                    selected = true,
+                    onClick = {},
                     text = { Text("Text") },
                     icon = { Icon(icon, null) },
-                    modifier = Modifier.testTag("leadingIconTab"),
-                    selected = true,
-                    onClick = {}
+                    modifier = Modifier.testTag("leadingIconTab")
                 )
             }
         }
@@ -170,12 +170,12 @@ class TabTest {
         rule.setMaterialContent(lightColorScheme()) {
             Box {
                 LeadingIconTab(
-                    enabled = false,
+                    selected = true,
+                    onClick = {},
                     text = { Text("Text") },
                     icon = { Icon(icon, null) },
                     modifier = Modifier.testTag("leadingIconTab"),
-                    selected = true,
-                    onClick = {}
+                    enabled = false
                 )
             }
         }
@@ -191,7 +191,7 @@ class TabTest {
     fun textTab_height() {
         rule
             .setMaterialContentForSizeAssertions {
-                Tab(text = { Text("Text") }, selected = true, onClick = {})
+                Tab(selected = true, onClick = {}, text = { Text("Text") })
             }
             .assertHeightIsEqualTo(ExpectedSmallTabHeight)
     }
@@ -200,7 +200,7 @@ class TabTest {
     fun iconTab_height() {
         rule
             .setMaterialContentForSizeAssertions {
-                Tab(icon = { Icon(icon, null) }, selected = true, onClick = {})
+                Tab(selected = true, onClick = {}, icon = { Icon(icon, null) })
             }
             .assertHeightIsEqualTo(ExpectedSmallTabHeight)
     }
@@ -211,10 +211,10 @@ class TabTest {
             .setMaterialContentForSizeAssertions {
                 Surface {
                     Tab(
-                        text = { Text("Text and Icon") },
-                        icon = { Icon(icon, null) },
                         selected = true,
-                        onClick = {}
+                        onClick = {},
+                        text = { Text("Text and Icon") },
+                        icon = { Icon(icon, null) }
                     )
                 }
             }
@@ -227,10 +227,10 @@ class TabTest {
             .setMaterialContentForSizeAssertions {
                 Surface {
                     LeadingIconTab(
-                        text = { Text("Text") },
-                        icon = { Icon(icon, null) },
                         selected = true,
-                        onClick = {}
+                        onClick = {},
+                        text = { Text("Text") },
+                        icon = { Icon(icon, null) }
                     )
                 }
             }
@@ -263,9 +263,9 @@ class TabTest {
                 ) {
                     titles.forEachIndexed { index, title ->
                         Tab(
-                            text = { Text(title) },
                             selected = state == index,
-                            onClick = { state = index }
+                            onClick = { state = index },
+                            text = { Text(title) }
                         )
                     }
                 }
@@ -308,10 +308,10 @@ class TabTest {
                 ) {
                     titles.forEachIndexed { index, title ->
                         Tab(
-                            modifier = Modifier.height(tabRowHeight),
-                            text = { Text(title) },
                             selected = index == 0,
-                            onClick = {}
+                            onClick = {},
+                            modifier = Modifier.height(tabRowHeight),
+                            text = { Text(title) }
                         )
                     }
                 }
@@ -341,11 +341,11 @@ class TabTest {
                 ) {
                     titles.forEachIndexed { index, title ->
                         Tab(
+                            selected = state == index,
+                            onClick = { state = index },
                             text = {
                                 Text(title, Modifier.testTag("text"))
-                            },
-                            selected = state == index,
-                            onClick = { state = index }
+                            }
                         )
                     }
                 }
@@ -372,12 +372,12 @@ class TabTest {
                 ) {
                     titles.forEachIndexed { index, title ->
                         Tab(
+                            selected = state == index,
+                            onClick = { state = index },
                             text = {
                                 Text(title, Modifier.testTag("text"))
                             },
-                            icon = { Icon(Icons.Filled.Favorite, null) },
-                            selected = state == index,
-                            onClick = { state = index }
+                            icon = { Icon(Icons.Filled.Favorite, null) }
                         )
                     }
                 }
@@ -412,11 +412,11 @@ class TabTest {
                 ) {
                     titles.forEachIndexed { index, title ->
                         Tab(
+                            selected = state == index,
+                            onClick = { state = index },
                             text = {
                                 Text(title, Modifier.testTag("text"), maxLines = 2)
-                            },
-                            selected = state == index,
-                            onClick = { state = index }
+                            }
                         )
                     }
                 }
@@ -440,12 +440,12 @@ class TabTest {
                     selectedTabIndex = 0
                 ) {
                     LeadingIconTab(
+                        selected = true,
+                        onClick = {},
                         text = {
                             Text("TAB", Modifier.testTag("text"))
                         },
-                        icon = { Icon(Icons.Filled.Favorite, null, Modifier.testTag("icon")) },
-                        selected = true,
-                        onClick = {}
+                        icon = { Icon(Icons.Filled.Favorite, null, Modifier.testTag("icon")) }
                     )
                 }
             }
@@ -499,9 +499,9 @@ class TabTest {
                 ) {
                     titles.forEachIndexed { index, title ->
                         Tab(
-                            text = { Text(title) },
                             selected = state == index,
-                            onClick = { state = index }
+                            onClick = { state = index },
+                            text = { Text(title) }
                         )
                     }
                 }
@@ -546,10 +546,10 @@ class TabTest {
                 ) {
                     titles.forEachIndexed { index, title ->
                         Tab(
-                            modifier = Modifier.height(tabRowHeight),
-                            text = { Text(title) },
                             selected = index == 0,
-                            onClick = {}
+                            onClick = {},
+                            modifier = Modifier.height(tabRowHeight),
+                            text = { Text(title) }
                         )
                     }
                 }
@@ -685,9 +685,9 @@ class TabTest {
                 ScrollableTabRow(selectedTabIndex = state) {
                     titles.forEachIndexed { index, title ->
                         Tab(
-                            text = { Text(title) },
                             selected = state == index,
-                            onClick = { state = index }
+                            onClick = { state = index },
+                            text = { Text(title) }
                         )
                     }
                 }
@@ -757,9 +757,9 @@ class TabTest {
                 ) {
                     titles.forEachIndexed { index, title ->
                         Tab(
-                            text = { Text(title) },
                             selected = state == index,
-                            onClick = { state = index }
+                            onClick = { state = index },
+                            text = { Text(title) }
                         )
                     }
                 }
@@ -802,11 +802,11 @@ class TabTest {
         rule.setMaterialContent(lightColorScheme()) {
             Box {
                 Tab(
-                    enabled = false,
-                    text = { Text("Text") },
-                    modifier = Modifier.testTag("tab"),
                     selected = true,
-                    onClick = { clicks++ }
+                    onClick = { clicks++ },
+                    modifier = Modifier.testTag("tab"),
+                    enabled = false,
+                    text = { Text("Text") }
                 )
             }
         }
@@ -825,12 +825,12 @@ class TabTest {
         rule.setMaterialContent(lightColorScheme()) {
             Box {
                 LeadingIconTab(
-                    enabled = false,
+                    selected = true,
+                    onClick = { clicks++ },
                     text = { Text("Text") },
                     icon = { Icon(icon, null) },
                     modifier = Modifier.testTag("tab"),
-                    selected = true,
-                    onClick = { clicks++ }
+                    enabled = false
                 )
             }
         }
@@ -856,10 +856,10 @@ class TabTest {
                 ) {
                     Surface {
                         Tab(
-                            text = { Text("Text") },
-                            icon = { Icon(icon, null) },
                             selected = true,
-                            onClick = {}
+                            onClick = {},
+                            text = { Text("Text") },
+                            icon = { Icon(icon, null) }
                         )
                     }
                 }

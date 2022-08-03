@@ -79,12 +79,12 @@ import kotlin.math.max
  * services.
  * @param text the text label displayed in this tab
  * @param icon the icon displayed in this tab
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this tab. You can create and pass in your own `remember`ed instance to observe [Interaction]s
- * and customize the appearance / behavior of this tab in different states.
  * @param selectedContentColor the color for the content of this tab when selected, and the color
  * of the ripple.
  * @param unselectedContentColor the color for the content of this tab when not selected
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this tab. You can create and pass in your own `remember`ed instance to observe [Interaction]s
+ * and customize the appearance / behavior of this tab in different states.
  *
  * @see LeadingIconTab
  */
@@ -96,9 +96,9 @@ fun Tab(
     enabled: Boolean = true,
     text: @Composable (() -> Unit)? = null,
     icon: @Composable (() -> Unit)? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     selectedContentColor: Color = LocalContentColor.current,
-    unselectedContentColor: Color = selectedContentColor
+    unselectedContentColor: Color = selectedContentColor,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     val styledText: @Composable (() -> Unit)? = text?.let {
         @Composable {
@@ -113,9 +113,9 @@ fun Tab(
         onClick,
         modifier,
         enabled,
-        interactionSource,
         selectedContentColor,
-        unselectedContentColor
+        unselectedContentColor,
+        interactionSource
     ) {
         TabBaselineLayout(icon = icon, text = styledText)
     }
@@ -142,12 +142,12 @@ fun Tab(
  * @param enabled controls the enabled state of this tab. When `false`, this component will not
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this tab. You can create and pass in your own `remember`ed instance to observe [Interaction]s
- * and customize the appearance / behavior of this tab in different states.
  * @param selectedContentColor the color for the content of this tab when selected, and the color
  * of the ripple.
  * @param unselectedContentColor the color for the content of this tab when not selected
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this tab. You can create and pass in your own `remember`ed instance to observe [Interaction]s
+ * and customize the appearance / behavior of this tab in different states.
  *
  * @see Tab
  */
@@ -155,13 +155,13 @@ fun Tab(
 fun LeadingIconTab(
     selected: Boolean,
     onClick: () -> Unit,
-    text: @Composable (() -> Unit),
-    icon: @Composable (() -> Unit),
+    text: @Composable () -> Unit,
+    icon: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     selectedContentColor: Color = LocalContentColor.current,
-    unselectedContentColor: Color = selectedContentColor
+    unselectedContentColor: Color = selectedContentColor,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     // The color of the Ripple should always the be selected color, as we want to show the color
     // before the item is considered selected, and hence before the new contentColor is
@@ -214,12 +214,12 @@ fun LeadingIconTab(
  * @param enabled controls the enabled state of this tab. When `false`, this component will not
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this tab. You can create and pass in your own `remember`ed instance to observe [Interaction]s
- * and customize the appearance / behavior of this tab in different states.
  * @param selectedContentColor the color for the content of this tab when selected, and the color
  * of the ripple.
  * @param unselectedContentColor the color for the content of this tab when not selected
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this tab. You can create and pass in your own `remember`ed instance to observe [Interaction]s
+ * and customize the appearance / behavior of this tab in different states.
  * @param content the content of this tab
  */
 @Composable
@@ -228,9 +228,9 @@ fun Tab(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     selectedContentColor: Color = LocalContentColor.current,
     unselectedContentColor: Color = selectedContentColor,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable ColumnScope.() -> Unit
 ) {
     // The color of the Ripple should always the selected color, as we want to show the color
