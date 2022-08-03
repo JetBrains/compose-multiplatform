@@ -1,0 +1,43 @@
+plugins {
+    id("com.android.library")
+    id("kotlin-multiplatform")
+}
+
+initDeps(project)
+
+kotlin {
+    jvm("desktop")
+    android()
+    ios()
+
+    js(IR) {
+        browser()
+    }
+
+    sourceSets {
+        named("commonTest") {
+            dependencies {
+            }
+        }
+
+        named("androidTest") {
+            dependencies {
+//                implementation(Deps.JetBrains.Kotlin.testJunit)
+            }
+        }
+        named("desktopTest") {
+            dependencies {
+//                implementation(Deps.JetBrains.Kotlin.testJunit)
+            }
+        }
+        named("jsTest") {
+            dependencies {
+//                implementation(Deps.JetBrains.Kotlin.testJs)
+            }
+        }
+    }
+
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions.jvmTarget = "11"
+    }
+}
