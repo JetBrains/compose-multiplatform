@@ -279,7 +279,7 @@ private fun Modifier.pointerScrollable(
     val scrollConfig = platformScrollConfig()
 
     return draggable(
-        { draggableState },
+        draggableState,
         orientation = orientation,
         enabled = enabled,
         interactionSource = interactionSource,
@@ -361,13 +361,9 @@ private class ScrollingLogic(
 
     fun Offset.reverseIfNeeded(): Offset = if (reverseDirection) this * -1f else this
 
-    fun ScrollScope.dispatchScroll(
-        availableDelta: Offset,
-        pointerPosition: Offset?,
-        source: NestedScrollSource
-    ): Offset {
+    fun ScrollScope.dispatchScroll(availableDelta: Offset, source: NestedScrollSource): Offset {
         val scrollDelta = availableDelta.singleAxisOffset()
-        val overscrollPreConsumed = overscrollPreConsumeDelta(scrollDelta, pointerPosition, source)
+        val overscrollPreConsumed = overscrollPreConsumeDelta(scrollDelta, source)
 
         val afterPreOverscroll = scrollDelta - overscrollPreConsumed
         val nestedScrollDispatcher = nestedScrollDispatcher.value
@@ -388,7 +384,6 @@ private class ScrollingLogic(
         overscrollPostConsumeDelta(
             scrollAvailable,
             leftForParent - parentConsumed,
-            pointerPosition,
             source
         )
         return leftForParent
@@ -396,11 +391,10 @@ private class ScrollingLogic(
 
     fun overscrollPreConsumeDelta(
         scrollDelta: Offset,
-        pointerPosition: Offset?,
         source: NestedScrollSource
     ): Offset {
         return if (overscrollEffect != null && overscrollEffect.isEnabled) {
-            overscrollEffect.consumePreScroll(scrollDelta, pointerPosition, source)
+            overscrollEffect.consumePreScroll(scrollDelta, source)
         } else {
             Offset.Zero
         }
@@ -409,14 +403,12 @@ private class ScrollingLogic(
     private fun overscrollPostConsumeDelta(
         consumedByChain: Offset,
         availableForOverscroll: Offset,
-        pointerPosition: Offset?,
         source: NestedScrollSource
     ) {
         if (overscrollEffect != null && overscrollEffect.isEnabled) {
             overscrollEffect.consumePostScroll(
                 consumedByChain,
                 availableForOverscroll,
-                pointerPosition,
                 source
             )
         }
@@ -459,7 +451,7 @@ private class ScrollingLogic(
         var result: Velocity = available
         scrollableState.scroll {
             val outerScopeScroll: (Offset) -> Offset = { delta ->
-                val consumed = this.dispatchScroll(delta.reverseIfNeeded(), null, Fling)
+                val consumed = this.dispatchScroll(delta.reverseIfNeeded(), Fling)
                 delta - consumed.reverseIfNeeded()
             }
             val scope = object : ScrollScope {
@@ -486,29 +478,26 @@ private class ScrollingLogic(
 
 private class ScrollDraggableState(
     val scrollLogic: State<ScrollingLogic>
-) : PointerAwareDraggableState, PointerAwareDragScope {
+) : DraggableState, DragScope {
     var latestScrollScope: ScrollScope = NoOpScrollScope
 
-    override fun dragBy(pixels: Offset, pointerPosition: Offset) {
+    override fun dragBy(pixels: Float) {
         with(scrollLogic.value) {
             with(latestScrollScope) {
-                dispatchScroll(pixels, pointerPosition, Drag)
+                dispatchScroll(pixels.toOffset(), Drag)
             }
         }
     }
 
-    override suspend fun drag(
-        dragPriority: MutatePriority,
-        block: suspend PointerAwareDragScope.() -> Unit
-    ) {
+    override suspend fun drag(dragPriority: MutatePriority, block: suspend DragScope.() -> Unit) {
         scrollLogic.value.scrollableState.scroll(dragPriority) {
             latestScrollScope = this
             block()
         }
     }
 
-    override fun dispatchRawDelta(delta: Offset) {
-        with(scrollLogic.value) { performRawScroll(delta) }
+    override fun dispatchRawDelta(delta: Float) {
+        with(scrollLogic.value) { performRawScroll(delta.toOffset()) }
     }
 }
 

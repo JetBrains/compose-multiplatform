@@ -148,9 +148,7 @@ class OverscrollTest {
             assertThat(controller.drawCallsCount).isEqualTo(1)
         }
 
-        var centerXAxis = 0f
         rule.onNodeWithTag(boxTag).performTouchInput {
-            centerXAxis = centerX
             down(center)
             moveBy(Offset(1000f, 0f))
         }
@@ -161,8 +159,6 @@ class OverscrollTest {
             assertThat(abs(acummulatedScroll - 1000f * 9 / 10)).isWithin(0.1f)
 
             assertThat(controller.preScrollDelta).isEqualTo(Offset(1000f - slop, 0f))
-            assertThat(controller.preScrollPointerPosition?.x)
-                .isEqualTo(centerXAxis + slop)
             assertThat(controller.lastNestedScrollSource).isEqualTo(NestedScrollSource.Drag)
         }
 
@@ -184,9 +180,7 @@ class OverscrollTest {
             overscrollEffect = controller
         )
 
-        var centerXAxis = 0f
         rule.onNodeWithTag(boxTag).performTouchInput {
-            centerXAxis = centerX
             down(center)
             moveBy(Offset(1000f, 0f))
             up()
@@ -198,15 +192,12 @@ class OverscrollTest {
             assertThat(abs(acummulatedScroll - 1000f * 9 / 10)).isWithin(0.1f)
 
             assertThat(controller.preScrollDelta).isEqualTo(Offset(1000f - slop, 0f))
-            assertThat(controller.preScrollPointerPosition?.x)
-                .isEqualTo(centerXAxis + slop)
             assertThat(controller.lastNestedScrollSource).isEqualTo(NestedScrollSource.Drag)
             controller.isEnabled = false
             controller.preScrollDelta
         }
 
         rule.onNodeWithTag(boxTag).performTouchInput {
-            centerXAxis = centerX
             down(center)
             moveBy(Offset(1000f, 0f))
             up()
@@ -369,7 +360,6 @@ class OverscrollTest {
             controller.consumePostScroll(
                 initialDragDelta = offset,
                 overscrollDelta = offset,
-                pointerPosition = null,
                 source = NestedScrollSource.Drag
             )
             // we have to disable further invalidation requests as otherwise while the overscroll
@@ -408,9 +398,9 @@ class OverscrollTest {
             repeat(2) {
                 val offset = Offset(-10f, -10f)
                 assertThat(
-                    effect.consumePreScroll(offset, null, NestedScrollSource.Drag)
+                    effect.consumePreScroll(offset, NestedScrollSource.Drag)
                 ).isEqualTo(Offset.Zero)
-                effect.consumePostScroll(offset, offset, null, NestedScrollSource.Drag)
+                effect.consumePostScroll(offset, offset, NestedScrollSource.Drag)
             }
             val velocity = Velocity(-5f, -5f)
             runBlocking {
@@ -435,9 +425,9 @@ class OverscrollTest {
             repeat(2) {
                 val offset = Offset(0f, 10f)
                 assertThat(
-                    effect.consumePreScroll(offset, null, NestedScrollSource.Drag)
+                    effect.consumePreScroll(offset, NestedScrollSource.Drag)
                 ).isEqualTo(Offset.Zero)
-                effect.consumePostScroll(offset, offset, null, NestedScrollSource.Drag)
+                effect.consumePostScroll(offset, offset, NestedScrollSource.Drag)
             }
 
             val velocity = Velocity(0f, 5f)
@@ -645,22 +635,18 @@ class OverscrollTest {
         var lastVelocity = Velocity.Zero
         var lastInitialDragDelta = Offset.Zero
         var lastOverscrollDelta = Offset.Zero
-        var lastPointerPosition: Offset? = Offset.Zero
         var lastNestedScrollSource: NestedScrollSource? = null
 
         var preScrollDelta = Offset.Zero
-        var preScrollPointerPosition: Offset? = Offset.Zero
         var preScrollSource: NestedScrollSource? = null
 
         var preFlingVelocity = Velocity.Zero
 
         override fun consumePreScroll(
             scrollDelta: Offset,
-            pointerPosition: Offset?,
             source: NestedScrollSource
         ): Offset {
             preScrollDelta = scrollDelta
-            preScrollPointerPosition = pointerPosition
             preScrollSource = source
 
             return if (consumePreCycles) scrollDelta / 10f else Offset.Zero
@@ -669,12 +655,10 @@ class OverscrollTest {
         override fun consumePostScroll(
             initialDragDelta: Offset,
             overscrollDelta: Offset,
-            pointerPosition: Offset?,
             source: NestedScrollSource
         ) {
             lastInitialDragDelta = initialDragDelta
             lastOverscrollDelta = overscrollDelta
-            lastPointerPosition = pointerPosition
             lastNestedScrollSource = source
         }
 
@@ -712,7 +696,7 @@ class OverscrollTest {
                 delta
             }
         }
-        val viewConfig = rule.setOverscrollContentAndReturnViewConfig(
+        rule.setOverscrollContentAndReturnViewConfig(
             scrollableState = scrollableState,
             overscrollEffect = controller,
             reverseDirection = reverseDirection
@@ -725,9 +709,7 @@ class OverscrollTest {
 
         rule.onNodeWithTag(boxTag).assertExists()
 
-        var centerXAxis = 0f
         rule.onNodeWithTag(boxTag).performTouchInput {
-            centerXAxis = centerX
             down(center)
             moveBy(Offset(1000f, 0f))
         }
@@ -735,9 +717,6 @@ class OverscrollTest {
         rule.runOnIdle {
             assertThat(controller.lastInitialDragDelta.x).isGreaterThan(0f)
             assertThat(controller.lastInitialDragDelta.y).isZero()
-            // there was only one pointer position coming from the center + 1000, let's check
-            assertThat(controller.lastPointerPosition?.x)
-                .isEqualTo(centerXAxis + viewConfig.touchSlop)
             // consuming all, so overscroll is 0
             assertThat(controller.lastOverscrollDelta).isEqualTo(Offset.Zero)
         }
