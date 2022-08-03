@@ -50,15 +50,17 @@ internal class AndroidFontLoader(
                 else -> throw IllegalArgumentException(
                     "Unknown loading type ${font.loadingStrategy}"
                 )
-            }
+            }.setFontVariationSettings(font.variationSettings, context)
             else -> null
         }
     }
 
+    @OptIn(ExperimentalTextApi::class)
     override suspend fun awaitLoad(font: Font): Typeface? {
         return when (font) {
             is AndroidFont -> font.typefaceLoader.awaitLoad(context, font)
             is ResourceFont -> font.loadAsync(context)
+                .setFontVariationSettings(font.variationSettings, context)
             else -> throw IllegalArgumentException("Unknown font type: $font")
         }
     }

@@ -778,6 +778,7 @@ package androidx.compose.ui.text.font {
 
   public final class FontKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.Font Font(int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional int loadingStrategy);
+    method @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional int loadingStrategy, optional androidx.compose.ui.text.font.FontVariation.Settings variationSettings);
     method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.Font! Font(int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily toFontFamily(androidx.compose.ui.text.font.Font);
   }
@@ -930,14 +931,16 @@ package androidx.compose.ui.text.font {
 
   public final class ResourceFont implements androidx.compose.ui.text.font.Font {
     method public androidx.compose.ui.text.font.ResourceFont copy(optional int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
-    method @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.font.ResourceFont copy(optional int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional int loadingStrategy);
+    method @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.font.ResourceFont copy(optional int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional int loadingStrategy, optional androidx.compose.ui.text.font.FontVariation.Settings variationSettings);
     method @androidx.compose.ui.text.ExperimentalTextApi public int getLoadingStrategy();
     method public int getResId();
     method public int getStyle();
+    method @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.font.FontVariation.Settings getVariationSettings();
     method public androidx.compose.ui.text.font.FontWeight getWeight();
     property @androidx.compose.ui.text.ExperimentalTextApi public int loadingStrategy;
     property public final int resId;
     property public int style;
+    property @androidx.compose.ui.text.ExperimentalTextApi public final androidx.compose.ui.text.font.FontVariation.Settings variationSettings;
     property public androidx.compose.ui.text.font.FontWeight weight;
   }
 

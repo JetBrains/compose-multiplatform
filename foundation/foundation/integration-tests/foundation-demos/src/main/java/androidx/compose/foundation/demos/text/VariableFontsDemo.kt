@@ -25,6 +25,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.testutils.fonts.R
 import androidx.compose.foundation.demos.text.FontVariationSettingsCompot.compatSetFontVariationSettings
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -86,6 +87,10 @@ fun VariableFontsDemo() {
                 "exaggerates 'wght'. Font only supports the codepoint 'A' code=\"0x41\"")
         }
         item {
+            TagLine(tag = "ResourceFont")
+            ResourceFont(weight.toInt(), italic)
+        }
+        item {
             TagLine(tag = "AssetFont")
             AssetFont(weight.toInt(), italic)
         }
@@ -145,7 +150,7 @@ fun FileFont(weight: Int, italic: Boolean) {
     val actualPath = filePath.value ?: return
 
     Column(Modifier.fillMaxWidth()) {
-        val assetFonts = remember(weight, italic) {
+        val fileFonts = remember(weight, italic) {
             FontFamily(
                 Font(
                     File(actualPath),
@@ -160,7 +165,7 @@ fun FileFont(weight: Int, italic: Boolean) {
         Text(
             "A",
             fontSize = 48.sp,
-            fontFamily = assetFonts,
+            fontFamily = fileFonts,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
     }
@@ -178,7 +183,7 @@ fun ParcelFileDescriptorFont(weight: Int, italic: Boolean) {
     val actualPath = filePath.value ?: return
 
     Column(Modifier.fillMaxWidth()) {
-        val assetFonts = remember(weight, italic) {
+        val parcelFonts = remember(weight, italic) {
             FontFamily(
                 Font(
                     File(actualPath).toParcelFileDescriptor(context),
@@ -193,7 +198,7 @@ fun ParcelFileDescriptorFont(weight: Int, italic: Boolean) {
         Text(
             "A",
             fontSize = 48.sp,
-            fontFamily = assetFonts,
+            fontFamily = parcelFonts,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
     }
@@ -203,7 +208,7 @@ fun ParcelFileDescriptorFont(weight: Int, italic: Boolean) {
 @Composable
 fun DeviceNamedFontFamilyFont(weight: Int, italic: Boolean) {
     Column(Modifier.fillMaxWidth()) {
-        val assetFonts = remember(weight, italic) {
+        val deviceFonts = remember(weight, italic) {
             FontFamily(
                 Font(
                     DeviceFontFamilyName("sans-serif"),
@@ -218,7 +223,7 @@ fun DeviceNamedFontFamilyFont(weight: Int, italic: Boolean) {
         Text(
             "Setting variation on system fonts has no effect on (most) Android builds",
             fontSize = 12.sp,
-            fontFamily = assetFonts,
+            fontFamily = deviceFonts,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
         val textPaint = remember { TextPaint() }
@@ -243,6 +248,32 @@ fun DeviceNamedFontFamilyFont(weight: Int, italic: Boolean) {
         }
     }
 }
+
+@OptIn(ExperimentalTextApi::class)
+@Composable
+fun ResourceFont(weight: Int, italic: Boolean) {
+    Column(Modifier.fillMaxWidth()) {
+        val resourceFonts = remember(weight, italic) {
+            FontFamily(
+                Font(
+                    R.font.variable_font,
+                    variationSettings = FontVariation.Settings(
+                        FontVariation.weight(weight.toInt()), /* Changes "A" glyph */
+                        /* italic not supported by font, ignored */
+                        FontVariation.italic(if (italic) 1f else 0f)
+                    )
+                )
+            )
+        }
+        Text(
+            "A",
+            fontSize = 48.sp,
+            fontFamily = resourceFonts,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+    }
+}
+
 private suspend fun mkTempFont(context: Context): File = withContext(Dispatchers.IO) {
     val temp = File.createTempFile("tmp", ".ttf", context.filesDir)
     context.assets.open("subdirectory/asset_variable_font.ttf").use { input ->
