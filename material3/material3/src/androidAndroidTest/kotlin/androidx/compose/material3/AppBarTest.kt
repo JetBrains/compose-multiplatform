@@ -17,7 +17,6 @@
 package androidx.compose.material3
 
 import android.os.Build
-import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -218,7 +217,7 @@ class AppBarTest {
         var expectedScrolledContainerColor: Color = Color.Unspecified
         lateinit var scrollBehavior: TopAppBarScrollBehavior
         rule.setMaterialContent(lightColorScheme()) {
-            scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+            scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
             SmallTopAppBar(
                 modifier = Modifier.testTag(TopAppBarTestTag),
                 title = {
@@ -249,8 +248,7 @@ class AppBarTest {
         var scrollHeightOffsetPx = 0f
 
         rule.setMaterialContent(lightColorScheme()) {
-            scrollBehavior =
-                TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+            scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
             scrollHeightOffsetPx = with(LocalDensity.current) { scrollHeightOffsetDp.toPx() }
             SmallTopAppBar(
                 modifier = Modifier.testTag(TopAppBarTestTag),
@@ -460,7 +458,7 @@ class AppBarTest {
         lateinit var scrollBehavior: TopAppBarScrollBehavior
 
         rule.setMaterialContent(lightColorScheme()) {
-            scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+            scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
             CenterAlignedTopAppBar(
                 modifier = Modifier.testTag(TopAppBarTestTag),
                 title = {
@@ -691,11 +689,7 @@ class AppBarTest {
         lateinit var state: LazyListState
         rule.setMaterialContent(lightColorScheme()) {
             state = rememberLazyListState()
-            MultiPageContent(
-                TopAppBarDefaults.enterAlwaysScrollBehavior(
-                    rememberTopAppBarState()
-                ), state
-            )
+            MultiPageContent(TopAppBarDefaults.enterAlwaysScrollBehavior(), state)
         }
 
         rule.onNodeWithTag(LazyListTag).performTouchInput { swipeLeft() }
@@ -715,12 +709,7 @@ class AppBarTest {
         lateinit var state: LazyListState
         rule.setMaterialContent(lightColorScheme()) {
             state = rememberLazyListState()
-            MultiPageContent(
-                TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
-                    rememberSplineBasedDecay(),
-                    rememberTopAppBarState()
-                ), state
-            )
+            MultiPageContent(TopAppBarDefaults.exitUntilCollapsedScrollBehavior(), state)
         }
 
         rule.onNodeWithTag(LazyListTag).performTouchInput { swipeLeft() }
@@ -741,7 +730,7 @@ class AppBarTest {
         rule.setMaterialContent(lightColorScheme()) {
             state = rememberLazyListState()
             MultiPageContent(
-                TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState()),
+                TopAppBarDefaults.pinnedScrollBehavior(),
                 state
             )
         }
@@ -765,9 +754,7 @@ class AppBarTest {
                 title = {
                     Text("Title")
                 },
-                scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(
-                    rememberTopAppBarState()
-                )
+                scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
             )
         }
 
@@ -793,10 +780,7 @@ class AppBarTest {
                 title = {
                     Text("Title")
                 },
-                scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
-                    rememberSplineBasedDecay(),
-                    rememberTopAppBarState()
-                )
+                scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
             )
         }
 
@@ -809,6 +793,47 @@ class AppBarTest {
             moveTo(Offset(x = 0f, y = 0f))
         }
         rule.waitForIdle()
+        // Check that the app bar collapsed to its small size constraints (i.e.
+        // TopAppBarSmallTokens.ContainerHeight).
+        rule.onNodeWithTag(TopAppBarTestTag)
+            .assertHeightIsEqualTo(TopAppBarSmallTokens.ContainerHeight)
+    }
+
+    @Test
+    fun topAppBar_dragSnapToCollapsed() {
+        rule.setMaterialContentForSizeAssertions {
+            LargeTopAppBar(
+                modifier = Modifier.testTag(TopAppBarTestTag),
+                title = {
+                    Text("Title")
+                },
+                scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+            )
+        }
+
+        rule.onNodeWithTag(TopAppBarTestTag)
+            .assertHeightIsEqualTo(TopAppBarLargeTokens.ContainerHeight)
+
+        // Slightly drag up the app bar.
+        rule.onNodeWithTag(TopAppBarTestTag).performTouchInput {
+            down(Offset(x = 0f, y = height - 20f))
+            moveTo(Offset(x = 0f, y = height - 40f))
+            up()
+        }
+        rule.waitForIdle()
+
+        // Check that the app bar returned to its expanded size (i.e. fully expanded).
+        rule.onNodeWithTag(TopAppBarTestTag)
+            .assertHeightIsEqualTo(TopAppBarLargeTokens.ContainerHeight)
+
+        // Drag up the app bar to the point it should continue to collapse after.
+        rule.onNodeWithTag(TopAppBarTestTag).performTouchInput {
+            down(Offset(x = 0f, y = height - 20f))
+            moveTo(Offset(x = 0f, y = 40f))
+            up()
+        }
+        rule.waitForIdle()
+
         // Check that the app bar collapsed to its small size constraints (i.e.
         // TopAppBarSmallTokens.ContainerHeight).
         rule.onNodeWithTag(TopAppBarTestTag)
@@ -1155,11 +1180,7 @@ class AppBarTest {
         var fullyCollapsedHeightOffsetPx = 0f
         lateinit var scrollBehavior: TopAppBarScrollBehavior
         rule.setMaterialContent(lightColorScheme()) {
-            scrollBehavior =
-                TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
-                    rememberSplineBasedDecay(),
-                    rememberTopAppBarState()
-                )
+            scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
             with(LocalDensity.current) {
                 partiallyCollapsedHeightOffsetPx = partiallyCollapsedOffsetDp.toPx()
                 fullyCollapsedHeightOffsetPx = fullyCollapsedOffsetDp.toPx()
@@ -1219,11 +1240,7 @@ class AppBarTest {
         var titleContentColor: Color = Color.Unspecified
         lateinit var scrollBehavior: TopAppBarScrollBehavior
         rule.setMaterialContent(lightColorScheme()) {
-            scrollBehavior =
-                TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
-                    rememberSplineBasedDecay(),
-                    rememberTopAppBarState()
-                )
+            scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
             // Using the mediumTopAppBarColors for both Medium and Large top app bars, as the
             // current content color settings are the same.
             oneThirdCollapsedContainerColor =
@@ -1311,11 +1328,7 @@ class AppBarTest {
         var oneThirdCollapsedHeightOffsetPx = 0f
         lateinit var scrollBehavior: TopAppBarScrollBehavior
         rule.setMaterialContent(lightColorScheme()) {
-            scrollBehavior =
-                TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
-                    rememberSplineBasedDecay(),
-                    rememberTopAppBarState()
-                )
+            scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
             with(LocalDensity.current) {
                 oneThirdCollapsedHeightOffsetPx = oneThirdCollapsedOffsetDp.toPx()
                 fullyCollapsedHeightOffsetPx = fullyCollapsedOffsetDp.toPx()
