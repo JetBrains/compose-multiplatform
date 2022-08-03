@@ -468,7 +468,11 @@ class FontFamilyResolverImplTest {
             }
         }
         val fontFamily = FontFamily(
-            object : AndroidFont(FontLoadingStrategy.Blocking, unstableLoader) {
+            object : AndroidFont(
+                FontLoadingStrategy.Blocking,
+                unstableLoader,
+                FontVariation.Settings()
+            ) {
                 override val weight: FontWeight = FontWeight.Normal
                 override val style: FontStyle = FontStyle.Normal
             }
@@ -495,14 +499,12 @@ class FontFamilyResolverImplTest {
     }
 
     @Test(expected = IllegalStateException::class)
-    @OptIn(ExperimentalTextApi::class)
     fun throwsExceptionIfFontIsNotIncludedInTheApp() {
         val fontFamily = FontFamily(Font(resId = -1))
         resolveAsTypeface(fontFamily)
     }
 
     @Test(expected = IllegalStateException::class)
-    @OptIn(ExperimentalTextApi::class)
     fun throwsExceptionIfFontIsNotReadable() {
         val fontFamily = FontFamily(FontTestData.FONT_INVALID)
         resolveAsTypeface(fontFamily)

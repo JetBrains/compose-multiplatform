@@ -663,11 +663,14 @@ package androidx.compose.ui.text.caches {
 package androidx.compose.ui.text.font {
 
   public abstract class AndroidFont implements androidx.compose.ui.text.font.Font {
+    ctor @androidx.compose.ui.text.ExperimentalTextApi public AndroidFont(int loadingStrategy, androidx.compose.ui.text.font.AndroidFont.TypefaceLoader typefaceLoader, androidx.compose.ui.text.font.FontVariation.Settings variationSettings);
     ctor public AndroidFont(int loadingStrategy, androidx.compose.ui.text.font.AndroidFont.TypefaceLoader typefaceLoader);
     method public final int getLoadingStrategy();
     method public final androidx.compose.ui.text.font.AndroidFont.TypefaceLoader getTypefaceLoader();
+    method @androidx.compose.ui.text.ExperimentalTextApi public final androidx.compose.ui.text.font.FontVariation.Settings getVariationSettings();
     property public final int loadingStrategy;
     property public final androidx.compose.ui.text.font.AndroidFont.TypefaceLoader typefaceLoader;
+    property @androidx.compose.ui.text.ExperimentalTextApi public final androidx.compose.ui.text.font.FontVariation.Settings variationSettings;
   }
 
   public static interface AndroidFont.TypefaceLoader {
@@ -676,10 +679,6 @@ package androidx.compose.ui.text.font {
   }
 
   public final class AndroidFontKt {
-    method @Deprecated @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(android.content.res.AssetManager assetManager, String path, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
-    method @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(String path, android.content.res.AssetManager assetManager, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
-    method @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(java.io.File file, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
-    method @RequiresApi(26) @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(android.os.ParcelFileDescriptor fileDescriptor, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
   }
 
   public final class AndroidFontLoader_androidKt {
@@ -689,6 +688,13 @@ package androidx.compose.ui.text.font {
   }
 
   public final class AndroidFontUtils_androidKt {
+  }
+
+  public final class AndroidLoadableFontsKt {
+    method @Deprecated @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(android.content.res.AssetManager assetManager, String path, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
+    method @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(String path, android.content.res.AssetManager assetManager, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional androidx.compose.ui.text.font.FontVariation.Settings variationSettings);
+    method @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(java.io.File file, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional androidx.compose.ui.text.font.FontVariation.Settings variationSettings);
+    method @RequiresApi(26) @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(android.os.ParcelFileDescriptor fileDescriptor, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional androidx.compose.ui.text.font.FontVariation.Settings variationSettings);
   }
 
   public final class AndroidTypeface_androidKt {
@@ -830,6 +836,32 @@ package androidx.compose.ui.text.font {
   }
 
   public final class FontSynthesis_androidKt {
+  }
+
+  @androidx.compose.ui.text.ExperimentalTextApi public final class FontVariation {
+    method public androidx.compose.ui.text.font.FontVariation.Setting Setting(String name, float value);
+    method public androidx.compose.ui.text.font.FontVariation.Settings Settings(androidx.compose.ui.text.font.FontWeight weight, int style, androidx.compose.ui.text.font.FontVariation.Setting... settings);
+    method public androidx.compose.ui.text.font.FontVariation.Setting grade(int value);
+    method public androidx.compose.ui.text.font.FontVariation.Setting italic(float value);
+    method public androidx.compose.ui.text.font.FontVariation.Setting opticalSizing(long textSize);
+    method public androidx.compose.ui.text.font.FontVariation.Setting slant(float value);
+    method public androidx.compose.ui.text.font.FontVariation.Setting weight(int value);
+    method public androidx.compose.ui.text.font.FontVariation.Setting width(float value);
+    field public static final androidx.compose.ui.text.font.FontVariation INSTANCE;
+  }
+
+  @androidx.compose.runtime.Immutable public static interface FontVariation.Setting {
+    method public String getAxisName();
+    method public boolean getNeedsDensity();
+    method public float toVariationValue(androidx.compose.ui.unit.Density? density);
+    property public abstract String axisName;
+    property public abstract boolean needsDensity;
+  }
+
+  @androidx.compose.runtime.Immutable public static final class FontVariation.Settings {
+    ctor public FontVariation.Settings(androidx.compose.ui.text.font.FontVariation.Setting... settings);
+    method public java.util.List<androidx.compose.ui.text.font.FontVariation.Setting> getSettings();
+    property public final java.util.List<androidx.compose.ui.text.font.FontVariation.Setting> settings;
   }
 
   @androidx.compose.runtime.Immutable public final class FontWeight implements java.lang.Comparable<androidx.compose.ui.text.font.FontWeight> {
