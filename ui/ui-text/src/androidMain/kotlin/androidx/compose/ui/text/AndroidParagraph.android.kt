@@ -53,6 +53,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import kotlin.math.min
 
 /**
  * Android specific implementation for [Paragraph]
@@ -128,12 +129,16 @@ internal class AndroidParagraph(
         if (ellipsis && firstLayout.height > constraints.maxHeight && maxLines > 1) {
             val calculatedMaxLines =
                 firstLayout.numberOfLinesThatFitMaxHeight(constraints.maxHeight)
-            layout = if (calculatedMaxLines > 0 && calculatedMaxLines != maxLines) {
+            layout = if (calculatedMaxLines >= 0 && calculatedMaxLines != maxLines) {
                 constructTextLayout(
                     alignment = alignment,
                     justificationMode = justificationMode,
                     ellipsize = ellipsize,
-                    maxLines = calculatedMaxLines
+                    // When we can't fully fit even a single line, measure with one line anyway.
+                    // This will allow to have an ellipsis on that single line. If we measured with
+                    // 0 maxLines, it would measure all lines with no ellipsis even though the first
+                    // line might be partially visible
+                    maxLines = calculatedMaxLines.coerceAtLeast(1)
                 )
             } else {
                 firstLayout
@@ -179,6 +184,10 @@ internal class AndroidParagraph(
     internal val textLocale: JavaLocale
         get() = paragraphIntrinsics.textPaint.textLocale
 
+    /**
+     * Resolved line count. If maxLines smaller than the real number of lines in the text, this
+     * property will return the minimum between the two
+     */
     override val lineCount: Int
         get() = layout.lineCount
 
