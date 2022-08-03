@@ -1344,27 +1344,28 @@ package androidx.compose.ui.text.style {
   }
 
   public final class LineHeightStyle {
-    ctor public LineHeightStyle(int alignment, int trim);
-    method public int getAlignment();
+    ctor public LineHeightStyle(float alignment, int trim);
+    method public float getAlignment();
     method public int getTrim();
-    property public final int alignment;
+    property public final float alignment;
     property public final int trim;
     field public static final androidx.compose.ui.text.style.LineHeightStyle.Companion Companion;
   }
 
   @kotlin.jvm.JvmInline public static final value class LineHeightStyle.Alignment {
+    ctor @androidx.compose.ui.text.ExperimentalTextApi public LineHeightStyle.Alignment(float topRatio);
     field public static final androidx.compose.ui.text.style.LineHeightStyle.Alignment.Companion Companion;
   }
 
   public static final class LineHeightStyle.Alignment.Companion {
-    method public int getBottom();
-    method public int getCenter();
-    method public int getProportional();
-    method public int getTop();
-    property public final int Bottom;
-    property public final int Center;
-    property public final int Proportional;
-    property public final int Top;
+    method public float getBottom();
+    method public float getCenter();
+    method public float getProportional();
+    method public float getTop();
+    property public final float Bottom;
+    property public final float Center;
+    property public final float Proportional;
+    property public final float Top;
   }
 
   public static final class LineHeightStyle.Companion {

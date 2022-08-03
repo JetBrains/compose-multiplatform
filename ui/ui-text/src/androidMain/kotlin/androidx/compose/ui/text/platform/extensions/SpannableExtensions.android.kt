@@ -136,7 +136,7 @@ internal fun Spannable.setLineHeight(
                 endIndex = endIndex,
                 trimFirstLineTop = lineHeightStyle.trim.isTrimFirstLineTop(),
                 trimLastLineBottom = lineHeightStyle.trim.isTrimLastLineBottom(),
-                topPercentage = lineHeightStyle.alignment.topPercentage
+                topRatio = lineHeightStyle.alignment.topRatio
             ),
             start = 0,
             end = length
