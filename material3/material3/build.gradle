@@ -45,7 +45,8 @@ dependencies {
         api("androidx.compose.runtime:runtime:1.0.1")
         api("androidx.compose.ui:ui-graphics:1.0.1")
         api("androidx.compose.ui:ui:1.1.1")
-        api("androidx.compose.ui:ui-text:1.0.1")
+        // TODO: pin this to 1.3.0 stable, when PlatformTextStyle is not experimental
+        api(project(":compose:ui:ui-text"))
 
         // TODO: remove next 3 dependencies when b/202810604 is fixed
         implementation("androidx.savedstate:savedstate-ktx:1.2.0")
