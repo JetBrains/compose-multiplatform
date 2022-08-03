@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_103
+// VERSION: v0_117
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -21,6 +21,6 @@ package androidx.compose.material3.tokens
 import androidx.compose.ui.unit.dp
 
 internal object DividerTokens {
-    val Color = ColorSchemeKeyTokens.SurfaceVariant
+    val Color = ColorSchemeKeyTokens.OutlineVariant
     val Thickness = 1.0.dp
 }

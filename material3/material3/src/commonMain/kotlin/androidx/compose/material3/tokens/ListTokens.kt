@@ -13,16 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_93
+// VERSION: v0_117
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
 
 import androidx.compose.ui.unit.dp
-
 internal object ListTokens {
-    val DividerColor = ColorSchemeKeyTokens.Outline
-    val DividerHeight = 1.0.dp
     val ListItemContainerColor = ColorSchemeKeyTokens.Surface
     val ListItemContainerElevation = ElevationTokens.Level0
     val ListItemContainerHeight = 56.0.dp

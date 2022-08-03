@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_92
+// VERSION: v0_117
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 
 internal object SliderTokens {
     val ActiveTrackColor = ColorSchemeKeyTokens.Primary
-    val ActiveTrackHeight = 6.0.dp
+    val ActiveTrackHeight = 4.0.dp
     val ActiveTrackShape = ShapeKeyTokens.CornerFull
     val DisabledActiveTrackColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledActiveTrackOpacity = 0.38f

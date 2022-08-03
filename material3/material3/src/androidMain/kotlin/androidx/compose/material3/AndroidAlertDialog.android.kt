@@ -132,7 +132,7 @@ object AlertDialogDefaults {
     val iconContentColor: Color @Composable get() = DialogTokens.IconColor.toColor()
 
     /** The default title color for alert dialogs */
-    val titleContentColor: Color @Composable get() = DialogTokens.SubheadColor.toColor()
+    val titleContentColor: Color @Composable get() = DialogTokens.HeadlineColor.toColor()
 
     /** The default text color for alert dialogs */
     val textContentColor: Color @Composable get() = DialogTokens.SupportingTextColor.toColor()
