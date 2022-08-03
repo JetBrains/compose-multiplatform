@@ -1653,6 +1653,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             for (notification in boundsUpdateChannel) {
                 if (isAccessibilityEnabled) {
                     for (i in subtreeChangedLayoutNodes.indices) {
+                        @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
                         sendSubtreeChangeAccessibilityEvents(
                             subtreeChangedLayoutNodes.valueAt(i)!!,
                             subtreeChangedSemanticsNodesIds
