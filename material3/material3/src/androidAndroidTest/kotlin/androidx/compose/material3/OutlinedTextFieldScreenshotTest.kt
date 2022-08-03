@@ -534,6 +534,37 @@ class OutlinedTextFieldScreenshotTest {
     }
 
     @Test
+    fun outlinedTextField_supportingText() {
+        rule.setMaterialContent(lightColorScheme()) {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                modifier = Modifier.testTag(TextFieldTag).fillMaxWidth(),
+                singleLine = true,
+                supportingText = { Text("Supporting text") }
+            )
+        }
+
+        assertAgainstGolden("outlinedTextField_supportingText")
+    }
+
+    @Test
+    fun outlinedTextField_errorSupportingText() {
+        rule.setMaterialContent(lightColorScheme()) {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                isError = true,
+                modifier = Modifier.testTag(TextFieldTag).fillMaxWidth(),
+                singleLine = true,
+                supportingText = { Text("Error supporting text") }
+            )
+        }
+
+        assertAgainstGolden("outlinedTextField_errorSupportingText")
+    }
+
+    @Test
     fun outlinedTextField_leadingTrailingIcons() {
         rule.setMaterialContent(lightColorScheme()) {
             OutlinedTextField(

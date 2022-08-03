@@ -20,6 +20,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.InteractionSource
@@ -86,6 +87,33 @@ object TextFieldDefaults {
     val FocusedBorderThickness = 2.dp
 
     /**
+     * Composable that draws a default container for the content of [TextField], with an indicator
+     * line at the bottom. You can use it to draw a container for your custom text field based on
+     * [TextFieldDecorationBox]. [TextField] applies it automatically.
+     *
+     * @param enabled whether the text field is enabled
+     * @param isError whether the text field's current value is in error
+     * @param interactionSource the [InteractionSource] of this text field. Helps to determine if
+     * the text field is in focus or not
+     * @param colors [TextFieldColors] used to resolve colors of the text field
+     * @param shape shape of the container
+     */
+    @ExperimentalMaterial3Api
+    @Composable
+    fun FilledContainerBox(
+        enabled: Boolean,
+        isError: Boolean,
+        interactionSource: InteractionSource,
+        colors: TextFieldColors,
+        shape: Shape = filledShape,
+    ) {
+        Box(
+            Modifier
+                .background(colors.containerColor().value, shape)
+                .indicatorLine(enabled, isError, interactionSource, colors))
+    }
+
+    /**
      * A modifier to draw a default bottom indicator line in [TextField]. You can use this modifier
      * if you build your custom text field using [TextFieldDecorationBox] whilst the [TextField]
      * applies it automatically.
@@ -129,9 +157,9 @@ object TextFieldDefaults {
     }
 
     /**
-     * Composable that draws a default border stroke in [OutlinedTextField]. You can use it to
-     * draw a border stroke in your custom text field based on [OutlinedTextFieldDecorationBox].
-     * The [OutlinedTextField] applies it automatically.
+     * Composable that draws a default container for [OutlinedTextField] with a border stroke. You
+     * can use it to draw a border stroke in your custom text field based on
+     * [OutlinedTextFieldDecorationBox]. The [OutlinedTextField] applies it automatically.
      *
      * @param enabled whether the text field is enabled
      * @param isError whether the text field's current value is in error
@@ -145,7 +173,7 @@ object TextFieldDefaults {
      */
     @ExperimentalMaterial3Api
     @Composable
-    fun BorderBox(
+    fun OutlinedBorderContainerBox(
         enabled: Boolean,
         isError: Boolean,
         interactionSource: InteractionSource,
@@ -162,7 +190,10 @@ object TextFieldDefaults {
             focusedBorderThickness,
             unfocusedBorderThickness
         )
-        Box(Modifier.border(borderStroke.value, shape))
+        Box(
+            Modifier
+                .border(borderStroke.value, shape)
+                .background(colors.containerColor().value, shape))
     }
 
     /**
@@ -208,6 +239,19 @@ object TextFieldDefaults {
     ): PaddingValues = PaddingValues(start, top, end, bottom)
 
     /**
+     * Default padding applied to supporting text for both [TextField] and [OutlinedTextField].
+     * See [PaddingValues] for more details.
+     */
+    // TODO(246775477): consider making this public
+    @ExperimentalMaterial3Api
+    internal fun supportingTextPadding(
+        start: Dp = TextFieldPadding,
+        top: Dp = SupportingTopPadding,
+        end: Dp = TextFieldPadding,
+        bottom: Dp = 0.dp,
+    ): PaddingValues = PaddingValues(start, top, end, bottom)
+
+    /**
      * Creates a [TextFieldColors] that represents the default input text, container, and content
      * (including label, placeholder, leading and trailing icons) colors used in a [TextField].
      *
@@ -236,6 +280,13 @@ object TextFieldDefaults {
      * @param errorLabelColor the label color for this text field when in error state
      * @param placeholderColor the placeholder color for this text field
      * @param disabledPlaceholderColor the placeholder color for this text field when disabled
+     * @param focusedSupportingTextColor the supporting text color for this text field when focused
+     * @param unfocusedSupportingTextColor the supporting text color for this text field when not
+     * focused
+     * @param disabledSupportingTextColor the supporting text color for this text field when
+     * disabled
+     * @param errorSupportingTextColor the supporting text color for this text field when in error
+     * state
      */
     @ExperimentalMaterial3Api
     @Composable
@@ -269,7 +320,12 @@ object TextFieldDefaults {
         errorLabelColor: Color = FilledTextFieldTokens.ErrorLabelColor.toColor(),
         placeholderColor: Color = FilledTextFieldTokens.InputPlaceholderColor.toColor(),
         disabledPlaceholderColor: Color = FilledTextFieldTokens.DisabledInputColor.toColor()
-            .copy(alpha = FilledTextFieldTokens.DisabledInputOpacity)
+            .copy(alpha = FilledTextFieldTokens.DisabledInputOpacity),
+        focusedSupportingTextColor: Color = FilledTextFieldTokens.FocusSupportingColor.toColor(),
+        unfocusedSupportingTextColor: Color = FilledTextFieldTokens.SupportingColor.toColor(),
+        disabledSupportingTextColor: Color = FilledTextFieldTokens.DisabledSupportingColor.toColor()
+            .copy(alpha = FilledTextFieldTokens.DisabledSupportingOpacity),
+        errorSupportingTextColor: Color = FilledTextFieldTokens.ErrorSupportingColor.toColor(),
     ): TextFieldColors =
         TextFieldColors(
             textColor = textColor,
@@ -295,7 +351,11 @@ object TextFieldDefaults {
             disabledLabelColor = disabledLabelColor,
             errorLabelColor = errorLabelColor,
             placeholderColor = placeholderColor,
-            disabledPlaceholderColor = disabledPlaceholderColor
+            disabledPlaceholderColor = disabledPlaceholderColor,
+            focusedSupportingTextColor = focusedSupportingTextColor,
+            unfocusedSupportingTextColor = unfocusedSupportingTextColor,
+            disabledSupportingTextColor = disabledSupportingTextColor,
+            errorSupportingTextColor = errorSupportingTextColor,
         )
 
     /**
@@ -327,6 +387,13 @@ object TextFieldDefaults {
      * @param errorLabelColor the label color for this text field when in error state
      * @param placeholderColor the placeholder color for this text field
      * @param disabledPlaceholderColor the placeholder color for this text field when disabled
+     * @param focusedSupportingTextColor the supporting text color for this text field when focused
+     * @param unfocusedSupportingTextColor the supporting text color for this text field when not
+     * focused
+     * @param disabledSupportingTextColor the supporting text color for this text field when
+     * disabled
+     * @param errorSupportingTextColor the supporting text color for this text field when in error
+     * state
      */
     @ExperimentalMaterial3Api
     @Composable
@@ -360,7 +427,12 @@ object TextFieldDefaults {
         errorLabelColor: Color = OutlinedTextFieldTokens.ErrorLabelColor.toColor(),
         placeholderColor: Color = OutlinedTextFieldTokens.InputPlaceholderColor.toColor(),
         disabledPlaceholderColor: Color = OutlinedTextFieldTokens.DisabledInputColor.toColor()
-            .copy(alpha = OutlinedTextFieldTokens.DisabledInputOpacity)
+            .copy(alpha = OutlinedTextFieldTokens.DisabledInputOpacity),
+        focusedSupportingTextColor: Color = OutlinedTextFieldTokens.FocusSupportingColor.toColor(),
+        unfocusedSupportingTextColor: Color = OutlinedTextFieldTokens.SupportingColor.toColor(),
+        disabledSupportingTextColor: Color = OutlinedTextFieldTokens.DisabledSupportingColor
+            .toColor().copy(alpha = OutlinedTextFieldTokens.DisabledSupportingOpacity),
+        errorSupportingTextColor: Color = OutlinedTextFieldTokens.ErrorSupportingColor.toColor(),
     ): TextFieldColors =
         TextFieldColors(
             textColor = textColor,
@@ -386,7 +458,11 @@ object TextFieldDefaults {
             disabledLabelColor = disabledLabelColor,
             errorLabelColor = errorLabelColor,
             placeholderColor = placeholderColor,
-            disabledPlaceholderColor = disabledPlaceholderColor
+            disabledPlaceholderColor = disabledPlaceholderColor,
+            focusedSupportingTextColor = focusedSupportingTextColor,
+            unfocusedSupportingTextColor = unfocusedSupportingTextColor,
+            disabledSupportingTextColor = disabledSupportingTextColor,
+            errorSupportingTextColor = errorSupportingTextColor,
         )
 
     /**
@@ -433,6 +509,7 @@ object TextFieldDefaults {
      * field container
      * @param trailingIcon the optional trailing icon to be displayed at the end of the text field
      * container
+     * @param supportingText the optional supporting text to be displayed below the text field
      * @param colors [TextFieldColors] that will be used to resolve the colors used for this text
      * field in different states. See [TextFieldDefaults.textFieldColors].
      * @param contentPadding the spacing values to apply internally between the internals of text
@@ -443,6 +520,8 @@ object TextFieldDefaults {
      * padding will mean the distance from label's [last baseline][LastBaseline] to the top edge of
      * the container. All other paddings mean the distance from the corresponding edge of the
      * container to the corresponding edge of the closest to it element
+     * @param container the container to be drawn behind the text field. By default, this includes
+     * the bottom indicator line. Default colors for the container come from the [colors].
      */
     @Composable
     @ExperimentalMaterial3Api
@@ -458,13 +537,18 @@ object TextFieldDefaults {
         placeholder: @Composable (() -> Unit)? = null,
         leadingIcon: @Composable (() -> Unit)? = null,
         trailingIcon: @Composable (() -> Unit)? = null,
+        supportingText: @Composable (() -> Unit)? = null,
+        shape: Shape = filledShape,
         colors: TextFieldColors = textFieldColors(),
         contentPadding: PaddingValues =
             if (label == null) {
                 textFieldWithoutLabelPadding()
             } else {
                 textFieldWithLabelPadding()
-            }
+            },
+        container: @Composable () -> Unit = {
+            FilledContainerBox(enabled, isError, interactionSource, colors, shape)
+        }
     ) {
         CommonDecorationBox(
             type = TextFieldType.Filled,
@@ -475,12 +559,14 @@ object TextFieldDefaults {
             label = label,
             leadingIcon = leadingIcon,
             trailingIcon = trailingIcon,
+            supportingText = supportingText,
             singleLine = singleLine,
             enabled = enabled,
             isError = isError,
             interactionSource = interactionSource,
             colors = colors,
-            contentPadding = contentPadding
+            contentPadding = contentPadding,
+            container = container
         )
     }
 
@@ -493,7 +579,7 @@ object TextFieldDefaults {
      *
      * For example, if you need to create a dense outlined text field, use [contentPadding]
      * parameter to decrease the paddings around the input field. If you need to change the
-     * thickness of the border, use [border] parameter to achieve that.
+     * thickness of the border, use [container] parameter to achieve that.
      *
      * Example of custom text field based on [OutlinedTextFieldDecorationBox]:
      * @sample androidx.compose.material3.samples.CustomOutlinedTextFieldBasedOnDecorationBox
@@ -528,14 +614,16 @@ object TextFieldDefaults {
      * field container
      * @param trailingIcon the optional trailing icon to be displayed at the end of the text field
      * container
+     * @param supportingText the optional supporting text to be displayed below the text field
      * @param colors [TextFieldColors] that will be used to resolve the colors used for this text
      * field in different states. See [TextFieldDefaults.outlinedTextFieldColors].
-     * @param border the border to be drawn around the text field. The cutout to fit the [label]
-     * will be automatically added by the framework. Note that by default the color of the border
-     * comes from the [colors].
      * @param contentPadding the spacing values to apply internally between the internals of text
      * field and the decoration box container. You can use it to implement dense text fields or
      * simply to control horizontal padding. See [TextFieldDefaults.outlinedTextFieldPadding].
+     * @param container the container to be drawn behind the text field. By default, this is
+     * transparent and only includes a border. The cutout in the border to fit the [label] will be
+     * automatically added by the framework. Note that by default the color of the border comes from
+     * the [colors].
      */
     @Composable
     @ExperimentalMaterial3Api
@@ -551,10 +639,11 @@ object TextFieldDefaults {
         placeholder: @Composable (() -> Unit)? = null,
         leadingIcon: @Composable (() -> Unit)? = null,
         trailingIcon: @Composable (() -> Unit)? = null,
+        supportingText: @Composable (() -> Unit)? = null,
         colors: TextFieldColors = outlinedTextFieldColors(),
         contentPadding: PaddingValues = outlinedTextFieldPadding(),
-        border: @Composable () -> Unit = {
-            BorderBox(enabled, isError, interactionSource, colors)
+        container: @Composable () -> Unit = {
+            OutlinedBorderContainerBox(enabled, isError, interactionSource, colors)
         }
     ) {
         CommonDecorationBox(
@@ -566,13 +655,14 @@ object TextFieldDefaults {
             label = label,
             leadingIcon = leadingIcon,
             trailingIcon = trailingIcon,
+            supportingText = supportingText,
             singleLine = singleLine,
             enabled = enabled,
             isError = isError,
             interactionSource = interactionSource,
             colors = colors,
             contentPadding = contentPadding,
-            border = border
+            container = container
         )
     }
 }
@@ -611,7 +701,11 @@ class TextFieldColors internal constructor(
     private val disabledLabelColor: Color,
     private val errorLabelColor: Color,
     private val placeholderColor: Color,
-    private val disabledPlaceholderColor: Color
+    private val disabledPlaceholderColor: Color,
+    private val focusedSupportingTextColor: Color,
+    private val unfocusedSupportingTextColor: Color,
+    private val disabledSupportingTextColor: Color,
+    private val errorSupportingTextColor: Color,
     ) {
     /**
      * Represents the color used for the leading icon of this text field.
@@ -742,6 +836,24 @@ class TextFieldColors internal constructor(
         return rememberUpdatedState(if (enabled) textColor else disabledTextColor)
     }
 
+    @Composable
+    internal fun supportingTextColor(
+        enabled: Boolean,
+        isError: Boolean,
+        interactionSource: InteractionSource
+    ): State<Color> {
+        val focused by interactionSource.collectIsFocusedAsState()
+
+        return rememberUpdatedState(
+            when {
+                !enabled -> disabledSupportingTextColor
+                isError -> errorSupportingTextColor
+                focused -> focusedSupportingTextColor
+                else -> unfocusedSupportingTextColor
+            }
+        )
+    }
+
     /**
      * Represents the color used for the cursor of this text field.
      *
@@ -786,6 +898,10 @@ class TextFieldColors internal constructor(
         if (errorLabelColor != other.errorLabelColor) return false
         if (placeholderColor != other.placeholderColor) return false
         if (disabledPlaceholderColor != other.disabledPlaceholderColor) return false
+        if (focusedSupportingTextColor != other.focusedSupportingTextColor) return false
+        if (unfocusedSupportingTextColor != other.unfocusedSupportingTextColor) return false
+        if (disabledSupportingTextColor != other.disabledSupportingTextColor) return false
+        if (errorSupportingTextColor != other.errorSupportingTextColor) return false
 
         return true
     }
@@ -815,6 +931,10 @@ class TextFieldColors internal constructor(
         result = 31 * result + errorLabelColor.hashCode()
         result = 31 * result + placeholderColor.hashCode()
         result = 31 * result + disabledPlaceholderColor.hashCode()
+        result = 31 * result + focusedSupportingTextColor.hashCode()
+        result = 31 * result + unfocusedSupportingTextColor.hashCode()
+        result = 31 * result + disabledSupportingTextColor.hashCode()
+        result = 31 * result + errorSupportingTextColor.hashCode()
         return result
     }
 }
