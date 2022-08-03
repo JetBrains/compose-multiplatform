@@ -232,20 +232,20 @@ private fun DefaultTabs(
     Box(Modifier.semantics(mergeDescendants = true) {}.testTag(Tag)) {
         TabRow(selectedTabIndex = 0) {
             Tab(
-                text = { Text("TAB") },
                 selected = true,
-                interactionSource = interactionSource,
-                onClick = {}
+                onClick = {},
+                text = { Text("TAB") },
+                interactionSource = interactionSource
             )
             Tab(
-                text = { Text("TAB") },
                 selected = false,
-                onClick = {}
+                onClick = {},
+                text = { Text("TAB") }
             )
             Tab(
-                text = { Text("TAB") },
                 selected = false,
-                onClick = {}
+                onClick = {},
+                text = { Text("TAB") }
             )
         }
     }
@@ -277,26 +277,26 @@ private fun CustomTabs(
                 )
             }) {
             Tab(
-                text = { Text("TAB") },
                 selected = true,
-                interactionSource = interactionSource,
+                onClick = {},
+                text = { Text("TAB") },
                 selectedContentColor = selectedContentColor,
                 unselectedContentColor = unselectedContentColor,
-                onClick = {}
+                interactionSource = interactionSource
             )
             Tab(
-                text = { Text("TAB") },
                 selected = false,
+                onClick = {},
+                text = { Text("TAB") },
                 selectedContentColor = selectedContentColor,
-                unselectedContentColor = unselectedContentColor,
-                onClick = {}
+                unselectedContentColor = unselectedContentColor
             )
             Tab(
-                text = { Text("TAB") },
                 selected = false,
+                onClick = {},
+                text = { Text("TAB") },
                 selectedContentColor = selectedContentColor,
-                unselectedContentColor = unselectedContentColor,
-                onClick = {}
+                unselectedContentColor = unselectedContentColor
             )
         }
     }
@@ -316,23 +316,23 @@ private fun DefaultLeadingIconTabs(
     Box(Modifier.semantics(mergeDescendants = true) {}.testTag(Tag)) {
         TabRow(selectedTabIndex = 0) {
             LeadingIconTab(
-                text = { Text("TAB") },
-                icon = { Icon(Icons.Filled.Favorite, contentDescription = "Favorite") },
                 selected = true,
-                interactionSource = interactionSource,
-                onClick = {}
-            )
-            LeadingIconTab(
+                onClick = {},
                 text = { Text("TAB") },
                 icon = { Icon(Icons.Filled.Favorite, contentDescription = "Favorite") },
-                selected = false,
-                onClick = {}
+                interactionSource = interactionSource
             )
             LeadingIconTab(
-                text = { Text("TAB") },
-                icon = { Icon(Icons.Filled.Favorite, contentDescription = "Favorite") },
                 selected = false,
-                onClick = {}
+                onClick = {},
+                text = { Text("TAB") },
+                icon = { Icon(Icons.Filled.Favorite, contentDescription = "Favorite") }
+            )
+            LeadingIconTab(
+                selected = false,
+                onClick = {},
+                text = { Text("TAB") },
+                icon = { Icon(Icons.Filled.Favorite, contentDescription = "Favorite") }
             )
         }
     }
