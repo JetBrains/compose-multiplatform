@@ -171,11 +171,7 @@ internal class AndroidParagraph(
         get() = getLineBaseline(0)
 
     override val lastBaseline: Float
-        get() = if (maxLines < lineCount) {
-            getLineBaseline(maxLines - 1)
-        } else {
-            getLineBaseline(lineCount - 1)
-        }
+        get() = getLineBaseline(lineCount - 1)
 
     override val didExceedMaxLines: Boolean
         get() = layout.didExceedMaxLines
