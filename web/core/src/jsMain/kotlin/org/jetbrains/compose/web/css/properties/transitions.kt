@@ -27,7 +27,8 @@ fun Transition.duration(value: CSSSizeValue<out CSSUnitTime>) = apply { duration
 fun Transition.timingFunction(value: AnimationTimingFunction) = apply { timingFunction = value }
 fun Transition.delay(value: CSSSizeValue<out CSSUnitTime>) = apply { delay = value }
 fun Transition.ease(ease: AnimationTimingFunction) = timingFunction(ease)
-data class CSSTransitions(
+
+data class Transitions(
 	var transitions: List<Transition> = emptyList(),
 	private var defaultDuration: CSSSizeValue<out CSSUnitTime>? = null,
 	private var defaultTimingFunction: AnimationTimingFunction? = null,
@@ -74,7 +75,7 @@ data class CSSTransitions(
 	fun ease(ease: AnimationTimingFunction) = timingFunction(ease)
 }
 
-inline fun StyleScope.transitions(transitions: CSSTransitions.() -> Unit) {
-	val transitionsValue = CSSTransitions().apply(transitions)
+inline fun StyleScope.transitions(transitions: Transitions.() -> Unit) {
+	val transitionsValue = Transitions().apply(transitions)
 	property("transition", transitionsValue.toString())
 }
