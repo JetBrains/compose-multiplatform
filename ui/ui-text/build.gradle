@@ -75,7 +75,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     android {
         sourceSets {
             main {
-                java.srcDirs += "../../../text/text/src/main/java"
+                java.srcDirs += "${supportRootFolder}/text/text/src/main/java"
             }
         }
     }
@@ -133,7 +133,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation('androidx.collection:collection:1.0.0')
             }
 
-            androidMain.kotlin.srcDirs("../../../text/text/src/main/java")
+            androidMain.kotlin.srcDirs("${supportRootFolder}/text/text/src/main/java")
 
             // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
             //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
