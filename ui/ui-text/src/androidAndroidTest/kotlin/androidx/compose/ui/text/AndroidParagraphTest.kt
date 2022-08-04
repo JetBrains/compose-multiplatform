@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
@@ -57,6 +58,7 @@ import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.platform.bitmap
+import androidx.compose.ui.text.platform.style.DrawStyleSpan
 import androidx.compose.ui.text.platform.style.ShaderBrushSpan
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
@@ -905,6 +907,80 @@ AndroidParagraphTest {
             }
     }
 
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testAnnotatedString_setDrawStyle() {
+        val text = "abcde"
+        val strokeWidth = 8f
+        val strokeMiter = 4f
+        val strokeCap = StrokeCap.Round
+        val strokeJoin = StrokeJoin.Bevel
+        val spanStyle = SpanStyle(drawStyle = Stroke(
+            strokeWidth,
+            strokeMiter,
+            strokeCap,
+            strokeJoin
+        ))
+
+        val paragraph = simpleParagraph(
+            text = text,
+            spanStyles = listOf(
+                AnnotatedString.Range(spanStyle, start = 0, end = text.length)
+            ),
+            width = 0.0f
+        )
+
+        assertThat(paragraph.charSequence)
+            .hasSpan(DrawStyleSpan::class, start = 0, end = text.length) {
+                return@hasSpan it.drawStyle == Stroke(
+                    strokeWidth,
+                    strokeMiter,
+                    strokeCap,
+                    strokeJoin
+                )
+            }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testAnnotatedString_setDrawStyle_FillOnTopOfStroke() {
+        val text = "abcde"
+        val strokeWidth = 8f
+        val strokeMiter = 4f
+        val strokeCap = StrokeCap.Round
+        val strokeJoin = StrokeJoin.Bevel
+        val strokeSpanStyle = SpanStyle(drawStyle = Stroke(
+            strokeWidth,
+            strokeMiter,
+            strokeCap,
+            strokeJoin
+        ))
+        val fillSpanStyle = SpanStyle(drawStyle = Fill)
+
+        val paragraph = simpleParagraph(
+            text = text,
+            spanStyles = listOf(
+                AnnotatedString.Range(strokeSpanStyle, start = 0, end = text.length),
+                AnnotatedString.Range(fillSpanStyle, start = 1, end = 3)
+            ),
+            width = 0.0f
+        )
+
+        assertThat(paragraph.charSequence)
+            .hasSpan(DrawStyleSpan::class, start = 0, end = text.length) {
+                return@hasSpan it.drawStyle == Stroke(
+                    strokeWidth,
+                    strokeMiter,
+                    strokeCap,
+                    strokeJoin
+                )
+            }
+        assertThat(paragraph.charSequence)
+            .hasSpanOnTop(DrawStyleSpan::class, start = 1, end = 3) {
+                return@hasSpanOnTop it.drawStyle == Fill
+            }
+    }
+
     @Test
     fun testAnnotatedString_fontFeatureSetting_setSpanOnText() {
         val text = "abc"
@@ -1386,6 +1462,39 @@ AndroidParagraphTest {
             .hasSpan(TextDecorationSpan::class, 0, text.length) { it.isStrikethroughText }
     }
 
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testSpanStyle_drawStyle_stroke_appliedOnTextPaint() {
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(drawStyle = Stroke(
+                width = 8f,
+                miter = 6f,
+                cap = StrokeCap.Round,
+                join = StrokeJoin.Bevel
+            )),
+            width = 0.0f
+        )
+
+        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.STROKE)
+        assertThat(paragraph.textPaint.strokeWidth).isEqualTo(8f)
+        assertThat(paragraph.textPaint.strokeMiter).isEqualTo(6f)
+        assertThat(paragraph.textPaint.strokeCap).isEqualTo(Paint.Cap.ROUND)
+        assertThat(paragraph.textPaint.strokeJoin).isEqualTo(Paint.Join.BEVEL)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testSpanStyle_drawStyle_fill_appliedOnTextPaint() {
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(drawStyle = Fill),
+            width = 0.0f
+        )
+
+        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.FILL)
+    }
+
     @Test
     fun testSpanStyle_background_appliedAsSpan() {
         // bgColor is reset in the Android Layout constructor.
@@ -1453,6 +1562,60 @@ AndroidParagraphTest {
 
         paragraph.paint(canvas, textDecoration = null)
         assertThat(paragraph.textPaint.isUnderlineText).isTrue()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testPaint_can_change_DrawStyle_to_Stroke() {
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(drawStyle = null),
+            width = 0.0f
+        )
+        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.FILL)
+
+        val stroke = Stroke(width = 4f, miter = 2f, cap = StrokeCap.Square, join = StrokeJoin.Bevel)
+        val canvas = Canvas(android.graphics.Canvas())
+        paragraph.paint(canvas, drawStyle = stroke)
+
+        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.STROKE)
+        assertThat(paragraph.textPaint.strokeWidth).isEqualTo(4f)
+        assertThat(paragraph.textPaint.strokeMiter).isEqualTo(2f)
+        assertThat(paragraph.textPaint.strokeCap).isEqualTo(Paint.Cap.SQUARE)
+        assertThat(paragraph.textPaint.strokeJoin).isEqualTo(Paint.Join.BEVEL)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testPaint_can_change_DrawStyle_to_Fill() {
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(drawStyle = Stroke(8f)),
+            width = 0.0f
+        )
+        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.STROKE)
+        assertThat(paragraph.textPaint.strokeWidth).isEqualTo(8f)
+
+        val canvas = Canvas(android.graphics.Canvas())
+        paragraph.paint(canvas, drawStyle = Fill)
+        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.FILL)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testPaint_null_drawStyle_should_be_noop() {
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(drawStyle = Stroke(8f)),
+            width = 0.0f
+        )
+        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.STROKE)
+        assertThat(paragraph.textPaint.strokeWidth).isEqualTo(8f)
+
+        val canvas = Canvas(android.graphics.Canvas())
+        paragraph.paint(canvas, drawStyle = null)
+        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.STROKE)
+        assertThat(paragraph.textPaint.strokeWidth).isEqualTo(8f)
     }
 
     @SdkSuppress(minSdkVersion = 29)
@@ -1661,24 +1824,6 @@ AndroidParagraphTest {
         val canvas = Canvas(android.graphics.Canvas())
         paragraph.paint(canvas, color = color2)
         assertThat(paragraph.textPaint.color).isEqualTo(color2.toArgb())
-    }
-
-    @Test
-    fun testPaint_can_change_drawStyle_to_Stroke() {
-        val paragraph = simpleParagraph(
-            text = "",
-            width = 0.0f
-        )
-        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.FILL)
-
-        val stroke = Stroke(width = 4f, miter = 2f, cap = StrokeCap.Square, join = StrokeJoin.Bevel)
-        val canvas = Canvas(android.graphics.Canvas())
-        paragraph.paint(canvas, drawStyle = stroke)
-        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.STROKE)
-        assertThat(paragraph.textPaint.strokeWidth).isEqualTo(4f)
-        assertThat(paragraph.textPaint.strokeMiter).isEqualTo(2f)
-        assertThat(paragraph.textPaint.strokeCap).isEqualTo(Paint.Cap.SQUARE)
-        assertThat(paragraph.textPaint.strokeJoin).isEqualTo(Paint.Join.BEVEL)
     }
 
     @Test

@@ -107,6 +107,7 @@ internal fun AndroidTextPaint.applySpanStyle(
     setBrush(style.brush, Size.Unspecified, style.alpha)
     setShadow(style.shadow)
     // Skip textDecoration (b/199939617). TextDecoration should be applied as a span.
+    setDrawStyle(style.drawStyle)
 
     // letterSpacing with unit Sp needs to be handled by span.
     // baselineShift and bgColor is reset in the Android Layout constructor,

@@ -366,6 +366,7 @@ class TextStyleLayoutAttributesTest {
             getProperty("textGeometricTransform"),
             getProperty("localeList"),
             getProperty("background"),
+            getProperty("drawStyle"),
             getProperty("textAlign"),
             getProperty("textDirection"),
             getProperty("lineHeight"),

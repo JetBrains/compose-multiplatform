@@ -21,6 +21,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
@@ -261,6 +262,8 @@ class TextStyle internal constructor(
      * @param background The background color for the text.
      * @param textDecoration The decorations to paint on the text (e.g., an underline).
      * @param shadow The shadow effect applied on the text.
+     * @param drawStyle Drawing style of text, whether fill in the text while drawing or stroke
+     * around the edges.
      * @param textAlign The alignment of the text within the lines of the paragraph.
      * @param textDirection The algorithm to be used to resolve the final text and paragraph
      * direction: Left To Right or Right To Left. If no value is provided the system will use the
@@ -291,6 +294,7 @@ class TextStyle internal constructor(
         background: Color = Color.Unspecified,
         textDecoration: TextDecoration? = null,
         shadow: Shadow? = null,
+        drawStyle: DrawStyle? = null,
         textAlign: TextAlign? = null,
         textDirection: TextDirection? = null,
         lineHeight: TextUnit = TextUnit.Unspecified,
@@ -315,7 +319,8 @@ class TextStyle internal constructor(
             background = background,
             textDecoration = textDecoration,
             shadow = shadow,
-            platformStyle = platformStyle?.spanStyle
+            platformStyle = platformStyle?.spanStyle,
+            drawStyle = drawStyle
         ),
         ParagraphStyle(
             textAlign = textAlign,
@@ -357,6 +362,8 @@ class TextStyle internal constructor(
      * @param background The background color for the text.
      * @param textDecoration The decorations to paint on the text (e.g., an underline).
      * @param shadow The shadow effect applied on the text.
+     * @param drawStyle Drawing style of text, whether fill in the text while drawing or stroke
+     * around the edges.
      * @param textAlign The alignment of the text within the lines of the paragraph.
      * @param textDirection The algorithm to be used to resolve the final text and paragraph
      * direction: Left To Right or Right To Left. If no value is provided the system will use the
@@ -387,6 +394,7 @@ class TextStyle internal constructor(
         background: Color = Color.Unspecified,
         textDecoration: TextDecoration? = null,
         shadow: Shadow? = null,
+        drawStyle: DrawStyle? = null,
         textAlign: TextAlign? = null,
         textDirection: TextDirection? = null,
         lineHeight: TextUnit = TextUnit.Unspecified,
@@ -412,7 +420,8 @@ class TextStyle internal constructor(
             background = background,
             textDecoration = textDecoration,
             shadow = shadow,
-            platformStyle = platformStyle?.spanStyle
+            platformStyle = platformStyle?.spanStyle,
+            drawStyle = drawStyle
         ),
         ParagraphStyle(
             textAlign = textAlign,
@@ -536,7 +545,8 @@ class TextStyle internal constructor(
                 background = background,
                 textDecoration = textDecoration,
                 shadow = shadow,
-                platformStyle = this.spanStyle.platformStyle
+                platformStyle = this.spanStyle.platformStyle,
+                drawStyle = this.spanStyle.drawStyle
             ),
             paragraphStyle = ParagraphStyle(
                 textAlign = textAlign,
@@ -628,6 +638,7 @@ class TextStyle internal constructor(
         background: Color = this.spanStyle.background,
         textDecoration: TextDecoration? = this.spanStyle.textDecoration,
         shadow: Shadow? = this.spanStyle.shadow,
+        drawStyle: DrawStyle? = this.spanStyle.drawStyle,
         textAlign: TextAlign? = this.paragraphStyle.textAlign,
         textDirection: TextDirection? = this.paragraphStyle.textDirection,
         lineHeight: TextUnit = this.paragraphStyle.lineHeight,
@@ -657,7 +668,8 @@ class TextStyle internal constructor(
                 background = background,
                 textDecoration = textDecoration,
                 shadow = shadow,
-                platformStyle = platformStyle?.spanStyle
+                platformStyle = platformStyle?.spanStyle,
+                drawStyle = drawStyle
             ),
             paragraphStyle = ParagraphStyle(
                 textAlign = textAlign,
@@ -690,6 +702,7 @@ class TextStyle internal constructor(
         background: Color = this.spanStyle.background,
         textDecoration: TextDecoration? = this.spanStyle.textDecoration,
         shadow: Shadow? = this.spanStyle.shadow,
+        drawStyle: DrawStyle? = this.spanStyle.drawStyle,
         textAlign: TextAlign? = this.paragraphStyle.textAlign,
         textDirection: TextDirection? = this.paragraphStyle.textDirection,
         lineHeight: TextUnit = this.paragraphStyle.lineHeight,
@@ -716,7 +729,8 @@ class TextStyle internal constructor(
                 background = background,
                 textDecoration = textDecoration,
                 shadow = shadow,
-                platformStyle = platformStyle?.spanStyle
+                platformStyle = platformStyle?.spanStyle,
+                drawStyle = drawStyle
             ),
             paragraphStyle = ParagraphStyle(
                 textAlign = textAlign,
@@ -823,6 +837,14 @@ class TextStyle internal constructor(
      * The shadow effect applied on the text.
      */
     val shadow: Shadow? get() = this.spanStyle.shadow
+
+    /**
+     * Drawing style of text, whether fill in the text while drawing or stroke around the edges.
+     */
+    @ExperimentalTextApi
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalTextApi
+    val drawStyle: DrawStyle? get() = this.spanStyle.drawStyle
 
     /**
      * The alignment of the text within the lines of the paragraph.
@@ -933,7 +955,9 @@ class TextStyle internal constructor(
             "localeList=$localeList, " +
             "background=$background, " +
             "textDecoration=$textDecoration, " +
-            "shadow=$shadow, textAlign=$textAlign, " +
+            "shadow=$shadow, " +
+            "drawStyle=$drawStyle, " +
+            "textAlign=$textAlign, " +
             "textDirection=$textDirection, " +
             "lineHeight=$lineHeight, " +
             "textIndent=$textIndent, " +
