@@ -17,6 +17,8 @@
 package androidx.compose.material3
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -57,9 +59,9 @@ import androidx.compose.ui.unit.dp
  * matching content color for [containerColor], or to the current [LocalContentColor] if
  * [containerColor] is not a color from the theme.
  * @param content content of the screen. The lambda receives a [PaddingValues] that should be
- * applied to the content root via [Modifier.padding] to properly offset top and bottom bars. If
- * using [Modifier.verticalScroll], apply this modifier to the child of the scroll, and not on
- * the scroll itself.
+ * applied to the content root via [Modifier.padding] and [Modifier.consumeWindowInsets] to
+ * properly offset top and bottom bars. If using [Modifier.verticalScroll], apply this modifier to
+ * the child of the scroll, and not on the scroll itself.
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -182,9 +184,17 @@ private fun ScaffoldLayout(
             }
 
             val bodyContentPlaceables = subcompose(ScaffoldLayoutContent.MainContent) {
+                val insets = WindowInsets.safeDrawingForVisualComponents
+                    .asPaddingValues(this@SubcomposeLayout)
                 val innerPadding = PaddingValues(
-                    top = topBarHeight.toDp(),
-                    bottom = bottomBarHeight.toDp()
+                    top =
+                    if (topBarHeight == 0) insets.calculateTopPadding()
+                    else topBarHeight.toDp(),
+                    bottom =
+                    if (bottomBarHeight == 0) insets.calculateBottomPadding()
+                    else bottomBarHeight.toDp(),
+                    start = insets.calculateLeftPadding((this@SubcomposeLayout).layoutDirection),
+                    end = insets.calculateRightPadding((this@SubcomposeLayout).layoutDirection)
                 )
                 content(innerPadding)
             }.map { it.measure(looseConstraints) }

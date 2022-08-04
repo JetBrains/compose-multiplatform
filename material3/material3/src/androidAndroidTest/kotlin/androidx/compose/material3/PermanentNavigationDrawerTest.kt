@@ -17,6 +17,7 @@
 package androidx.compose.material3
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.tokens.NavigationDrawerTokens
@@ -28,6 +29,7 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -68,6 +70,28 @@ class PermanentNavigationDrawerTest {
 
         rule.onNodeWithTag("content")
             .assertLeftPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun permanentNavigationDrawer_sheet_respectsContentPadding() {
+        rule.setMaterialContent(lightColorScheme()) {
+            PermanentNavigationDrawer(
+                drawerContent = {
+                    PermanentDrawerSheet(windowInsets = WindowInsets(13.dp, 13.dp, 13.dp, 13.dp)) {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("content")
+                        )
+                    }
+                },
+                content = {}
+            )
+        }
+
+        rule.onNodeWithTag("content")
+            .assertLeftPositionInRootIsEqualTo(13.dp)
+            .assertTopPositionInRootIsEqualTo(13.dp)
     }
 
     @Test

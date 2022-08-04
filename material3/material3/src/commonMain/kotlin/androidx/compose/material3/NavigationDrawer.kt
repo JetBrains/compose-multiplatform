@@ -29,14 +29,18 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.tokens.NavigationDrawerTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -446,6 +450,7 @@ fun PermanentNavigationDrawer(
  * @param drawerTonalElevation when [drawerContainerColor] is [ColorScheme.surface], a translucent
  * primary color overlay is applied on top of the container. A higher tonal elevation value will
  * result in a darker color in light theme and lighter color in dark theme. See also: [Surface].
+ * @param windowInsets a window insets for the sheet.
  * @param content content inside of a modal navigation drawer
  */
 @ExperimentalMaterial3Api
@@ -456,9 +461,11 @@ fun ModalDrawerSheet(
     drawerContainerColor: Color = MaterialTheme.colorScheme.surface,
     drawerContentColor: Color = contentColorFor(drawerContainerColor),
     drawerTonalElevation: Dp = DrawerDefaults.ModalDrawerElevation,
+    windowInsets: WindowInsets = DrawerDefaults.windowInsets,
     content: @Composable ColumnScope.() -> Unit
 ) {
     DrawerSheet(
+        windowInsets,
         modifier,
         drawerShape,
         drawerContainerColor,
@@ -481,6 +488,7 @@ fun ModalDrawerSheet(
  * @param drawerTonalElevation when [drawerContainerColor] is [ColorScheme.surface], a translucent
  * primary color overlay is applied on top of the container. A higher tonal elevation value will
  * result in a darker color in light theme and lighter color in dark theme. See also: [Surface].
+ * @param windowInsets a window insets for the sheet.
  * @param content content inside of a dismissible navigation drawer
  */
 @ExperimentalMaterial3Api
@@ -491,9 +499,11 @@ fun DismissibleDrawerSheet(
     drawerContainerColor: Color = MaterialTheme.colorScheme.surface,
     drawerContentColor: Color = contentColorFor(drawerContainerColor),
     drawerTonalElevation: Dp = DrawerDefaults.DismissibleDrawerElevation,
+    windowInsets: WindowInsets = DrawerDefaults.windowInsets,
     content: @Composable ColumnScope.() -> Unit
 ) {
     DrawerSheet(
+        windowInsets,
         modifier,
         drawerShape,
         drawerContainerColor,
@@ -516,6 +526,7 @@ fun DismissibleDrawerSheet(
  * @param drawerTonalElevation when [drawerContainerColor] is [ColorScheme.surface], a translucent
  * primary color overlay is applied on top of the container. A higher tonal elevation value will
  * result in a darker color in light theme and lighter color in dark theme. See also: [Surface].
+ * @param windowInsets a window insets for the sheet.
  * @param content content inside a permanent navigation drawer
  */
 @ExperimentalMaterial3Api
@@ -526,10 +537,12 @@ fun PermanentDrawerSheet(
     drawerContainerColor: Color = MaterialTheme.colorScheme.surface,
     drawerContentColor: Color = contentColorFor(drawerContainerColor),
     drawerTonalElevation: Dp = DrawerDefaults.PermanentDrawerElevation,
+    windowInsets: WindowInsets = DrawerDefaults.windowInsets,
     content: @Composable ColumnScope.() -> Unit
 ) {
     val navigationMenu = getString(Strings.NavigationMenu)
     DrawerSheet(
+        windowInsets,
         modifier.semantics {
             paneTitle = navigationMenu
         },
@@ -544,6 +557,7 @@ fun PermanentDrawerSheet(
 @ExperimentalMaterial3Api
 @Composable
 private fun DrawerSheet(
+    windowInsets: WindowInsets,
     modifier: Modifier = Modifier,
     drawerShape: Shape = RectangleShape,
     drawerContainerColor: Color = MaterialTheme.colorScheme.surface,
@@ -568,7 +582,8 @@ private fun DrawerSheet(
                 .sizeIn(
                     minWidth = MinimumDrawerWidth,
                     maxWidth = DrawerDefaults.MaximumDrawerWidth
-                ),
+                )
+                .windowInsetsPadding(windowInsets),
             content = content
         )
     }
@@ -609,6 +624,14 @@ object DrawerDefaults {
 
     /** Default and maximum width of a navigation drawer **/
     val MaximumDrawerWidth = NavigationDrawerTokens.ContainerWidth
+
+    /**
+     * Default window insets for drawer sheets
+     */
+    val windowInsets: WindowInsets
+        @Composable
+        get() = WindowInsets.safeDrawingForVisualComponents
+            .only(WindowInsetsSides.Vertical + WindowInsetsSides.Start)
 }
 
 /**

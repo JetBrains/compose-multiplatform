@@ -17,6 +17,8 @@
 package androidx.compose.material3
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.tokens.NavigationBarTokens
@@ -53,6 +55,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -195,6 +198,22 @@ class NavigationBarTest {
         }
             .assertWidthIsEqualTo(rule.rootWidth())
             .assertHeightIsEqualTo(height)
+    }
+
+    @Test
+    fun navigationBar_respectContentPadding() {
+        rule.setMaterialContentForSizeAssertions {
+            NavigationBar(windowInsets = WindowInsets(17.dp, 17.dp, 17.dp, 17.dp)) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .testTag("content")
+                )
+            }
+        }
+        rule.onNodeWithTag("content")
+            .assertLeftPositionInRootIsEqualTo(17.dp)
+            .assertTopPositionInRootIsEqualTo(17.dp)
     }
 
     @Test

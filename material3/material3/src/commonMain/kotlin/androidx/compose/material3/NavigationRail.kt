@@ -28,10 +28,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.ripple.rememberRipple
@@ -90,6 +94,7 @@ import kotlin.math.roundToInt
  * either the matching content color for [containerColor], or to the current [LocalContentColor] if
  * [containerColor] is not a color from the theme.
  * @param header optional header that may hold a [FloatingActionButton] or a logo
+ * @param windowInsets a window insets of the navigation rail.
  * @param content the content of this navigation rail, typically 3-7 [NavigationRailItem]s
  */
 @Composable
@@ -98,6 +103,7 @@ fun NavigationRail(
     containerColor: Color = NavigationRailDefaults.ContainerColor,
     contentColor: Color = contentColorFor(containerColor),
     header: @Composable (ColumnScope.() -> Unit)? = null,
+    windowInsets: WindowInsets = NavigationRailDefaults.windowInsets,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Surface(
@@ -108,6 +114,7 @@ fun NavigationRail(
         Column(
             Modifier
                 .fillMaxHeight()
+                .windowInsetsPadding(windowInsets)
                 .widthIn(min = NavigationRailTokens.ContainerWidth)
                 .padding(vertical = NavigationRailVerticalPadding)
                 .selectableGroup(),
@@ -255,6 +262,14 @@ fun NavigationRailItem(
 object NavigationRailDefaults {
     /** Default container color of a navigation rail. */
     val ContainerColor: Color @Composable get() = NavigationRailTokens.ContainerColor.toColor()
+
+    /**
+     * Default window insets for navigation rail.
+     */
+    val windowInsets: WindowInsets
+        @Composable
+        get() = WindowInsets.safeDrawingForVisualComponents
+            .only(WindowInsetsSides.Vertical + WindowInsetsSides.Start)
 }
 
 /** Defaults used in [NavigationRailItem]. */
@@ -576,7 +591,7 @@ private const val LabelLayoutIdTag: String = "label"
  * Vertical padding between the contents of the [NavigationRail] and its top/bottom, and internally
  * between items.
  */
-private val NavigationRailVerticalPadding: Dp = 4.dp
+internal val NavigationRailVerticalPadding: Dp = 4.dp
 
 /**
  * Padding at the bottom of the [NavigationRail]'s header. This padding will only be added when the

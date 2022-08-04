@@ -21,14 +21,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.consumedWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
@@ -39,7 +38,6 @@ import androidx.compose.integration.demos.common.Demo
 import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.integration.demos.common.FragmentDemo
 import androidx.compose.integration.demos.common.allLaunchableDemos
-import androidx.compose.integration.demos.settings.DecorFitsSystemWindowsSetting
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -75,7 +73,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentContainerView
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun DemoApp(
     currentDemo: Demo,
@@ -94,11 +92,6 @@ fun DemoApp(
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
-    // Only handle window insets when the system isn't doing it for us.
-    val insetsModifier = if (!DecorFitsSystemWindowsSetting.asState().value) {
-        Modifier.windowInsetsPadding(WindowInsets.safeDrawing)
-    } else Modifier
-
     Scaffold(
         topBar = {
             DemoAppBar(
@@ -114,11 +107,17 @@ fun DemoApp(
             )
         },
         modifier = Modifier
-            .then(insetsModifier)
             .nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
-        val modifier = Modifier.padding(innerPadding)
-        DemoContent(modifier, currentDemo, isFiltering, filterText, onNavigateToDemo, onNavigateUp)
+        val modifier = Modifier.consumedWindowInsets(innerPadding).padding(innerPadding)
+        DemoContent(
+            modifier,
+            currentDemo,
+            isFiltering,
+            filterText,
+            onNavigateToDemo,
+            onNavigateUp
+        )
     }
 }
 

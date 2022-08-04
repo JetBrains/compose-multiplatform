@@ -20,6 +20,7 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.tokens.NavigationDrawerTokens
 import androidx.compose.runtime.CompositionLocalProvider
@@ -33,6 +34,7 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -138,6 +140,30 @@ class ModalNavigationDrawerTest {
 
         rule.onNodeWithTag("content")
             .assertWidthIsEqualTo(NavigationDrawerTokens.ContainerWidth)
+    }
+
+    @Test
+    fun navigationDrawer_sheet_respectsContentPadding() {
+        rule.setMaterialContent(lightColorScheme()) {
+            val drawerState = rememberDrawerState(DrawerValue.Open)
+            ModalNavigationDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    ModalDrawerSheet(windowInsets = WindowInsets(10.dp, 10.dp, 10.dp, 10.dp)) {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("content")
+                        )
+                    }
+                },
+                content = {}
+            )
+        }
+
+        rule.onNodeWithTag("content")
+            .assertTopPositionInRootIsEqualTo(10.dp)
+            .assertLeftPositionInRootIsEqualTo(10.dp)
     }
 
     @Test

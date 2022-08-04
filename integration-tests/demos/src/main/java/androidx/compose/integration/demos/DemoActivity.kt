@@ -52,6 +52,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentActivity
 
 /**
@@ -88,9 +89,13 @@ class DemoActivity : FragmentActivity() {
             }
 
             SoftInputModeEffect(SoftInputModeSetting.asState().value, window)
-            DecorFitsSystemWindowsEffect(DecorFitsSystemWindowsSetting.asState().value, window)
+            DecorFitsSystemWindowsEffect(
+                DecorFitsSystemWindowsSetting.asState().value,
+                hostView,
+                window
+            )
 
-            DemoTheme(DynamicThemeSetting.asState().value, window) {
+            DemoTheme(DynamicThemeSetting.asState().value, this.hostView, window) {
                 val filteringMode = rememberSaveable(
                     saver = FilterMode.Saver(onBackPressedDispatcher)
                 ) {
@@ -135,6 +140,7 @@ class DemoActivity : FragmentActivity() {
 @Composable
 private fun DemoTheme(
     isDynamicThemeOn: Boolean,
+    view: View,
     window: Window,
     content: @Composable () -> Unit
 ) {
@@ -150,8 +156,10 @@ private fun DemoTheme(
         }
 
     SideEffect {
-        window.statusBarColor =
-            (if (isDarkMode) Color.Black else colorScheme.inversePrimary).toArgb()
+        WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !isDarkMode
+        WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !isDarkMode
+        window.statusBarColor = Color.Transparent.toArgb()
+        window.navigationBarColor = Color.Transparent.toArgb()
     }
     MaterialTheme(colorScheme = colorScheme, content = content)
 }
