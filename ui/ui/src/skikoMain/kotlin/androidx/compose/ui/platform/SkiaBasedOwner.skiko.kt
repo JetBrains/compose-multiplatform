@@ -169,6 +169,7 @@ internal class SkiaBasedOwner(
     var constraints: Constraints = Constraints()
 
     override val root = LayoutNode().also {
+        it.layoutDirection = platform.layoutDirection
         it.measurePolicy = RootMeasurePolicy
         it.modifier = semanticsModifier
             .then(focusManager.modifier)
