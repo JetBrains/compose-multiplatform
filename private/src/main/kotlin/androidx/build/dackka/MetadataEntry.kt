@@ -31,6 +31,14 @@ data class MetadataEntry(
     @SerializedName("releaseNotesUrl")
     val releaseNotesUrl: String,
 
+    // TODO (b/243175565): remove @Transient once bug is resolved
+    //
+    // Dackka currently fails if extra keys are present in the JSON file; temporarily omit this
+    // field in the JSON output
+    @Transient
+    @SerializedName("jarContents")
+    val jarContents: List<String>,
+
     // TODO (b/241582234): Remove when bug is resolved.
     //
     // This will no longer be used once Dackka is updated, but is currently needed as Dackka
