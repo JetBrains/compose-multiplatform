@@ -403,7 +403,12 @@ private fun createLetterSpacingSpan(
 private fun Spannable.setShadow(shadow: Shadow?, start: Int, end: Int) {
     shadow?.let {
         setSpan(
-            ShadowSpan(it.color.toArgb(), it.offset.x, it.offset.y, it.blurRadius),
+            ShadowSpan(
+                it.color.toArgb(),
+                it.offset.x,
+                it.offset.y,
+                correctBlurRadius(it.blurRadius)
+            ),
             start,
             end
         )

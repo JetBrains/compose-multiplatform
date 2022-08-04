@@ -778,6 +778,90 @@ AndroidParagraphTest {
     }
 
     @Test
+    fun testAnnotatedString_setShadow_withZeroBlur() {
+        val text = "abcde"
+        val spanStyle = SpanStyle(
+            shadow = Shadow(
+                color = Color(0xFF00FF00),
+                offset = Offset(1f, 2f),
+                blurRadius = 0f
+            )
+        )
+        val paragraph = simpleParagraph(
+            text = text,
+            spanStyles = listOf(
+                AnnotatedString.Range(spanStyle, start = 0, end = text.length)
+            ),
+            width = 100.0f // width is not important
+        )
+
+        assertThat(paragraph.charSequence)
+            .hasSpan(ShadowSpan::class, start = 0, end = text.length) {
+                return@hasSpan it.radius == Float.MIN_VALUE
+            }
+    }
+
+    @Test
+    fun testAnnotatedString_setShadow_withZeroBlur_bitmap() {
+        val text = "abcde"
+        val width = 100.0f // width is not important
+
+        val shadow = Shadow(
+            color = Color(0xFF00FF00),
+            offset = Offset(1f, 2f),
+            blurRadius = 0f
+        )
+
+        val textStyle = TextStyle(fontSize = 8.sp)
+
+        val paragraphNoShadow = simpleParagraph(
+            text = text,
+            style = textStyle,
+            spanStyles = listOf(),
+            width = width
+        )
+
+        val paragraphZeroBlur = simpleParagraph(
+            text = text,
+            style = textStyle,
+            spanStyles = listOf(
+                AnnotatedString.Range(SpanStyle(shadow = shadow), start = 0, end = text.length)
+            ),
+            width = width
+        )
+
+        val paragraphFloatMinBlur = simpleParagraph(
+            text = text,
+            style = textStyle,
+            spanStyles = listOf(
+                AnnotatedString.Range(
+                    SpanStyle(shadow = shadow.copy(blurRadius = Float.MIN_VALUE)),
+                    start = 0,
+                    end = text.length
+                )
+            ),
+            width = width
+        )
+
+        val paragraphOneBlur = simpleParagraph(
+            text = text,
+            style = textStyle,
+            spanStyles = listOf(
+                AnnotatedString.Range(
+                    SpanStyle(shadow = shadow.copy(blurRadius = 1f)),
+                    start = 0,
+                    end = text.length
+                )
+            ),
+            width = width
+        )
+
+        assertThat(paragraphZeroBlur.bitmap()).isNotEqualToBitmap(paragraphNoShadow.bitmap())
+        assertThat(paragraphZeroBlur.bitmap()).isEqualToBitmap(paragraphFloatMinBlur.bitmap())
+        assertThat(paragraphZeroBlur.bitmap()).isNotEqualToBitmap(paragraphOneBlur.bitmap())
+    }
+
+    @Test
     fun testAnnotatedString_setShadowTwice_lastOnTop() {
         val text = "abcde"
         val color = Color(0xFF00FF00)
@@ -1430,6 +1514,75 @@ AndroidParagraphTest {
         assertThat(paragraph.textPaint.shadowLayerDy).isEqualTo(0f)
         assertThat(paragraph.textPaint.shadowLayerRadius).isEqualTo(0f)
         assertThat(paragraph.textPaint.shadowLayerColor).isEqualTo(0)
+    }
+
+    @SdkSuppress(minSdkVersion = 29)
+    @Test
+    fun testPaint_shadow_blur_with_zero_resets_to_float_min() {
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(shadow = null),
+            width = 0.0f
+        )
+
+        assertThat(paragraph.textPaint.shadowLayerRadius).isEqualTo(0f)
+
+        val canvas = Canvas(android.graphics.Canvas())
+        val color = Color.Red
+        val dx = 1f
+        val dy = 2f
+        val radius = 0f
+
+        paragraph.paint(
+            canvas,
+            shadow = Shadow(color = color, offset = Offset(dx, dy), blurRadius = radius)
+        )
+
+        assertThat(paragraph.textPaint.shadowLayerRadius).isEqualTo(Float.MIN_VALUE)
+    }
+
+    @Test
+    fun testPaint_shadow_blur_with_zero_resets_to_float_min_bitmap() {
+        val text = "a"
+        val width = 100f
+        val fontSize = 8.sp
+
+        val shadow = Shadow(
+            color = Color(0xFF00FF00),
+            offset = Offset(1f, 2f),
+            blurRadius = 0f
+        )
+
+        val paragraphNoShadow = simpleParagraph(
+            text = text,
+            style = TextStyle(fontSize = fontSize),
+            width = width
+        )
+
+        val paragraphZeroBlur = simpleParagraph(
+            text = text,
+            style = TextStyle(fontSize = fontSize, shadow = shadow),
+            width = width
+        )
+
+        val paragraphFloatMinBlur = simpleParagraph(
+            text = text,
+            style = TextStyle(
+                fontSize = fontSize,
+                shadow = shadow.copy(blurRadius = Float.MIN_VALUE)
+            ),
+            width = width
+        )
+
+        val paragraphOneBlur = simpleParagraph(
+            text = text,
+            style = TextStyle(fontSize = fontSize, shadow = shadow.copy(blurRadius = 1f)),
+            width = width
+        )
+
+        assertThat(paragraphZeroBlur.bitmap()).isNotEqualToBitmap(paragraphNoShadow.bitmap())
+        assertThat(paragraphZeroBlur.bitmap()).isEqualToBitmap(paragraphFloatMinBlur.bitmap())
+        assertThat(paragraphZeroBlur.bitmap()).isNotEqualToBitmap(paragraphOneBlur.bitmap())
     }
 
     @Test
