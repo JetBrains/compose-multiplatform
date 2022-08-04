@@ -28,6 +28,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventTimeoutCancellationException
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
@@ -47,8 +48,6 @@ import androidx.compose.ui.util.fastForEach
 import kotlin.math.abs
 import kotlin.math.sign
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.withTimeout
 
 /**
  * Waits for drag motion to pass [touch slop][ViewConfiguration.touchSlop], using [pointerId] as
@@ -234,15 +233,13 @@ suspend fun PointerInputScope.detectDragGesturesAfterLongPress(
     onDrag: (change: PointerInputChange, dragAmount: Offset) -> Unit
 ) {
     forEachGesture {
-        val down = awaitPointerEventScope {
-            awaitFirstDown(requireUnconsumed = false)
-        }
         try {
-            val drag = awaitLongPressOrCancellation(down)
-            if (drag != null) {
-                onDragStart.invoke(drag.position)
+            awaitPointerEventScope {
+                val down = awaitFirstDown(requireUnconsumed = false)
+                val drag = awaitLongPressOrCancellation(down)
+                if (drag != null) {
+                    onDragStart.invoke(drag.position)
 
-                awaitPointerEventScope {
                     if (
                         drag(drag.id) {
                             onDrag(it, it.positionChange())
@@ -788,7 +785,7 @@ internal fun Orientation.toPointerDirectionConfig(): PointerDirectionConfig =
     if (this == Orientation.Vertical) VerticalPointerDirectionConfig
     else HorizontalPointerDirectionConfig
 
-private suspend fun PointerInputScope.awaitLongPressOrCancellation(
+private suspend fun AwaitPointerEventScope.awaitLongPressOrCancellation(
     initialDown: PointerInputChange
 ): PointerInputChange? {
     var longPress: PointerInputChange? = null
@@ -797,47 +794,45 @@ private suspend fun PointerInputScope.awaitLongPressOrCancellation(
     return try {
         // wait for first tap up or long press
         withTimeout(longPressTimeout) {
-            awaitPointerEventScope {
-                var finished = false
-                while (!finished) {
-                    val event = awaitPointerEvent(PointerEventPass.Main)
-                    if (event.changes.fastAll { it.changedToUpIgnoreConsumed() }) {
-                        // All pointers are up
-                        finished = true
-                    }
+            var finished = false
+            while (!finished) {
+                val event = awaitPointerEvent(PointerEventPass.Main)
+                if (event.changes.fastAll { it.changedToUpIgnoreConsumed() }) {
+                    // All pointers are up
+                    finished = true
+                }
 
-                    if (
-                        event.changes.fastAny {
-                            it.isConsumed || it.isOutOfBounds(size, extendedTouchPadding)
-                        }
-                    ) {
-                        finished = true // Canceled
+                if (
+                    event.changes.fastAny {
+                        it.isConsumed || it.isOutOfBounds(size, extendedTouchPadding)
                     }
+                ) {
+                    finished = true // Canceled
+                }
 
-                    // Check for cancel by position consumption. We can look on the Final pass of
-                    // the existing pointer event because it comes after the Main pass we checked
-                    // above.
-                    val consumeCheck = awaitPointerEvent(PointerEventPass.Final)
-                    if (consumeCheck.changes.fastAny { it.isConsumed }) {
-                        finished = true
-                    }
-                    if (!event.isPointerUp(currentDown.id)) {
-                        longPress = event.changes.fastFirstOrNull { it.id == currentDown.id }
+                // Check for cancel by position consumption. We can look on the Final pass of
+                // the existing pointer event because it comes after the Main pass we checked
+                // above.
+                val consumeCheck = awaitPointerEvent(PointerEventPass.Final)
+                if (consumeCheck.changes.fastAny { it.isConsumed }) {
+                    finished = true
+                }
+                if (!event.isPointerUp(currentDown.id)) {
+                    longPress = event.changes.fastFirstOrNull { it.id == currentDown.id }
+                } else {
+                    val newPressed = event.changes.fastFirstOrNull { it.pressed }
+                    if (newPressed != null) {
+                        currentDown = newPressed
+                        longPress = currentDown
                     } else {
-                        val newPressed = event.changes.fastFirstOrNull { it.pressed }
-                        if (newPressed != null) {
-                            currentDown = newPressed
-                            longPress = currentDown
-                        } else {
-                            // should technically never happen as we checked it above
-                            finished = true
-                        }
+                        // should technically never happen as we checked it above
+                        finished = true
                     }
                 }
             }
         }
         null
-    } catch (_: TimeoutCancellationException) {
+    } catch (_: PointerEventTimeoutCancellationException) {
         longPress ?: initialDown
     }
 }
