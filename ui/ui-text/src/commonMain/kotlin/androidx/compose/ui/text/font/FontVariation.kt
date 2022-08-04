@@ -80,7 +80,7 @@ object FontVariation {
      * Represents a single point in a variation, such as 0.7 or 100
      */
     @Immutable
-    interface Setting {
+    sealed interface Setting {
         /**
          * Convert a value to a final value for use as a font variation setting.
          *
