@@ -35,9 +35,10 @@ import androidx.compose.animation.demos.layoutanimation.NestedMenuDemo
 import androidx.compose.animation.demos.layoutanimation.ScaleEnterExitDemo
 import androidx.compose.animation.demos.layoutanimation.ScreenTransitionDemo
 import androidx.compose.animation.demos.layoutanimation.ShrineCartDemo
+import androidx.compose.animation.demos.lookahead.AnimateBoundsModifierDemo
 import androidx.compose.animation.demos.lookahead.CraneDemo
 import androidx.compose.animation.demos.lookahead.LookaheadLayoutWithAlignmentLinesDemo
-import androidx.compose.animation.demos.lookahead.LookaheadMeasurePlaceDemo
+import androidx.compose.animation.demos.lookahead.LookaheadWithFlowRowDemo
 import androidx.compose.animation.demos.lookahead.LookaheadWithMovableContentDemo
 import androidx.compose.animation.demos.lookahead.ScreenSizeChangeDemo
 import androidx.compose.animation.demos.singlevalue.SingleValueAnimationDemo
@@ -98,6 +99,9 @@ val AnimationDemos = DemoCategory(
         DemoCategory(
             "\uD83E\uDD7C\uD83E\uDDD1\u200D\uD83D\uDD2C Lookahead Animation Demos",
             listOf(
+                ComposableDemo("AnimateBoundsModifier") {
+                    AnimateBoundsModifierDemo()
+                },
                 ComposableDemo("Crane Nested Shared Element") { CraneDemo() },
                 ComposableDemo("Screen Size Change Demo") { ScreenSizeChangeDemo() },
                 ComposableDemo("Lookahead With Movable Content") {
@@ -106,7 +110,7 @@ val AnimationDemos = DemoCategory(
                 ComposableDemo("Lookahead With Alignment Lines") {
                     LookaheadLayoutWithAlignmentLinesDemo()
                 },
-                ComposableDemo("Flow Row Lookahead") { LookaheadMeasurePlaceDemo() },
+                ComposableDemo("Flow Row Lookahead") { LookaheadWithFlowRowDemo() },
             )
         ),
         DemoCategory(
