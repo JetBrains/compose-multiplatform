@@ -146,7 +146,7 @@ class BringIntoViewRequesterViewIntegrationTest {
         val requesterOffset = IntOffset(1, 2)
         val rectangleToRequest = Rect(Offset(10f, 20f), Size(30f, 40f))
         val expectedRectangle = AndroidRect(11, 22, 41, 62)
-        val requests = mutableListOf<Rect>()
+        val requests = mutableListOf<Rect?>()
         lateinit var scope: CoroutineScope
         val bringIntoViewRequester = BringIntoViewRequester()
         rule.setContent {
@@ -154,7 +154,7 @@ class BringIntoViewRequesterViewIntegrationTest {
             AndroidView(
                 modifier = Modifier
                     // This offset needs to be non-zero or it won't see the request at all.
-                    .fakeScrollable { requests += it },
+                    .fakeScrollable { requests += it() },
                 factory = { context ->
                     val parent = FakeScrollable(context)
                     val child = ComposeView(context)

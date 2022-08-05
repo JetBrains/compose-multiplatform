@@ -989,7 +989,7 @@ package androidx.compose.foundation.relocation {
   }
 
   @androidx.compose.foundation.ExperimentalFoundationApi public interface BringIntoViewResponder {
-    method @androidx.compose.foundation.ExperimentalFoundationApi public suspend Object? bringChildIntoView(androidx.compose.ui.geometry.Rect localRect, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public suspend Object? bringChildIntoView(kotlin.jvm.functions.Function0<androidx.compose.ui.geometry.Rect> localRect, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method @androidx.compose.foundation.ExperimentalFoundationApi public androidx.compose.ui.geometry.Rect calculateRectForParent(androidx.compose.ui.geometry.Rect localRect);
   }
 

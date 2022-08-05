@@ -62,7 +62,7 @@ class BringIntoViewResponderTest {
         rule.setContent {
             Box(
                 Modifier
-                    .fakeScrollable { requestedRect = it }
+                    .fakeScrollable { requestedRect = it() }
                     .bringIntoViewRequester(bringIntoViewRequester)
             )
         }
@@ -82,11 +82,11 @@ class BringIntoViewResponderTest {
     fun bringIntoView_rectInChild() {
         // Arrange.
         val bringIntoViewRequester = BringIntoViewRequester()
-        lateinit var requestedRect: Rect
+        var requestedRect: Rect? = null
         rule.setContent {
             Box(
                 Modifier
-                    .fakeScrollable { requestedRect = it }
+                    .fakeScrollable { requestedRect = it() }
                     .bringIntoViewRequester(bringIntoViewRequester)
             )
         }
@@ -104,12 +104,12 @@ class BringIntoViewResponderTest {
     fun bringIntoView_childWithSize() {
         // Arrange.
         val bringIntoViewRequester = BringIntoViewRequester()
-        lateinit var requestedRect: Rect
+        var requestedRect: Rect? = null
         rule.setContent {
             Box(Modifier) {
                 Box(
                     Modifier
-                        .fakeScrollable { requestedRect = it }
+                        .fakeScrollable { requestedRect = it() }
                         .size(20f.toDp(), 10f.toDp())
                         .offset { IntOffset(40, 30) }
                         .bringIntoViewRequester(bringIntoViewRequester)
@@ -130,12 +130,12 @@ class BringIntoViewResponderTest {
     fun bringIntoView_childBiggerThanParent() {
         // Arrange.
         val bringIntoViewRequester = BringIntoViewRequester()
-        lateinit var requestedRect: Rect
+        var requestedRect: Rect? = null
         rule.setContent {
             Box(
                 Modifier
                     .size(1f.toDp())
-                    .fakeScrollable { requestedRect = it }
+                    .fakeScrollable { requestedRect = it() }
                     .bringIntoViewRequester(bringIntoViewRequester)
                     .size(20f.toDp(), 10f.toDp())
             )
@@ -153,15 +153,15 @@ class BringIntoViewResponderTest {
     @Test
     fun bringIntoView_propagatesToMultipleResponders() {
         // Arrange.
-        lateinit var outerRequest: Rect
-        lateinit var innerRequest: Rect
+        var outerRequest: Rect? = null
+        var innerRequest: Rect? = null
         val bringIntoViewRequester = BringIntoViewRequester()
         rule.setContent {
             Box(
                 Modifier
-                    .fakeScrollable { outerRequest = it }
+                    .fakeScrollable { outerRequest = it() }
                     .offset(2f.toDp(), 1f.toDp())
-                    .fakeScrollable { innerRequest = it }
+                    .fakeScrollable { innerRequest = it() }
                     .size(20f.toDp(), 10f.toDp())
                     .bringIntoViewRequester(bringIntoViewRequester)
             )
@@ -180,15 +180,15 @@ class BringIntoViewResponderTest {
     @Test
     fun bringIntoView_onlyPropagatesUp() {
         // Arrange.
-        lateinit var parentRequest: Rect
+        var parentRequest: Rect? = null
         var childRequest: Rect? = null
         val bringIntoViewRequester = BringIntoViewRequester()
         rule.setContent {
             Box(
                 Modifier
-                    .fakeScrollable { parentRequest = it }
+                    .fakeScrollable { parentRequest = it() }
                     .bringIntoViewRequester(bringIntoViewRequester)
-                    .fakeScrollable { childRequest = it }
+                    .fakeScrollable { childRequest = it() }
             )
         }
 
@@ -205,14 +205,14 @@ class BringIntoViewResponderTest {
     @Test
     fun bringIntoView_propagatesUp_whenRectForParentReturnsInput() {
         // Arrange.
-        lateinit var parentRequest: Rect
+        var parentRequest: Rect? = null
         var childRequest: Rect? = null
         val bringIntoViewRequester = BringIntoViewRequester()
         rule.setContent {
             Box(
                 Modifier
-                    .fakeScrollable { parentRequest = it }
-                    .fakeScrollable { childRequest = it }
+                    .fakeScrollable { parentRequest = it() }
+                    .fakeScrollable { childRequest = it() }
                     .bringIntoViewRequester(bringIntoViewRequester)
             )
         }
@@ -230,12 +230,12 @@ class BringIntoViewResponderTest {
     @Test
     fun bringIntoView_translatesByCalculateRectForParent() {
         // Arrange.
-        lateinit var requestedRect: Rect
+        var requestedRect: Rect? = null
         val bringIntoViewRequester = BringIntoViewRequester()
         rule.setContent {
             Box(
                 Modifier
-                    .fakeScrollable { requestedRect = it }
+                    .fakeScrollable { requestedRect = it() }
                     .fakeScrollable(Offset(2f, 3f)) {}
                     .bringIntoViewRequester(bringIntoViewRequester)
             )
@@ -603,7 +603,7 @@ class BringIntoViewResponderTest {
         rule.setContent {
             Box(
                 Modifier
-                    .fakeScrollable(Offset.Zero) { requestedRect = it }
+                    .fakeScrollable(Offset.Zero) { requestedRect = it() }
                     .bringIntoViewRequester(bringIntoViewRequester)
             )
         }
