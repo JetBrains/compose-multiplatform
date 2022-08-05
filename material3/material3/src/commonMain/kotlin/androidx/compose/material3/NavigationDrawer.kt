@@ -438,14 +438,14 @@ fun PermanentNavigationDrawer(
  *
  * @param modifier the [Modifier] to be applied to this drawer's content
  * @param drawerShape defines the shape of this drawer's container
- * @param drawerTonalElevation when [drawerContainerColor] is [ColorScheme.surface], a translucent
- * primary color overlay is applied on top of the container. A higher tonal elevation value will
- * result in a darker color in light theme and lighter color in dark theme. See also: [Surface].
  * @param drawerContainerColor the color used for the background of this drawer. Use
  * [Color.Transparent] to have no color.
  * @param drawerContentColor the preferred color for content inside this drawer. Defaults to either
  * the matching content color for [drawerContainerColor], or to the current [LocalContentColor] if
  * [drawerContainerColor] is not a color from the theme.
+ * @param drawerTonalElevation when [drawerContainerColor] is [ColorScheme.surface], a translucent
+ * primary color overlay is applied on top of the container. A higher tonal elevation value will
+ * result in a darker color in light theme and lighter color in dark theme. See also: [Surface].
  * @param content content inside of a modal navigation drawer
  */
 @ExperimentalMaterial3Api
@@ -453,17 +453,17 @@ fun PermanentNavigationDrawer(
 fun ModalDrawerSheet(
     modifier: Modifier = Modifier,
     drawerShape: Shape = DrawerDefaults.shape,
-    drawerTonalElevation: Dp = DrawerDefaults.ModalDrawerElevation,
     drawerContainerColor: Color = MaterialTheme.colorScheme.surface,
     drawerContentColor: Color = contentColorFor(drawerContainerColor),
+    drawerTonalElevation: Dp = DrawerDefaults.ModalDrawerElevation,
     content: @Composable ColumnScope.() -> Unit
 ) {
     DrawerSheet(
         modifier,
         drawerShape,
-        drawerTonalElevation,
         drawerContainerColor,
         drawerContentColor,
+        drawerTonalElevation,
         content
     )
 }
@@ -473,14 +473,14 @@ fun ModalDrawerSheet(
  *
  * @param modifier the [Modifier] to be applied to this drawer's content
  * @param drawerShape defines the shape of this drawer's container
- * @param drawerTonalElevation when [drawerContainerColor] is [ColorScheme.surface], a translucent
- * primary color overlay is applied on top of the container. A higher tonal elevation value will
- * result in a darker color in light theme and lighter color in dark theme. See also: [Surface].
  * @param drawerContainerColor the color used for the background of this drawer. Use
  * [Color.Transparent] to have no color.
  * @param drawerContentColor the preferred color for content inside this drawer. Defaults to either
  * the matching content color for [drawerContainerColor], or to the current [LocalContentColor] if
  * [drawerContainerColor] is not a color from the theme.
+ * @param drawerTonalElevation when [drawerContainerColor] is [ColorScheme.surface], a translucent
+ * primary color overlay is applied on top of the container. A higher tonal elevation value will
+ * result in a darker color in light theme and lighter color in dark theme. See also: [Surface].
  * @param content content inside of a dismissible navigation drawer
  */
 @ExperimentalMaterial3Api
@@ -488,17 +488,17 @@ fun ModalDrawerSheet(
 fun DismissibleDrawerSheet(
     modifier: Modifier = Modifier,
     drawerShape: Shape = RectangleShape,
-    drawerTonalElevation: Dp = DrawerDefaults.DismissibleDrawerElevation,
     drawerContainerColor: Color = MaterialTheme.colorScheme.surface,
     drawerContentColor: Color = contentColorFor(drawerContainerColor),
+    drawerTonalElevation: Dp = DrawerDefaults.DismissibleDrawerElevation,
     content: @Composable ColumnScope.() -> Unit
 ) {
     DrawerSheet(
         modifier,
         drawerShape,
-        drawerTonalElevation,
         drawerContainerColor,
         drawerContentColor,
+        drawerTonalElevation,
         content
     )
 }
@@ -508,14 +508,14 @@ fun DismissibleDrawerSheet(
  *
  * @param modifier the [Modifier] to be applied to this drawer's content
  * @param drawerShape defines the shape of this drawer's container
- * @param drawerTonalElevation when [drawerContainerColor] is [ColorScheme.surface], a translucent
- * primary color overlay is applied on top of the container. A higher tonal elevation value will
- * result in a darker color in light theme and lighter color in dark theme. See also: [Surface].
  * @param drawerContainerColor the color used for the background of this drawer. Use
  * [Color.Transparent] to have no color.
  * @param drawerContentColor the preferred color for content inside this drawer. Defaults to either
  * the matching content color for [drawerContainerColor], or to the current [LocalContentColor] if
  * [drawerContainerColor] is not a color from the theme.
+ * @param drawerTonalElevation when [drawerContainerColor] is [ColorScheme.surface], a translucent
+ * primary color overlay is applied on top of the container. A higher tonal elevation value will
+ * result in a darker color in light theme and lighter color in dark theme. See also: [Surface].
  * @param content content inside a permanent navigation drawer
  */
 @ExperimentalMaterial3Api
@@ -523,9 +523,9 @@ fun DismissibleDrawerSheet(
 fun PermanentDrawerSheet(
     modifier: Modifier = Modifier,
     drawerShape: Shape = RectangleShape,
-    drawerTonalElevation: Dp = DrawerDefaults.PermanentDrawerElevation,
     drawerContainerColor: Color = MaterialTheme.colorScheme.surface,
     drawerContentColor: Color = contentColorFor(drawerContainerColor),
+    drawerTonalElevation: Dp = DrawerDefaults.PermanentDrawerElevation,
     content: @Composable ColumnScope.() -> Unit
 ) {
     val navigationMenu = getString(Strings.NavigationMenu)
@@ -534,9 +534,9 @@ fun PermanentDrawerSheet(
             paneTitle = navigationMenu
         },
         drawerShape,
-        drawerTonalElevation,
         drawerContainerColor,
         drawerContentColor,
+        drawerTonalElevation,
         content
     )
 }
@@ -546,9 +546,9 @@ fun PermanentDrawerSheet(
 private fun DrawerSheet(
     modifier: Modifier = Modifier,
     drawerShape: Shape = RectangleShape,
-    drawerTonalElevation: Dp = DrawerDefaults.PermanentDrawerElevation,
     drawerContainerColor: Color = MaterialTheme.colorScheme.surface,
     drawerContentColor: Color = contentColorFor(drawerContainerColor),
+    drawerTonalElevation: Dp = DrawerDefaults.PermanentDrawerElevation,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Surface(

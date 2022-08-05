@@ -87,19 +87,19 @@ import androidx.compose.ui.unit.dp
  * services.
  * @param leadingIcon optional icon at the start of the chip, preceding the [label] text
  * @param trailingIcon optional icon at the end of the chip
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this chip. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
+ * different states. See [AssistChipDefaults.assistChipColors].
  * @param elevation [ChipElevation] used to resolve the elevation for this chip in different states.
  * This controls the size of the shadow below the chip. Additionally, when the container color is
  * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See
  * [AssistChipDefaults.assistChipElevation].
- * @param shape defines the shape of this chip's container, border (when [border] is not null), and
- * shadow (when using [elevation])
  * @param border the border to draw around the container of this chip. Pass `null` for no border.
  * See [AssistChipDefaults.assistChipBorder].
- * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
- * different states. See [AssistChipDefaults.assistChipColors].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -110,11 +110,11 @@ fun AssistChip(
     enabled: Boolean = true,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    elevation: ChipElevation? = AssistChipDefaults.assistChipElevation(),
     shape: Shape = AssistChipDefaults.shape,
+    colors: ChipColors = AssistChipDefaults.assistChipColors(),
+    elevation: ChipElevation? = AssistChipDefaults.assistChipElevation(),
     border: ChipBorder? = AssistChipDefaults.assistChipBorder(),
-    colors: ChipColors = AssistChipDefaults.assistChipColors()
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) = Chip(
     modifier = modifier,
     onClick = onClick,
@@ -124,12 +124,12 @@ fun AssistChip(
     labelColor = colors.labelColor(enabled).value,
     leadingIcon = leadingIcon,
     trailingIcon = trailingIcon,
-    elevation = elevation,
+    shape = shape,
     colors = colors,
+    elevation = elevation,
+    border = border?.borderStroke(enabled)?.value,
     minHeight = AssistChipDefaults.Height,
     paddingValues = AssistChipPadding,
-    shape = shape,
-    border = border?.borderStroke(enabled)?.value,
     interactionSource = interactionSource
 )
 
@@ -160,18 +160,18 @@ fun AssistChip(
  * services.
  * @param leadingIcon optional icon at the start of the chip, preceding the [label] text
  * @param trailingIcon optional icon at the end of the chip
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this chip. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
+ * different states. See [AssistChipDefaults.elevatedAssistChipColors].
  * @param elevation [ChipElevation] used to resolve the elevation for this chip in different states.
  * This controls the size of the shadow below the chip. Additionally, when the container color is
  * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See
  * [AssistChipDefaults.elevatedAssistChipElevation].
- * @param shape defines the shape of this chip's container, border (when [border] is not null), and
- * shadow (when using [elevation])
  * @param border the border to draw around the container of this chip
- * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
- * different states. See [AssistChipDefaults.elevatedAssistChipColors].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -182,11 +182,11 @@ fun ElevatedAssistChip(
     enabled: Boolean = true,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    elevation: ChipElevation? = AssistChipDefaults.elevatedAssistChipElevation(),
     shape: Shape = AssistChipDefaults.shape,
+    colors: ChipColors = AssistChipDefaults.elevatedAssistChipColors(),
+    elevation: ChipElevation? = AssistChipDefaults.elevatedAssistChipElevation(),
     border: ChipBorder? = null,
-    colors: ChipColors = AssistChipDefaults.elevatedAssistChipColors()
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) = Chip(
     modifier = modifier,
     onClick = onClick,
@@ -240,19 +240,19 @@ fun ElevatedAssistChip(
  * [selected] is true, this icon may visually indicate that the chip is selected (for example, via a
  * checkmark icon).
  * @param trailingIcon optional icon at the end of the chip
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this chip. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param colors [SelectableChipColors] that will be used to resolve the colors used for this chip
+ * in different states. See [FilterChipDefaults.filterChipColors].
  * @param elevation [SelectableChipElevation] used to resolve the elevation for this chip in
  * different states. This controls the size of the shadow below the chip. Additionally, when the
  * container color is [ColorScheme.surface], this controls the amount of primary color applied as an
  * overlay. See [FilterChipDefaults.filterChipElevation].
- * @param shape defines the shape of this chip's container, border (when [border] is not null), and
- * shadow (when using [elevation])
  * @param border the border to draw around the container of this chip. Pass `null` for no border.
  * See [FilterChipDefaults.filterChipBorder].
- * @param colors [SelectableChipColors] that will be used to resolve the colors used for this chip
- * in different states. See [FilterChipDefaults.filterChipColors].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -264,11 +264,11 @@ fun FilterChip(
     enabled: Boolean = true,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    elevation: SelectableChipElevation? = FilterChipDefaults.filterChipElevation(),
     shape: Shape = FilterChipDefaults.shape,
+    colors: SelectableChipColors = FilterChipDefaults.filterChipColors(),
+    elevation: SelectableChipElevation? = FilterChipDefaults.filterChipElevation(),
     border: SelectableChipBorder? = FilterChipDefaults.filterChipBorder(),
-    colors: SelectableChipColors = FilterChipDefaults.filterChipColors()
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) = SelectableChip(
     selected = selected,
     modifier = modifier,
@@ -320,19 +320,19 @@ fun FilterChip(
  * [selected] is true, this icon may visually indicate that the chip is selected (for example, via a
  * checkmark icon).
  * @param trailingIcon optional icon at the end of the chip
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this chip. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param colors [SelectableChipColors] that will be used to resolve the colors used for this chip
+ * in different states. See [FilterChipDefaults.elevatedFilterChipColors].
  * @param elevation [SelectableChipElevation] used to resolve the elevation for this chip in
  * different states. This controls the size of the shadow below the chip. Additionally, when the
  * container color is [ColorScheme.surface], this controls the amount of primary color applied as an
  * overlay. See [FilterChipDefaults.filterChipElevation].
- * @param shape defines the shape of this chip's container, border (when [border] is not null), and
- * shadow (when using [elevation])
  * @param border the border to draw around the container of this chip. Pass `null` for no border.
  * See [FilterChipDefaults.filterChipBorder].
- * @param colors [SelectableChipColors] that will be used to resolve the colors used for this chip
- * in different states. See [FilterChipDefaults.elevatedFilterChipColors].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -344,11 +344,11 @@ fun ElevatedFilterChip(
     enabled: Boolean = true,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    elevation: SelectableChipElevation? = FilterChipDefaults.elevatedFilterChipElevation(),
     shape: Shape = FilterChipDefaults.shape,
+    colors: SelectableChipColors = FilterChipDefaults.elevatedFilterChipColors(),
+    elevation: SelectableChipElevation? = FilterChipDefaults.elevatedFilterChipElevation(),
     border: SelectableChipBorder? = null,
-    colors: SelectableChipColors = FilterChipDefaults.elevatedFilterChipColors()
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) = SelectableChip(
     selected = selected,
     modifier = modifier,
@@ -404,19 +404,19 @@ fun ElevatedFilterChip(
  * @param leadingIcon optional icon at the start of the chip, preceding the [label] text
  * @param avatar optional avatar at the start of the chip, preceding the [label] text
  * @param trailingIcon optional icon at the end of the chip
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this chip. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
+ * different states. See [InputChipDefaults.inputChipColors].
  * @param elevation [ChipElevation] used to resolve the elevation for this chip in different states.
  * This controls the size of the shadow below the chip. Additionally, when the container color is
  * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See
  * [InputChipDefaults.inputChipElevation].
- * @param shape defines the shape of this chip's container, border (when [border] is not null), and
- * shadow (when using [elevation])
  * @param border the border to draw around the container of this chip. Pass `null` for no border.
  * See [InputChipDefaults.inputChipBorder].
- * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
- * different states. See [InputChipDefaults.inputChipColors].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -429,11 +429,11 @@ fun InputChip(
     leadingIcon: @Composable (() -> Unit)? = null,
     avatar: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    elevation: SelectableChipElevation? = InputChipDefaults.inputChipElevation(),
     shape: Shape = InputChipDefaults.shape,
+    colors: SelectableChipColors = InputChipDefaults.inputChipColors(),
+    elevation: SelectableChipElevation? = InputChipDefaults.inputChipElevation(),
     border: SelectableChipBorder? = InputChipDefaults.inputChipBorder(),
-    colors: SelectableChipColors = InputChipDefaults.inputChipColors()
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     // If given, place the avatar in an InputChipTokens.AvatarShape shape before passing it into the
     // Chip function.
@@ -464,16 +464,16 @@ fun InputChip(
         leadingIcon = leadingIcon,
         avatar = shapedAvatar,
         trailingIcon = trailingIcon,
-        elevation = elevation,
+        shape = shape,
         colors = colors,
+        elevation = elevation,
+        border = border?.borderStroke(enabled, selected)?.value,
         minHeight = InputChipDefaults.Height,
         paddingValues = inputChipPadding(
             hasAvatar = shapedAvatar != null,
             hasLeadingIcon = leadingIcon != null,
             hasTrailingIcon = trailingIcon != null
         ),
-        shape = shape,
-        border = border?.borderStroke(enabled, selected)?.value,
         interactionSource = interactionSource
     )
 }
@@ -503,19 +503,19 @@ fun InputChip(
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
  * @param icon optional icon at the start of the chip, preceding the [label] text
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this chip. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
+ * different states. See [SuggestionChipDefaults.suggestionChipColors].
  * @param elevation [ChipElevation] used to resolve the elevation for this chip in different states.
  * This controls the size of the shadow below the chip. Additionally, when the container color is
  * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See
  * [SuggestionChipDefaults.suggestionChipElevation].
- * @param shape defines the shape of this chip's container, border (when [border] is not null), and
- * shadow (when using [elevation])
  * @param border the border to draw around the container of this chip. Pass `null` for no border.
  * See [SuggestionChipDefaults.suggestionChipBorder].
- * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
- * different states. See [SuggestionChipDefaults.suggestionChipColors].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -525,11 +525,11 @@ fun SuggestionChip(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     icon: @Composable (() -> Unit)? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    elevation: ChipElevation? = SuggestionChipDefaults.suggestionChipElevation(),
     shape: Shape = SuggestionChipDefaults.shape,
+    colors: ChipColors = SuggestionChipDefaults.suggestionChipColors(),
+    elevation: ChipElevation? = SuggestionChipDefaults.suggestionChipElevation(),
     border: ChipBorder? = SuggestionChipDefaults.suggestionChipBorder(),
-    colors: ChipColors = SuggestionChipDefaults.suggestionChipColors()
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) = Chip(
     modifier = modifier,
     onClick = onClick,
@@ -539,12 +539,12 @@ fun SuggestionChip(
     labelColor = colors.labelColor(enabled).value,
     leadingIcon = icon,
     trailingIcon = null,
-    elevation = elevation,
+    shape = shape,
     colors = colors,
+    elevation = elevation,
+    border = border?.borderStroke(enabled)?.value,
     minHeight = SuggestionChipDefaults.Height,
     paddingValues = SuggestionChipPadding,
-    shape = shape,
-    border = border?.borderStroke(enabled)?.value,
     interactionSource = interactionSource
 )
 
@@ -573,18 +573,18 @@ fun SuggestionChip(
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
  * @param icon optional icon at the start of the chip, preceding the [label] text
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this chip. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
  * @param elevation [ChipElevation] used to resolve the elevation for this chip in different states.
  * This controls the size of the shadow below the chip. Additionally, when the container color is
  * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See
  * [Surface] and [SuggestionChipDefaults.elevatedSuggestionChipElevation].
- * @param shape defines the shape of this chip's container, border (when [border] is not null), and
- * shadow (when using [elevation])
  * @param border the border to draw around the container of this chip
- * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
  * different states. See [SuggestionChipDefaults.elevatedSuggestionChipColors].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -594,11 +594,11 @@ fun ElevatedSuggestionChip(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     icon: @Composable (() -> Unit)? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    elevation: ChipElevation? = SuggestionChipDefaults.elevatedSuggestionChipElevation(),
     shape: Shape = SuggestionChipDefaults.shape,
+    colors: ChipColors = SuggestionChipDefaults.elevatedSuggestionChipColors(),
+    elevation: ChipElevation? = SuggestionChipDefaults.elevatedSuggestionChipElevation(),
     border: ChipBorder? = null,
-    colors: ChipColors = SuggestionChipDefaults.elevatedSuggestionChipColors()
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) = Chip(
     modifier = modifier,
     onClick = onClick,
@@ -1637,12 +1637,12 @@ private fun Chip(
     labelColor: Color,
     leadingIcon: @Composable (() -> Unit)?,
     trailingIcon: @Composable (() -> Unit)?,
-    elevation: ChipElevation?,
+    shape: Shape,
     colors: ChipColors,
+    elevation: ChipElevation?,
+    border: BorderStroke?,
     minHeight: Dp,
     paddingValues: PaddingValues,
-    shape: Shape,
-    border: BorderStroke?,
     interactionSource: MutableInteractionSource,
 ) {
     Surface(
@@ -1683,12 +1683,12 @@ private fun SelectableChip(
     leadingIcon: @Composable (() -> Unit)?,
     avatar: @Composable (() -> Unit)?,
     trailingIcon: @Composable (() -> Unit)?,
-    elevation: SelectableChipElevation?,
+    shape: Shape,
     colors: SelectableChipColors,
+    elevation: SelectableChipElevation?,
+    border: BorderStroke?,
     minHeight: Dp,
     paddingValues: PaddingValues,
-    shape: Shape,
-    border: BorderStroke?,
     interactionSource: MutableInteractionSource
 ) {
     // TODO(b/229794614): Animate transition between unselected and selected.
