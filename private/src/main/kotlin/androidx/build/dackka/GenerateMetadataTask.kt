@@ -16,7 +16,8 @@
 
 package androidx.build.dackka
 
-import java.io.File
+import com.google.gson.Gson
+import java.io.FileWriter
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.component.ComponentArtifactIdentifier
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
@@ -27,7 +28,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.component.external.model.DefaultModuleComponentIdentifier
-import org.json.JSONArray
 
 @CacheableTask
 abstract class GenerateMetadataTask : DefaultTask() {
@@ -67,10 +67,9 @@ abstract class GenerateMetadataTask : DefaultTask() {
         }
 
         val jsonMapping = generateJsonMapping(entries)
-        val json = JSONArray(jsonMapping)
-
-        val outputFile = File(destinationFile.get().toString())
-        outputFile.writeText(json.toString(2))
+        val writer = FileWriter(destinationFile.get().toString())
+        Gson().toJson(jsonMapping, writer)
+        writer.close()
     }
 
     /**
