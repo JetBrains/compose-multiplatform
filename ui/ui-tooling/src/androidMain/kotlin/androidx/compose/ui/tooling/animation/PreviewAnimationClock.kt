@@ -62,7 +62,7 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
      * and in [getAnimatedProperties], where we get the animation values.
      */
     @VisibleForTesting
-    internal val trackedTransitions = hashSetOf<TransitionComposeAnimation>()
+    internal val trackedTransitions = linkedSetOf<TransitionComposeAnimation>()
 
     /**
      * Set of tracked [AnimatedVisibilityComposeAnimation]s, each one having a [Transition] object
@@ -72,11 +72,11 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
      * child transition used in [getAnimatedProperties], where we get the animation values.
      */
     @VisibleForTesting
-    internal val trackedAnimatedVisibility = hashSetOf<AnimatedVisibilityComposeAnimation>()
+    internal val trackedAnimatedVisibility = linkedSetOf<AnimatedVisibilityComposeAnimation>()
 
     /** Set of detected but not supported animations. */
     @VisibleForTesting
-    internal val trackedUnsupported = hashSetOf<UnsupportedComposeAnimation>()
+    internal val trackedUnsupported = linkedSetOf<UnsupportedComposeAnimation>()
 
     /**
      * Maps [Transition]s to their corresponding cached [TransitionState], which we use to seek
@@ -115,7 +115,7 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
      * Each animation can only be subscribed once.
      */
     private inner class UnsupportedComposeAnimationSubscriber<T> {
-        private val animations = mutableSetOf<T>()
+        private val animations = linkedSetOf<T>()
         private val lock = Any()
 
         fun trackAnimation(animation: T, label: String) {

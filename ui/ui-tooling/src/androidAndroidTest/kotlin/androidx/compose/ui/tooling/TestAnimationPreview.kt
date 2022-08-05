@@ -102,6 +102,24 @@ fun AllAnimations() {
     InfiniteTransitionPreview()
 }
 
+@Preview(name = "Animations are ordered")
+@Composable
+fun AnimationOrder() {
+    val selected by remember { mutableStateOf(false) }
+    updateTransition(
+        if (selected) CheckBoxState.Selected else CheckBoxState.Unselected,
+        label = "transitionOne"
+    )
+    updateTransition(
+        if (selected) CheckBoxState.Selected else CheckBoxState.Unselected,
+        label = "transitionTwo"
+    )
+    updateTransition(
+        if (selected) CheckBoxState.Selected else CheckBoxState.Unselected,
+        label = "transitionThree"
+    )
+}
+
 @OptIn(ExperimentalAnimationApi::class)
 @Preview(name = "AnimatedContent")
 @Composable
