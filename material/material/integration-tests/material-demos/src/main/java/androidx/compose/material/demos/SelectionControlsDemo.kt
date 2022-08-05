@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.samples.FocusedCheckboxSample
 import androidx.compose.material.samples.RadioButtonSample
 import androidx.compose.material.samples.RadioGroupSample
 import androidx.compose.material.samples.SwitchSample
@@ -38,6 +39,10 @@ fun SelectionControlsDemo() {
         item {
             Text(text = "Checkbox", style = headerStyle)
             TriStateCheckboxSample()
+        }
+        item {
+            Text(text = "Programmatically focused checkbox", style = headerStyle)
+            FocusedCheckboxSample()
         }
         item {
             Text(text = "Switch", style = headerStyle)

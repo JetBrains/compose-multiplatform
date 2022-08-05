@@ -22,10 +22,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.input.InputModeManager
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
@@ -427,14 +430,13 @@ class CardScreenshotTest {
     @Test
     fun filledCard_focused() {
         val focusRequester = FocusRequester()
+        var localInputModeManager: InputModeManager? = null
         rule.setMaterialContent(lightColorScheme()) {
+            localInputModeManager = LocalInputModeManager.current
             Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
                 Card(
                     onClick = {},
                     Modifier.size(width = 180.dp, height = 100.dp)
-                        // Normally this is only focusable in non-touch mode, so let's force it to
-                        // always be focusable so we can test how it appears
-                        .focusProperties { canFocus = true }
                         .focusRequester(focusRequester)
                 ) {
                     Box(Modifier.fillMaxSize()) {
@@ -447,7 +449,11 @@ class CardScreenshotTest {
             }
         }
 
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            localInputModeManager!!.requestInputMode(InputMode.Keyboard)
+            focusRequester.requestFocus()
+        }
         rule.waitForIdle()
 
         assertAgainstGolden("filledCard_focus")
@@ -456,14 +462,13 @@ class CardScreenshotTest {
     @Test
     fun elevatedCard_focused() {
         val focusRequester = FocusRequester()
+        var localInputModeManager: InputModeManager? = null
         rule.setMaterialContent(lightColorScheme()) {
+            localInputModeManager = LocalInputModeManager.current
             Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
                 ElevatedCard(
                     onClick = {},
                     Modifier.size(width = 180.dp, height = 100.dp)
-                        // Normally this is only focusable in non-touch mode, so let's force it to
-                        // always be focusable so we can test how it appears
-                        .focusProperties { canFocus = true }
                         .focusRequester(focusRequester)
                 ) {
                     Box(Modifier.fillMaxSize()) {
@@ -476,7 +481,11 @@ class CardScreenshotTest {
             }
         }
 
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            localInputModeManager!!.requestInputMode(InputMode.Keyboard)
+            focusRequester.requestFocus()
+        }
         rule.waitForIdle()
 
         assertAgainstGolden("elevatedCard_focused")
@@ -485,14 +494,13 @@ class CardScreenshotTest {
     @Test
     fun outlinedCard_focused() {
         val focusRequester = FocusRequester()
+        var localInputModeManager: InputModeManager? = null
         rule.setMaterialContent(lightColorScheme()) {
+            localInputModeManager = LocalInputModeManager.current
             Box(wrap.testTag(wrapperTestTag), contentAlignment = Alignment.Center) {
                 OutlinedCard(
                     onClick = {},
                     Modifier.size(width = 180.dp, height = 100.dp)
-                        // Normally this is only focusable in non-touch mode, so let's force it to
-                        // always be focusable so we can test how it appears
-                        .focusProperties { canFocus = true }
                         .focusRequester(focusRequester)
                 ) {
                     Box(Modifier.fillMaxSize()) {
@@ -505,7 +513,11 @@ class CardScreenshotTest {
             }
         }
 
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            localInputModeManager!!.requestInputMode(InputMode.Keyboard)
+            focusRequester.requestFocus()
+        }
         rule.waitForIdle()
 
         assertAgainstGolden("outlinedCard_focused")

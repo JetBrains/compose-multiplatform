@@ -22,10 +22,13 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.testutils.assertAgainstGolden
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.input.InputModeManager
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasClickAction
@@ -144,15 +147,14 @@ class FloatingActionButtonScreenshotTest {
     @Test
     fun focus() {
         val focusRequester = FocusRequester()
+        var localInputModeManager: InputModeManager? = null
 
         rule.setMaterialContent {
+            localInputModeManager = LocalInputModeManager.current
             Box(Modifier.requiredSize(100.dp, 100.dp).wrapContentSize()) {
                 FloatingActionButton(
                     onClick = { },
                     modifier = Modifier
-                        // Normally this is only focusable in non-touch mode, so let's force it to
-                        // always be focusable so we can test how it appears
-                        .focusProperties { canFocus = true }
                         .focusRequester(focusRequester)
                 ) {
                     Icon(Icons.Filled.Favorite, contentDescription = null)
@@ -161,6 +163,8 @@ class FloatingActionButtonScreenshotTest {
         }
 
         rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            localInputModeManager!!.requestInputMode(InputMode.Keyboard)
             focusRequester.requestFocus()
         }
 
