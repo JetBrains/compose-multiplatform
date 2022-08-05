@@ -58,6 +58,7 @@ def addMavenRepositories(RepositoryHandler handler) {
         }
     }
     if (System.getenv("ALLOW_PUBLIC_REPOS") != null || System.getProperty("ALLOW_PUBLIC_REPOS") != null) {
+        handler.mavenLocal()
         handler.mavenCentral()
         handler.google()
         handler.gradlePluginPortal()
@@ -67,7 +68,6 @@ def addMavenRepositories(RepositoryHandler handler) {
         handler.maven {
                url("https://maven.pkg.jetbrains.space/public/p/kotlinx-coroutines/maven")
         }
-        handler.mavenLocal()
     }
     // Ordering appears to be important: b/229733266
     def androidPluginRepoOverride = System.getenv("GRADLE_PLUGIN_REPO")
