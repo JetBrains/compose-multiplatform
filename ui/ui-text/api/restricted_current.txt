@@ -592,6 +592,9 @@ package androidx.compose.ui.text.android {
 
 package androidx.compose.ui.text.android.style {
 
+  public final class IndentationFixSpanKt {
+  }
+
   public final class LineHeightStyleSpanKt {
   }
 

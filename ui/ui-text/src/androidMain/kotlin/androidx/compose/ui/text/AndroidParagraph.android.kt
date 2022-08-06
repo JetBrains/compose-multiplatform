@@ -17,6 +17,8 @@
 package androidx.compose.ui.text
 
 import java.util.Locale as JavaLocale
+import android.text.Spannable
+import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextUtils
 import androidx.annotation.VisibleForTesting
@@ -42,10 +44,12 @@ import androidx.compose.ui.text.android.LayoutCompat.DEFAULT_LINESPACING_MULTIPL
 import androidx.compose.ui.text.android.LayoutCompat.JUSTIFICATION_MODE_INTER_WORD
 import androidx.compose.ui.text.android.TextLayout
 import androidx.compose.ui.text.android.selection.WordBoundary
+import androidx.compose.ui.text.android.style.IndentationFixSpan
 import androidx.compose.ui.text.android.style.PlaceholderSpan
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.platform.AndroidParagraphIntrinsics
 import androidx.compose.ui.text.platform.AndroidTextPaint
+import androidx.compose.ui.text.platform.extensions.setSpan
 import androidx.compose.ui.text.platform.isIncludeFontPaddingEnabled
 import androidx.compose.ui.text.platform.style.ShaderBrushSpan
 import androidx.compose.ui.text.style.ResolvedTextDirection
@@ -53,7 +57,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
-import kotlin.math.min
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
 
 /**
  * Android specific implementation for [Paragraph]
@@ -69,7 +74,6 @@ internal class AndroidParagraph(
     val ellipsis: Boolean,
     val constraints: Constraints
 ) : Paragraph {
-
     constructor(
         text: String,
         style: TextStyle,
@@ -96,6 +100,8 @@ internal class AndroidParagraph(
 
     private val layout: TextLayout
 
+    @VisibleForTesting
+    internal val charSequence: CharSequence
     init {
         require(constraints.minHeight == 0 && constraints.minWidth == 0) {
             "Setting Constraints.minWidth and Constraints.minHeight is not supported, " +
@@ -104,6 +110,15 @@ internal class AndroidParagraph(
         require(maxLines >= 1) { "maxLines should be greater than 0" }
 
         val style = paragraphIntrinsics.style
+
+        charSequence = if (shouldAttachIndentationFixSpan(style, ellipsis)) {
+            // When letter spacing, align and ellipsize applied to text, the ellipsized line is
+            // indented wrong. This function adds the IndentationFixSpan in order to fix the issue
+            // with best effort. b/228463206
+            paragraphIntrinsics.charSequence.attachIndentationFixSpan()
+        } else {
+            paragraphIntrinsics.charSequence
+        }
 
         val alignment = toLayoutAlign(style.textAlign)
 
@@ -188,7 +203,7 @@ internal class AndroidParagraph(
         get() = layout.lineCount
 
     override val placeholderRects: List<Rect?> =
-        with(paragraphIntrinsics.charSequence) {
+        with(charSequence) {
             if (this !is Spanned) return@with listOf()
             getSpans(0, length, PlaceholderSpan::class.java).map { span ->
                 val start = getSpanStart(span)
@@ -240,10 +255,6 @@ internal class AndroidParagraph(
                 Rect(left, top, right, bottom)
             }
         }
-
-    @VisibleForTesting
-    internal val charSequence: CharSequence
-        get() = paragraphIntrinsics.charSequence
 
     @VisibleForTesting
     internal val textPaint: AndroidTextPaint
@@ -459,7 +470,7 @@ internal class AndroidParagraph(
         maxLines: Int
     ) =
         TextLayout(
-            charSequence = paragraphIntrinsics.charSequence,
+            charSequence = charSequence,
             width = width,
             textPaint = textPaint,
             ellipsize = ellipsize,
@@ -493,4 +504,17 @@ private fun TextLayout.numberOfLinesThatFitMaxHeight(maxHeight: Int): Int {
         if (getLineBottom(lineIndex) > maxHeight) return lineIndex
     }
     return lineCount
+}
+
+private fun shouldAttachIndentationFixSpan(textStyle: TextStyle, ellipsis: Boolean) =
+    with(textStyle) {
+        ellipsis && (letterSpacing != 0.sp && letterSpacing != TextUnit.Unspecified) &&
+            (textAlign != null && textAlign != TextAlign.Start && textAlign != TextAlign.Justify)
+    }
+
+@OptIn(InternalPlatformTextApi::class)
+private fun CharSequence.attachIndentationFixSpan(): CharSequence {
+    val spannable = if (this is Spannable) this else SpannableString(this)
+    spannable.setSpan(IndentationFixSpan(), spannable.length - 1, spannable.length - 1)
+    return spannable
 }
