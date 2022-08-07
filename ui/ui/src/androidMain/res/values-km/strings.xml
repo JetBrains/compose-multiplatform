@@ -17,8 +17,7 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <!-- no translation found for indeterminate (7933458017204019916) -->
-    <skip />
+    <string name="indeterminate" msgid="7933458017204019916">"បានធីកខ្លះ"</string>
     <string name="on" msgid="8655164131929253426">"បើក"</string>
     <string name="off" msgid="875452955155264703">"បិទ"</string>
     <string name="selected" msgid="6043586758067023">"បានជ្រើសរើស"</string>
