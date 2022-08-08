@@ -226,7 +226,6 @@ package androidx.compose.ui.text {
     ctor public ParagraphStyle(optional androidx.compose.ui.text.style.TextAlign? textAlign, optional androidx.compose.ui.text.style.TextDirection? textDirection, optional long lineHeight, optional androidx.compose.ui.text.style.TextIndent? textIndent);
     method public androidx.compose.ui.text.ParagraphStyle copy(optional androidx.compose.ui.text.style.TextAlign? textAlign, optional androidx.compose.ui.text.style.TextDirection? textDirection, optional long lineHeight, optional androidx.compose.ui.text.style.TextIndent? textIndent);
     method public androidx.compose.ui.text.ParagraphStyle copy(optional androidx.compose.ui.text.style.TextAlign? textAlign, optional androidx.compose.ui.text.style.TextDirection? textDirection, optional long lineHeight, optional androidx.compose.ui.text.style.TextIndent? textIndent, optional androidx.compose.ui.text.PlatformParagraphStyle? platformStyle, optional androidx.compose.ui.text.style.LineHeightStyle? lineHeightStyle);
-    method public operator boolean equals(Object? other);
     method public long getLineHeight();
     method public androidx.compose.ui.text.style.LineHeightStyle? getLineHeightStyle();
     method public androidx.compose.ui.text.PlatformParagraphStyle? getPlatformStyle();
@@ -250,7 +249,6 @@ package androidx.compose.ui.text {
   @androidx.compose.runtime.Immutable public final class Placeholder {
     ctor public Placeholder(long width, long height, int placeholderVerticalAlign);
     method public androidx.compose.ui.text.Placeholder copy(optional long width, optional long height, optional int placeholderVerticalAlign);
-    method public operator boolean equals(Object? other);
     method public long getHeight();
     method public int getPlaceholderVerticalAlign();
     method public long getWidth();
@@ -321,7 +319,6 @@ package androidx.compose.ui.text {
     ctor public SpanStyle(optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontSynthesis? fontSynthesis, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional String? fontFeatureSettings, optional long letterSpacing, optional androidx.compose.ui.text.style.BaselineShift? baselineShift, optional androidx.compose.ui.text.style.TextGeometricTransform? textGeometricTransform, optional androidx.compose.ui.text.intl.LocaleList? localeList, optional long background, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.graphics.Shadow? shadow, optional androidx.compose.ui.text.PlatformSpanStyle? platformStyle);
     method public androidx.compose.ui.text.SpanStyle copy(optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontSynthesis? fontSynthesis, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional String? fontFeatureSettings, optional long letterSpacing, optional androidx.compose.ui.text.style.BaselineShift? baselineShift, optional androidx.compose.ui.text.style.TextGeometricTransform? textGeometricTransform, optional androidx.compose.ui.text.intl.LocaleList? localeList, optional long background, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.graphics.Shadow? shadow);
     method public androidx.compose.ui.text.SpanStyle copy(optional long color, optional long fontSize, optional androidx.compose.ui.text.font.FontWeight? fontWeight, optional androidx.compose.ui.text.font.FontStyle? fontStyle, optional androidx.compose.ui.text.font.FontSynthesis? fontSynthesis, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional String? fontFeatureSettings, optional long letterSpacing, optional androidx.compose.ui.text.style.BaselineShift? baselineShift, optional androidx.compose.ui.text.style.TextGeometricTransform? textGeometricTransform, optional androidx.compose.ui.text.intl.LocaleList? localeList, optional long background, optional androidx.compose.ui.text.style.TextDecoration? textDecoration, optional androidx.compose.ui.graphics.Shadow? shadow, optional androidx.compose.ui.text.PlatformSpanStyle? platformStyle);
-    method public operator boolean equals(Object? other);
     method public long getBackground();
     method public androidx.compose.ui.text.style.BaselineShift? getBaselineShift();
     method public long getColor();
@@ -378,7 +375,6 @@ package androidx.compose.ui.text {
     ctor @Deprecated public TextLayoutInput(androidx.compose.ui.text.AnnotatedString text, androidx.compose.ui.text.TextStyle style, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, int maxLines, boolean softWrap, int overflow, androidx.compose.ui.unit.Density density, androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader, long constraints);
     ctor public TextLayoutInput(androidx.compose.ui.text.AnnotatedString text, androidx.compose.ui.text.TextStyle style, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, int maxLines, boolean softWrap, int overflow, androidx.compose.ui.unit.Density density, androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.ui.text.font.FontFamily.Resolver fontFamilyResolver, long constraints);
     method @Deprecated public androidx.compose.ui.text.TextLayoutInput copy(optional androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional int maxLines, optional boolean softWrap, optional int overflow, optional androidx.compose.ui.unit.Density density, optional androidx.compose.ui.unit.LayoutDirection layoutDirection, optional androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader, optional long constraints);
-    method public operator boolean equals(Object? other);
     method public long getConstraints();
     method public androidx.compose.ui.unit.Density getDensity();
     method public androidx.compose.ui.text.font.FontFamily.Resolver getFontFamilyResolver();
@@ -406,7 +402,6 @@ package androidx.compose.ui.text {
   public final class TextLayoutResult {
     ctor public TextLayoutResult(androidx.compose.ui.text.TextLayoutInput layoutInput, androidx.compose.ui.text.MultiParagraph multiParagraph, long size);
     method public androidx.compose.ui.text.TextLayoutResult copy(optional androidx.compose.ui.text.TextLayoutInput layoutInput, optional long size);
-    method public operator boolean equals(Object? other);
     method public androidx.compose.ui.text.style.ResolvedTextDirection getBidiRunDirection(int offset);
     method public androidx.compose.ui.geometry.Rect getBoundingBox(int offset);
     method public androidx.compose.ui.geometry.Rect getCursorRect(int offset);
@@ -1355,7 +1350,6 @@ package androidx.compose.ui.text.style {
 
   @androidx.compose.runtime.Immutable public final class TextDecoration {
     method public operator boolean contains(androidx.compose.ui.text.style.TextDecoration other);
-    method public operator boolean equals(Object? other);
     method public int getMask();
     method public operator androidx.compose.ui.text.style.TextDecoration plus(androidx.compose.ui.text.style.TextDecoration decoration);
     property public final int mask;
@@ -1395,7 +1389,6 @@ package androidx.compose.ui.text.style {
   @androidx.compose.runtime.Immutable public final class TextGeometricTransform {
     ctor public TextGeometricTransform(optional float scaleX, optional float skewX);
     method public androidx.compose.ui.text.style.TextGeometricTransform copy(optional float scaleX, optional float skewX);
-    method public operator boolean equals(Object? other);
     method public float getScaleX();
     method public float getSkewX();
     property public final float scaleX;
@@ -1413,7 +1406,6 @@ package androidx.compose.ui.text.style {
   @androidx.compose.runtime.Immutable public final class TextIndent {
     ctor public TextIndent(optional long firstLine, optional long restLine);
     method public androidx.compose.ui.text.style.TextIndent copy(optional long firstLine, optional long restLine);
-    method public operator boolean equals(Object? other);
     method public long getFirstLine();
     method public long getRestLine();
     property public final long firstLine;
