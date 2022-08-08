@@ -18,10 +18,12 @@ package androidx.compose.foundation.lazy.layout
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.structuralEqualityPolicy
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.snapshots.Snapshot
 
 /**
  * Calculate and memoize range of indexes which contains at least [extraItemCount] items near
@@ -41,16 +43,33 @@ fun rememberLazyNearestItemsRangeState(
     firstVisibleItemIndex: () -> Int,
     slidingWindowSize: () -> Int,
     extraItemCount: () -> Int
-): State<IntRange> =
-    remember(firstVisibleItemIndex, slidingWindowSize, extraItemCount) {
-        derivedStateOf(structuralEqualityPolicy()) {
+): State<IntRange> {
+    val state = remember(firstVisibleItemIndex, slidingWindowSize, extraItemCount) {
+        Snapshot.withoutReadObservation {
+            mutableStateOf(
+                calculateNearestItemsRange(
+                    firstVisibleItemIndex(),
+                    slidingWindowSize(),
+                    extraItemCount()
+                )
+            )
+        }
+    }
+
+    LaunchedEffect(state) {
+        snapshotFlow {
             calculateNearestItemsRange(
                 firstVisibleItemIndex(),
                 slidingWindowSize(),
                 extraItemCount()
             )
+        }.collect {
+            state.value = it
         }
     }
+
+    return state
+}
 
 /**
  * Returns a range of indexes which contains at least [extraItemCount] items near
