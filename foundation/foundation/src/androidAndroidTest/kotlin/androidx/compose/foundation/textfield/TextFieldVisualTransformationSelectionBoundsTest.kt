@@ -38,6 +38,7 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import kotlin.math.roundToInt
@@ -181,6 +182,7 @@ internal class TextFieldVisualTransformationSelectionBoundsTest {
         assertValidMessage(error, sourceIndex = 0, toTransformed = false)
     }
 
+    @FlakyTest(bugId = 241572024)
     @Test
     fun selectionEnd_throws_onStart_whenInvalidOriginalToTransformed() {
         rule.runOnIdle {
