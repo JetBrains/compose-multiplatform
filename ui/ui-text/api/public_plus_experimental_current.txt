@@ -851,7 +851,7 @@ package androidx.compose.ui.text.font {
     field public static final androidx.compose.ui.text.font.FontVariation INSTANCE;
   }
 
-  @androidx.compose.runtime.Immutable public static interface FontVariation.Setting {
+  @androidx.compose.runtime.Immutable public static sealed interface FontVariation.Setting {
     method public String getAxisName();
     method public boolean getNeedsDensity();
     method public float toVariationValue(androidx.compose.ui.unit.Density? density);
