@@ -302,12 +302,10 @@ class EditProcessorTest {
 
     @Test
     fun throwsDescriptiveMessage_whenCommandFailsInBatch() {
-        fun invalidCommand(index: Int) = object : EditCommand {
+        class InvalidCommand : EditCommand {
             override fun applyTo(buffer: EditingBuffer) {
                 throw RuntimeException("Better luck next time")
             }
-
-            override fun toStringForLog(): String = "InvalidCommand(index=$index)"
         }
 
         val processor = EditProcessor().apply {
@@ -317,7 +315,7 @@ class EditProcessorTest {
         }
         val batch = listOf(
             CommitTextCommand("ab", 0),
-            invalidCommand(42),
+            InvalidCommand(),
             SetSelectionCommand(0, 2),
         )
 
@@ -329,7 +327,7 @@ class EditProcessorTest {
             "Error while applying EditCommand batch to buffer " +
                 "(length=11, composition=null, selection=TextRange(5, 5)):\n" +
                 "   CommitTextCommand(text.length=2, newCursorPosition=0)\n" +
-                " > InvalidCommand(index=42)\n" +
+                " > Unknown EditCommand: InvalidCommand\n" +
                 "   SetSelectionCommand(start=0, end=2)"
         )
         assertThat(error).hasCauseThat().hasMessageThat().isEqualTo("Better luck next time")
