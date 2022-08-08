@@ -73,6 +73,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.DecayAnimation
 import androidx.compose.animation.core.InfiniteTransition
 import androidx.compose.animation.core.TargetBasedAnimation
+import androidx.compose.ui.tooling.animation.UnsupportedComposeAnimation
 import kotlin.reflect.KClass
 import kotlin.reflect.safeCast
 
@@ -435,10 +436,14 @@ internal class ComposeViewAdapter : FrameLayout {
         val animatedVisibilitySearch = AnimatedVisibilitySearch {
             clock.trackAnimatedVisibility(it as Transition<Any>, ::requestLayout)
         }
-
-        val search = listOf(
+        // All supported animations.
+        val supportedSearch = setOf(
             transitionSearch,
             animatedVisibilitySearch,
+        )
+
+        // All unsupported animations, if API is available.
+        val extraSearch = if (UnsupportedComposeAnimation.apiAvailable) setOf(
             animatedContentSearch,
             AnimateXAsStateSearch { clock.trackAnimateXAsState(it as Animatable<*, *>) },
             AnimateContentSizeSearch { clock.trackAnimateContentSize(it) },
@@ -451,14 +456,21 @@ internal class ComposeViewAdapter : FrameLayout {
             RememberSearch(InfiniteTransition::class) {
                 clock.trackInfiniteTransition(it as InfiniteTransition)
             }
-        )
+        ) else emptyList()
+
+        // Animations to track in PreviewAnimationClock.
+        val setToTrack = supportedSearch + extraSearch
+
+        // Animations to search. animatedContentSearch is included even if it's not going to be
+        // tracked as it should be excluded from transitionSearch.
+        val setToSearch = setToTrack + setOf(animatedContentSearch)
 
         // Check all the slot tables, since some animations might not be present in the same
         // table as the one containing the `@Composable` being previewed, e.g. when they're
         // defined using sub-composition.
         slotTrees.forEach { tree ->
             val treeWithLocation = tree.findAll { it.location != null }
-            search.forEach { it.parse(treeWithLocation) }
+            setToSearch.forEach { it.parse(treeWithLocation) }
 
             // Remove all AnimatedVisibility parent transitions from the transitions list,
             // otherwise we'd duplicate them in the Android Studio Animation Preview because we
@@ -470,11 +482,11 @@ internal class ComposeViewAdapter : FrameLayout {
             transitionSearch.animations.removeAll(animatedContentSearch.animations)
         }
 
-        hasAnimations = search.any { it.hasAnimations() }
+        hasAnimations = setToTrack.any { it.hasAnimations() }
 
         // Make the `PreviewAnimationClock` track all the transitions found.
         if (::clock.isInitialized) {
-            search.forEach { it.track() }
+            setToTrack.forEach { it.track() }
         }
     }
 

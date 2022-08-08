@@ -21,6 +21,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.ui.tooling.animation.PreviewAnimationClock
+import androidx.compose.ui.tooling.animation.UnsupportedComposeAnimation
 import androidx.compose.ui.tooling.data.UiToolingDataApi
 import androidx.compose.ui.tooling.test.R
 import androidx.test.filters.LargeTest
@@ -155,7 +156,7 @@ class ComposeViewAdapterTest {
 
     @Test
     fun animatedContentIsSubscribed() {
-        checkUnsupportedIsSubscribed("AnimatedContentPreview", listOf("AnimatedContent"))
+        checkAnimationsAreSubscribed("AnimatedContentPreview", listOf("AnimatedContent"))
     }
 
     @Test
@@ -170,7 +171,7 @@ class ComposeViewAdapterTest {
 
     @Test
     fun animateXAsStateIsSubscribed() {
-        checkUnsupportedIsSubscribed(
+        checkAnimationsAreSubscribed(
             "AnimateAsStatePreview",
             listOf("animateValueAsState", "animateValueAsState")
         )
@@ -178,7 +179,7 @@ class ComposeViewAdapterTest {
 
     @Test
     fun animateContentSizeIsSubscribed() {
-        checkUnsupportedIsSubscribed("AnimateContentSizePreview", listOf("animateContentSize"))
+        checkAnimationsAreSubscribed("AnimateContentSizePreview", listOf("animateContentSize"))
     }
 
     @Test
@@ -188,20 +189,35 @@ class ComposeViewAdapterTest {
 
     @Test
     fun targetBasedAnimationIsSubscribed() {
-        checkUnsupportedIsSubscribed("TargetBasedAnimationPreview", listOf("TargetBasedAnimation"))
+        checkAnimationsAreSubscribed("TargetBasedAnimationPreview", listOf("TargetBasedAnimation"))
     }
 
     @Test
     fun decayAnimationIsSubscribed() {
-        checkUnsupportedIsSubscribed("DecayAnimationPreview", listOf("DecayAnimation"))
+        checkAnimationsAreSubscribed("DecayAnimationPreview", listOf("DecayAnimation"))
     }
 
     @Test
     fun infiniteTransitionIsSubscribed() {
-        checkUnsupportedIsSubscribed("InfiniteTransitionPreview", listOf("InfiniteTransition"))
+        checkAnimationsAreSubscribed("InfiniteTransitionPreview", listOf("InfiniteTransition"))
     }
 
-    private fun checkUnsupportedIsSubscribed(preview: String, labels: List<String>) {
+    @Test
+    fun unsupportedAreNotSubscribedWhenEnumIsNotAvailable() {
+        UnsupportedComposeAnimation.testOverrideAvailability(false)
+        checkAnimationsAreSubscribed(
+            "AllAnimations",
+            emptyList(),
+            listOf("String", "checkBoxAnim")
+        )
+        UnsupportedComposeAnimation.testOverrideAvailability(true)
+    }
+
+    private fun checkAnimationsAreSubscribed(
+        preview: String,
+        unsupported: List<String>,
+        transitions: List<String> = emptyList()
+    ) {
         val clock = PreviewAnimationClock()
 
         activityTestRule.runOnUiThread {
@@ -212,9 +228,11 @@ class ComposeViewAdapterTest {
             composeViewAdapter.clock = clock
             assertFalse(composeViewAdapter.hasAnimations())
             assertTrue(clock.trackedTransitions.isEmpty())
+            assertTrue(clock.trackedUnsupported.isEmpty())
+            assertTrue(clock.trackedAnimatedVisibility.isEmpty())
         }
 
-        waitFor("Composable to have animations", 1, TimeUnit.SECONDS) {
+        waitFor("Composable to have animations", 2, TimeUnit.SECONDS) {
             // Handle the case where onLayout was called too soon. Calling requestLayout will
             // make sure onLayout will be called again.
             composeViewAdapter.requestLayout()
@@ -222,8 +240,8 @@ class ComposeViewAdapterTest {
         }
 
         activityTestRule.runOnUiThread {
-            assertEquals(labels, clock.trackedUnsupported.map { it.label }.sortedBy { it })
-            assertEquals(0, clock.trackedTransitions.size)
+            assertEquals(unsupported, clock.trackedUnsupported.map { it.label }.sortedBy { it })
+            assertEquals(transitions, clock.trackedTransitions.map { it.label }.sortedBy { it })
             assertEquals(0, clock.trackedAnimatedVisibility.size)
         }
     }

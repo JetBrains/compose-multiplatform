@@ -89,6 +89,19 @@ fun CheckBoxScaffoldPreview() {
     }
 }
 
+@Preview(name = "All unsupported and transition animations")
+@Composable
+fun AllAnimations() {
+    AnimatedContentPreview()
+    CheckBox()
+    AnimateAsStatePreview()
+    CrossFadePreview()
+    AnimateContentSizePreview()
+    TargetBasedAnimationPreview()
+    DecayAnimationPreview()
+    InfiniteTransitionPreview()
+}
+
 @OptIn(ExperimentalAnimationApi::class)
 @Preview(name = "AnimatedContent")
 @Composable
