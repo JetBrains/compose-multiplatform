@@ -24,10 +24,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -42,6 +47,14 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun RtlDemo() {
     Column(verticalArrangement = Arrangement.SpaceEvenly) {
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            Text("RTL")
+            TestPlacementInLimitedSpace()
+        }
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+            Text("LTR")
+            TestPlacementInLimitedSpace()
+        }
         Text("TEXT", Modifier.align(Alignment.CenterHorizontally))
         TestText()
         Text("ROW", Modifier.align(Alignment.CenterHorizontally))
@@ -70,6 +83,20 @@ fun RtlDemo() {
         LayoutWithConstraints(text = "LD: locale")
         Text("STACK EXAMPLE", Modifier.align(Alignment.CenterHorizontally))
         StackExample()
+    }
+}
+
+@Composable
+private fun TestPlacementInLimitedSpace() {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Box(modifier = Modifier.padding(12.dp).size(56.dp).background(Color.Yellow)) {
+            IconButton( // adds minimumTouchTargetSize
+                modifier = Modifier.padding(horizontal = 12.dp),
+                onClick = { }
+            ) {
+                Icon(Icons.Filled.Info, null)
+            }
+        }
     }
 }
 

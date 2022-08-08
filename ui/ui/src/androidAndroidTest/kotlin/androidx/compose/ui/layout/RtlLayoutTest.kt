@@ -17,8 +17,12 @@
 package androidx.compose.ui.layout
 
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -26,13 +30,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.FixedSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.node.Ref
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import org.junit.Assert
@@ -44,6 +52,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
@@ -295,6 +305,94 @@ class RtlLayoutTest {
 
         assertTrue(latch.await(1, TimeUnit.SECONDS))
         assertEquals(LayoutDirection.Ltr, resultLayoutDirection.value)
+    }
+
+    @Test
+    fun testChildGetsPlacedWithinContainerWithPaddingAndMinimumTouchTarget() {
+        // copy-pasted from TouchTarget.kt (internal in material module)
+        class MinimumTouchTargetModifier(val size: DpSize = DpSize(48.dp, 48.dp)) : LayoutModifier {
+            override fun MeasureScope.measure(
+                measurable: Measurable,
+                constraints: Constraints
+            ): MeasureResult {
+                val placeable = measurable.measure(constraints)
+                val width = maxOf(placeable.width, size.width.roundToPx())
+                val height = maxOf(placeable.height, size.height.roundToPx())
+                return layout(width, height) {
+                    val centerX = ((width - placeable.width) / 2f).roundToInt()
+                    val centerY = ((height - placeable.height) / 2f).roundToInt()
+                    placeable.place(centerX, centerY)
+                }
+            }
+
+            override fun equals(other: Any?): Boolean {
+                val otherModifier = other as? MinimumTouchTargetModifier ?: return false
+                return size == otherModifier.size
+            }
+
+            override fun hashCode(): Int = size.hashCode()
+        }
+
+        val latch = CountDownLatch(2)
+        var outerLC: LayoutCoordinates? = null
+        var innerLC: LayoutCoordinates? = null
+        var density: Density? = null
+
+        val rowWidth = 200.dp
+        val outerBoxWidth = 56.dp
+        val padding = 16.dp
+
+        activityTestRule.runOnUiThread {
+            activity.setContent {
+                density = LocalDensity.current
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                    Row(modifier = Modifier.width(rowWidth)) {
+                        Box(
+                            modifier = Modifier
+                                .onGloballyPositioned {
+                                    outerLC = it
+                                    latch.countDown()
+                                }
+                                .size(outerBoxWidth)
+                                .background(color = Color.Red)
+                                .padding(horizontal = padding)
+                                .then(MinimumTouchTargetModifier())
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .onGloballyPositioned {
+                                        innerLC = it
+                                        latch.countDown()
+                                    }
+                                    .size(30.dp)
+                                    .background(color = Color.Gray)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        val (innerOffset, innerWidth) = with(innerLC!!) {
+            localToWindow(Offset.Zero) to size.width
+        }
+        val (outerOffset, outerWidth) = with(outerLC!!) {
+            localToWindow(Offset.Zero) to size.width
+        }
+        assertTrue(innerWidth < outerWidth)
+        assertTrue(innerOffset.x > outerOffset.x)
+        assertTrue(innerWidth + innerOffset.x < outerWidth + outerOffset.x)
+
+        with(density!!) {
+            assertEquals(outerOffset.x.roundToInt(), rowWidth.roundToPx() - outerWidth)
+            val paddingPx = padding.roundToPx()
+            // OuterBoxLeftEdge_padding-16dp_InnerBoxLeftEdge
+            assertTrue(abs(outerOffset.x + paddingPx - innerOffset.x) <= 1.0)
+            // InnerBoxRightEdge_padding-16dp_OuterRightEdge
+            val outerRightEdge = outerOffset.x + outerWidth
+            assertTrue(abs(outerRightEdge - paddingPx - (innerOffset.x + innerWidth)) <= 1)
+        }
     }
 
     @Composable
