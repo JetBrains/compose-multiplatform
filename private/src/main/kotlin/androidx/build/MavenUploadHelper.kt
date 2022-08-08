@@ -335,6 +335,12 @@ private fun Project.replaceBaseMultiplatformPublication(
         configure<PublishingExtension> {
             publications { pubs ->
                 pubs.create<MavenPublication>("androidxKmp") {
+                    // Duplicate behavior from KMP plugin
+                    // (https://cs.github.com/JetBrains/kotlin/blob/0c001cc9939a2ab11815263ed825c1096b3ce087/libraries/tools/kotlin-gradle-plugin/src/common/kotlin/org/jetbrains/kotlin/gradle/plugin/mpp/Publishing.kt#L42)
+                    // Should be able to remove internal API usage once
+                    // https://youtrack.jetbrains.com/issue/KT-36943 is fixed
+                    (this as MavenPublicationInternal).publishWithOriginalFileName()
+
                     from(object : ComponentWithVariants, SoftwareComponentInternal {
                         override fun getName(): String {
                             return "androidxKmp"
