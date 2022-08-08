@@ -328,33 +328,37 @@ internal fun CoreTextField(
     val pointerModifier = if (isInTouchMode) {
         val selectionModifier =
             Modifier.longPressDragGestureFilter(manager.touchSelectionObserver, enabled)
-        Modifier.tapPressTextFieldModifier(interactionSource, enabled) { offset ->
-            tapToFocus(state, focusRequester, !readOnly)
-            if (state.hasFocus) {
-                if (state.handleState != HandleState.Selection) {
-                    state.layoutResult?.let { layoutResult ->
-                        TextFieldDelegate.setCursorOffset(
-                            offset,
-                            layoutResult,
-                            state.processor,
-                            offsetMapping,
-                            state.onValueChange
-                        )
-                        // Won't enter cursor state when text is empty.
-                        if (state.textDelegate.text.isNotEmpty()) {
-                            state.handleState = HandleState.Cursor
+        Modifier
+            .tapPressTextFieldModifier(interactionSource, enabled) { offset ->
+                tapToFocus(state, focusRequester, !readOnly)
+                if (state.hasFocus) {
+                    if (state.handleState != HandleState.Selection) {
+                        state.layoutResult?.let { layoutResult ->
+                            TextFieldDelegate.setCursorOffset(
+                                offset,
+                                layoutResult,
+                                state.processor,
+                                offsetMapping,
+                                state.onValueChange
+                            )
+                            // Won't enter cursor state when text is empty.
+                            if (state.textDelegate.text.isNotEmpty()) {
+                                state.handleState = HandleState.Cursor
+                            }
                         }
+                    } else {
+                        manager.deselect(offset)
                     }
-                } else {
-                    manager.deselect(offset)
                 }
             }
-        }.then(selectionModifier)
+            .then(selectionModifier)
     } else {
-        Modifier.mouseDragGestureDetector(
-            observer = manager.mouseSelectionObserver,
-            enabled = enabled
-        ).pointerHoverIcon(textPointerIcon)
+        Modifier
+            .mouseDragGestureDetector(
+                observer = manager.mouseSelectionObserver,
+                enabled = enabled
+            )
+            .pointerHoverIcon(textPointerIcon)
     }
 
     val drawModifier = Modifier.drawBehind {
