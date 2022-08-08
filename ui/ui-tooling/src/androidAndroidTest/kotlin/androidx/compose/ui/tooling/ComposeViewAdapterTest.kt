@@ -173,7 +173,7 @@ class ComposeViewAdapterTest {
     fun animateXAsStateIsSubscribed() {
         checkAnimationsAreSubscribed(
             "AnimateAsStatePreview",
-            listOf("animateValueAsState", "animateValueAsState")
+            listOf("DpAnimation", "IntAnimation")
         )
     }
 
@@ -184,7 +184,7 @@ class ComposeViewAdapterTest {
 
     @Test
     fun crossFadeIsSubscribed() {
-        checkTransitionIsSubscribed("CrossFadePreview", "String")
+        checkTransitionIsSubscribed("CrossFadePreview", "Crossfade")
     }
 
     @Test
@@ -208,7 +208,7 @@ class ComposeViewAdapterTest {
         checkAnimationsAreSubscribed(
             "AllAnimations",
             emptyList(),
-            listOf("checkBoxAnim", "String")
+            listOf("checkBoxAnim", "Crossfade")
         )
         UnsupportedComposeAnimation.testOverrideAvailability(true)
     }
@@ -241,7 +241,7 @@ class ComposeViewAdapterTest {
             assertTrue(clock.trackedAnimatedVisibility.isEmpty())
         }
 
-        waitFor("Composable to have animations", 2, TimeUnit.SECONDS) {
+        waitFor("Composable to have animations", 5, TimeUnit.SECONDS) {
             // Handle the case where onLayout was called too soon. Calling requestLayout will
             // make sure onLayout will be called again.
             composeViewAdapter.requestLayout()

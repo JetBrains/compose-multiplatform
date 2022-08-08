@@ -201,8 +201,7 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
     }
 
     fun trackAnimateXAsState(animatable: Animatable<*, *>) {
-        // TODO(b/240919893) Use label from animatable.
-        animateXAsStateSubscriber.trackAnimation(animatable, "animateValueAsState")
+        animateXAsStateSubscriber.trackAnimation(animatable, animatable.label)
     }
 
     fun trackAnimateContentSize(sizeAnimationModifier: Any) {
