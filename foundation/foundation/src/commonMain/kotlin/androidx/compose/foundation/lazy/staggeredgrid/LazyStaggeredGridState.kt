@@ -58,6 +58,9 @@ internal class LazyStaggeredGridState : ScrollableState {
     internal var scrollToBeConsumed = 0f
         private set
 
+    /* @VisibleForTesting */
+    internal var measurePassCount = 0
+
     override suspend fun scroll(
         scrollPriority: MutatePriority,
         block: suspend ScrollScope.() -> Unit
@@ -109,6 +112,8 @@ internal class LazyStaggeredGridState : ScrollableState {
         firstVisibleItemScrollOffsets = result.firstVisibleItemScrollOffsets
         canScrollBackward = result.canScrollBackward
         canScrollForward = result.canScrollForward
+
+        measurePassCount++
     }
 
     override val isScrollInProgress: Boolean

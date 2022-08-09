@@ -38,8 +38,8 @@ internal sealed interface LazyStaggeredGridItemScope
 
 @ExperimentalFoundationApi
 internal fun LazyStaggeredGridScope.item(
-    key: Any?,
-    contentType: Any?,
+    key: Any? = null,
+    contentType: Any? = null,
     itemContent: @Composable LazyStaggeredGridItemScope.(index: Int) -> Unit
 ) {
     items(
