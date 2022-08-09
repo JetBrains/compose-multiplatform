@@ -291,7 +291,9 @@ internal class ComposeViewAdapter : FrameLayout {
         open fun parse(treeWithLocation: Collection<Group>) {}
         fun hasAnimations() = animations.isNotEmpty()
         fun track() {
-            animations.forEach { trackAnimation(it) }
+            // Animations are found in reversed order in the tree,
+            // reverse it back so they are tracked in the order they appear in the code.
+            animations.reversed().forEach { trackAnimation(it) }
         }
     }
 

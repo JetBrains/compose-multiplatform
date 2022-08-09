@@ -208,9 +208,18 @@ class ComposeViewAdapterTest {
         checkAnimationsAreSubscribed(
             "AllAnimations",
             emptyList(),
-            listOf("String", "checkBoxAnim")
+            listOf("checkBoxAnim", "String")
         )
         UnsupportedComposeAnimation.testOverrideAvailability(true)
+    }
+
+    @Test
+    fun animationsAreOrdered() {
+        checkAnimationsAreSubscribed(
+            "AnimationOrder",
+            emptyList(),
+            listOf("transitionOne", "transitionTwo", "transitionThree")
+        )
     }
 
     private fun checkAnimationsAreSubscribed(
@@ -240,8 +249,8 @@ class ComposeViewAdapterTest {
         }
 
         activityTestRule.runOnUiThread {
-            assertEquals(unsupported, clock.trackedUnsupported.map { it.label }.sortedBy { it })
-            assertEquals(transitions, clock.trackedTransitions.map { it.label }.sortedBy { it })
+            assertEquals(unsupported, clock.trackedUnsupported.map { it.label })
+            assertEquals(transitions, clock.trackedTransitions.map { it.label })
             assertEquals(0, clock.trackedAnimatedVisibility.size)
         }
     }
