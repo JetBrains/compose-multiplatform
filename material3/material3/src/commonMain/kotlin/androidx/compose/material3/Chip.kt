@@ -1153,8 +1153,7 @@ object SuggestionChipDefaults {
     /**
      * The size of a suggestion chip icon.
      */
-    // TODO(b/229778210): Read from the tokens when available.
-    val IconSize = 18.dp
+    val IconSize = SuggestionChipTokens.LeadingIconSize
 
     /**
      * Creates a [ChipColors] that represents the default container, label, and icon colors used in
@@ -1171,14 +1170,12 @@ object SuggestionChipDefaults {
     fun suggestionChipColors(
         containerColor: Color = Color.Transparent,
         labelColor: Color = SuggestionChipTokens.LabelTextColor.toColor(),
-        // TODO(b/229778210): Read from the tokens when available
-        //  (i.e. SuggestionChipTokens.IconColor.toColor()).
-        iconContentColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+        iconContentColor: Color = SuggestionChipTokens.LeadingIconColor.toColor(),
         disabledContainerColor: Color = Color.Transparent,
         disabledLabelColor: Color = SuggestionChipTokens.DisabledLabelTextColor.toColor()
             .copy(alpha = SuggestionChipTokens.DisabledLabelTextOpacity),
-        // TODO(b/229778210): Read from the tokens when available.
-        disabledIconContentColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+        disabledIconContentColor: Color = SuggestionChipTokens.DisabledLeadingIconColor.toColor()
+            .copy(alpha = SuggestionChipTokens.DisabledLeadingIconOpacity)
     ): ChipColors = ChipColors(
         containerColor = containerColor,
         labelColor = labelColor,
