@@ -26,7 +26,7 @@ const val BUILD_ON_SERVER_TASK = "buildOnServer"
  * Configures the root project's buildOnServer task to run the specified task.
  */
 fun <T : Task> Project.addToBuildOnServer(taskProvider: TaskProvider<T>) {
-    rootProject.tasks.named(BUILD_ON_SERVER_TASK).configure {
+    tasks.named(BUILD_ON_SERVER_TASK).configure {
         it.dependsOn(taskProvider)
     }
 }
@@ -35,7 +35,7 @@ fun <T : Task> Project.addToBuildOnServer(taskProvider: TaskProvider<T>) {
  * Configures the root project's buildOnServer task to run the specified task.
  */
 fun <T : Task> Project.addToBuildOnServer(taskPath: String) {
-    rootProject.tasks.named(BUILD_ON_SERVER_TASK).configure {
+    tasks.named(BUILD_ON_SERVER_TASK).configure {
         it.dependsOn(taskPath)
     }
 }

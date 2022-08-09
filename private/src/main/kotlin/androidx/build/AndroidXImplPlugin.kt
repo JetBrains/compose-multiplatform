@@ -59,6 +59,7 @@ import java.time.Duration
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
+import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion.VERSION_11
 import org.gradle.api.JavaVersion.VERSION_1_8
@@ -110,6 +111,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             AndroidXMultiplatformExtension.EXTENSION_NAME,
             project
         )
+        project.tasks.register(BUILD_ON_SERVER_TASK, DefaultTask::class.java)
         // Perform different actions based on which plugins have been applied to the project.
         // Many of the actions overlap, ex. API tracking.
         project.plugins.all { plugin ->
