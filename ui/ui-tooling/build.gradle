@@ -32,7 +32,7 @@ dependencies {
         implementation(libs.kotlinStdlib)
 
         api("androidx.annotation:annotation:1.1.0")
-        implementation("androidx.compose.animation:animation:1.1.1")
+        implementation(project(":compose:animation:animation"))
 
         api("androidx.compose.runtime:runtime:1.1.1")
         api(project(":compose:ui:ui"))
