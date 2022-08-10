@@ -69,11 +69,12 @@ private val DefaultCacheSize = 8
  * @param fallbackLayoutDirection layout direction of the measurement environment.
  * @param fallbackDensity density of the measurement environment. Density controls the scaling
  * factor for fonts.
- * @param cacheSize Capacity of internal cache inside TextMeasurer. Value of this parameter highly
- * depends on the consumer use case. Provide a cache size that is in line with how many distinct
- * text layouts are going to be calculated by this measurer repeatedly. If you are animating font
- * attributes, or any other layout affecting input, cache can be skipped because most measure calls
- * would miss the cache.
+ * @param cacheSize Capacity of internal cache inside TextMeasurer. Size unit is the number of
+ * unique text layout inputs that are measured. Value of this parameter highly depends on the
+ * consumer use case. Provide a cache size that is in line with how many distinct text layouts are
+ * going to be calculated by this measurer repeatedly. If you are animating font attributes, or any
+ * other layout affecting input, cache can be skipped because most repeated measure calls would miss
+ * the cache.
  */
 @ExperimentalTextApi
 @Immutable
@@ -264,7 +265,8 @@ class TextMeasurer constructor(
  * Keeps an LRU layout cache of TextLayoutInput, TextLayoutResult pairs. Any non-layout affecting
  * change in TextLayoutInput (color, brush, shadow, TextDecoration) is ignored by this cache.
  *
- * @param capacity Maximum initial size of LRU cache.
+ * @param capacity Maximum size of LRU cache. Size unit is the number of [CacheTextLayoutInput]
+ * and [TextLayoutResult] pairs.
  *
  * @throws IllegalArgumentException if capacity is not a positive integer.
  */
