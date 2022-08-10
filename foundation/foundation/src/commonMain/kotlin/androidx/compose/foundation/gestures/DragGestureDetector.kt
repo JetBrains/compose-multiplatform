@@ -785,7 +785,7 @@ internal fun Orientation.toPointerDirectionConfig(): PointerDirectionConfig =
     if (this == Orientation.Vertical) VerticalPointerDirectionConfig
     else HorizontalPointerDirectionConfig
 
-private suspend fun AwaitPointerEventScope.awaitLongPressOrCancellation(
+suspend fun AwaitPointerEventScope.awaitLongPressOrCancellation(
     initialDown: PointerInputChange
 ): PointerInputChange? {
     var longPress: PointerInputChange? = null
