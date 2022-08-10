@@ -18,9 +18,11 @@ package androidx.compose.foundation.text
 
 import android.os.Build
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeAction.Companion.Go
@@ -96,6 +98,50 @@ class KeyboardActionsTest(param: Param) {
                 imeAction -> assertThat(triggered).isTrue()
                 else -> assertThat(triggered).isFalse()
             }
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
+    fun imeActionDone_customCallback_doesNotHideKeyboard() {
+        if (imeAction != Done) return
+
+        // Arrange.
+        val initialTextField = "text field test tag"
+        val textFieldValue = TextFieldValue("Placeholder Text")
+        val keyboardHelper = KeyboardHelper(rule)
+        var wasCallbackTriggered = false
+
+        rule.setContent {
+            keyboardHelper.view = LocalView.current
+
+            CoreTextField(
+                value = textFieldValue,
+                onValueChange = {},
+                modifier = Modifier
+                    .testTag(initialTextField),
+                imeOptions = ImeOptions(imeAction = Done),
+                keyboardActions = KeyboardActions(
+                    onDone = { wasCallbackTriggered = true },
+                )
+            )
+        }
+
+        // Show keyboard.
+        rule.onNodeWithTag(initialTextField).performClick()
+        keyboardHelper.waitForKeyboardVisibility(visible = true)
+        assertThat(keyboardHelper.isSoftwareKeyboardShown()).isTrue()
+
+        // Act.
+        rule.onNodeWithTag(initialTextField).performImeAction()
+
+        // Assert.
+        rule.runOnIdle {
+            // The custom onDone callback was triggered.
+            assertThat(wasCallbackTriggered).isTrue()
+
+            // Software keyboard is still visible.
+            assertThat(keyboardHelper.isSoftwareKeyboardShown()).isTrue()
         }
     }
 }
