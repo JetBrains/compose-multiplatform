@@ -275,33 +275,35 @@ object NavigationBarItemDefaults {
         indicatorColor: Color = NavigationBarTokens.ActiveIndicatorColor.toColor(),
         unselectedIconColor: Color = NavigationBarTokens.InactiveIconColor.toColor(),
         unselectedTextColor: Color = NavigationBarTokens.InactiveLabelTextColor.toColor(),
-    ): NavigationBarItemColors = remember(
-        selectedIconColor,
-        unselectedIconColor,
-        selectedTextColor,
-        unselectedTextColor,
-        indicatorColor
-    ) {
-        DefaultNavigationBarItemColors(
-            selectedIconColor = selectedIconColor,
-            selectedTextColor = selectedTextColor,
-            selectedIndicatorColor = indicatorColor,
-            unselectedIconColor = unselectedIconColor,
-            unselectedTextColor = unselectedTextColor,
-        )
-    }
+    ): NavigationBarItemColors = NavigationBarItemColors(
+        selectedIconColor = selectedIconColor,
+        selectedTextColor = selectedTextColor,
+        selectedIndicatorColor = indicatorColor,
+        unselectedIconColor = unselectedIconColor,
+        unselectedTextColor = unselectedTextColor,
+    )
 }
 
-/** Represents the colors of the various elements of a navigation item. */
 @Stable
-interface NavigationBarItemColors {
+class NavigationBarItemColors internal constructor(
+    private val selectedIconColor: Color,
+    private val selectedTextColor: Color,
+    private val selectedIndicatorColor: Color,
+    private val unselectedIconColor: Color,
+    private val unselectedTextColor: Color,
+) {
     /**
      * Represents the icon color for this item, depending on whether it is [selected].
      *
      * @param selected whether the item is selected
      */
     @Composable
-    fun iconColor(selected: Boolean): State<Color>
+    internal fun iconColor(selected: Boolean): State<Color> {
+        return animateColorAsState(
+            targetValue = if (selected) selectedIconColor else unselectedIconColor,
+            animationSpec = tween(ItemAnimationDurationMillis)
+        )
+    }
 
     /**
      * Represents the text color for this item, depending on whether it is [selected].
@@ -309,40 +311,38 @@ interface NavigationBarItemColors {
      * @param selected whether the item is selected
      */
     @Composable
-    fun textColor(selected: Boolean): State<Color>
-
-    /** Represents the color of the indicator used for selected items. */
-    val indicatorColor: Color
-        @Composable get
-}
-
-@Stable
-private class DefaultNavigationBarItemColors(
-    private val selectedIconColor: Color,
-    private val selectedTextColor: Color,
-    private val selectedIndicatorColor: Color,
-    private val unselectedIconColor: Color,
-    private val unselectedTextColor: Color,
-) : NavigationBarItemColors {
-    @Composable
-    override fun iconColor(selected: Boolean): State<Color> {
-        return animateColorAsState(
-            targetValue = if (selected) selectedIconColor else unselectedIconColor,
-            animationSpec = tween(ItemAnimationDurationMillis)
-        )
-    }
-
-    @Composable
-    override fun textColor(selected: Boolean): State<Color> {
+    internal fun textColor(selected: Boolean): State<Color> {
         return animateColorAsState(
             targetValue = if (selected) selectedTextColor else unselectedTextColor,
             animationSpec = tween(ItemAnimationDurationMillis)
         )
     }
 
-    override val indicatorColor: Color
-        @Composable
+    /** Represents the color of the indicator used for selected items. */
+    internal val indicatorColor: Color
         get() = selectedIndicatorColor
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || other !is NavigationBarItemColors) return false
+
+        if (selectedIconColor != other.selectedIconColor) return false
+        if (unselectedIconColor != other.unselectedIconColor) return false
+        if (selectedTextColor != other.selectedTextColor) return false
+        if (unselectedTextColor != other.unselectedTextColor) return false
+        if (selectedIndicatorColor != other.selectedIndicatorColor) return false
+
+        return true
+    }
+    override fun hashCode(): Int {
+        var result = selectedIconColor.hashCode()
+        result = 31 * result + unselectedIconColor.hashCode()
+        result = 31 * result + selectedTextColor.hashCode()
+        result = 31 * result + unselectedTextColor.hashCode()
+        result = 31 * result + selectedIndicatorColor.hashCode()
+
+        return result
+    }
 }
 
 /**

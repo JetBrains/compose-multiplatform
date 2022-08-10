@@ -178,29 +178,23 @@ class AppBarTest {
                     FakeIcon(Modifier.testTag(NavigationIconTestTag))
                     navigationIconColor = LocalContentColor.current
                     expectedNavigationIconColor =
-                        TopAppBarDefaults.smallTopAppBarColors()
-                            .navigationIconContentColor(colorTransitionFraction = 0f).value
+                        TopAppBarDefaults.smallTopAppBarColors().navigationIconContentColor
                     // fraction = 0f to indicate no scroll.
                     expectedContainerColor = TopAppBarDefaults
                         .smallTopAppBarColors()
                         .containerColor(colorTransitionFraction = 0f)
-                        .value
                 },
                 title = {
                     Text("Title", Modifier.testTag(TitleTestTag))
                     titleColor = LocalContentColor.current
                     expectedTitleColor = TopAppBarDefaults
-                        .smallTopAppBarColors()
-                        .titleContentColor(colorTransitionFraction = 0f)
-                        .value
+                        .smallTopAppBarColors().titleContentColor
                 },
                 actions = {
                     FakeIcon(Modifier.testTag(ActionsTestTag))
                     actionsColor = LocalContentColor.current
                     expectedActionsColor = TopAppBarDefaults
-                        .smallTopAppBarColors()
-                        .actionIconContentColor(colorTransitionFraction = 0f)
-                        .value
+                        .smallTopAppBarColors().actionIconContentColor
                 }
             )
         }
@@ -230,7 +224,7 @@ class AppBarTest {
                     // fraction = 1f to indicate a scroll.
                     expectedScrolledContainerColor =
                         TopAppBarDefaults.smallTopAppBarColors()
-                            .containerColor(colorTransitionFraction = 1f).value
+                            .containerColor(colorTransitionFraction = 1f)
                 },
                 scrollBehavior = scrollBehavior
             )
@@ -392,25 +386,25 @@ class AppBarTest {
                     navigationIconColor = LocalContentColor.current
                     expectedNavigationIconColor =
                         TopAppBarDefaults.centerAlignedTopAppBarColors()
-                            .navigationIconContentColor(colorTransitionFraction = 0f).value
+                            .navigationIconContentColor
                     // fraction = 0f to indicate no scroll.
                     expectedContainerColor =
                         TopAppBarDefaults.centerAlignedTopAppBarColors()
-                            .containerColor(colorTransitionFraction = 0f).value
+                            .containerColor(colorTransitionFraction = 0f)
                 },
                 title = {
                     Text("Title", Modifier.testTag(TitleTestTag))
                     titleColor = LocalContentColor.current
                     expectedTitleColor =
                         TopAppBarDefaults.centerAlignedTopAppBarColors()
-                            .titleContentColor(colorTransitionFraction = 0f).value
+                            .titleContentColor
                 },
                 actions = {
                     FakeIcon(Modifier.testTag(ActionsTestTag))
                     actionsColor = LocalContentColor.current
                     expectedActionsColor =
                         TopAppBarDefaults.centerAlignedTopAppBarColors()
-                            .actionIconContentColor(colorTransitionFraction = 0f).value
+                            .actionIconContentColor
                 }
             )
         }
@@ -441,7 +435,7 @@ class AppBarTest {
                     // fraction = 1f to indicate a scroll.
                     expectedScrolledContainerColor =
                         TopAppBarDefaults.centerAlignedTopAppBarColors()
-                            .containerColor(colorTransitionFraction = 1f).value
+                            .containerColor(colorTransitionFraction = 1f)
                 },
                 scrollBehavior = scrollBehavior
             )
@@ -817,7 +811,7 @@ class AppBarTest {
                         FloatingActionButton(
                             onClick = { /* do something */ },
                             containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-                            elevation = BottomAppBarDefaults.BottomAppBarFabElevation
+                            elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
                         ) {
                             Icon(Icons.Filled.Add, "Localized description")
                         }
@@ -869,7 +863,7 @@ class AppBarTest {
                         onClick = { /* do something */ },
                         modifier = Modifier.testTag("FAB"),
                         containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-                        elevation = BottomAppBarDefaults.BottomAppBarFabElevation
+                        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
                     ) {
                         Icon(Icons.Filled.Add, "Localized description")
                     }
@@ -1141,16 +1135,15 @@ class AppBarTest {
             // current content color settings are the same.
             oneThirdCollapsedContainerColor =
                 TopAppBarDefaults.mediumTopAppBarColors()
-                    .containerColor(colorTransitionFraction = 1 / 3f).value
+                    .containerColor(colorTransitionFraction = 1 / 3f)
             fullyCollapsedContainerColor =
                 TopAppBarDefaults.mediumTopAppBarColors()
-                    .containerColor(colorTransitionFraction = 1f).value
+                    .containerColor(colorTransitionFraction = 1f)
 
             // Resolve the title's content color. The default implementation returns the same color
             // regardless of the fraction, and the color is applied later with alpha.
             titleContentColor =
-                TopAppBarDefaults.mediumTopAppBarColors()
-                    .titleContentColor(colorTransitionFraction = 1f).value
+                TopAppBarDefaults.mediumTopAppBarColors().titleContentColor
 
             with(LocalDensity.current) {
                 oneThirdCollapsedHeightOffsetPx = oneThirdCollapsedOffsetDp.toPx()
