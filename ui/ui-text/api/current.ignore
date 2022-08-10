@@ -71,3 +71,21 @@ DefaultValueChange: androidx.compose.ui.text.Paragraph#paint(androidx.compose.ui
     Attempted to remove default value from parameter shadow in androidx.compose.ui.text.Paragraph.paint
 DefaultValueChange: androidx.compose.ui.text.Paragraph#paint(androidx.compose.ui.graphics.Canvas, long, androidx.compose.ui.graphics.Shadow, androidx.compose.ui.text.style.TextDecoration) parameter #3:
     Attempted to remove default value from parameter textDecoration in androidx.compose.ui.text.Paragraph.paint
+
+
+RemovedMethod: androidx.compose.ui.text.ParagraphStyle#equals(Object):
+    Removed method androidx.compose.ui.text.ParagraphStyle.equals(Object)
+RemovedMethod: androidx.compose.ui.text.Placeholder#equals(Object):
+    Removed method androidx.compose.ui.text.Placeholder.equals(Object)
+RemovedMethod: androidx.compose.ui.text.SpanStyle#equals(Object):
+    Removed method androidx.compose.ui.text.SpanStyle.equals(Object)
+RemovedMethod: androidx.compose.ui.text.TextLayoutInput#equals(Object):
+    Removed method androidx.compose.ui.text.TextLayoutInput.equals(Object)
+RemovedMethod: androidx.compose.ui.text.TextLayoutResult#equals(Object):
+    Removed method androidx.compose.ui.text.TextLayoutResult.equals(Object)
+RemovedMethod: androidx.compose.ui.text.style.TextDecoration#equals(Object):
+    Removed method androidx.compose.ui.text.style.TextDecoration.equals(Object)
+RemovedMethod: androidx.compose.ui.text.style.TextGeometricTransform#equals(Object):
+    Removed method androidx.compose.ui.text.style.TextGeometricTransform.equals(Object)
+RemovedMethod: androidx.compose.ui.text.style.TextIndent#equals(Object):
+    Removed method androidx.compose.ui.text.style.TextIndent.equals(Object)

@@ -209,7 +209,7 @@ class TextLayoutInput private constructor(
         )
     }
 
-    override operator fun equals(other: Any?): Boolean {
+    override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is TextLayoutInput) return false
 
@@ -548,7 +548,7 @@ class TextLayoutResult constructor(
         )
     }
 
-    override operator fun equals(other: Any?): Boolean {
+    override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is TextLayoutResult) return false
 
