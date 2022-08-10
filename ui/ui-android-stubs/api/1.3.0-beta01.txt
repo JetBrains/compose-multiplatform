@@ -1,0 +1,78 @@
+// Signature format: 4.0
+package android.view {
+
+  public final class DisplayListCanvas extends android.graphics.Canvas {
+    ctor public DisplayListCanvas();
+    method public void drawRenderNode(android.view.RenderNode);
+  }
+
+  public class RenderNode {
+    method public static android.view.RenderNode create(String?, android.view.View?);
+    method public void destroy();
+    method public void destroyDisplayListData();
+    method public void discardDisplayList();
+    method public void end(android.view.DisplayListCanvas);
+    method public float getAlpha();
+    method public int getAmbientShadowColor();
+    method public float getCameraDistance();
+    method public boolean getClipToOutline();
+    method public float getElevation();
+    method public void getInverseMatrix(android.graphics.Matrix);
+    method public void getMatrix(android.graphics.Matrix);
+    method public float getPivotX();
+    method public float getPivotY();
+    method public float getRotation();
+    method public float getRotationX();
+    method public float getRotationY();
+    method public float getScaleX();
+    method public float getScaleY();
+    method public int getSpotShadowColor();
+    method public float getTranslationX();
+    method public float getTranslationY();
+    method public float getTranslationZ();
+    method public boolean hasIdentityMatrix();
+    method public boolean hasOverlappingRendering();
+    method public boolean hasShadow();
+    method public boolean isAttached();
+    method public boolean isPivotExplicitlySet();
+    method public boolean isValid();
+    method public boolean offsetLeftAndRight(int);
+    method public boolean offsetTopAndBottom(int);
+    method public void output();
+    method public boolean setAlpha(float);
+    method public boolean setAmbientShadowColor(int);
+    method public boolean setAnimationMatrix(android.graphics.Matrix);
+    method public boolean setBottom(int);
+    method public boolean setCameraDistance(float);
+    method public boolean setClipBounds(android.graphics.Rect?);
+    method public boolean setClipToBounds(boolean);
+    method public boolean setClipToOutline(boolean);
+    method public boolean setElevation(float);
+    method public boolean setHasOverlappingRendering(boolean);
+    method public boolean setLayerPaint(android.graphics.Paint?);
+    method public boolean setLayerType(int);
+    method public boolean setLeft(int);
+    method public boolean setLeftTopRightBottom(int, int, int, int);
+    method public boolean setOutline(android.graphics.Outline?);
+    method public boolean setPivotX(float);
+    method public boolean setPivotY(float);
+    method public boolean setProjectBackwards(boolean);
+    method public boolean setProjectionReceiver(boolean);
+    method public boolean setRevealClip(boolean, float, float, float);
+    method public boolean setRight(int);
+    method public boolean setRotation(float);
+    method public boolean setRotationX(float);
+    method public boolean setRotationY(float);
+    method public boolean setScaleX(float);
+    method public boolean setScaleY(float);
+    method public boolean setSpotShadowColor(int);
+    method public boolean setStaticMatrix(android.graphics.Matrix);
+    method public boolean setTop(int);
+    method public boolean setTranslationX(float);
+    method public boolean setTranslationY(float);
+    method public boolean setTranslationZ(float);
+    method public android.view.DisplayListCanvas start(int, int);
+  }
+
+}
+
