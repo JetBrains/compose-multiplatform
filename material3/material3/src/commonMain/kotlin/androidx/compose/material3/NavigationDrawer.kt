@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.tokens.NavigationDrawerTokens
+import androidx.compose.material3.tokens.ScrimTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
@@ -602,7 +603,7 @@ object DrawerDefaults {
 
     /** Default color of the scrim that obscures content when the drawer is open */
     val scrimColor: Color
-        @Composable get() = MaterialTheme.colorScheme.scrim.copy(.32f)
+        @Composable get() = ScrimTokens.ContainerColor.toColor().copy(ScrimTokens.ContainerOpacity)
 
     /** Default container color for a navigation drawer */
     val containerColor: Color @Composable get() = NavigationDrawerTokens.ContainerColor.toColor()
