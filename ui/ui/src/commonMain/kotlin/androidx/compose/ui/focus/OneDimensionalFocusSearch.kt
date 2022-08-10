@@ -27,7 +27,7 @@ import androidx.compose.ui.focus.FocusStateImpl.Deactivated
 import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.node.LayoutNodeWrapper
+import androidx.compose.ui.node.NodeCoordinator
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -212,8 +212,8 @@ private object FocusableChildrenComparator : Comparator<FocusModifier> {
         if (focusModifier1 === focusModifier2) return 0
 
         // Ignore non-attached focus modifiers as they won't be considered during focus search.
-        val wrapper1 = focusModifier1.layoutNodeWrapper ?: return 0
-        val wrapper2 = focusModifier2.layoutNodeWrapper ?: return 0
+        val wrapper1 = focusModifier1.coordinator ?: return 0
+        val wrapper2 = focusModifier2.coordinator ?: return 0
 
         // Compare the place order of the children of the least common ancestor.
         val pathFromRoot1 = pathFromRoot(wrapper1)
@@ -229,9 +229,9 @@ private object FocusableChildrenComparator : Comparator<FocusModifier> {
         error("Could not find a common ancestor between the two FocusModifiers.")
     }
 
-    private fun pathFromRoot(layoutNodeWrapper: LayoutNodeWrapper): MutableVector<LayoutNode> {
+    private fun pathFromRoot(nodeCoordinator: NodeCoordinator): MutableVector<LayoutNode> {
         val path = mutableVectorOf<LayoutNode>()
-        var current: LayoutNode? = layoutNodeWrapper.layoutNode
+        var current: LayoutNode? = nodeCoordinator.layoutNode
         while (current != null) {
             path.add(0, current)
             current = current.parent

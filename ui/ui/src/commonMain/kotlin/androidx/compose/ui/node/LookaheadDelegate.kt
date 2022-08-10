@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 
 /**
- * This is the base class for LayoutNodeWrapper and LookaheadDelegate. The common
+ * This is the base class for NodeCoordinator and LookaheadDelegate. The common
  * functionalities between the two are extracted here.
  */
 internal abstract class LookaheadCapablePlaceable : Placeable(), MeasureScope {
@@ -55,7 +55,7 @@ internal abstract class LookaheadCapablePlaceable : Placeable(), MeasureScope {
 
     abstract fun calculateAlignmentLine(alignmentLine: AlignmentLine): Int
 
-    // True when the wrapper is running its own placing block to obtain the position
+    // True when the coordinator is running its own placing block to obtain the position
     // in parent, but is not interested in the position of children.
     internal var isShallowPlacing: Boolean = false
     internal abstract val measureResult: MeasureResult
@@ -71,7 +71,7 @@ internal abstract class LookaheadCapablePlaceable : Placeable(), MeasureScope {
      */
     internal var isPlacingForAlignment = false
 
-    protected fun LayoutNodeWrapper.invalidateAlignmentLinesFromPositionChange() {
+    protected fun NodeCoordinator.invalidateAlignmentLinesFromPositionChange() {
         if (wrapped?.layoutNode != layoutNode) {
             alignmentLinesOwner.alignmentLines.onAlignmentsChanged()
         } else {
@@ -81,11 +81,11 @@ internal abstract class LookaheadCapablePlaceable : Placeable(), MeasureScope {
 }
 
 internal abstract class LookaheadDelegate(
-    val wrapper: LayoutNodeWrapper,
+    val coordinator: NodeCoordinator,
     val lookaheadScope: LookaheadScope
 ) : Measurable, LookaheadCapablePlaceable() {
     override val child: LookaheadCapablePlaceable?
-        get() = wrapper.wrapped?.lookaheadDelegate
+        get() = coordinator.wrapped?.lookaheadDelegate
     override val hasMeasureResult: Boolean
         get() = _measureResult != null
     override var position = IntOffset.Zero
@@ -95,21 +95,21 @@ internal abstract class LookaheadDelegate(
             "LookaheadDelegate has not been measured yet when measureResult is requested."
         )
     override val layoutDirection: LayoutDirection
-        get() = wrapper.layoutDirection
+        get() = coordinator.layoutDirection
     override val density: Float
-        get() = wrapper.density
+        get() = coordinator.density
     override val fontScale: Float
-        get() = wrapper.fontScale
+        get() = coordinator.fontScale
     override val parent: LookaheadCapablePlaceable?
-        get() = wrapper.wrappedBy?.lookaheadDelegate
+        get() = coordinator.wrappedBy?.lookaheadDelegate
     override val layoutNode: LayoutNode
-        get() = wrapper.layoutNode
+        get() = coordinator.layoutNode
     override val coordinates: LayoutCoordinates
         get() = lookaheadLayoutCoordinates
 
     val lookaheadLayoutCoordinates = LookaheadLayoutCoordinatesImpl(this)
     override val alignmentLinesOwner: AlignmentLinesOwner
-        get() = wrapper.layoutNode.layoutDelegate.lookaheadAlignmentLinesOwner!!
+        get() = coordinator.layoutNode.layoutDelegate.lookaheadAlignmentLinesOwner!!
 
     private var _measureResult: MeasureResult? = null
         set(result) {
@@ -151,7 +151,7 @@ internal abstract class LookaheadDelegate(
             this.position = position
             layoutNode.layoutDelegate.lookaheadPassDelegate
                 ?.notifyChildrenUsingCoordinatesWhilePlacing()
-            wrapper.invalidateAlignmentLinesFromPositionChange()
+            coordinator.invalidateAlignmentLinesFromPositionChange()
         }
         if (isShallowPlacing) return
         placeChildren()
@@ -160,7 +160,7 @@ internal abstract class LookaheadDelegate(
     protected open fun placeChildren() {
         PlacementScope.executeWithRtlMirroringValues(
             measureResult.width,
-            wrapper.layoutDirection,
+            coordinator.layoutDirection,
             this
         ) {
             measureResult.placeChildren()
@@ -177,22 +177,22 @@ internal abstract class LookaheadDelegate(
     }
 
     override val parentData: Any?
-        get() = wrapper.parentData
+        get() = coordinator.parentData
 
     override fun minIntrinsicWidth(height: Int): Int {
-        return wrapper.wrapped!!.lookaheadDelegate!!.minIntrinsicWidth(height)
+        return coordinator.wrapped!!.lookaheadDelegate!!.minIntrinsicWidth(height)
     }
 
     override fun maxIntrinsicWidth(height: Int): Int {
-        return wrapper.wrapped!!.lookaheadDelegate!!.maxIntrinsicWidth(height)
+        return coordinator.wrapped!!.lookaheadDelegate!!.maxIntrinsicWidth(height)
     }
 
     override fun minIntrinsicHeight(width: Int): Int {
-        return wrapper.wrapped!!.lookaheadDelegate!!.minIntrinsicHeight(width)
+        return coordinator.wrapped!!.lookaheadDelegate!!.minIntrinsicHeight(width)
     }
 
     override fun maxIntrinsicHeight(width: Int): Int {
-        return wrapper.wrapped!!.lookaheadDelegate!!.maxIntrinsicHeight(width)
+        return coordinator.wrapped!!.lookaheadDelegate!!.maxIntrinsicHeight(width)
     }
 
     internal fun positionIn(ancestor: LookaheadDelegate): IntOffset {
@@ -200,7 +200,7 @@ internal abstract class LookaheadDelegate(
         var lookaheadDelegate = this
         while (lookaheadDelegate != ancestor) {
             aggregatedOffset += lookaheadDelegate.position
-            lookaheadDelegate = lookaheadDelegate.wrapper.wrappedBy!!.lookaheadDelegate!!
+            lookaheadDelegate = lookaheadDelegate.coordinator.wrappedBy!!.lookaheadDelegate!!
         }
         return aggregatedOffset
     }

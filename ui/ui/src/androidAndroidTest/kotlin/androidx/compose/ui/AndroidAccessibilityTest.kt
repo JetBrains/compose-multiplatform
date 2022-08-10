@@ -2701,7 +2701,7 @@ class AndroidAccessibilityTest {
     }
 
     @Test
-    fun testSemanticsSort_doesNotThrow_whenLayoutNodeWrapperNotAttached() {
+    fun testSemanticsSort_doesNotThrow_whenCoordinatorNotAttached() {
         container.setContent {
             with(LocalDensity.current) {
                 Box(Modifier.size(100.toDp()).testTag("parent")) {
@@ -2714,7 +2714,7 @@ class AndroidAccessibilityTest {
         val child = rule.onNodeWithTag("child").fetchSemanticsNode()
 
         rule.runOnIdle {
-            child.layoutNode.innerLayoutNodeWrapper.detach()
+            child.layoutNode.innerCoordinator.detach()
             child.outerSemanticsEntity.onDetach()
         }
 
@@ -2725,7 +2725,7 @@ class AndroidAccessibilityTest {
     }
 
     @Test
-    fun testSemanticsSort_doesNotThrow_whenLayoutNodeWrapperNotAttached_compare() {
+    fun testSemanticsSort_doesNotThrow_whenCoordinatorNotAttached_compare() {
         container.setContent {
             with(LocalDensity.current) {
                 Box(Modifier.size(100.toDp()).testTag("parent")) {
@@ -2743,9 +2743,9 @@ class AndroidAccessibilityTest {
         val grandChild1 = rule.onNodeWithTag("grandChild1").fetchSemanticsNode()
         val grandChild2 = rule.onNodeWithTag("grandChild2").fetchSemanticsNode()
         rule.runOnIdle {
-            grandChild1.layoutNode.innerLayoutNodeWrapper.detach()
+            grandChild1.layoutNode.innerCoordinator.detach()
             grandChild1.outerSemanticsEntity.onDetach()
-            grandChild2.layoutNode.innerLayoutNodeWrapper.detach()
+            grandChild2.layoutNode.innerCoordinator.detach()
             grandChild2.outerSemanticsEntity.onDetach()
         }
 

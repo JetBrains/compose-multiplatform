@@ -98,8 +98,8 @@ internal class FocusRequesterModifierLocal(
     fun findFocusNode(): FocusModifier? {
         // find the first child:
         val first = focusModifiers.fold(null as FocusModifier?) { mod1, mod2 ->
-            var layoutNode1 = mod1?.layoutNodeWrapper?.layoutNode ?: return@fold mod2
-            var layoutNode2 = mod2.layoutNodeWrapper?.layoutNode ?: return@fold mod1
+            var layoutNode1 = mod1?.coordinator?.layoutNode ?: return@fold mod2
+            var layoutNode2 = mod2.coordinator?.layoutNode ?: return@fold mod1
 
             while (layoutNode1.depth > layoutNode2.depth) {
                 layoutNode1 = layoutNode1.parent!!

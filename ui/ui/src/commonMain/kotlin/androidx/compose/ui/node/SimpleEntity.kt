@@ -22,6 +22,6 @@ import androidx.compose.ui.Modifier
  * A [LayoutNodeEntity] that only contains a [Modifier] and no logic
  */
 internal class SimpleEntity<M : Modifier>(
-    layoutNodeWrapper: LayoutNodeWrapper,
+    coordinator: NodeCoordinator,
     modifier: M
-) : LayoutNodeEntity<SimpleEntity<M>, M>(layoutNodeWrapper, modifier)
+) : LayoutNodeEntity<SimpleEntity<M>, M>(coordinator, modifier)

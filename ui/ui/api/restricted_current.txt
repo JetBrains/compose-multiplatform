@@ -2232,13 +2232,13 @@ package androidx.compose.ui.node {
   public final class HitTestResultKt {
   }
 
+  public final class LayoutModifierNodeCoordinatorKt {
+  }
+
   public final class LayoutNodeKt {
   }
 
   public final class LayoutNodeLayoutDelegateKt {
-  }
-
-  public final class ModifiedLayoutNodeKt {
   }
 
   public final class Ref<T> {

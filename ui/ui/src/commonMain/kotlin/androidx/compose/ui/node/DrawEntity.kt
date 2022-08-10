@@ -25,9 +25,9 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.toSize
 
 internal class DrawEntity(
-    layoutNodeWrapper: LayoutNodeWrapper,
+    coordinator: NodeCoordinator,
     modifier: DrawModifier
-) : LayoutNodeEntity<DrawEntity, DrawModifier>(layoutNodeWrapper, modifier), OwnerScope {
+) : LayoutNodeEntity<DrawEntity, DrawModifier>(coordinator, modifier), OwnerScope {
     private var cacheDrawModifier: DrawCacheModifier? = updateCacheDrawModifier()
 
     private val buildCacheParams: BuildDrawCacheParams = object : BuildDrawCacheParams {
@@ -37,7 +37,7 @@ internal class DrawEntity(
 
         override val layoutDirection: LayoutDirection get() = layoutNode.layoutDirection
 
-        override val size: Size get() = layoutNodeWrapper.size.toSize()
+        override val size: Size get() = coordinator.size.toSize()
     }
 
     // Flag to determine if the cache should be re-built
@@ -92,7 +92,7 @@ internal class DrawEntity(
         }
 
         val drawScope = layoutNode.mDrawScope
-        drawScope.draw(canvas, size, layoutNodeWrapper, this) {
+        drawScope.draw(canvas, size, coordinator, this) {
             with(drawScope) {
                 with(modifier) {
                     draw()
@@ -109,11 +109,11 @@ internal class DrawEntity(
             { drawEntity ->
                 if (drawEntity.isValid) {
                     drawEntity.invalidateCache = true
-                    drawEntity.layoutNodeWrapper.invalidateLayer()
+                    drawEntity.coordinator.invalidateLayer()
                 }
             }
     }
 
     override val isValid: Boolean
-        get() = layoutNodeWrapper.isAttached
+        get() = coordinator.isAttached
 }

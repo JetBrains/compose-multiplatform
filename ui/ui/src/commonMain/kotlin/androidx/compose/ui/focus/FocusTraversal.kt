@@ -183,10 +183,9 @@ internal fun FocusModifier.findActiveParent(): FocusModifier? = parent?.let {
  * Returns the bounding box of the focus layout area in the root or [Rect.Zero] if the
  * FocusModifier has not had a layout.
  */
-internal fun FocusModifier.focusRect(): Rect = layoutNodeWrapper?.let {
+internal fun FocusModifier.focusRect(): Rect = coordinator?.let {
     it.findRootCoordinates().localBoundingBoxOf(it, clipBounds = false)
 } ?: Rect.Zero
-
 /**
  * Returns all [FocusModifier] children that are not [FocusStateImpl.isDeactivated]. Any
  * child that is deactivated will add activated children instead.
@@ -211,7 +210,7 @@ internal fun FocusModifier.activatedChildren(): MutableVector<FocusModifier> {
  */
 @Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
 internal fun FocusModifier.findLastKeyInputModifier(): KeyInputModifier? {
-    val layoutNode = layoutNodeWrapper?.layoutNode ?: return null
+    val layoutNode = coordinator?.layoutNode ?: return null
     var best: KeyInputModifier? = null
     keyInputChildren.forEach { keyInputModifier ->
         if (keyInputModifier.layoutNode == layoutNode) {
@@ -229,8 +228,8 @@ internal fun FocusModifier.findLastKeyInputModifier(): KeyInputModifier? {
  * Whether this node should be considered when searching for the next item during a traversal.
  */
 internal val FocusModifier.isEligibleForFocusSearch: Boolean
-    get() = layoutNodeWrapper?.layoutNode?.isPlaced == true &&
-            layoutNodeWrapper?.layoutNode?.isAttached == true
+    get() = coordinator?.layoutNode?.isPlaced == true &&
+            coordinator?.layoutNode?.isAttached == true
 
 /**
  * Returns [one] if it comes after [two] in the modifier chain or [two] if it comes after [one].

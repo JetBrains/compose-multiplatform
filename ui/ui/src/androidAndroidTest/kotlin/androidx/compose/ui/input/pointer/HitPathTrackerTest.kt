@@ -77,7 +77,7 @@ class HitPathTrackerTest {
 
     @Before
     fun setup() {
-        hitPathTracker = HitPathTracker(layoutNode.outerLayoutNodeWrapper)
+        hitPathTracker = HitPathTracker(layoutNode.outerCoordinator)
     }
 
     @Test
@@ -3266,7 +3266,7 @@ class HitPathTrackerTest {
     @Test
     fun addHitPath_hoverMove_enterExit() {
         val log = mutableListOf<LogEntry>()
-        val layoutCoordinates = layoutNode.outerLayoutNodeWrapper
+        val layoutCoordinates = layoutNode.outerCoordinator
         val pif1: PointerInputFilter = PointerInputFilterMock(
             log = log,
             layoutCoordinates = layoutCoordinates
@@ -3364,7 +3364,7 @@ class HitPathTrackerTest {
     @Test
     fun addHitPath_hoverExit() {
         val log = mutableListOf<LogEntry>()
-        val layoutCoordinates = layoutNode.outerLayoutNodeWrapper
+        val layoutCoordinates = layoutNode.outerCoordinator
         val pif1: PointerInputFilter = PointerInputFilterMock(
             log = log,
             layoutCoordinates = layoutCoordinates

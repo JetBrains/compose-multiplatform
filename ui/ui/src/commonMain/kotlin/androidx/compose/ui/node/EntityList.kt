@@ -42,18 +42,18 @@ internal value class EntityList(
      * Add [LayoutNodeEntity] values for types that [modifier] supports that should be
      * added before the LayoutModifier.
      */
-    fun addBeforeLayoutModifier(layoutNodeWrapper: LayoutNodeWrapper, modifier: Modifier) {
+    fun addBeforeLayoutModifier(coordinator: NodeCoordinator, modifier: Modifier) {
         if (modifier is DrawModifier) {
-            add(DrawEntity(layoutNodeWrapper, modifier), DrawEntityType.index)
+            add(DrawEntity(coordinator, modifier), DrawEntityType.index)
         }
         if (modifier is PointerInputModifier) {
-            add(PointerInputEntity(layoutNodeWrapper, modifier), PointerInputEntityType.index)
+            add(PointerInputEntity(coordinator, modifier), PointerInputEntityType.index)
         }
         if (modifier is SemanticsModifier) {
-            add(SemanticsEntity(layoutNodeWrapper, modifier), SemanticsEntityType.index)
+            add(SemanticsEntity(coordinator, modifier), SemanticsEntityType.index)
         }
         if (modifier is ParentDataModifier) {
-            add(SimpleEntity(layoutNodeWrapper, modifier), ParentDataEntityType.index)
+            add(SimpleEntity(coordinator, modifier), ParentDataEntityType.index)
         }
     }
 
@@ -61,15 +61,15 @@ internal value class EntityList(
      * Add [LayoutNodeEntity] values that must be added after the LayoutModifier.
      */
     @OptIn(ExperimentalComposeUiApi::class)
-    fun addAfterLayoutModifier(layoutNodeWrapper: LayoutNodeWrapper, modifier: Modifier) {
+    fun addAfterLayoutModifier(coordinator: NodeCoordinator, modifier: Modifier) {
         if (modifier is OnPlacedModifier) {
-            add(SimpleEntity(layoutNodeWrapper, modifier), OnPlacedEntityType.index)
+            add(SimpleEntity(coordinator, modifier), OnPlacedEntityType.index)
         }
         if (modifier is OnRemeasuredModifier) {
-            add(SimpleEntity(layoutNodeWrapper, modifier), RemeasureEntityType.index)
+            add(SimpleEntity(coordinator, modifier), RemeasureEntityType.index)
         }
         if (modifier is LookaheadOnPlacedModifier) {
-            add(SimpleEntity(layoutNodeWrapper, modifier), LookaheadOnPlacedEntityType.index)
+            add(SimpleEntity(coordinator, modifier), LookaheadOnPlacedEntityType.index)
         }
     }
 

@@ -702,28 +702,28 @@ class LayoutNodeTest {
         assertFalse(layoutNode.coordinates.isAttached)
     }
 
-    // The LayoutNodeWrapper should be reused when it has been replaced with the same type
+    // The NodeCoordinator should be reused when it has been replaced with the same type
     @Test
-    fun layoutNodeWrapperSameWithReplacementModifier() {
+    fun nodeCoordinatorSameWithReplacementModifier() {
         val layoutNode = LayoutNode()
         val layoutModifier = Modifier.graphicsLayer { }
 
         layoutNode.modifier = layoutModifier
-        val oldLayoutNodeWrapper = layoutNode.outerLayoutNodeWrapper
-        assertFalse(oldLayoutNodeWrapper.isAttached)
+        val oldNodeCoordinator = layoutNode.outerCoordinator
+        assertFalse(oldNodeCoordinator.isAttached)
 
         layoutNode.attach(MockOwner())
-        assertTrue(oldLayoutNodeWrapper.isAttached)
+        assertTrue(oldNodeCoordinator.isAttached)
 
         layoutNode.modifier = Modifier.graphicsLayer { }
-        val newLayoutNodeWrapper = layoutNode.outerLayoutNodeWrapper
-        assertSame(newLayoutNodeWrapper, oldLayoutNodeWrapper)
+        val newNodeCoordinator = layoutNode.outerCoordinator
+        assertSame(newNodeCoordinator, oldNodeCoordinator)
     }
 
-    // The LayoutNodeWrapper should be reused when it has been replaced with the same type,
-    // even with multiple LayoutNodeWrappers for one modifier.
+    // The NodeCoordinator should be reused when it has been replaced with the same type,
+    // even with multiple NodeCoordinators for one modifier.
     @Test
-    fun layoutNodeWrapperSameWithReplacementMultiModifier() {
+    fun nodeCoordinatorSameWithReplacementMultiModifier() {
         class TestModifier : DrawModifier, LayoutModifier {
             override fun ContentDrawScope.draw() {
                 drawContent()
@@ -738,48 +738,48 @@ class LayoutNodeTest {
         val layoutNode = LayoutNode()
 
         layoutNode.modifier = TestModifier()
-        val oldLayoutNodeWrapper = layoutNode.outerLayoutNodeWrapper
-        val oldLayoutNodeWrapper2 = oldLayoutNodeWrapper.wrapped
+        val oldNodeCoordinator = layoutNode.outerCoordinator
+        val oldNodeCoordinator2 = oldNodeCoordinator.wrapped
         layoutNode.modifier = TestModifier()
-        val newLayoutNodeWrapper = layoutNode.outerLayoutNodeWrapper
-        val newLayoutNodeWrapper2 = newLayoutNodeWrapper.wrapped
-        assertSame(newLayoutNodeWrapper, oldLayoutNodeWrapper)
-        assertSame(newLayoutNodeWrapper2, oldLayoutNodeWrapper2)
+        val newNodeCoordinator = layoutNode.outerCoordinator
+        val newNodeCoordinator2 = newNodeCoordinator.wrapped
+        assertSame(newNodeCoordinator, oldNodeCoordinator)
+        assertSame(newNodeCoordinator2, oldNodeCoordinator2)
     }
 
-    // The LayoutNodeWrapper should be detached when it has been replaced.
+    // The NodeCoordinator should be detached when it has been replaced.
     @Test
-    fun layoutNodeWrapperAttachedWhenLayoutNodeAttached() {
+    fun nodeCoordinatorAttachedWhenLayoutNodeAttached() {
         val layoutNode = LayoutNode()
         // 2 modifiers at the start
         val layoutModifier = Modifier.graphicsLayer { }.graphicsLayer { }
 
         layoutNode.modifier = layoutModifier
-        val oldLayoutNodeWrapper = layoutNode.outerLayoutNodeWrapper
-        val oldInnerLayoutNodeWrapper = oldLayoutNodeWrapper.wrapped
-        assertFalse(oldLayoutNodeWrapper.isAttached)
-        assertNotNull(oldInnerLayoutNodeWrapper)
-        assertFalse(oldInnerLayoutNodeWrapper!!.isAttached)
+        val oldNodeCoordinator = layoutNode.outerCoordinator
+        val oldInnerNodeCoordinator = oldNodeCoordinator.wrapped
+        assertFalse(oldNodeCoordinator.isAttached)
+        assertNotNull(oldInnerNodeCoordinator)
+        assertFalse(oldInnerNodeCoordinator!!.isAttached)
 
         layoutNode.attach(MockOwner())
-        assertTrue(oldLayoutNodeWrapper.isAttached)
+        assertTrue(oldNodeCoordinator.isAttached)
 
         // only 1 modifier now, so one should be detached and the other can be reused
         layoutNode.modifier = Modifier.graphicsLayer()
-        val newLayoutNodeWrapper = layoutNode.outerLayoutNodeWrapper
+        val newNodeCoordinator = layoutNode.outerCoordinator
 
         // one can be reused, but we don't care which one
-        val notReused = if (newLayoutNodeWrapper == oldLayoutNodeWrapper) {
-            oldInnerLayoutNodeWrapper
+        val notReused = if (newNodeCoordinator == oldNodeCoordinator) {
+            oldInnerNodeCoordinator
         } else {
-            oldLayoutNodeWrapper
+            oldNodeCoordinator
         }
-        assertTrue(newLayoutNodeWrapper.isAttached)
+        assertTrue(newNodeCoordinator.isAttached)
         assertFalse(notReused.isAttached)
     }
 
     @Test
-    fun layoutNodeWrapperParentLayoutCoordinates() {
+    fun nodeCoordinatorParentLayoutCoordinates() {
         val layoutNode = LayoutNode()
         val layoutNode2 = LayoutNode()
         val layoutModifier = Modifier.graphicsLayer { }
@@ -788,17 +788,17 @@ class LayoutNodeTest {
         layoutNode2.attach(MockOwner())
 
         assertEquals(
-            layoutNode2.innerLayoutNodeWrapper,
-            layoutNode.innerLayoutNodeWrapper.parentLayoutCoordinates
+            layoutNode2.innerCoordinator,
+            layoutNode.innerCoordinator.parentLayoutCoordinates
         )
         assertEquals(
-            layoutNode2.innerLayoutNodeWrapper,
-            layoutNode.outerLayoutNodeWrapper.parentLayoutCoordinates
+            layoutNode2.innerCoordinator,
+            layoutNode.outerCoordinator.parentLayoutCoordinates
         )
     }
 
     @Test
-    fun layoutNodeWrapperParentCoordinates() {
+    fun nodeCoordinatorParentCoordinates() {
         val layoutNode = LayoutNode()
         val layoutNode2 = LayoutNode()
         val layoutModifier = object : LayoutModifier {
@@ -814,20 +814,20 @@ class LayoutNodeTest {
         layoutNode2.insertAt(0, layoutNode)
         layoutNode2.attach(MockOwner())
 
-        val layoutModifierWrapper = layoutNode.outerLayoutNodeWrapper
+        val layoutModifierWrapper = layoutNode.outerCoordinator
 
         assertEquals(
             layoutModifierWrapper,
-            layoutNode.innerLayoutNodeWrapper.parentCoordinates
+            layoutNode.innerCoordinator.parentCoordinates
         )
         assertEquals(
-            layoutNode2.innerLayoutNodeWrapper,
+            layoutNode2.innerCoordinator,
             layoutModifierWrapper.parentCoordinates
         )
     }
 
     @Test
-    fun layoutNodeWrapper_transformFrom_offsets() {
+    fun nodeCoordinator_transformFrom_offsets() {
         val parent = ZeroSizedLayoutNode()
         parent.attach(MockOwner())
         val child = ZeroSizedLayoutNode()
@@ -836,17 +836,17 @@ class LayoutNodeTest {
         child.place(50, 80)
 
         val matrix = Matrix()
-        child.innerLayoutNodeWrapper.transformFrom(parent.innerLayoutNodeWrapper, matrix)
+        child.innerCoordinator.transformFrom(parent.innerCoordinator, matrix)
 
         assertEquals(Offset(-50f, -80f), matrix.map(Offset.Zero))
 
-        parent.innerLayoutNodeWrapper.transformFrom(child.innerLayoutNodeWrapper, matrix)
+        parent.innerCoordinator.transformFrom(child.innerCoordinator, matrix)
 
         assertEquals(Offset(50f, 80f), matrix.map(Offset.Zero))
     }
 
     @Test
-    fun layoutNodeWrapper_transformFrom_translation() {
+    fun nodeCoordinator_transformFrom_translation() {
         val parent = ZeroSizedLayoutNode()
         parent.attach(MockOwner())
         val child = ZeroSizedLayoutNode()
@@ -855,27 +855,27 @@ class LayoutNodeTest {
             translationX = 5f
             translationY = 2f
         }
-        parent.outerLayoutNodeWrapper
-            .measure(listOf(parent.outerLayoutNodeWrapper), Constraints())
-        child.outerLayoutNodeWrapper
-            .measure(listOf(child.outerLayoutNodeWrapper), Constraints())
+        parent.outerCoordinator
+            .measure(listOf(parent.outerCoordinator), Constraints())
+        child.outerCoordinator
+            .measure(listOf(child.outerCoordinator), Constraints())
         parent.place(0, 0)
         child.place(0, 0)
 
         val matrix = Matrix()
-        child.innerLayoutNodeWrapper.transformFrom(parent.innerLayoutNodeWrapper, matrix)
+        child.innerCoordinator.transformFrom(parent.innerCoordinator, matrix)
 
         assertEquals(-5f, matrix.map(Offset.Zero).x, 0.001f)
         assertEquals(-2f, matrix.map(Offset.Zero).y, 0.001f)
 
-        parent.innerLayoutNodeWrapper.transformFrom(child.innerLayoutNodeWrapper, matrix)
+        parent.innerCoordinator.transformFrom(child.innerCoordinator, matrix)
 
         assertEquals(5f, matrix.map(Offset.Zero).x, 0.001f)
         assertEquals(2f, matrix.map(Offset.Zero).y, 0.001f)
     }
 
     @Test
-    fun layoutNodeWrapper_transformFrom_rotation() {
+    fun nodeCoordinator_transformFrom_rotation() {
         val parent = ZeroSizedLayoutNode()
         parent.attach(MockOwner())
         val child = ZeroSizedLayoutNode()
@@ -883,27 +883,27 @@ class LayoutNodeTest {
         child.modifier = Modifier.graphicsLayer {
             rotationZ = 90f
         }
-        parent.outerLayoutNodeWrapper
-            .measure(listOf(parent.outerLayoutNodeWrapper), Constraints())
-        child.outerLayoutNodeWrapper
-            .measure(listOf(child.outerLayoutNodeWrapper), Constraints())
+        parent.outerCoordinator
+            .measure(listOf(parent.outerCoordinator), Constraints())
+        child.outerCoordinator
+            .measure(listOf(child.outerCoordinator), Constraints())
         parent.place(0, 0)
         child.place(0, 0)
 
         val matrix = Matrix()
-        child.innerLayoutNodeWrapper.transformFrom(parent.innerLayoutNodeWrapper, matrix)
+        child.innerCoordinator.transformFrom(parent.innerCoordinator, matrix)
 
         assertEquals(0f, matrix.map(Offset(1f, 0f)).x, 0.001f)
         assertEquals(-1f, matrix.map(Offset(1f, 0f)).y, 0.001f)
 
-        parent.innerLayoutNodeWrapper.transformFrom(child.innerLayoutNodeWrapper, matrix)
+        parent.innerCoordinator.transformFrom(child.innerCoordinator, matrix)
 
         assertEquals(0f, matrix.map(Offset(1f, 0f)).x, 0.001f)
         assertEquals(1f, matrix.map(Offset(1f, 0f)).y, 0.001f)
     }
 
     @Test
-    fun layoutNodeWrapper_transformFrom_scale() {
+    fun nodeCoordinator_transformFrom_scale() {
         val parent = ZeroSizedLayoutNode()
         parent.attach(MockOwner())
         val child = ZeroSizedLayoutNode()
@@ -911,45 +911,45 @@ class LayoutNodeTest {
         child.modifier = Modifier.graphicsLayer {
             scaleX = 0f
         }
-        parent.outerLayoutNodeWrapper
-            .measure(listOf(parent.outerLayoutNodeWrapper), Constraints())
-        child.outerLayoutNodeWrapper
-            .measure(listOf(child.outerLayoutNodeWrapper), Constraints())
+        parent.outerCoordinator
+            .measure(listOf(parent.outerCoordinator), Constraints())
+        child.outerCoordinator
+            .measure(listOf(child.outerCoordinator), Constraints())
         parent.place(0, 0)
         child.place(0, 0)
 
         val matrix = Matrix()
-        child.innerLayoutNodeWrapper.transformFrom(parent.innerLayoutNodeWrapper, matrix)
+        child.innerCoordinator.transformFrom(parent.innerCoordinator, matrix)
 
         // The X coordinate is somewhat nonsensical since it is scaled to 0
         // We've chosen to make it not transform when there's a nonsensical inverse.
         assertEquals(1f, matrix.map(Offset(1f, 1f)).x, 0.001f)
         assertEquals(1f, matrix.map(Offset(1f, 1f)).y, 0.001f)
 
-        parent.innerLayoutNodeWrapper.transformFrom(child.innerLayoutNodeWrapper, matrix)
+        parent.innerCoordinator.transformFrom(child.innerCoordinator, matrix)
 
         // This direction works, so we can expect the normal scaling
         assertEquals(0f, matrix.map(Offset(1f, 1f)).x, 0.001f)
         assertEquals(1f, matrix.map(Offset(1f, 1f)).y, 0.001f)
 
-        child.innerLayoutNodeWrapper.onLayerBlockUpdated {
+        child.innerCoordinator.onLayerBlockUpdated {
             scaleX = 0.5f
             scaleY = 0.25f
         }
 
-        child.innerLayoutNodeWrapper.transformFrom(parent.innerLayoutNodeWrapper, matrix)
+        child.innerCoordinator.transformFrom(parent.innerCoordinator, matrix)
 
         assertEquals(2f, matrix.map(Offset(1f, 1f)).x, 0.001f)
         assertEquals(4f, matrix.map(Offset(1f, 1f)).y, 0.001f)
 
-        parent.innerLayoutNodeWrapper.transformFrom(child.innerLayoutNodeWrapper, matrix)
+        parent.innerCoordinator.transformFrom(child.innerCoordinator, matrix)
 
         assertEquals(0.5f, matrix.map(Offset(1f, 1f)).x, 0.001f)
         assertEquals(0.25f, matrix.map(Offset(1f, 1f)).y, 0.001f)
     }
 
     @Test
-    fun layoutNodeWrapper_transformFrom_siblings() {
+    fun nodeCoordinator_transformFrom_siblings() {
         val parent = ZeroSizedLayoutNode()
         parent.attach(MockOwner())
         val child1 = ZeroSizedLayoutNode()
@@ -966,18 +966,18 @@ class LayoutNodeTest {
             scaleY = 2f
             transformOrigin = TransformOrigin(0f, 0f)
         }
-        parent.outerLayoutNodeWrapper
-            .measure(listOf(parent.outerLayoutNodeWrapper), Constraints())
-        child1.outerLayoutNodeWrapper
-            .measure(listOf(child1.outerLayoutNodeWrapper), Constraints())
-        child2.outerLayoutNodeWrapper
-            .measure(listOf(child2.outerLayoutNodeWrapper), Constraints())
+        parent.outerCoordinator
+            .measure(listOf(parent.outerCoordinator), Constraints())
+        child1.outerCoordinator
+            .measure(listOf(child1.outerCoordinator), Constraints())
+        child2.outerCoordinator
+            .measure(listOf(child2.outerCoordinator), Constraints())
         parent.place(0, 0)
         child1.place(100, 200)
         child2.place(5, 11)
 
         val matrix = Matrix()
-        child2.innerLayoutNodeWrapper.transformFrom(child1.innerLayoutNodeWrapper, matrix)
+        child2.innerCoordinator.transformFrom(child1.innerCoordinator, matrix)
 
         // (20, 36) should be (10, 9) in real coordinates due to scaling
         // Translate to (110, 209) in the parent
@@ -987,14 +987,14 @@ class LayoutNodeTest {
         assertEquals(21f, offset.x, 0.001f)
         assertEquals(99f, offset.y, 0.001f)
 
-        child1.innerLayoutNodeWrapper.transformFrom(child2.innerLayoutNodeWrapper, matrix)
+        child1.innerCoordinator.transformFrom(child2.innerCoordinator, matrix)
         val offset2 = matrix.map(Offset(21f, 99f))
         assertEquals(20f, offset2.x, 0.001f)
         assertEquals(36f, offset2.y, 0.001f)
     }
 
     @Test
-    fun layoutNodeWrapper_transformFrom_cousins() {
+    fun nodeCoordinator_transformFrom_cousins() {
         val parent = ZeroSizedLayoutNode()
         parent.attach(MockOwner())
         val child1 = ZeroSizedLayoutNode()
@@ -1014,12 +1014,12 @@ class LayoutNodeTest {
         grandChild2.place(17, 59)
 
         val matrix = Matrix()
-        grandChild1.innerLayoutNodeWrapper.transformFrom(grandChild2.innerLayoutNodeWrapper, matrix)
+        grandChild1.innerCoordinator.transformFrom(grandChild2.innerCoordinator, matrix)
 
         // (17, 59) + (22, 33) - (10, 11) - (45, 27) = (-16, 54)
         assertEquals(Offset(-16f, 54f), matrix.map(Offset.Zero))
 
-        grandChild2.innerLayoutNodeWrapper.transformFrom(grandChild1.innerLayoutNodeWrapper, matrix)
+        grandChild2.innerCoordinator.transformFrom(grandChild1.innerCoordinator, matrix)
 
         assertEquals(Offset(16f, -54f), matrix.map(Offset.Zero))
     }
@@ -2324,23 +2324,23 @@ class LayoutNodeTest {
         val root = LayoutNode()
         root.modifier = modifier1.then(modifier2)
 
-        val wrapper1 = root.outerLayoutNodeWrapper
-        val wrapper2 = root.outerLayoutNodeWrapper.wrapped
+        val wrapper1 = root.outerCoordinator
+        val wrapper2 = root.outerCoordinator.wrapped
 
-        assertEquals(modifier1, (wrapper1 as ModifiedLayoutNode).modifier)
-        assertEquals(modifier2, (wrapper2 as ModifiedLayoutNode).modifier)
+        assertEquals(modifier1, (wrapper1 as LayoutModifierNodeCoordinator).modifier)
+        assertEquals(modifier2, (wrapper2 as LayoutModifierNodeCoordinator).modifier)
 
         root.modifier = modifier2.then(modifier1)
 
-        assertEquals(wrapper2, root.outerLayoutNodeWrapper)
-        assertEquals(wrapper1, root.outerLayoutNodeWrapper.wrapped)
+        assertEquals(wrapper2, root.outerCoordinator)
+        assertEquals(wrapper1, root.outerCoordinator.wrapped)
         assertEquals(
             modifier1,
-            (root.outerLayoutNodeWrapper.wrapped as ModifiedLayoutNode).modifier
+            (root.outerCoordinator.wrapped as LayoutModifierNodeCoordinator).modifier
         )
         assertEquals(
             modifier2,
-            (root.outerLayoutNodeWrapper as ModifiedLayoutNode).modifier
+            (root.outerCoordinator as LayoutModifierNodeCoordinator).modifier
         )
     }
 
@@ -2349,7 +2349,7 @@ class LayoutNodeTest {
         val node = LayoutNode(20, 20, 100, 100)
         val owner = MockOwner()
         node.attach(owner)
-        node.innerLayoutNodeWrapper.measureResult = object : MeasureResult {
+        node.innerCoordinator.measureResult = object : MeasureResult {
             override val width = 50
             override val height = 50
             override val alignmentLines: Map<AlignmentLine, Int> get() = mapOf()
@@ -2366,13 +2366,13 @@ class LayoutNodeTest {
         val owner = MockOwner()
         node.attach(owner)
         assertEquals(0, owner.layoutChangeCount)
-        node.innerLayoutNodeWrapper.onLayerBlockUpdated { scaleX = 0.5f }
+        node.innerCoordinator.onLayerBlockUpdated { scaleX = 0.5f }
         assertEquals(1, owner.layoutChangeCount)
         repeat(2) {
-            node.innerLayoutNodeWrapper.onLayerBlockUpdated { scaleX = 1f }
+            node.innerCoordinator.onLayerBlockUpdated { scaleX = 1f }
         }
         assertEquals(2, owner.layoutChangeCount)
-        node.innerLayoutNodeWrapper.onLayerBlockUpdated(null)
+        node.innerCoordinator.onLayerBlockUpdated(null)
         assertEquals(3, owner.layoutChangeCount)
     }
 
@@ -2405,7 +2405,7 @@ class LayoutNodeTest {
     }
 
     @Test
-    fun layoutNodeWrapper_alpha() {
+    fun nodeCoordinator_alpha() {
         val root = LayoutNode().apply { this.modifier = Modifier.drawBehind {} }
         val layoutNode1 = LayoutNode().apply {
             this.modifier = Modifier.graphicsLayer { }.graphicsLayer { }.drawBehind {}
@@ -2418,17 +2418,17 @@ class LayoutNodeTest {
         root.attach(owner)
 
         // provide alpha to the graphics layer
-        layoutNode1.outerLayoutNodeWrapper.wrapped!!.onLayerBlockUpdated {
+        layoutNode1.outerCoordinator.wrapped!!.onLayerBlockUpdated {
             alpha = 0f
         }
-        layoutNode1.outerLayoutNodeWrapper.wrapped!!.wrapped!!.onLayerBlockUpdated {
+        layoutNode1.outerCoordinator.wrapped!!.wrapped!!.onLayerBlockUpdated {
             alpha = 0.5f
         }
 
-        assertFalse(layoutNode1.outerLayoutNodeWrapper.isTransparent())
-        assertTrue(layoutNode1.innerLayoutNodeWrapper.isTransparent())
-        assertTrue(layoutNode2.outerLayoutNodeWrapper.isTransparent())
-        assertTrue(layoutNode2.innerLayoutNodeWrapper.isTransparent())
+        assertFalse(layoutNode1.outerCoordinator.isTransparent())
+        assertTrue(layoutNode1.innerCoordinator.isTransparent())
+        assertTrue(layoutNode2.outerCoordinator.isTransparent())
+        assertTrue(layoutNode2.innerCoordinator.isTransparent())
     }
 
     private fun createSimpleLayout(): Triple<LayoutNode, LayoutNode, LayoutNode> {
@@ -2702,10 +2702,10 @@ private fun LayoutNode(
     attach(MockOwner())
     markMeasurePending()
     remeasure(Constraints())
-    var wrapper: LayoutNodeWrapper? = outerLayoutNodeWrapper
+    var wrapper: NodeCoordinator? = outerCoordinator
     while (wrapper != null) {
-        wrapper.measureResult = innerLayoutNodeWrapper.measureResult
-        wrapper = (wrapper as? LayoutNodeWrapper)?.wrapped
+        wrapper.measureResult = innerCoordinator.measureResult
+        wrapper = (wrapper as? NodeCoordinator)?.wrapped
     }
     place(x, y)
     detach()

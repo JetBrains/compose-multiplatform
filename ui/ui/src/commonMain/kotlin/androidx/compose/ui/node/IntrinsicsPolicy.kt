@@ -34,44 +34,44 @@ internal class IntrinsicsPolicy(val layoutNode: LayoutNode) {
     }
 
     fun minIntrinsicWidth(height: Int) = with(measurePolicyFromState()) {
-        layoutNode.outerLayoutNodeWrapper.minIntrinsicWidth(layoutNode.childMeasurables, height)
+        layoutNode.outerCoordinator.minIntrinsicWidth(layoutNode.childMeasurables, height)
     }
 
     fun minIntrinsicHeight(width: Int) = with(measurePolicyFromState()) {
-        layoutNode.outerLayoutNodeWrapper.minIntrinsicHeight(layoutNode.childMeasurables, width)
+        layoutNode.outerCoordinator.minIntrinsicHeight(layoutNode.childMeasurables, width)
     }
 
     fun maxIntrinsicWidth(height: Int) = with(measurePolicyFromState()) {
-        layoutNode.outerLayoutNodeWrapper.maxIntrinsicWidth(layoutNode.childMeasurables, height)
+        layoutNode.outerCoordinator.maxIntrinsicWidth(layoutNode.childMeasurables, height)
     }
 
     fun maxIntrinsicHeight(width: Int) = with(measurePolicyFromState()) {
-        layoutNode.outerLayoutNodeWrapper.maxIntrinsicHeight(layoutNode.childMeasurables, width)
+        layoutNode.outerCoordinator.maxIntrinsicHeight(layoutNode.childMeasurables, width)
     }
 
     fun minLookaheadIntrinsicWidth(height: Int) = with(measurePolicyFromState()) {
-        layoutNode.outerLayoutNodeWrapper.minIntrinsicWidth(
+        layoutNode.outerCoordinator.minIntrinsicWidth(
             layoutNode.childLookaheadMeasurables,
             height
         )
     }
 
     fun minLookaheadIntrinsicHeight(width: Int) = with(measurePolicyFromState()) {
-        layoutNode.outerLayoutNodeWrapper.minIntrinsicHeight(
+        layoutNode.outerCoordinator.minIntrinsicHeight(
             layoutNode.childLookaheadMeasurables,
             width
         )
     }
 
     fun maxLookaheadIntrinsicWidth(height: Int) = with(measurePolicyFromState()) {
-        layoutNode.outerLayoutNodeWrapper.maxIntrinsicWidth(
+        layoutNode.outerCoordinator.maxIntrinsicWidth(
             layoutNode.childLookaheadMeasurables,
             height
         )
     }
 
     fun maxLookaheadIntrinsicHeight(width: Int) = with(measurePolicyFromState()) {
-        layoutNode.outerLayoutNodeWrapper.maxIntrinsicHeight(
+        layoutNode.outerCoordinator.maxIntrinsicHeight(
             layoutNode.childLookaheadMeasurables,
             width
         )

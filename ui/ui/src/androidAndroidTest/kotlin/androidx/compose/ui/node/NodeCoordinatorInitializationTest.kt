@@ -39,7 +39,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class LayoutNodeWrapperInitializationTest {
+class NodeCoordinatorInitializationTest {
     @get:Rule
     val rule = createComposeRule()
 
@@ -104,8 +104,8 @@ class LayoutNodeWrapperInitializationTest {
 
         // Assert.
         rule.runOnIdle {
-            val layoutNodeWrapper = layoutCoordinates as LayoutNodeWrapper
-            val callbacks = layoutNodeWrapper.layoutNode.getOrCreateOnPositionedCallbacks()
+            val coordinator = layoutCoordinates as NodeCoordinator
+            val callbacks = coordinator.layoutNode.getOrCreateOnPositionedCallbacks()
             assertThat(callbacks.asMutableList()).isNotEmpty()
         }
     }
@@ -184,8 +184,8 @@ class LayoutNodeWrapperInitializationTest {
 
         // Assert.
         rule.runOnIdle {
-            val layoutNodeWrapper = layoutCoordinates as LayoutNodeWrapper
-            val callbacks = layoutNodeWrapper.layoutNode.getOrCreateOnPositionedCallbacks()
+            val coordinator = layoutCoordinates as NodeCoordinator
+            val callbacks = coordinator.layoutNode.getOrCreateOnPositionedCallbacks()
             assertThat(callbacks.asMutableList()).isNotEmpty()
         }
     }

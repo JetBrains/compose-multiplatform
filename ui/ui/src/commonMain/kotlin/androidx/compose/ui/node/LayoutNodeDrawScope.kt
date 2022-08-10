@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 
 /**
  * [ContentDrawScope] implementation that extracts density and layout direction information
- * from the given LayoutNodeWrapper
+ * from the given NodeCoordinator
  */
 internal class LayoutNodeDrawScope(
     private val canvasDrawScope: CanvasDrawScope = CanvasDrawScope()
@@ -45,7 +45,7 @@ internal class LayoutNodeDrawScope(
             if (nextDrawEntity != null) {
                 nextDrawEntity.draw(canvas)
             } else {
-                drawEntity.layoutNodeWrapper.performDraw(canvas)
+                drawEntity.coordinator.performDraw(canvas)
             }
         }
     }
@@ -53,15 +53,15 @@ internal class LayoutNodeDrawScope(
     internal inline fun draw(
         canvas: Canvas,
         size: Size,
-        layoutNodeWrapper: LayoutNodeWrapper,
+        coordinator: NodeCoordinator,
         drawEntity: DrawEntity,
         block: DrawScope.() -> Unit
     ) {
         val previousDrawEntity = this.drawEntity
         this.drawEntity = drawEntity
         canvasDrawScope.draw(
-            layoutNodeWrapper,
-            layoutNodeWrapper.layoutDirection,
+            coordinator,
+            coordinator.layoutDirection,
             canvas,
             size,
             block

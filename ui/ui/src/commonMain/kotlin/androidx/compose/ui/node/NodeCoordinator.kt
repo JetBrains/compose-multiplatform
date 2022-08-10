@@ -61,13 +61,13 @@ import androidx.compose.ui.unit.plus
 /**
  * Measurable and Placeable type that has a position.
  */
-internal abstract class LayoutNodeWrapper(
+internal abstract class NodeCoordinator(
     override val layoutNode: LayoutNode
 ) : LookaheadCapablePlaceable(), Measurable, LayoutCoordinates, OwnerScope,
         (Canvas) -> Unit {
 
-    internal open val wrapped: LayoutNodeWrapper? get() = null
-    internal var wrappedBy: LayoutNodeWrapper? = null
+    internal open val wrapped: NodeCoordinator? get() = null
+    internal var wrappedBy: NodeCoordinator? = null
 
     override val layoutDirection: LayoutDirection
         get() = layoutNode.layoutDirection
@@ -176,16 +176,16 @@ internal abstract class LayoutNodeWrapper(
     override val providedAlignmentLines: Set<AlignmentLine>
         get() {
             var set: MutableSet<AlignmentLine>? = null
-            var wrapper: LayoutNodeWrapper? = this
-            while (wrapper != null) {
-                val alignmentLines = wrapper._measureResult?.alignmentLines
+            var coordinator: NodeCoordinator? = this
+            while (coordinator != null) {
+                val alignmentLines = coordinator._measureResult?.alignmentLines
                 if (alignmentLines?.isNotEmpty() == true) {
                     if (set == null) {
                         set = mutableSetOf()
                     }
                     set.addAll(alignmentLines.keys)
                 }
-                wrapper = wrapper.wrapped
+                coordinator = coordinator.wrapped
             }
             return set ?: emptySet()
         }
@@ -231,7 +231,7 @@ internal abstract class LayoutNodeWrapper(
     final override val parentLayoutCoordinates: LayoutCoordinates?
         get() {
             check(isAttached) { ExpectAttachedLayoutCoordinates }
-            return layoutNode.outerLayoutNodeWrapper.wrappedBy
+            return layoutNode.outerCoordinator.wrappedBy
         }
 
     final override val parentCoordinates: LayoutCoordinates?
@@ -249,7 +249,7 @@ internal abstract class LayoutNodeWrapper(
     private val snapshotObserver get() = layoutNode.requireOwner().snapshotObserver
 
     /**
-     * All [LayoutNodeEntity] elements that are associated with this [LayoutNodeWrapper].
+     * All [LayoutNodeEntity] elements that are associated with this [NodeCoordinator].
      */
     val entities = EntityList()
 
@@ -279,8 +279,8 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
-     * An initialization function that is called when the [LayoutNodeWrapper] is initially created,
-     * and also called when the [LayoutNodeWrapper] is re-used.
+     * An initialization function that is called when the [NodeCoordinator] is initially created,
+     * and also called when the [NodeCoordinator] is re-used.
      */
     open fun onInitialize() {
         layer?.invalidate()
@@ -382,7 +382,7 @@ internal abstract class LayoutNodeWrapper(
                     move(position)
                 }
                 updateLayerParameters()
-                layoutNode.innerLayerWrapperIsDirty = true
+                layoutNode.innerLayerCoordinatorIsDirty = true
                 invalidateParentLayer()
             } else if (layerInvalidated) {
                 updateLayerParameters()
@@ -390,7 +390,7 @@ internal abstract class LayoutNodeWrapper(
         } else {
             layer?.let {
                 it.destroy()
-                layoutNode.innerLayerWrapperIsDirty = true
+                layoutNode.innerLayerCoordinatorIsDirty = true
                 invalidateParentLayer()
                 if (isAttached) {
                     layoutNode.owner?.onLayoutChange(layoutNode)
@@ -462,11 +462,11 @@ internal abstract class LayoutNodeWrapper(
         get() = with(layerDensity) { layoutNode.viewConfiguration.minimumTouchTargetSize.toSize() }
 
     /**
-     * Executes a hit test for this [LayoutNodeWrapper].
+     * Executes a hit test for this [NodeCoordinator].
      *
      * @param hitTestSource The hit test specifics for pointer input or semantics
      * @param pointerPosition The tested pointer position, which is relative to
-     * the [LayoutNodeWrapper].
+     * the [NodeCoordinator].
      * @param hitTestResult The parent [HitTestResult] that any hit should be added to.
      * @param isTouchEvent `true` if this is from a touch source. Touch sources allow for
      * minimum touch target. Semantics hit tests always treat hits as needing minimum touch target.
@@ -544,7 +544,7 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
-     * The [LayoutNodeWrapper] had a hit in bounds and can record any children in the
+     * The [NodeCoordinator] had a hit in bounds and can record any children in the
      * [hitTestResult].
      */
     private fun <T : LayoutNodeEntity<T, M>, C, M : Modifier> T?.hit(
@@ -564,7 +564,7 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
-     * The [LayoutNodeWrapper] had a hit [distanceFromEdge] from the bounds and it is within
+     * The [NodeCoordinator] had a hit [distanceFromEdge] from the bounds and it is within
      * the minimum touch target distance, so it should be recorded as such in the [hitTestResult].
      */
     private fun <T : LayoutNodeEntity<T, M>, C, M : Modifier> T?.hitNear(
@@ -597,7 +597,7 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
-     * The [LayoutNodeWrapper] had a miss, but it hasn't been clipped out. The child must be
+     * The [NodeCoordinator] had a miss, but it hasn't been clipped out. The child must be
      * checked to see if it hit.
      */
     private fun <T : LayoutNodeEntity<T, M>, C, M : Modifier> T?.speculativeHit(
@@ -640,7 +640,7 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
-     * Do a [hitTest] on the children of this [LayoutNodeWrapper].
+     * Do a [hitTest] on the children of this [NodeCoordinator].
      */
     open fun <T : LayoutNodeEntity<T, M>, C, M : Modifier> hitTestChild(
         hitTestSource: HitTestSource<T, C, M>,
@@ -665,7 +665,7 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
-     * Returns the bounds of this [LayoutNodeWrapper], including the minimum touch target.
+     * Returns the bounds of this [NodeCoordinator], including the minimum touch target.
      */
     fun touchBoundsInRoot(): Rect {
         if (!isAttached) {
@@ -681,14 +681,18 @@ internal abstract class LayoutNodeWrapper(
         bounds.right = measuredWidth + padding.width
         bounds.bottom = measuredHeight + padding.height
 
-        var wrapper: LayoutNodeWrapper = this
-        while (wrapper !== root) {
-            wrapper.rectInParent(bounds, clipBounds = false, clipToMinimumTouchTargetSize = true)
+        var coordinator: NodeCoordinator = this
+        while (coordinator !== root) {
+            coordinator.rectInParent(
+                bounds,
+                clipBounds = false,
+                clipToMinimumTouchTargetSize = true
+            )
             if (bounds.isEmpty) {
                 return Rect.Zero
             }
 
-            wrapper = wrapper.wrappedBy!!
+            coordinator = coordinator.wrappedBy!!
         }
         return bounds.toRect()
     }
@@ -707,38 +711,38 @@ internal abstract class LayoutNodeWrapper(
         return owner.calculatePositionInWindow(positionInRoot)
     }
 
-    private fun LayoutCoordinates.toWrapper() =
-        (this as? LookaheadLayoutCoordinatesImpl)?.wrapper ?: this as LayoutNodeWrapper
+    private fun LayoutCoordinates.toCoordinator() =
+        (this as? LookaheadLayoutCoordinatesImpl)?.coordinator ?: this as NodeCoordinator
 
     override fun localPositionOf(
         sourceCoordinates: LayoutCoordinates,
         relativeToSource: Offset
     ): Offset {
-        val layoutNodeWrapper = sourceCoordinates.toWrapper()
-        val commonAncestor = findCommonAncestor(layoutNodeWrapper)
+        val nodeCoordinator = sourceCoordinates.toCoordinator()
+        val commonAncestor = findCommonAncestor(nodeCoordinator)
 
         var position = relativeToSource
-        var wrapper = layoutNodeWrapper
-        while (wrapper !== commonAncestor) {
-            position = wrapper.toParentPosition(position)
-            wrapper = wrapper.wrappedBy!!
+        var coordinator = nodeCoordinator
+        while (coordinator !== commonAncestor) {
+            position = coordinator.toParentPosition(position)
+            coordinator = coordinator.wrappedBy!!
         }
 
         return ancestorToLocal(commonAncestor, position)
     }
 
     override fun transformFrom(sourceCoordinates: LayoutCoordinates, matrix: Matrix) {
-        val layoutNodeWrapper = sourceCoordinates.toWrapper()
-        val commonAncestor = findCommonAncestor(layoutNodeWrapper)
+        val coordinator = sourceCoordinates.toCoordinator()
+        val commonAncestor = findCommonAncestor(coordinator)
 
         matrix.reset()
         // Transform from the source to the common ancestor
-        layoutNodeWrapper.transformToAncestor(commonAncestor, matrix)
+        coordinator.transformToAncestor(commonAncestor, matrix)
         // Transform from the common ancestor to this
         transformFromAncestor(commonAncestor, matrix)
     }
 
-    private fun transformToAncestor(ancestor: LayoutNodeWrapper, matrix: Matrix) {
+    private fun transformToAncestor(ancestor: NodeCoordinator, matrix: Matrix) {
         var wrapper = this
         while (wrapper != ancestor) {
             wrapper.layer?.transform(matrix)
@@ -752,7 +756,7 @@ internal abstract class LayoutNodeWrapper(
         }
     }
 
-    private fun transformFromAncestor(ancestor: LayoutNodeWrapper, matrix: Matrix) {
+    private fun transformFromAncestor(ancestor: NodeCoordinator, matrix: Matrix) {
         if (ancestor != this) {
             wrappedBy!!.transformFromAncestor(ancestor, matrix)
             if (position != IntOffset.Zero) {
@@ -772,8 +776,8 @@ internal abstract class LayoutNodeWrapper(
         check(sourceCoordinates.isAttached) {
             "LayoutCoordinates $sourceCoordinates is not attached!"
         }
-        val layoutNodeWrapper = sourceCoordinates.toWrapper()
-        val commonAncestor = findCommonAncestor(layoutNodeWrapper)
+        val srcCoordinator = sourceCoordinates.toCoordinator()
+        val commonAncestor = findCommonAncestor(srcCoordinator)
 
         val bounds = rectCache
         bounds.left = 0f
@@ -781,21 +785,21 @@ internal abstract class LayoutNodeWrapper(
         bounds.right = sourceCoordinates.size.width.toFloat()
         bounds.bottom = sourceCoordinates.size.height.toFloat()
 
-        var wrapper = layoutNodeWrapper
-        while (wrapper !== commonAncestor) {
-            wrapper.rectInParent(bounds, clipBounds)
+        var coordinator = srcCoordinator
+        while (coordinator !== commonAncestor) {
+            coordinator.rectInParent(bounds, clipBounds)
             if (bounds.isEmpty) {
                 return Rect.Zero
             }
 
-            wrapper = wrapper.wrappedBy!!
+            coordinator = coordinator.wrappedBy!!
         }
 
         ancestorToLocal(commonAncestor, bounds, clipBounds)
         return bounds.toRect()
     }
 
-    private fun ancestorToLocal(ancestor: LayoutNodeWrapper, offset: Offset): Offset {
+    private fun ancestorToLocal(ancestor: NodeCoordinator, offset: Offset): Offset {
         if (ancestor === this) {
             return offset
         }
@@ -807,7 +811,7 @@ internal abstract class LayoutNodeWrapper(
     }
 
     private fun ancestorToLocal(
-        ancestor: LayoutNodeWrapper,
+        ancestor: NodeCoordinator,
         rect: MutableRect,
         clipBounds: Boolean
     ) {
@@ -820,11 +824,11 @@ internal abstract class LayoutNodeWrapper(
 
     override fun localToRoot(relativeToLocal: Offset): Offset {
         check(isAttached) { ExpectAttachedLayoutCoordinates }
-        var wrapper: LayoutNodeWrapper? = this
+        var coordinator: NodeCoordinator? = this
         var position = relativeToLocal
-        while (wrapper != null) {
-            position = wrapper.toParentPosition(position)
-            wrapper = wrapper.wrappedBy
+        while (coordinator != null) {
+            position = coordinator.toParentPosition(position)
+            coordinator = coordinator.wrappedBy
         }
         return position
     }
@@ -852,10 +856,10 @@ internal abstract class LayoutNodeWrapper(
      * local coordinate system.
      */
     open fun fromParentPosition(position: Offset): Offset {
-        val relativeToWrapperPosition = position - this.position
+        val relativeToPosition = position - this.position
         val layer = layer
-        return layer?.mapOffset(relativeToWrapperPosition, inverse = true)
-            ?: relativeToWrapperPosition
+        return layer?.mapOffset(relativeToPosition, inverse = true)
+            ?: relativeToPosition
     }
 
     protected fun drawBorder(canvas: Canvas, paint: Paint) {
@@ -869,13 +873,13 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
-     * Attaches the [LayoutNodeWrapper] and its wrapped [LayoutNodeWrapper] to an active
+     * Attaches the [NodeCoordinator] and its wrapped [NodeCoordinator] to an active
      * LayoutNode.
      *
-     * This will be called when the [LayoutNode] associated with this [LayoutNodeWrapper] is
+     * This will be called when the [LayoutNode] associated with this [NodeCoordinator] is
      * attached to the [Owner].
      *
-     * It is also called whenever the modifier chain is replaced and the [LayoutNodeWrapper]s are
+     * It is also called whenever the modifier chain is replaced and the [NodeCoordinator]s are
      * recreated.
      */
     open fun attach() {
@@ -885,13 +889,13 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
-     * Detaches the [LayoutNodeWrapper] and its wrapped [LayoutNodeWrapper] from an active
+     * Detaches the [NodeCoordinator] and its wrapped [NodeCoordinator] from an active
      * LayoutNode.
      *
-     * This will be called when the [LayoutNode] associated with this [LayoutNodeWrapper] is
+     * This will be called when the [LayoutNode] associated with this [NodeCoordinator] is
      * detached from the [Owner].
      *
-     * It is also called whenever the modifier chain is replaced and the [LayoutNodeWrapper]s are
+     * It is also called whenever the modifier chain is replaced and the [NodeCoordinator]s are
      * recreated.
      */
     open fun detach() {
@@ -906,7 +910,7 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
-     * Modifies bounds to be in the parent LayoutNodeWrapper's coordinates, including clipping,
+     * Modifies bounds to be in the parent NodeCoordinator's coordinates, including clipping,
      * if [clipBounds] is true. If [clipToMinimumTouchTargetSize] is true and the layer clips,
      * then the clip bounds are extended to allow minimum touch target extended area.
      */
@@ -945,7 +949,7 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
-     * Modifies bounds in the parent's coordinates to be in this LayoutNodeWrapper's
+     * Modifies bounds in the parent's coordinates to be in this NodeCoordinator's
      * coordinates, including clipping, if [clipBounds] is true.
      */
     private fun fromParentRect(bounds: MutableRect, clipBounds: Boolean) {
@@ -978,8 +982,8 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
-     * Whether a pointer that is relative to the [LayoutNodeWrapper] is in the bounds of this
-     * LayoutNodeWrapper.
+     * Whether a pointer that is relative to the [NodeCoordinator] is in the bounds of this
+     * NodeCoordinator.
      */
     protected fun isPointerInBounds(pointerPosition: Offset): Boolean {
         val x = pointerPosition.x
@@ -988,7 +992,7 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
-     * Invalidates the layer that this wrapper will draw into.
+     * Invalidates the layer that this coordinator will draw into.
      */
     open fun invalidateLayer() {
         val layer = layer
@@ -1002,13 +1006,13 @@ internal abstract class LayoutNodeWrapper(
     /**
      * Send a request to bring a portion of this item into view. The portion that has to be
      * brought into view is specified as a rectangle where the coordinates are in the local
-     * coordinates of that layoutNodeWrapper. This request is sent up the hierarchy to all parents
+     * coordinates of that nodeCoordinator. This request is sent up the hierarchy to all parents
      * that have a [RelocationModifier][androidx.compose.ui.layout.RelocationModifier].
      */
     open suspend fun propagateRelocationRequest(rect: Rect) {
         val parent = wrappedBy ?: return
 
-        // Translate this layoutNodeWrapper to the coordinate system of the parent.
+        // Translate this nodeCoordinator to the coordinate system of the parent.
         val boundingBoxInParentCoordinates = parent.localBoundingBoxOf(this, false)
 
         // Translate the rect to parent coordinates
@@ -1018,19 +1022,19 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
-     * Called when [LayoutNode.modifier] has changed and all the LayoutNodeWrappers have been
+     * Called when [LayoutNode.modifier] has changed and all the NodeCoordinators have been
      * configured.
      */
     open fun onModifierChanged() {
         layer?.invalidate()
     }
 
-    internal fun findCommonAncestor(other: LayoutNodeWrapper): LayoutNodeWrapper {
+    internal fun findCommonAncestor(other: NodeCoordinator): NodeCoordinator {
         var ancestor1 = other.layoutNode
         var ancestor2 = layoutNode
         if (ancestor1 === ancestor2) {
             // They are on the same node, but we don't know which is the deeper of the two
-            val tooFar = layoutNode.outerLayoutNodeWrapper
+            val tooFar = layoutNode.outerCoordinator
             var tryMe = this
             while (tryMe !== tooFar && tryMe !== other) {
                 tryMe = tryMe.wrappedBy!!
@@ -1062,7 +1066,7 @@ internal abstract class LayoutNodeWrapper(
         return when {
             ancestor2 === layoutNode -> this
             ancestor1 === other.layoutNode -> other
-            else -> ancestor1.innerLayoutNodeWrapper
+            else -> ancestor1.innerCoordinator
         }
     }
 
@@ -1163,18 +1167,18 @@ internal abstract class LayoutNodeWrapper(
         const val ExpectAttachedLayoutCoordinates = "LayoutCoordinate operations are only valid " +
             "when isAttached is true"
         const val UnmeasuredError = "Asking for measurement result of unmeasured layout modifier"
-        private val onCommitAffectingLayerParams: (LayoutNodeWrapper) -> Unit = { wrapper ->
-            if (wrapper.isValid) {
-                // wrapper.layerPositionalProperties should always be non-null here, but
+        private val onCommitAffectingLayerParams: (NodeCoordinator) -> Unit = { coordinator ->
+            if (coordinator.isValid) {
+                // coordinator.layerPositionalProperties should always be non-null here, but
                 // we'll just be careful with a null check.
-                val layerPositionalProperties = wrapper.layerPositionalProperties
+                val layerPositionalProperties = coordinator.layerPositionalProperties
                 if (layerPositionalProperties == null) {
-                    wrapper.updateLayerParameters()
+                    coordinator.updateLayerParameters()
                 } else {
                     tmpLayerPositionalProperties.copyFrom(layerPositionalProperties)
-                    wrapper.updateLayerParameters()
+                    coordinator.updateLayerParameters()
                     if (!tmpLayerPositionalProperties.hasSameValuesAs(layerPositionalProperties)) {
-                        val layoutNode = wrapper.layoutNode
+                        val layoutNode = coordinator.layoutNode
                         val layoutDelegate = layoutNode.layoutDelegate
                         if (layoutDelegate.childrenAccessingCoordinatesDuringPlacement > 0) {
                             if (layoutDelegate.coordinatesAccessedDuringPlacement) {
@@ -1188,8 +1192,8 @@ internal abstract class LayoutNodeWrapper(
                 }
             }
         }
-        private val onCommitAffectingLayer: (LayoutNodeWrapper) -> Unit = { wrapper ->
-            wrapper.layer?.invalidate()
+        private val onCommitAffectingLayer: (NodeCoordinator) -> Unit = { coordinator ->
+            coordinator.layer?.invalidate()
         }
         private val graphicsLayerScope = ReusableGraphicsLayerScope()
         private val tmpLayerPositionalProperties = LayerPositionalProperties()
