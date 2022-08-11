@@ -15,8 +15,8 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <application
-        android:theme="@style/Theme.MaterialComponents.Light">
+
+    <application android:theme="@style/Theme.MaterialComponents.Light">
         <activity
             android:name=".viewinterop.ComposeNothingInAndroidTap"
             android:configChanges="orientation|screenSize"
@@ -54,5 +54,12 @@
             android:name=".viewinterop.ViewComposeViewNestedScrollInteropDemo"
             android:configChanges="orientation|screenSize"
             android:label="Coordinator Layout Activity with Compose > View" />
+
+        <activity
+            android:name=".PainterResourcesDemoActivity"
+            android:configChanges="colorMode|density|fontScale|keyboard|keyboardHidden|
+            layoutDirection|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|
+            smallestScreenSize|touchscreen|uiMode"
+            android:label="Painter Resources Demo" />
     </application>
 </manifest>
