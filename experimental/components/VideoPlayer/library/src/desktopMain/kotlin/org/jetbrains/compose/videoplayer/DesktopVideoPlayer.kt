@@ -28,6 +28,13 @@ internal actual fun VideoPlayerImpl(url: String, width: Int, height: Int) {
     SideEffect {
         mediaPlayerComponent.mediaPlayer().media().play(url)
     }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            mediaPlayerComponent.mediaPlayer().release()
+        }
+    }
+
     return SwingPanel(
         background = Color.Transparent,
         modifier = Modifier.fillMaxSize(),
