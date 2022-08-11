@@ -242,6 +242,17 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     }
 
     @Test
+    fun testPopulateAccessibilityNodeInfoProperties_screenReaderFocusable_speakable() {
+        val node = createSemanticsNodeWithProperties(1, false) {
+            text = AnnotatedString("Example text")
+        }
+
+        accessibilityDelegate.populateAccessibilityNodeInfoProperties(1, info, node)
+
+        assertTrue(info.isScreenReaderFocusable)
+    }
+
+    @Test
     fun testPopulateAccessibilityNodeInfoProperties_disabled() {
         rule.setContent {
             LocalClipboardManager.current.setText(AnnotatedString("test"))
