@@ -33,8 +33,13 @@ import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.ModuleVersionIdentifier
 import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.component.ComponentWithCoordinates
+import org.gradle.api.component.ComponentWithVariants
+import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
 import org.gradle.api.internal.artifacts.ivyservice.projectmodule.ProjectComponentPublication
+import org.gradle.api.internal.component.SoftwareComponentInternal
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -220,7 +225,7 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
                     this.artifactId = it.name.toString()
                     this.groupId = it.group.toString()
                     this.version = it.version.toString()
-                    this.isTipOfTree = it is ProjectDependency
+                    this.isTipOfTree = it is ProjectDependency || it is BuildInfoVariantDependency
                 }
             }.toHashSet().sortedWith(
                 compareBy({ it.groupId }, { it.artifactId }, { it.version })
@@ -293,9 +298,12 @@ private fun Project.createTaskForComponent(
                 artifactId = artifactId,
                 taskSuffix = computeTaskSuffix(artifactId),
                 dependencies = project.provider {
-                    pub.component?.usages?.flatMap { it.dependencies }.orEmpty()
-                }
-            ),
+                    pub.component?.let { component ->
+                        val usageDependencies =
+                            component.usages.orEmpty().flatMap { it.dependencies }
+                        usageDependencies + dependenciesOnKmpVariants(component)
+                    }.orEmpty()
+                }),
             shaProvider = project.provider {
                 project.getFrameworksSupportCommitShaAtHead()
             }
@@ -305,6 +313,16 @@ private fun Project.createTaskForComponent(
         .configure { it.dependsOn(task) }
     addTaskToAggregateBuildInfoFileTask(task)
 }
+
+private fun dependenciesOnKmpVariants(component: SoftwareComponentInternal) =
+    (component as? ComponentWithVariants)?.variants.orEmpty()
+        .mapNotNull { (it as? ComponentWithCoordinates)?.coordinates?.asDependency() }
+
+private fun ModuleVersionIdentifier.asDependency() =
+    BuildInfoVariantDependency(group, name, version)
+
+class BuildInfoVariantDependency(group: String, name: String, version: String) :
+    DefaultExternalModuleDependency(group, name, version)
 
 // For examples, see CreateLibraryBuildInfoFileTaskTest
 @VisibleForTesting
