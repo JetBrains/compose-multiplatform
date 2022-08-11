@@ -254,6 +254,7 @@ internal class SkiaParagraph(
 
     private fun getBoxBackwardByOffset(offset: Int, end: Int = offset): TextBox? {
         var from = offset - 1
+        val isRtl = paragraphIntrinsics.textDirection == ResolvedTextDirection.Rtl
         while (from >= 0) {
             val box = para.getRectsForRange(
                 from, end,
@@ -261,10 +262,39 @@ internal class SkiaParagraph(
             ).firstOrNull()
             when {
                 (box == null) -> from -= 1
-                (text.get(from) == '\n') -> {
-                    val bottom = box.rect.bottom + box.rect.bottom - box.rect.top
-                    val rect = SkRect(0f, box.rect.bottom, 0f, bottom)
-                    return TextBox(rect, box.direction)
+                (text[from] == '\n') -> {
+                    return if (!isRtl) {
+                        val bottom = box.rect.bottom + box.rect.bottom - box.rect.top
+                        val rect = SkRect(0f, box.rect.bottom, 0f, bottom)
+                        return TextBox(rect, box.direction)
+                    } else {
+                        // For RTL:
+                        // When cursor changes its position across lines, we apply the following rules:
+
+                        // if '\n' is the last character, then the box should be aligned to the right:
+                        // _________________abc   <- '\n' new line here
+                        // ___________________|   <- cursor is in the end of the next line
+
+                        // if '\n' is not the last, then the box should be be aligned to the left of the following box:
+                        // _________________abc   <- '\n' new line here
+                        // _________________|qw   <- cursor is before the box ('q') following the new line
+
+                        if (from == text.lastIndex) {
+                            val bottom = box.rect.bottom + box.rect.bottom - box.rect.top
+                            val rect = SkRect(width, box.rect.bottom, width, bottom)
+                            TextBox(rect, box.direction)
+                        } else {
+                            val nextBox =  para.getRectsForRange(
+                                offset, offset + 1,
+                                RectHeightMode.STRUT, RectWidthMode.TIGHT
+                            ).first()
+                            val rect = SkRect(
+                                nextBox.rect.left, nextBox.rect.top,
+                                nextBox.rect.left, nextBox.rect.bottom
+                            )
+                            TextBox(rect, nextBox.direction)
+                        }
+                    }
                 }
                 else -> return box
             }
