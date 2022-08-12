@@ -15,12 +15,14 @@
  */
 package androidx.compose.ui.text
 
+import android.graphics.Paint
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.AnnotatedString.Range
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
 import androidx.compose.ui.text.font.toFontFamily
@@ -1580,6 +1582,31 @@ class MultiParagraphIntegrationTest {
 
         assertThat(multiParagraph.bitmap(brush))
             .isEqualToBitmap(multiParagraph2.bitmap(brush, 0.5f))
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun multiParagraph_appliesDrawStyle_toAllParagraphs() = with(defaultDensity) {
+        val fontSize = 20.sp
+        val fontSizeInPx = fontSize.toPx()
+        val multiParagraph = simpleMultiParagraph(
+            text = buildAnnotatedString {
+                withStyle(ParagraphStyle(textAlign = TextAlign.Right)) {
+                    append("Lorem")
+                }
+                withStyle(ParagraphStyle()) {
+                    append("Ipsum")
+                }
+            },
+            style = TextStyle(fontSize = fontSize),
+            width = fontSizeInPx * 5
+        )
+
+        multiParagraph.bitmap(drawStyle = Stroke())
+
+        multiParagraph.paragraphInfoList.map { it.paragraph }.forEach {
+            assertThat((it as AndroidParagraph).textPaint.style).isEqualTo(Paint.Style.STROKE)
+        }
     }
 
     private fun MultiParagraph.disableAntialias() {

@@ -19,6 +19,7 @@ package androidx.compose.ui.text.platform
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.MultiParagraph
 import androidx.compose.ui.text.style.TextDecoration
@@ -30,11 +31,12 @@ internal actual fun MultiParagraph.drawMultiParagraph(
     brush: Brush,
     alpha: Float,
     shadow: Shadow?,
-    decoration: TextDecoration?
+    decoration: TextDecoration?,
+    drawStyle: DrawStyle?
 ) {
     canvas.save()
     paragraphInfoList.fastForEach {
-        it.paragraph.paint(canvas, brush, alpha, shadow, decoration)
+        it.paragraph.paint(canvas, brush, alpha, shadow, decoration, drawStyle)
         canvas.translate(0f, it.paragraph.height)
     }
     canvas.restore()
