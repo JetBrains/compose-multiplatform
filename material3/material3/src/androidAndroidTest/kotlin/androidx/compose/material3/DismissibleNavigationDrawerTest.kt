@@ -20,6 +20,7 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.tokens.NavigationDrawerTokens
 import androidx.compose.runtime.CompositionLocalProvider
@@ -32,6 +33,7 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -85,6 +87,30 @@ class DismissibleNavigationDrawerTest {
 
         rule.onNodeWithTag("content")
             .assertLeftPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun dismissibleNavigationDrawer_sheet_respectsContentPadding() {
+        rule.setMaterialContent(lightColorScheme()) {
+            val drawerState = rememberDrawerState(DrawerValue.Open)
+            DismissibleNavigationDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    DismissibleDrawerSheet(windowInsets = WindowInsets(7.dp, 7.dp, 7.dp, 7.dp)) {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("content")
+                        )
+                    }
+                },
+                content = {}
+            )
+        }
+
+        rule.onNodeWithTag("content")
+            .assertLeftPositionInRootIsEqualTo(7.dp)
+            .assertTopPositionInRootIsEqualTo(7.dp)
     }
 
     @Test

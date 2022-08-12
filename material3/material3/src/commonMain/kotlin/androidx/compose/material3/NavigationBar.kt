@@ -27,9 +27,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.ripple.rememberRipple
@@ -88,6 +92,7 @@ import kotlin.math.roundToInt
  * @param tonalElevation when [containerColor] is [ColorScheme.surface], a translucent primary color
  * overlay is applied on top of the container. A higher tonal elevation value will result in a
  * darker color in light theme and lighter color in dark theme. See also: [Surface].
+ * @param windowInsets a window insets of the navigation bar.
  * @param content the content of this navigation bar, typically 3-5 [NavigationBarItem]s
  */
 @Composable
@@ -96,6 +101,7 @@ fun NavigationBar(
     containerColor: Color = NavigationBarDefaults.containerColor,
     contentColor: Color = MaterialTheme.colorScheme.contentColorFor(containerColor),
     tonalElevation: Dp = NavigationBarDefaults.Elevation,
+    windowInsets: WindowInsets = NavigationBarDefaults.windowInsets,
     content: @Composable RowScope.() -> Unit
 ) {
     Surface(
@@ -105,7 +111,11 @@ fun NavigationBar(
         modifier = modifier
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().height(NavigationBarHeight).selectableGroup(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .windowInsetsPadding(windowInsets)
+                .height(NavigationBarHeight)
+                .selectableGroup(),
             horizontalArrangement = Arrangement.spacedBy(NavigationBarItemHorizontalPadding),
             content = content
         )
@@ -219,14 +229,16 @@ fun RowScope.NavigationBarItem(
         // ripple, which is why they are separate composables
         val indicatorRipple = @Composable {
             Box(
-                Modifier.layoutId(IndicatorRippleLayoutIdTag)
+                Modifier
+                    .layoutId(IndicatorRippleLayoutIdTag)
                     .clip(NavigationBarTokens.ActiveIndicatorShape.toShape())
                     .indication(offsetInteractionSource, rememberRipple())
             )
         }
         val indicator = @Composable {
             Box(
-                Modifier.layoutId(IndicatorLayoutIdTag)
+                Modifier
+                    .layoutId(IndicatorLayoutIdTag)
                     .background(
                         color = colors.indicatorColor.copy(alpha = animationProgress),
                         shape = NavigationBarTokens.ActiveIndicatorShape.toShape(),
@@ -252,6 +264,14 @@ object NavigationBarDefaults {
 
     /** Default color for a navigation bar. */
     val containerColor: Color @Composable get() = NavigationBarTokens.ContainerColor.toColor()
+
+    /**
+     * Default window insets to be used and consumed by navigation bar
+     */
+    val windowInsets: WindowInsets
+        @Composable
+        get() = WindowInsets.safeDrawingForVisualComponents
+            .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
 }
 
 /** Defaults used in [NavigationBarItem]. */
@@ -377,7 +397,8 @@ private fun NavigationBarItemBaselineLayout(
 
         if (label != null) {
             Box(
-                Modifier.layoutId(LabelLayoutIdTag)
+                Modifier
+                    .layoutId(LabelLayoutIdTag)
                     .alpha(if (alwaysShowLabel) 1f else animationProgress)
                     .padding(horizontal = NavigationBarItemHorizontalPadding / 2)
             ) { label() }

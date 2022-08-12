@@ -17,6 +17,8 @@
 package androidx.compose.material3
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
@@ -55,6 +57,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -195,6 +198,21 @@ class NavigationRailTest {
                 }
             }
         }.assertWidthIsEqualTo(defaultWidth)
+    }
+
+    @Test
+    fun navigationRail_respectsContentPadding() {
+        rule.setMaterialContentForSizeAssertions {
+            NavigationRail(windowInsets = WindowInsets(13.dp, 13.dp, 13.dp, 13.dp)) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .testTag("content"))
+            }
+        }
+        rule.onNodeWithTag("content")
+            .assertTopPositionInRootIsEqualTo(13.dp + NavigationRailVerticalPadding)
+            .assertLeftPositionInRootIsEqualTo(13.dp)
     }
 
     @Test

@@ -34,10 +34,14 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.tokens.BottomAppBarTokens
 import androidx.compose.material3.tokens.FabSecondaryTokens
 import androidx.compose.material3.tokens.TopAppBarLargeTokens
@@ -100,6 +104,7 @@ import kotlin.math.roundToInt
  * typically be an [IconButton] or [IconToggleButton].
  * @param actions the actions displayed at the end of the top app bar. This should typically be
  * [IconButton]s. The default layout here is a [Row], so icons inside will be placed horizontally.
+ * @param windowInsets a window insets that app bar will respect.
  * @param colors [TopAppBarColors] that will be used to resolve the colors used for this top app
  * bar in different states. See [TopAppBarDefaults.smallTopAppBarColors].
  * @param scrollBehavior a [TopAppBarScrollBehavior] which holds various offset values that will be
@@ -114,6 +119,7 @@ fun SmallTopAppBar(
     modifier: Modifier = Modifier,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     colors: TopAppBarColors = TopAppBarDefaults.smallTopAppBarColors(),
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
@@ -124,6 +130,7 @@ fun SmallTopAppBar(
         centeredTitle = false,
         navigationIcon = navigationIcon,
         actions = actions,
+        windowInsets = windowInsets,
         colors = colors,
         scrollBehavior = scrollBehavior
     )
@@ -150,6 +157,7 @@ fun SmallTopAppBar(
  * typically be an [IconButton] or [IconToggleButton].
  * @param actions the actions displayed at the end of the top app bar. This should typically be
  * [IconButton]s. The default layout here is a [Row], so icons inside will be placed horizontally.
+ * @param windowInsets a window insets that app bar will respect.
  * @param colors [TopAppBarColors] that will be used to resolve the colors used for this top app
  * bar in different states. See [TopAppBarDefaults.centerAlignedTopAppBarColors].
  * @param scrollBehavior a [TopAppBarScrollBehavior] which holds various offset values that will be
@@ -164,6 +172,7 @@ fun CenterAlignedTopAppBar(
     modifier: Modifier = Modifier,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
@@ -176,6 +185,7 @@ fun CenterAlignedTopAppBar(
         navigationIcon = navigationIcon,
         actions = actions,
         colors = colors,
+        windowInsets = windowInsets,
         scrollBehavior = scrollBehavior
     )
 }
@@ -202,6 +212,7 @@ fun CenterAlignedTopAppBar(
  * typically be an [IconButton] or [IconToggleButton].
  * @param actions the actions displayed at the end of the top app bar. This should typically be
  * [IconButton]s. The default layout here is a [Row], so icons inside will be placed horizontally.
+ * @param windowInsets a window insets that app bar will respect.
  * @param colors [TopAppBarColors] that will be used to resolve the colors used for this top app
  * bar in different states. See [TopAppBarDefaults.mediumTopAppBarColors].
  * @param scrollBehavior a [TopAppBarScrollBehavior] which holds various offset values that will be
@@ -216,6 +227,7 @@ fun MediumTopAppBar(
     modifier: Modifier = Modifier,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     colors: TopAppBarColors = TopAppBarDefaults.mediumTopAppBarColors(),
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
@@ -229,6 +241,7 @@ fun MediumTopAppBar(
         navigationIcon = navigationIcon,
         actions = actions,
         colors = colors,
+        windowInsets = windowInsets,
         maxHeight = TopAppBarMediumTokens.ContainerHeight,
         pinnedHeight = TopAppBarSmallTokens.ContainerHeight,
         scrollBehavior = scrollBehavior
@@ -257,6 +270,7 @@ fun MediumTopAppBar(
  * typically be an [IconButton] or [IconToggleButton].
  * @param actions the actions displayed at the end of the top app bar. This should typically be
  * [IconButton]s. The default layout here is a [Row], so icons inside will be placed horizontally.
+ * @param windowInsets a window insets that app bar will respect.
  * @param colors [TopAppBarColors] that will be used to resolve the colors used for this top app
  * bar in different states. See [TopAppBarDefaults.largeTopAppBarColors].
  * @param scrollBehavior a [TopAppBarScrollBehavior] which holds various offset values that will be
@@ -271,6 +285,7 @@ fun LargeTopAppBar(
     modifier: Modifier = Modifier,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
@@ -284,6 +299,7 @@ fun LargeTopAppBar(
         navigationIcon = navigationIcon,
         actions = actions,
         colors = colors,
+        windowInsets = windowInsets,
         maxHeight = TopAppBarLargeTokens.ContainerHeight,
         pinnedHeight = TopAppBarSmallTokens.ContainerHeight,
         scrollBehavior = scrollBehavior
@@ -318,6 +334,7 @@ fun LargeTopAppBar(
  * overlay is applied on top of the container. A higher tonal elevation value will result in a
  * darker color in light theme and lighter color in dark theme. See also: [Surface].
  * @param contentPadding the padding applied to the content of this BottomAppBar
+ * @param windowInsets a window insets that app bar will respect.
  */
 @Composable
 fun BottomAppBar(
@@ -328,11 +345,13 @@ fun BottomAppBar(
     contentColor: Color = contentColorFor(containerColor),
     tonalElevation: Dp = BottomAppBarDefaults.ContainerElevation,
     contentPadding: PaddingValues = BottomAppBarDefaults.ContentPadding,
+    windowInsets: WindowInsets = BottomAppBarDefaults.windowInsets,
 ) = BottomAppBar(
     modifier = modifier,
     containerColor = containerColor,
     contentColor = contentColor,
     tonalElevation = tonalElevation,
+    windowInsets = windowInsets,
     contentPadding = contentPadding
 ) {
     actions()
@@ -373,6 +392,7 @@ fun BottomAppBar(
  * overlay is applied on top of the container. A higher tonal elevation value will result in a
  * darker color in light theme and lighter color in dark theme. See also: [Surface].
  * @param contentPadding the padding applied to the content of this BottomAppBar
+ * @param windowInsets a window insets that app bar will respect.
  * @param content the content of this BottomAppBar. The default layout here is a [Row],
  * so content inside will be placed horizontally.
  */
@@ -383,6 +403,7 @@ fun BottomAppBar(
     contentColor: Color = contentColorFor(containerColor),
     tonalElevation: Dp = BottomAppBarDefaults.ContainerElevation,
     contentPadding: PaddingValues = BottomAppBarDefaults.ContentPadding,
+    windowInsets: WindowInsets = BottomAppBarDefaults.windowInsets,
     content: @Composable RowScope.() -> Unit
 ) {
     Surface(
@@ -396,6 +417,7 @@ fun BottomAppBar(
         Row(
             Modifier
                 .fillMaxWidth()
+                .windowInsetsPadding(windowInsets)
                 .height(BottomAppBarTokens.ContainerHeight)
                 .padding(contentPadding),
             horizontalArrangement = Arrangement.Start,
@@ -470,6 +492,14 @@ object TopAppBarDefaults {
             titleContentColor,
             actionIconContentColor
         )
+
+    /**
+     * Default insets to be used and consumed by the top app bars
+     */
+    val windowInsets: WindowInsets
+        @Composable
+        get() = WindowInsets.safeDrawingForVisualComponents
+            .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
 
     /**
      * Creates a [TopAppBarColors] for center aligned top app bars. The default implementation
@@ -774,6 +804,16 @@ object BottomAppBarDefaults {
         end = BottomAppBarHorizontalPadding
     )
 
+    /**
+     * Default insets that will be used and consumed by [BottomAppBar].
+     */
+    val windowInsets: WindowInsets
+        @Composable
+        get() {
+            return WindowInsets.safeDrawingForVisualComponents
+                .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+        }
+
     /** The color of a [BottomAppBar]'s [FloatingActionButton] */
     val bottomAppBarFabColor: Color
         @Composable get() =
@@ -782,9 +822,7 @@ object BottomAppBarDefaults {
 
 // Padding minus IconButton's min touch target expansion
 private val BottomAppBarHorizontalPadding = 16.dp - 12.dp
-
-// Padding minus IconButton's min touch target expansion
-private val BottomAppBarVerticalPadding = 16.dp - 12.dp
+internal val BottomAppBarVerticalPadding = 16.dp - 12.dp
 
 // Padding minus content padding
 private val FABHorizontalPadding = 16.dp - BottomAppBarHorizontalPadding
@@ -807,6 +845,7 @@ private fun SingleRowTopAppBar(
     centeredTitle: Boolean,
     navigationIcon: @Composable () -> Unit,
     actions: @Composable RowScope.() -> Unit,
+    windowInsets: WindowInsets,
     colors: TopAppBarColors,
     scrollBehavior: TopAppBarScrollBehavior?
 ) {
@@ -863,7 +902,10 @@ private fun SingleRowTopAppBar(
                 ?: 0f)
         }
         TopAppBarLayout(
-            modifier = Modifier,
+            modifier = Modifier
+                .windowInsetsPadding(windowInsets)
+                // clip after padding so we don't know the title over the inset area
+                .clipToBounds(),
             heightPx = height,
             navigationIconContentColor = colors.navigationIconContentColor,
             titleContentColor = colors.titleContentColor,
@@ -900,6 +942,7 @@ private fun TwoRowsTopAppBar(
     smallTitleTextStyle: TextStyle,
     navigationIcon: @Composable () -> Unit,
     actions: @Composable RowScope.() -> Unit,
+    windowInsets: WindowInsets,
     colors: TopAppBarColors,
     maxHeight: Dp,
     pinnedHeight: Dp,
@@ -960,7 +1003,11 @@ private fun TwoRowsTopAppBar(
     )
 
     Surface(modifier = modifier.then(appBarDragModifier), color = appBarContainerColor) {
-        Column {
+        Column(
+            Modifier
+                .windowInsetsPadding(windowInsets)
+                // clip after padding so we don't know the title over the inset area
+                .clipToBounds()) {
             TopAppBarLayout(
                 modifier = Modifier,
                 heightPx = pinnedHeightPx,
