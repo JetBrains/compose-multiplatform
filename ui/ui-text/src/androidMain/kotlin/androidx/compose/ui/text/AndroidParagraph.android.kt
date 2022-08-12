@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.asComposePath
+import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.text.android.InternalPlatformTextApi
 import androidx.compose.ui.text.android.LayoutCompat.ALIGN_CENTER
@@ -427,15 +428,25 @@ internal class AndroidParagraph(
             setTextDecoration(textDecoration)
         }
 
-        val nativeCanvas = canvas.nativeCanvas
-        if (didExceedMaxLines) {
-            nativeCanvas.save()
-            nativeCanvas.clipRect(0f, 0f, width, height)
+        paint(canvas)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    override fun paint(
+        canvas: Canvas,
+        color: Color,
+        shadow: Shadow?,
+        textDecoration: TextDecoration?,
+        drawStyle: DrawStyle?
+    ) {
+        with(textPaint) {
+            setColor(color)
+            setShadow(shadow)
+            setTextDecoration(textDecoration)
+            setDrawStyle(drawStyle)
         }
-        layout.paint(nativeCanvas)
-        if (didExceedMaxLines) {
-            nativeCanvas.restore()
-        }
+
+        paint(canvas)
     }
 
     @OptIn(ExperimentalTextApi::class)
@@ -444,14 +455,20 @@ internal class AndroidParagraph(
         brush: Brush,
         alpha: Float,
         shadow: Shadow?,
-        textDecoration: TextDecoration?
+        textDecoration: TextDecoration?,
+        drawStyle: DrawStyle?
     ) {
         with(textPaint) {
             setBrush(brush, Size(width, height), alpha)
             setShadow(shadow)
             setTextDecoration(textDecoration)
+            setDrawStyle(drawStyle)
         }
 
+        paint(canvas)
+    }
+
+    private fun paint(canvas: Canvas) {
         val nativeCanvas = canvas.nativeCanvas
         if (didExceedMaxLines) {
             nativeCanvas.save()

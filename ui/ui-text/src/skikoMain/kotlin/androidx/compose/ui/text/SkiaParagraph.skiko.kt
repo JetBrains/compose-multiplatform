@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.asSkiaPath
+import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.text.platform.SkiaParagraphIntrinsics
@@ -290,7 +291,6 @@ internal class SkiaParagraph(
         }
     }
 
-    // TODO(b/229518449): Implement an alternative to paint function that takes a brush.
     override fun paint(
         canvas: Canvas,
         color: Color,
@@ -312,10 +312,32 @@ internal class SkiaParagraph(
     @ExperimentalTextApi
     override fun paint(
         canvas: Canvas,
+        color: Color,
+        shadow: Shadow?,
+        textDecoration: TextDecoration?,
+        drawStyle: DrawStyle?
+    ) {
+        para = layouter.layoutParagraph(
+            width = width,
+            maxLines = maxLines,
+            ellipsis = ellipsisChar,
+            color = color,
+            shadow = shadow,
+            textDecoration = textDecoration
+        )
+
+        para.paint(canvas.nativeCanvas, 0.0f, 0.0f)
+    }
+
+    // TODO(b/229518449): Implement this paint function that draws text with a Brush.
+    @ExperimentalTextApi
+    override fun paint(
+        canvas: Canvas,
         brush: Brush,
         alpha: Float,
         shadow: Shadow?,
-        textDecoration: TextDecoration?
+        textDecoration: TextDecoration?,
+        drawStyle: DrawStyle?
     ) {
         throw UnsupportedOperationException(
             "Using brush for painting the paragraph is a separate functionality that " +

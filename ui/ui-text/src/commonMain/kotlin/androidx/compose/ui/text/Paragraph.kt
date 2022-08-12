@@ -21,7 +21,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.drawscope.DrawStyle
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.platform.ActualParagraph
@@ -234,7 +238,19 @@ expect sealed interface Paragraph {
     fun getWordBoundary(offset: Int): TextRange
 
     /**
-     * Paint the paragraph to canvas, and also overrides some paint settings.
+     * Draws this paragraph onto given [canvas] while modifying supported draw properties. Any
+     * change caused by overriding parameters are permanent, meaning that they affect the
+     * subsequent paint calls.
+     *
+     * @param canvas Canvas to draw this paragraph on.
+     * @param color Applies to the default text paint color that's used by this paragraph. Text
+     * color spans are not affected. [Color.Unspecified] is treated as no-op.
+     * @param shadow Applies to the default text paint shadow that's used by this paragraph. Text
+     * shadow spans are not affected. Passing this value as [Shadow.None] or `null` removes any
+     * existing shadow on this paragraph.
+     * @param textDecoration Applies to the default text paint that's used by this paragraph. Spans
+     * that specify a TextDecoration are not affected. Passing this value as [TextDecoration.None]
+     * or `null` removes any existing TextDecoration on this paragraph.
      */
     fun paint(
         canvas: Canvas,
@@ -244,9 +260,54 @@ expect sealed interface Paragraph {
     )
 
     /**
-     * Paint the paragraph to canvas, and also overrides some paint settings.
+     * Draws this paragraph onto given [canvas] while modifying supported draw properties. Any
+     * change caused by overriding parameters are permanent, meaning that they affect the
+     * subsequent paint calls.
      *
-     * If not overridden, this function @throws [UnsupportedOperationException].
+     * @param canvas Canvas to draw this paragraph on.
+     * @param color Applies to the default text paint color that's used by this paragraph. Text
+     * color spans are not affected. [Color.Unspecified] is treated as no-op.
+     * @param shadow Applies to the default text paint shadow that's used by this paragraph. Text
+     * shadow spans are not affected. Passing this value as [Shadow.None] or `null` removes any
+     * existing shadow on this paragraph.
+     * @param textDecoration Applies to the default text paint that's used by this paragraph. Spans
+     * that specify a TextDecoration are not affected. Passing this value as [TextDecoration.None]
+     * or `null` removes any existing TextDecoration on this paragraph.
+     * @param drawStyle Applies to the default text paint style that's used by this paragraph. Spans
+     * that specify a DrawStyle are not affected. Passing this value as `null` is treated equally
+     * to passing it as [Fill].
+     */
+    @ExperimentalTextApi
+    fun paint(
+        canvas: Canvas,
+        color: Color = Color.Unspecified,
+        shadow: Shadow? = null,
+        textDecoration: TextDecoration? = null,
+        drawStyle: DrawStyle? = null
+    )
+
+    /**
+     * Draws this paragraph onto given [canvas] while modifying supported draw properties. Any
+     * change caused by overriding parameters are permanent, meaning that they affect the
+     * subsequent paint calls.
+     *
+     * @param canvas Canvas to draw this paragraph on.
+     * @param brush Applies to the default text paint shader that's used by this paragraph. Text
+     * brush spans are not affected. If brush is type of [SolidColor], color's alpha value is
+     * modulated by [alpha] parameter and gets applied as a color. If brush is type of
+     * [ShaderBrush], its internal shader is created using this paragraph's layout size.
+     * @param alpha Applies to the default text paint alpha that's used by this paragraph. Text
+     * alpha spans are not affected. [Float.NaN] is treated as no-op. All other values are coerced
+     * into [0f, 1f] range.
+     * @param shadow Applies to the default text paint shadow that's used by this paragraph. Text
+     * shadow spans are not affected. Passing this value as [Shadow.None] or `null` removes any
+     * existing shadow on this paragraph.
+     * @param textDecoration Applies to the default text paint that's used by this paragraph. Spans
+     * that specify a TextDecoration are not affected. Passing this value as [TextDecoration.None]
+     * or `null` removes any existing TextDecoration on this paragraph.
+     * @param drawStyle Applies to the default text paint style that's used by this paragraph. Spans
+     * that specify a DrawStyle are not affected. Passing this value as `null` is treated equally
+     * to passing it as [Fill].
      */
     @ExperimentalTextApi
     fun paint(
@@ -254,7 +315,8 @@ expect sealed interface Paragraph {
         brush: Brush,
         alpha: Float = Float.NaN,
         shadow: Shadow? = null,
-        textDecoration: TextDecoration? = null
+        textDecoration: TextDecoration? = null,
+        drawStyle: DrawStyle? = null
     )
 }
 

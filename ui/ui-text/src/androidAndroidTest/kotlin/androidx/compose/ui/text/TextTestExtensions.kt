@@ -20,6 +20,8 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.AndroidFontLoader
 import androidx.compose.ui.text.font.AndroidFontResolveInterceptor
 import androidx.compose.ui.text.font.AsyncTypefaceCache
@@ -30,30 +32,54 @@ import androidx.compose.ui.text.font.PlatformFontFamilyTypefaceAdapter
 import androidx.compose.ui.text.font.PlatformFontLoader
 import androidx.compose.ui.text.font.PlatformResolveInterceptor
 import androidx.compose.ui.text.font.TypefaceRequestCache
+import androidx.compose.ui.graphics.drawscope.DrawStyle
+import androidx.compose.ui.text.style.TextDecoration
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-fun Paragraph.bitmap(): Bitmap {
-    val bitmap = Bitmap.createBitmap(
-        width.toIntPx(),
-        height.toIntPx(),
-        Bitmap.Config.ARGB_8888
-    )
-    this.paint(androidx.compose.ui.graphics.Canvas(Canvas(bitmap)))
-    return bitmap
-}
-
 @OptIn(ExperimentalTextApi::class)
 fun Paragraph.bitmap(
-    brush: Brush,
-    alpha: Float
+    color: Color = Color.Unspecified,
+    shadow: Shadow? = null,
+    textDecoration: TextDecoration? = null,
+    drawStyle: DrawStyle? = null
 ): Bitmap {
     val bitmap = Bitmap.createBitmap(
         width.toIntPx(),
         height.toIntPx(),
         Bitmap.Config.ARGB_8888
     )
-    this.paint(androidx.compose.ui.graphics.Canvas(Canvas(bitmap)), brush, alpha)
+    this.paint(
+        canvas = androidx.compose.ui.graphics.Canvas(Canvas(bitmap)),
+        color = color,
+        shadow = shadow,
+        textDecoration = textDecoration,
+        drawStyle = drawStyle
+    )
+    return bitmap
+}
+
+@OptIn(ExperimentalTextApi::class)
+fun Paragraph.bitmap(
+    brush: Brush,
+    alpha: Float,
+    shadow: Shadow? = null,
+    textDecoration: TextDecoration? = null,
+    drawStyle: DrawStyle? = null
+): Bitmap {
+    val bitmap = Bitmap.createBitmap(
+        width.toIntPx(),
+        height.toIntPx(),
+        Bitmap.Config.ARGB_8888
+    )
+    this.paint(
+        canvas = androidx.compose.ui.graphics.Canvas(Canvas(bitmap)),
+        brush = brush,
+        alpha = alpha,
+        shadow = shadow,
+        textDecoration = textDecoration,
+        drawStyle = drawStyle
+    )
     return bitmap
 }
 

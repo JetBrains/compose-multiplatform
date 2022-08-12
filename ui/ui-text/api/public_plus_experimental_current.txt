@@ -202,7 +202,8 @@ package androidx.compose.ui.text {
     method public long getWordBoundary(int offset);
     method public boolean isLineEllipsized(int lineIndex);
     method public void paint(androidx.compose.ui.graphics.Canvas canvas, long color, androidx.compose.ui.graphics.Shadow? shadow, androidx.compose.ui.text.style.TextDecoration? textDecoration);
-    method @androidx.compose.ui.text.ExperimentalTextApi public void paint(androidx.compose.ui.graphics.Canvas canvas, androidx.compose.ui.graphics.Brush brush, float alpha, androidx.compose.ui.graphics.Shadow? shadow, androidx.compose.ui.text.style.TextDecoration? textDecoration);
+    method @androidx.compose.ui.text.ExperimentalTextApi public void paint(androidx.compose.ui.graphics.Canvas canvas, long color, androidx.compose.ui.graphics.Shadow? shadow, androidx.compose.ui.text.style.TextDecoration? textDecoration, androidx.compose.ui.graphics.drawscope.DrawStyle? drawStyle);
+    method @androidx.compose.ui.text.ExperimentalTextApi public void paint(androidx.compose.ui.graphics.Canvas canvas, androidx.compose.ui.graphics.Brush brush, float alpha, androidx.compose.ui.graphics.Shadow? shadow, androidx.compose.ui.text.style.TextDecoration? textDecoration, androidx.compose.ui.graphics.drawscope.DrawStyle? drawStyle);
     property public abstract boolean didExceedMaxLines;
     property public abstract float firstBaseline;
     property public abstract float height;

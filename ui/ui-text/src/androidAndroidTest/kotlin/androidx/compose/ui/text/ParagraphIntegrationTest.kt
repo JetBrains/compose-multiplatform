@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_KERN_FONT
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
 import androidx.compose.ui.text.FontTestData.Companion.FONT_100_REGULAR
@@ -3755,8 +3756,10 @@ class ParagraphIntegrationTest {
                 width = paragraphWidth
             )
 
-            assertThat(paragraphWithoutAlpha.bitmap(brush, 0.5f))
-                .isEqualToBitmap(paragraphWithAlpha.bitmap())
+            val firstBitmap = paragraphWithoutAlpha.bitmap(brush, 0.5f)
+            val secondBitmap = paragraphWithAlpha.bitmap()
+
+            assertThat(firstBitmap).isEqualToBitmap(secondBitmap)
         }
     }
 
@@ -4394,6 +4397,51 @@ class ParagraphIntegrationTest {
             // Color on the same pixel should be the same since they used the same brush.
             assertThat(ltrParagraph.bitmap().getPixel(50, 50))
                 .isEqualTo(rtlParagraph.bitmap().getPixel(50, 50))
+        }
+    }
+
+    @Test
+    fun paint_withDrawStyle_changesVisual() {
+        with(defaultDensity) {
+            val text = "aaa"
+            // FontSize doesn't matter here, but it should be big enough for bitmap comparison.
+            val fontSize = 100.sp
+            val fontSizeInPx = fontSize.toPx()
+            val paragraphWidth = fontSizeInPx * text.length
+
+            val baseParagraph = simpleParagraph(
+                text = text,
+                style = TextStyle(fontSize = fontSize, color = Color.Red),
+                width = paragraphWidth
+            )
+
+            assertThat(baseParagraph.bitmap(drawStyle = Stroke()))
+                .isNotEqualToBitmap(baseParagraph.bitmap())
+        }
+    }
+
+    @Test
+    fun paint_withDrawStyle_doesNotResetWithNull() {
+        with(defaultDensity) {
+            val text = "aaa"
+            // FontSize doesn't matter here, but it should be big enough for bitmap comparison.
+            val fontSize = 100.sp
+            val fontSizeInPx = fontSize.toPx()
+            val paragraphWidth = fontSizeInPx * text.length
+
+            val baseParagraph = simpleParagraph(
+                text = text,
+                style = TextStyle(
+                    fontSize = fontSize,
+                    color = Color.Red
+                ),
+                width = paragraphWidth
+            )
+
+            val firstBitmap = baseParagraph.bitmap(drawStyle = Stroke(4f))
+            val secondBitmap = baseParagraph.bitmap(drawStyle = null)
+
+            assertThat(firstBitmap).isEqualToBitmap(secondBitmap)
         }
     }
 
