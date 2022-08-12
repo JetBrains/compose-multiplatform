@@ -37,6 +37,7 @@ val TextDemos = DemoCategory(
         ComposableDemo("Layout Reuse") { TextReuseLayoutDemo() },
         ComposableDemo("Line Height Behavior") { TextLineHeightDemo() },
         ComposableDemo("Interactive text") { InteractiveTextDemo() },
+        ComposableDemo("Ellipsize and letterspacing") { EllipsizeWithLetterSpacing() },
         DemoCategory(
             "Input fields",
             listOf(

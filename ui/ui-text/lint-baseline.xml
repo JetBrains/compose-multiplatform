@@ -67,6 +67,15 @@
     <issue
         id="NullAnnotationGroup"
         message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@OptIn(InternalPlatformTextApi::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/AndroidParagraph.android.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
         errorLine1="@OptIn(InternalPlatformTextApi::class, ExperimentalTextApi::class)"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -134,6 +143,15 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="../../../text/text/src/main/java/androidx/compose/ui/text/android/style/FontFeatureSpan.kt"/>
+    </issue>
+
+    <issue
+        id="NullAnnotationGroup"
+        message="Could not find associated group for annotation androidx.compose.ui.text.android.InternalPlatformTextApi, which is used in androidx.compose.ui."
+        errorLine1="@InternalPlatformTextApi"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/style/IndentationFixSpan.kt"/>
     </issue>
 
     <issue
