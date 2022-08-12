@@ -16,13 +16,13 @@
 
 import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryType
-import androidx.build.Publish
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
     id("AndroidXComposePlugin")
+    id("AndroidXPaparazziPlugin")
 }
 
 AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
