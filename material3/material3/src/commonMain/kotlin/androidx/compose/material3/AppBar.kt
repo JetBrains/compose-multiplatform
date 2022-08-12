@@ -461,6 +461,7 @@ interface TopAppBarScrollBehavior {
 }
 
 /** Contains default values used for the top app bar implementations. */
+@ExperimentalMaterial3Api
 object TopAppBarDefaults {
 
     /**
@@ -603,7 +604,6 @@ object TopAppBarDefaults {
      * @param canScroll a callback used to determine whether scroll events are to be handled by this
      * pinned [TopAppBarScrollBehavior]
      */
-    @ExperimentalMaterial3Api
     fun pinnedScrollBehavior(
         state: TopAppBarState,
         canScroll: () -> Boolean = { true }
@@ -620,7 +620,6 @@ object TopAppBarDefaults {
      * @param canScroll a callback used to determine whether scroll events are to be
      * handled by this [EnterAlwaysScrollBehavior]
      */
-    @ExperimentalMaterial3Api
     fun enterAlwaysScrollBehavior(
         state: TopAppBarState,
         canScroll: () -> Boolean = { true }
@@ -644,7 +643,6 @@ object TopAppBarDefaults {
      * @param canScroll a callback used to determine whether scroll events are to be
      * handled by this [ExitUntilCollapsedScrollBehavior]
      */
-    @ExperimentalMaterial3Api
     fun exitUntilCollapsedScrollBehavior(
         decayAnimationSpec: DecayAnimationSpec<Float>,
         state: TopAppBarState,
@@ -783,6 +781,64 @@ class TopAppBarState(
     }
 
     private var _heightOffset = mutableStateOf(initialHeightOffset)
+}
+
+/**
+ * Represents the colors used by a top app bar in different states.
+ * This implementation animates the container color according to the top app bar scroll state. It
+ * does not animate the leading, headline, or trailing colors.
+ */
+@ExperimentalMaterial3Api
+@Stable
+class TopAppBarColors internal constructor(
+    private val containerColor: Color,
+    private val scrolledContainerColor: Color,
+    internal val navigationIconContentColor: Color,
+    internal val titleContentColor: Color,
+    internal val actionIconContentColor: Color,
+) {
+
+    /**
+     * Represents the container color used for the top app bar.
+     *
+     * A [colorTransitionFraction] provides a percentage value that can be used to generate a color.
+     * Usually, an app bar implementation will pass in a [colorTransitionFraction] read from
+     * the [TopAppBarState.collapsedFraction] or the [TopAppBarState.overlappedFraction].
+     *
+     * @param colorTransitionFraction a `0.0` to `1.0` value that represents a color transition
+     * percentage
+     */
+    @Composable
+    internal fun containerColor(colorTransitionFraction: Float): Color {
+        return lerp(
+            containerColor,
+            scrolledContainerColor,
+            FastOutLinearInEasing.transform(colorTransitionFraction)
+        )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || other !is TopAppBarColors) return false
+
+        if (containerColor != other.containerColor) return false
+        if (scrolledContainerColor != other.scrolledContainerColor) return false
+        if (navigationIconContentColor != other.navigationIconContentColor) return false
+        if (titleContentColor != other.titleContentColor) return false
+        if (actionIconContentColor != other.actionIconContentColor) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = containerColor.hashCode()
+        result = 31 * result + scrolledContainerColor.hashCode()
+        result = 31 * result + navigationIconContentColor.hashCode()
+        result = 31 * result + titleContentColor.hashCode()
+        result = 31 * result + actionIconContentColor.hashCode()
+
+        return result
+    }
 }
 
 /** Contains default values used for the bottom app bar implementations. */
@@ -1007,7 +1063,8 @@ private fun TwoRowsTopAppBar(
             Modifier
                 .windowInsetsPadding(windowInsets)
                 // clip after padding so we don't know the title over the inset area
-                .clipToBounds()) {
+                .clipToBounds()
+        ) {
             TopAppBarLayout(
                 modifier = Modifier,
                 heightPx = pinnedHeightPx,
@@ -1196,63 +1253,6 @@ private fun TopAppBarLayout(
                 y = (layoutHeight - actionIconsPlaceable.height) / 2
             )
         }
-    }
-}
-
-/**
- * Represents the colors used by a top app bar in different states.
- * This implementation animates the container color according to the top app bar scroll state. It
- * does not animate the leading, headline, or trailing colors.
- */
-@Stable
-class TopAppBarColors internal constructor(
-    private val containerColor: Color,
-    private val scrolledContainerColor: Color,
-    internal val navigationIconContentColor: Color,
-    internal val titleContentColor: Color,
-    internal val actionIconContentColor: Color,
-) {
-
-    /**
-     * Represents the container color used for the top app bar.
-     *
-     * A [colorTransitionFraction] provides a percentage value that can be used to generate a color.
-     * Usually, an app bar implementation will pass in a [colorTransitionFraction] read from
-     * the [TopAppBarState.collapsedFraction] or the [TopAppBarState.overlappedFraction].
-     *
-     * @param colorTransitionFraction a `0.0` to `1.0` value that represents a color transition
-     * percentage
-     */
-    @Composable
-    internal fun containerColor(colorTransitionFraction: Float): Color {
-        return lerp(
-            containerColor,
-            scrolledContainerColor,
-            FastOutLinearInEasing.transform(colorTransitionFraction)
-        )
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || other !is TopAppBarColors) return false
-
-        if (containerColor != other.containerColor) return false
-        if (scrolledContainerColor != other.scrolledContainerColor) return false
-        if (navigationIconContentColor != other.navigationIconContentColor) return false
-        if (titleContentColor != other.titleContentColor) return false
-        if (actionIconContentColor != other.actionIconContentColor) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = containerColor.hashCode()
-        result = 31 * result + scrolledContainerColor.hashCode()
-        result = 31 * result + navigationIconContentColor.hashCode()
-        result = 31 * result + titleContentColor.hashCode()
-        result = 31 * result + actionIconContentColor.hashCode()
-
-        return result
     }
 }
 
