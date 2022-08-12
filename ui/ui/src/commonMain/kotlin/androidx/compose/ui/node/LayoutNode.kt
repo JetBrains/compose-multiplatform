@@ -17,9 +17,8 @@ package androidx.compose.ui.node
 
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusOrderModifierToProperties
-import androidx.compose.ui.focus.FocusPropertiesModifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.input.pointer.PointerInputFilter
@@ -28,7 +27,6 @@ import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.LayoutInfo
-import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.LayoutNodeSubcompositionsState
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasurePolicy
@@ -37,21 +35,14 @@ import androidx.compose.ui.layout.ModifierInfo
 import androidx.compose.ui.layout.OnGloballyPositionedModifier
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.Remeasurement
-import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.layout.LookaheadScope
-import androidx.compose.ui.modifier.ModifierLocalConsumer
-import androidx.compose.ui.modifier.ModifierLocalProvider
-import androidx.compose.ui.modifier.ProvidableModifierLocal
-import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.node.LayoutNode.LayoutState.Idle
 import androidx.compose.ui.node.LayoutNode.LayoutState.LayingOut
 import androidx.compose.ui.node.LayoutNode.LayoutState.Measuring
 import androidx.compose.ui.node.LayoutNode.LayoutState.LookaheadLayingOut
 import androidx.compose.ui.node.LayoutNode.LayoutState.LookaheadMeasuring
 import androidx.compose.ui.platform.ViewConfiguration
-import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.platform.simpleIdentityToString
-import androidx.compose.ui.semantics.SemanticsEntity
 import androidx.compose.ui.semantics.SemanticsModifierCore.Companion.generateSemanticsId
 import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.unit.Constraints
@@ -136,7 +127,7 @@ internal class LayoutNode(
      * This should **not** be mutated or even accessed directly from outside of [LayoutNode]. Use
      * [forEachChild]/[forEachChildIndexed] when there's a need to iterate through the vector.
      */
-    private val _children: MutableVector<LayoutNode>
+    internal val _children: MutableVector<LayoutNode>
         get() {
             updateChildrenIfDirty()
             return if (virtualChildrenCount == 0) {
@@ -218,11 +209,6 @@ internal class LayoutNode(
      */
     private val measurePassDelegate
         get() = layoutDelegate.measurePassDelegate
-
-    /**
-     * A cache of modifiers to be used when setting and reusing previous modifiers.
-     */
-    private var coordinatorCache = mutableVectorOf<LayoutModifierNodeCoordinator>()
 
     /**
      * [requestRemeasure] calls will be ignored while this flag is true.
@@ -388,6 +374,7 @@ internal class LayoutNode(
 
         this.owner = owner
         this.depth = (parent?.depth ?: -1) + 1
+        @OptIn(ExperimentalComposeUiApi::class)
         if (outerSemantics != null) {
             owner.onSemanticsChange()
         }
@@ -397,6 +384,7 @@ internal class LayoutNode(
         mLookaheadScope =
             parent?.mLookaheadScope ?: if (isLookaheadRoot) LookaheadScope(this) else null
 
+        nodes.attach()
         _foldedChildren.forEach { child ->
             child.attach(owner)
         }
@@ -405,7 +393,6 @@ internal class LayoutNode(
         parent?.invalidateMeasurements()
 
         forEachCoordinatorIncludingInner { it.attach() }
-        forEachModifierLocalProvider { it.attach() }
         onAttach?.invoke(owner)
     }
 
@@ -426,12 +413,13 @@ internal class LayoutNode(
         }
         layoutDelegate.resetAlignmentLines()
         onDetach?.invoke(owner)
-        forEachModifierLocalProvider { it.detach() }
         forEachCoordinatorIncludingInner { it.detach() }
 
+        @OptIn(ExperimentalComposeUiApi::class)
         if (outerSemantics != null) {
             owner.onSemanticsChange()
         }
+        nodes.detach()
         owner.onDetach(this)
         this.owner = null
         depth = 0
@@ -577,6 +565,7 @@ internal class LayoutNode(
     override var viewConfiguration: ViewConfiguration = DummyViewConfiguration
 
     private fun onDensityOrLayoutDirectionChanged() {
+        // TODO(b/242120396): it seems like we need to update some densities in the node coordinators here
         // measure/layout modifiers on the node
         invalidateMeasurements()
         // draw modifiers on the node
@@ -671,10 +660,12 @@ internal class LayoutNode(
             }
         }
 
-    internal val innerCoordinator = InnerNodeCoordinator(this)
-    internal val layoutDelegate = LayoutNodeLayoutDelegate(this, innerCoordinator)
+    internal val nodes = NodeChain(this)
+    internal val innerCoordinator: NodeCoordinator
+        get() = nodes.innerCoordinator
+    internal val layoutDelegate = LayoutNodeLayoutDelegate(this)
     internal val outerCoordinator: NodeCoordinator
-        get() = layoutDelegate.outerCoordinator
+        get() = nodes.outerCoordinator
 
     /**
      * zIndex defines the drawing order of the LayoutNode. Children with larger zIndex are drawn
@@ -716,22 +707,6 @@ internal class LayoutNode(
         }
 
     /**
-     * The head of the [ModifierLocalProviderEntity] linked list. The head is always a sentinel
-     * provider that doesn't provide any value, so consumers attached to it don't read any
-     * provided values from this LayoutNode and instead reads only from ModifierLocalProviders
-     * on parent LayoutNodes.
-     */
-    internal val modifierLocalsHead =
-        ModifierLocalProviderEntity(this, SentinelModifierLocalProvider)
-
-    /**
-     * The tail of the [ModifierLocalProviderEntity] linked list. This is used for finding
-     * the ModifierLocalProvider by following backwards along the linked list.
-     */
-    internal var modifierLocalsTail = modifierLocalsHead
-        private set
-
-    /**
      * Invalidates the inner-most layer as part of this LayoutNode or from the containing
      * LayoutNode. This is added for performance so that NodeCoordinator.invalidateLayer() can be
      * faster.
@@ -752,80 +727,32 @@ internal class LayoutNode(
     override var modifier: Modifier = Modifier
         set(value) {
             if (value == field) return
-            if (modifier != Modifier) {
-                require(!isVirtual) { "Modifiers are not supported on virtual LayoutNodes" }
+            require(!isVirtual || modifier === Modifier) {
+                "Modifiers are not supported on virtual LayoutNodes"
             }
             field = value
+            val oldShouldInvalidateParentLayer = shouldInvalidateParentLayer()
+            val oldOuterCoordinator = outerCoordinator
 
-            val invalidateParentLayer = shouldInvalidateParentLayer()
+            nodes.updateFrom(value)
 
-            copyCoordinatorsToCache()
-            forEachCoordinatorIncludingInner { it.entities.clear() }
-            markReusedModifiers(value)
-
-            // Rebuild NodeCoordinator
-            val oldOuterCoordinator = layoutDelegate.outerCoordinator
-            if (outerSemantics != null && isAttached) {
-                owner!!.onSemanticsChange()
-            }
-            val addedCallback = hasNewPositioningCallback()
-            onPositionedCallbacks?.clear()
-
-            innerCoordinator.onInitialize()
-
-            // Create a new chain of NodeCoordinators, reusing existing ones from coordinator
-            // when possible.
-            val innerCoordinator: NodeCoordinator = innerCoordinator
-            val outerCoordinator = modifier.foldOut(innerCoordinator) { mod, toWrap ->
-                if (mod is RemeasurementModifier) {
-                    mod.onRemeasurementAvailable(this)
-                }
-
-                toWrap.entities.addBeforeLayoutModifier(toWrap, mod)
-
-                if (mod is OnGloballyPositionedModifier) {
-                    getOrCreateOnPositionedCallbacks() += toWrap to mod
-                }
-
-                val coordinator = if (mod is LayoutModifier) {
-                    // Re-use the nodeCoordinator if possible.
-                    (reuseCoordinator(toWrap, mod)
-                        ?: LayoutModifierNodeCoordinator(toWrap, mod)).apply {
-                        onInitialize()
-                        updateLookaheadScope(mLookaheadScope)
-                    }
-                } else {
-                    toWrap
-                }
-                coordinator.entities.addAfterLayoutModifier(coordinator, mod)
-                coordinator
+            // TODO(lmr): we don't need to do this every time and should attempt to avoid it
+            //  whenever possible!
+            forEachCoordinatorIncludingInner {
+                it.onInitialize()
+                it.updateLookaheadScope(mLookaheadScope)
             }
 
-            setModifierLocals(value)
+            // TODO(lmr): lets move this to the responsibility of the nodes
+            layoutDelegate.updateParentData()
 
-            outerCoordinator.wrappedBy = parent?.innerCoordinator
-            layoutDelegate.outerCoordinator = outerCoordinator
+            // TODO(lmr): lets move this to the responsibility of the nodes
+            if (oldShouldInvalidateParentLayer || shouldInvalidateParentLayer())
+                parent?.invalidateLayer()
 
-            if (isAttached) {
-                // call detach() on all removed NodeCoordinators
-                coordinatorCache.forEach {
-                    it.detach()
-                }
-
-                // attach() all new NodeCoordinators
-                forEachCoordinatorIncludingInner { coordinator ->
-                    if (!coordinator.isAttached) {
-                        coordinator.attach()
-                    } else {
-                        coordinator.entities.forEach { it.onAttach() }
-                    }
-                }
-            }
-            coordinatorCache.clear()
-
-            // call onModifierChanged() on all NodeCoordinators
-            forEachCoordinatorIncludingInner { it.onModifierChanged() }
-
+            // TODO(lmr): this logic is not clear to me, but we want to move all invalidate* calls
+            //  to the responsibility of the nodes to avoid unnecessary work. Let's try to include
+            //  this one as well since it looks like it will be hit quite a bit
             // Optimize the case where the layout itself is not modified. A common reason for
             // this is if no wrapping actually occurs above because no LayoutModifiers are
             // present in the modifier chain.
@@ -833,19 +760,6 @@ internal class LayoutNode(
                 outerCoordinator != innerCoordinator
             ) {
                 invalidateMeasurements()
-            } else if (layoutState == Idle && !measurePending && addedCallback) {
-                // We need to notify the callbacks of a change in position since there's
-                // a new one.
-                invalidateMeasurements()
-            } else if (innerCoordinator.entities.has(EntityList.OnPlacedEntityType)) {
-                // We need to be sure that OnPlacedModifiers are called, even if we don't
-                // have a relayout.
-                owner?.registerOnLayoutCompletedListener(this)
-            }
-            // If the parent data has changed, the parent needs remeasurement.
-            layoutDelegate.updateParentData()
-            if (invalidateParentLayer || shouldInvalidateParentLayer()) {
-                parent?.invalidateLayer()
             }
         }
 
@@ -864,17 +778,6 @@ internal class LayoutNode(
      * Callback to be executed whenever the [LayoutNode] is detached from an [Owner].
      */
     internal var onDetach: ((Owner) -> Unit)? = null
-
-    /**
-     * List of all OnPositioned callbacks in the modifier chain.
-     */
-    private var onPositionedCallbacks:
-        MutableVector<Pair<NodeCoordinator, OnGloballyPositionedModifier>>? = null
-
-    internal fun getOrCreateOnPositionedCallbacks() = onPositionedCallbacks
-        ?: mutableVectorOf<Pair<NodeCoordinator, OnGloballyPositionedModifier>>().also {
-            onPositionedCallbacks = it
-        }
 
     /**
      * Flag used by [OnPositionedDispatcher] to identify LayoutNodes that have already
@@ -948,9 +851,10 @@ internal class LayoutNode(
      * @param hitTestResult The collection that the hit [PointerInputFilter]s will be
      * added to if hit.
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     internal fun hitTest(
         pointerPosition: Offset,
-        hitTestResult: HitTestResult<PointerInputFilter>,
+        hitTestResult: HitTestResult<PointerInputModifierNode>,
         isTouchEvent: Boolean = false,
         isInLayer: Boolean = true
     ) {
@@ -965,9 +869,10 @@ internal class LayoutNode(
     }
 
     @Suppress("UNUSED_PARAMETER")
+    @OptIn(ExperimentalComposeUiApi::class)
     internal fun hitTestSemantics(
         pointerPosition: Offset,
-        hitSemanticsEntities: HitTestResult<SemanticsEntity>,
+        hitSemanticsEntities: HitTestResult<SemanticsModifierNode>,
         isTouchEvent: Boolean = true,
         isInLayer: Boolean = true
     ) {
@@ -979,17 +884,6 @@ internal class LayoutNode(
             isTouchEvent = true,
             isInLayer = isInLayer
         )
-    }
-
-    /**
-     * Return true if there is a new [OnGloballyPositionedModifier] assigned to this Layout.
-     */
-    private fun hasNewPositioningCallback(): Boolean {
-        val onPositionedCallbacks = onPositionedCallbacks
-        return modifier.foldOut(false) { mod, hasNewCallback ->
-            hasNewCallback || mod is OnGloballyPositionedModifier &&
-                (onPositionedCallbacks?.firstOrNull { mod == it.second } == null)
-        }
     }
 
     /**
@@ -1174,6 +1068,7 @@ internal class LayoutNode(
         }
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     internal fun dispatchOnPositionedCallbacks() {
         if (layoutState != Idle || layoutPending || measurePending) {
             return // it hasn't yet been properly positioned, so don't make a call
@@ -1181,8 +1076,8 @@ internal class LayoutNode(
         if (!isPlaced) {
             return // it hasn't been placed, so don't make a call
         }
-        onPositionedCallbacks?.forEach {
-            it.second.onGloballyPositioned(it.first)
+        nodes.headToTail(Nodes.GlobalPositionAware) {
+            it.onGloballyPositioned(it.requireCoordinator(Nodes.GlobalPositionAware))
         }
     }
 
@@ -1191,25 +1086,7 @@ internal class LayoutNode(
      * that may be useful. This is used for tooling to retrieve layout modifier and layer
      * information.
      */
-    override fun getModifierInfo(): List<ModifierInfo> {
-        val infoList = mutableVectorOf<ModifierInfo>()
-        forEachCoordinator { coordinator ->
-            val layer = coordinator.layer
-            val info = ModifierInfo(coordinator.modifier, coordinator, layer)
-            infoList += info
-            coordinator.entities.forEach {
-                infoList += ModifierInfo(it.modifier, coordinator, layer)
-            }
-        }
-        innerCoordinator.entities.forEach {
-            infoList += ModifierInfo(
-                it.modifier,
-                innerCoordinator,
-                innerCoordinator.layer
-            )
-        }
-        return infoList.asMutableList()
-    }
+    override fun getModifierInfo(): List<ModifierInfo> = nodes.getModifierInfo()
 
     /**
      * Invalidates layers defined on this LayoutNode.
@@ -1219,177 +1096,6 @@ internal class LayoutNode(
             coordinator.layer?.invalidate()
         }
         innerCoordinator.layer?.invalidate()
-    }
-
-    private fun setModifierLocals(modifier: Modifier) {
-        // Collect existing consumers and providers
-        val consumers = mutableVectorOf<ModifierLocalConsumerEntity>()
-        var node: ModifierLocalProviderEntity? = modifierLocalsHead
-        while (node != null) {
-            consumers.addAll(node.consumers)
-            node.consumers.clear()
-            node = node.next
-        }
-
-        // Create the chain
-        modifierLocalsTail = modifier.foldIn(modifierLocalsHead) { lastProvider, mod ->
-            // Ensure that ModifierLocalConsumers come before ModifierLocalProviders
-            // so that consumers don't consume values from their own providers.
-            var provider = lastProvider
-
-            // Special handling for FocusOrderModifier -- we have to use modifier local
-            // consumers and providers for it.
-            @Suppress("DEPRECATION")
-            if (mod is androidx.compose.ui.focus.FocusOrderModifier) {
-                val focusPropertiesModifier = findFocusPropertiesModifier(mod, consumers)
-                    ?: run {
-                        // Have to create a new consumer/provider
-                        val scope = FocusOrderModifierToProperties(mod)
-                        FocusPropertiesModifier(
-                            focusPropertiesScope = scope,
-                            inspectorInfo = debugInspectorInfo {
-                                name = "focusProperties"
-                                properties["scope"] = scope
-                            }
-                        )
-                    }
-                addModifierLocalConsumer(focusPropertiesModifier, provider, consumers)
-                provider = addModifierLocalProvider(focusPropertiesModifier, provider)
-            }
-            if (mod is ModifierLocalConsumer) {
-                addModifierLocalConsumer(mod, provider, consumers)
-            }
-            if (mod is ModifierLocalProvider<*>) {
-                provider = addModifierLocalProvider(mod, provider)
-            }
-            provider
-        }
-        // Capture the value after the tail. Anything after the tail can be removed.
-        node = modifierLocalsTail.next
-
-        // Terminate the linked list at the tail.
-        modifierLocalsTail.next = null
-
-        if (isAttached) {
-            // These have been removed and should be detached
-            consumers.forEach { it.detach() }
-
-            // detach all removed providers
-            while (node != null) {
-                node.detach()
-                node = node.next
-            }
-
-            // Attach or invalidate all providers and consumers
-            forEachModifierLocalProvider { it.attachDelayed() }
-        }
-    }
-
-    @Suppress("DEPRECATION", "ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
-    private fun findFocusPropertiesModifier(
-        mod: androidx.compose.ui.focus.FocusOrderModifier,
-        consumers: MutableVector<ModifierLocalConsumerEntity>
-    ): FocusPropertiesModifier? = consumers.firstOrNull {
-        it.modifier is FocusPropertiesModifier &&
-            it.modifier.focusPropertiesScope is FocusOrderModifierToProperties &&
-            it.modifier.focusPropertiesScope.modifier === mod
-    }?.modifier as? FocusPropertiesModifier
-
-    private fun addModifierLocalConsumer(
-        mod: ModifierLocalConsumer,
-        provider: ModifierLocalProviderEntity,
-        consumers: MutableVector<ModifierLocalConsumerEntity>
-    ) {
-        val index = consumers.indexOfFirst { it.modifier === mod }
-        val consumer = if (index < 0) {
-            // Not found, so make a new one:
-            ModifierLocalConsumerEntity(provider, mod)
-        } else {
-            // Reuse the existing one:
-            consumers.removeAt(index).also { it.provider = provider }
-        }
-        provider.consumers += consumer
-    }
-
-    private fun addModifierLocalProvider(
-        mod: ModifierLocalProvider<*>,
-        provider: ModifierLocalProviderEntity
-    ): ModifierLocalProviderEntity {
-        // Look for the existing one:
-        var providerNode = provider.next
-        while (providerNode != null && providerNode.modifier !== mod) {
-            providerNode = providerNode.next
-        }
-        if (providerNode == null) {
-            // Couldn't find one to reuse, so create a new one:
-            providerNode = ModifierLocalProviderEntity(this, mod)
-        } else {
-            // Reuse the existing one, just tell the linked list to skip it.
-            providerNode.prev?.next = providerNode.next
-            providerNode.next?.prev = providerNode.prev
-        }
-        // Add the provider:
-        providerNode.next = provider.next
-        provider.next?.prev = providerNode
-        provider.next = providerNode
-        providerNode.prev = provider
-
-        return providerNode
-    }
-
-    /**
-     * Reuses a [LayoutModifierNodeCoordinator] from [coordinatorCache]. If none can be reused, `null` is returned.
-     */
-    private fun reuseCoordinator(
-        toWrap: NodeCoordinator,
-        modifier: LayoutModifier
-    ): LayoutModifierNodeCoordinator? {
-        if (coordinatorCache.isEmpty()) {
-            return null
-        }
-        // Look for exact match
-        var lastIndex = coordinatorCache.indexOfLast {
-            it.toBeReusedForSameModifier && it.modifier === modifier
-        }
-
-        if (lastIndex < 0) {
-            // Look for one that isn't reused
-            lastIndex = coordinatorCache.indexOfLast {
-                !it.toBeReusedForSameModifier
-            }
-        }
-
-        if (lastIndex < 0) {
-            return null
-        }
-
-        return coordinatorCache.removeAt(lastIndex).also {
-            it.modifier = modifier
-            it.wrapped = toWrap
-        }
-    }
-
-    /**
-     * Copies all [LayoutModifierNodeCoordinator]s currently in use and returns them in a new
-     * Array.
-     */
-    private fun copyCoordinatorsToCache() {
-        forEachCoordinator {
-            coordinatorCache += it
-        }
-    }
-
-    private fun markReusedModifiers(modifier: Modifier) {
-        coordinatorCache.forEach {
-            it.toBeReusedForSameModifier = false
-        }
-
-        modifier.foldIn(Unit) { _, mod ->
-            val coordinator = coordinatorCache.lastOrNull {
-                it.modifier === mod && !it.toBeReusedForSameModifier
-            }
-            coordinator?.toBeReusedForSameModifier = true
-        }
     }
 
     internal fun lookaheadRemeasure(
@@ -1478,9 +1184,10 @@ internal class LayoutNode(
         }
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun onLayoutComplete() {
-        innerCoordinator.entities.forEach(EntityList.OnPlacedEntityType) {
-            it.modifier.onPlaced(innerCoordinator)
+        innerCoordinator.visitNodes(Nodes.LayoutAware) {
+            it.onPlaced(innerCoordinator)
         }
     }
 
@@ -1488,11 +1195,11 @@ internal class LayoutNode(
      * Calls [block] on all [LayoutModifierNodeCoordinator]s in the NodeCoordinator chain.
      */
     private inline fun forEachCoordinator(block: (LayoutModifierNodeCoordinator) -> Unit) {
-        var delegate = outerCoordinator
+        var coordinator: NodeCoordinator? = outerCoordinator
         val inner = innerCoordinator
-        while (delegate != inner) {
-            block(delegate as LayoutModifierNodeCoordinator)
-            delegate = delegate.wrapped
+        while (coordinator !== inner) {
+            block(coordinator as LayoutModifierNodeCoordinator)
+            coordinator = coordinator.wrapped
         }
     }
 
@@ -1508,24 +1215,16 @@ internal class LayoutNode(
         }
     }
 
-    /**
-     * Iterates over the [ModifierLocalProviderEntity]s and execute [block] on each one.
-     */
-    private inline fun forEachModifierLocalProvider(block: (ModifierLocalProviderEntity) -> Unit) {
-        var node: ModifierLocalProviderEntity? = modifierLocalsHead
-        while (node != null) {
-            block(node)
-            node = node.next
-        }
-    }
-
+    @OptIn(ExperimentalComposeUiApi::class)
     private fun shouldInvalidateParentLayer(): Boolean {
-        forEachCoordinatorIncludingInner {
-            if (it.layer != null) {
-                return false
-            } else if (it.entities.has(EntityList.DrawEntityType)) {
-                return true
+        if (nodes.has(Nodes.Draw) && !nodes.has(Nodes.Layout)) return true
+        nodes.headToTail {
+            if (it.isKind(Nodes.Layout) && it is LayoutModifierNode) {
+                if (it.requireCoordinator(Nodes.Layout).layer != null) {
+                    return false
+                }
             }
+            if (it.isKind(Nodes.Draw)) return true
         }
         return true
     }
@@ -1638,20 +1337,6 @@ internal class LayoutNode(
                 get() = 16f
             override val minimumTouchTargetSize: DpSize
                 get() = DpSize.Zero
-        }
-
-        // key for EmptyModifierLocalProvider
-        private val ModifierLocalNothing = modifierLocalOf {
-            error("default value for sentinel shouldn't be read")
-        }
-
-        // sentinel value for a provider that doesn't supply any values. This is important
-        // for modifier local consumers that don't have any provider before it in the chain.
-        private val SentinelModifierLocalProvider = object : ModifierLocalProvider<Nothing> {
-            override val key: ProvidableModifierLocal<Nothing>
-                get() = ModifierLocalNothing
-            override val value: Nothing
-                get() = error("Sentinel ModifierLocal shouldn't be read")
         }
     }
 

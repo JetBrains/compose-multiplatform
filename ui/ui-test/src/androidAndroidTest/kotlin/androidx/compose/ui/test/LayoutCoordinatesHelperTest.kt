@@ -16,6 +16,12 @@
 
 package androidx.compose.ui.test
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector2D
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,20 +30,28 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.OnPlacedModifier
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onPlaced
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -46,13 +60,16 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
+import androidx.compose.ui.unit.toOffset
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.launch
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Ignore
@@ -200,6 +217,119 @@ class LayoutCoordinatesHelperTest {
             assertThat(invocations).containsExactlyElementsIn(listOf(3, 3, 3))
         }
     }
+
+    @Test
+    @Ignore("b/242125166")
+    fun onPlacedUpToDateWhenModifierChainChanges() {
+        var alignment by mutableStateOf(Alignment.TopStart)
+        val targetOffset = mutableStateOf(Offset.Zero)
+        rule.setContent {
+            CompositionLocalProvider(LocalDensity.provides(Density(1f))) {
+                Box(
+                    Modifier
+                        .size(200.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .animatePlacement(targetOffset) { alignment }
+                            .align(alignment)
+                            .size(20.dp)
+                            .background(Color.Red)
+                    )
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertEquals(
+                calculateExpectedIntOffset(alignment),
+                targetOffset.value
+            )
+            alignment = Alignment.Center
+        }
+        rule.runOnIdle {
+            assertEquals(
+                calculateExpectedIntOffset(alignment),
+                targetOffset.value
+            )
+            alignment = Alignment.BottomEnd
+        }
+        rule.runOnIdle {
+            assertEquals(
+                calculateExpectedIntOffset(alignment),
+                targetOffset.value
+            )
+            alignment = Alignment.TopCenter
+        }
+        rule.runOnIdle {
+            assertEquals(
+                calculateExpectedIntOffset(alignment),
+                targetOffset.value
+            )
+            alignment = Alignment.TopEnd
+        }
+        rule.runOnIdle {
+            assertEquals(
+                calculateExpectedIntOffset(alignment),
+                targetOffset.value
+            )
+        }
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    private fun Modifier.animatePlacement(
+        targetOffset: MutableState<Offset>,
+        alignment: () -> Alignment
+    ): Modifier = composed {
+        val scope = rememberCoroutineScope()
+        var animatable by remember {
+            mutableStateOf<Animatable<Offset, AnimationVector2D>?>(
+                null
+            )
+        }
+        this
+            .layout { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                layout(placeable.width, placeable.height) {
+                    placeable.place(
+                        0, 0
+                    )
+                }
+            }
+            .onPlaced { coordinates ->
+                targetOffset.value = coordinates.positionInParent()
+                assertEquals(calculateExpectedIntOffset(alignment()), targetOffset.value)
+                // Animate to the new target offset when alignment changes.
+                val anim =
+                    animatable ?: Animatable(
+                        targetOffset.value,
+                        Offset.VectorConverter
+                    ).also { animatable = it }
+                if (anim.targetValue != targetOffset.value) {
+                    scope.launch {
+                        anim.animateTo(
+                            targetOffset.value,
+                            spring(stiffness = Spring.StiffnessMediumLow)
+                        )
+                    }
+                }
+            }
+            .layout { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                layout(placeable.width, placeable.height) {
+                    placeable.place(
+                        animatable?.let {
+                            (it.value - targetOffset.value).round()
+                        } ?: IntOffset.Zero
+                    )
+                }
+            }
+    }
+
+    private fun calculateExpectedIntOffset(alignment: Alignment) =
+        alignment.align(
+            IntSize(20, 20), IntSize(200, 200), LayoutDirection.Ltr
+        ).toOffset()
 
     @Test
     fun onPlacedModifierWithLayoutModifier() {

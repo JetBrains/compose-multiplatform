@@ -27,8 +27,6 @@ import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.PointerInteropFilter
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -93,24 +91,6 @@ class NodeCoordinatorInitializationTest {
     }
 
     @Test
-    fun initializeIsCalledWhenOnGloballyPositionedNodeIsCreated() {
-        // Arrange.
-        lateinit var layoutCoordinates: LayoutCoordinates
-
-        // Act.
-        rule.setContent {
-            Box(modifier = Modifier.onGloballyPositioned { layoutCoordinates = it })
-        }
-
-        // Assert.
-        rule.runOnIdle {
-            val coordinator = layoutCoordinates as NodeCoordinator
-            val callbacks = coordinator.layoutNode.getOrCreateOnPositionedCallbacks()
-            assertThat(callbacks.asMutableList()).isNotEmpty()
-        }
-    }
-
-    @Test
     fun initializeIsCalledWhenFocusNodeIsReused() {
         // Arrange.
         lateinit var focusModifier: FocusModifier
@@ -166,27 +146,6 @@ class NodeCoordinatorInitializationTest {
         // Assert.
         rule.runOnIdle {
             assertThat(pointerInputModifier.pointerInputFilter.layoutCoordinates).isNotNull()
-        }
-    }
-
-    @Test
-    fun initializeIsCalledWhenOnGloballyPositionedNodeIsReused() {
-        // Arrange.
-        lateinit var layoutCoordinates: LayoutCoordinates
-        lateinit var scope: RecomposeScope
-        rule.setContent {
-            scope = currentRecomposeScope
-            Box(modifier = Modifier.onGloballyPositioned { layoutCoordinates = it })
-        }
-
-        // Act.
-        rule.runOnIdle { scope.invalidate() }
-
-        // Assert.
-        rule.runOnIdle {
-            val coordinator = layoutCoordinates as NodeCoordinator
-            val callbacks = coordinator.layoutNode.getOrCreateOnPositionedCallbacks()
-            assertThat(callbacks.asMutableList()).isNotEmpty()
         }
     }
 }

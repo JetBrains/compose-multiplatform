@@ -27,7 +27,6 @@ import androidx.compose.ui.focus.FocusStateImpl.Deactivated
 import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.node.NodeCoordinator
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -209,15 +208,20 @@ private object FocusableChildrenComparator : Comparator<FocusModifier> {
     override fun compare(focusModifier1: FocusModifier?, focusModifier2: FocusModifier?): Int {
         requireNotNull(focusModifier1)
         requireNotNull(focusModifier2)
-        if (focusModifier1 === focusModifier2) return 0
 
-        // Ignore non-attached focus modifiers as they won't be considered during focus search.
-        val wrapper1 = focusModifier1.coordinator ?: return 0
-        val wrapper2 = focusModifier2.coordinator ?: return 0
+        // Ignore focus modifiers that won't be considered during focus search.
+        if (!focusModifier1.isEligibleForFocusSearch) return 0
+        if (!focusModifier2.isEligibleForFocusSearch) return 0
+
+        val layoutNode1 = checkNotNull(focusModifier1.coordinator?.layoutNode)
+        val layoutNode2 = checkNotNull(focusModifier2.coordinator?.layoutNode)
+
+        // Use natural order for focus modifiers within the same layout node.
+        if (layoutNode1 == layoutNode2) return 0
 
         // Compare the place order of the children of the least common ancestor.
-        val pathFromRoot1 = pathFromRoot(wrapper1)
-        val pathFromRoot2 = pathFromRoot(wrapper2)
+        val pathFromRoot1 = pathFromRoot(layoutNode1)
+        val pathFromRoot2 = pathFromRoot(layoutNode2)
         for (depth in 0..minOf(pathFromRoot1.lastIndex, pathFromRoot2.lastIndex)) {
             // If the items from the two paths are not equal, we have
             // found the first two children after the least common ancestor.
@@ -229,9 +233,9 @@ private object FocusableChildrenComparator : Comparator<FocusModifier> {
         error("Could not find a common ancestor between the two FocusModifiers.")
     }
 
-    private fun pathFromRoot(nodeCoordinator: NodeCoordinator): MutableVector<LayoutNode> {
+    private fun pathFromRoot(layoutNode: LayoutNode): MutableVector<LayoutNode> {
         val path = mutableVectorOf<LayoutNode>()
-        var current: LayoutNode? = nodeCoordinator.layoutNode
+        var current: LayoutNode? = layoutNode
         while (current != null) {
             path.add(0, current)
             current = current.parent

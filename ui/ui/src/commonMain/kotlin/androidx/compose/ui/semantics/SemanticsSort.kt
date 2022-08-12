@@ -16,18 +16,21 @@
 
 package androidx.compose.ui.semantics
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.NodeCoordinator
+import androidx.compose.ui.node.SemanticsModifierNode
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 
 // This part is a copy from ViewGroup#addChildrenForAccessibility.
+@OptIn(ExperimentalComposeUiApi::class)
 internal fun LayoutNode.findOneLayerOfSemanticsWrappersSortedByBounds(
-    list: MutableList<SemanticsEntity> = mutableListOf()
-): List<SemanticsEntity> {
+    list: MutableList<SemanticsModifierNode> = mutableListOf()
+): List<SemanticsModifierNode> {
     fun sortWithStrategy(holders: List<NodeLocationHolder>): List<NodeLocationHolder> {
         // This is gross but the least risky solution. The current comparison
         // strategy breaks transitivity but produces very good results. Coming
@@ -179,6 +182,7 @@ internal fun LayoutNode.findNodeByPredicateTraversal(
  * If this node has semantics, we use the semantics wrapper to get bounds. Otherwise, we use
  * innerCoordinator because it seems the bounds after padding is the effective content.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 internal fun LayoutNode.findCoordinatorToGetBounds(): NodeCoordinator {
-    return (outerMergingSemantics ?: outerSemantics)?.coordinator ?: innerCoordinator
+    return (outerMergingSemantics ?: outerSemantics)?.node?.coordinator ?: innerCoordinator
 }

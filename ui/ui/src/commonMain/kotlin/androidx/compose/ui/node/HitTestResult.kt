@@ -29,7 +29,6 @@ import kotlin.math.sign
  *
  * @see LayoutNode.hitTest
  * @see NodeCoordinator.hitTest
- * @see PointerInputEntity.hitTest
  */
 internal class HitTestResult<T> : List<T> {
     private var values = arrayOfNulls<Any>(16)

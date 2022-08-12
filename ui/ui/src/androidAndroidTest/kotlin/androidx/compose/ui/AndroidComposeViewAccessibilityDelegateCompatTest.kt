@@ -33,6 +33,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.toAndroidRect
 import androidx.compose.ui.node.InnerNodeCoordinator
 import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.node.SemanticsModifierNode
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -43,11 +44,11 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.ScrollAxisRange
+import androidx.compose.ui.semantics.SemanticsConfiguration
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
-import androidx.compose.ui.semantics.SemanticsEntity
 import androidx.compose.ui.semantics.collapse
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.copyText
@@ -1269,15 +1270,25 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         )
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     private fun createSemanticsNodeWithProperties(
         id: Int,
         mergeDescendants: Boolean,
         properties: (SemanticsPropertyReceiver.() -> Unit)
     ): SemanticsNode {
-        val semanticsModifier = SemanticsModifierCore(mergeDescendants, false, properties)
+        val layoutNode = LayoutNode(semanticsId = id)
+        val nodeCoordinator = InnerNodeCoordinator(layoutNode)
+        val modifierNode = object : SemanticsModifierNode, Modifier.Node() {
+            override val semanticsConfiguration = SemanticsConfiguration().also {
+                it.isMergingSemanticsOfDescendants = mergeDescendants
+                it.properties()
+            }
+        }
+        modifierNode.updateCoordinator(nodeCoordinator)
         return SemanticsNode(
-            SemanticsEntity(InnerNodeCoordinator(LayoutNode(semanticsId = id)), semanticsModifier),
-            true
+            modifierNode,
+            true,
+            layoutNode
         )
     }
 
