@@ -46,7 +46,6 @@ interface OverscrollEffect {
      * good user-experience.
      *
      * @param scrollDelta the original delta to scroll
-     * @param pointerPosition position of the pointer causing the scroll, if known
      * @param source source of the scroll event
      *
      * @return the amount of scroll consumed that won't be available for scrollable container
@@ -54,7 +53,6 @@ interface OverscrollEffect {
      */
     fun consumePreScroll(
         scrollDelta: Offset,
-        pointerPosition: Offset?,
         source: NestedScrollSource
     ): Offset
 
@@ -67,13 +65,11 @@ interface OverscrollEffect {
      *
      * @param initialDragDelta initial drag delta before any consumption was made
      * @param overscrollDelta the amount of overscroll left after the scroll process
-     * @param pointerPosition the pointer location in the bounds of the container
      * @param source source of the scroll event
      */
     fun consumePostScroll(
         initialDragDelta: Offset,
         overscrollDelta: Offset,
-        pointerPosition: Offset?,
         source: NestedScrollSource
     )
 

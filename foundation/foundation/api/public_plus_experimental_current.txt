@@ -153,9 +153,9 @@ package androidx.compose.foundation {
 
   @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public interface OverscrollEffect {
     method public suspend Object? consumePostFling(long velocity, kotlin.coroutines.Continuation<? super kotlin.Unit>);
-    method public void consumePostScroll(long initialDragDelta, long overscrollDelta, androidx.compose.ui.geometry.Offset? pointerPosition, int source);
+    method public void consumePostScroll(long initialDragDelta, long overscrollDelta, int source);
     method public suspend Object? consumePreFling(long velocity, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity>);
-    method public long consumePreScroll(long scrollDelta, androidx.compose.ui.geometry.Offset? pointerPosition, int source);
+    method public long consumePreScroll(long scrollDelta, int source);
     method public androidx.compose.ui.Modifier getEffectModifier();
     method public boolean isEnabled();
     method public boolean isInProgress();
