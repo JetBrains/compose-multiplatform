@@ -36,7 +36,8 @@ class UiIssueRegistry : IssueRegistry() {
         ModifierDeclarationDetector.ModifierFactoryReturnType,
         ModifierDeclarationDetector.ModifierFactoryUnreferencedReceiver,
         ModifierParameterDetector.ModifierParameter,
-        ReturnFromAwaitPointerEventScopeDetector.ExitAwaitPointerEventScope
+        ReturnFromAwaitPointerEventScopeDetector.ExitAwaitPointerEventScope,
+        MultipleAwaitPointerEventScopesDetector.MultipleAwaitPointerEventScopes
     )
     override val vendor = Vendor(
         vendorName = "Jetpack Compose",
