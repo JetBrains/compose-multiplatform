@@ -20,6 +20,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.platform.testTag
@@ -281,6 +284,176 @@ class LazyStaggeredGridTest(
                 .assertIsDisplayed()
                 .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
         }
+    }
+
+    @Test
+    fun itemsAreCorrectedWhenSizeIncreased() {
+        val state = LazyStaggeredGridState()
+        var expanded by mutableStateOf(false)
+        rule.setContent {
+            LazyStaggeredGrid(
+                lanes = 2,
+                state = state,
+                modifier = Modifier.axisSize(
+                    crossAxis = itemSizeDp * 2,
+                    mainAxis = itemSizeDp * 2
+                ),
+            ) {
+                item {
+                    Spacer(
+                        Modifier.axisSize(
+                            crossAxis = itemSizeDp,
+                            mainAxis = if (expanded) itemSizeDp * 2 else itemSizeDp
+                        ).testTag("$it")
+                    )
+                }
+                items(5) {
+                    Spacer(
+                        Modifier.axisSize(
+                            crossAxis = itemSizeDp,
+                            mainAxis = itemSizeDp
+                        ).testTag("${it + 1}")
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertMainAxisSizeIsEqualTo(itemSizeDp)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("1")
+            .assertMainAxisSizeIsEqualTo(itemSizeDp)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("2")
+            .assertMainAxisSizeIsEqualTo(itemSizeDp)
+            .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertMainAxisStartPositionInRootIsEqualTo(itemSizeDp)
+
+        state.scrollBy(itemSizeDp * 3)
+
+        expanded = true
+
+        state.scrollBy(-itemSizeDp * 3)
+
+        rule.onNodeWithTag("0")
+            .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertMainAxisSizeIsEqualTo(itemSizeDp * 2)
+
+        rule.onNodeWithTag("2")
+            .assertMainAxisSizeIsEqualTo(itemSizeDp)
+            .assertCrossAxisStartPositionInRootIsEqualTo(itemSizeDp)
+            .assertMainAxisStartPositionInRootIsEqualTo(itemSizeDp)
+    }
+
+    @Test
+    fun itemsAreCorrectedWhenSizeDecreased() {
+        val state = LazyStaggeredGridState()
+        var expanded by mutableStateOf(true)
+        rule.setContent {
+            LazyStaggeredGrid(
+                lanes = 2,
+                state = state,
+                modifier = Modifier.axisSize(
+                    crossAxis = itemSizeDp * 2,
+                    mainAxis = itemSizeDp * 2
+                ),
+            ) {
+                item {
+                    Spacer(
+                        Modifier.axisSize(
+                            crossAxis = itemSizeDp,
+                            mainAxis = if (expanded) itemSizeDp * 2 else itemSizeDp
+                        ).testTag("$it")
+                    )
+                }
+                items(5) {
+                    Spacer(
+                        Modifier.axisSize(
+                            crossAxis = itemSizeDp,
+                            mainAxis = itemSizeDp
+                        ).testTag("${it + 1}")
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertMainAxisSizeIsEqualTo(itemSizeDp * 2)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("1")
+            .assertMainAxisSizeIsEqualTo(itemSizeDp)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("2")
+            .assertMainAxisSizeIsEqualTo(itemSizeDp)
+            .assertCrossAxisStartPositionInRootIsEqualTo(itemSizeDp)
+            .assertMainAxisStartPositionInRootIsEqualTo(itemSizeDp)
+
+        state.scrollBy(itemSizeDp * 3)
+
+        expanded = false
+
+        state.scrollBy(-itemSizeDp * 3)
+
+        rule.onNodeWithTag("0")
+            .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertMainAxisSizeIsEqualTo(itemSizeDp)
+
+        rule.onNodeWithTag("2")
+            .assertMainAxisSizeIsEqualTo(itemSizeDp)
+            .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertMainAxisStartPositionInRootIsEqualTo(itemSizeDp)
+    }
+
+    @Test
+    fun itemsAreCorrectedWithWrongColumns() {
+        val state = LazyStaggeredGridState(
+            // intentionally wrong values, normally items should be [0, 1][2, 3][4, 5]
+            initialFirstVisibleItems = intArrayOf(3, 4),
+            initialFirstVisibleOffsets = intArrayOf(itemSizePx / 2, itemSizePx / 2)
+        )
+        rule.setContent {
+            LazyStaggeredGrid(
+                lanes = 2,
+                state = state,
+                modifier = Modifier.axisSize(
+                    crossAxis = itemSizeDp * 2,
+                    mainAxis = itemSizeDp
+                ),
+            ) {
+                items(6) {
+                    Spacer(
+                        Modifier.axisSize(
+                            crossAxis = itemSizeDp,
+                            mainAxis = itemSizeDp
+                        ).testTag("$it")
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertDoesNotExist()
+
+        rule.onNodeWithTag("3")
+            .assertMainAxisStartPositionInRootIsEqualTo(-itemSizeDp / 2)
+
+        rule.onNodeWithTag("4")
+            .assertMainAxisSizeIsEqualTo(itemSizeDp)
+            .assertMainAxisStartPositionInRootIsEqualTo(-itemSizeDp / 2)
+
+        state.scrollBy(-itemSizeDp * 3)
+
+        rule.onNodeWithTag("0")
+            .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("1")
+            .assertCrossAxisStartPositionInRootIsEqualTo(itemSizeDp)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
     }
 
     @Test

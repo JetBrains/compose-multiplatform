@@ -29,11 +29,14 @@ import androidx.compose.ui.layout.RemeasurementModifier
 import kotlin.math.abs
 
 @ExperimentalFoundationApi
-internal class LazyStaggeredGridState : ScrollableState {
-    var firstVisibleItems: IntArray by mutableStateOf(IntArray(0))
+internal class LazyStaggeredGridState(
+    initialFirstVisibleItems: IntArray = IntArray(0),
+    initialFirstVisibleOffsets: IntArray = IntArray(0)
+) : ScrollableState {
+    var firstVisibleItems: IntArray by mutableStateOf(initialFirstVisibleItems)
         private set
 
-    var firstVisibleItemScrollOffsets: IntArray by mutableStateOf(IntArray(0))
+    var firstVisibleItemScrollOffsets: IntArray by mutableStateOf(initialFirstVisibleOffsets)
         private set
 
     internal val spans: SpanLookup = SpanLookup()

@@ -94,8 +94,8 @@ internal fun rememberStaggeredGridMeasurePolicy(
         val beforeContentPadding = 0
         val afterContentPadding = 0
 
-        val initialItemIndices: IntArray
-        val initialItemOffsets: IntArray
+        var initialItemIndices: IntArray
+        var initialItemOffsets: IntArray
 
         Snapshot.withoutReadObservation {
             initialItemIndices =
@@ -118,7 +118,7 @@ internal fun rememberStaggeredGridMeasurePolicy(
 
         // Measure items
 
-        if (itemCount <= 0) {
+        if (itemCount <= 0 || resolvedSlotSums.isEmpty()) {
             LazyStaggeredGridMeasureResult(
                 firstVisibleItemIndices = IntArray(0),
                 firstVisibleItemScrollOffsets = IntArray(0),
@@ -158,9 +158,9 @@ internal fun rememberStaggeredGridMeasurePolicy(
             val maxOffset = mainAxisAvailableSize
 
             fun hasSpaceOnTop(): Boolean {
-                for (column in firstItemIndices.indices) {
-                    val itemIndex = firstItemIndices[column]
-                    val itemOffset = firstItemOffsets[column]
+                for (lane in firstItemIndices.indices) {
+                    val itemIndex = firstItemIndices[lane]
+                    val itemOffset = firstItemOffsets[lane]
 
                     if (itemOffset <= 0 && itemIndex > 0) {
                         return true
@@ -174,28 +174,52 @@ internal fun rememberStaggeredGridMeasurePolicy(
             // items before current firstItemScrollOffset should be visible. compose them and update
             // firstItemScrollOffset
             while (hasSpaceOnTop()) {
-                val columnIndex = firstItemOffsets.indexOfMinValue()
+                val laneIndex = firstItemOffsets.indexOfMinValue()
                 val previousItemIndex = spans.findPreviousItemIndex(
-                    item = firstItemIndices[columnIndex],
-                    column = columnIndex
+                    item = firstItemIndices[laneIndex],
+                    lane = laneIndex
                 )
 
                 if (previousItemIndex < 0) {
+                    // If we scrolled past the first item in the lane, we have a point of reference
+                    // to re-align items.
+                    // Case 1: Item offsets for first item are not aligned
+                    val misalignedOffsets = firstItemOffsets.any {
+                        it != firstItemOffsets[laneIndex]
+                    }
+                    // Case 2: Other lanes have more items than the current one
+                    val moreItemsInOtherLanes = firstItemIndices.indices.any { lane ->
+                        spans.findPreviousItemIndex(firstItemIndices[lane], lane) != -1
+                    }
+                    // Case 3: the first item is in the wrong lane (it should always be in
+                    // the first one)
+                    val firstItemInWrongLane = spans.getSpan(0) != 0
+                    // If items are not aligned, reset all measurement data we gathered before and
+                    // proceed with initial measure
+                    if (misalignedOffsets || moreItemsInOtherLanes || firstItemInWrongLane) {
+                        initialItemIndices = IntArray(firstItemIndices.size) { -1 }
+                        initialItemOffsets = IntArray(firstItemOffsets.size) {
+                            initialItemOffsets[laneIndex]
+                        }
+                        firstItemIndices.fill(-1)
+                        firstItemOffsets.fill(initialItemOffsets[laneIndex] - scrollDelta)
+                        measuredItems.forEach { it.clear() }
+                    }
                     break
                 }
 
                 if (spans.getSpan(previousItemIndex) == SpanLookup.SpanUnset) {
-                    spans.setSpan(previousItemIndex, columnIndex)
+                    spans.setSpan(previousItemIndex, laneIndex)
                 }
 
                 val measuredItem = measuredItemProvider.getAndMeasure(
                     previousItemIndex,
-                    columnIndex
+                    laneIndex
                 )
-                measuredItems[columnIndex].add(0, measuredItem)
+                measuredItems[laneIndex].add(0, measuredItem)
 
-                firstItemIndices[columnIndex] = previousItemIndex
-                firstItemOffsets[columnIndex] += measuredItem.sizeWithSpacings
+                firstItemIndices[laneIndex] = previousItemIndex
+                firstItemOffsets[laneIndex] += measuredItem.sizeWithSpacings
             }
 
             // if we were scrolled backward, but there were not enough items before. this means
@@ -216,21 +240,21 @@ internal fun rememberStaggeredGridMeasurePolicy(
             val maxMainAxis = (maxOffset + afterContentPadding).coerceAtLeast(0)
 
             // compose first visible items we received from state
-            currentItemIndices.forEachIndexed { columnIndex, itemIndex ->
+            currentItemIndices.forEachIndexed { laneIndex, itemIndex ->
                 if (itemIndex == -1) return@forEachIndexed
 
-                val measuredItem = measuredItemProvider.getAndMeasure(itemIndex, columnIndex)
-                currentItemOffsets[columnIndex] += measuredItem.sizeWithSpacings
+                val measuredItem = measuredItemProvider.getAndMeasure(itemIndex, laneIndex)
+                currentItemOffsets[laneIndex] += measuredItem.sizeWithSpacings
 
                 if (
-                    currentItemOffsets[columnIndex] <= minOffset &&
+                    currentItemOffsets[laneIndex] <= minOffset &&
                         measuredItem.index != itemCount - 1
                 ) {
                     // this item is offscreen and will not be placed. advance item index
-                    firstItemIndices[columnIndex] = -1
-                    firstItemOffsets[columnIndex] -= measuredItem.sizeWithSpacings
+                    firstItemIndices[laneIndex] = -1
+                    firstItemOffsets[laneIndex] -= measuredItem.sizeWithSpacings
                 } else {
-                    measuredItems[columnIndex].add(measuredItem)
+                    measuredItems[laneIndex].add(measuredItem)
                 }
             }
 
@@ -241,59 +265,56 @@ internal fun rememberStaggeredGridMeasurePolicy(
                 currentItemOffsets.any { it <= maxMainAxis } ||
                     measuredItems.all { it.isEmpty() }
             ) {
-                val columnIndex = currentItemOffsets.indexOfMinValue()
-                val nextItemIndex = spans.findNextItemIndex(
-                    currentItemIndices[columnIndex],
-                    columnIndex
-                )
+                val laneIndex = currentItemOffsets.indexOfMinValue()
+                val nextItemIndex = currentItemIndices.max() + 1
 
                 if (nextItemIndex == itemCount) {
                     break
                 }
 
-                if (firstItemIndices[columnIndex] == -1) {
-                    firstItemIndices[columnIndex] = nextItemIndex
+                if (firstItemIndices[laneIndex] == -1) {
+                    firstItemIndices[laneIndex] = nextItemIndex
                 }
-                spans.setSpan(nextItemIndex, columnIndex)
+                spans.setSpan(nextItemIndex, laneIndex)
 
-                val measuredItem = measuredItemProvider.getAndMeasure(nextItemIndex, columnIndex)
-                currentItemOffsets[columnIndex] += measuredItem.sizeWithSpacings
+                val measuredItem = measuredItemProvider.getAndMeasure(nextItemIndex, laneIndex)
+                currentItemOffsets[laneIndex] += measuredItem.sizeWithSpacings
 
                 if (
-                    currentItemOffsets[columnIndex] <= minOffset &&
+                    currentItemOffsets[laneIndex] <= minOffset &&
                         measuredItem.index != itemCount - 1
                 ) {
                     // this item is offscreen and will not be placed. advance item index
-                    firstItemIndices[columnIndex] = -1
-                    firstItemOffsets[columnIndex] -= measuredItem.sizeWithSpacings
+                    firstItemIndices[laneIndex] = -1
+                    firstItemOffsets[laneIndex] -= measuredItem.sizeWithSpacings
                 } else {
-                    measuredItems[columnIndex].add(measuredItem)
+                    measuredItems[laneIndex].add(measuredItem)
                 }
 
-                currentItemIndices[columnIndex] = nextItemIndex
+                currentItemIndices[laneIndex] = nextItemIndex
             }
 
             // we didn't fill the whole viewport with items starting from firstVisibleItemIndex.
             // lets try to scroll back if we have enough items before firstVisibleItemIndex.
             if (currentItemOffsets.all { it < maxOffset }) {
-                val maxOffsetColumn = currentItemOffsets.indexOfMaxValue()
-                val toScrollBack = maxOffset - currentItemOffsets[maxOffsetColumn]
+                val maxOffsetLane = currentItemOffsets.indexOfMaxValue()
+                val toScrollBack = maxOffset - currentItemOffsets[maxOffsetLane]
                 firstItemOffsets.offsetBy(-toScrollBack)
                 currentItemOffsets.offsetBy(toScrollBack)
                 while (
                     firstItemOffsets.any { it < beforeContentPadding } &&
                         firstItemIndices.all { it != 0 }
                 ) {
-                    val columnIndex = firstItemOffsets.indexOfMinValue()
+                    val laneIndex = firstItemOffsets.indexOfMinValue()
                     val currentIndex =
-                        if (firstItemIndices[columnIndex] == -1) {
+                        if (firstItemIndices[laneIndex] == -1) {
                             itemCount
                         } else {
-                            firstItemIndices[columnIndex]
+                            firstItemIndices[laneIndex]
                         }
 
                     val previousIndex =
-                        spans.findPreviousItemIndex(currentIndex, columnIndex)
+                        spans.findPreviousItemIndex(currentIndex, laneIndex)
 
                     if (previousIndex < 0) {
                         break
@@ -301,17 +322,17 @@ internal fun rememberStaggeredGridMeasurePolicy(
 
                     val measuredItem = measuredItemProvider.getAndMeasure(
                         previousIndex,
-                        columnIndex
+                        laneIndex
                     )
-                    measuredItems[columnIndex].add(0, measuredItem)
-                    firstItemOffsets[columnIndex] += measuredItem.sizeWithSpacings
-                    firstItemIndices[columnIndex] = previousIndex
+                    measuredItems[laneIndex].add(0, measuredItem)
+                    firstItemOffsets[laneIndex] += measuredItem.sizeWithSpacings
+                    firstItemIndices[laneIndex] = previousIndex
                 }
                 scrollDelta += toScrollBack
 
-                val minOffsetColumn = firstItemOffsets.indexOfMinValue()
-                if (firstItemOffsets[minOffsetColumn] < 0) {
-                    val offsetValue = firstItemOffsets[minOffsetColumn]
+                val minOffsetLane = firstItemOffsets.indexOfMinValue()
+                if (firstItemOffsets[minOffsetLane] < 0) {
+                    val offsetValue = firstItemOffsets[minOffsetLane]
                     scrollDelta += offsetValue
                     currentItemOffsets.offsetBy(offsetValue)
                     firstItemOffsets.offsetBy(-offsetValue)
@@ -356,20 +377,20 @@ internal fun rememberStaggeredGridMeasurePolicy(
             }
 
             var currentCrossAxis = 0
-            measuredItems.forEachIndexed { i, columnItems ->
+            measuredItems.forEachIndexed { i, laneItems ->
                 var currentMainAxis = itemScrollOffsets[i]
 
                 // todo(b/182882362): arrangement/spacing support
 
-                columnItems.fastForEach { item ->
+                laneItems.fastForEach { item ->
                     positionedItems[i] += item.position(
                         currentMainAxis,
                         currentCrossAxis,
                     )
                     currentMainAxis += item.sizeWithSpacings
                 }
-                if (columnItems.isNotEmpty()) {
-                    currentCrossAxis += columnItems[0].crossAxisSize
+                if (laneItems.isNotEmpty()) {
+                    currentCrossAxis += laneItems[0].crossAxisSize
                 }
             }
 
@@ -379,12 +400,12 @@ internal fun rememberStaggeredGridMeasurePolicy(
             // only scroll backward if the first item is not on screen or fully visible
             val canScrollBackward = !(firstItemIndices[0] == 0 && firstItemOffsets[0] <= 0)
             // only scroll forward if the last item is not on screen or fully visible
-            val canScrollForward = currentItemIndices.indexOf(itemCount - 1).let { columnIndex ->
-                if (columnIndex == -1) {
+            val canScrollForward = currentItemIndices.indexOf(itemCount - 1).let { laneIndex ->
+                if (laneIndex == -1) {
                     true
                 } else {
-                    (currentItemOffsets[columnIndex] -
-                        measuredItems[columnIndex].last().sizeWithSpacings) < mainAxisAvailableSize
+                    (currentItemOffsets[laneIndex] -
+                        measuredItems[laneIndex].last().sizeWithSpacings) < mainAxisAvailableSize
                 }
             }
 
@@ -451,24 +472,14 @@ private fun IntArray.indexOfMaxValue(): Int {
     return result
 }
 
-private fun SpanLookup.findPreviousItemIndex(item: Int, column: Int): Int {
+private fun SpanLookup.findPreviousItemIndex(item: Int, lane: Int): Int {
     for (i in (item - 1) downTo 0) {
         val span = getSpan(i)
-        if (span == column || span == SpanLookup.SpanUnset) {
+        if (span == lane || span == SpanLookup.SpanUnset) {
             return i
         }
     }
     return -1
-}
-
-private fun SpanLookup.findNextItemIndex(item: Int, column: Int): Int {
-    for (i in (item + 1) until capacity()) {
-        val span = getSpan(i)
-        if (span == column || span == SpanLookup.SpanUnset) {
-            return i
-        }
-    }
-    return capacity()
 }
 
 @OptIn(ExperimentalFoundationApi::class)
