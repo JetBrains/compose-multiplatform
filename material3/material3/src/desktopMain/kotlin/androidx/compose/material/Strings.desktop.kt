@@ -27,6 +27,7 @@ internal actual fun getString(string: Strings): String {
         Strings.DefaultErrorMessage -> "Invalid input"
         Strings.SliderRangeStart -> "Range Start"
         Strings.SliderRangeEnd -> "Range End"
+        Strings.Dialog -> "Dialog"
         else -> ""
     }
 }
