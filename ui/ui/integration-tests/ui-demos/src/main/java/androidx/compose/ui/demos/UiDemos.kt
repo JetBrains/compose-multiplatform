@@ -166,7 +166,11 @@ private val GraphicsDemos = DemoCategory(
     "Graphics",
     listOf(
         ComposableDemo("VectorGraphicsDemo") { VectorGraphicsDemo() },
-        ComposableDemo("DeclarativeGraphicsDemo") { DeclarativeGraphicsDemo() }
+        ComposableDemo("DeclarativeGraphicsDemo") { DeclarativeGraphicsDemo() },
+        ActivityDemo(
+            "Painter Resources Demo",
+            PainterResourcesDemoActivity::class
+        )
     )
 )
 

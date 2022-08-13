@@ -19,6 +19,7 @@ package androidx.compose.ui.res
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.content.res.XmlResourceParser
+import android.util.TypedValue
 import android.util.Xml
 import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
@@ -46,9 +47,10 @@ import java.lang.ref.WeakReference
 @Composable
 fun ImageVector.Companion.vectorResource(@DrawableRes id: Int): ImageVector {
     val context = LocalContext.current
-    val res = context.resources
+    val res = resources()
     val theme = context.theme
-    return remember(id) {
+
+    return remember(id, res, theme, res.configuration) {
         vectorResource(theme, res, id)
     }
 }
@@ -57,9 +59,18 @@ fun ImageVector.Companion.vectorResource(@DrawableRes id: Int): ImageVector {
 fun ImageVector.Companion.vectorResource(
     theme: Resources.Theme? = null,
     res: Resources,
-    resId: Int,
-): ImageVector =
-    loadVectorResourceInner(theme, res, res.getXml(resId).apply { seekToStartTag() }).imageVector
+    resId: Int
+): ImageVector {
+    val value = TypedValue()
+    res.getValue(resId, value, true)
+
+    return loadVectorResourceInner(
+        theme,
+        res,
+        res.getXml(resId).apply { seekToStartTag() },
+        value.changingConfigurations
+    ).imageVector
+}
 
 /**
  * Helper method that parses a vector asset from the given [XmlResourceParser] position.
@@ -70,7 +81,8 @@ fun ImageVector.Companion.vectorResource(
 internal fun loadVectorResourceInner(
     theme: Resources.Theme? = null,
     res: Resources,
-    parser: XmlResourceParser
+    parser: XmlResourceParser,
+    changingConfigurations: Int
 ): ImageVectorCache.ImageVectorEntry {
     val attrs = Xml.asAttributeSet(parser)
     val resourceParser = AndroidVectorParser(parser)
@@ -87,7 +99,7 @@ internal fun loadVectorResourceInner(
         )
         parser.next()
     }
-    return ImageVectorCache.ImageVectorEntry(builder.build(), resourceParser.config)
+    return ImageVectorCache.ImageVectorEntry(builder.build(), changingConfigurations)
 }
 
 /**

@@ -135,14 +135,15 @@ private fun obtainImageVectorCache(
     configuration: Configuration?
 ): ImageVectorCache {
     val imageVectorCache = remember { ImageVectorCache() }
-    var currentConfiguration = remember { configuration }
+    val currentConfiguration: Configuration = remember {
+        Configuration().apply { configuration?.let { this.setTo(it) } }
+    }
     val callbacks = remember {
         object : ComponentCallbacks2 {
             override fun onConfigurationChanged(configuration: Configuration) {
-                // If there is no configuration, assume all flags have changed.
-                val changedFlags = currentConfiguration?.updateFrom(configuration) ?: -0x1
+                val changedFlags = currentConfiguration.updateFrom(configuration)
                 imageVectorCache.prune(changedFlags)
-                currentConfiguration = configuration
+                currentConfiguration.setTo(configuration)
             }
 
             override fun onLowMemory() {
