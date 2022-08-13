@@ -19,4 +19,13 @@
     <style name="DialogWindowTheme">
         <item name="android:windowClipToOutline">false</item>
     </style>
+    <!-- Style for decorFitsSystemWindows = false on API 30 and earlier. WindowInsets won't
+     be set on Dialogs without android:windowIsFloating set to false. -->
+    <style name="FloatingDialogWindowTheme">
+        <item name="android:windowClipToOutline">false</item>
+        <item name="android:dialogTheme">@style/FloatingDialogTheme</item>
+    </style>
+    <style name="FloatingDialogTheme">
+        <item name="android:windowIsFloating">false</item>
+    </style>
 </resources>

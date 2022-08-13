@@ -3398,12 +3398,14 @@ package androidx.compose.ui.window {
   }
 
   @androidx.compose.runtime.Immutable public final class DialogProperties {
-    ctor @androidx.compose.ui.ExperimentalComposeUiApi public DialogProperties(optional boolean dismissOnBackPress, optional boolean dismissOnClickOutside, optional androidx.compose.ui.window.SecureFlagPolicy securePolicy, optional boolean usePlatformDefaultWidth);
+    ctor @androidx.compose.ui.ExperimentalComposeUiApi public DialogProperties(optional boolean dismissOnBackPress, optional boolean dismissOnClickOutside, optional androidx.compose.ui.window.SecureFlagPolicy securePolicy, optional boolean usePlatformDefaultWidth, optional boolean decorFitsSystemWindows);
     ctor public DialogProperties(optional boolean dismissOnBackPress, optional boolean dismissOnClickOutside, optional androidx.compose.ui.window.SecureFlagPolicy securePolicy);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public boolean getDecorFitsSystemWindows();
     method public boolean getDismissOnBackPress();
     method public boolean getDismissOnClickOutside();
     method public androidx.compose.ui.window.SecureFlagPolicy getSecurePolicy();
     method public boolean getUsePlatformDefaultWidth();
+    property @androidx.compose.ui.ExperimentalComposeUiApi public final boolean decorFitsSystemWindows;
     property public final boolean dismissOnBackPress;
     property public final boolean dismissOnClickOutside;
     property public final androidx.compose.ui.window.SecureFlagPolicy securePolicy;
