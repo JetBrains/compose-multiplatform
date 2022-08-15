@@ -24,6 +24,7 @@ import androidx.benchmark.macro.TraceSectionMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.benchmark.perfetto.PerfettoCapture
 import androidx.test.filters.LargeTest
+import androidx.test.filters.SdkSuppress
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,6 +38,7 @@ import org.junit.runners.Parameterized.Parameters
  * a Perfetto trace.
  */
 @OptIn(ExperimentalMetricApi::class)
+@SdkSuppress(minSdkVersion = Build.VERSION_CODES.R) // TODO(234351579): Support API < 30
 class TrivialTracingBenchmark(private val composableName: String) {
     @get:Rule
     val benchmarkRule = MacrobenchmarkRule()
