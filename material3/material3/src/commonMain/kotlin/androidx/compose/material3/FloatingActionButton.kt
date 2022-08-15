@@ -143,9 +143,6 @@ fun FloatingActionButton(
  *
  * @param onClick called when this FAB is clicked
  * @param modifier the [Modifier] to be applied to this FAB
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this FAB. You can create and pass in your own `remember`ed instance to observe [Interaction]s
- * and customize the appearance / behavior of this FAB in different states.
  * @param shape defines the shape of this FAB's container and shadow (when using [elevation])
  * @param containerColor the color used for the background of this FAB. Use [Color.Transparent] to
  * have no color.
@@ -156,17 +153,20 @@ fun FloatingActionButton(
  * different states. This controls the size of the shadow below the FAB. Additionally, when the
  * container color is [ColorScheme.surface], this controls the amount of primary color applied as an
  * overlay. See also: [Surface].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this FAB. You can create and pass in your own `remember`ed instance to observe [Interaction]s
+ * and customize the appearance / behavior of this FAB in different states.
  * @param content the content of this FAB, typically an [Icon]
  */
 @Composable
 fun SmallFloatingActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = FloatingActionButtonDefaults.smallShape,
     containerColor: Color = FloatingActionButtonDefaults.containerColor,
     contentColor: Color = contentColorFor(containerColor),
     elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit,
 ) {
     FloatingActionButton(
@@ -175,11 +175,11 @@ fun SmallFloatingActionButton(
             minWidth = FabPrimarySmallTokens.ContainerWidth,
             minHeight = FabPrimarySmallTokens.ContainerHeight,
         ),
-        interactionSource = interactionSource,
         shape = shape,
         containerColor = containerColor,
         contentColor = contentColor,
         elevation = elevation,
+        interactionSource = interactionSource,
         content = content,
     )
 }
@@ -195,9 +195,6 @@ fun SmallFloatingActionButton(
  *
  * @param onClick called when this FAB is clicked
  * @param modifier the [Modifier] to be applied to this FAB
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this FAB. You can create and pass in your own `remember`ed instance to observe [Interaction]s
- * and customize the appearance / behavior of this FAB in different states.
  * @param shape defines the shape of this FAB's container and shadow (when using [elevation])
  * @param containerColor the color used for the background of this FAB. Use [Color.Transparent] to
  * have no color.
@@ -208,17 +205,20 @@ fun SmallFloatingActionButton(
  * different states. This controls the size of the shadow below the FAB. Additionally, when the
  * container color is [ColorScheme.surface], this controls the amount of primary color applied as an
  * overlay. See also: [Surface].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this FAB. You can create and pass in your own `remember`ed instance to observe [Interaction]s
+ * and customize the appearance / behavior of this FAB in different states.
  * @param content the content of this FAB, typically an [Icon]
  */
 @Composable
 fun LargeFloatingActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = FloatingActionButtonDefaults.largeShape,
     containerColor: Color = FloatingActionButtonDefaults.containerColor,
     contentColor: Color = contentColorFor(containerColor),
     elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit,
 ) {
     FloatingActionButton(
@@ -227,11 +227,11 @@ fun LargeFloatingActionButton(
             minWidth = FabPrimaryLargeTokens.ContainerWidth,
             minHeight = FabPrimaryLargeTokens.ContainerHeight,
         ),
-        interactionSource = interactionSource,
         shape = shape,
         containerColor = containerColor,
         contentColor = contentColor,
         elevation = elevation,
+        interactionSource = interactionSource,
         content = content,
     )
 }
@@ -250,9 +250,6 @@ fun LargeFloatingActionButton(
  *
  * @param onClick called when this FAB is clicked
  * @param modifier the [Modifier] to be applied to this FAB
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this FAB. You can create and pass in your own `remember`ed instance to observe [Interaction]s
- * and customize the appearance / behavior of this FAB in different states.
  * @param shape defines the shape of this FAB's container and shadow (when using [elevation])
  * @param containerColor the color used for the background of this FAB. Use [Color.Transparent] to
  * have no color.
@@ -263,27 +260,30 @@ fun LargeFloatingActionButton(
  * different states. This controls the size of the shadow below the FAB. Additionally, when the
  * container color is [ColorScheme.surface], this controls the amount of primary color applied as an
  * overlay. See also: [Surface].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this FAB. You can create and pass in your own `remember`ed instance to observe [Interaction]s
+ * and customize the appearance / behavior of this FAB in different states.
  * @param content the content of this FAB, typically a [Text] label
  */
 @Composable
 fun ExtendedFloatingActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = FloatingActionButtonDefaults.extendedFabShape,
     containerColor: Color = FloatingActionButtonDefaults.containerColor,
     contentColor: Color = contentColorFor(containerColor),
     elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit,
 ) {
     FloatingActionButton(
-        modifier = modifier,
         onClick = onClick,
-        interactionSource = interactionSource,
+        modifier = modifier,
         shape = shape,
         containerColor = containerColor,
         contentColor = contentColor,
         elevation = elevation,
+        interactionSource = interactionSource,
     ) {
         Row(
             modifier = Modifier
@@ -318,9 +318,6 @@ fun ExtendedFloatingActionButton(
  * @param modifier the [Modifier] to be applied to this FAB
  * @param expanded controls the expansion state of this FAB. In an expanded state, the FAB will show
  * both the [icon] and [text]. In a collapsed state, the FAB will show only the [icon].
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this FAB. You can create and pass in your own `remember`ed instance to observe [Interaction]s
- * and customize the appearance / behavior of this FAB in different states.
  * @param shape defines the shape of this FAB's container and shadow (when using [elevation])
  * @param containerColor the color used for the background of this FAB. Use [Color.Transparent] to
  * have no color.
@@ -331,6 +328,9 @@ fun ExtendedFloatingActionButton(
  * different states. This controls the size of the shadow below the FAB. Additionally, when the
  * container color is [ColorScheme.surface], this controls the amount of primary color applied as an
  * overlay. See also: [Surface].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this FAB. You can create and pass in your own `remember`ed instance to observe [Interaction]s
+ * and customize the appearance / behavior of this FAB in different states.
  */
 @Composable
 fun ExtendedFloatingActionButton(
@@ -339,20 +339,20 @@ fun ExtendedFloatingActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     expanded: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = FloatingActionButtonDefaults.extendedFabShape,
     containerColor: Color = FloatingActionButtonDefaults.containerColor,
     contentColor: Color = contentColorFor(containerColor),
     elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     FloatingActionButton(
-        modifier = modifier,
         onClick = onClick,
-        interactionSource = interactionSource,
+        modifier = modifier,
         shape = shape,
         containerColor = containerColor,
         contentColor = contentColor,
         elevation = elevation,
+        interactionSource = interactionSource,
     ) {
         val startPadding = if (expanded) ExtendedFabStartIconPadding else 0.dp
         val endPadding = if (expanded) ExtendedFabTextPadding else 0.dp
