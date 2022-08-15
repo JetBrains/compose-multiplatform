@@ -91,9 +91,7 @@ internal class IdentityArraySet<T : Any> : Set<T> {
      * Remove all values from the set.
      */
     fun clear() {
-        for (i in 0 until size) {
-            values[i] = null
-        }
+        values.fill(null)
 
         size = 0
     }
