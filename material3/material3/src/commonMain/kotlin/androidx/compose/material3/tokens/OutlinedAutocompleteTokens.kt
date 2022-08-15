@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_92
+// VERSION: v0_103
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -34,7 +34,7 @@ internal object OutlinedAutocompleteTokens {
     val TextFieldCaretColor = ColorSchemeKeyTokens.Primary
     val TextFieldContainerColor = ColorSchemeKeyTokens.SurfaceVariant
     val TextFieldContainerHeight = 56.0.dp
-    val TextFieldContainerShape = ShapeKeyTokens.CornerExtraSmallTop
+    val TextFieldContainerShape = ShapeKeyTokens.CornerExtraSmall
     val FieldDisabledInputTextColor = ColorSchemeKeyTokens.OnSurface
     const val FieldDisabledInputTextOpacity = 0.38f
     val FieldDisabledLabelTextColor = ColorSchemeKeyTokens.OnSurface
