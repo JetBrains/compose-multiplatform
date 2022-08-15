@@ -1616,7 +1616,7 @@ class SelectableChipElevation internal constructor(
     private val disabledElevation: Dp
 ) {
     /**
-     * Represents the tonal elevation used in a chip, depending on [enabled], [selected], and
+     * Represents the tonal elevation used in a chip, depending on [enabled] and
      * [interactionSource]. This should typically be the same value as the [shadowElevation].
      *
      * Tonal elevation is used to apply a color shift to the surface to give the it higher emphasis.
@@ -1637,7 +1637,7 @@ class SelectableChipElevation internal constructor(
     }
 
     /**
-     * Represents the shadow elevation used in a chip, depending on [enabled], [selected], and
+     * Represents the shadow elevation used in a chip, depending on [enabled] and
      * [interactionSource]. This should typically be the same value as the [tonalElevation].
      *
      * Shadow elevation is used to apply a shadow around the surface to give it higher emphasis.
