@@ -41,7 +41,10 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Matrix
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
@@ -371,6 +374,55 @@ class LayoutCoordinatesHelperTest {
         rule.runOnIdle {
             assertThat(coordinates).isNotNull()
         }
+    }
+
+    @Test(expected = UnsupportedOperationException::class)
+    fun defaultTransformFromThrows() {
+        val layoutCoordinates = object : LayoutCoordinates {
+            override val size: IntSize
+                get() = TODO("Not yet implemented")
+            override val providedAlignmentLines: Set<AlignmentLine>
+                get() = TODO("Not yet implemented")
+            override val parentLayoutCoordinates: LayoutCoordinates?
+                get() = TODO("Not yet implemented")
+            override val parentCoordinates: LayoutCoordinates?
+                get() = TODO("Not yet implemented")
+            override val isAttached: Boolean
+                get() = TODO("Not yet implemented")
+
+            override fun windowToLocal(relativeToWindow: Offset): Offset {
+                TODO("Not yet implemented")
+            }
+
+            override fun localToWindow(relativeToLocal: Offset): Offset {
+                TODO("Not yet implemented")
+            }
+
+            override fun localToRoot(relativeToLocal: Offset): Offset {
+                TODO("Not yet implemented")
+            }
+
+            override fun localPositionOf(
+                sourceCoordinates: LayoutCoordinates,
+                relativeToSource: Offset
+            ): Offset {
+                TODO("Not yet implemented")
+            }
+
+            override fun localBoundingBoxOf(
+                sourceCoordinates: LayoutCoordinates,
+                clipBounds: Boolean
+            ): Rect {
+                TODO("Not yet implemented")
+            }
+
+            override fun get(alignmentLine: AlignmentLine): Int {
+                TODO("Not yet implemented")
+            }
+        }
+        val matrix = Matrix()
+        // This should throw UnsupoportedOperationException
+        layoutCoordinates.transformFrom(layoutCoordinates, matrix)
     }
 
     private fun LayoutCoordinates.placementInParent() =
