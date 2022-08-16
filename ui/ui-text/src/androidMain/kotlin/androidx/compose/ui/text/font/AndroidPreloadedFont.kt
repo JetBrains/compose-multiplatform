@@ -24,108 +24,10 @@ import android.os.Build
 import android.os.ParcelFileDescriptor
 import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.fastMap
 import java.io.File
-
-/**
- * Create a Font declaration from a file in the assets directory. The content of the [File] is
- * read during construction.
- *
- * @param assetManager Android AssetManager
- * @param path full path starting from the assets directory (i.e. dir/myfont.ttf for
- * assets/dir/myfont.ttf).
- * @param weight The weight of the font. The system uses this to match a font to a font request
- * that is given in a [androidx.compose.ui.text.SpanStyle].
- * @param style The style of the font, normal or italic. The system uses this to match a font to a
- * font request that is given in a [androidx.compose.ui.text.SpanStyle].
- */
-@ExperimentalTextApi
-@Stable
-@Deprecated("This experimental Font is replaced by Font(path, assetManager, ...)",
-    replaceWith = ReplaceWith("Font(path, assetManager, weight, style)"),
-    level = DeprecationLevel.WARNING
-)
-fun Font(
-    assetManager: AssetManager,
-    path: String,
-    weight: FontWeight = FontWeight.Normal,
-    style: FontStyle = FontStyle.Normal
-): Font = AndroidAssetFont(
-    assetManager,
-    path,
-    weight,
-    style,
-    FontVariation.Settings(weight, style)
-)
-
-/**
- * Create a Font declaration from a file in the assets directory. The content of the [File] is
- * read during construction.
- *
- * @param path full path starting from the assets directory (i.e. dir/myfont.ttf for
- * assets/dir/myfont.ttf).
- * @param assetManager Android AssetManager
- * @param weight The weight of the font. The system uses this to match a font to a font request
- * that is given in a [androidx.compose.ui.text.SpanStyle].
- * @param style The style of the font, normal or italic. The system uses this to match a font to a
- * font request that is given in a [androidx.compose.ui.text.SpanStyle].
- * @param variationSettings on API 26 and above these settings are applied to a variable font when
- * the font is loaded
- */
-@ExperimentalTextApi
-@Stable
-fun Font(
-    path: String,
-    assetManager: AssetManager,
-    weight: FontWeight = FontWeight.Normal,
-    style: FontStyle = FontStyle.Normal,
-    variationSettings: FontVariation.Settings = FontVariation.Settings(weight, style)
-): Font = AndroidAssetFont(assetManager, path, weight, style, variationSettings)
-
-/**
- * Create a Font declaration from a file. The content of the [File] is read during construction.
- *
- * @param file the font file.
- * @param weight The weight of the font. The system uses this to match a font to a font request
- * that is given in a [androidx.compose.ui.text.SpanStyle].
- * @param style The style of the font, normal or italic. The system uses this to match a font to a
- * font request that is given in a [androidx.compose.ui.text.SpanStyle].
- * @param variationSettings on API 26 and above these settings are applied to a variable font when
- * the font is loaded
- */
-@ExperimentalTextApi
-@Stable
-@Suppress("StreamFiles")
-fun Font(
-    file: File,
-    weight: FontWeight = FontWeight.Normal,
-    style: FontStyle = FontStyle.Normal,
-    variationSettings: FontVariation.Settings = FontVariation.Settings(weight, style)
-): Font = AndroidFileFont(file, weight, style, variationSettings)
-
-/**
- * Create a Font declaration from a [ParcelFileDescriptor]. The content of the
- * [ParcelFileDescriptor] is read during construction.
- *
- * @param fileDescriptor the file descriptor for the font file.
- * @param weight The weight of the font. The system uses this to match a font to a font request
- * that is given in a [androidx.compose.ui.text.SpanStyle].
- * @param style The style of the font, normal or italic. The system uses this to match a font to a
- * font request that is given in a [androidx.compose.ui.text.SpanStyle].
- * @param variationSettings these settings are applied to a variable font when the font is loaded
- */
-@RequiresApi(26)
-@ExperimentalTextApi
-@Stable
-fun Font(
-    fileDescriptor: ParcelFileDescriptor,
-    weight: FontWeight = FontWeight.Normal,
-    style: FontStyle = FontStyle.Normal,
-    variationSettings: FontVariation.Settings = FontVariation.Settings(weight, style)
-): Font = AndroidFileDescriptorFont(fileDescriptor, weight, style, variationSettings)
 
 @OptIn(ExperimentalTextApi::class)
 internal sealed class AndroidPreloadedFont @OptIn(ExperimentalTextApi::class) constructor(
@@ -163,7 +65,7 @@ private object AndroidPreloadedFontTypefaceLoader : AndroidFont.TypefaceLoader {
 }
 
 @OptIn(ExperimentalTextApi::class) /* FontVariation.Settings */
-private class AndroidAssetFont constructor(
+internal class AndroidAssetFont constructor(
     val assetManager: AssetManager,
     val path: String,
     weight: FontWeight = FontWeight.Normal,
@@ -207,7 +109,7 @@ private class AndroidAssetFont constructor(
 }
 
 @OptIn(ExperimentalTextApi::class)
-private class AndroidFileFont constructor(
+internal class AndroidFileFont constructor(
     val file: File,
     weight: FontWeight = FontWeight.Normal,
     style: FontStyle = FontStyle.Normal,
@@ -234,7 +136,7 @@ private class AndroidFileFont constructor(
 
 @RequiresApi(26)
 @OptIn(ExperimentalTextApi::class)
-private class AndroidFileDescriptorFont constructor(
+internal class AndroidFileDescriptorFont constructor(
     val fileDescriptor: ParcelFileDescriptor,
     weight: FontWeight = FontWeight.Normal,
     style: FontStyle = FontStyle.Normal,
