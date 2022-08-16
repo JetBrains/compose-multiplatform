@@ -68,16 +68,23 @@ private val NoPressGesture: suspend PressGestureScope.(Offset) -> Unit = { }
  * The first pointer down and final pointer up are consumed, and in the
  * case of long press, all changes after the long press is detected are consumed.
  *
+ * Each function parameter receives an [Offset] representing the position relative to the containing
+ * element. The [Offset] can be outside the actual bounds of the element itself meaning the numbers
+ * can be negative or larger than the element bounds if the touch target is smaller than the
+ * [ViewConfiguration.minimumTouchTargetSize].
+ *
  * When [onDoubleTap] is provided, the tap gesture is detected only after
  * the [ViewConfiguration.doubleTapMinTimeMillis] has passed and [onDoubleTap] is called if the
  * second tap is started before [ViewConfiguration.doubleTapTimeoutMillis]. If [onDoubleTap] is not
  * provided, then [onTap] is called when the pointer up has been received.
  *
- * If the first down event was consumed, the entire gesture will be skipped, including
- * [onPress]. If the first down event was not consumed, if any other gesture consumes the down or
- * up events, the pointer moves out of the input area, or the position change is consumed,
- * the gestures are considered canceled. [onDoubleTap], [onLongPress], and [onTap] will not be
- * called after a gesture has been canceled.
+ * After the initial [onPress], if the pointer moves out of the input area, the position change
+ * is consumed, or another gesture consumes the down or up events, the gestures are considered
+ * canceled. That means [onDoubleTap], [onLongPress], and [onTap] will not be called after a
+ * gesture has been canceled.
+ *
+ * If the first down event is consumed somewhere else, the entire gesture will be skipped,
+ * including [onPress].
  */
 suspend fun PointerInputScope.detectTapGestures(
     onDoubleTap: ((Offset) -> Unit)? = null,
@@ -196,6 +203,11 @@ private suspend fun AwaitPointerEventScope.awaitSecondDown(
 /**
  * Shortcut for cases when we only need to get press/click logic, as for cases without long press
  * and double click we don't require channelling or any other complications.
+ *
+ * Each function parameter receives an [Offset] representing the position relative to the containing
+ * element. The [Offset] can be outside the actual bounds of the element itself meaning the numbers
+ * can be negative or larger than the element bounds if the touch target is smaller than the
+ * [ViewConfiguration.minimumTouchTargetSize].
  */
 internal suspend fun PointerInputScope.detectTapAndPress(
     onPress: suspend PressGestureScope.(Offset) -> Unit = NoPressGesture,

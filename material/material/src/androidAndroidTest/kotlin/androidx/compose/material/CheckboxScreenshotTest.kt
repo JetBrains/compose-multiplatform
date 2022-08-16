@@ -21,10 +21,13 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.input.InputModeManager
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -229,14 +232,13 @@ class CheckboxScreenshotTest {
     @Test
     fun checkBoxTest_focus() {
         val focusRequester = FocusRequester()
+        var localInputModeManager: InputModeManager? = null
 
         rule.setMaterialContent {
+            localInputModeManager = LocalInputModeManager.current
             Box(wrap.testTag(wrapperTestTag)) {
                 Checkbox(
                     modifier = wrap
-                        // Normally this is only focusable in non-touch mode, so let's force it to
-                        // always be focusable so we can test how it appears
-                        .focusProperties { canFocus = true }
                         .focusRequester(focusRequester),
                     checked = true,
                     onCheckedChange = { }
@@ -245,6 +247,8 @@ class CheckboxScreenshotTest {
         }
 
         rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            localInputModeManager!!.requestInputMode(InputMode.Keyboard)
             focusRequester.requestFocus()
         }
 

@@ -49,16 +49,15 @@ fun FlingGameDemo() {
             Modifier.fillMaxSize().pointerInput(Unit) {
                 coroutineScope {
                     while (true) {
-                        val pointerId = awaitPointerEventScope {
-                            awaitFirstDown().run {
+                        val velocityTracker = VelocityTracker()
+                        awaitPointerEventScope {
+                           val pointerId = awaitFirstDown().run {
                                 launch {
                                     anim.snapTo(position)
                                 }
                                 id
                             }
-                        }
-                        val velocityTracker = VelocityTracker()
-                        awaitPointerEventScope {
+
                             drag(pointerId) {
                                 launch {
                                     anim.snapTo(anim.value + it.positionChange())
@@ -69,6 +68,7 @@ fun FlingGameDemo() {
                                 )
                             }
                         }
+
                         val (x, y) = velocityTracker.calculateVelocity()
                         anim.updateBounds(
                             Offset(100f, 100f),

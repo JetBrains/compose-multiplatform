@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-// VERSION: v0_93
+// VERSION: v0_103
 // GENERATED CODE - DO NOT MODIFY BY HAND
+
 package androidx.compose.material3.tokens
+
 import androidx.compose.ui.unit.dp
+
 internal object FabSecondaryTokens {
     val ContainerColor = ColorSchemeKeyTokens.SecondaryContainer
     val ContainerElevation = ElevationTokens.Level3

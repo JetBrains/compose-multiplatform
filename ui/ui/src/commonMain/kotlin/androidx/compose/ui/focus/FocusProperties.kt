@@ -244,9 +244,9 @@ internal fun FocusProperties.clear() {
 }
 
 internal fun FocusModifier.refreshFocusProperties() {
-    val layoutNodeWrapper = layoutNodeWrapper ?: return
+    val coordinator = coordinator ?: return
     focusProperties.clear()
-    layoutNodeWrapper.layoutNode.owner?.snapshotObserver?.observeReads(this,
+    coordinator.layoutNode.owner?.snapshotObserver?.observeReads(this,
         FocusModifier.RefreshFocusProperties
     ) {
         focusPropertiesModifier?.calculateProperties(focusProperties)

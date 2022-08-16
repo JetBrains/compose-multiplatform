@@ -17,7 +17,7 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="indeterminate" msgid="2486394087603402002">"선택 또는 선택 해제되지 않음"</string>
+    <string name="indeterminate" msgid="7933458017204019916">"일부 선택됨"</string>
     <string name="on" msgid="8655164131929253426">"켜짐"</string>
     <string name="off" msgid="875452955155264703">"꺼짐"</string>
     <string name="selected" msgid="6043586758067023">"선택됨"</string>

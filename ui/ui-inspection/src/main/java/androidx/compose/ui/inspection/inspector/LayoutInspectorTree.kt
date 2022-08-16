@@ -553,13 +553,10 @@ class LayoutInspectorTree {
                 .flatMap { config -> config.map { RawParameter(it.key.name, it.value) } }
         )
 
-        node.mergedSemantics.addAll(
-            modifierInfo.asSequence()
-                .map { it.modifier }
-                .filterIsInstance<SemanticsModifier>()
-                .map { it.id }
-                .flatMap { semanticsMap[it].orEmpty() }
-        )
+        val mergedSemantics = semanticsMap.get(layoutInfo.semanticsId)
+        if (mergedSemantics != null) {
+            node.mergedSemantics.addAll(mergedSemantics)
+        }
 
         node.id = modifierInfo.asSequence()
             .map { it.extra }
@@ -749,9 +746,7 @@ class LayoutInspectorTree {
             if (!capturing) {
                 return node
             }
-            val root = group.data.filterIsInstance<ViewRootForInspector>().singleOrNull()
-                ?: group.data.filterIsInstance<Ref<ViewRootForInspector>>().singleOrNull()?.value
-                ?: return node
+            val root = findSingleRootInGroupData(group) ?: return node
 
             val view = root.subCompositionView
             if (view != null) {
@@ -765,6 +760,12 @@ class LayoutInspectorTree {
                 clear()
             }
             return node
+        }
+
+        private fun findSingleRootInGroupData(group: CompositionGroup): ViewRootForInspector? {
+            group.data.filterIsInstance<ViewRootForInspector>().singleOrNull()?.let { return it }
+            val refs = group.data.filterIsInstance<Ref<*>>().map { it.value }
+            return refs.filterIsInstance<ViewRootForInspector>().singleOrNull()
         }
 
         /**

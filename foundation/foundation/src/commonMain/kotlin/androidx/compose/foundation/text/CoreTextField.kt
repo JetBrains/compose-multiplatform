@@ -21,6 +21,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
@@ -105,6 +106,7 @@ import androidx.compose.ui.text.input.TextInputSession
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
@@ -210,7 +212,7 @@ internal fun CoreTextField(
 
     // State
     val transformedText = remember(value, visualTransformation) {
-        val transformed = visualTransformation.filter(value.annotatedString)
+        val transformed = visualTransformation.filterWithValidation(value.annotatedString)
         value.composition?.let {
             TextFieldDelegate.applyCompositionDecoration(it, transformed)
         } ?: transformed
@@ -312,8 +314,8 @@ internal fun CoreTextField(
 
     // Hide the keyboard if made disabled or read-only while focused (b/237308379).
     if (enabled && !readOnly) {
-        // Workaround for b/230536793. We don't get an explicit focus blur event when the text field
-        // is removed from the composition entirely.
+        // TODO(b/230536793) This is a workaround since we don't get an explicit focus blur event
+        //  when the text field is removed from the composition entirely.
         DisposableEffect(state) {
             onDispose {
                 if (state.hasFocus) {
@@ -326,33 +328,37 @@ internal fun CoreTextField(
     val pointerModifier = if (isInTouchMode) {
         val selectionModifier =
             Modifier.longPressDragGestureFilter(manager.touchSelectionObserver, enabled)
-        Modifier.tapPressTextFieldModifier(interactionSource, enabled) { offset ->
-            tapToFocus(state, focusRequester, !readOnly)
-            if (state.hasFocus) {
-                if (state.handleState != HandleState.Selection) {
-                    state.layoutResult?.let { layoutResult ->
-                        TextFieldDelegate.setCursorOffset(
-                            offset,
-                            layoutResult,
-                            state.processor,
-                            offsetMapping,
-                            state.onValueChange
-                        )
-                        // Won't enter cursor state when text is empty.
-                        if (state.textDelegate.text.isNotEmpty()) {
-                            state.handleState = HandleState.Cursor
+        Modifier
+            .tapPressTextFieldModifier(interactionSource, enabled) { offset ->
+                tapToFocus(state, focusRequester, !readOnly)
+                if (state.hasFocus) {
+                    if (state.handleState != HandleState.Selection) {
+                        state.layoutResult?.let { layoutResult ->
+                            TextFieldDelegate.setCursorOffset(
+                                offset,
+                                layoutResult,
+                                state.processor,
+                                offsetMapping,
+                                state.onValueChange
+                            )
+                            // Won't enter cursor state when text is empty.
+                            if (state.textDelegate.text.isNotEmpty()) {
+                                state.handleState = HandleState.Cursor
+                            }
                         }
+                    } else {
+                        manager.deselect(offset)
                     }
-                } else {
-                    manager.deselect(offset)
                 }
             }
-        }.then(selectionModifier)
+            .then(selectionModifier)
     } else {
-        Modifier.mouseDragGestureDetector(
-            observer = manager.mouseSelectionObserver,
-            enabled = enabled
-        ).pointerHoverIcon(textPointerIcon)
+        Modifier
+            .mouseDragGestureDetector(
+                observer = manager.mouseSelectionObserver,
+                enabled = enabled
+            )
+            .pointerHoverIcon(textPointerIcon)
     }
 
     val drawModifier = Modifier.drawBehind {
@@ -539,6 +545,9 @@ internal fun CoreTextField(
             // Modifiers applied directly to the internal input field implementation. In general,
             // these will most likely include draw, layout and IME related modifiers.
             val coreTextFieldModifier = Modifier
+                // min height is set for maxLines == 1 in order to prevent text cuts for single line
+                // TextFields
+                .heightIn(min = state.minHeightForSingleLineField)
                 .maxLinesHeight(maxLines, textStyle)
                 .textFieldScroll(
                     scrollerPosition,
@@ -574,6 +583,18 @@ internal fun CoreTextField(
                                 state.layoutResult = TextLayoutResultProxy(result)
                                 onTextLayout(result)
                             }
+
+                            // calculate the min height for single line text to prevent text cuts.
+                            // for single line text maxLines puts in max height constraint based on
+                            // constant characters therefore if the user enters a character that is
+                            // longer (i.e. emoji or a tall script) the text is cut
+                            state.minHeightForSingleLineField = with(density) {
+                                when (maxLines) {
+                                    1 -> result.getLineBottom(0).ceilToIntPx()
+                                    else -> 0
+                                }.toDp()
+                            }
+
                             return layout(
                                 width = width,
                                 height = height,
@@ -695,6 +716,11 @@ internal class TextFieldState(
      * state observation during onDraw callback will make it work.
      */
     var hasFocus by mutableStateOf(false)
+
+    /**
+     * Set to a non-zero value for single line TextFields in order to prevent text cuts.
+     */
+    var minHeightForSingleLineField by mutableStateOf(0.dp)
 
     /** The last layout coordinates for the Text's layout, used by selection */
     var layoutCoordinates: LayoutCoordinates? = null
@@ -822,6 +848,7 @@ internal class TextFieldState(
         this.keyboardActionRunner.apply {
             this.keyboardActions = keyboardActions
             this.focusManager = focusManager
+            this.inputSession = this@TextFieldState.inputSession
         }
         this.untransformedText = untransformedText
 

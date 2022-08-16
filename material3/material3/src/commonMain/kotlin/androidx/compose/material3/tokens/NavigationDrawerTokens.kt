@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_92
+// VERSION: v0_117
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -39,7 +39,6 @@ internal object NavigationDrawerTokens {
     val ContainerShape = ShapeKeyTokens.CornerLargeEnd
     val ContainerSurfaceTintLayerColor = ColorSchemeKeyTokens.SurfaceTint
     val ContainerWidth = 360.0.dp
-    val DividerColor = ColorSchemeKeyTokens.Outline
     val HeadlineColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val HeadlineFont = TypographyKeyTokens.TitleSmall
     val IconSize = 24.0.dp
@@ -55,6 +54,5 @@ internal object NavigationDrawerTokens {
     val LargeBadgeLabelColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val LargeBadgeLabelFont = TypographyKeyTokens.LabelLarge
     val ModalContainerElevation = ElevationTokens.Level1
-    const val ScrimOpacity = 0.4f
     val StandardContainerElevation = ElevationTokens.Level0
 }

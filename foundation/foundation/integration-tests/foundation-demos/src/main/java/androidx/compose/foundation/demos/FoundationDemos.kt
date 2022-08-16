@@ -22,6 +22,7 @@ import androidx.compose.foundation.demos.relocation.BringIntoViewResponderDemo
 import androidx.compose.foundation.demos.relocation.BringNestedIntoViewDemo
 import androidx.compose.foundation.demos.relocation.BringRectangleIntoViewDemo
 import androidx.compose.foundation.demos.relocation.RequestRectangleOnScreenDemo
+import androidx.compose.foundation.demos.snapping.SnappingDemos
 import androidx.compose.foundation.samples.BringIntoViewResponderSample
 import androidx.compose.foundation.samples.BringPartOfComposableIntoViewSample
 import androidx.compose.foundation.samples.ControlledScrollableRowSample
@@ -55,6 +56,7 @@ val FoundationDemos = DemoCategory(
         ComposableDemo("Controlled Scrollable Row") { ControlledScrollableRowSample() },
         ComposableDemo("Draw Modifiers") { DrawModifiersDemo() },
         DemoCategory("Lazy lists", LazyListDemos),
+        DemoCategory("Snapping", SnappingDemos),
         ComposableDemo("Simple InteractionSource") { SimpleInteractionSourceSample() },
         ComposableDemo("Flow InteractionSource") { InteractionSourceFlowSample() },
         DemoCategory("Suspending Gesture Detectors", CoroutineGestureDemos),

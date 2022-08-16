@@ -16,8 +16,10 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.ui.text.AnnotatedString
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -27,8 +29,14 @@ import org.junit.runners.JUnit4
 class TextControllerTest {
     @Test
     fun `semantics modifier recreated when TextDelegate is set`() {
-        val textDelegateBefore = mock<TextDelegate>()
-        val textDelegateAfter = mock<TextDelegate>()
+        val textDelegateBefore = mock<TextDelegate>() {
+            whenever(it.text).thenReturn(AnnotatedString("Example Text String 1"))
+        }
+
+        val textDelegateAfter = mock<TextDelegate>() {
+            whenever(it.text).thenReturn(AnnotatedString("Example Text String 2"))
+        }
+
         // Make sure that mock doesn't do smart memory management:
         assertThat(textDelegateAfter).isNotSameInstanceAs(textDelegateBefore)
 

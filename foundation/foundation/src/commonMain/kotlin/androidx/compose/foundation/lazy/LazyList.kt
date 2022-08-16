@@ -74,7 +74,7 @@ internal fun LazyList(
     content: LazyListScope.() -> Unit
 ) {
     val overscrollEffect = ScrollableDefaults.overscrollEffect()
-    val itemProvider = rememberItemProvider(state, content)
+    val itemProvider = rememberLazyListItemProvider(state, content)
     val beyondBoundsInfo = remember { LazyListBeyondBoundsInfo() }
     val scope = rememberCoroutineScope()
     val placementAnimator = remember(state, isVertical) {

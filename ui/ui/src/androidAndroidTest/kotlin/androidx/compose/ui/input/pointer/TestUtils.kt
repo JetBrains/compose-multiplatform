@@ -28,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.node.NodeCoordinator
+import androidx.compose.ui.node.PointerInputModifierNode
 import androidx.compose.ui.unit.IntSize
 import com.google.common.truth.FailureMetadata
 import com.google.common.truth.Subject
@@ -268,16 +270,27 @@ internal fun InternalPointerEvent(
     return InternalPointerEvent(changes, pointer)
 }
 
-internal class PointerInputFilterMock(
+@OptIn(ExperimentalComposeUiApi::class)
+internal class PointerInputNodeMock(
     val log: MutableList<LogEntry> = mutableListOf(),
     val pointerEventHandler: PointerEventHandler? = null,
-    layoutCoordinates: LayoutCoordinates? = null
-) :
-    PointerInputFilter() {
-
+    coordinator: NodeCoordinator = LayoutCoordinatesStub(true)
+) : PointerInputModifierNode, Modifier.Node() {
     init {
-        this.layoutCoordinates = layoutCoordinates ?: LayoutCoordinatesStub(true)
-        this.isAttached = this.layoutCoordinates!!.isAttached
+        updateCoordinator(coordinator)
+        if (coordinator.isAttached) {
+            attach()
+        }
+    }
+
+    fun remove() {
+        val coordinator = coordinator as LayoutCoordinatesStub
+        if (coordinator.isAttached) {
+            coordinator.isAttached = false
+        }
+        if (isAttached) {
+            detach()
+        }
     }
 
     override fun onPointerEvent(
@@ -296,25 +309,74 @@ internal class PointerInputFilterMock(
         pointerEventHandler?.invokeOverPass(pointerEvent, pass, bounds)
     }
 
-    override fun onCancel() {
+    override fun onCancelPointerInput() {
         log.add(OnCancelEntry(this))
     }
 }
 
+internal class PointerInputFilterMock(
+    val log: MutableList<LogEntry> = mutableListOf(),
+    val pointerEventHandler: PointerEventHandler? = null,
+    layoutCoordinates: LayoutCoordinates? = null
+) :
+    PointerInputFilter() {
+
+    init {
+        this.layoutCoordinates = layoutCoordinates ?: LayoutCoordinatesStub(true)
+        this.isAttached = this.layoutCoordinates!!.isAttached
+    }
+
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
+        pass: PointerEventPass,
+        bounds: IntSize
+    ) {
+        log.add(
+            OnPointerEventFilterEntry(
+                this,
+                pointerEvent.deepCopy(),
+                pass,
+                bounds
+            )
+        )
+        pointerEventHandler?.invokeOverPass(pointerEvent, pass, bounds)
+    }
+
+    override fun onCancel() {
+        log.add(OnCancelFilterEntry(this))
+    }
+}
+
 internal fun List<LogEntry>.getOnPointerEventLog() = filterIsInstance<OnPointerEventEntry>()
+internal fun List<LogEntry>.getOnPointerEventFilterLog() =
+    filterIsInstance<OnPointerEventFilterEntry>()
 
 internal fun List<LogEntry>.getOnCancelLog() = filterIsInstance<OnCancelEntry>()
+internal fun List<LogEntry>.getOnCancelFilterLog() = filterIsInstance<OnCancelFilterEntry>()
 
 internal sealed class LogEntry
 
+@OptIn(ExperimentalComposeUiApi::class)
 internal data class OnPointerEventEntry(
+    val pointerInputNode: PointerInputModifierNode,
+    val pointerEvent: PointerEvent,
+    val pass: PointerEventPass,
+    val bounds: IntSize
+) : LogEntry()
+
+internal data class OnPointerEventFilterEntry(
     val pointerInputFilter: PointerInputFilter,
     val pointerEvent: PointerEvent,
     val pass: PointerEventPass,
     val bounds: IntSize
 ) : LogEntry()
 
+@OptIn(ExperimentalComposeUiApi::class)
 internal class OnCancelEntry(
+    val pointerInputNode: PointerInputModifierNode
+) : LogEntry()
+
+internal class OnCancelFilterEntry(
     val pointerInputFilter: PointerInputFilter
 ) : LogEntry()
 

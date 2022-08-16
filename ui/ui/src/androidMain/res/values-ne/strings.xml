@@ -17,7 +17,7 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="indeterminate" msgid="2486394087603402002">"न त चिन्ह लगाइएको छ न नै चिन्ह हटाइएको छ"</string>
+    <string name="indeterminate" msgid="7933458017204019916">"आंशिक रूपमा जाँच गरिएको"</string>
     <string name="on" msgid="8655164131929253426">"अन छ"</string>
     <string name="off" msgid="875452955155264703">"अफ छ"</string>
     <string name="selected" msgid="6043586758067023">"चयन गरिएको छ"</string>

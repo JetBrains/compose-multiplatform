@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalTextApi::class)
-
 package androidx.compose.ui.text
 
 /**
  * Provides platform specific [TextStyle] configuration options for styling and compatibility.
  */
-@ExperimentalTextApi
 expect class PlatformTextStyle {
     /**
      * Platform specific text span styling and compatibility configuration.
@@ -42,7 +39,6 @@ internal expect fun createPlatformTextStyle(
 /**
  * Provides platform specific [ParagraphStyle] configuration options for styling and compatibility.
  */
-@ExperimentalTextApi
 expect class PlatformParagraphStyle {
     companion object {
         val Default: PlatformParagraphStyle
@@ -54,7 +50,6 @@ expect class PlatformParagraphStyle {
 /**
  * Provides platform specific [SpanStyle] configuration options for styling and compatibility.
  */
-@ExperimentalTextApi
 expect class PlatformSpanStyle {
     companion object {
         val Default: PlatformSpanStyle
@@ -76,7 +71,6 @@ expect class PlatformSpanStyle {
  * between [start] and [stop]. The interpolation can be extrapolated beyond 0.0 and
  * 1.0, so negative values and values greater than 1.0 are valid.
  */
-@ExperimentalTextApi
 expect fun lerp(
     start: PlatformParagraphStyle,
     stop: PlatformParagraphStyle,
@@ -96,7 +90,6 @@ expect fun lerp(
  * between [start] and [stop]. The interpolation can be extrapolated beyond 0.0 and
  * 1.0, so negative values and values greater than 1.0 are valid.
  */
-@ExperimentalTextApi
 expect fun lerp(
     start: PlatformSpanStyle,
     stop: PlatformSpanStyle,

@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.platform.extensions.correctBlurRadius
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.modulate
 import kotlin.math.roundToInt
@@ -56,7 +57,7 @@ internal class AndroidTextPaint(flags: Int, density: Float) : TextPaint(flags) {
                 clearShadowLayer()
             } else {
                 setShadowLayer(
-                    this.shadow.blurRadius,
+                    correctBlurRadius(this.shadow.blurRadius),
                     this.shadow.offset.x,
                     this.shadow.offset.y,
                     this.shadow.color.toArgb()

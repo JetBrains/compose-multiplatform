@@ -49,16 +49,11 @@ import androidx.compose.ui.unit.TextUnit
  * @see ParagraphStyle
  */
 @Immutable
-class TextStyle
-@OptIn(ExperimentalTextApi::class)
-internal constructor(
+class TextStyle internal constructor(
     internal val spanStyle: SpanStyle,
     internal val paragraphStyle: ParagraphStyle,
-    @ExperimentalTextApi
-    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
-    @get:ExperimentalTextApi val platformStyle: PlatformTextStyle? = null,
+    val platformStyle: PlatformTextStyle? = null,
 ) {
-    @OptIn(ExperimentalTextApi::class)
     internal constructor(
         spanStyle: SpanStyle,
         paragraphStyle: ParagraphStyle,
@@ -101,7 +96,6 @@ internal constructor(
      * @param lineHeight Line height for the [Paragraph] in [TextUnit] unit, e.g. SP or EM.
      * @param textIndent The indentation of the paragraph.
      */
-    @OptIn(ExperimentalTextApi::class)
     constructor(
         color: Color = Color.Unspecified,
         fontSize: TextUnit = TextUnit.Unspecified,
@@ -185,7 +179,6 @@ internal constructor(
      * and bottom of last line. The configuration is applied only when a [lineHeight] is defined.
      * When null, [LineHeightStyle.Default] is used.
      */
-    @ExperimentalTextApi
     constructor(
         color: Color = Color.Unspecified,
         fontSize: TextUnit = TextUnit.Unspecified,
@@ -395,7 +388,6 @@ internal constructor(
     @Stable
     operator fun plus(other: SpanStyle): TextStyle = this.merge(other)
 
-    @OptIn(ExperimentalTextApi::class)
     fun copy(
         color: Color = this.spanStyle.color,
         fontSize: TextUnit = this.spanStyle.fontSize,
@@ -450,7 +442,6 @@ internal constructor(
         )
     }
 
-    @ExperimentalTextApi
     fun copy(
         color: Color = this.spanStyle.color,
         fontSize: TextUnit = this.spanStyle.fontSize,
@@ -684,12 +675,8 @@ internal constructor(
      *
      * When null, [LineHeightStyle.Default] is used.
      */
-    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
-    @ExperimentalTextApi
-    @get:ExperimentalTextApi
     val lineHeightStyle: LineHeightStyle? get() = this.paragraphStyle.lineHeightStyle
 
-    @OptIn(ExperimentalTextApi::class)
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is TextStyle) return false
@@ -714,13 +701,11 @@ internal constructor(
      *
      * @param other The TextStyle to compare to.
      */
-    @OptIn(ExperimentalTextApi::class)
     fun hasSameLayoutAffectingAttributes(other: TextStyle): Boolean {
         return (this === other) || (paragraphStyle == other.paragraphStyle &&
             spanStyle.hasSameLayoutAffectingAttributes(other.spanStyle))
     }
 
-    @OptIn(ExperimentalTextApi::class)
     override fun hashCode(): Int {
         var result = spanStyle.hashCode()
         result = 31 * result + paragraphStyle.hashCode()
@@ -728,7 +713,6 @@ internal constructor(
         return result
     }
 
-    @OptIn(ExperimentalTextApi::class)
     internal fun hashCodeLayoutAffectingAttributes(): Int {
         var result = spanStyle.hashCodeLayoutAffectingAttributes()
         result = 31 * result + paragraphStyle.hashCode()
@@ -800,7 +784,6 @@ fun lerp(start: TextStyle, stop: TextStyle, fraction: Float): TextStyle {
  * @param direction a layout direction to be used for resolving text layout direction algorithm
  * @return resolved text style.
  */
-@OptIn(ExperimentalTextApi::class)
 fun resolveDefaults(style: TextStyle, direction: LayoutDirection) = TextStyle(
     spanStyle = resolveSpanStyleDefaults(style.spanStyle),
     paragraphStyle = resolveParagraphStyleDefaults(style.paragraphStyle, direction),
@@ -827,7 +810,6 @@ internal fun resolveTextDirection(
     }
 }
 
-@OptIn(ExperimentalTextApi::class)
 private fun createPlatformTextStyleInternal(
     platformSpanStyle: PlatformSpanStyle?,
     platformParagraphStyle: PlatformParagraphStyle?

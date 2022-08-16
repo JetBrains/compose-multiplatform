@@ -18,6 +18,10 @@ package androidx.compose.ui
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.internal.JvmDefaultWithCompatibility
+import androidx.compose.ui.node.DelegatableNode
+import androidx.compose.ui.node.NodeCoordinator
+import androidx.compose.ui.node.NodeKind
+import androidx.compose.ui.node.requireOwner
 
 /**
  * An ordered, immutable collection of [modifier elements][Modifier.Element] that decorate or add
@@ -117,6 +121,72 @@ interface Modifier {
         override fun all(predicate: (Element) -> Boolean): Boolean = predicate(this)
     }
 
+    @ExperimentalComposeUiApi
+    abstract class Node : DelegatableNode {
+        @Suppress("LeakingThis")
+        final override var node: Node = this
+            private set
+        internal var kindSet: Long = 0
+        // NOTE: We use an aggregate mask that or's all of the type masks of the children of the
+        // chain so that we can quickly prune a subtree. This INCLUDES the kindSet of this node
+        // as well
+        internal var aggregateChildKindSet: Long = 0
+        internal var parent: Node? = null
+        internal var child: Node? = null
+        internal var coordinator: NodeCoordinator? = null
+            private set
+        var isAttached: Boolean = false
+            private set
+
+        internal open fun updateCoordinator(coordinator: NodeCoordinator?) {
+            this.coordinator = coordinator
+        }
+
+        @Suppress("NOTHING_TO_INLINE")
+        internal inline fun isKind(kind: NodeKind<*>) = kindSet and kind.mask != 0L
+
+        internal fun attach() {
+            check(!isAttached)
+            check(coordinator != null)
+            isAttached = true
+            onAttach()
+            // TODO(lmr): run side effects?
+        }
+
+        internal fun detach() {
+            check(isAttached)
+            check(coordinator != null)
+            onDetach()
+            isAttached = false
+//            coordinator = null
+            // TODO(lmr): cancel jobs / side effects?
+        }
+
+        /**
+         * When called, `node` is guaranteed to be non-null. You can call sideEffect,
+         * coroutineScope, etc.
+         */
+        open fun onAttach() {}
+
+        /**
+         * This should be called right before the node gets removed from the list, so you should
+         * still be able to traverse inside of this method. Ideally we would not allow you to
+         * trigger side effects here.
+         */
+        open fun onDetach() {}
+
+        /**
+         *
+         */
+        fun sideEffect(effect: () -> Unit) {
+            requireOwner().registerOnEndApplyChangesListener(effect)
+        }
+
+        internal fun setAsDelegateTo(owner: Node) {
+            node = owner
+        }
+    }
+
     /**
      * The companion object `Modifier` is the empty, default, or starter [Modifier]
      * that contains no [elements][Element]. Use it to create a new [Modifier] using
@@ -145,8 +215,8 @@ interface Modifier {
  * a Modifier [outer] that wraps around the Modifier [inner].
  */
 class CombinedModifier(
-    private val outer: Modifier,
-    private val inner: Modifier
+    internal val outer: Modifier,
+    internal val inner: Modifier
 ) : Modifier {
     override fun <R> foldIn(initial: R, operation: (R, Modifier.Element) -> R): R =
         inner.foldIn(outer.foldIn(initial, operation), operation)

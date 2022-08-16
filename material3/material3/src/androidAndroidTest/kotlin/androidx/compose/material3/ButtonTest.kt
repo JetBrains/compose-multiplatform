@@ -17,6 +17,10 @@ package androidx.compose.material3
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,14 +29,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsEqualTo
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -51,13 +59,13 @@ class ButtonTest {
     fun defaultSemantics() {
         rule.setMaterialContent(lightColorScheme()) {
             Box {
-                Button(modifier = Modifier.testTag("myButton"), onClick = {}) {
+                Button(modifier = Modifier.testTag(ButtonTestTag), onClick = {}) {
                     Text("myButton")
                 }
             }
         }
 
-        rule.onNodeWithTag("myButton")
+        rule.onNodeWithTag(ButtonTestTag)
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
             .assertIsEnabled()
     }
@@ -66,13 +74,13 @@ class ButtonTest {
     fun disabledSemantics() {
         rule.setMaterialContent(lightColorScheme()) {
             Box {
-                Button(modifier = Modifier.testTag("myButton"), onClick = {}, enabled = false) {
+                Button(modifier = Modifier.testTag(ButtonTestTag), onClick = {}, enabled = false) {
                     Text("myButton")
                 }
             }
         }
 
-        rule.onNodeWithTag("myButton")
+        rule.onNodeWithTag(ButtonTestTag)
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
             .assertIsNotEnabled()
     }
@@ -85,7 +93,7 @@ class ButtonTest {
 
         rule.setMaterialContent(lightColorScheme()) {
             Box {
-                Button(onClick = onClick, modifier = Modifier.testTag("myButton")) {
+                Button(onClick = onClick, modifier = Modifier.testTag(ButtonTestTag)) {
                     Text(text)
                 }
             }
@@ -93,7 +101,7 @@ class ButtonTest {
 
         // TODO(b/129400818): this actually finds the text, not the button as
         // merge semantics aren't implemented yet
-        rule.onNodeWithTag("myButton")
+        rule.onNodeWithTag(ButtonTestTag)
             // remove this and the todo
             //    rule.onNodeWithText(text)
             .performClick()
@@ -105,18 +113,20 @@ class ButtonTest {
 
     @Test
     fun canBeDisabled() {
-        val tag = "myButton"
-
         rule.setMaterialContent(lightColorScheme()) {
             var enabled by remember { mutableStateOf(true) }
             val onClick = { enabled = false }
             Box {
-                Button(modifier = Modifier.testTag(tag), onClick = onClick, enabled = enabled) {
+                Button(
+                    modifier = Modifier.testTag(ButtonTestTag),
+                    onClick = onClick,
+                    enabled = enabled
+                ) {
                     Text("Hello")
                 }
             }
         }
-        rule.onNodeWithTag(tag)
+        rule.onNodeWithTag(ButtonTestTag)
             // Confirm the button starts off enabled, with a click action
             .assertHasClickAction()
             .assertIsEnabled()
@@ -165,4 +175,84 @@ class ButtonTest {
             assertThat(button2Counter).isEqualTo(1)
         }
     }
+
+    @Test
+    fun button_positioning() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Button(
+                onClick = { /* Do something! */ },
+                modifier = Modifier.testTag(ButtonTestTag)
+            ) {
+                Text(
+                    "Button",
+                    modifier = Modifier
+                        .testTag(TextTestTag)
+                        .semantics(mergeDescendants = true) {}
+                )
+            }
+        }
+
+        val buttonBounds = rule.onNodeWithTag(ButtonTestTag).getUnclippedBoundsInRoot()
+        val textBounds = rule.onNodeWithTag(TextTestTag).getUnclippedBoundsInRoot()
+
+        (textBounds.left - buttonBounds.left).assertIsEqualTo(
+            24.dp,
+            "padding between the start of the button and the start of the text."
+        )
+
+        (buttonBounds.right - textBounds.right).assertIsEqualTo(
+            24.dp,
+            "padding between the end of the text and the end of the button."
+        )
+    }
+
+    @Test
+    fun button_withIcon_positioning() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Button(
+                onClick = { /* Do something! */ },
+                contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
+                modifier = Modifier.testTag(ButtonTestTag)
+            ) {
+                Icon(
+                    Icons.Filled.Favorite,
+                    contentDescription = "Localized description",
+                    modifier = Modifier
+                        .size(ButtonDefaults.IconSize)
+                        .testTag(IconTestTag)
+                        .semantics(mergeDescendants = true) {}
+                )
+                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                Text(
+                    "Like",
+                    modifier = Modifier
+                        .testTag(TextTestTag)
+                        .semantics(mergeDescendants = true) {}
+                )
+            }
+        }
+
+        val textBounds = rule.onNodeWithTag(TextTestTag).getUnclippedBoundsInRoot()
+        val iconBounds = rule.onNodeWithTag(IconTestTag).getUnclippedBoundsInRoot()
+        val buttonBounds = rule.onNodeWithTag(ButtonTestTag).getUnclippedBoundsInRoot()
+
+        (iconBounds.left - buttonBounds.left).assertIsEqualTo(
+            16.dp,
+            "Padding between start of button and start of icon."
+        )
+
+        (textBounds.left - iconBounds.right).assertIsEqualTo(
+            ButtonDefaults.IconSpacing,
+            "Padding between end of icon and start of text."
+        )
+
+        (buttonBounds.right - textBounds.right).assertIsEqualTo(
+            24.dp,
+            "padding between end of text and end of button."
+        )
+    }
 }
+
+private const val ButtonTestTag = "button"
+private const val IconTestTag = "icon"
+private const val TextTestTag = "text"

@@ -16,18 +16,21 @@
 
 package androidx.compose.ui.semantics
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.node.LayoutNodeWrapper
+import androidx.compose.ui.node.NodeCoordinator
+import androidx.compose.ui.node.SemanticsModifierNode
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 
 // This part is a copy from ViewGroup#addChildrenForAccessibility.
+@OptIn(ExperimentalComposeUiApi::class)
 internal fun LayoutNode.findOneLayerOfSemanticsWrappersSortedByBounds(
-    list: MutableList<SemanticsEntity> = mutableListOf()
-): List<SemanticsEntity> {
+    list: MutableList<SemanticsModifierNode> = mutableListOf()
+): List<SemanticsModifierNode> {
     fun sortWithStrategy(holders: List<NodeLocationHolder>): List<NodeLocationHolder> {
         // This is gross but the least risky solution. The current comparison
         // strategy breaks transitivity but produces very good results. Coming
@@ -78,10 +81,10 @@ internal class NodeLocationHolder internal constructor(
     private val layoutDirection = subtreeRoot.layoutDirection
 
     init {
-        val subtreeRootWrapper = subtreeRoot.innerLayoutNodeWrapper
-        val nodeWrapper = node.findWrapperToGetBounds()
-        location = if (subtreeRootWrapper.isAttached && nodeWrapper.isAttached) {
-            subtreeRootWrapper.localBoundingBoxOf(nodeWrapper)
+        val subtreeRootCoordinator = subtreeRoot.innerCoordinator
+        val coordinator = node.findCoordinatorToGetBounds()
+        location = if (subtreeRootCoordinator.isAttached && coordinator.isAttached) {
+            subtreeRootCoordinator.localBoundingBoxOf(coordinator)
         } else {
             null
         }
@@ -124,27 +127,17 @@ internal class NodeLocationHolder internal constructor(
         if (topDifference != 0f) {
             return if (topDifference < 0) -1 else 1
         }
-        // Break tie by height.
-        val heightDifference = location.height - other.location.height
-        if (heightDifference != 0f) {
-            return if (heightDifference < 0) 1 else -1
-        }
-        // Break tie by width.
-        val widthDifference = location.width - other.location.width
-        if (widthDifference != 0f) {
-            return if (widthDifference < 0) 1 else -1
-        }
 
         // Find a child of each view with different screen bounds. If we get here, node and
         // other.node must be attached.
-        val view1Bounds = node.findWrapperToGetBounds().boundsInRoot()
-        val view2Bounds = other.node.findWrapperToGetBounds().boundsInRoot()
+        val view1Bounds = node.findCoordinatorToGetBounds().boundsInRoot()
+        val view2Bounds = other.node.findCoordinatorToGetBounds().boundsInRoot()
         val child1 = node.findNodeByPredicateTraversal {
-            val wrapper = it.findWrapperToGetBounds()
+            val wrapper = it.findCoordinatorToGetBounds()
             wrapper.isAttached && view1Bounds != wrapper.boundsInRoot()
         }
         val child2 = other.node.findNodeByPredicateTraversal {
-            val wrapper = it.findWrapperToGetBounds()
+            val wrapper = it.findCoordinatorToGetBounds()
             wrapper.isAttached && view2Bounds != wrapper.boundsInRoot()
         }
         // Compare the children recursively
@@ -187,8 +180,9 @@ internal fun LayoutNode.findNodeByPredicateTraversal(
 
 /**
  * If this node has semantics, we use the semantics wrapper to get bounds. Otherwise, we use
- * innerLayoutNodeWrapper because it seems the bounds after padding is the effective content.
+ * innerCoordinator because it seems the bounds after padding is the effective content.
  */
-internal fun LayoutNode.findWrapperToGetBounds(): LayoutNodeWrapper {
-    return (outerMergingSemantics ?: outerSemantics)?.layoutNodeWrapper ?: innerLayoutNodeWrapper
+@OptIn(ExperimentalComposeUiApi::class)
+internal fun LayoutNode.findCoordinatorToGetBounds(): NodeCoordinator {
+    return (outerMergingSemantics ?: outerSemantics)?.node?.coordinator ?: innerCoordinator
 }

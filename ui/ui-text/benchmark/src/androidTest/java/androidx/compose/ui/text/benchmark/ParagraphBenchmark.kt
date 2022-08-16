@@ -52,7 +52,7 @@ class ParagraphBenchmark(
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "length={0} type={1} alphabet={2}")
-        fun initParameters(): List<Array<Any>> = cartesian(
+        fun initParameters(): List<Array<Any?>> = cartesian(
             arrayOf(512),
             arrayOf(TextType.PlainText),
             arrayOf(Alphabet.Latin, Alphabet.Cjk)

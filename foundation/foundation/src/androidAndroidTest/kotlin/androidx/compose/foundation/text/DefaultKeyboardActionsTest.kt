@@ -24,9 +24,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.text.input.ImeAction.Companion.Go
 import androidx.compose.ui.text.input.ImeAction.Companion.Search
@@ -77,8 +79,11 @@ class DefaultKeyboardActionsTest(param: Param) {
         val (value1, value2, value3) = List(3) { TextFieldValue("Placeholder Text") }
         val (textField1, textField2, textField3) = FocusRequester.createRefs()
         var (focusState1, focusState2, focusState3) = List(3) { false }
+        val keyboardHelper = KeyboardHelper(rule)
 
         rule.setContent {
+            keyboardHelper.view = LocalView.current
+
             Column {
                 CoreTextField(
                     value = value1,
@@ -107,6 +112,11 @@ class DefaultKeyboardActionsTest(param: Param) {
             }
         }
 
+        // Show keyboard.
+        rule.onNodeWithTag(initialTextField).performClick()
+        keyboardHelper.waitForKeyboardVisibility(visible = true)
+        assertThat(keyboardHelper.isSoftwareKeyboardShown()).isTrue()
+
         // Act.
         rule.onNodeWithTag(initialTextField).performImeAction()
 
@@ -123,6 +133,16 @@ class DefaultKeyboardActionsTest(param: Param) {
                 assertThat(focusState1).isTrue()
                 assertThat(focusState2).isFalse()
                 assertThat(focusState3).isFalse()
+            }
+            Done -> {
+                // No change to focus state.
+                assertThat(focusState1).isFalse()
+                assertThat(focusState2).isTrue()
+                assertThat(focusState3).isFalse()
+
+                // Software keyboard is hidden.
+                keyboardHelper.waitForKeyboardVisibility(false)
+                assertThat(keyboardHelper.isSoftwareKeyboardShown()).isFalse()
             }
             else -> {
                 // No change to focus state.
@@ -141,8 +161,11 @@ class DefaultKeyboardActionsTest(param: Param) {
         val (value1, value2, value3) = List(3) { TextFieldValue("Placeholder Text") }
         val (textField1, textField2, textField3) = FocusRequester.createRefs()
         var (focusState1, focusState2, focusState3) = List(3) { false }
+        val keyboardHelper = KeyboardHelper(rule)
 
         rule.setContent {
+            keyboardHelper.view = LocalView.current
+
             Column {
                 CoreTextField(
                     value = value1,
@@ -179,6 +202,12 @@ class DefaultKeyboardActionsTest(param: Param) {
             }
         }
 
+        // Show keyboard.
+        rule.onNodeWithTag(initialTextField).performClick()
+
+        keyboardHelper.waitForKeyboardVisibility(visible = true)
+        assertThat(keyboardHelper.isSoftwareKeyboardShown()).isTrue()
+
         // Act.
         rule.onNodeWithTag(initialTextField).performImeAction()
 
@@ -195,6 +224,16 @@ class DefaultKeyboardActionsTest(param: Param) {
                 assertThat(focusState1).isTrue()
                 assertThat(focusState2).isFalse()
                 assertThat(focusState3).isFalse()
+            }
+            Done -> {
+                // No change to focus state.
+                assertThat(focusState1).isFalse()
+                assertThat(focusState2).isTrue()
+                assertThat(focusState3).isFalse()
+
+                // Software keyboard is hidden.
+                keyboardHelper.waitForKeyboardVisibility(false)
+                assertThat(keyboardHelper.isSoftwareKeyboardShown()).isFalse()
             }
             else -> {
                 // No change to focus state.

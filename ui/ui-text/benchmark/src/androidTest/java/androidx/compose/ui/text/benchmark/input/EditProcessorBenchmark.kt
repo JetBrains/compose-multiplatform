@@ -62,7 +62,7 @@ class EditProcessorBenchmark(val initText: InitialText, val scenario: TestScenar
 
         @JvmStatic
         @Parameterized.Parameters(name = "initText={0}, senario={1}")
-        fun initParameters(): List<Array<Any>> = cartesian(
+        fun initParameters(): List<Array<Any?>> = cartesian(
             arrayOf(
                 InitialText(longText, "Long Text"),
                 InitialText(shortText, "Short Text")

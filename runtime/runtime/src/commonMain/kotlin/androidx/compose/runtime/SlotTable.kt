@@ -596,6 +596,9 @@ internal class SlotTable : CompositionData, Iterable<CompositionGroup> {
 
     override fun iterator(): Iterator<CompositionGroup> =
         GroupIterator(this, 0, groupsSize)
+
+    override fun find(identityToFind: Any): CompositionGroup? =
+         SlotTableGroup(this, 0).find(identityToFind)
 }
 
 /**
@@ -2963,6 +2966,64 @@ internal class SlotWriter(
         if (index > parentAnchorPivot) index else size + index - parentAnchorPivot
 }
 
+private class SlotTableGroup(
+    val table: SlotTable,
+    val group: Int,
+    val version: Int = table.version
+) : CompositionGroup, Iterable<CompositionGroup> {
+    override val isEmpty: Boolean get() = table.groups.groupSize(group) == 0
+
+    override val key: Any
+        get() = if (table.groups.hasObjectKey(group))
+            table.slots[table.groups.objectKeyIndex(group)]!!
+        else table.groups.key(group)
+
+    override val sourceInfo: String?
+        get() = if (table.groups.hasAux(group))
+            table.slots[table.groups.auxIndex(group)] as? String
+        else null
+
+    override val node: Any?
+        get() = if (table.groups.isNode(group))
+            table.slots[table.groups.nodeIndex(group)] else
+            null
+
+    override val data: Iterable<Any?> get() = DataIterator(table, group)
+
+    override val identity: Any
+        get() {
+            validateRead()
+            return table.read { it.anchor(group) }
+        }
+
+    override val compositionGroups: Iterable<CompositionGroup> get() = this
+
+    override fun iterator(): Iterator<CompositionGroup> {
+        validateRead()
+        return GroupIterator(
+            table,
+            group + 1,
+            group + table.groups.groupSize(group)
+        )
+    }
+
+    private fun validateRead() {
+        if (table.version != version) {
+            throw ConcurrentModificationException()
+        }
+    }
+
+    override fun find(identityToFind: Any): CompositionGroup? =
+        (identityToFind as? Anchor)?.let { anchor ->
+            if (table.ownsAnchor(anchor)) {
+                val anchorGroup = table.anchorIndex(anchor)
+                if (anchorGroup >= group && (anchorGroup - group < table.groups.groupSize(group)))
+                    SlotTableGroup(table, anchorGroup, version)
+                else null
+            } else null
+        }
+}
+
 private class GroupIterator(
     val table: SlotTable,
     start: Int,
@@ -2982,43 +3043,7 @@ private class GroupIterator(
         val group = index
 
         index += table.groups.groupSize(group)
-        return object : CompositionGroup, Iterable<CompositionGroup> {
-            override val isEmpty: Boolean get() = table.groups.groupSize(group) == 0
-
-            override val key: Any
-                get() = if (table.groups.hasObjectKey(group))
-                    table.slots[table.groups.objectKeyIndex(group)]!!
-                else table.groups.key(group)
-
-            override val sourceInfo: String?
-                get() = if (table.groups.hasAux(group))
-                    table.slots[table.groups.auxIndex(group)] as? String
-                else null
-
-            override val node: Any?
-                get() = if (table.groups.isNode(group))
-                    table.slots[table.groups.nodeIndex(group)] else
-                    null
-
-            override val data: Iterable<Any?> get() = DataIterator(table, group)
-
-            override val identity: Any
-                get() {
-                    validateRead()
-                    return table.read { it.anchor(group) }
-                }
-
-            override val compositionGroups: Iterable<CompositionGroup> get() = this
-
-            override fun iterator(): Iterator<CompositionGroup> {
-                validateRead()
-                return GroupIterator(
-                    table,
-                    group + 1,
-                    group + table.groups.groupSize(group)
-                )
-            }
-        }
+        return SlotTableGroup(table, group, version)
     }
 
     private fun validateRead() {

@@ -39,14 +39,14 @@ dependencies {
         implementation(libs.kotlinCoroutinesCore)
 
         // when updating the runtime version please also update the runtime-saveable version
-        implementation("androidx.compose.runtime:runtime:1.2.0-rc02")
-        api("androidx.compose.runtime:runtime-saveable:1.2.0-rc02")
+        implementation("androidx.compose.runtime:runtime:1.2.0")
+        api("androidx.compose.runtime:runtime-saveable:1.2.0")
 
         api(project(":compose:ui:ui-geometry"))
         api(project(":compose:ui:ui-graphics"))
         api(project(":compose:ui:ui-text"))
         api(project(":compose:ui:ui-unit"))
-        api(project(":annotation:annotation"))
+        api("androidx.annotation:annotation:1.5.0-alpha01")
 
         // This has stub APIs for access to legacy Android APIs, so we don't want
         // any dependency on this module.
@@ -59,12 +59,12 @@ dependencies {
 
         implementation("androidx.core:core:1.5.0")
         implementation('androidx.collection:collection:1.0.0')
-        implementation("androidx.customview:customview-poolingcontainer:1.0.0-rc01")
-        implementation("androidx.savedstate:savedstate-ktx:1.2.0-rc01")
+        implementation("androidx.customview:customview-poolingcontainer:1.0.0")
+        implementation("androidx.savedstate:savedstate-ktx:1.2.0")
         implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
         implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
         implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
-        implementation("androidx.profileinstaller:profileinstaller:1.2.0-rc01")
+        implementation("androidx.profileinstaller:profileinstaller:1.2.0")
 
         testImplementation(libs.testRules)
         testImplementation(libs.testRunner)
@@ -150,8 +150,8 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation("androidx.autofill:autofill:1.0.0")
                 implementation(libs.kotlinCoroutinesAndroid)
 
-                implementation("androidx.customview:customview-poolingcontainer:1.0.0-rc01")
-                implementation("androidx.savedstate:savedstate-ktx:1.2.0-rc01")
+                implementation("androidx.customview:customview-poolingcontainer:1.0.0")
+                implementation("androidx.savedstate:savedstate-ktx:1.2.0")
                 implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
                 implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
                 implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")

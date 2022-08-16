@@ -17,8 +17,12 @@ package androidx.compose.material3
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -208,5 +212,97 @@ class ButtonScreenshotTest {
         rule.onNodeWithTag("button")
             .captureToImage()
             .assertAgainstGolden(screenshotRule, "text_button_disabled_light_theme")
+    }
+
+    @Test
+    fun button_withIcon_lightTheme() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Button(
+                onClick = { /* Do something! */ },
+                contentPadding = ButtonDefaults.ButtonWithIconContentPadding
+            ) {
+                Icon(
+                    Icons.Filled.Favorite,
+                    contentDescription = "Localized description",
+                    modifier = Modifier.size(ButtonDefaults.IconSize)
+                )
+                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                Text("Like")
+            }
+        }
+
+        rule.onNode(hasClickAction())
+            .captureToImage()
+            .assertAgainstGolden(screenshotRule, "button_withIcon_lightTheme")
+    }
+
+    @Test
+    fun disabled_button_withIcon_lightTheme() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Button(
+                onClick = { /* Do something! */ },
+                contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
+                enabled = false,
+                modifier = Modifier.testTag("button")
+            ) {
+                Icon(
+                    Icons.Filled.Favorite,
+                    contentDescription = "Localized description",
+                    modifier = Modifier.size(ButtonDefaults.IconSize)
+                )
+                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                Text("Like")
+            }
+        }
+
+        rule.onNodeWithTag("button")
+            .captureToImage()
+            .assertAgainstGolden(screenshotRule, "button_withIcon_disabled_lightTheme")
+    }
+
+    @Test
+    fun button_withIcon_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) {
+            Button(
+                onClick = { /* Do something! */ },
+                contentPadding = ButtonDefaults.ButtonWithIconContentPadding
+            ) {
+                Icon(
+                    Icons.Filled.Favorite,
+                    contentDescription = "Localized description",
+                    modifier = Modifier.size(ButtonDefaults.IconSize)
+                )
+                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                Text("Like")
+            }
+        }
+
+        rule.onNode(hasClickAction())
+            .captureToImage()
+            .assertAgainstGolden(screenshotRule, "button_withIcon_darkTheme")
+    }
+
+    @Test
+    fun disabled_button_withIcon_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) {
+            Button(
+                onClick = { /* Do something! */ },
+                contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
+                enabled = false,
+                modifier = Modifier.testTag("button")
+            ) {
+                Icon(
+                    Icons.Filled.Favorite,
+                    contentDescription = "Localized description",
+                    modifier = Modifier.size(ButtonDefaults.IconSize)
+                )
+                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                Text("Like")
+            }
+        }
+
+        rule.onNodeWithTag("button")
+            .captureToImage()
+            .assertAgainstGolden(screenshotRule, "button_withIcon_disabled_darkTheme")
     }
 }

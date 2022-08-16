@@ -20,6 +20,7 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.tokens.NavigationDrawerTokens
 import androidx.compose.runtime.CompositionLocalProvider
@@ -32,6 +33,7 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -71,7 +73,13 @@ class DismissibleNavigationDrawerTest {
             DismissibleNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag("content"))
+                    DismissibleDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("content")
+                        )
+                    }
                 },
                 content = {}
             )
@@ -82,13 +90,43 @@ class DismissibleNavigationDrawerTest {
     }
 
     @Test
+    fun dismissibleNavigationDrawer_sheet_respectsContentPadding() {
+        rule.setMaterialContent(lightColorScheme()) {
+            val drawerState = rememberDrawerState(DrawerValue.Open)
+            DismissibleNavigationDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    DismissibleDrawerSheet(windowInsets = WindowInsets(7.dp, 7.dp, 7.dp, 7.dp)) {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("content")
+                        )
+                    }
+                },
+                content = {}
+            )
+        }
+
+        rule.onNodeWithTag("content")
+            .assertLeftPositionInRootIsEqualTo(7.dp)
+            .assertTopPositionInRootIsEqualTo(7.dp)
+    }
+
+    @Test
     fun dismissibleNavigationDrawer_testOffset_whenClosed() {
         rule.setMaterialContent(lightColorScheme()) {
             val drawerState = rememberDrawerState(DrawerValue.Closed)
             DismissibleNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag("content"))
+                    DismissibleDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("content")
+                        )
+                    }
                 },
                 content = {}
             )
@@ -105,7 +143,13 @@ class DismissibleNavigationDrawerTest {
             DismissibleNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag("content"))
+                    DismissibleDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("content")
+                        )
+                    }
                 },
                 content = {}
             )
@@ -123,7 +167,12 @@ class DismissibleNavigationDrawerTest {
             DismissibleNavigationDrawer(
                 drawerState = rememberDrawerState(DrawerValue.Open),
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag("navigationDrawerTag"))
+                    DismissibleDrawerSheet(Modifier.testTag("navigationDrawerTag")) {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                        )
+                    }
                 },
                 content = {}
             )
@@ -144,7 +193,13 @@ class DismissibleNavigationDrawerTest {
             DismissibleNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
+                    DismissibleDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag(DrawerTestTag)
+                        )
+                    }
                 },
                 content = {}
             )
@@ -173,7 +228,13 @@ class DismissibleNavigationDrawerTest {
             DismissibleNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
+                    DismissibleDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag(DrawerTestTag)
+                        )
+                    }
                 },
                 content = {}
             )
@@ -202,7 +263,13 @@ class DismissibleNavigationDrawerTest {
             DismissibleNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
+                    DismissibleDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag(DrawerTestTag)
+                        )
+                    }
                 },
                 content = {}
             )
@@ -231,7 +298,13 @@ class DismissibleNavigationDrawerTest {
             DismissibleNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
+                    DismissibleDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag(DrawerTestTag)
+                        )
+                    }
                 },
                 content = {}
             )
@@ -264,10 +337,19 @@ class DismissibleNavigationDrawerTest {
                 DismissibleNavigationDrawer(
                     drawerState = drawerState,
                     drawerContent = {
-                        Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
+                        DismissibleDrawerSheet {
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .testTag(DrawerTestTag)
+                            )
+                        }
                     },
                     content = {
-                        Box(Modifier.fillMaxSize().clickable { bodyClicks += 1 })
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .clickable { bodyClicks += 1 })
                     }
                 )
             }
@@ -300,10 +382,20 @@ class DismissibleNavigationDrawerTest {
                 DismissibleNavigationDrawer(
                     drawerState = drawerState,
                     drawerContent = {
-                        Box(Modifier.fillMaxSize().background(color = Color.Magenta))
+                        DismissibleDrawerSheet {
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .background(color = Color.Magenta)
+                            )
+                        }
                     },
                     content = {
-                        Box(Modifier.fillMaxSize().background(color = Color.Red))
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .background(color = Color.Red)
+                        )
                     }
                 )
             }
@@ -339,14 +431,20 @@ class DismissibleNavigationDrawerTest {
                 DismissibleNavigationDrawer(
                     drawerState = drawerState,
                     drawerContent = {
-                        Box(
-                            Modifier.fillMaxSize()
-                                .testTag("content")
-                                .background(color = Color.Magenta)
-                        )
+                        DismissibleDrawerSheet(Modifier.testTag("content")) {
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .background(color = Color.Magenta)
+                            )
+                        }
                     },
                     content = {
-                        Box(Modifier.fillMaxSize().background(color = Color.Red))
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .background(color = Color.Red)
+                        )
                     }
                 )
             }
@@ -381,10 +479,20 @@ class DismissibleNavigationDrawerTest {
                     DismissibleNavigationDrawer(
                         drawerState = drawerState,
                         drawerContent = {
-                            Box(Modifier.fillMaxSize().background(color = Color.Magenta))
+                            DismissibleDrawerSheet {
+                                Box(
+                                    Modifier
+                                        .fillMaxSize()
+                                        .background(color = Color.Magenta)
+                                )
+                            }
                         },
                         content = {
-                            Box(Modifier.fillMaxSize().background(color = Color.Red))
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .background(color = Color.Red)
+                            )
                         }
                     )
                 }
@@ -418,7 +526,12 @@ class DismissibleNavigationDrawerTest {
                 DismissibleNavigationDrawer(
                     drawerState = drawerState,
                     drawerContent = {
-                        Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
+                        DismissibleDrawerSheet(Modifier.testTag(DrawerTestTag)) {
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                            )
+                        }
                     },
                     content = {}
                 )

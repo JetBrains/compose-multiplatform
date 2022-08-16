@@ -29,7 +29,8 @@ import androidx.compose.ui.input.key.NativeKeyEvent
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.platform.LocalTextInputService
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
@@ -42,7 +43,6 @@ import androidx.compose.ui.test.performTextInputSelection
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.input.TextInputService
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
@@ -134,9 +134,9 @@ class CoreTextFieldSelectionOnBackTest {
     @Test
     fun whenBackPressed_andReleased_whenCursorHandleShown_doesNotConsumeEvent() {
         var backPressCount = 0
-        var textInputService: TextInputService? = null
+        var softwareKeyboardController: SoftwareKeyboardController? = null
         rule.setContent {
-            textInputService = LocalTextInputService.current
+            softwareKeyboardController = LocalSoftwareKeyboardController.current
             BasicTextField(
                 "hello world",
                 onValueChange = {},
@@ -159,7 +159,7 @@ class CoreTextFieldSelectionOnBackTest {
             // Hide the keyboard before pressing back, since the first back should be consumed by
             // the keyboard.
             rule.runOnUiThread {
-                textInputService!!.hideSoftwareKeyboard()
+                softwareKeyboardController!!.hide()
             }
 
             // Press back.

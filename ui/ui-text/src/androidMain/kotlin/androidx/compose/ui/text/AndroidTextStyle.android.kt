@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalTextApi::class)
-
 package androidx.compose.ui.text
 
 internal const val DefaultIncludeFontPadding = true
@@ -23,7 +21,6 @@ internal const val DefaultIncludeFontPadding = true
 /**
  * Provides Android specific [TextStyle] configuration options for styling and compatibility.
  */
-@ExperimentalTextApi
 actual class PlatformTextStyle {
     /**
      * Android specific text span styling and compatibility configuration.
@@ -105,7 +102,6 @@ internal actual fun createPlatformTextStyle(
  * Provides Android specific [ParagraphStyle] configuration options for styling and compatibility.
  */
 @Suppress("DEPRECATION")
-@ExperimentalTextApi
 actual class PlatformParagraphStyle {
     actual companion object {
         actual val Default: PlatformParagraphStyle =
@@ -150,7 +146,6 @@ actual class PlatformParagraphStyle {
 /**
  * Provides Android specific [SpanStyle] configuration options for styling and compatibility.
  */
-@ExperimentalTextApi
 actual class PlatformSpanStyle {
     actual companion object {
         actual val Default: PlatformSpanStyle = PlatformSpanStyle()
@@ -190,7 +185,6 @@ actual class PlatformSpanStyle {
  * 1.0, so negative values and values greater than 1.0 are valid.
  */
 @Suppress("DEPRECATION")
-@ExperimentalTextApi
 actual fun lerp(
     start: PlatformParagraphStyle,
     stop: PlatformParagraphStyle,
@@ -220,7 +214,6 @@ actual fun lerp(
  * between [start] and [stop]. The interpolation can be extrapolated beyond 0.0 and
  * 1.0, so negative values and values greater than 1.0 are valid.
  */
-@ExperimentalTextApi
 actual fun lerp(
     start: PlatformSpanStyle,
     stop: PlatformSpanStyle,

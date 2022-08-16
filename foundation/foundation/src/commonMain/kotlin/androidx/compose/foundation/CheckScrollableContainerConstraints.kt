@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.Constraints
  * @param constraints [Constraints] used to measure the scrollable container
  * @param orientation orientation of the scrolling
  */
-@ExperimentalFoundationApi
 fun checkScrollableContainerConstraints(
     constraints: Constraints,
     orientation: Orientation

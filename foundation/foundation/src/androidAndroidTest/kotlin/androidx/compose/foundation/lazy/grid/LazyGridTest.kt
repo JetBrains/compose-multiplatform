@@ -29,10 +29,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.list.TestTouchSlop
 import androidx.compose.foundation.lazy.list.setContentWithTestViewConfiguration
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
@@ -74,6 +76,8 @@ import com.google.common.collect.Range
 import com.google.common.truth.IntegerSubject
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -1334,6 +1338,42 @@ class LazyGridTest(
         assertThat(bounds2.top).isEqualTo(0.dp)
         assertThat(bounds2.left).isEqualTo(0.dp)
         assertThat(bounds2.size).isEqualTo(DpSize(0.dp, 0.dp))
+    }
+
+    @Test
+    fun itemsComposedInOrderDuringAnimatedScroll() {
+        // for the Paging use case it is important that during such long scrolls we do not
+        // accidentally compose an item from completely other part of the list as it will break
+        // the logic defining what page to load. this issue was happening right after the
+        // teleporting during the animated scrolling happens (for example we were on item 100
+        // and we immediately snap to item 400). the prefetching logic was not detecting such
+        // moves and were continuing prefetching item 101 even if it is not needed anymore.
+        val state = LazyGridState()
+        var previousItem = -1
+        // initialize lambda here so it is not recreated when items block is rerun causing
+        // extra recompositions
+        val itemContent: @Composable LazyGridItemScope.(index: Int) -> Unit = {
+            Truth.assertWithMessage("Item $it should be larger than $previousItem")
+                .that(it > previousItem).isTrue()
+            previousItem = it
+            BasicText("$it", Modifier.size(10.dp))
+        }
+        lateinit var scope: CoroutineScope
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            LazyGrid(1, Modifier.size(30.dp), state = state) {
+                items(500, itemContent = itemContent)
+            }
+        }
+
+        var animationFinished by mutableStateOf(false)
+        rule.runOnIdle {
+            scope.launch {
+                state.animateScrollToItem(500)
+                animationFinished = true
+            }
+        }
+        rule.waitUntil(timeoutMillis = 10000) { animationFinished }
     }
 }
 

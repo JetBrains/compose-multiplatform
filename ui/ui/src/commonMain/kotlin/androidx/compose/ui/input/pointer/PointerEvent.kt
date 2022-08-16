@@ -376,6 +376,9 @@ value class PointerEventType private constructor(internal val value: Int) {
  * The [position] represents the position of the pointer relative to the element that
  * this [PointerInputChange] is being dispatched to.
  *
+ * Note: The [position] values can be outside the actual bounds of the element itself meaning the
+ * numbers can be negative or larger than the element bounds.
+ *
  * The [previousPosition] represents the position of the pointer offset to the current
  * position of the pointer relative to the screen.
  *
@@ -392,7 +395,7 @@ value class PointerEventType private constructor(internal val value: Int) {
  * @param uptimeMillis The time of the current pointer event, in milliseconds. The start (`0`) time
  * is platform-dependent
  * @param position The [Offset] of the current pointer event, relative to the containing
- * element
+ * element (values can be negative or larger than the element bounds).
  * @param pressed `true` if the pointer event is considered "pressed." For example, finger
  * touching the screen or a mouse button is pressed [pressed] would be `true`.
  * @param previousUptimeMillis The [uptimeMillis] of the previous pointer event

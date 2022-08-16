@@ -21,6 +21,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.node.HitTestResult
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.node.PointerInputModifierNode
 import androidx.compose.ui.util.fastForEach
 
 internal interface PositionCalculator {
@@ -31,12 +32,12 @@ internal interface PositionCalculator {
 /**
  * The core element that receives [PointerInputEvent]s and process them in Compose UI.
  */
-@OptIn(InternalCoreApi::class)
+@OptIn(InternalCoreApi::class, ExperimentalComposeUiApi::class)
 internal class PointerInputEventProcessor(val root: LayoutNode) {
 
     private val hitPathTracker = HitPathTracker(root.coordinates)
     private val pointerInputChangeEventProducer = PointerInputChangeEventProducer()
-    private val hitResult = HitTestResult<PointerInputFilter>()
+    private val hitResult = HitTestResult<PointerInputModifierNode>()
 
     /**
      * [process] doesn't currently support reentrancy. This prevents reentrant calls
@@ -118,8 +119,11 @@ internal class PointerInputEventProcessor(val root: LayoutNode) {
      * new pointers.
      */
     fun processCancel() {
-        pointerInputChangeEventProducer.clear()
-        hitPathTracker.processCancel()
+        if (!isProcessing) {
+            // Processing currently does not support reentrancy.
+            pointerInputChangeEventProducer.clear()
+            hitPathTracker.processCancel()
+        }
     }
 }
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_92
+// VERSION: v0_117
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -69,7 +69,7 @@ internal object CheckboxTokens {
     val UnselectedFocusOutlineWidth = 2.0.dp
     val UnselectedHoverOutlineColor = ColorSchemeKeyTokens.OnSurface
     val UnselectedHoverOutlineWidth = 2.0.dp
-    val UnselectedOutlineColor = ColorSchemeKeyTokens.OnSurface
+    val UnselectedOutlineColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val UnselectedOutlineWidth = 2.0.dp
     val UnselectedPressedOutlineColor = ColorSchemeKeyTokens.OnSurface
     val UnselectedPressedOutlineWidth = 2.0.dp

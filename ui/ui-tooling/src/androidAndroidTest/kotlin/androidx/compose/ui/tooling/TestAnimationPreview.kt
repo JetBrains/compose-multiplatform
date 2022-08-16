@@ -18,13 +18,37 @@ package androidx.compose.ui.tooling
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.DecayAnimation
+import androidx.compose.animation.core.FloatExponentialDecaySpec
+import androidx.compose.animation.core.InfiniteTransition
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.StartOffset
+import androidx.compose.animation.core.StartOffsetType
+import androidx.compose.animation.core.TargetBasedAnimation
+import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
@@ -35,12 +59,18 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 enum class CheckBoxState { Unselected, Selected }
@@ -57,6 +87,37 @@ fun CheckBoxScaffoldPreview() {
     Scaffold {
         CheckBox()
     }
+}
+
+@Preview(name = "All unsupported and transition animations")
+@Composable
+fun AllAnimations() {
+    AnimatedContentPreview()
+    CheckBox()
+    AnimateAsStatePreview()
+    CrossFadePreview()
+    AnimateContentSizePreview()
+    TargetBasedAnimationPreview()
+    DecayAnimationPreview()
+    InfiniteTransitionPreview()
+}
+
+@Preview(name = "Animations are ordered")
+@Composable
+fun AnimationOrder() {
+    val selected by remember { mutableStateOf(false) }
+    updateTransition(
+        if (selected) CheckBoxState.Selected else CheckBoxState.Unselected,
+        label = "transitionOne"
+    )
+    updateTransition(
+        if (selected) CheckBoxState.Selected else CheckBoxState.Unselected,
+        label = "transitionTwo"
+    )
+    updateTransition(
+        if (selected) CheckBoxState.Selected else CheckBoxState.Unselected,
+        label = "transitionThree"
+    )
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -122,4 +183,150 @@ private fun CheckBox() {
     ) {
         Icon(imageVector = Icons.Filled.Done, contentDescription = null)
     }
+}
+
+@Preview(name = "AnimateAsStatePreview")
+@Composable
+fun AnimateAsStatePreview() {
+    var showMenu by remember { mutableStateOf(true) }
+    var message by remember { mutableStateOf("Hello") }
+
+    val size: Dp by animateDpAsState(
+        targetValue = if (showMenu) 0.dp else 10.dp,
+        animationSpec = spring(Spring.DampingRatioHighBouncy, Spring.StiffnessHigh),
+    )
+    val offset by animateIntAsState(
+        targetValue = if (showMenu) 2 else 1
+    )
+
+    Box(
+        Modifier
+            .padding(size)
+            .offset(offset.dp)
+            .pointerInput(Unit) {
+                detectTapGestures {
+                    showMenu = !showMenu
+                    message += "!"
+                }
+            }) {
+        Text(text = message)
+    }
+}
+
+@Preview(name = "CrossFadePreview")
+@Composable
+fun CrossFadePreview() {
+    var currentPage by remember { mutableStateOf("A") }
+    Row {
+        Button(onClick = {
+            currentPage = when (currentPage) {
+                "A" -> "B"
+                "B" -> "A"
+                else -> "A"
+            }
+        }) {
+            Text("Switch Page")
+        }
+        Crossfade(targetState = currentPage) { screen ->
+            when (screen) {
+                "A" -> Text("Page A")
+                "B" -> Text("Page B")
+            }
+        }
+    }
+}
+
+@Preview(name = "AnimateContentSizePreview")
+@Composable
+fun AnimateContentSizePreview() {
+    var message by remember { mutableStateOf("Hello") }
+    Row {
+        var count by remember { mutableStateOf(0) }
+        Button(onClick = {
+            count++
+            message = "Count is $count"
+        }) {
+            Text("Add")
+        }
+        Box(
+            modifier = Modifier
+                .animateContentSize()
+        ) {
+            Text(text = message)
+        }
+    }
+}
+
+@Preview(name = "TargetBasedAnimationPreview")
+@Composable
+fun TargetBasedAnimationPreview() {
+    val anim = remember {
+        TargetBasedAnimation(
+            animationSpec = tween(200),
+            typeConverter = Float.VectorConverter,
+            initialValue = 200f,
+            targetValue = 1000f
+        )
+    }
+    var playTime by remember { mutableStateOf(0L) }
+
+    LaunchedEffect(anim) {
+        val startTime = withFrameNanos { it }
+
+        do {
+            playTime = withFrameNanos { it } - startTime
+        } while (playTime < 1_000_000L)
+    }
+    Box { Text(text = "Play time $playTime") }
+}
+
+@Preview(name = "DecayAnimationPreview")
+@Composable
+fun DecayAnimationPreview() {
+    val anim = remember {
+        DecayAnimation(
+            animationSpec = FloatExponentialDecaySpec(),
+            initialValue = 200f,
+        )
+    }
+    var playTime by remember { mutableStateOf(0L) }
+
+    LaunchedEffect(anim) {
+        val startTime = withFrameNanos { it }
+
+        do {
+            playTime = withFrameNanos { it } - startTime
+        } while (playTime < 1_000_000L)
+    }
+    Box { Text(text = "Play time $playTime") }
+}
+
+@Preview
+@Composable
+fun InfiniteTransitionPreview() {
+    val infiniteTransition = rememberInfiniteTransition()
+    Row {
+        infiniteTransition.PulsingDot(StartOffset(0))
+        infiniteTransition.PulsingDot(StartOffset(150, StartOffsetType.FastForward))
+        infiniteTransition.PulsingDot(StartOffset(300, StartOffsetType.FastForward))
+    }
+}
+
+@Composable
+fun InfiniteTransition.PulsingDot(startOffset: StartOffset) {
+    val scale by animateFloat(
+        0.2f,
+        1f,
+        infiniteRepeatable(tween(600), RepeatMode.Reverse, initialStartOffset = startOffset)
+    )
+    Box(
+        Modifier
+            .padding(5.dp)
+            .size(20.dp)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .background(Color.Gray, shape = CircleShape)
+    )
 }

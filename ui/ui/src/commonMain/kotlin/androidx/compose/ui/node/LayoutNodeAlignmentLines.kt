@@ -107,8 +107,8 @@ internal sealed class AlignmentLines(val alignmentLinesOwner: AlignmentLinesOwne
 
     fun getLastCalculation(): Map<AlignmentLine, Int> = alignmentLineMap
 
-    protected abstract val LayoutNodeWrapper.alignmentLinesMap: Map<AlignmentLine, Int>
-    protected abstract fun LayoutNodeWrapper.getPositionFor(alignmentLine: AlignmentLine): Int
+    protected abstract val NodeCoordinator.alignmentLinesMap: Map<AlignmentLine, Int>
+    protected abstract fun NodeCoordinator.getPositionFor(alignmentLine: AlignmentLine): Int
 
     /**
      * Returns the alignment line value for a given alignment line without affecting whether
@@ -117,16 +117,16 @@ internal sealed class AlignmentLines(val alignmentLinesOwner: AlignmentLinesOwne
     private fun addAlignmentLine(
         alignmentLine: AlignmentLine,
         initialPosition: Int,
-        initialWrapper: LayoutNodeWrapper
+        initialCoordinator: NodeCoordinator
     ) {
         var position = Offset(initialPosition.toFloat(), initialPosition.toFloat())
-        var wrapper = initialWrapper
+        var coordinator = initialCoordinator
         while (true) {
-            position = wrapper.calculatePositionInParent(position)
-            wrapper = wrapper.wrappedBy!!
-            if (wrapper == alignmentLinesOwner.innerLayoutNodeWrapper) break
-            if (alignmentLine in wrapper.alignmentLinesMap) {
-                val newPosition = wrapper.getPositionFor(alignmentLine)
+            position = coordinator.calculatePositionInParent(position)
+            coordinator = coordinator.wrappedBy!!
+            if (coordinator == alignmentLinesOwner.innerCoordinator) break
+            if (alignmentLine in coordinator.alignmentLinesMap) {
+                val newPosition = coordinator.getPositionFor(alignmentLine)
                 position = Offset(newPosition.toFloat(), newPosition.toFloat())
             }
         }
@@ -161,19 +161,19 @@ internal sealed class AlignmentLines(val alignmentLinesOwner: AlignmentLinesOwne
             }
             // Add alignment lines on the child node.
             childOwner.alignmentLines.alignmentLineMap.forEach { (childLine, linePosition) ->
-                addAlignmentLine(childLine, linePosition, childOwner.innerLayoutNodeWrapper)
+                addAlignmentLine(childLine, linePosition, childOwner.innerCoordinator)
             }
 
             // Add alignment lines on the modifier of the child.
-            var wrapper = childOwner.innerLayoutNodeWrapper.wrappedBy!!
-            while (wrapper != alignmentLinesOwner.innerLayoutNodeWrapper) {
-                wrapper.alignmentLinesMap.keys.forEach { childLine ->
-                    addAlignmentLine(childLine, wrapper.getPositionFor(childLine), wrapper)
+            var coordinator = childOwner.innerCoordinator.wrappedBy!!
+            while (coordinator != alignmentLinesOwner.innerCoordinator) {
+                coordinator.alignmentLinesMap.keys.forEach { childLine ->
+                    addAlignmentLine(childLine, coordinator.getPositionFor(childLine), coordinator)
                 }
-                wrapper = wrapper.wrappedBy!!
+                coordinator = coordinator.wrappedBy!!
             }
         }
-        alignmentLineMap += alignmentLinesOwner.innerLayoutNodeWrapper.alignmentLinesMap
+        alignmentLineMap += alignmentLinesOwner.innerCoordinator.alignmentLinesMap
         dirty = false
     }
 
@@ -208,7 +208,7 @@ internal sealed class AlignmentLines(val alignmentLinesOwner: AlignmentLinesOwne
         parent.alignmentLines.onAlignmentsChanged()
     }
 
-    protected abstract fun LayoutNodeWrapper.calculatePositionInParent(position: Offset): Offset
+    protected abstract fun NodeCoordinator.calculatePositionInParent(position: Offset): Offset
 }
 
 /**
@@ -218,13 +218,13 @@ internal class LayoutNodeAlignmentLines(
     alignmentLinesOwner: AlignmentLinesOwner
 ) : AlignmentLines(alignmentLinesOwner) {
 
-    override val LayoutNodeWrapper.alignmentLinesMap: Map<AlignmentLine, Int>
+    override val NodeCoordinator.alignmentLinesMap: Map<AlignmentLine, Int>
         get() = measureResult.alignmentLines
 
-    override fun LayoutNodeWrapper.getPositionFor(alignmentLine: AlignmentLine): Int =
+    override fun NodeCoordinator.getPositionFor(alignmentLine: AlignmentLine): Int =
         get(alignmentLine)
 
-    override fun LayoutNodeWrapper.calculatePositionInParent(position: Offset): Offset =
+    override fun NodeCoordinator.calculatePositionInParent(position: Offset): Offset =
         toParentPosition(position)
 }
 
@@ -235,12 +235,12 @@ internal class LookaheadAlignmentLines(
     alignmentLinesOwner: AlignmentLinesOwner
 ) : AlignmentLines(alignmentLinesOwner) {
 
-    override val LayoutNodeWrapper.alignmentLinesMap: Map<AlignmentLine, Int>
+    override val NodeCoordinator.alignmentLinesMap: Map<AlignmentLine, Int>
         get() = lookaheadDelegate!!.measureResult.alignmentLines
 
-    override fun LayoutNodeWrapper.getPositionFor(alignmentLine: AlignmentLine): Int =
+    override fun NodeCoordinator.getPositionFor(alignmentLine: AlignmentLine): Int =
         lookaheadDelegate!![alignmentLine]
 
-    override fun LayoutNodeWrapper.calculatePositionInParent(position: Offset): Offset =
+    override fun NodeCoordinator.calculatePositionInParent(position: Offset): Offset =
         this.lookaheadDelegate!!.position.toOffset() + position
 }

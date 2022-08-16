@@ -21,6 +21,9 @@ import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.node.InternalCoreApi
+import androidx.compose.ui.node.PointerInputModifierNode
+import androidx.compose.ui.node.isAttached
+import androidx.compose.ui.node.layoutCoordinates
 import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.fastForEach
 
@@ -31,32 +34,32 @@ import androidx.compose.ui.util.fastForEach
  * @property rootCoordinates the root [LayoutCoordinates] that [PointerInputChange]s will be
  * relative to.
  */
-@OptIn(InternalCoreApi::class)
+@OptIn(InternalCoreApi::class, ExperimentalComposeUiApi::class)
 internal class HitPathTracker(private val rootCoordinates: LayoutCoordinates) {
 
     /*@VisibleForTesting*/
     internal val root: NodeParent = NodeParent()
 
     /**
-     * Associates a [pointerId] to a list of hit [pointerInputFilters] and keeps track of them.
+     * Associates a [pointerId] to a list of hit [pointerInputNodes] and keeps track of them.
      *
      * This enables future calls to [dispatchChanges] to dispatch the correct [PointerInputChange]s
      * to the right [PointerInputFilter]s at the right time.
      *
-     * If [pointerInputFilters] is empty, nothing will be added.
+     * If [pointerInputNodes] is empty, nothing will be added.
      *
      * @param pointerId The id of the pointer that was hit tested against [PointerInputFilter]s
-     * @param pointerInputFilters The [PointerInputFilter]s that were hit by [pointerId].  Must be
+     * @param pointerInputNodes The [PointerInputFilter]s that were hit by [pointerId].  Must be
      * ordered from ancestor to descendant.
      */
-    fun addHitPath(pointerId: PointerId, pointerInputFilters: List<PointerInputFilter>) {
+    fun addHitPath(pointerId: PointerId, pointerInputNodes: List<PointerInputModifierNode>) {
         var parent: NodeParent = root
         var merging = true
-        eachPin@ for (i in pointerInputFilters.indices) {
-            val pointerInputFilter = pointerInputFilters[i]
+        eachPin@ for (i in pointerInputNodes.indices) {
+            val pointerInputNode = pointerInputNodes[i]
             if (merging) {
                 val node = parent.children.firstOrNull {
-                    it.pointerInputFilter == pointerInputFilter
+                    it.pointerInputNode == pointerInputNode
                 }
                 if (node != null) {
                     node.markIsIn()
@@ -67,7 +70,8 @@ internal class HitPathTracker(private val rootCoordinates: LayoutCoordinates) {
                     merging = false
                 }
             }
-            val node = Node(pointerInputFilter).apply {
+            // TODO(lmr): i wonder if Node here and PointerInputNode ought to be the same thing?
+            val node = Node(pointerInputNode).apply {
                 pointerIds.add(pointerId)
             }
             parent.children.add(node)
@@ -134,7 +138,7 @@ internal class HitPathTracker(private val rootCoordinates: LayoutCoordinates) {
  * pointer or [PointerInputFilter] information.
  */
 /*@VisibleForTesting*/
-@OptIn(InternalCoreApi::class)
+@OptIn(InternalCoreApi::class, ExperimentalComposeUiApi::class)
 internal open class NodeParent {
     val children: MutableVector<Node> = mutableVectorOf()
 
@@ -222,7 +226,7 @@ internal open class NodeParent {
         var index = 0
         while (index < children.size) {
             val child = children[index]
-            if (!child.pointerInputFilter.isAttached) {
+            if (!child.pointerInputNode.isAttached) {
                 children.removeAt(index)
                 child.dispatchCancel()
             } else {
@@ -247,8 +251,8 @@ internal open class NodeParent {
  * hit it (tracked as [PointerId]s).
  */
 /*@VisibleForTesting*/
-@OptIn(InternalCoreApi::class)
-internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
+@OptIn(InternalCoreApi::class, ExperimentalComposeUiApi::class)
+internal class Node(val pointerInputNode: PointerInputModifierNode) : NodeParent() {
 
     // Note: this is essentially a set, and writes should be guarded accordingly. We use a
     // MutableVector here instead since a set ends up being quite heavy, and calls to
@@ -289,10 +293,10 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
             val event = pointerEvent!!
             val size = coordinates!!.size
             // Dispatch on the tunneling pass.
-            pointerInputFilter.onPointerEvent(event, PointerEventPass.Initial, size)
+            pointerInputNode.onPointerEvent(event, PointerEventPass.Initial, size)
 
             // Dispatch to children.
-            if (pointerInputFilter.isAttached) {
+            if (pointerInputNode.isAttached) {
                 children.forEach {
                     it.dispatchMainEventPass(
                         // Pass only the already-filtered and position-translated changes down to
@@ -305,9 +309,9 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
                 }
             }
 
-            if (pointerInputFilter.isAttached) {
+            if (pointerInputNode.isAttached) {
                 // Dispatch on the bubbling pass.
-                pointerInputFilter.onPointerEvent(event, PointerEventPass.Main, size)
+                pointerInputNode.onPointerEvent(event, PointerEventPass.Main, size)
             }
         }
     }
@@ -323,10 +327,10 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
             val event = pointerEvent!!
             val size = coordinates!!.size
             // Dispatch on the tunneling pass.
-            pointerInputFilter.onPointerEvent(event, PointerEventPass.Final, size)
+            pointerInputNode.onPointerEvent(event, PointerEventPass.Final, size)
 
             // Dispatch to children.
-            if (pointerInputFilter.isAttached) {
+            if (pointerInputNode.isAttached) {
                 children.forEach { it.dispatchFinalEventPass(internalPointerEvent) }
             }
         }
@@ -358,9 +362,9 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
             )
 
         // Avoid future work if we know this node will no-op
-        if (!pointerInputFilter.isAttached) return true
+        if (!pointerInputNode.isAttached) return true
 
-        coordinates = pointerInputFilter.layoutCoordinates
+        coordinates = pointerInputNode.layoutCoordinates
 
         @OptIn(ExperimentalComposeUiApi::class)
         for ((key, change) in changes) {
@@ -471,7 +475,7 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
     }
 
     /**
-     * Calls [block] if there are relevant changes, and if [pointerInputFilter] is attached
+     * Calls [block] if there are relevant changes, and if [pointerInputNode] is attached
      *
      * @return whether [block] was called
      */
@@ -481,7 +485,7 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
         // If there are no relevant changes, there is nothing to process so return false.
         if (relevantChanges.isEmpty()) return false
         // If the input filter is not attached, avoid dispatching
-        if (!pointerInputFilter.isAttached) return false
+        if (!pointerInputNode.isAttached) return false
 
         block()
 
@@ -498,7 +502,7 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
      */
     override fun dispatchCancel() {
         children.forEach { it.dispatchCancel() }
-        pointerInputFilter.onCancel()
+        pointerInputNode.onCancelPointerInput()
     }
 
     fun markIsIn() {
@@ -527,7 +531,7 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
     }
 
     override fun toString(): String {
-        return "Node(pointerInputFilter=$pointerInputFilter, children=$children, " +
+        return "Node(pointerInputFilter=$pointerInputNode, children=$children, " +
             "pointerIds=$pointerIds)"
     }
 }

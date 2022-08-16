@@ -63,8 +63,10 @@ class AnnotatedString internal constructor(
 
     init {
         var lastStyleEnd = -1
-        paragraphStyles.fastForEach { paragraphStyle ->
-            require(paragraphStyle.start >= lastStyleEnd) { "ParagraphStyle should not overlap" }
+        paragraphStyles.sortedBy { it.start }.fastForEach { paragraphStyle ->
+            require(paragraphStyle.start >= lastStyleEnd) {
+                "ParagraphStyle should not overlap"
+            }
             require(paragraphStyle.end <= text.length) {
                 "ParagraphStyle range [${paragraphStyle.start}, ${paragraphStyle.end})" +
                     " is out of boundary"

@@ -98,7 +98,7 @@ fun TextFieldWithIcons() {
     TextField(
         value = text,
         onValueChange = { text = it },
-        placeholder = { Text("placeholder") },
+        label = { Text("Label") },
         leadingIcon = { Icon(Icons.Filled.Favorite, contentDescription = "Localized description") },
         trailingIcon = { Icon(Icons.Filled.Info, contentDescription = "Localized description") }
     )
@@ -372,7 +372,7 @@ fun CustomTextFieldBasedOnDecorationBox() {
             onValueChange = onValueChange,
             modifier = modifier
                 .background(
-                    color = colors.containerColor(enabled).value,
+                    color = MaterialTheme.colorScheme.surfaceVariant,
                     shape = RoundedCornerShape(
                         topStart = 4.0.dp,
                         topEnd = 4.0.dp,

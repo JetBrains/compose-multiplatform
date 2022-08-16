@@ -1,31 +1,91 @@
 // Baseline format: 1.0
-InvalidNullConversion: androidx.compose.ui.text.font.FontKt#Font(int, androidx.compose.ui.text.font.FontWeight, int):
-    Attempted to remove @NonNull annotation from method androidx.compose.ui.text.font.FontKt.Font(int,androidx.compose.ui.text.font.FontWeight,int)
+AddSealed: androidx.compose.ui.text.Paragraph:
+    Cannot add 'sealed' modifier to class androidx.compose.ui.text.Paragraph: Incompatible change
 
 
-RemovedClass: androidx.compose.ui.text.TextLayoutResultKt:
-    Removed class androidx.compose.ui.text.TextLayoutResultKt
+AddedFinal: androidx.compose.ui.text.Paragraph#getBidiRunDirection(int):
+    Method androidx.compose.ui.text.Paragraph.getBidiRunDirection has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getBoundingBox(int):
+    Method androidx.compose.ui.text.Paragraph.getBoundingBox has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getCursorRect(int):
+    Method androidx.compose.ui.text.Paragraph.getCursorRect has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getDidExceedMaxLines():
+    Method androidx.compose.ui.text.Paragraph.getDidExceedMaxLines has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getFirstBaseline():
+    Method androidx.compose.ui.text.Paragraph.getFirstBaseline has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getHeight():
+    Method androidx.compose.ui.text.Paragraph.getHeight has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getHorizontalPosition(int, boolean):
+    Method androidx.compose.ui.text.Paragraph.getHorizontalPosition has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getLastBaseline():
+    Method androidx.compose.ui.text.Paragraph.getLastBaseline has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getLineBottom(int):
+    Method androidx.compose.ui.text.Paragraph.getLineBottom has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getLineCount():
+    Method androidx.compose.ui.text.Paragraph.getLineCount has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getLineEnd(int, boolean):
+    Method androidx.compose.ui.text.Paragraph.getLineEnd has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getLineForOffset(int):
+    Method androidx.compose.ui.text.Paragraph.getLineForOffset has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getLineForVerticalPosition(float):
+    Method androidx.compose.ui.text.Paragraph.getLineForVerticalPosition has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getLineHeight(int):
+    Method androidx.compose.ui.text.Paragraph.getLineHeight has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getLineLeft(int):
+    Method androidx.compose.ui.text.Paragraph.getLineLeft has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getLineRight(int):
+    Method androidx.compose.ui.text.Paragraph.getLineRight has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getLineStart(int):
+    Method androidx.compose.ui.text.Paragraph.getLineStart has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getLineTop(int):
+    Method androidx.compose.ui.text.Paragraph.getLineTop has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getLineWidth(int):
+    Method androidx.compose.ui.text.Paragraph.getLineWidth has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getMaxIntrinsicWidth():
+    Method androidx.compose.ui.text.Paragraph.getMaxIntrinsicWidth has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getMinIntrinsicWidth():
+    Method androidx.compose.ui.text.Paragraph.getMinIntrinsicWidth has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getOffsetForPosition(long):
+    Method androidx.compose.ui.text.Paragraph.getOffsetForPosition has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getParagraphDirection(int):
+    Method androidx.compose.ui.text.Paragraph.getParagraphDirection has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getPathForRange(int, int):
+    Method androidx.compose.ui.text.Paragraph.getPathForRange has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getPlaceholderRects():
+    Method androidx.compose.ui.text.Paragraph.getPlaceholderRects has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getWidth():
+    Method androidx.compose.ui.text.Paragraph.getWidth has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#getWordBoundary(int):
+    Method androidx.compose.ui.text.Paragraph.getWordBoundary has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#isLineEllipsized(int):
+    Method androidx.compose.ui.text.Paragraph.isLineEllipsized has added 'final' qualifier
+AddedFinal: androidx.compose.ui.text.Paragraph#paint(androidx.compose.ui.graphics.Canvas, long, androidx.compose.ui.graphics.Shadow, androidx.compose.ui.text.style.TextDecoration):
+    Method androidx.compose.ui.text.Paragraph.paint has added 'final' qualifier
 
 
-RemovedMethod: androidx.compose.ui.text.PlaceholderVerticalAlign#PlaceholderVerticalAlign():
-    Removed constructor androidx.compose.ui.text.PlaceholderVerticalAlign()
-RemovedMethod: androidx.compose.ui.text.TextRange#TextRange():
-    Removed constructor androidx.compose.ui.text.TextRange()
-RemovedMethod: androidx.compose.ui.text.font.FontStyle#FontStyle():
-    Removed constructor androidx.compose.ui.text.font.FontStyle()
-RemovedMethod: androidx.compose.ui.text.font.FontSynthesis#FontSynthesis():
-    Removed constructor androidx.compose.ui.text.font.FontSynthesis()
-RemovedMethod: androidx.compose.ui.text.input.ImeAction#ImeAction():
-    Removed constructor androidx.compose.ui.text.input.ImeAction()
-RemovedMethod: androidx.compose.ui.text.input.KeyboardCapitalization#KeyboardCapitalization():
-    Removed constructor androidx.compose.ui.text.input.KeyboardCapitalization()
-RemovedMethod: androidx.compose.ui.text.input.KeyboardType#KeyboardType():
-    Removed constructor androidx.compose.ui.text.input.KeyboardType()
-RemovedMethod: androidx.compose.ui.text.style.BaselineShift#BaselineShift():
-    Removed constructor androidx.compose.ui.text.style.BaselineShift()
-RemovedMethod: androidx.compose.ui.text.style.TextAlign#TextAlign():
-    Removed constructor androidx.compose.ui.text.style.TextAlign()
-RemovedMethod: androidx.compose.ui.text.style.TextDirection#TextDirection():
-    Removed constructor androidx.compose.ui.text.style.TextDirection()
-RemovedMethod: androidx.compose.ui.text.style.TextOverflow#TextOverflow():
-    Removed constructor androidx.compose.ui.text.style.TextOverflow()
+DefaultValueChange: androidx.compose.ui.text.Paragraph#getLineEnd(int, boolean) parameter #1:
+    Attempted to remove default value from parameter visibleEnd in androidx.compose.ui.text.Paragraph.getLineEnd
+DefaultValueChange: androidx.compose.ui.text.Paragraph#paint(androidx.compose.ui.graphics.Canvas, long, androidx.compose.ui.graphics.Shadow, androidx.compose.ui.text.style.TextDecoration) parameter #1:
+    Attempted to remove default value from parameter color in androidx.compose.ui.text.Paragraph.paint
+DefaultValueChange: androidx.compose.ui.text.Paragraph#paint(androidx.compose.ui.graphics.Canvas, long, androidx.compose.ui.graphics.Shadow, androidx.compose.ui.text.style.TextDecoration) parameter #2:
+    Attempted to remove default value from parameter shadow in androidx.compose.ui.text.Paragraph.paint
+DefaultValueChange: androidx.compose.ui.text.Paragraph#paint(androidx.compose.ui.graphics.Canvas, long, androidx.compose.ui.graphics.Shadow, androidx.compose.ui.text.style.TextDecoration) parameter #3:
+    Attempted to remove default value from parameter textDecoration in androidx.compose.ui.text.Paragraph.paint
+
+
+RemovedMethod: androidx.compose.ui.text.ParagraphStyle#equals(Object):
+    Removed method androidx.compose.ui.text.ParagraphStyle.equals(Object)
+RemovedMethod: androidx.compose.ui.text.Placeholder#equals(Object):
+    Removed method androidx.compose.ui.text.Placeholder.equals(Object)
+RemovedMethod: androidx.compose.ui.text.SpanStyle#equals(Object):
+    Removed method androidx.compose.ui.text.SpanStyle.equals(Object)
+RemovedMethod: androidx.compose.ui.text.TextLayoutInput#equals(Object):
+    Removed method androidx.compose.ui.text.TextLayoutInput.equals(Object)
+RemovedMethod: androidx.compose.ui.text.TextLayoutResult#equals(Object):
+    Removed method androidx.compose.ui.text.TextLayoutResult.equals(Object)
+RemovedMethod: androidx.compose.ui.text.style.TextDecoration#equals(Object):
+    Removed method androidx.compose.ui.text.style.TextDecoration.equals(Object)
+RemovedMethod: androidx.compose.ui.text.style.TextGeometricTransform#equals(Object):
+    Removed method androidx.compose.ui.text.style.TextGeometricTransform.equals(Object)
+RemovedMethod: androidx.compose.ui.text.style.TextIndent#equals(Object):
+    Removed method androidx.compose.ui.text.style.TextIndent.equals(Object)

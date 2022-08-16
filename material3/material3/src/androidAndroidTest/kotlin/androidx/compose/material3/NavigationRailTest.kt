@@ -17,6 +17,8 @@
 package androidx.compose.material3
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
@@ -34,6 +36,7 @@ import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
@@ -54,6 +57,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -128,6 +132,56 @@ class NavigationRailTest {
     }
 
     @Test
+    fun navigationRailItem_clearsIconSemantics_whenLabelIsPresent() {
+        rule.setMaterialContent(lightColorScheme()) {
+            NavigationRail {
+                NavigationRailItem(
+                    modifier = Modifier.testTag("item1"),
+                    icon = {
+                        Icon(Icons.Filled.Favorite, "Favorite")
+                    },
+                    label = {
+                        Text("Favorite")
+                    },
+                    selected = true,
+                    alwaysShowLabel = false,
+                    onClick = {}
+                )
+                NavigationRailItem(
+                    modifier = Modifier.testTag("item2"),
+                    icon = {
+                        Icon(Icons.Filled.Favorite, "Favorite")
+                    },
+                    label = {
+                        Text("Favorite")
+                    },
+                    selected = false,
+                    alwaysShowLabel = false,
+                    onClick = {}
+                )
+                NavigationRailItem(
+                    modifier = Modifier.testTag("item3"),
+                    icon = {
+                        Icon(Icons.Filled.Favorite, "Favorite")
+                    },
+                    selected = false,
+                    onClick = {}
+                )
+            }
+        }
+
+        val node1 = rule.onNodeWithTag("item1").fetchSemanticsNode()
+        val node2 = rule.onNodeWithTag("item2").fetchSemanticsNode()
+        val node3 = rule.onNodeWithTag("item3").fetchSemanticsNode()
+
+        Truth.assertThat(node1.config.getOrNull(SemanticsProperties.ContentDescription)).isNull()
+        Truth.assertThat(node2.config.getOrNull(SemanticsProperties.ContentDescription))
+            .isEqualTo(listOf("Favorite"))
+        Truth.assertThat(node3.config.getOrNull(SemanticsProperties.ContentDescription))
+            .isEqualTo(listOf("Favorite"))
+    }
+
+    @Test
     fun navigationRail_width() {
         val defaultWidth = NavigationRailItemWidth
         rule.setMaterialContentForSizeAssertions {
@@ -144,6 +198,21 @@ class NavigationRailTest {
                 }
             }
         }.assertWidthIsEqualTo(defaultWidth)
+    }
+
+    @Test
+    fun navigationRail_respectsContentPadding() {
+        rule.setMaterialContentForSizeAssertions {
+            NavigationRail(windowInsets = WindowInsets(13.dp, 13.dp, 13.dp, 13.dp)) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .testTag("content"))
+            }
+        }
+        rule.onNodeWithTag("content")
+            .assertTopPositionInRootIsEqualTo(13.dp + NavigationRailVerticalPadding)
+            .assertLeftPositionInRootIsEqualTo(13.dp)
     }
 
     @Test

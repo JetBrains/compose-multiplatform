@@ -56,7 +56,7 @@ class Placeholder(
         )
     }
 
-    override operator fun equals(other: Any?): Boolean {
+    override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Placeholder) return false
         if (width != other.width) return false

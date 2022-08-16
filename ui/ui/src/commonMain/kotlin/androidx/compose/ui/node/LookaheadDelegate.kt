@@ -18,24 +18,30 @@ package androidx.compose.ui.node
 
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.LookaheadLayoutCoordinatesImpl
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.LookaheadScope
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 
 /**
- * This is the base class for LayoutNodeWrapper and LookaheadDelegate. The common
+ * This is the base class for NodeCoordinator and LookaheadDelegate. The common
  * functionalities between the two are extracted here.
  */
-internal abstract class LookaheadCapablePlaceable : Placeable() {
+internal abstract class LookaheadCapablePlaceable : Placeable(), MeasureScope {
     abstract val position: IntOffset
     abstract val child: LookaheadCapablePlaceable?
+    abstract val parent: LookaheadCapablePlaceable?
     abstract val hasMeasureResult: Boolean
+    abstract val layoutNode: LayoutNode
+    abstract val coordinates: LayoutCoordinates
     final override fun get(alignmentLine: AlignmentLine): Int {
         if (!hasMeasureResult) return AlignmentLine.Unspecified
         val measuredPosition = calculateAlignmentLine(alignmentLine)
@@ -49,14 +55,23 @@ internal abstract class LookaheadCapablePlaceable : Placeable() {
 
     abstract fun calculateAlignmentLine(alignmentLine: AlignmentLine): Int
 
-    // True when the wrapper is running its own placing block to obtain the position
+    // True when the coordinator is running its own placing block to obtain the position
     // in parent, but is not interested in the position of children.
     internal var isShallowPlacing: Boolean = false
     internal abstract val measureResult: MeasureResult
     internal abstract fun replace()
     abstract val alignmentLinesOwner: AlignmentLinesOwner
 
-    protected fun LayoutNodeWrapper.invalidateAlignmentLinesFromPositionChange() {
+    /**
+     * Used to indicate that this placement pass is for the purposes of calculating an
+     * alignment line. If it is, then
+     * [LayoutNodeLayoutDelegate.coordinatesAccessedDuringPlacement] will be changed
+     * when [Placeable.PlacementScope.coordinates] is accessed to indicate that the placement
+     * is not finalized and must be run again.
+     */
+    internal var isPlacingForAlignment = false
+
+    protected fun NodeCoordinator.invalidateAlignmentLinesFromPositionChange() {
         if (wrapped?.layoutNode != layoutNode) {
             alignmentLinesOwner.alignmentLines.onAlignmentsChanged()
         } else {
@@ -66,11 +81,11 @@ internal abstract class LookaheadCapablePlaceable : Placeable() {
 }
 
 internal abstract class LookaheadDelegate(
-    val wrapper: LayoutNodeWrapper,
+    val coordinator: NodeCoordinator,
     val lookaheadScope: LookaheadScope
 ) : Measurable, LookaheadCapablePlaceable() {
     override val child: LookaheadCapablePlaceable?
-        get() = wrapper.wrapped?.lookaheadDelegate
+        get() = coordinator.wrapped?.lookaheadDelegate
     override val hasMeasureResult: Boolean
         get() = _measureResult != null
     override var position = IntOffset.Zero
@@ -79,10 +94,22 @@ internal abstract class LookaheadDelegate(
         get() = _measureResult ?: error(
             "LookaheadDelegate has not been measured yet when measureResult is requested."
         )
+    override val layoutDirection: LayoutDirection
+        get() = coordinator.layoutDirection
+    override val density: Float
+        get() = coordinator.density
+    override val fontScale: Float
+        get() = coordinator.fontScale
+    override val parent: LookaheadCapablePlaceable?
+        get() = coordinator.wrappedBy?.lookaheadDelegate
+    override val layoutNode: LayoutNode
+        get() = coordinator.layoutNode
+    override val coordinates: LayoutCoordinates
+        get() = lookaheadLayoutCoordinates
 
     val lookaheadLayoutCoordinates = LookaheadLayoutCoordinatesImpl(this)
     override val alignmentLinesOwner: AlignmentLinesOwner
-        get() = wrapper.layoutNode.layoutDelegate.lookaheadAlignmentLinesOwner!!
+        get() = coordinator.layoutNode.layoutDelegate.lookaheadAlignmentLinesOwner!!
 
     private var _measureResult: MeasureResult? = null
         set(result) {
@@ -122,7 +149,9 @@ internal abstract class LookaheadDelegate(
     ) {
         if (this.position != position) {
             this.position = position
-            wrapper.invalidateAlignmentLinesFromPositionChange()
+            layoutNode.layoutDelegate.lookaheadPassDelegate
+                ?.notifyChildrenUsingCoordinatesWhilePlacing()
+            coordinator.invalidateAlignmentLinesFromPositionChange()
         }
         if (isShallowPlacing) return
         placeChildren()
@@ -131,7 +160,8 @@ internal abstract class LookaheadDelegate(
     protected open fun placeChildren() {
         PlacementScope.executeWithRtlMirroringValues(
             measureResult.width,
-            wrapper.measureScope.layoutDirection
+            coordinator.layoutDirection,
+            this
         ) {
             measureResult.placeChildren()
         }
@@ -147,22 +177,22 @@ internal abstract class LookaheadDelegate(
     }
 
     override val parentData: Any?
-        get() = wrapper.parentData
+        get() = coordinator.parentData
 
     override fun minIntrinsicWidth(height: Int): Int {
-        return wrapper.wrapped!!.lookaheadDelegate!!.minIntrinsicWidth(height)
+        return coordinator.wrapped!!.lookaheadDelegate!!.minIntrinsicWidth(height)
     }
 
     override fun maxIntrinsicWidth(height: Int): Int {
-        return wrapper.wrapped!!.lookaheadDelegate!!.maxIntrinsicWidth(height)
+        return coordinator.wrapped!!.lookaheadDelegate!!.maxIntrinsicWidth(height)
     }
 
     override fun minIntrinsicHeight(width: Int): Int {
-        return wrapper.wrapped!!.lookaheadDelegate!!.minIntrinsicHeight(width)
+        return coordinator.wrapped!!.lookaheadDelegate!!.minIntrinsicHeight(width)
     }
 
     override fun maxIntrinsicHeight(width: Int): Int {
-        return wrapper.wrapped!!.lookaheadDelegate!!.maxIntrinsicHeight(width)
+        return coordinator.wrapped!!.lookaheadDelegate!!.maxIntrinsicHeight(width)
     }
 
     internal fun positionIn(ancestor: LookaheadDelegate): IntOffset {
@@ -170,7 +200,7 @@ internal abstract class LookaheadDelegate(
         var lookaheadDelegate = this
         while (lookaheadDelegate != ancestor) {
             aggregatedOffset += lookaheadDelegate.position
-            lookaheadDelegate = lookaheadDelegate.wrapper.wrappedBy!!.lookaheadDelegate!!
+            lookaheadDelegate = lookaheadDelegate.coordinator.wrappedBy!!.lookaheadDelegate!!
         }
         return aggregatedOffset
     }

@@ -50,19 +50,36 @@ import androidx.compose.ui.unit.Dp
  * @param targetValue Target value of the animation
  * @param animationSpec The animation that will be used to change the value through time,
  *                      [spring] by default
+ * @param label An optional label to differentiate from other animations in Android Studio.
  * @param finishedListener An optional listener to get notified when the animation is finished.
  */
 @Composable
 fun animateColorAsState(
     targetValue: Color,
     animationSpec: AnimationSpec<Color> = colorDefaultSpring,
+    label: String = "ColorAnimation",
     finishedListener: ((Color) -> Unit)? = null
 ): State<Color> {
     val converter = remember(targetValue.colorSpace) {
         (Color.VectorConverter)(targetValue.colorSpace)
     }
     return animateValueAsState(
-        targetValue, converter, animationSpec, finishedListener = finishedListener
+        targetValue, converter, animationSpec, label = label, finishedListener = finishedListener
+    )
+}
+
+@Deprecated(
+    "animate*AsState APIs now have a new label parameter added.",
+    level = DeprecationLevel.HIDDEN
+)
+@Composable
+fun animateColorAsState(
+    targetValue: Color,
+    animationSpec: AnimationSpec<Color> = colorDefaultSpring,
+    finishedListener: ((Color) -> Unit)? = null
+): State<Color> {
+    return animateColorAsState(
+        targetValue, animationSpec, finishedListener = finishedListener
     )
 }
 

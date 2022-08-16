@@ -321,7 +321,6 @@ private data class ScrollingLayoutModifier(
     val isVertical: Boolean,
     val overscrollEffect: OverscrollEffect
 ) : LayoutModifier {
-    @OptIn(ExperimentalFoundationApi::class)
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
@@ -359,20 +358,44 @@ private data class ScrollingLayoutModifier(
     override fun IntrinsicMeasureScope.minIntrinsicWidth(
         measurable: IntrinsicMeasurable,
         height: Int
-    ) = measurable.minIntrinsicWidth(height)
+    ): Int {
+        return if (isVertical) {
+            measurable.minIntrinsicWidth(Constraints.Infinity)
+        } else {
+            measurable.minIntrinsicWidth(height)
+        }
+    }
 
     override fun IntrinsicMeasureScope.minIntrinsicHeight(
         measurable: IntrinsicMeasurable,
         width: Int
-    ) = measurable.minIntrinsicHeight(width)
+    ): Int {
+        return if (isVertical) {
+            measurable.minIntrinsicHeight(width)
+        } else {
+            measurable.minIntrinsicHeight(Constraints.Infinity)
+        }
+    }
 
     override fun IntrinsicMeasureScope.maxIntrinsicWidth(
         measurable: IntrinsicMeasurable,
         height: Int
-    ) = measurable.maxIntrinsicWidth(height)
+    ): Int {
+        return if (isVertical) {
+            measurable.maxIntrinsicWidth(Constraints.Infinity)
+        } else {
+            measurable.maxIntrinsicWidth(height)
+        }
+    }
 
     override fun IntrinsicMeasureScope.maxIntrinsicHeight(
         measurable: IntrinsicMeasurable,
         width: Int
-    ) = measurable.maxIntrinsicHeight(width)
+    ): Int {
+        return if (isVertical) {
+            measurable.maxIntrinsicHeight(width)
+        } else {
+            measurable.maxIntrinsicHeight(Constraints.Infinity)
+        }
+    }
 }

@@ -19,7 +19,6 @@ package androidx.compose.ui.text
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.font.toFontFamily
-import androidx.compose.ui.text.platform.AndroidParagraph
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection

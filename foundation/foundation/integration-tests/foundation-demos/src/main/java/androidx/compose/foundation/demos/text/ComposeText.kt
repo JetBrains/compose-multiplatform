@@ -92,8 +92,10 @@ import androidx.compose.ui.unit.sp
 
 const val displayText = "Text Demo"
 const val displayTextChinese = "文本演示"
-const val displayTextArabic = "عرض النص"
+const val displayTextArabic = "\u0639\u0631\u0636\u0020\u0627\u0644\u0646\u0635"
 const val displayTextHindi = "पाठ डेमो"
+const val displayTextBidi = "Text \u0639\u0631\u0636"
+
 val fontSize4 = 16.sp
 val fontSize6 = 20.sp
 val fontSize8 = 25.sp

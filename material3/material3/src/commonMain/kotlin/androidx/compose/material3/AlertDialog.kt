@@ -74,7 +74,7 @@ internal fun AlertDialogContent(
             }
             title?.let {
                 CompositionLocalProvider(LocalContentColor provides titleContentColor) {
-                    val textStyle = MaterialTheme.typography.fromToken(DialogTokens.SubheadFont)
+                    val textStyle = MaterialTheme.typography.fromToken(DialogTokens.HeadlineFont)
                     ProvideTextStyle(textStyle) {
                         Box(
                             // Align the title to the center when an icon is present.

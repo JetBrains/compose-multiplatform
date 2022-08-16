@@ -311,7 +311,6 @@ class LazyListState constructor(
         }
         val info = layoutInfo
         if (info.visibleItemsInfo.isNotEmpty()) {
-            // check(isActive)
             val scrollingForward = delta < 0
             val indexToPrefetch = if (scrollingForward) {
                 info.visibleItemsInfo.last().index + 1
@@ -333,6 +332,17 @@ class LazyListState constructor(
                 currentPrefetchHandle = prefetchState.schedulePrefetch(
                     indexToPrefetch, premeasureConstraints
                 )
+            }
+        }
+    }
+
+    private fun cancelPrefetchIfVisibleItemsChanged(info: LazyListLayoutInfo) {
+        if (indexToPrefetch != -1 && info.visibleItemsInfo.isNotEmpty()) {
+            if (indexToPrefetch != info.visibleItemsInfo.first().index - 1 &&
+                indexToPrefetch != info.visibleItemsInfo.last().index + 1) {
+                indexToPrefetch = -1
+                currentPrefetchHandle?.cancel()
+                currentPrefetchHandle = null
             }
         }
     }
@@ -368,6 +378,8 @@ class LazyListState constructor(
             result.firstVisibleItemScrollOffset != 0
 
         numMeasurePasses++
+
+        cancelPrefetchIfVisibleItemsChanged(result)
     }
 
     /**

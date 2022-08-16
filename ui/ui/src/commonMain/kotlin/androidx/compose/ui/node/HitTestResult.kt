@@ -28,8 +28,7 @@ import kotlin.math.sign
  * The List<T> interface should only be used after hit testing has completed.
  *
  * @see LayoutNode.hitTest
- * @see LayoutNodeWrapper.hitTest
- * @see PointerInputEntity.hitTest
+ * @see NodeCoordinator.hitTest
  */
 internal class HitTestResult<T> : List<T> {
     private var values = arrayOfNulls<Any>(16)

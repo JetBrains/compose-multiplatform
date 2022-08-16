@@ -53,6 +53,9 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.HitTestResult
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.OwnerScope
+import androidx.compose.ui.node.SemanticsModifierNode
+import androidx.compose.ui.node.collapsedSemanticsConfiguration
+import androidx.compose.ui.node.requireLayoutNode
 import androidx.compose.ui.platform.accessibility.hasCollectionInfo
 import androidx.compose.ui.platform.accessibility.setCollectionInfo
 import androidx.compose.ui.platform.accessibility.setCollectionItemInfo
@@ -69,7 +72,6 @@ import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.SemanticsPropertiesAndroid
-import androidx.compose.ui.semantics.SemanticsEntity
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.state.ToggleableState
@@ -387,6 +389,15 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         info: AccessibilityNodeInfoCompat,
         semanticsNode: SemanticsNode
     ) {
+        val isUnmergedLeafNode =
+            !semanticsNode.isFake &&
+            semanticsNode.replacedChildren.isEmpty() &&
+            semanticsNode.layoutNode.findClosestParentNode {
+                it.outerSemantics
+                    ?.collapsedSemanticsConfiguration()
+                    ?.isMergingSemanticsOfDescendants == true
+            } == null
+
         // set classname
         info.className = ClassName
         val role = semanticsNode.unmergedConfig.getOrNull(SemanticsProperties.Role)
@@ -403,21 +414,13 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         Role.Image -> "android.widget.ImageView"
                         else -> null
                     }
-                    if (role != Role.Image) {
+                    // Images are often minor children of larger widgets, so we only want to
+                    // announce the Image role when the image itself is focusable.
+                    if (role != Role.Image ||
+                        isUnmergedLeafNode ||
+                        semanticsNode.unmergedConfig.isMergingSemanticsOfDescendants
+                    ) {
                         info.className = className
-                    } else {
-                        // If ancestor of the image is a merging container (e.g. IconButton), we
-                        // don't want to announce Image role to avoid "Favorite, Image, Button"
-                        val ancestor = semanticsNode.layoutNode.findClosestParentNode { parent ->
-                            parent.outerSemantics
-                                ?.collapsedSemanticsConfiguration()
-                                ?.isMergingSemanticsOfDescendants == true
-                        }
-                        if (ancestor == null ||
-                            semanticsNode.unmergedConfig.isMergingSemanticsOfDescendants
-                        ) {
-                            info.className = className
-                        }
                     }
                 }
             }
@@ -522,10 +525,6 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             )?.firstOrNull()
         }
 
-        if (semanticsNode.unmergedConfig.isMergingSemanticsOfDescendants) {
-            info.isScreenReaderFocusable = true
-        }
-
         // Map testTag to resourceName if testTagsAsResourceId == true (which can be set by an ancestor)
         val testTag = semanticsNode.unmergedConfig.getOrNull(SemanticsProperties.TestTag)
         if (testTag != null) {
@@ -570,9 +569,9 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         val wrapperToCheckTransparency = if (semanticsNode.isFake) {
             // when node is fake, its parent that is the original semantics node should define the
             // alpha value
-            semanticsNode.parent?.findWrapperToGetBounds()
+            semanticsNode.parent?.findCoordinatorToGetBounds()
         } else {
-            semanticsNode.findWrapperToGetBounds()
+            semanticsNode.findCoordinatorToGetBounds()
         }
         val isTransparent = wrapperToCheckTransparency?.isTransparent() ?: false
         info.isVisibleToUser = !isTransparent &&
@@ -919,6 +918,13 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 labelToActionId.put(virtualViewId, currentLabelToActionId)
             }
         }
+
+        val isSpeakingNode = info.contentDescription != null || info.text != null ||
+            info.hintText != null || info.stateDescription != null || info.isCheckable
+
+        info.isScreenReaderFocusable =
+            semanticsNode.unmergedConfig.isMergingSemanticsOfDescendants ||
+            isUnmergedLeafNode && isSpeakingNode
     }
 
     /** Set the error text for this node */
@@ -1536,29 +1542,34 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     internal fun hitTestSemanticsAt(x: Float, y: Float): Int {
         view.measureAndLayout()
 
-        val hitSemanticsEntities = HitTestResult<SemanticsEntity>()
+        val hitSemanticsEntities = HitTestResult<SemanticsModifierNode>()
         view.root.hitTestSemantics(
             pointerPosition = Offset(x, y),
             hitSemanticsEntities = hitSemanticsEntities
         )
 
-        val wrapper = hitSemanticsEntities.lastOrNull()?.layoutNode?.outerSemantics
+        val wrapper = hitSemanticsEntities.lastOrNull()?.requireLayoutNode()?.outerSemantics
         var virtualViewId = InvalidId
         if (wrapper != null) {
 
             // The node below is not added to the tree; it's a wrapper around outer semantics to
             // use the methods available to the SemanticsNode
             val semanticsNode = SemanticsNode(wrapper, false)
-            val wrapperToCheckAlpha = semanticsNode.findWrapperToGetBounds()
+            val wrapperToCheckAlpha = semanticsNode.findCoordinatorToGetBounds()
 
             // Do not 'find' invisible nodes when exploring by touch. This will prevent us from
             // sending events for invisible nodes
             if (!semanticsNode.unmergedConfig.contains(SemanticsProperties.InvisibleToUser) &&
                 !wrapperToCheckAlpha.isTransparent()
             ) {
-                val androidView = view.androidViewsHandler.layoutNodeToHolder[wrapper.layoutNode]
+                val layoutNode = wrapper.requireLayoutNode()
+                val androidView = view
+                    .androidViewsHandler
+                    .layoutNodeToHolder[layoutNode]
                 if (androidView == null) {
-                    virtualViewId = semanticsNodeIdToAccessibilityVirtualNodeId(wrapper.modifier.id)
+                    virtualViewId = semanticsNodeIdToAccessibilityVirtualNodeId(
+                        layoutNode.semanticsId
+                    )
                 }
             }
         }
@@ -1695,6 +1706,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     private fun sendSubtreeChangeAccessibilityEvents(
         layoutNode: LayoutNode,
         subtreeChangedSemanticsNodesIds: ArraySet<Int>
@@ -1719,7 +1731,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     ?.isMergingSemanticsOfDescendants == true
             }?.outerSemantics?.let { semanticsWrapper = it }
         }
-        val id = semanticsWrapper.modifier.id
+        val id = semanticsWrapper.requireLayoutNode().semanticsId
         if (!subtreeChangedSemanticsNodesIds.add(id)) {
             return
         }
@@ -1854,8 +1866,9 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                                     AccessibilityEvent.TYPE_VIEW_SELECTED
                                 )
                                 // Here we use the merged node
+                                @OptIn(ExperimentalComposeUiApi::class)
                                 val mergedNode =
-                                    SemanticsNode(newNode.outerSemanticsEntity, true)
+                                    SemanticsNode(newNode.outerSemanticsNode, true)
                                 val contentDescription = mergedNode.config.getOrNull(
                                     SemanticsProperties.ContentDescription
                                 )?.fastJoinToString(",")
@@ -2498,6 +2511,7 @@ private val SemanticsNode.isPassword: Boolean get() = config.contains(SemanticsP
 private val SemanticsNode.isTextField get() = this.unmergedConfig.contains(SemanticsActions.SetText)
 private val SemanticsNode.isRtl get() = layoutInfo.layoutDirection == LayoutDirection.Rtl
 
+@OptIn(ExperimentalComposeUiApi::class)
 private fun SemanticsNode.excludeLineAndPageGranularities(): Boolean {
     // text field that is not in focus
     if (isTextField && unmergedConfig.getOrNull(SemanticsProperties.Focused) != true) return true

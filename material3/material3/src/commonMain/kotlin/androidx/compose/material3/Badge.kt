@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
  * @param content the anchor to which this badge will be positioned
  *
  */
+@ExperimentalMaterial3Api
 @Composable
 fun BadgedBox(
     badge: @Composable BoxScope.() -> Unit,
@@ -134,6 +135,7 @@ fun BadgedBox(
  * [containerColor] is not a color from the theme.
  * @param content optional content to be rendered inside this badge
  */
+@ExperimentalMaterial3Api
 @Composable
 fun Badge(
     modifier: Modifier = Modifier,
@@ -183,6 +185,7 @@ fun Badge(
 }
 
 /** Default values used for [Badge] implementations. */
+@ExperimentalMaterial3Api
 object BadgeDefaults {
     /** Default container color for a badge. */
     val containerColor: Color @Composable get() = BadgeTokens.Color.toColor()

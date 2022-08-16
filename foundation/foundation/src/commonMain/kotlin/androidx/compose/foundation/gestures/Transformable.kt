@@ -83,6 +83,8 @@ fun Modifier.transformable(
     }
 )
 
+// b/242023503 for a planned fix for the MultipleAwaitPointerEventScopes lint violation.
+@Suppress("MultipleAwaitPointerEventScopes")
 private suspend fun PointerInputScope.detectZoom(
     panZoomLock: State<Boolean>,
     state: State<TransformableState>

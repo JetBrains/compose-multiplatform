@@ -25,6 +25,7 @@ import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -39,8 +40,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertPixels
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
@@ -52,9 +55,12 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalDensity
@@ -798,6 +804,192 @@ class ScrollTest(private val config: Config) {
             ).inOrder()
         }
     }
+
+    @Test
+    fun minIntrinsic_mainAxis() {
+        var sizeParam by mutableStateOf(0)
+
+        val layoutModifier = object : LayoutModifier {
+            override fun MeasureScope.measure(
+                measurable: Measurable,
+                constraints: Constraints
+            ): MeasureResult {
+                val p = measurable.measure(constraints)
+                return layout(p.width, p.height) {
+                    p.place(0, 0)
+                }
+            }
+
+            override fun IntrinsicMeasureScope.minIntrinsicWidth(
+                measurable: IntrinsicMeasurable,
+                height: Int
+            ): Int {
+                sizeParam = height
+                return measurable.minIntrinsicWidth(height)
+            }
+
+            override fun IntrinsicMeasureScope.minIntrinsicHeight(
+                measurable: IntrinsicMeasurable,
+                width: Int
+            ): Int {
+                sizeParam = width
+                return measurable.minIntrinsicHeight(width)
+            }
+        }
+        rule.setContent {
+            Box(Modifier.intrinsicMainAxisSize(IntrinsicSize.Min)
+                .scrollerWithOrientation()
+                .then(layoutModifier)
+            )
+        }
+        rule.waitForIdle()
+        assertThat(sizeParam).isNotEqualTo(Constraints.Infinity)
+    }
+
+    @Test
+    fun minIntrinsic_crossAxis() {
+        var sizeParam by mutableStateOf(0)
+
+        val layoutModifier = object : LayoutModifier {
+            override fun MeasureScope.measure(
+                measurable: Measurable,
+                constraints: Constraints
+            ): MeasureResult {
+                val p = measurable.measure(constraints)
+                return layout(p.width, p.height) {
+                    p.place(0, 0)
+                }
+            }
+
+            override fun IntrinsicMeasureScope.minIntrinsicWidth(
+                measurable: IntrinsicMeasurable,
+                height: Int
+            ): Int {
+                sizeParam = height
+                return measurable.minIntrinsicWidth(height)
+            }
+
+            override fun IntrinsicMeasureScope.minIntrinsicHeight(
+                measurable: IntrinsicMeasurable,
+                width: Int
+            ): Int {
+                sizeParam = width
+                return measurable.minIntrinsicHeight(width)
+            }
+        }
+        rule.setContent {
+            Box(Modifier.intrinsicCrossAxisSize(IntrinsicSize.Min)
+                .scrollerWithOrientation()
+                .then(layoutModifier)
+            )
+        }
+        rule.waitForIdle()
+        assertThat(sizeParam).isEqualTo(Constraints.Infinity)
+    }
+
+    @Test
+    fun maxIntrinsic_mainAxis() {
+        var sizeParam by mutableStateOf(0)
+
+        val layoutModifier = object : LayoutModifier {
+            override fun MeasureScope.measure(
+                measurable: Measurable,
+                constraints: Constraints
+            ): MeasureResult {
+                val p = measurable.measure(constraints)
+                return layout(p.width, p.height) {
+                    p.place(0, 0)
+                }
+            }
+
+            override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+                measurable: IntrinsicMeasurable,
+                height: Int
+            ): Int {
+                sizeParam = height
+                return measurable.minIntrinsicWidth(height)
+            }
+
+            override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+                measurable: IntrinsicMeasurable,
+                width: Int
+            ): Int {
+                sizeParam = width
+                return measurable.minIntrinsicHeight(width)
+            }
+        }
+        rule.setContent {
+            Box(Modifier.intrinsicMainAxisSize(IntrinsicSize.Max)
+                .scrollerWithOrientation()
+                .then(layoutModifier)
+            )
+        }
+        rule.waitForIdle()
+        assertThat(sizeParam).isNotEqualTo(Constraints.Infinity)
+    }
+
+    @Test
+    fun maxIntrinsic_crossAxis() {
+        var sizeParam by mutableStateOf(0)
+
+        val layoutModifier = object : LayoutModifier {
+            override fun MeasureScope.measure(
+                measurable: Measurable,
+                constraints: Constraints
+            ): MeasureResult {
+                val p = measurable.measure(constraints)
+                return layout(p.width, p.height) {
+                    p.place(0, 0)
+                }
+            }
+
+            override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+                measurable: IntrinsicMeasurable,
+                height: Int
+            ): Int {
+                sizeParam = height
+                return measurable.minIntrinsicWidth(height)
+            }
+
+            override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+                measurable: IntrinsicMeasurable,
+                width: Int
+            ): Int {
+                sizeParam = width
+                return measurable.minIntrinsicHeight(width)
+            }
+        }
+        rule.setContent {
+            Box(Modifier.intrinsicCrossAxisSize(IntrinsicSize.Max)
+                .scrollerWithOrientation()
+                .then(layoutModifier)
+            )
+        }
+        rule.waitForIdle()
+        assertThat(sizeParam).isEqualTo(Constraints.Infinity)
+    }
+
+    private fun Modifier.intrinsicMainAxisSize(size: IntrinsicSize): Modifier =
+        if (config.orientation == Horizontal) {
+            width(size)
+        } else {
+            height(size)
+        }
+
+    private fun Modifier.intrinsicCrossAxisSize(size: IntrinsicSize): Modifier =
+        if (config.orientation == Vertical) {
+            width(size)
+        } else {
+            height(size)
+        }
+
+    @Composable
+    private fun Modifier.scrollerWithOrientation(): Modifier =
+        if (config.orientation == Vertical) {
+            verticalScroll(rememberScrollState())
+        } else {
+            horizontalScroll(rememberScrollState())
+        }
 
     /**
      * Swipes forward (up/left) or backward given the current orientation and layout direction

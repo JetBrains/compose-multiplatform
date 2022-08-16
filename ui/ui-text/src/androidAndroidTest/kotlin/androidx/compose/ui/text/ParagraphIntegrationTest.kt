@@ -36,7 +36,6 @@ import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.matchers.isZero
-import androidx.compose.ui.text.platform.AndroidParagraph
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
@@ -479,6 +478,30 @@ class ParagraphIntegrationTest {
     }
 
     @Test
+    fun getBoundingBox_rtl_singleLine() {
+        with(defaultDensity) {
+            val text = "\u05D0\u05D1\u05D2"
+            val fontSize = 50.sp
+            val fontSizeInPx = fontSize.toPx()
+            val paragraph = simpleParagraph(
+                text = text,
+                style = TextStyle(fontSize = fontSize),
+                width = text.length * fontSizeInPx
+            )
+
+            // test positions that are 0, 1, 2 ... which maps to chars 0, 1, 2 ...
+            for (c in 0 until text.length) {
+                val box = paragraph.getBoundingBox(c)
+                val i = text.length - 1 - c // take the opposite side for non-relative calculation
+                assertThat(box.left).isEqualTo(i * fontSizeInPx)
+                assertThat(box.right).isEqualTo((i + 1) * fontSizeInPx)
+                assertThat(box.top).isZero()
+                assertThat(box.bottom).isEqualTo(fontSizeInPx)
+            }
+        }
+    }
+
+    @Test
     fun getBoundingBox_ltr_multiLines() {
         with(defaultDensity) {
             val firstLine = "abc"
@@ -502,6 +525,78 @@ class ParagraphIntegrationTest {
                 assertThat(box.top).isEqualTo(fontSizeInPx)
                 assertThat(box.bottom).isEqualTo(2f * fontSizeInPx)
             }
+        }
+    }
+
+    @Test
+    fun getBoundingBox_rtl_multiLines() {
+        with(defaultDensity) {
+            val firstLine = "\u05D0\u05D1\u05D2"
+            val secondLine = "\u05D3\u05D4\u05D5"
+            val text = firstLine + secondLine
+            val fontSize = 50.sp
+            val fontSizeInPx = fontSize.toPx()
+            val paragraph = simpleParagraph(
+                text = text,
+                style = TextStyle(fontSize = fontSize),
+                width = firstLine.length * fontSizeInPx
+            )
+
+            // test positions are 3, 4, 5 and always on the second line
+            // which maps to chars 3, 4, 5
+            for (i in secondLine.indices) {
+                val textPosition = i + firstLine.length
+                val layoutPosition = secondLine.length - 1 - i
+                val box = paragraph.getBoundingBox(textPosition)
+                assertThat(box.left).isEqualTo(layoutPosition * fontSizeInPx)
+                assertThat(box.right).isEqualTo((layoutPosition + 1) * fontSizeInPx)
+                assertThat(box.top).isEqualTo(fontSizeInPx)
+                assertThat(box.bottom).isEqualTo(2f * fontSizeInPx)
+            }
+        }
+    }
+
+    @Test
+    fun getBoundingBox_ltr_multiLines_spaceAtTheEndOfLine() {
+        with(defaultDensity) {
+            val firstLine = "abc "
+            val secondLine = "def"
+            val text = firstLine + secondLine
+            val fontSize = 50.sp
+            val fontSizeInPx = fontSize.toPx()
+            val paragraph = simpleParagraph(
+                text = text,
+                style = TextStyle(fontSize = fontSize),
+                width = firstLine.length * fontSizeInPx
+            )
+
+            val box = paragraph.getBoundingBox(3)
+            assertThat(box.left).isEqualTo(3 * fontSizeInPx)
+            assertThat(box.right).isEqualTo(3 * fontSizeInPx)
+            assertThat(box.top).isEqualTo(0)
+            assertThat(box.bottom).isEqualTo(fontSizeInPx)
+        }
+    }
+
+    @Test
+    fun getBoundingBox_rtl_multiLines_spaceAtTheEndOfLine() {
+        with(defaultDensity) {
+            val firstLine = "\u05D0\u05D1\u05D2 "
+            val secondLine = "\u05D3\u05D4\u05D5"
+            val text = firstLine + secondLine
+            val fontSize = 50.sp
+            val fontSizeInPx = fontSize.toPx()
+            val paragraph = simpleParagraph(
+                text = text,
+                style = TextStyle(fontSize = fontSize),
+                width = firstLine.length * fontSizeInPx
+            )
+
+            val box = paragraph.getBoundingBox(3)
+            assertThat(box.left).isEqualTo(50)
+            assertThat(box.right).isEqualTo(50)
+            assertThat(box.top).isEqualTo(0)
+            assertThat(box.bottom).isEqualTo(fontSizeInPx)
         }
     }
 
@@ -1807,6 +1902,7 @@ class ParagraphIntegrationTest {
                 maxLines = maxLines
             )
 
+            assertThat(paragraph.lineCount).isEqualTo(maxLines)
             val expectFirstBaseline = 0.8f * fontSizeInPx
             assertThat(paragraph.firstBaseline).isEqualTo(expectFirstBaseline)
             val expectLastBaseline = (maxLines - 1) * fontSizeInPx + 0.8f * fontSizeInPx
@@ -1849,6 +1945,27 @@ class ParagraphIntegrationTest {
 
             val expectHeight = lineCount * fontSizeInPx
             assertThat(paragraph.height).isEqualTo(expectHeight)
+        }
+    }
+    @Test
+    fun maxLines_withMaxLineGreaterThanTextLines_haveCorrectBaselines() {
+        with(defaultDensity) {
+            val text = "a\na\na"
+            val fontSize = 100.sp
+            val fontSizeInPx = fontSize.toPx()
+            val lineCount = text.lines().size
+            val maxLines = lineCount + 1
+            val paragraph = simpleParagraph(
+                text = text,
+                style = TextStyle(fontSize = fontSize),
+                maxLines = maxLines
+            )
+
+            assertThat(paragraph.lineCount).isEqualTo(lineCount)
+            val expectFirstBaseline = 0.8f * fontSizeInPx
+            assertThat(paragraph.firstBaseline).isEqualTo(expectFirstBaseline)
+            val expectLastBaseline = (lineCount - 1) * fontSizeInPx + 0.8f * fontSizeInPx
+            assertThat(paragraph.lastBaseline).isEqualTo(expectLastBaseline)
         }
     }
 

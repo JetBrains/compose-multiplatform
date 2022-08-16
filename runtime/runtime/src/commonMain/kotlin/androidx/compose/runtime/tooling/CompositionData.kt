@@ -39,6 +39,14 @@ interface CompositionData {
      * doesn't contain any child groups.
      */
     val isEmpty: Boolean
+
+    /**
+     * Find a sub-group by identity. Returns `null` if the group is not found or the implementation
+     * of this interface does not support finding groups by their identity. In other words, a
+     * `null` result from this method should not be interpreted as the identity is not a group in
+     * the composition data.
+     */
+    fun find(identityToFind: Any): CompositionGroup? = null
 }
 
 /**

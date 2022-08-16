@@ -18,18 +18,23 @@ package androidx.compose.material3
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.TopAppBarDefaults.enterAlwaysScrollBehavior
+import androidx.compose.material3.tokens.TopAppBarSmallTokens
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
@@ -41,7 +46,7 @@ import org.junit.runner.RunWith
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalTestApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 class AppBarScreenshotTest {
 
     @get:Rule
@@ -79,6 +84,48 @@ class AppBarScreenshotTest {
         }
 
         assertAppBarAgainstGolden(goldenIdentifier = "smallAppBar_lightTheme")
+    }
+
+    @Test
+    fun smallAppBar_lightTheme_clipsWhenCollapsedWithInsets() {
+        composeTestRule.setMaterialContent(lightColorScheme()) {
+            val behavior = enterAlwaysScrollBehavior(rememberTopAppBarState())
+            Box(Modifier.testTag(TopAppBarTestTag)) {
+                SmallTopAppBar(
+                    navigationIcon = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
+                        }
+                    },
+                    scrollBehavior = behavior,
+                    windowInsets = WindowInsets(top = 30.dp),
+                    title = {
+                        Text("Title")
+                    },
+                    actions = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.Favorite,
+                                contentDescription = "Like"
+                            )
+                        }
+                    }
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithTag(TopAppBarTestTag).performTouchInput {
+            // start from the bottom so we can drag enough
+            down(bottomCenter - Offset(1f, 1f))
+            moveBy(Offset(0f, -((TopAppBarSmallTokens.ContainerHeight - 10.dp).toPx())))
+        }
+
+        assertAppBarAgainstGolden(
+            goldenIdentifier = "smallAppBar_lightTheme_clipsWhenCollapsedWithInsets"
+        )
     }
 
     @Test
@@ -303,7 +350,7 @@ class AppBarScreenshotTest {
         composeTestRule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(BottomAppBarTestTag)) {
                 BottomAppBar(
-                    icons = {
+                    actions = {
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(
                                 imageVector = Icons.Filled.Menu,
@@ -315,7 +362,7 @@ class AppBarScreenshotTest {
                         FloatingActionButton(
                             onClick = { /* do something */ },
                             containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-                            elevation = BottomAppBarDefaults.BottomAppBarFabElevation
+                            elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
                         ) {
                             Icon(Icons.Filled.Add, "Localized description")
                         }
@@ -335,7 +382,7 @@ class AppBarScreenshotTest {
         composeTestRule.setMaterialContent(darkColorScheme()) {
             Box(Modifier.testTag(BottomAppBarTestTag)) {
                 BottomAppBar(
-                    icons = {
+                    actions = {
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(
                                 imageVector = Icons.Filled.Menu,
@@ -347,7 +394,7 @@ class AppBarScreenshotTest {
                         FloatingActionButton(
                             onClick = { /* do something */ },
                             containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-                            elevation = BottomAppBarDefaults.BottomAppBarFabElevation
+                            elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
                         ) {
                             Icon(Icons.Filled.Add, "Localized description")
                         }

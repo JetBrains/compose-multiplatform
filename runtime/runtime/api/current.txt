@@ -963,6 +963,7 @@ package androidx.compose.runtime.snapshots {
 package androidx.compose.runtime.tooling {
 
   public interface CompositionData {
+    method public default androidx.compose.runtime.tooling.CompositionGroup? find(Object identityToFind);
     method public Iterable<androidx.compose.runtime.tooling.CompositionGroup> getCompositionGroups();
     method public boolean isEmpty();
     property public abstract Iterable<androidx.compose.runtime.tooling.CompositionGroup> compositionGroups;

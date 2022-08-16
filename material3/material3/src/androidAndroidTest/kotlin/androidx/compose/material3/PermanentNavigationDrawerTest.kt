@@ -17,7 +17,9 @@
 package androidx.compose.material3
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.tokens.NavigationDrawerTokens
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -27,6 +29,7 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -53,7 +56,13 @@ class PermanentNavigationDrawerTest {
         rule.setMaterialContent(lightColorScheme()) {
             PermanentNavigationDrawer(
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag("content"))
+                    PermanentDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("content")
+                        )
+                    }
                 },
                 content = {}
             )
@@ -64,12 +73,40 @@ class PermanentNavigationDrawerTest {
     }
 
     @Test
+    fun permanentNavigationDrawer_sheet_respectsContentPadding() {
+        rule.setMaterialContent(lightColorScheme()) {
+            PermanentNavigationDrawer(
+                drawerContent = {
+                    PermanentDrawerSheet(windowInsets = WindowInsets(13.dp, 13.dp, 13.dp, 13.dp)) {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("content")
+                        )
+                    }
+                },
+                content = {}
+            )
+        }
+
+        rule.onNodeWithTag("content")
+            .assertLeftPositionInRootIsEqualTo(13.dp)
+            .assertTopPositionInRootIsEqualTo(13.dp)
+    }
+
+    @Test
     fun permanentNavigationDrawer_testOffset_rtl() {
         rule.setMaterialContent(lightColorScheme()) {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 PermanentNavigationDrawer(
                     drawerContent = {
-                        Box(Modifier.fillMaxSize().testTag("content"))
+                        PermanentDrawerSheet {
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .testTag("content")
+                            )
+                        }
                     },
                     content = {}
                 )
@@ -87,7 +124,13 @@ class PermanentNavigationDrawerTest {
         rule.setMaterialContent(lightColorScheme()) {
             PermanentNavigationDrawer(
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag("content"))
+                    PermanentDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("content")
+                        )
+                    }
                 },
                 content = {}
             )
@@ -98,13 +141,40 @@ class PermanentNavigationDrawerTest {
     }
 
     @Test
+    fun permanentNavigationDrawer_testCustomWidth() {
+        rule.setMaterialContent(lightColorScheme()) {
+            PermanentNavigationDrawer(
+                drawerContent = {
+                    PermanentDrawerSheet(modifier = Modifier.width(260.dp)) {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("content")
+                        )
+                    }
+                },
+                content = {}
+            )
+        }
+
+        rule.onNodeWithTag("content")
+            .assertWidthIsEqualTo(260.dp)
+    }
+
+    @Test
     @SmallTest
     fun permanentNavigationDrawer_hasPaneTitle() {
         lateinit var navigationMenu: String
         rule.setMaterialContent(lightColorScheme()) {
             PermanentNavigationDrawer(
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag("navigationDrawerTag"))
+                    PermanentDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("navigationDrawerTag")
+                        )
+                    }
                 },
                 content = {}
             )

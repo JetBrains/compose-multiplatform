@@ -20,6 +20,8 @@ import androidx.annotation.Sampled
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.consumedWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -60,7 +62,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Sampled
 @Composable
 fun SimpleScaffoldWithTopBar() {
@@ -94,7 +96,11 @@ fun SimpleScaffoldWithTopBar() {
             }
         },
         content = { innerPadding ->
-            LazyColumn(contentPadding = innerPadding) {
+            LazyColumn(
+                // consume insets as scaffold doesn't do it by default (yet)
+                modifier = Modifier.consumedWindowInsets(innerPadding),
+                contentPadding = innerPadding
+            ) {
                 items(count = 100) {
                     Box(
                         Modifier
@@ -184,7 +190,7 @@ fun ScaffoldWithCustomSnackbar() {
         override val withDismissAction: Boolean
             get() = false
         override val duration: SnackbarDuration
-            get() = SnackbarDuration.Long
+            get() = SnackbarDuration.Indefinite
     }
 
     val snackbarHostState = remember { SnackbarHostState() }

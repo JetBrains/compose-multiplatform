@@ -51,6 +51,7 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -161,11 +162,15 @@ fun OutlinedTextField(
         BasicTextField(
             value = value,
             modifier = if (label != null) {
-                modifier.padding(top = OutlinedTextFieldTopPadding)
+                modifier
+                    // Merge semantics at the beginning of the modifier chain to ensure padding is
+                    // considered part of the text field.
+                    .semantics(mergeDescendants = true) {}
+                    .padding(top = OutlinedTextFieldTopPadding)
             } else {
                 modifier
             }
-                .background(colors.containerColor(enabled).value, shape)
+                .background(colors.containerColor().value, shape)
                 .defaultMinSize(
                     minWidth = TextFieldDefaults.MinWidth,
                     minHeight = TextFieldDefaults.MinHeight
@@ -306,11 +311,15 @@ fun OutlinedTextField(
         BasicTextField(
             value = value,
             modifier = if (label != null) {
-                modifier.padding(top = OutlinedTextFieldTopPadding)
+                modifier
+                    // Merge semantics at the beginning of the modifier chain to ensure padding is
+                    // considered part of the text field.
+                    .semantics(mergeDescendants = true) {}
+                    .padding(top = OutlinedTextFieldTopPadding)
             } else {
                 modifier
             }
-                .background(colors.containerColor(enabled).value, shape)
+                .background(colors.containerColor().value, shape)
                 .defaultMinSize(
                     minWidth = TextFieldDefaults.MinWidth,
                     minHeight = TextFieldDefaults.MinHeight

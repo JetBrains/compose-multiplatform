@@ -32,6 +32,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerIconService
+import androidx.compose.ui.modifier.ModifierLocalManager
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.modifier.modifierLocalProvider
@@ -279,9 +280,9 @@ class ModifierLocalConsumerEntityTest {
 
     private fun changeModifier(modifier: Modifier) {
         with(layoutNode) {
-            if (isAttached) { forEachLayoutNodeWrapper { it.detach() } }
+            if (isAttached) { forEachNodeCoordinator { it.detach() } }
             this.modifier = modifier
-            if (isAttached) { forEachLayoutNodeWrapper { it.attach() } }
+            if (isAttached) { forEachNodeCoordinator { it.attach() } }
             owner?.onEndApplyChanges()
         }
     }
@@ -292,6 +293,9 @@ class ModifierLocalConsumerEntityTest {
         @OptIn(InternalCoreApi::class)
         override var showLayoutBounds: Boolean = false
         override val snapshotObserver: OwnerSnapshotObserver = OwnerSnapshotObserver { it.invoke() }
+
+        override val modifierLocalManager: ModifierLocalManager = ModifierLocalManager(this)
+
         override fun registerOnEndApplyChangesListener(listener: () -> Unit) {
             listeners += listener
         }
@@ -311,8 +315,8 @@ class ModifierLocalConsumerEntityTest {
             affectsLookahead: Boolean,
             forceRequest: Boolean
         ) {}
-        override fun onAttach(node: LayoutNode) = node.forEachLayoutNodeWrapper { it.attach() }
-        override fun onDetach(node: LayoutNode) = node.forEachLayoutNodeWrapper { it.detach() }
+        override fun onAttach(node: LayoutNode) = node.forEachNodeCoordinator { it.attach() }
+        override fun onDetach(node: LayoutNode) = node.forEachNodeCoordinator { it.detach() }
 
         override val root: LayoutNode
             get() = TODO("Not yet implemented")
@@ -396,10 +400,10 @@ class ModifierLocalConsumerEntityTest {
     }
 }
 
-private fun LayoutNode.forEachLayoutNodeWrapper(action: (LayoutNodeWrapper) -> Unit) {
-    var layoutNodeWrapper: LayoutNodeWrapper? = outerLayoutNodeWrapper
-    while (layoutNodeWrapper != null) {
-        action.invoke(layoutNodeWrapper)
-        layoutNodeWrapper = layoutNodeWrapper.wrapped
+private fun LayoutNode.forEachNodeCoordinator(action: (NodeCoordinator) -> Unit) {
+    var coordinator: NodeCoordinator? = outerCoordinator
+    while (coordinator != null) {
+        action.invoke(coordinator)
+        coordinator = coordinator.wrapped
     }
 }

@@ -55,6 +55,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 @Sampled
@@ -66,9 +67,9 @@ fun TextTabs() {
         TabRow(selectedTabIndex = state) {
             titles.forEachIndexed { index, title ->
                 Tab(
-                    text = { Text(title) },
                     selected = state == index,
-                    onClick = { state = index }
+                    onClick = { state = index },
+                    text = { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) }
                 )
             }
         }
@@ -88,9 +89,9 @@ fun IconTabs() {
         TabRow(selectedTabIndex = state) {
             icons.forEachIndexed { index, icon ->
                 Tab(
-                    icon = { Icon(icon, contentDescription = "Favorite") },
                     selected = state == index,
-                    onClick = { state = index }
+                    onClick = { state = index },
+                    icon = { Icon(icon, contentDescription = "Favorite") }
                 )
             }
         }
@@ -114,10 +115,10 @@ fun TextAndIconTabs() {
         TabRow(selectedTabIndex = state) {
             titlesAndIcons.forEachIndexed { index, (title, icon) ->
                 Tab(
-                    text = { Text(title) },
-                    icon = { Icon(icon, contentDescription = null) },
                     selected = state == index,
-                    onClick = { state = index }
+                    onClick = { state = index },
+                    text = { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) },
+                    icon = { Icon(icon, contentDescription = null) }
                 )
             }
         }
@@ -141,10 +142,10 @@ fun LeadingIconTabs() {
         ScrollableTabRow(selectedTabIndex = state) {
             titlesAndIcons.forEachIndexed { index, (title, icon) ->
                 LeadingIconTab(
-                    text = { Text(title) },
-                    icon = { Icon(icon, contentDescription = null) },
                     selected = state == index,
-                    onClick = { state = index }
+                    onClick = { state = index },
+                    text = { Text(title) },
+                    icon = { Icon(icon, contentDescription = null) }
                 )
             }
         }
@@ -175,9 +176,9 @@ fun ScrollingTextTabs() {
         ScrollableTabRow(selectedTabIndex = state) {
             titles.forEachIndexed { index, title ->
                 Tab(
-                    text = { Text(title) },
                     selected = state == index,
-                    onClick = { state = index }
+                    onClick = { state = index },
+                    text = { Text(title) }
                 )
             }
         }
@@ -229,9 +230,9 @@ fun FancyIndicatorTabs() {
         ) {
             titles.forEachIndexed { index, title ->
                 Tab(
-                    text = { Text(title) },
                     selected = state == index,
-                    onClick = { state = index }
+                    onClick = { state = index },
+                    text = { Text(title) }
                 )
             }
         }
@@ -260,9 +261,9 @@ fun FancyIndicatorContainerTabs() {
         ) {
             titles.forEachIndexed { index, title ->
                 Tab(
-                    text = { Text(title) },
                     selected = state == index,
-                    onClick = { state = index }
+                    onClick = { state = index },
+                    text = { Text(title) }
                 )
             }
         }
@@ -300,9 +301,9 @@ fun ScrollingFancyIndicatorContainerTabs() {
         ) {
             titles.forEachIndexed { index, title ->
                 Tab(
-                    text = { Text(title) },
                     selected = state == index,
-                    onClick = { state = index }
+                    onClick = { state = index },
+                    text = { Text(title) }
                 )
             }
         }

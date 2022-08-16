@@ -207,4 +207,33 @@ class KeyframeAnimationTest {
         assertTrue(animation != animationAlteredEasing)
         assertTrue(animation != animationAlteredKeyframes)
     }
+
+    @Test
+    fun percentageBasedKeyFrames() {
+        val start = 0f
+        val end = start // the same
+        val fullTime = 400
+        val animation = keyframes<Float> {
+            durationMillis = fullTime
+            start atFraction 0.25f
+            0.5f atFraction 0.5f
+            0.8f atFraction 0.75f
+            end atFraction 1f
+        }.vectorize(Float.VectorConverter)
+
+        assertThat(animation.at(0)).isEqualTo(start)
+        assertThat(animation.at(250)).isEqualTo(0.65f)
+        assertThat(animation.at(fullTime.toLong())).isEqualTo(end)
+    }
+
+    @Test
+    fun percentageBasedKeyframesWithEasing() {
+        val animation = keyframes<Float> {
+            durationMillis = 100
+            0.5f atFraction 0.5f with FastOutSlowInEasing
+            1f atFraction 1f
+        }.vectorize(Float.VectorConverter)
+
+        assertThat(animation.at(25)).isEqualTo(0.25f)
+    }
 }

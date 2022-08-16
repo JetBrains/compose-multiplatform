@@ -18,11 +18,6 @@ package androidx.compose.material3.catalog.library.ui.common
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -34,9 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallTopAppBar
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.catalog.library.R
 import androidx.compose.runtime.Composable
@@ -44,8 +37,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -67,94 +58,76 @@ fun CatalogTopAppBar(
     onLicensesClick: () -> Unit = {}
 ) {
     var moreMenuExpanded by remember { mutableStateOf(false) }
-    val backgroundColors = TopAppBarDefaults.smallTopAppBarColors()
-    val backgroundColor = backgroundColors.containerColor(
-        colorTransitionFraction = scrollBehavior?.state?.overlappedFraction ?: 0f
-    ).value
-    val foregroundColors = TopAppBarDefaults.smallTopAppBarColors(
-        containerColor = Color.Transparent,
-        scrolledContainerColor = Color.Transparent
-    )
-    // Wrapping in a Surface to handle window insets
-    // https://issuetracker.google.com/issues/183161866
-    Surface(color = backgroundColor) {
-        SmallTopAppBar(
-            title = {
-                Text(
-                    text = title,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            },
-            actions = {
-                Box {
-                    Row {
-                        IconButton(onClick = onThemeClick) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_palette_24dp),
-                                contentDescription = null
-                            )
-                        }
-                        IconButton(onClick = { moreMenuExpanded = true }) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = null
-                            )
-                        }
-                    }
-                    MoreMenu(
-                        expanded = moreMenuExpanded,
-                        onDismissRequest = { moreMenuExpanded = false },
-                        onGuidelinesClick = {
-                            onGuidelinesClick()
-                            moreMenuExpanded = false
-                        },
-                        onDocsClick = {
-                            onDocsClick()
-                            moreMenuExpanded = false
-                        },
-                        onSourceClick = {
-                            onSourceClick()
-                            moreMenuExpanded = false
-                        },
-                        onIssueClick = {
-                            onIssueClick()
-                            moreMenuExpanded = false
-                        },
-                        onTermsClick = {
-                            onTermsClick()
-                            moreMenuExpanded = false
-                        },
-                        onPrivacyClick = {
-                            onPrivacyClick()
-                            moreMenuExpanded = false
-                        },
-                        onLicensesClick = {
-                            onLicensesClick()
-                            moreMenuExpanded = false
-                        }
-                    )
-                }
-            },
-            navigationIcon = {
-                if (showBackNavigationIcon) {
-                    IconButton(onClick = onBackClick) {
+    SmallTopAppBar(
+        title = {
+            Text(
+                text = title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        actions = {
+            Box {
+                Row {
+                    IconButton(onClick = onThemeClick) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            painter = painterResource(id = R.drawable.ic_palette_24dp),
+                            contentDescription = null
+                        )
+                    }
+                    IconButton(onClick = { moreMenuExpanded = true }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
                             contentDescription = null
                         )
                     }
                 }
-            },
-            scrollBehavior = scrollBehavior,
-            colors = foregroundColors,
-            modifier = Modifier.windowInsetsPadding(
-                WindowInsets.safeDrawing.only(
-                    WindowInsetsSides.Horizontal + WindowInsetsSides.Top
+                MoreMenu(
+                    expanded = moreMenuExpanded,
+                    onDismissRequest = { moreMenuExpanded = false },
+                    onGuidelinesClick = {
+                        onGuidelinesClick()
+                        moreMenuExpanded = false
+                    },
+                    onDocsClick = {
+                        onDocsClick()
+                        moreMenuExpanded = false
+                    },
+                    onSourceClick = {
+                        onSourceClick()
+                        moreMenuExpanded = false
+                    },
+                    onIssueClick = {
+                        onIssueClick()
+                        moreMenuExpanded = false
+                    },
+                    onTermsClick = {
+                        onTermsClick()
+                        moreMenuExpanded = false
+                    },
+                    onPrivacyClick = {
+                        onPrivacyClick()
+                        moreMenuExpanded = false
+                    },
+                    onLicensesClick = {
+                        onLicensesClick()
+                        moreMenuExpanded = false
+                    }
                 )
-            )
-        )
-    }
+            }
+        },
+        navigationIcon = {
+            if (showBackNavigationIcon) {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = null
+                    )
+                }
+            }
+        },
+        scrollBehavior = scrollBehavior
+    )
 }
 
 @Composable

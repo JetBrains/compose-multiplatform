@@ -27,6 +27,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerIconService
+import androidx.compose.ui.modifier.ModifierLocalManager
 import androidx.compose.ui.platform.AccessibilityManager
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
@@ -259,6 +260,8 @@ internal interface Owner {
      * automatically when the snapshot value has been changed.
      */
     val snapshotObserver: OwnerSnapshotObserver
+
+    val modifierLocalManager: ModifierLocalManager
 
     /**
      * Registers a call to be made when the [Applier.onEndChanges] is called. [listener]

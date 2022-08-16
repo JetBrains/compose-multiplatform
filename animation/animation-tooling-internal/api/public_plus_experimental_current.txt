@@ -26,9 +26,17 @@ package androidx.compose.animation.tooling {
   public enum ComposeAnimationType {
     method public static androidx.compose.animation.tooling.ComposeAnimationType valueOf(String name) throws java.lang.IllegalArgumentException;
     method public static androidx.compose.animation.tooling.ComposeAnimationType[] values();
+    enum_constant public static final androidx.compose.animation.tooling.ComposeAnimationType ANIMATABLE;
+    enum_constant public static final androidx.compose.animation.tooling.ComposeAnimationType ANIMATED_CONTENT;
     enum_constant public static final androidx.compose.animation.tooling.ComposeAnimationType ANIMATED_VALUE;
     enum_constant public static final androidx.compose.animation.tooling.ComposeAnimationType ANIMATED_VISIBILITY;
+    enum_constant public static final androidx.compose.animation.tooling.ComposeAnimationType ANIMATE_CONTENT_SIZE;
+    enum_constant public static final androidx.compose.animation.tooling.ComposeAnimationType ANIMATE_X_AS_STATE;
+    enum_constant public static final androidx.compose.animation.tooling.ComposeAnimationType DECAY_ANIMATION;
+    enum_constant public static final androidx.compose.animation.tooling.ComposeAnimationType INFINITE_TRANSITION;
+    enum_constant public static final androidx.compose.animation.tooling.ComposeAnimationType TARGET_BASED_ANIMATION;
     enum_constant public static final androidx.compose.animation.tooling.ComposeAnimationType TRANSITION_ANIMATION;
+    enum_constant public static final androidx.compose.animation.tooling.ComposeAnimationType UNSUPPORTED;
   }
 
   public final class TransitionInfo {

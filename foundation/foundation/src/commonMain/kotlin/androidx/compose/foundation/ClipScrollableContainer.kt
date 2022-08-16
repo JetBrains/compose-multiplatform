@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
  *
  * @param orientation orientation of the scrolling
  */
-@ExperimentalFoundationApi
 fun Modifier.clipScrollableContainer(orientation: Orientation) =
     then(
         if (orientation == Orientation.Vertical) {

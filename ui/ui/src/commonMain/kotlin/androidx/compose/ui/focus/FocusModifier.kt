@@ -42,7 +42,7 @@ import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.modifier.ProvidableModifierLocal
 import androidx.compose.ui.modifier.modifierLocalOf
-import androidx.compose.ui.node.LayoutNodeWrapper
+import androidx.compose.ui.node.NodeCoordinator
 import androidx.compose.ui.node.OwnerScope
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
@@ -87,7 +87,7 @@ internal class FocusModifier(
     var focusPropertiesModifier: FocusPropertiesModifier? = null
     val focusProperties: FocusProperties = FocusPropertiesImpl()
     var focusRequester: FocusRequesterModifierLocal? = null
-    var layoutNodeWrapper: LayoutNodeWrapper? = null
+    var coordinator: NodeCoordinator? = null
     var focusRequestedOnPlaced = false
 
     /**
@@ -111,7 +111,7 @@ internal class FocusModifier(
                 if (newParent != parent) {
                     if (newParent == null) {
                         when (focusState) {
-                            Active, Captured -> layoutNodeWrapper?.layoutNode?.owner
+                            Active, Captured -> coordinator?.layoutNode?.owner
                                 ?.focusManager?.clearFocus(force = true)
                             ActiveParent, DeactivatedParent, Deactivated, Inactive -> {
                                 // do nothing.
@@ -167,8 +167,8 @@ internal class FocusModifier(
         get() = this
 
     override fun onPlaced(coordinates: LayoutCoordinates) {
-        val wasNull = layoutNodeWrapper == null
-        layoutNodeWrapper = coordinates as LayoutNodeWrapper
+        val wasNull = coordinator == null
+        coordinator = coordinates as NodeCoordinator
         if (wasNull) {
             refreshFocusProperties()
         }

@@ -27,6 +27,7 @@ val TextDemos = DemoCategory(
         ComposableDemo("Brush") { TextBrushDemo() },
         ComposableDemo("Ellipsize") { EllipsizeDemo() },
         ComposableDemo("Typeface") { TypefaceDemo() },
+        ComposableDemo("Variable Fonts") { VariableFontsDemo() },
         ComposableDemo("FontFamily fallback") { FontFamilyDemo() },
         ComposableDemo("All system font families") { SystemFontFamilyDemo() },
         ComposableDemo("Text selection") { TextSelectionDemo() },
@@ -36,6 +37,7 @@ val TextDemos = DemoCategory(
         ComposableDemo("Layout Reuse") { TextReuseLayoutDemo() },
         ComposableDemo("Line Height Behavior") { TextLineHeightDemo() },
         ComposableDemo("Interactive text") { InteractiveTextDemo() },
+        ComposableDemo("Ellipsize and letterspacing") { EllipsizeWithLetterSpacing() },
         DemoCategory(
             "Input fields",
             listOf(

@@ -80,7 +80,7 @@ private val DefaultColor = Color.Black
  * @see ParagraphStyle
  */
 @Immutable
-class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
+class SpanStyle internal constructor(
     // The fill to draw text, a unified representation of Color and Brush.
     internal val textDrawStyle: TextDrawStyle,
     val fontSize: TextUnit = TextUnit.Unspecified,
@@ -96,9 +96,7 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
     val background: Color = Color.Unspecified,
     val textDecoration: TextDecoration? = null,
     val shadow: Shadow? = null,
-    @ExperimentalTextApi
-    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
-    @get:ExperimentalTextApi val platformStyle: PlatformSpanStyle? = null
+    val platformStyle: PlatformSpanStyle? = null
 ) {
 
     /**
@@ -133,7 +131,6 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
      * @see TextStyle
      * @see ParagraphStyle
      */
-    @OptIn(ExperimentalTextApi::class)
     constructor(
         color: Color = Color.Unspecified,
         fontSize: TextUnit = TextUnit.Unspecified,
@@ -200,7 +197,6 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
      * @see TextStyle
      * @see ParagraphStyle
      */
-    @ExperimentalTextApi
     constructor(
         color: Color = Color.Unspecified,
         fontSize: TextUnit = TextUnit.Unspecified,
@@ -339,7 +335,6 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
      *
      * If the given span style is null, returns this span style.
      */
-    @OptIn(ExperimentalTextApi::class)
     @Stable
     fun merge(other: SpanStyle? = null): SpanStyle {
         if (other == null) return this
@@ -367,7 +362,6 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
         )
     }
 
-    @OptIn(ExperimentalTextApi::class)
     private fun mergePlatformStyle(other: PlatformSpanStyle?): PlatformSpanStyle? {
         if (platformStyle == null) return other
         if (other == null) return platformStyle
@@ -380,7 +374,6 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
     @Stable
     operator fun plus(other: SpanStyle): SpanStyle = this.merge(other)
 
-    @OptIn(ExperimentalTextApi::class)
     fun copy(
         color: Color = this.color,
         fontSize: TextUnit = this.fontSize,
@@ -416,7 +409,6 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
         )
     }
 
-    @ExperimentalTextApi
     fun copy(
         color: Color = this.color,
         fontSize: TextUnit = this.fontSize,
@@ -491,14 +483,13 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
         )
     }
 
-    override operator fun equals(other: Any?): Boolean {
+    override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is SpanStyle) return false
         return hasSameLayoutAffectingAttributes(other) &&
             hasSameNonLayoutAttributes(other)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     internal fun hasSameLayoutAffectingAttributes(other: SpanStyle): Boolean {
         if (this === other) return true
         if (fontSize != other.fontSize) return false
@@ -545,7 +536,6 @@ class SpanStyle @OptIn(ExperimentalTextApi::class) internal constructor(
         return result
     }
 
-    @OptIn(ExperimentalTextApi::class)
     internal fun hashCodeLayoutAffectingAttributes(): Int {
         var result = fontSize.hashCode()
         result = 31 * result + (fontWeight?.hashCode() ?: 0)
@@ -614,7 +604,6 @@ internal fun <T> lerpDiscrete(a: T, b: T, fraction: Float): T = if (fraction < 0
  * between [start] and [stop]. The interpolation can be extrapolated beyond 0.0 and
  * 1.0, so negative values and values greater than 1.0 are valid.
  */
-@OptIn(ExperimentalTextApi::class)
 fun lerp(start: SpanStyle, stop: SpanStyle, fraction: Float): SpanStyle {
     return SpanStyle(
         textDrawStyle = lerp(start.textDrawStyle, stop.textDrawStyle, fraction),
@@ -679,7 +668,6 @@ fun lerp(start: SpanStyle, stop: SpanStyle, fraction: Float): SpanStyle {
     )
 }
 
-@OptIn(ExperimentalTextApi::class)
 private fun lerpPlatformStyle(
     start: PlatformSpanStyle?,
     stop: PlatformSpanStyle?,
@@ -691,7 +679,6 @@ private fun lerpPlatformStyle(
     return lerp(startNonNull, stopNonNull, fraction)
 }
 
-@OptIn(ExperimentalTextApi::class)
 internal fun resolveSpanStyleDefaults(style: SpanStyle) = SpanStyle(
     textDrawStyle = style.textDrawStyle.takeOrElse { TextDrawStyle.from(DefaultColor) },
     fontSize = if (style.fontSize.isUnspecified) DefaultFontSize else style.fontSize,

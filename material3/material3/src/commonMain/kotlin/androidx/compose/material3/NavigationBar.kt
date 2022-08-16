@@ -27,9 +27,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.ripple.rememberRipple
@@ -56,6 +60,7 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -87,6 +92,7 @@ import kotlin.math.roundToInt
  * @param tonalElevation when [containerColor] is [ColorScheme.surface], a translucent primary color
  * overlay is applied on top of the container. A higher tonal elevation value will result in a
  * darker color in light theme and lighter color in dark theme. See also: [Surface].
+ * @param windowInsets a window insets of the navigation bar.
  * @param content the content of this navigation bar, typically 3-5 [NavigationBarItem]s
  */
 @Composable
@@ -95,6 +101,7 @@ fun NavigationBar(
     containerColor: Color = NavigationBarDefaults.containerColor,
     contentColor: Color = MaterialTheme.colorScheme.contentColorFor(containerColor),
     tonalElevation: Dp = NavigationBarDefaults.Elevation,
+    windowInsets: WindowInsets = NavigationBarDefaults.windowInsets,
     content: @Composable RowScope.() -> Unit
 ) {
     Surface(
@@ -104,7 +111,11 @@ fun NavigationBar(
         modifier = modifier
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().height(NavigationBarHeight).selectableGroup(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .windowInsetsPadding(windowInsets)
+                .height(NavigationBarHeight)
+                .selectableGroup(),
             horizontalArrangement = Arrangement.spacedBy(NavigationBarItemHorizontalPadding),
             content = content
         )
@@ -139,11 +150,11 @@ fun NavigationBar(
  * @param label optional text label for this item
  * @param alwaysShowLabel whether to always show the label for this item. If `false`, the label will
  * only be shown when this item is selected.
+ * @param colors [NavigationBarItemColors] that will be used to resolve the colors used for this
+ * item in different states. See [NavigationBarItemDefaults.colors].
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
  * for this item. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this item in different states.
- * @param colors [NavigationBarItemColors] that will be used to resolve the colors used for this
- * item in different states. See [NavigationBarItemDefaults.colors].
  */
 @Composable
 fun RowScope.NavigationBarItem(
@@ -154,12 +165,16 @@ fun RowScope.NavigationBarItem(
     enabled: Boolean = true,
     label: @Composable (() -> Unit)? = null,
     alwaysShowLabel: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    colors: NavigationBarItemColors = NavigationBarItemDefaults.colors()
+    colors: NavigationBarItemColors = NavigationBarItemDefaults.colors(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     val styledIcon = @Composable {
         val iconColor by colors.iconColor(selected = selected)
-        CompositionLocalProvider(LocalContentColor provides iconColor, content = icon)
+        // If there's a label, don't have a11y services repeat the icon description.
+        val clearSemantics = label != null && (alwaysShowLabel || selected)
+        Box(modifier = if (clearSemantics) Modifier.clearAndSetSemantics {} else Modifier) {
+            CompositionLocalProvider(LocalContentColor provides iconColor, content = icon)
+        }
     }
 
     val styledLabel: @Composable (() -> Unit)? = label?.let {
@@ -214,14 +229,16 @@ fun RowScope.NavigationBarItem(
         // ripple, which is why they are separate composables
         val indicatorRipple = @Composable {
             Box(
-                Modifier.layoutId(IndicatorRippleLayoutIdTag)
+                Modifier
+                    .layoutId(IndicatorRippleLayoutIdTag)
                     .clip(NavigationBarTokens.ActiveIndicatorShape.toShape())
                     .indication(offsetInteractionSource, rememberRipple())
             )
         }
         val indicator = @Composable {
             Box(
-                Modifier.layoutId(IndicatorLayoutIdTag)
+                Modifier
+                    .layoutId(IndicatorLayoutIdTag)
                     .background(
                         color = colors.indicatorColor.copy(alpha = animationProgress),
                         shape = NavigationBarTokens.ActiveIndicatorShape.toShape(),
@@ -247,6 +264,14 @@ object NavigationBarDefaults {
 
     /** Default color for a navigation bar. */
     val containerColor: Color @Composable get() = NavigationBarTokens.ContainerColor.toColor()
+
+    /**
+     * Default window insets to be used and consumed by navigation bar
+     */
+    val windowInsets: WindowInsets
+        @Composable
+        get() = WindowInsets.safeDrawingForVisualComponents
+            .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
 }
 
 /** Defaults used in [NavigationBarItem]. */
@@ -257,46 +282,48 @@ object NavigationBarItemDefaults {
      * specification.
      *
      * @param selectedIconColor the color to use for the icon when the item is selected.
-     * @param unselectedIconColor the color to use for the icon when the item is unselected.
      * @param selectedTextColor the color to use for the text label when the item is selected.
-     * @param unselectedTextColor the color to use for the text label when the item is unselected.
      * @param indicatorColor the color to use for the indicator when the item is selected.
+     * @param unselectedIconColor the color to use for the icon when the item is unselected.
+     * @param unselectedTextColor the color to use for the text label when the item is unselected.
      * @return the resulting [NavigationBarItemColors] used for [NavigationBarItem]
      */
     @Composable
     fun colors(
         selectedIconColor: Color = NavigationBarTokens.ActiveIconColor.toColor(),
-        unselectedIconColor: Color = NavigationBarTokens.InactiveIconColor.toColor(),
         selectedTextColor: Color = NavigationBarTokens.ActiveLabelTextColor.toColor(),
-        unselectedTextColor: Color = NavigationBarTokens.InactiveLabelTextColor.toColor(),
         indicatorColor: Color = NavigationBarTokens.ActiveIndicatorColor.toColor(),
-    ): NavigationBarItemColors = remember(
-        selectedIconColor,
-        unselectedIconColor,
-        selectedTextColor,
-        unselectedTextColor,
-        indicatorColor
-    ) {
-        DefaultNavigationBarItemColors(
-            selectedIconColor = selectedIconColor,
-            unselectedIconColor = unselectedIconColor,
-            selectedTextColor = selectedTextColor,
-            unselectedTextColor = unselectedTextColor,
-            selectedIndicatorColor = indicatorColor,
-        )
-    }
+        unselectedIconColor: Color = NavigationBarTokens.InactiveIconColor.toColor(),
+        unselectedTextColor: Color = NavigationBarTokens.InactiveLabelTextColor.toColor(),
+    ): NavigationBarItemColors = NavigationBarItemColors(
+        selectedIconColor = selectedIconColor,
+        selectedTextColor = selectedTextColor,
+        selectedIndicatorColor = indicatorColor,
+        unselectedIconColor = unselectedIconColor,
+        unselectedTextColor = unselectedTextColor,
+    )
 }
 
-/** Represents the colors of the various elements of a navigation item. */
 @Stable
-interface NavigationBarItemColors {
+class NavigationBarItemColors internal constructor(
+    private val selectedIconColor: Color,
+    private val selectedTextColor: Color,
+    private val selectedIndicatorColor: Color,
+    private val unselectedIconColor: Color,
+    private val unselectedTextColor: Color,
+) {
     /**
      * Represents the icon color for this item, depending on whether it is [selected].
      *
      * @param selected whether the item is selected
      */
     @Composable
-    fun iconColor(selected: Boolean): State<Color>
+    internal fun iconColor(selected: Boolean): State<Color> {
+        return animateColorAsState(
+            targetValue = if (selected) selectedIconColor else unselectedIconColor,
+            animationSpec = tween(ItemAnimationDurationMillis)
+        )
+    }
 
     /**
      * Represents the text color for this item, depending on whether it is [selected].
@@ -304,40 +331,38 @@ interface NavigationBarItemColors {
      * @param selected whether the item is selected
      */
     @Composable
-    fun textColor(selected: Boolean): State<Color>
-
-    /** Represents the color of the indicator used for selected items. */
-    val indicatorColor: Color
-        @Composable get
-}
-
-@Stable
-private class DefaultNavigationBarItemColors(
-    private val selectedIconColor: Color,
-    private val unselectedIconColor: Color,
-    private val selectedTextColor: Color,
-    private val unselectedTextColor: Color,
-    private val selectedIndicatorColor: Color,
-) : NavigationBarItemColors {
-    @Composable
-    override fun iconColor(selected: Boolean): State<Color> {
-        return animateColorAsState(
-            targetValue = if (selected) selectedIconColor else unselectedIconColor,
-            animationSpec = tween(ItemAnimationDurationMillis)
-        )
-    }
-
-    @Composable
-    override fun textColor(selected: Boolean): State<Color> {
+    internal fun textColor(selected: Boolean): State<Color> {
         return animateColorAsState(
             targetValue = if (selected) selectedTextColor else unselectedTextColor,
             animationSpec = tween(ItemAnimationDurationMillis)
         )
     }
 
-    override val indicatorColor: Color
-        @Composable
+    /** Represents the color of the indicator used for selected items. */
+    internal val indicatorColor: Color
         get() = selectedIndicatorColor
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || other !is NavigationBarItemColors) return false
+
+        if (selectedIconColor != other.selectedIconColor) return false
+        if (unselectedIconColor != other.unselectedIconColor) return false
+        if (selectedTextColor != other.selectedTextColor) return false
+        if (unselectedTextColor != other.unselectedTextColor) return false
+        if (selectedIndicatorColor != other.selectedIndicatorColor) return false
+
+        return true
+    }
+    override fun hashCode(): Int {
+        var result = selectedIconColor.hashCode()
+        result = 31 * result + unselectedIconColor.hashCode()
+        result = 31 * result + selectedTextColor.hashCode()
+        result = 31 * result + unselectedTextColor.hashCode()
+        result = 31 * result + selectedIndicatorColor.hashCode()
+
+        return result
+    }
 }
 
 /**
@@ -372,7 +397,8 @@ private fun NavigationBarItemBaselineLayout(
 
         if (label != null) {
             Box(
-                Modifier.layoutId(LabelLayoutIdTag)
+                Modifier
+                    .layoutId(LabelLayoutIdTag)
                     .alpha(if (alwaysShowLabel) 1f else animationProgress)
                     .padding(horizontal = NavigationBarItemHorizontalPadding / 2)
             ) { label() }

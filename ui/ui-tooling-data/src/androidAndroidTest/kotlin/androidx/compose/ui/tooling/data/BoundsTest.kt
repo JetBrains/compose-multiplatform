@@ -93,6 +93,7 @@ class BoundsTest : ToolingTest() {
     @Test
     fun testBoundsWithoutParsingParameters() {
         val lefts = mutableMapOf<String, Dp>()
+        val anchors = mutableMapOf<String, Any?>()
         val slotTableRecord = CompositionDataRecord.create()
         show {
             Inspectable(slotTableRecord) {
@@ -105,10 +106,11 @@ class BoundsTest : ToolingTest() {
         }
 
         activityTestRule.runOnUiThread {
-            slotTableRecord.store.first().mapTree<Any>({ _, context, _ ->
+            slotTableRecord.store.first().mapTree<Any>({ group, context, _ ->
                 if (context.location?.sourceFile == "BoundsTest.kt") {
                     with(Density(activityTestRule.activity)) {
                         lefts[context.name!!] = context.bounds.left.toDp()
+                        anchors[context.name!!] = group.identity
                     }
                 }
             })
@@ -116,6 +118,11 @@ class BoundsTest : ToolingTest() {
             assertThat(lefts["Box"]?.value).isWithin(1f).of(0f)
             assertThat(lefts["Column"]?.value).isWithin(1f).of(10f)
             assertThat(lefts["Text"]?.value).isWithin(0.5f).of(15f)
+
+            val textAnchor = anchors["Text"]
+            val textGroup = slotTableRecord.store.first().find(textAnchor!!)!!
+            val textParams = textGroup.findParameters()
+            assertThat(textParams.find { it.name == "text" }?.value).isEqualTo("Hello")
         }
     }
 

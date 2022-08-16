@@ -17,7 +17,7 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="indeterminate" msgid="2486394087603402002">"未勾選或者未取消勾選"</string>
+    <string name="indeterminate" msgid="7933458017204019916">"部分剔咗"</string>
     <string name="on" msgid="8655164131929253426">"開"</string>
     <string name="off" msgid="875452955155264703">"閂"</string>
     <string name="selected" msgid="6043586758067023">"揀咗"</string>

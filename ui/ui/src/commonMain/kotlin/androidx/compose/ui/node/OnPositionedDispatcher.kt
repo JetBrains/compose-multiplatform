@@ -48,6 +48,8 @@ internal class OnPositionedDispatcher {
     }
 
     private fun dispatchHierarchy(layoutNode: LayoutNode) {
+        // TODO(lmr): investigate a non-recursive version of this that leverages
+        //  node traversal
         layoutNode.dispatchOnPositionedCallbacks()
         layoutNode.needsOnPositionedDispatch = false
 

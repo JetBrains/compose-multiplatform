@@ -24,6 +24,10 @@ import kotlinx.metadata.ClassName
 object Names {
     object Animation {
         val PackageName = Package("androidx.compose.animation")
+        object Core {
+            val PackageName = Package("androidx.compose.animation.core")
+            val Animatable = Name(PackageName, "Animatable")
+        }
     }
     object AnimationCore {
         val PackageName = Package("androidx.compose.animation.core")
@@ -34,6 +38,7 @@ object Names {
         val Composable = Name(PackageName, "Composable")
         val CompositionLocal = Name(PackageName, "CompositionLocal")
         val DerivedStateOf = Name(PackageName, "derivedStateOf")
+        val State = Name(PackageName, "State")
         val MutableState = Name(PackageName, "MutableState")
         val MutableStateOf = Name(PackageName, "mutableStateOf")
         val MutableStateListOf = Name(PackageName, "mutableStateListOf")
@@ -49,7 +54,20 @@ object Names {
             val PackageName = Package("androidx.compose.ui.layout")
             val ParentDataModifier = Name(PackageName, "ParentDataModifier")
         }
+
+        object Pointer {
+            val PackageName = Package(Ui.PackageName, "input.pointer")
+            val PointerInputScope = Name(PackageName, "PointerInputScope")
+            val PointerInputScopeModifier = Name(PackageName, "pointerInput")
+            val AwaitPointerEventScope = Name(PackageName, "awaitPointerEventScope")
+        }
+
+        object Unit {
+            val PackageName = Package("androidx.compose.ui.unit")
+            val Dp = Name(PackageName, "Dp")
+        }
     }
+
     object UiGraphics {
         val PackageName = Package("androidx.compose.ui.graphics")
         val Color = Name(PackageName, "Color")

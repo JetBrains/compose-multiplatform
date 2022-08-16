@@ -61,6 +61,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -974,6 +975,89 @@ class LookaheadLayoutTest {
                 }
             }
         }
+    }
+
+    @Test
+    fun lookaheadLayoutTransformFrom() {
+        val matrix = Matrix()
+        rule.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(1f)) {
+                LookaheadLayout(
+                    measurePolicy = { measurables, constraints ->
+                        val placeable = measurables[0].measure(constraints)
+                        // Position the children.
+                        layout(placeable.width + 10, placeable.height + 10) {
+                            placeable.place(10, 10)
+                        }
+                    },
+                    content = {
+                        Box(
+                            Modifier
+                                .onPlaced { lookaheadScopeCoordinates, layoutCoordinates ->
+                                    layoutCoordinates.transformFrom(
+                                        lookaheadScopeCoordinates,
+                                        matrix
+                                    )
+                                }
+                                .size(10.dp))
+                    }
+                )
+            }
+        }
+        rule.waitForIdle()
+        val posInChild = matrix.map(Offset(10f, 10f))
+        assertEquals(Offset.Zero, posInChild)
+    }
+
+    @Test
+    fun multiMeasureLayoutInLookahead() {
+        var horizontal by mutableStateOf(true)
+        rule.setContent {
+            MyLookaheadLayout {
+                @Suppress("DEPRECATION")
+                MultiMeasureLayout(
+                    content = {
+                        if (horizontal) {
+                            Row {
+                                repeat(3) {
+                                    Box(
+                                        Modifier
+                                            .weight(1f)
+                                            .background(Color.Red)
+                                    )
+                                }
+                            }
+                        } else {
+                            Column {
+                                repeat(3) {
+                                    Box(
+                                        Modifier
+                                            .weight(1f)
+                                            .background(Color.Red)
+                                    )
+                                }
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize(0.6f),
+                    measurePolicy = MeasurePolicy { measurables, constraints ->
+                        // Intentionally measure twice here to ensure multi-measure is supported.
+                        measurables.map { it.measure(Constraints.fixed(200, 300)) }
+                        val placeables = measurables.map { it.measure(constraints) }
+                        val maxWidth: Int = placeables.maxOf { it.width }
+                        val maxHeight = placeables.maxOf { it.height }
+                        // Position the children.
+                        layout(maxWidth, maxHeight) {
+                            placeables.forEach {
+                                it.place(0, 0)
+                            }
+                        }
+                    })
+            }
+        }
+        rule.runOnIdle { horizontal = !horizontal }
+        rule.runOnIdle { horizontal = !horizontal }
+        rule.waitForIdle()
     }
 
     private fun assertSameLayoutWithAndWithoutLookahead(

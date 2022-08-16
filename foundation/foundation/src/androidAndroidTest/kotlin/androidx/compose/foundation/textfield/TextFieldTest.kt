@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -58,6 +59,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.toPixelMap
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.NativeKeyEvent
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
@@ -84,8 +87,10 @@ import androidx.compose.ui.test.isFocused
 import androidx.compose.ui.test.isNotFocused
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performKeyPress
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextClearance
@@ -994,6 +999,36 @@ class TextFieldTest {
         }
     }
 
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun textField_stringOverload_doesNotCallOnValueChange_ifSelectionInherentlyChanges() {
+        var callbackCounter = 0
+        val text = mutableStateOf("ABCDE")
+
+        rule.setContent {
+            BasicTextField(
+                value = text.value,
+                onValueChange = {
+                    callbackCounter += 1
+                    text.value = it
+                },
+                modifier = Modifier.testTag("tag")
+            )
+        }
+
+        rule.onNodeWithTag("tag").performTextInputSelection(TextRange(0, 4))
+        rule.waitForIdle()
+
+        text.value = ""
+        rule.waitForIdle()
+
+        text.value = "ABCDE"
+
+        rule.runOnIdle {
+            assertThat(callbackCounter).isEqualTo(0)
+        }
+    }
+
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun textField_textAlignCenter_defaultWidth() {
@@ -1093,6 +1128,165 @@ class TextFieldTest {
 
         rule.waitForIdle()
         rule.onNodeWithTag(Tag).captureToImage().assertCentered(fontSize)
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun whenSelectedTextIsRemoved_SelectionCoerces() {
+        val textFieldValue = mutableStateOf("Hello")
+        rule.setContent {
+            BasicTextField(
+                value = textFieldValue.value,
+                onValueChange = {
+                    textFieldValue.value = it
+                },
+                modifier = Modifier.testTag(Tag).wrapContentSize()
+            )
+        }
+        val textNode = rule.onNodeWithTag(Tag)
+        textNode.performTouchInput { longClick() }
+        textNode.performTextInputSelection(TextRange(0, 4))
+        textFieldValue.value = ""
+
+        rule.waitForIdle()
+        val expected = TextRange(0, 0)
+        val actual = textNode.fetchSemanticsNode().config
+            .getOrNull(SemanticsProperties.TextSelectionRange)
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun whenPartiallySelectedTextIsRemoved_SelectionCoercesToEdges() {
+        val textFieldValue = mutableStateOf("Hello World!")
+        rule.setContent {
+            BasicTextField(
+                value = textFieldValue.value,
+                onValueChange = {
+                    textFieldValue.value = it
+                },
+                modifier = Modifier.testTag(Tag).wrapContentSize()
+            )
+        }
+        val textNode = rule.onNodeWithTag(Tag)
+        textNode.performTouchInput { longClick() }
+        textNode.performTextInputSelection(TextRange(2, 8))
+        textFieldValue.value = "Hello"
+
+        rule.waitForIdle()
+
+        val expected = TextRange(2, 5)
+        val actual = textNode.fetchSemanticsNode().config
+            .getOrNull(SemanticsProperties.TextSelectionRange)
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun whenSelectedTextIsRemoved_addedLater_SelectionDoesNotRemain() {
+        val textFieldValue = mutableStateOf("Hello")
+        rule.setContent {
+            BasicTextField(
+                value = textFieldValue.value,
+                onValueChange = {
+                    textFieldValue.value = it
+                },
+                modifier = Modifier.testTag(Tag).wrapContentSize()
+            )
+        }
+        val textNode = rule.onNodeWithTag(Tag)
+        textNode.performTouchInput { longClick() }
+        textNode.performTextInputSelection(TextRange(0, 4))
+        rule.waitForIdle()
+
+        textFieldValue.value = ""
+        rule.waitForIdle()
+
+        textNode.assertTextEquals("")
+
+        textFieldValue.value = "Hello"
+        rule.waitForIdle()
+
+        val expected = TextRange.Zero
+        val actual = textNode.fetchSemanticsNode().config
+            .getOrNull(SemanticsProperties.TextSelectionRange)
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun whenSelectedTextIsPartiallyRemoved_addedLater_SelectionRemainsPartially() {
+        val textFieldValue = mutableStateOf("Hello")
+        rule.setContent {
+            BasicTextField(
+                value = textFieldValue.value,
+                onValueChange = {
+                    textFieldValue.value = it
+                },
+                modifier = Modifier.testTag(Tag).wrapContentSize()
+            )
+        }
+        val textNode = rule.onNodeWithTag(Tag)
+        textNode.performTouchInput { longClick() }
+        textNode.performTextInputSelection(TextRange(0, 4))
+        rule.waitForIdle()
+
+        textFieldValue.value = "He"
+        rule.waitForIdle()
+
+        textNode.assertTextEquals("He")
+
+        textFieldValue.value = "Hello"
+        rule.waitForIdle()
+
+        val expected = TextRange(0, 2)
+        val actual = textNode.fetchSemanticsNode().config
+            .getOrNull(SemanticsProperties.TextSelectionRange)
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun whenSelectedTextIsRemovedByIME_SelectionDoesNotRevert() {
+        // hard to find a descriptive name. Take a look at
+        // `whenSelectedTextIsRemoved_addedLater_SelectionRemains` to understand this case better.
+
+        val textFieldValue = mutableStateOf("Hello")
+        rule.setContent {
+            BasicTextField(
+                value = textFieldValue.value,
+                onValueChange = {
+                    textFieldValue.value = it
+                },
+                modifier = Modifier.testTag(Tag).wrapContentSize()
+            )
+        }
+        val textNode = rule.onNodeWithTag(Tag)
+        textNode.performTouchInput { longClick() }
+        textNode.performTextInputSelection(TextRange(0, 4))
+        textNode.performKeyPress(
+            KeyEvent(
+                NativeKeyEvent(
+                    NativeKeyEvent.ACTION_DOWN,
+                    NativeKeyEvent.KEYCODE_DEL
+                )
+            )
+        )
+        textNode.performKeyPress(KeyEvent(
+            NativeKeyEvent(
+                NativeKeyEvent.ACTION_UP,
+                NativeKeyEvent.KEYCODE_DEL
+            )
+        ))
+
+        textFieldValue.value = "Hello"
+
+        rule.waitForIdle()
+
+        val expected = TextRange(0, 0)
+        val actual = textNode.fetchSemanticsNode().config
+            .getOrNull(SemanticsProperties.TextSelectionRange)
+        assertThat(actual).isEqualTo(expected)
     }
 }
 

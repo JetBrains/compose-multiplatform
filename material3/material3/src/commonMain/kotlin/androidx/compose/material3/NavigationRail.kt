@@ -28,10 +28,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.ripple.rememberRipple
@@ -55,6 +59,7 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainWidth
@@ -89,6 +94,7 @@ import kotlin.math.roundToInt
  * either the matching content color for [containerColor], or to the current [LocalContentColor] if
  * [containerColor] is not a color from the theme.
  * @param header optional header that may hold a [FloatingActionButton] or a logo
+ * @param windowInsets a window insets of the navigation rail.
  * @param content the content of this navigation rail, typically 3-7 [NavigationRailItem]s
  */
 @Composable
@@ -97,6 +103,7 @@ fun NavigationRail(
     containerColor: Color = NavigationRailDefaults.ContainerColor,
     contentColor: Color = contentColorFor(containerColor),
     header: @Composable (ColumnScope.() -> Unit)? = null,
+    windowInsets: WindowInsets = NavigationRailDefaults.windowInsets,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Surface(
@@ -107,6 +114,7 @@ fun NavigationRail(
         Column(
             Modifier
                 .fillMaxHeight()
+                .windowInsetsPadding(windowInsets)
                 .widthIn(min = NavigationRailTokens.ContainerWidth)
                 .padding(vertical = NavigationRailVerticalPadding)
                 .selectableGroup(),
@@ -143,11 +151,11 @@ fun NavigationRail(
  * @param label optional text label for this item
  * @param alwaysShowLabel whether to always show the label for this item. If false, the label will
  * only be shown when this item is selected.
+ * @param colors [NavigationRailItemColors] that will be used to resolve the colors used for this
+ * item in different states. See [NavigationRailItemDefaults.colors].
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
  * for this item. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this item in different states.
- * @param colors [NavigationRailItemColors] that will be used to resolve the colors used for this
- * item in different states. See [NavigationRailItemDefaults.colors].
  */
 @Composable
 fun NavigationRailItem(
@@ -158,12 +166,16 @@ fun NavigationRailItem(
     enabled: Boolean = true,
     label: @Composable (() -> Unit)? = null,
     alwaysShowLabel: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: NavigationRailItemColors = NavigationRailItemDefaults.colors(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val styledIcon = @Composable {
         val iconColor by colors.iconColor(selected = selected)
-        CompositionLocalProvider(LocalContentColor provides iconColor, content = icon)
+        // If there's a label, don't have a11y services repeat the icon description.
+        val clearSemantics = label != null && (alwaysShowLabel || selected)
+        Box(modifier = if (clearSemantics) Modifier.clearAndSetSemantics {} else Modifier) {
+            CompositionLocalProvider(LocalContentColor provides iconColor, content = icon)
+        }
     }
 
     val styledLabel: @Composable (() -> Unit)? = label?.let {
@@ -250,6 +262,14 @@ fun NavigationRailItem(
 object NavigationRailDefaults {
     /** Default container color of a navigation rail. */
     val ContainerColor: Color @Composable get() = NavigationRailTokens.ContainerColor.toColor()
+
+    /**
+     * Default window insets for navigation rail.
+     */
+    val windowInsets: WindowInsets
+        @Composable
+        get() = WindowInsets.safeDrawingForVisualComponents
+            .only(WindowInsetsSides.Vertical + WindowInsetsSides.Start)
 }
 
 /** Defaults used in [NavigationRailItem]. */
@@ -259,46 +279,49 @@ object NavigationRailItemDefaults {
      * specification.
      *
      * @param selectedIconColor the color to use for the icon when the item is selected.
-     * @param unselectedIconColor the color to use for the icon when the item is unselected.
      * @param selectedTextColor the color to use for the text label when the item is selected.
-     * @param unselectedTextColor the color to use for the text label when the item is unselected.
      * @param indicatorColor the color to use for the indicator when the item is selected.
+     * @param unselectedIconColor the color to use for the icon when the item is unselected.
+     * @param unselectedTextColor the color to use for the text label when the item is unselected.
      * @return the resulting [NavigationRailItemColors] used for [NavigationRailItem]
      */
     @Composable
     fun colors(
         selectedIconColor: Color = NavigationRailTokens.ActiveIconColor.toColor(),
-        unselectedIconColor: Color = NavigationRailTokens.InactiveIconColor.toColor(),
         selectedTextColor: Color = NavigationRailTokens.ActiveLabelTextColor.toColor(),
-        unselectedTextColor: Color = NavigationRailTokens.InactiveLabelTextColor.toColor(),
         indicatorColor: Color = NavigationRailTokens.ActiveIndicatorColor.toColor(),
-    ): NavigationRailItemColors = remember(
-        selectedIconColor,
-        unselectedIconColor,
-        selectedTextColor,
-        unselectedTextColor,
-        indicatorColor
-    ) {
-        DefaultNavigationRailItemColors(
-            selectedIconColor = selectedIconColor,
-            unselectedIconColor = unselectedIconColor,
-            selectedTextColor = selectedTextColor,
-            unselectedTextColor = unselectedTextColor,
-            selectedIndicatorColor = indicatorColor,
-        )
-    }
+        unselectedIconColor: Color = NavigationRailTokens.InactiveIconColor.toColor(),
+        unselectedTextColor: Color = NavigationRailTokens.InactiveLabelTextColor.toColor(),
+    ): NavigationRailItemColors = NavigationRailItemColors(
+        selectedIconColor = selectedIconColor,
+        selectedTextColor = selectedTextColor,
+        selectedIndicatorColor = indicatorColor,
+        unselectedIconColor = unselectedIconColor,
+        unselectedTextColor = unselectedTextColor,
+    )
 }
 
 /** Represents the colors of the various elements of a navigation item. */
 @Stable
-interface NavigationRailItemColors {
+class NavigationRailItemColors internal constructor(
+    private val selectedIconColor: Color,
+    private val selectedTextColor: Color,
+    private val selectedIndicatorColor: Color,
+    private val unselectedIconColor: Color,
+    private val unselectedTextColor: Color,
+) {
     /**
      * Represents the icon color for this item, depending on whether it is [selected].
      *
      * @param selected whether the item is selected
      */
     @Composable
-    fun iconColor(selected: Boolean): State<Color>
+    internal fun iconColor(selected: Boolean): State<Color> {
+        return animateColorAsState(
+            targetValue = if (selected) selectedIconColor else unselectedIconColor,
+            animationSpec = tween(ItemAnimationDurationMillis)
+        )
+    }
 
     /**
      * Represents the text color for this item, depending on whether it is [selected].
@@ -306,40 +329,40 @@ interface NavigationRailItemColors {
      * @param selected whether the item is selected
      */
     @Composable
-    fun textColor(selected: Boolean): State<Color>
-
-    /** Represents the color of the indicator used for selected items. */
-    val indicatorColor: Color
-        @Composable get
-}
-
-@Stable
-private class DefaultNavigationRailItemColors(
-    private val selectedIconColor: Color,
-    private val unselectedIconColor: Color,
-    private val selectedTextColor: Color,
-    private val unselectedTextColor: Color,
-    private val selectedIndicatorColor: Color,
-) : NavigationRailItemColors {
-    @Composable
-    override fun iconColor(selected: Boolean): State<Color> {
-        return animateColorAsState(
-            targetValue = if (selected) selectedIconColor else unselectedIconColor,
-            animationSpec = tween(ItemAnimationDurationMillis)
-        )
-    }
-
-    @Composable
-    override fun textColor(selected: Boolean): State<Color> {
+    internal fun textColor(selected: Boolean): State<Color> {
         return animateColorAsState(
             targetValue = if (selected) selectedTextColor else unselectedTextColor,
             animationSpec = tween(ItemAnimationDurationMillis)
         )
     }
 
-    override val indicatorColor: Color
+    /** Represents the color of the indicator used for selected items. */
+    internal val indicatorColor: Color
         @Composable
         get() = selectedIndicatorColor
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || other !is NavigationRailItemColors) return false
+
+        if (selectedIconColor != other.selectedIconColor) return false
+        if (unselectedIconColor != other.unselectedIconColor) return false
+        if (selectedTextColor != other.selectedTextColor) return false
+        if (unselectedTextColor != other.unselectedTextColor) return false
+        if (selectedIndicatorColor != other.selectedIndicatorColor) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = selectedIconColor.hashCode()
+        result = 31 * result + unselectedIconColor.hashCode()
+        result = 31 * result + selectedTextColor.hashCode()
+        result = 31 * result + unselectedTextColor.hashCode()
+        result = 31 * result + selectedIndicatorColor.hashCode()
+
+        return result
+    }
 }
 
 /**
@@ -568,7 +591,7 @@ private const val LabelLayoutIdTag: String = "label"
  * Vertical padding between the contents of the [NavigationRail] and its top/bottom, and internally
  * between items.
  */
-private val NavigationRailVerticalPadding: Dp = 4.dp
+internal val NavigationRailVerticalPadding: Dp = 4.dp
 
 /**
  * Padding at the bottom of the [NavigationRail]'s header. This padding will only be added when the

@@ -712,6 +712,20 @@ fun <T> CompositionData.mapTree(
 }
 
 /**
+ * Return the parameters found for this [CompositionGroup].
+ */
+@UiToolingDataApi
+fun CompositionGroup.findParameters(cache: ContextCache? = null): List<ParameterInformation> {
+    val information = sourceInfo ?: return emptyList()
+    val context = if (cache == null) sourceInformationContextOf(information) else
+        cache.contexts.getOrPut(information) { sourceInformationContextOf(information) }
+            as? SourceInformationContext
+    val data = mutableListOf<Any?>()
+    data.addAll(this.data)
+    return extractParameterInfo(data, context)
+}
+
+/**
  * Return a group tree for for the slot table that represents the entire content of the slot
  * table.
  */

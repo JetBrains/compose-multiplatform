@@ -37,7 +37,7 @@ package androidx.compose.foundation {
   }
 
   public final class CheckScrollableContainerConstraintsKt {
-    method @androidx.compose.foundation.ExperimentalFoundationApi public static void checkScrollableContainerConstraints(long constraints, androidx.compose.foundation.gestures.Orientation orientation);
+    method public static void checkScrollableContainerConstraints(long constraints, androidx.compose.foundation.gestures.Orientation orientation);
   }
 
   public final class ClickableKt {
@@ -51,7 +51,7 @@ package androidx.compose.foundation {
   }
 
   public final class ClipScrollableContainerKt {
-    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.ui.Modifier clipScrollableContainer(androidx.compose.ui.Modifier, androidx.compose.foundation.gestures.Orientation orientation);
+    method public static androidx.compose.ui.Modifier clipScrollableContainer(androidx.compose.ui.Modifier, androidx.compose.foundation.gestures.Orientation orientation);
   }
 
   public final class DarkThemeKt {
@@ -153,9 +153,9 @@ package androidx.compose.foundation {
 
   @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public interface OverscrollEffect {
     method public suspend Object? consumePostFling(long velocity, kotlin.coroutines.Continuation<? super kotlin.Unit>);
-    method public void consumePostScroll(long initialDragDelta, long overscrollDelta, androidx.compose.ui.geometry.Offset? pointerPosition, int source);
+    method public void consumePostScroll(long initialDragDelta, long overscrollDelta, int source);
     method public suspend Object? consumePreFling(long velocity, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity>);
-    method public long consumePreScroll(long scrollDelta, androidx.compose.ui.geometry.Offset? pointerPosition, int source);
+    method public long consumePreScroll(long scrollDelta, int source);
     method public androidx.compose.ui.Modifier getEffectModifier();
     method public boolean isEnabled();
     method public boolean isInProgress();
@@ -221,6 +221,7 @@ package androidx.compose.foundation.gestures {
     method public static suspend Object? awaitDragOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>);
     method public static suspend Object? awaitHorizontalDragOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>);
     method public static suspend Object? awaitHorizontalTouchSlopOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super java.lang.Float,kotlin.Unit> onTouchSlopReached, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>);
+    method public static suspend Object? awaitLongPressOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, androidx.compose.ui.input.pointer.PointerInputChange initialDown, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>);
     method public static suspend Object? awaitTouchSlopOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super androidx.compose.ui.geometry.Offset,kotlin.Unit> onTouchSlopReached, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>);
     method public static suspend Object? awaitVerticalDragOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>);
     method public static suspend Object? awaitVerticalTouchSlopOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, long pointerId, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputChange,? super java.lang.Float,kotlin.Unit> onTouchSlopReached, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>);
@@ -285,7 +286,7 @@ package androidx.compose.foundation.gestures {
   public final class ScrollableDefaults {
     method @androidx.compose.runtime.Composable public androidx.compose.foundation.gestures.FlingBehavior flingBehavior();
     method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public androidx.compose.foundation.OverscrollEffect overscrollEffect();
-    method @androidx.compose.foundation.ExperimentalFoundationApi public boolean reverseDirection(androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.foundation.gestures.Orientation orientation, boolean reverseScrolling);
+    method public boolean reverseDirection(androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.foundation.gestures.Orientation orientation, boolean reverseScrolling);
     field public static final androidx.compose.foundation.gestures.ScrollableDefaults INSTANCE;
   }
 
@@ -345,6 +346,26 @@ package androidx.compose.foundation.gestures {
     method public static suspend Object? rotateBy(androidx.compose.foundation.gestures.TransformableState, float degrees, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public static suspend Object? stopTransformation(androidx.compose.foundation.gestures.TransformableState, optional androidx.compose.foundation.MutatePriority terminationPriority, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public static suspend Object? zoomBy(androidx.compose.foundation.gestures.TransformableState, float zoomFactor, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+  }
+
+}
+
+package androidx.compose.foundation.gestures.snapping {
+
+  public final class LazyListSnapLayoutInfoProviderKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider lazyListSnapLayoutInfoProvider(androidx.compose.foundation.lazy.LazyListState lazyListState, optional kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,java.lang.Float> positionInLayout);
+  }
+
+  public final class SnapFlingBehaviorKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static androidx.compose.foundation.gestures.FlingBehavior rememberSnapFlingBehavior(androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider snapLayoutInfoProvider, optional androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float> approachAnimationSpec, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> snapAnimationSpec);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.foundation.gestures.FlingBehavior snapFlingBehavior(androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider snapLayoutInfoProvider, androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float> approachAnimationSpec, androidx.compose.animation.core.AnimationSpec<java.lang.Float> snapAnimationSpec, androidx.compose.ui.unit.Density density, optional float shortSnapVelocityThreshold);
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi public interface SnapLayoutInfoProvider {
+    method public float calculateApproachOffset(float initialVelocity);
+    method public kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> calculateSnappingOffsetBounds();
+    method public float getSnapStepSize();
+    property public abstract float snapStepSize;
   }
 
 }
@@ -503,7 +524,7 @@ package androidx.compose.foundation.lazy {
   public final class LazyListItemPlacementAnimatorKt {
   }
 
-  public final class LazyListItemProviderImplKt {
+  public final class LazyListItemProviderKt {
   }
 
   public final class LazyListKt {
@@ -639,7 +660,7 @@ package androidx.compose.foundation.lazy.grid {
   public final class LazyGridItemPlacementAnimatorKt {
   }
 
-  public final class LazyGridItemProviderImplKt {
+  public final class LazyGridItemProviderKt {
   }
 
   @androidx.compose.foundation.lazy.grid.LazyGridScopeMarker @androidx.compose.runtime.Stable public sealed interface LazyGridItemScope {
@@ -731,7 +752,7 @@ package androidx.compose.foundation.lazy.grid {
 package androidx.compose.foundation.lazy.layout {
 
   @androidx.compose.foundation.ExperimentalFoundationApi public sealed interface IntervalList<T> {
-    method public void forEach(optional int fromIndex, optional int toIndex, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.layout.IntervalList.Interval<T>,kotlin.Unit> block);
+    method public void forEach(optional int fromIndex, optional int toIndex, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.layout.IntervalList.Interval<? extends T>,kotlin.Unit> block);
     method public operator androidx.compose.foundation.lazy.layout.IntervalList.Interval<T> get(int index);
     method public int getSize();
     property public abstract int size;
@@ -749,6 +770,13 @@ package androidx.compose.foundation.lazy.layout {
   public final class IntervalListKt {
   }
 
+  @androidx.compose.foundation.ExperimentalFoundationApi public interface LazyLayoutIntervalContent {
+    method public default kotlin.jvm.functions.Function1<java.lang.Integer,java.lang.Object>? getKey();
+    method public default kotlin.jvm.functions.Function1<java.lang.Integer,java.lang.Object> getType();
+    property public default kotlin.jvm.functions.Function1<java.lang.Integer,java.lang.Object>? key;
+    property public default kotlin.jvm.functions.Function1<java.lang.Integer,java.lang.Object> type;
+  }
+
   @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public interface LazyLayoutItemProvider {
     method @androidx.compose.runtime.Composable public void Item(int index);
     method public default Object? getContentType(int index);
@@ -757,6 +785,12 @@ package androidx.compose.foundation.lazy.layout {
     method public default java.util.Map<java.lang.Object,java.lang.Integer> getKeyToIndexMap();
     property public abstract int itemCount;
     property public default java.util.Map<java.lang.Object,java.lang.Integer> keyToIndexMap;
+  }
+
+  public final class LazyLayoutItemProviderKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider DelegatingLazyLayoutItemProvider(androidx.compose.runtime.State<? extends androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider> delegate);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static <T extends androidx.compose.foundation.lazy.layout.LazyLayoutIntervalContent> androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider LazyLayoutItemProvider(androidx.compose.foundation.lazy.layout.IntervalList<? extends T> intervals, kotlin.ranges.IntRange nearestItemsRange, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit> itemContent);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static Object! getDefaultLazyLayoutKey(int index);
   }
 
   public final class LazyLayoutKt {
@@ -788,6 +822,7 @@ package androidx.compose.foundation.lazy.layout {
   }
 
   public final class LazyNearestItemsRangeKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<kotlin.ranges.IntRange> rememberLazyNearestItemsRangeState(kotlin.jvm.functions.Function0<java.lang.Integer> firstVisibleItemIndex, kotlin.jvm.functions.Function0<java.lang.Integer> slidingWindowSize, kotlin.jvm.functions.Function0<java.lang.Integer> extraItemCount);
   }
 
   public final class Lazy_androidKt {
@@ -797,7 +832,7 @@ package androidx.compose.foundation.lazy.layout {
   @androidx.compose.foundation.ExperimentalFoundationApi public final class MutableIntervalList<T> implements androidx.compose.foundation.lazy.layout.IntervalList<T> {
     ctor public MutableIntervalList();
     method public void addInterval(int size, T? value);
-    method public void forEach(int fromIndex, int toIndex, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.layout.IntervalList.Interval<T>,kotlin.Unit> block);
+    method public void forEach(int fromIndex, int toIndex, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.layout.IntervalList.Interval<? extends T>,kotlin.Unit> block);
     method public androidx.compose.foundation.lazy.layout.IntervalList.Interval<T> get(int index);
     method public int getSize();
     property public int size;
@@ -1085,6 +1120,9 @@ package androidx.compose.foundation.text {
   public final class StringHelpers_jvmKt {
   }
 
+  public final class TextDelegateKt {
+  }
+
   public final class TextFieldCursorKt {
   }
 
@@ -1125,6 +1163,9 @@ package androidx.compose.foundation.text {
   }
 
   public final class UndoManager_jvmKt {
+  }
+
+  public final class ValidatingOffsetMappingKt {
   }
 
 }

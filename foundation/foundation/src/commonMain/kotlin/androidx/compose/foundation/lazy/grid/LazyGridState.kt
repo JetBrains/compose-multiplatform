@@ -318,7 +318,6 @@ class LazyGridState constructor(
         }
         val info = layoutInfo
         if (info.visibleItemsInfo.isNotEmpty()) {
-            // check(isActive)
             val scrollingForward = delta < 0
             val lineToPrefetch: Int
             val closestNextItemToPrefetch: Int
@@ -355,6 +354,22 @@ class LazyGridState constructor(
         }
     }
 
+    private fun cancelPrefetchIfVisibleItemsChanged(info: LazyGridLayoutInfo) {
+        if (lineToPrefetch != -1 && info.visibleItemsInfo.isNotEmpty()) {
+            val firstLine = info.visibleItemsInfo.first().let {
+                if (isVertical) it.row else it.column
+            }
+            val lastLine = info.visibleItemsInfo.last().let {
+                if (isVertical) it.row else it.column
+            }
+            if (lineToPrefetch != firstLine - 1 && lineToPrefetch != lastLine + 1) {
+                lineToPrefetch = -1
+                currentLinePrefetchHandles.forEach { it.cancel() }
+                currentLinePrefetchHandles.clear()
+            }
+        }
+    }
+
     internal val prefetchState = LazyLayoutPrefetchState()
 
     /**
@@ -386,6 +401,8 @@ class LazyGridState constructor(
             result.firstVisibleLineScrollOffset != 0
 
         numMeasurePasses++
+
+        cancelPrefetchIfVisibleItemsChanged(result)
     }
 
     /**

@@ -122,6 +122,7 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.UsageByParent
 import androidx.compose.ui.node.LayoutNodeDrawScope
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
+import androidx.compose.ui.modifier.ModifierLocalManager
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerSnapshotObserver
@@ -189,7 +190,6 @@ internal class AndroidComposeView(context: Context) :
         private set
 
     private val semanticsModifier = SemanticsModifierCore(
-        id = SemanticsModifierCore.generateSemanticsId(),
         mergeDescendants = false,
         clearAndSetSemantics = false,
         properties = {}
@@ -225,13 +225,13 @@ internal class AndroidComposeView(context: Context) :
 
     override val root = LayoutNode().also {
         it.measurePolicy = RootMeasurePolicy
+        it.density = density
         // Composed modifiers cannot be added here directly
         it.modifier = Modifier
             .then(semanticsModifier)
             .then(rotaryInputModifier)
             .then(_focusManager.modifier)
             .then(keyInputModifier)
-        it.density = density
     }
 
     override val rootForTest: RootForTest = this
@@ -324,7 +324,7 @@ internal class AndroidComposeView(context: Context) :
     override val hasPendingMeasureOrLayout
         get() = measureAndLayoutDelegate.hasPendingMeasureOrLayout
 
-    private var globalPosition: IntOffset = IntOffset.Zero
+    private var globalPosition: IntOffset = IntOffset(Int.MAX_VALUE, Int.MAX_VALUE)
 
     private val tmpPositionArray = intArrayOf(0, 0)
     private val viewToWindowMatrix = Matrix()
@@ -433,6 +433,8 @@ internal class AndroidComposeView(context: Context) :
         }
     )
     override val inputModeManager: InputModeManager get() = _inputModeManager
+
+    override val modifierLocalManager: ModifierLocalManager = ModifierLocalManager(this)
 
     /**
      * Provide textToolbar to the user, for text-related operation. Use the Android version of
@@ -885,9 +887,13 @@ internal class AndroidComposeView(context: Context) :
     private fun updatePositionCacheAndDispatch() {
         var positionChanged = false
         getLocationOnScreen(tmpPositionArray)
-        if (globalPosition.x != tmpPositionArray[0] || globalPosition.y != tmpPositionArray[1]) {
+        val (globalX, globalY) = globalPosition
+        if (globalX != tmpPositionArray[0] || globalY != tmpPositionArray[1]) {
             globalPosition = IntOffset(tmpPositionArray[0], tmpPositionArray[1])
-            positionChanged = true
+            if (globalX != Int.MAX_VALUE && globalY != Int.MAX_VALUE) {
+                positionChanged = true
+                root.layoutDelegate.measurePassDelegate.notifyChildrenUsingCoordinatesWhilePlacing()
+            }
         }
         measureAndLayoutDelegate.dispatchOnPositionedCallbacks(forceDispatch = positionChanged)
     }

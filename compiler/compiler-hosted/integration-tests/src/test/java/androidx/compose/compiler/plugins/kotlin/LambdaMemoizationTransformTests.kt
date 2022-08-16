@@ -572,6 +572,85 @@ class LambdaMemoizationTransformTests : ComposeIrTransformTest() {
         """
     )
 
+    @Test // Regression test for b/180168881
+    fun testFunctionReferenceWithinInferredComposableLambda(): Unit = verifyComposeIrTransform(
+        """
+            import androidx.compose.runtime.Composable
+
+            fun Problem() {
+                fun foo() { }
+                val lambda: @Composable ()->Unit = {
+                    ::foo
+                }
+            }
+        """,
+        """
+            fun Problem() {
+              fun foo() { }
+              val lambda = composableLambdaInstance(<>, false) { %composer: Composer?, %changed: Int ->
+                sourceInformation(%composer, "C:Test.kt")
+                if (%changed and 0b1011 !== 0b0010 || !%composer.skipping) {
+                  if (isTraceInProgress()) {
+                    traceEventStart(<>, %changed, -1, <>)
+                  }
+                  foo
+                  if (isTraceInProgress()) {
+                    traceEventEnd()
+                  }
+                } else {
+                  %composer.skipToGroupEnd()
+                }
+              }
+            }
+        """
+    )
+
+    @Test
+    fun testFunctionReferenceNonComposableMemoization(): Unit = verifyComposeIrTransform(
+        """
+            import androidx.compose.runtime.Composable
+            @Composable fun Example(x: Int) {
+                fun foo() { use(x) }
+                val shouldMemoize: ()->(()->Unit) = { ::foo }
+            }
+        """,
+        """
+            @Composable
+            fun Example(x: Int, %composer: Composer?, %changed: Int) {
+              %composer = %composer.startRestartGroup(<>)
+              sourceInformation(%composer, "C(Example)<{>:Test.kt")
+              val %dirty = %changed
+              if (%changed and 0b1110 === 0) {
+                %dirty = %dirty or if (%composer.changed(x)) 0b0100 else 0b0010
+              }
+              if (%dirty and 0b1011 !== 0b0010 || !%composer.skipping) {
+                if (isTraceInProgress()) {
+                  traceEventStart(<>, %dirty, -1, <>)
+                }
+                fun foo() {
+                  use(x)
+                }
+                val shouldMemoize = remember(x, {
+                  {
+                    foo
+                  }
+                }, %composer, 0b1110 and %dirty)
+                if (isTraceInProgress()) {
+                  traceEventEnd()
+                }
+              } else {
+                %composer.skipToGroupEnd()
+              }
+              %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
+                Example(x, %composer, %changed or 0b0001)
+              }
+            }
+        """,
+        """
+            fun use(x: Any) = println(x)
+        """.trimIndent()
+    )
+
     @Test // regression of b/162575428
     fun testComposableInAFunctionParameter(): Unit = verifyComposeIrTransform(
         """
@@ -982,6 +1061,95 @@ class LambdaMemoizationTransformTests : ComposeIrTransformTest() {
         """
             import androidx.compose.runtime.Composable
             @Composable fun Text(s: String) {}
+        """
+    )
+
+    @Test
+    fun memoizeLambdaInsideFunctionReturningValue() = verifyComposeIrTransform(
+        """
+            import androidx.compose.runtime.Composable
+
+            @Composable
+            fun Test(foo: Foo): Int =
+              Consume { foo.value }
+        """,
+        """
+            @Composable
+            fun Test(foo: Foo, %composer: Composer?, %changed: Int): Int {
+              %composer.startReplaceableGroup(<>)
+              sourceInformation(%composer, "C(Test)<{>,<Consum...>:Test.kt")
+              if (isTraceInProgress()) {
+                traceEventStart(<>, %changed, -1, <>)
+              }
+              val tmp0 = Consume(remember(foo, {
+                {
+                  foo.value
+                }
+              }, %composer, 0b1110 and %changed), %composer, 0)
+              if (isTraceInProgress()) {
+                traceEventEnd()
+              }
+              %composer.endReplaceableGroup()
+              return tmp0
+            }
+
+        """.trimIndent(),
+        """
+            import androidx.compose.runtime.Composable
+            import androidx.compose.runtime.Stable
+
+            @Composable
+            fun Consume(block: () -> Int): Int = block()
+
+            @Stable
+            class Foo {
+                val value: Int = 0
+            }
+        """.trimIndent()
+    )
+
+    @Test
+    fun testComposableCaptureInDelegates() = verifyComposeIrTransform(
+        """
+            import androidx.compose.runtime.*
+
+            class Test(val value: Int) : Delegate by Impl({
+                value
+            })
+        """,
+        """
+            @StabilityInferred(parameters = 0)
+            class Test(val value: Int) : Delegate {
+              private val %%delegate_0: Impl = Impl(composableLambdaInstance(<>, true) { %composer: Composer?, %changed: Int ->
+                sourceInformation(%composer, "C:Test.kt")
+                if (%changed and 0b1011 !== 0b0010 || !%composer.skipping) {
+                  if (isTraceInProgress()) {
+                    traceEventStart(<>, %changed, -1, <>)
+                  }
+                  value
+                  if (isTraceInProgress()) {
+                    traceEventEnd()
+                  }
+                } else {
+                  %composer.skipToGroupEnd()
+                }
+              }
+              )
+              val content: Function2<Composer, Int, Unit>
+                get() {
+                  return <this>.%%delegate_0.content
+                }
+              static val %stable: Int = 0
+            }
+        """,
+        """
+            import androidx.compose.runtime.Composable
+
+            interface Delegate {
+                val content: @Composable () -> Unit
+            }
+
+            class Impl(override val content: @Composable () -> Unit) : Delegate
         """
     )
 }

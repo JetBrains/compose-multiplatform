@@ -31,7 +31,6 @@ import androidx.compose.material3.tokens.OutlinedIconButtonTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -63,11 +62,11 @@ import androidx.compose.ui.semantics.semantics
  * @param enabled controls the enabled state of this icon button. When `false`, this component will
  * not respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
+ * @param colors [IconButtonColors] that will be used to resolve the colors used for this icon
+ * button in different states. See [IconButtonDefaults.iconButtonColors].
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
  * for this icon button. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this icon button in different states.
- * @param colors [IconButtonColors] that will be used to resolve the colors used for this icon
- * button in different states. See [IconButtonDefaults.iconButtonColors].
  * @param content the content of this icon button, typically an [Icon]
  */
 @Composable
@@ -75,8 +74,8 @@ fun IconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit
 ) {
     Box(
@@ -123,11 +122,11 @@ fun IconButton(
  * @param enabled controls the enabled state of this icon button. When `false`, this component will
  * not respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
+ * @param colors [IconToggleButtonColors] that will be used to resolve the colors used for this icon
+ * button in different states. See [IconButtonDefaults.iconToggleButtonColors].
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
  * for this icon button. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this icon button in different states.
- * @param colors [IconToggleButtonColors] that will be used to resolve the colors used for this icon
- * button in different states. See [IconButtonDefaults.iconToggleButtonColors].
  * @param content the content of this icon button, typically an [Icon]
  */
 @Composable
@@ -136,8 +135,8 @@ fun IconToggleButton(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: IconToggleButtonColors = IconButtonDefaults.iconToggleButtonColors(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit
 ) {
     Box(
@@ -185,23 +184,23 @@ fun IconToggleButton(
  * @param enabled controls the enabled state of this icon button. When `false`, this component will
  * not respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this icon button. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this icon button in different states.
  * @param shape defines the shape of this icon button's container
  * @param colors [IconButtonColors] that will be used to resolve the colors used for this icon
  * button in different states. See [IconButtonDefaults.filledIconButtonColors].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this icon button. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this icon button in different states.
  * @param content the content of this icon button, typically an [Icon]
  */
-@ExperimentalMaterial3Api
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilledIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = IconButtonDefaults.filledShape,
     colors: IconButtonColors = IconButtonDefaults.filledIconButtonColors(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit
 ) = Surface(
     onClick = onClick,
@@ -246,23 +245,23 @@ fun FilledIconButton(
  * @param enabled controls the enabled state of this icon button. When `false`, this component will
  * not respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this icon button. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this icon button in different states.
  * @param shape defines the shape of this icon button's container
  * @param colors [IconButtonColors] that will be used to resolve the colors used for this icon
  * button in different states. See [IconButtonDefaults.filledIconButtonColors].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this icon button. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this icon button in different states.
  * @param content the content of this icon button, typically an [Icon]
  */
-@ExperimentalMaterial3Api
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilledTonalIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = IconButtonDefaults.filledShape,
     colors: IconButtonColors = IconButtonDefaults.filledTonalIconButtonColors(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit
 ) = Surface(
     onClick = onClick,
@@ -303,24 +302,24 @@ fun FilledTonalIconButton(
  * @param enabled controls the enabled state of this icon button. When `false`, this component will
  * not respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this icon button. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this icon button in different states.
  * @param shape defines the shape of this icon button's container
  * @param colors [IconToggleButtonColors] that will be used to resolve the colors used for this icon
  * button in different states. See [IconButtonDefaults.filledIconToggleButtonColors].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this icon button. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this icon button in different states.
  * @param content the content of this icon button, typically an [Icon]
  */
-@ExperimentalMaterial3Api
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilledIconToggleButton(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = IconButtonDefaults.filledShape,
     colors: IconToggleButtonColors = IconButtonDefaults.filledIconToggleButtonColors(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit
 ) = Surface(
     checked = checked,
@@ -367,24 +366,24 @@ fun FilledIconToggleButton(
  * @param enabled controls the enabled state of this icon button. When `false`, this component will
  * not respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this icon button. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this icon button in different states.
  * @param shape defines the shape of this icon button's container
  * @param colors [IconToggleButtonColors] that will be used to resolve the colors used for this icon
  * button in different states. See [IconButtonDefaults.filledIconToggleButtonColors].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this icon button. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this icon button in different states.
  * @param content the content of this icon button, typically an [Icon]
  */
-@ExperimentalMaterial3Api
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilledTonalIconToggleButton(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = IconButtonDefaults.filledShape,
     colors: IconToggleButtonColors = IconButtonDefaults.filledTonalIconToggleButtonColors(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit
 ) = Surface(
     checked = checked,
@@ -430,27 +429,27 @@ fun FilledTonalIconToggleButton(
  * @param enabled controls the enabled state of this icon button. When `false`, this component will
  * not respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
+ * @param shape defines the shape of this icon button's container and border (when [border] is not
+ * null)
+ * @param colors [IconButtonColors] that will be used to resolve the colors used for this icon
+ * button in different states. See [IconButtonDefaults.outlinedIconButtonColors].
+ * @param border the border to draw around the container of this icon button. Pass `null` for no
+ * border. See [IconButtonDefaults.outlinedIconButtonBorder].
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
  * for this icon button. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this icon button in different states.
- * @param shape defines the shape of this icon button's container and border (when [border] is not
- * null)
- * @param border the border to draw around the container of this icon button. Pass `null` for no
- * border. See [IconButtonDefaults.outlinedIconButtonBorder].
- * @param colors [IconButtonColors] that will be used to resolve the colors used for this icon
- * button in different states. See [IconButtonDefaults.outlinedIconButtonColors].
  * @param content the content of this icon button, typically an [Icon]
  */
-@ExperimentalMaterial3Api
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OutlinedIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = IconButtonDefaults.outlinedShape,
-    border: BorderStroke? = IconButtonDefaults.outlinedIconButtonBorder(enabled),
     colors: IconButtonColors = IconButtonDefaults.outlinedIconButtonColors(),
+    border: BorderStroke? = IconButtonDefaults.outlinedIconButtonBorder(enabled),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit
 ) = Surface(
     onClick = onClick,
@@ -491,28 +490,28 @@ fun OutlinedIconButton(
  * @param enabled controls the enabled state of this icon button. When `false`, this component will
  * not respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
+ * @param shape defines the shape of this icon button's container and border (when [border] is not
+ * null)
+ * @param colors [IconToggleButtonColors] that will be used to resolve the colors used for this icon
+ * button in different states. See [IconButtonDefaults.outlinedIconToggleButtonColors].
+ * @param border the border to draw around the container of this icon button. Pass `null` for no
+ * border. See [IconButtonDefaults.outlinedIconToggleButtonBorder].
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
  * for this icon button. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this icon button in different states.
- * @param shape defines the shape of this icon button's container and border (when [border] is not
- * null)
- * @param border the border to draw around the container of this icon button. Pass `null` for no
- * border. See [IconButtonDefaults.outlinedIconToggleButtonBorder].
- * @param colors [IconToggleButtonColors] that will be used to resolve the colors used for this icon
- * button in different states. See [IconButtonDefaults.outlinedIconToggleButtonColors].
  * @param content the content of this icon button, typically an [Icon]
  */
-@ExperimentalMaterial3Api
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OutlinedIconToggleButton(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = IconButtonDefaults.outlinedShape,
-    border: BorderStroke? = IconButtonDefaults.outlinedIconToggleButtonBorder(enabled, checked),
     colors: IconToggleButtonColors = IconButtonDefaults.outlinedIconToggleButtonColors(),
+    border: BorderStroke? = IconButtonDefaults.outlinedIconToggleButtonBorder(enabled, checked),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit
 ) = Surface(
     checked = checked,
@@ -534,65 +533,6 @@ fun OutlinedIconToggleButton(
 }
 
 /**
- * Represents the container and content colors used in an icon button in different states.
- *
- * - See [IconButtonDefaults.filledIconButtonColors] and
- * [IconButtonDefaults.filledTonalIconButtonColors] for the default colors used in a
- * [FilledIconButton].
- * - See [IconButtonDefaults.outlinedIconButtonColors] for the default colors used in an
- * [OutlinedIconButton].
- */
-@Stable
-interface IconButtonColors {
-    /**
-     * Represents the container color for this icon button, depending on [enabled].
-     *
-     * @param enabled whether the icon button is enabled
-     */
-    @Composable
-    fun containerColor(enabled: Boolean): State<Color>
-
-    /**
-     * Represents the content color for this icon button, depending on [enabled].
-     *
-     * @param enabled whether the icon button is enabled
-     */
-    @Composable
-    fun contentColor(enabled: Boolean): State<Color>
-}
-
-/**
- * Represents the container and content colors used in a toggleable icon button in
- * different states.
- *
- * - See [IconButtonDefaults.filledIconToggleButtonColors] and
- * [IconButtonDefaults.filledTonalIconToggleButtonColors] for the default colors used in a
- * [FilledIconButton].
- * - See [IconButtonDefaults.outlinedIconToggleButtonColors] for the default colors used in a
- *  toggleable [OutlinedIconButton].
- */
-@Stable
-interface IconToggleButtonColors {
-    /**
-     * Represents the container color for this icon button, depending on [enabled] and [checked].
-     *
-     * @param enabled whether the icon button is enabled
-     * @param checked whether the icon button is checked
-     */
-    @Composable
-    fun containerColor(enabled: Boolean, checked: Boolean): State<Color>
-
-    /**
-     * Represents the content color for this icon button, depending on [enabled] and [checked].
-     *
-     * @param enabled whether the icon button is enabled
-     * @param checked whether the icon button is checked
-     */
-    @Composable
-    fun contentColor(enabled: Boolean, checked: Boolean): State<Color>
-}
-
-/**
  * Contains the default values used by all icon button types.
  */
 object IconButtonDefaults {
@@ -600,8 +540,9 @@ object IconButtonDefaults {
     val filledShape: Shape @Composable get() = FilledIconButtonTokens.ContainerShape.toShape()
 
     /** Default shape for an outlined icon button. */
-    val outlinedShape: Shape @Composable get() =
-        OutlinedIconButtonTokens.ContainerShape.toShape()
+    val outlinedShape: Shape
+        @Composable get() =
+            OutlinedIconButtonTokens.ContainerShape.toShape()
 
     /**
      * Creates a [IconButtonColors] that represents the default colors used in a [IconButton].
@@ -619,7 +560,7 @@ object IconButtonDefaults {
         disabledContentColor: Color =
             contentColor.copy(alpha = IconButtonTokens.DisabledIconOpacity)
     ): IconButtonColors =
-        DefaultIconButtonColors(
+        IconButtonColors(
             containerColor = containerColor,
             contentColor = contentColor,
             disabledContainerColor = disabledContainerColor,
@@ -647,7 +588,7 @@ object IconButtonDefaults {
         checkedContainerColor: Color = Color.Transparent,
         checkedContentColor: Color = IconButtonTokens.SelectedIconColor.toColor()
     ): IconToggleButtonColors =
-        DefaultIconToggleButtonColors(
+        IconToggleButtonColors(
             containerColor = containerColor,
             contentColor = contentColor,
             disabledContainerColor = disabledContainerColor,
@@ -673,7 +614,7 @@ object IconButtonDefaults {
         disabledContentColor: Color = FilledIconButtonTokens.DisabledColor.toColor()
             .copy(alpha = FilledIconButtonTokens.DisabledOpacity)
     ): IconButtonColors =
-        DefaultIconButtonColors(
+        IconButtonColors(
             containerColor = containerColor,
             contentColor = contentColor,
             disabledContainerColor = disabledContainerColor,
@@ -704,7 +645,7 @@ object IconButtonDefaults {
         checkedContainerColor: Color = FilledIconButtonTokens.SelectedContainerColor.toColor(),
         checkedContentColor: Color = contentColorFor(checkedContainerColor)
     ): IconToggleButtonColors =
-        DefaultIconToggleButtonColors(
+        IconToggleButtonColors(
             containerColor = containerColor,
             contentColor = contentColor,
             disabledContainerColor = disabledContainerColor,
@@ -731,7 +672,7 @@ object IconButtonDefaults {
         disabledContentColor: Color = FilledTonalIconButtonTokens.DisabledColor.toColor()
             .copy(alpha = FilledTonalIconButtonTokens.DisabledOpacity)
     ): IconButtonColors =
-        DefaultIconButtonColors(
+        IconButtonColors(
             containerColor = containerColor,
             contentColor = contentColor,
             disabledContainerColor = disabledContainerColor,
@@ -761,7 +702,7 @@ object IconButtonDefaults {
             FilledTonalIconButtonTokens.SelectedContainerColor.toColor(),
         checkedContentColor: Color = FilledTonalIconButtonTokens.ToggleSelectedColor.toColor()
     ): IconToggleButtonColors =
-        DefaultIconToggleButtonColors(
+        IconToggleButtonColors(
             containerColor = containerColor,
             contentColor = contentColor,
             disabledContainerColor = disabledContainerColor,
@@ -787,7 +728,7 @@ object IconButtonDefaults {
         disabledContentColor: Color =
             contentColor.copy(alpha = OutlinedIconButtonTokens.DisabledOpacity)
     ): IconButtonColors =
-        DefaultIconButtonColors(
+        IconButtonColors(
             containerColor = containerColor,
             contentColor = contentColor,
             disabledContainerColor = disabledContainerColor,
@@ -816,7 +757,7 @@ object IconButtonDefaults {
             OutlinedIconButtonTokens.SelectedContainerColor.toColor(),
         checkedContentColor: Color = contentColorFor(checkedContainerColor)
     ): IconToggleButtonColors =
-        DefaultIconToggleButtonColors(
+        IconToggleButtonColors(
             containerColor = containerColor,
             contentColor = contentColor,
             disabledContainerColor = disabledContainerColor,
@@ -851,7 +792,7 @@ object IconButtonDefaults {
             LocalContentColor.current
         } else {
             LocalContentColor.current
-                .copy(alpha = OutlinedIconButtonTokens.DisabledOutlineOpacity)
+                .copy(alpha = OutlinedIconButtonTokens.DisabledUnselectedOutlineOpacity)
         }
         return remember(color) {
             BorderStroke(OutlinedIconButtonTokens.UnselectedOutlineWidth, color)
@@ -860,30 +801,44 @@ object IconButtonDefaults {
 }
 
 /**
- * Default [IconButtonColors] implementation.
+ * Represents the container and content colors used in an icon button in different states.
+ *
+ * - See [IconButtonDefaults.filledIconButtonColors] and
+ * [IconButtonDefaults.filledTonalIconButtonColors] for the default colors used in a
+ * [FilledIconButton].
+ * - See [IconButtonDefaults.outlinedIconButtonColors] for the default colors used in an
+ * [OutlinedIconButton].
  */
 @Immutable
-private class DefaultIconButtonColors(
+class IconButtonColors internal constructor(
     private val containerColor: Color,
     private val contentColor: Color,
     private val disabledContainerColor: Color,
     private val disabledContentColor: Color,
-) : IconButtonColors {
+) {
+    /**
+     * Represents the container color for this icon button, depending on [enabled].
+     *
+     * @param enabled whether the icon button is enabled
+     */
     @Composable
-    override fun containerColor(enabled: Boolean): State<Color> {
+    internal fun containerColor(enabled: Boolean): State<Color> {
         return rememberUpdatedState(if (enabled) containerColor else disabledContainerColor)
     }
 
+    /**
+     * Represents the content color for this icon button, depending on [enabled].
+     *
+     * @param enabled whether the icon button is enabled
+     */
     @Composable
-    override fun contentColor(enabled: Boolean): State<Color> {
+    internal fun contentColor(enabled: Boolean): State<Color> {
         return rememberUpdatedState(if (enabled) contentColor else disabledContentColor)
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || this::class != other::class) return false
-
-        other as DefaultIconButtonColors
+        if (other == null || other !is IconButtonColors) return false
 
         if (containerColor != other.containerColor) return false
         if (contentColor != other.contentColor) return false
@@ -904,19 +859,32 @@ private class DefaultIconButtonColors(
 }
 
 /**
- * Default [IconToggleButtonColors] implementation.
+ * Represents the container and content colors used in a toggleable icon button in
+ * different states.
+ *
+ * - See [IconButtonDefaults.filledIconToggleButtonColors] and
+ * [IconButtonDefaults.filledTonalIconToggleButtonColors] for the default colors used in a
+ * [FilledIconButton].
+ * - See [IconButtonDefaults.outlinedIconToggleButtonColors] for the default colors used in a
+ *  toggleable [OutlinedIconButton].
  */
 @Immutable
-private class DefaultIconToggleButtonColors(
+class IconToggleButtonColors internal constructor(
     private val containerColor: Color,
     private val contentColor: Color,
     private val disabledContainerColor: Color,
     private val disabledContentColor: Color,
     private val checkedContainerColor: Color,
     private val checkedContentColor: Color,
-) : IconToggleButtonColors {
+) {
+    /**
+     * Represents the container color for this icon button, depending on [enabled] and [checked].
+     *
+     * @param enabled whether the icon button is enabled
+     * @param checked whether the icon button is checked
+     */
     @Composable
-    override fun containerColor(enabled: Boolean, checked: Boolean): State<Color> {
+    internal fun containerColor(enabled: Boolean, checked: Boolean): State<Color> {
         val target = when {
             !enabled -> disabledContainerColor
             !checked -> containerColor
@@ -925,8 +893,14 @@ private class DefaultIconToggleButtonColors(
         return rememberUpdatedState(target)
     }
 
+    /**
+     * Represents the content color for this icon button, depending on [enabled] and [checked].
+     *
+     * @param enabled whether the icon button is enabled
+     * @param checked whether the icon button is checked
+     */
     @Composable
-    override fun contentColor(enabled: Boolean, checked: Boolean): State<Color> {
+    internal fun contentColor(enabled: Boolean, checked: Boolean): State<Color> {
         val target = when {
             !enabled -> disabledContentColor
             !checked -> contentColor
@@ -937,9 +911,7 @@ private class DefaultIconToggleButtonColors(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || this::class != other::class) return false
-
-        other as DefaultIconToggleButtonColors
+        if (other == null || other !is IconToggleButtonColors) return false
 
         if (containerColor != other.containerColor) return false
         if (contentColor != other.contentColor) return false

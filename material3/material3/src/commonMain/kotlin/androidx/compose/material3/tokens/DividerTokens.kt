@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_92
+// VERSION: v0_117
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -21,6 +21,6 @@ package androidx.compose.material3.tokens
 import androidx.compose.ui.unit.dp
 
 internal object DividerTokens {
-    val Color = ColorSchemeKeyTokens.OnSurfaceVariant
+    val Color = ColorSchemeKeyTokens.OutlineVariant
     val Thickness = 1.0.dp
 }

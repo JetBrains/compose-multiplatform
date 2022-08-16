@@ -17,7 +17,7 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="indeterminate" msgid="2486394087603402002">"টিক চিহ্ন দেওয়া বা টিকচিহ্ন সরান হয়নি"</string>
+    <string name="indeterminate" msgid="7933458017204019916">"কয়েকটি বিকল্প বেছে নেওয়া হয়েছে"</string>
     <string name="on" msgid="8655164131929253426">"চালু আছে"</string>
     <string name="off" msgid="875452955155264703">"বন্ধ আছে"</string>
     <string name="selected" msgid="6043586758067023">"বেছে নেওয়া হয়েছে"</string>

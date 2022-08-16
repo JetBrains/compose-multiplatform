@@ -35,14 +35,12 @@ internal actual fun rememberOverscrollEffect(): OverscrollEffect {
 private class DesktopEdgeEffectOverscrollEffect() : OverscrollEffect {
     override fun consumePreScroll(
         scrollDelta: Offset,
-        pointerPosition: Offset?,
         source: NestedScrollSource
     ): Offset = Offset.Zero
 
     override fun consumePostScroll(
         initialDragDelta: Offset,
         overscrollDelta: Offset,
-        pointerPosition: Offset?,
         source: NestedScrollSource
     ) {}
 

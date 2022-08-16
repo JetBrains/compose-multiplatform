@@ -259,15 +259,16 @@ private class ClassContext(override val declaration: IrClass) : DeclarationConte
     override fun recordCapture(local: IrValueDeclaration?): Boolean {
         val isThis = local == thisParam
         val isCtorParam = (local?.parent as? IrConstructor)?.parent === declaration
-        if (local != null && collectors.isNotEmpty() && isThis) {
+        val isClassParam = isThis || isCtorParam
+        if (local != null && collectors.isNotEmpty() && isClassParam) {
             for (collector in collectors) {
                 collector.recordCapture(local)
             }
         }
-        if (local != null && declaration.isLocal && !isThis && !isCtorParam) {
+        if (local != null && declaration.isLocal && !isClassParam) {
             captures.add(local)
         }
-        return isThis || isCtorParam
+        return isClassParam
     }
     override fun recordCapture(local: IrSymbolOwner?) { }
     override fun pushCollector(collector: CaptureCollector) {
@@ -415,10 +416,7 @@ class ComposerLambdaMemoization(
         val composable = declaration.allowsComposableCalls
         val canRemember = composable &&
             // Don't use remember in an inline function
-            !descriptor.isInline &&
-            // Don't use remember if in a composable that returns a value
-            // TODO(b/150390108): Consider allowing remember in effects
-            descriptor.returnType.let { it != null && it.isUnit() }
+            !descriptor.isInline
 
         val context = FunctionContext(declaration, composable, canRemember)
         declarationContextStack.push(context)
@@ -453,6 +451,9 @@ class ComposerLambdaMemoization(
 
     override fun visitFunctionReference(expression: IrFunctionReference): IrExpression {
         // Memoize the instance created by using the :: operator
+        if (expression.symbol.owner.isLocal) {
+            declarationContextStack.recordLocalCapture(expression.symbol.owner)
+        }
         val result = super.visitFunctionReference(expression)
         val functionContext = currentFunctionContext ?: return result
         if (expression.valueArgumentsCount != 0) {
@@ -570,7 +571,7 @@ class ComposerLambdaMemoization(
         return super.visitConstructorCall(expression)
     }
 
-    @ObsoleteDescriptorBasedAPI
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
     private fun visitComposableFunctionExpression(
         expression: IrFunctionExpression,
         declarationContext: DeclarationContext
@@ -676,7 +677,6 @@ class ComposerLambdaMemoization(
         ).markAsComposableSingleton()
     }
 
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun visitFunctionExpression(expression: IrFunctionExpression): IrExpression {
         val declarationContext = declarationContextStack.peek()
             ?: return super.visitFunctionExpression(expression)
@@ -698,7 +698,6 @@ class ComposerLambdaMemoization(
         }
     }
 
-    @ObsoleteDescriptorBasedAPI
     private fun wrapFunctionExpression(
         declarationContext: DeclarationContext,
         expression: IrFunctionExpression,
@@ -707,7 +706,7 @@ class ComposerLambdaMemoization(
         val function = expression.function
         val argumentCount = function.valueParameters.size
 
-        val isJs = context.moduleDescriptor.platform.isJs()
+        val isJs = context.platform.isJs()
         if (argumentCount > MAX_RESTART_ARGUMENT_COUNT && isJs) {
             error(
                 "only $MAX_RESTART_ARGUMENT_COUNT parameters " +

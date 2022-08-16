@@ -40,64 +40,6 @@ class UnrememberedAnimatableDetectorTest : LintDetectorTest() {
     override fun getIssues(): MutableList<Issue> =
         mutableListOf(UnrememberedAnimatableDetector.UnrememberedAnimatable)
 
-    // Simplified Animatable.kt stubs
-    private val AnimatableStub = compiledStub(
-        filename = "Animatable.kt",
-        filepath = "androidx/compose/animation/core",
-        checksum = 0xfbab86fa,
-        """
-            package androidx.compose.animation.core
-
-            class Animatable<T, V>(
-                initialValue: T,
-                val typeConverter: V? = null
-            )
-
-            fun Animatable(initialValue: Float): Animatable<Float, Any> = Animatable(initialValue)
-        """,
-"""
-        META-INF/main.kotlin_module:
-        H4sIAAAAAAAAAHWLuwrCQBBFR6IIo9UWIiIIKRQs1sYfEMt0CraySYY4sI+w
-        D/DzXVGrYHG5cDgHAAoAGOVNvg94xJWyrXfcPmXjTO8CSWXZqMjOisWVbafp
-        pnSi049WEQ+4+V9l4knMP76qNeVgi8tB4JONbEjghQyZmnz2drgeeIll51X/
-        4CaI6dlp9xZnOI4UoijuVSxhDy8wojKE3QAAAA==
-        """,
-        """
-        androidx/compose/animation/core/Animatable.class:
-        H4sIAAAAAAAAAI1SW08TQRT+ZrvdtmsLSwUpeENFbQuyaHwgQky8xKRJQQJN
-        X4gPQzvitNtdsjNt8MXwN3z1F2iiIfHBEB/9UcYz23qjPpjNzrnMmfN95/Lt
-        ++cvAO7jHkOVh+04ku0jvxX1DiMlfB7KHtcyCskTC/9RYvL9QGTAGDY2Gg/q
-        HT7gfsDDA//5fke09HrzH76H4y4G76wvA5vB2ZCh1A8ZbpfHH417Kk2GXLnR
-        WG80E32xHsUHfkfo/ZjLUFEFYaSTEpS/1Q8CQ56wU+VKMw8Hros0zjEU9OtD
-        8SQKByLWImYojiPlUcBEDhYmGWz9SiqG5fr/d4xA86YyyYMmD/qCoflfBdbq
-        3UgHMvQ7g54vQ2IX8sB/Kl7yfqCJsdJxv6WjeJPHXRGvD8vKuMRzhlp8IHTj
-        78qmy5V/DSNdrlAHqTHJOfUTdFNo3qYCyGf1BinaFGaONAPrkutIGmuVtPZd
-        hhenx55rlSzXytLvnR6T4pROj6t2lm4YCeZZ96zV1OO5ouPZ89ba6XHRzVpe
-        et4usTX29Z1jec7OzB+2S3ly83Y242UNCC0pa9BPgwYN7Xd3V7qa9mBXHoRc
-        92Nq7sWdfqhlT9TCgVSSIh79XgSa35OoTUGTdRmKrX5vX8QNk8XMPWqZAcXS
-        2CPn4tlc2zzmPUHt/CtpYVfzVneTH46eubtRP26JZ9IYc6MczTE2uEuzSpvO
-        omhWjKwKWRbmUSXpkD9HMkWSBktyiaxtujetd6snyFeXP8H7kLxZpnMiubHp
-        c+iljTtkLQyjMUUYSLTzFMcS7U/MLFZI5qyEDsF6BnSadAO6QUkM0cnL6Tdv
-        aQc2q0vLJ7gwRPaHHLMJhSLBIiHgUEqbADIEPYvSiL5PGQ14uvoR3vtfzJ3E
-        6SSM88OAEeMhu7kzHRl6U1hNZJk6CdTo9iK9u7SHVA2Xa7hCJ66aY6GGa7i+
-        B6ZwA4t7cBWKCjcVbincVjivUFDIKMwqlBQmfgAHXc93GwUAAA==
-        """,
-        """
-        androidx/compose/animation/core/AnimatableKt.class:
-        H4sIAAAAAAAAAJVRTW/TQBB9a+eDuKF1w1frAoVyoRJi08KJIKQKKVKECRKt
-        eslpE6+iTezdyl5HPeYncUQcUM78KMSsGykSXKi1np33/Ha88+bX7x8/AbzF
-        EcMroZPcqOSaT0x2ZQrJhVaZsMpoYnLJzyooxqn8ZJtgDOFMLARPhZ7yL+OZ
-        nBDrMwQbHQN/2T+O/79wj+Hidifex5tL9FMjbC/++1a9D1T2RWzyKZ9JO86F
-        0gUV1MZWFQs+NHZYpmmvjToaATy0GNpKK6tEeinSkvpgfYbdeG5sqjT/LK1I
-        6PdU1ssWPhnIXKiTbO4Sj/hr5bIuZckJw5vVMgxWy8Db8wIvbNJLYLWMItqj
-        7U6t43W9KvpddtoIaxFhd/SUxnI7+8Bwd0O8nluG2keTUAs7sdJyWGZjmV/c
-        DKcTm4nrMFcOr8nWuZpqYcuc8oOvpbYqkwO9UIWiz2cb12jQ56bMJ7Kv3LH9
-        tfTyHyFOyNEa3EMyZzF8HBDihJnz7eg7gm/ONzym2KjIFp5QbN8IsEUZ8LTS
-        NHG4Vt2p8LMqRnhO+zvXPum3R/AH2BkgpIjdATq4N8B9PBiBFXiIRyPUC7f2
-        CuxXa+sP0YZpjAsDAAA=
-        """
-    )
-
     // Simplified Animatable Color function stub, from androidx.compose.animation
     private val AnimatableColorStub = compiledStub(
         filename = "SingleValueAnimation.kt",
@@ -226,7 +168,7 @@ class UnrememberedAnimatableDetectorTest : LintDetectorTest() {
                 }
             """
             ),
-            AnimatableStub,
+            Stubs.Animatable,
             AnimatableColorStub,
             Stubs.Color,
             Stubs.Composable,
@@ -390,7 +332,7 @@ src/test/{.kt:80: Error: Creating an Animatable during composition without using
                 }
             """
             ),
-            AnimatableStub,
+            Stubs.Animatable,
             AnimatableColorStub,
             Stubs.Color,
             Stubs.Composable,
@@ -503,7 +445,7 @@ src/test/{.kt:80: Error: Creating an Animatable during composition without using
                 }
             """
             ),
-            AnimatableStub,
+            Stubs.Animatable,
             AnimatableColorStub,
             Stubs.Color,
             Stubs.Composable,
