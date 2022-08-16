@@ -248,7 +248,7 @@ internal class SlotTable : CompositionData, Iterable<CompositionGroup> {
      * Close [reader].
      */
     internal fun close(reader: SlotReader) {
-        require(reader.table === this && readers > 0) { "Unexpected reader close()" }
+        runtimeCheck(reader.table === this && readers > 0) { "Unexpected reader close()" }
         readers--
     }
 
@@ -647,6 +647,12 @@ internal class SlotReader(
     private val slotsSize: Int = table.slotsSize
 
     /**
+     * True if the reader has been closed
+     */
+    var closed: Boolean = false
+        private set
+
+    /**
      * The current group that will be started with [startGroup] or skipped with [skipGroup].
      */
     var currentGroup = 0
@@ -898,7 +904,10 @@ internal class SlotReader(
      * Close the slot reader. After all [SlotReader]s have been closed the [SlotTable] a
      * [SlotWriter] can be created.
      */
-    fun close() = table.close(this)
+    fun close() {
+        closed = true
+        table.close(this)
+    }
 
     /**
      * Start a group.
