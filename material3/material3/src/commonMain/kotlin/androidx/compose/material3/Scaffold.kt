@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.offset
 
 /**
  * <a href="https://material.io/design/layout/understanding-layout.html" class="external" target="_blank">Material Design layout</a>.
@@ -134,7 +135,19 @@ private fun ScaffoldLayout(
             val topBarHeight = topBarPlaceables.maxByOrNull { it.height }?.height ?: 0
 
             val snackbarPlaceables = subcompose(ScaffoldLayoutContent.Snackbar, snackbar).map {
-                it.measure(looseConstraints)
+                // respect only bottom and horizontal for snackbar and fab
+                val leftInset = contentWindowInsets
+                    .getLeft(this@SubcomposeLayout, layoutDirection)
+                val rightInset = contentWindowInsets
+                    .getRight(this@SubcomposeLayout, layoutDirection)
+                val bottomInset = contentWindowInsets.getBottom(this@SubcomposeLayout)
+                // offset the snackbar constraints by the insets values
+                it.measure(
+                    looseConstraints.offset(
+                        -leftInset - rightInset,
+                        -bottomInset
+                    )
+                )
             }
 
             val snackbarHeight = snackbarPlaceables.maxByOrNull { it.height }?.height ?: 0
@@ -142,7 +155,19 @@ private fun ScaffoldLayout(
 
             val fabPlaceables =
                 subcompose(ScaffoldLayoutContent.Fab, fab).mapNotNull { measurable ->
-                    measurable.measure(looseConstraints).takeIf { it.height != 0 && it.width != 0 }
+                    // respect only bottom and horizontal for snackbar and fab
+                    val leftInset =
+                        contentWindowInsets.getLeft(this@SubcomposeLayout, layoutDirection)
+                    val rightInset =
+                        contentWindowInsets.getRight(this@SubcomposeLayout, layoutDirection)
+                    val bottomInset = contentWindowInsets.getBottom(this@SubcomposeLayout)
+                    measurable.measure(
+                        looseConstraints.offset(
+                            -leftInset - rightInset,
+                            -bottomInset
+                        )
+                    )
+                        .takeIf { it.height != 0 && it.width != 0 }
                 }
 
             val fabPlacement = if (fabPlaceables.isNotEmpty()) {
@@ -175,10 +200,11 @@ private fun ScaffoldLayout(
                 )
             }.map { it.measure(looseConstraints) }
 
-            val bottomBarHeight = bottomBarPlaceables.maxByOrNull { it.height }?.height ?: 0
+            val bottomBarHeight = bottomBarPlaceables.maxByOrNull { it.height }?.height
             val fabOffsetFromBottom = fabPlacement?.let {
-                if (bottomBarHeight == 0) {
-                    it.height + FabSpacing.roundToPx()
+                if (bottomBarHeight == null) {
+                    it.height + FabSpacing.roundToPx() +
+                        contentWindowInsets.getBottom(this@SubcomposeLayout)
                 } else {
                     // Total height is the bottom bar height + the FAB height + the padding
                     // between the FAB and bottom bar
@@ -187,7 +213,9 @@ private fun ScaffoldLayout(
             }
 
             val snackbarOffsetFromBottom = if (snackbarHeight != 0) {
-                snackbarHeight + (fabOffsetFromBottom ?: bottomBarHeight)
+                snackbarHeight +
+                    (fabOffsetFromBottom ?: bottomBarHeight
+                    ?: contentWindowInsets.getBottom(this@SubcomposeLayout))
             } else {
                 0
             }
@@ -202,7 +230,7 @@ private fun ScaffoldLayout(
                         topBarHeight.toDp()
                     },
                     bottom =
-                    if (bottomBarPlaceables.isEmpty()) {
+                    if (bottomBarPlaceables.isEmpty() || bottomBarHeight == null) {
                         insets.calculateBottomPadding()
                     } else {
                         bottomBarHeight.toDp()
@@ -223,13 +251,14 @@ private fun ScaffoldLayout(
             }
             snackbarPlaceables.forEach {
                 it.place(
-                    (layoutWidth - snackbarWidth) / 2,
+                    (layoutWidth - snackbarWidth) / 2 +
+                        contentWindowInsets.getLeft(this@SubcomposeLayout, layoutDirection),
                     layoutHeight - snackbarOffsetFromBottom
                 )
             }
             // The bottom bar is always at the bottom of the layout
             bottomBarPlaceables.forEach {
-                it.place(0, layoutHeight - bottomBarHeight)
+                it.place(0, layoutHeight - (bottomBarHeight ?: 0))
             }
             // Explicitly not using placeRelative here as `leftOffset` already accounts for RTL
             fabPlacement?.let { placement ->
