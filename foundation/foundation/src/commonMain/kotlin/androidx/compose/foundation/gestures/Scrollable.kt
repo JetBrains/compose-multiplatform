@@ -322,6 +322,7 @@ private class ScrollingLogic(
     val flingBehavior: FlingBehavior,
     val overscrollEffect: OverscrollEffect?
 ) {
+    private val isNestedFlinging = mutableStateOf(false)
     fun Float.toOffset(): Offset = when {
         this == 0f -> Offset.Zero
         orientation == Horizontal -> Offset(this, 0f)
@@ -372,7 +373,8 @@ private class ScrollingLogic(
             leftForParent - parentConsumed,
             source
         )
-        return leftForParent
+
+        return leftForParent - parentConsumed
     }
 
     fun overscrollPreConsumeDelta(
@@ -410,6 +412,9 @@ private class ScrollingLogic(
     }
 
     suspend fun onDragStopped(initialVelocity: Velocity) {
+        // Self started flinging, set
+        registerNestedFling(true)
+
         val availableVelocity = initialVelocity.singleAxisVelocity()
         val preOverscrollConsumed =
             if (overscrollEffect != null && overscrollEffect.isEnabled) {
@@ -431,6 +436,9 @@ private class ScrollingLogic(
         if (overscrollEffect != null && overscrollEffect.isEnabled) {
             overscrollEffect.consumePostFling(totalLeft)
         }
+
+        // Self stopped flinging, reset
+        registerNestedFling(false)
     }
 
     suspend fun doFlingAnimation(available: Velocity): Velocity {
@@ -457,8 +465,12 @@ private class ScrollingLogic(
     }
 
     fun shouldScrollImmediately(): Boolean {
-        return scrollableState.isScrollInProgress ||
+        return scrollableState.isScrollInProgress || isNestedFlinging.value ||
             overscrollEffect?.isInProgress ?: false
+    }
+
+    fun registerNestedFling(isFlinging: Boolean) {
+        isNestedFlinging.value = isFlinging
     }
 }
 
@@ -495,6 +507,14 @@ private fun scrollableNestedScrollConnection(
     scrollLogic: State<ScrollingLogic>,
     enabled: Boolean
 ): NestedScrollConnection = object : NestedScrollConnection {
+    override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+        // child will fling, set
+        if (source == Fling) {
+            scrollLogic.value.registerNestedFling(true)
+        }
+        return Offset.Zero
+    }
+
     override fun onPostScroll(
         consumed: Offset,
         available: Offset,
@@ -514,6 +534,9 @@ private fun scrollableNestedScrollConnection(
             available - velocityLeft
         } else {
             Velocity.Zero
+        }.also {
+            // Flinging child finished flinging, reset
+            scrollLogic.value.registerNestedFling(false)
         }
     }
 }
