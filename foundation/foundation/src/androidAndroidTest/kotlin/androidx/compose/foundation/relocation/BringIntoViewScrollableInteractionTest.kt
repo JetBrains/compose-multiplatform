@@ -16,11 +16,9 @@
 
 package androidx.compose.foundation.relocation
 
-import android.os.Build.VERSION_CODES.O
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.Orientation.Horizontal
 import androidx.compose.foundation.gestures.Orientation.Vertical
@@ -33,50 +31,50 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.testutils.assertAgainstGolden
-import androidx.compose.foundation.GOLDEN_UI
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.background
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.TestMonotonicFrameClock
-import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.assertPositionInRootIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpRect
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.toSize
 import androidx.test.filters.MediumTest
-import androidx.test.filters.SdkSuppress
-import androidx.test.screenshot.AndroidXScreenshotTestRule
+import com.google.common.truth.Truth.assertThat
+import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @MediumTest
 @RunWith(Parameterized::class)
-@SdkSuppress(minSdkVersion = O)
-class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
+class BringIntoViewScrollableInteractionTest(private val orientation: Orientation) {
+
     @get:Rule
     val rule = createComposeRule()
 
-    @get:Rule
-    val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_UI)
-
     private val parentBox = "parent box"
+    private val childBox = "child box"
+
+    /**
+     * Captures a scope from inside the composition for [runBlockingAndAwaitIdle].
+     * Make sure to call [setContentAndInitialize] instead of calling `rule.setContent` to initialize this.
+     */
+    private lateinit var testScope: CoroutineScope
 
     companion object {
         @JvmStatic
@@ -88,13 +86,13 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
     fun noScrollableParent_noChange() {
         // Arrange.
         val bringIntoViewRequester = BringIntoViewRequester()
-        rule.setContent {
+        setContentAndInitialize {
             Box(
                 Modifier
                     .then(
                         when (orientation) {
-                            Horizontal -> Modifier.size(100.dp, 50.dp)
-                            Vertical -> Modifier.size(50.dp, 100.dp)
+                            Horizontal -> Modifier.size(100.toDp(), 50.toDp())
+                            Vertical -> Modifier.size(50.toDp(), 100.toDp())
                         }
                     )
                     .testTag(parentBox)
@@ -102,31 +100,34 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
             ) {
                 Box(
                     Modifier
-                        .size(50.dp)
+                        .size(50.toDp())
                         .background(Blue)
                         .bringIntoViewRequester(bringIntoViewRequester)
+                        .testTag(childBox)
                 )
             }
         }
+        val startingBounds = getUnclippedBoundsInRoot(childBox)
 
         // Act.
         runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
-        assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
+        assertThat(getUnclippedBoundsInRoot(childBox)).isEqualTo(startingBounds)
+        assertChildMaxInView()
     }
 
     @Test
     fun noScrollableParent_itemNotVisible_noChange() {
         // Arrange.
         val bringIntoViewRequester = BringIntoViewRequester()
-        rule.setContent {
+        setContentAndInitialize {
             Box(
                 Modifier
                     .then(
                         when (orientation) {
-                            Horizontal -> Modifier.size(100.dp, 50.dp)
-                            Vertical -> Modifier.size(50.dp, 100.dp)
+                            Horizontal -> Modifier.size(100.toDp(), 50.toDp())
+                            Vertical -> Modifier.size(50.toDp(), 100.toDp())
                         }
                     )
                     .testTag(parentBox)
@@ -136,29 +137,32 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
                     Modifier
                         .then(
                             when (orientation) {
-                                Horizontal -> Modifier.offset(x = 150.dp)
-                                Vertical -> Modifier.offset(y = 150.dp)
+                                Horizontal -> Modifier.offset(x = 150.toDp())
+                                Vertical -> Modifier.offset(y = 150.toDp())
                             }
                         )
-                        .size(50.dp)
+                        .size(50.toDp())
                         .background(Blue)
                         .bringIntoViewRequester(bringIntoViewRequester)
+                        .testTag(childBox)
                 )
             }
         }
+        val startingBounds = getUnclippedBoundsInRoot(childBox)
 
         // Act.
         runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
-        assertScreenshot(if (horizontal) "grayRectangleHorizontal" else "grayRectangleVertical")
+        assertThat(getUnclippedBoundsInRoot(childBox)).isEqualTo(startingBounds)
+        assertChildMaxInView()
     }
 
     @Test
     fun itemAtLeadingEdge_alreadyVisible_noChange() {
         // Arrange.
         val bringIntoViewRequester = BringIntoViewRequester()
-        rule.setContent {
+        setContentAndInitialize {
             Box(
                 Modifier
                     .testTag(parentBox)
@@ -167,36 +171,39 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
                         when (orientation) {
                             Horizontal ->
                                 Modifier
-                                    .size(100.dp, 50.dp)
+                                    .size(100.toDp(), 50.toDp())
                                     .horizontalScroll(rememberScrollState())
                             Vertical ->
                                 Modifier
-                                    .size(50.dp, 100.dp)
+                                    .size(50.toDp(), 100.toDp())
                                     .verticalScroll(rememberScrollState())
                         }
                     )
             ) {
                 Box(
                     Modifier
-                        .size(50.dp)
+                        .size(50.toDp())
                         .background(Blue)
                         .bringIntoViewRequester(bringIntoViewRequester)
+                        .testTag(childBox)
                 )
             }
         }
+        val startingBounds = getUnclippedBoundsInRoot(childBox)
 
         // Act.
         runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
-        assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
+        assertThat(getUnclippedBoundsInRoot(childBox)).isEqualTo(startingBounds)
+        assertChildMaxInView()
     }
 
     @Test
     fun itemAtTrailingEdge_alreadyVisible_noChange() {
         // Arrange.
         val bringIntoViewRequester = BringIntoViewRequester()
-        rule.setContent {
+        setContentAndInitialize {
             Box(
                 Modifier
                     .testTag(parentBox)
@@ -205,11 +212,11 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
                         when (orientation) {
                             Horizontal ->
                                 Modifier
-                                    .size(100.dp, 50.dp)
+                                    .size(100.toDp(), 50.toDp())
                                     .horizontalScroll(rememberScrollState())
                             Vertical ->
                                 Modifier
-                                    .size(50.dp, 100.dp)
+                                    .size(50.toDp(), 100.toDp())
                                     .verticalScroll(rememberScrollState())
                         }
                     )
@@ -218,29 +225,32 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
                     Modifier
                         .then(
                             when (orientation) {
-                                Horizontal -> Modifier.offset(x = 50.dp)
-                                Vertical -> Modifier.offset(y = 50.dp)
+                                Horizontal -> Modifier.offset(x = 50.toDp())
+                                Vertical -> Modifier.offset(y = 50.toDp())
                             }
                         )
-                        .size(50.dp)
+                        .size(50.toDp())
                         .background(Blue)
                         .bringIntoViewRequester(bringIntoViewRequester)
+                        .testTag(childBox)
                 )
             }
         }
+        val startingBounds = getUnclippedBoundsInRoot(childBox)
 
         // Act.
         runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
-        assertScreenshot(if (horizontal) "blueBoxRight" else "blueBoxBottom")
+        assertThat(getUnclippedBoundsInRoot(childBox)).isEqualTo(startingBounds)
+        assertChildMaxInView()
     }
 
     @Test
     fun itemAtCenter_alreadyVisible_noChange() {
         // Arrange.
         val bringIntoViewRequester = BringIntoViewRequester()
-        rule.setContent {
+        setContentAndInitialize {
             Box(
                 Modifier
                     .testTag(parentBox)
@@ -249,11 +259,11 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
                         when (orientation) {
                             Horizontal ->
                                 Modifier
-                                    .size(100.dp, 50.dp)
+                                    .size(100.toDp(), 50.toDp())
                                     .horizontalScroll(rememberScrollState())
                             Vertical ->
                                 Modifier
-                                    .size(50.dp, 100.dp)
+                                    .size(50.toDp(), 100.toDp())
                                     .verticalScroll(rememberScrollState())
                         }
                     )
@@ -262,32 +272,35 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
                     Modifier
                         .then(
                             when (orientation) {
-                                Horizontal -> Modifier.offset(x = 25.dp)
-                                Vertical -> Modifier.offset(y = 25.dp)
+                                Horizontal -> Modifier.offset(x = 25.toDp())
+                                Vertical -> Modifier.offset(y = 25.toDp())
                             }
                         )
-                        .size(50.dp)
+                        .size(50.toDp())
                         .background(Blue)
                         .bringIntoViewRequester(bringIntoViewRequester)
+                        .testTag(childBox)
                 )
             }
         }
+        val startingBounds = getUnclippedBoundsInRoot(childBox)
 
         // Act.
         runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
-        assertScreenshot(if (horizontal) "blueBoxCenterHorizontal" else "blueBoxCenterVertical")
+        assertThat(getUnclippedBoundsInRoot(childBox)).isEqualTo(startingBounds)
+        assertChildMaxInView()
     }
 
     @Test
     fun itemBiggerThanParentAtLeadingEdge_alreadyVisible_noChange() {
         // Arrange.
         val bringIntoViewRequester = BringIntoViewRequester()
-        rule.setContent {
+        setContentAndInitialize {
             Box(
                 Modifier
-                    .size(50.dp)
+                    .size(50.toDp())
                     .testTag(parentBox)
                     .background(LightGray)
                     .then(
@@ -299,19 +312,37 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
             ) {
                 // Using a multi-colored item to make sure we can assert that the right part of
                 // the item is visible.
-                RowOrColumn(Modifier.bringIntoViewRequester(bringIntoViewRequester)) {
-                    Box(Modifier.size(50.dp).background(Blue))
-                    Box(Modifier.size(50.dp).background(Green))
-                    Box(Modifier.size(50.dp).background(Red))
+                RowOrColumn(
+                    Modifier
+                        .bringIntoViewRequester(bringIntoViewRequester)
+                        .testTag(childBox)
+                ) {
+                    Box(
+                        Modifier
+                            .size(50.toDp())
+                            .background(Blue)
+                    )
+                    Box(
+                        Modifier
+                            .size(50.toDp())
+                            .background(Green)
+                    )
+                    Box(
+                        Modifier
+                            .size(50.toDp())
+                            .background(Red)
+                    )
                 }
             }
         }
+        val startingBounds = getUnclippedBoundsInRoot(childBox)
 
         // Act.
         runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
-        assertScreenshot("blueBox")
+        assertThat(getUnclippedBoundsInRoot(childBox)).isEqualTo(startingBounds)
+        assertChildMaxInView()
     }
 
     @Test
@@ -319,11 +350,11 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
         // Arrange.
         val bringIntoViewRequester = BringIntoViewRequester()
         lateinit var scrollState: ScrollState
-        rule.setContent {
+        setContentAndInitialize {
             scrollState = rememberScrollState()
             Box(
                 Modifier
-                    .size(50.dp)
+                    .size(50.toDp())
                     .testTag(parentBox)
                     .background(LightGray)
                     .then(
@@ -335,20 +366,38 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
             ) {
                 // Using a multi-colored item to make sure we can assert that the right part of
                 // the item is visible.
-                RowOrColumn(Modifier.bringIntoViewRequester(bringIntoViewRequester)) {
-                    Box(Modifier.size(50.dp).background(Red))
-                    Box(Modifier.size(50.dp).background(Green))
-                    Box(Modifier.size(50.dp).background(Blue))
+                RowOrColumn(
+                    Modifier
+                        .bringIntoViewRequester(bringIntoViewRequester)
+                        .testTag(childBox)
+                ) {
+                    Box(
+                        Modifier
+                            .size(50.toDp())
+                            .background(Red)
+                    )
+                    Box(
+                        Modifier
+                            .size(50.toDp())
+                            .background(Green)
+                    )
+                    Box(
+                        Modifier
+                            .size(50.toDp())
+                            .background(Blue)
+                    )
                 }
             }
         }
         runBlockingAndAwaitIdle { scrollState.scrollTo(scrollState.maxValue) }
+        val startingBounds = getUnclippedBoundsInRoot(childBox)
 
         // Act.
         runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
-        assertScreenshot("blueBox")
+        assertThat(getUnclippedBoundsInRoot(childBox)).isEqualTo(startingBounds)
+        assertChildMaxInView()
     }
 
     @Test
@@ -356,11 +405,11 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
         // Arrange.
         val bringIntoViewRequester = BringIntoViewRequester()
         lateinit var scrollState: ScrollState
-        rule.setContent {
+        setContentAndInitialize {
             scrollState = rememberScrollState()
             Box(
                 Modifier
-                    .size(50.dp)
+                    .size(50.toDp())
                     .testTag(parentBox)
                     .background(LightGray)
                     .then(
@@ -372,20 +421,38 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
             ) {
                 // Using a multi-colored item to make sure we can assert that the right part of
                 // the item is visible.
-                RowOrColumn(Modifier.bringIntoViewRequester(bringIntoViewRequester)) {
-                    Box(Modifier.size(50.dp).background(Green))
-                    Box(Modifier.size(50.dp).background(Blue))
-                    Box(Modifier.size(50.dp).background(Red))
+                RowOrColumn(
+                    Modifier
+                        .bringIntoViewRequester(bringIntoViewRequester)
+                        .testTag(childBox)
+                ) {
+                    Box(
+                        Modifier
+                            .size(50.toDp())
+                            .background(Green)
+                    )
+                    Box(
+                        Modifier
+                            .size(50.toDp())
+                            .background(Blue)
+                    )
+                    Box(
+                        Modifier
+                            .size(50.toDp())
+                            .background(Red)
+                    )
                 }
             }
         }
         runBlockingAndAwaitIdle { scrollState.scrollTo(scrollState.maxValue / 2) }
+        val startingBounds = getUnclippedBoundsInRoot(childBox)
 
         // Act.
         runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
-        assertScreenshot("blueBox")
+        assertThat(getUnclippedBoundsInRoot(childBox)).isEqualTo(startingBounds)
+        assertChildMaxInView()
     }
 
     @Test
@@ -393,7 +460,7 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
         // Arrange.
         val bringIntoViewRequester = BringIntoViewRequester()
         lateinit var scrollState: ScrollState
-        rule.setContent {
+        setContentAndInitialize {
             scrollState = rememberScrollState()
             Box(
                 Modifier
@@ -403,32 +470,33 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
                         when (orientation) {
                             Horizontal ->
                                 Modifier
-                                    .size(100.dp, 50.dp)
+                                    .size(100.toDp(), 50.toDp())
                                     .horizontalScroll(scrollState)
                             Vertical ->
                                 Modifier
-                                    .size(50.dp, 100.dp)
+                                    .size(50.toDp(), 100.toDp())
                                     .verticalScroll(scrollState)
                         }
                     )
             ) {
                 Box(
                     when (orientation) {
-                        Horizontal -> Modifier.size(200.dp, 50.dp)
-                        Vertical -> Modifier.size(50.dp, 200.dp)
+                        Horizontal -> Modifier.size(200.toDp(), 50.toDp())
+                        Vertical -> Modifier.size(50.toDp(), 200.toDp())
                     }
                 ) {
                     Box(
                         Modifier
                             .then(
                                 when (orientation) {
-                                    Horizontal -> Modifier.offset(x = 50.dp)
-                                    Vertical -> Modifier.offset(y = 50.dp)
+                                    Horizontal -> Modifier.offset(x = 50.toDp())
+                                    Vertical -> Modifier.offset(y = 50.toDp())
                                 }
                             )
-                            .size(50.dp)
+                            .size(50.toDp())
                             .background(Blue)
                             .bringIntoViewRequester(bringIntoViewRequester)
+                            .testTag(childBox)
                     )
                 }
             }
@@ -439,7 +507,8 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
         runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
-        assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
+        rule.onNodeWithTag(childBox).assertPositionInRootIsEqualTo(0.toDp(), 0.toDp())
+        assertChildMaxInView()
     }
 
     @Test
@@ -447,7 +516,7 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
         // Arrange.
         val bringIntoViewRequester = BringIntoViewRequester()
         lateinit var scrollState: ScrollState
-        rule.setContent {
+        setContentAndInitialize {
             scrollState = rememberScrollState()
             Box(
                 Modifier
@@ -457,32 +526,33 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
                         when (orientation) {
                             Horizontal ->
                                 Modifier
-                                    .size(100.dp, 50.dp)
+                                    .size(100.toDp(), 50.toDp())
                                     .horizontalScroll(scrollState)
                             Vertical ->
                                 Modifier
-                                    .size(50.dp, 100.dp)
+                                    .size(50.toDp(), 100.toDp())
                                     .verticalScroll(scrollState)
                         }
                     )
             ) {
                 Box(
                     when (orientation) {
-                        Horizontal -> Modifier.size(200.dp, 50.dp)
-                        Vertical -> Modifier.size(50.dp, 200.dp)
+                        Horizontal -> Modifier.size(200.toDp(), 50.toDp())
+                        Vertical -> Modifier.size(50.toDp(), 200.toDp())
                     }
                 ) {
                     Box(
                         Modifier
                             .then(
                                 when (orientation) {
-                                    Horizontal -> Modifier.offset(x = 150.dp)
-                                    Vertical -> Modifier.offset(y = 150.dp)
+                                    Horizontal -> Modifier.offset(x = 150.toDp())
+                                    Vertical -> Modifier.offset(y = 150.toDp())
                                 }
                             )
-                            .size(50.dp)
+                            .size(50.toDp())
                             .background(Blue)
                             .bringIntoViewRequester(bringIntoViewRequester)
+                            .testTag(childBox)
                     )
                 }
             }
@@ -493,7 +563,11 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
         runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
-        assertScreenshot(if (horizontal) "blueBoxRight" else "blueBoxBottom")
+        rule.onNodeWithTag(childBox).assertPositionInRootIsEqualTo(
+            expectedLeft = if (orientation == Horizontal) 50.toDp() else 0.toDp(),
+            expectedTop = if (orientation == Horizontal) 0.toDp() else 50.toDp()
+        )
+        assertChildMaxInView()
     }
 
     @Test
@@ -501,7 +575,7 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
         // Arrange.
         val bringIntoViewRequester = BringIntoViewRequester()
         lateinit var scrollState: ScrollState
-        rule.setContent {
+        setContentAndInitialize {
             scrollState = rememberScrollState()
             Box(
                 Modifier
@@ -511,27 +585,28 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
                         when (orientation) {
                             Horizontal ->
                                 Modifier
-                                    .size(100.dp, 50.dp)
+                                    .size(100.toDp(), 50.toDp())
                                     .horizontalScroll(scrollState)
                             Vertical ->
                                 Modifier
-                                    .size(50.dp, 100.dp)
+                                    .size(50.toDp(), 100.toDp())
                                     .verticalScroll(scrollState)
                         }
                     )
             ) {
-                Box(Modifier.size(200.dp)) {
+                Box(Modifier.size(200.toDp())) {
                     Box(
                         Modifier
                             .then(
                                 when (orientation) {
-                                    Horizontal -> Modifier.offset(x = 25.dp)
-                                    Vertical -> Modifier.offset(y = 25.dp)
+                                    Horizontal -> Modifier.offset(x = 25.toDp())
+                                    Vertical -> Modifier.offset(y = 25.toDp())
                                 }
                             )
-                            .size(50.dp)
+                            .size(50.toDp())
                             .background(Blue)
                             .bringIntoViewRequester(bringIntoViewRequester)
+                            .testTag(childBox)
                     )
                 }
             }
@@ -542,7 +617,8 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
         runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
-        assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
+        rule.onNodeWithTag(childBox).assertPositionInRootIsEqualTo(0.toDp(), 0.toDp())
+        assertChildMaxInView()
     }
 
     @Test
@@ -550,7 +626,7 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
         // Arrange.
         val bringIntoViewRequester = BringIntoViewRequester()
         lateinit var scrollState: ScrollState
-        rule.setContent {
+        setContentAndInitialize {
             scrollState = rememberScrollState()
             Box(
                 Modifier
@@ -560,32 +636,33 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
                         when (orientation) {
                             Horizontal ->
                                 Modifier
-                                    .size(100.dp, 50.dp)
+                                    .size(100.toDp(), 50.toDp())
                                     .horizontalScroll(scrollState)
                             Vertical ->
                                 Modifier
-                                    .size(50.dp, 100.dp)
+                                    .size(50.toDp(), 100.toDp())
                                     .verticalScroll(scrollState)
                         }
                     )
             ) {
                 Box(
                     when (orientation) {
-                        Horizontal -> Modifier.size(200.dp, 50.dp)
-                        Vertical -> Modifier.size(50.dp, 200.dp)
+                        Horizontal -> Modifier.size(200.toDp(), 50.toDp())
+                        Vertical -> Modifier.size(50.toDp(), 200.toDp())
                     }
                 ) {
                     Box(
                         Modifier
                             .then(
                                 when (orientation) {
-                                    Horizontal -> Modifier.offset(x = 150.dp)
-                                    Vertical -> Modifier.offset(y = 150.dp)
+                                    Horizontal -> Modifier.offset(x = 150.toDp())
+                                    Vertical -> Modifier.offset(y = 150.toDp())
                                 }
                             )
-                            .size(50.dp)
+                            .size(50.toDp())
                             .background(Blue)
                             .bringIntoViewRequester(bringIntoViewRequester)
+                            .testTag(childBox)
                     )
                 }
             }
@@ -596,7 +673,11 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
         runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
-        assertScreenshot(if (horizontal) "blueBoxRight" else "blueBoxBottom")
+        rule.onNodeWithTag(childBox).assertPositionInRootIsEqualTo(
+            expectedLeft = if (orientation == Horizontal) 50.toDp() else 0.toDp(),
+            expectedTop = if (orientation == Horizontal) 0.toDp() else 50.toDp()
+        )
+        assertChildMaxInView()
     }
 
     @Test
@@ -605,7 +686,7 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
         val bringIntoViewRequester = BringIntoViewRequester()
         lateinit var parentScrollState: ScrollState
         lateinit var grandParentScrollState: ScrollState
-        rule.setContent {
+        setContentAndInitialize {
             parentScrollState = rememberScrollState()
             grandParentScrollState = rememberScrollState()
             Box(
@@ -616,11 +697,11 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
                         when (orientation) {
                             Horizontal ->
                                 Modifier
-                                    .size(100.dp, 50.dp)
+                                    .size(100.toDp(), 50.toDp())
                                     .horizontalScroll(grandParentScrollState)
                             Vertical ->
                                 Modifier
-                                    .size(50.dp, 100.dp)
+                                    .size(50.toDp(), 100.toDp())
                                     .verticalScroll(grandParentScrollState)
                         }
                     )
@@ -632,32 +713,33 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
                             when (orientation) {
                                 Horizontal ->
                                     Modifier
-                                        .size(200.dp, 50.dp)
+                                        .size(200.toDp(), 50.toDp())
                                         .horizontalScroll(parentScrollState)
                                 Vertical ->
                                     Modifier
-                                        .size(50.dp, 200.dp)
+                                        .size(50.toDp(), 200.toDp())
                                         .verticalScroll(parentScrollState)
                             }
                         )
                 ) {
                     Box(
                         when (orientation) {
-                            Horizontal -> Modifier.size(400.dp, 50.dp)
-                            Vertical -> Modifier.size(50.dp, 400.dp)
+                            Horizontal -> Modifier.size(400.toDp(), 50.toDp())
+                            Vertical -> Modifier.size(50.toDp(), 400.toDp())
                         }
                     ) {
                         Box(
                             Modifier
                                 .then(
                                     when (orientation) {
-                                        Horizontal -> Modifier.offset(x = 25.dp)
-                                        Vertical -> Modifier.offset(y = 25.dp)
+                                        Horizontal -> Modifier.offset(x = 25.toDp())
+                                        Vertical -> Modifier.offset(y = 25.toDp())
                                     }
                                 )
-                                .size(50.dp)
+                                .size(50.toDp())
                                 .background(Blue)
                                 .bringIntoViewRequester(bringIntoViewRequester)
+                                .testTag(childBox)
                         )
                     }
                 }
@@ -670,7 +752,8 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
         runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
-        assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
+        rule.onNodeWithTag(childBox).assertPositionInRootIsEqualTo(0.toDp(), 0.toDp())
+        assertChildMaxInView()
     }
 
     @Test
@@ -679,7 +762,7 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
         val bringIntoViewRequester = BringIntoViewRequester()
         lateinit var parentScrollState: ScrollState
         lateinit var grandParentScrollState: ScrollState
-        rule.setContent {
+        setContentAndInitialize {
             parentScrollState = rememberScrollState()
             grandParentScrollState = rememberScrollState()
             Box(
@@ -690,18 +773,18 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
                         when (orientation) {
                             Horizontal ->
                                 Modifier
-                                    .size(100.dp, 50.dp)
+                                    .size(100.toDp(), 50.toDp())
                                     .verticalScroll(grandParentScrollState)
                             Vertical ->
                                 Modifier
-                                    .size(50.dp, 100.dp)
+                                    .size(50.toDp(), 100.toDp())
                                     .horizontalScroll(grandParentScrollState)
                         }
                     )
             ) {
                 Box(
                     Modifier
-                        .size(100.dp)
+                        .size(100.toDp())
                         .background(LightGray)
                         .then(
                             when (orientation) {
@@ -710,13 +793,14 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
                             }
                         )
                 ) {
-                    Box(Modifier.size(200.dp)) {
+                    Box(Modifier.size(200.toDp())) {
                         Box(
                             Modifier
-                                .offset(x = 25.dp, y = 25.dp)
-                                .size(50.dp)
+                                .offset(x = 25.toDp(), y = 25.toDp())
+                                .size(50.toDp())
                                 .background(Blue)
                                 .bringIntoViewRequester(bringIntoViewRequester)
+                                .testTag(childBox)
                         )
                     }
                 }
@@ -729,7 +813,8 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
         runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
-        assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
+        rule.onNodeWithTag(childBox).assertPositionInRootIsEqualTo(0.toDp(), 0.toDp())
+        assertChildMaxInView()
     }
 
     @Test
@@ -737,12 +822,12 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
         // Arrange.
         val bringIntoViewRequester = BringIntoViewRequester()
         lateinit var density: Density
-        rule.setContent {
+        setContentAndInitialize {
             density = LocalDensity.current
             Box(
                 Modifier
                     .testTag(parentBox)
-                    .size(50.dp)
+                    .size(50.toDp())
                     .background(LightGray)
                     .then(
                         when (orientation) {
@@ -751,22 +836,28 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
                         }
                     )
             ) {
-                Canvas(
-                    when (orientation) {
-                        Horizontal -> Modifier.size(150.dp, 50.dp)
-                        Vertical -> Modifier.size(50.dp, 150.dp)
-                    }.bringIntoViewRequester(bringIntoViewRequester)
-                ) {
-                    with(density) {
-                        drawRect(
-                            color = Blue,
-                            topLeft = when (orientation) {
-                                Horizontal -> Offset(50.dp.toPx(), 0.dp.toPx())
-                                Vertical -> Offset(0.dp.toPx(), 50.dp.toPx())
-                            },
-                            size = Size(50.dp.toPx(), 50.dp.toPx())
+                Box(
+                    Modifier
+                        .then(
+                            when (orientation) {
+                                Horizontal -> Modifier.size(150.toDp(), 50.toDp())
+                                Vertical -> Modifier.size(50.toDp(), 150.toDp())
+                            }
                         )
-                    }
+                        .bringIntoViewRequester(bringIntoViewRequester)
+                ) {
+                    Box(
+                        Modifier
+                            .size(50.toDp())
+                            .then(
+                                when (orientation) {
+                                    Horizontal -> Modifier.offset(50.toDp(), 0.toDp())
+                                    Vertical -> Modifier.offset(0.toDp(), 50.toDp())
+                                }
+                            )
+                            .background(Blue)
+                            .testTag(childBox)
+                    )
                 }
             }
         }
@@ -775,18 +866,40 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
         runBlockingAndAwaitIdle {
             val rect = with(density) {
                 when (orientation) {
-                    Horizontal -> Rect(50.dp.toPx(), 0.dp.toPx(), 100.dp.toPx(), 50.dp.toPx())
-                    Vertical -> Rect(0.dp.toPx(), 50.dp.toPx(), 50.dp.toPx(), 100.dp.toPx())
+                    Horizontal -> DpRect(50.toDp(), 0.toDp(), 100.toDp(), 50.toDp()).toRect()
+                    Vertical -> DpRect(0.toDp(), 50.toDp(), 50.toDp(), 100.toDp()).toRect()
                 }
             }
             bringIntoViewRequester.bringIntoView(rect)
         }
 
         // Assert.
-        assertScreenshot("blueBox")
+        rule.onNodeWithTag(childBox).assertPositionInRootIsEqualTo(0.toDp(), 0.toDp())
+        assertChildMaxInView()
     }
 
-    private val horizontal: Boolean get() = (orientation == Horizontal)
+    private fun setContentAndInitialize(content: @Composable () -> Unit) {
+        rule.setContent {
+            testScope = rememberCoroutineScope()
+            content()
+        }
+    }
+
+    /**
+     * Sizes and offsets of the composables in these tests must be specified using this function.
+     * If they're specified using `xx.dp` syntax, a rounding error somewhere in the layout system
+     * will cause the pixel values to be off-by-one.
+     */
+    private fun Int.toDp(): Dp = with(rule.density) { this@toDp.toDp() }
+
+    /**
+     * Returns the bounds of the node with [tag], without performing any clipping by any parents.
+     */
+    @Suppress("SameParameterValue")
+    private fun getUnclippedBoundsInRoot(tag: String): Rect {
+        val node = rule.onNodeWithTag(tag).fetchSemanticsNode()
+        return Rect(node.positionInRoot, node.size.toSize())
+    }
 
     @Composable
     private fun RowOrColumn(
@@ -799,20 +912,32 @@ class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
         }
     }
 
-    @RequiresApi(O)
-    private fun assertScreenshot(screenshot: String) {
-        rule.onNodeWithTag(parentBox)
-            .captureToImage()
-            .assertAgainstGolden(screenshotRule, "bringIntoParentBounds_$screenshot")
+    private fun runBlockingAndAwaitIdle(block: suspend CoroutineScope.() -> Unit) {
+        val job = testScope.launch(block = block)
+        rule.waitForIdle()
+        runBlocking {
+            job.join()
+        }
     }
 
-    private fun runBlockingAndAwaitIdle(block: suspend CoroutineScope.() -> Unit) {
-        runTest {
-            withContext(TestMonotonicFrameClock(this)) {
-                block()
-                advanceUntilIdle()
-            }
+    /**
+     * Asserts that as much of the child (identified by [childBox]) as can fit in the viewport
+     * (identified by [parentBox]) is visible. This is the min of the child size and the viewport
+     * size.
+     */
+    private fun assertChildMaxInView() {
+        val parentNode = rule.onNodeWithTag(parentBox).fetchSemanticsNode()
+        val childNode = rule.onNodeWithTag(childBox).fetchSemanticsNode()
+
+        // BoundsInRoot returns the clipped bounds.
+        val visibleBounds: IntSize = childNode.boundsInRoot.size.run {
+            IntSize(width.roundToInt(), height.roundToInt())
         }
-        rule.waitForIdle()
+        val expectedVisibleBounds = IntSize(
+            width = minOf(parentNode.size.width, childNode.size.width),
+            height = minOf(parentNode.size.height, childNode.size.height)
+        )
+
+        assertThat(visibleBounds).isEqualTo(expectedVisibleBounds)
     }
 }
