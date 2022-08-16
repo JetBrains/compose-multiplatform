@@ -21,6 +21,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.TestOnly
 import androidx.compose.runtime.collection.IdentityArrayIntMap
 import androidx.compose.runtime.collection.IdentityArrayMap
+import androidx.compose.runtime.collection.IdentityArraySet
 import androidx.compose.runtime.collection.IdentityScopeMap
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.observeDerivedStateRecalculations
@@ -261,7 +262,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
         /**
          * Scopes that were invalidated during previous apply step.
          */
-        private val invalidated = hashSetOf<Any>()
+        private val invalidated = IdentityArraySet<Any>()
 
         // derived state handling
 
@@ -417,7 +418,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
                         // Invalidate only if currentValue is different than observed on read
                         if (!policy.equivalent(derivedState.currentValue, previousValue)) {
                             valueToScopes.forEachScopeOf(derivedState) { scope ->
-                                invalidated += scope
+                                invalidated.add(scope)
                                 hasValues = true
                             }
                         }
@@ -425,7 +426,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
                 }
 
                 valueToScopes.forEachScopeOf(value) { scope ->
-                    invalidated += scope
+                    invalidated.add(scope)
                     hasValues = true
                 }
             }
@@ -436,7 +437,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
          * Call [onChanged] for previously invalidated scopes.
          */
         fun notifyInvalidatedScopes() {
-            invalidated.forEach(onChanged)
+            invalidated.fastForEach(onChanged)
             invalidated.clear()
         }
     }
