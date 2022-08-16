@@ -280,7 +280,7 @@ package androidx.compose.material3 {
   }
 
   public final class DividerKt {
-    method @androidx.compose.runtime.Composable public static void Divider(optional androidx.compose.ui.Modifier modifier, optional long color, optional float thickness, optional float startIndent);
+    method @androidx.compose.runtime.Composable public static void Divider(optional androidx.compose.ui.Modifier modifier, optional float thickness, optional long color);
   }
 
   public final class DragGestureDetectorCopyKt {
