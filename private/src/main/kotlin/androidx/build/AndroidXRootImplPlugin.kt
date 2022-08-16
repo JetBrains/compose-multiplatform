@@ -16,16 +16,19 @@
 
 package androidx.build
 
+import androidx.build.AndroidXImplPlugin.Companion.CREATE_LIBRARY_BUILD_INFO_FILES_TASK
 import androidx.build.AndroidXImplPlugin.Companion.ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.AndroidXImplPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
+import androidx.build.buildInfo.CreateAggregateLibraryBuildInfoFileTask
+import androidx.build.buildInfo.CreateAggregateLibraryBuildInfoFileTask.Companion.CREATE_AGGREGATE_BUILD_INFO_FILES_TASK
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gradle.isRoot
 import androidx.build.license.CheckExternalDependencyLicensesTask
 import androidx.build.playground.VerifyPlaygroundGradleConfigurationTask
 import androidx.build.studio.StudioTask.Companion.registerStudioTask
 import androidx.build.testConfiguration.registerOwnersServiceTasks
-import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import androidx.build.uptodatedness.TaskUpToDateValidator
+import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
@@ -37,6 +40,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.component.ModuleComponentSelector
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.plugins.JvmEcosystemPlugin
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.build.event.BuildEventsListenerRegistry
@@ -51,6 +55,10 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
         if (!project.isRoot) {
             throw Exception("This plugin should only be applied to root project")
         }
+        // workaround for https://github.com/gradle/gradle/issues/20145
+        // note that a future KMP plugin(1.8+) will apply this and then we can remove the following
+        // line.
+        project.plugins.apply(JvmEcosystemPlugin::class.java)
         project.configureRootProject()
     }
 
@@ -87,12 +95,12 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
         buildOnServerTask.buildId = getBuildId()
         buildOnServerTask.dependsOn(
             tasks.register(
-                AndroidXImplPlugin.CREATE_AGGREGATE_BUILD_INFO_FILES_TASK,
+                CREATE_AGGREGATE_BUILD_INFO_FILES_TASK,
                 CreateAggregateLibraryBuildInfoFileTask::class.java
             )
         )
         buildOnServerTask.dependsOn(
-            tasks.register(AndroidXImplPlugin.CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
+            tasks.register(CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
         )
 
         VerifyPlaygroundGradleConfigurationTask.createIfNecessary(project)?.let {
@@ -101,15 +109,6 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
 
         val createArchiveTask = Release.getGlobalFullZipTask(this)
         buildOnServerTask.dependsOn(createArchiveTask)
-
-        buildOnServerTask.dependsOn(
-            tasks.register(
-                "saveSystemStats",
-                SaveSystemStatsTask::class.java
-            ) { task ->
-                task.outputFile.set(File(project.getDistributionDirectory(), "system_stats.txt"))
-            }
-        )
 
         extra.set("projects", ConcurrentHashMap<String, String>())
         subprojects { project ->

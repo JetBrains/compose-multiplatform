@@ -630,6 +630,8 @@ class AffectedModuleDetectorImpl constructor(
             "development/",
             "playground-common/",
             ".github/",
+            // since we only used AMD for device tests, versions do not affect test outcomes.
+            "libraryversions.toml",
         )
     }
 }

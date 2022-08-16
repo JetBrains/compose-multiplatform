@@ -16,7 +16,6 @@
 
 package androidx.build
 
-import androidx.build.dependencyTracker.AffectedModuleDetector
 import com.android.build.api.dsl.Lint
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.android.build.gradle.internal.lint.AndroidLintTask
@@ -55,18 +54,6 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
 
     // Create fake variant tasks since that is what is invoked by developers.
     val lintTask = tasks.named("lint")
-    lintTask.configure { task ->
-        AffectedModuleDetector.configureTaskGuard(task)
-    }
-    afterEvaluate {
-        tasks.named("lintAnalyze").configure { task ->
-            AffectedModuleDetector.configureTaskGuard(task)
-        }
-        /* TODO: uncomment when we upgrade to AGP 7.1.0-alpha04
-        tasks.named("lintReport").configure { task ->
-            AffectedModuleDetector.configureTaskGuard(task)
-        }*/
-    }
     tasks.register("lintDebug") {
         it.dependsOn(lintTask)
         it.enabled = false
@@ -101,28 +88,6 @@ fun Project.configureAndroidProjectForLint(
     tasks.named("lint").configure { task ->
         // We already run lintDebug, we don't need to run lint which lints the release variant
         task.enabled = false
-    }
-    afterEvaluate {
-        for (variant in project.agpVariants) {
-            tasks.named(
-                "lint${variant.name.replaceFirstChar {
-                    if (it.isLowerCase()) it.titlecase(Locale.US) else it.toString()
-                }}"
-            ).configure { task ->
-                AffectedModuleDetector.configureTaskGuard(task)
-            }
-            tasks.named(
-                "lintAnalyze${variant.name.replaceFirstChar {
-                    if (it.isLowerCase()) it.titlecase(Locale.US) else it.toString()
-                }}"
-            ).configure { task ->
-                AffectedModuleDetector.configureTaskGuard(task)
-            }
-            /* TODO: uncomment when we upgrade to AGP 7.1.0-alpha04
-            tasks.named("lintReport${variant.name.capitalize(Locale.US)}").configure { task ->
-                AffectedModuleDetector.configureTaskGuard(task)
-            }*/
-        }
     }
 }
 
@@ -177,7 +142,9 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
         if (task.name.startsWith("updateLintBaseline")) {
             task.doLast {
                 task.outputs.files.find { it.name == "lint-baseline.xml" }?.let { file ->
-                    file.writeText(removeLineAndColumnAttributes(file.readText()))
+                    if (file.exists()) {
+                        file.writeText(removeLineAndColumnAttributes(file.readText()))
+                    }
                 }
             }
         }
@@ -216,15 +183,15 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
             fatal.add("VisibleForTests")
         }
 
+        // Reenable after b/238892319 is resolved
+        disable.add("NotificationPermission")
+
         // Broken in 7.4.0-alpha04 due to b/236262744
         disable.add("CustomPermissionTypo")
         disable.add("KnownPermissionError")
         disable.add("PermissionNamingConvention")
         disable.add("ReservedSystemPermission")
         disable.add("SystemPermissionTypo")
-
-        // Reenable after b/235251897 is resolved
-        disable.add("IllegalExperimentalApiUsage")
 
         // Disable dependency checks that suggest to change them. We want libraries to be
         // intentional with their dependency version bumps.

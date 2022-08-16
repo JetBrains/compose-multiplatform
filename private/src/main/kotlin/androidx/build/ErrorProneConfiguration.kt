@@ -39,7 +39,7 @@ import org.gradle.process.CommandLineArgumentProvider
 const val ERROR_PRONE_TASK = "runErrorProne"
 
 private const val ERROR_PRONE_CONFIGURATION = "errorprone"
-private const val ERROR_PRONE_VERSION = "com.google.errorprone:error_prone_core:2.4.0"
+private const val ERROR_PRONE_VERSION = "com.google.errorprone:error_prone_core:2.14.0"
 private val log = Logging.getLogger("ErrorProneConfiguration")
 
 fun Project.configureErrorProneForJava() {
@@ -128,6 +128,29 @@ private fun JavaCompile.configureWithErrorProne() {
 
             "-XepExcludedPaths:.*/(build/generated|build/errorProne|external)/.*",
 
+            // Consider re-enabling the following checks. Disabled as part of
+            // error-prone upgrade
+            "-Xep:InlineMeSuggester:OFF",
+            "-Xep:NarrowCalculation:OFF",
+            "-Xep:LongDoubleConversion:OFF",
+            "-Xep:UnicodeEscape:OFF",
+            "-Xep:JavaUtilDate:OFF",
+            "-Xep:UnrecognisedJavadocTag:OFF",
+            "-Xep:ObjectEqualsForPrimitives:OFF",
+            "-Xep:DoNotCallSuggester:OFF",
+            "-Xep:EqualsNull:OFF",
+            "-Xep:MalformedInlineTag:OFF",
+            "-Xep:MissingSuperCall:OFF",
+            "-Xep:ToStringReturnsNull:OFF",
+            "-Xep:ReturnValueIgnored:OFF",
+            "-Xep:MissingImplementsComparable:OFF",
+            "-Xep:EmptyTopLevelDeclaration:OFF",
+            "-Xep:InvalidThrowsLink:OFF",
+            "-Xep:StaticAssignmentOfThrowable:OFF",
+            "-Xep:DoNotClaimAnnotations:OFF",
+            "-Xep:AlreadyChecked:OFF",
+            "-Xep:StringSplitter:OFF",
+
             // We allow inter library RestrictTo usage.
             "-Xep:RestrictTo:OFF",
 
@@ -173,7 +196,7 @@ private fun JavaCompile.configureWithErrorProne() {
             "-Xep:MissingFail:ERROR",
             "-Xep:JavaLangClash:ERROR",
             "-Xep:TypeParameterUnusedInFormals:ERROR",
-            "-Xep:StringSplitter:ERROR",
+            // "-Xep:StringSplitter:ERROR", // disabled with upgrade to 2.14.0
             "-Xep:ReferenceEquality:ERROR",
             "-Xep:AssertionFailureIgnored:ERROR",
             "-Xep:UnnecessaryParentheses:ERROR",

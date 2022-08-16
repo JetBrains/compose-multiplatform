@@ -18,6 +18,7 @@ package androidx.build.docs
 
 import androidx.build.SupportConfig
 import androidx.build.dackka.DackkaTask
+import androidx.build.dackka.GenerateMetadataTask
 import androidx.build.dependencies.KOTLIN_VERSION
 import androidx.build.doclava.DacOptions
 import androidx.build.doclava.DoclavaTask
@@ -44,6 +45,8 @@ import org.gradle.api.Task
 import org.gradle.api.artifacts.ComponentMetadataContext
 import org.gradle.api.artifacts.ComponentMetadataRule
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.component.ComponentArtifactIdentifier
+import org.gradle.api.artifacts.result.ResolvedArtifactResult
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.DocsType
@@ -52,8 +55,10 @@ import org.gradle.api.attributes.Usage
 import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.RegularFile
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.JavaBasePlugin
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.PathSensitive
@@ -80,7 +85,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
     lateinit var samplesSourcesConfiguration: Configuration
     lateinit var dependencyClasspath: FileCollection
 
-    @get:javax.inject.Inject
+    @get:Inject
     abstract val archiveOperations: ArchiveOperations
 
     override fun apply(project: Project) {
@@ -139,7 +144,8 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             unzippedSamplesSources,
             unzipSamplesTask,
             dependencyClasspath,
-            buildOnServer
+            buildOnServer,
+            docsSourcesConfiguration,
         )
         configureDokka(
             project,
@@ -345,7 +351,8 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
         unzippedSamplesSources: File,
         unzipSamplesTask: TaskProvider<Sync>,
         dependencyClasspath: FileCollection,
-        buildOnServer: TaskProvider<*>
+        buildOnServer: TaskProvider<*>,
+        docsConfiguration: Configuration
     ) {
         val generatedDocsDir = project.file("${project.buildDir}/dackkaDocs")
 
@@ -353,10 +360,32 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             dependencies.add(project.dependencies.create(project.getLibraryByName("dackka")))
         }
 
+        val generateMetadataTask = project.tasks.register(
+            "generateMetadata",
+            GenerateMetadataTask::class.java
+        ) { task ->
+
+            @Suppress("UnstableApiUsage") // getResolvedArtifacts() is marked @Incubating
+            val artifacts = docsConfiguration.incoming.artifacts.resolvedArtifacts
+            task.getArtifactIds().set(
+
+                /**
+                 * Transforms the Set of [ResolvedArtifactResult] objects to a List of
+                 * [ComponentArtifactIdentifier] objects.
+                 *
+                 * This follows the guidance from
+                 * https://docs.gradle.org/7.5/userguide/more_about_tasks.html.
+                 */
+                artifacts.map { result -> result.map { it.id } }
+            )
+            task.destinationFile.set(getMetadataRegularFile(project))
+        }
+
         val dackkaTask = project.tasks.register("dackkaDocs", DackkaTask::class.java) { task ->
             task.apply {
                 dependsOn(unzipDocsTask)
                 dependsOn(unzipSamplesTask)
+                dependsOn(generateMetadataTask)
 
                 description = "Generates reference documentation using a Google devsite Dokka" +
                     " plugin. Places docs in $generatedDocsDir"
@@ -372,10 +401,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
                 excludedPackages = hiddenPackages.toSet()
                 excludedPackagesForJava = hiddenPackagesJava
                 excludedPackagesForKotlin = emptySet()
-
-                // TODO(b/239095864): replace this placeholder file with a dynamically generated one
-                libraryMetadataFile = project.rootProject.layout.projectDirectory
-                    .file("buildSrc/SampleLibraryMetadata.json")
+                libraryMetadataFile.set(getMetadataRegularFile(project))
 
                 // TODO(b/223712700): change to `true` once bug is resolved
                 showLibraryMetadata = false
@@ -662,6 +688,12 @@ abstract class SourcesVariantRule : ComponentMetadataRule {
         }
     }
 }
+
+/**
+ * Location of the library metadata JSON file that's used by Dackka, represented as a [RegularFile]
+ */
+private fun getMetadataRegularFile(project: Project): Provider<RegularFile> =
+    project.layout.buildDirectory.file("SampleLibraryMetadata.json")
 
 private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
 

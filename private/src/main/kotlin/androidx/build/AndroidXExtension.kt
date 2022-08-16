@@ -17,6 +17,7 @@
 package androidx.build
 
 import androidx.build.checkapi.shouldConfigureApiTasks
+import com.android.build.gradle.internal.crash.afterEvaluate
 import groovy.lang.Closure
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -184,6 +185,14 @@ open class AndroidXExtension(val project: Project) {
         } else {
             false
         }
+
+    internal fun ifReleasing(action: () -> Unit) {
+        project.afterEvaluate {
+            if (shouldRelease()) {
+                action()
+            }
+        }
+    }
 
     internal fun isPublishConfigured(): Boolean = (
             publish != Publish.UNSET ||

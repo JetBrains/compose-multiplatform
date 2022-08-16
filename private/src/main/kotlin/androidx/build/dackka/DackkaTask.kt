@@ -22,7 +22,9 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFile
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
@@ -91,7 +93,7 @@ abstract class DackkaTask @Inject constructor(
      * SHOW_LIBRARY_METADATA: set to "true" to display the data
      */
     @get:[InputFile PathSensitive(PathSensitivity.NONE)]
-    lateinit var libraryMetadataFile: RegularFile
+    abstract val libraryMetadataFile: RegularFileProperty
 
     @Input
     var showLibraryMetadata: Boolean = false
@@ -169,7 +171,7 @@ interface DackkaParams : WorkParameters {
     val excludedPackages: ListProperty<String>
     val excludedPackagesForJava: ListProperty<String>
     val excludedPackagesForKotlin: ListProperty<String>
-    var libraryMetadataFile: RegularFile
+    var libraryMetadataFile: Provider<RegularFile>
     var showLibraryMetadata: Boolean
 }
 
@@ -180,7 +182,7 @@ fun runDackkaWithArgs(
     excludedPackages: Set<String>,
     excludedPackagesForJava: Set<String>,
     excludedPackagesForKotlin: Set<String>,
-    libraryMetadataFile: RegularFile,
+    libraryMetadataFile: Provider<RegularFile>,
     showLibraryMetadata: Boolean,
 ) {
     val workQueue = workerExecutor.noIsolation()
@@ -206,7 +208,7 @@ abstract class DackkaWorkAction @Inject constructor(
 
             // b/183989795 tracks moving these away from an environment variables
             it.environment("DEVSITE_TENANT", "androidx")
-            it.environment("LIBRARY_METADATA_FILE", parameters.libraryMetadataFile.toString())
+            it.environment("LIBRARY_METADATA_FILE", parameters.libraryMetadataFile.get().toString())
             it.environment("SHOW_LIBRARY_METADATA", parameters.showLibraryMetadata)
 
             if (parameters.excludedPackages.get().isNotEmpty())

@@ -161,6 +161,9 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
                     error.add("MutableCollectionMutableState")
                     error.add("UnnecessaryComposedModifier")
                     error.add("FrequentlyChangedStateReadInComposition")
+                    error.add("ReturnFromAwaitPointerEventScope")
+                    error.add("UseOfNonLambdaOffsetOverload")
+                    error.add("MultipleAwaitPointerEventScopes")
 
                     // Paths we want to enable ListIterator checks for - for higher level
                     // libraries it won't have a noticeable performance impact, and we don't want
@@ -192,17 +195,19 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
                 }
             }
 
-            // TODO: figure out how to apply this to multiplatform modules
-            dependencies.add(
-                "lintChecks",
-                project.dependencies.project(
-                    mapOf(
-                        "path" to ":compose:lint:internal-lint-checks",
-                        // TODO(b/206617878) remove this shadow configuration
-                        "configuration" to "shadow"
+            if (!allowMissingLintProject()) {
+                // TODO: figure out how to apply this to multiplatform modules
+                dependencies.add(
+                    "lintChecks",
+                    project.dependencies.project(
+                        mapOf(
+                            "path" to ":compose:lint:internal-lint-checks",
+                            // TODO(b/206617878) remove this shadow configuration
+                            "configuration" to "shadow"
+                        )
                     )
                 )
-            )
+            }
         }
 
         private fun Project.configureManifests() {

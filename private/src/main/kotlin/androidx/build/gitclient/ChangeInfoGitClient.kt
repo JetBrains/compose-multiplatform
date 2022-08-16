@@ -16,11 +16,9 @@
 
 package androidx.build.gitclient
 
-import org.gradle.api.GradleException
-import org.json.simple.JSONArray
-import org.json.simple.JSONObject
-import org.json.simple.parser.JSONParser
+import com.google.gson.Gson
 import java.io.File
+import org.gradle.api.GradleException
 
 /**
  * A git client based on changeinfo files and manifest files created by the build server.
@@ -37,21 +35,40 @@ class ChangeInfoGitClient(
     /**
      * The file containing the information about which changes are new in this build
      */
-    private val changeInfo: String,
+    changeInfoText: String,
     /**
      * The file containing version information
      */
     private val versionInfo: String
 ) : GitClient {
 
-    private val changeInfoParsed: JSONObject
-
-    init {
-       val changeInfoParser = JSONParser()
-       changeInfoParsed = changeInfoParser.parse(changeInfo) as JSONObject
+    private val changeInfo: ChangeInfo by lazy {
+        val gson = Gson()
+        gson.fromJson(changeInfoText, ChangeInfo::class.java)
     }
 
-    private fun parseSupportVersion(config: String): String? {
+    private data class ChangeInfo(
+        val changes: List<ChangeEntry>?
+    )
+    private data class ChangeEntry(
+        val project: String,
+        val revisions: List<Revisions>?
+    )
+    private data class Revisions(
+        val fileInfos: List<FileInfo>?
+    )
+    private data class FileInfo(
+        val path: String?,
+        val oldPath: String?,
+        val status: String
+    )
+
+    private val changesInThisRepo: List<ChangeEntry>
+        get() {
+            return changeInfo.changes?.filter { it.project == mainProject } ?: emptyList()
+        }
+
+    private fun parseSupportVersion(config: String): String {
         val revisionRegex = Regex("revision=\"([^\"]*)\"")
         for (line in config.split("\n")) {
             if (line.contains("path=\"frameworks/support\"")) {
@@ -63,20 +80,6 @@ class ChangeInfoGitClient(
         }
         throw GradleException("Could not identify frameworks/support version from text '$config'")
     }
-
-    private val changesInThisRepo: List<JSONObject>
-        get() {
-          val allChanges: JSONArray? = changeInfoParsed.get("changes") as? JSONArray
-          if (allChanges == null) {
-              return listOf()
-          } else {
-              return allChanges.map({ change ->
-                  change as JSONObject
-              }).filter({ change ->
-                  change.get("project") == mainProject
-              })
-          }
-      }
 
     /**
      * Finds changed file paths
@@ -95,17 +98,20 @@ class ChangeInfoGitClient(
         val fileList = mutableListOf<String>()
         val fileSet = mutableSetOf<String>()
         for (change in changesInThisRepo) {
-            val revisions = change.get("revisions") as? JSONArray ?: listOf()
+            val revisions = change.revisions ?: listOf()
             for (revision in revisions) {
-                val fileInfos = (revision as JSONObject).get("fileInfos") as? JSONArray ?: listOf()
+                val fileInfos = revision.fileInfos ?: listOf()
                 for (fileInfo in fileInfos) {
-                    for (pathKey in listOf("oldPath", "path")) { // path and oldPath list files
-                        val path = (fileInfo as JSONObject).get(pathKey)?.toString()
-                        if (path != null) {
-                            if (!fileSet.contains(path)) {
-                                fileList.add(path)
-                                fileSet.add(path)
-                            }
+                    fileInfo.oldPath?.let { path ->
+                        if (!fileSet.contains(path)) {
+                            fileList.add(path)
+                            fileSet.add(path)
+                        }
+                    }
+                    fileInfo.path?.let { path ->
+                        if (!fileSet.contains(path)) {
+                            fileList.add(path)
+                            fileSet.add(path)
                         }
                     }
                 }
@@ -119,7 +125,7 @@ class ChangeInfoGitClient(
      * If this were supported, it would:
      * Finds the most recently submitted change before any pending changes being tested
      */
-    override fun findPreviousSubmittedChange(): String? {
+    override fun findPreviousSubmittedChange(): String {
         // findChangedFilesSince doesn't need this information, so
         // this is unsupported at the moment.
         // For now we just return a non-null string to signify that there was no error
@@ -142,13 +148,14 @@ class ChangeInfoGitClient(
         if (gitCommitRange.untilInclusive != "HEAD") {
             throw UnsupportedOperationException(
                 "ChangeInfoGitClient only supports untilInclusive = HEAD, " +
-                "not ${gitCommitRange.untilInclusive}"
+                    "not ${gitCommitRange.untilInclusive}"
             )
         }
-        var latestCommit: String? = parseSupportVersion(versionInfo)
-        if (latestCommit != null) {
-            return listOf(Commit("_CommitSHA:$latestCommit", fullProjectDir.toString()))
-        }
-        return listOf()
+        return listOf(
+            Commit(
+                "_CommitSHA:${parseSupportVersion(versionInfo)}",
+                fullProjectDir.toString()
+            )
+        )
     }
 }

@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 apply plugin: "kotlin"
 apply from: "../kotlin-dsl-dependency.gradle"
 apply plugin: "java-gradle-plugin"
@@ -13,144 +11,48 @@ buildscript {
     }
 }
 
-configurations {
-    // Dependencies added to these configurations get copied into the corresponding configuration
-    // (cacheableApi gets copied into api, etc).
-    // Because we cache the resolutions of these configurations, performance is faster when
-    // artifacts are put into these configurations than when those artifacts are put into their
-    // corresponding configuration.
-    cacheableApi {
-        canBeConsumed = false // not directly used to satisfy a project dependency
-        attributes {
-            attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.class, Usage.JAVA_RUNTIME));
-            attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.class, Category.LIBRARY));
-            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.class, LibraryElements.JAR));
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, Integer.parseInt(JavaVersion.current().getMajorVersion()));
-            attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, project.objects.named(GradlePluginApiVersion.class, GradleVersion.current().getVersion()));
-        }
-    }
-    cacheableImplementation {
-        canBeConsumed = false // not directly used to satisfy a project dependency
-        attributes {
-            attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.class, Usage.JAVA_RUNTIME));
-            attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.class, Category.LIBRARY));
-            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.class, LibraryElements.JAR));
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, Integer.parseInt(JavaVersion.current().getMajorVersion()));
-            attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, project.objects.named(GradlePluginApiVersion.class, GradleVersion.current().getVersion()));
-        }
-        extendsFrom(project.configurations.cacheableApi)
-    }
-    cacheableRuntimeOnly {
-        canBeConsumed = false // not directly used to satisfy a project dependency
-    }
-}
-
 dependencies {
-    cacheableApi(libs.toml)
-    cacheableImplementation(libs.gson)
-    cacheableImplementation(libs.dom4j) {
+    implementation(project(":jetpad-integration"))
+
+    // Gradle APIs
+    implementation(gradleApi())
+    compileOnly(findGradleKotlinDsl())
+
+    // Plugins we use and configure
+    implementation(libs.androidGradlePluginz)
+    implementation(libs.androidToolsCommon) // for com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
+    implementation(libs.kotlinGradlePluginz)
+    implementation(libs.dokkaGradlePluginz)
+
+    // variety of json parsers
+    implementation(libs.gson)
+    implementation(libs.json) // b/241475613
+    implementation(libs.jsonSimple)
+
+    // XML parsers used in MavenUploadHelper.kt
+    implementation(libs.dom4j) {
         // Optional dependency where Ivy fails to parse the POM file.
         exclude(group:"net.java.dev.msv", module:"xsdlib")
     }
-    cacheableApi(libs.androidGradlePluginz)
-    cacheableImplementation(libs.dexMemberList)
-    cacheableApi(libs.kotlinGradlePluginz)
-    cacheableImplementation(gradleApi())
-    cacheableApi(libs.dokkaGradlePluginz)
-    // needed by inspection plugin
-    cacheableImplementation(libs.protobufGradlePluginz)
-    cacheableImplementation(libs.wireGradlePluginz)
-    cacheableImplementation(libs.shadow)
+    implementation(libs.xerces)
+
+    implementation(libs.shadow) // used by BundleInsideHelper.kt
+    implementation(libs.apacheAnt) // used in AarManifestTransformerTask.kt for unziping
+    implementation(libs.toml)
+    implementation(libs.apacheCommonIo) // used in CheckApiEquivalenceTask.kt
+    implementation(libs.dexMemberList) // used in ReportLibraryMetricsTask.kt
+
+    implementation(libs.protobufGradlePluginz) // needed to compile inspection plugin
+    implementation(libs.kotlinPoet) // needed to compile material-icon-generator
+    implementation(libs.xmlpull) // needed to compile material-icon-generator
+
     // dependencies that aren't used by buildSrc directly but that we resolve here so that the
     // root project doesn't need to re-resolve them and their dependencies on every build
-    cacheableRuntimeOnly(libs.hiltAndroidGradlePluginz)
-    // Needed for hiltAndroidGradlePluginz to workaround https://github.com/google/dagger/issues/3068
-    cacheableApi(libs.javapoet)
-    // room kotlintestapp uses the ksp plugin but it does not publish a plugin marker yet
-    cacheableApi(libs.kspGradlePluginz)
-    cacheableApi(libs.japicmpPluginz)
-    // dependencies whose resolutions we don't need to cache
-    compileOnly(findGradleKotlinDsl()) // Only one file in this configuration, no need to cache it
-    implementation(project(":jetpad-integration")) // Doesn't have a .pom, so not slow to load
+    runtimeOnly(libs.hiltAndroidGradlePluginz)
+    runtimeOnly(libs.javapoet) // for hiltAndroidGradlePluginz to workaround https://github.com/google/dagger/issues/3068
+    runtimeOnly(libs.kspGradlePluginz)
+    runtimeOnly(libs.wireGradlePluginz)
 }
-
-// Saves configuration into destFile
-// Each line of destFile will be the absolute filepath of one of the files in configuration
-def saveConfigurationResolution(configuration, destFile) {
-    def resolvedConfiguration = configuration.resolvedConfiguration
-    def files = resolvedConfiguration.files
-    def paths = files.collect { f -> f.toString() }
-    def serialized = paths.join("\n")
-    destFile.text = serialized
-}
-
-// Parses a file into a list of Dependency objects representing a ResolvedConfiguration
-def parseConfigurationResolution(savedFile, throwOnError) {
-    def savedText = savedFile.text
-    def filenames = savedText.split("\n")
-    def valid = true
-    def dependencies = filenames.collect { filename ->
-        if (!project.file(filename).exists()) {
-            if (throwOnError) {
-                throw new GradleException("\nFile " + filename + " listed as a resolved dependency in " + savedFile + " does not exist!\n\nFor more information, see b/187075069")
-            } else {
-                valid = false
-            }
-        }
-        project.dependencies.create(project.files(filename))
-    }
-    if (!valid) {
-        return null
-    }
-    return dependencies
-}
-
-// Resolves a Configuration into a list of Dependency objects
-def resolveConfiguration(configuration) {
-    def resolvedName = configuration.name
-    def cacheDir = new File(project.rootProject.buildDir, "/" + resolvedName)
-    def inputsFile = new File(cacheDir, "/deps")
-    def outputsFile = new File(cacheDir, "/result")
-
-    def inputText = fingerprintConfiguration(configuration)
-    def parsed = null
-    if (inputsFile.exists() && inputsFile.text == inputText) {
-        // Try to parse the previously resolved configuration, but don't give up if it mentions a
-        // nonexistent file. If something has since deleted one of the referenced files, we will
-        // try to reresolve that file later
-        parsed = parseConfigurationResolution(outputsFile, false)
-    }
-    // If the configuration has changed or if any of its files have been deleted, reresolve it
-    if (parsed == null) {
-        cacheDir.mkdirs()
-        saveConfigurationResolution(configuration, outputsFile)
-        inputsFile.text = inputText
-        // confirm that the resolved configuration parses successfully
-        parsed = parseConfigurationResolution(outputsFile, true)
-    }
-    return parsed
-}
-
-// Computes a unique string from a Configuration based on its dependencies
-// This is used for up-to-date checks
-def fingerprintConfiguration(configuration) {
-    def dependencies = configuration.allDependencies
-    def dependencyTexts = dependencies.collect { dep -> dep.group + ":" + dep.name + ":" + dep.version }
-    return dependencyTexts.join("\n")
-}
-
-// Imports the contents of fromConf into toConf
-// Uses caching to often short-circuit the resolution of fromConf
-def loadConfigurationQuicklyInto(fromConf, toConf) {
-    def resolved = resolveConfiguration(fromConf)
-    resolved.each { dep ->
-        project.dependencies.add(toConf.name, dep)
-    }
-}
-
-loadConfigurationQuicklyInto(configurations.cacheableApi, configurations.api)
-loadConfigurationQuicklyInto(configurations.cacheableImplementation, configurations.implementation)
-loadConfigurationQuicklyInto(configurations.cacheableRuntimeOnly, configurations.runtimeOnly)
 
 project.tasks.withType(Jar) { task ->
     task.reproducibleFileOrder = true

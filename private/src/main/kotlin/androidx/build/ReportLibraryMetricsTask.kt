@@ -16,7 +16,9 @@
 
 package androidx.build
 
+import com.google.gson.Gson
 import com.jakewharton.dex.DexParser.Companion.toDexParser
+import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
@@ -27,8 +29,6 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
-import org.json.simple.JSONObject
-import java.io.File
 
 private const val BYTECODE_SIZE = "bytecode_size"
 private const val METHOD_COUNT = "method_count"
@@ -57,20 +57,19 @@ abstract class ReportLibraryMetricsTask : DefaultTask() {
     fun reportLibraryMetrics() {
         val file = outputFile.get()
         file.parentFile.mkdirs()
-        val json = JSONObject()
-
         val jarFiles = getJarFiles()
+        val map = mutableMapOf<String, Any>()
         val bytecodeSize = getBytecodeSize(jarFiles)
         if (bytecodeSize > 0L) {
-            json[BYTECODE_SIZE] = bytecodeSize
+            map[BYTECODE_SIZE] = bytecodeSize
         }
 
         val methodCount = getMethodCount(jarFiles)
         if (methodCount > 0) {
-            json[METHOD_COUNT] = methodCount
+            map[METHOD_COUNT] = methodCount
         }
 
-        file.writeText(json.toJSONString())
+        file.writeText(Gson().toJson(map))
     }
 
     private fun getJarFiles(): List<File> {
@@ -97,10 +96,7 @@ abstract class ReportLibraryMetricsTask : DefaultTask() {
 }
 
 fun Project.configureReportLibraryMetricsTask(): TaskProvider<ReportLibraryMetricsTask> {
-    val task = tasks.register(
-        AndroidXImplPlugin.REPORT_LIBRARY_METRICS_TASK,
-        ReportLibraryMetricsTask::class.java
-    )
+    val task = tasks.register("reportLibraryMetrics", ReportLibraryMetricsTask::class.java)
     task.configure {
         val outputDir = project.rootProject.getLibraryMetricsDirectory()
         it.outputFile.set(

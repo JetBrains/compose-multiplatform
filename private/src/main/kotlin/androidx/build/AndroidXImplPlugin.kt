@@ -25,6 +25,7 @@ import androidx.build.SupportConfig.COMPILE_SDK_VERSION
 import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.SupportConfig.TARGET_SDK_VERSION
+import androidx.build.buildInfo.addCreateLibraryBuildInfoFileTasks
 import androidx.build.checkapi.JavaApiTaskConfig
 import androidx.build.checkapi.KmpApiTaskConfig
 import androidx.build.checkapi.LibraryApiTaskConfig
@@ -53,12 +54,20 @@ import com.android.build.gradle.TestPlugin
 import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.internal.tasks.AnalyticsRecordingTask
 import com.android.build.gradle.internal.tasks.ListingFileRedirectTask
+import java.io.File
+import java.time.Duration
+import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Inject
+import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.JavaVersion.VERSION_11
+import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.artifacts.repositories.IvyArtifactRepository
+import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginExtension
@@ -71,25 +80,18 @@ import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.io.File
-import java.time.Duration
-import java.util.Locale
-import java.util.concurrent.ConcurrentHashMap
-import javax.inject.Inject
-import org.gradle.api.component.SoftwareComponentFactory
-import org.gradle.api.artifacts.repositories.IvyArtifactRepository
-import org.gradle.kotlin.dsl.KotlinClosure1
-import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.targets.native.KotlinNativeHostTestRun
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.kotlin.gradle.testing.KotlinTaskTestRun
 
@@ -109,6 +111,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             AndroidXMultiplatformExtension.EXTENSION_NAME,
             project
         )
+        project.tasks.register(BUILD_ON_SERVER_TASK, DefaultTask::class.java)
         // Perform different actions based on which plugins have been applied to the project.
         // Many of the actions overlap, ex. API tracking.
         project.plugins.all { plugin ->
@@ -183,8 +186,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
     }
 
     private fun configureTestTask(project: Project, task: Test) {
-        AffectedModuleDetector.configureTaskGuard(task)
-
         // Robolectric 1.7 increased heap size requirements, see b/207169653.
         task.maxHeapSize = "3g"
 
@@ -273,7 +274,9 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
     ) {
         project.afterEvaluate {
             project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
-                if (extension.type.compilationTarget == CompilationTarget.HOST) {
+                if (extension.type.compilationTarget == CompilationTarget.HOST &&
+                    extension.type != LibraryType.ANNOTATION_PROCESSOR_UTILS
+                ) {
                     task.kotlinOptions.jvmTarget = "11"
                 } else {
                     task.kotlinOptions.jvmTarget = "1.8"
@@ -417,7 +420,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         project.configurePublicResourcesStub(libraryExtension)
         project.configureSourceJarForAndroid(libraryExtension)
         project.configureVersionFileWriter(libraryExtension, androidXExtension)
-        project.addCreateLibraryBuildInfoFileTask(androidXExtension)
+        project.addCreateLibraryBuildInfoFileTasks(androidXExtension)
         project.configureJavaCompilationWarnings(androidXExtension)
 
         project.configureDependencyVerification(androidXExtension) { taskProvider ->
@@ -456,7 +459,9 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         // Force Java 1.8 source- and target-compatibility for all Java libraries.
         val javaExtension = project.extensions.getByType<JavaPluginExtension>()
         project.afterEvaluate {
-            if (extension.type.compilationTarget == CompilationTarget.HOST) {
+            if (extension.type.compilationTarget == CompilationTarget.HOST &&
+                extension.type != LibraryType.ANNOTATION_PROCESSOR_UTILS
+            ) {
                 javaExtension.apply {
                     sourceCompatibility = VERSION_11
                     targetCompatibility = VERSION_11
@@ -479,7 +484,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             }
         }
 
-        project.addCreateLibraryBuildInfoFileTask(extension)
+        project.addCreateLibraryBuildInfoFileTasks(extension)
 
         // Standard lint, docs, and Metalava configuration for AndroidX projects.
         project.configureNonAndroidProjectForLint(extension)
@@ -672,6 +677,8 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                 addToTestZips(project, packageTask)
             }
         }
+        // This task needs to be guarded by AffectedModuleDetector due to guarding test
+        // APK building above. It can only be removed if we stop using AMD for test APKs.
         project.tasks.withType(ListingFileRedirectTask::class.java).forEach {
             AffectedModuleDetector.configureTaskGuard(it)
         }
@@ -833,41 +840,11 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         }
     }
 
-    // Task that creates a json file of a project's dependencies
-    private fun Project.addCreateLibraryBuildInfoFileTask(extension: AndroidXExtension) {
-        afterEvaluate {
-            if (extension.shouldRelease()) {
-                // Only generate build info files for published libraries.
-                val task = CreateLibraryBuildInfoFileTask.setup(project, extension)
-
-                rootProject.tasks.named(CreateLibraryBuildInfoFileTask.TASK_NAME).configure {
-                    it.dependsOn(task)
-                }
-                addTaskToAggregateBuildInfoFileTask(task)
-            }
-        }
-    }
-
-    private fun Project.addTaskToAggregateBuildInfoFileTask(
-        task: TaskProvider<CreateLibraryBuildInfoFileTask>
-    ) {
-        rootProject.tasks.named(CREATE_AGGREGATE_BUILD_INFO_FILES_TASK).configure {
-            val aggregateLibraryBuildInfoFileTask: CreateAggregateLibraryBuildInfoFileTask = it
-                as CreateAggregateLibraryBuildInfoFileTask
-            aggregateLibraryBuildInfoFileTask.dependsOn(task)
-            aggregateLibraryBuildInfoFileTask.libraryBuildInfoFiles.add(
-                task.flatMap { task -> task.outputFile }
-            )
-        }
-    }
-
     companion object {
         const val BUILD_TEST_APKS_TASK = "buildTestApks"
         const val CHECK_RELEASE_READY_TASK = "checkReleaseReady"
         const val CREATE_LIBRARY_BUILD_INFO_FILES_TASK = "createLibraryBuildInfoFiles"
-        const val CREATE_AGGREGATE_BUILD_INFO_FILES_TASK = "createAggregateBuildInfoFiles"
         const val GENERATE_TEST_CONFIGURATION_TASK = "GenerateTestConfiguration"
-        const val REPORT_LIBRARY_METRICS_TASK = "reportLibraryMetrics"
         const val ZIP_TEST_CONFIGS_WITH_APKS_TASK = "zipTestConfigsWithApks"
         const val ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK = "zipConstrainedTestConfigsWithApks"
 
