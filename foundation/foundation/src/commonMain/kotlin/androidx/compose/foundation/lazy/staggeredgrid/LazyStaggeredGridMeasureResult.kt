@@ -27,12 +27,13 @@ internal class LazyStaggeredGridMeasureResult(
     val measureResult: MeasureResult,
     val canScrollForward: Boolean,
     val canScrollBackward: Boolean,
-    val visibleItemsInfo: Array<List<LazyStaggeredGridItemInfo>>
+    val visibleItemsInfo: List<LazyStaggeredGridItemInfo>
 ) : MeasureResult by measureResult
 
 internal interface LazyStaggeredGridItemInfo {
     val offset: IntOffset
     val index: Int
+    val lane: Int
     val key: Any
     val size: IntSize
 }

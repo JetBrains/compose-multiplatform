@@ -17,14 +17,18 @@
 package androidx.compose.foundation.lazy.staggeredgrid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -453,6 +457,208 @@ class LazyStaggeredGridTest(
 
         rule.onNodeWithTag("1")
             .assertCrossAxisStartPositionInRootIsEqualTo(itemSizeDp)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun addItems() {
+        val state = LazyStaggeredGridState()
+        var itemsCount by mutableStateOf(1)
+        rule.setContent {
+            LazyStaggeredGrid(
+                lanes = 2,
+                state = state,
+                modifier = Modifier.axisSize(
+                    crossAxis = itemSizeDp * 2,
+                    mainAxis = itemSizeDp
+                ),
+            ) {
+                items(itemsCount) {
+                    Spacer(
+                        Modifier.axisSize(
+                            crossAxis = itemSizeDp,
+                            mainAxis = itemSizeDp
+                        ).testTag("$it")
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("1")
+            .assertDoesNotExist()
+
+        itemsCount = 10
+
+        rule.waitForIdle()
+
+        state.scrollBy(itemSizeDp * 10)
+
+        rule.onNodeWithTag("8")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("9")
+            .assertIsDisplayed()
+
+        itemsCount = 20
+
+        rule.waitForIdle()
+
+        state.scrollBy(itemSizeDp * 10)
+
+        rule.onNodeWithTag("18")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("19")
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun removeItems() {
+        val state = LazyStaggeredGridState()
+        var itemsCount by mutableStateOf(20)
+        rule.setContent {
+            LazyStaggeredGrid(
+                lanes = 2,
+                state = state,
+                modifier = Modifier.axisSize(
+                    crossAxis = itemSizeDp * 2,
+                    mainAxis = itemSizeDp
+                ),
+            ) {
+                items(itemsCount) {
+                    Spacer(
+                        Modifier.axisSize(
+                            crossAxis = itemSizeDp,
+                            mainAxis = itemSizeDp
+                        ).testTag("$it")
+                    )
+                }
+            }
+        }
+
+        state.scrollBy(itemSizeDp * 20)
+
+        rule.onNodeWithTag("18")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("19")
+            .assertIsDisplayed()
+
+        itemsCount = 10
+
+        rule.onNodeWithTag("8")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("9")
+            .assertIsDisplayed()
+
+        itemsCount = 1
+
+        rule.onNodeWithTag("0")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("1")
+            // seems like reuse keeps the node around?
+            .assertIsNotDisplayed()
+    }
+
+    @Test
+    fun resizingItems_maintainsScrollingRange() {
+        val state = LazyStaggeredGridState()
+        var itemSizes by mutableStateOf(
+            List(20) {
+                itemSizeDp * (it % 4 + 1)
+            }
+        )
+        rule.setContent {
+            LazyStaggeredGrid(
+                lanes = 2,
+                state = state,
+                modifier = Modifier.axisSize(
+                    crossAxis = itemSizeDp * 2,
+                    mainAxis = itemSizeDp * 5
+                ).testTag("lazy").border(1.dp, Color.Red),
+            ) {
+                items(20) {
+                    Box(
+                        Modifier.axisSize(
+                            crossAxis = itemSizeDp,
+                            mainAxis = itemSizes[it]
+                        ).testTag("$it").border(1.dp, Color.Black)
+                    ) {
+                        BasicText("$it")
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("lazy")
+            .scrollMainAxisBy(itemSizeDp * 20)
+
+        rule.onNodeWithTag("18")
+            .assertMainAxisSizeIsEqualTo(itemSizes[18])
+
+        rule.onNodeWithTag("19")
+            .assertMainAxisSizeIsEqualTo(itemSizes[19])
+
+        itemSizes = itemSizes.reversed()
+
+        rule.onNodeWithTag("18")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("19")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("lazy")
+            .scrollMainAxisBy(-itemSizeDp * 20)
+
+        rule.onNodeWithTag("0")
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("1")
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun removingItems_maintainsCorrectOffsets() {
+        val state = LazyStaggeredGridState(
+            initialFirstVisibleItems = intArrayOf(10, 11),
+            initialFirstVisibleOffsets = intArrayOf(0, 0)
+        )
+        var itemCount by mutableStateOf(20)
+        rule.setContent {
+            LazyStaggeredGrid(
+                lanes = 2,
+                state = state,
+                modifier = Modifier.axisSize(
+                    crossAxis = itemSizeDp * 2,
+                    mainAxis = itemSizeDp * 5
+                ).testTag("lazy").border(1.dp, Color.Red),
+            ) {
+                items(itemCount) {
+                    Box(
+                        Modifier.axisSize(
+                            crossAxis = itemSizeDp,
+                            mainAxis = itemSizeDp * (it % 3 + 1)
+                        ).testTag("$it").border(1.dp, Color.Black)
+                    ) {
+                        BasicText("$it")
+                    }
+                }
+            }
+        }
+
+        itemCount = 3
+
+        rule.waitForIdle()
+
+        rule.onNodeWithTag("0")
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("1")
             .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
     }
 
