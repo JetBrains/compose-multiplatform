@@ -19,7 +19,10 @@ package androidx.compose.material3.catalog.library.ui.component
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.consumedWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,6 +43,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -53,6 +57,7 @@ fun Component(
     onExampleClick: (example: Example) -> Unit,
     onBackClick: () -> Unit
 ) {
+    val ltr = LocalLayoutDirection.current
     CatalogScaffold(
         topBarTitle = component.name,
         showBackNavigationIcon = true,
@@ -65,7 +70,12 @@ fun Component(
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier.consumedWindowInsets(paddingValues),
-            contentPadding = paddingValues
+            contentPadding = PaddingValues(
+                start = paddingValues.calculateStartPadding(ltr) + ComponentPadding,
+                top = paddingValues.calculateTopPadding() + ComponentPadding,
+                end = paddingValues.calculateEndPadding(ltr) + ComponentPadding,
+                bottom = paddingValues.calculateBottomPadding() + ComponentPadding
+            )
         ) {
             item {
                 Box(
