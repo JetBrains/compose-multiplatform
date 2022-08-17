@@ -279,18 +279,14 @@ package androidx.compose.ui.focus {
 
   public static final class FocusDirection.Companion {
     method public int getDown();
-    method public int getIn();
     method public int getLeft();
     method public int getNext();
-    method public int getOut();
     method public int getPrevious();
     method public int getRight();
     method public int getUp();
     property public final int Down;
-    property public final int In;
     property public final int Left;
     property public final int Next;
-    property public final int Out;
     property public final int Previous;
     property public final int Right;
     property public final int Up;

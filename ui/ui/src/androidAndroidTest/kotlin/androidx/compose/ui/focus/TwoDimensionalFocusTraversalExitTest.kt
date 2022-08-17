@@ -20,8 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusDirection.Companion.Down
+import androidx.compose.ui.focus.FocusDirection.Companion.Exit
 import androidx.compose.ui.focus.FocusDirection.Companion.Left
-import androidx.compose.ui.focus.FocusDirection.Companion.Out
 import androidx.compose.ui.focus.FocusDirection.Companion.Right
 import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.platform.LocalFocusManager
@@ -37,7 +37,7 @@ import org.junit.runner.RunWith
 @OptIn(ExperimentalComposeUiApi::class)
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class TwoDimensionalFocusTraversalOutTest {
+class TwoDimensionalFocusTraversalExitTest {
     @get:Rule
     val rule = createComposeRule()
 
@@ -51,14 +51,14 @@ class TwoDimensionalFocusTraversalOutTest {
      *     |_______________|
      */
     @Test
-    fun focusOut_noParent_focusStateUnchanged() {
+    fun moveFocusExit_noParent_focusStateUnchanged() {
         // Arrange.
         rule.setContentForTest {
             FocusableBox(focusedItem, 0, 0, 10, 10, initialFocus)
         }
 
         // Act.
-        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Out) }
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Exit) }
 
         // Assert.
         rule.runOnIdle {
@@ -76,7 +76,7 @@ class TwoDimensionalFocusTraversalOutTest {
      *     |____________________|
      */
     @Test
-    fun focusOut_focusesOnParent() {
+    fun moveFocusExit_focusesOnParent() {
         // Arrange.
         val parent = mutableStateOf(false)
         rule.setContentForTest {
@@ -86,7 +86,7 @@ class TwoDimensionalFocusTraversalOutTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Out) }
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Exit) }
 
         // Assert.
         rule.runOnIdle {
@@ -105,7 +105,7 @@ class TwoDimensionalFocusTraversalOutTest {
      *     |____________________|
      */
     @Test
-    fun focusOut_doesNotFocusOnDeactivatedParent() {
+    fun moveFocusExit_doesNotFocusOnDeactivatedParent() {
         // Arrange.
         val parent = mutableStateOf(false)
         rule.setContentForTest {
@@ -115,7 +115,7 @@ class TwoDimensionalFocusTraversalOutTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Out) }
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Exit) }
 
         // Assert.
         rule.runOnIdle {
@@ -137,7 +137,7 @@ class TwoDimensionalFocusTraversalOutTest {
      *     |_________________________|
      */
     @Test
-    fun focusOut_focusesOnImmediateParent() {
+    fun moveFocusExit_focusesOnImmediateParent() {
         // Arrange.
         val (parent, grandparent) = List(2) { mutableStateOf(false) }
         rule.setContentForTest {
@@ -149,7 +149,7 @@ class TwoDimensionalFocusTraversalOutTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Out) }
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Exit) }
 
         // Assert.
         rule.runOnIdle {
@@ -172,7 +172,7 @@ class TwoDimensionalFocusTraversalOutTest {
      *     |_________________________|
      */
     @Test
-    fun focusOut_skipsImmediateParentIfItIsDeactivated() {
+    fun moveFocusExit_skipsImmediateParentIfItIsDeactivated() {
         // Arrange.
         val (parent, grandparent) = List(2) { mutableStateOf(false) }
         rule.setContentForTest {
@@ -184,7 +184,7 @@ class TwoDimensionalFocusTraversalOutTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Out) }
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Exit) }
 
         // Assert.
         rule.runOnIdle {
@@ -207,7 +207,7 @@ class TwoDimensionalFocusTraversalOutTest {
      *     |_________________________|
      */
     @Test
-    fun focusOut_doesNotChangeIfAllParentsAreDeactivated() {
+    fun moveFocusExit_doesNotChangeIfAllParentsAreDeactivated() {
         // Arrange.
         val (parent, grandparent) = List(2) { mutableStateOf(false) }
         rule.setContentForTest {
@@ -219,7 +219,7 @@ class TwoDimensionalFocusTraversalOutTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Out) }
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Exit) }
 
         // Assert.
         rule.runOnIdle {
@@ -239,7 +239,7 @@ class TwoDimensionalFocusTraversalOutTest {
      *     |____________________|
      */
     @Test
-    fun focusRight_focusesOnSiblingOfParent() {
+    fun moveFocusRight_focusesOnSiblingOfParent() {
         // Arrange.
         val (parent, nextItem) = List(2) { mutableStateOf(false) }
         rule.setContentForTest {
@@ -270,7 +270,7 @@ class TwoDimensionalFocusTraversalOutTest {
      *     |____________________|
      */
     @Test
-    fun focusRight_focusesOnNonDeactivatedSiblingOfParent() {
+    fun moveFocusRight_focusesOnNonDeactivatedSiblingOfParent() {
         // Arrange.
         val (parent, deactivated, nextItem) = List(3) { mutableStateOf(false) }
         rule.setContentForTest {
@@ -303,7 +303,7 @@ class TwoDimensionalFocusTraversalOutTest {
      *     |____________________|
      */
     @Test
-    fun focusRight_focusesOnNonDeactivatedSiblingOfParent_withOverlappingDeactivatedItem() {
+    fun moveFocusRight_focusesOnNonDeactivatedSiblingOfParent_withOverlappingDeactivatedItem() {
         // Arrange.
         val (parent, deactivated, nextItem) = List(3) { mutableStateOf(false) }
         rule.setContentForTest {
@@ -339,7 +339,7 @@ class TwoDimensionalFocusTraversalOutTest {
      *   |__________________________|
      */
     @Test
-    fun focusRight_focusesOnSiblingOfGrandparent() {
+    fun moveFocusRight_focusesOnSiblingOfGrandparent() {
         // Arrange.
         val (grandparent, parent, nextItem) = List(3) { mutableStateOf(false) }
         rule.setContentForTest {
@@ -379,7 +379,7 @@ class TwoDimensionalFocusTraversalOutTest {
      *                      |____________________|
      */
     @Test
-    fun focusLeft_fromItemOnLeftEdge_movesFocusOutsideParent() {
+    fun moveFocusLeft_fromItemOnLeftEdge_movesFocusOutsideParent() {
         // Arrange.
         val parent = mutableStateOf(false)
         val (item1, item2, item3, item4, item5) = List(5) { mutableStateOf(false) }
@@ -425,7 +425,7 @@ class TwoDimensionalFocusTraversalOutTest {
      *                      |____________________|
      */
     @Test
-    fun focusLeft_fromItemOnLeftEdge_movesFocusOutsideDeactivatedParent() {
+    fun moveFocusLeft_fromItemOnLeftEdge_movesFocusOutsideDeactivatedParent() {
         // Arrange.
         val parent = mutableStateOf(false)
         val (item1, item2, item3, item4, item5) = List(5) { mutableStateOf(false) }
@@ -471,7 +471,7 @@ class TwoDimensionalFocusTraversalOutTest {
      *     |____________________|
      */
     @Test
-    fun focusRight_fromItemOnRightEdge_movesFocusOutsideParent() {
+    fun moveFocusRight_fromItemOnRightEdge_movesFocusOutsideParent() {
         // Arrange.
         val parent = mutableStateOf(false)
         val (item1, item2, item3, item4, item5) = List(5) { mutableStateOf(false) }
@@ -517,7 +517,7 @@ class TwoDimensionalFocusTraversalOutTest {
      *     |____________________|
      */
     @Test
-    fun focusRight_fromItemOnRightEdge_movesFocusOutsideDeactivatedParent() {
+    fun moveFocusRight_fromItemOnRightEdge_movesFocusOutsideDeactivatedParent() {
         // Arrange.
         val parent = mutableStateOf(false)
         val (item1, item2, item3, item4, item5) = List(5) { mutableStateOf(false) }
@@ -560,7 +560,7 @@ class TwoDimensionalFocusTraversalOutTest {
      *   |________________________________________________________|
      */
     @Test
-    fun focusUp_fromTopmostItem_movesFocusOutsideParent() {
+    fun moveFocusUp_fromTopmostItem_movesFocusOutsideParent() {
         // Arrange.
         val parent = mutableStateOf(false)
         val (item1, item2, item3, item4, item5) = List(5) { mutableStateOf(false) }
@@ -603,7 +603,7 @@ class TwoDimensionalFocusTraversalOutTest {
      *   |________________________________________________________|
      */
     @Test
-    fun focusUp_fromTopmostItem_movesFocusOutsideDeactivatedParent() {
+    fun moveFocusUp_fromTopmostItem_movesFocusOutsideDeactivatedParent() {
         // Arrange.
         val parent = mutableStateOf(false)
         val (item1, item2, item3, item4, item5) = List(5) { mutableStateOf(false) }
@@ -646,7 +646,7 @@ class TwoDimensionalFocusTraversalOutTest {
      *      |______________|  |______________|  |______________|
      */
     @Test
-    fun focusDown_fromBottommostItem_movesFocusOutsideParent() {
+    fun moveFocusDown_fromBottommostItem_movesFocusOutsideParent() {
         // Arrange.
         val parent = mutableStateOf(false)
         val (item1, item2, item3, item4, item5) = List(5) { mutableStateOf(false) }
@@ -689,7 +689,7 @@ class TwoDimensionalFocusTraversalOutTest {
      *      |______________|  |______________|  |______________|
      */
     @Test
-    fun focusDown_fromBottommostItem_movesFocusOutsideDeactivatedParent() {
+    fun moveFocusDown_fromBottommostItem_movesFocusOutsideDeactivatedParent() {
         // Arrange.
         val parent = mutableStateOf(false)
         val (item1, item2, item3, item4, item5) = List(5) { mutableStateOf(false) }

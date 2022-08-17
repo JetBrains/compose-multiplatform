@@ -18,6 +18,8 @@ package androidx.compose.ui.focus
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection.Companion.Enter
+import androidx.compose.ui.focus.FocusDirection.Companion.Exit
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 
@@ -169,7 +171,7 @@ fun Modifier.focusOrder(
  * @sample androidx.compose.ui.samples.CustomFocusOrderSample
  */
 @Deprecated(
-    "Use focusRequster() instead",
+    "Use focusRequester() instead",
     ReplaceWith("this.focusRequester(focusRequester)", "androidx.compose.ui.focus.focusRequester")
 )
 fun Modifier.focusOrder(focusRequester: FocusRequester): Modifier = focusRequester(focusRequester)
@@ -221,9 +223,9 @@ internal fun FocusModifier.customFocusSearch(
         //  Developers can specify a custom "Out" to specify which composable should take focus
         //  when the user presses the back button.
         @OptIn(ExperimentalComposeUiApi::class)
-        (FocusDirection.In) -> FocusRequester.Default
+        Enter -> FocusRequester.Default
         @OptIn(ExperimentalComposeUiApi::class)
-        (FocusDirection.Out) -> FocusRequester.Default
+        Exit -> FocusRequester.Default
         else -> error("invalid FocusDirection")
     }
 }

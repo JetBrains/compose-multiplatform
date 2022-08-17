@@ -20,7 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.focus.FocusDirection.Companion.In
+import androidx.compose.ui.focus.FocusDirection.Companion.Enter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -34,7 +34,7 @@ import org.junit.runner.RunWith
 @OptIn(ExperimentalComposeUiApi::class)
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class TwoDimensionalFocusTraversalInTest {
+class TwoDimensionalFocusTraversalEnterTest {
     @get:Rule
     val rule = createComposeRule()
 
@@ -48,7 +48,7 @@ class TwoDimensionalFocusTraversalInTest {
      *     |_______________|  |___________|
      */
     @Test
-    fun focusIn_noChildren_doesNotMoveFocus() {
+    fun moveFocusEnter_noChildren_doesNotMoveFocus() {
         // Arrange.
         val otherItem = mutableStateOf(false)
         rule.setContentForTest {
@@ -57,7 +57,7 @@ class TwoDimensionalFocusTraversalInTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(In) }
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Enter) }
 
         // Assert.
         rule.runOnIdle {
@@ -76,7 +76,7 @@ class TwoDimensionalFocusTraversalInTest {
      *     |__________________|  |___________|
      */
     @Test
-    fun focusIn_deactivatedChild_doesNotMoveFocus() {
+    fun moveFocusEnter_deactivatedChild_doesNotMoveFocus() {
         // Arrange.
         val (focusedItem, deactivatedItem, otherItem) = List(3) { mutableStateOf(false) }
         rule.setContentForTest {
@@ -87,7 +87,7 @@ class TwoDimensionalFocusTraversalInTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(In) }
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Enter) }
 
         // Assert.
         rule.runOnIdle {
@@ -107,7 +107,7 @@ class TwoDimensionalFocusTraversalInTest {
      *     |______________|
      */
     @Test
-    fun focusIn_focusesOnChild() {
+    fun moveFocusEnter_focusesOnChild() {
         // Arrange.
         val child = mutableStateOf(false)
         rule.setContentForTest {
@@ -117,7 +117,7 @@ class TwoDimensionalFocusTraversalInTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(In) }
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Enter) }
 
         // Assert.
         rule.runOnIdle {
@@ -139,7 +139,7 @@ class TwoDimensionalFocusTraversalInTest {
      *     |________________________|
      */
     @Test
-    fun focusIn_focusesOnImmediateChild() {
+    fun moveFocusEnter_focusesOnImmediateChild() {
         // Arrange.
         val (child, grandchild) = List(2) { mutableStateOf(false) }
         rule.setContentForTest {
@@ -151,7 +151,7 @@ class TwoDimensionalFocusTraversalInTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(In) }
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Enter) }
 
         // Assert.
         rule.runOnIdle {
@@ -174,7 +174,7 @@ class TwoDimensionalFocusTraversalInTest {
      *     |________________________|
      */
     @Test
-    fun focusIn_skipsImmediateDeactivatedChild() {
+    fun moveFocusEnter_skipsImmediateDeactivatedChild() {
         // Arrange.
         val (child, grandchild) = List(2) { mutableStateOf(false) }
         rule.setContentForTest {
@@ -186,7 +186,7 @@ class TwoDimensionalFocusTraversalInTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(In) }
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Enter) }
 
         // Assert.
         rule.runOnIdle {
@@ -211,7 +211,7 @@ class TwoDimensionalFocusTraversalInTest {
      *     |______________________________________|
      */
     @Test
-    fun focusIn_topLeftChildIsFocused() {
+    fun moveFocusEnter_topLeftChildIsFocused() {
         // Arrange.
         val children = List(6) { mutableStateOf(false) }
         rule.setContentForTest {
@@ -226,7 +226,7 @@ class TwoDimensionalFocusTraversalInTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(In) }
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Enter) }
 
         // Assert.
         rule.runOnIdle {
@@ -251,7 +251,7 @@ class TwoDimensionalFocusTraversalInTest {
      *     |______________________________________|
      */
     @Test
-    fun focusIn_deactivatedTopLeftChildIsSkipped() {
+    fun moveFocusEnter_deactivatedTopLeftChildIsSkipped() {
         // Arrange.
         val children = List(6) { mutableStateOf(false) }
         rule.setContentForTest {
@@ -266,7 +266,7 @@ class TwoDimensionalFocusTraversalInTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(In) }
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Enter) }
 
         // Assert.
         rule.runOnIdle {

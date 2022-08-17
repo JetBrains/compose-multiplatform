@@ -24,9 +24,9 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection.Companion.In
+import androidx.compose.ui.focus.FocusDirection.Companion.Enter
+import androidx.compose.ui.focus.FocusDirection.Companion.Exit
 import androidx.compose.ui.focus.FocusDirection.Companion.Next
-import androidx.compose.ui.focus.FocusDirection.Companion.Out
 import androidx.compose.ui.focus.FocusDirection.Companion.Right
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
@@ -126,7 +126,7 @@ class FocusGroupTest {
     }
 
     @Test
-    fun itemWithfocusGroup_canBeMadeFocusable() {
+    fun itemWithFocusGroup_canBeMadeFocusable() {
         // Arrange.
         val focusRequester = FocusRequester()
         var isFocused = false
@@ -255,7 +255,7 @@ class FocusGroupTest {
     }
 
     @Test
-    fun twoDimensionalFocusSearch_In() {
+    fun twoDimensionalFocusSearch_Enter() {
         // Arrange.
         lateinit var expectedFocus: FocusState
         rule.setContentWithInitialFocus {
@@ -265,24 +265,24 @@ class FocusGroupTest {
                     .focusProperties { canFocus = true }
                     .focusGroup()
             ) {
-                    Box(
-                        Modifier
-                            .onFocusChanged { expectedFocus = it }
-                            .focusable()
-                    )
+                Box(
+                    Modifier
+                        .onFocusChanged { expectedFocus = it }
+                        .focusable()
+                )
             }
         }
 
         // Act.
         @OptIn(ExperimentalComposeUiApi::class)
-        rule.runOnIdle { focusManager.moveFocus(In) }
+        rule.runOnIdle { focusManager.moveFocus(Enter) }
 
         // Assert.
         rule.runOnIdle { assertThat(expectedFocus.isFocused).isTrue() }
     }
 
     @Test
-    fun twoDimensionalFocusSearch_Out() {
+    fun twoDimensionalFocusSearch_Exit() {
         // Arrange.
         lateinit var expectedFocus: FocusState
         rule.setContentWithInitialFocus {
@@ -302,7 +302,7 @@ class FocusGroupTest {
 
         // Act.
         @OptIn(ExperimentalComposeUiApi::class)
-        rule.runOnIdle { focusManager.moveFocus(Out) }
+        rule.runOnIdle { focusManager.moveFocus(Exit) }
 
         // Assert.
         rule.runOnIdle { assertThat(expectedFocus.isFocused).isTrue() }

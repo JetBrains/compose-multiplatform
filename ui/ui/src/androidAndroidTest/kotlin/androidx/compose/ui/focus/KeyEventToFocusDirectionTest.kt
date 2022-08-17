@@ -18,10 +18,8 @@ package androidx.compose.ui.focus
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusDirection.Companion.Down
-import androidx.compose.ui.focus.FocusDirection.Companion.In
 import androidx.compose.ui.focus.FocusDirection.Companion.Left
 import androidx.compose.ui.focus.FocusDirection.Companion.Next
-import androidx.compose.ui.focus.FocusDirection.Companion.Out
 import androidx.compose.ui.focus.FocusDirection.Companion.Previous
 import androidx.compose.ui.focus.FocusDirection.Companion.Right
 import androidx.compose.ui.focus.FocusDirection.Companion.Up
@@ -41,6 +39,8 @@ import org.junit.runner.RunWith
 import android.view.KeyEvent as AndroidKeyEvent
 import android.view.KeyEvent.ACTION_DOWN as KeyDown
 import android.view.KeyEvent.META_SHIFT_ON as Shift
+import androidx.compose.ui.focus.FocusDirection.Companion.Enter
+import androidx.compose.ui.focus.FocusDirection.Companion.Exit
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
@@ -131,7 +131,7 @@ class KeyEventToFocusDirectionTest {
     }
 
     @Test
-    fun dpadCenter_in() {
+    fun dpadCenter_enter() {
         // Arrange.
         val keyEvent = KeyEvent(AndroidKeyEvent(KeyDown, Key.DirectionCenter.nativeKeyCode))
 
@@ -140,11 +140,11 @@ class KeyEventToFocusDirectionTest {
 
         // Assert.
         @OptIn(ExperimentalComposeUiApi::class)
-        assertThat(focusDirection).isEqualTo(In)
+        assertThat(focusDirection).isEqualTo(Enter)
     }
 
     @Test
-    fun enter_in() {
+    fun enter_enter() {
         // Arrange.
         val keyEvent = KeyEvent(AndroidKeyEvent(KeyDown, Key.Enter.nativeKeyCode))
 
@@ -153,11 +153,11 @@ class KeyEventToFocusDirectionTest {
 
         // Assert.
         @OptIn(ExperimentalComposeUiApi::class)
-        assertThat(focusDirection).isEqualTo(In)
+        assertThat(focusDirection).isEqualTo(Enter)
     }
 
     @Test
-    fun numpadEnter_in() {
+    fun numPadEnter_enter() {
         // Arrange.
         val keyEvent = KeyEvent(AndroidKeyEvent(KeyDown, Key.NumPadEnter.nativeKeyCode))
 
@@ -166,11 +166,11 @@ class KeyEventToFocusDirectionTest {
 
         // Assert.
         @OptIn(ExperimentalComposeUiApi::class)
-        assertThat(focusDirection).isEqualTo(In)
+        assertThat(focusDirection).isEqualTo(Enter)
     }
 
     @Test
-    fun back_out() {
+    fun back_exit() {
         // Arrange.
         val keyEvent = KeyEvent(AndroidKeyEvent(KeyDown, Key.Back.nativeKeyCode))
 
@@ -179,11 +179,11 @@ class KeyEventToFocusDirectionTest {
 
         // Assert.
         @OptIn(ExperimentalComposeUiApi::class)
-        assertThat(focusDirection).isEqualTo(Out)
+        assertThat(focusDirection).isEqualTo(Exit)
     }
 
     @Test
-    fun esc_out() {
+    fun esc_exit() {
         // Arrange.
         val keyEvent = KeyEvent(AndroidKeyEvent(KeyDown, Key.Escape.nativeKeyCode))
 
@@ -192,6 +192,6 @@ class KeyEventToFocusDirectionTest {
 
         // Assert.
         @OptIn(ExperimentalComposeUiApi::class)
-        assertThat(focusDirection).isEqualTo(Out)
+        assertThat(focusDirection).isEqualTo(Exit)
     }
 }
