@@ -18,6 +18,7 @@ package androidx.compose.foundation.lazy.list
 
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.AutoTestFrameClock
+import androidx.compose.foundation.BaseLazyLayoutTestWithOrientation
 import androidx.compose.foundation.composeViewSwipeDown
 import androidx.compose.foundation.composeViewSwipeLeft
 import androidx.compose.foundation.composeViewSwipeRight
@@ -30,8 +31,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
@@ -39,42 +38,16 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.testutils.assertIsEqualTo
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.SemanticsNodeInteraction
-import androidx.compose.ui.test.assertHeightIsEqualTo
-import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
-import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
-import androidx.compose.ui.test.assertWidthIsEqualTo
-import androidx.compose.ui.test.getUnclippedBoundsInRoot
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import org.junit.Rule
 
-open class BaseLazyListTestWithOrientation(private val orientation: Orientation) {
-
-    @get:Rule
-    val rule = createComposeRule()
-
-    val vertical: Boolean
-        get() = orientation == Orientation.Vertical
-
-    fun Modifier.mainAxisSize(size: Dp) =
-        if (vertical) {
-            this.height(size)
-        } else {
-            this.width(size)
-        }
-
-    fun Modifier.crossAxisSize(size: Dp) =
-        if (vertical) {
-            this.width(size)
-        } else {
-            this.height(size)
-        }
+open class BaseLazyListTestWithOrientation(
+    private val orientation: Orientation
+) : BaseLazyLayoutTestWithOrientation(orientation) {
 
     fun Modifier.fillMaxCrossAxis() =
         if (vertical) {
@@ -89,82 +62,6 @@ open class BaseLazyListTestWithOrientation(private val orientation: Orientation)
         } else {
             Modifier.fillParentMaxHeight()
         }
-
-    fun SemanticsNodeInteraction.scrollMainAxisBy(distance: Dp) {
-        if (vertical) {
-            this.scrollBy(y = distance, density = rule.density)
-        } else {
-            this.scrollBy(x = distance, density = rule.density)
-        }
-    }
-
-    fun SemanticsNodeInteraction.assertMainAxisSizeIsEqualTo(expectedSize: Dp) =
-        if (vertical) {
-            assertHeightIsEqualTo(expectedSize)
-        } else {
-            assertWidthIsEqualTo(expectedSize)
-        }
-
-    fun SemanticsNodeInteraction.assertCrossAxisSizeIsEqualTo(expectedSize: Dp) =
-        if (vertical) {
-            assertWidthIsEqualTo(expectedSize)
-        } else {
-            assertHeightIsEqualTo(expectedSize)
-        }
-
-    fun SemanticsNodeInteraction.assertStartPositionIsAlmost(expected: Dp) {
-        val position = if (vertical) {
-            getUnclippedBoundsInRoot().top
-        } else {
-            getUnclippedBoundsInRoot().left
-        }
-        position.assertIsEqualTo(expected, tolerance = 1.dp)
-    }
-
-    fun SemanticsNodeInteraction.assertStartPositionInRootIsEqualTo(expectedStart: Dp) =
-        if (vertical) {
-            assertTopPositionInRootIsEqualTo(expectedStart)
-        } else {
-            assertLeftPositionInRootIsEqualTo(expectedStart)
-        }
-
-    fun SemanticsNodeInteraction.assertCrossAxisStartPositionInRootIsEqualTo(expectedStart: Dp) =
-        if (vertical) {
-            assertLeftPositionInRootIsEqualTo(expectedStart)
-        } else {
-            assertTopPositionInRootIsEqualTo(expectedStart)
-        }
-
-    fun PaddingValues(
-        mainAxis: Dp = 0.dp,
-        crossAxis: Dp = 0.dp
-    ) = PaddingValues(
-        beforeContent = mainAxis,
-        afterContent = mainAxis,
-        beforeContentCrossAxis = crossAxis,
-        afterContentCrossAxis = crossAxis
-    )
-
-    fun PaddingValues(
-        beforeContent: Dp = 0.dp,
-        afterContent: Dp = 0.dp,
-        beforeContentCrossAxis: Dp = 0.dp,
-        afterContentCrossAxis: Dp = 0.dp,
-    ) = if (vertical) {
-        PaddingValues(
-            start = beforeContentCrossAxis,
-            top = beforeContent,
-            end = afterContentCrossAxis,
-            bottom = afterContent
-        )
-    } else {
-        PaddingValues(
-            start = beforeContent,
-            top = beforeContentCrossAxis,
-            end = afterContent,
-            bottom = afterContentCrossAxis
-        )
-    }
 
     fun LazyListState.scrollBy(offset: Dp) {
         runBlocking(Dispatchers.Main + AutoTestFrameClock()) {
