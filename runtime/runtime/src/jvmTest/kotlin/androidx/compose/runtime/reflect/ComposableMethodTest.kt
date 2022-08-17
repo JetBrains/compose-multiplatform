@@ -26,9 +26,9 @@ import androidx.compose.runtime.mock.EmptyApplier
 import androidx.compose.runtime.withRunningRecomposer
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
-import kotlin.test.assertTrue
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlinx.coroutines.runBlocking
 
 @Composable
@@ -209,9 +209,9 @@ private class ComposablesWrapper {
     ) { }
 }
 
-class ComposableMethodInvokerTest {
+class ComposableMethodTest {
     private val clazz =
-        Class.forName("androidx.compose.runtime.reflect.ComposableMethodInvokerTestKt")
+        Class.forName("androidx.compose.runtime.reflect.ComposableMethodTestKt")
     private val wrapperClazz =
         Class.forName("androidx.compose.runtime.reflect.ComposablesWrapper")
 
@@ -228,12 +228,12 @@ class ComposableMethodInvokerTest {
 
     @Test
     fun test_isComposable_correctly_checks_functions() {
-        assertTrue(composable.isComposable)
-        assertFalse(nonComposable.isComposable)
-        assertFalse(nonComposableWithComposer.isComposable)
-        assertTrue(composableMethod.isComposable)
-        assertFalse(nonComposableMethod.isComposable)
-        assertFalse(nonComposableMethodWithComposer.isComposable)
+        assertNotNull(composable.asComposableMethod())
+        assertNull(nonComposable.asComposableMethod())
+        assertNull(nonComposableWithComposer.asComposableMethod())
+        assertNotNull(composableMethod.asComposableMethod())
+        assertNull(nonComposableMethod.asComposableMethod())
+        assertNull(nonComposableMethodWithComposer.asComposableMethod())
     }
 
     @Throws(NoSuchMethodException::class)
@@ -363,23 +363,19 @@ class ComposableMethodInvokerTest {
                 *Array(12) { String::class.java }
             )
 
-        assertEquals(0, function0.realParametersCount)
-        assertEquals(1, function1.realParametersCount)
-        assertEquals(10, function10.realParametersCount)
-        assertEquals(11, function11.realParametersCount)
-        assertEquals(12, function12.realParametersCount)
+        assertEquals(0, function0.parameterCount)
+        assertEquals(1, function1.parameterCount)
+        assertEquals(10, function10.parameterCount)
+        assertEquals(11, function11.parameterCount)
+        assertEquals(12, function12.parameterCount)
 
-        assertEquals(0, method0.realParametersCount)
-        assertEquals(1, method1.realParametersCount)
-        assertEquals(10, method10.realParametersCount)
-        assertEquals(11, method11.realParametersCount)
-        assertEquals(12, method12.realParametersCount)
+        assertEquals(0, method0.parameterCount)
+        assertEquals(1, method1.parameterCount)
+        assertEquals(10, method10.parameterCount)
+        assertEquals(11, method11.parameterCount)
+        assertEquals(12, method12.parameterCount)
 
-        assertEquals(0, nonComposable.realParametersCount)
-        assertEquals(1, nonComposableWithComposer.realParametersCount)
-        assertEquals(0, composableMethod.realParametersCount)
-        assertEquals(0, nonComposableMethod.realParametersCount)
-        assertEquals(1, nonComposableMethodWithComposer.realParametersCount)
+        assertEquals(0, composableMethod.asComposableMethod()!!.parameterCount)
     }
 
     @Suppress("ClassVerificationFailure", "NewApi")
@@ -449,36 +445,32 @@ class ComposableMethodInvokerTest {
                 Long::class.java
             )
 
-        assertEquals(0, function0.realParameters.size)
-        assertEquals(1, function1.realParameters.size)
-        assertEquals(10, function10.realParameters.size)
-        assertEquals(11, function11.realParameters.size)
-        assertEquals(12, function12.realParameters.size)
-        assertEquals(12, function12.realParameters.size)
+        assertEquals(0, function0.parameters.size)
+        assertEquals(1, function1.parameters.size)
+        assertEquals(10, function10.parameters.size)
+        assertEquals(11, function11.parameters.size)
+        assertEquals(12, function12.parameters.size)
+        assertEquals(12, function12.parameters.size)
 
-        assertEquals(0, method0.realParameters.size)
-        assertEquals(1, method1.realParameters.size)
-        assertEquals(10, method10.realParameters.size)
-        assertEquals(11, method11.realParameters.size)
-        assertEquals(12, method12.realParameters.size)
+        assertEquals(0, method0.parameters.size)
+        assertEquals(1, method1.parameters.size)
+        assertEquals(10, method10.parameters.size)
+        assertEquals(11, method11.parameters.size)
+        assertEquals(12, method12.parameters.size)
 
-        assertEquals(0, nonComposable.realParameters.size)
-        assertEquals(1, nonComposableWithComposer.realParameters.size)
-        assertEquals(0, composableMethod.realParameters.size)
-        assertEquals(0, nonComposableMethod.realParameters.size)
-        assertEquals(1, nonComposableMethodWithComposer.realParameters.size)
+        assertEquals(0, composableMethod.asComposableMethod()!!.parameters.size)
 
-        assertEquals(6, diffParameters.realParameters.size)
+        assertEquals(6, diffParameters.parameters.size)
         assertEquals(
             listOf(String::class.java, Any::class.java, Int::class.java, Float::class.java,
                 Double::class.java, Long::class.java),
-            diffParameters.realParameters.map { it.type })
+            diffParameters.parameters.map { it.type })
 
-        assertEquals(6, diffParametersMethod.realParameters.size)
+        assertEquals(6, diffParametersMethod.parameters.size)
         assertEquals(
             listOf(String::class.java, Any::class.java, Int::class.java, Float::class.java,
                 Double::class.java, Long::class.java),
-            diffParametersMethod.realParameters.map { it.type })
+            diffParametersMethod.parameters.map { it.type })
     }
 
     private class TestFrameClock : MonotonicFrameClock {
@@ -512,27 +504,29 @@ class ComposableMethodInvokerTest {
     fun testInvokeComposableFunctions() {
 
         val composableWithDefaults =
-            clazz.declaredMethods.find { it.name == "composableFunctionWithDefaults" }!!
-        composableWithDefaults.isAccessible = true
+            clazz.declaredMethods
+                .find { it.name == "composableFunctionWithDefaults" }!!
+                .asComposableMethod()!!
+        composableWithDefaults.asMethod().isAccessible = true
 
         val resABAAA = executeWithComposer {
-            composableWithDefaults.invokeComposable(it, null, "a", "b") as String
+            composableWithDefaults.invoke(it, null, "a", "b") as String
         }
 
         val resABCAA = executeWithComposer {
-            composableWithDefaults.invokeComposable(it, null, "a", "b", "c") as String
+            composableWithDefaults.invoke(it, null, "a", "b", "c") as String
         }
 
         val resABCDA = executeWithComposer {
-            composableWithDefaults.invokeComposable(it, null, "a", "b", "c", "d") as String
+            composableWithDefaults.invoke(it, null, "a", "b", "c", "d") as String
         }
 
         val resABCDE = executeWithComposer {
-            composableWithDefaults.invokeComposable(it, null, "a", "b", "c", "d", "e") as String
+            composableWithDefaults.invoke(it, null, "a", "b", "c", "d", "e") as String
         }
 
         val resABADA = executeWithComposer {
-            composableWithDefaults.invokeComposable(it, null, "a", "b", null, "d") as String
+            composableWithDefaults.invoke(it, null, "a", "b", null, "d") as String
         }
 
         assertEquals("abaaa", resABAAA)
@@ -546,30 +540,32 @@ class ComposableMethodInvokerTest {
     fun testInvokeComposableMethods() {
 
         val composableWithDefaults =
-            wrapperClazz.declaredMethods.find { it.name == "composableMethodWithDefaults" }!!
-        composableWithDefaults.isAccessible = true
+            wrapperClazz
+                .declaredMethods
+                .find { it.name == "composableMethodWithDefaults" }!!
+                .asComposableMethod()!!
+        composableWithDefaults.asMethod().isAccessible = true
 
         val instance = ComposablesWrapper()
 
         val resABAAA = executeWithComposer {
-            composableWithDefaults.invokeComposable(it, instance, "a", "b") as String
+            composableWithDefaults.invoke(it, instance, "a", "b") as String
         }
 
         val resABCAA = executeWithComposer {
-            composableWithDefaults.invokeComposable(it, instance, "a", "b", "c") as String
+            composableWithDefaults.invoke(it, instance, "a", "b", "c") as String
         }
 
         val resABCDA = executeWithComposer {
-            composableWithDefaults.invokeComposable(it, instance, "a", "b", "c", "d") as String
+            composableWithDefaults.invoke(it, instance, "a", "b", "c", "d") as String
         }
 
         val resABCDE = executeWithComposer {
-            composableWithDefaults
-                .invokeComposable(it, instance, "a", "b", "c", "d", "e") as String
+            composableWithDefaults.invoke(it, instance, "a", "b", "c", "d", "e") as String
         }
 
         val resABADA = executeWithComposer {
-            composableWithDefaults.invokeComposable(it, instance, "a", "b", null, "d") as String
+            composableWithDefaults.invoke(it, instance, "a", "b", null, "d") as String
         }
 
         assertEquals("abaaa", resABAAA)
