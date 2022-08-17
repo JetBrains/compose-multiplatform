@@ -61,7 +61,7 @@ internal class NodeChainTester : NodeChain.Logger {
             return result
         }
 
-    val aggregateChildMasks: List<Long> get() = nodes.map { it.aggregateChildKindSet }
+    val aggregateChildMasks: List<Int> get() = nodes.map { it.aggregateChildKindSet }
 
     fun clearLog(): NodeChainTester {
         log.clear()

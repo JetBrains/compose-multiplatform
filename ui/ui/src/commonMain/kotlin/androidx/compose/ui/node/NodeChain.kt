@@ -37,7 +37,7 @@ internal class NodeChain(val layoutNode: LayoutNode) {
     internal var head: Modifier.Node = tail
         private set
     private val isUpdating: Boolean get() = head === SentinelHead
-    private val aggregateChildKindSet: Long get() = head.aggregateChildKindSet
+    private val aggregateChildKindSet: Int get() = head.aggregateChildKindSet
     private var current: MutableVector<Modifier.Element>? = null
     private var buffer: MutableVector<Modifier.Element>? = null
     private var cachedDiffer: Differ? = null
@@ -105,7 +105,7 @@ internal class NodeChain(val layoutNode: LayoutNode) {
             // for the linear diff we want to start with the "unpadded" tail
             var node: Modifier.Node? = tail.parent
             var i = size - 1
-            var aggregateChildKindSet = 0L
+            var aggregateChildKindSet = 0
             while (node != null && i >= 0) {
                 val prev = before[i]
                 val next = after[i]
@@ -165,7 +165,7 @@ internal class NodeChain(val layoutNode: LayoutNode) {
             attachNeeded = true
             coordinatorSyncNeeded = true
             var i = after.size - 1
-            var aggregateChildKindSet = 0L
+            var aggregateChildKindSet = 0
             var node = tail
             while (i >= 0) {
                 val next = after[i]
@@ -291,7 +291,7 @@ internal class NodeChain(val layoutNode: LayoutNode) {
 
     private inner class Differ(
         var node: Modifier.Node,
-        var aggregateChildKindSet: Long,
+        var aggregateChildKindSet: Int,
         var before: MutableVector<Modifier.Element>,
         var after: MutableVector<Modifier.Element>,
     ) : DiffCallback {
@@ -530,13 +530,13 @@ internal class NodeChain(val layoutNode: LayoutNode) {
         }
     }
 
-    internal inline fun headToTail(mask: Long, block: (Modifier.Node) -> Unit) {
-        if (aggregateChildKindSet and mask == 0L) return
+    internal inline fun headToTail(mask: Int, block: (Modifier.Node) -> Unit) {
+        if (aggregateChildKindSet and mask == 0) return
         headToTail {
-            if (it.kindSet and mask != 0L) {
+            if (it.kindSet and mask != 0) {
                 block(it)
             }
-            if (it.aggregateChildKindSet and mask == 0L) return
+            if (it.aggregateChildKindSet and mask == 0) return
         }
     }
 
@@ -569,10 +569,10 @@ internal class NodeChain(val layoutNode: LayoutNode) {
         }
     }
 
-    internal inline fun tailToHead(mask: Long, block: (Modifier.Node) -> Unit) {
-        if (aggregateChildKindSet and mask == 0L) return
+    internal inline fun tailToHead(mask: Int, block: (Modifier.Node) -> Unit) {
+        if (aggregateChildKindSet and mask == 0) return
         tailToHead {
-            if (it.kindSet and mask != 0L) {
+            if (it.kindSet and mask != 0) {
                 block(it)
             }
         }
@@ -600,7 +600,7 @@ internal class NodeChain(val layoutNode: LayoutNode) {
         return null
     }
 
-    internal fun has(type: NodeKind<*>): Boolean = aggregateChildKindSet and type.mask != 0L
+    internal fun has(type: NodeKind<*>): Boolean = aggregateChildKindSet and type.mask != 0
 
     override fun toString(): String = buildString {
         append("[")
