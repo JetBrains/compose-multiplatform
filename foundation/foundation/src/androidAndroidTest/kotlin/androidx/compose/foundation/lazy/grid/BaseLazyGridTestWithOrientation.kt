@@ -18,139 +18,24 @@ package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.AutoTestFrameClock
+import androidx.compose.foundation.BaseLazyLayoutTestWithOrientation
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.testutils.assertIsEqualTo
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.SemanticsNodeInteraction
-import androidx.compose.ui.test.assertHeightIsEqualTo
-import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
-import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
-import androidx.compose.ui.test.assertWidthIsEqualTo
-import androidx.compose.ui.test.getUnclippedBoundsInRoot
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import org.junit.Rule
 
-open class BaseLazyGridTestWithOrientation(private val orientation: Orientation) {
-
-    @get:Rule
-    val rule = createComposeRule()
-
-    val vertical: Boolean
-        get() = orientation == Orientation.Vertical
-
-    @Stable
-    fun Modifier.crossAxisSize(size: Dp) =
-        if (vertical) {
-            this.width(size)
-        } else {
-            this.height(size)
-        }
-
-    @Stable
-    fun Modifier.mainAxisSize(size: Dp) =
-        if (vertical) {
-            this.height(size)
-        } else {
-            this.width(size)
-        }
-
-    @Stable
-    fun Modifier.axisSize(crossAxis: Dp, mainAxis: Dp) =
-        if (vertical) {
-            this.size(crossAxis, mainAxis)
-        } else {
-            this.size(mainAxis, crossAxis)
-        }
-
-    fun SemanticsNodeInteraction.scrollMainAxisBy(distance: Dp) {
-        if (vertical) {
-            this.scrollBy(y = distance, density = rule.density)
-        } else {
-            this.scrollBy(x = distance, density = rule.density)
-        }
-    }
-
-    fun SemanticsNodeInteraction.assertMainAxisSizeIsEqualTo(expectedSize: Dp) =
-        if (vertical) {
-            assertHeightIsEqualTo(expectedSize)
-        } else {
-            assertWidthIsEqualTo(expectedSize)
-        }
-
-    fun SemanticsNodeInteraction.assertCrossAxisSizeIsEqualTo(expectedSize: Dp) =
-        if (vertical) {
-            assertWidthIsEqualTo(expectedSize)
-        } else {
-            assertHeightIsEqualTo(expectedSize)
-        }
-
-    fun SemanticsNodeInteraction.assertStartPositionIsAlmost(expected: Dp) {
-        val position = if (vertical) {
-            getUnclippedBoundsInRoot().top
-        } else {
-            getUnclippedBoundsInRoot().left
-        }
-        position.assertIsEqualTo(expected, tolerance = 1.dp)
-    }
-
-    fun SemanticsNodeInteraction.assertMainAxisStartPositionInRootIsEqualTo(expectedStart: Dp) =
-        if (vertical) {
-            assertTopPositionInRootIsEqualTo(expectedStart)
-        } else {
-            assertLeftPositionInRootIsEqualTo(expectedStart)
-        }
-
-    fun SemanticsNodeInteraction.assertCrossAxisStartPositionInRootIsEqualTo(expectedStart: Dp) =
-        if (vertical) {
-            assertLeftPositionInRootIsEqualTo(expectedStart)
-        } else {
-            assertTopPositionInRootIsEqualTo(expectedStart)
-        }
-
-    fun PaddingValues(
-        mainAxis: Dp = 0.dp,
-        crossAxis: Dp = 0.dp
-    ) = PaddingValues(
-        beforeContent = mainAxis,
-        afterContent = mainAxis,
-        beforeContentCrossAxis = crossAxis,
-        afterContentCrossAxis = crossAxis
-    )
-
-    fun PaddingValues(
-        beforeContent: Dp = 0.dp,
-        afterContent: Dp = 0.dp,
-        beforeContentCrossAxis: Dp = 0.dp,
-        afterContentCrossAxis: Dp = 0.dp,
-    ) = if (vertical) {
-        PaddingValues(
-            start = beforeContentCrossAxis,
-            top = beforeContent,
-            end = afterContentCrossAxis,
-            bottom = afterContent
-        )
-    } else {
-        PaddingValues(
-            start = beforeContent,
-            top = beforeContentCrossAxis,
-            end = afterContent,
-            bottom = afterContentCrossAxis
-        )
-    }
+open class BaseLazyGridTestWithOrientation(
+    orientation: Orientation
+) : BaseLazyLayoutTestWithOrientation(orientation) {
 
     fun LazyGridState.scrollBy(offset: Dp) {
         runBlocking(Dispatchers.Main + AutoTestFrameClock()) {
@@ -164,11 +49,7 @@ open class BaseLazyGridTestWithOrientation(private val orientation: Orientation)
         }
     }
 
-    fun SemanticsNodeInteraction.scrollBy(offset: Dp) = scrollBy(
-        x = if (vertical) 0.dp else offset,
-        y = if (!vertical) 0.dp else offset,
-        density = rule.density
-    )
+    fun SemanticsNodeInteraction.scrollBy(offset: Dp) = scrollMainAxisBy(offset)
 
     @Composable
     fun LazyGrid(
