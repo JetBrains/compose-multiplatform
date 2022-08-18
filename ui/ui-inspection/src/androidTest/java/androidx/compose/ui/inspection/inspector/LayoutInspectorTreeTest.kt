@@ -433,7 +433,7 @@ class LayoutInspectorTreeTest {
         assertThat(node?.parameters).isEmpty()
 
         // Get parameters for the Spacer after getting the tree without parameters:
-        val paramsNode = builder.findParameters(view, node!!.anchorHash)!!
+        val paramsNode = builder.findParameters(view, node!!.anchorId)!!
         val params = builder.convertParameters(
             ROOT_ID, paramsNode, ParameterKind.Normal, MAX_RECURSIONS, MAX_ITERABLE_SIZE
         )

@@ -21,7 +21,7 @@ import androidx.compose.ui.inspection.rules.sendCommand
 import androidx.compose.ui.inspection.testdata.ParametersTestActivity
 import androidx.compose.ui.inspection.util.GetComposablesCommand
 import androidx.compose.ui.inspection.util.GetParameterDetailsCommand
-import androidx.compose.ui.inspection.util.GetParametersByAnchorHashCommand
+import androidx.compose.ui.inspection.util.GetParametersByAnchorIdCommand
 import androidx.compose.ui.inspection.util.GetParametersCommand
 import androidx.compose.ui.inspection.util.GetUpdateSettingsCommand
 import androidx.compose.ui.inspection.util.flatten
@@ -132,7 +132,7 @@ class ParametersTest {
 
         val function = nodes.filter("FunctionWithIntArray").single()
         val paramResponse = if (useDelayedParameterExtraction) {
-            tester.sendCommand(GetParametersByAnchorHashCommand(rule.rootId, function.anchorHash))
+            tester.sendCommand(GetParametersByAnchorIdCommand(rule.rootId, function.anchorHash))
         } else {
             tester.sendCommand(GetParametersCommand(rule.rootId, function.id))
         }
@@ -242,7 +242,7 @@ class ParametersTest {
 
         // But looking up by anchor will find the parameters
         var paramsByAnchor = rule.inspectorTester.sendCommand(
-            GetParametersByAnchorHashCommand(rule.rootId, text.anchorHash)
+            GetParametersByAnchorIdCommand(rule.rootId, text.anchorHash)
         ).getParametersResponse
         strings = paramsByAnchor.stringsList.toMap()
         assertThat(paramsByAnchor.parameterGroup.parameterList).isNotEmpty()
@@ -268,7 +268,7 @@ class ParametersTest {
         // Looking up by anchor should not find parameters
         // (The code should use the cached values but the id is not specified.)
         paramsByAnchor = rule.inspectorTester.sendCommand(
-            GetParametersByAnchorHashCommand(rule.rootId, text.anchorHash)
+            GetParametersByAnchorIdCommand(rule.rootId, text.anchorHash)
         ).getParametersResponse
         assertThat(paramsByAnchor.parameterGroup.parameterList).isEmpty()
     }

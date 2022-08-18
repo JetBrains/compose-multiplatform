@@ -251,7 +251,7 @@ class ComposeLayoutInspector(
             getParameterDetailsCommand.reference.compositeIndexList
         )
         val foundComposable = if (delayParameterExtractions && !cachedHasAllParameters) {
-            getComposableFromAnchor(reference.anchorHash)
+            getComposableFromAnchor(reference.anchorId)
         } else {
             getComposableNodes(
                 getParameterDetailsCommand.rootViewId,
@@ -350,12 +350,12 @@ class ComposeLayoutInspector(
      * Find an [InspectorNode] with extracted parameters that represent the composable with the
      * specified anchor hash.
      */
-    private fun getComposableFromAnchor(anchorHash: Int): InspectorNode? =
+    private fun getComposableFromAnchor(anchorId: Int): InspectorNode? =
         ThreadUtils.runOnMainThread {
             layoutInspectorTree.resetAccumulativeState()
             layoutInspectorTree.includeAllParameters = false
             val composeViews = getAndroidComposeViews(-1L, false, 1)
-            composeViews.firstNotNullOfOrNull { it.findParameters(anchorHash) }
+            composeViews.firstNotNullOfOrNull { it.findParameters(anchorId) }
         }.get()
 
     /**

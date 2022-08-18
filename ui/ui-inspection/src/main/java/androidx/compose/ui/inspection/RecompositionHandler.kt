@@ -37,10 +37,10 @@ class RecompositionHandler(private val artTooling: ArtTooling) {
     /**
      * Key of a Composable method.
      *
-     * The [key] identified the runtime method and the [anchorHash] identified a
+     * The [key] identified the runtime method and the [anchorId] identified a
      * specific compose node.
      */
-    private data class MethodKey(val key: Int, val anchorHash: Int)
+    private data class MethodKey(val key: Int, val anchorId: Int)
 
     private val lock = Any()
     @GuardedBy("lock")
@@ -66,16 +66,16 @@ class RecompositionHandler(private val artTooling: ArtTooling) {
         }
     }
 
-    fun getCounts(key: Int, anchorHash: Int): Data? {
+    fun getCounts(key: Int, anchorId: Int): Data? {
         synchronized(lock) {
-            return counts[MethodKey(key, anchorHash)]
+            return counts[MethodKey(key, anchorId)]
         }
     }
 
     /**
      * We install 3 hooks:
      * - entry hook for ComposerImpl.startRestartGroup gives us the [MethodKey.key]
-     * - exit hook for ComposerImpl.startRestartGroup gives us the [MethodKey.anchorHash]
+     * - exit hook for ComposerImpl.startRestartGroup gives us the [MethodKey.anchorId]
      * - entry hook for ComposerImpl.skipToGroupEnd converts a recompose count to a skip count.
      */
     private fun installHooks() {

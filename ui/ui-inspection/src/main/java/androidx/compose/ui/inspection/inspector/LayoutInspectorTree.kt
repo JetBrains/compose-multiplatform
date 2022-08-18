@@ -147,16 +147,16 @@ class LayoutInspectorTree {
         return result
     }
 
-    fun findParameters(view: View, anchorHash: Int): InspectorNode? {
+    fun findParameters(view: View, anchorId: Int): InspectorNode? {
         windowSize = IntSize(view.width, view.height)
         parameterFactory.density = Density(view.context)
-        val identity = anchorMap[anchorHash] ?: return null
+        val identity = anchorMap[anchorId] ?: return null
 
         @Suppress("UNCHECKED_CAST")
         val tables = view.getTag(R.id.inspection_slot_table_set) as?
             Set<CompositionData>
             ?: return null
-        val node = newNode().apply { this.anchorHash = anchorHash }
+        val node = newNode().apply { this.anchorId = anchorId }
         val group = tables.firstNotNullOfOrNull { it.find(identity) } ?: return null
         group.findParameters(contextCache).forEach {
             val castedValue = castValue(it)
@@ -200,7 +200,7 @@ class LayoutInspectorTree {
             parameterFactory.create(
                 rootId,
                 node.id,
-                node.anchorHash,
+                node.anchorId,
                 parameter.name,
                 parameter.value,
                 kind,
@@ -233,7 +233,7 @@ class LayoutInspectorTree {
         return parameterFactory.expand(
             rootId,
             node.id,
-            node.anchorHash,
+            node.anchorId,
             parameter.name,
             parameter.value,
             reference,
@@ -467,8 +467,8 @@ class LayoutInspectorTree {
         if (isHiddenSystemNode(node)) {
             return markUnwanted(group, context, node)
         }
-        node.anchorHash = anchorMap[group.identity]
-        node.id = syntheticId(node.anchorHash)
+        node.anchorId = anchorMap[group.identity]
+        node.id = syntheticId(node.anchorId)
         if (includeAllParameters) {
             addParameters(context, node)
         }
