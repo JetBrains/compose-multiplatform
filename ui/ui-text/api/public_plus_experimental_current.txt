@@ -677,6 +677,10 @@ package androidx.compose.ui.text.font {
   }
 
   public final class AndroidFontKt {
+    method @Deprecated @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(android.content.res.AssetManager assetManager, String path, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
+    method @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(String path, android.content.res.AssetManager assetManager, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional androidx.compose.ui.text.font.FontVariation.Settings variationSettings);
+    method @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(java.io.File file, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional androidx.compose.ui.text.font.FontVariation.Settings variationSettings);
+    method @RequiresApi(26) @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(android.os.ParcelFileDescriptor fileDescriptor, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional androidx.compose.ui.text.font.FontVariation.Settings variationSettings);
   }
 
   public final class AndroidFontLoader_androidKt {
@@ -686,13 +690,6 @@ package androidx.compose.ui.text.font {
   }
 
   public final class AndroidFontUtils_androidKt {
-  }
-
-  public final class AndroidLoadableFontsKt {
-    method @Deprecated @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(android.content.res.AssetManager assetManager, String path, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
-    method @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(String path, android.content.res.AssetManager assetManager, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional androidx.compose.ui.text.font.FontVariation.Settings variationSettings);
-    method @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(java.io.File file, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional androidx.compose.ui.text.font.FontVariation.Settings variationSettings);
-    method @RequiresApi(26) @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(android.os.ParcelFileDescriptor fileDescriptor, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional androidx.compose.ui.text.font.FontVariation.Settings variationSettings);
   }
 
   public final class AndroidTypeface_androidKt {

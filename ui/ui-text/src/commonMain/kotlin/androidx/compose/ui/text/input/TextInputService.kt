@@ -88,7 +88,7 @@ open class TextInputService(private val platformTextInputService: PlatformTextIn
      * system service may silently ignore this request.
      */
     @Deprecated(
-        message = "Use SoftwareKeyboardController.showSoftwareKeyboard or " +
+        message = "Use SoftwareKeyboardController.show or " +
             "TextInputSession.showSoftwareKeyboard instead.",
         replaceWith = ReplaceWith("textInputSession.showSoftwareKeyboard()")
     )
@@ -103,7 +103,7 @@ open class TextInputService(private val platformTextInputService: PlatformTextIn
      * Hide onscreen keyboard.
      */
     @Deprecated(
-        message = "Use SoftwareKeyboardController.hideSoftwareKeyboard or " +
+        message = "Use SoftwareKeyboardController.hide or " +
             "TextInputSession.hideSoftwareKeyboard instead.",
         replaceWith = ReplaceWith("textInputSession.hideSoftwareKeyboard()")
     )

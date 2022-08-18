@@ -98,7 +98,7 @@ class DialogProperties @ExperimentalComposeUiApi constructor(
         dismissOnBackPress: Boolean = true,
         dismissOnClickOutside: Boolean = true,
         securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
-    ) : this (
+    ) : this(
         dismissOnBackPress = dismissOnBackPress,
         dismissOnClickOutside = dismissOnClickOutside,
         securePolicy = securePolicy,
@@ -297,7 +297,9 @@ private class DialogWrapper(
 
     private val dialogLayout: DialogLayout
 
-    private val maxSupportedElevation = 30.dp
+    // On systems older than Android S, there is a bug in the surface insets matrix math used by
+    // elevation, so high values of maxSupportedElevation break accessibility services: b/232788477.
+    private val maxSupportedElevation = 8.dp
 
     override val subCompositionView: AbstractComposeView get() = dialogLayout
 

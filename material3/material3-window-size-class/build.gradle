@@ -38,7 +38,7 @@ dependencies {
         api("androidx.compose.runtime:runtime:1.2.0")
         api("androidx.compose.ui:ui:1.2.0")
         api("androidx.compose.ui:ui-unit:1.2.0")
-        implementation("androidx.window:window:1.0.0")
+        implementation("androidx.window:window:1.1.0-alpha02")
 
         testImplementation(libs.kotlinTest)
         testImplementation(libs.truth)
@@ -76,7 +76,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
 
             androidMain.dependencies {
-                implementation("androidx.window:window:1.0.0")
+                implementation("androidx.window:window:1.1.0-alpha02")
             }
 
             androidMain.dependsOn(jvmMain)
