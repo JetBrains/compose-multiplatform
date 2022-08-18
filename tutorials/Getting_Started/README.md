@@ -161,3 +161,9 @@ updates the UI.
 Running and debugging the `main()` function using run gutter is also supported.
 
 <img alt="Application running" src="screen6.png" height="500" />
+
+## Next steps
+
+Congratulations on getting your first Compose Multiplatform project working!  We encourage you to continue playing around with the areas that interest you, and look forward to seeing what you build!  When you're ready to continue learning, we have many more great tutorials available here: [Compose Multiplatform Tutorials](https://github.com/JetBrains/compose-jb/tree/master/tutorials).
+
+We also have some more advanced [Compose Multiplatorm Example Projects](https://github.com/JetBrains/compose-jb/tree/master/examples) that you can learn from.
