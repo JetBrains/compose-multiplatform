@@ -399,7 +399,7 @@ class SliderTest {
                 expected = calculateFraction(left, right, centerX - 100 + slop)
             }
         rule.runOnIdle {
-            Truth.assertThat(state.value).isWithin(0.002f).of(expected)
+            Truth.assertThat(state.value).isWithin(0.003f).of(expected)
         }
     }
 
