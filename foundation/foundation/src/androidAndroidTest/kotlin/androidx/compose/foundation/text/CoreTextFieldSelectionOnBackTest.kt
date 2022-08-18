@@ -44,6 +44,7 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -72,6 +73,7 @@ class CoreTextFieldSelectionOnBackTest {
         )
     )
 
+    @FlakyTest(bugId = 209063017)
     @Test
     fun whenBackPressed_andReleased_coreTextFieldClearsSelection() {
         val results = mutableListOf<TextFieldValue>()

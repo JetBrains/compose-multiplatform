@@ -93,6 +93,7 @@ internal class TextFieldVisualTransformationSelectionBoundsTest {
         }
     }
 
+    @FlakyTest(bugId = 241572024)
     @Test
     fun cursor_throws_onShow_whenInvalidOriginalToTransformed() {
         rule.runOnIdle {
