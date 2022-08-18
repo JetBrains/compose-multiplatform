@@ -42,7 +42,7 @@ Preview functionality (check your application UI without building/running it) fo
        * [Swing interoperability](tutorials/Swing_Integration)
        * [Development for Android](tutorials/Development_for_Android)
        * [Navigation](tutorials/Navigation)
-       * [Accessebility](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Accessibility)
+       * [Accessibility](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Accessibility)
        * [Building native distribution](tutorials/Native_distributions_and_local_execution)
        * [Signing and notarization](tutorials/Signing_and_notarization_on_macOS)
    * [tutorials: compose for web](tutorials/Web) - tutorials on using Compose for Web
