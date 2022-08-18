@@ -26,6 +26,7 @@ import androidx.compose.ui.util.fastSumBy
 
 /**
  * A [SnapLayoutInfoProvider] for LazyLists.
+ *
  * @param lazyListState The [LazyListState] with information about the current state of the list
  * @param positionInLayout The desired positioning of the snapped item within the main layout.
  * This position should be considered with regard to the start edge of the item and the placement
@@ -34,7 +35,7 @@ import androidx.compose.ui.util.fastSumBy
  * @return A [SnapLayoutInfoProvider] that can be used with [snapFlingBehavior]
  */
 @ExperimentalFoundationApi
-fun lazyListSnapLayoutInfoProvider(
+fun SnapLayoutInfoProvider(
     lazyListState: LazyListState,
     positionInLayout: (layoutSize: Float, itemSize: Float) -> Float = { layoutSize, itemSize ->
         layoutSize / 2f - itemSize / 2f

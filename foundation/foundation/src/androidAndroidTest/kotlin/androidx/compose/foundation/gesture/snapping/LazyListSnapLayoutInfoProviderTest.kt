@@ -19,7 +19,6 @@ package androidx.compose.foundation.gesture.snapping
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
-import androidx.compose.foundation.gestures.snapping.lazyListSnapLayoutInfoProvider
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -183,7 +182,7 @@ class LazyListSnapLayoutInfoProviderTest(orientation: Orientation) :
     }
 
     private fun createLayoutInfo(state: LazyListState): SnapLayoutInfoProvider {
-        return lazyListSnapLayoutInfoProvider(state)
+        return SnapLayoutInfoProvider(state)
     }
 
     companion object {

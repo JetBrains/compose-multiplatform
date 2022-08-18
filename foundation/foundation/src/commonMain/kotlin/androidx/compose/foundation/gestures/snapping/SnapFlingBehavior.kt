@@ -61,7 +61,8 @@ import kotlin.math.sign
  * to do so.
  *
  * Please refer to the sample to learn how to use this API.
- * @sample androidx.compose.foundation.samples.SnapFlingBehaviorSample
+ * @sample androidx.compose.foundation.samples.SnapFlingBehaviorSimpleSample
+ * @sample androidx.compose.foundation.samples.SnapFlingBehaviorCustomizedSample
  *
  * @param snapLayoutInfoProvider The information about the layout being snapped.
  * @param approachAnimationSpec The animation spec used to approach the target offset.

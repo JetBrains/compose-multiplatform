@@ -23,7 +23,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
-import androidx.compose.foundation.gestures.snapping.lazyListSnapLayoutInfoProvider
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -69,7 +68,7 @@ fun MultiPageDemo() {
     val snappingLayout = remember(lazyListState) {
         MultiPageSnappingLayoutInfoProvider(
             animation,
-            lazyListSnapLayoutInfoProvider(lazyListState = lazyListState)
+            SnapLayoutInfoProvider(lazyListState = lazyListState)
         )
     }
 
@@ -95,7 +94,7 @@ fun ViewPortBasedDemo() {
     val lazyListState = rememberLazyListState()
     val snappingLayout = remember(lazyListState) {
         ViewPortBasedSnappingLayoutInfoProvider(
-            lazyListSnapLayoutInfoProvider(lazyListState = lazyListState),
+            SnapLayoutInfoProvider(lazyListState = lazyListState),
             lazyListState
         )
     }
