@@ -201,6 +201,7 @@ class ComposeIrGenerationExtension(
             WrapJsComposableLambdaLowering(
                 pluginContext,
                 symbolRemapper,
+                bindingTrace,
                 metrics,
                 idSignatureBuilder!!
             ).lower(moduleFragment)
