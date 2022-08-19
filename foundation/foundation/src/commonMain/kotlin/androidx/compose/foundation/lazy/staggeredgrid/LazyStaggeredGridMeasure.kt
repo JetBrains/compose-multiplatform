@@ -234,7 +234,7 @@ private fun LazyStaggeredGridMeasureContext.measure(
                 break
             }
 
-            if (spans.getSpan(previousItemIndex) == SpanLookup.SpanUnset) {
+            if (spans.getSpan(previousItemIndex) == LazyStaggeredGridSpans.Unset) {
                 spans.setSpan(previousItemIndex, laneIndex)
             }
 
@@ -309,7 +309,7 @@ private fun LazyStaggeredGridMeasureContext.measure(
                     var itemIndex = findNextItemIndex(i, laneIndex)
                     while (itemIndex < itemCount) {
                         missedItemIndex = minOf(itemIndex, missedItemIndex)
-                        spans.setSpan(itemIndex, SpanLookup.SpanUnset)
+                        spans.setSpan(itemIndex, LazyStaggeredGridSpans.Unset)
                         itemIndex = findNextItemIndex(itemIndex, laneIndex)
                     }
                 }
@@ -527,7 +527,7 @@ private fun LazyStaggeredGridMeasureContext.ensureIndicesInRange(
         while (indices[i] >= itemCount) {
             indices[i] = findPreviousItemIndex(indices[i], i)
         }
-        if (indices[i] != SpanLookup.SpanUnset) {
+        if (indices[i] != LazyStaggeredGridSpans.Unset) {
             // reserve item for span
             spans.setSpan(indices[i], i)
         }
@@ -537,7 +537,7 @@ private fun LazyStaggeredGridMeasureContext.ensureIndicesInRange(
 private fun LazyStaggeredGridMeasureContext.findPreviousItemIndex(item: Int, lane: Int): Int {
     for (i in (item - 1) downTo 0) {
         val span = spans.getSpan(i)
-        if (span == lane || span == SpanLookup.SpanUnset) {
+        if (span == lane || span == LazyStaggeredGridSpans.Unset) {
             return i
         }
     }
@@ -545,13 +545,13 @@ private fun LazyStaggeredGridMeasureContext.findPreviousItemIndex(item: Int, lan
 }
 
 private fun LazyStaggeredGridMeasureContext.findNextItemIndex(item: Int, lane: Int): Int {
-    for (i in item + 1 until spans.capacity()) {
+    for (i in item + 1 until spans.upperBound()) {
         val span = spans.getSpan(i)
-        if (span == lane || span == SpanLookup.SpanUnset) {
+        if (span == lane || span == LazyStaggeredGridSpans.Unset) {
             return i
         }
     }
-    return spans.capacity()
+    return spans.upperBound()
 }
 
 @OptIn(ExperimentalFoundationApi::class)

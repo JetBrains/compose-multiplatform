@@ -22,6 +22,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.scrollBy
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -660,6 +661,46 @@ class LazyStaggeredGridTest(
 
         rule.onNodeWithTag("1")
             .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun staggeredGrid_supportsLargeIndices() {
+        val state = LazyStaggeredGridState(
+            initialFirstVisibleItems = intArrayOf(Int.MAX_VALUE / 2, Int.MAX_VALUE / 2 + 1),
+            initialFirstVisibleOffsets = intArrayOf(0, 0)
+        )
+        rule.setContent {
+            LazyStaggeredGrid(
+                lanes = 2,
+                state = state,
+                modifier = Modifier.axisSize(
+                    crossAxis = itemSizeDp * 2,
+                    mainAxis = itemSizeDp * 5
+                ).testTag("lazy").border(1.dp, Color.Red),
+            ) {
+                items(Int.MAX_VALUE) {
+                    Spacer(
+                        Modifier.axisSize(
+                            crossAxis = itemSizeDp,
+                            mainAxis = itemSizeDp * (it % 3 + 1)
+                        ).testTag("$it").border(1.dp, Color.Black)
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag("${Int.MAX_VALUE / 2}")
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("${Int.MAX_VALUE / 2 + 1}")
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+
+        // check that scrolling back and forth doesn't crash
+        rule.onNodeWithTag("lazy")
+            .scrollMainAxisBy(10000.dp)
+
+        rule.onNodeWithTag("lazy")
+            .scrollMainAxisBy(-10000.dp)
     }
 
     @Test

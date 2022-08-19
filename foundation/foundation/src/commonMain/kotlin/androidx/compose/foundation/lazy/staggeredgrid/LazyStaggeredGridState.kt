@@ -39,7 +39,7 @@ internal class LazyStaggeredGridState(
     var firstVisibleItemScrollOffsets: IntArray by mutableStateOf(initialFirstVisibleOffsets)
         private set
 
-    internal val spans = SpanLookup()
+    internal val spans = LazyStaggeredGridSpans()
 
     private var canScrollForward = true
     private var canScrollBackward = true
@@ -121,35 +121,4 @@ internal class LazyStaggeredGridState(
 
     override val isScrollInProgress: Boolean
         get() = scrollableState.isScrollInProgress
-}
-
-internal class SpanLookup {
-    private var spans = IntArray(16)
-
-    fun setSpan(item: Int, span: Int) {
-        ensureCapacity(item + 1)
-        spans[item] = span + 1
-    }
-
-    fun getSpan(item: Int): Int =
-        spans[item] - 1
-
-    fun capacity(): Int =
-        spans.size
-
-    private fun ensureCapacity(capacity: Int) {
-        if (spans.size < capacity) {
-            var newSize = spans.size
-            while (newSize < capacity) newSize *= 2
-            spans = spans.copyInto(IntArray(newSize))
-        }
-    }
-
-    fun reset() {
-        spans.fill(0)
-    }
-
-    companion object {
-        internal const val SpanUnset = -1
-    }
 }
