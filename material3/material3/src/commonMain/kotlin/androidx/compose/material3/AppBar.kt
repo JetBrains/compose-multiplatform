@@ -17,6 +17,7 @@
 package androidx.compose.material3
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.animation.core.FastOutLinearInEasing
@@ -455,6 +456,18 @@ interface TopAppBarScrollBehavior {
     val isPinned: Boolean
 
     /**
+     * An optional [AnimationSpec] that defines how the top app bar snaps to either fully collapsed
+     * or fully extended state when a fling or a drag scrolled it into an intermediate position.
+     */
+    val snapAnimationSpec: AnimationSpec<Float>?
+
+    /**
+     * An optional [DecayAnimationSpec] that defined how to fling the top app bar when the user
+     * flings the app bar itself, or the content below it.
+     */
+    val flingAnimationSpec: DecayAnimationSpec<Float>?
+
+    /**
      * A [NestedScrollConnection] that should be attached to a [Modifier.nestedScroll] in order to
      * keep track of the scroll events.
      */
@@ -620,16 +633,24 @@ object TopAppBarDefaults {
      * state. See [rememberTopAppBarState] for a state that is remembered across compositions.
      * @param canScroll a callback used to determine whether scroll events are to be
      * handled by this [EnterAlwaysScrollBehavior]
+     * @param snapAnimationSpec an optional [AnimationSpec] that defines how the top app bar snaps
+     * to either fully collapsed or fully extended state when a fling or a drag scrolled it into an
+     * intermediate position
+     * @param flingAnimationSpec an optional [DecayAnimationSpec] that defined how to fling the top
+     * app bar when the user flings the app bar itself, or the content below it
      */
     @ExperimentalMaterial3Api
     @Composable
     fun enterAlwaysScrollBehavior(
         state: TopAppBarState = rememberTopAppBarState(),
-        canScroll: () -> Boolean = { true }
+        canScroll: () -> Boolean = { true },
+        snapAnimationSpec: AnimationSpec<Float>? = spring(stiffness = Spring.StiffnessMediumLow),
+        flingAnimationSpec: DecayAnimationSpec<Float>? = rememberSplineBasedDecay()
     ): TopAppBarScrollBehavior =
         EnterAlwaysScrollBehavior(
             state = state,
-            flingAnimationSpec = rememberSplineBasedDecay(),
+            snapAnimationSpec = snapAnimationSpec,
+            flingAnimationSpec = flingAnimationSpec,
             canScroll = canScroll
         )
 
@@ -645,16 +666,24 @@ object TopAppBarDefaults {
      * state. See [rememberTopAppBarState] for a state that is remembered across compositions.
      * @param canScroll a callback used to determine whether scroll events are to be
      * handled by this [ExitUntilCollapsedScrollBehavior]
+     * @param snapAnimationSpec an optional [AnimationSpec] that defines how the top app bar snaps
+     * to either fully collapsed or fully extended state when a fling or a drag scrolled it into an
+     * intermediate position
+     * @param flingAnimationSpec an optional [DecayAnimationSpec] that defined how to fling the top
+     * app bar when the user flings the app bar itself, or the content below it
      */
     @ExperimentalMaterial3Api
     @Composable
     fun exitUntilCollapsedScrollBehavior(
         state: TopAppBarState = rememberTopAppBarState(),
-        canScroll: () -> Boolean = { true }
+        canScroll: () -> Boolean = { true },
+        snapAnimationSpec: AnimationSpec<Float>? = spring(stiffness = Spring.StiffnessMediumLow),
+        flingAnimationSpec: DecayAnimationSpec<Float>? = rememberSplineBasedDecay()
     ): TopAppBarScrollBehavior =
         ExitUntilCollapsedScrollBehavior(
             state = state,
-            flingAnimationSpec = rememberSplineBasedDecay(),
+            snapAnimationSpec = snapAnimationSpec,
+            flingAnimationSpec = flingAnimationSpec,
             canScroll = canScroll
         )
 }
@@ -946,7 +975,14 @@ private fun SingleRowTopAppBar(
             state = rememberDraggableState { delta ->
                 scrollBehavior.state.heightOffset = scrollBehavior.state.heightOffset + delta
             },
-            onDragStopped = { snapTopAppBar(scrollBehavior.state) }
+            onDragStopped = { velocity ->
+                settleAppBar(
+                    scrollBehavior.state,
+                    velocity,
+                    scrollBehavior.flingAnimationSpec,
+                    scrollBehavior.snapAnimationSpec
+                )
+            }
         )
     } else {
         Modifier
@@ -1059,7 +1095,14 @@ private fun TwoRowsTopAppBar(
             state = rememberDraggableState { delta ->
                 scrollBehavior.state.heightOffset = scrollBehavior.state.heightOffset + delta
             },
-            onDragStopped = { snapTopAppBar(scrollBehavior.state) }
+            onDragStopped = { velocity ->
+                settleAppBar(
+                    scrollBehavior.state,
+                    velocity,
+                    scrollBehavior.flingAnimationSpec,
+                    scrollBehavior.snapAnimationSpec
+                )
+            }
         )
     } else {
         Modifier
@@ -1273,10 +1316,12 @@ private fun TopAppBarLayout(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 private class PinnedScrollBehavior(
-    override var state: TopAppBarState,
+    override val state: TopAppBarState,
     val canScroll: () -> Boolean = { true }
 ) : TopAppBarScrollBehavior {
     override val isPinned: Boolean = true
+    override val snapAnimationSpec: AnimationSpec<Float>? = null
+    override val flingAnimationSpec: DecayAnimationSpec<Float>? = null
     override var nestedScrollConnection =
         object : NestedScrollConnection {
             override fun onPostScroll(
@@ -1305,16 +1350,19 @@ private class PinnedScrollBehavior(
  * the nested content is pulled up, and will immediately appear when the content is pulled down.
  *
  * @param state a [TopAppBarState]
- * @param flingAnimationSpec a [DecayAnimationSpec] that will be used to animate the top app
- * bar motion when the user flings the content and the app bar should collapse or expand at a
- * similar fling velocity and decay
+ * @param snapAnimationSpec an optional [AnimationSpec] that defines how the top app bar snaps to
+ * either fully collapsed or fully extended state when a fling or a drag scrolled it into an
+ * intermediate position
+ * @param flingAnimationSpec an optional [DecayAnimationSpec] that defined how to fling the top app
+ * bar when the user flings the app bar itself, or the content below it
  * @param canScroll a callback used to determine whether scroll events are to be
  * handled by this [EnterAlwaysScrollBehavior]
  */
 @OptIn(ExperimentalMaterial3Api::class)
 private class EnterAlwaysScrollBehavior(
-    override var state: TopAppBarState,
-    val flingAnimationSpec: DecayAnimationSpec<Float>?,
+    override val state: TopAppBarState,
+    override val snapAnimationSpec: AnimationSpec<Float>?,
+    override val flingAnimationSpec: DecayAnimationSpec<Float>?,
     val canScroll: () -> Boolean = { true }
 ) : TopAppBarScrollBehavior {
     override val isPinned: Boolean = false
@@ -1352,19 +1400,13 @@ private class EnterAlwaysScrollBehavior(
             }
 
             override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-                var result = super.onPostFling(consumed, available)
-                // Check if the app bar is partially collapsed/expanded.
-                // Note that we don't check for 0f due to float precision with the collapsedFraction
-                // calculation.
-                if (state.collapsedFraction > 0.01f && state.collapsedFraction < 1f) {
-                    result += flingTopAppBar(
-                        state = state,
-                        initialVelocity = available.y,
-                        flingAnimationSpec = flingAnimationSpec
-                    )
-                    snapTopAppBar(state)
-                }
-                return result
+                val superConsumed = super.onPostFling(consumed, available)
+                return superConsumed + settleAppBar(
+                    state,
+                    available.y,
+                    flingAnimationSpec,
+                    snapAnimationSpec
+                )
             }
         }
 }
@@ -1378,16 +1420,19 @@ private class EnterAlwaysScrollBehavior(
  * pulled all the way down.
  *
  * @param state a [TopAppBarState]
- * @param flingAnimationSpec a [DecayAnimationSpec] that will be used to animate the top app
- * bar motion when the user flings the content and the app bar should collapse or expand at a
- * similar fling velocity and decay
+ * @param snapAnimationSpec an optional [AnimationSpec] that defines how the top app bar snaps to
+ * either fully collapsed or fully extended state when a fling or a drag scrolled it into an
+ * intermediate position
+ * @param flingAnimationSpec an optional [DecayAnimationSpec] that defined how to fling the top app
+ * bar when the user flings the app bar itself, or the content below it
  * @param canScroll a callback used to determine whether scroll events are to be
  * handled by this [ExitUntilCollapsedScrollBehavior]
  */
 @OptIn(ExperimentalMaterial3Api::class)
 private class ExitUntilCollapsedScrollBehavior(
     override val state: TopAppBarState,
-    val flingAnimationSpec: DecayAnimationSpec<Float>?,
+    override val snapAnimationSpec: AnimationSpec<Float>?,
+    override val flingAnimationSpec: DecayAnimationSpec<Float>?,
     val canScroll: () -> Boolean = { true }
 ) : TopAppBarScrollBehavior {
     override val isPinned: Boolean = false
@@ -1440,37 +1485,43 @@ private class ExitUntilCollapsedScrollBehavior(
             }
 
             override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-                var result = super.onPostFling(consumed, available)
-                // Check if the app bar is partially collapsed/expanded.
-                // Note that we don't check for 0f due to float precision with the collapsedFraction
-                // calculation.
-                if (state.collapsedFraction > 0.01f && state.collapsedFraction < 1f) {
-                    result += flingTopAppBar(
-                        state = state,
-                        initialVelocity = available.y,
-                        flingAnimationSpec = flingAnimationSpec
-                    )
-                    snapTopAppBar(state)
-                }
-                return result
+                val superConsumed = super.onPostFling(consumed, available)
+                return superConsumed + settleAppBar(
+                    state,
+                    available.y,
+                    flingAnimationSpec,
+                    snapAnimationSpec
+                )
             }
         }
 }
 
+/**
+ * Settles the app bar by flinging, in case the given velocity is greater than zero, and snapping
+ * after the fling settles.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
-private suspend fun flingTopAppBar(
+private suspend fun settleAppBar(
     state: TopAppBarState,
-    initialVelocity: Float,
-    flingAnimationSpec: DecayAnimationSpec<Float>?
+    velocity: Float,
+    flingAnimationSpec: DecayAnimationSpec<Float>?,
+    snapAnimationSpec: AnimationSpec<Float>?
 ): Velocity {
-    var remainingVelocity = initialVelocity
+    // Check if the app bar is completely collapsed/expanded. If so, no need to settle the app bar,
+    // and just return Zero Velocity.
+    // Note that we don't check for 0f due to float precision with the collapsedFraction
+    // calculation.
+    if (state.collapsedFraction < 0.01f || state.collapsedFraction == 1f) {
+        return Velocity.Zero
+    }
+    var remainingVelocity = velocity
     // In case there is an initial velocity that was left after a previous user fling, animate to
     // continue the motion to expand or collapse the app bar.
-    if (flingAnimationSpec != null && abs(initialVelocity) > 1f) {
+    if (flingAnimationSpec != null && abs(velocity) > 1f) {
         var lastValue = 0f
         AnimationState(
             initialValue = 0f,
-            initialVelocity = initialVelocity,
+            initialVelocity = velocity,
         )
             .animateDecay(flingAnimationSpec) {
                 val delta = value - lastValue
@@ -1483,21 +1534,23 @@ private suspend fun flingTopAppBar(
                 if (abs(delta - consumed) > 0.5f) this.cancelAnimation()
             }
     }
-    return Velocity(0f, remainingVelocity)
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-private suspend fun snapTopAppBar(state: TopAppBarState) {
-    // In case the app bar motion was stopped in a state where it's partially visible, snap it to
-    // the nearest state.
-    if (state.heightOffset < 0 &&
-        state.heightOffset > state.heightOffsetLimit
-    ) {
-        AnimationState(initialValue = state.heightOffset).animateTo(
-            if (state.collapsedFraction < 0.5f) 0f else state.heightOffsetLimit,
-            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-        ) { state.heightOffset = value }
+    // Snap if animation specs were provided.
+    if (snapAnimationSpec != null) {
+        if (state.heightOffset < 0 &&
+            state.heightOffset > state.heightOffsetLimit
+        ) {
+            AnimationState(initialValue = state.heightOffset).animateTo(
+                if (state.collapsedFraction < 0.5f) {
+                    0f
+                } else {
+                    state.heightOffsetLimit
+                },
+                animationSpec = snapAnimationSpec
+            ) { state.heightOffset = value }
+        }
     }
+
+    return Velocity(0f, remainingVelocity)
 }
 
 private val MediumTitleBottomPadding = 24.dp
