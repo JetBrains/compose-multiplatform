@@ -761,12 +761,18 @@ package androidx.compose.runtime.internal {
 
 package androidx.compose.runtime.reflect {
 
-  public final class ComposableMethodInvokerKt {
-    method @kotlin.jvm.Throws(exceptionClasses=NoSuchMethodException::class) public static java.lang.reflect.Method getDeclaredComposableMethod(Class<?>, String methodName, Class<?>... args) throws java.lang.NoSuchMethodException;
-    method public static java.lang.reflect.Parameter![] getRealParameters(java.lang.reflect.Method);
-    method public static int getRealParametersCount(java.lang.reflect.Method);
-    method public static Object? invokeComposable(java.lang.reflect.Method, androidx.compose.runtime.Composer composer, Object? instance, java.lang.Object?... args);
-    method public static boolean isComposable(java.lang.reflect.Method);
+  public final class ComposableMethod {
+    method public java.lang.reflect.Method asMethod();
+    method public int getParameterCount();
+    method public java.lang.reflect.Parameter![] getParameters();
+    method public operator Object? invoke(androidx.compose.runtime.Composer composer, Object? instance, java.lang.Object?... args);
+    property public final int parameterCount;
+    property public final java.lang.reflect.Parameter![] parameters;
+  }
+
+  public final class ComposableMethodKt {
+    method public static androidx.compose.runtime.reflect.ComposableMethod? asComposableMethod(java.lang.reflect.Method);
+    method @kotlin.jvm.Throws(exceptionClasses=NoSuchMethodException::class) public static androidx.compose.runtime.reflect.ComposableMethod getDeclaredComposableMethod(Class<?>, String methodName, Class<?>... args) throws java.lang.NoSuchMethodException;
   }
 
 }
