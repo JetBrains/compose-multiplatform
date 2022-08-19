@@ -22,12 +22,14 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumedWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
@@ -108,7 +110,10 @@ fun DemoApp(
         modifier = Modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
-        val modifier = Modifier.consumedWindowInsets(innerPadding).padding(innerPadding)
+        val modifier = Modifier
+            // as scaffold currently doesn't consume the safe drawing internally - consume here
+            .consumedWindowInsets(WindowInsets.safeDrawing)
+            .padding(innerPadding)
         DemoContent(
             modifier,
             currentDemo,
