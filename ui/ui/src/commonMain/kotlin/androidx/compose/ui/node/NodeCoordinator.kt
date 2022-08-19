@@ -93,12 +93,12 @@ internal abstract class NodeCoordinator(
         }
     }
 
-    inline fun visitNodes(mask: Long, includeTail: Boolean, block: (Modifier.Node) -> Unit) {
+    inline fun visitNodes(mask: Int, includeTail: Boolean, block: (Modifier.Node) -> Unit) {
         val stopNode = if (includeTail) tail else (tail.parent ?: return)
         var node: Modifier.Node? = headNode(includeTail)
         while (node != null) {
-            if (node.aggregateChildKindSet and mask == 0L) return
-            if (node.kindSet and mask != 0L) block(node)
+            if (node.aggregateChildKindSet and mask == 0) return
+            if (node.kindSet and mask != 0) block(node)
             if (node === stopNode) break
             node = node.child
         }
@@ -1337,12 +1337,12 @@ private class LayerPositionalProperties {
 
 private fun <T> DelegatableNode.nextUncheckedUntil(type: NodeKind<T>, stopType: NodeKind<*>): T? {
     val child = node.child ?: return null
-    if (child.aggregateChildKindSet and type.mask == 0L) return null
+    if (child.aggregateChildKindSet and type.mask == 0) return null
     var next: Modifier.Node? = child
     while (next != null) {
         val kindSet = next.kindSet
-        if (kindSet and stopType.mask != 0L) return null
-        if (kindSet and type.mask != 0L) {
+        if (kindSet and stopType.mask != 0) return null
+        if (kindSet and type.mask != 0) {
             @Suppress("UNCHECKED_CAST")
             return next as? T
         }

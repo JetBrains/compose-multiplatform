@@ -126,11 +126,11 @@ interface Modifier {
         @Suppress("LeakingThis")
         final override var node: Node = this
             private set
-        internal var kindSet: Long = 0
+        internal var kindSet: Int = 0
         // NOTE: We use an aggregate mask that or's all of the type masks of the children of the
         // chain so that we can quickly prune a subtree. This INCLUDES the kindSet of this node
         // as well
-        internal var aggregateChildKindSet: Long = 0
+        internal var aggregateChildKindSet: Int = 0
         internal var parent: Node? = null
         internal var child: Node? = null
         internal var coordinator: NodeCoordinator? = null
@@ -143,7 +143,7 @@ interface Modifier {
         }
 
         @Suppress("NOTHING_TO_INLINE")
-        internal inline fun isKind(kind: NodeKind<*>) = kindSet and kind.mask != 0L
+        internal inline fun isKind(kind: NodeKind<*>) = kindSet and kind.mask != 0
 
         internal fun attach() {
             check(!isAttached)

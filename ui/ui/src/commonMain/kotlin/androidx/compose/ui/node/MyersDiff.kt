@@ -27,8 +27,6 @@ internal interface DiffCallback {
     fun same(oldIndex: Int, newIndex: Int)
 }
 
-private const val MaxListSize = Short.MAX_VALUE.toInt() - 1
-
 // Myers' algorithm uses two lists as axis labels. In DiffUtil's implementation, `x` axis is
 // used for old list and `y` axis is used for new list.
 /**
@@ -47,57 +45,60 @@ private fun calculateDiff(
     oldSize: Int,
     newSize: Int,
     cb: DiffCallback,
-): LongStack {
+): IntStack {
     val max = (oldSize + newSize + 1) / 2
-    require(oldSize < MaxListSize && newSize < MaxListSize) {
-        "This diff algorithm encodes various values as Shorts, and thus the before and after " +
-            "lists must have size less than ${Short.MAX_VALUE} in order to be valid."
-    }
-    val diagonals = LongStack(max)
+    val diagonals = IntStack(max * 3)
     // instead of a recursive implementation, we keep our own stack to avoid potential stack
     // overflow exceptions
-    val stack = LongStack(10)
-    stack.pushRange(Range(0, oldSize, 0, newSize))
-    // allocate androidx.compose.ui.node.forward and androidx.compose.ui.node.backward k-lines. K
-    // lines are diagonal lines in the matrix. (see the paper for details)
-    // These arrays lines keep the max reachable position for each k-line.
+    val stack = IntStack(max * 4)
+    stack.pushRange(0, oldSize, 0, newSize)
+    // allocate forward and backward k-lines. K lines are diagonal lines in the matrix.
+    // (see the paper for details) These arrays lines keep the max reachable position for
+    // each k-line.
     val forward = CenteredArray(IntArray(max * 2 + 1))
     val backward = CenteredArray(IntArray(max * 2 + 1))
+    val snake = Snake(IntArray(5))
 
     while (stack.isNotEmpty()) {
-        val range = stack.popRange()
-        val snake = midPoint(range, cb, forward, backward)
-        if (snake != NullSnake) {
+        val newEnd = stack.pop()
+        val newStart = stack.pop()
+        val oldEnd = stack.pop()
+        val oldStart = stack.pop()
+
+        val found = midPoint(
+            oldStart,
+            oldEnd,
+            newStart,
+            newEnd,
+            cb, forward, backward, snake.data)
+
+        if (found) {
             // if it has a diagonal, save it
             if (snake.diagonalSize > 0) {
-                diagonals.pushDiagonal(snake.toDiagonal())
+                snake.addDiagonalToStack(diagonals)
             }
             // add new ranges for left and right
             // left
             stack.pushRange(
-                Range(
-                    oldStart = range.oldStart,
-                    oldEnd = snake.startX,
-                    newStart = range.newStart,
-                    newEnd = snake.startY,
-                )
+                oldStart = oldStart,
+                oldEnd = snake.startX,
+                newStart = newStart,
+                newEnd = snake.startY,
             )
 
             // right
             stack.pushRange(
-                Range(
-                    oldStart = snake.endX,
-                    oldEnd = range.oldEnd,
-                    newStart = snake.endY,
-                    newEnd = range.newEnd,
-                )
+                oldStart = snake.endX,
+                oldEnd = oldEnd,
+                newStart = snake.endY,
+                newEnd = newEnd,
             )
         }
     }
     // sort snakes
-    diagonals.sort()
+    diagonals.sortDiagonals()
     // always add one last
-    diagonals.pushDiagonal(Diagonal(oldSize, newSize, 0))
+    diagonals.pushDiagonal(oldSize, newSize, 0)
 
     return diagonals
 }
@@ -105,15 +106,15 @@ private fun calculateDiff(
 private fun applyDiff(
     oldSize: Int,
     newSize: Int,
-    diagonals: LongStack,
+    diagonals: IntStack,
     callback: DiffCallback,
 ) {
     var posX = oldSize
     var posY = newSize
-    for (diagonalIndex in diagonals.size - 1 downTo 0) {
-        val diagonal = Diagonal(diagonals[diagonalIndex])
-        val endX = diagonal.endX
-        val endY = diagonal.endY
+    while (diagonals.isNotEmpty()) {
+        var i = diagonals.pop() // diagonal size
+        val endY = diagonals.pop()
+        val endX = diagonals.pop()
         while (posX > endX) {
             posX--
             callback.remove(posX)
@@ -122,7 +123,6 @@ private fun applyDiff(
             posY--
             callback.insert(posX, posY)
         }
-        var i = diagonal.size
         while (i-- > 0) {
             posX--
             posY--
@@ -149,39 +149,59 @@ internal fun executeDiff(oldSize: Int, newSize: Int, callback: DiffCallback) {
  * Finds a middle snake in the given range.
  */
 private fun midPoint(
-    range: Range,
-    cb: DiffCallback,
-    forward: CenteredArray,
-    backward: CenteredArray
-): Snake {
-    if (range.oldSize < 1 || range.newSize < 1) {
-        return NullSnake
-    }
-    val max = (range.oldSize + range.newSize + 1) / 2
-    forward[1] = range.oldStart
-    backward[1] = range.oldEnd
-    for (d in 0 until max) {
-        var snake = forward(range, cb, forward, backward, d)
-        if (snake != NullSnake) {
-            return snake
-        }
-        snake = backward(range, cb, forward, backward, d)
-        if (snake != NullSnake) {
-            return snake
-        }
-    }
-    return NullSnake
-}
-
-private fun forward(
-    range: Range,
+    oldStart: Int,
+    oldEnd: Int,
+    newStart: Int,
+    newEnd: Int,
     cb: DiffCallback,
     forward: CenteredArray,
     backward: CenteredArray,
-    d: Int
-): Snake {
-    val checkForSnake = abs(range.oldSize - range.newSize) % 2 == 1
-    val delta = range.oldSize - range.newSize
+    snake: IntArray,
+): Boolean {
+    val oldSize = oldEnd - oldStart
+    val newSize = newEnd - newStart
+    if (oldSize < 1 || newSize < 1) {
+        return false
+    }
+    val max = (oldSize + newSize + 1) / 2
+    forward[1] = oldStart
+    backward[1] = oldEnd
+    for (d in 0 until max) {
+        val found = forward(
+            oldStart,
+            oldEnd,
+            newStart,
+            newEnd, cb, forward, backward, d, snake)
+        if (found) {
+            return true
+        }
+        val found2 = backward(
+            oldStart,
+            oldEnd,
+            newStart,
+            newEnd, cb, forward, backward, d, snake)
+        if (found2) {
+            return true
+        }
+    }
+    return false
+}
+
+private fun forward(
+    oldStart: Int,
+    oldEnd: Int,
+    newStart: Int,
+    newEnd: Int,
+    cb: DiffCallback,
+    forward: CenteredArray,
+    backward: CenteredArray,
+    d: Int,
+    snake: IntArray,
+): Boolean {
+    val oldSize = oldEnd - oldStart
+    val newSize = newEnd - newStart
+    val checkForSnake = abs(oldSize - newSize) % 2 == 1
+    val delta = oldSize - newSize
     var k = -d
     while (k <= d) {
         // we either come from d-1, k-1 OR d-1. k+1
@@ -199,10 +219,10 @@ private fun forward(
             startX = forward[k - 1]
             x = startX + 1
         }
-        var y: Int = range.newStart + (x - range.oldStart) - k
+        var y: Int = newStart + (x - oldStart) - k
         startY = if (d == 0 || x != startX) y else y - 1
         // now find snake size
-        while ((x < range.oldEnd) && y < range.newEnd && cb.areItemsTheSame(x, y)) {
+        while ((x < oldEnd) && y < newEnd && cb.areItemsTheSame(x, y)) {
             x++
             y++
         }
@@ -215,29 +235,37 @@ private fun forward(
             // if backwards K is calculated and it passed me, found match
             if ((backwardsK >= -d + 1 && backwardsK <= d - 1) && backward[backwardsK] <= x) {
                 // match
-                return Snake(
+                fillSnake(
                     startX,
                     startY,
                     x,
                     y,
-                    false
+                    false,
+                    snake,
                 )
+                return true
             }
         }
         k += 2
     }
-    return NullSnake
+    return false
 }
 
 private fun backward(
-    range: Range,
+    oldStart: Int,
+    oldEnd: Int,
+    newStart: Int,
+    newEnd: Int,
     cb: DiffCallback,
     forward: CenteredArray,
     backward: CenteredArray,
-    d: Int
-): Snake {
-    val checkForSnake = (range.oldSize - range.newSize) % 2 == 0
-    val delta = range.oldSize - range.newSize
+    d: Int,
+    snake: IntArray,
+): Boolean {
+    val oldSize = oldEnd - oldStart
+    val newSize = newEnd - newStart
+    val checkForSnake = (oldSize - newSize) % 2 == 0
+    val delta = oldSize - newSize
     // same as androidx.compose.ui.node.forward but we go backwards from end of the lists to be
     // beginning this also means we'll try to optimize for minimizing x instead of maximizing it
     var k = -d
@@ -258,10 +286,10 @@ private fun backward(
             startX = backward[k - 1]
             x = startX - 1
         }
-        var y = range.newEnd - (range.oldEnd - x - k)
+        var y = newEnd - (oldEnd - x - k)
         val startY = if (d == 0 || x != startX) y else y + 1
         // now find snake size
-        while ((x > range.oldStart) && y > range.newStart && cb.areItemsTheSame(x - 1, y - 1)) {
+        while ((x > oldStart) && y > newStart && cb.areItemsTheSame(x - 1, y - 1)) {
             x--
             y--
         }
@@ -275,71 +303,52 @@ private fun backward(
             if (((forwardsK >= -d) && forwardsK <= d) && forward[forwardsK] >= x) {
                 // match
                 // assignment are reverse since we are a reverse snake
-                return Snake(
+                fillSnake(
                     x,
                     y,
                     startX,
                     startY,
-                    true
+                    true,
+                    snake,
                 )
+                return true
             }
         }
         k += 2
     }
-    return NullSnake
+    return false
 }
-
-/**
- * A diagonal is a match in the graph.
- * Rather than snakes, we only record the diagonals in the path.
- */
-@JvmInline
-internal value class Diagonal(val packedValue: ULong) {
-    val x: Int get() = endX - size
-    val y: Int get() = endY - size
-
-    // NOTE: we choose to store endX/endY/size instead of x/y/size since only
-    // the endX/endY/size are used when applying the diff.
-    val endX: Int get() = unpackShort1(packedValue)
-    val endY: Int get() = unpackShort2(packedValue)
-    val size: Int get() = unpackShort3(packedValue)
-    override fun toString() = "Diagonal($endX,$endY,$size)"
-}
-
-internal fun Diagonal(x: Int, y: Int, size: Int) = Diagonal(
-    packShorts((x + size).toShort(), (y + size).toShort(), size.toShort(), 0)
-)
 
 /**
  * Snakes represent a match between two lists. It is optionally prefixed or postfixed with an
  * add androidx.compose.ui.node.or remove operation. See the Myers' paper for details.
  */
 @JvmInline
-internal value class Snake(private val packedValue: ULong) {
+private value class Snake(val data: IntArray) {
     /**
      * Position in the old list
      */
-    val startX: Int get() = unpackShort1(packedValue)
+    val startX: Int get() = data[0]
 
     /**
      * Position in the new list
      */
-    val startY: Int get() = unpackShort2(packedValue)
+    val startY: Int get() = data[1]
 
     /**
      * End position in the old list, exclusive
      */
-    val endX: Int get() = unpackShort3(packedValue)
+    val endX: Int get() = data[2]
 
     /**
      * End position in the new list, exclusive
      */
-    val endY: Int get() = unpackShort4(packedValue)
+    val endY: Int get() = data[3]
 
     /**
      * True if this snake was created in the reverse search, false otherwise.
      */
-    val reverse: Boolean get() = unpackHighestBit(packedValue) == 1
+    val reverse: Boolean get() = data[4] != 0
     val diagonalSize: Int
         get() = min(endX - startX, endY - startY)
 
@@ -353,79 +362,42 @@ internal value class Snake(private val packedValue: ULong) {
      * Extract the diagonal of the snake to make reasoning easier for the rest of the
      * algorithm where we try to produce a path and also find moves.
      */
-    fun toDiagonal(): Diagonal {
+    fun addDiagonalToStack(diagonals: IntStack) {
         if (hasAdditionOrRemoval) {
-            return if (reverse) {
+            if (reverse) {
                 // snake edge it at the end
-                Diagonal(startX, startY, diagonalSize)
+                diagonals.pushDiagonal(startX, startY, diagonalSize)
             } else {
                 // snake edge it at the beginning
                 if (isAddition) {
-                    Diagonal(startX, startY + 1, diagonalSize)
+                    diagonals.pushDiagonal(startX, startY + 1, diagonalSize)
                 } else {
-                    Diagonal(startX + 1, startY, diagonalSize)
+                    diagonals.pushDiagonal(startX + 1, startY, diagonalSize)
                 }
             }
         } else {
             // we are a pure diagonal
-            return Diagonal(startX, startY, endX - startX)
+            diagonals.pushDiagonal(startX, startY, endX - startX)
         }
     }
 
     override fun toString() = "Snake($startX,$startY,$endX,$endY,$reverse)"
 }
 
-private val NullSnake = Snake(ULong.MAX_VALUE)
-
-internal fun Snake(
+internal fun fillSnake(
     startX: Int,
     startY: Int,
     endX: Int,
     endY: Int,
     reverse: Boolean,
-) = Snake(
-    packShortsAndBool(
-        startX.toShort(),
-        startY.toShort(),
-        endX.toShort(),
-        endY.toShort(),
-        reverse,
-    )
-)
-
-/**
- * Represents a range in two lists that needs to be solved.
- *
- *
- * This internal class is used when running Myers' algorithm without recursion.
- *
- *
- * Ends are exclusive
- */
-@JvmInline
-internal value class Range(val packedValue: ULong) {
-    val oldStart: Int get() = unpackShort1(packedValue)
-    val oldEnd: Int get() = unpackShort2(packedValue)
-    val newStart: Int get() = unpackShort3(packedValue)
-    val newEnd: Int get() = unpackShort4(packedValue)
-    val oldSize: Int get() = oldEnd - oldStart
-    val newSize: Int get() = newEnd - newStart
-    override fun toString() = "Range($oldStart,$oldEnd,$newStart,$newEnd,$oldSize,$newSize)"
+    data: IntArray,
+) {
+    data[0] = startX
+    data[1] = startY
+    data[2] = endX
+    data[3] = endY
+    data[4] = if (reverse) 1 else 0
 }
-
-internal fun Range(
-    oldStart: Int,
-    oldEnd: Int,
-    newStart: Int,
-    newEnd: Int,
-) = Range(
-    packShorts(
-        oldStart.toShort(),
-        oldEnd.toShort(),
-        newStart.toShort(),
-        newEnd.toShort(),
-    )
-)
 
 /**
  * Array wrapper w/ negative index support.
@@ -444,74 +416,99 @@ private value class CenteredArray(private val data: IntArray) {
     }
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
-private class LongStack(initialCapacity: Int) {
-    private var stack = ULongArray(initialCapacity)
+private class IntStack(initialCapacity: Int) {
+    private var stack = IntArray(initialCapacity)
     private var lastIndex = 0
 
-    val size: Int get() = lastIndex
-
-    operator fun get(index: Int) = stack[index]
-    fun push(value: ULong) {
-        if (lastIndex >= stack.size) {
+    fun pushRange(
+        oldStart: Int,
+        oldEnd: Int,
+        newStart: Int,
+        newEnd: Int,
+    ) {
+        val i = lastIndex
+        if (i + 4 >= stack.size) {
             stack = stack.copyOf(stack.size * 2)
         }
-        stack[lastIndex++] = value
+        val stack = stack
+        stack[i + 0] = oldStart
+        stack[i + 1] = oldEnd
+        stack[i + 2] = newStart
+        stack[i + 3] = newEnd
+        lastIndex = i + 4
     }
 
-    fun pop(): ULong = stack[--lastIndex]
-    fun sort() = stack.sort(fromIndex = 0, toIndex = lastIndex)
+    fun pushDiagonal(
+        x: Int,
+        y: Int,
+        size: Int,
+    ) {
+        val i = lastIndex
+        if (i + 3 >= stack.size) {
+            stack = stack.copyOf(stack.size * 2)
+        }
+        val stack = stack
+        stack[i + 0] = x + size
+        stack[i + 1] = y + size
+        stack[i + 2] = size
+        lastIndex = i + 3
+    }
+
+    fun pop(): Int = stack[--lastIndex]
+
     fun isNotEmpty() = lastIndex != 0
+
+    fun sortDiagonals() {
+        // diagonals are made up of 3 elements, so we must ensure that the array size is some
+        // multiple of three, or else it is malformed. If the size is 3, then there is no need to
+        // sort. If it is greater than 3, we pass in the index of the "start" element of the last
+        // diagonal
+        val i = lastIndex
+        check(i % 3 == 0)
+        if (i > 3) {
+            quickSort(0, i - 3, 3)
+        }
+    }
+
+    private fun quickSort(start: Int, end: Int, elSize: Int) {
+        if (start < end) {
+            val i = partition(start, end, elSize)
+            quickSort(start, i - elSize, elSize)
+            quickSort(i + elSize, end, elSize)
+        }
+    }
+
+    private fun partition(start: Int, end: Int, elSize: Int): Int {
+        var i = start - elSize
+        var j = start
+        while (j < end) {
+            if (compareDiagonal(j, end)) {
+                i += elSize
+                swapDiagonal(i, j)
+            }
+            j += elSize
+        }
+        swapDiagonal(i + elSize, end)
+        return i + elSize
+    }
+
+    private fun swapDiagonal(i: Int, j: Int) {
+        val stack = stack
+        stack.swap(i, j)
+        stack.swap(i + 1, j + 1)
+        stack.swap(i + 2, j + 2)
+    }
+
+    private fun compareDiagonal(a: Int, b: Int): Boolean {
+        val stack = stack
+        val a0 = stack[a]
+        val b0 = stack[b]
+        return a0 < b0 || (a0 == b0 && stack[a + 1] <= stack[b + 1])
+    }
 }
 
-private fun LongStack.pushRange(range: Range) = push(range.packedValue)
-private fun LongStack.popRange() = Range(pop())
-private fun LongStack.pushDiagonal(diagonal: Diagonal) = push(diagonal.packedValue)
-
-internal inline fun packShorts(
-    val1: Short,
-    val2: Short,
-    val3: Short,
-    val4: Short
-): ULong {
-    return val1.toULong().shl(48) or
-        val2.toULong().shl(32) or
-        val3.toULong().shl(16) or
-        val4.toULong()
-}
-
-internal inline fun unpackHighestBit(value: ULong): Int {
-    // leaving the sign bit off
-    return value.shr(63).and(0b1u).toInt()
-}
-
-internal inline fun unpackShort1(value: ULong): Int {
-    // leaving the sign bit off
-    return value.shr(48).and(0b0111_1111_1111_1111u).toInt()
-}
-
-internal inline fun unpackShort2(value: ULong): Int {
-    return value.shr(32).and(0xFFFFu).toInt()
-}
-
-internal inline fun unpackShort3(value: ULong): Int {
-    return value.shr(16).and(0xFFFFu).toInt()
-}
-
-internal inline fun unpackShort4(value: ULong): Int {
-    return value.and(0xFFFFu).toInt()
-}
-
-internal inline fun packShortsAndBool(
-    val1: Short,
-    val2: Short,
-    val3: Short,
-    val4: Short,
-    bool: Boolean,
-): ULong {
-    return (if (bool) 1 else 0).toULong().shl(63) or
-        val1.toULong().shl(48) or
-        val2.toULong().shl(32) or
-        val3.toULong().shl(16) or
-        val4.toULong()
+private fun IntArray.swap(i: Int, j: Int) {
+    val tmp = this[i]
+    this[i] = this[j]
+    this[j] = tmp
 }
