@@ -353,7 +353,7 @@ package androidx.compose.foundation.gestures {
 package androidx.compose.foundation.gestures.snapping {
 
   public final class LazyListSnapLayoutInfoProviderKt {
-    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider lazyListSnapLayoutInfoProvider(androidx.compose.foundation.lazy.LazyListState lazyListState, optional kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,java.lang.Float> positionInLayout);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider SnapLayoutInfoProvider(androidx.compose.foundation.lazy.LazyListState lazyListState, optional kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,java.lang.Float> positionInLayout);
   }
 
   public final class SnapFlingBehaviorKt {
@@ -505,6 +505,11 @@ package androidx.compose.foundation.lazy {
     method public androidx.compose.ui.Modifier fillParentMaxHeight(androidx.compose.ui.Modifier, optional float fraction);
     method public androidx.compose.ui.Modifier fillParentMaxSize(androidx.compose.ui.Modifier, optional float fraction);
     method public androidx.compose.ui.Modifier fillParentMaxWidth(androidx.compose.ui.Modifier, optional float fraction);
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi public final class LazyListDefaults {
+    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public androidx.compose.foundation.gestures.FlingBehavior snapFlingBehavior(androidx.compose.foundation.lazy.LazyListState lazyListState);
+    field public static final androidx.compose.foundation.lazy.LazyListDefaults INSTANCE;
   }
 
   public final class LazyListHeadersKt {

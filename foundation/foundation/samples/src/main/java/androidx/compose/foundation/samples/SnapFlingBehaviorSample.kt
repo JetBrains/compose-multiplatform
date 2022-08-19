@@ -19,13 +19,14 @@ package androidx.compose.foundation.samples
 import androidx.annotation.Sampled
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.snapping.lazyListSnapLayoutInfoProvider
+import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListDefaults
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Text
@@ -40,16 +41,45 @@ import androidx.compose.ui.unit.sp
 @OptIn(ExperimentalFoundationApi::class)
 @Sampled
 @Composable
-fun SnapFlingBehaviorSample() {
+fun SnapFlingBehaviorSimpleSample() {
     val state = rememberLazyListState()
-    val layoutInfoProvider = remember(state) { lazyListSnapLayoutInfoProvider(state) }
-    val snapFlingBehavior = rememberSnapFlingBehavior(snapLayoutInfoProvider = layoutInfoProvider)
 
     LazyRow(
         modifier = Modifier.fillMaxSize(),
         verticalAlignment = Alignment.CenterVertically,
         state = state,
-        flingBehavior = snapFlingBehavior
+        flingBehavior = LazyListDefaults.snapFlingBehavior(lazyListState = state)
+    ) {
+        items(200) {
+            Box(
+                modifier = Modifier
+                    .height(400.dp)
+                    .width(200.dp)
+                    .padding(8.dp)
+                    .background(Color.Gray),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(it.toString(), fontSize = 32.sp)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Sampled
+@Composable
+fun SnapFlingBehaviorCustomizedSample() {
+    val state = rememberLazyListState()
+
+    // If you'd like to customize either the snap behavior or the layout provider
+    val snappingLayout = remember(state) { SnapLayoutInfoProvider(state) }
+    val flingBehavior = rememberSnapFlingBehavior(snappingLayout)
+
+    LazyRow(
+        modifier = Modifier.fillMaxSize(),
+        verticalAlignment = Alignment.CenterVertically,
+        state = state,
+        flingBehavior = flingBehavior
     ) {
         items(200) {
             Box(

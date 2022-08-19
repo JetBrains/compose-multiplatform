@@ -18,13 +18,12 @@ package androidx.compose.foundation.demos.snapping
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.snapping.lazyListSnapLayoutInfoProvider
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListDefaults
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.material.Text
@@ -51,12 +50,10 @@ val SinglePageSnappingDemos = listOf(
 @Composable
 fun SamePageSizeDemo() {
     val lazyListState = rememberLazyListState()
-    val snappingLayout = remember(lazyListState) { lazyListSnapLayoutInfoProvider(lazyListState) }
-    val flingBehavior = rememberSnapFlingBehavior(snappingLayout)
 
     SnappingDemoMainLayout(
         lazyListState = lazyListState,
-        flingBehavior = flingBehavior
+        flingBehavior = LazyListDefaults.snapFlingBehavior(lazyListState = lazyListState)
     ) {
         DefaultSnapDemoItem(it)
     }
@@ -85,10 +82,11 @@ fun ResizableSnapDemoItem(modifier: Modifier, position: Int) {
 @Composable
 fun LargePageSizeDemo() {
     val lazyListState = rememberLazyListState()
-    val snappingLayout = remember(lazyListState) { lazyListSnapLayoutInfoProvider(lazyListState) }
-    val flingBehavior = rememberSnapFlingBehavior(snappingLayout)
 
-    SnappingDemoMainLayout(lazyListState = lazyListState, flingBehavior = flingBehavior) {
+    SnappingDemoMainLayout(
+        lazyListState = lazyListState,
+        flingBehavior = LazyListDefaults.snapFlingBehavior(lazyListState = lazyListState)
+    ) {
         ResizableSnapDemoItem(
             modifier = Modifier
                 .width(350.dp)
@@ -104,10 +102,11 @@ private val PagesSizes = (0..ItemNumber).toList().map { (50..500).random().dp }
 @Composable
 fun MultiSizePageDemo() {
     val lazyListState = rememberLazyListState()
-    val snappingLayout = remember(lazyListState) { lazyListSnapLayoutInfoProvider(lazyListState) }
-    val flingBehavior = rememberSnapFlingBehavior(snappingLayout)
 
-    SnappingDemoMainLayout(lazyListState = lazyListState, flingBehavior = flingBehavior) {
+    SnappingDemoMainLayout(
+        lazyListState = lazyListState,
+        flingBehavior = LazyListDefaults.snapFlingBehavior(lazyListState = lazyListState)
+    ) {
         ResizableSnapDemoItem(
             modifier = Modifier
                 .width(PagesSizes[it])
@@ -121,12 +120,10 @@ fun MultiSizePageDemo() {
 @Composable
 fun DifferentContentPaddingDemo() {
     val lazyListState = rememberLazyListState()
-    val snappingLayout = remember(lazyListState) { lazyListSnapLayoutInfoProvider(lazyListState) }
-    val flingBehavior = rememberSnapFlingBehavior(snappingLayout)
 
     SnappingDemoMainLayout(
         lazyListState = lazyListState,
-        flingBehavior = flingBehavior,
+        flingBehavior = LazyListDefaults.snapFlingBehavior(lazyListState = lazyListState),
         contentPaddingValues = PaddingValues(start = 20.dp, end = 50.dp)
     ) {
         DefaultSnapDemoItem(position = it)
