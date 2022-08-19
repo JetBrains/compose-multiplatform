@@ -46,7 +46,7 @@ dependencies {
         api(project(":compose:ui:ui-graphics"))
         api(project(":compose:ui:ui-text"))
         api(project(":compose:ui:ui-unit"))
-        api("androidx.annotation:annotation:1.5.0-alpha01")
+        api(project(":annotation:annotation"))
 
         // This has stub APIs for access to legacy Android APIs, so we don't want
         // any dependency on this module.
