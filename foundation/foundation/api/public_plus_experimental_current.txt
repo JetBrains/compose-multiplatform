@@ -803,7 +803,7 @@ package androidx.compose.foundation.lazy.layout {
   }
 
   @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public sealed interface LazyLayoutMeasureScope extends androidx.compose.ui.layout.MeasureScope {
-    method public androidx.compose.ui.layout.Placeable![] measure(int index, long constraints);
+    method public java.util.List<androidx.compose.ui.layout.Placeable> measure(int index, long constraints);
     method @androidx.compose.runtime.Stable public default float toDp(long);
     method @androidx.compose.runtime.Stable public default float toDp(int);
     method @androidx.compose.runtime.Stable public default float toDp(float);
