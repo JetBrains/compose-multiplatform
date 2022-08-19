@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,19 @@
 package androidx.compose.ui.layout
 
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.node.getChildrenOfVirtualChildren
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.util.fastMap
-import androidx.compose.ui.internal.JvmDefaultWithCompatibility
-import androidx.compose.ui.layout.RootMeasurePolicy.measure
-import androidx.compose.ui.layout.RootMeasurePolicy.minIntrinsicWidth
 
 /**
- * Defines the measure and layout behavior of a [Layout]. [Layout] and [MeasurePolicy] are the way
- * Compose layouts (such as `Box`, `Column`, etc.) are built, and they can also be used to achieve
- * custom layouts.
+ * Defines the measure and layout behavior of a [Layout] overload which accepts a list of multiple
+ * composable content lambdas.
  *
- * See [Layout] samples for examples of how to use [MeasurePolicy].
+ * This interface is identical to [MeasurePolicy], but provides you with a list of lists of
+ * [Measurable]s which allows to threat children put into different content lambdas differently.
+ * Such list has the same size as the list of contents passed into [Layout] and contains the list
+ * of [Measurable]s of the corresponding content lambda in the same order.
  *
  * Intrinsic measurement methods define the intrinsic size of the layout. These can be queried
  * by the layout's parent in order to obtain, in specific cases, more information about
@@ -52,13 +53,14 @@ import androidx.compose.ui.layout.RootMeasurePolicy.minIntrinsicWidth
  * and `preferredHeight(IntrinsicSize)` modifiers. See their samples for when they can be useful.
  *
  * @see Layout
+ * @see MeasurePolicy
  */
 @Stable
-@JvmDefaultWithCompatibility
-fun interface MeasurePolicy {
+@ExperimentalComposeUiApi
+fun interface MultiContentMeasurePolicy {
     /**
      * The function that defines the measurement and layout. Each [Measurable] in the [measurables]
-     * list corresponds to a layout child of the layout, and children can be measured using the
+     * lists corresponds to a layout child of the layout, and children can be measured using the
      * [Measurable.measure] method. This method takes the [Constraints] which the child should
      * respect; different children can be measured with different constraints.
      * Measuring a child returns a [Placeable], which reveals the size chosen by the child as a
@@ -69,6 +71,11 @@ fun interface MeasurePolicy {
      * children choose, they can be laid out correctly according to the parent's layout algorithm.
      * This is because there is no measurement negotiation between the parent and children:
      * once a child chooses its size, the parent needs to handle it correctly.
+     *
+     * It is identical to [MeasurePolicy.measure], but provides you with a list of lists of
+     * [Measurable]s which allows to threat children put into different content lambdas
+     * differently. Such list has the same size as the list of contents passed into [Layout] and
+     * contains the list of [Measurable]s of the corresponding content lambda in the same order.
      *
      * Note that a child is allowed to choose a size that does not satisfy its constraints. However,
      * when this happens, the placeable's [width][Placeable.width] and [height][Placeable.height]
@@ -86,7 +93,7 @@ fun interface MeasurePolicy {
      * defining the positioning of the children layouts.
      */
     fun MeasureScope.measure(
-        measurables: List<Measurable>,
+        measurables: List<List<Measurable>>,
         constraints: Constraints
     ): MeasureResult
 
@@ -94,13 +101,20 @@ fun interface MeasurePolicy {
      * The function used to calculate [IntrinsicMeasurable.minIntrinsicWidth]. It represents
      * the minimum width this layout can take, given a specific height, such that the content
      * of the layout can be painted correctly.
+     *
+     * It is identical to [MeasurePolicy.minIntrinsicWidth], but provides you with a list of
+     * lists of [Measurable]s which allows to threat children put into different content lambdas
+     * differently. Such list has the same size as the list of contents passed into [Layout] and
+     * contains the list of [Measurable]s of the corresponding content lambda in the same order.
      */
     fun IntrinsicMeasureScope.minIntrinsicWidth(
-        measurables: List<IntrinsicMeasurable>,
+        measurables: List<List<IntrinsicMeasurable>>,
         height: Int
     ): Int {
-        val mapped = measurables.fastMap {
-            DefaultIntrinsicMeasurable(it, IntrinsicMinMax.Min, IntrinsicWidthHeight.Width)
+        val mapped = measurables.fastMap { list ->
+            list.fastMap {
+                DefaultIntrinsicMeasurable(it, IntrinsicMinMax.Min, IntrinsicWidthHeight.Width)
+            }
         }
         val constraints = Constraints(maxHeight = height)
         val layoutReceiver = IntrinsicsMeasureScope(this, layoutDirection)
@@ -112,13 +126,20 @@ fun interface MeasurePolicy {
      * The function used to calculate [IntrinsicMeasurable.minIntrinsicHeight]. It represents
      * the minimum height this layout can take, given a specific width, such that the content
      * of the layout will be painted correctly.
+     *
+     * It is identical to [MeasurePolicy.minIntrinsicHeight], but provides you with a list of
+     * lists of [Measurable]s which allows to threat children put into different content lambdas
+     * differently. Such list has the same size as the list of contents passed into [Layout] and
+     * contains the list of [Measurable]s of the corresponding content lambda in the same order.
      */
     fun IntrinsicMeasureScope.minIntrinsicHeight(
-        measurables: List<IntrinsicMeasurable>,
+        measurables: List<List<IntrinsicMeasurable>>,
         width: Int
     ): Int {
-        val mapped = measurables.fastMap {
-            DefaultIntrinsicMeasurable(it, IntrinsicMinMax.Min, IntrinsicWidthHeight.Height)
+        val mapped = measurables.fastMap { list ->
+            list.fastMap {
+                DefaultIntrinsicMeasurable(it, IntrinsicMinMax.Min, IntrinsicWidthHeight.Height)
+            }
         }
         val constraints = Constraints(maxWidth = width)
         val layoutReceiver = IntrinsicsMeasureScope(this, layoutDirection)
@@ -129,13 +150,20 @@ fun interface MeasurePolicy {
     /**
      * The function used to calculate [IntrinsicMeasurable.maxIntrinsicWidth]. It represents the
      * minimum width such that increasing it further will not decrease the minimum intrinsic height.
+     *
+     * It is identical to [MeasurePolicy.maxIntrinsicWidth], but provides you with a list of
+     * lists of [Measurable]s which allows to threat children put into different content lambdas
+     * differently. Such list has the same size as the list of contents passed into [Layout] and
+     * contains the list of [Measurable]s of the corresponding content lambda in the same order.
      */
     fun IntrinsicMeasureScope.maxIntrinsicWidth(
-        measurables: List<IntrinsicMeasurable>,
+        measurables: List<List<IntrinsicMeasurable>>,
         height: Int
     ): Int {
-        val mapped = measurables.fastMap {
-            DefaultIntrinsicMeasurable(it, IntrinsicMinMax.Max, IntrinsicWidthHeight.Width)
+        val mapped = measurables.fastMap { list ->
+            list.fastMap {
+                DefaultIntrinsicMeasurable(it, IntrinsicMinMax.Max, IntrinsicWidthHeight.Width)
+            }
         }
         val constraints = Constraints(maxHeight = height)
         val layoutReceiver = IntrinsicsMeasureScope(this, layoutDirection)
@@ -146,13 +174,20 @@ fun interface MeasurePolicy {
     /**
      * The function used to calculate [IntrinsicMeasurable.maxIntrinsicHeight]. It represents the
      * minimum height such that increasing it further will not decrease the minimum intrinsic width.
+     *
+     * It is identical to [MeasurePolicy.maxIntrinsicHeight], but provides you with a list of
+     * lists of [Measurable]s which allows to threat children put into different content lambdas
+     * differently. Such list has the same size as the list of contents passed into [Layout] and
+     * contains the list of [Measurable]s of the corresponding content lambda in the same order.
      */
     fun IntrinsicMeasureScope.maxIntrinsicHeight(
-        measurables: List<IntrinsicMeasurable>,
+        measurables: List<List<IntrinsicMeasurable>>,
         width: Int
     ): Int {
-        val mapped = measurables.fastMap {
-            DefaultIntrinsicMeasurable(it, IntrinsicMinMax.Max, IntrinsicWidthHeight.Height)
+        val mapped = measurables.fastMap { list ->
+            list.fastMap {
+                DefaultIntrinsicMeasurable(it, IntrinsicMinMax.Max, IntrinsicWidthHeight.Height)
+            }
         }
         val constraints = Constraints(maxWidth = width)
         val layoutReceiver = IntrinsicsMeasureScope(this, layoutDirection)
@@ -160,3 +195,38 @@ fun interface MeasurePolicy {
         return layoutResult.height
     }
 }
+
+@ExperimentalComposeUiApi
+@PublishedApi
+internal fun createMeasurePolicy(
+    // metalava thinks experimental MultiContentMeasurePolicy is hidden b/244423074
+    @Suppress("HiddenTypeParameter") measurePolicy: MultiContentMeasurePolicy
+): MeasurePolicy =
+    with(measurePolicy) {
+        object : MeasurePolicy {
+            override fun MeasureScope.measure(
+                measurables: List<Measurable>,
+                constraints: Constraints
+            ) = measure(getChildrenOfVirtualChildren(this), constraints)
+
+            override fun IntrinsicMeasureScope.minIntrinsicWidth(
+                measurables: List<IntrinsicMeasurable>,
+                height: Int
+            ) = minIntrinsicWidth(getChildrenOfVirtualChildren(this), height)
+
+            override fun IntrinsicMeasureScope.minIntrinsicHeight(
+                measurables: List<IntrinsicMeasurable>,
+                width: Int
+            ) = minIntrinsicHeight(getChildrenOfVirtualChildren(this), width)
+
+            override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+                measurables: List<IntrinsicMeasurable>,
+                height: Int
+            ) = maxIntrinsicWidth(getChildrenOfVirtualChildren(this), height)
+
+            override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+                measurables: List<IntrinsicMeasurable>,
+                width: Int
+            ) = maxIntrinsicHeight(getChildrenOfVirtualChildren(this), width)
+        }
+    }

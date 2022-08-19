@@ -23,6 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReusableComposeNode
 import androidx.compose.runtime.SkippableUpdater
 import androidx.compose.runtime.currentComposer
+import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.UiComposable
 import androidx.compose.ui.graphics.GraphicsLayerScope
@@ -39,6 +41,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 
 /**
@@ -132,6 +135,58 @@ inline fun Layout(
             set(materialized, ComposeUiNode.SetModifier)
         },
     )
+}
+
+/**
+ * [Layout] is the main core component for layout for "leaf" nodes. It can be used to measure and
+ * position zero children.
+ *
+ * This overload accepts a list of multiple composable content lambdas, which allows to threat
+ * measurables put into different content lambdas differently - measure policy will provide
+ * a list of lists of Measurables, not just a single list. Such list has the same size
+ * as the list of contents passed into [Layout] and contains the list of measurables
+ * of the corresponding content lambda in the same order.
+ *
+ * Note that layouts emitted as part of all [contents] lambdas will be added as a direct children
+ * for this [Layout]. This means that if you set a custom z index on some children, the drawing
+ * order will be calculated as if they were all provided as part of one lambda.
+ *
+ * Example usage:
+ * @sample androidx.compose.ui.samples.LayoutWithMultipleContentsUsage
+ *
+ * @param contents The list of children composable contents to be laid out.
+ * @param modifier Modifiers to be applied to the layout.
+ * @param measurePolicy The policy defining the measurement and positioning of the layout.
+ *
+ * @see Layout for a simpler use case when you have only one content lambda.
+ */
+@ExperimentalComposeUiApi
+@Suppress("ComposableLambdaParameterPosition", "NOTHING_TO_INLINE")
+@UiComposable
+@Composable
+inline fun Layout(
+    contents: List<@Composable @UiComposable () -> Unit>,
+    modifier: Modifier = Modifier,
+    measurePolicy: MultiContentMeasurePolicy
+) {
+    Layout(
+        content = combineAsVirtualLayouts(contents),
+        modifier = modifier,
+        measurePolicy = remember(measurePolicy) { createMeasurePolicy(measurePolicy) }
+    )
+}
+
+@PublishedApi
+internal fun combineAsVirtualLayouts(
+    contents: List<@Composable @UiComposable () -> Unit>
+): @Composable @UiComposable () -> Unit = {
+    contents.fastForEach { content ->
+        ReusableComposeNode<ComposeUiNode, Applier<Any>>(
+            factory = ComposeUiNode.VirtualConstructor,
+            update = {},
+            content = content
+        )
+    }
 }
 
 @Suppress("ComposableLambdaParameterPosition")

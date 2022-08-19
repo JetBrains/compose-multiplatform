@@ -1996,6 +1996,9 @@ package androidx.compose.ui.layout {
     property public final androidx.compose.ui.Modifier modifier;
   }
 
+  public final class MultiContentMeasurePolicyKt {
+  }
+
   @kotlin.jvm.JvmDefaultWithCompatibility public interface OnGloballyPositionedModifier extends androidx.compose.ui.Modifier.Element {
     method public void onGloballyPositioned(androidx.compose.ui.layout.LayoutCoordinates coordinates);
   }
@@ -2221,6 +2224,9 @@ package androidx.compose.ui.node {
   }
 
   public final class LayoutNodeLayoutDelegateKt {
+  }
+
+  public final class MeasureScopeWithLayoutNodeKt {
   }
 
   public final class ModifierNodeElementKt {
