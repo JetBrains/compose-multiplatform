@@ -154,7 +154,8 @@ fun ComposeBenchmarkRule.benchmarkDrawPerf(caseFactory: () -> ComposeTestCase) {
  */
 fun <T> ComposeBenchmarkRule.toggleStateBenchmarkRecompose(
     caseFactory: () -> T,
-    assertOneRecomposition: Boolean = true
+    assertOneRecomposition: Boolean = true,
+    requireRecomposition: Boolean = true,
 ) where T : ComposeTestCase, T : ToggleableTestCase {
     runBenchmarkFor(caseFactory) {
         doFramesUntilNoChangesPending()
@@ -163,7 +164,11 @@ fun <T> ComposeBenchmarkRule.toggleStateBenchmarkRecompose(
             runWithTimingDisabled {
                 getTestCase().toggleState()
             }
-            recomposeAssertHadChanges()
+            if (requireRecomposition) {
+                recomposeAssertHadChanges()
+            } else {
+                recompose()
+            }
             if (assertOneRecomposition) {
                 assertNoPendingChanges()
             }
@@ -352,14 +357,19 @@ fun <T> AndroidBenchmarkRule.toggleStateBenchmarkDraw(
  */
 fun <T> ComposeBenchmarkRule.toggleStateBenchmarkComposeMeasureLayout(
     caseFactory: () -> T,
-    assertOneRecomposition: Boolean = true
+    assertOneRecomposition: Boolean = true,
+    requireRecomposition: Boolean = true
 ) where T : ComposeTestCase, T : ToggleableTestCase {
     runBenchmarkFor(caseFactory) {
         doFramesUntilNoChangesPending()
 
         measureRepeated {
             getTestCase().toggleState()
-            recomposeAssertHadChanges()
+            if (requireRecomposition) {
+                recomposeAssertHadChanges()
+            } else {
+                recompose()
+            }
             if (assertOneRecomposition) {
                 assertNoPendingChanges()
             }

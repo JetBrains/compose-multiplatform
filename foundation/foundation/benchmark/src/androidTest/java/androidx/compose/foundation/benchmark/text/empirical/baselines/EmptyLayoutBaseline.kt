@@ -62,12 +62,6 @@ class EmptyLayoutBaseline(
     override fun MeasuredContent() {
         // emit a layout based on text length, which is the minimal work that Text must perform
         Layout(modifier = modifier, measurePolicy = measurePolicy)
-
-        // benchmark framework _requires_ that there is a read in composition, though this is not
-        // strictly necessary work for a minimal-Text impl (e.g. if passed AnnotatedCharSequence)
-
-        // TODO: update the benchmark framework to remove this line in a followup CL
-        toggleText.value
     }
 
     override fun toggleState() {
@@ -101,12 +95,15 @@ open class EmptyLayoutBaselineParent(private val size: Int) {
 
     @Test
     fun recomposeOnly() {
-        benchmarkRule.toggleStateBenchmarkRecompose(caseFactory)
+        benchmarkRule.toggleStateBenchmarkRecompose(caseFactory, requireRecomposition = false)
     }
 
     @Test
     fun recomposeMeasureLayout() {
-        benchmarkRule.toggleStateBenchmarkComposeMeasureLayout(caseFactory)
+        benchmarkRule.toggleStateBenchmarkComposeMeasureLayout(
+            caseFactory,
+            requireRecomposition = false
+        )
     }
 }
 
