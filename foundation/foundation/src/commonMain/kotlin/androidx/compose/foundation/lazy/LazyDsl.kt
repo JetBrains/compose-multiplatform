@@ -21,14 +21,14 @@ import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.internal.JvmDefaultWithCompatibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.internal.JvmDefaultWithCompatibility
-import androidx.compose.runtime.remember
 
 /**
  * Receiver scope which is used by [LazyColumn] and [LazyRow].
@@ -440,8 +440,7 @@ object LazyListDefaults {
     @ExperimentalFoundationApi
     @Composable
     fun snapFlingBehavior(lazyListState: LazyListState): FlingBehavior {
-        val snappingLayout =
-            remember(lazyListState) { SnapLayoutInfoProvider(lazyListState) }
+        val snappingLayout = remember(lazyListState) { SnapLayoutInfoProvider(lazyListState) }
         return rememberSnapFlingBehavior(snappingLayout)
     }
 }
