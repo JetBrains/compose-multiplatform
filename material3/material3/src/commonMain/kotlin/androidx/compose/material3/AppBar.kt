@@ -19,6 +19,7 @@ package androidx.compose.material3
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationState
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.Spring
@@ -26,6 +27,7 @@ import androidx.compose.animation.core.animateDecay
 import androidx.compose.animation.core.animateTo
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.rememberSplineBasedDecay
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -992,15 +994,16 @@ private fun SingleRowTopAppBar(
     // The surface's background color is animated as specified above.
     // The height of the app bar is determined by subtracting the bar's height offset from the
     // app bar's defined constant height value (i.e. the ContainerHeight token).
-    Surface(modifier = modifier.then(appBarDragModifier), color = appBarContainerColor) {
+    Surface(modifier = modifier.then(appBarDragModifier)) {
         val height = LocalDensity.current.run {
             TopAppBarSmallTokens.ContainerHeight.toPx() + (scrollBehavior?.state?.heightOffset
                 ?: 0f)
         }
         TopAppBarLayout(
             modifier = Modifier
+                .background(color = appBarContainerColor)
                 .windowInsetsPadding(windowInsets)
-                // clip after padding so we don't know the title over the inset area
+                // clip after padding so we don't show the title over the inset area
                 .clipToBounds(),
             heightPx = height,
             navigationIconContentColor = colors.navigationIconContentColor,
@@ -1082,7 +1085,8 @@ private fun TwoRowsTopAppBar(
             content = actions
         )
     }
-    val titleAlpha = 1f - colorTransitionFraction
+    val topTitleAlpha = TopTitleAlphaEasing.transform(colorTransitionFraction)
+    val bottomTitleAlpha = 1f - colorTransitionFraction
     // Hide the top row title semantics when its alpha value goes below 0.5 threshold.
     // Hide the bottom row title semantics when the top title semantics are active.
     val hideTopRowSemantics = colorTransitionFraction < 0.5f
@@ -1108,15 +1112,14 @@ private fun TwoRowsTopAppBar(
         Modifier
     }
 
-    Surface(modifier = modifier.then(appBarDragModifier), color = appBarContainerColor) {
-        Column(
-            Modifier
-                .windowInsetsPadding(windowInsets)
-                // clip after padding so we don't know the title over the inset area
-                .clipToBounds()
-        ) {
+    Surface(modifier = modifier.then(appBarDragModifier)) {
+        Column {
             TopAppBarLayout(
-                modifier = Modifier,
+                modifier = Modifier
+                    .background(color = appBarContainerColor)
+                    .windowInsetsPadding(windowInsets)
+                    // clip after padding so we don't show the title over the inset area
+                    .clipToBounds(),
                 heightPx = pinnedHeightPx,
                 navigationIconContentColor =
                 colors.navigationIconContentColor,
@@ -1125,7 +1128,7 @@ private fun TwoRowsTopAppBar(
                 colors.actionIconContentColor,
                 title = smallTitle,
                 titleTextStyle = smallTitleTextStyle,
-                titleAlpha = 1f - titleAlpha,
+                titleAlpha = topTitleAlpha,
                 titleVerticalArrangement = Arrangement.Center,
                 titleHorizontalArrangement = Arrangement.Start,
                 titleBottomPadding = 0,
@@ -1144,7 +1147,7 @@ private fun TwoRowsTopAppBar(
                 colors.actionIconContentColor,
                 title = title,
                 titleTextStyle = titleTextStyle,
-                titleAlpha = titleAlpha,
+                titleAlpha = bottomTitleAlpha,
                 titleVerticalArrangement = Arrangement.Bottom,
                 titleHorizontalArrangement = Arrangement.Start,
                 titleBottomPadding = titleBottomPaddingPx,
@@ -1552,6 +1555,11 @@ private suspend fun settleAppBar(
 
     return Velocity(0f, remainingVelocity)
 }
+
+// An easing function used to compute the alpha value that is applied to the top title part of a
+// Medium or Large app bar.
+/*@VisibleForTesting*/
+internal val TopTitleAlphaEasing = CubicBezierEasing(.8f, 0f, .8f, .15f)
 
 private val MediumTitleBottomPadding = 24.dp
 private val LargeTitleBottomPadding = 28.dp
