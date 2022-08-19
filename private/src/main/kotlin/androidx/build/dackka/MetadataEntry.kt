@@ -16,33 +16,25 @@
 
 package androidx.build.dackka
 
-import java.io.Serializable
+import com.google.gson.annotations.SerializedName
 
 /**
  * Helper data class to store the metadata information for each library/path.
  */
 data class MetadataEntry(
+    @SerializedName("groupId")
     val groupId: String,
+
+    @SerializedName("artifactId")
     val artifactId: String,
-    val sourceDir: String,
-) : Serializable {
 
-    /**
-     * Transforms the contents of this data class into a [Map] for future conversion to JSON
-     *
-     * @return the contents of this data class as a [Map].
-     */
-    fun toMap(): Map<String, String> {
-        return mapOf(
-            "groupId" to groupId,
-            "artifactId" to artifactId,
-            "releaseNotesUrl" to generateReleaseNotesUrl(),
-            "sourceDir" to sourceDir
-        )
-    }
+    @SerializedName("releaseNotesUrl")
+    val releaseNotesUrl: String,
 
-    private fun generateReleaseNotesUrl(): String {
-        val library = groupId.removePrefix("androidx.").replace(".", "-")
-        return "https://developer.android.com/jetpack/androidx/releases/$library"
-    }
-}
+    // TODO (b/241582234): Remove when bug is resolved.
+    //
+    // This will no longer be used once Dackka is updated, but is currently needed as Dackka
+    // expects this key to be present.
+    @SerializedName("sourceDir")
+    val sourceDir: String = "TBD/SOURCE/DIR",
+)

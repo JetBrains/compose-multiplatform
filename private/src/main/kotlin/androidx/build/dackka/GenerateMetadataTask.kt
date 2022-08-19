@@ -61,23 +61,18 @@ abstract class GenerateMetadataTask : DefaultTask() {
             val entry = MetadataEntry(
                 groupId = componentId.group,
                 artifactId = componentId.module,
-                sourceDir = "TBD/SOURCE/DIR" // TODO: fetch from JAR file
+                releaseNotesUrl = generateReleaseNotesUrl(componentId.group)
             )
             entries.add(entry)
         }
 
-        val jsonMapping = generateJsonMapping(entries)
         val writer = FileWriter(destinationFile.get().toString())
-        Gson().toJson(jsonMapping, writer)
+        Gson().toJson(entries, writer)
         writer.close()
     }
 
-    /**
-     * Converts a list of [MetadataEntry] objects into a list of maps.
-     */
-    private fun generateJsonMapping(
-        metadataEntries: List<MetadataEntry>
-    ): List<Map<String, String>> {
-        return metadataEntries.map { it.toMap() }
+    private fun generateReleaseNotesUrl(groupId: String): String {
+        val library = groupId.removePrefix("androidx.").replace(".", "-")
+        return "https://developer.android.com/jetpack/androidx/releases/$library"
     }
 }
