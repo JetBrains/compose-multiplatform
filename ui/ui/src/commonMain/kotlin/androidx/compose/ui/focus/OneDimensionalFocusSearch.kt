@@ -205,7 +205,7 @@ private inline fun <T> MutableVector<T>.forEachItemBefore(item: T, action: (T) -
  * the items makes the next focus search more efficient.
  */
 private object FocusableChildrenComparator : Comparator<FocusModifier> {
-    override fun compare(focusModifier1: FocusModifier?, focusModifier2: FocusModifier?): Int {
+    override fun compare(focusModifier1: FocusModifier, focusModifier2: FocusModifier): Int {
         requireNotNull(focusModifier1)
         requireNotNull(focusModifier2)
 
