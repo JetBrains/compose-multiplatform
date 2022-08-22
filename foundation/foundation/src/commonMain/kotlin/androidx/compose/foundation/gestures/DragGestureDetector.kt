@@ -236,7 +236,7 @@ suspend fun PointerInputScope.detectDragGesturesAfterLongPress(
         try {
             awaitPointerEventScope {
                 val down = awaitFirstDown(requireUnconsumed = false)
-                val drag = awaitLongPressOrCancellation(down)
+                val drag = awaitLongPressOrCancellation(down.id)
                 if (drag != null) {
                     onDragStart.invoke(drag.position)
 
@@ -785,9 +785,29 @@ internal fun Orientation.toPointerDirectionConfig(): PointerDirectionConfig =
     if (this == Orientation.Vertical) VerticalPointerDirectionConfig
     else HorizontalPointerDirectionConfig
 
+/**
+ * Waits for a long press by examining [pointerId].
+ *
+ * If that [pointerId] is raised (that is, the user lifts their finger), but another
+ * finger ([PointerId]) is down at that time, another pointer will be chosen as the lead for the
+ * gesture, and if none are down, `null` is returned.
+ *
+ * @return The latest [PointerInputChange] associated with a long press or `null` if all pointers
+ * are raised before a long press is detected or another gesture consumed the change.
+ *
+ * Example Usage:
+ * @sample androidx.compose.foundation.samples.AwaitLongPressOrCancellationSample
+ */
 suspend fun AwaitPointerEventScope.awaitLongPressOrCancellation(
-    initialDown: PointerInputChange
+    pointerId: PointerId
 ): PointerInputChange? {
+    if (currentEvent.isPointerUp(pointerId)) {
+        return null // The pointer has already been lifted, so the long press is cancelled.
+    }
+
+    val initialDown =
+        currentEvent.changes.fastFirstOrNull { it.id == pointerId } ?: return null
+
     var longPress: PointerInputChange? = null
     var currentDown = initialDown
     val longPressTimeout = viewConfiguration.longPressTimeoutMillis
@@ -817,9 +837,7 @@ suspend fun AwaitPointerEventScope.awaitLongPressOrCancellation(
                 if (consumeCheck.changes.fastAny { it.isConsumed }) {
                     finished = true
                 }
-                if (!event.isPointerUp(currentDown.id)) {
-                    longPress = event.changes.fastFirstOrNull { it.id == currentDown.id }
-                } else {
+                if (event.isPointerUp(currentDown.id)) {
                     val newPressed = event.changes.fastFirstOrNull { it.pressed }
                     if (newPressed != null) {
                         currentDown = newPressed
@@ -828,6 +846,9 @@ suspend fun AwaitPointerEventScope.awaitLongPressOrCancellation(
                         // should technically never happen as we checked it above
                         finished = true
                     }
+                // Pointer (id) stayed down.
+                } else {
+                    longPress = event.changes.fastFirstOrNull { it.id == currentDown.id }
                 }
             }
         }
