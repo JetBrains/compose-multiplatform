@@ -31,8 +31,8 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.window.Application
 
 fun getViewControllerWithCompose() = Application("Compose/Native sample") {
-    var textState1 by remember { mutableStateOf("text field 1") }
-    var textState2 by remember { mutableStateOf("text field 2") }
+    val textState1 = remember { mutableStateOf("text field 1") }
+    val textState2 = remember { mutableStateOf("text field 2") }
     Column {
         Text(".")
         Text(".")
@@ -43,11 +43,11 @@ fun getViewControllerWithCompose() = Application("Compose/Native sample") {
         Text(".")
         Text(".")
         Text("Hello, UIKit")
-        TextField(value = textState1, onValueChange = {
-            textState1 = it
+        TextField(value = textState1.value, onValueChange = {
+            textState1.value = it
         })
-        TextField(value = textState2, onValueChange = {
-            textState2 = it
+        TextField(value = textState2.value, onValueChange = {
+            textState2.value = it
         })
         Image(
             painter = object : Painter() {

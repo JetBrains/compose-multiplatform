@@ -24,7 +24,7 @@ plugins {
 
 AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 dependencies {
-    kotlinNativeCompilerPluginClasspath(project(":compose:compiler:compiler"))
+    kotlinNativeCompilerPluginClasspath(project(":compose:compiler:compiler-hosted"))
 }
 
 androidXComposeMultiplatform {
