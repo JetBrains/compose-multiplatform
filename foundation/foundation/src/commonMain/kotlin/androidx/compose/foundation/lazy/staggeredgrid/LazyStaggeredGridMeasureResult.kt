@@ -27,8 +27,9 @@ internal class LazyStaggeredGridMeasureResult(
     val measureResult: MeasureResult,
     val canScrollForward: Boolean,
     val canScrollBackward: Boolean,
-    val visibleItemsInfo: List<LazyStaggeredGridItemInfo>
-) : MeasureResult by measureResult
+    override val totalItemsCount: Int,
+    override val visibleItemsInfo: List<LazyStaggeredGridItemInfo>
+) : LazyStaggeredGridLayoutInfo, MeasureResult by measureResult
 
 internal interface LazyStaggeredGridItemInfo {
     val offset: IntOffset
@@ -36,4 +37,14 @@ internal interface LazyStaggeredGridItemInfo {
     val lane: Int
     val key: Any
     val size: IntSize
+}
+
+internal interface LazyStaggeredGridLayoutInfo {
+    val visibleItemsInfo: List<LazyStaggeredGridItemInfo>
+    val totalItemsCount: Int
+
+    companion object Empty : LazyStaggeredGridLayoutInfo {
+        override val visibleItemsInfo: List<LazyStaggeredGridItemInfo> = emptyList()
+        override val totalItemsCount: Int = 0
+    }
 }

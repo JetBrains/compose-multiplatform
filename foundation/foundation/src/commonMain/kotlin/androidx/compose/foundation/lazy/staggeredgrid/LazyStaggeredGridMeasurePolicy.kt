@@ -59,6 +59,10 @@ internal fun rememberStaggeredGridMeasurePolicy(
         )
         val resolvedSlotSums = slotSizesSums(this, constraints)
 
+        // setup information for prefetch
+        state.prefetchLaneWidths = resolvedSlotSums
+        state.isVertical = orientation == Orientation.Vertical
+
         measure(
             state,
             itemProvider,

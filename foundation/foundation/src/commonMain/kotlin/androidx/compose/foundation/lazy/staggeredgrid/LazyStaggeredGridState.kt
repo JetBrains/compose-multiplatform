@@ -21,11 +21,14 @@ import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState
+import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState.PrefetchHandle
+import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
+import androidx.compose.ui.unit.Constraints
 import kotlin.math.abs
 
 @ExperimentalFoundationApi
@@ -37,6 +40,11 @@ internal class LazyStaggeredGridState(
         private set
 
     var firstVisibleItemScrollOffsets: IntArray by mutableStateOf(initialFirstVisibleOffsets)
+        private set
+
+    internal var layoutInfo: LazyStaggeredGridLayoutInfo by mutableStateOf(
+        LazyStaggeredGridLayoutInfo.Empty
+    )
         private set
 
     internal val spans = LazyStaggeredGridSpans()
@@ -64,6 +72,12 @@ internal class LazyStaggeredGridState(
     /* @VisibleForTesting */
     internal var measurePassCount = 0
 
+    private var wasScrollingForward = true
+    internal var isVertical = false
+    internal var prefetchLaneWidths: IntArray = IntArray(0)
+    private var prefetchBaseIndex: Int = -1
+    private val currentItemPrefetchHandles = mutableVectorOf<PrefetchHandle>()
+
     override suspend fun scroll(
         scrollPriority: MutatePriority,
         block: suspend ScrollScope.() -> Unit
@@ -84,12 +98,11 @@ internal class LazyStaggeredGridState(
         // inside measuring we do scrollToBeConsumed.roundToInt() so there will be no scroll if
         // we have less than 0.5 pixels
         if (abs(scrollToBeConsumed) > 0.5f) {
+            val preScrollToBeConsumed = scrollToBeConsumed
             remeasurement?.forceRemeasure()
-            // todo(b/182882362): notify prefetch
-//            if (prefetchingEnabled) {
-//                val leftoverScroll = preScrollToBeConsumed - scrollToBeConsumed
-//                notifyPrefetch(preScrollToBeConsumed - scrollToBeConsumed)
-//            }
+            if (prefetchingEnabled) {
+                notifyPrefetch(preScrollToBeConsumed - scrollToBeConsumed)
+            }
         }
 
         // here scrollToBeConsumed is already consumed during the forceRemeasure invocation
@@ -109,12 +122,91 @@ internal class LazyStaggeredGridState(
     override fun dispatchRawDelta(delta: Float): Float =
         scrollableState.dispatchRawDelta(delta)
 
+    private fun notifyPrefetch(delta: Float) {
+        if (!prefetchingEnabled) {
+            return
+        }
+        val info = layoutInfo
+        if (info.visibleItemsInfo.isNotEmpty()) {
+            val scrollingForward = delta < 0
+
+            if (wasScrollingForward != scrollingForward) {
+                // the scrolling direction has been changed which means the last prefetched item
+                // is not going to be reached anytime soon so it is safer to dispose it.
+                // if this item is already visible it is safe to call the method anyway
+                // as it will be a no-op
+                currentItemPrefetchHandles.forEach { it.cancel() }
+            }
+
+            wasScrollingForward = scrollingForward
+            val prefetchIndex = if (scrollingForward) {
+                info.visibleItemsInfo.last().index
+            } else {
+                info.visibleItemsInfo.first().index
+            }
+
+            if (prefetchIndex == prefetchBaseIndex) {
+                // Already prefetched based on this index
+                return
+            }
+            prefetchBaseIndex = prefetchIndex
+            currentItemPrefetchHandles.clear()
+
+            var targetIndex = prefetchIndex
+            for (lane in prefetchLaneWidths.indices) {
+                val previousIndex = targetIndex
+
+                // find the next item for each line and prefetch if it is valid
+                targetIndex = if (scrollingForward) {
+                    spans.findNextItemIndex(previousIndex, lane)
+                } else {
+                    spans.findPreviousItemIndex(previousIndex, lane)
+                }
+                if (
+                    targetIndex !in (0 until info.totalItemsCount) ||
+                        previousIndex == targetIndex
+                ) {
+                    return
+                }
+
+                val crossAxisSize = prefetchLaneWidths[lane] -
+                    if (lane == 0) 0 else prefetchLaneWidths[lane - 1]
+
+                val constraints = if (isVertical) {
+                    Constraints.fixedWidth(crossAxisSize)
+                } else {
+                    Constraints.fixedHeight(crossAxisSize)
+                }
+
+                currentItemPrefetchHandles.add(
+                    prefetchState.schedulePrefetch(
+                        index = targetIndex,
+                        constraints = constraints
+                    )
+                )
+            }
+        }
+    }
+
+    private fun cancelPrefetchIfVisibleItemsChanged(info: LazyStaggeredGridLayoutInfo) {
+        val items = info.visibleItemsInfo
+        if (prefetchBaseIndex != -1 && items.isNotEmpty()) {
+            if (prefetchBaseIndex !in items.first().index..items.last().index) {
+                prefetchBaseIndex = -1
+                currentItemPrefetchHandles.forEach { it.cancel() }
+                currentItemPrefetchHandles.clear()
+            }
+        }
+    }
+
     internal fun applyMeasureResult(result: LazyStaggeredGridMeasureResult) {
         scrollToBeConsumed -= result.consumedScroll
         firstVisibleItems = result.firstVisibleItemIndices
         firstVisibleItemScrollOffsets = result.firstVisibleItemScrollOffsets
         canScrollBackward = result.canScrollBackward
         canScrollForward = result.canScrollForward
+        layoutInfo = result
+        cancelPrefetchIfVisibleItemsChanged(result)
 
         measurePassCount++
     }

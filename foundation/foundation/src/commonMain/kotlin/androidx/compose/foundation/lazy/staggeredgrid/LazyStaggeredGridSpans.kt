@@ -49,11 +49,13 @@ internal class LazyStaggeredGridSpans {
     /**
      * @return upper bound of currently valid span range
      */
+    /* @VisibleForTests */
     fun upperBound(): Int = anchor + spans.size
 
     /**
      * @return lower bound of currently valid span range
      */
+    /* @VisibleForTests */
     fun lowerBound(): Int = anchor
 
     /**
@@ -61,6 +63,34 @@ internal class LazyStaggeredGridSpans {
      */
     fun reset() {
         spans.fill(0)
+    }
+
+    /**
+     * Find the previous item relative to [item] set to target span
+     * @return found item index or [Unset] if it doesn't exist.
+     */
+    fun findPreviousItemIndex(item: Int, target: Int): Int {
+        for (i in (item - 1) downTo 0) {
+            val span = getSpan(i)
+            if (span == target || span == Unset) {
+                return i
+            }
+        }
+        return Unset
+    }
+
+    /**
+     * Find the next item relative to [item] set to target span
+     * @return found item index or [upperBound] if it doesn't exist.
+     */
+    fun findNextItemIndex(item: Int, target: Int): Int {
+        for (i in item + 1 until upperBound()) {
+            val span = getSpan(i)
+            if (span == target || span == Unset) {
+                return i
+            }
+        }
+        return upperBound()
     }
 
     private fun ensureValidIndex(requestedIndex: Int) {
