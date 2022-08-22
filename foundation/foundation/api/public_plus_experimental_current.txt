@@ -977,6 +977,16 @@ package androidx.compose.foundation.lazy.staggeredgrid {
 
 }
 
+package androidx.compose.foundation.pager {
+
+  public final class PagerKt {
+  }
+
+  public final class PagerStateKt {
+  }
+
+}
+
 package androidx.compose.foundation.relocation {
 
   public final class BringIntoViewKt {

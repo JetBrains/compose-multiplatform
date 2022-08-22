@@ -197,6 +197,7 @@ class LazyListState constructor(
      */
     internal var remeasurement: Remeasurement? by mutableStateOf(null)
         private set
+
     /**
      * The modifier which provides [remeasurement].
      */
