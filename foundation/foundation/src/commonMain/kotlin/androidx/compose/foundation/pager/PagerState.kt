@@ -37,8 +37,11 @@ import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastMaxBy
 import kotlin.math.abs
+import kotlin.math.roundToInt
+import kotlin.math.sign
 
 /**
  * Creates and remember a [PagerState] to be used with a [Pager]
@@ -65,6 +68,8 @@ internal class PagerState(
     initialPageOffset: Int = 0
 ) : ScrollableState {
 
+    internal var snapRemainingScrollOffset by mutableStateOf(0f)
+
     internal val lazyListState = LazyListState(initialPage, initialPageOffset)
 
     internal var pageSpacing by mutableStateOf(0)
@@ -77,6 +82,16 @@ internal class PagerState(
 
     private val pageAvailableSpace: Int
         get() = pageSize + pageSpacing
+
+    /**
+     * How far the current page needs to scroll so the target page is considered to be the next
+     * page.
+     */
+    private val positionThresholdFraction: Float
+        get() = with(lazyListState.density) {
+            val minThreshold = minOf(DefaultPositionThreshold.toPx(), pageSize / 2f)
+            minThreshold / pageSize.toFloat()
+        }
 
     internal val pageCount: Int
         get() = lazyListState.layoutInfo.totalItemsCount
@@ -113,6 +128,8 @@ internal class PagerState(
      */
     val currentPage: Int by derivedStateOf { closestPageToSnappedPosition?.index ?: 0 }
 
+    private var animationTargetPage by mutableStateOf(-1)
+
     private var settledPageState by mutableStateOf(initialPage)
 
     /**
@@ -122,6 +139,31 @@ internal class PagerState(
      */
     val settledPage: Int by derivedStateOf {
         if (pageCount == 0) 0 else settledPageState.coerceInPageRange()
+    }
+
+    /**
+     * The page this [Pager] intends to settle to.
+     * During fling or animated scroll (from [animateScrollToPage] this will represent the page
+     * this pager intends to settle to. When no scroll is ongoing, this will be equal to
+     * [currentPage].
+     */
+    val targetPage: Int by derivedStateOf {
+        if (!isScrollInProgress) {
+            currentPage
+        } else if (animationTargetPage != -1) {
+            animationTargetPage
+        } else {
+            val offsetFromFling = snapRemainingScrollOffset
+            val offsetFromScroll =
+                if (abs(currentPageOffset) >= abs(positionThresholdFraction)) {
+                    (abs(currentPageOffset) + 1) * pageAvailableSpace * currentPageOffset.sign
+                } else {
+                    0f
+                }
+            val pageDisplacement =
+                (offsetFromFling + offsetFromScroll).roundToInt() / pageAvailableSpace
+            (currentPage + pageDisplacement).coerceInPageRange()
+        }
     }
 
     /**
@@ -162,6 +204,8 @@ internal class PagerState(
     ) {
         if (page == currentPage) return
         var currentPosition = currentPage
+        val targetPage = page.coerceInPageRange()
+        animationTargetPage = targetPage
         // If our future page is too far off, that is, outside of the current viewport
         val firstVisiblePageIndex = visiblePages.first().index
         val lastVisiblePageIndex = visiblePages.last().index
@@ -179,13 +223,13 @@ internal class PagerState(
             currentPosition = preJumpPosition
         }
 
-        val targetPage = page.coerceInPageRange()
         val targetOffset = targetPage * pageAvailableSpace
         val currentOffset = currentPosition * pageAvailableSpace
         val pageOffsetToSnappedPosition = distanceToSnapPosition
 
         val displacement = targetOffset - currentOffset + pageOffsetToSnappedPosition
         lazyListState.animateScrollBy(displacement, animationSpec)
+        animationTargetPage = -1
     }
 
     override suspend fun scroll(
@@ -238,4 +282,5 @@ private const val MinPageOffset = -0.5f
 private const val MaxPageOffset = 0.5f
 internal val SnapAlignmentStartToStart: Density.(layoutSize: Float, itemSize: Float) -> Float =
     { _, _ -> 0f }
+private val DefaultPositionThreshold = 56.dp
 private const val MaxPagesForAnimateScroll = 3

@@ -27,6 +27,7 @@ import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.snapping.SnapFlingBehavior
 import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
 import androidx.compose.foundation.layout.Arrangement
@@ -205,6 +206,10 @@ internal fun Pager(
         )
     }
 
+    val pagerFlingBehavior = remember(flingBehavior, state) {
+        PagerWrapperFlingBehavior(flingBehavior, state)
+    }
+
     LaunchedEffect(density, state, pageSpacing) {
         with(density) { state.pageSpacing = pageSpacing.roundToPx() }
     }
@@ -246,7 +251,7 @@ internal fun Pager(
             modifier = Modifier,
             state = state.lazyListState,
             contentPadding = contentPadding,
-            flingBehavior = flingBehavior,
+            flingBehavior = pagerFlingBehavior,
             horizontalAlignment = horizontalAlignment,
             horizontalArrangement = Arrangement.spacedBy(
                 pageSpacing,
@@ -495,6 +500,20 @@ private fun SnapLayoutInfoProvider(
             val finalOffset = (correctedTargetPage - startPage) * effectivePageSize
 
             return (finalOffset - initialOffset)
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+private class PagerWrapperFlingBehavior(
+    val originalFlingBehavior: SnapFlingBehavior,
+    val pagerState: PagerState
+) : FlingBehavior {
+    override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
+        return with(originalFlingBehavior) {
+            performFling(initialVelocity) { remainingScrollOffset ->
+                pagerState.snapRemainingScrollOffset = remainingScrollOffset
+            }
         }
     }
 }
