@@ -19,6 +19,8 @@ package androidx.compose.foundation.lazy.staggeredgrid
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.OverscrollEffect
 import androidx.compose.foundation.checkScrollableContainerConstraints
+import androidx.compose.foundation.fastFold
+import androidx.compose.foundation.fastMaxOfOrNull
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -497,16 +499,16 @@ private class LazyStaggeredGridMeasureProvider(
 private class LazyStaggeredGridMeasuredItem(
     val index: Int,
     val key: Any,
-    val placeables: Array<Placeable>,
+    val placeables: List<Placeable>,
     val isVertical: Boolean
 ) {
-    val sizeWithSpacings: Int = placeables.fold(0) { size, placeable ->
+    val sizeWithSpacings: Int = placeables.fastFold(0) { size, placeable ->
         size + if (isVertical) placeable.height else placeable.width
     }
 
-    val crossAxisSize: Int = placeables.maxOf {
+    val crossAxisSize: Int = placeables.fastMaxOfOrNull {
         if (isVertical) it.width else it.height
-    }
+    }!!
 
     fun position(
         mainAxis: Int,
@@ -530,10 +532,10 @@ private class LazyStaggeredGridPositionedItem(
     override val index: Int,
     override val key: Any,
     override val size: IntSize,
-    val placeables: Array<Placeable>
+    private val placeables: List<Placeable>
 ) : LazyStaggeredGridItemInfo {
     fun place(scope: Placeable.PlacementScope) = with(scope) {
-        placeables.forEach { placeable ->
+        placeables.fastForEach { placeable ->
             placeable.placeWithLayer(offset)
         }
     }
@@ -544,6 +546,6 @@ private fun interface MeasuredItemFactory {
     fun createItem(
         index: Int,
         key: Any,
-        placeables: Array<Placeable>
+        placeables: List<Placeable>
     ): LazyStaggeredGridMeasuredItem
 }

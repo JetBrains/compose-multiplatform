@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.util.fastForEach
 
 /**
  * Represents one measured item of the lazy list. It can in fact consist of multiple placeables
@@ -30,7 +31,7 @@ import androidx.compose.ui.unit.LayoutDirection
 @OptIn(ExperimentalFoundationApi::class)
 internal class LazyMeasuredItem @ExperimentalFoundationApi constructor(
     val index: Int,
-    private val placeables: Array<Placeable>,
+    private val placeables: List<Placeable>,
     private val isVertical: Boolean,
     private val horizontalAlignment: Alignment.Horizontal?,
     private val verticalAlignment: Alignment.Vertical?,
@@ -69,7 +70,7 @@ internal class LazyMeasuredItem @ExperimentalFoundationApi constructor(
     init {
         var mainAxisSize = 0
         var maxCrossAxis = 0
-        placeables.forEach {
+        placeables.fastForEach {
             mainAxisSize += if (isVertical) it.height else it.width
             maxCrossAxis = maxOf(maxCrossAxis, if (!isVertical) it.height else it.width)
         }
