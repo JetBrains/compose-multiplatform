@@ -54,7 +54,6 @@ fun SliderSample() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Sampled
 @Composable
@@ -72,49 +71,6 @@ fun StepsSliderSample() {
                 // viewModel.updateSelectedSliderValue(sliderPosition)
             },
             steps = 4
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Sampled
-@Composable
-fun RangeSliderSample() {
-    var sliderPosition by remember { mutableStateOf(0f..100f) }
-    Column {
-        Text(text = sliderPosition.toString())
-        RangeSlider(
-            modifier = Modifier.semantics { contentDescription = "Localized Description" },
-            value = sliderPosition,
-            onValueChange = { sliderPosition = it },
-            valueRange = 0f..100f,
-            onValueChangeFinished = {
-                // launch some business logic update with the state you hold
-                // viewModel.updateSelectedSliderValue(sliderPosition)
-            },
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Sampled
-@Composable
-fun StepRangeSliderSample() {
-    var sliderPosition by remember { mutableStateOf(0f..100f) }
-    Column {
-        Text(text = sliderPosition.toString())
-        RangeSlider(
-            modifier = Modifier.semantics { contentDescription = "Localized Description" },
-            steps = 5,
-            value = sliderPosition,
-            onValueChange = { sliderPosition = it },
-            valueRange = 0f..100f,
-            onValueChangeFinished = {
-                // launch some business logic update with the state you hold
-                // viewModel.updateSelectedSliderValue(sliderPosition)
-            },
         )
     }
 }
@@ -178,6 +134,97 @@ fun SliderWithCustomTrackAndThumb() {
             track = { sliderPositions ->
                 SliderDefaults.Track(
                     colors = colors,
+                    sliderPositions = sliderPositions
+                )
+            }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Sampled
+@Composable
+fun RangeSliderSample() {
+    var sliderPosition by remember { mutableStateOf(0f..100f) }
+    Column {
+        Text(text = sliderPosition.toString())
+        RangeSlider(
+            modifier = Modifier.semantics { contentDescription = "Localized Description" },
+            value = sliderPosition,
+            onValueChange = { sliderPosition = it },
+            valueRange = 0f..100f,
+            onValueChangeFinished = {
+                // launch some business logic update with the state you hold
+                // viewModel.updateSelectedSliderValue(sliderPosition)
+            },
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Sampled
+@Composable
+fun StepRangeSliderSample() {
+    var sliderPosition by remember { mutableStateOf(0f..100f) }
+    Column {
+        Text(text = sliderPosition.toString())
+        RangeSlider(
+            modifier = Modifier.semantics { contentDescription = "Localized Description" },
+            steps = 5,
+            value = sliderPosition,
+            onValueChange = { sliderPosition = it },
+            valueRange = 0f..100f,
+            onValueChangeFinished = {
+                // launch some business logic update with the state you hold
+                // viewModel.updateSelectedSliderValue(sliderPosition)
+            },
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Sampled
+@Composable
+fun RangeSliderWithCustomComponents() {
+    var sliderPosition by remember { mutableStateOf(0f..100f) }
+    val startInteractionSource = remember { MutableInteractionSource() }
+    val endInteractionSource = remember { MutableInteractionSource() }
+    val startThumbAndTrackColors = SliderDefaults.colors(
+        thumbColor = Color.Blue,
+        activeTrackColor = Color.Red
+    )
+    val endThumbColors = SliderDefaults.colors(thumbColor = Color.Green)
+    Column {
+        Text(text = sliderPosition.toString())
+        RangeSlider(
+            modifier = Modifier.semantics { contentDescription = "Localized Description" },
+            value = sliderPosition,
+            onValueChange = { sliderPosition = it },
+            valueRange = 0f..100f,
+            onValueChangeFinished = {
+                // launch some business logic update with the state you hold
+                // viewModel.updateSelectedSliderValue(sliderPosition)
+            },
+            startInteractionSource = startInteractionSource,
+            endInteractionSource = endInteractionSource,
+            startThumb = {
+                SliderDefaults.Thumb(
+                    interactionSource = startInteractionSource,
+                    colors = startThumbAndTrackColors
+                )
+            },
+            endThumb = {
+                SliderDefaults.Thumb(
+                    interactionSource = endInteractionSource,
+                    colors = endThumbColors
+                )
+            },
+            track = { sliderPositions ->
+                SliderDefaults.Track(
+                    colors = startThumbAndTrackColors,
                     sliderPositions = sliderPositions
                 )
             }

@@ -597,7 +597,7 @@ package androidx.compose.material3 {
   @androidx.compose.runtime.Immutable public final class SliderColors {
   }
 
-  public final class SliderDefaults {
+  @androidx.compose.runtime.Stable public final class SliderDefaults {
     method @androidx.compose.runtime.Composable public androidx.compose.material3.SliderColors colors(optional long thumbColor, optional long activeTrackColor, optional long activeTickColor, optional long inactiveTrackColor, optional long inactiveTickColor, optional long disabledThumbColor, optional long disabledActiveTrackColor, optional long disabledActiveTickColor, optional long disabledInactiveTrackColor, optional long disabledInactiveTickColor);
     field public static final androidx.compose.material3.SliderDefaults INSTANCE;
   }
