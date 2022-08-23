@@ -50,6 +50,7 @@ import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onPlaced
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -83,7 +84,7 @@ class MultiPageSnappingLayoutInfoProvider(
     private val decayAnimationSpec: DecayAnimationSpec<Float>,
     private val lazySnapLayoutInfoProvider: SnapLayoutInfoProvider
 ) : SnapLayoutInfoProvider by lazySnapLayoutInfoProvider {
-    override fun calculateApproachOffset(initialVelocity: Float): Float {
+    override fun Density.calculateApproachOffset(initialVelocity: Float): Float {
         return decayAnimationSpec.calculateTargetValue(0f, initialVelocity) / 2f
     }
 }
@@ -110,7 +111,7 @@ class ViewPortBasedSnappingLayoutInfoProvider(
     private val lazySnapLayoutInfoProvider: SnapLayoutInfoProvider,
     private val lazyLayoutState: LazyListState
 ) : SnapLayoutInfoProvider by lazySnapLayoutInfoProvider {
-    override fun calculateApproachOffset(initialVelocity: Float): Float {
+    override fun Density.calculateApproachOffset(initialVelocity: Float): Float {
         return lazyLayoutState.layoutInfo.visibleItemsInfo.sumOf { it.size }.toFloat()
     }
 }

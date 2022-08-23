@@ -38,6 +38,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.unit.Density
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import kotlin.test.assertEquals
@@ -53,6 +54,9 @@ class SnapFlingBehaviorTest {
     val rule = createComposeRule()
 
     private val inspectSpringAnimationSpec = InspectSpringAnimationSpec(spring())
+
+    private val density: Density
+        get() = rule.density
 
     @Test
     fun performFling_whenVelocityIsBelowThreshold_shouldShortSnap() {
@@ -105,15 +109,15 @@ class SnapFlingBehaviorTest {
     @Test
     fun findClosestOffset_noFlingDirection_shouldReturnAbsoluteDistance() {
         val testLayoutInfoProvider = TestLayoutInfoProvider()
-        val offset = findClosestOffset(0f, testLayoutInfoProvider)
+        val offset = findClosestOffset(0f, testLayoutInfoProvider, density)
         assertEquals(offset, MinOffset)
     }
 
     @Test
     fun findClosestOffset_flingDirection_shouldReturnCorrectBound() {
         val testLayoutInfoProvider = TestLayoutInfoProvider()
-        val forwardOffset = findClosestOffset(1f, testLayoutInfoProvider)
-        val backwardOffset = findClosestOffset(-1f, testLayoutInfoProvider)
+        val forwardOffset = findClosestOffset(1f, testLayoutInfoProvider, density)
+        val backwardOffset = findClosestOffset(-1f, testLayoutInfoProvider, density)
         assertEquals(forwardOffset, MaxOffset)
         assertEquals(backwardOffset, MinOffset)
     }
@@ -266,14 +270,15 @@ private class TestLayoutInfoProvider(
 ) : SnapLayoutInfoProvider {
     var calculateApproachOffsetCount = 0
 
-    override val snapStepSize: Float
-        get() = snapStep
+    override fun Density.snapStepSize(): Float {
+        return snapStep
+    }
 
-    override fun calculateSnappingOffsetBounds(): ClosedFloatingPointRange<Float> {
+    override fun Density.calculateSnappingOffsetBounds(): ClosedFloatingPointRange<Float> {
         return minOffset.rangeTo(maxOffset)
     }
 
-    override fun calculateApproachOffset(initialVelocity: Float): Float {
+    override fun Density.calculateApproachOffset(initialVelocity: Float): Float {
         calculateApproachOffsetCount++
         return approachOffset
     }

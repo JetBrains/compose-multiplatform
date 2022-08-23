@@ -21,6 +21,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastSumBy
 
@@ -32,23 +33,22 @@ import androidx.compose.ui.util.fastSumBy
  * This position should be considered with regard to the start edge of the item and the placement
  * within the viewport.
  *
- * @return A [SnapLayoutInfoProvider] that can be used with [snapFlingBehavior]
+ * @return A [SnapLayoutInfoProvider] that can be used with [SnapFlingBehavior]
  */
 @ExperimentalFoundationApi
 fun SnapLayoutInfoProvider(
     lazyListState: LazyListState,
-    positionInLayout: (layoutSize: Float, itemSize: Float) -> Float = { layoutSize, itemSize ->
-        layoutSize / 2f - itemSize / 2f
-    }
-) = object : SnapLayoutInfoProvider {
+    positionInLayout: Density.(layoutSize: Float, itemSize: Float) -> Float =
+        { layoutSize, itemSize -> (layoutSize / 2f - itemSize / 2f) }
+): SnapLayoutInfoProvider = object : SnapLayoutInfoProvider {
 
     private val layoutInfo: LazyListLayoutInfo
         get() = lazyListState.layoutInfo
 
     // Single page snapping is the default
-    override fun calculateApproachOffset(initialVelocity: Float): Float = 0f
+    override fun Density.calculateApproachOffset(initialVelocity: Float): Float = 0f
 
-    override fun calculateSnappingOffsetBounds(): ClosedFloatingPointRange<Float> {
+    override fun Density.calculateSnappingOffsetBounds(): ClosedFloatingPointRange<Float> {
         var lowerBoundOffset = Float.NEGATIVE_INFINITY
         var upperBoundOffset = Float.POSITIVE_INFINITY
 
@@ -70,20 +70,19 @@ fun SnapLayoutInfoProvider(
         return lowerBoundOffset.rangeTo(upperBoundOffset)
     }
 
-    override val snapStepSize: Float
-        get() = with(layoutInfo) {
-            if (visibleItemsInfo.isNotEmpty()) {
-                visibleItemsInfo.fastSumBy { it.size } / visibleItemsInfo.size.toFloat()
-            } else {
-                0f
-            }
+    override fun Density.snapStepSize(): Float = with(layoutInfo) {
+        if (visibleItemsInfo.isNotEmpty()) {
+            visibleItemsInfo.fastSumBy { it.size } / visibleItemsInfo.size.toFloat()
+        } else {
+            0f
         }
+    }
 }
 
-internal fun calculateDistanceToDesiredSnapPosition(
+internal fun Density.calculateDistanceToDesiredSnapPosition(
     layoutInfo: LazyListLayoutInfo,
     item: LazyListItemInfo,
-    positionInLayout: (layoutSize: Float, itemSize: Float) -> Float
+    positionInLayout: Density.(layoutSize: Float, itemSize: Float) -> Float
 ): Float {
     val containerSize =
         with(layoutInfo) { singleAxisViewportSize - beforeContentPadding - afterContentPadding }
