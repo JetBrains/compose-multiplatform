@@ -1,3 +1,1 @@
-pushd frameworks/support
-./gradlew "$@"
-popd
+./frameworks/support/gradlew "$@"

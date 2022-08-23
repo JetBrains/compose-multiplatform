@@ -7,7 +7,7 @@ import org.gradle.api.*
 
 class ComposeProperties(private val myProject: Project) {
     val isOelPublication: Boolean
-        get() = myProject.findProperty("oel.publication") == "true"
+        get() = myProject.findProperty("oel.publication") != "false"
 
     val targetPlatforms: Set<ComposePlatforms>
         get() {
