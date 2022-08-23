@@ -160,21 +160,12 @@ class ComposePanel : JLayeredPane() {
                                 layer?.scene?.requestFocus()
                                 layer?.scene?.moveFocus(FocusDirection.Previous)
                             }
-                            FocusEvent.Cause.ACTIVATION -> Unit
-                            else -> {
-                                layer?.scene?.requestFocus()
-                            }
+                            else -> Unit
                         }
                     }
                 }
 
-                override fun focusLost(e: FocusEvent) {
-                    // We don't reset focus for Compose when the window loses focus
-                    // Partially because we don't support restoring focus after clearing it
-                    if (e.cause != FocusEvent.Cause.ACTIVATION) {
-                        layer?.scene?.releaseFocus()
-                    }
-                }
+                override fun focusLost(e: FocusEvent) = Unit
             })
         }
         initContent()

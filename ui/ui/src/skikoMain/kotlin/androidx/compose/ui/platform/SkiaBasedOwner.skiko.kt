@@ -95,6 +95,7 @@ private typealias Command = () -> Unit
 internal class SkiaBasedOwner(
     override val scene: ComposeScene,
     private val platform: Platform,
+    parentFocusManager: FocusManager = EmptyFocusManager,
     private val pointerPositionUpdater: PointerPositionUpdater,
     density: Density = Density(1f, 1f),
     bounds: IntRect = IntRect.Zero,
@@ -125,7 +126,7 @@ internal class SkiaBasedOwner(
     )
 
     override val focusManager = FocusManagerImpl(
-        parent = platform.focusManager
+        parent = parentFocusManager
     ).apply {
         layoutDirection = platform.layoutDirection
     }

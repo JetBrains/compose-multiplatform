@@ -31,6 +31,8 @@ import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.hostOs
 import java.awt.Color
 import java.awt.Component
+import java.awt.Container
+import java.awt.FocusTraversalPolicy
 import java.awt.Window
 import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
@@ -95,6 +97,14 @@ internal class ComposeWindowDelegate(
     private val clipMap = mutableMapOf<Component, ClipComponent>()
 
     init {
+        pane.focusTraversalPolicy = object : FocusTraversalPolicy() {
+            override fun getComponentAfter(aContainer: Container?, aComponent: Component?) = null
+            override fun getComponentBefore(aContainer: Container?, aComponent: Component?) = null
+            override fun getFirstComponent(aContainer: Container?) = null
+            override fun getLastComponent(aContainer: Container?) = null
+            override fun getDefaultComponent(aContainer: Container?) = null
+        }
+        pane.isFocusCycleRoot = true
         setContent {}
     }
 

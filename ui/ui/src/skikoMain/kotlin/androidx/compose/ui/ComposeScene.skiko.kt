@@ -357,6 +357,7 @@ class ComposeScene internal constructor(
         val mainOwner = SkiaBasedOwner(
             this,
             platform,
+            platform.focusManager,
             pointerPositionUpdater,
             density,
             IntSize(constraints.maxWidth, constraints.maxHeight).toIntRect(),
@@ -584,9 +585,7 @@ class ComposeScene internal constructor(
 
     @ExperimentalComposeUiApi
     fun requestFocus() {
-        list.forEach {
-            it.focusManager.takeFocus()
-        }
+        list.findLast { it.isFocusable }?.focusManager?.takeFocus()
         isFocused = true
     }
 

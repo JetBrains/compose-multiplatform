@@ -29,6 +29,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.performClick
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
+import com.google.common.truth.BooleanSubject
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import java.awt.Component
@@ -163,41 +165,59 @@ class ComposeFocusTest {
         window.preferredSize = Dimension(500, 500)
 
         window.contentPane.add(javax.swing.Box.createVerticalBox().apply {
-            add(outerButton1)
-            add(outerButton2)
-
             add(ComposePanel().apply {
                 setContent {
                     MaterialTheme {
                         Column(Modifier.fillMaxSize()) {
-                            composeButton1.Content()
-                            composeButton2.Content()
+                            composeButton3.Content()
                             SwingPanel(
                                 modifier = Modifier.size(100.dp),
                                 factory = {
                                     javax.swing.Box.createVerticalBox().apply {
                                         add(innerButton1)
-                                        add(innerButton2)
-                                        add(innerButton3)
                                     }
                                 }
                             )
-                            composeButton3.Content()
                             composeButton4.Content()
                         }
                     }
                 }
             })
-            add(outerButton3)
-            add(outerButton4)
         })
         window.pack()
         window.isVisible = true
 
         testRandomFocus(
-            window, outerButton1, outerButton2, composeButton1, composeButton2,
-            innerButton1, innerButton2, innerButton3, composeButton3, composeButton4,
-            outerButton3, outerButton4
+            window, composeButton3, innerButton1, composeButton4,
+        )
+    }
+
+    @Test
+    fun `swing panel in the middle of compose window`() = runFocusTest {
+        val window = ComposeWindow().disposeOnEnd()
+        window.preferredSize = Dimension(500, 500)
+
+        window.setContent {
+            MaterialTheme {
+                Column(Modifier.fillMaxSize()) {
+                    composeButton3.Content()
+                    SwingPanel(
+                        modifier = Modifier.size(100.dp),
+                        factory = {
+                            javax.swing.Box.createVerticalBox().apply {
+                                add(innerButton1)
+                            }
+                        }
+                    )
+                    composeButton4.Content()
+                }
+            }
+        }
+        window.pack()
+        window.isVisible = true
+
+        testRandomFocus(
+            window, composeButton3, innerButton1, composeButton4
         )
     }
 
@@ -330,36 +350,206 @@ class ComposeFocusTest {
         testRandomFocus(window, outerButton1, outerButton2, outerButton3, outerButton4)
     }
 
-    private val outerButton1 = JButton("outerButton1")
-    private val outerButton2 = JButton("outerButton2")
-    private val outerButton3 = JButton("outerButton3")
-    private val outerButton4 = JButton("outerButton4")
-    private val innerButton1 = JButton("innerButton1")
-    private val innerButton2 = JButton("innerButton2")
-    private val innerButton3 = JButton("innerButton3")
+    @Test
+    fun `popup inside window`() = runFocusTest {
+        val window = ComposeWindow().disposeOnEnd()
+        window.preferredSize = Dimension(500, 500)
+
+        window.setContent {
+            MaterialTheme {
+                Column(Modifier.fillMaxSize()) {
+                    composeButton1.Content()
+                    composeButton2.Content()
+                    Popup(focusable = true) {
+                        composeButton3.Content()
+                        composeButton4.Content()
+                    }
+                    composeButton5.Content()
+                    composeButton6.Content()
+                }
+            }
+        }
+        window.pack()
+        window.isVisible = true
+
+        testRandomFocus(
+            window, composeButton3, composeButton4
+        )
+    }
+
+    @Test
+    fun `popup inside panel`() = runFocusTest {
+        val window = JFrame().disposeOnEnd()
+        window.preferredSize = Dimension(500, 500)
+
+        window.contentPane.add(javax.swing.Box.createVerticalBox().apply {
+            add(outerButton1)
+            add(outerButton2)
+
+            add(ComposePanel().apply {
+                setContent {
+                    MaterialTheme {
+                        Column(Modifier.fillMaxSize()) {
+                            composeButton1.Content()
+                            composeButton2.Content()
+                            Popup(focusable = true) {
+                                composeButton3.Content()
+                                composeButton4.Content()
+                            }
+                            composeButton3.Content()
+                            composeButton4.Content()
+                        }
+                    }
+                }
+            })
+
+            add(outerButton3)
+            add(outerButton4)
+        })
+        window.pack()
+        window.isVisible = true
+
+        testRandomFocus(
+            window, composeButton3, composeButton4
+        )
+    }
+
+    @Test
+    fun `popup with swingPanel`() = runFocusTest {
+        val window = ComposeWindow().disposeOnEnd()
+        window.preferredSize = Dimension(500, 500)
+
+        window.setContent {
+            MaterialTheme {
+                Column(Modifier.fillMaxSize()) {
+                    composeButton1.Content()
+                    composeButton2.Content()
+                    Popup(focusable = true) {
+                        Column(Modifier.fillMaxSize()) {
+                            composeButton3.Content()
+                            SwingPanel(
+                                modifier = Modifier.size(100.dp),
+                                factory = {
+                                    javax.swing.Box.createVerticalBox().apply {
+                                        add(innerButton1)
+                                    }
+                                }
+                            )
+                            composeButton4.Content()
+                        }
+                    }
+                    composeButton5.Content()
+                    composeButton6.Content()
+                }
+            }
+        }
+        window.pack()
+        window.isVisible = true
+
+        testRandomFocus(
+            window, composeButton3, innerButton1, composeButton4
+        )
+    }
+
+    @Test
+    fun `popup with swingPanel before it`() = runFocusTest {
+        val window = ComposeWindow().disposeOnEnd()
+        window.preferredSize = Dimension(500, 500)
+
+        window.setContent {
+            MaterialTheme {
+                Column(Modifier.fillMaxSize()) {
+                    composeButton1.Content()
+                    composeButton2.Content()
+                    SwingPanel(
+                        modifier = Modifier.size(100.dp),
+                        factory = {
+                            javax.swing.Box.createVerticalBox().apply {
+                                add(innerButton1)
+                            }
+                        }
+                    )
+                    Popup(focusable = true) {
+                        Column(Modifier.fillMaxSize()) {
+                            composeButton3.Content()
+                            composeButton4.Content()
+                        }
+                    }
+                    composeButton5.Content()
+                    composeButton6.Content()
+                }
+            }
+        }
+        window.pack()
+        window.isVisible = true
+
+        testRandomFocus(
+            window, composeButton3, composeButton4
+        )
+    }
+
+    @Test
+    fun `popup with swingPanel after it`() = runFocusTest {
+        val window = ComposeWindow().disposeOnEnd()
+        window.preferredSize = Dimension(500, 500)
+
+        window.setContent {
+            MaterialTheme {
+                Column(Modifier.fillMaxSize()) {
+                    composeButton1.Content()
+                    composeButton2.Content()
+                    Popup(focusable = true) {
+                        Column(Modifier.fillMaxSize()) {
+                            composeButton3.Content()
+                            composeButton4.Content()
+                        }
+                    }
+                    SwingPanel(
+                        modifier = Modifier.size(100.dp),
+                        factory = {
+                            javax.swing.Box.createVerticalBox().apply {
+                                add(innerButton1)
+                            }
+                        }
+                    )
+                    composeButton5.Content()
+                    composeButton6.Content()
+                }
+            }
+        }
+        window.pack()
+        window.isVisible = true
+
+        testRandomFocus(
+            window, composeButton3, composeButton4
+        )
+    }
+
+    private val outerButton1 = TestJButton("outerButton1")
+    private val outerButton2 = TestJButton("outerButton2")
+    private val outerButton3 = TestJButton("outerButton3")
+    private val outerButton4 = TestJButton("outerButton4")
+    private val innerButton1 = TestJButton("innerButton1")
+    private val innerButton2 = TestJButton("innerButton2")
+    private val innerButton3 = TestJButton("innerButton3")
     private val composeButton1 = ComposeButton("composeButton1")
     private val composeButton2 = ComposeButton("composeButton2")
     private val composeButton3 = ComposeButton("composeButton3")
     private val composeButton4 = ComposeButton("composeButton4")
+    private val composeButton5 = ComposeButton("composeButton5")
+    private val composeButton6 = ComposeButton("composeButton6")
 
     private suspend fun FocusTestScope.testRandomFocus(window: Window, vararg buttons: Any) {
         fun Any.validateIsFocused() {
-            assertFocused().isTrue()
-            if (this != outerButton1) outerButton1.assertFocused().isFalse()
-            if (this != outerButton2) outerButton2.assertFocused().isFalse()
-            if (this != outerButton3) outerButton3.assertFocused().isFalse()
-            if (this != outerButton4) outerButton4.assertFocused().isFalse()
-            if (this != innerButton1) innerButton1.assertFocused().isFalse()
-            if (this != innerButton2) innerButton2.assertFocused().isFalse()
-            if (this != innerButton3) innerButton3.assertFocused().isFalse()
-            if (this != composeButton1) composeButton1.assertFocused().isFalse()
-            if (this != composeButton2) composeButton2.assertFocused().isFalse()
-            if (this != composeButton3) composeButton3.assertFocused().isFalse()
-            if (this != composeButton4) composeButton4.assertFocused().isFalse()
+            assertThat(
+                buttons.filter { it.isFocused() }
+            ).containsExactly(this)
         }
 
         suspend fun cycleForward() {
             var focusedIndex = buttons.indexOfFirst { it.isFocused() }
+            println("cycleForward from ${buttons[focusedIndex]}")
+
             repeat(2 * buttons.size) {
                 pressNextFocusKey()
                 focusedIndex = (focusedIndex + 1).mod(buttons.size)
@@ -369,6 +559,7 @@ class ComposeFocusTest {
 
         suspend fun cycleBackward() {
             var focusedIndex = buttons.indexOfFirst { it.isFocused() }
+            println("cycleBackward from ${buttons[focusedIndex]}")
 
             repeat(2 * buttons.size) {
                 pressPreviousFocusKey()
@@ -379,6 +570,7 @@ class ComposeFocusTest {
 
         suspend fun cycleRandom() {
             var focusedIndex = buttons.indexOfFirst { it.isFocused() }
+            println("cycleRandom from ${buttons[focusedIndex]}")
 
             repeat(4 * buttons.size) {
                 @Suppress("LiftReturnOrAssignment")
@@ -394,6 +586,8 @@ class ComposeFocusTest {
         }
 
         suspend fun randomRequest() {
+            println("randomRequest")
+
             val button = buttons.toList().random()
             button.requestFocus()
             awaitEDT()
@@ -401,6 +595,8 @@ class ComposeFocusTest {
         }
 
         suspend fun randomPress() {
+            println("randomPress")
+
             val button = buttons.filterIsInstance<Component>().randomOrNull()
             button?.performClick()
             awaitEDT()
@@ -408,6 +604,7 @@ class ComposeFocusTest {
         }
 
         awaitEDT()
+        println("firstButton")
         buttons.first().requestFocus()
         awaitEDT()
         buttons.first().validateIsFocused()
@@ -478,12 +675,6 @@ private fun Any.isFocused() = when (this) {
     else -> error("Unknown component")
 }
 
-private fun Any.assertFocused() = when (this) {
-    is ComposeButton -> assertWithMessage("$name.isFocused").that(isFocused)
-    is JButton -> assertWithMessage("$text.isFocused").that(hasFocus())
-    else -> error("Unknown component")
-}
-
 private class ComposeButton(val name: String) {
     var isFocused = false
         private set
@@ -495,4 +686,9 @@ private class ComposeButton(val name: String) {
     }
 
     fun requestFocus() = focusRequester.requestFocus()
+
+    override fun toString() = name
+}
+private class TestJButton(name: String) : JButton(name) {
+    override fun toString(): String = text
 }

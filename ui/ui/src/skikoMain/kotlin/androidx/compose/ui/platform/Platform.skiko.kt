@@ -50,10 +50,7 @@ internal interface Platform {
                 isWindowFocused = true
             }
 
-            override val focusManager = object : FocusManager {
-                override fun clearFocus(force: Boolean) = Unit
-                override fun moveFocus(focusDirection: FocusDirection) = false
-            }
+            override val focusManager = EmptyFocusManager
 
             override fun requestFocusForOwner() = false
 
@@ -80,4 +77,9 @@ internal interface Platform {
             override fun setPointerIcon(pointerIcon: PointerIcon) = Unit
         }
     }
+}
+
+internal object EmptyFocusManager : FocusManager {
+    override fun clearFocus(force: Boolean) = Unit
+    override fun moveFocus(focusDirection: FocusDirection) = false
 }

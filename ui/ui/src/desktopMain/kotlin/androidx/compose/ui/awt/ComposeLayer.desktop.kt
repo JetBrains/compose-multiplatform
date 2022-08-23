@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package androidx.compose.ui.awt
 
 import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
@@ -74,6 +76,7 @@ import javax.swing.SwingUtilities
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 import java.awt.Cursor
+import java.awt.event.FocusListener
 import org.jetbrains.skiko.hostOs
 
 internal class ComposeLayer {
@@ -319,6 +322,24 @@ internal class ComposeLayer {
                 if (isDisposed) return
                 catchExceptions {
                     platform.textInputService.onInputEvent(event)
+                }
+            }
+        })
+
+        _component.addFocusListener(object : FocusListener {
+            override fun focusGained(e: FocusEvent) {
+                // We don't reset focus for Compose when the window loses focus
+                // Partially because we don't support restoring focus after clearing it
+                if (e.cause != FocusEvent.Cause.ACTIVATION) {
+                    scene.requestFocus()
+                }
+            }
+
+            override fun focusLost(e: FocusEvent) {
+                // We don't reset focus for Compose when the window loses focus
+                // Partially because we don't support restoring focus after clearing it
+                if (e.cause != FocusEvent.Cause.ACTIVATION) {
+                    scene.releaseFocus()
                 }
             }
         })
