@@ -54,9 +54,8 @@ fun Project.writeSdkPathToLocalPropertiesFile() {
  * Returns the root project's platform-specific SDK path as a file.
  */
 fun Project.getSdkPath(): File {
-    if (rootProject.plugins.hasPlugin("AndroidXPlaygroundRootPlugin") ||
-        System.getenv("COMPOSE_DESKTOP_GITHUB_BUILD") != null
-    ) {
+    val isJBFork = true
+    if (isJBFork) {
         // This is not full checkout, use local settings instead.
         // https://developer.android.com/studio/command-line/variables
         // check for local.properties first
