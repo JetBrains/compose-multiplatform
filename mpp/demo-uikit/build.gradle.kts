@@ -43,6 +43,18 @@ kotlin {
             }
         }
     }
+    iosSimulatorArm64("uikitSimArm64") {
+        binaries {
+            framework {
+                baseName = "shared"
+                freeCompilerArgs += listOf(
+                    "-linker-option", "-framework", "-linker-option", "Metal",
+                    "-linker-option", "-framework", "-linker-option", "CoreText",
+                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                )
+            }
+        }
+    }
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -68,6 +80,7 @@ kotlin {
         val uikitMain by creating { dependsOn(darwinMain) }
         val uikitX64Main by getting { dependsOn(uikitMain) }
         val uikitArm64Main by getting { dependsOn(uikitMain) }
+        val uikitSimArm64Main by getting { dependsOn(uikitMain) }
     }
 }
 
