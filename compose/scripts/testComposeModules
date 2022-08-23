@@ -1,7 +1,6 @@
 #!/bin/bash
 
 cd "$(dirname "$0")"
-. ./prepare
 
 pushd ..
 # used in https://github.com/JetBrains/androidx/tree/jb-main/.github/workflows

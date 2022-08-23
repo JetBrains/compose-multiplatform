@@ -3,10 +3,6 @@
 cd "$(dirname "$0")"
 cd ../frameworks/support
 
-export JAVA_TOOLS_JAR="$PWD/../../external/tools.jar"
-export ALLOW_PUBLIC_REPOS=1
-export ANDROIDX_PROJECTS=COMPOSE
-
 ../../gradlew --no-daemon \
   -Pandroidx.compose.multiplatformEnabled=false \
   -Pjetbrains.compose.jsCompilerTestsEnabled=false \
