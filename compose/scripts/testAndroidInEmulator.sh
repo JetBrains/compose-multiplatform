@@ -5,10 +5,6 @@ echo "First need to start android emulator or connect device"
 cd "$(dirname "$0")"
 cd ../frameworks/support
 
-export JAVA_TOOLS_JAR="$PWD/../../external/tools.jar"
-export ALLOW_PUBLIC_REPOS=1
-export ANDROIDX_PROJECTS=COMPOSE
-
 select CURRENT_TASK in \
   ":compose:animation:animation-core:animation-core-samples:connectedDebugAndroidTest" \
   ":compose:animation:animation-core:connectedDebugAndroidTest" \
