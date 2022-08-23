@@ -1,2 +1,1 @@
-cd frameworks/support
-gradlew.bat %*
+frameworks/support/gradlew.bat %*
