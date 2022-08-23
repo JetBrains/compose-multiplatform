@@ -24,7 +24,6 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import kotlin.math.roundToInt
@@ -46,7 +45,7 @@ open class BaseLazyStaggeredGridWithOrientation(
     internal fun LazyStaggeredGrid(
         lanes: Int,
         modifier: Modifier = Modifier,
-        state: LazyStaggeredGridState = remember { LazyStaggeredGridState() },
+        state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
         content: LazyStaggeredGridScope.() -> Unit,
     ) {
         LazyStaggeredGrid(

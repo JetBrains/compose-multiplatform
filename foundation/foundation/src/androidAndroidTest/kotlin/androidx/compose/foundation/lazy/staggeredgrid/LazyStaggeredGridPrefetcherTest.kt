@@ -424,8 +424,8 @@ class LazyStaggeredGridPrefetcherTest(
         itemOffset: Int = 0,
     ) {
         state = LazyStaggeredGridState(
-            initialFirstVisibleItems = intArrayOf(firstItem, firstItem + 1),
-            initialFirstVisibleOffsets = intArrayOf(itemOffset, itemOffset)
+            initialFirstVisibleItemIndex = firstItem,
+            initialFirstVisibleItemOffset = itemOffset
         )
         rule.setContent {
             LazyStaggeredGrid(

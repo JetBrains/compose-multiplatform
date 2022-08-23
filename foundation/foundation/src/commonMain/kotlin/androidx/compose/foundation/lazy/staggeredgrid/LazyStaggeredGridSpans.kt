@@ -67,7 +67,7 @@ internal class LazyStaggeredGridSpans {
 
     /**
      * Find the previous item relative to [item] set to target span
-     * @return found item index or [Unset] if it doesn't exist.
+     * @return found item index or -1 if it doesn't exist.
      */
     fun findPreviousItemIndex(item: Int, target: Int): Int {
         for (i in (item - 1) downTo 0) {
@@ -76,7 +76,7 @@ internal class LazyStaggeredGridSpans {
                 return i
             }
         }
-        return Unset
+        return -1
     }
 
     /**

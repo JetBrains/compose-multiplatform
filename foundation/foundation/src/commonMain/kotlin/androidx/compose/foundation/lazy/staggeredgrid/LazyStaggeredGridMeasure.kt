@@ -45,24 +45,6 @@ internal fun LazyLayoutMeasureScope.measure(
     beforeContentPadding: Int,
     afterContentPadding: Int,
 ): LazyStaggeredGridMeasureResult {
-    val initialItemIndices: IntArray
-    val initialItemOffsets: IntArray
-
-    Snapshot.withoutReadObservation {
-        initialItemIndices =
-            if (state.firstVisibleItems.size == resolvedSlotSums.size) {
-                state.firstVisibleItems
-            } else {
-                IntArray(resolvedSlotSums.size) { -1 }
-            }
-        initialItemOffsets =
-            if (state.firstVisibleItemScrollOffsets.size == resolvedSlotSums.size) {
-                state.firstVisibleItemScrollOffsets
-            } else {
-                IntArray(resolvedSlotSums.size) { 0 }
-            }
-    }
-
     val context = LazyStaggeredGridMeasureContext(
         state = state,
         itemProvider = itemProvider,
@@ -73,6 +55,53 @@ internal fun LazyLayoutMeasureScope.measure(
         afterContentPadding = afterContentPadding,
         measureScope = this
     )
+
+    val initialItemIndices: IntArray
+    val initialItemOffsets: IntArray
+
+    Snapshot.withoutReadObservation {
+        initialItemIndices =
+            if (state.firstVisibleItems.size == resolvedSlotSums.size) {
+                state.firstVisibleItems
+            } else {
+                // Grid got resized (or we are in a initial state)
+                // Adjust indices accordingly
+                context.spans.reset()
+                IntArray(resolvedSlotSums.size).apply {
+                    // Try to adjust indices in case grid got resized
+                    for (lane in indices) {
+                        this[lane] = if (lane < state.firstVisibleItems.size) {
+                            state.firstVisibleItems[lane]
+                        } else {
+                            if (lane == 0) {
+                                0
+                            } else {
+                                context.findNextItemIndex(this[lane - 1], lane)
+                            }
+                        }
+                        // Ensure spans are updated to be in correct range
+                        context.spans.setSpan(this[lane], lane)
+                    }
+                }
+            }
+        initialItemOffsets =
+            if (state.firstVisibleItemScrollOffsets.size == resolvedSlotSums.size) {
+                state.firstVisibleItemScrollOffsets
+            } else {
+                // Grid got resized (or we are in a initial state)
+                // Adjust offsets accordingly
+                IntArray(resolvedSlotSums.size).apply {
+                    // Adjust offsets to match previously set ones
+                    for (lane in indices) {
+                        this[lane] = if (lane < state.firstVisibleItemScrollOffsets.size) {
+                            state.firstVisibleItemScrollOffsets[lane]
+                        } else {
+                            if (lane == 0) 0 else this[lane - 1]
+                        }
+                    }
+                }
+            }
+    }
 
     return context.measure(
         initialScrollDelta = state.scrollToBeConsumed.roundToInt(),
@@ -143,14 +172,6 @@ private fun LazyStaggeredGridMeasureContext.measure(
 
         val firstItemIndices = initialItemIndices.copyOf()
         val firstItemOffsets = initialItemOffsets.copyOf()
-
-        // record first span assignments for first items in case they haven't been recorded
-        // before
-        firstItemIndices.forEachIndexed { laneIndex, itemIndex ->
-            if (itemIndex != -1) {
-                spans.setSpan(itemIndex, laneIndex)
-            }
-        }
 
         // update spans in case item count is lower than before
         ensureIndicesInRange(firstItemIndices, itemCount)
@@ -552,7 +573,7 @@ private fun LazyStaggeredGridMeasureContext.ensureIndicesInRange(
         while (indices[i] >= itemCount) {
             indices[i] = findPreviousItemIndex(indices[i], i)
         }
-        if (indices[i] != LazyStaggeredGridSpans.Unset) {
+        if (indices[i] != -1) {
             // reserve item for span
             spans.setSpan(indices[i], i)
         }

@@ -22,9 +22,14 @@ import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState.PrefetchHandle
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
@@ -32,20 +37,34 @@ import androidx.compose.ui.unit.Constraints
 import kotlin.math.abs
 
 @ExperimentalFoundationApi
+@Composable
+internal fun rememberLazyStaggeredGridState(
+    firstVisibleItemIndex: Int = 0,
+    firstVisibleItemOffset: Int = 0
+): LazyStaggeredGridState =
+    rememberSaveable(saver = LazyStaggeredGridState.Saver) {
+        LazyStaggeredGridState(
+            firstVisibleItemIndex,
+            firstVisibleItemOffset
+        )
+    }
+
+@ExperimentalFoundationApi
 internal class LazyStaggeredGridState(
     initialFirstVisibleItems: IntArray = IntArray(0),
     initialFirstVisibleOffsets: IntArray = IntArray(0)
 ) : ScrollableState {
-    var firstVisibleItems: IntArray by mutableStateOf(initialFirstVisibleItems)
-        private set
-
-    var firstVisibleItemScrollOffsets: IntArray by mutableStateOf(initialFirstVisibleOffsets)
-        private set
-
-    internal var layoutInfo: LazyStaggeredGridLayoutInfo by mutableStateOf(
-        LazyStaggeredGridLayoutInfo.Empty
+    constructor(initialFirstVisibleItemIndex: Int, initialFirstVisibleItemOffset: Int) : this(
+        intArrayOf(initialFirstVisibleItemIndex),
+        intArrayOf(initialFirstVisibleItemOffset)
     )
-        private set
+
+    internal var firstVisibleItems by mutableStateOf(initialFirstVisibleItems)
+
+    internal var firstVisibleItemScrollOffsets by mutableStateOf(initialFirstVisibleOffsets)
+
+    private val layoutInfoState: MutableState<LazyStaggeredGridLayoutInfo> =
+        mutableStateOf(LazyStaggeredGridLayoutInfo.Empty)
 
     internal val spans = LazyStaggeredGridSpans()
 
@@ -126,7 +145,7 @@ internal class LazyStaggeredGridState(
         if (!prefetchingEnabled) {
             return
         }
-        val info = layoutInfo
+        val info = layoutInfoState.value
         if (info.visibleItemsInfo.isNotEmpty()) {
             val scrollingForward = delta < 0
 
@@ -205,7 +224,7 @@ internal class LazyStaggeredGridState(
         firstVisibleItemScrollOffsets = result.firstVisibleItemScrollOffsets
         canScrollBackward = result.canScrollBackward
         canScrollForward = result.canScrollForward
-        layoutInfo = result
+        layoutInfoState.value = result
         cancelPrefetchIfVisibleItemsChanged(result)
 
         measurePassCount++
@@ -213,4 +232,19 @@ internal class LazyStaggeredGridState(
 
     override val isScrollInProgress: Boolean
         get() = scrollableState.isScrollInProgress
+
+    companion object {
+        val Saver = listSaver<LazyStaggeredGridState, IntArray>(
+            save = { state ->
+                listOf(
+                    state.firstVisibleItems,
+                    state.firstVisibleItemScrollOffsets
+                    // todo: save spans as well?
+                )
+            },
+            restore = {
+                LazyStaggeredGridState(it[0], it[1])
+            }
+        )
+    }
 }
