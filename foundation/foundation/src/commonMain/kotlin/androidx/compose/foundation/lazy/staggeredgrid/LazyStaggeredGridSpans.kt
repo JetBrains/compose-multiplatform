@@ -93,7 +93,7 @@ internal class LazyStaggeredGridSpans {
         return upperBound()
     }
 
-    private fun ensureValidIndex(requestedIndex: Int) {
+    fun ensureValidIndex(requestedIndex: Int) {
         val requestedCapacity = requestedIndex - anchor
 
         if (requestedCapacity in 0 until MaxCapacity) {

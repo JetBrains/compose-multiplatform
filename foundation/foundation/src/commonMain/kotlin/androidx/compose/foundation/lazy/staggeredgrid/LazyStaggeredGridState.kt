@@ -20,17 +20,15 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState.PrefetchHandle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collection.mutableVectorOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.unit.Constraints
@@ -50,18 +48,23 @@ internal fun rememberLazyStaggeredGridState(
     }
 
 @ExperimentalFoundationApi
-internal class LazyStaggeredGridState(
-    initialFirstVisibleItems: IntArray = IntArray(0),
-    initialFirstVisibleOffsets: IntArray = IntArray(0)
+internal class LazyStaggeredGridState private constructor(
+    initialFirstVisibleItems: IntArray,
+    initialFirstVisibleOffsets: IntArray,
 ) : ScrollableState {
-    constructor(initialFirstVisibleItemIndex: Int, initialFirstVisibleItemOffset: Int) : this(
+    constructor(
+        initialFirstVisibleItemIndex: Int = 0,
+        initialFirstVisibleItemOffset: Int = 0
+    ) : this(
         intArrayOf(initialFirstVisibleItemIndex),
         intArrayOf(initialFirstVisibleItemOffset)
     )
 
-    internal var firstVisibleItems by mutableStateOf(initialFirstVisibleItems)
+    val firstVisibleItemIndex: Int get() = scrollPosition.indices.getOrNull(0) ?: 0
 
-    internal var firstVisibleItemScrollOffsets by mutableStateOf(initialFirstVisibleOffsets)
+    val firstVisibleItemScrollOffset: Int get() = scrollPosition.offsets.getOrNull(0) ?: 0
+
+    val layoutInfo: LazyStaggeredGridLayoutInfo get() = layoutInfoState.value
 
     private val layoutInfoState: MutableState<LazyStaggeredGridLayoutInfo> =
         mutableStateOf(LazyStaggeredGridLayoutInfo.Empty)
@@ -70,6 +73,12 @@ internal class LazyStaggeredGridState(
 
     private var canScrollForward = true
     private var canScrollBackward = true
+
+    internal val scrollPosition = LazyStaggeredGridScrollPosition(
+        initialFirstVisibleItems,
+        initialFirstVisibleOffsets,
+        ::fillNearestIndices
+    )
 
     private var remeasurement: Remeasurement? = null
 
@@ -136,6 +145,35 @@ internal class LazyStaggeredGridState(
             scrollToBeConsumed = 0f // We're not consuming the rest, give it back
             return scrollConsumed
         }
+    }
+
+    suspend fun scrollToItem(
+        /* @IntRange(from = 0) */
+        index: Int,
+        scrollOffset: Int = 0
+    ) {
+        scroll {
+            snapToItemInternal(index, scrollOffset)
+        }
+    }
+
+    internal fun ScrollScope.snapToItemInternal(index: Int, scrollOffset: Int) {
+        val visibleItem = layoutInfo.findVisibleItem(index)
+        if (visibleItem != null) {
+            val currentOffset = if (isVertical) visibleItem.offset.y else visibleItem.offset.x
+            val delta = currentOffset + scrollOffset
+            scrollBy(delta.toFloat())
+        } else {
+            scrollPosition.requestPosition(index, scrollOffset)
+            remeasurement?.forceRemeasure()
+        }
+    }
+
+    /**
+     * Maintain scroll position for item based on custom key if its index has changed.
+     */
+    internal fun updateScrollPositionIfTheFirstItemWasMoved(itemProvider: LazyLayoutItemProvider) {
+        scrollPosition.updateScrollPositionIfTheFirstItemWasMoved(itemProvider)
     }
 
     override fun dispatchRawDelta(delta: Float): Float =
@@ -220,12 +258,11 @@ internal class LazyStaggeredGridState(
 
     internal fun applyMeasureResult(result: LazyStaggeredGridMeasureResult) {
         scrollToBeConsumed -= result.consumedScroll
-        firstVisibleItems = result.firstVisibleItemIndices
-        firstVisibleItemScrollOffsets = result.firstVisibleItemScrollOffsets
         canScrollBackward = result.canScrollBackward
         canScrollForward = result.canScrollForward
         layoutInfoState.value = result
         cancelPrefetchIfVisibleItemsChanged(result)
+        scrollPosition.updateFromMeasureResult(result)
 
         measurePassCount++
     }
@@ -233,13 +270,44 @@ internal class LazyStaggeredGridState(
     override val isScrollInProgress: Boolean
         get() = scrollableState.isScrollInProgress
 
+    private fun fillNearestIndices(itemIndex: Int, laneCount: Int): IntArray {
+        // reposition spans if needed to ensure valid indices
+        spans.ensureValidIndex(itemIndex + laneCount)
+
+        val span = spans.getSpan(itemIndex)
+        val targetLaneIndex =
+            if (span == LazyStaggeredGridSpans.Unset) 0 else minOf(span, laneCount)
+        val indices = IntArray(laneCount)
+
+        // fill lanes before starting index
+        var currentItemIndex = itemIndex
+        for (lane in (targetLaneIndex - 1) downTo 0) {
+            indices[lane] = spans.findPreviousItemIndex(currentItemIndex, lane)
+            if (indices[lane] == -1) {
+                indices.fill(-1, toIndex = lane)
+                break
+            }
+            currentItemIndex = indices[lane]
+        }
+
+        indices[targetLaneIndex] = itemIndex
+
+        // fill lanes after starting index
+        currentItemIndex = itemIndex
+        for (lane in (targetLaneIndex + 1) until laneCount) {
+            indices[lane] = spans.findNextItemIndex(currentItemIndex, lane)
+            currentItemIndex = indices[lane]
+        }
+
+        return indices
+    }
+
     companion object {
         val Saver = listSaver<LazyStaggeredGridState, IntArray>(
             save = { state ->
                 listOf(
-                    state.firstVisibleItems,
-                    state.firstVisibleItemScrollOffsets
-                    // todo: save spans as well?
+                    state.scrollPosition.indices,
+                    state.scrollPosition.offsets
                 )
             },
             restore = {

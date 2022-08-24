@@ -25,6 +25,7 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.layout.LazyLayout
+import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
 import androidx.compose.foundation.overscroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -74,6 +75,8 @@ internal fun LazyStaggeredGrid(
         overscrollEffect
     )
 
+    ScrollPositionUpdater(itemProvider, state)
+
     LazyLayout(
         modifier = modifier
             .then(state.remeasurementModifier)
@@ -95,4 +98,16 @@ internal fun LazyStaggeredGrid(
         itemProvider = itemProvider,
         measurePolicy = measurePolicy
     )
+}
+
+/** Extracted to minimize the recomposition scope */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun ScrollPositionUpdater(
+    itemProvider: LazyLayoutItemProvider,
+    state: LazyStaggeredGridState
+) {
+    if (itemProvider.itemCount > 0) {
+        state.updateScrollPositionIfTheFirstItemWasMoved(itemProvider)
+    }
 }
