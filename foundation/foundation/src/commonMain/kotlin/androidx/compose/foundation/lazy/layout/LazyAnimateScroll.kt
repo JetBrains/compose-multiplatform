@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.lazy.grid
+package androidx.compose.foundation.lazy.layout
 
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.animateTo
 import androidx.compose.animation.core.copy
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.ScrollScope
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.fastFirstOrNull
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.abs
-import kotlin.math.max
 
-@OptIn(ExperimentalFoundationApi::class)
 private class ItemFoundInScroll(
-    val item: LazyGridItemInfo,
+    val itemOffset: Int,
     val previousAnimation: AnimationState<Float, AnimationVector1D>
 ) : CancellationException()
 
@@ -39,33 +37,52 @@ private val BoundDistance = 1500.dp
 private const val DEBUG = false
 private inline fun debugLog(generateMsg: () -> String) {
     if (DEBUG) {
-        println("LazyGridScrolling: ${generateMsg()}")
+        println("LazyScrolling: ${generateMsg()}")
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-internal suspend fun LazyGridState.doSmoothScrollToItem(
+/**
+ * Abstraction over animated scroll for using [animateScrollToItem] in different layouts.
+ * todo(b/243786897): revisit this API and make it public
+ **/
+internal interface LazyAnimateScrollScope {
+    val density: Density
+
+    val firstVisibleItemIndex: Int
+
+    val firstVisibleItemScrollOffset: Int
+
+    val lastVisibleItemIndex: Int
+
+    val itemCount: Int
+
+    fun getTargetItemOffset(index: Int): Int?
+
+    fun snapToItem(index: Int, scrollOffset: Int)
+
+    fun expectedDistanceTo(index: Int, targetScrollOffset: Int): Float
+
+    /** defines min number of items that forces scroll to snap if animation did not reach it */
+    val numOfItemsForTeleport: Int
+
+    suspend fun scroll(block: suspend ScrollScope.() -> Unit)
+}
+
+internal suspend fun LazyAnimateScrollScope.animateScrollToItem(
     index: Int,
     scrollOffset: Int,
-    slotsPerLine: Int
 ) {
-    require(index >= 0f) { "Index should be non-negative ($index)" }
-    fun getTargetItem() = layoutInfo.visibleItemsInfo.fastFirstOrNull {
-        it.index == index
-    }
     scroll {
+        require(index >= 0f) { "Index should be non-negative ($index)" }
         try {
             val targetDistancePx = with(density) { TargetDistance.toPx() }
             val boundDistancePx = with(density) { BoundDistance.toPx() }
             var loop = true
             var anim = AnimationState(0f)
-            val targetItemInitialInfo = getTargetItem()
-            if (targetItemInitialInfo != null) {
+            val targetItemInitialOffset = getTargetItemOffset(index)
+            if (targetItemInitialOffset != null) {
                 // It's already visible, just animate directly
-                throw ItemFoundInScroll(
-                    targetItemInitialInfo,
-                    anim
-                )
+                throw ItemFoundInScroll(targetItemInitialOffset, anim)
             }
             val forward = index > firstVisibleItemIndex
 
@@ -98,19 +115,8 @@ internal suspend fun LazyGridState.doSmoothScrollToItem(
             }
 
             var loops = 1
-            while (loop && layoutInfo.totalItemsCount > 0) {
-                val visibleItems = layoutInfo.visibleItemsInfo
-                val averageLineMainAxisSize = calculateLineAverageMainAxisSize(
-                    visibleItems,
-                    true // TODO(b/191238807)
-                )
-                val before = index < firstVisibleItemIndex
-                val linesDiff =
-                    (index - firstVisibleItemIndex + (slotsPerLine - 1) * if (before) -1 else 1) /
-                        slotsPerLine
-
-                val expectedDistance = (averageLineMainAxisSize * linesDiff).toFloat() +
-                    scrollOffset - firstVisibleItemScrollOffset
+            while (loop && itemCount > 0) {
+                val expectedDistance = expectedDistanceTo(index, scrollOffset)
                 val target = if (abs(expectedDistance) < targetDistancePx) {
                     expectedDistance
                 } else {
@@ -120,7 +126,7 @@ internal suspend fun LazyGridState.doSmoothScrollToItem(
                 debugLog {
                     "Scrolling to index=$index offset=$scrollOffset from " +
                         "index=$firstVisibleItemIndex offset=$firstVisibleItemScrollOffset with " +
-                        "averageSize=$averageLineMainAxisSize and calculated target=$target"
+                        " calculated target=$target"
                 }
 
                 anim = anim.copy(value = 0f)
@@ -130,9 +136,9 @@ internal suspend fun LazyGridState.doSmoothScrollToItem(
                     sequentialAnimation = (anim.velocity != 0f)
                 ) {
                     // If we haven't found the item yet, check if it's visible.
-                    var targetItem = getTargetItem()
+                    var targetItemOffset = getTargetItemOffset(index)
 
-                    if (targetItem == null) {
+                    if (targetItemOffset == null) {
                         // Springs can overshoot their target, clamp to the desired range
                         val coercedValue = if (target > 0) {
                             value.coerceAtMost(target)
@@ -145,8 +151,8 @@ internal suspend fun LazyGridState.doSmoothScrollToItem(
                         }
 
                         val consumed = scrollBy(delta)
-                        targetItem = getTargetItem()
-                        if (targetItem != null) {
+                        targetItemOffset = getTargetItemOffset(index)
+                        if (targetItemOffset != null) {
                             debugLog { "Found the item after performing scrollBy()" }
                         } else if (!isOvershot()) {
                             if (delta != consumed) {
@@ -168,24 +174,29 @@ internal suspend fun LazyGridState.doSmoothScrollToItem(
                                 }
                             }
 
-                            // Magic constants for teleportation chosen arbitrarily by experiment
                             if (forward) {
                                 if (
                                     loops >= 2 &&
-                                    index - layoutInfo.visibleItemsInfo.last().index > 200
+                                    index - lastVisibleItemIndex > numOfItemsForTeleport
                                 ) {
                                     // Teleport
                                     debugLog { "Teleport forward" }
-                                    snapToItemIndexInternal(index = index - 200, scrollOffset = 0)
+                                    snapToItem(
+                                        index = index - numOfItemsForTeleport,
+                                        scrollOffset = 0
+                                    )
                                 }
                             } else {
                                 if (
                                     loops >= 2 &&
-                                    layoutInfo.visibleItemsInfo.first().index - index > 100
+                                    firstVisibleItemIndex - index > numOfItemsForTeleport
                                 ) {
                                     // Teleport
                                     debugLog { "Teleport backward" }
-                                    snapToItemIndexInternal(index = index + 200, scrollOffset = 0)
+                                    snapToItem(
+                                        index = index + numOfItemsForTeleport,
+                                        scrollOffset = 0
+                                    )
                                 }
                             }
                         }
@@ -195,16 +206,13 @@ internal suspend fun LazyGridState.doSmoothScrollToItem(
                     // the final position, there's no need to animate to it.
                     if (isOvershot()) {
                         debugLog { "Overshot" }
-                        snapToItemIndexInternal(index = index, scrollOffset = scrollOffset)
+                        snapToItem(index = index, scrollOffset = scrollOffset)
                         loop = false
                         cancelAnimation()
                         return@animateTo
-                    } else if (targetItem != null) {
+                    } else if (targetItemOffset != null) {
                         debugLog { "Found item" }
-                        throw ItemFoundInScroll(
-                            targetItem,
-                            anim
-                        )
+                        throw ItemFoundInScroll(targetItemOffset, anim)
                     }
                 }
 
@@ -214,8 +222,7 @@ internal suspend fun LazyGridState.doSmoothScrollToItem(
             // We found it, animate to it
             // Bring to the requested position - will be automatically stopped if not possible
             val anim = itemFound.previousAnimation.copy(value = 0f)
-            // TODO(b/191238807)
-            val target = (itemFound.item.offset.y + scrollOffset).toFloat()
+            val target = (itemFound.itemOffset + scrollOffset).toFloat()
             var prevValue = 0f
             debugLog {
                 "Seeking by $target at velocity ${itemFound.previousAnimation.velocity}"
@@ -248,51 +255,7 @@ internal suspend fun LazyGridState.doSmoothScrollToItem(
             // rounding error (otherwise we tend to end up with the previous item scrolled the
             // tiniest bit onscreen)
             // TODO: prevent temporarily scrolling *past* the item
-            snapToItemIndexInternal(index = index, scrollOffset = scrollOffset)
+            snapToItem(index = index, scrollOffset = scrollOffset)
         }
     }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-private fun calculateLineAverageMainAxisSize(
-    visibleItems: List<LazyGridItemInfo>,
-    isVertical: Boolean
-): Int {
-    val lineOf: (Int) -> Int = {
-        if (isVertical) visibleItems[it].row else visibleItems[it].column
-    }
-
-    var totalLinesMainAxisSize = 0
-    var linesCount = 0
-
-    var lineStartIndex = 0
-    while (lineStartIndex < visibleItems.size) {
-        val currentLine = lineOf(lineStartIndex)
-        if (currentLine == -1) {
-            // Filter out exiting items.
-            ++lineStartIndex
-            continue
-        }
-
-        var lineMainAxisSize = 0
-        var lineEndIndex = lineStartIndex
-        while (lineEndIndex < visibleItems.size && lineOf(lineEndIndex) == currentLine) {
-            lineMainAxisSize = max(
-                lineMainAxisSize,
-                if (isVertical) {
-                    visibleItems[lineEndIndex].size.height
-                } else {
-                    visibleItems[lineEndIndex].size.width
-                }
-            )
-            ++lineEndIndex
-        }
-
-        totalLinesMainAxisSize += lineMainAxisSize
-        ++linesCount
-
-        lineStartIndex = lineEndIndex
-    }
-
-    return totalLinesMainAxisSize / linesCount
 }
