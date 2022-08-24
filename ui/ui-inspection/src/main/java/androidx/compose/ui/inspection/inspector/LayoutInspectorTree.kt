@@ -22,6 +22,8 @@ import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.tooling.CompositionGroup
 import androidx.compose.ui.R
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.inspection.util.AnchorMap
+import androidx.compose.ui.inspection.util.NO_ANCHOR_ID
 import androidx.compose.ui.layout.GraphicLayerInfo
 import androidx.compose.ui.layout.LayoutInfo
 import androidx.compose.ui.node.Ref
@@ -34,6 +36,7 @@ import androidx.compose.ui.tooling.data.ParameterInformation
 import androidx.compose.ui.tooling.data.SourceContext
 import androidx.compose.ui.tooling.data.SourceLocation
 import androidx.compose.ui.tooling.data.UiToolingDataApi
+import androidx.compose.ui.tooling.data.findParameters
 import androidx.compose.ui.tooling.data.mapTree
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
@@ -106,8 +109,6 @@ class LayoutInspectorTree {
     var hideSystemNodes = true
     var includeNodesOutsizeOfWindow = true
     var includeAllParameters = true
-    private var searchingForAnchorId = false
-    private var includeParametersForAnchorHash = 0
     private var foundNode: InspectorNode? = null
     private var windowSize = emptySize
     private val inlineClassConverter = InlineClassConverter()
@@ -127,6 +128,7 @@ class LayoutInspectorTree {
     private val stitched =
         Collections.newSetFromMap(IdentityHashMap<MutableInspectorNode, Boolean>())
     private val contextCache = ContextCache()
+    private val anchorMap = AnchorMap()
 
     /**
      * Converts the [CompositionData] set held by [view] into a list of root nodes.
@@ -145,19 +147,22 @@ class LayoutInspectorTree {
         return result
     }
 
-    fun findParameters(view: View, anchorHash: Int): InspectorNode? {
+    fun findParameters(view: View, anchorId: Int): InspectorNode? {
         windowSize = IntSize(view.width, view.height)
         parameterFactory.density = Density(view.context)
+        val identity = anchorMap[anchorId] ?: return null
+
         @Suppress("UNCHECKED_CAST")
         val tables = view.getTag(R.id.inspection_slot_table_set) as?
             Set<CompositionData>
             ?: return null
-        clear()
-        searchingForAnchorId = true
-        includeParametersForAnchorHash = anchorHash
-        val node = tables.firstNotNullOfOrNull { findParameters(it) }
-        clear()
-        return node
+        val node = newNode().apply { this.anchorId = anchorId }
+        val group = tables.firstNotNullOfOrNull { it.find(identity) } ?: return null
+        group.findParameters(contextCache).forEach {
+            val castedValue = castValue(it)
+            node.parameters.add(RawParameter(it.name, castedValue))
+        }
+        return buildAndRelease(node)
     }
 
     /**
@@ -195,7 +200,7 @@ class LayoutInspectorTree {
             parameterFactory.create(
                 rootId,
                 node.id,
-                node.anchorHash,
+                node.anchorId,
                 parameter.name,
                 parameter.value,
                 kind,
@@ -228,7 +233,7 @@ class LayoutInspectorTree {
         return parameterFactory.expand(
             rootId,
             node.id,
-            node.anchorHash,
+            node.anchorId,
             parameter.name,
             parameter.value,
             reference,
@@ -259,8 +264,6 @@ class LayoutInspectorTree {
         semanticsMap.clear()
         stitched.clear()
         subCompositions.clear()
-        searchingForAnchorId = false
-        includeParametersForAnchorHash = 0
         foundNode = null
     }
 
@@ -379,11 +382,6 @@ class LayoutInspectorTree {
         return if (belongsToView(fakeParent.layoutNodes, view)) fakeParent else null
     }
 
-    private fun findParameters(table: CompositionData): InspectorNode? {
-        table.mapTree(::convert, contextCache) ?: return null
-        return foundNode
-    }
-
     private fun convert(
         group: CompositionGroup,
         context: SourceContext,
@@ -465,23 +463,14 @@ class LayoutInspectorTree {
         if (unwantedName(node.name) || (node.box == emptyBox && !subCompositions.capturing)) {
             return markUnwanted(group, context, node)
         }
-        if (!searchingForAnchorId) {
-            parseCallLocation(node, context.location)
-            if (isHiddenSystemNode(node)) {
-                return markUnwanted(group, context, node)
-            }
+        parseCallLocation(node, context.location)
+        if (isHiddenSystemNode(node)) {
+            return markUnwanted(group, context, node)
         }
-        val hash = group.identity?.hashCode()
-        node.anchorHash = hash ?: 0
-        node.id = syntheticId(hash)
-        if (includeAllParameters ||
-            (searchingForAnchorId && includeParametersForAnchorHash == hash)
-        ) {
+        node.anchorId = anchorMap[group.identity]
+        node.id = syntheticId(node.anchorId)
+        if (includeAllParameters) {
             addParameters(context, node)
-            if (searchingForAnchorId && includeParametersForAnchorHash == hash) {
-                foundNode = buildAndRelease(node)
-                return newNode()
-            }
         }
         return node
     }
@@ -539,10 +528,6 @@ class LayoutInspectorTree {
 
         node.box = box.emptyCheck()
         node.bounds = bounds
-        if (searchingForAnchorId) {
-            return node
-        }
-
         node.layoutNodes.add(layoutInfo)
         val modifierInfo = layoutInfo.getModifierInfo()
         node.unmergedSemantics.addAll(
@@ -567,10 +552,12 @@ class LayoutInspectorTree {
         return node
     }
 
-    private fun syntheticId(identityHash: Int?): Long {
-        val id = identityHash ?: return UNDEFINED_ID
-        // The hashCode is an Int
-        return id.toLong() - Int.MAX_VALUE.toLong() + RESERVED_FOR_GENERATED_IDS
+    private fun syntheticId(anchorId: Int): Long {
+        if (anchorId == NO_ANCHOR_ID) {
+            return UNDEFINED_ID
+        }
+        // The anchorId is an Int
+        return anchorId.toLong() - Int.MAX_VALUE.toLong() + RESERVED_FOR_GENERATED_IDS
     }
 
     private fun belongsToView(layoutNodes: List<LayoutInfo>, view: View): Boolean =

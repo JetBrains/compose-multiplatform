@@ -40,14 +40,14 @@ fun GetParametersCommand(
     }.build()
 }.build()
 
-fun GetParametersByAnchorHashCommand(
+fun GetParametersByAnchorIdCommand(
     rootViewId: Long,
-    anchorHash: Int,
+    anchorId: Int,
     skipSystemComposables: Boolean = true
 ): Command = Command.newBuilder().apply {
     getParametersCommand = GetParametersCommand.newBuilder().apply {
         this.rootViewId = rootViewId
-        this.anchorHash = anchorHash
+        this.anchorHash = anchorId
         this.skipSystemComposables = skipSystemComposables
     }.build()
 }.build()
