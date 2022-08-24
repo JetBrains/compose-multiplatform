@@ -53,6 +53,7 @@ import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -838,6 +839,39 @@ class AppBarTest {
         // TopAppBarSmallTokens.ContainerHeight).
         rule.onNodeWithTag(TopAppBarTestTag)
             .assertHeightIsEqualTo(TopAppBarSmallTokens.ContainerHeight)
+    }
+
+    @Test
+    fun topAppBar_dragWithSnapDisabled() {
+        rule.setMaterialContentForSizeAssertions {
+            LargeTopAppBar(
+                modifier = Modifier.testTag(TopAppBarTestTag),
+                title = {
+                    Text("Title")
+                },
+                scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+                    snapAnimationSpec = null
+                )
+            )
+        }
+
+        // Check that the app bar stayed at its position (i.e. its bounds are with a smaller height)
+        val boundsBefore = rule.onNodeWithTag(TopAppBarTestTag).getBoundsInRoot()
+        assertThat(TopAppBarLargeTokens.ContainerHeight).isEqualTo(boundsBefore.height)
+
+        // Slightly drag up the app bar.
+        rule.onNodeWithTag(TopAppBarTestTag).performTouchInput {
+            down(Offset(x = 100f, y = height - 20f))
+            moveTo(Offset(x = 100f, y = height - 100f))
+            up()
+        }
+        rule.waitForIdle()
+
+        // Check that the app bar did not snap back to its fully expanded height, or collapsed to
+        // its collapsed height.
+        val boundsAfter = rule.onNodeWithTag(TopAppBarTestTag).getBoundsInRoot()
+        assertThat(TopAppBarLargeTokens.ContainerHeight).isGreaterThan(boundsAfter.height)
+        assertThat(TopAppBarSmallTokens.ContainerHeight).isLessThan(boundsAfter.height)
     }
 
     @Test
