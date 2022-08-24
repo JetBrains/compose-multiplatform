@@ -122,11 +122,33 @@ internal class SkiaParagraph(
         val horizontal = getHorizontalPosition(offset, true)
         val line = lineMetricsForOffset(offset)!!
 
+        // workaround for https://bugs.chromium.org/p/skia/issues/detail?id=11321 :(
+        // Otherwise it shows a big cursor on a new empty line https://github.com/JetBrains/compose-jb/issues/1895
+        val isNewEmptyLine = offset - 1 == line.startIndex && offset == text.length
+        val metrics = layouter.defaultFont.metrics
+
+        val asc = line.ascent.let {
+            if (isNewEmptyLine) {
+                val ascent = -metrics.ascent.toDouble()
+                it.coerceAtMost(ascent)
+            } else {
+                it
+            }
+        }
+        val desc = line.descent.let {
+            if (isNewEmptyLine) {
+                val descent = metrics.descent.toDouble()
+                it.coerceAtMost(descent)
+            } else {
+                it
+            }
+        }
+
         return Rect(
             horizontal,
-            (line.baseline - line.ascent).toFloat(),
+            (line.baseline - asc).toFloat(),
             horizontal,
-            (line.baseline + line.descent).toFloat()
+            (line.baseline + desc).toFloat()
         )
     }
 
