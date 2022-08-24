@@ -230,8 +230,10 @@ private fun rememberLazyListMeasurePolicy(
         state.density = this
 
         // this will update the scope used by the item composables
-        itemProvider.itemScope.maxWidth = contentConstraints.maxWidth.toDp()
-        itemProvider.itemScope.maxHeight = contentConstraints.maxHeight.toDp()
+        itemProvider.itemScope.setMaxSize(
+            width = contentConstraints.maxWidth,
+            height = contentConstraints.maxHeight
+        )
 
         val spaceBetweenItemsDp = if (isVertical) {
             requireNotNull(verticalArrangement).spacing

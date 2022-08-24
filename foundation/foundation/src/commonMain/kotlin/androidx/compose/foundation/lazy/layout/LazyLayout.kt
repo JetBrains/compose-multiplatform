@@ -68,8 +68,6 @@ fun LazyLayout(
         modifier,
         remember(itemContentFactory, measurePolicy) {
             { constraints ->
-                itemContentFactory.onBeforeMeasure(this, constraints)
-
                 with(LazyLayoutMeasureScopeImpl(itemContentFactory, this)) {
                     measurePolicy(constraints)
                 }
