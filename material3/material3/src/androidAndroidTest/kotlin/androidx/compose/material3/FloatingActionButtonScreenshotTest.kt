@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -322,7 +323,7 @@ class FloatingActionButtonScreenshotTest {
                 onClick = {},
                 containerColor = MaterialTheme.colorScheme.surface,
                 contentColor = MaterialTheme.colorScheme.primary,
-                icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
+                icon = { Icon(Icons.Filled.Add, contentDescription = null) },
                 text = { Text(text = "Extended FAB") },
             )
         }
