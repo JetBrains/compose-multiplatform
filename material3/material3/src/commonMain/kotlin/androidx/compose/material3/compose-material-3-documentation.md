@@ -65,14 +65,18 @@ For more information, check out the <a href="https://developer.android.com/jetpa
 |  | [FilledTonalIconToggleButton] | M3 filled tonal icon toggle button |
 |  | [OutlinedIconButton] | M3 outlined icon button |
 |  | [OutlinedIconToggleButton] | M3 outlined icon toggle button |
+| **Lists** | [ListItem] | M3 list item |
 | **Menus** | [DropdownMenu] | M3 menu |
 |  | [DropdownMenuItem] | M3 menu item |
 |  | [ExposedDropdownMenuBox] | M3 exposed dropdown menu |
 | **Navigation bar** | [NavigationBar] | M3 navigation bar |
 |  | [NavigationBarItem] | M3 navigation bar item |
 | **Navigation drawer** | [ModalNavigationDrawer] | M3 modal navigation drawer |
+|  | [ModalDrawerSheet] | M3 modal drawer sheet |
 |  | [PermanentNavigationDrawer] | M3 permanent standard navigation drawer |
+|  | [PermanentDrawerSheet] | M3 permanent standard drawer sheet |
 |  | [DismissibleNavigationDrawer] | M3 dismissible standard navigation drawer |
+|  | [DismissibleDrawerSheet] | M3 dismissible standard drawer sheet |
 |  | [NavigationDrawerItem] | M3 navigation drawer item |
 | **Navigation rail** | [NavigationRail] | M3 navigation rail |
 |  | [NavigationRailItem] | M3 navigation rail item |
@@ -108,4 +112,4 @@ For more information, check out the <a href="https://developer.android.com/jetpa
 | **Icon** | [Icon] | M3 icon |
 | **Text** | [Text] | M3 text |
 
-Also check out the `androidx.compose.material.icons` [package](/reference/kotlin/androidx/compose/material/icons/package-summary).
+Also check out the androidx.compose.material.icons ![package](https://developer.android.com/reference/kotlin/androidx/compose/material/icons/package-summary).
