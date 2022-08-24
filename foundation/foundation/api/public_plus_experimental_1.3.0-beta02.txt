@@ -830,6 +830,9 @@ package androidx.compose.foundation.lazy.layout {
     method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<kotlin.ranges.IntRange> rememberLazyNearestItemsRangeState(kotlin.jvm.functions.Function0<java.lang.Integer> firstVisibleItemIndex, kotlin.jvm.functions.Function0<java.lang.Integer> slidingWindowSize, kotlin.jvm.functions.Function0<java.lang.Integer> extraItemCount);
   }
 
+  public final class LazySaveableStateHolderKt {
+  }
+
   public final class Lazy_androidKt {
     method @androidx.compose.foundation.ExperimentalFoundationApi public static Object getDefaultLazyLayoutKey(int index);
   }

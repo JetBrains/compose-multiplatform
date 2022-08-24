@@ -20,7 +20,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.SubcomposeLayout
@@ -48,32 +47,33 @@ fun LazyLayout(
 ) {
     val currentItemProvider = rememberUpdatedState(itemProvider)
 
-    val saveableStateHolder = rememberSaveableStateHolder()
-    val itemContentFactory = remember {
-        LazyLayoutItemContentFactory(saveableStateHolder) { currentItemProvider.value }
-    }
-    val subcomposeLayoutState = remember {
-        SubcomposeLayoutState(LazyLayoutItemReusePolicy(itemContentFactory))
-    }
-    prefetchState?.let {
-        LazyLayoutPrefetcher(
-            prefetchState,
-            itemContentFactory,
-            subcomposeLayoutState
-        )
-    }
+    LazySaveableStateHolderProvider { saveableStateHolder ->
+        val itemContentFactory = remember {
+            LazyLayoutItemContentFactory(saveableStateHolder) { currentItemProvider.value }
+        }
+        val subcomposeLayoutState = remember {
+            SubcomposeLayoutState(LazyLayoutItemReusePolicy(itemContentFactory))
+        }
+        prefetchState?.let {
+            LazyLayoutPrefetcher(
+                prefetchState,
+                itemContentFactory,
+                subcomposeLayoutState
+            )
+        }
 
-    SubcomposeLayout(
-        subcomposeLayoutState,
-        modifier,
-        remember(itemContentFactory, measurePolicy) {
-            { constraints ->
-                with(LazyLayoutMeasureScopeImpl(itemContentFactory, this)) {
-                    measurePolicy(constraints)
+        SubcomposeLayout(
+            subcomposeLayoutState,
+            modifier,
+            remember(itemContentFactory, measurePolicy) {
+                { constraints ->
+                    with(LazyLayoutMeasureScopeImpl(itemContentFactory, this)) {
+                        measurePolicy(constraints)
+                    }
                 }
             }
-        }
-    )
+        )
+    }
 }
 
 @ExperimentalFoundationApi
