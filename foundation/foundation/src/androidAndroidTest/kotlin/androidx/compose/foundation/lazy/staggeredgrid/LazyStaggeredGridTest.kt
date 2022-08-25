@@ -39,6 +39,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
+import org.junit.After
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -70,6 +73,25 @@ class LazyStaggeredGridTest(
     fun setUp() {
         with(rule.density) {
             itemSizeDp = itemSizePx.toDp()
+        }
+    }
+
+    @After
+    fun tearDown() {
+        if (::state.isInitialized) {
+            var isSorted = true
+            var previousIndex = Int.MIN_VALUE
+            for (item in state.layoutInfo.visibleItemsInfo) {
+                if (previousIndex > item.index) {
+                    isSorted = false
+                    break
+                }
+                previousIndex = item.index
+            }
+            assertTrue(
+                "Visible items MUST BE sorted: ${state.layoutInfo.visibleItemsInfo}",
+                isSorted
+            )
         }
     }
 
@@ -785,6 +807,54 @@ class LazyStaggeredGridTest(
 
         rule.onNodeWithTag("30")
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun restoredScrollPositionIsCorrectWhenItemsAreLoadedAsynchronously() {
+        val restorationTester = StateRestorationTester(rule)
+
+        var itemsCount = 100
+        val recomposeCounter = mutableStateOf(0)
+
+        restorationTester.setContent {
+            state = rememberLazyStaggeredGridState()
+            LazyStaggeredGrid(
+                lanes = 3,
+                state = state,
+                modifier = Modifier
+                    .mainAxisSize(itemSizeDp * 10)
+                    .testTag(LazyStaggeredGridTag)
+            ) {
+                recomposeCounter.value // read state to force recomposition
+
+                items(itemsCount) {
+                    Spacer(
+                        Modifier
+                            .mainAxisSize(itemSizeDp)
+                            .testTag("$it")
+                    )
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollToItem(9, 10)
+            }
+            itemsCount = 0
+        }
+
+        restorationTester.emulateSavedInstanceStateRestore()
+
+        rule.runOnIdle {
+            itemsCount = 100
+            recomposeCounter.value = 1
+        }
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(9)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
+        }
     }
 
     @Test

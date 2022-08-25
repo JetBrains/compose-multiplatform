@@ -33,7 +33,7 @@ internal fun rememberStaggeredGridItemProvider(
 ): LazyLayoutItemProvider {
     val latestContent = rememberUpdatedState(content)
     val nearestItemsRangeState = rememberLazyNearestItemsRangeState(
-        firstVisibleItemIndex = { state.firstVisibleItems.getOrNull(0) ?: 0 },
+        firstVisibleItemIndex = { state.firstVisibleItemIndex },
         slidingWindowSize = { 90 },
         extraItemCount = { 200 }
     )

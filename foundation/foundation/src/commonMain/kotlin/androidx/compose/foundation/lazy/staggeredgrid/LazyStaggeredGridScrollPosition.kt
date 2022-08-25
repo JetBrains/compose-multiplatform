@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,54 +14,43 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.lazy.grid
+package androidx.compose.foundation.lazy.staggeredgrid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
 import androidx.compose.foundation.lazy.layout.findIndexByKey
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 
-/**
- * Contains the current scroll position represented by the first visible item index and the first
- * visible item scroll offset.
- */
-@OptIn(ExperimentalFoundationApi::class)
-internal class LazyGridScrollPosition(
-    initialIndex: Int = 0,
-    initialScrollOffset: Int = 0
+internal class LazyStaggeredGridScrollPosition(
+    initialIndices: IntArray,
+    initialOffsets: IntArray,
+    private val fillIndices: (targetIndex: Int, laneCount: Int) -> IntArray
 ) {
-    var index by mutableStateOf(ItemIndex(initialIndex))
-        private set
-
-    var scrollOffset by mutableStateOf(initialScrollOffset)
-        private set
+    var indices by mutableStateOf(initialIndices)
+    var offsets by mutableStateOf(initialOffsets)
 
     private var hadFirstNotEmptyLayout = false
 
-    /** The last known key of the first item at [index] line. */
+    /** The last know key of the item at lowest of [indices] position. */
     private var lastKnownFirstItemKey: Any? = null
 
     /**
      * Updates the current scroll position based on the results of the last measurement.
      */
-    fun updateFromMeasureResult(measureResult: LazyGridMeasureResult) {
-        lastKnownFirstItemKey = measureResult.firstVisibleLine?.items?.firstOrNull()?.key
+    fun updateFromMeasureResult(measureResult: LazyStaggeredGridMeasureResult) {
+        lastKnownFirstItemKey = measureResult.visibleItemsInfo.firstOrNull()?.key
         // we ignore the index and offset from measureResult until we get at least one
         // measurement with real items. otherwise the initial index and scroll passed to the
         // state would be lost and overridden with zeros.
         if (hadFirstNotEmptyLayout || measureResult.totalItemsCount > 0) {
             hadFirstNotEmptyLayout = true
-            val scrollOffset = measureResult.firstVisibleLineScrollOffset
-            check(scrollOffset >= 0f) { "scrollOffset should be non-negative ($scrollOffset)" }
-
             Snapshot.withoutReadObservation {
                 update(
-                    ItemIndex(
-                        measureResult.firstVisibleLine?.items?.firstOrNull()?.index?.value ?: 0
-                    ),
-                    scrollOffset
+                    measureResult.firstVisibleItemIndices,
+                    measureResult.firstVisibleItemScrollOffsets
                 )
             }
         }
@@ -70,7 +59,7 @@ internal class LazyGridScrollPosition(
     /**
      * Updates the scroll position - the passed values will be used as a start position for
      * composing the items during the next measure pass and will be updated by the real
-     * position calculated during the measurement. This means that there is guarantee that
+     * position calculated during the measurement. This means that there is no guarantee that
      * exactly this index and offset will be applied as it is possible that:
      * a) there will be no item at this index in reality
      * b) item at this index will be smaller than the asked scrollOffset, which means we would
@@ -78,10 +67,12 @@ internal class LazyGridScrollPosition(
      * c) there will be not enough items to fill the viewport after the requested index, so we
      * would have to compose few elements before the asked index, changing the first visible item.
      */
-    fun requestPosition(index: ItemIndex, scrollOffset: Int) {
-        update(index, scrollOffset)
+    fun requestPosition(index: Int, scrollOffset: Int) {
+        val newIndices = fillIndices(index, indices.size)
+        val newOffsets = IntArray(newIndices.size) { scrollOffset }
+        update(newIndices, newOffsets)
         // clear the stored key as we have a direct request to scroll to [index] position and the
-        // next [checkIfFirstVisibleItemWasMoved] shouldn't override this.
+        // next [updateScrollPositionIfTheFirstItemWasMoved] shouldn't override this.
         lastKnownFirstItemKey = null
     }
 
@@ -91,22 +82,28 @@ internal class LazyGridScrollPosition(
      * there were items added or removed before our current first visible item and keep this item
      * as the first visible one even given that its index has been changed.
      */
-    fun updateScrollPositionIfTheFirstItemWasMoved(itemProvider: LazyGridItemProvider) {
+    @ExperimentalFoundationApi
+    fun updateScrollPositionIfTheFirstItemWasMoved(itemProvider: LazyLayoutItemProvider) {
         Snapshot.withoutReadObservation {
-            update(
-                ItemIndex(itemProvider.findIndexByKey(lastKnownFirstItemKey, index.value)),
-                scrollOffset
+            val lastIndex = itemProvider.findIndexByKey(
+                key = lastKnownFirstItemKey,
+                lastKnownIndex = indices.getOrNull(0) ?: 0
             )
+            if (lastIndex !in indices) {
+                update(
+                    fillIndices(lastIndex, indices.size),
+                    offsets
+                )
+            }
         }
     }
 
-    private fun update(index: ItemIndex, scrollOffset: Int) {
-        require(index.value >= 0f) { "Index should be non-negative (${index.value})" }
-        if (index != this.index) {
-            this.index = index
+    private fun update(indices: IntArray, offsets: IntArray) {
+        if (!indices.contentEquals(this.indices)) {
+            this.indices = indices
         }
-        if (scrollOffset != this.scrollOffset) {
-            this.scrollOffset = scrollOffset
+        if (!offsets.contentEquals(this.offsets)) {
+            this.offsets = offsets
         }
     }
 }

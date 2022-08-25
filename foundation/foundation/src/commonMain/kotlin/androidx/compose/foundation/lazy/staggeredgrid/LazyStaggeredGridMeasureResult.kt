@@ -48,3 +48,18 @@ internal interface LazyStaggeredGridLayoutInfo {
         override val totalItemsCount: Int = 0
     }
 }
+
+internal fun LazyStaggeredGridLayoutInfo.findVisibleItem(
+    itemIndex: Int
+): LazyStaggeredGridItemInfo? {
+    if (visibleItemsInfo.isEmpty()) {
+        return null
+    }
+
+    if (itemIndex !in visibleItemsInfo.first().index..visibleItemsInfo.last().index) {
+        return null
+    }
+
+    val index = visibleItemsInfo.binarySearch { it.index - itemIndex }
+    return visibleItemsInfo.getOrNull(index)
+}

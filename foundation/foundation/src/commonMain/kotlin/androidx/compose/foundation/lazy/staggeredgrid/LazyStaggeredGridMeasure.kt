@@ -60,9 +60,12 @@ internal fun LazyLayoutMeasureScope.measure(
     val initialItemOffsets: IntArray
 
     Snapshot.withoutReadObservation {
+        val firstVisibleIndices = state.scrollPosition.indices
+        val firstVisibleOffsets = state.scrollPosition.offsets
+
         initialItemIndices =
-            if (state.firstVisibleItems.size == resolvedSlotSums.size) {
-                state.firstVisibleItems
+            if (firstVisibleIndices.size == resolvedSlotSums.size) {
+                firstVisibleIndices
             } else {
                 // Grid got resized (or we are in a initial state)
                 // Adjust indices accordingly
@@ -70,8 +73,8 @@ internal fun LazyLayoutMeasureScope.measure(
                 IntArray(resolvedSlotSums.size).apply {
                     // Try to adjust indices in case grid got resized
                     for (lane in indices) {
-                        this[lane] = if (lane < state.firstVisibleItems.size) {
-                            state.firstVisibleItems[lane]
+                        this[lane] = if (lane < firstVisibleIndices.size) {
+                            firstVisibleIndices[lane]
                         } else {
                             if (lane == 0) {
                                 0
@@ -85,16 +88,16 @@ internal fun LazyLayoutMeasureScope.measure(
                 }
             }
         initialItemOffsets =
-            if (state.firstVisibleItemScrollOffsets.size == resolvedSlotSums.size) {
-                state.firstVisibleItemScrollOffsets
+            if (firstVisibleOffsets.size == resolvedSlotSums.size) {
+                firstVisibleOffsets
             } else {
                 // Grid got resized (or we are in a initial state)
                 // Adjust offsets accordingly
                 IntArray(resolvedSlotSums.size).apply {
                     // Adjust offsets to match previously set ones
                     for (lane in indices) {
-                        this[lane] = if (lane < state.firstVisibleItemScrollOffsets.size) {
-                            state.firstVisibleItemScrollOffsets[lane]
+                        this[lane] = if (lane < firstVisibleOffsets.size) {
+                            firstVisibleOffsets[lane]
                         } else {
                             if (lane == 0) 0 else this[lane - 1]
                         }
