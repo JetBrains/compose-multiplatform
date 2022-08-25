@@ -25,6 +25,7 @@ import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.AwaitFirstLayoutModifier
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState
+import androidx.compose.foundation.lazy.layout.animateScrollToItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collection.mutableVectorOf
@@ -222,6 +223,8 @@ class LazyGridState constructor(
 
     internal var placementAnimator by mutableStateOf<LazyGridItemPlacementAnimator?>(null)
 
+    private val animateScrollScope = LazyGridAnimateScrollScope(this)
+
     /**
      * Instantly brings the item at [index] to the top of the viewport, offset by [scrollOffset]
      * pixels.
@@ -385,7 +388,7 @@ class LazyGridState constructor(
         index: Int,
         scrollOffset: Int = 0
     ) {
-        doSmoothScrollToItem(index, scrollOffset, slotsPerLine)
+        animateScrollScope.animateScrollToItem(index, scrollOffset)
     }
 
     /**

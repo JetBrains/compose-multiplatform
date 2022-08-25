@@ -573,9 +573,6 @@ package androidx.compose.foundation.lazy {
     method @androidx.compose.foundation.ExperimentalFoundationApi public void stickyHeader(optional Object? key, optional Object? contentType, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,kotlin.Unit> content);
   }
 
-  public final class LazyListScrollingKt {
-  }
-
   @androidx.compose.runtime.Stable public final class LazyListState implements androidx.compose.foundation.gestures.ScrollableState {
     ctor public LazyListState(optional int firstVisibleItemIndex, optional int firstVisibleItemScrollOffset);
     method public suspend Object? animateScrollToItem(int index, optional int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
@@ -717,9 +714,6 @@ package androidx.compose.foundation.lazy.grid {
   @kotlin.DslMarker public @interface LazyGridScopeMarker {
   }
 
-  public final class LazyGridScrollingKt {
-  }
-
   public final class LazyGridSpanKt {
     method public static long GridItemSpan(int currentLineSpan);
   }
@@ -776,6 +770,9 @@ package androidx.compose.foundation.lazy.layout {
   }
 
   public final class IntervalListKt {
+  }
+
+  public final class LazyAnimateScrollKt {
   }
 
   @androidx.compose.foundation.ExperimentalFoundationApi public interface LazyLayoutIntervalContent {
