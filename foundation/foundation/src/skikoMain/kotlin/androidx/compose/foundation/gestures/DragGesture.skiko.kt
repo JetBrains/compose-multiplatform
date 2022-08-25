@@ -18,7 +18,6 @@ package androidx.compose.foundation.gestures
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.PointerMatcher
-import androidx.compose.foundation.awaitPress
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed

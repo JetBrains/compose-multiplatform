@@ -304,7 +304,7 @@ suspend fun AwaitPointerEventScope.waitForUpOrCancellation(): PointerInputChange
 /**
  * [detectTapGestures]'s implementation of [PressGestureScope].
  */
-private class PressGestureScopeImpl(
+internal class PressGestureScopeImpl(
     density: Density
 ) : PressGestureScope, Density by density {
     private var isReleased = false
