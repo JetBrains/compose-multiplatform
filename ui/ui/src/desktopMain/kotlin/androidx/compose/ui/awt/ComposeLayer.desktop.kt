@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.PlatformComponent
 import androidx.compose.ui.platform.PlatformInput
 import androidx.compose.ui.platform.WindowInfoImpl
 import androidx.compose.ui.semantics.SemanticsOwner
+import androidx.compose.ui.toPointerKeyboardModifiers
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -389,19 +390,6 @@ internal class ComposeLayer {
             event.consume()
         }
     }
-
-    private fun KeyEvent.toPointerKeyboardModifiers() = PointerKeyboardModifiers(
-        isCtrlPressed = this.isControlDown,
-        isMetaPressed = this.isMetaDown,
-        isAltPressed = this.isAltDown,
-        isShiftPressed = this.isShiftDown,
-        isAltGraphPressed = this.isAltGraphDown,
-        isSymPressed = false,
-        isFunctionPressed = false,
-        isCapsLockOn = getLockingKeyStateSafe(KeyEvent.VK_CAPS_LOCK),
-        isScrollLockOn = getLockingKeyStateSafe(KeyEvent.VK_SCROLL_LOCK),
-        isNumLockOn = getLockingKeyStateSafe(KeyEvent.VK_NUM_LOCK)
-    )
 
     fun dispose() {
         check(!isDisposed)

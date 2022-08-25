@@ -18,12 +18,12 @@
 
 package androidx.compose.ui.test
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.InternalComposeUiApi
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.pointer.PointerId
-import androidx.compose.ui.input.pointer.TestPointerInputEventData
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.nativeKeyLocation
 import androidx.compose.ui.input.pointer.PointerButton
@@ -32,6 +32,7 @@ import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.SkiaRootForTest
 import java.awt.Component
+import java.awt.event.InputEvent
 
 internal actual fun createInputDispatcher(
     testContext: TestContext,
@@ -51,6 +52,7 @@ internal class DesktopInputDispatcher(
 ) {
     private val scene get() = root.scene
     private var batchedEvents = mutableListOf<() -> Unit>()
+    private var modifiers = 0
 
     override fun PartialGesture.enqueueDown(pointerId: Int) {
         val position = lastPositions[pointerId]!!
@@ -191,12 +193,31 @@ internal class DesktopInputDispatcher(
         }
     }
 
-    // TODO(b/233199964): Implement key injection for desktop
-    //  don't forget to change DefaultPointerStateTracker.keyboardModifiers when we press modifiers
-    override fun KeyInputState.enqueueDown(key: Key) = TODO("Not yet implemented")
+    @OptIn(ExperimentalComposeUiApi::class)
+    private fun updateModifiers(key: Key, down: Boolean) {
+        val mask = when (key) {
+            Key.ShiftLeft, Key.ShiftRight -> InputEvent.SHIFT_DOWN_MASK
+            Key.CtrlLeft, Key.CtrlRight -> InputEvent.CTRL_DOWN_MASK
+            Key.AltLeft, Key.AltRight -> InputEvent.ALT_DOWN_MASK
+            Key.MetaLeft, Key.MetaRight -> InputEvent.META_DOWN_MASK
+            else -> null
+        }
+        if (mask != null) modifiers = if (down) modifiers or mask else modifiers xor mask
+    }
 
-    // TODO(b/233199964): Implement key injection for desktop
-    override fun KeyInputState.enqueueUp(key: Key) = TODO("Not yet implemented")
+    override fun KeyInputState.enqueueDown(key: Key) {
+        enqueue {
+            updateModifiers(key = key, down = true)
+            scene.sendKeyEvent(keyEvent(key, KeyEventType.KeyDown, modifiers))
+        }
+    }
+
+    override fun KeyInputState.enqueueUp(key: Key) {
+        enqueue {
+            updateModifiers(key = key, down = false)
+            scene.sendKeyEvent(keyEvent(key, KeyEventType.KeyUp, modifiers))
+        }
+    }
 
     override fun RotaryInputState.enqueueRotaryScrollHorizontally(horizontalScrollPixels: Float) {
         // desktop don't have rotary events as Android Wear does
@@ -219,4 +240,32 @@ internal class DesktopInputDispatcher(
     override fun onDispose() {
         batchedEvents.clear()
     }
+}
+
+private object DummyComponent : Component()
+/**
+ * The [KeyEvent] is usually created by the system. This function creates an instance of
+ * [KeyEvent] that can be used in tests.
+ */
+internal fun keyEvent(
+    key: Key,
+    keyEventType: KeyEventType,
+    modifiers: Int = 0
+): KeyEvent {
+    val action = when (keyEventType) {
+        KeyEventType.KeyDown -> java.awt.event.KeyEvent.KEY_PRESSED
+        KeyEventType.KeyUp -> java.awt.event.KeyEvent.KEY_RELEASED
+        else -> error("Unknown key event type")
+    }
+    return KeyEvent(
+        java.awt.event.KeyEvent(
+            DummyComponent,
+            action,
+            0L,
+            modifiers,
+            key.nativeKeyCode,
+            java.awt.event.KeyEvent.getKeyText(key.nativeKeyCode)[0],
+            key.nativeKeyLocation
+        )
+    )
 }

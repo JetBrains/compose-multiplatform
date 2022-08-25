@@ -35,7 +35,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.NativeKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.input.pointer.PointerEventType
@@ -566,6 +568,7 @@ class ComposeScene internal constructor(
      * @return true if the event was consumed by the content
      */
     fun sendKeyEvent(event: ComposeKeyEvent): Boolean = postponeInvalidation {
+        defaultPointerStateTracker.onKeyEvent(event)
         return focusedOwner?.sendKeyEvent(event) == true
     }
 
@@ -608,6 +611,10 @@ private class DefaultPointerStateTracker {
             PointerEventType.Press -> buttons = buttons.copyFor(button ?: PointerButton.Primary, pressed = true)
             PointerEventType.Release -> buttons = buttons.copyFor(button ?: PointerButton.Primary, pressed = false)
         }
+    }
+
+    fun onKeyEvent(keyEvent: KeyEvent) {
+        keyboardModifiers = keyEvent.nativeKeyEvent.toPointerKeyboardModifiers()
     }
 
     var buttons = PointerButtons()
@@ -668,3 +675,5 @@ private fun createMoveEvent(
 )
 
 internal expect fun createSkiaLayer(): SkiaLayer
+
+internal expect fun NativeKeyEvent.toPointerKeyboardModifiers(): PointerKeyboardModifiers

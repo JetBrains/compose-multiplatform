@@ -16,6 +16,32 @@
 
 package androidx.compose.ui
 
+import androidx.compose.ui.input.key.NativeKeyEvent
+import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
+import java.awt.Toolkit
 import org.jetbrains.skiko.SkiaLayer
 
 internal actual fun createSkiaLayer(): SkiaLayer = SkiaLayer()
+
+private fun getLockingKeyStateSafe(
+    mask: Int
+): Boolean = try {
+    Toolkit.getDefaultToolkit().getLockingKeyState(mask)
+} catch (_: Exception) {
+    false
+}
+internal actual fun NativeKeyEvent.toPointerKeyboardModifiers(): PointerKeyboardModifiers {
+    val awtEventOrNull = this as? java.awt.event.KeyEvent
+    return PointerKeyboardModifiers(
+        isCtrlPressed = awtEventOrNull?.isControlDown ?:  false,
+        isShiftPressed = awtEventOrNull?.isShiftDown ?:  false,
+        isAltPressed = awtEventOrNull?.isAltDown ?:  false,
+        isAltGraphPressed = awtEventOrNull?.isAltGraphDown ?: false,
+        isMetaPressed = awtEventOrNull?.isMetaDown ?: false,
+        isSymPressed = false, // no sym in awtEvent?
+        isFunctionPressed = false, // no Fn in awtEvent?
+        isCapsLockOn = getLockingKeyStateSafe(java.awt.event.KeyEvent.VK_CAPS_LOCK),
+        isScrollLockOn = getLockingKeyStateSafe(java.awt.event.KeyEvent.VK_SCROLL_LOCK),
+        isNumLockOn = getLockingKeyStateSafe(java.awt.event.KeyEvent.VK_NUM_LOCK)
+    )
+}
