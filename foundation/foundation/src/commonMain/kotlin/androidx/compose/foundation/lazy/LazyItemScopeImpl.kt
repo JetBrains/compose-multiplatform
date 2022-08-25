@@ -98,21 +98,21 @@ private class ParentSizeModifier(
         measurable: Measurable,
         constraints: Constraints
     ): MeasureResult {
-        val width = if (widthState != null) {
+        val width = if (widthState != null && widthState.value != Constraints.Infinity) {
             (widthState.value * fraction).roundToInt()
         } else {
-            Int.MAX_VALUE
+            Constraints.Infinity
         }
-        val height = if (heightState != null) {
+        val height = if (heightState != null && heightState.value != Constraints.Infinity) {
             (heightState.value * fraction).roundToInt()
         } else {
-            Int.MAX_VALUE
+            Constraints.Infinity
         }
         val childConstraints = Constraints(
-            minWidth = if (width != Int.MAX_VALUE) width else constraints.minWidth,
-            minHeight = if (height != Int.MAX_VALUE) height else constraints.minHeight,
-            maxWidth = if (width != Int.MAX_VALUE) width else constraints.maxWidth,
-            maxHeight = if (height != Int.MAX_VALUE) height else constraints.maxHeight,
+            minWidth = if (width != Constraints.Infinity) width else constraints.minWidth,
+            minHeight = if (height != Constraints.Infinity) height else constraints.minHeight,
+            maxWidth = if (width != Constraints.Infinity) width else constraints.maxWidth,
+            maxHeight = if (height != Constraints.Infinity) height else constraints.maxHeight,
         )
         val placeable = measurable.measure(childConstraints)
         return layout(placeable.width, placeable.height) {
