@@ -878,6 +878,9 @@ package androidx.compose.foundation.lazy.staggeredgrid {
   public final class LazyStaggeredGridMeasurePolicyKt {
   }
 
+  public final class LazyStaggeredGridStateKt {
+  }
+
 }
 
 package androidx.compose.foundation.relocation {
