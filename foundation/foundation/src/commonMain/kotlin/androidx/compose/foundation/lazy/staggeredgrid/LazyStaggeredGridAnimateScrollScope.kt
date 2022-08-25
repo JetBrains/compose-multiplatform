@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.lazy
+package androidx.compose.foundation.lazy.staggeredgrid
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.lazy.layout.LazyAnimateScrollScope
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.fastSumBy
 
-internal class LazyListAnimateScrollScope(
-    private val state: LazyListState
+@ExperimentalFoundationApi
+internal class LazyStaggeredGridAnimateScrollScope(
+    private val state: LazyStaggeredGridState
 ) : LazyAnimateScrollScope {
     override val density: Density get() = state.density
 
@@ -34,27 +35,31 @@ internal class LazyListAnimateScrollScope(
     override val lastVisibleItemIndex: Int
         get() = state.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
 
-    override val itemCount: Int
-        get() = state.layoutInfo.totalItemsCount
-
-    override val numOfItemsForTeleport: Int = 100
+    override val itemCount: Int get() = state.layoutInfo.totalItemsCount
 
     override fun getTargetItemOffset(index: Int): Int? =
-        state.layoutInfo.visibleItemsInfo.fastFirstOrNull {
-            it.index == index
-        }?.offset
+        state.layoutInfo.findVisibleItem(index)?.offset?.let {
+            if (state.isVertical) it.y else it.x
+        }
 
     override fun ScrollScope.snapToItem(index: Int, scrollOffset: Int) {
-        state.snapToItemIndexInternal(index, scrollOffset)
+        with(state) {
+            snapToItemInternal(index, scrollOffset)
+        }
     }
 
     override fun expectedDistanceTo(index: Int, targetScrollOffset: Int): Float {
         val visibleItems = state.layoutInfo.visibleItemsInfo
-        val averageSize = visibleItems.fastSumBy { it.size } / visibleItems.size
+        val itemSizeSum = visibleItems
+            .fastSumBy { if (state.isVertical) it.size.height else it.size.width }
+        val averageMainAxisItemSize = itemSizeSum / (visibleItems.size * state.laneCount)
+
         val indexesDiff = index - firstVisibleItemIndex
-        return (averageSize * indexesDiff).toFloat() +
+        return (averageMainAxisItemSize * indexesDiff).toFloat() +
             targetScrollOffset - firstVisibleItemScrollOffset
     }
+
+    override val numOfItemsForTeleport: Int get() = 100 * state.laneCount
 
     override suspend fun scroll(block: suspend ScrollScope.() -> Unit) {
         state.scroll(block = block)

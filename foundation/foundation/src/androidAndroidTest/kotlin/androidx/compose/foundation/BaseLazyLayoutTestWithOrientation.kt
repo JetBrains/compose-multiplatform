@@ -148,4 +148,8 @@ open class BaseLazyLayoutTestWithOrientation(private val orientation: Orientatio
             bottom = afterContentCrossAxis
         )
     }
+
+    companion object {
+        internal const val FrameDuration = 16L
+    }
 }

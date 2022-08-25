@@ -48,7 +48,7 @@ internal class LazyGridAnimateScrollScope(
                 }
             }
 
-    override fun snapToItem(index: Int, scrollOffset: Int) {
+    override fun ScrollScope.snapToItem(index: Int, scrollOffset: Int) {
         state.snapToItemIndexInternal(index, scrollOffset)
     }
 
