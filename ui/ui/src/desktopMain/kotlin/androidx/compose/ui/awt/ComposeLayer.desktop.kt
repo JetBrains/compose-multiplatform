@@ -78,9 +78,12 @@ import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 import java.awt.Cursor
 import java.awt.event.FocusListener
+import org.jetbrains.skiko.SkiaLayerAnalytics
 import org.jetbrains.skiko.hostOs
 
-internal class ComposeLayer {
+internal class ComposeLayer(
+    private val skiaLayerAnalytics: SkiaLayerAnalytics
+) {
     private var isDisposed = false
 
     private val _component = ComponentImpl()
@@ -198,7 +201,7 @@ internal class ComposeLayer {
     }
 
     private inner class ComponentImpl :
-        SkiaLayer(externalAccessibleFactory = ::makeAccessible), Accessible, PlatformComponent {
+        SkiaLayer(externalAccessibleFactory = ::makeAccessible, analytics = skiaLayerAnalytics), Accessible, PlatformComponent {
         var currentInputMethodRequests: InputMethodRequests? = null
 
         private var window: Window? = null

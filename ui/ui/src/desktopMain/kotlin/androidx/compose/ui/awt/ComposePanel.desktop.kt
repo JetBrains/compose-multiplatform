@@ -31,11 +31,21 @@ import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
 import javax.swing.JLayeredPane
 import javax.swing.SwingUtilities.isEventDispatchThread
+import org.jetbrains.skiko.SkiaLayerAnalytics
 
 /**
  * ComposePanel is a panel for building UI using Compose for Desktop.
+ *
+ * @param skiaLayerAnalytics Analytics that helps to know more about SkiaLayer behaviour.
+ * SkiaLayer is underlying class used internally to draw Compose content.
+ * Implementation usually uses third-party solution to send info to some centralized analytics gatherer.
  */
-class ComposePanel : JLayeredPane() {
+class ComposePanel @ExperimentalComposeUiApi constructor(
+    private val skiaLayerAnalytics: SkiaLayerAnalytics,
+) : JLayeredPane() {
+    @OptIn(ExperimentalComposeUiApi::class)
+    constructor() : this(SkiaLayerAnalytics.Empty)
+
     init {
         check(isEventDispatchThread()) {
             "ComposePanel should be created inside AWT Event Dispatch Thread" +
@@ -139,7 +149,7 @@ class ComposePanel : JLayeredPane() {
 
         // After [super.addNotify] is called we can safely initialize the layer and composable
         // content.
-        layer = ComposeLayer().apply {
+        layer = ComposeLayer(skiaLayerAnalytics).apply {
             scene.releaseFocus()
             component.setSize(width, height)
             component.isFocusable = _isFocusable
@@ -176,6 +186,7 @@ class ComposePanel : JLayeredPane() {
         if (layer != null) {
             layer!!.dispose()
             super.remove(layer!!.component)
+            layer = null
         }
 
         super.removeNotify()

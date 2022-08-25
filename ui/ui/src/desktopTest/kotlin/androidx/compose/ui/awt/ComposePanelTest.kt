@@ -18,11 +18,13 @@ package androidx.compose.ui.awt
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.density
+import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.skiko.MainUIDispatcher
@@ -31,11 +33,16 @@ import org.junit.Test
 import java.awt.Dimension
 import java.awt.GraphicsEnvironment
 import javax.swing.JFrame
+import org.jetbrains.skiko.ExperimentalSkikoApi
+import org.jetbrains.skiko.GraphicsApi
+import org.jetbrains.skiko.OS
+import org.jetbrains.skiko.SkiaLayerAnalytics
+import org.junit.Assume.assumeFalse
 
 class ComposePanelTest {
     @Test
     fun `don't override user preferred size`() {
-        Assume.assumeFalse(GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance)
+        assumeFalse(GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance)
 
         runBlocking(MainUIDispatcher) {
             val composePanel = ComposePanel()
@@ -60,7 +67,7 @@ class ComposePanelTest {
 
     @Test
     fun `pack to Compose content`() {
-        Assume.assumeFalse(GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance)
+        assumeFalse(GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance)
 
         runBlocking(MainUIDispatcher) {
             val composePanel = ComposePanel()
@@ -88,7 +95,7 @@ class ComposePanelTest {
 
     @Test
     fun `a single layout pass at the window start`() {
-        Assume.assumeFalse(GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance)
+        assumeFalse(GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance)
 
         val layoutPassConstraints = mutableListOf<Constraints>()
 
@@ -117,6 +124,41 @@ class ComposePanelTest {
                         )
                     )
                 )
+            } finally {
+                frame.dispose()
+            }
+        }
+    }
+
+    @OptIn(ExperimentalSkikoApi::class, ExperimentalComposeUiApi::class)
+    @Test
+    fun SkiaLayerAnalytics() {
+        assumeFalse(GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance)
+
+        runBlocking(MainUIDispatcher) {
+            var rendererIsCalled = false
+            val analytics = object : SkiaLayerAnalytics {
+                override fun renderer(
+                    skikoVersion: String,
+                    os: OS,
+                    api: GraphicsApi
+                ): SkiaLayerAnalytics.RendererAnalytics {
+                    rendererIsCalled = true
+                    return super.renderer(skikoVersion, os, api)
+                }
+            }
+
+            val composePanel = ComposePanel(skiaLayerAnalytics = analytics)
+            composePanel.size = Dimension(100, 100)
+
+            val frame = JFrame()
+            try {
+                frame.contentPane.add(composePanel)
+                frame.size = Dimension(100, 100)
+                frame.isUndecorated = true
+                frame.isVisible = true
+                frame.contentPane.paint(frame.graphics)
+                assertThat(rendererIsCalled).isTrue()
             } finally {
                 frame.dispose()
             }

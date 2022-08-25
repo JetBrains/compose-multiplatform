@@ -38,10 +38,12 @@ import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
 import java.awt.event.MouseWheelListener
 import javax.swing.JLayeredPane
+import org.jetbrains.skiko.SkiaLayerAnalytics
 
 internal class ComposeWindowDelegate(
     private val window: Window,
-    private val isUndecorated: () -> Boolean
+    private val isUndecorated: () -> Boolean,
+    private val skiaLayerAnalytics: SkiaLayerAnalytics
 ) {
     private var isDisposed = false
 
@@ -49,7 +51,7 @@ internal class ComposeWindowDelegate(
     // (see https://github.com/JetBrains/compose-jb/issues/1688),
     // so we nullify layer on dispose, to prevent keeping
     // big objects in memory (like the whole LayoutNode tree of the window)
-    private var _layer: ComposeLayer? = ComposeLayer()
+    private var _layer: ComposeLayer? = ComposeLayer(skiaLayerAnalytics)
     private val layer get() = requireNotNull(_layer) {
         "ComposeLayer is disposed"
     }

@@ -23,30 +23,51 @@ import androidx.compose.ui.window.DialogWindowScope
 import androidx.compose.ui.window.WindowExceptionHandler
 import org.jetbrains.skiko.GraphicsApi
 import java.awt.Component
+import java.awt.Dialog
 import java.awt.Window
 import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
 import java.awt.event.MouseWheelListener
 import javax.swing.JDialog
+import org.jetbrains.skiko.SkiaLayerAnalytics
 
 /**
  * ComposeDialog is a dialog for building UI using Compose for Desktop.
  * ComposeDialog inherits javax.swing.JDialog.
  */
 class ComposeDialog : JDialog {
+    private var skiaLayerAnalytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty
+
     constructor(
         owner: Window?,
         modalityType: ModalityType = ModalityType.MODELESS
     ) : super(owner, modalityType)
 
-    @Deprecated("Use the constructor with setting owner explicitly")
+    /**
+     * ComposeDialog is a dialog for building UI using Compose for Desktop.
+     * ComposeDialog inherits javax.swing.JDialog.
+     *
+     * @param skiaLayerAnalytics Analytics that helps to know more about SkiaLayer behaviour.
+     * SkiaLayer is underlying class used internally to draw Compose content.
+     * Implementation usually uses third-party solution to send info to some centralized analytics gatherer.
+     */
+    @ExperimentalComposeUiApi
+    constructor(
+        owner: Window?,
+        modalityType: ModalityType = ModalityType.MODELESS,
+        skiaLayerAnalytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty
+    ) : super(owner, modalityType) {
+        this.skiaLayerAnalytics = skiaLayerAnalytics
+    }
+
+    @Deprecated("Use the constructor with setting owner explicitly. Will be remove in 1.3")
     constructor(
         modalityType: ModalityType = ModalityType.MODELESS
     ) : super(null, modalityType)
 
     constructor() : super()
 
-    private val delegate = ComposeWindowDelegate(this, ::isUndecorated)
+    private val delegate = ComposeWindowDelegate(this, ::isUndecorated, skiaLayerAnalytics)
 
     init {
         contentPane.add(delegate.pane)

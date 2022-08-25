@@ -29,6 +29,8 @@ import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
 import java.awt.event.MouseWheelListener
 import javax.swing.JFrame
+import org.jetbrains.skiko.ExperimentalSkikoApi
+import org.jetbrains.skiko.SkiaLayerAnalytics
 
 /**
  * ComposeWindow is a window for building UI using Compose for Desktop.
@@ -36,11 +38,27 @@ import javax.swing.JFrame
  *
  * @param graphicsConfiguration the GraphicsConfiguration that is used to construct the new window.
  * If null, the system default GraphicsConfiguration is assumed.
+ * @param skiaLayerAnalytics Analytics that helps to know more about SkiaLayer behaviour.
+ * SkiaLayer is underlying class used internally to draw Compose content.
+ * Implementation usually uses third-party solution to send info to some centralized analytics gatherer.
  */
-class ComposeWindow(
-    graphicsConfiguration: GraphicsConfiguration? = null
+class ComposeWindow @ExperimentalComposeUiApi constructor(
+    graphicsConfiguration: GraphicsConfiguration? = null,
+    skiaLayerAnalytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
 ) : JFrame(graphicsConfiguration) {
-    private val delegate = ComposeWindowDelegate(this, ::isUndecorated)
+    /**
+     * ComposeWindow is a window for building UI using Compose for Desktop.
+     * ComposeWindow inherits javax.swing.JFrame.
+     *
+     * @param graphicsConfiguration the GraphicsConfiguration that is used to construct the new window.
+     * If null, the system default GraphicsConfiguration is assumed.
+     */
+    @OptIn(ExperimentalComposeUiApi::class)
+    constructor(
+        graphicsConfiguration: GraphicsConfiguration? = null
+    ) : this(graphicsConfiguration, SkiaLayerAnalytics.Empty)
+
+    private val delegate = ComposeWindowDelegate(this, ::isUndecorated, skiaLayerAnalytics)
 
     init {
         contentPane.add(delegate.pane)

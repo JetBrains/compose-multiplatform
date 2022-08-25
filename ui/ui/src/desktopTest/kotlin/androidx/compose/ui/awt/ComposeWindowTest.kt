@@ -16,7 +16,6 @@
 package androidx.compose.ui.awt
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -45,7 +44,11 @@ import java.awt.event.MouseEvent.MOUSE_PRESSED
 import java.awt.event.MouseEvent.MOUSE_RELEASED
 import java.awt.event.WindowEvent
 import kotlinx.coroutines.runBlocking
+import org.jetbrains.skiko.ExperimentalSkikoApi
+import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.MainUIDispatcher
+import org.jetbrains.skiko.OS
+import org.jetbrains.skiko.SkiaLayerAnalytics
 import org.junit.Assume
 import org.junit.Test
 
@@ -237,6 +240,31 @@ class ComposeWindowTest {
             window.sendMouseEvent(MOUSE_RELEASED, 100, 50)
             awaitIdle()
             assertThat(isClickHappened).isTrue()
+        } finally {
+            window.dispose()
+        }
+    }
+
+    @OptIn(ExperimentalSkikoApi::class)
+    @Test
+    fun SkiaLayerAnalytics() = runApplicationTest {
+        var rendererIsCalled = false
+        val analytics = object : SkiaLayerAnalytics {
+            override fun renderer(
+                skikoVersion: String,
+                os: OS,
+                api: GraphicsApi
+            ): SkiaLayerAnalytics.RendererAnalytics {
+                rendererIsCalled = true
+                return super.renderer(skikoVersion, os, api)
+            }
+        }
+        val window = ComposeWindow(graphicsConfiguration = null, skiaLayerAnalytics = analytics)
+        try {
+            window.size = Dimension(100, 100)
+            window.isVisible = true
+            awaitIdle()
+            assertThat(rendererIsCalled).isTrue()
         } finally {
             window.dispose()
         }
