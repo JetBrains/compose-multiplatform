@@ -51,7 +51,7 @@ val EaseInOut: Easing = CubicBezierEasing(0.42f, 0.0f, 0.58f, 1.0f)
 /**
  * Easing Curve that starts slowly and ends quickly. Similar to EaseIn, but with slightly less abrupt beginning
  *
- *  ![EaseInSine Curve](https://developer.android.com/images/reference/androidx/compose/animation-core/ease_out.gif)
+ *  ![EaseInSine Curve](https://developer.android.com/images/reference/androidx/compose/animation-core/ease_in_sine.gif)
  */
 val EaseInSine: Easing = CubicBezierEasing(0.12f, 0f, 0.39f, 0f)
 
