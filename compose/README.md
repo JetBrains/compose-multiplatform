@@ -13,14 +13,14 @@ git config --global submodule.recurse true
 
 ## General requirements
 - Java 11 (should be specified in JAVA_HOME)
-- [macOs/Linux] Android SDK downloaded via `./compose/frameworks/support/jpdeps/android-sdk/downloadAndroidSdk`
+- [macOs/Linux] Android SDK downloaded via `./compose/frameworks/support/jbdeps/android-sdk/downloadAndroidSdk`
 - [Windows] Android SDK downloaded from Android Studio and specified in ANDROID_SDK_ROOT
 
 ## Developing in IDE
 1. Download Android Studio from [the official site](https://developer.android.com/studio/archive) (it is mandatory to use the version, written [here](https://github.com/JetBrains/androidx/blob/jb-main/gradle/libs.versions.toml#L11)). As an alternative you can use IDEA, which is compatible with [this AGP version](https://github.com/JetBrains/androidx/blob/jb-main/gradle/libs.versions.toml#L5), or you can disable Android plugin in IDEA plugins, to develop non-Android targets.
 2. Open `compose/frameworks/support` folder in Android Studio or in IDEA.
 3. Specify Gradle JDK 11 in `... -> Build Tools -> Gradle`
-4. [macOs/Linux] Specify Android SDK pointed to a folder, downloaded via `./compose/frameworks/support/jpdeps/android-sdk/downloadAndroidSdk`
+4. [macOs/Linux] Specify Android SDK pointed to a folder, downloaded via `./compose/frameworks/support/jbdeps/android-sdk/downloadAndroidSdk`
 
 ## Scripts
 Publish artifacts to the local directory `out/androidx/build/support_repo/org/jetbrains/compose`:
@@ -78,7 +78,7 @@ Run native macos sample:
 ## Multiplatform build
 
 ```console
-./compose/frameworks/support/jpdeps/android-sdk/downloadAndroidSdk
+./compose/frameworks/support/jbdeps/android-sdk/downloadAndroidSdk
 export COMPOSE_CUSTOM_VERSION=1.1.0-beta04
 ./scripts/publishToMavenLocal -Pcompose.platforms=all
 ./scripts/publishGradlePluginToMavenLocal
