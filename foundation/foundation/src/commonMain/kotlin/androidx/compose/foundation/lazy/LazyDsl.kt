@@ -19,13 +19,10 @@ package androidx.compose.foundation.lazy
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.ScrollableDefaults
-import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.internal.JvmDefaultWithCompatibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -422,25 +419,4 @@ fun LazyRow(
         userScrollEnabled = true,
         content = content
     )
-}
-
-/**
- * Important default implementations to be used with LazyLists
- */
-@ExperimentalFoundationApi
-object LazyListDefaults {
-
-    /**
-     * Creates and remembers a FlingBehavior for 1 page snapping in Lazy Lists. This will snap
-     * the item's center to the center of the viewport.
-     *
-     * @param lazyListState The [LazyListState] from the LazyList where this [FlingBehavior] will
-     * be used.
-     */
-    @ExperimentalFoundationApi
-    @Composable
-    fun snapFlingBehavior(lazyListState: LazyListState): FlingBehavior {
-        val snappingLayout = remember(lazyListState) { SnapLayoutInfoProvider(lazyListState) }
-        return rememberSnapFlingBehavior(snappingLayout)
-    }
 }
