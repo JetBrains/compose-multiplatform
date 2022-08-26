@@ -16,7 +16,6 @@
 package androidx.compose.foundation.layout
 
 import android.os.Build
-import android.os.SystemClock
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
@@ -121,9 +120,8 @@ class WindowInsetsDeviceTest {
         // We don't have any way to know when the animation controller is applied, so just
         // loop until the value changes.
 
-        val endTime = SystemClock.uptimeMillis() + 1000L
         var iteration = 0
-        while (imeInset1 == 0 && SystemClock.uptimeMillis() < endTime) {
+        rule.waitUntil(timeoutMillis = 3000) {
             rule.runOnIdle {
                 if (iteration % 5 == 0) {
                     // Cuttlefish doesn't consistently show the IME when requested, so
@@ -137,14 +135,11 @@ class WindowInsetsDeviceTest {
                     NestedScrollSource.Drag
                 )
                 Snapshot.sendApplyNotifications()
+                iteration++
             }
-            Thread.sleep(50)
-            iteration++
-        }
-
-        rule.runOnIdle {
-            assertThat(imeInset1).isGreaterThan(0)
-            assertThat(imeInset2).isEqualTo(imeInset1)
+            rule.runOnIdle {
+                imeInset1 > 0 && imeInset1 == imeInset2
+            }
         }
     }
 
