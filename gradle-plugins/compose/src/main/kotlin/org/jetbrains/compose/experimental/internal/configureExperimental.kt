@@ -29,5 +29,4 @@ internal fun Project.configureExperimental(
             target.configureExperimentalWebApplication(experimentalExt.web.application)
         }
     }
-    project.checkExperimentalTargetsWithSkikoIsEnabled()
 }
