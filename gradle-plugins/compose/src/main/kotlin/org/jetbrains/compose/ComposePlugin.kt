@@ -54,6 +54,7 @@ class ComposePlugin : Plugin<Project> {
         project.afterEvaluate {
             configureDesktop(project, desktopExtension)
             project.configureExperimental(composeExtension, experimentalExtension)
+            project.checkExperimentalTargetsWithSkikoIsEnabled()
 
             if (androidExtension.useAndroidX) {
                 project.logger.warn("useAndroidX is an experimental feature at the moment!")
@@ -134,7 +135,6 @@ class ComposePlugin : Plugin<Project> {
                 }
             }
         }
-        project.checkExperimentalTargetsWithSkikoIsEnabled()
     }
 
     class RedirectAndroidVariants : ComponentMetadataRule {
