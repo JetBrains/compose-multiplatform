@@ -58,6 +58,13 @@ open class BaseLazyListTestWithOrientation(
             this.fillMaxHeight()
         }
 
+    fun LazyItemScope.fillParentMaxMainAxis() =
+        if (vertical) {
+            Modifier.fillParentMaxHeight()
+        } else {
+            Modifier.fillParentMaxWidth()
+        }
+
     fun LazyItemScope.fillParentMaxCrossAxis() =
         if (vertical) {
             Modifier.fillParentMaxWidth()

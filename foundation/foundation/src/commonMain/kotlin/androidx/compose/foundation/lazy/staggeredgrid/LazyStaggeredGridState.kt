@@ -147,6 +147,12 @@ class LazyStaggeredGridState private constructor(
         }
     }
 
+    /**
+     * Only used for testing to disable prefetching when needed to test the main logic.
+     */
+    /*@VisibleForTesting*/
+    internal var prefetchingEnabled: Boolean = true
+
     /** prefetch state used for precomputing items in the direction of scroll **/
     internal val prefetchState: LazyLayoutPrefetchState = LazyLayoutPrefetchState()
 
@@ -218,7 +224,9 @@ class LazyStaggeredGridState private constructor(
         if (abs(scrollToBeConsumed) > 0.5f) {
             val preScrollToBeConsumed = scrollToBeConsumed
             remeasurement?.forceRemeasure()
-            notifyPrefetch(preScrollToBeConsumed - scrollToBeConsumed)
+            if (prefetchingEnabled) {
+                notifyPrefetch(preScrollToBeConsumed - scrollToBeConsumed)
+            }
         }
 
         // here scrollToBeConsumed is already consumed during the forceRemeasure invocation

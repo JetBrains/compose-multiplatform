@@ -442,7 +442,7 @@ class LazyGridsContentPaddingTest {
             .assertTopPositionInRootIsEqualTo(0.dp)
         // Not visible.
         rule.onNodeWithTag("1")
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
 
         // Scroll to the top.
         state.scrollBy(itemSize * 5f)

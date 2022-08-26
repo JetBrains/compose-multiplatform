@@ -19,9 +19,11 @@ package androidx.compose.foundation.lazy.staggeredgrid
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.list.setContentWithTestViewConfiguration
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -258,7 +260,7 @@ class LazyStaggeredGridTest(
         }
 
         rule.onNodeWithTag("3")
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
 
         state.scrollBy(itemSizeDp * 3)
 
@@ -1209,5 +1211,38 @@ class LazyStaggeredGridTest(
 
         rule.waitForIdle()
         assertThat(state.measurePassCount).isEqualTo(1)
+    }
+
+    @Test
+    fun fillingFullSize_nextItemIsNotComposed() {
+        val state = LazyStaggeredGridState()
+        state.prefetchingEnabled = false
+        val itemSizePx = 5f
+        val itemSize = with(rule.density) { itemSizePx.toDp() }
+        rule.setContentWithTestViewConfiguration {
+            LazyStaggeredGrid(
+                1,
+                Modifier
+                    .testTag(LazyStaggeredGridTag)
+                    .mainAxisSize(itemSize),
+                state
+            ) {
+                items(3) { index ->
+                    Box(Modifier.size(itemSize).testTag("$index"))
+                }
+            }
+        }
+
+        repeat(3) { index ->
+            rule.onNodeWithTag("$index")
+                .assertIsDisplayed()
+            rule.onNodeWithTag("${index + 1}")
+                .assertDoesNotExist()
+            rule.runOnIdle {
+                runBlocking {
+                    state.scrollBy(itemSizePx)
+                }
+            }
+        }
     }
 }

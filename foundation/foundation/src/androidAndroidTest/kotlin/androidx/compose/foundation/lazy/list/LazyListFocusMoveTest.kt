@@ -316,7 +316,7 @@ class LazyListFocusMoveTest(param: Param) {
         }
         rule.runOnIdle {
             // Scroll so that the focused item is in the middle.
-            runBlocking { lazyListState.scrollToItem(1) }
+            runBlocking { lazyListState.scrollToItem(1, 10) }
             initiallyFocused.requestFocus()
 
             // Move focus to the last visible item.
@@ -370,7 +370,7 @@ class LazyListFocusMoveTest(param: Param) {
         }
         rule.runOnIdle {
             // Scroll so that the focused item is in the middle.
-            runBlocking { lazyListState.scrollToItem(1) }
+            runBlocking { lazyListState.scrollToItem(2, 0) }
             initiallyFocused.requestFocus()
 
             // Move focus to the last visible item.
