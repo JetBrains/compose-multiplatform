@@ -9,32 +9,52 @@ import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 
-private class Target(
-    val gradlePropertySuffix: String,
+private const val SKIKO_ARTIFACT_PREFIX = "org.jetbrains.skiko:skiko"
+
+private class TargetType(
+    val id: String,
     val presets: List<String>
 )
+private val TargetType.gradlePropertyName get() = "org.jetbrains.compose.experimental.$id.enabled"
 
-private val EXPERIMENTAL_TARGETS: Set<Target> = setOf(
-    Target("uikit", presets = listOf("iosSimulatorArm64", "iosArm64", "iosX64")),
-    Target("macos", presets = listOf("macosX64", "macosArm64")),
-    Target("skikojs", presets = listOf("jsIr", "js")),
+private val EXPERIMENTAL_TARGETS: Set<TargetType> = setOf(
+    TargetType("uikit", presets = listOf("iosSimulatorArm64", "iosArm64", "iosX64")),
+    TargetType("macos", presets = listOf("macosX64", "macosArm64")),
+    TargetType("skikojs", presets = listOf("jsIr", "js")),
 )
 
-private const val SKIKO_ARTIFACT_PREFIX = "org.jetbrains.skiko:skiko"
+private sealed interface CheckResult {
+    object Success : CheckResult
+    class Fail(val target: TargetType) : CheckResult
+}
 
 internal fun Project.checkExperimentalTargetsWithSkikoIsEnabled() = afterEvaluate {
     val mppExt = project.extensions.findByType(KotlinMultiplatformExtension::class.java) ?: return@afterEvaluate
-    mppExt.targets.forEach {
-        checkTarget(it)
+    val failedResults = mppExt.targets.map { checkTarget(it) }
+        .filterIsInstance<CheckResult.Fail>()
+        .distinctBy { it.target }
+
+    if (failedResults.isNotEmpty()) {
+        val ids = failedResults.map { it.target.id }
+        val msg = buildString {
+            appendLine("ERROR: Compose targets '$ids' is experimental and may have bugs!")
+            appendLine("But, if you still want to use it, add to gradle.properties:")
+            failedResults.forEach {
+                appendLine("${it.target.gradlePropertyName}=true")
+            }
+        }
+
+        project.logger.error(msg)
+        error(msg)
     }
 }
 
-private fun Project.checkTarget(target: KotlinTarget) {
-    val presetName = target.preset?.name ?: return
+private fun Project.checkTarget(target: KotlinTarget):CheckResult {
+    val presetName = target.preset?.name ?: return CheckResult.Success
 
-    val gradlePropertySuffix = EXPERIMENTAL_TARGETS.firstOrNull {
+    val targetType = EXPERIMENTAL_TARGETS.firstOrNull {
         it.presets.contains(presetName)
-    }?.gradlePropertySuffix ?: return
+    } ?: return CheckResult.Success
 
     val targetConfigurationNames = target.compilations.map { compilation ->
         compilation.compileDependencyConfigurationName
@@ -46,16 +66,11 @@ private fun Project.checkTarget(target: KotlinTarget) {
                 it.id.displayName.contains(SKIKO_ARTIFACT_PREFIX)
             }
             if (containsSkikoArtifact) {
-                val gradlePropertyName = "org.jetbrains.compose.experimental.$gradlePropertySuffix.enabled"
-                if (project.findProperty(gradlePropertyName) != "true") {
-                    val msg = """
-                            ERROR: Compose target '${target.name}' is experimental and may have bugs!
-                            But, if you still want to use it, add to gradle.properties: $gradlePropertyName=true
-                        """.trimIndent()
-                    project.logger.error(msg)
-                    error(msg)
+                if (project.findProperty(targetType.gradlePropertyName) != "true") {
+                    return CheckResult.Fail(targetType)
                 }
             }
         }
     }
+    return CheckResult.Success
 }
