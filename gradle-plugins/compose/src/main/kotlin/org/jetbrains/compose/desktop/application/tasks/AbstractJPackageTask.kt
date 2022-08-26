@@ -224,7 +224,9 @@ abstract class AbstractJPackageTask @Inject constructor(
     protected val signDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/sign")
 
     @get:LocalState
-    protected val jpackageResources: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/resources")
+    val jpackageResources: DirectoryProperty = objects.directoryProperty().apply {
+        set(project.layout.buildDirectory.dir("compose/tmp/resources"))
+    }
 
     @get:LocalState
     protected val skikoDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/skiko")
@@ -466,7 +468,6 @@ abstract class AbstractJPackageTask @Inject constructor(
             }
         }
 
-        cleanDirs(jpackageResources)
         if (currentOS == OS.MacOS) {
             InfoPlistBuilder(macExtraPlistKeysRawXml.orNull)
                 .also { setInfoPlistValues(it) }

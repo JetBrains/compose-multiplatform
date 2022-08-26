@@ -19,8 +19,8 @@ import org.jetbrains.compose.desktop.application.tasks.*
 import org.jetbrains.compose.desktop.tasks.AbstractUnpackDefaultComposeApplicationResourcesTask
 import org.jetbrains.compose.internal.*
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.utils.`is`
 import java.io.File
-import java.util.*
 
 private val defaultJvmArgs = listOf("-D$CONFIGURE_SWING_GLOBALS=true")
 
@@ -102,6 +102,18 @@ internal fun Project.configurePackagingTasks(
             into(destDir)
         }
 
+        val prepareJpackageResources = tasks.composeDesktopJvmTask<Sync>(
+            taskName("prepareJpackageResources", app)
+        ) {
+            val jpackageResourceDir = app.nativeDistributions.jpackageResourceDir
+            if(jpackageResourceDir.isPresent) {
+                from(jpackageResourceDir)
+            }
+
+            val destDir = project.layout.buildDirectory.dir("compose/tmp/resources")
+            into(destDir)
+        }
+
         val createRuntimeImage = tasks.composeDesktopJvmTask<AbstractJLinkTask>(
             taskName("createRuntimeImage", app)
         ) {
@@ -121,6 +133,7 @@ internal fun Project.configurePackagingTasks(
                 app,
                 createRuntimeImage = createRuntimeImage,
                 prepareAppResources = prepareAppResources,
+                prepareJpackageResources = prepareJpackageResources,
                 checkRuntime = checkRuntime,
                 unpackDefaultResources = unpackDefaultResources
             )
@@ -201,6 +214,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(
     app: JvmApplication,
     createAppImage: TaskProvider<AbstractJPackageTask>? = null,
     createRuntimeImage: TaskProvider<AbstractJLinkTask>? = null,
+    prepareJpackageResources: TaskProvider<Sync>? = null,
     prepareAppResources: TaskProvider<Sync>? = null,
     checkRuntime: TaskProvider<AbstractCheckNativeDistributionRuntime>? = null,
     unpackDefaultResources: TaskProvider<AbstractUnpackDefaultComposeApplicationResourcesTask>
@@ -215,6 +229,12 @@ internal fun AbstractJPackageTask.configurePackagingTask(
     createRuntimeImage?.let { createRuntimeImage ->
         dependsOn(createRuntimeImage)
         runtimeImage.set(createRuntimeImage.flatMap { it.destinationDir })
+    }
+
+    prepareJpackageResources?.let { prepareResources ->
+        dependsOn(prepareResources)
+        val resourcesDir = project.layout.dir(prepareResources.map { it.destinationDir })
+        jpackageResources.set(resourcesDir)
     }
 
     prepareAppResources?.let { prepareResources ->
