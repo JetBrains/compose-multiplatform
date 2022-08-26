@@ -351,6 +351,13 @@ internal class SlotTable : CompositionData, Iterable<CompositionGroup> {
     }
 
     /**
+     * Turns true if the first group (considered the root group) contains a mark.
+     */
+    fun containsMark(): Boolean {
+        return groupsSize >= 0 && groups.containsMark(0)
+    }
+
+    /**
      * Find the nearest recompose scope for [group] that, when invalidated, will cause [group]
      * group to be recomposed.
      */
@@ -469,7 +476,7 @@ internal class SlotTable : CompositionData, Iterable<CompositionGroup> {
         var lastLocation = -1
         anchors.fastForEach { anchor ->
             val location = anchor.toIndexFor(this)
-            require(location in 0..groupsSize) { "Location out of bound" }
+            require(location in 0..groupsSize) { "Invalid anchor, location out of bound" }
             require(lastLocation < location) { "Anchor is out of order" }
             lastLocation = location
         }

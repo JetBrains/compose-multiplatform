@@ -410,6 +410,7 @@ internal class LayoutNode(
         if (parent != null) {
             parent.invalidateLayer()
             parent.invalidateMeasurements()
+            measuredByParent = UsageByParent.NotUsed
         }
         layoutDelegate.resetAlignmentLines()
         onDetach?.invoke(owner)

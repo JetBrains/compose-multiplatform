@@ -595,6 +595,24 @@ internal class CompositionImpl(
             if (!disposed) {
                 disposed = true
                 composable = {}
+
+                // Changes are deferred if the composition contains movable content that needs
+                // to be released. NOTE: Applying these changes leaves the slot table in
+                // potentially invalid state. The routine use to produce this change list reuses
+                // code that extracts movable content from groups that are being deleted. This code
+                // does not bother to correctly maintain the node counts of a group nested groups
+                // that are going to be removed anyway so the node counts of the groups affected
+                // are might be incorrect after the changes have been applied.
+                val deferredChanges = composer.deferredChanges
+                if (deferredChanges != null) {
+                    applyChangesInLocked(deferredChanges)
+                }
+
+                // Dispatch all the `onForgotten` events for object that are no longer part of a
+                // composition because this composition is being discarded. It is important that
+                // this is done after applying deferred changes above to avoid sending `
+                // onForgotten` notification to objects that are still part of movable content that
+                // will be moved to a new location.
                 val nonEmptySlotTable = slotTable.groupsSize > 0
                 if (nonEmptySlotTable || abandonSet.isNotEmpty()) {
                     val manager = RememberEventDispatcher(abandonSet)
@@ -791,7 +809,6 @@ internal class CompositionImpl(
                     }
                     changes.clear()
                 }
-
                 applier.onEndChanges()
             }
 
