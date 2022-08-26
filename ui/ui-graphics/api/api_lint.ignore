@@ -43,6 +43,18 @@ GetterOnBuilder: androidx.compose.ui.graphics.vector.PathBuilder#getNodes():
     Getter should be on the built object, not the builder: method androidx.compose.ui.graphics.vector.PathBuilder.getNodes()
 
 
+KotlinDefaultParameterOrder: androidx.compose.ui.graphics.Canvas#drawImageRect(androidx.compose.ui.graphics.ImageBitmap, long, long, long, long, androidx.compose.ui.graphics.Paint) parameter #1:
+    Parameter `srcOffset` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.graphics.Canvas#drawImageRect(androidx.compose.ui.graphics.ImageBitmap, long, long, long, long, androidx.compose.ui.graphics.Paint) parameter #2:
+    Parameter `srcSize` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.graphics.Canvas#drawImageRect(androidx.compose.ui.graphics.ImageBitmap, long, long, long, long, androidx.compose.ui.graphics.Paint) parameter #3:
+    Parameter `dstOffset` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.graphics.Canvas#drawImageRect(androidx.compose.ui.graphics.ImageBitmap, long, long, long, long, androidx.compose.ui.graphics.Paint) parameter #4:
+    Parameter `dstSize` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.graphics.CanvasKt#scale(androidx.compose.ui.graphics.Canvas, float, float, float, float) parameter #2:
+    Parameter `sy` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+
+
 MissingBuildMethod: androidx.compose.ui.graphics.vector.PathBuilder:
     androidx.compose.ui.graphics.vector.PathBuilder does not declare a `build()` method, but builder classes are expected to
 
