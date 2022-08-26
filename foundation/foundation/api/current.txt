@@ -710,6 +710,9 @@ package androidx.compose.foundation.lazy.layout {
 
 package androidx.compose.foundation.lazy.staggeredgrid {
 
+  public final class LazyStaggeredGridCellsKt {
+  }
+
   public final class LazyStaggeredGridDslKt {
   }
 

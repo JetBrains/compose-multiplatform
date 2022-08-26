@@ -25,6 +25,20 @@ import androidx.compose.runtime.Composable
 internal class LazyStaggeredGridScopeImpl : LazyStaggeredGridScope {
     val intervals = MutableIntervalList<LazyStaggeredGridIntervalContent>()
 
+    @ExperimentalFoundationApi
+    override fun item(
+        key: Any?,
+        contentType: Any?,
+        content: @Composable LazyStaggeredGridItemScope.() -> Unit
+    ) {
+        items(
+            count = 1,
+            key = key?.let { { it } },
+            contentType = { contentType },
+            itemContent = { content() }
+        )
+    }
+
     override fun items(
         count: Int,
         key: ((index: Int) -> Any)?,

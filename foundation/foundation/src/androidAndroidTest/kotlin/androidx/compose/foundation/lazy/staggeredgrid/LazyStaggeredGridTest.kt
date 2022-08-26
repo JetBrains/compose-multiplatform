@@ -22,7 +22,6 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.scrollBy
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -348,7 +347,7 @@ class LazyStaggeredGridTest(
                                 crossAxis = itemSizeDp,
                                 mainAxis = if (expanded) itemSizeDp * 2 else itemSizeDp
                             )
-                            .testTag("$it")
+                            .testTag("0")
                     )
                 }
                 items(5) {
@@ -413,7 +412,7 @@ class LazyStaggeredGridTest(
                                 crossAxis = itemSizeDp,
                                 mainAxis = if (expanded) itemSizeDp * 2 else itemSizeDp
                             )
-                            .testTag("$it")
+                            .testTag("0")
                     )
                 }
                 items(5) {
@@ -463,8 +462,8 @@ class LazyStaggeredGridTest(
         rule.setContent {
             // intentionally wrong values, normally items should be [0, 1][2, 3][4, 5]
             state = rememberLazyStaggeredGridState(
-                firstVisibleItemIndex = 3,
-                firstVisibleItemOffset = itemSizePx / 2
+                initialFirstVisibleItemIndex = 3,
+                initialFirstVisibleItemScrollOffset = itemSizePx / 2
             )
             LazyStaggeredGrid(
                 lanes = 2,
@@ -685,8 +684,8 @@ class LazyStaggeredGridTest(
         var itemCount by mutableStateOf(20)
         rule.setContent {
             state = rememberLazyStaggeredGridState(
-                firstVisibleItemIndex = 10,
-                firstVisibleItemOffset = 0
+                initialFirstVisibleItemIndex = 10,
+                initialFirstVisibleItemScrollOffset = 0
             )
             LazyStaggeredGrid(
                 lanes = 2,
@@ -730,8 +729,8 @@ class LazyStaggeredGridTest(
     fun staggeredGrid_supportsLargeIndices() {
         rule.setContent {
             state = rememberLazyStaggeredGridState(
-                firstVisibleItemIndex = Int.MAX_VALUE / 2,
-                firstVisibleItemOffset = 0
+                initialFirstVisibleItemIndex = Int.MAX_VALUE / 2,
+                initialFirstVisibleItemScrollOffset = 0
             )
             LazyStaggeredGrid(
                 lanes = 2,

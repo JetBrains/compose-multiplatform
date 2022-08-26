@@ -26,6 +26,7 @@ import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.animateScrollBy
@@ -39,6 +40,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
@@ -54,8 +56,12 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.samples.StickyHeaderSample
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.material.Button
@@ -117,6 +123,7 @@ val LazyListDemos = listOf(
     ComposableDemo("Item reordering") { PopularBooksDemo() },
     ComposableDemo("List drag and drop") { LazyColumnDragAndDropDemo() },
     ComposableDemo("Grid drag and drop") { LazyGridDragAndDropDemo() },
+    ComposableDemo("Staggered grid") { LazyStaggeredGridDemo() },
     PagingDemos
 )
 
@@ -284,7 +291,10 @@ private fun LazyRowItemsDemo() {
 private fun Square(index: Int) {
     val width = remember { Random.nextInt(50, 150).dp }
     Box(
-        Modifier.width(width).fillMaxHeight().background(colors[index % colors.size]),
+        Modifier
+            .width(width)
+            .fillMaxHeight()
+            .background(colors[index % colors.size]),
         contentAlignment = Alignment.Center
     ) {
         Text(index.toString())
@@ -330,7 +340,10 @@ private fun PagerLikeDemo() {
     val pages = listOf(Color.LightGray, Color.White, Color.DarkGray)
     LazyRow {
         items(pages) {
-            Spacer(Modifier.fillParentMaxSize().background(it))
+            Spacer(
+                Modifier
+                    .fillParentMaxSize()
+                    .background(it))
         }
     }
 }
@@ -375,7 +388,9 @@ private fun LazyRowScope() {
         val items = listOf(Color.Cyan, Color.Blue, Color.Magenta)
         itemsIndexed(items) { index, item ->
             Box(
-                modifier = Modifier.background(item).requiredSize(40.dp),
+                modifier = Modifier
+                    .background(item)
+                    .requiredSize(40.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text("$index", fontSize = 30.sp)
@@ -431,7 +446,9 @@ private fun LazyListArrangements() {
             }
             LazyColumn(
                 verticalArrangement = Arrangements[arrangement],
-                modifier = Modifier.weight(1f).fillMaxHeight()
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
             ) {
                 items(count) {
                     item()
@@ -498,9 +515,13 @@ private fun ReverseLayoutAndRtlDemo() {
         }
 
         val itemModifier = if (column) {
-            Modifier.heightIn(200.dp).fillMaxWidth()
+            Modifier
+                .heightIn(200.dp)
+                .fillMaxWidth()
         } else {
-            Modifier.widthIn(200.dp).fillMaxHeight()
+            Modifier
+                .widthIn(200.dp)
+                .fillMaxHeight()
         }
         val item1 = @Composable { index: Int ->
             Text(
@@ -560,7 +581,9 @@ private fun ReverseLayoutAndRtlDemo() {
                     LazyColumn(
                         reverseLayout = reverse,
                         state = lazyState,
-                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
                         content = lazyContent
                     )
                 }
@@ -585,7 +608,9 @@ private fun ReverseLayoutAndRtlDemo() {
             CompositionLocalProvider(LocalLayoutDirection provides direction) {
                 LazyRow(
                     state = lazyState,
-                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
                     reverseLayout = reverse,
                     content = lazyContent
                 )
@@ -598,7 +623,10 @@ private fun ReverseLayoutAndRtlDemo() {
 private fun NestedLazyDemo() {
     val item = @Composable { index: Int ->
         Box(
-            Modifier.padding(16.dp).requiredSize(200.dp).background(Color.LightGray),
+            Modifier
+                .padding(16.dp)
+                .requiredSize(200.dp)
+                .background(Color.LightGray),
             contentAlignment = Alignment.Center
         ) {
             var state by rememberSaveable { mutableStateOf(0) }
@@ -899,5 +927,78 @@ private fun LazyWithFlingConfig() {
                 )
             }
         }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Preview
+@Composable
+private fun LazyStaggeredGridDemo() {
+    val heights = remember {
+        List(100) {
+            (Random.nextInt(100) + 100).dp
+        }
+    }
+
+    val colors = remember {
+        List(100) {
+            Color.hsl(
+                Random.nextFloat() * 360,
+                .5f,
+                .65f
+            )
+        }
+    }
+
+    val indices = remember {
+        mutableStateOf(List(100) { it })
+    }
+
+    var count by remember { mutableStateOf(100) }
+
+    Column(Modifier.fillMaxSize()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(onClick = { count++ }) { Text(text = "++") }
+            Button(onClick = {
+                indices.value = indices.value.toMutableList().apply { shuffle() }
+            }) { Text(text = "shuffle") }
+            Button(onClick = { if (count != 0) count-- }) { Text(text = "--") }
+        }
+
+        val scope = rememberCoroutineScope()
+        val state = rememberLazyStaggeredGridState()
+
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Fixed(3),
+            modifier = Modifier.fillMaxSize(),
+            state = state,
+            content = {
+                items(count) {
+                    val index = indices.value[it % indices.value.size]
+                    val color = colors[index]
+                    Box(
+                        modifier = Modifier
+                            .height(heights[index])
+                            .padding(5.dp)
+                            .border(2.dp, color, RoundedCornerShape(5.dp))
+                            .clickable {
+                                scope.launch {
+                                    state.animateScrollToItem(it + 1000, 100)
+                                }
+                            }
+                    ) {
+                        Text(
+                            "$it",
+                            modifier = Modifier.align(Alignment.Center),
+                            color = color,
+                            fontSize = 36.sp
+                        )
+                    }
+                }
+            }
+        )
     }
 }

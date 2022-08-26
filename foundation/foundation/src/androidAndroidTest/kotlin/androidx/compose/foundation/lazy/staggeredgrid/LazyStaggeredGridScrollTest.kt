@@ -93,8 +93,8 @@ class LazyStaggeredGridScrollTest(
         runBlocking(AutoTestFrameClock() + Dispatchers.Main) {
             state.scrollToItem(2, 10)
         }
-        assertThat(state.firstVisibleItemIndex).isEqualTo(2)
-        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
+        assertThat(state.firstVisibleItemIndex).isEqualTo(1)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(110)
     }
 
     @Test
@@ -113,8 +113,8 @@ class LazyStaggeredGridScrollTest(
             state.scrollToItem(4, -10)
         }
 
-        assertThat(state.firstVisibleItemIndex).isEqualTo(2)
-        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(itemSizePx - 10)
+        assertThat(state.firstVisibleItemIndex).isEqualTo(1)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(itemSizePx * 2 - 10)
     }
 
     @Test
