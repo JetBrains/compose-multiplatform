@@ -81,7 +81,7 @@ Run native macos sample:
 ./frameworks/support/jbdeps/android-sdk/downloadAndroidSdk
 export ANDROID_SDK_ROOT=./frameworks/support/jbdeps/android-sdk/downloadAndroidSdk/darwin
 #export ANDROID_SDK_ROOT=./frameworks/support/jbdeps/android-sdk/downloadAndroidSdk/linux-gnu
-export COMPOSE_CUSTOM_VERSION=0.0.0-gradle-plugin-experimental-2
+export COMPOSE_CUSTOM_VERSION=0.0.0-some-local-build
 ./scripts/publishToMavenLocal -Pcompose.platforms=all
 ./scripts/publishGradlePluginToMavenLocal
 ./scripts/publishWebComponentsToMavenLocal
