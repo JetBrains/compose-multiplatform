@@ -1851,9 +1851,6 @@ package androidx.compose.ui.layout {
     property public abstract Object? parentData;
   }
 
-  public final class IntrinsicMeasurableKt {
-  }
-
   public interface IntrinsicMeasureScope extends androidx.compose.ui.unit.Density {
     method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
     property public abstract androidx.compose.ui.unit.LayoutDirection layoutDirection;
@@ -1973,9 +1970,6 @@ package androidx.compose.ui.layout {
 
   @kotlin.jvm.JvmDefaultWithCompatibility public interface MeasureScope extends androidx.compose.ui.layout.IntrinsicMeasureScope {
     method public default androidx.compose.ui.layout.MeasureResult layout(int width, int height, optional java.util.Map<androidx.compose.ui.layout.AlignmentLine,java.lang.Integer> alignmentLines, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.Placeable.PlacementScope,kotlin.Unit> placementBlock);
-  }
-
-  public final class MeasureScopeKt {
   }
 
   public interface Measured {

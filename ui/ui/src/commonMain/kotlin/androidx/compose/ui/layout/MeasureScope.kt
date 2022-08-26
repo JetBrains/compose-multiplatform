@@ -17,7 +17,6 @@
 package androidx.compose.ui.layout
 
 import androidx.compose.ui.node.LookaheadCapablePlaceable
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 
 /**
@@ -59,9 +58,3 @@ interface MeasureScope : IntrinsicMeasureScope {
         }
     }
 }
-
-/**
- * A function for performing layout measurement.
- */
-@Deprecated("MeasureBlock was deprecated. See MeasurePolicy and the new Layout overloads.")
-internal typealias MeasureBlock = MeasureScope.(List<Measurable>, Constraints) -> MeasureResult
