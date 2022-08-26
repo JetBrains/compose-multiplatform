@@ -373,6 +373,36 @@ val WindowInsets.Companion.isTappableElementVisible: Boolean
     get() = WindowInsetsHolder.current().tappableElement.isVisible
 
 /**
+ * The [WindowInsets] for the IME before the IME started animating in. The current
+ * animated value is [WindowInsets.Companion.ime].
+ *
+ * This will be the same as [imeAnimationTarget] when there is no IME animation
+ * in progress.
+ */
+@ExperimentalLayoutApi
+val WindowInsets.Companion.imeAnimationSource: WindowInsets
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @ExperimentalLayoutApi
+    @Composable
+    @NonRestartableComposable
+    get() = WindowInsetsHolder.current().imeAnimationSource
+
+/**
+ * The [WindowInsets] for the IME when the animation completes, if it is allowed
+ * to complete successfully. The current animated value is [WindowInsets.Companion.ime].
+ *
+ * This will be the same as [imeAnimationSource] when there is no IME animation
+ * in progress.
+ */
+@ExperimentalLayoutApi
+val WindowInsets.Companion.imeAnimationTarget: WindowInsets
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @ExperimentalLayoutApi
+    @Composable
+    @NonRestartableComposable
+    get() = WindowInsetsHolder.current().imeAnimationTarget
+
+/**
  * The insets for various values in the current window.
  */
 internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat?, view: View) {
@@ -426,6 +456,16 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
         insets,
         WindowInsetsCompat.Type.tappableElement(),
         "tappableElementIgnoringVisibility"
+    )
+    val imeAnimationTarget = valueInsetsIgnoringVisibility(
+        insets,
+        WindowInsetsCompat.Type.ime(),
+        "imeAnimationTarget"
+    )
+    val imeAnimationSource = valueInsetsIgnoringVisibility(
+        insets,
+        WindowInsetsCompat.Type.ime(),
+        "imeAnimationSource"
     )
 
     /**
@@ -525,6 +565,24 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
             }
         }
         Snapshot.sendApplyNotifications()
+    }
+
+    /**
+     * Updates [WindowInsets.Companion.imeAnimationSource]. It should be called prior to
+     * [update].
+     */
+    fun updateImeAnimationSource(windowInsets: WindowInsetsCompat) {
+        imeAnimationSource.value =
+            windowInsets.getInsets(WindowInsetsCompat.Type.ime()).toInsetsValues()
+    }
+
+    /**
+     * Updates [WindowInsets.Companion.imeAnimationTarget]. It should be called prior to
+     * [update].
+     */
+    fun updateImeAnimationTarget(windowInsets: WindowInsetsCompat) {
+        imeAnimationTarget.value =
+            windowInsets.getInsets(WindowInsetsCompat.Type.ime()).toInsetsValues()
     }
 
     companion object {
@@ -649,6 +707,8 @@ private class InsetsListener(
         runningAnimation = false
         val insets = savedInsets
         if (animation.durationMillis != 0L && insets != null) {
+            composeInsets.updateImeAnimationSource(insets)
+            composeInsets.updateImeAnimationTarget(insets)
             composeInsets.update(insets)
         }
         savedInsets = null
@@ -659,6 +719,7 @@ private class InsetsListener(
         // Keep track of the most recent insets we've seen, to ensure onEnd will always use the
         // most recently acquired insets
         savedInsets = insets
+        composeInsets.updateImeAnimationTarget(insets)
         if (prepared) {
             // There may be no callback on R if the animation is canceled after onPrepare(),
             // so we won't know if the onPrepare() was canceled or if this is an
@@ -671,6 +732,7 @@ private class InsetsListener(
             // If an animation is running, rely on onProgress() to update the insets
             // On APIs less than 30 where the IME animation is backported, this avoids reporting
             // the final insets for a frame while the animation is running.
+            composeInsets.updateImeAnimationSource(insets)
             composeInsets.update(insets)
         }
         return if (composeInsets.consumes) WindowInsetsCompat.CONSUMED else insets
@@ -688,6 +750,7 @@ private class InsetsListener(
             prepared = false
             runningAnimation = false
             savedInsets?.let {
+                composeInsets.updateImeAnimationSource(it)
                 composeInsets.update(it)
                 savedInsets = null
             }
