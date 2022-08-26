@@ -142,11 +142,11 @@ class LazyStaggeredGridPrefetcherTest(
             }
         }
 
-        waitForPrefetch(0)
+        waitForPrefetch(2)
 
-        rule.onNodeWithTag("0")
+        rule.onNodeWithTag("2")
             .assertExists()
-        rule.onNodeWithTag("1")
+        rule.onNodeWithTag("3")
             .assertExists()
         rule.onNodeWithTag("8")
             .assertDoesNotExist()

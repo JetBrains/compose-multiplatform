@@ -18,6 +18,7 @@ package androidx.compose.foundation.lazy.list
 
 import androidx.compose.animation.core.FloatSpringSpec
 import androidx.compose.foundation.AutoTestFrameClock
+import androidx.compose.foundation.BaseLazyLayoutTestWithOrientation.Companion.FrameDuration
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -331,5 +332,3 @@ class LazyScrollTest(private val orientation: Orientation) {
         fun params() = arrayOf(Orientation.Vertical, Orientation.Horizontal)
     }
 }
-
-private val FrameDuration = 16L

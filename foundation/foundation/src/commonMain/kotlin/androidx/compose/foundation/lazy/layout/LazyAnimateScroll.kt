@@ -58,7 +58,7 @@ internal interface LazyAnimateScrollScope {
 
     fun getTargetItemOffset(index: Int): Int?
 
-    fun snapToItem(index: Int, scrollOffset: Int)
+    fun ScrollScope.snapToItem(index: Int, scrollOffset: Int)
 
     fun expectedDistanceTo(index: Int, targetScrollOffset: Int): Float
 

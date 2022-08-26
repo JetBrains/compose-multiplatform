@@ -23,6 +23,7 @@ import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState.PrefetchHandle
+import androidx.compose.foundation.lazy.layout.animateScrollToItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collection.mutableVectorOf
@@ -32,6 +33,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
 import kotlin.math.abs
 
 @ExperimentalFoundationApi
@@ -74,6 +76,8 @@ internal class LazyStaggeredGridState private constructor(
     private var canScrollForward = true
     private var canScrollBackward = true
 
+    private val animateScrollScope = LazyStaggeredGridAnimateScrollScope(this)
+
     internal val scrollPosition = LazyStaggeredGridScrollPosition(
         initialFirstVisibleItems,
         initialFirstVisibleOffsets,
@@ -90,8 +94,6 @@ internal class LazyStaggeredGridState private constructor(
 
     internal val prefetchState: LazyLayoutPrefetchState = LazyLayoutPrefetchState()
 
-    internal var prefetchingEnabled = true
-
     private val scrollableState = ScrollableState { -onScroll(-it) }
 
     internal var scrollToBeConsumed = 0f
@@ -102,9 +104,12 @@ internal class LazyStaggeredGridState private constructor(
 
     private var wasScrollingForward = true
     internal var isVertical = false
-    internal var prefetchLaneWidths: IntArray = IntArray(0)
+    internal var laneWidthsPrefixSum: IntArray = IntArray(0)
     private var prefetchBaseIndex: Int = -1
     private val currentItemPrefetchHandles = mutableVectorOf<PrefetchHandle>()
+
+    internal var density: Density = Density(1f, 1f)
+    internal val laneCount get() = laneWidthsPrefixSum.size
 
     override suspend fun scroll(
         scrollPriority: MutatePriority,
@@ -128,9 +133,7 @@ internal class LazyStaggeredGridState private constructor(
         if (abs(scrollToBeConsumed) > 0.5f) {
             val preScrollToBeConsumed = scrollToBeConsumed
             remeasurement?.forceRemeasure()
-            if (prefetchingEnabled) {
-                notifyPrefetch(preScrollToBeConsumed - scrollToBeConsumed)
-            }
+            notifyPrefetch(preScrollToBeConsumed - scrollToBeConsumed)
         }
 
         // here scrollToBeConsumed is already consumed during the forceRemeasure invocation
@@ -157,6 +160,14 @@ internal class LazyStaggeredGridState private constructor(
         }
     }
 
+    suspend fun animateScrollToItem(
+        /* @IntRange(from = 0) */
+        index: Int,
+        scrollOffset: Int = 0
+    ) {
+        animateScrollScope.animateScrollToItem(index, scrollOffset)
+    }
+
     internal fun ScrollScope.snapToItemInternal(index: Int, scrollOffset: Int) {
         val visibleItem = layoutInfo.findVisibleItem(index)
         if (visibleItem != null) {
@@ -180,9 +191,6 @@ internal class LazyStaggeredGridState private constructor(
         scrollableState.dispatchRawDelta(delta)
 
     private fun notifyPrefetch(delta: Float) {
-        if (!prefetchingEnabled) {
-            return
-        }
         val info = layoutInfoState.value
         if (info.visibleItemsInfo.isNotEmpty()) {
             val scrollingForward = delta < 0
@@ -210,7 +218,7 @@ internal class LazyStaggeredGridState private constructor(
             currentItemPrefetchHandles.clear()
 
             var targetIndex = prefetchIndex
-            for (lane in prefetchLaneWidths.indices) {
+            for (lane in laneWidthsPrefixSum.indices) {
                 val previousIndex = targetIndex
 
                 // find the next item for each line and prefetch if it is valid
@@ -226,8 +234,8 @@ internal class LazyStaggeredGridState private constructor(
                     return
                 }
 
-                val crossAxisSize = prefetchLaneWidths[lane] -
-                    if (lane == 0) 0 else prefetchLaneWidths[lane - 1]
+                val crossAxisSize = laneWidthsPrefixSum[lane] -
+                    if (lane == 0) 0 else laneWidthsPrefixSum[lane - 1]
 
                 val constraints = if (isVertical) {
                     Constraints.fixedWidth(crossAxisSize)
