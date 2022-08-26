@@ -22,8 +22,8 @@ private val EXPERIMENTAL_TARGETS: Set<Target> = setOf(
 
 private const val SKIKO_ARTIFACT_PREFIX = "org.jetbrains.skiko:skiko"
 
-internal fun Project.checkExperimentalTargetsWithSkikoIsEnabled() {
-    val mppExt = project.extensions.findByType(KotlinMultiplatformExtension::class.java) ?: return
+internal fun Project.checkExperimentalTargetsWithSkikoIsEnabled() = afterEvaluate {
+    val mppExt = project.extensions.findByType(KotlinMultiplatformExtension::class.java) ?: return@afterEvaluate
     mppExt.targets.forEach {
         checkTarget(it)
     }
