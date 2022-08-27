@@ -25,10 +25,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection.Companion.Down
-import androidx.compose.ui.focus.FocusDirection.Companion.In
+import androidx.compose.ui.focus.FocusDirection.Companion.Enter
+import androidx.compose.ui.focus.FocusDirection.Companion.Exit
 import androidx.compose.ui.focus.FocusDirection.Companion.Left
 import androidx.compose.ui.focus.FocusDirection.Companion.Next
-import androidx.compose.ui.focus.FocusDirection.Companion.Out
 import androidx.compose.ui.focus.FocusDirection.Companion.Previous
 import androidx.compose.ui.focus.FocusDirection.Companion.Right
 import androidx.compose.ui.focus.FocusDirection.Companion.Up
@@ -51,7 +51,7 @@ class CancelFocusMoveTest(param: Param) {
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
-        fun init() = listOf(Left, Right, Up, Down, In, Out, Previous, Next).map { Param(it) }
+        fun init() = listOf(Left, Right, Up, Down, Enter, Exit, Previous, Next).map { Param(it) }
     }
 
     @get:Rule val rule = createComposeRule()
@@ -531,7 +531,7 @@ class CancelFocusMoveTest(param: Param) {
         rule.runOnIdle {
             when (focusDirection) {
                 // TODO(b/183746982): remove this after we add custom Enter and Exit.
-                In, Out -> {
+                Enter, Exit -> {
                     assertThat(success).isTrue()
                     assertThat(focusState[defaultFocusMoveResult]).isTrue()
                 }
@@ -613,8 +613,8 @@ class CancelFocusMoveTest(param: Param) {
             Right -> 6
             Up -> 2
             Down -> 9
-            In, Next -> 7
-            Out -> 0
+            Enter, Next -> 7
+            Exit -> 0
             else -> error("")
         }
 }
