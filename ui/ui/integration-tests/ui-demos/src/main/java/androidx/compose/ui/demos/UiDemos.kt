@@ -23,6 +23,7 @@ import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.demos.autofill.ExplicitAutofillTypesDemo
 import androidx.compose.ui.demos.focus.AdjacentScrollablesFocusDemo
+import androidx.compose.ui.demos.focus.CancelFocusDemo
 import androidx.compose.ui.demos.focus.CaptureFocusDemo
 import androidx.compose.ui.demos.focus.ClickableInLazyColumnDemo
 import androidx.compose.ui.demos.focus.ConditionalFocusabilityDemo
@@ -142,6 +143,7 @@ private val FocusDemos = DemoCategory(
         ComposableDemo("1D Focus Search") { OneDimensionalFocusSearchDemo() },
         ComposableDemo("2D Focus Search") { TwoDimensionalFocusSearchDemo() },
         ComposableDemo("Custom Focus Order") { CustomFocusOrderDemo() },
+        ComposableDemo("Cancel Focus Move") { CancelFocusDemo() },
         ComposableDemo("FocusManager.moveFocus()") { FocusManagerMoveFocusDemo() },
         ComposableDemo("Capture/Free Focus") { CaptureFocusDemo() },
         ComposableDemo("Focus In Scrollable Row") { ScrollableRowFocusDemo() },

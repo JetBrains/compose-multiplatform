@@ -491,7 +491,9 @@ package androidx.compose.ui.focus {
 
   public static final class FocusRequester.Companion {
     method @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory createRefs();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.focus.FocusRequester getCancel();
     method public androidx.compose.ui.focus.FocusRequester getDefault();
+    property @androidx.compose.ui.ExperimentalComposeUiApi public final androidx.compose.ui.focus.FocusRequester Cancel;
     property public final androidx.compose.ui.focus.FocusRequester Default;
   }
 
