@@ -16,6 +16,11 @@
 
 package androidx.compose.foundation.benchmark.text.empirical
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+
 object AllApps {
     /**
      * For all apps, the vast majority of text is <64 characters.
@@ -29,11 +34,32 @@ object AllApps {
     val TextLengths: Array<Any> = arrayOf(2, 16, 32, 64)
 }
 
+object SocialApps {
+    /**
+     * Social apps show lots of adjacent-text like "Profile" or "userName" mixed with some longer
+     * UGC.
+     */
+    val TextLengths: Array<Any> = arrayOf(32)
+    val SpanCounts: Array<Any> = arrayOf(4, 8)
+    val TextLengthsWithSpans: List<Array<Any>> = TextLengths.cartesian(SpanCounts)
+}
+
 object ChatApps {
     /**
      * For chat apps, strings tend to be longer due to user generated content.
      */
     val TextLengths: Array<Any> = arrayOf(256, 512)
+    val SpanCounts: Array<Any> = arrayOf(2)
+    val TextLengthsWithSpans: List<Array<Any>> = TextLengths.cartesian(SpanCounts)
+}
+
+object ShoppingApps {
+    /**
+     * Shopping apps are more designed focused with short, intentional, text usage
+     */
+    val TextLengths: Array<Any> = arrayOf(2, 64)
+    val SpanCounts: Array<Any> = arrayOf(16)
+    val TextLengthsWithSpans: List<Array<Any>> = TextLengths.cartesian(SpanCounts)
 }
 
 fun generateCacheableStringOf(size: Int): String {
@@ -52,4 +78,22 @@ fun generateCacheableStringOf(size: Int): String {
         workingSize--
     }
     return builder.toString()
+}
+
+internal fun String.annotateWithSpans(spanCount: Int): AnnotatedString {
+    return buildAnnotatedString {
+        repeat(spanCount) {
+            // this appends a [ForegroundColorSpan] which is not [MetricsAffectingSpan]
+            pushStyle(SpanStyle(color = Color(it, it, it)))
+        }
+        append(this@annotateWithSpans)
+        pop((spanCount - 1).coerceAtLeast(0))
+    }
+}
+
+/**
+ * ([1,2,3] X [A, B]) -> [[1, A], [1, B], [2, A], ...
+ */
+private fun Array<Any>.cartesian(rhs: Array<Any>): List<Array<Any>> = flatMap { lhs ->
+    rhs.map { arrayOf(lhs, it) }
 }
