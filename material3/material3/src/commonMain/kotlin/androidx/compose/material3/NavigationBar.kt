@@ -270,7 +270,7 @@ object NavigationBarDefaults {
      */
     val windowInsets: WindowInsets
         @Composable
-        get() = WindowInsets.safeDrawingForVisualComponents
+        get() = WindowInsets.systemBarsForVisualComponents
             .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
 }
 

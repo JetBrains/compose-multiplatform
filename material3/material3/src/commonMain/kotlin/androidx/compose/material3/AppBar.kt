@@ -566,7 +566,7 @@ object TopAppBarDefaults {
      */
     val windowInsets: WindowInsets
         @Composable
-        get() = WindowInsets.safeDrawingForVisualComponents
+        get() = WindowInsets.systemBarsForVisualComponents
             .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
 
     /**
@@ -952,7 +952,7 @@ object BottomAppBarDefaults {
     val windowInsets: WindowInsets
         @Composable
         get() {
-            return WindowInsets.safeDrawingForVisualComponents
+            return WindowInsets.systemBarsForVisualComponents
                 .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
         }
 

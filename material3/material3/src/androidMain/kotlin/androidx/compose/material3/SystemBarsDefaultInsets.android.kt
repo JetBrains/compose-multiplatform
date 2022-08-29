@@ -17,7 +17,9 @@
 package androidx.compose.material3
 
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.runtime.Composable
 
-internal expect val WindowInsets.Companion.safeDrawingForVisualComponents: WindowInsets
-    @Composable get
+internal actual val WindowInsets.Companion.systemBarsForVisualComponents: WindowInsets
+    @Composable
+    get() = systemBars

@@ -20,7 +20,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -51,7 +51,7 @@ class MaterialComponentsInsetSupportTest {
         var contentPadding: WindowInsets? = null
         var expected: WindowInsets? = null
         rule.setContent {
-            expected = WindowInsets.safeDrawing
+            expected = WindowInsets.systemBars
                 .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
             contentPadding = TopAppBarDefaults.windowInsets
         }
@@ -66,7 +66,7 @@ class MaterialComponentsInsetSupportTest {
         var contentPadding: WindowInsets? = null
         var expected: WindowInsets? = null
         rule.setContent {
-            expected = WindowInsets.safeDrawing
+            expected = WindowInsets.systemBars
                 .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
             contentPadding = BottomAppBarDefaults.windowInsets
         }
@@ -82,7 +82,7 @@ class MaterialComponentsInsetSupportTest {
         var contentPadding: WindowInsets? = null
         var expected: WindowInsets? = null
         rule.setContent {
-            expected = WindowInsets.safeDrawing
+            expected = WindowInsets.systemBars
                 .only(WindowInsetsSides.Start + WindowInsetsSides.Vertical)
             contentPadding = DrawerDefaults.windowInsets
         }
@@ -97,7 +97,7 @@ class MaterialComponentsInsetSupportTest {
         var contentPadding: WindowInsets? = null
         var expected: WindowInsets? = null
         rule.setContent {
-            expected = WindowInsets.safeDrawing
+            expected = WindowInsets.systemBars
                 .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)
             contentPadding = NavigationBarDefaults.windowInsets
         }
@@ -112,7 +112,7 @@ class MaterialComponentsInsetSupportTest {
         var contentPadding: WindowInsets? = null
         var expected: WindowInsets? = null
         rule.setContent {
-            expected = WindowInsets.safeDrawing
+            expected = WindowInsets.systemBars
                 .only(WindowInsetsSides.Start + WindowInsetsSides.Vertical)
             contentPadding = NavigationRailDefaults.windowInsets
         }
@@ -129,7 +129,7 @@ class MaterialComponentsInsetSupportTest {
         var layoutDirection: LayoutDirection? = null
         rule.setContent {
             layoutDirection = LocalLayoutDirection.current
-            expected = WindowInsets.safeDrawing
+            expected = WindowInsets.systemBars
                 .asPaddingValues(LocalDensity.current)
             Scaffold { paddingValues ->
                 contentPadding = paddingValues
