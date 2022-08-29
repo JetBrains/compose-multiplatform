@@ -37,8 +37,10 @@ import org.junit.runners.Parameterized
  * Toggle between "" and "aaaa..." to simulate backend text loading.
  *
  * This intentionally hits as many text caches as possible, to isolate compose setText behavior.
+ *
+ * This benchmark removes dynamic layout sizing cost by using fillMaxWidth.
  */
-class SetTextFixedSize(private val text: String) : LayeredComposeTestCase(), ToggleableTestCase {
+class SetTextFillMaxWidth(private val text: String) : LayeredComposeTestCase(), ToggleableTestCase {
     private var toggleText = mutableStateOf("")
 
     @Composable
@@ -61,14 +63,14 @@ class SetTextFixedSize(private val text: String) : LayeredComposeTestCase(), Tog
 
 @LargeTest
 @RunWith(Parameterized::class)
-open class SetTextFixedSizeParent(private val size: Int) {
+open class SetTextFillMaxWidthParent(private val size: Int) {
 
     @get:Rule
     val benchmarkRule = ComposeBenchmarkRule()
 
     private val caseFactory = {
         val text = generateCacheableStringOf(size)
-        SetText(text)
+        SetTextFillMaxWidth(text)
     }
 
     companion object {
@@ -93,7 +95,7 @@ open class SetTextFixedSizeParent(private val size: Int) {
  */
 @LargeTest
 @RunWith(Parameterized::class)
-class AllAppsSetTextFixedSize(size: Int) : SetTextParent(size) {
+class AllAppsSetTextFillMaxWidth(size: Int) : SetTextFillMaxWidthParent(size) {
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "size={0}")
@@ -108,7 +110,7 @@ class AllAppsSetTextFixedSize(size: Int) : SetTextParent(size) {
  */
 @LargeTest
 @RunWith(Parameterized::class)
-class ChatAppSetTextFixedSize(size: Int) : SetTextParent(size) {
+class ChatAppSetTextFillMaxWidth(size: Int) : SetTextFillMaxWidthParent(size) {
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "size={0}")
