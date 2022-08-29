@@ -38,7 +38,7 @@ internal fun Project.checkExperimentalTargetsWithSkikoIsEnabled() = afterEvaluat
         val ids = failedResults.map { it.target.id }
         val msg = buildString {
             appendLine("ERROR: Compose targets '$ids' are experimental and may have bugs!")
-            appendLine("But, if you still want fo use them, add to gradle.properties:")
+            appendLine("But, if you still want to use them, add to gradle.properties:")
             failedResults.forEach {
                 appendLine("${it.target.gradlePropertyName}=true")
             }
