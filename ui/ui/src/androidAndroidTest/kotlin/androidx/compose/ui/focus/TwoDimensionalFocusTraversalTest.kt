@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection.Companion.Down
 import androidx.compose.ui.focus.FocusDirection.Companion.Left
 import androidx.compose.ui.focus.FocusDirection.Companion.Right
@@ -424,7 +425,7 @@ private fun FocusableBox(
     deactivated: Boolean = false,
     content: @Composable () -> Unit = {}
 ) {
-    FocusableBox(isFocused, x, y, width, height, focusRequester, deactivated, content)
+    FocusableBox(isFocused, x, y, width, height, focusRequester, deactivated, Modifier, content)
 }
 
 private val MutableList<MutableState<Boolean>>.values get() = this.map { it.value }
