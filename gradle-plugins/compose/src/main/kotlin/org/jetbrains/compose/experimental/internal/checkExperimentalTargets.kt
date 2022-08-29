@@ -6,6 +6,7 @@
 package org.jetbrains.compose.experimental.internal
 
 import org.gradle.api.Project
+import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 
@@ -13,14 +14,21 @@ private const val SKIKO_ARTIFACT_PREFIX = "org.jetbrains.skiko:skiko"
 
 private class TargetType(
     val id: String,
-    val presets: List<String>
+    val presets: List<String>,
+    /**
+     * @return true if target is experimental
+     */
+    val experimentalCondition: (ExperimentalExtension) -> Boolean
 )
+
 private val TargetType.gradlePropertyName get() = "org.jetbrains.compose.experimental.$id.enabled"
 
 private val EXPERIMENTAL_TARGETS: Set<TargetType> = setOf(
-    TargetType("uikit", presets = listOf("iosSimulatorArm64", "iosArm64", "iosX64")),
-    TargetType("macos", presets = listOf("macosX64", "macosArm64")),
-    TargetType("jscanvas", presets = listOf("jsIr", "js")),
+    TargetType("uikit", presets = listOf("iosSimulatorArm64", "iosArm64", "iosX64")) { true },
+    TargetType("macos", presets = listOf("macosX64", "macosArm64")) { true },
+    TargetType("jscanvas", presets = listOf("jsIr", "js")) { experimentalExtension ->
+        experimentalExtension.web._isApplicationInitialized
+    },
 )
 
 private sealed interface CheckResult {
@@ -28,9 +36,11 @@ private sealed interface CheckResult {
     class Fail(val target: TargetType) : CheckResult
 }
 
-internal fun Project.checkExperimentalTargetsWithSkikoIsEnabled() = afterEvaluate {
+internal fun Project.checkExperimentalTargetsWithSkikoIsEnabled(
+    experimentalExtension: ExperimentalExtension
+) = afterEvaluate {
     val mppExt = project.extensions.findByType(KotlinMultiplatformExtension::class.java) ?: return@afterEvaluate
-    val failedResults = mppExt.targets.map { checkTarget(it) }
+    val failedResults = mppExt.targets.map { checkTarget(it, experimentalExtension) }
         .filterIsInstance<CheckResult.Fail>()
         .distinctBy { it.target }
 
@@ -49,7 +59,7 @@ internal fun Project.checkExperimentalTargetsWithSkikoIsEnabled() = afterEvaluat
     }
 }
 
-private fun Project.checkTarget(target: KotlinTarget):CheckResult {
+private fun Project.checkTarget(target: KotlinTarget, experimentalExtension: ExperimentalExtension): CheckResult {
     val presetName = target.preset?.name ?: return CheckResult.Success
 
     val targetType = EXPERIMENTAL_TARGETS.firstOrNull {
@@ -62,10 +72,8 @@ private fun Project.checkTarget(target: KotlinTarget):CheckResult {
 
     configurations.forEach { configuration ->
         if (configuration.isCanBeResolved && configuration.name in targetConfigurationNames) {
-            val containsSkikoArtifact = configuration.resolvedConfiguration.resolvedArtifacts.any {
-                it.id.displayName.contains(SKIKO_ARTIFACT_PREFIX)
-            }
-            if (containsSkikoArtifact) {
+            val isExperimental = targetType.experimentalCondition(experimentalExtension)
+            if (isExperimental) {
                 if (project.findProperty(targetType.gradlePropertyName) != "true") {
                     return CheckResult.Fail(targetType)
                 }
