@@ -23,6 +23,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.EdgeEffectCompat.distanceCompat
 import androidx.compose.foundation.EdgeEffectCompat.onAbsorbCompat
 import androidx.compose.foundation.EdgeEffectCompat.onPullDistanceCompat
+import androidx.compose.foundation.EdgeEffectCompat.onReleaseWithOppositeDelta
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.runtime.Composable
@@ -459,19 +460,19 @@ internal class AndroidEdgeEffectOverscrollEffect(
     private fun releaseOppositeOverscroll(delta: Offset): Boolean {
         var needsInvalidation = false
         if (!leftEffect.isFinished && delta.x < 0) {
-            leftEffect.onRelease()
+            leftEffect.onReleaseWithOppositeDelta(delta = delta.x)
             needsInvalidation = leftEffect.isFinished
         }
         if (!rightEffect.isFinished && delta.x > 0) {
-            rightEffect.onRelease()
+            rightEffect.onReleaseWithOppositeDelta(delta = delta.x)
             needsInvalidation = needsInvalidation || rightEffect.isFinished
         }
         if (!topEffect.isFinished && delta.y < 0) {
-            topEffect.onRelease()
+            topEffect.onReleaseWithOppositeDelta(delta = delta.y)
             needsInvalidation = needsInvalidation || topEffect.isFinished
         }
         if (!bottomEffect.isFinished && delta.y > 0) {
-            bottomEffect.onRelease()
+            bottomEffect.onReleaseWithOppositeDelta(delta = delta.y)
             needsInvalidation = needsInvalidation || bottomEffect.isFinished
         }
         return needsInvalidation
