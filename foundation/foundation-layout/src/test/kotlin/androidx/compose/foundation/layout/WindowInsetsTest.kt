@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.layout
 
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -286,5 +287,60 @@ class WindowInsetsTest {
         assertThat(paddingValues.calculateTopPadding()).isEqualTo(11.dp)
         assertThat(paddingValues.calculateRightPadding(LayoutDirection.Ltr)).isEqualTo(12.dp)
         assertThat(paddingValues.calculateBottomPadding()).isEqualTo(13.dp)
+    }
+
+    @OptIn(ExperimentalLayoutApi::class)
+    @Test
+    fun mutableWindowInsetsDefaultConstructor() {
+        val insets = MutableWindowInsets()
+        val density = Density(1f)
+        val layoutDirection = LayoutDirection.Ltr
+        assertThat(insets.getLeft(density, layoutDirection)).isEqualTo(0)
+        assertThat(insets.getTop(density)).isEqualTo(0)
+        assertThat(insets.getRight(density, layoutDirection)).isEqualTo(0)
+        assertThat(insets.getBottom(density)).isEqualTo(0)
+    }
+
+    @OptIn(ExperimentalLayoutApi::class)
+    @Test
+    fun mutableWindowInsetsConstructor() {
+        val insets = MutableWindowInsets(WindowInsets(1, 2, 3, 4))
+        val density = Density(2f)
+        val layoutDirection = LayoutDirection.Ltr
+        assertThat(insets.getLeft(density, layoutDirection)).isEqualTo(1)
+        assertThat(insets.getTop(density)).isEqualTo(2)
+        assertThat(insets.getRight(density, layoutDirection)).isEqualTo(3)
+        assertThat(insets.getBottom(density)).isEqualTo(4)
+    }
+
+    @OptIn(ExperimentalLayoutApi::class)
+    @Test
+    fun mutableWindowInsetsChanging() {
+        val insets = MutableWindowInsets()
+        val density = Density(2f)
+        val layoutDirection = LayoutDirection.Ltr
+        val readValues = mutableListOf<Any>()
+        Snapshot.observe(readObserver = {
+            readValues += it
+        }) {
+            insets.getLeft(density, layoutDirection)
+        }
+        assertThat(readValues).hasSize(1)
+
+        val writeValues = mutableListOf<Any>()
+        Snapshot.observe(writeObserver = {
+            writeValues += it
+        }) {
+            insets.insets = WindowInsets(1, 2, 3, 4)
+        }
+        Snapshot.sendApplyNotifications()
+
+        assertThat(writeValues).hasSize(1)
+        assertThat(readValues[0]).isSameInstanceAs(writeValues[0])
+
+        assertThat(insets.getLeft(density, layoutDirection)).isEqualTo(1)
+        assertThat(insets.getTop(density)).isEqualTo(2)
+        assertThat(insets.getRight(density, layoutDirection)).isEqualTo(3)
+        assertThat(insets.getBottom(density)).isEqualTo(4)
     }
 }
