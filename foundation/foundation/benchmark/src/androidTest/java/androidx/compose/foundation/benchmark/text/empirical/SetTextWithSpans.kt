@@ -97,7 +97,17 @@ open class SetTextWithSpansParent(private val size: Int, private val spanCount: 
 
 @LargeTest
 @RunWith(Parameterized::class)
-class SocialAppsWithSpans(size: Int, spanCount: Int) : SetTextWithSpansParent(size, spanCount) {
+class AllAppsWithSpans(size: Int, spanCount: Int) : SetTextWithSpansParent(size, spanCount) {
+    companion object {
+        @JvmStatic
+        @Parameterized.Parameters(name = "size={0}, spanCount={1}")
+        fun initParameters() = AllApps.TextLengthsWithSpans
+    }
+}
+
+@LargeTest
+@RunWith(Parameterized::class)
+class SocialAppWithSpans(size: Int, spanCount: Int) : SetTextWithSpansParent(size, spanCount) {
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "size={0}, spanCount={1}")
