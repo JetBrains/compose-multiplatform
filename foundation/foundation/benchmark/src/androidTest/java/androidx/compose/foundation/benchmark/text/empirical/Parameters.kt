@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.benchmark.text.empirical
 
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -90,6 +91,15 @@ internal fun String.annotateWithSpans(spanCount: Int): AnnotatedString {
         }
         append(this@annotateWithSpans)
         pop((spanCount - 1).coerceAtLeast(0))
+    }
+}
+
+internal const val BenchmarkInlineContentId = "BenchmarkInlineContent.Id"
+
+internal fun String.annotateWithInlineContent(): AnnotatedString {
+    return buildAnnotatedString {
+        appendInlineContent(BenchmarkInlineContentId)
+        append(this@annotateWithInlineContent)
     }
 }
 
