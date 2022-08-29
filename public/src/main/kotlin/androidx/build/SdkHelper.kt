@@ -55,7 +55,9 @@ fun Project.writeSdkPathToLocalPropertiesFile() {
  */
 fun Project.getSdkPath(): File {
     val isJBFork = true
-    if (isJBFork) {
+    if (rootProject.plugins.hasPlugin("AndroidXPlaygroundRootPlugin") ||
+        System.getenv("COMPOSE_DESKTOP_GITHUB_BUILD") != null
+    ) {
         // This is not full checkout, use local settings instead.
         // https://developer.android.com/studio/command-line/variables
         // check for local.properties first
@@ -78,6 +80,14 @@ fun Project.getSdkPath(): File {
     val os = getOperatingSystem()
     return if (os == OperatingSystem.WINDOWS) {
         getSdkPathFromEnvironmentVariable()
+    } else if (isJBFork) {
+        val platform = if (os == OperatingSystem.MAC) "darwin" else "linux"
+        val folder = rootProject.projectDir.resolve("jbdeps/android-sdk/$platform")
+        check(folder.exists()) {
+            "Android SDK folder $folder doesn't exist. " +
+                "Call ./jbdeps/android-sdk/downloadAndroidSdk before opening the project"
+        }
+        folder
     } else {
         val platform = if (os == OperatingSystem.MAC) "darwin" else "linux"
 

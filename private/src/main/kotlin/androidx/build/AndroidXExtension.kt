@@ -40,7 +40,7 @@ open class AndroidXExtension(val project: Project) {
         )
         val content = project.providers.fileContents(toml)
         val composeCustomVersion = project.providers.environmentVariable("COMPOSE_CUSTOM_VERSION")
-        val composeCustomGroup = project.providers.environmentVariable("COMPOSE_CUSTOM_GROUP")
+        val composeCustomGroup = project.providers.provider { "org.jetbrains.compose" }
 
         val serviceProvider = project.gradle.sharedServices.registerIfAbsent(
             "libraryVersionsService",

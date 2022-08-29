@@ -57,7 +57,8 @@ def addMavenRepositories(RepositoryHandler handler) {
             artifact()
         }
     }
-    if (System.getenv("ALLOW_PUBLIC_REPOS") != null || System.getProperty("ALLOW_PUBLIC_REPOS") != null) {
+    def isJBFork = true
+    if (isJBFork) {
         handler.mavenLocal()
         handler.mavenCentral()
         handler.google()
