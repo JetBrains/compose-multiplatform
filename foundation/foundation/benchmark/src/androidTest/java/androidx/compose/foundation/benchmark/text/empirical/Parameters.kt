@@ -32,6 +32,8 @@ object AllApps {
      * "Click below to learn more"
      */
     val TextLengths: Array<Any> = arrayOf(2, 16, 32, 64)
+    val SpanCounts: Array<Any> = arrayOf(4, 16)
+    val TextLengthsWithSpans: List<Array<Any>> = TextLengths.cartesian(SpanCounts)
 }
 
 object SocialApps {
