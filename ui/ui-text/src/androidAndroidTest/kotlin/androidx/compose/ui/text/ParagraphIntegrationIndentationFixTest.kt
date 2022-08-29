@@ -236,6 +236,13 @@ class ParagraphIntegrationIndentationFixTest {
         }
     }
 
+    @Test
+    fun constructWithEmptyString() {
+        // main issue that this is testing is that fact that paragraph construction does not
+        // throw exception for empty text
+        paragraph(text = "", letterSpacing = letterSpacing.sp)
+    }
+
     private fun paragraph(
         text: String = "",
         textIndent: TextIndent = TextIndent.None,
