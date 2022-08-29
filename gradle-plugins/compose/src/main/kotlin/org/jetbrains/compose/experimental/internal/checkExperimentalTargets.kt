@@ -15,6 +15,7 @@ private class TargetType(
     val id: String,
     val presets: List<String>
 )
+
 private val TargetType.gradlePropertyName get() = "org.jetbrains.compose.experimental.$id.enabled"
 
 private val EXPERIMENTAL_TARGETS: Set<TargetType> = setOf(
@@ -49,7 +50,7 @@ internal fun Project.checkExperimentalTargetsWithSkikoIsEnabled() = afterEvaluat
     }
 }
 
-private fun Project.checkTarget(target: KotlinTarget):CheckResult {
+private fun Project.checkTarget(target: KotlinTarget): CheckResult {
     val presetName = target.preset?.name ?: return CheckResult.Success
 
     val targetType = EXPERIMENTAL_TARGETS.firstOrNull {
