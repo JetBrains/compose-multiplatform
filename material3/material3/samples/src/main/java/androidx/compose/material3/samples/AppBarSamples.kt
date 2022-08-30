@@ -39,8 +39,8 @@ import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -49,17 +49,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 /**
- * A sample for a simple use of [SmallTopAppBar].
+ * A sample for a simple use of small [TopAppBar].
  *
  * The top app bar here does not react to any scroll events in the content under it.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Sampled
 @Composable
-fun SimpleSmallTopAppBar() {
+fun SimpleTopAppBar() {
     Scaffold(
         topBar = {
-            SmallTopAppBar(
+            TopAppBar(
                 title = {
                     Text(
                         "Simple TopAppBar",
@@ -163,7 +163,7 @@ fun SimpleCenterAlignedTopAppBar() {
 }
 
 /**
- * A sample for a pinned [SmallTopAppBar].
+ * A sample for a pinned small [TopAppBar].
  *
  * The top app bar here is pinned to its location and changes its container color when the content
  * under it is scrolled.
@@ -171,15 +171,15 @@ fun SimpleCenterAlignedTopAppBar() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Sampled
 @Composable
-fun PinnedSmallTopAppBar() {
+fun PinnedTopAppBar() {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            SmallTopAppBar(
+            TopAppBar(
                 title = {
                     Text(
-                        "Small TopAppBar",
+                        "TopAppBar",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -231,21 +231,21 @@ fun PinnedSmallTopAppBar() {
 }
 
 /**
- * A sample for a [SmallTopAppBar] that collapses when the content is scrolled up, and
+ * A sample for a small [TopAppBar] that collapses when the content is scrolled up, and
  * appears when the content scrolled down.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Sampled
 @Composable
-fun EnterAlwaysSmallTopAppBar() {
+fun EnterAlwaysTopAppBar() {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            SmallTopAppBar(
+            TopAppBar(
                 title = {
                     Text(
-                        "Small TopAppBar",
+                        "TopAppBar",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )

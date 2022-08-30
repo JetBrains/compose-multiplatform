@@ -59,7 +59,7 @@ class AppBarScreenshotTest {
     fun smallAppBar_lightTheme() {
         composeTestRule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(TopAppBarTestTag)) {
-                SmallTopAppBar(
+                TopAppBar(
                     navigationIcon = {
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(
@@ -91,7 +91,7 @@ class AppBarScreenshotTest {
         composeTestRule.setMaterialContent(lightColorScheme()) {
             val behavior = enterAlwaysScrollBehavior(rememberTopAppBarState())
             Box(Modifier.testTag(TopAppBarTestTag)) {
-                SmallTopAppBar(
+                TopAppBar(
                     navigationIcon = {
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(
@@ -132,7 +132,7 @@ class AppBarScreenshotTest {
     fun smallAppBar_darkTheme() {
         composeTestRule.setMaterialContent(darkColorScheme()) {
             Box(Modifier.testTag(TopAppBarTestTag)) {
-                SmallTopAppBar(
+                TopAppBar(
                     navigationIcon = {
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(

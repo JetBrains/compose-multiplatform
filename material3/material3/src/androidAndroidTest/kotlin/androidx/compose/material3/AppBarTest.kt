@@ -91,7 +91,7 @@ class AppBarTest {
     fun smallTopAppBar_expandsToScreen() {
         rule
             .setMaterialContentForSizeAssertions {
-                SmallTopAppBar(title = { Text("Title") })
+                TopAppBar(title = { Text("Title") })
             }
             .assertHeightIsEqualTo(TopAppBarSmallTokens.ContainerHeight)
             .assertWidthIsEqualTo(rule.rootWidth())
@@ -102,7 +102,7 @@ class AppBarTest {
         val title = "Title"
         rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(TopAppBarTestTag)) {
-                SmallTopAppBar(title = { Text(title) })
+                TopAppBar(title = { Text(title) })
             }
         }
         rule.onNodeWithText(title).assertIsDisplayed()
@@ -112,7 +112,7 @@ class AppBarTest {
     fun smallTopAppBar_default_positioning() {
         rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(TopAppBarTestTag)) {
-                SmallTopAppBar(
+                TopAppBar(
                     navigationIcon = {
                         FakeIcon(Modifier.testTag(NavigationIconTestTag))
                     },
@@ -132,7 +132,7 @@ class AppBarTest {
     fun smallTopAppBar_noNavigationIcon_positioning() {
         rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(TopAppBarTestTag)) {
-                SmallTopAppBar(
+                TopAppBar(
                     title = {
                         Text("Title", Modifier.testTag(TitleTestTag))
                     },
@@ -150,7 +150,7 @@ class AppBarTest {
         var textStyle: TextStyle? = null
         var expectedTextStyle: TextStyle? = null
         rule.setMaterialContent(lightColorScheme()) {
-            SmallTopAppBar(title = {
+            TopAppBar(title = {
                 Text("Title")
                 textStyle = LocalTextStyle.current
                 expectedTextStyle =
@@ -174,7 +174,7 @@ class AppBarTest {
         var expectedContainerColor: Color = Color.Unspecified
 
         rule.setMaterialContent(lightColorScheme()) {
-            SmallTopAppBar(
+            TopAppBar(
                 modifier = Modifier.testTag(TopAppBarTestTag),
                 navigationIcon = {
                     FakeIcon(Modifier.testTag(NavigationIconTestTag))
@@ -219,8 +219,7 @@ class AppBarTest {
         lateinit var scrollBehavior: TopAppBarScrollBehavior
         rule.setMaterialContent(lightColorScheme()) {
             scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-            SmallTopAppBar(
-                modifier = Modifier.testTag(TopAppBarTestTag),
+            TopAppBar(
                 title = {
                     Text("Title", Modifier.testTag(TitleTestTag))
                     // fraction = 1f to indicate a scroll.
@@ -228,6 +227,7 @@ class AppBarTest {
                         TopAppBarDefaults.smallTopAppBarColors()
                             .containerColor(colorTransitionFraction = 1f)
                 },
+                modifier = Modifier.testTag(TopAppBarTestTag),
                 scrollBehavior = scrollBehavior
             )
         }
@@ -251,9 +251,9 @@ class AppBarTest {
         rule.setMaterialContent(lightColorScheme()) {
             scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
             scrollHeightOffsetPx = with(LocalDensity.current) { scrollHeightOffsetDp.toPx() }
-            SmallTopAppBar(
-                modifier = Modifier.testTag(TopAppBarTestTag),
+            TopAppBar(
                 title = { Text("Title", Modifier.testTag(TitleTestTag)) },
+                modifier = Modifier.testTag(TopAppBarTestTag),
                 scrollBehavior = scrollBehavior
             )
         }
@@ -750,11 +750,11 @@ class AppBarTest {
     @Test
     fun topAppBar_smallPinnedDraggedAppBar() {
         rule.setMaterialContentForSizeAssertions {
-            SmallTopAppBar(
-                modifier = Modifier.testTag(TopAppBarTestTag),
+            TopAppBar(
                 title = {
                     Text("Title")
                 },
+                modifier = Modifier.testTag(TopAppBarTestTag),
                 scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
             )
         }
@@ -1031,10 +1031,10 @@ class AppBarTest {
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                SmallTopAppBar(
-                    modifier = Modifier.testTag(TopAppBarTestTag),
+                TopAppBar(
                     title = { Text(text = "Title") },
-                    scrollBehavior = scrollBehavior,
+                    modifier = Modifier.testTag(TopAppBarTestTag),
+                    scrollBehavior = scrollBehavior
                 )
             }
         ) { contentPadding ->
@@ -1061,7 +1061,7 @@ class AppBarTest {
     }
 
     /**
-     * Checks the app bar's components positioning when it's a [SmallTopAppBar], a
+     * Checks the app bar's components positioning when it's a [TopAppBar], a
      * [CenterAlignedTopAppBar], or a larger app bar that is scrolled up and collapsed into a small
      * configuration and there is no navigation icon.
      */
@@ -1089,7 +1089,7 @@ class AppBarTest {
     }
 
     /**
-     * Checks the app bar's components positioning when it's a [SmallTopAppBar] or a
+     * Checks the app bar's components positioning when it's a [TopAppBar] or a
      * [CenterAlignedTopAppBar].
      */
     private fun assertSmallDefaultPositioning(isCenteredTitle: Boolean = false) {
