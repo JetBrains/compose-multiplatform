@@ -30,6 +30,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.AndroidFontResolveInterceptor
 import androidx.compose.ui.text.font.PlatformResolveInterceptor
+import androidx.compose.ui.text.style.TextDecoration
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
@@ -68,7 +69,8 @@ fun Paragraph.bitmap(
 @OptIn(ExperimentalTextApi::class)
 fun MultiParagraph.bitmap(
     brush: Brush? = null,
-    alpha: Float = Float.NaN
+    alpha: Float = Float.NaN,
+    textDecoration: TextDecoration? = null
 ): Bitmap {
     val width = paragraphInfoList.maxByOrNull { it.paragraph.width }?.paragraph?.width ?: 0f
     val bitmap = Bitmap.createBitmap(
@@ -77,9 +79,17 @@ fun MultiParagraph.bitmap(
         Bitmap.Config.ARGB_8888
     )
     if (brush != null) {
-        this.paint(androidx.compose.ui.graphics.Canvas(Canvas(bitmap)), brush, alpha)
+        this.paint(
+            canvas = androidx.compose.ui.graphics.Canvas(Canvas(bitmap)),
+            brush = brush,
+            alpha = alpha,
+            decoration = textDecoration
+        )
     } else {
-        this.paint(androidx.compose.ui.graphics.Canvas(Canvas(bitmap)))
+        this.paint(
+            canvas = androidx.compose.ui.graphics.Canvas(Canvas(bitmap)),
+            decoration = textDecoration
+        )
     }
     return bitmap
 }
