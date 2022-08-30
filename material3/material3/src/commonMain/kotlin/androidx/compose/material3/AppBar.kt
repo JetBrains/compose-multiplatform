@@ -91,16 +91,16 @@ import kotlin.math.roundToInt
  *
  * Top app bars display information and actions at the top of a screen.
  *
- * This SmallTopAppBar has slots for a title, navigation icon, and actions.
+ * This small TopAppBar has slots for a title, navigation icon, and actions.
  *
  * ![Small top app bar image](https://developer.android.com/images/reference/androidx/compose/material3/small-top-app-bar.png)
  *
  * A simple top app bar looks like:
- * @sample androidx.compose.material3.samples.SimpleSmallTopAppBar
+ * @sample androidx.compose.material3.samples.SimpleTopAppBar
  * A top app bar that uses a [scrollBehavior] to customize its nested scrolling behavior when
  * working in conjunction with a scrolling content looks like:
- * @sample androidx.compose.material3.samples.PinnedSmallTopAppBar
- * @sample androidx.compose.material3.samples.EnterAlwaysSmallTopAppBar
+ * @sample androidx.compose.material3.samples.PinnedTopAppBar
+ * @sample androidx.compose.material3.samples.EnterAlwaysTopAppBar
  *
  * @param title the title to be displayed in the top app bar
  * @param modifier the [Modifier] to be applied to this top app bar
@@ -118,7 +118,7 @@ import kotlin.math.roundToInt
  */
 @ExperimentalMaterial3Api
 @Composable
-fun SmallTopAppBar(
+fun TopAppBar(
     title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     navigationIcon: @Composable () -> Unit = {},
@@ -139,6 +139,57 @@ fun SmallTopAppBar(
         scrollBehavior = scrollBehavior
     )
 }
+
+/**
+ * <a href="https://m3.material.io/components/top-app-bar/overview" class="external" target="_blank">Material Design small top app bar</a>.
+ *
+ * Top app bars display information and actions at the top of a screen.
+ *
+ * This SmallTopAppBar has slots for a title, navigation icon, and actions.
+ *
+ * ![Small top app bar image](https://developer.android.com/images/reference/androidx/compose/material3/small-top-app-bar.png)
+ *
+ * A simple top app bar looks like:
+ * @sample androidx.compose.material3.samples.SimpleTopAppBar
+ * A top app bar that uses a [scrollBehavior] to customize its nested scrolling behavior when
+ * working in conjunction with a scrolling content looks like:
+ * @sample androidx.compose.material3.samples.PinnedTopAppBar
+ * @sample androidx.compose.material3.samples.EnterAlwaysTopAppBar
+ *
+ * @param title the title to be displayed in the top app bar
+ * @param modifier the [Modifier] to be applied to this top app bar
+ * @param navigationIcon the navigation icon displayed at the start of the top app bar. This should
+ * typically be an [IconButton] or [IconToggleButton].
+ * @param actions the actions displayed at the end of the top app bar. This should typically be
+ * [IconButton]s. The default layout here is a [Row], so icons inside will be placed horizontally.
+ * @param windowInsets a window insets that app bar will respect.
+ * @param colors [TopAppBarColors] that will be used to resolve the colors used for this top app
+ * bar in different states. See [TopAppBarDefaults.smallTopAppBarColors].
+ * @param scrollBehavior a [TopAppBarScrollBehavior] which holds various offset values that will be
+ * applied by this top app bar to set up its height and colors. A scroll behavior is designed to
+ * work in conjunction with a scrolled content to change the top app bar appearance as the content
+ * scrolls. See [TopAppBarScrollBehavior.nestedScrollConnection].
+ * @deprecated use [TopAppBar] instead
+ */
+@Deprecated(
+    message = "Use TopAppBar instead.",
+    replaceWith = ReplaceWith(
+        "TopAppBar(title, modifier, navigationIcon, actions, windowInsets, colors, " +
+            "scrollBehavior)"
+    ),
+    level = DeprecationLevel.ERROR
+)
+@ExperimentalMaterial3Api
+@Composable
+fun SmallTopAppBar(
+    title: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    navigationIcon: @Composable () -> Unit = {},
+    actions: @Composable RowScope.() -> Unit = {},
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
+    colors: TopAppBarColors = TopAppBarDefaults.smallTopAppBarColors(),
+    scrollBehavior: TopAppBarScrollBehavior? = null
+) = TopAppBar(title, modifier, navigationIcon, actions, windowInsets, colors, scrollBehavior)
 
 /**
  * <a href="https://m3.material.io/components/top-app-bar/overview" class="external" target="_blank">Material Design center-aligned small top app bar</a>.
