@@ -365,9 +365,6 @@ private fun configureComposeCompilerPlugin(
         val libraryMetricsDirectory = project.rootProject.getLibraryMetricsDirectory()
         val libraryReportsDirectory = project.rootProject.getLibraryReportsDirectory()
         project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
-            // TODO(b/157230235): remove when this is enabled by default
-            compile.kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
-
             // Append inputs to KotlinCompile so tasks get invalidated if any of these values change
             compile.inputs.files({ kotlinPlugin })
                 .withPropertyName("composeCompilerExtension")
