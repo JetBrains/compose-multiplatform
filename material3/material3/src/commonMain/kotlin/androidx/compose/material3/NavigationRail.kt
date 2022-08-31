@@ -268,7 +268,7 @@ object NavigationRailDefaults {
      */
     val windowInsets: WindowInsets
         @Composable
-        get() = WindowInsets.safeDrawingForVisualComponents
+        get() = WindowInsets.systemBarsForVisualComponents
             .only(WindowInsetsSides.Vertical + WindowInsetsSides.Start)
 }
 
