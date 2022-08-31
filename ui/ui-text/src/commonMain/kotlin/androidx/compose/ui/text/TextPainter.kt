@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.modulate
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import kotlin.math.ceil
 import kotlin.math.roundToInt
@@ -108,7 +109,7 @@ object TextPainter {
  * skipped during layout and replaced with [Placeholder]. It's required that the range of each
  * [Placeholder] doesn't cross paragraph boundary, otherwise [IllegalArgumentException] is
  * thrown.
- * @param size how wide and tall the text is allowed to be. [IntSize.width] will define the width
+ * @param maxSize how wide and tall the text is allowed to be. [IntSize.width] will define the width
  * of the text. [IntSize.height] helps defining the number of lines that fit if [softWrap] is
  * enabled and [overflow] is [TextOverflow.Ellipsis]. Otherwise, [IntSize.height] either defines
  * where the text is clipped ([TextOverflow.Clip]) or becomes no-op.
@@ -125,9 +126,9 @@ fun DrawScope.drawText(
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
     placeholders: List<AnnotatedString.Range<Placeholder>> = emptyList(),
-    size: IntSize = IntSize(
-        width = ceil(this.size.width).roundToInt(),
-        height = ceil(this.size.height).roundToInt()
+    maxSize: IntSize = IntSize(
+        width = ceil(this.size.width - topLeft.x).roundToInt(),
+        height = ceil(this.size.height - topLeft.y).roundToInt()
     )
 ) {
     val textLayoutResult = textMeasurer.measure(
@@ -137,7 +138,7 @@ fun DrawScope.drawText(
         softWrap = softWrap,
         maxLines = maxLines,
         placeholders = placeholders,
-        size = size,
+        constraints = Constraints(maxWidth = maxSize.width, maxHeight = maxSize.height),
         layoutDirection = layoutDirection,
         density = this
     )
@@ -172,7 +173,7 @@ fun DrawScope.drawText(
  * @param maxLines An optional maximum number of lines for the text to span, wrapping if
  * necessary. If the text exceeds the given number of lines, it will be truncated according to
  * [overflow] and [softWrap]. If it is not null, then it must be greater than zero.
- * @param size how wide and tall the text is allowed to be. [IntSize.width] will define the width
+ * @param maxSize how wide and tall the text is allowed to be. [IntSize.width] will define the width
  * of the text. [IntSize.height] helps defining the number of lines that fit if [softWrap] is
  * enabled and [overflow] is [TextOverflow.Ellipsis]. Otherwise, [IntSize.height] either defines
  * where the text is clipped ([TextOverflow.Clip]) or becomes no-op.
@@ -188,9 +189,9 @@ fun DrawScope.drawText(
     overflow: TextOverflow = TextOverflow.Clip,
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
-    size: IntSize = IntSize(
-        width = ceil(this.size.width).roundToInt(),
-        height = ceil(this.size.height).roundToInt()
+    maxSize: IntSize = IntSize(
+        width = ceil(this.size.width - topLeft.x).roundToInt(),
+        height = ceil(this.size.height - topLeft.y).roundToInt()
     )
 ) {
     val textLayoutResult = textMeasurer.measure(
@@ -199,7 +200,7 @@ fun DrawScope.drawText(
         overflow = overflow,
         softWrap = softWrap,
         maxLines = maxLines,
-        size = size,
+        constraints = Constraints(maxWidth = maxSize.width, maxHeight = maxSize.height),
         layoutDirection = layoutDirection,
         density = this
     )

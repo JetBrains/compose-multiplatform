@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -64,7 +65,7 @@ class TextPainterTest {
         val textLayoutResult = measurer.measure(
             text = longText,
             style = TextStyle(fontFamily = fontFamilyMeasureFont, fontSize = 20.sp),
-            size = IntSize(400, 400)
+            constraints = Constraints(maxWidth = 400, maxHeight = 400)
         )
 
         val bitmap = draw {
@@ -75,7 +76,7 @@ class TextPainterTest {
                 measurer,
                 text = longText,
                 style = TextStyle(fontFamily = fontFamilyMeasureFont, fontSize = 20.sp),
-                size = IntSize(400, 400)
+                maxSize = IntSize(400, 400)
             )
         }
 
@@ -95,7 +96,7 @@ class TextPainterTest {
                     fontFamily = fontFamilyMeasureFont,
                     fontSize = 20.sp
                 ),
-                size = IntSize(400, 400)
+                maxSize = IntSize(400, 400)
             )
         }
         val bitmap2 = draw {
@@ -107,7 +108,7 @@ class TextPainterTest {
                     fontFamily = fontFamilyMeasureFont,
                     fontSize = 20.sp
                 ),
-                size = IntSize(400, 400)
+                maxSize = IntSize(400, 400)
             )
         }
 
@@ -123,7 +124,7 @@ class TextPainterTest {
                 textMeasurer = measurer,
                 text = longText,
                 style = TextStyle(fontFamily = fontFamilyMeasureFont, fontSize = 20.sp),
-                size = IntSize(400, 400)
+                maxSize = IntSize(400, 400)
             )
         }
         val bitmap2 = draw {
@@ -131,7 +132,7 @@ class TextPainterTest {
                 textMeasurer = measurer,
                 text = longText,
                 style = TextStyle(fontFamily = fontFamilyMeasureFont, fontSize = 24.sp),
-                size = IntSize(400, 400)
+                maxSize = IntSize(400, 400)
             )
         }
 
@@ -148,7 +149,7 @@ class TextPainterTest {
                 fontFamily = fontFamilyMeasureFont,
                 fontSize = 20.sp
             ),
-            size = IntSize(400, 400)
+            constraints = Constraints.fixed(400, 400)
         )
 
         val textLayoutResultBlue = measurer.measure(
@@ -158,7 +159,7 @@ class TextPainterTest {
                 fontFamily = fontFamilyMeasureFont,
                 fontSize = 20.sp
             ),
-            size = IntSize(400, 400)
+            constraints = Constraints.fixed(400, 400)
         )
 
         val bitmap = draw {
@@ -181,7 +182,7 @@ class TextPainterTest {
                 fontFamily = fontFamilyMeasureFont,
                 fontSize = 20.sp
             ),
-            size = IntSize(400, 400)
+            constraints = Constraints.fixed(400, 400)
         )
 
         val textLayoutResultHalfOpaque = measurer.measure(
@@ -191,7 +192,7 @@ class TextPainterTest {
                 fontFamily = fontFamilyMeasureFont,
                 fontSize = 20.sp
             ),
-            size = IntSize(400, 400)
+            constraints = Constraints.fixed(400, 400)
         )
 
         val bitmap = draw {
@@ -216,7 +217,7 @@ class TextPainterTest {
                 fontFamily = fontFamilyMeasureFont,
                 fontSize = 20.sp
             ),
-            size = IntSize(400, 400)
+            constraints = Constraints.fixed(400, 400)
         )
 
         val textLayoutResultGY = measurer.measure(
@@ -226,7 +227,7 @@ class TextPainterTest {
                 fontFamily = fontFamilyMeasureFont,
                 fontSize = 20.sp
             ),
-            size = IntSize(400, 400)
+            constraints = Constraints.fixed(400, 400)
         )
 
         val bitmap = draw {
@@ -251,7 +252,7 @@ class TextPainterTest {
                 fontFamily = fontFamilyMeasureFont,
                 fontSize = 20.sp
             ),
-            size = IntSize(400, 400)
+            constraints = Constraints.fixed(400, 400)
         )
 
         val textLayoutResultHalfOpaque = measurer.measure(
@@ -262,7 +263,7 @@ class TextPainterTest {
                 fontFamily = fontFamilyMeasureFont,
                 fontSize = 20.sp
             ),
-            size = IntSize(400, 400)
+            constraints = Constraints.fixed(400, 400)
         )
 
         val bitmap = draw {
@@ -285,7 +286,7 @@ class TextPainterTest {
                 fontFamily = fontFamilyMeasureFont,
                 fontSize = 20.sp
             ),
-            size = IntSize(200, 4000)
+            constraints = Constraints.fixed(200, 4000)
         )
 
         val bitmap = draw(200f, 4000f) {
@@ -312,7 +313,7 @@ class TextPainterTest {
                 fontSize = 20.sp
             ),
             density = Density(4f),
-            size = IntSize(1000, 1000)
+            constraints = Constraints.fixed(1000, 1000)
         )
 
         val bitmap = draw {
@@ -342,7 +343,7 @@ class TextPainterTest {
             ),
             softWrap = false,
             overflow = TextOverflow.Clip,
-            size = IntSize(200, 200)
+            constraints = Constraints.fixed(200, 200)
         )
 
         val bitmap = draw(400f, 200f) {
@@ -371,7 +372,7 @@ class TextPainterTest {
                 ),
                 softWrap = false,
                 overflow = TextOverflow.Ellipsis,
-                size = IntSize(200, height)
+                constraints = Constraints.fixed(200, height)
             )
 
             val bitmap = draw(200f, 200f) {
@@ -402,7 +403,7 @@ class TextPainterTest {
             ),
             softWrap = false,
             overflow = TextOverflow.Clip,
-            size = IntSize(400, 200)
+            constraints = Constraints.fixed(400, 200)
         )
 
         val textLayoutResultNoClip = measurer.measure(
@@ -413,7 +414,7 @@ class TextPainterTest {
             ),
             softWrap = false,
             overflow = TextOverflow.Visible,
-            size = IntSize(200, 200)
+            constraints = Constraints.fixed(200, 200)
         )
 
         val bitmap = draw(400f, 200f) {
