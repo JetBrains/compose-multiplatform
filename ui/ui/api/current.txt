@@ -1851,9 +1851,6 @@ package androidx.compose.ui.layout {
     property public abstract Object? parentData;
   }
 
-  public final class IntrinsicMeasurableKt {
-  }
-
   public interface IntrinsicMeasureScope extends androidx.compose.ui.unit.Density {
     method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
     property public abstract androidx.compose.ui.unit.LayoutDirection layoutDirection;
@@ -1973,9 +1970,6 @@ package androidx.compose.ui.layout {
     method public default androidx.compose.ui.layout.MeasureResult layout(int width, int height, optional java.util.Map<androidx.compose.ui.layout.AlignmentLine,java.lang.Integer> alignmentLines, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.Placeable.PlacementScope,kotlin.Unit> placementBlock);
   }
 
-  public final class MeasureScopeKt {
-  }
-
   public interface Measured {
     method public operator int get(androidx.compose.ui.layout.AlignmentLine alignmentLine);
     method public int getMeasuredHeight();
@@ -1994,6 +1988,9 @@ package androidx.compose.ui.layout {
     property public final androidx.compose.ui.layout.LayoutCoordinates coordinates;
     property public final Object? extra;
     property public final androidx.compose.ui.Modifier modifier;
+  }
+
+  public final class MultiContentMeasurePolicyKt {
   }
 
   @kotlin.jvm.JvmDefaultWithCompatibility public interface OnGloballyPositionedModifier extends androidx.compose.ui.Modifier.Element {
@@ -2221,6 +2218,9 @@ package androidx.compose.ui.node {
   }
 
   public final class LayoutNodeLayoutDelegateKt {
+  }
+
+  public final class MeasureScopeWithLayoutNodeKt {
   }
 
   public final class ModifierNodeElementKt {

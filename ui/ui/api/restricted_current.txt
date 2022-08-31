@@ -1851,9 +1851,6 @@ package androidx.compose.ui.layout {
     property public abstract Object? parentData;
   }
 
-  public final class IntrinsicMeasurableKt {
-  }
-
   public interface IntrinsicMeasureScope extends androidx.compose.ui.unit.Density {
     method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
     property public abstract androidx.compose.ui.unit.LayoutDirection layoutDirection;
@@ -1927,6 +1924,7 @@ package androidx.compose.ui.layout {
     method @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public static inline void Layout(kotlin.jvm.functions.Function0<kotlin.Unit> content, optional androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.MeasurePolicy measurePolicy);
     method @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public static inline void Layout(optional androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.MeasurePolicy measurePolicy);
     method @Deprecated @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public static void MultiMeasureLayout(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function0<kotlin.Unit> content, androidx.compose.ui.layout.MeasurePolicy measurePolicy);
+    method @kotlin.PublishedApi internal static kotlin.jvm.functions.Function0<kotlin.Unit> combineAsVirtualLayouts(java.util.List<? extends kotlin.jvm.functions.Function0<kotlin.Unit>> contents);
     method @kotlin.PublishedApi internal static kotlin.jvm.functions.Function1<androidx.compose.runtime.SkippableUpdater<androidx.compose.ui.node.ComposeUiNode>,kotlin.Unit> materializerOf(androidx.compose.ui.Modifier modifier);
   }
 
@@ -1974,9 +1972,6 @@ package androidx.compose.ui.layout {
     method public default androidx.compose.ui.layout.MeasureResult layout(int width, int height, optional java.util.Map<androidx.compose.ui.layout.AlignmentLine,java.lang.Integer> alignmentLines, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.Placeable.PlacementScope,kotlin.Unit> placementBlock);
   }
 
-  public final class MeasureScopeKt {
-  }
-
   public interface Measured {
     method public operator int get(androidx.compose.ui.layout.AlignmentLine alignmentLine);
     method public int getMeasuredHeight();
@@ -1995,6 +1990,10 @@ package androidx.compose.ui.layout {
     property public final androidx.compose.ui.layout.LayoutCoordinates coordinates;
     property public final Object? extra;
     property public final androidx.compose.ui.Modifier modifier;
+  }
+
+  public final class MultiContentMeasurePolicyKt {
+    method @kotlin.PublishedApi internal static androidx.compose.ui.layout.MeasurePolicy createMeasurePolicy(androidx.compose.ui.layout.MultiContentMeasurePolicy measurePolicy);
   }
 
   @kotlin.jvm.JvmDefaultWithCompatibility public interface OnGloballyPositionedModifier extends androidx.compose.ui.Modifier.Element {
@@ -2226,12 +2225,14 @@ package androidx.compose.ui.node {
     method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.layout.MeasurePolicy,kotlin.Unit> getSetMeasurePolicy();
     method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.Modifier,kotlin.Unit> getSetModifier();
     method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.platform.ViewConfiguration,kotlin.Unit> getSetViewConfiguration();
+    method public kotlin.jvm.functions.Function0<androidx.compose.ui.node.ComposeUiNode> getVirtualConstructor();
     property public final kotlin.jvm.functions.Function0<androidx.compose.ui.node.ComposeUiNode> Constructor;
     property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.unit.Density,kotlin.Unit> SetDensity;
     property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.unit.LayoutDirection,kotlin.Unit> SetLayoutDirection;
     property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.layout.MeasurePolicy,kotlin.Unit> SetMeasurePolicy;
     property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.Modifier,kotlin.Unit> SetModifier;
     property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.platform.ViewConfiguration,kotlin.Unit> SetViewConfiguration;
+    property public final kotlin.jvm.functions.Function0<androidx.compose.ui.node.ComposeUiNode> VirtualConstructor;
   }
 
   public final class DelegatableNodeKt {
@@ -2256,6 +2257,9 @@ package androidx.compose.ui.node {
   }
 
   public final class LayoutNodeLayoutDelegateKt {
+  }
+
+  public final class MeasureScopeWithLayoutNodeKt {
   }
 
   public final class ModifierNodeElementKt {

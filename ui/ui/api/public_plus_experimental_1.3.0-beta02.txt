@@ -2018,9 +2018,6 @@ package androidx.compose.ui.layout {
     property public abstract Object? parentData;
   }
 
-  public final class IntrinsicMeasurableKt {
-  }
-
   public interface IntrinsicMeasureScope extends androidx.compose.ui.unit.Density {
     method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
     property public abstract androidx.compose.ui.unit.LayoutDirection layoutDirection;
@@ -2093,6 +2090,7 @@ package androidx.compose.ui.layout {
   public final class LayoutKt {
     method @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public static inline void Layout(kotlin.jvm.functions.Function0<kotlin.Unit> content, optional androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.MeasurePolicy measurePolicy);
     method @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public static inline void Layout(optional androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.MeasurePolicy measurePolicy);
+    method @androidx.compose.runtime.Composable @androidx.compose.ui.ExperimentalComposeUiApi @androidx.compose.ui.UiComposable public static inline void Layout(java.util.List<? extends kotlin.jvm.functions.Function0<kotlin.Unit>> contents, optional androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.MultiContentMeasurePolicy measurePolicy);
     method @Deprecated @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public static void MultiMeasureLayout(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function0<kotlin.Unit> content, androidx.compose.ui.layout.MeasurePolicy measurePolicy);
   }
 
@@ -2150,9 +2148,6 @@ package androidx.compose.ui.layout {
     method public default androidx.compose.ui.layout.MeasureResult layout(int width, int height, optional java.util.Map<androidx.compose.ui.layout.AlignmentLine,java.lang.Integer> alignmentLines, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.Placeable.PlacementScope,kotlin.Unit> placementBlock);
   }
 
-  public final class MeasureScopeKt {
-  }
-
   public interface Measured {
     method public operator int get(androidx.compose.ui.layout.AlignmentLine alignmentLine);
     method public int getMeasuredHeight();
@@ -2171,6 +2166,17 @@ package androidx.compose.ui.layout {
     property public final androidx.compose.ui.layout.LayoutCoordinates coordinates;
     property public final Object? extra;
     property public final androidx.compose.ui.Modifier modifier;
+  }
+
+  @androidx.compose.runtime.Stable @androidx.compose.ui.ExperimentalComposeUiApi public fun interface MultiContentMeasurePolicy {
+    method public default int maxIntrinsicHeight(androidx.compose.ui.layout.IntrinsicMeasureScope, java.util.List<? extends java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>> measurables, int width);
+    method public default int maxIntrinsicWidth(androidx.compose.ui.layout.IntrinsicMeasureScope, java.util.List<? extends java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>> measurables, int height);
+    method public androidx.compose.ui.layout.MeasureResult measure(androidx.compose.ui.layout.MeasureScope, java.util.List<? extends java.util.List<? extends androidx.compose.ui.layout.Measurable>> measurables, long constraints);
+    method public default int minIntrinsicHeight(androidx.compose.ui.layout.IntrinsicMeasureScope, java.util.List<? extends java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>> measurables, int width);
+    method public default int minIntrinsicWidth(androidx.compose.ui.layout.IntrinsicMeasureScope, java.util.List<? extends java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>> measurables, int height);
+  }
+
+  public final class MultiContentMeasurePolicyKt {
   }
 
   @kotlin.jvm.JvmDefaultWithCompatibility public interface OnGloballyPositionedModifier extends androidx.compose.ui.Modifier.Element {
@@ -2473,6 +2479,9 @@ package androidx.compose.ui.node {
   }
 
   public final class LayoutNodeLayoutDelegateKt {
+  }
+
+  public final class MeasureScopeWithLayoutNodeKt {
   }
 
   @androidx.compose.ui.ExperimentalComposeUiApi public abstract class ModifierNodeElement<N extends androidx.compose.ui.Modifier.Node> implements androidx.compose.ui.Modifier.Element {

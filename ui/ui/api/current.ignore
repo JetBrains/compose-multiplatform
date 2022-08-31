@@ -1,4 +1,10 @@
 // Baseline format: 1.0
+RemovedClass: androidx.compose.ui.layout.IntrinsicMeasurableKt:
+    Removed class androidx.compose.ui.layout.IntrinsicMeasurableKt
+RemovedClass: androidx.compose.ui.layout.MeasureScopeKt:
+    Removed class androidx.compose.ui.layout.MeasureScopeKt
+
+
 RemovedMethod: androidx.compose.ui.focus.FocusDirection.Companion#getIn():
     Removed method androidx.compose.ui.focus.FocusDirection.Companion.getIn()
 RemovedMethod: androidx.compose.ui.focus.FocusDirection.Companion#getOut():
