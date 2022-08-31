@@ -859,13 +859,45 @@ package androidx.compose.foundation.lazy.layout {
 
 package androidx.compose.foundation.lazy.staggeredgrid {
 
+  public final class LazyStaggeredGridCellsKt {
+  }
+
   public final class LazyStaggeredGridDslKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static void LazyHorizontalStaggeredGrid(androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells rows, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState state, optional androidx.compose.foundation.gestures.FlingBehavior flingBehavior, optional boolean userScrollEnabled, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope,kotlin.Unit> content);
+    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static void LazyVerticalStaggeredGrid(androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells columns, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState state, optional androidx.compose.foundation.gestures.FlingBehavior flingBehavior, optional boolean userScrollEnabled, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope,kotlin.Unit> content);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static <T> void items(androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope, java.util.List<? extends T> items, optional kotlin.jvm.functions.Function1<? super T,?>? key, optional kotlin.jvm.functions.Function1<? super T,?> contentType, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemScope,? super T,kotlin.Unit> itemContent);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static <T> void items(androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope, T![] items, optional kotlin.jvm.functions.Function1<? super T,?>? key, optional kotlin.jvm.functions.Function1<? super T,?> contentType, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemScope,? super T,kotlin.Unit> itemContent);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static <T> void itemsIndexed(androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope, java.util.List<? extends T> items, optional kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,?>? key, optional kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,?> contentType, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static <T> void itemsIndexed(androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope, T![] items, optional kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,?>? key, optional kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,?> contentType, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi public interface LazyStaggeredGridItemInfo {
+    method public int getIndex();
+    method public Object getKey();
+    method public int getLane();
+    method public long getOffset();
+    method public long getSize();
+    property public abstract int index;
+    property public abstract Object key;
+    property public abstract int lane;
+    property public abstract long offset;
+    property public abstract long size;
   }
 
   public final class LazyStaggeredGridItemProviderKt {
   }
 
+  @androidx.compose.foundation.ExperimentalFoundationApi public sealed interface LazyStaggeredGridItemScope {
+  }
+
   public final class LazyStaggeredGridKt {
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi public interface LazyStaggeredGridLayoutInfo {
+    method public int getTotalItemsCount();
+    method public java.util.List<androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemInfo> getVisibleItemsInfo();
+    property public abstract int totalItemsCount;
+    property public abstract java.util.List<androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemInfo> visibleItemsInfo;
   }
 
   public final class LazyStaggeredGridMeasureKt {
@@ -877,7 +909,51 @@ package androidx.compose.foundation.lazy.staggeredgrid {
   public final class LazyStaggeredGridMeasureResultKt {
   }
 
+  @androidx.compose.foundation.ExperimentalFoundationApi public sealed interface LazyStaggeredGridScope {
+    method @androidx.compose.foundation.ExperimentalFoundationApi public void item(optional Object? key, optional Object? contentType, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemScope,kotlin.Unit> content);
+    method public void items(int count, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,?>? key, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,?> contentType, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemScope,? super java.lang.Integer,kotlin.Unit> itemContent);
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi public final class LazyStaggeredGridState implements androidx.compose.foundation.gestures.ScrollableState {
+    ctor public LazyStaggeredGridState(optional int initialFirstVisibleItemIndex, optional int initialFirstVisibleItemOffset);
+    method public suspend Object? animateScrollToItem(int index, optional int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public float dispatchRawDelta(float delta);
+    method public int getFirstVisibleItemIndex();
+    method public int getFirstVisibleItemScrollOffset();
+    method public androidx.compose.foundation.interaction.InteractionSource getInteractionSource();
+    method public androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridLayoutInfo getLayoutInfo();
+    method public boolean isScrollInProgress();
+    method public suspend Object? scroll(androidx.compose.foundation.MutatePriority scrollPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? scrollToItem(int index, optional int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    property public final int firstVisibleItemIndex;
+    property public final int firstVisibleItemScrollOffset;
+    property public final androidx.compose.foundation.interaction.InteractionSource interactionSource;
+    property public boolean isScrollInProgress;
+    property public final androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridLayoutInfo layoutInfo;
+    field public static final androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState.Companion Companion;
+  }
+
+  public static final class LazyStaggeredGridState.Companion {
+    method public androidx.compose.runtime.saveable.Saver<androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState,java.lang.Object> getSaver();
+    property public final androidx.compose.runtime.saveable.Saver<androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState,java.lang.Object> Saver;
+  }
+
   public final class LazyStaggeredGridStateKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState rememberLazyStaggeredGridState(optional int initialFirstVisibleItemIndex, optional int initialFirstVisibleItemScrollOffset);
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public interface StaggeredGridCells {
+    method public java.util.List<java.lang.Integer> calculateCrossAxisCellSizes(androidx.compose.ui.unit.Density, int availableSize, int spacing);
+  }
+
+  public static final class StaggeredGridCells.Adaptive implements androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells {
+    ctor public StaggeredGridCells.Adaptive(float minSize);
+    method public java.util.List<java.lang.Integer> calculateCrossAxisCellSizes(androidx.compose.ui.unit.Density, int availableSize, int spacing);
+  }
+
+  public static final class StaggeredGridCells.Fixed implements androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells {
+    ctor public StaggeredGridCells.Fixed(int count);
+    method public java.util.List<java.lang.Integer> calculateCrossAxisCellSizes(androidx.compose.ui.unit.Density, int availableSize, int spacing);
   }
 
 }

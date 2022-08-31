@@ -22,11 +22,9 @@ import androidx.compose.foundation.BaseLazyLayoutTestWithOrientation
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.animateScrollBy
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
@@ -48,24 +46,20 @@ open class BaseLazyStaggeredGridWithOrientation(
         state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
         content: LazyStaggeredGridScope.() -> Unit,
     ) {
-        LazyStaggeredGrid(
-            state = state,
-            modifier = modifier,
-            orientation = orientation,
-            userScrollEnabled = true,
-            verticalArrangement = Arrangement.Top,
-            horizontalArrangement = Arrangement.Start,
-            slotSizesSums = { constraints ->
-                val crossAxisSize = if (orientation == Orientation.Vertical) {
-                    constraints.maxWidth
-                } else {
-                    constraints.maxHeight
-                }
-                IntArray(lanes) {
-                    (crossAxisSize / lanes.toDouble() * (it + 1)).roundToInt()
-                }
-            },
-            content = content
-        )
+        if (orientation == Orientation.Vertical) {
+            LazyVerticalStaggeredGrid(
+                columns = StaggeredGridCells.Fixed(lanes),
+                modifier = modifier,
+                state = state,
+                content = content
+            )
+        } else {
+            LazyHorizontalStaggeredGrid(
+                rows = StaggeredGridCells.Fixed(lanes),
+                modifier = modifier,
+                state = state,
+                content = content
+            )
+        }
     }
 }

@@ -16,39 +16,64 @@
 
 package androidx.compose.foundation.lazy.staggeredgrid
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
-internal class LazyStaggeredGridMeasureResult(
-    val firstVisibleItemIndices: IntArray,
-    val firstVisibleItemScrollOffsets: IntArray,
-    val consumedScroll: Float,
-    val measureResult: MeasureResult,
-    val canScrollForward: Boolean,
-    val canScrollBackward: Boolean,
-    override val totalItemsCount: Int,
-    override val visibleItemsInfo: List<LazyStaggeredGridItemInfo>
-) : LazyStaggeredGridLayoutInfo, MeasureResult by measureResult
-
-internal interface LazyStaggeredGridItemInfo {
+/**
+ * Information about layout state of individual item in lazy staggered grid.
+ * @see [LazyStaggeredGridLayoutInfo]
+ */
+@ExperimentalFoundationApi
+interface LazyStaggeredGridItemInfo {
+    /**
+     * Relative offset from the start of the staggered grid.
+     */
     val offset: IntOffset
+
+    /**
+     * Index of the item.
+     */
     val index: Int
+
+    /**
+     * Column (for vertical staggered grids) or row (for horizontal staggered grids) that the item
+     * is in.
+     */
     val lane: Int
+
+    /**
+     * Key of the item passed in [LazyStaggeredGridScope.items]
+     */
     val key: Any
+
+    /**
+     * Item size in pixels. If item contains multiple layouts, the size is calculated as a sum of
+     * their sizes.
+     */
     val size: IntSize
 }
 
-internal interface LazyStaggeredGridLayoutInfo {
+/**
+ * Information about layout state of lazy staggered grids.
+ * Can be retrieved from [LazyStaggeredGridState.layoutInfo].
+ */
+// todo(b/182882362): expose more information about layout state
+@ExperimentalFoundationApi
+interface LazyStaggeredGridLayoutInfo {
+    /**
+     * The list of [LazyStaggeredGridItemInfo] per each visible item ordered by index.
+     */
     val visibleItemsInfo: List<LazyStaggeredGridItemInfo>
-    val totalItemsCount: Int
 
-    companion object Empty : LazyStaggeredGridLayoutInfo {
-        override val visibleItemsInfo: List<LazyStaggeredGridItemInfo> = emptyList()
-        override val totalItemsCount: Int = 0
-    }
+    /**
+     * The total count of items passed to staggered grid.
+     */
+    val totalItemsCount: Int
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 internal fun LazyStaggeredGridLayoutInfo.findVisibleItem(
     itemIndex: Int
 ): LazyStaggeredGridItemInfo? {
@@ -62,4 +87,22 @@ internal fun LazyStaggeredGridLayoutInfo.findVisibleItem(
 
     val index = visibleItemsInfo.binarySearch { it.index - itemIndex }
     return visibleItemsInfo.getOrNull(index)
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+internal class LazyStaggeredGridMeasureResult(
+    val firstVisibleItemIndices: IntArray,
+    val firstVisibleItemScrollOffsets: IntArray,
+    val consumedScroll: Float,
+    val measureResult: MeasureResult,
+    val canScrollForward: Boolean,
+    val canScrollBackward: Boolean,
+    override val totalItemsCount: Int,
+    override val visibleItemsInfo: List<LazyStaggeredGridItemInfo>
+) : LazyStaggeredGridLayoutInfo, MeasureResult by measureResult
+
+@OptIn(ExperimentalFoundationApi::class)
+internal object EmptyLazyStaggeredGridLayoutInfo : LazyStaggeredGridLayoutInfo {
+    override val visibleItemsInfo: List<LazyStaggeredGridItemInfo> = emptyList()
+    override val totalItemsCount: Int = 0
 }

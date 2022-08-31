@@ -17,14 +17,223 @@
 package androidx.compose.foundation.lazy.staggeredgrid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollableDefaults
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 
+/**
+ * Vertical staggered grid layout that composes and lays out only items currently visible on screen.
+ *
+ * @param columns description of the size and number of staggered grid columns.
+ * @param modifier modifier to apply to the layout.
+ * @param state state object that can be used to control and observe staggered grid state.
+ * @param flingBehavior logic handling fling.
+ * @param userScrollEnabled whether scroll with gestures or accessibility actions are allowed. It is
+ *  still possible to scroll programmatically through state when
+ *  [userScrollEnabled] is set to false.
+ * @param content a lambda describing the staggered grid content. Inside this block you can use
+ *  [LazyStaggeredGridScope.items] to present list of items or [LazyStaggeredGridScope.item] for a
+ *  single one.
+ */
+// todo(b/182882362): Content padding, reverse layout and arrangement support
+@ExperimentalFoundationApi
+@Composable
+fun LazyVerticalStaggeredGrid(
+    columns: StaggeredGridCells,
+    modifier: Modifier = Modifier,
+    state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
+    flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
+    userScrollEnabled: Boolean = true,
+    content: LazyStaggeredGridScope.() -> Unit
+) {
+    LazyStaggeredGrid(
+        modifier = modifier,
+        orientation = Orientation.Vertical,
+        state = state,
+        flingBehavior = flingBehavior,
+        userScrollEnabled = userScrollEnabled,
+        slotSizesSums = rememberColumnWidthSums(
+            columns,
+            Arrangement.Start,
+            PaddingValues()
+        ),
+        content = content
+    )
+}
+
+/** calculates prefix sums for columns used in staggered grid measure */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun rememberColumnWidthSums(
+    columns: StaggeredGridCells,
+    horizontalArrangement: Arrangement.Horizontal,
+    contentPadding: PaddingValues
+) = remember<Density.(Constraints) -> IntArray>(
+    columns,
+    horizontalArrangement,
+    contentPadding,
+) {
+    { constraints ->
+        require(constraints.maxWidth != Constraints.Infinity) {
+            "LazyVerticalStaggeredGrid's width should be bound by parent."
+        }
+        val horizontalPadding =
+            contentPadding.calculateStartPadding(LayoutDirection.Ltr) +
+                contentPadding.calculateEndPadding(LayoutDirection.Ltr)
+        val gridWidth = constraints.maxWidth - horizontalPadding.roundToPx()
+        with(columns) {
+            calculateCrossAxisCellSizes(
+                gridWidth,
+                horizontalArrangement.spacing.roundToPx()
+            ).run {
+                val result = IntArray(size) { this[it] }
+                for (i in 1 until size) {
+                    result[i] += result[i - 1]
+                }
+                result
+            }
+        }
+    }
+}
+
+/**
+ * Horizontal staggered grid layout that composes and lays out only items currently
+ * visible on screen.
+ *
+ * @param rows description of the size and number of staggered grid columns.
+ * @param modifier modifier to apply to the layout.
+ * @param state state object that can be used to control and observe staggered grid state.
+ * @param flingBehavior logic handling fling.
+ * @param userScrollEnabled whether scroll with gestures or accessibility actions are allowed. It is
+ *  still possible to scroll programmatically through state when
+ *  [userScrollEnabled] is set to false.
+ * @param content a lambda describing the staggered grid content. Inside this block you can use
+ *  [LazyStaggeredGridScope.items] to present list of items or [LazyStaggeredGridScope.item] for a
+ *  single one.
+ */
+// todo(b/182882362): Content padding, reverse layout and arrangement support
+@ExperimentalFoundationApi
+@Composable
+fun LazyHorizontalStaggeredGrid(
+    rows: StaggeredGridCells,
+    modifier: Modifier = Modifier,
+    state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
+    flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
+    userScrollEnabled: Boolean = true,
+    content: LazyStaggeredGridScope.() -> Unit
+) {
+    LazyStaggeredGrid(
+        modifier = modifier,
+        orientation = Orientation.Horizontal,
+        state = state,
+        flingBehavior = flingBehavior,
+        userScrollEnabled = userScrollEnabled,
+        slotSizesSums = rememberRowHeightSums(rows, Arrangement.Top, PaddingValues()),
+        content = content
+    )
+}
+
+/** calculates prefix sums for rows used in staggered grid measure */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun rememberRowHeightSums(
+    rows: StaggeredGridCells,
+    verticalArrangement: Arrangement.Vertical,
+    contentPadding: PaddingValues
+) = remember<Density.(Constraints) -> IntArray>(
+    rows,
+    verticalArrangement,
+    contentPadding,
+) {
+    { constraints ->
+        require(constraints.maxHeight != Constraints.Infinity) {
+            "LazyHorizontalStaggeredGrid's height should be bound by parent."
+        }
+        val verticalPadding = contentPadding.calculateTopPadding() +
+            contentPadding.calculateBottomPadding()
+        val gridHeight = constraints.maxHeight - verticalPadding.roundToPx()
+        with(rows) {
+            calculateCrossAxisCellSizes(
+                gridHeight,
+                verticalArrangement.spacing.roundToPx()
+            ).run {
+                val result = IntArray(size) { this[it] }
+                for (i in 1 until size) {
+                    result[i] += result[i - 1]
+                }
+                result
+            }
+        }
+    }
+}
+
+/** Dsl marker for [LazyStaggeredGridScope] below **/
 @DslMarker
 internal annotation class LazyStaggeredGridScopeMarker
 
+/**
+ * Receiver scope for itemContent in [LazyStaggeredGridScope.item]
+ */
+@ExperimentalFoundationApi
+sealed interface LazyStaggeredGridItemScope
+
+/**
+ * Receiver scope for [LazyVerticalStaggeredGrid] and [LazyHorizontalStaggeredGrid]
+ */
 @ExperimentalFoundationApi
 @LazyStaggeredGridScopeMarker
-internal sealed interface LazyStaggeredGridScope {
+sealed interface LazyStaggeredGridScope {
+
+    /**
+     * Add a single item to the staggered grid.
+     *
+     * @param key a factory of stable and unique keys representing the item. The key
+     *  MUST be saveable via Bundle on Android. If set to null (by default), the position of the
+     *  item will be used as a key instead.
+     *  Using the same key for multiple items in the staggered grid is not allowed.
+     *
+     *  When you specify the key the scroll position will be maintained based on the key, which
+     *  means if you add/remove items before the current visible item the item with the given key
+     *  will be kept as the first visible one.
+     * @param contentType a factory of content types representing the item. Content for item of
+     *  the same type can be reused more efficiently. null is a valid type as well and items
+     *  of such type will be considered compatible.
+     * @param content composable content displayed by current item
+     */
+    @ExperimentalFoundationApi
+    fun item(
+        key: Any? = null,
+        contentType: Any? = null,
+        content: @Composable LazyStaggeredGridItemScope.() -> Unit
+    )
+
+    /**
+     * Add a [count] of items to the staggered grid.
+     *
+     * @param count number of items to add.
+     * @param key a factory of stable and unique keys representing the item. The key
+     *  MUST be saveable via Bundle on Android. If set to null (by default), the position of the
+     *  item will be used as a key instead.
+     *  Using the same key for multiple items in the staggered grid is not allowed.
+     *
+     *  When you specify the key the scroll position will be maintained based on the key, which
+     *  means if you add/remove items before the current visible item the item with the given key
+     *  will be kept as the first visible one.
+     * @param contentType a factory of content types representing the item. Content for item of
+     *  the same type can be reused more efficiently. null is a valid type as well and items
+     *  of such type will be considered compatible.
+     * @param itemContent composable content displayed by item on provided position
+     */
     fun items(
         count: Int,
         key: ((index: Int) -> Any)? = null,
@@ -33,21 +242,138 @@ internal sealed interface LazyStaggeredGridScope {
     )
 }
 
+/**
+ * Add a list of items to the staggered grid.
+ *
+ * @param items a data list to present
+ * @param key a factory of stable and unique keys representing the item. The key
+ *  MUST be saveable via Bundle on Android. If set to null (by default), the position of the
+ *  item will be used as a key instead.
+ *  Using the same key for multiple items in the staggered grid is not allowed.
+ *
+ *  When you specify the key the scroll position will be maintained based on the key, which
+ *  means if you add/remove items before the current visible item the item with the given key
+ *  will be kept as the first visible one.
+ * @param contentType a factory of content types representing the item. Content for item of
+ *  the same type can be reused more efficiently. null is a valid type as well and items
+ *  of such type will be considered compatible.
+ * @param itemContent composable content displayed by the provided item
+ */
 @ExperimentalFoundationApi
-internal sealed interface LazyStaggeredGridItemScope
-
-@ExperimentalFoundationApi
-internal fun LazyStaggeredGridScope.item(
-    key: Any? = null,
-    contentType: Any? = null,
-    itemContent: @Composable LazyStaggeredGridItemScope.(index: Int) -> Unit
+fun <T> LazyStaggeredGridScope.items(
+    items: List<T>,
+    key: ((item: T) -> Any)? = null,
+    contentType: (item: T) -> Any? = { null },
+    itemContent: @Composable LazyStaggeredGridItemScope.(item: T) -> Unit
 ) {
     items(
-        count = 1,
-        key = key?.let { { it } },
-        contentType = { contentType },
-        itemContent = itemContent
+        count = items.size,
+        key = key?.let {
+            { index -> key(items[index]) }
+        },
+        contentType = { index -> contentType(items[index]) },
+        itemContent = { index -> itemContent(items[index]) }
     )
 }
 
-// todo(b/182882362): item DSL for lists/arrays
+/**
+ * Add a list of items with index-aware content to the staggered grid.
+ *
+ * @param items a data list to present
+ * @param key a factory of stable and unique keys representing the item. The key
+ *  MUST be saveable via Bundle on Android. If set to null (by default), the position of the
+ *  item will be used as a key instead.
+ *  Using the same key for multiple items in the staggered grid is not allowed.
+ *
+ *  When you specify the key the scroll position will be maintained based on the key, which
+ *  means if you add/remove items before the current visible item the item with the given key
+ *  will be kept as the first visible one.
+ * @param contentType a factory of content types representing the item. Content for item of
+ *  the same type can be reused more efficiently. null is a valid type as well and items
+ *  of such type will be considered compatible.
+ * @param itemContent composable content displayed given item and index
+ */
+@ExperimentalFoundationApi
+fun <T> LazyStaggeredGridScope.itemsIndexed(
+    items: List<T>,
+    key: ((index: Int, item: T) -> Any)? = null,
+    contentType: (index: Int, item: T) -> Any? = { _, _ -> null },
+    itemContent: @Composable LazyStaggeredGridItemScope.(index: Int, item: T) -> Unit
+) {
+    items(
+        count = items.size,
+        key = key?.let {
+            { index -> key(index, items[index]) }
+        },
+        contentType = { index -> contentType(index, items[index]) },
+        itemContent = { index -> itemContent(index, items[index]) }
+    )
+}
+
+/**
+ * Add an array of items to the staggered grid.
+ *
+ * @param items a data array to present
+ * @param key a factory of stable and unique keys representing the item. The key
+ *  MUST be saveable via Bundle on Android. If set to null (by default), the position of the
+ *  item will be used as a key instead.
+ *  Using the same key for multiple items in the staggered grid is not allowed.
+ *
+ *  When you specify the key the scroll position will be maintained based on the key, which
+ *  means if you add/remove items before the current visible item the item with the given key
+ *  will be kept as the first visible one.
+ * @param contentType a factory of content types representing the item. Content for item of
+ *  the same type can be reused more efficiently. null is a valid type as well and items
+ *  of such type will be considered compatible.
+ * @param itemContent composable content displayed by the provided item
+ */
+@ExperimentalFoundationApi
+fun <T> LazyStaggeredGridScope.items(
+    items: Array<T>,
+    key: ((item: T) -> Any)? = null,
+    contentType: (item: T) -> Any? = { null },
+    itemContent: @Composable LazyStaggeredGridItemScope.(item: T) -> Unit
+) {
+    items(
+        count = items.size,
+        key = key?.let {
+            { index -> key(items[index]) }
+        },
+        contentType = { index -> contentType(items[index]) },
+        itemContent = { index -> itemContent(items[index]) }
+    )
+}
+
+/**
+ * Add an array of items with index-aware content to the staggered grid.
+ *
+ * @param items a data array to present
+ * @param key a factory of stable and unique keys representing the item. The key
+ *  MUST be saveable via Bundle on Android. If set to null (by default), the position of the
+ *  item will be used as a key instead.
+ *  Using the same key for multiple items in the staggered grid is not allowed.
+ *
+ *  When you specify the key the scroll position will be maintained based on the key, which
+ *  means if you add/remove items before the current visible item the item with the given key
+ *  will be kept as the first visible one.
+ * @param contentType a factory of content types representing the item. Content for item of
+ *  the same type can be reused more efficiently. null is a valid type as well and items
+ *  of such type will be considered compatible.
+ * @param itemContent composable content displayed given item and index
+ */
+@ExperimentalFoundationApi
+fun <T> LazyStaggeredGridScope.itemsIndexed(
+    items: Array<T>,
+    key: ((index: Int, item: T) -> Any)? = null,
+    contentType: (index: Int, item: T) -> Any? = { _, _ -> null },
+    itemContent: @Composable LazyStaggeredGridItemScope.(index: Int, item: T) -> Unit
+) {
+    items(
+        count = items.size,
+        key = key?.let {
+            { index -> key(index, items[index]) }
+        },
+        contentType = { index -> contentType(index, items[index]) },
+        itemContent = { index -> itemContent(index, items[index]) }
+    )
+}

@@ -526,7 +526,7 @@ private fun IntArray.offsetBy(delta: Int) {
     }
 }
 
-private fun IntArray.indexOfMinValue(): Int {
+internal fun IntArray.indexOfMinValue(): Int {
     var result = -1
     var min = Int.MAX_VALUE
     for (i in indices) {
@@ -661,6 +661,7 @@ private class LazyStaggeredGridMeasuredItem(
         )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 private class LazyStaggeredGridPositionedItem(
     override val offset: IntOffset,
     override val index: Int,

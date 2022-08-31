@@ -77,6 +77,7 @@ internal fun LazyStaggeredGrid(
 
     ScrollPositionUpdater(itemProvider, state)
 
+    // todo(b/182882362): accessibility
     LazyLayout(
         modifier = modifier
             .then(state.remeasurementModifier)
@@ -89,6 +90,7 @@ internal fun LazyStaggeredGrid(
                     orientation,
                     reverseLayout
                 ),
+                interactionSource = state.mutableInteractionSource,
                 flingBehavior = flingBehavior,
                 state = state,
                 overscrollEffect = overscrollEffect,
