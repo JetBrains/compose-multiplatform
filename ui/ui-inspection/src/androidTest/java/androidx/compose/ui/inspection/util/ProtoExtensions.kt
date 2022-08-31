@@ -30,6 +30,17 @@ fun List<LayoutInspectorComposeProtocol.StringEntry>.toMap() = associate { it.id
 
 fun GetParametersCommand(
     rootViewId: Long,
+    node: ComposableNode,
+    useDelayedParameterExtraction: Boolean,
+    skipSystemComposables: Boolean = true
+): Command = if (useDelayedParameterExtraction) {
+    GetParametersByAnchorIdCommand(rootViewId, node.anchorHash, node.id, skipSystemComposables)
+} else {
+    GetParametersByIdCommand(rootViewId, node.id, skipSystemComposables)
+}
+
+fun GetParametersByIdCommand(
+    rootViewId: Long,
     composableId: Long,
     skipSystemComposables: Boolean = true
 ): Command = Command.newBuilder().apply {
@@ -43,11 +54,13 @@ fun GetParametersCommand(
 fun GetParametersByAnchorIdCommand(
     rootViewId: Long,
     anchorId: Int,
+    composableId: Long,
     skipSystemComposables: Boolean = true
 ): Command = Command.newBuilder().apply {
     getParametersCommand = GetParametersCommand.newBuilder().apply {
         this.rootViewId = rootViewId
         this.anchorHash = anchorId
+        this.composableId = composableId
         this.skipSystemComposables = skipSystemComposables
     }.build()
 }.build()
