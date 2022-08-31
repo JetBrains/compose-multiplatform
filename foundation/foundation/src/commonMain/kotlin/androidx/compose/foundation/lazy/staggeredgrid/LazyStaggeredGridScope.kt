@@ -33,7 +33,7 @@ internal class LazyStaggeredGridScopeImpl : LazyStaggeredGridScope {
     ) {
         items(
             count = 1,
-            key = key?.let { { it } },
+            key = key?.let { { key } },
             contentType = { contentType },
             itemContent = { content() }
         )
