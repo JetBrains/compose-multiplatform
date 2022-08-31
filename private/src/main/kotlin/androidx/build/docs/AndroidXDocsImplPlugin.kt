@@ -379,7 +379,8 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
                 artifacts.map { result -> result.map { it.id } }
             )
             task.destinationFile.set(getMetadataRegularFile(project))
-            task.prebuiltsRoot.set(File(project.getCheckoutRoot(), "prebuilts").absolutePath)
+            task.prebuiltsRoot.set(
+                File(project.getCheckoutRoot(), "prebuilts").toRelativeString(project.rootDir))
         }
 
         val dackkaTask = project.tasks.register("dackkaDocs", DackkaTask::class.java) { task ->
