@@ -34,7 +34,7 @@ class LiveEditTests {
     @After
     fun tearDown() {
         clearCompositionErrors()
-        Recomposer.setHotReloadEnabled(true)
+        Recomposer.setHotReloadEnabled(false)
     }
 
     @Test

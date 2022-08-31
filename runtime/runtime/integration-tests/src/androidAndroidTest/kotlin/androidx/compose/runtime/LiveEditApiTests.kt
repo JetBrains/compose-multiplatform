@@ -392,6 +392,36 @@ class LiveEditApiTests : BaseComposeTest() {
             assertThat(errors).hasSize(0)
         }
     }
+
+    @Test
+    @MediumTest
+    fun throwErrorOnReload_recoversAfterInvalidate() {
+        var shouldThrow = false
+        activity.show {
+            TestError { shouldThrow }
+        }
+
+        activity.waitForAFrame()
+
+        run {
+            shouldThrow = true
+            simulateHotReload(Unit)
+
+            val start = errorInvoked
+            var errors = compositionErrors()
+            assertThat(errors).hasSize(1)
+            assertThat(errors[0].first.message).isEqualTo("Test crash!")
+            assertThat(errors[0].second).isEqualTo(true)
+
+            shouldThrow = false
+            invalidateGroup(errorKey)
+
+            assertTrue("TestError should be invoked!", errorInvoked > start)
+
+            errors = compositionErrors()
+            assertThat(errors).hasSize(0)
+        }
+    }
 }
 
 const val someFunctionKey = -1580285603 // Extracted from .class file

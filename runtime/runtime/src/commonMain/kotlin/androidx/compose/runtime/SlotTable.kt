@@ -298,8 +298,8 @@ internal class SlotTable : CompositionData, Iterable<CompositionGroup> {
      * which we know will no longer have the same structure so we want to remove them before
      * recomposing.
      *
-     * Returns true if all the groups were successfully invalidated. If this returns fals then
-     * the a full composition must be foreced.
+     * Returns a list of groups if they were successfully invalidated. If this returns null then
+     * a full composition must be forced.
      */
     internal fun invalidateGroupsWithKey(target: Int): List<RecomposeScopeImpl>? {
         val anchors = mutableListOf<Anchor>()
@@ -939,7 +939,7 @@ internal class SlotReader(
      *  Skip a group. Must be called at the start of a group.
      */
     fun skipGroup(): Int {
-        require(emptyCount == 0) { "Cannot skip while in an empty region" }
+        runtimeCheck(emptyCount == 0) { "Cannot skip while in an empty region" }
         val count = if (groups.isNode(currentGroup)) 1 else groups.nodeCount(currentGroup)
         currentGroup += groups.groupSize(currentGroup)
         return count
@@ -949,7 +949,7 @@ internal class SlotReader(
      * Skip to the end of the current group.
      */
     fun skipToGroupEnd() {
-        require(emptyCount == 0) { "Cannot skip the enclosing group while in an empty region" }
+        runtimeCheck(emptyCount == 0) { "Cannot skip the enclosing group while in an empty region" }
         currentGroup = currentEnd
     }
 
@@ -957,7 +957,7 @@ internal class SlotReader(
      * Reposition the read to the group at [index].
      */
     fun reposition(index: Int) {
-        require(emptyCount == 0) { "Cannot reposition while in an empty region" }
+        runtimeCheck(emptyCount == 0) { "Cannot reposition while in an empty region" }
         currentGroup = index
         val parent = if (index < groupsSize) groups.parentAnchor(index) else -1
         this.parent = parent
@@ -976,7 +976,7 @@ internal class SlotReader(
         val newCurrentEnd = index + groups.groupSize(index)
         val current = currentGroup
         @Suppress("ConvertTwoComparisonsToRangeCheck")
-        require(current >= index && current <= newCurrentEnd) {
+        runtimeCheck(current >= index && current <= newCurrentEnd) {
             "Index $index is not a parent of $current"
         }
         this.parent = index
@@ -990,7 +990,9 @@ internal class SlotReader(
      */
     fun endGroup() {
         if (emptyCount == 0) {
-            require(currentGroup == currentEnd) { "endGroup() not called at the end of a group" }
+            runtimeCheck(currentGroup == currentEnd) {
+                "endGroup() not called at the end of a group"
+            }
             val parent = groups.parentAnchor(parent)
             this.parent = parent
             currentEnd = if (parent < 0)
@@ -1476,7 +1478,7 @@ internal class SlotWriter(
      * currently started [parent].
      */
     fun advanceBy(amount: Int) {
-        require(amount >= 0) { "Cannot seek backwards" }
+        runtimeCheck(amount >= 0) { "Cannot seek backwards" }
         check(insertCount <= 0) { "Cannot call seek() while inserting" }
         if (amount == 0) return
         val index = currentGroup + amount
@@ -1532,7 +1534,7 @@ internal class SlotWriter(
      * Enter the group at current without changing it. Requires not currently inserting.
      */
     fun startGroup() {
-        require(insertCount == 0) { "Key must be supplied when inserting" }
+        runtimeCheck(insertCount == 0) { "Key must be supplied when inserting" }
         startGroup(key = 0, objectKey = Composer.Empty, isNode = false, aux = Composer.Empty)
     }
 
@@ -1657,7 +1659,7 @@ internal class SlotWriter(
             nodeCount = nodeCountStack.pop() + if (isNode) 1 else newNodes
             parent = groups.parent(groupIndex)
         } else {
-            require(currentGroup == currentGroupEnd) {
+            runtimeCheck(currentGroup == currentGroupEnd) {
                 "Expected to be at the end of a group"
             }
             // Update group length
@@ -1733,12 +1735,12 @@ internal class SlotWriter(
      * group is reached.
      */
     fun ensureStarted(index: Int) {
-        require(insertCount <= 0) { "Cannot call ensureStarted() while inserting" }
+        runtimeCheck(insertCount <= 0) { "Cannot call ensureStarted() while inserting" }
         val parent = parent
         if (parent != index) {
             // The new parent a child of the current group.
             @Suppress("ConvertTwoComparisonsToRangeCheck")
-            require(index >= parent && index < currentGroupEnd) {
+            runtimeCheck(index >= parent && index < currentGroupEnd) {
                 "Started group at $index must be a subgroup of the group at $parent"
             }
 
@@ -1770,7 +1772,7 @@ internal class SlotWriter(
      * Remove the current group. Returns if any anchors were in the group removed.
      */
     fun removeGroup(): Boolean {
-        require(insertCount == 0) { "Cannot remove group while inserting" }
+        runtimeCheck(insertCount == 0) { "Cannot remove group while inserting" }
         val oldGroup = currentGroup
         val oldSlot = currentSlot
         val count = skipGroup()
@@ -1813,8 +1815,8 @@ internal class SlotWriter(
      * number of groups after the [currentGroup] left in the [parent] group.
      */
     fun moveGroup(offset: Int) {
-        require(insertCount == 0) { "Cannot move a group while inserting" }
-        require(offset >= 0) { "Parameter offset is out of bounds" }
+        runtimeCheck(insertCount == 0) { "Cannot move a group while inserting" }
+        runtimeCheck(offset >= 0) { "Parameter offset is out of bounds" }
         if (offset == 0) return
         val current = currentGroup
         val parent = parent
@@ -1827,7 +1829,7 @@ internal class SlotWriter(
             groupToMove += groups.groupSize(
                 address = groupIndexToAddress(groupToMove)
             )
-            require(groupToMove <= parentEnd) { "Parameter offset is out of bounds" }
+            runtimeCheck(groupToMove <= parentEnd) { "Parameter offset is out of bounds" }
             count--
         }
 
@@ -2104,12 +2106,12 @@ internal class SlotWriter(
      * This requires [writer] be inserting and this writer to not be inserting.
      */
     fun moveTo(anchor: Anchor, offset: Int, writer: SlotWriter): List<Anchor> {
-        require(writer.insertCount > 0)
-        require(insertCount == 0)
-        require(anchor.valid)
+        runtimeCheck(writer.insertCount > 0)
+        runtimeCheck(insertCount == 0)
+        runtimeCheck(anchor.valid)
         val location = anchorIndex(anchor) + offset
         val currentGroup = currentGroup
-        require(location in currentGroup until currentGroupEnd)
+        runtimeCheck(location in currentGroup until currentGroupEnd)
         val parent = parent(location)
         val size = groupSize(location)
         val nodes = if (isNode(location)) 1 else nodeCount(location)
@@ -2154,7 +2156,7 @@ internal class SlotWriter(
      * @return a list of the anchors that were moved
      */
     fun moveFrom(table: SlotTable, index: Int): List<Anchor> {
-        require(insertCount > 0)
+        runtimeCheck(insertCount > 0)
 
         if (index == 0 && currentGroup == 0 && this.table.groupsSize == 0) {
             // Special case for moving the entire slot table into an empty table. This case occurs
@@ -3218,7 +3220,7 @@ private fun IntArray.nodeCount(address: Int) =
 
 private fun IntArray.updateNodeCount(address: Int, value: Int) {
     @Suppress("ConvertTwoComparisonsToRangeCheck")
-    require(value >= 0 && value < NodeCount_Mask)
+    runtimeCheck(value >= 0 && value < NodeCount_Mask)
     this[address * Group_Fields_Size + GroupInfo_Offset] =
         (this[address * Group_Fields_Size + GroupInfo_Offset] and NodeCount_Mask.inv()) or value
 }
@@ -3241,7 +3243,7 @@ private fun IntArray.parentAnchors(len: Int = size) =
 // Slot count access
 private fun IntArray.groupSize(address: Int) = this[address * Group_Fields_Size + Size_Offset]
 private fun IntArray.updateGroupSize(address: Int, value: Int) {
-    require(value >= 0)
+    runtimeCheck(value >= 0)
     this[address * Group_Fields_Size + Size_Offset] = value
 }
 
