@@ -758,6 +758,7 @@ internal class ComposeViewAdapter : FrameLayout {
         if (::clock.isInitialized) {
             clock.dispose()
         }
+        FakeSavedStateRegistryOwner.lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
         FakeViewModelStoreOwner.viewModelStore.clear()
     }
 
@@ -831,19 +832,19 @@ internal class ComposeViewAdapter : FrameLayout {
 
     @SuppressLint("VisibleForTests")
     private val FakeSavedStateRegistryOwner = object : SavedStateRegistryOwner {
-        private val lifecycle = LifecycleRegistry.createUnsafe(this)
+        val lifecycleRegistry = LifecycleRegistry.createUnsafe(this)
         private val controller = SavedStateRegistryController.create(this).apply {
             performRestore(Bundle())
         }
 
         init {
-            lifecycle.currentState = Lifecycle.State.RESUMED
+            lifecycleRegistry.currentState = Lifecycle.State.RESUMED
         }
 
         override val savedStateRegistry: SavedStateRegistry
             get() = controller.savedStateRegistry
 
-        override fun getLifecycle(): Lifecycle = lifecycle
+        override fun getLifecycle(): Lifecycle = lifecycleRegistry
     }
 
     private val FakeViewModelStoreOwner = object : ViewModelStoreOwner {
@@ -856,7 +857,7 @@ internal class ComposeViewAdapter : FrameLayout {
         private val onBackPressedDispatcher = OnBackPressedDispatcher()
 
         override fun getOnBackPressedDispatcher() = onBackPressedDispatcher
-        override fun getLifecycle() = FakeSavedStateRegistryOwner.lifecycle
+        override fun getLifecycle() = FakeSavedStateRegistryOwner.lifecycleRegistry
     }
 
     private val FakeActivityResultRegistryOwner = object : ActivityResultRegistryOwner {
