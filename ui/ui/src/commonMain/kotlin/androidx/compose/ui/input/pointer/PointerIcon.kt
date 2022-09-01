@@ -98,10 +98,11 @@ fun Modifier.pointerHoverIcon(icon: PointerIcon, overrideDescendants: Boolean = 
                         val isOutsideRelease = event.type == PointerEventType.Release &&
                             event.changes[0].isOutOfBounds(size, Size.Zero)
 
-                        hovered.value = false
                         if (event.type != PointerEventType.Exit && !isOutsideRelease) {
                             hovered.value = true
                             pointerIconService.current = rememberIcon.value
+                        } else {
+                            hovered.value = false
                         }
                     }
                 }
