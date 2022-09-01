@@ -44,10 +44,3 @@ dependencies {
 // Define a task dependency so the app is installed before we run macro benchmarks.
 tasks.getByPath(":compose:integration-tests:macrobenchmark:connectedCheck")
     .dependsOn(tasks.getByPath(":compose:integration-tests:macrobenchmark-target:installRelease"))
-
-// Allow usage of Kotlin's @OptIn.
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += ["-opt-in=kotlin.RequiresOptIn"]
-    }
-}
