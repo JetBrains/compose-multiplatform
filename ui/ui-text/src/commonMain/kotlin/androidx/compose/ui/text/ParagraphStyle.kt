@@ -18,6 +18,7 @@ package androidx.compose.ui.text
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
@@ -49,6 +50,7 @@ private val DefaultLineHeight = TextUnit.Unspecified
  * line, whether to apply additional space as a result of line height to top of first line top and
  * bottom of last line. The configuration is applied only when a [lineHeight] is defined.
  * When null, [LineHeightStyle.Default] is used.
+ * @param lineBreak The line breaking configuration for the text.
  *
  * @see Paragraph
  * @see AnnotatedString
@@ -56,13 +58,15 @@ private val DefaultLineHeight = TextUnit.Unspecified
  * @see TextStyle
  */
 @Immutable
-class ParagraphStyle constructor(
+class ParagraphStyle @ExperimentalTextApi constructor(
     val textAlign: TextAlign? = null,
     val textDirection: TextDirection? = null,
     val lineHeight: TextUnit = TextUnit.Unspecified,
     val textIndent: TextIndent? = null,
     val platformStyle: PlatformParagraphStyle? = null,
-    val lineHeightStyle: LineHeightStyle? = null
+    val lineHeightStyle: LineHeightStyle? = null,
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalTextApi val lineBreak: LineBreak? = null
 ) {
 
     /**
@@ -100,6 +104,51 @@ class ParagraphStyle constructor(
         lineHeightStyle = null
     )
 
+    /**
+     * Paragraph styling configuration for a paragraph. The difference between [SpanStyle] and
+     * `ParagraphStyle` is that, `ParagraphStyle` can be applied to a whole [Paragraph] while
+     * [SpanStyle] can be applied at the character level.
+     * Once a portion of the text is marked with a `ParagraphStyle`, that portion will be separated from
+     * the remaining as if a line feed character was added.
+     *
+     * @sample androidx.compose.ui.text.samples.ParagraphStyleSample
+     * @sample androidx.compose.ui.text.samples.ParagraphStyleAnnotatedStringsSample
+     *
+     * @param textAlign The alignment of the text within the lines of the paragraph.
+     * @param textDirection The algorithm to be used to resolve the final text direction:
+     * Left To Right or Right To Left.
+     * @param lineHeight Line height for the [Paragraph] in [TextUnit] unit, e.g. SP or EM.
+     * @param textIndent The indentation of the paragraph.
+     * @param platformStyle Platform specific [ParagraphStyle] parameters.
+     * @param lineHeightStyle the configuration for line height such as vertical alignment of the
+     * line, whether to apply additional space as a result of line height to top of first line top and
+     * bottom of last line. The configuration is applied only when a [lineHeight] is defined.
+     * When null, [LineHeightStyle.Default] is used.
+     *
+     * @see Paragraph
+     * @see AnnotatedString
+     * @see SpanStyle
+     * @see TextStyle
+     */
+    // TODO(b/245939557): Deprecate this when LineBreak is stable
+    @OptIn(ExperimentalTextApi::class)
+    constructor(
+        textAlign: TextAlign? = null,
+        textDirection: TextDirection? = null,
+        lineHeight: TextUnit = TextUnit.Unspecified,
+        textIndent: TextIndent? = null,
+        platformStyle: PlatformParagraphStyle? = null,
+        lineHeightStyle: LineHeightStyle? = null
+    ) : this(
+        textAlign = textAlign,
+        textDirection = textDirection,
+        lineHeight = lineHeight,
+        textIndent = textIndent,
+        platformStyle = platformStyle,
+        lineHeightStyle = lineHeightStyle,
+        lineBreak = null
+    )
+
     init {
         if (lineHeight != TextUnit.Unspecified) {
             // Since we are checking if it's negative, no need to convert Sp into Px at this point.
@@ -115,6 +164,7 @@ class ParagraphStyle constructor(
      *
      * If the given paragraph style is null, returns this paragraph style.
      */
+    @OptIn(ExperimentalTextApi::class)
     @Stable
     fun merge(other: ParagraphStyle? = null): ParagraphStyle {
         if (other == null) return this
@@ -129,7 +179,8 @@ class ParagraphStyle constructor(
             textAlign = other.textAlign ?: this.textAlign,
             textDirection = other.textDirection ?: this.textDirection,
             platformStyle = mergePlatformStyle(other.platformStyle),
-            lineHeightStyle = other.lineHeightStyle ?: this.lineHeightStyle
+            lineHeightStyle = other.lineHeightStyle ?: this.lineHeightStyle,
+            lineBreak = other.lineBreak ?: this.lineBreak
         )
     }
 
@@ -145,6 +196,7 @@ class ParagraphStyle constructor(
     @Stable
     operator fun plus(other: ParagraphStyle): ParagraphStyle = this.merge(other)
 
+    @OptIn(ExperimentalTextApi::class)
     fun copy(
         textAlign: TextAlign? = this.textAlign,
         textDirection: TextDirection? = this.textDirection,
@@ -157,10 +209,13 @@ class ParagraphStyle constructor(
             lineHeight = lineHeight,
             textIndent = textIndent,
             platformStyle = this.platformStyle,
-            lineHeightStyle = this.lineHeightStyle
+            lineHeightStyle = this.lineHeightStyle,
+            lineBreak = this.lineBreak
         )
     }
 
+    // TODO(b/245939557): Deprecate this when LineBreak is stable
+    @OptIn(ExperimentalTextApi::class)
     fun copy(
         textAlign: TextAlign? = this.textAlign,
         textDirection: TextDirection? = this.textDirection,
@@ -175,10 +230,33 @@ class ParagraphStyle constructor(
             lineHeight = lineHeight,
             textIndent = textIndent,
             platformStyle = platformStyle,
-            lineHeightStyle = lineHeightStyle
+            lineHeightStyle = lineHeightStyle,
+            lineBreak = this.lineBreak
         )
     }
 
+    @ExperimentalTextApi
+    fun copy(
+        textAlign: TextAlign? = this.textAlign,
+        textDirection: TextDirection? = this.textDirection,
+        lineHeight: TextUnit = this.lineHeight,
+        textIndent: TextIndent? = this.textIndent,
+        platformStyle: PlatformParagraphStyle? = this.platformStyle,
+        lineHeightStyle: LineHeightStyle? = this.lineHeightStyle,
+        lineBreak: LineBreak? = this.lineBreak
+    ): ParagraphStyle {
+        return ParagraphStyle(
+            textAlign = textAlign,
+            textDirection = textDirection,
+            lineHeight = lineHeight,
+            textIndent = textIndent,
+            platformStyle = platformStyle,
+            lineHeightStyle = lineHeightStyle,
+            lineBreak = lineBreak
+        )
+    }
+
+    @OptIn(ExperimentalTextApi::class)
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ParagraphStyle) return false
@@ -189,10 +267,12 @@ class ParagraphStyle constructor(
         if (textIndent != other.textIndent) return false
         if (platformStyle != other.platformStyle) return false
         if (lineHeightStyle != other.lineHeightStyle) return false
+        if (lineBreak != other.lineBreak) return false
 
         return true
     }
 
+    @OptIn(ExperimentalTextApi::class)
     override fun hashCode(): Int {
         var result = textAlign?.hashCode() ?: 0
         result = 31 * result + (textDirection?.hashCode() ?: 0)
@@ -200,9 +280,11 @@ class ParagraphStyle constructor(
         result = 31 * result + (textIndent?.hashCode() ?: 0)
         result = 31 * result + (platformStyle?.hashCode() ?: 0)
         result = 31 * result + (lineHeightStyle?.hashCode() ?: 0)
+        result = 31 * result + (lineBreak?.hashCode() ?: 0)
         return result
     }
 
+    @OptIn(ExperimentalTextApi::class)
     override fun toString(): String {
         return "ParagraphStyle(" +
             "textAlign=$textAlign, " +
@@ -210,7 +292,8 @@ class ParagraphStyle constructor(
             "lineHeight=$lineHeight, " +
             "textIndent=$textIndent, " +
             "platformStyle=$platformStyle, " +
-            "lineHeightStyle=$lineHeightStyle" +
+            "lineHeightStyle=$lineHeightStyle, " +
+            "lineBreak=$lineBreak" +
             ")"
     }
 }
@@ -228,6 +311,7 @@ class ParagraphStyle constructor(
  * between [start] and [stop]. The interpolation can be extrapolated beyond 0.0 and
  * 1.0, so negative values and values greater than 1.0 are valid.
  */
+@OptIn(ExperimentalTextApi::class)
 @Stable
 fun lerp(start: ParagraphStyle, stop: ParagraphStyle, fraction: Float): ParagraphStyle {
     return ParagraphStyle(
@@ -248,7 +332,8 @@ fun lerp(start: ParagraphStyle, stop: ParagraphStyle, fraction: Float): Paragrap
             start.lineHeightStyle,
             stop.lineHeightStyle,
             fraction
-        )
+        ),
+        lineBreak = lerpDiscrete(start.lineBreak, stop.lineBreak, fraction)
     )
 }
 
@@ -263,6 +348,7 @@ private fun lerpPlatformStyle(
     return lerp(startNonNull, stopNonNull, fraction)
 }
 
+@OptIn(ExperimentalTextApi::class)
 internal fun resolveParagraphStyleDefaults(
     style: ParagraphStyle,
     direction: LayoutDirection
@@ -272,5 +358,6 @@ internal fun resolveParagraphStyleDefaults(
     lineHeight = if (style.lineHeight.isUnspecified) DefaultLineHeight else style.lineHeight,
     textIndent = style.textIndent ?: TextIndent.None,
     platformStyle = style.platformStyle,
-    lineHeightStyle = style.lineHeightStyle
+    lineHeightStyle = style.lineHeightStyle,
+    lineBreak = style.lineBreak ?: LineBreak.Simple
 )

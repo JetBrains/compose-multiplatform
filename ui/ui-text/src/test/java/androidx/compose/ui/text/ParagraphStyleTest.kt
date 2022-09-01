@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.text
 
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.LineHeightStyle.Trim
 import androidx.compose.ui.text.style.LineHeightStyle.Alignment
@@ -159,6 +160,50 @@ class ParagraphStyleTest {
         val newStyle = style.merge(otherStyle)
 
         assertThat(newStyle.textIndent).isNull()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge null with non-null lineBreak uses other's lineBreak`() {
+        val style = ParagraphStyle(lineBreak = null)
+        val otherStyle = ParagraphStyle(lineBreak = LineBreak.Heading)
+
+        val mergedStyle = style.merge(otherStyle)
+
+        assertThat(mergedStyle.lineBreak).isEqualTo(otherStyle.lineBreak)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge non-null with null lineBreak returns original's lineBreak`() {
+        val style = ParagraphStyle(lineBreak = LineBreak.Paragraph)
+        val otherStyle = ParagraphStyle(lineBreak = null)
+
+        val mergedStyle = style.merge(otherStyle)
+
+        assertThat(mergedStyle.lineBreak).isEqualTo(style.lineBreak)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge null with null lineBreak returns null`() {
+        val style = ParagraphStyle(lineBreak = null)
+        val otherStyle = ParagraphStyle(lineBreak = null)
+
+        val mergedStyle = style.merge(otherStyle)
+
+        assertThat(mergedStyle.lineBreak).isEqualTo(null)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge non-null with non-null lineBreak returns other's lineBreak`() {
+        val style = ParagraphStyle(lineBreak = LineBreak.Paragraph)
+        val otherStyle = ParagraphStyle(lineBreak = LineBreak.Heading)
+
+        val mergedStyle = style.merge(otherStyle)
+
+        assertThat(mergedStyle.lineBreak).isEqualTo(otherStyle.lineBreak)
     }
 
     @OptIn(ExperimentalTextApi::class)
@@ -377,6 +422,50 @@ class ParagraphStyleTest {
 
     @OptIn(ExperimentalTextApi::class)
     @Test
+    fun `lerp with non-null start, null end, closer to start has non-null lineBreak`() {
+        val style = ParagraphStyle(lineBreak = LineBreak.Heading)
+        val otherStyle = ParagraphStyle(lineHeightStyle = null)
+
+        val lerpedStyle = lerp(start = style, stop = otherStyle, fraction = 0.4f)
+
+        assertThat(lerpedStyle.lineBreak).isSameInstanceAs(style.lineBreak)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp with non-null start, null end, closer to end has null lineBreak`() {
+        val style = ParagraphStyle(lineBreak = LineBreak.Heading)
+        val otherStyle = ParagraphStyle(lineHeightStyle = null)
+
+        val lerpedStyle = lerp(start = style, stop = otherStyle, fraction = 0.6f)
+
+        assertThat(lerpedStyle.lineBreak).isNull()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp with null start, non-null end, closer to start has null lineBreak`() {
+        val style = ParagraphStyle(lineHeightStyle = null)
+        val otherStyle = ParagraphStyle(lineBreak = LineBreak.Heading)
+
+        val lerpedStyle = lerp(start = style, stop = otherStyle, fraction = 0.4f)
+
+        assertThat(lerpedStyle.lineBreak).isNull()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp with null start, non-null end, closer to end has non-null lineBreak`() {
+        val style = ParagraphStyle(lineBreak = null)
+        val otherStyle = ParagraphStyle(lineBreak = LineBreak.Heading)
+
+        val lerpedStyle = lerp(start = style, stop = otherStyle, fraction = 0.6f)
+
+        assertThat(lerpedStyle.lineBreak).isSameInstanceAs(otherStyle.lineBreak)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
     fun `equals return false for different line height behavior`() {
         val style = ParagraphStyle(lineHeightStyle = null)
         val otherStyle = ParagraphStyle(lineHeightStyle = LineHeightStyle.Default)
@@ -513,5 +602,41 @@ class ParagraphStyleTest {
         val style = ParagraphStyle(textAlign = TextAlign.Start)
 
         assertThat(style.lineHeightStyle).isNull()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `copy with lineBreak returns new lineBreak`() {
+        val style = ParagraphStyle(lineBreak = LineBreak.Paragraph)
+        val newStyle = style.copy(lineBreak = LineBreak.Heading)
+
+        assertThat(newStyle.lineBreak).isEqualTo(LineBreak.Heading)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `copy without lineBreak uses existing lineBreak`() {
+        val style = ParagraphStyle(lineBreak = LineBreak.Paragraph)
+        val newStyle = style.copy()
+
+        assertThat(newStyle.lineBreak).isEqualTo(style.lineBreak)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `hashCode is same for same lineBreak`() {
+        val style = ParagraphStyle(lineBreak = LineBreak.Paragraph)
+        val otherStyle = ParagraphStyle(lineBreak = LineBreak.Paragraph)
+
+        assertThat(style.hashCode()).isEqualTo(otherStyle.hashCode())
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `hashCode is different for different lineBreak`() {
+        val style = ParagraphStyle(lineBreak = LineBreak.Paragraph)
+        val otherStyle = ParagraphStyle(lineBreak = LineBreak.Heading)
+
+        assertThat(style.hashCode()).isNotEqualTo(otherStyle.hashCode())
     }
 }

@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.lerp
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.LineHeightStyle.Trim
 import androidx.compose.ui.text.style.LineHeightStyle.Alignment
@@ -66,6 +67,7 @@ class TextStyleTest {
         assertThat(style.textDecoration).isNull()
         assertThat(style.fontFamily).isNull()
         assertThat(style.platformStyle).isNull()
+        assertThat(style.lineBreak).isNull()
     }
 
     @OptIn(ExperimentalTextApi::class)
@@ -148,6 +150,26 @@ class TextStyleTest {
             assertThat(this.color).isEqualTo(Color.Red)
             assertThat(this.brush).isNull()
         }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `copy with lineBreak returns new lineBreak`() {
+        val style = TextStyle(lineBreak = LineBreak.Paragraph)
+
+        val newStyle = style.copy(lineBreak = LineBreak.Heading)
+
+        assertThat(newStyle.lineBreak).isEqualTo(LineBreak.Heading)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `copy without lineBreak uses existing lineBreak`() {
+        val style = TextStyle(lineBreak = LineBreak.Paragraph)
+
+        val newStyle = style.copy()
+
+        assertThat(newStyle.lineBreak).isEqualTo(style.lineBreak)
     }
 
     @Test
@@ -249,6 +271,14 @@ class TextStyleTest {
         val style = TextStyle(fontFamily = fontFamily)
 
         assertThat(style.fontFamily).isEqualTo(fontFamily)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `constructor with customized lineBreak`() {
+        val style = TextStyle(lineBreak = LineBreak.Heading)
+
+        assertThat(style.lineBreak).isEqualTo(LineBreak.Heading)
     }
 
     @Test
@@ -667,6 +697,50 @@ class TextStyleTest {
         assertThat(mergedStyle.color).isEqualTo(Color.Unspecified)
         assertThat(mergedStyle.brush).isEqualTo(brush)
         assertThat(mergedStyle.alpha).isEqualTo(0.3f)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge null and non-null lineBreak uses other's lineBreak`() {
+        val style = TextStyle(lineBreak = null)
+        val otherStyle = TextStyle(lineBreak = LineBreak.Heading)
+
+        val mergedStyle = style.merge(otherStyle)
+
+        assertThat(mergedStyle.lineBreak).isEqualTo(otherStyle.lineBreak)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge non-null and null lineBreak uses original`() {
+        val style = TextStyle(lineBreak = LineBreak.Paragraph)
+        val otherStyle = TextStyle(lineBreak = null)
+
+        val mergedStyle = style.merge(otherStyle)
+
+        assertThat(mergedStyle.lineBreak).isEqualTo(style.lineBreak)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge with both null lineBreak uses null`() {
+        val style = TextStyle(lineBreak = null)
+        val otherStyle = TextStyle(lineBreak = null)
+
+        val mergedStyle = style.merge(otherStyle)
+
+        assertThat(mergedStyle.lineBreak).isEqualTo(null)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge with both non-null lineBreak uses other's lineBreak`() {
+        val style = TextStyle(lineBreak = LineBreak.Paragraph)
+        val otherStyle = TextStyle(lineBreak = LineBreak.Heading)
+
+        val mergedStyle = style.merge(otherStyle)
+
+        assertThat(mergedStyle.lineBreak).isEqualTo(otherStyle.lineBreak)
     }
 
     @Test
@@ -1210,6 +1284,50 @@ class TextStyleTest {
         assertThat(newStyle.color).isEqualTo(Color.Unspecified)
     }
 
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp with non-null start, null end, closer to start has non-null lineBreak`() {
+        val style = TextStyle(lineBreak = LineBreak.Heading)
+        val otherStyle = TextStyle(lineHeightStyle = null)
+
+        val lerpedStyle = lerp(start = style, stop = otherStyle, fraction = 0.4f)
+
+        assertThat(lerpedStyle.lineBreak).isSameInstanceAs(style.lineBreak)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp with non-null start, null end, closer to end has null lineBreak`() {
+        val style = TextStyle(lineBreak = LineBreak.Heading)
+        val otherStyle = TextStyle(lineHeightStyle = null)
+
+        val lerpedStyle = lerp(start = style, stop = otherStyle, fraction = 0.6f)
+
+        assertThat(lerpedStyle.lineBreak).isNull()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp with null start, non-null end, closer to start has null lineBreak`() {
+        val style = TextStyle(lineHeightStyle = null)
+        val otherStyle = TextStyle(lineBreak = LineBreak.Heading)
+
+        val lerpedStyle = lerp(start = style, stop = otherStyle, fraction = 0.4f)
+
+        assertThat(lerpedStyle.lineBreak).isNull()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp with null start, non-null end, closer to end has non-null lineBreak`() {
+        val style = TextStyle(lineBreak = null)
+        val otherStyle = TextStyle(lineBreak = LineBreak.Heading)
+
+        val lerpedStyle = lerp(start = style, stop = otherStyle, fraction = 0.6f)
+
+        assertThat(lerpedStyle.lineBreak).isSameInstanceAs(otherStyle.lineBreak)
+    }
+
     @Test
     fun `toSpanStyle return attributes with correct values`() {
         val color = Color.Red
@@ -1330,13 +1448,19 @@ class TextStyleTest {
             alignment = Alignment.Center,
             trim = Trim.None
         )
+        val lineBreak = LineBreak(
+            strategy = LineBreak.Strategy.Balanced,
+            strictness = LineBreak.Strictness.Strict,
+            wordBreak = LineBreak.WordBreak.Phrase
+        )
 
         val style = TextStyle(
             textAlign = textAlign,
             textDirection = textDirection,
             lineHeight = lineHeight,
             textIndent = textIndent,
-            lineHeightStyle = lineHeightStyle
+            lineHeightStyle = lineHeightStyle,
+            lineBreak = lineBreak
         )
 
         assertThat(style.toParagraphStyle()).isEqualTo(
@@ -1345,7 +1469,8 @@ class TextStyleTest {
                 textDirection = textDirection,
                 lineHeight = lineHeight,
                 textIndent = textIndent,
-                lineHeightStyle = lineHeightStyle
+                lineHeightStyle = lineHeightStyle,
+                lineBreak = lineBreak
             )
         )
     }

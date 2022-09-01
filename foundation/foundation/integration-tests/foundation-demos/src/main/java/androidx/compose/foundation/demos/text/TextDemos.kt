@@ -38,6 +38,7 @@ val TextDemos = DemoCategory(
         ComposableDemo("Line Height Behavior") { TextLineHeightDemo() },
         ComposableDemo("Interactive text") { InteractiveTextDemo() },
         ComposableDemo("Ellipsize and letterspacing") { EllipsizeWithLetterSpacing() },
+        ComposableDemo("Line breaking") { TextLineBreakingDemo() },
         DemoCategory(
             "Text Overflow",
             listOf(
