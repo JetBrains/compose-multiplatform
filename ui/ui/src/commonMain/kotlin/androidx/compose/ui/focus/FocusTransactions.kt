@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.focus
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.Captured
@@ -37,13 +38,20 @@ internal fun FocusModifier.requestFocus() {
         return
     }
     when (focusState) {
-        Active, Captured, Deactivated, DeactivatedParent -> {
+        Active, Captured -> {
             // There is no change in focus state, but we send a focus event to notify the user
             // that the focus request is completed.
             sendOnFocusEvent()
         }
         ActiveParent -> if (clearChildFocus()) grantFocus()
-
+        Deactivated, DeactivatedParent -> {
+            // If the node is deactivated, we perform a moveFocus(Enter).
+            @OptIn(ExperimentalComposeUiApi::class)
+            findChildCorrespondingToFocusEnter(FocusDirection.Enter) {
+                it.requestFocus()
+                true
+            }
+        }
         Inactive -> {
             val focusParent = parent
             if (focusParent != null) {

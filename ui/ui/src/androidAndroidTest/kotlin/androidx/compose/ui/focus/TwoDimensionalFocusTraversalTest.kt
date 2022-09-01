@@ -60,7 +60,7 @@ class TwoDimensionalFocusTraversalTest(param: Param) {
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
-        fun initParameters() = listOf(Param(Left), Param(Right), Param(Up), Param(Down))
+        fun initParameters() = listOf(Left, Right, Up, Down).map { Param(it) }
     }
 
     @FlakyTest(bugId = 233373546)

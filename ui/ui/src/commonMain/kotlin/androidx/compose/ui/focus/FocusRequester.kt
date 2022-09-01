@@ -52,7 +52,33 @@ class FocusRequester {
      */
     fun requestFocus() {
         check(focusRequesterModifierLocals.isNotEmpty()) { focusRequesterNotInitialized }
-        focusRequesterModifierLocals.forEach { it.findFocusNode()?.requestFocus() }
+        performRequestFocus {
+            it.requestFocus()
+            // TODO(b/245755256): Make focusModifier.requestFocus() return a Boolean.
+            true
+        }
+    }
+
+    /**
+     * This function searches down the hierarchy and calls [onFound] for all focus nodes associated
+     * with this [FocusRequester].
+     * @param onFound the callback that is run when the child is found.
+     * @return false if no focus nodes were found or if the FocusRequester is
+     * [FocusRequester.Cancel]. Returns null if the FocusRequester is [FocusRequester.Default].
+     * Otherwise returns a logical or of the result of calling [onFound] for each focus node
+     * associated with this [FocusRequester].
+     */
+    @OptIn(ExperimentalComposeUiApi::class)
+    internal fun performRequestFocus(onFound: (FocusModifier) -> Boolean): Boolean? = when (this) {
+        Cancel -> false
+        Default -> null
+        else -> {
+            var success = false
+            focusRequesterModifierLocals.forEach {
+                it.findFocusNode()?.let { success = onFound.invoke(it) || success }
+            }
+            success
+        }
     }
 
     /**
