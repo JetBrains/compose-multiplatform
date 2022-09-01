@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:JvmName("TextDrawStyleKt")
 
 package androidx.compose.ui.text.style
 
@@ -35,17 +36,17 @@ import androidx.compose.ui.util.lerp
  * - Both [color] can be [Color.Unspecified] and [brush] null, indicating that nothing is specified.
  * - [SolidColor] brushes are stored as regular [Color].
  */
-internal interface TextDrawStyle {
+internal interface TextForegroundStyle {
     val color: Color
 
     val brush: Brush?
 
     val alpha: Float
 
-    fun merge(other: TextDrawStyle): TextDrawStyle {
-        // This control prevents Color or Unspecified TextDrawStyle to override an existing Brush.
-        // It is a temporary measure to prevent Material Text composables to remove given Brush
-        // from a TextStyle.
+    fun merge(other: TextForegroundStyle): TextForegroundStyle {
+        // This control prevents Color or Unspecified TextForegroundStyle to override an existing
+        // Brush. It is a temporary measure to prevent Material Text composables to remove given
+        // Brush from a TextStyle.
         // TODO(b/230787077): Just return other.takeOrElse { this } when Brush is stable.
         return when {
             other is BrushStyle && this is BrushStyle ->
@@ -56,11 +57,11 @@ internal interface TextDrawStyle {
         }
     }
 
-    fun takeOrElse(other: () -> TextDrawStyle): TextDrawStyle {
+    fun takeOrElse(other: () -> TextForegroundStyle): TextForegroundStyle {
         return if (this != Unspecified) this else other()
     }
 
-    object Unspecified : TextDrawStyle {
+    object Unspecified : TextForegroundStyle {
         override val color: Color
             get() = Color.Unspecified
 
@@ -72,11 +73,11 @@ internal interface TextDrawStyle {
     }
 
     companion object {
-        fun from(color: Color): TextDrawStyle {
+        fun from(color: Color): TextForegroundStyle {
             return if (color.isSpecified) ColorStyle(color) else Unspecified
         }
 
-        fun from(brush: Brush?, alpha: Float): TextDrawStyle {
+        fun from(brush: Brush?, alpha: Float): TextForegroundStyle {
             return when (brush) {
                 null -> Unspecified
                 is SolidColor -> from(brush.value.modulate(alpha))
@@ -88,10 +89,10 @@ internal interface TextDrawStyle {
 
 private data class ColorStyle(
     val value: Color
-) : TextDrawStyle {
+) : TextForegroundStyle {
     init {
         require(value.isSpecified) {
-            "ColorStyle value must be specified, use TextDrawStyle.Unspecified instead."
+            "ColorStyle value must be specified, use TextForegroundStyle.Unspecified instead."
         }
     }
 
@@ -108,7 +109,7 @@ private data class ColorStyle(
 private data class BrushStyle(
     val value: ShaderBrush,
     override val alpha: Float
-) : TextDrawStyle {
+) : TextForegroundStyle {
     override val color: Color
         get() = Color.Unspecified
 
@@ -117,14 +118,18 @@ private data class BrushStyle(
 }
 
 /**
- * If both TextDrawStyles do not represent a Brush, lerp the color values. Otherwise, lerp
+ * If both TextForegroundStyles do not represent a Brush, lerp the color values. Otherwise, lerp
  * start to end discretely.
  */
-internal fun lerp(start: TextDrawStyle, stop: TextDrawStyle, fraction: Float): TextDrawStyle {
+internal fun lerp(
+    start: TextForegroundStyle,
+    stop: TextForegroundStyle,
+    fraction: Float
+): TextForegroundStyle {
     return if ((start !is BrushStyle && stop !is BrushStyle)) {
-        TextDrawStyle.from(lerpColor(start.color, stop.color, fraction))
+        TextForegroundStyle.from(lerpColor(start.color, stop.color, fraction))
     } else if (start is BrushStyle && stop is BrushStyle) {
-        TextDrawStyle.from(
+        TextForegroundStyle.from(
             lerpDiscrete(start.brush, stop.brush, fraction),
             lerp(start.alpha, stop.alpha, fraction)
         )
