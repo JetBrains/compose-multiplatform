@@ -1176,11 +1176,7 @@ class MultiParagraphIntegrationTest {
         )
 
         val bitmapWithSpan = multiParagraph.bitmap()
-        // Our text rendering stack relies on the fact that given textstyle is also passed to draw
-        // functions of TextLayoutResult, MultiParagraph, Paragraph. If Underline is not specified
-        // here, it would be removed while drawing the MultiParagraph. We are simply mimicking
-        // what TextPainter does.
-        val bitmapNoSpan = multiParagraph2.bitmap(textDecoration = TextDecoration.Underline)
+        val bitmapNoSpan = multiParagraph2.bitmap()
 
         assertThat(bitmapWithSpan).isEqualToBitmap(bitmapNoSpan)
     }

@@ -41,18 +41,18 @@ internal class AndroidTextPaint(flags: Int, density: Float) : TextPaint(flags) {
     private var brushSize: Size? = null
 
     fun setTextDecoration(textDecoration: TextDecoration?) {
-        val tmpTextDecoration = textDecoration ?: TextDecoration.None
-        if (this.textDecoration != tmpTextDecoration) {
-            this.textDecoration = tmpTextDecoration
+        if (textDecoration == null) return
+        if (this.textDecoration != textDecoration) {
+            this.textDecoration = textDecoration
             isUnderlineText = TextDecoration.Underline in this.textDecoration
             isStrikeThruText = TextDecoration.LineThrough in this.textDecoration
         }
     }
 
     fun setShadow(shadow: Shadow?) {
-        val tmpShadow = shadow ?: Shadow.None
-        if (this.shadow != tmpShadow) {
-            this.shadow = tmpShadow
+        if (shadow == null) return
+        if (this.shadow != shadow) {
+            this.shadow = shadow
             if (this.shadow == Shadow.None) {
                 clearShadowLayer()
             } else {
@@ -73,6 +73,8 @@ internal class AndroidTextPaint(flags: Int, density: Float) : TextPaint(flags) {
                 this.color = argbColor
             }
             this.shader = null
+            this.brush = null
+            this.brushSize = null
         }
     }
 
@@ -84,9 +86,6 @@ internal class AndroidTextPaint(flags: Int, density: Float) : TextPaint(flags) {
                 this.brushSize = null
             }
             is SolidColor -> {
-                this.shader = null
-                this.brush = null
-                this.brushSize = null
                 setColor(brush.value.modulate(alpha))
             }
             is ShaderBrush -> {
