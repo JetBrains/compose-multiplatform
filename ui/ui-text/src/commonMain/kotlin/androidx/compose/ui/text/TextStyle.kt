@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -142,7 +143,8 @@ class TextStyle internal constructor(
             textIndent = textIndent,
             platformStyle = null,
             lineHeightStyle = null,
-            lineBreak = null
+            lineBreak = null,
+            hyphens = null
         ),
         platformStyle = null
     )
@@ -182,7 +184,7 @@ class TextStyle internal constructor(
      * and bottom of last line. The configuration is applied only when a [lineHeight] is defined.
      * When null, [LineHeightStyle.Default] is used.
      */
-    // TODO(b/245939557): Deprecate this when LineBreak is stable
+    // TODO(b/246715337, b/245939557): Deprecate this when Hyphens and LineBreak are stable
     @OptIn(ExperimentalTextApi::class)
     constructor(
         color: Color = Color.Unspecified,
@@ -230,7 +232,8 @@ class TextStyle internal constructor(
             textIndent = textIndent,
             platformStyle = platformStyle?.paragraphStyle,
             lineHeightStyle = lineHeightStyle,
-            lineBreak = null
+            lineBreak = null,
+            hyphens = null
         ),
         platformStyle = platformStyle
     )
@@ -270,6 +273,7 @@ class TextStyle internal constructor(
      * and bottom of last line. The configuration is applied only when a [lineHeight] is defined.
      * When null, [LineHeightStyle.Default] is used.
      * @param lineBreak The line breaking configuration for the text.
+     * @param hyphens The configuration of hyphenation.
      */
     @ExperimentalTextApi
     constructor(
@@ -293,7 +297,8 @@ class TextStyle internal constructor(
         textIndent: TextIndent? = null,
         platformStyle: PlatformTextStyle? = null,
         lineHeightStyle: LineHeightStyle? = null,
-        lineBreak: LineBreak? = null
+        lineBreak: LineBreak? = null,
+        hyphens: Hyphens? = null
     ) : this(
         SpanStyle(
             color = color,
@@ -319,7 +324,8 @@ class TextStyle internal constructor(
             textIndent = textIndent,
             platformStyle = platformStyle?.paragraphStyle,
             lineHeightStyle = lineHeightStyle,
-            lineBreak = lineBreak
+            lineBreak = lineBreak,
+            hyphens = hyphens
         ),
         platformStyle = platformStyle
     )
@@ -362,6 +368,7 @@ class TextStyle internal constructor(
      * line, whether to apply additional space as a result of line height to top of first line top
      * and bottom of last line. The configuration is applied only when a [lineHeight] is defined.
      * @param lineBreak The line breaking configuration for the text.
+     * @param hyphens The configuration of hyphenation.
      */
     @ExperimentalTextApi
     constructor(
@@ -386,7 +393,8 @@ class TextStyle internal constructor(
         textIndent: TextIndent? = null,
         platformStyle: PlatformTextStyle? = null,
         lineHeightStyle: LineHeightStyle? = null,
-        lineBreak: LineBreak? = null
+        lineBreak: LineBreak? = null,
+        hyphens: Hyphens? = null
     ) : this(
         SpanStyle(
             brush = brush,
@@ -413,7 +421,8 @@ class TextStyle internal constructor(
             textIndent = textIndent,
             platformStyle = platformStyle?.paragraphStyle,
             lineHeightStyle = lineHeightStyle,
-            lineBreak = lineBreak
+            lineBreak = lineBreak,
+            hyphens = hyphens
         ),
         platformStyle = platformStyle
     )
@@ -536,13 +545,14 @@ class TextStyle internal constructor(
                 textIndent = textIndent,
                 platformStyle = this.paragraphStyle.platformStyle,
                 lineHeightStyle = this.lineHeightStyle,
-                lineBreak = this.lineBreak
+                lineBreak = this.lineBreak,
+                hyphens = this.hyphens
             ),
             platformStyle = this.platformStyle
         )
     }
 
-    // TODO(b/245939557): Deprecate this when LineBreak is stable
+    // TODO(b/246715337, b/245939557): Deprecate this when Hyphens and LineBreak are stable
     @OptIn(ExperimentalTextApi::class)
     fun copy(
         color: Color = this.spanStyle.color,
@@ -595,7 +605,8 @@ class TextStyle internal constructor(
                 textIndent = textIndent,
                 platformStyle = platformStyle?.paragraphStyle,
                 lineHeightStyle = lineHeightStyle,
-                lineBreak = this.lineBreak
+                lineBreak = this.lineBreak,
+                hyphens = this.hyphens
             ),
             platformStyle = platformStyle
         )
@@ -623,7 +634,8 @@ class TextStyle internal constructor(
         textIndent: TextIndent? = this.paragraphStyle.textIndent,
         platformStyle: PlatformTextStyle? = this.platformStyle,
         lineHeightStyle: LineHeightStyle? = this.paragraphStyle.lineHeightStyle,
-        lineBreak: LineBreak? = this.paragraphStyle.lineBreak
+        lineBreak: LineBreak? = this.paragraphStyle.lineBreak,
+        hyphens: Hyphens? = this.paragraphStyle.hyphens
     ): TextStyle {
         return TextStyle(
             spanStyle = SpanStyle(
@@ -654,7 +666,8 @@ class TextStyle internal constructor(
                 textIndent = textIndent,
                 platformStyle = platformStyle?.paragraphStyle,
                 lineHeightStyle = lineHeightStyle,
-                lineBreak = lineBreak
+                lineBreak = lineBreak,
+                hyphens = hyphens
             ),
             platformStyle = platformStyle
         )
@@ -683,7 +696,8 @@ class TextStyle internal constructor(
         textIndent: TextIndent? = this.paragraphStyle.textIndent,
         platformStyle: PlatformTextStyle? = this.platformStyle,
         lineHeightStyle: LineHeightStyle? = this.paragraphStyle.lineHeightStyle,
-        lineBreak: LineBreak? = this.paragraphStyle.lineBreak
+        lineBreak: LineBreak? = this.paragraphStyle.lineBreak,
+        hyphens: Hyphens? = this.paragraphStyle.hyphens
     ): TextStyle {
         return TextStyle(
             spanStyle = SpanStyle(
@@ -711,7 +725,8 @@ class TextStyle internal constructor(
                 textIndent = textIndent,
                 platformStyle = platformStyle?.paragraphStyle,
                 lineHeightStyle = lineHeightStyle,
-                lineBreak = lineBreak
+                lineBreak = lineBreak,
+                hyphens = hyphens
             ),
             platformStyle = platformStyle
         )
@@ -747,7 +762,7 @@ class TextStyle internal constructor(
 
     /**
      * The typeface thickness to use when painting the text (e.g., bold).
-      */
+     */
     val fontWeight: FontWeight? get() = this.spanStyle.fontWeight
 
     /**
@@ -842,6 +857,14 @@ class TextStyle internal constructor(
     val lineHeightStyle: LineHeightStyle? get() = this.paragraphStyle.lineHeightStyle
 
     /**
+     * The hyphens configuration of the paragraph.
+     */
+    @ExperimentalTextApi
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalTextApi
+    val hyphens: Hyphens? get() = this.paragraphStyle.hyphens
+
+    /**
      * The line breaking configuration of the paragraph.
      */
     @ExperimentalTextApi
@@ -916,7 +939,8 @@ class TextStyle internal constructor(
             "textIndent=$textIndent, " +
             "platformStyle=$platformStyle, " +
             "lineHeightStyle=$lineHeightStyle, " +
-            "lineBreak=$lineBreak" +
+            "lineBreak=$lineBreak, " +
+            "hyphens=$hyphens" +
             ")"
     }
 
