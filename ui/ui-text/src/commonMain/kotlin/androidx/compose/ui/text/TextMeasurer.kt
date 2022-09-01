@@ -43,6 +43,9 @@ private val DefaultCacheSize = 8
 /**
  * TextMeasurer is responsible for measuring a text in its entirety so that it's ready to be drawn.
  *
+ * A TextMeasurer instance should be created via `androidx.compose.ui.rememberTextMeasurer` in a
+ * Composable context to use fallback values from default composition locals.
+ *
  * Text layout is a computationally expensive task. Therefore, this class holds an internal LRU
  * Cache of layout input and output pairs to optimize the repeated measure calls that use the same
  * input parameters.
@@ -94,12 +97,14 @@ class TextMeasurer constructor(
      * This function supports laying out text that consists of multiple paragraphs, includes
      * placeholders, wraps around soft line breaks, and might overflow outside the specified size.
      *
-     * Most parameters for text affect the final text layout. One pixel change in [size] can
-     * displace a word to another line which would cause a chain reaction that completely changes
-     * how text is rendered. On the other hand, some attributes only play a role when drawing the
-     * created text layout. For example text layout can be created completely in black color but we
-     * can apply [TextStyle.color] later in draw phase. This also means that animating text color
-     * shouldn't invalidate text layout.
+     * Most parameters for text affect the final text layout. One pixel change in [constraints]
+     * boundaries can displace a word to another line which would cause a chain reaction that
+     * completely changes how text is rendered.
+     *
+     * On the other hand, some attributes only play a role when drawing the created text layout.
+     * For example text layout can be created completely in black color but we can apply
+     * [TextStyle.color] later in draw phase. This also means that animating text color shouldn't
+     * invalidate text layout.
      *
      * Thus, [textLayoutCache] helps in the process of converting a set of text layout inputs to
      * a text layout while ignoring non-layout-affecting attributes. Iterative calls that use the
@@ -118,9 +123,10 @@ class TextMeasurer constructor(
      * skipped during layout and replaced with [Placeholder]. It's required that the range of each
      * [Placeholder] doesn't cross paragraph boundary, otherwise [IllegalArgumentException] is
      * thrown.
-     * @param size how wide and tall the text is allowed to be. [IntSize.width]
-     * will define the width of the text. [IntSize.height] helps defining the
-     * number of lines that fit if [softWrap] is enabled and [overflow] is [TextOverflow.Ellipsis].
+     * @param constraints how wide and tall the text is allowed to be. [Constraints.maxWidth]
+     * will define the width of the MultiParagraph. [Constraints.maxHeight] helps defining the
+     * number of lines that fit with ellipsis is true. [Constraints.minWidth] defines the minimum
+     * width the resulting [TextLayoutResult.size] will report. [Constraints.minHeight] is no-op.
      * @param layoutDirection layout direction of the measurement environment. If not specified,
      * defaults to the value that was given during initialization of this [TextMeasurer].
      * @param density density of the measurement environment. If not specified, defaults to
@@ -137,13 +143,12 @@ class TextMeasurer constructor(
         softWrap: Boolean = true,
         maxLines: Int = Int.MAX_VALUE,
         placeholders: List<AnnotatedString.Range<Placeholder>> = emptyList(),
-        size: IntSize = IntSize(Int.MAX_VALUE, Int.MAX_VALUE),
+        constraints: Constraints = Constraints(),
         layoutDirection: LayoutDirection = this.fallbackLayoutDirection,
         density: Density = this.fallbackDensity,
         fontFamilyResolver: FontFamily.Resolver = this.fallbackFontFamilyResolver,
         skipCache: Boolean = false
     ): TextLayoutResult {
-        val constraints = Constraints(maxWidth = size.width, maxHeight = size.height)
         val requestedTextLayoutInput = TextLayoutInput(
             text,
             style,

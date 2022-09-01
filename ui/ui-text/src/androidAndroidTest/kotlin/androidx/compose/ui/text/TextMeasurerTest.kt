@@ -28,7 +28,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
@@ -331,7 +330,7 @@ class TextMeasurerTest {
             softWrap = softWrap,
             maxLines = maxLines,
             placeholders = placeholders,
-            size = IntSize(constraints.maxWidth, constraints.maxHeight),
+            constraints = constraints,
         )
     }
 }

@@ -59,6 +59,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -141,7 +142,10 @@ fun DrawTextLongString() {
             topLeft = Offset(padding, padding),
             style = TextStyle(fontSize = fontSize6),
             overflow = TextOverflow.Visible,
-            size = IntSize((size.width - 2 * padding).toInt(), (size.height - 2 * padding).toInt())
+            maxSize = IntSize(
+                width = (size.width - 2 * padding).toInt(),
+                height = (size.height - 2 * padding).toInt()
+            )
         )
     }
 }
@@ -181,15 +185,12 @@ fun DrawTextCenter() {
                 textAlign = TextAlign.Center,
                 platformStyle = PlatformTextStyle(includeFontPadding = includeFontPadding)
             ),
-            size = IntSize((radius * 2).roundToPx(), (radius * 2).roundToPx())
+            constraints = Constraints.fixedWidth((radius * 2).roundToPx())
         )
 
         drawText(
             textLayoutResult,
-            topLeft = center - Offset(
-                textLayoutResult.size.width / 2f,
-                textLayoutResult.size.height / 2f
-            )
+            topLeft = center - Offset(radius.toPx(), textLayoutResult.size.height / 2f)
         )
 
         if (drawLines) {

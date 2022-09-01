@@ -30,8 +30,8 @@ import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.createFontFamilyResolver
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
@@ -109,7 +109,7 @@ class TextMeasurerBenchmark(
                 textMeasurer.measure(
                     text,
                     style = TextStyle(color = Color.Red, fontSize = fontSize),
-                    size = IntSize(width, Int.MAX_VALUE)
+                    constraints = Constraints.fixedWidth(width)
                 )
             }
         }
@@ -130,7 +130,7 @@ class TextMeasurerBenchmark(
                 textMeasurer.measure(
                     text,
                     style = TextStyle(color = Color.Red, fontSize = fontSize),
-                    size = IntSize(width, Int.MAX_VALUE)
+                    constraints = Constraints.fixedWidth(width)
                 )
             }
         }
@@ -149,7 +149,7 @@ class TextMeasurerBenchmark(
             val textLayoutResult = textMeasurer.measure(
                 text(textGenerator),
                 style = TextStyle(color = Color.Red, fontSize = fontSize),
-                size = IntSize(width, Int.MAX_VALUE)
+                constraints = Constraints.fixedWidth(width)
             )
             val drawScope = CanvasDrawScope()
             val canvas = Canvas(
@@ -181,7 +181,7 @@ class TextMeasurerBenchmark(
             val textLayoutResult = textMeasurer.measure(
                 text(textGenerator),
                 style = TextStyle(color = Color.Red, fontSize = fontSize),
-                size = IntSize(width, Int.MAX_VALUE)
+                constraints = Constraints.fixedWidth(width)
             )
             val drawScope = CanvasDrawScope()
             val canvas = Canvas(
