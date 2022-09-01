@@ -27,6 +27,8 @@ import androidx.compose.ui.focus.FocusDirection.Companion.Next
 import androidx.compose.ui.focus.FocusDirection.Companion.Previous
 import androidx.compose.ui.focus.FocusDirection.Companion.Right
 import androidx.compose.ui.focus.FocusDirection.Companion.Up
+import androidx.compose.ui.focus.FocusRequester.Companion.Cancel
+import androidx.compose.ui.focus.FocusRequester.Companion.Default
 import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.Captured
@@ -220,7 +222,8 @@ internal fun FocusModifier.focusRect(): Rect = coordinator?.let {
 } ?: Rect.Zero
 /**
  * Returns all [FocusModifier] children that are not [FocusStateImpl.isDeactivated]. Any
- * child that is deactivated will add activated children instead.
+ * child that is deactivated will add activated children instead, unless the deactivated
+ * node has a custom Enter specified.
  */
 internal fun FocusModifier.activatedChildren(): MutableVector<FocusModifier> {
     if (!children.any { it.focusState.isDeactivated }) {
@@ -231,7 +234,16 @@ internal fun FocusModifier.activatedChildren(): MutableVector<FocusModifier> {
         if (!child.focusState.isDeactivated) {
             activated += child
         } else {
-            activated.addAll(child.activatedChildren())
+            // When we encounter a deactivated child, we add all its children,
+            // unless a custom Enter is specified.
+            @OptIn(ExperimentalComposeUiApi::class)
+            when (val customEnter = child.focusProperties.enter(Enter)) {
+                Cancel -> return mutableVectorOf()
+                Default -> activated.addAll(child.activatedChildren())
+                else -> customEnter.focusRequesterModifierLocals.forEach {
+                    it.findFocusNode()?.let { activated.add(it) }
+                }
+            }
         }
     }
     return activated

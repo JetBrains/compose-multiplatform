@@ -451,6 +451,8 @@ package androidx.compose.ui.focus {
     method public boolean getCanFocus();
     method public default androidx.compose.ui.focus.FocusRequester getDown();
     method public default androidx.compose.ui.focus.FocusRequester getEnd();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public default kotlin.jvm.functions.Function1<androidx.compose.ui.focus.FocusDirection,androidx.compose.ui.focus.FocusRequester> getEnter();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public default kotlin.jvm.functions.Function1<androidx.compose.ui.focus.FocusDirection,androidx.compose.ui.focus.FocusRequester> getExit();
     method public default androidx.compose.ui.focus.FocusRequester getLeft();
     method public default androidx.compose.ui.focus.FocusRequester getNext();
     method public default androidx.compose.ui.focus.FocusRequester getPrevious();
@@ -460,6 +462,8 @@ package androidx.compose.ui.focus {
     method public void setCanFocus(boolean);
     method public default void setDown(androidx.compose.ui.focus.FocusRequester);
     method public default void setEnd(androidx.compose.ui.focus.FocusRequester);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public default void setEnter(kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusDirection,androidx.compose.ui.focus.FocusRequester>);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public default void setExit(kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusDirection,androidx.compose.ui.focus.FocusRequester>);
     method public default void setLeft(androidx.compose.ui.focus.FocusRequester);
     method public default void setNext(androidx.compose.ui.focus.FocusRequester);
     method public default void setPrevious(androidx.compose.ui.focus.FocusRequester);
@@ -469,6 +473,8 @@ package androidx.compose.ui.focus {
     property public abstract boolean canFocus;
     property public default androidx.compose.ui.focus.FocusRequester down;
     property public default androidx.compose.ui.focus.FocusRequester end;
+    property @androidx.compose.ui.ExperimentalComposeUiApi public default kotlin.jvm.functions.Function1<androidx.compose.ui.focus.FocusDirection,androidx.compose.ui.focus.FocusRequester> enter;
+    property @androidx.compose.ui.ExperimentalComposeUiApi public default kotlin.jvm.functions.Function1<androidx.compose.ui.focus.FocusDirection,androidx.compose.ui.focus.FocusRequester> exit;
     property public default androidx.compose.ui.focus.FocusRequester left;
     property public default androidx.compose.ui.focus.FocusRequester next;
     property public default androidx.compose.ui.focus.FocusRequester previous;

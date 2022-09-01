@@ -17,10 +17,14 @@
 package androidx.compose.ui.focus
 
 import androidx.compose.runtime.collection.MutableVector
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusDirection.Companion.Down
+import androidx.compose.ui.focus.FocusDirection.Companion.Exit
 import androidx.compose.ui.focus.FocusDirection.Companion.Left
 import androidx.compose.ui.focus.FocusDirection.Companion.Right
 import androidx.compose.ui.focus.FocusDirection.Companion.Up
+import androidx.compose.ui.focus.FocusRequester.Companion.Cancel
+import androidx.compose.ui.focus.FocusRequester.Companion.Default
 import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.Captured
@@ -56,11 +60,37 @@ internal fun FocusModifier.twoDimensionalFocusSearch(
             // children and search among the siblings of the focused item by calling
             // "searchChildren" on this node.
             when (focusedChild.focusState) {
-                // If the focusedChild is an intermediate parent, we continue searching among its
-                // children. If we don't find a match, we search among the siblings of the parent.
-                ActiveParent, DeactivatedParent ->
-                  return focusedChild.twoDimensionalFocusSearch(direction, onFound) ||
-                      generateAndSearchChildren(focusedChild.activeNode(), direction, onFound)
+
+                ActiveParent, DeactivatedParent -> {
+                    // If the focusedChild is an intermediate parent,
+                    // we continue searching among its children.
+                    if (focusedChild.twoDimensionalFocusSearch(direction, onFound)) return true
+
+                    @OptIn(ExperimentalComposeUiApi::class)
+                    if (direction == Exit) {
+                        when (val exit = focusedChild.focusProperties.exit(direction)) {
+                            Cancel -> return false
+                            Default -> {
+                                // If we don't have a custom destination,
+                                // we search among the siblings of the parent.
+                                val activeNode = focusedChild.activeNode()
+                                return generateAndSearchChildren(activeNode, direction, onFound)
+                            }
+                            else -> {
+                                var success = false
+                                exit.focusRequesterModifierLocals.forEach {
+                                    it.findFocusNode()?.let {
+                                        success = onFound.invoke(it) || success
+                                    }
+                                }
+                                return success
+                            }
+                        }
+                    }
+
+                    // If we don't find a match, we search among the siblings of the parent.
+                    return generateAndSearchChildren(focusedChild.activeNode(), direction, onFound)
+                }
                 // Search for the next eligible sibling.
                 Active, Captured ->
                     return generateAndSearchChildren(focusedChild, direction, onFound)

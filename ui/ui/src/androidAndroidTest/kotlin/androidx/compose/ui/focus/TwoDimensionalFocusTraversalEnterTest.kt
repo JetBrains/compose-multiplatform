@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection.Companion.Enter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
@@ -197,6 +198,81 @@ class TwoDimensionalFocusTraversalEnterTest {
         }
     }
 
+    /**
+     *      _________________________
+     *     |  focusedItem           |
+     *     |   ___________________  |
+     *     |  |  child           |  |
+     *     |  |   _____________  |  |
+     *     |  |  | grandchild |  |  |
+     *     |  |  |____________|  |  |
+     *     |  |__________________|  |
+     *     |________________________|
+     */
+    @Test
+    fun moveFocusEnter_deactivatedChild_withCustomEnter_canCancelFocus() {
+        // Arrange.
+        val (child, grandchild) = List(2) { mutableStateOf(false) }
+        rule.setContentForTest {
+            FocusableBox(focusedItem, 0, 0, 30, 30, initialFocus) {
+                val customEnter = Modifier.focusProperties { enter = { FocusRequester.Cancel } }
+                FocusableBox(child, 10, 10, 10, 10, deactivated = true, modifier = customEnter) {
+                    FocusableBox(grandchild, 10, 10, 10, 10)
+                }
+            }
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Enter) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isFalse()
+            assertThat(focusedItem.value).isTrue()
+            assertThat(child.value).isFalse()
+            assertThat(grandchild.value).isFalse()
+        }
+    }
+
+    /**
+     *      __________________________________________
+     *     |  focusedItem                            |
+     *     |   ____________________________________  |
+     *     |  |  child                            |  |
+     *     |  |   ______________   ______________ |  |
+     *     |  |  | grandchild1 |  | grandchild2 | |  |
+     *     |  |  |_____________|  |_____________| |  |
+     *     |  |___________________________________|  |
+     *     |_________________________________________|
+     */
+    @Test
+    fun moveFocusEnter_deactivatedChild_withCustomEnter_canRedirectFocusEnter() {
+        // Arrange.
+        val (child, grandchild1, grandchild2) = List(3) { mutableStateOf(false) }
+        val grandchild2Requester = FocusRequester()
+        rule.setContentForTest {
+            FocusableBox(focusedItem, 0, 0, 30, 30, initialFocus) {
+                val customEnter = Modifier.focusProperties { enter = { grandchild2Requester } }
+                FocusableBox(child, 10, 10, 10, 10, deactivated = true, modifier = customEnter) {
+                    FocusableBox(grandchild1, 10, 10, 10, 10)
+                    FocusableBox(grandchild2, 10, 10, 10, 10, grandchild2Requester)
+                }
+            }
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Enter) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
+            assertThat(focusedItem.value).isFalse()
+            assertThat(child.value).isFalse()
+            assertThat(grandchild1.value).isFalse()
+            assertThat(grandchild2.value).isTrue()
+        }
+    }
+
     // TODO(b/176847718): After RTL support is added, add a similar test where the topRight child
     //  is focused.
     /**
@@ -260,6 +336,48 @@ class TwoDimensionalFocusTraversalEnterTest {
                 FocusableBox(children[1], 30, 10, 10, 10)
                 FocusableBox(children[2], 50, 10, 10, 10)
                 FocusableBox(children[3], 10, 30, 10, 10)
+                FocusableBox(children[4], 30, 30, 10, 10)
+                FocusableBox(children[5], 50, 30, 10, 10)
+            }
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Enter) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
+            assertThat(focusedItem.value).isFalse()
+            assertThat(children.values).isExactly(
+                false, false, false,
+                true, false, false
+            )
+        }
+    }
+
+    /**
+     *      _______________________________________
+     *     |  focusedItem                         |
+     *     |   _________   _________   _________  |
+     *     |  | child1 |  | child2 |  | child3 |  |
+     *     |  |________|  |________|  |________|  |
+     *     |   _________   _________   _________  |
+     *     |  | child4 |  | child5 |  | child6 |  |
+     *     |  |________|  |________|  |________|  |
+     *     |______________________________________|
+     */
+    @Test
+    fun moveFocusEnter_customChildIsFocused() {
+        // Arrange.
+        val children = List(6) { mutableStateOf(false) }
+        val child3 = FocusRequester()
+        val customFocusEnter = Modifier.focusProperties { enter = { child3 } }
+        rule.setContentForTest {
+            FocusableBox(focusedItem, 0, 0, 70, 50, initialFocus, modifier = customFocusEnter) {
+                FocusableBox(children[0], 10, 10, 10, 10)
+                FocusableBox(children[1], 30, 10, 10, 10)
+                FocusableBox(children[2], 50, 10, 10, 10)
+                FocusableBox(children[3], 10, 30, 10, 10, child3)
                 FocusableBox(children[4], 30, 30, 10, 10)
                 FocusableBox(children[5], 50, 30, 10, 10)
             }
