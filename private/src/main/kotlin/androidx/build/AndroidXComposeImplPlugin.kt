@@ -302,7 +302,6 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
             multiplatformExtension.sourceSets.all {
                 // Allow all experimental APIs, since MPP projects are themselves experimental
                 it.languageSettings.apply {
-                    optIn("kotlin.Experimental")
                     optIn("kotlin.ExperimentalMultiplatform")
                 }
             }
