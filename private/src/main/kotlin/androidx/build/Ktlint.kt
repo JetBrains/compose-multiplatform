@@ -104,16 +104,18 @@ fun Project.configureKtlint() {
         task.report = File("${outputDir}ktlint-checkstyle-report.xml")
         task.ktlintClasspath.from(getKtlintConfiguration())
     }
-
-    // afterEvaluate because Gradle's default "check" task doesn't exist yet
-    afterEvaluate {
-        addToCheckTask(lintProvider)
-    }
-    addToBuildOnServer(lintProvider)
-
     tasks.register("ktlintFormat", KtlintFormatTask::class.java) { task ->
         task.report = File("${outputDir}ktlint-format-checkstyle-report.xml")
         task.ktlintClasspath.from(getKtlintConfiguration())
+    }
+    // afterEvaluate because Gradle's default "check" task doesn't exist yet
+    afterEvaluate {
+        // multiplatform projects with no enabled platforms do not actually apply the kotlin plugin
+        // and therefore do not have the check task. They are skipped unless a platform is enabled.
+        if (project.tasks.findByName("check") != null) {
+            addToCheckTask(lintProvider)
+            addToBuildOnServer(lintProvider)
+        }
     }
 }
 
