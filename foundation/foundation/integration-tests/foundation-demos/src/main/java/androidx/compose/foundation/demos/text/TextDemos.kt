@@ -39,6 +39,16 @@ val TextDemos = DemoCategory(
         ComposableDemo("Interactive text") { InteractiveTextDemo() },
         ComposableDemo("Ellipsize and letterspacing") { EllipsizeWithLetterSpacing() },
         DemoCategory(
+            "Text Overflow",
+            listOf(
+                ComposableDemo("TextOverflow demo") { TextOverflowDemo() },
+                ComposableDemo("Visible overflow in drawText") {
+                    TextOverflowVisibleInDrawText()
+                },
+                ComposableDemo("Visible overflow in Popup") { TextOverflowVisibleInPopupDemo() }
+            )
+        ),
+        DemoCategory(
             "Input fields",
             listOf(
                 ComposableDemo("Basic input fields") { InputFieldDemo() },
