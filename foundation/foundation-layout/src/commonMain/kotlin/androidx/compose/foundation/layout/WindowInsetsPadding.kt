@@ -102,6 +102,26 @@ fun Modifier.consumedWindowInsets(paddingValues: PaddingValues): Modifier = this
     })
 )
 
+/**
+ * Calls [block] with the [WindowInsets] that have been consumed, either by [consumedWindowInsets]
+ * or one of the padding Modifiers, such as [imePadding].
+ *
+ * @sample androidx.compose.foundation.layout.samples.withConsumedInsetsSample
+ */
+@ExperimentalLayoutApi
+@Stable
+fun Modifier.withConsumedWindowInsets(
+    block: (consumedWindowInsets: WindowInsets) -> Unit
+) = this.then(
+    ConsumedInsetsModifier(
+        block,
+        debugInspectorInfo {
+            name = "withConsumedWindowInsets"
+            properties["block"] = block
+        }
+    )
+)
+
 internal val ModifierLocalConsumedWindowInsets = modifierLocalOf {
     WindowInsets(0, 0, 0, 0)
 }
@@ -212,6 +232,36 @@ private class PaddingValuesConsumingModifier(
     }
 
     override fun hashCode(): Int = paddingValues.hashCode()
+}
+
+@Stable
+private class ConsumedInsetsModifier(
+    private val block: (WindowInsets) -> Unit,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : InspectorValueInfo(inspectorInfo), ModifierLocalConsumer {
+
+    private var oldWindowInsets: WindowInsets? = null
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) {
+            return true
+        }
+        if (other !is ConsumedInsetsModifier) {
+            return false
+        }
+
+        return other.block == block
+    }
+
+    override fun hashCode(): Int = block.hashCode()
+
+    override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) = with(scope) {
+        val consumed = ModifierLocalConsumedWindowInsets.current
+        if (consumed != oldWindowInsets) {
+            oldWindowInsets = consumed
+            block(consumed)
+        }
+    }
 }
 
 @Stable
