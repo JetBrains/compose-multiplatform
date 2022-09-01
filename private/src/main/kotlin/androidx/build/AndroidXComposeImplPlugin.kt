@@ -502,7 +502,6 @@ public inline fun <reified T> transitiveClosure(seed: T, edges: T.() -> Iterable
     return results.toSet()
 }
 
-@OptIn(ExperimentalStdlibApi::class)
 @PublishedApi
 internal inline fun <reified T> deque(initialSize: Int): MutableList<T> {
     return if (KotlinVersion.CURRENT.isAtLeast(1, 4)) ArrayDeque(initialSize)
