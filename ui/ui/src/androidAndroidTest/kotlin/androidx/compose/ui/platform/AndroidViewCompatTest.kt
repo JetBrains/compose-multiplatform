@@ -802,7 +802,7 @@ class AndroidViewCompatTest {
             }
         }
         assertTrue(latch.await(3, TimeUnit.SECONDS))
-        rule.runOnIdle { assertTrue(boxY > 0) }
+        rule.waitUntil { boxY > 0 }
     }
 
     @Test
