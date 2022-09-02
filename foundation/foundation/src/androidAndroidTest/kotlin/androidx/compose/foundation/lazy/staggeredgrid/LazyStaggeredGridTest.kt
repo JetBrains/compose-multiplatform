@@ -458,6 +458,41 @@ class LazyStaggeredGridTest(
     }
 
     @Test
+    fun itemsAreCorrectedWhenItemCountIsIncreasedFromZero() {
+        var itemCount by mutableStateOf(0)
+        rule.setContent {
+            state = rememberLazyStaggeredGridState()
+            LazyStaggeredGrid(
+                lanes = 2,
+                state = state,
+                modifier = Modifier.axisSize(
+                    crossAxis = itemSizeDp * 2,
+                    mainAxis = itemSizeDp * 2
+                ),
+            ) {
+                items(itemCount) {
+                    Spacer(
+                        Modifier
+                            .mainAxisSize(itemSizeDp)
+                            .testTag("$it")
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertDoesNotExist()
+
+        itemCount = 4
+
+        rule.onNodeWithTag("0")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+    }
+
+    @Test
     fun itemsAreCorrectedWithWrongColumns() {
         rule.setContent {
             // intentionally wrong values, normally items should be [0, 1][2, 3][4, 5]

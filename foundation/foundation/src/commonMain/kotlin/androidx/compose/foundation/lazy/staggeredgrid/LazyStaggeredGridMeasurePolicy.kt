@@ -22,12 +22,19 @@ import androidx.compose.foundation.checkScrollableContainerConstraints
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
 import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.constrainHeight
+import androidx.compose.ui.unit.constrainWidth
 
 @Composable
 @ExperimentalFoundationApi
@@ -58,22 +65,93 @@ internal fun rememberStaggeredGridMeasurePolicy(
             orientation
         )
         val resolvedSlotSums = slotSizesSums(this, constraints)
+        val isVertical = orientation == Orientation.Vertical
 
         // setup information for prefetch
         state.laneWidthsPrefixSum = resolvedSlotSums
-        state.isVertical = orientation == Orientation.Vertical
+        state.isVertical = isVertical
 
+        val beforeContentPadding = contentPadding.beforePadding(
+            orientation, reverseLayout, layoutDirection
+        ).roundToPx()
+        val afterContentPadding = contentPadding.afterPadding(
+            orientation, reverseLayout, layoutDirection
+        ).roundToPx()
+        val startContentPadding = contentPadding.startPadding(
+            orientation, layoutDirection
+        ).roundToPx()
+
+        val maxMainAxisSize = if (isVertical) constraints.maxHeight else constraints.maxWidth
+        val mainAxisAvailableSize = maxMainAxisSize - beforeContentPadding - afterContentPadding
+        val contentOffset = if (isVertical) {
+            IntOffset(startContentPadding, beforeContentPadding)
+        } else {
+            IntOffset(beforeContentPadding, startContentPadding)
+        }
+
+        val horizontalPadding = contentPadding.run {
+            calculateStartPadding(layoutDirection) + calculateEndPadding(layoutDirection)
+        }.roundToPx()
+        val verticalPadding = contentPadding.run {
+            calculateTopPadding() + calculateBottomPadding()
+        }.roundToPx()
         measure(
             state,
             itemProvider,
             resolvedSlotSums,
-            constraints,
-            isVertical = orientation == Orientation.Vertical,
-            beforeContentPadding = 0,
-            afterContentPadding = 0,
+            constraints.copy(
+                minWidth = constraints.constrainWidth(horizontalPadding),
+                minHeight = constraints.constrainHeight(verticalPadding)
+            ),
+            contentOffset = contentOffset,
+            mainAxisAvailableSize = mainAxisAvailableSize,
+            isVertical = isVertical,
+            beforeContentPadding = beforeContentPadding,
+            afterContentPadding = afterContentPadding,
         ).also {
             state.applyMeasureResult(it)
             overscrollEffect.isEnabled = it.canScrollForward || it.canScrollBackward
         }
     }
 }
+
+private fun PaddingValues.startPadding(
+    orientation: Orientation,
+    layoutDirection: LayoutDirection
+): Dp =
+    when (orientation) {
+        Orientation.Vertical -> calculateStartPadding(layoutDirection)
+        Orientation.Horizontal -> calculateTopPadding()
+    }
+
+private fun PaddingValues.beforePadding(
+    orientation: Orientation,
+    reverseLayout: Boolean,
+    layoutDirection: LayoutDirection
+): Dp =
+    when (orientation) {
+        Orientation.Vertical ->
+            if (reverseLayout) calculateBottomPadding() else calculateTopPadding()
+        Orientation.Horizontal ->
+            if (reverseLayout) {
+                calculateEndPadding(layoutDirection)
+            } else {
+                calculateStartPadding(layoutDirection)
+            }
+    }
+
+private fun PaddingValues.afterPadding(
+    orientation: Orientation,
+    reverseLayout: Boolean,
+    layoutDirection: LayoutDirection
+): Dp =
+    when (orientation) {
+        Orientation.Vertical ->
+            if (reverseLayout) calculateTopPadding() else calculateBottomPadding()
+        Orientation.Horizontal ->
+            if (reverseLayout) {
+                calculateStartPadding(layoutDirection)
+            } else {
+                calculateEndPadding(layoutDirection)
+            }
+    }

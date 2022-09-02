@@ -35,6 +35,7 @@ import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -45,6 +46,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
@@ -974,6 +976,7 @@ private fun LazyStaggeredGridDemo() {
             columns = StaggeredGridCells.Fixed(3),
             modifier = Modifier.fillMaxSize(),
             state = state,
+            contentPadding = PaddingValues(vertical = 500.dp, horizontal = 20.dp),
             content = {
                 items(count) {
                     var expanded by rememberSaveable { mutableStateOf(false) }
