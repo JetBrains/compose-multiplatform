@@ -275,10 +275,15 @@ internal class ComposeViewAdapter : FrameLayout {
         )
     }
 
-    /** Find first data with type [T] within all remember calls. */
-    private inline fun <reified T> Collection<Group>.findRememberCall(): List<T> {
+    /** Find first data with type [T] in group or within all remember calls. */
+    private inline fun <reified T> Collection<Group>.findRememberedData(): List<T> {
+        val selfData = mapNotNull {
+            it.data.firstOrNull { data ->
+                data is T
+            } as? T
+        }
         val rememberCalls = mapNotNull { it.firstOrNull { call -> call.name == "remember" } }
-        return rememberCalls.mapNotNull {
+        return selfData + rememberCalls.mapNotNull {
             it.data.firstOrNull { data ->
                 data is T
             } as? T
@@ -308,8 +313,7 @@ internal class ComposeViewAdapter : FrameLayout {
 
         protected fun <T : Any> Collection<Group>.findRememberCallWithType(clazz: KClass<T>):
             List<T> {
-            val rememberCalls = filter { call -> call.name == REMEMBER }
-            return rememberCalls.mapNotNull {
+            return mapNotNull {
                 clazz.safeCast(
                     it.data.firstOrNull { data -> data?.javaClass?.kotlin == clazz })
             }
@@ -333,7 +337,7 @@ internal class ComposeViewAdapter : FrameLayout {
             animations.addAll(
                 treeWithLocation.filter { call -> call.name == ANIMATE_VALUE_AS_STATE }
                     .mapNotNull { animateValue ->
-                        animateValue.children.findRememberCall<Animatable<*, *>>().firstOrNull()
+                        animateValue.children.findRememberedData<Animatable<*, *>>().firstOrNull()
                     }.toSet()
             )
         }
@@ -358,7 +362,7 @@ internal class ComposeViewAdapter : FrameLayout {
         override fun parse(treeWithLocation: Collection<Group>) {
             // Find `updateTransition` calls.
             animations.addAll(treeWithLocation.filter { it.name == UPDATE_TRANSITION_FUNCTION_NAME }
-                .findRememberCall())
+                .findRememberedData())
         }
     }
 
@@ -373,7 +377,7 @@ internal class ComposeViewAdapter : FrameLayout {
                     it.children.firstOrNull { updateTransitionCall ->
                         updateTransitionCall.name == UPDATE_TRANSITION_FUNCTION_NAME
                     }
-                }.findRememberCall())
+                }.findRememberedData())
         }
     }
 
@@ -386,7 +390,7 @@ internal class ComposeViewAdapter : FrameLayout {
                     it.children.firstOrNull { updateTransitionCall ->
                         updateTransitionCall.name == UPDATE_TRANSITION_FUNCTION_NAME
                     }
-                }.findRememberCall())
+                }.findRememberedData())
         }
     }
 
@@ -501,25 +505,22 @@ internal class ComposeViewAdapter : FrameLayout {
 
         designInfoList = slotTrees.flatMap { rootGroup ->
             rootGroup.findAll { group ->
-                group.children.any { child ->
-                    child.name == "remember" && child.data.any {
-                        it?.getDesignInfoMethodOrNull() != null
-                    }
+                (group.name != REMEMBER && group.hasDesignInfo()) || group.children.any { child ->
+                    child.name == REMEMBER && child.hasDesignInfo()
                 }
             }.mapNotNull { group ->
-                // Get the DesignInfoProviders from the children, the parent group is needed to
-                // know the location on screen of the layout
-                group.children.forEach { child ->
-                    child.data.forEach {
-                        if (it?.getDesignInfoMethodOrNull() != null) {
-                            return@mapNotNull it.invokeGetDesignInfo(group.box.left, group.box.top)
-                        }
-                    }
-                }
-                return@mapNotNull null
+                // Get the DesignInfoProviders from the group or one of its children
+                group.getDesignInfoOrNull(group.box)
+                    ?: group.children.firstNotNullOfOrNull { it.getDesignInfoOrNull(group.box) }
             }
         }
     }
+
+    private fun Group.hasDesignInfo(): Boolean =
+        data.any { it?.getDesignInfoMethodOrNull() != null }
+
+    private fun Group.getDesignInfoOrNull(box: IntRect): String? =
+        data.firstNotNullOfOrNull { it?.invokeGetDesignInfo(box.left, box.right) }
 
     /**
      * Check if the object supports the method call for [DESIGN_INFO_METHOD], which is expected
