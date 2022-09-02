@@ -968,7 +968,6 @@ private fun LazyStaggeredGridDemo() {
             Button(onClick = { if (count != 0) count-- }) { Text(text = "--") }
         }
 
-        val scope = rememberCoroutineScope()
         val state = rememberLazyStaggeredGridState()
 
         LazyVerticalStaggeredGrid(
@@ -977,17 +976,16 @@ private fun LazyStaggeredGridDemo() {
             state = state,
             content = {
                 items(count) {
+                    var expanded by rememberSaveable { mutableStateOf(false) }
                     val index = indices.value[it % indices.value.size]
                     val color = colors[index]
                     Box(
                         modifier = Modifier
-                            .height(heights[index])
+                            .height(if (!expanded) heights[index] else heights[index] * 2)
                             .padding(5.dp)
                             .border(2.dp, color, RoundedCornerShape(5.dp))
                             .clickable {
-                                scope.launch {
-                                    state.animateScrollToItem(it + 1000, 100)
-                                }
+                                expanded = !expanded
                             }
                     ) {
                         Text(

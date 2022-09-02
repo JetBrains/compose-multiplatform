@@ -183,12 +183,6 @@ private fun LazyStaggeredGridMeasureContext.measure(
         // all of it later
         firstItemOffsets.offsetBy(-scrollDelta)
 
-        // if the current scroll offset is less than minimally possible
-        if (firstItemIndices[0] == 0 && firstItemOffsets[0] < 0) {
-            scrollDelta += firstItemOffsets[0]
-            firstItemOffsets.fill(0)
-        }
-
         // this will contain all the MeasuredItems representing the visible items
         val measuredItems = Array(resolvedSlotSums.size) {
             ArrayDeque<LazyStaggeredGridMeasuredItem>()
@@ -202,7 +196,7 @@ private fun LazyStaggeredGridMeasureContext.measure(
         val minOffset = -beforeContentPadding
         val maxOffset = mainAxisAvailableSize
 
-        fun hasSpaceBehind(): Boolean {
+        fun hasSpaceBeforeFirst(): Boolean {
             for (lane in firstItemIndices.indices) {
                 val itemIndex = firstItemIndices[lane]
                 val itemOffset = firstItemOffsets[lane]
@@ -215,29 +209,12 @@ private fun LazyStaggeredGridMeasureContext.measure(
             return false
         }
 
-        fun misalignedStart(laneIndex: Int): Boolean {
-            // If we scrolled past the first item in the lane, we have a point of reference
-            // to re-align items.
-            // Case 1: Item offsets for first item are not aligned
-            val misalignedOffsets = firstItemOffsets.any {
-                it != firstItemOffsets[laneIndex]
-            }
-            // Case 2: Other lanes have more items than the current one
-            val moreItemsInOtherLanes = firstItemIndices.indices.any { lane ->
-                findPreviousItemIndex(firstItemIndices[lane], lane) != -1
-            }
-            // Case 3: the first item is in the wrong lane (it should always be in
-            // the first one)
-            val firstItemInWrongLane = spans.getSpan(0) != 0
-            // If items are not aligned, reset all measurement data we gathered before and
-            // proceed with initial measure
-            return misalignedOffsets || moreItemsInOtherLanes || firstItemInWrongLane
-        }
+        var laneToCheckForGaps = -1
 
         // we had scrolled backward or we compose items in the start padding area, which means
         // items before current firstItemScrollOffset should be visible. compose them and update
         // firstItemScrollOffset
-        while (hasSpaceBehind()) {
+        while (hasSpaceBeforeFirst()) {
             val laneIndex = firstItemOffsets.indexOfMinValue()
             val previousItemIndex = findPreviousItemIndex(
                 item = firstItemIndices[laneIndex],
@@ -245,6 +222,7 @@ private fun LazyStaggeredGridMeasureContext.measure(
             )
 
             if (previousItemIndex < 0) {
+                laneToCheckForGaps = laneIndex
                 break
             }
 
@@ -262,9 +240,35 @@ private fun LazyStaggeredGridMeasureContext.measure(
             firstItemOffsets[laneIndex] += measuredItem.sizeWithSpacings
         }
 
+        fun misalignedStart(referenceLane: Int): Boolean {
+            // If we scrolled past the first item in the lane, we have a point of reference
+            // to re-align items.
+            val laneRange = firstItemIndices.indices
+
+            // Case 1: Each lane has laid out all items, but offsets do no match
+            val misalignedOffsets = laneRange.any { lane ->
+                findPreviousItemIndex(firstItemIndices[lane], lane) == -1 &&
+                    firstItemOffsets[lane] != firstItemOffsets[referenceLane]
+            }
+            // Case 2: Some lanes are still missing items, and there's no space left to place them
+            val moreItemsInOtherLanes = laneRange.any { lane ->
+                findPreviousItemIndex(firstItemIndices[lane], lane) != -1 &&
+                    firstItemOffsets[lane] >= firstItemOffsets[referenceLane]
+            }
+            // Case 3: the first item is in the wrong lane (it should always be in
+            // the first one)
+            val firstItemInWrongLane = spans.getSpan(0) != 0
+            // If items are not aligned, reset all measurement data we gathered before and
+            // proceed with initial measure
+            return misalignedOffsets || moreItemsInOtherLanes || firstItemInWrongLane
+        }
+
+        laneToCheckForGaps =
+            if (laneToCheckForGaps == -1) firstItemIndices.indexOf(0) else laneToCheckForGaps
+
         // re-check if columns are aligned after measure
-        if (firstItemOffsets.any { it < minOffset }) {
-            val lane = firstItemOffsets.indexOfMinValue()
+        if (laneToCheckForGaps != -1) {
+            val lane = laneToCheckForGaps
             if (misalignedStart(lane) && canRestartMeasure) {
                 spans.reset()
                 return measure(
@@ -278,8 +282,8 @@ private fun LazyStaggeredGridMeasureContext.measure(
             }
         }
 
-        // if we were scrolled backward, but there were not enough items before. this means
-        // not the whole scroll was consumed
+        // we scrolled backward, but there were not enough items to fill the start. this means
+        // some amount of scroll should be left over
         if (firstItemOffsets[0] < minOffset) {
             scrollDelta += firstItemOffsets[0]
             firstItemOffsets.offsetBy(minOffset - firstItemOffsets[0])
