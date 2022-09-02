@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.lazy.grid
+package androidx.compose.foundation.lazy.staggeredgrid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
 import androidx.compose.foundation.lazy.layout.LazyLayoutSemanticState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.semantics.CollectionInfo
 import androidx.compose.ui.semantics.ScrollAxisRange
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal fun rememberLazyGridSemanticState(
-    state: LazyGridState,
+internal fun rememberLazyStaggeredGridSemanticState(
+    state: LazyStaggeredGridState,
     itemProvider: LazyLayoutItemProvider,
     reverseScrolling: Boolean
 ): LazyLayoutSemanticState =
@@ -66,8 +65,7 @@ internal fun rememberLazyGridSemanticState(
                 state.scrollToItem(index)
             }
 
-            // TODO(popam): check if this is correct - it would be nice to provide correct columns
             override fun collectionInfo(): CollectionInfo =
-                CollectionInfo(rowCount = -1, columnCount = -1)
+                CollectionInfo(-1, -1)
         }
     }

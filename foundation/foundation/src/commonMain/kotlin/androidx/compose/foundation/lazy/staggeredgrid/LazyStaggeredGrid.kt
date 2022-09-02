@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.layout.LazyLayout
 import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
+import androidx.compose.foundation.lazy.layout.lazyLayoutSemantics
 import androidx.compose.foundation.overscroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -74,10 +75,10 @@ internal fun LazyStaggeredGrid(
         slotSizesSums,
         overscrollEffect
     )
+    val semanticState = rememberLazyStaggeredGridSemanticState(state, itemProvider, reverseLayout)
 
     ScrollPositionUpdater(itemProvider, state)
 
-    // todo(b/182882362): accessibility
     LazyLayout(
         modifier = modifier
             .then(state.remeasurementModifier)
@@ -95,6 +96,12 @@ internal fun LazyStaggeredGrid(
                 state = state,
                 overscrollEffect = overscrollEffect,
                 enabled = userScrollEnabled
+            )
+            .lazyLayoutSemantics(
+                itemProvider = itemProvider,
+                state = semanticState,
+                orientation = orientation,
+                userScrollEnabled = userScrollEnabled
             ),
         prefetchState = state.prefetchState,
         itemProvider = itemProvider,

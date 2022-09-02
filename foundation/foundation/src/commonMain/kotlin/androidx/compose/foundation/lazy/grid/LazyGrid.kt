@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.lazy.layout.LazyLayout
 import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
+import androidx.compose.foundation.lazy.layout.lazyLayoutSemantics
 import androidx.compose.foundation.overscroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -77,6 +78,8 @@ internal fun LazyGrid(
 
     val itemProvider = rememberLazyGridItemProvider(state, content)
 
+    val semanticState = rememberLazyGridSemanticState(state, itemProvider, reverseLayout)
+
     val scope = rememberCoroutineScope()
     val placementAnimator = remember(state, isVertical) {
         LazyGridItemPlacementAnimator(scope, isVertical)
@@ -105,12 +108,10 @@ internal fun LazyGrid(
         modifier = modifier
             .then(state.remeasurementModifier)
             .then(state.awaitLayoutModifier)
-            .lazyGridSemantics(
+            .lazyLayoutSemantics(
                 itemProvider = itemProvider,
-                state = state,
-                coroutineScope = scope,
-                isVertical = isVertical,
-                reverseScrolling = reverseLayout,
+                state = semanticState,
+                orientation = orientation,
                 userScrollEnabled = userScrollEnabled
             )
             .clipScrollableContainer(orientation)

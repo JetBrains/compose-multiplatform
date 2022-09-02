@@ -130,7 +130,7 @@ class LazyStaggeredGridState private constructor(
     /** storage for lane assignments for each item for consistent scrolling in both directions **/
     internal val spans = LazyStaggeredGridSpans()
 
-    private var canScrollForward = true
+    internal var canScrollForward = true
     private var canScrollBackward = true
 
     /** implementation of [LazyAnimateScrollScope] scope required for [animateScrollToItem] **/
