@@ -22,7 +22,7 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
 
     private fun composeCompilerArtifact(artifactId: String) =
         SubpluginArtifact(
-            groupId = "org.jetbrains.compose.compiler", artifactId = artifactId, version = composeVersion
+            groupId = "org.jetbrains.compose.compiler", artifactId = artifactId, version = ComposeBuildConfig.composeCompilerVersion
         )
 
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean =

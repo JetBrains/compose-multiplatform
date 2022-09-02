@@ -14,7 +14,8 @@ enum class ComposePlatforms(vararg val alternativeNames: String) {
     MacosX64("Macos"),
     MacosArm64("Macos"),
     UikitX64("UiKit"),
-    UikitArm64("UiKit");
+    UikitArm64("UiKit"),
+    UikitSimArm64("UiKit");
 
     fun matches(nameCandidate: String): Boolean =
         listOf(name, *alternativeNames).any { it.equals(nameCandidate, ignoreCase = true) }
