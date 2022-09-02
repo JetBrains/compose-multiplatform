@@ -49,7 +49,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -69,7 +68,6 @@ class TextOverflowTest {
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-    @Ignore("b/240931064")
     fun paint_singleParagraph_withVisibleOverflow() {
         val text = "Hello\nHello\nHello\nHello"
 
@@ -114,7 +112,6 @@ class TextOverflowTest {
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-    @Ignore("b/240931064")
     fun paint_multiParagraph_withVisibleOverflow() {
         val text = buildAnnotatedString {
             append("Hello\nHello")
