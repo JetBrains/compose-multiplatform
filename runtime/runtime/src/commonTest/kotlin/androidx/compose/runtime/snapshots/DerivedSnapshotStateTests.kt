@@ -244,6 +244,44 @@ class DerivedSnapshotStateTests {
         assertEquals(1, runs)
     }
 
+    @Test
+    fun stateUpdatedInSnapshotIsNotRecalculated() {
+        var runs = 0
+        val dependency = mutableStateOf(0)
+        val a = derivedStateOf {
+            runs++
+            dependency.value
+        }
+        val b = derivedStateOf {
+            a.value
+        }
+
+        Snapshot.takeMutableSnapshot().apply {
+            enter {
+                b.value
+            }
+            apply()
+        }
+
+        dependency.value++
+
+        Snapshot.takeMutableSnapshot().apply {
+            enter {
+                b.value
+            }
+            apply()
+        }
+
+        Snapshot.takeMutableSnapshot().apply {
+            enter {
+                b.value
+            }
+            apply()
+        }
+
+        assertEquals(2, runs)
+    }
+
     private var count = 0
 
     @BeforeTest
