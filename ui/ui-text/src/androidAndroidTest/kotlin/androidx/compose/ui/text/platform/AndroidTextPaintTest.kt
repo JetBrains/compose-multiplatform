@@ -99,6 +99,22 @@ class AndroidTextPaintTest {
     }
 
     @Test
+    fun setTextDecoration_changeDecorationToNone() {
+        val textPaint = defaultTextPaint
+        textPaint.setTextDecoration(
+            TextDecoration.combine(
+                listOf(TextDecoration.LineThrough, TextDecoration.Underline)
+            )
+        )
+        assertThat(textPaint.isUnderlineText).isTrue()
+        assertThat(textPaint.isStrikeThruText).isTrue()
+
+        textPaint.setTextDecoration(TextDecoration.None)
+        assertThat(textPaint.isUnderlineText).isFalse()
+        assertThat(textPaint.isStrikeThruText).isFalse()
+    }
+
+    @Test
     fun setTextDecoration_changeDecorationToNull() {
         val textPaint = defaultTextPaint
         textPaint.setTextDecoration(
@@ -110,8 +126,8 @@ class AndroidTextPaintTest {
         assertThat(textPaint.isStrikeThruText).isTrue()
 
         textPaint.setTextDecoration(null)
-        assertThat(textPaint.isUnderlineText).isFalse()
-        assertThat(textPaint.isStrikeThruText).isFalse()
+        assertThat(textPaint.isUnderlineText).isTrue()
+        assertThat(textPaint.isStrikeThruText).isTrue()
     }
 
     @Test
@@ -386,7 +402,7 @@ class AndroidTextPaintTest {
 
     @SdkSuppress(minSdkVersion = 29)
     @Test
-    fun resetShadow_to_null() {
+    fun resetShadow_to_null_has_no_effect() {
         val dx = 1f
         val dy = 2f
         val radius = 3f
@@ -396,10 +412,10 @@ class AndroidTextPaintTest {
         textPaint.setShadow(Shadow(color, Offset(dx, dy), radius))
         textPaint.setShadow(null)
 
-        assertThat(textPaint.shadowLayerDx).isEqualTo(0f)
-        assertThat(textPaint.shadowLayerDy).isEqualTo(0f)
-        assertThat(textPaint.shadowLayerRadius).isEqualTo(0f)
-        assertThat(textPaint.shadowLayerColor).isEqualTo(0)
+        assertThat(textPaint.shadowLayerDx).isEqualTo(dx)
+        assertThat(textPaint.shadowLayerDy).isEqualTo(dy)
+        assertThat(textPaint.shadowLayerRadius).isEqualTo(radius)
+        assertThat(textPaint.shadowLayerColor).isEqualTo(color.toArgb())
     }
 
     private val defaultTextPaint get() = AndroidTextPaint(flags = 0, density = 1.0f)

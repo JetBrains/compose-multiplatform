@@ -18,19 +18,18 @@ package androidx.compose.ui.text
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.AndroidFontLoader
+import androidx.compose.ui.text.font.AndroidFontResolveInterceptor
 import androidx.compose.ui.text.font.AsyncTypefaceCache
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontFamilyResolverImpl
 import androidx.compose.ui.text.font.FontListFontFamilyTypefaceAdapter
-import androidx.compose.ui.text.font.PlatformFontLoader
 import androidx.compose.ui.text.font.PlatformFontFamilyTypefaceAdapter
-import androidx.compose.ui.text.font.TypefaceRequestCache
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.text.font.AndroidFontResolveInterceptor
+import androidx.compose.ui.text.font.PlatformFontLoader
 import androidx.compose.ui.text.font.PlatformResolveInterceptor
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.font.TypefaceRequestCache
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
@@ -69,8 +68,7 @@ fun Paragraph.bitmap(
 @OptIn(ExperimentalTextApi::class)
 fun MultiParagraph.bitmap(
     brush: Brush? = null,
-    alpha: Float = Float.NaN,
-    textDecoration: TextDecoration? = null
+    alpha: Float = Float.NaN
 ): Bitmap {
     val width = paragraphInfoList.maxByOrNull { it.paragraph.width }?.paragraph?.width ?: 0f
     val bitmap = Bitmap.createBitmap(
@@ -82,13 +80,11 @@ fun MultiParagraph.bitmap(
         this.paint(
             canvas = androidx.compose.ui.graphics.Canvas(Canvas(bitmap)),
             brush = brush,
-            alpha = alpha,
-            decoration = textDecoration
+            alpha = alpha
         )
     } else {
         this.paint(
-            canvas = androidx.compose.ui.graphics.Canvas(Canvas(bitmap)),
-            decoration = textDecoration
+            canvas = androidx.compose.ui.graphics.Canvas(Canvas(bitmap))
         )
     }
     return bitmap

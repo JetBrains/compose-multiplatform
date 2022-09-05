@@ -1419,7 +1419,7 @@ AndroidParagraphTest {
     }
 
     @Test
-    fun testPaint_can_change_TextDecoration_null() {
+    fun testPaint_TextDecoration_null_should_have_no_effect() {
         val paragraph = simpleParagraph(
             text = "",
             style = TextStyle(
@@ -1434,7 +1434,7 @@ AndroidParagraphTest {
         assertThat(paragraph.textPaint.isUnderlineText).isTrue()
 
         paragraph.paint(canvas, textDecoration = null)
-        assertThat(paragraph.textPaint.isUnderlineText).isFalse()
+        assertThat(paragraph.textPaint.isUnderlineText).isTrue()
     }
 
     @SdkSuppress(minSdkVersion = 29)
@@ -1489,7 +1489,7 @@ AndroidParagraphTest {
         assertThat(paragraph.textPaint.shadowLayerColor).isEqualTo(color.toArgb())
 
         val canvas = Canvas(android.graphics.Canvas())
-        paragraph.paint(canvas, shadow = null)
+        paragraph.paint(canvas, shadow = Shadow.None)
         assertThat(paragraph.textPaint.shadowLayerDx).isEqualTo(0f)
         assertThat(paragraph.textPaint.shadowLayerDy).isEqualTo(0f)
         assertThat(paragraph.textPaint.shadowLayerRadius).isEqualTo(0f)
