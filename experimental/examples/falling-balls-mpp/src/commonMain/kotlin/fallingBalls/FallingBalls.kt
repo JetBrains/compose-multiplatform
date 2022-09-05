@@ -12,9 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
-import org.jetbrains.skiko.KotlinBackend
-import kotlin.math.round
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun FallingBalls(game: Game) {
@@ -22,10 +20,10 @@ fun FallingBalls(game: Game) {
     Column {
         Text(
             "Catch balls!${if (game.finished) " Game over!" else ""}",
-            fontSize = 1.8f.em,
+            fontSize = 20.sp,
             color = Color(218, 120, 91)
         )
-        Text("Score: ${game.score} Time: ${game.elapsed / 1_000_000} Blocks: ${game.numBlocks.toInt()}", fontSize = 1.8f.em)
+        Text("Score: ${game.score} Time: ${game.elapsed / 1_000_000} Blocks: ${game.numBlocks.toInt()}", fontSize = 20.sp)
         Row {
             if (!game.started) {
                 Slider(
@@ -45,7 +43,7 @@ fun FallingBalls(game: Game) {
                     }
                 }
             ) {
-                Text(if (game.started) "Stop" else "Start", fontSize = 2f.em)
+                Text(if (game.started) "Stop" else "Start", fontSize = 25.sp)
             }
             if (game.started) {
                 Button(
@@ -56,7 +54,7 @@ fun FallingBalls(game: Game) {
                     onClick = {
                     game.togglePause()
                 }) {
-                    Text(if (game.paused) "Resume" else "Pause", fontSize = 2f.em)
+                    Text(if (game.paused) "Resume" else "Pause", fontSize = 25.sp)
                 }
             }
         }
