@@ -977,6 +977,8 @@ private fun LazyStaggeredGridDemo() {
             modifier = Modifier.fillMaxSize(),
             state = state,
             contentPadding = PaddingValues(vertical = 500.dp, horizontal = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
             content = {
                 items(count) {
                     var expanded by rememberSaveable { mutableStateOf(false) }
@@ -985,7 +987,6 @@ private fun LazyStaggeredGridDemo() {
                     Box(
                         modifier = Modifier
                             .height(if (!expanded) heights[index] else heights[index] * 2)
-                            .padding(5.dp)
                             .border(2.dp, color, RoundedCornerShape(5.dp))
                             .clickable {
                                 expanded = !expanded

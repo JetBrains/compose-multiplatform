@@ -20,11 +20,14 @@ import androidx.compose.animation.core.snap
 import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.BaseLazyLayoutTestWithOrientation
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
@@ -41,12 +44,22 @@ open class BaseLazyStaggeredGridWithOrientation(
         }
     }
 
+    internal fun LazyStaggeredGridState.scrollTo(index: Int) {
+        runBlocking(Dispatchers.Main + AutoTestFrameClock()) {
+            scrollToItem(index)
+        }
+    }
+
+    internal fun Modifier.debugBorder(color: Color = Color.Black) = border(1.dp, color)
+
     @Composable
     internal fun LazyStaggeredGrid(
         lanes: Int,
         modifier: Modifier = Modifier,
         state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
         contentPadding: PaddingValues = PaddingValues(0.dp),
+        mainAxisArrangement: Arrangement.HorizontalOrVertical = Arrangement.spacedBy(0.dp),
+        crossAxisArrangement: Arrangement.HorizontalOrVertical = Arrangement.spacedBy(0.dp),
         content: LazyStaggeredGridScope.() -> Unit,
     ) {
         if (orientation == Orientation.Vertical) {
@@ -54,6 +67,8 @@ open class BaseLazyStaggeredGridWithOrientation(
                 columns = StaggeredGridCells.Fixed(lanes),
                 modifier = modifier,
                 contentPadding = contentPadding,
+                verticalArrangement = mainAxisArrangement,
+                horizontalArrangement = crossAxisArrangement,
                 state = state,
                 content = content
             )
@@ -62,6 +77,8 @@ open class BaseLazyStaggeredGridWithOrientation(
                 rows = StaggeredGridCells.Fixed(lanes),
                 modifier = modifier,
                 contentPadding = contentPadding,
+                verticalArrangement = crossAxisArrangement,
+                horizontalArrangement = mainAxisArrangement,
                 state = state,
                 content = content
             )

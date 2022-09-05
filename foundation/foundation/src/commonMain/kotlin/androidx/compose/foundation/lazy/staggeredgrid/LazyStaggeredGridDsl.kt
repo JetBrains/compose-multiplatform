@@ -38,7 +38,11 @@ import androidx.compose.ui.unit.dp
  * @param columns description of the size and number of staggered grid columns.
  * @param modifier modifier to apply to the layout.
  * @param state state object that can be used to control and observe staggered grid state.
- * @param contentPadding padding around the content
+ * @param contentPadding padding around the content.
+ * @param verticalArrangement arrangement specifying vertical spacing between items. The item
+ *  arrangement specifics are ignored for now.
+ * @param horizontalArrangement arrangement specifying horizontal spacing between items. The item
+ *  arrangement specifics are ignored for now.
  * @param flingBehavior logic responsible for handling fling.
  * @param userScrollEnabled whether scroll with gestures or accessibility actions are allowed. It is
  *  still possible to scroll programmatically through state when [userScrollEnabled] is set to false
@@ -54,6 +58,8 @@ fun LazyVerticalStaggeredGrid(
     modifier: Modifier = Modifier,
     state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(0.dp),
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(0.dp),
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     userScrollEnabled: Boolean = true,
     content: LazyStaggeredGridScope.() -> Unit
@@ -62,10 +68,12 @@ fun LazyVerticalStaggeredGrid(
         modifier = modifier,
         orientation = Orientation.Vertical,
         state = state,
+        verticalArrangement = verticalArrangement,
+        horizontalArrangement = horizontalArrangement,
         contentPadding = contentPadding,
         flingBehavior = flingBehavior,
         userScrollEnabled = userScrollEnabled,
-        slotSizesSums = rememberColumnWidthSums(columns, Arrangement.Start, contentPadding),
+        slotSizesSums = rememberColumnWidthSums(columns, horizontalArrangement, contentPadding),
         content = content
     )
 }
@@ -112,7 +120,11 @@ private fun rememberColumnWidthSums(
  * @param rows description of the size and number of staggered grid columns.
  * @param modifier modifier to apply to the layout.
  * @param state state object that can be used to control and observe staggered grid state.
- * @param contentPadding padding around the content
+ * @param contentPadding padding around the content.
+ * @param verticalArrangement arrangement specifying vertical spacing between items. The item
+ *  arrangement specifics are ignored for now.
+ * @param horizontalArrangement arrangement specifying horizontal spacing between items. The item
+ *  arrangement specifics are ignored for now.
  * @param flingBehavior logic responsible for handling fling.
  * @param userScrollEnabled whether scroll with gestures or accessibility actions are allowed. It is
  *  still possible to scroll programmatically through state when [userScrollEnabled] is set to false
@@ -128,6 +140,8 @@ fun LazyHorizontalStaggeredGrid(
     modifier: Modifier = Modifier,
     state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(0.dp),
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(0.dp),
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     userScrollEnabled: Boolean = true,
     content: LazyStaggeredGridScope.() -> Unit
@@ -137,9 +151,11 @@ fun LazyHorizontalStaggeredGrid(
         orientation = Orientation.Horizontal,
         state = state,
         contentPadding = contentPadding,
+        verticalArrangement = verticalArrangement,
+        horizontalArrangement = horizontalArrangement,
         flingBehavior = flingBehavior,
         userScrollEnabled = userScrollEnabled,
-        slotSizesSums = rememberRowHeightSums(rows, Arrangement.Top, contentPadding),
+        slotSizesSums = rememberRowHeightSums(rows, verticalArrangement, contentPadding),
         content = content
     )
 }
