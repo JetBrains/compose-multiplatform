@@ -75,17 +75,11 @@ import androidx.compose.ui.unit.dp
 
 enum class CheckBoxState { Unselected, Selected }
 
-@Preview("Single CheckBox")
-@Composable
-fun CheckBoxPreview() {
-    CheckBox()
-}
-
 @Preview(name = "CheckBox + Scaffold")
 @Composable
-fun CheckBoxScaffoldPreview() {
+fun TransitionWithScaffoldPreview() {
     Scaffold {
-        CheckBox()
+        TransitionPreview()
     }
 }
 
@@ -93,7 +87,7 @@ fun CheckBoxScaffoldPreview() {
 @Composable
 fun AllAnimations() {
     AnimatedContentPreview()
-    CheckBox()
+    TransitionPreview()
     AnimateAsStatePreview()
     CrossFadePreview()
     AnimateContentSizePreview()
@@ -121,7 +115,7 @@ fun AnimationOrder() {
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-@Preview(name = "AnimatedContent")
+@Preview
 @Composable
 fun AnimatedContentPreview() {
     Row {
@@ -137,7 +131,17 @@ fun AnimatedContentPreview() {
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-@Preview(name = "AnimatedVisibility")
+@Preview
+@Composable
+fun AnimatedContentExtensionPreview() {
+    val editable by remember { mutableStateOf(CheckBoxState.Unselected) }
+    val transition = updateTransition(targetState = editable, label = "transition.AV")
+    transition.AnimatedContent {
+        Text(text = "State: $it")
+    }
+}
+
+@Preview
 @Composable
 fun AnimatedVisibilityPreview() {
     val editable by remember { mutableStateOf(true) }
@@ -157,8 +161,9 @@ fun TransitionAnimatedVisibilityPreview() {
     }
 }
 
+@Preview
 @Composable
-private fun CheckBox() {
+fun TransitionPreview() {
     val (selected, onSelected) = remember { mutableStateOf(false) }
     val transition = updateTransition(
         if (selected) CheckBoxState.Selected else CheckBoxState.Unselected,
@@ -185,7 +190,7 @@ private fun CheckBox() {
     }
 }
 
-@Preview(name = "AnimateAsStatePreview")
+@Preview
 @Composable
 fun AnimateAsStatePreview() {
     var showMenu by remember { mutableStateOf(true) }
@@ -213,7 +218,7 @@ fun AnimateAsStatePreview() {
     }
 }
 
-@Preview(name = "CrossFadePreview")
+@Preview
 @Composable
 fun CrossFadePreview() {
     var currentPage by remember { mutableStateOf("A") }
@@ -236,7 +241,7 @@ fun CrossFadePreview() {
     }
 }
 
-@Preview(name = "AnimateContentSizePreview")
+@Preview
 @Composable
 fun AnimateContentSizePreview() {
     var message by remember { mutableStateOf("Hello") }
@@ -257,7 +262,7 @@ fun AnimateContentSizePreview() {
     }
 }
 
-@Preview(name = "TargetBasedAnimationPreview")
+@Preview
 @Composable
 fun TargetBasedAnimationPreview() {
     val anim = remember {
@@ -280,7 +285,7 @@ fun TargetBasedAnimationPreview() {
     Box { Text(text = "Play time $playTime") }
 }
 
-@Preview(name = "DecayAnimationPreview")
+@Preview
 @Composable
 fun DecayAnimationPreview() {
     val anim = remember {

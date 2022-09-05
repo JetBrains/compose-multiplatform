@@ -26,6 +26,9 @@ import androidx.compose.ui.tooling.data.UiToolingDataApi
 import androidx.compose.ui.tooling.test.R
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -34,9 +37,6 @@ import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicBoolean
 
 @MediumTest
 @OptIn(UiToolingDataApi::class)
@@ -133,7 +133,7 @@ class ComposeViewAdapterTest {
             )
             composeViewAdapter.clock = clock
             assertFalse(composeViewAdapter.hasAnimations())
-            assertTrue(clock.trackedAnimatedVisibility.isEmpty())
+            assertTrue(clock.animatedVisibilityClocks.isEmpty())
         }
 
         waitFor("Composable to have animations", 1, TimeUnit.SECONDS) {
@@ -144,7 +144,7 @@ class ComposeViewAdapterTest {
         }
 
         activityTestRule.runOnUiThread {
-            val animation = clock.trackedAnimatedVisibility.single()
+            val animation = clock.animatedVisibilityClocks.values.single().animation
             assertEquals("My Animated Visibility", animation.label)
         }
     }
@@ -161,12 +161,12 @@ class ComposeViewAdapterTest {
 
     @Test
     fun transitionAnimationsAreSubscribedToTheClock() {
-        checkTransitionIsSubscribed("CheckBoxPreview", "checkBoxAnim")
+        checkTransitionIsSubscribed("TransitionPreview", "checkBoxAnim")
     }
 
     @Test
     fun transitionAnimationsWithSubcomposition() {
-        checkTransitionIsSubscribed("CheckBoxScaffoldPreview", "checkBoxAnim")
+        checkTransitionIsSubscribed("TransitionWithScaffoldPreview", "checkBoxAnim")
     }
 
     @Test
@@ -236,9 +236,9 @@ class ComposeViewAdapterTest {
             )
             composeViewAdapter.clock = clock
             assertFalse(composeViewAdapter.hasAnimations())
-            assertTrue(clock.trackedTransitions.isEmpty())
-            assertTrue(clock.trackedUnsupported.isEmpty())
-            assertTrue(clock.trackedAnimatedVisibility.isEmpty())
+            assertTrue(clock.transitionClocks.isEmpty())
+            assertTrue(clock.trackedUnsupportedAnimations.isEmpty())
+            assertTrue(clock.animatedVisibilityClocks.isEmpty())
         }
 
         waitFor("Composable to have animations", 5, TimeUnit.SECONDS) {
@@ -249,9 +249,9 @@ class ComposeViewAdapterTest {
         }
 
         activityTestRule.runOnUiThread {
-            assertEquals(unsupported, clock.trackedUnsupported.map { it.label })
-            assertEquals(transitions, clock.trackedTransitions.map { it.label })
-            assertEquals(0, clock.trackedAnimatedVisibility.size)
+            assertEquals(unsupported, clock.trackedUnsupportedAnimations.map { it.label })
+            assertEquals(transitions, clock.transitionClocks.values.map { it.animation.label })
+            assertEquals(0, clock.animatedVisibilityClocks.size)
         }
     }
 
@@ -266,7 +266,7 @@ class ComposeViewAdapterTest {
             )
             composeViewAdapter.clock = clock
             assertFalse(composeViewAdapter.hasAnimations())
-            assertTrue(clock.trackedTransitions.isEmpty())
+            assertTrue(clock.transitionClocks.isEmpty())
         }
 
         waitFor("Composable to have animations", 1, TimeUnit.SECONDS) {
@@ -277,7 +277,7 @@ class ComposeViewAdapterTest {
         }
 
         activityTestRule.runOnUiThread {
-            val animation = clock.trackedTransitions.single()
+            val animation = clock.transitionClocks.values.single().animation
             assertEquals(label, animation.label)
         }
     }
@@ -416,8 +416,8 @@ class ComposeViewAdapterTest {
     @Test
     fun multipreviewTest() {
         assertRendersCorrectly(
-                "androidx.compose.ui.tooling.SimpleComposablePreviewKt",
-                "Multipreview"
+            "androidx.compose.ui.tooling.SimpleComposablePreviewKt",
+            "Multipreview"
         )
     }
 
@@ -443,8 +443,10 @@ class ComposeViewAdapterTest {
         repeat(5) {
             activityTestRule.runOnUiThread {
                 assertEquals(1, compositionCount.get())
-                assertTrue("At most, $expectedDrawCount draw is expected ($onDrawCounter happened)",
-                    onDrawCounter <= expectedDrawCount)
+                assertTrue(
+                    "At most, $expectedDrawCount draw is expected ($onDrawCounter happened)",
+                    onDrawCounter <= expectedDrawCount
+                )
             }
             Thread.sleep(250)
         }

@@ -15,7 +15,20 @@ package androidx.compose.ui.tooling {
 
 package androidx.compose.ui.tooling.animation {
 
-  public final class ComposeAnimationParserKt {
+  public final class AnimatedVisibilityComposeAnimationKt {
+  }
+
+  public final class AnimationSearchKt {
+  }
+
+  public final class TransitionComposeAnimationKt {
+  }
+
+}
+
+package androidx.compose.ui.tooling.animation.clock {
+
+  public final class UtilsKt {
   }
 
 }
