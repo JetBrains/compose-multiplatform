@@ -15,6 +15,7 @@ buildscript {
 }
 
 plugins {
+    id("com.android.application")
     kotlin("multiplatform")
     id("org.jetbrains.compose")
 }
@@ -29,6 +30,7 @@ repositories {
     google()}
 
 kotlin {
+    android()
     jvm("desktop")
     js(IR) {
         browser()
@@ -95,6 +97,15 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
+            }
+        }
+
+        val androidMain by getting {
+            dependsOn(commonMain)
+            kotlin.srcDirs("src/jvmMain/kotlin")
+            dependencies {
+                api("androidx.appcompat:appcompat:1.4.1")
+                implementation("androidx.activity:activity-compose:1.4.0")
             }
         }
 
@@ -209,4 +220,25 @@ project.tasks.withType(org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile::class.ja
     kotlinOptions.freeCompilerArgs += listOf(
         "-Xir-dce-runtime-diagnostic=log"
     )
+}
+
+android {
+    compileSdk = 31
+
+    defaultConfig {
+        minSdk = 21
+        targetSdk = 31
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    sourceSets {
+        named("main") {
+            manifest.srcFile("src/androidMain/AndroidManifest.xml")
+            res.srcDirs("src/androidMain/res", "src/commonMain/resources")
+        }
+    }
 }

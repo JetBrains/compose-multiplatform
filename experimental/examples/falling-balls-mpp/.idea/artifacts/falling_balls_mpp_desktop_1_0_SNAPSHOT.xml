@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="falling-balls-mpp-desktop-1.0-SNAPSHOT">
+    <output-path>$PROJECT_DIR$/build/libs</output-path>
+    <root id="archive" name="falling-balls-mpp-desktop-1.0-SNAPSHOT.jar">
+      <element id="module-output" name="falling-balls-mpp.desktopMain" />
+    </root>
+  </artifact>
+</component>

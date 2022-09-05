@@ -18,9 +18,10 @@ git config --global submodule.recurse true
 
 ## Developing in IDE
 1. Download Android Studio from [the official site](https://developer.android.com/studio/archive) (it is mandatory to use the version, written [here](https://github.com/JetBrains/androidx/blob/jb-main/gradle/libs.versions.toml#L11)). As an alternative you can use IDEA, which is compatible with [this AGP version](https://github.com/JetBrains/androidx/blob/jb-main/gradle/libs.versions.toml#L5), or you can disable Android plugin in IDEA plugins, to develop non-Android targets.
-2. Open `compose/frameworks/support` folder in Android Studio or in IDEA.
-3. Specify Gradle JDK 11 in `... -> Build Tools -> Gradle`
-4. [macOs/Linux] Specify Android SDK pointed to a folder, downloaded via `./compose/frameworks/support/jbdeps/android-sdk/downloadAndroidSdk`
+2. [macOs/Linux] Download Android SDK via `./compose/frameworks/support/jbdeps/android-sdk/downloadAndroidSdk`
+2. [Windows] Download Android SDK via [Android Studio](https://developer.android.com/studio/intro/update#sdk-manager) and specify it in ANDROID_SDK_ROOT environment variable. Components, their versions and folder structure should be the same as in downloaded via script `./compose/frameworks/support/jbdeps/android-sdk/downloadAndroidSdk` SDK for other platforms.
+3. Open `compose/frameworks/support` folder in Android Studio or in IDEA.
+4. Specify Gradle JVM to use JDK 11 in InteliJ IDEA Preferences (`Build, Execution, Deployment -> Build Tools -> Gradle`)
 
 ## Scripts
 Publish artifacts to the local directory `out/androidx/build/support_repo/org/jetbrains/compose`:
