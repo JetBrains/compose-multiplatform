@@ -458,6 +458,41 @@ class LazyStaggeredGridTest(
     }
 
     @Test
+    fun itemsAreCorrectedWhenItemCountIsIncreasedFromZero() {
+        var itemCount by mutableStateOf(0)
+        rule.setContent {
+            state = rememberLazyStaggeredGridState()
+            LazyStaggeredGrid(
+                lanes = 2,
+                state = state,
+                modifier = Modifier.axisSize(
+                    crossAxis = itemSizeDp * 2,
+                    mainAxis = itemSizeDp * 2
+                ),
+            ) {
+                items(itemCount) {
+                    Spacer(
+                        Modifier
+                            .mainAxisSize(itemSizeDp)
+                            .testTag("$it")
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertDoesNotExist()
+
+        itemCount = 4
+
+        rule.onNodeWithTag("0")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+    }
+
+    @Test
     fun itemsAreCorrectedWithWrongColumns() {
         rule.setContent {
             // intentionally wrong values, normally items should be [0, 1][2, 3][4, 5]
@@ -497,6 +532,102 @@ class LazyStaggeredGridTest(
             .assertMainAxisStartPositionInRootIsEqualTo(-itemSizeDp / 2)
 
         state.scrollBy(-itemSizeDp * 3)
+
+        rule.onNodeWithTag("0")
+            .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("1")
+            .assertCrossAxisStartPositionInRootIsEqualTo(itemSizeDp)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun itemsAreCorrectedWithAlignedOffsets() {
+        var expanded by mutableStateOf(false)
+        rule.setContent {
+            state = rememberLazyStaggeredGridState(
+                initialFirstVisibleItemIndex = 0,
+            )
+            LazyStaggeredGrid(
+                lanes = 2,
+                state = state,
+                modifier = Modifier.axisSize(
+                    crossAxis = itemSizeDp * 2,
+                    mainAxis = itemSizeDp
+                ),
+            ) {
+                items(6) {
+                    Spacer(
+                        Modifier
+                            .mainAxisSize(
+                                if (it % 2 == 1 && expanded) itemSizeDp * 2 else itemSizeDp
+                            )
+                            .testTag("$it")
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertIsDisplayed()
+
+        state.scrollBy(itemSizeDp * 2)
+
+        rule.runOnIdle {
+            expanded = true
+        }
+
+        state.scrollBy(itemSizeDp * -2)
+        state.scrollBy(-itemSizeDp)
+
+        rule.onNodeWithTag("0")
+            .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("1")
+            .assertCrossAxisStartPositionInRootIsEqualTo(itemSizeDp)
+            .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun itemsAreCorrectedWhenItemIncreased() {
+        var expanded by mutableStateOf(false)
+        rule.setContent {
+            state = rememberLazyStaggeredGridState(
+                initialFirstVisibleItemIndex = 0,
+            )
+            LazyStaggeredGrid(
+                lanes = 2,
+                state = state,
+                modifier = Modifier.axisSize(
+                    crossAxis = itemSizeDp * 2,
+                    mainAxis = itemSizeDp
+                ),
+            ) {
+                items(6) {
+                    Spacer(
+                        Modifier
+                            .mainAxisSize(
+                                if (it == 3 && expanded) itemSizeDp * 2 else itemSizeDp
+                            )
+                            .testTag("$it")
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertIsDisplayed()
+
+        state.scrollBy(itemSizeDp * 2)
+
+        rule.runOnIdle {
+            expanded = true
+        }
+
+        state.scrollBy(itemSizeDp * -2)
+        state.scrollBy(-itemSizeDp)
 
         rule.onNodeWithTag("0")
             .assertCrossAxisStartPositionInRootIsEqualTo(0.dp)

@@ -22,9 +22,11 @@ import androidx.compose.foundation.BaseLazyLayoutTestWithOrientation
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
@@ -44,12 +46,14 @@ open class BaseLazyStaggeredGridWithOrientation(
         lanes: Int,
         modifier: Modifier = Modifier,
         state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
+        contentPadding: PaddingValues = PaddingValues(0.dp),
         content: LazyStaggeredGridScope.() -> Unit,
     ) {
         if (orientation == Orientation.Vertical) {
             LazyVerticalStaggeredGrid(
                 columns = StaggeredGridCells.Fixed(lanes),
                 modifier = modifier,
+                contentPadding = contentPadding,
                 state = state,
                 content = content
             )
@@ -57,6 +61,7 @@ open class BaseLazyStaggeredGridWithOrientation(
             LazyHorizontalStaggeredGrid(
                 rows = StaggeredGridCells.Fixed(lanes),
                 modifier = modifier,
+                contentPadding = contentPadding,
                 state = state,
                 content = content
             )

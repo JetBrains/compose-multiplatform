@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 
 /**
  * Vertical staggered grid layout that composes and lays out only items currently visible on screen.
@@ -37,21 +38,22 @@ import androidx.compose.ui.unit.LayoutDirection
  * @param columns description of the size and number of staggered grid columns.
  * @param modifier modifier to apply to the layout.
  * @param state state object that can be used to control and observe staggered grid state.
- * @param flingBehavior logic handling fling.
+ * @param contentPadding padding around the content
+ * @param flingBehavior logic responsible for handling fling.
  * @param userScrollEnabled whether scroll with gestures or accessibility actions are allowed. It is
- *  still possible to scroll programmatically through state when
- *  [userScrollEnabled] is set to false.
+ *  still possible to scroll programmatically through state when [userScrollEnabled] is set to false
  * @param content a lambda describing the staggered grid content. Inside this block you can use
  *  [LazyStaggeredGridScope.items] to present list of items or [LazyStaggeredGridScope.item] for a
  *  single one.
  */
-// todo(b/182882362): Content padding, reverse layout and arrangement support
+// todo(b/182882362): Reverse layout and arrangement support
 @ExperimentalFoundationApi
 @Composable
 fun LazyVerticalStaggeredGrid(
     columns: StaggeredGridCells,
     modifier: Modifier = Modifier,
     state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     userScrollEnabled: Boolean = true,
     content: LazyStaggeredGridScope.() -> Unit
@@ -60,13 +62,10 @@ fun LazyVerticalStaggeredGrid(
         modifier = modifier,
         orientation = Orientation.Vertical,
         state = state,
+        contentPadding = contentPadding,
         flingBehavior = flingBehavior,
         userScrollEnabled = userScrollEnabled,
-        slotSizesSums = rememberColumnWidthSums(
-            columns,
-            Arrangement.Start,
-            PaddingValues()
-        ),
+        slotSizesSums = rememberColumnWidthSums(columns, Arrangement.Start, contentPadding),
         content = content
     )
 }
@@ -113,21 +112,22 @@ private fun rememberColumnWidthSums(
  * @param rows description of the size and number of staggered grid columns.
  * @param modifier modifier to apply to the layout.
  * @param state state object that can be used to control and observe staggered grid state.
- * @param flingBehavior logic handling fling.
+ * @param contentPadding padding around the content
+ * @param flingBehavior logic responsible for handling fling.
  * @param userScrollEnabled whether scroll with gestures or accessibility actions are allowed. It is
- *  still possible to scroll programmatically through state when
- *  [userScrollEnabled] is set to false.
+ *  still possible to scroll programmatically through state when [userScrollEnabled] is set to false
  * @param content a lambda describing the staggered grid content. Inside this block you can use
  *  [LazyStaggeredGridScope.items] to present list of items or [LazyStaggeredGridScope.item] for a
  *  single one.
  */
-// todo(b/182882362): Content padding, reverse layout and arrangement support
+// todo(b/182882362): Reverse layout and arrangement support
 @ExperimentalFoundationApi
 @Composable
 fun LazyHorizontalStaggeredGrid(
     rows: StaggeredGridCells,
     modifier: Modifier = Modifier,
     state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     userScrollEnabled: Boolean = true,
     content: LazyStaggeredGridScope.() -> Unit
@@ -136,9 +136,10 @@ fun LazyHorizontalStaggeredGrid(
         modifier = modifier,
         orientation = Orientation.Horizontal,
         state = state,
+        contentPadding = contentPadding,
         flingBehavior = flingBehavior,
         userScrollEnabled = userScrollEnabled,
-        slotSizesSums = rememberRowHeightSums(rows, Arrangement.Top, PaddingValues()),
+        slotSizesSums = rememberRowHeightSums(rows, Arrangement.Top, contentPadding),
         content = content
     )
 }
