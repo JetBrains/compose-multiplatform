@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.window
 
-import android.app.Dialog
 import android.content.Context
 import android.graphics.Outline
 import android.os.Build
@@ -27,6 +26,8 @@ import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import android.view.Window
 import android.view.WindowManager
+import androidx.activity.ComponentDialog
+import androidx.activity.addCallback
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.DisposableEffect
@@ -280,7 +281,7 @@ private class DialogWrapper(
     layoutDirection: LayoutDirection,
     density: Density,
     dialogId: UUID
-) : Dialog(
+) : ComponentDialog(
     /**
      * [Window.setClipToOutline] is only available from 22+, but the style attribute exists on 21.
      * So use a wrapped context that sets this attribute for compatibility back to 21.
@@ -359,6 +360,17 @@ private class DialogWrapper(
 
         // Initial setup
         updateParameters(onDismissRequest, properties, layoutDirection)
+
+        // Due to how the onDismissRequest callback works
+        // (it enforces a just-in-time decision on whether to update the state to hide the dialog)
+        // we need to unconditionally add a callback here that is always enabled,
+        // meaning we'll never get a system UI controlled predictive back animation
+        // for these dialogs
+        onBackPressedDispatcher.addCallback(this) {
+            if (properties.dismissOnBackPress) {
+                onDismissRequest()
+            }
+        }
     }
 
     private fun setLayoutDirection(layoutDirection: LayoutDirection) {
@@ -424,12 +436,6 @@ private class DialogWrapper(
     override fun cancel() {
         // Prevents the dialog from dismissing itself
         return
-    }
-
-    override fun onBackPressed() {
-        if (properties.dismissOnBackPress) {
-            onDismissRequest()
-        }
     }
 }
 
