@@ -302,7 +302,6 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
             multiplatformExtension.sourceSets.all {
                 // Allow all experimental APIs, since MPP projects are themselves experimental
                 it.languageSettings.apply {
-                    optIn("kotlin.Experimental")
                     optIn("kotlin.ExperimentalMultiplatform")
                 }
             }
@@ -365,9 +364,6 @@ private fun configureComposeCompilerPlugin(
         val libraryMetricsDirectory = project.rootProject.getLibraryMetricsDirectory()
         val libraryReportsDirectory = project.rootProject.getLibraryReportsDirectory()
         project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
-            // TODO(b/157230235): remove when this is enabled by default
-            compile.kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
-
             // Append inputs to KotlinCompile so tasks get invalidated if any of these values change
             compile.inputs.files({ kotlinPlugin })
                 .withPropertyName("composeCompilerExtension")
@@ -505,7 +501,6 @@ public inline fun <reified T> transitiveClosure(seed: T, edges: T.() -> Iterable
     return results.toSet()
 }
 
-@OptIn(ExperimentalStdlibApi::class)
 @PublishedApi
 internal inline fun <reified T> deque(initialSize: Int): MutableList<T> {
     return if (KotlinVersion.CURRENT.isAtLeast(1, 4)) ArrayDeque(initialSize)

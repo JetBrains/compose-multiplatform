@@ -23,6 +23,7 @@ import java.io.File
 import java.util.Locale
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.gradle.kotlin.dsl.getByType
@@ -255,6 +256,11 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
         // Broken in 7.0.0-alpha15 due to b/187343720
         disable.add("UnusedResources")
 
+        // Disable NullAnnotationGroup check for :compose:ui:ui-text (b/233788571)
+        if (isLibrary && project.group == "androidx.compose.ui" && project.name == "ui-text") {
+            disable.add("NullAnnotationGroup")
+        }
+
         if (extension.type == LibraryType.SAMPLES) {
             // TODO: b/190833328 remove if / when AGP will analyze dependencies by default
             //  This is needed because SampledAnnotationDetector uses partial analysis, and
@@ -283,5 +289,5 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
     }
 }
 
-val Project.lintBaseline get() =
+val Project.lintBaseline: RegularFileProperty get() =
     project.objects.fileProperty().fileValue(File(projectDir, "/lint-baseline.xml"))

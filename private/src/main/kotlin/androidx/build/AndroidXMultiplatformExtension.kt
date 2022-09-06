@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinTargetPreset
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests
@@ -57,6 +58,17 @@ open class AndroidXMultiplatformExtension(val project: Project) {
     ): KotlinJvmTarget? {
         return if (project.enableJvm()) {
             kotlinExtension.jvm {
+                block?.execute(this)
+            }
+        } else { null }
+    }
+
+    @JvmOverloads
+    fun android(
+        block: Action<KotlinAndroidTarget>? = null
+    ): KotlinAndroidTarget? {
+        return if (project.enableJvm()) {
+            kotlinExtension.android {
                 block?.execute(this)
             }
         } else { null }
