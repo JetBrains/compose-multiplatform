@@ -15,6 +15,7 @@
  */
 
 import androidx.build.AndroidXComposePlugin
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -91,6 +92,20 @@ kotlin {
             }
         }
     }
+    iosSimulatorArm64("uikitSimArm64") {
+        binaries {
+            executable() {
+                entryPoint = "androidx.compose.mpp.demo.main"
+                freeCompilerArgs += listOf(
+                    "-linker-option", "-framework", "-linker-option", "Metal",
+                    "-linker-option", "-framework", "-linker-option", "CoreText",
+                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                )
+                // TODO: the current compose binary surprises LLVM, so disable checks for now.
+                freeCompilerArgs += "-Xdisable-phases=VerifyBitcode"
+            }
+        }
+    }
     sourceSets {
         val commonMain by getting {
              dependencies {
@@ -127,11 +142,12 @@ kotlin {
         val uikitMain by creating { dependsOn(darwinMain) }
         val uikitX64Main by getting { dependsOn(uikitMain) }
         val uikitArm64Main by creating { dependsOn(uikitMain) }
+        val uikitSimArm64Main by getting { dependsOn(uikitMain) }
     }
 }
 
 enum class Target(val simulator: Boolean, val key: String) {
-    UIKIT_X64(true, "uikitX64"), UIKIT_ARM64(false, "uikitArm64")
+    UIKIT_X64(true, "uikitX64"), UIKIT_ARM64(false, "uikitArm64"), UIKIT_SIM_ARM64(true, "uikitSimArm64"),
 }
 
 if (System.getProperty("os.name") == "Mac OS X") {
@@ -143,7 +159,7 @@ if (System.getProperty("os.name") == "Mac OS X") {
             it.startsWith("iphoneos") -> Target.UIKIT_ARM64
             it.startsWith("iphonesimulator") -> {
                 if (System.getProperty("os.arch") == "aarch64") {
-                    Target.UIKIT_ARM64
+                    Target.UIKIT_SIM_ARM64
                 } else {
                     Target.UIKIT_X64
                 }

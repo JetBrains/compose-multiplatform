@@ -14,7 +14,7 @@ targets:
     platform: iOS
     deploymentTarget: "12.0"
     prebuildScripts:
-      - script: cd "$SRCROOT" && OUT_DIR=`pwd`/out  JAVA_TOOLS_JAR=/Users/jetbrains/jetpack_compose_ui/compose-jb/compose/scripts/../external/tools.jar  ALLOW_PUBLIC_REPOS=1  ANDROIDX_PROJECTS=compose ../../../../../gradlew  -i  -Pandroidx.compose.multiplatformEnabled=true  --no-daemon -Pkotlin.compiler.execution.strategy="in-process" -p . packForXCode
+      - script: cd "$SRCROOT" && OUT_DIR=`pwd`/out  JAVA_TOOLS_JAR=/Users/jetbrains/jetpack_compose_ui/compose-jb/compose/scripts/../external/tools.jar  ALLOW_PUBLIC_REPOS=1  ANDROIDX_PROJECTS=compose ../../../gradlew  -i  -Pandroidx.compose.multiplatformEnabled=true  --no-daemon -Pkotlin.compiler.execution.strategy="in-process" -p . packForXCode
         name: GradleCompile
     info:
       path: plists/Ios/Info.plist
