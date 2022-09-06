@@ -177,7 +177,7 @@ fun TopAppBar(
         "TopAppBar(title, modifier, navigationIcon, actions, windowInsets, colors, " +
             "scrollBehavior)"
     ),
-    level = DeprecationLevel.ERROR
+    level = DeprecationLevel.WARNING
 )
 @ExperimentalMaterial3Api
 @Composable
