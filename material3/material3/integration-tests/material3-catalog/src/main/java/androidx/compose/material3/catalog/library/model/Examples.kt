@@ -44,7 +44,7 @@ import androidx.compose.material3.samples.ElevatedButtonSample
 import androidx.compose.material3.samples.ElevatedCardSample
 import androidx.compose.material3.samples.ElevatedFilterChipSample
 import androidx.compose.material3.samples.ElevatedSuggestionChipSample
-import androidx.compose.material3.samples.EnterAlwaysSmallTopAppBar
+import androidx.compose.material3.samples.EnterAlwaysTopAppBar
 import androidx.compose.material3.samples.ExitUntilCollapsedLargeTopAppBar
 import androidx.compose.material3.samples.ExitUntilCollapsedMediumTopAppBar
 import androidx.compose.material3.samples.ExposedDropdownMenuSample
@@ -87,7 +87,7 @@ import androidx.compose.material3.samples.OutlinedIconToggleButtonSample
 import androidx.compose.material3.samples.OutlinedTextFieldSample
 import androidx.compose.material3.samples.PasswordTextField
 import androidx.compose.material3.samples.PermanentNavigationDrawerSample
-import androidx.compose.material3.samples.PinnedSmallTopAppBar
+import androidx.compose.material3.samples.PinnedTopAppBar
 import androidx.compose.material3.samples.RadioButtonSample
 import androidx.compose.material3.samples.RadioGroupSample
 import androidx.compose.material3.samples.RangeSliderSample
@@ -100,8 +100,8 @@ import androidx.compose.material3.samples.ScrollingTextTabs
 import androidx.compose.material3.samples.SimpleBottomAppBar
 import androidx.compose.material3.samples.SimpleCenterAlignedTopAppBar
 import androidx.compose.material3.samples.SimpleOutlinedTextFieldSample
-import androidx.compose.material3.samples.SimpleSmallTopAppBar
 import androidx.compose.material3.samples.SimpleTextFieldSample
+import androidx.compose.material3.samples.SimpleTopAppBar
 import androidx.compose.material3.samples.SliderSample
 import androidx.compose.material3.samples.SmallFloatingActionButtonSample
 import androidx.compose.material3.samples.StepRangeSliderSample
@@ -364,25 +364,25 @@ private const val TopAppBarExampleSourceUrl = "$SampleSourceUrl/AppBarSamples.kt
 val TopAppBarExamples =
     listOf(
         Example(
-            name = ::SimpleSmallTopAppBar.name,
+            name = ::SimpleTopAppBar.name,
             description = TopAppBarExampleDescription,
             sourceUrl = TopAppBarExampleSourceUrl,
-        ) { SimpleSmallTopAppBar() },
+        ) { SimpleTopAppBar() },
         Example(
             name = ::SimpleCenterAlignedTopAppBar.name,
             description = TopAppBarExampleDescription,
             sourceUrl = TopAppBarExampleSourceUrl,
         ) { SimpleCenterAlignedTopAppBar() },
         Example(
-            name = ::PinnedSmallTopAppBar.name,
+            name = ::PinnedTopAppBar.name,
             description = TopAppBarExampleDescription,
             sourceUrl = TopAppBarExampleSourceUrl,
-        ) { PinnedSmallTopAppBar() },
+        ) { PinnedTopAppBar() },
         Example(
-            name = ::EnterAlwaysSmallTopAppBar.name,
+            name = ::EnterAlwaysTopAppBar.name,
             description = TopAppBarExampleDescription,
             sourceUrl = TopAppBarExampleSourceUrl,
-        ) { EnterAlwaysSmallTopAppBar() },
+        ) { EnterAlwaysTopAppBar() },
         Example(
             name = ::ExitUntilCollapsedMediumTopAppBar.name,
             description = TopAppBarExampleDescription,

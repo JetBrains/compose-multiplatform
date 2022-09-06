@@ -30,11 +30,19 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.platform.AndroidTextPaint
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 
+/**
+ * Applies given SpanStyle to this AndroidTextPaint.
+ *
+ * Although most attributes in SpanStyle can be applied to TextPaint, some are only applicable as
+ * regular platform spans such as background, baselineShift. This function also returns a new
+ * SpanStyle that consists of attributes that were not applied to the TextPaint.
+ */
 @OptIn(ExperimentalTextApi::class)
 internal fun AndroidTextPaint.applySpanStyle(
     style: SpanStyle,
@@ -98,7 +106,7 @@ internal fun AndroidTextPaint.applySpanStyle(
     // Paragraph.paint will receive a proper Size after layout is completed.
     setBrush(style.brush, Size.Unspecified, style.alpha)
     setShadow(style.shadow)
-    setTextDecoration(style.textDecoration)
+    // Skip textDecoration (b/199939617). TextDecoration should be applied as a span.
 
     // letterSpacing with unit Sp needs to be handled by span.
     // baselineShift and bgColor is reset in the Android Layout constructor,
@@ -120,6 +128,9 @@ internal fun AndroidTextPaint.applySpanStyle(
             null
         } else {
             style.baselineShift
+        },
+        textDecoration = style.textDecoration.takeIf {
+            style.textDecoration != TextDecoration.None
         }
     )
 }

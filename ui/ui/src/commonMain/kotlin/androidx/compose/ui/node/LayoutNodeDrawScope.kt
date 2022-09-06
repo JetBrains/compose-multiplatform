@@ -101,11 +101,11 @@ private fun DelegatableNode.nextDrawNode(): DrawModifierNode? {
     val drawMask = Nodes.Draw.mask
     val measureMask = Nodes.Layout.mask
     val child = node.child ?: return null
-    if (child.aggregateChildKindSet and drawMask == 0L) return null
+    if (child.aggregateChildKindSet and drawMask == 0) return null
     var next: Modifier.Node? = child
     while (next != null) {
-        if (next.kindSet and measureMask != 0L) return null
-        if (next.kindSet and drawMask != 0L) {
+        if (next.kindSet and measureMask != 0) return null
+        if (next.kindSet and drawMask != 0) {
             return next as DrawModifierNode
         }
         next = next.child

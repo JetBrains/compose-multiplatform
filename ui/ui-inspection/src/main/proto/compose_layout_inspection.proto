@@ -99,7 +99,7 @@ message ComposableNode {
     // The number of recomposition skips detected since the last counter reset
     int32 recompose_skips = 12;
 
-    // The anchor hash of the composable. See InspectorNode.anchorHash.
+    // The unique id of an anchor. This used to be its hashcode. See InspectorNode.anchorId.
     sint32 anchor_hash = 13;
 }
 
@@ -195,7 +195,7 @@ message ParameterReference {
   // The kind of parameter this is a reference to
   Kind kind = 4;
 
-  // The anchor hash of the composable. See InspectorNode.anchorHash.
+  // The anchor hash of the composable. See InspectorNode.anchorId.
   sint32 anchor_hash = 5;
 }
 
@@ -250,7 +250,7 @@ message GetParametersCommand {
   int32 max_initial_iterable_size = 5;
   // If the cached data generation matches the specified generation then the cache is still valid.
   int32 generation = 6;
-  // The anchor hash of the composable. See InspectorNode.anchorHash.
+  // The anchor hash of the composable. See InspectorNode.anchorId.
   sint32 anchor_hash = 7;
 }
 

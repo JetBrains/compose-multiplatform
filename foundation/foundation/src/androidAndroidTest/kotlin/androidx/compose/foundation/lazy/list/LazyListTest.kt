@@ -64,6 +64,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.util.VelocityTracker
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
@@ -88,6 +89,7 @@ import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.swipeWithVelocity
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
@@ -101,6 +103,7 @@ import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import java.util.concurrent.CountDownLatch
 import kotlin.math.abs
+import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -2020,6 +2023,65 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
             }
         }
         rule.waitUntil(timeoutMillis = 10000) { animationFinished }
+    }
+
+    @Test
+    fun increasingConstraintsWhenParentMaxSizeIsUsed_correctlyMaintainsThePosition() {
+        val state = LazyListState(1, 10)
+        var constraints by mutableStateOf(Constraints.fixed(100, 100))
+        rule.setContentWithTestViewConfiguration {
+            Layout(content = {
+                LazyColumnOrRow(state = state) {
+                    items(3) {
+                        Box(Modifier.fillParentMaxSize())
+                    }
+                }
+            }) { measurables, _ ->
+                val placeable = measurables.first().measure(constraints)
+                layout(constraints.maxWidth, constraints.maxHeight) {
+                    placeable.place(0, 0)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            constraints = Constraints.fixed(500, 500)
+        }
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(1)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
+        }
+    }
+
+    @Test
+    fun usingFillParentMaxSizeOnInfinityConstraintsIsIgnored() {
+        rule.setContentWithTestViewConfiguration {
+            Layout(content = {
+                LazyColumnOrRow {
+                    items(1) {
+                        Box(
+                            Modifier
+                                .fillParentMaxSize(0.95f)
+                                .testTag("item"))
+                    }
+                }
+            }) { measurables, _ ->
+                val crossInfinityConstraints = if (vertical) {
+                    Constraints(maxWidth = Constraints.Infinity, maxHeight = 100)
+                } else {
+                    Constraints(maxWidth = 100, maxHeight = Constraints.Infinity)
+                }
+                val placeable = measurables.first().measure(crossInfinityConstraints)
+                layout(placeable.width, placeable.height) {
+                    placeable.place(0, 0)
+                }
+            }
+        }
+
+        rule.onNodeWithTag("item")
+            .assertMainAxisSizeIsEqualTo(with(rule.density) { (100 * 0.95f).roundToInt().toDp() })
+            .assertCrossAxisSizeIsEqualTo(0.dp)
     }
 
     // ********************* END OF TESTS *********************

@@ -1343,25 +1343,29 @@ AndroidParagraphTest {
     }
 
     @Test
-    fun testSpanStyle_textDecoration_underline_appliedOnTextPaint() {
+    fun testSpanStyle_textDecoration_underline_appliedAsSpan() {
+        val text = "abc"
         val paragraph = simpleParagraph(
-            text = "",
+            text = text,
             style = TextStyle(textDecoration = TextDecoration.Underline),
             width = 0.0f
         )
 
-        assertThat(paragraph.textPaint.isUnderlineText).isTrue()
+        assertThat(paragraph.charSequence)
+            .hasSpan(TextDecorationSpan::class, 0, text.length) { it.isUnderlineText }
     }
 
     @Test
-    fun testSpanStyle_textDecoration_lineThrough_appliedOnTextPaint() {
+    fun testSpanStyle_textDecoration_lineThrough_appliedAsSpan() {
+        val text = "abc"
         val paragraph = simpleParagraph(
-            text = "",
+            text = text,
             style = TextStyle(textDecoration = TextDecoration.LineThrough),
             width = 0.0f
         )
 
-        assertThat(paragraph.textPaint.isStrikeThruText).isTrue()
+        assertThat(paragraph.charSequence)
+            .hasSpan(TextDecorationSpan::class, 0, text.length) { it.isStrikethroughText }
     }
 
     @Test
@@ -1389,7 +1393,6 @@ AndroidParagraphTest {
             style = TextStyle(textDecoration = null),
             width = 0.0f
         )
-        assertThat(paragraph.textPaint.isUnderlineText).isFalse()
 
         val canvas = Canvas(android.graphics.Canvas())
         paragraph.paint(canvas, textDecoration = TextDecoration.Underline)
@@ -1405,9 +1408,12 @@ AndroidParagraphTest {
             ),
             width = 0.0f
         )
+        // Underline text is not applied on TextPaint initially. It is set as a span.
+        // Once drawn, this span gets applied on the TextPaint.
+        val canvas = Canvas(android.graphics.Canvas())
+        paragraph.paint(canvas, textDecoration = TextDecoration.Underline)
         assertThat(paragraph.textPaint.isUnderlineText).isTrue()
 
-        val canvas = Canvas(android.graphics.Canvas())
         paragraph.paint(canvas, textDecoration = TextDecoration.None)
         assertThat(paragraph.textPaint.isUnderlineText).isFalse()
     }
@@ -1421,9 +1427,12 @@ AndroidParagraphTest {
             ),
             width = 0.0f
         )
+        // Underline text is not applied on TextPaint initially. It is set as a span.
+        // Once drawn, this span gets applied on the TextPaint.
+        val canvas = Canvas(android.graphics.Canvas())
+        paragraph.paint(canvas, textDecoration = TextDecoration.Underline)
         assertThat(paragraph.textPaint.isUnderlineText).isTrue()
 
-        val canvas = Canvas(android.graphics.Canvas())
         paragraph.paint(canvas, textDecoration = null)
         assertThat(paragraph.textPaint.isUnderlineText).isFalse()
     }
@@ -1762,6 +1771,38 @@ AndroidParagraphTest {
             fontFamilyResolver = UncachedFontFamilyResolver(context),
             density = defaultDensity,
         )
+    }
+
+    @Test
+    fun drawText_withUnderlineStyle_equalToUnderlinePaint() = with(defaultDensity) {
+        val fontSize = 30.sp
+        val fontSizeInPx = fontSize.toPx()
+        val text = "レンズ(単焦点)"
+        val spanStyle = SpanStyle(textDecoration = TextDecoration.Underline)
+        val paragraph = simpleParagraph(
+            text = text,
+            style = TextStyle(fontSize = fontSize),
+            spanStyles = listOf(AnnotatedString.Range(spanStyle, 0, text.length)),
+            width = fontSizeInPx * 20
+        )
+
+        val paragraph2 = simpleParagraph(
+            text = text,
+            style = TextStyle(
+                fontSize = fontSize,
+                textDecoration = TextDecoration.Underline
+            ),
+            width = fontSizeInPx * 20
+        )
+
+        val bitmapWithSpan = paragraph.bitmap()
+        // Our text rendering stack relies on the fact that given textstyle is also passed to draw
+        // functions of TextLayoutResult, MultiParagraph, Paragraph. If Underline is not specified
+        // here, it would be removed while drawing the MultiParagraph. We are simply mimicking
+        // what TextPainter does.
+        val bitmapNoSpan = paragraph2.bitmap(textDecoration = TextDecoration.Underline)
+
+        assertThat(bitmapWithSpan).isEqualToBitmap(bitmapNoSpan)
     }
 
     private fun simpleParagraph(

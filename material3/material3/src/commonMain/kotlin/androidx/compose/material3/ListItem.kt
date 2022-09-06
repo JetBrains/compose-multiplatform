@@ -37,11 +37,13 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-// TODO: Provide M3 ListItem asset and doc link when available
+// TODO: Provide M3 ListItem doc link when available
 /**
  * Material Design list item.
  *
  * Lists are continuous, vertical indexes of text or images.
+ *
+ * ![Lists image](https://developer.android.com/images/reference/androidx/compose/material3/lists.png)
  *
  * This component can be used to achieve the list item templates existing in the spec. One-line list
  * items have a singular line of headline text. Two-line list items additionally have either

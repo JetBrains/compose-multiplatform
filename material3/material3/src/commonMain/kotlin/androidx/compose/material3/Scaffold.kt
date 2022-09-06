@@ -19,6 +19,8 @@ package androidx.compose.material3
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -58,6 +60,10 @@ import androidx.compose.ui.unit.dp
  * @param contentColor the preferred color for content inside this scaffold. Defaults to either the
  * matching content color for [containerColor], or to the current [LocalContentColor] if
  * [containerColor] is not a color from the theme.
+ * @param contentWindowInsets window insets to be passed to [content] slot via [PaddingValues]
+ * params. Scaffold will take the insets into account from the top/bottom only if the [topBar]/
+ * [bottomBar] are not present, as the scaffold expect [topBar]/[bottomBar] to handle insets
+ * instead
  * @param content content of the screen. The lambda receives a [PaddingValues] that should be
  * applied to the content root via [Modifier.padding] and [Modifier.consumeWindowInsets] to
  * properly offset top and bottom bars. If using [Modifier.verticalScroll], apply this modifier to
@@ -74,6 +80,7 @@ fun Scaffold(
     floatingActionButtonPosition: FabPosition = FabPosition.End,
     containerColor: Color = MaterialTheme.colorScheme.background,
     contentColor: Color = contentColorFor(containerColor),
+    contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
     content: @Composable (PaddingValues) -> Unit
 ) {
     Surface(modifier = modifier, color = containerColor, contentColor = contentColor) {
@@ -83,6 +90,7 @@ fun Scaffold(
             bottomBar = bottomBar,
             content = content,
             snackbar = snackbarHost,
+            contentWindowInsets = contentWindowInsets,
             fab = floatingActionButton
         )
     }
@@ -108,6 +116,7 @@ private fun ScaffoldLayout(
     content: @Composable (PaddingValues) -> Unit,
     snackbar: @Composable () -> Unit,
     fab: @Composable () -> Unit,
+    contentWindowInsets: WindowInsets,
     bottomBar: @Composable () -> Unit
 
 ) {
@@ -184,17 +193,22 @@ private fun ScaffoldLayout(
             }
 
             val bodyContentPlaceables = subcompose(ScaffoldLayoutContent.MainContent) {
-                val insets = WindowInsets.safeDrawingForVisualComponents
-                    .asPaddingValues(this@SubcomposeLayout)
+                val insets = contentWindowInsets.asPaddingValues(this@SubcomposeLayout)
                 val innerPadding = PaddingValues(
                     top =
-                    if (topBarHeight == 0) insets.calculateTopPadding()
-                    else topBarHeight.toDp(),
+                    if (topBarPlaceables.isEmpty()) {
+                        insets.calculateTopPadding()
+                    } else {
+                        topBarHeight.toDp()
+                    },
                     bottom =
-                    if (bottomBarHeight == 0) insets.calculateBottomPadding()
-                    else bottomBarHeight.toDp(),
-                    start = insets.calculateLeftPadding((this@SubcomposeLayout).layoutDirection),
-                    end = insets.calculateRightPadding((this@SubcomposeLayout).layoutDirection)
+                    if (bottomBarPlaceables.isEmpty()) {
+                        insets.calculateBottomPadding()
+                    } else {
+                        bottomBarHeight.toDp()
+                    },
+                    start = insets.calculateStartPadding((this@SubcomposeLayout).layoutDirection),
+                    end = insets.calculateEndPadding((this@SubcomposeLayout).layoutDirection)
                 )
                 content(innerPadding)
             }.map { it.measure(looseConstraints) }
@@ -225,6 +239,19 @@ private fun ScaffoldLayout(
             }
         }
     }
+}
+
+/**
+ * Object containing various default values for [Scaffold] component.
+ */
+@ExperimentalMaterial3Api
+object ScaffoldDefaults {
+    /**
+     * Default insets to be used and consumed by the scaffold content slot
+     */
+    val contentWindowInsets: WindowInsets
+        @Composable
+        get() = WindowInsets.systemBarsForVisualComponents
 }
 
 /**

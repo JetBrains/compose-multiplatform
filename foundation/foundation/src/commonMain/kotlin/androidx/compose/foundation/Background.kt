@@ -123,6 +123,7 @@ private class Background constructor(
         brush?.let { drawOutline(outline, brush = brush, alpha = alpha) }
         lastOutline = outline
         lastSize = size
+        lastLayoutDirection = layoutDirection
     }
 
     override fun hashCode(): Int {

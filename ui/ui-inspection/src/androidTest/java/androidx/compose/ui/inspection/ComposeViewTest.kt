@@ -20,7 +20,7 @@ import androidx.compose.ui.inspection.rules.ComposeInspectionRule
 import androidx.compose.ui.inspection.rules.sendCommand
 import androidx.compose.ui.inspection.testdata.ComposeViewTestActivity
 import androidx.compose.ui.inspection.util.GetComposablesCommand
-import androidx.compose.ui.inspection.util.GetParametersCommand
+import androidx.compose.ui.inspection.util.GetParametersByIdCommand
 import androidx.compose.ui.inspection.util.flatten
 import androidx.compose.ui.inspection.util.toMap
 import androidx.test.filters.LargeTest
@@ -59,7 +59,7 @@ class ComposeViewTest {
     private val ComposableNode.textParameter: String?
         get() = runBlocking {
             val params = rule.inspectorTester.sendCommand(
-                GetParametersCommand(
+                GetParametersByIdCommand(
                     rule.rootId,
                     skipSystemComposables = false,
                     composableId = id

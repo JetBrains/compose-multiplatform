@@ -17,6 +17,7 @@
 package androidx.compose.foundation.gestures.snapping
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.ui.unit.Density
 
 /**
  * Provides information about the layout that is using a SnapFlingBehavior.
@@ -30,7 +31,7 @@ interface SnapLayoutInfoProvider {
     /**
      * The minimum offset that snapping will use to animate. (e.g. an item size)
      */
-    val snapStepSize: Float
+    fun Density.snapStepSize(): Float
 
     /**
      * Calculate the distance to navigate before settling into the next snapping bound.
@@ -38,7 +39,7 @@ interface SnapLayoutInfoProvider {
      * @param initialVelocity The current fling movement velocity. You can use this tho calculate a
      * velocity based offset.
      */
-    fun calculateApproachOffset(initialVelocity: Float): Float
+    fun Density.calculateApproachOffset(initialVelocity: Float): Float
 
     /**
      * Given a target placement in a layout, the snapping bounds should be the closest offset we
@@ -48,5 +49,5 @@ interface SnapLayoutInfoProvider {
      *
      * Bounds are *always* a negative (lower bound) and a positive (upper bound) value.
      */
-    fun calculateSnappingOffsetBounds(): ClosedFloatingPointRange<Float>
+    fun Density.calculateSnappingOffsetBounds(): ClosedFloatingPointRange<Float>
 }

@@ -1,0 +1,36 @@
+// Signature format: 4.0
+package androidx.compose.ui.util {
+
+  public final class AndroidTrace_androidKt {
+    method public static inline <T> T! trace(String sectionName, kotlin.jvm.functions.Function0<? extends T> block);
+  }
+
+  public final class InlineClassHelperKt {
+    method public static inline long packFloats(float val1, float val2);
+    method public static inline long packInts(int val1, int val2);
+    method public static inline float unpackFloat1(long value);
+    method public static inline float unpackFloat2(long value);
+    method public static inline int unpackInt1(long value);
+    method public static inline int unpackInt2(long value);
+  }
+
+  public final class ListUtilsKt {
+    method public static inline <T> boolean fastAll(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
+    method public static inline <T> boolean fastAny(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
+    method public static inline <T> T? fastFirstOrNull(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
+    method public static inline <T> void fastForEach(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> action);
+    method public static inline <T> void fastForEachIndexed(java.util.List<? extends T>, kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,kotlin.Unit> action);
+    method public static inline <T, R> java.util.List<R> fastMap(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,? extends R> transform);
+    method public static inline <T, R, C extends java.util.Collection<? super R>> C fastMapTo(java.util.List<? extends T>, C destination, kotlin.jvm.functions.Function1<? super T,? extends R> transform);
+    method public static inline <T, R extends java.lang.Comparable<? super R>> T? fastMaxBy(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,? extends R> selector);
+    method public static inline <T> int fastSumBy(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,java.lang.Integer> selector);
+  }
+
+  public final class MathHelpersKt {
+    method public static float lerp(float start, float stop, float fraction);
+    method public static int lerp(int start, int stop, float fraction);
+    method public static long lerp(long start, long stop, float fraction);
+  }
+
+}
+

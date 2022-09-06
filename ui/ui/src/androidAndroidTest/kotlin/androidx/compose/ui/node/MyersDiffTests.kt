@@ -20,60 +20,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class MyersDiffTests {
-    @Test
-    fun testSnakePacking() {
-        val snake = Snake(
-            123,
-            234,
-            345,
-            678,
-            true
-        )
-        assertEquals(123, snake.startX)
-        assertEquals(234, snake.startY)
-        assertEquals(345, snake.endX)
-        assertEquals(678, snake.endY)
-        assertEquals(true, snake.reverse)
-
-        val snake2 = Snake(
-            1,
-            2,
-            3,
-            4,
-            false
-        )
-        assertEquals(1, snake2.startX)
-        assertEquals(2, snake2.startY)
-        assertEquals(3, snake2.endX)
-        assertEquals(4, snake2.endY)
-        assertEquals(false, snake2.reverse)
-    }
-
-    @Test
-    fun testRangePacking() {
-        val range = Range(
-            123,
-            234,
-            345,
-            456,
-        )
-        assertEquals(123, range.oldStart)
-        assertEquals(234, range.oldEnd)
-        assertEquals(345, range.newStart)
-        assertEquals(456, range.newEnd)
-    }
-
-    @Test
-    fun testDiagonalPacking() {
-        val diagonal = Diagonal(
-            123,
-            234,
-            345
-        )
-        assertEquals(123, diagonal.x)
-        assertEquals(234, diagonal.y)
-        assertEquals(345, diagonal.size)
-    }
 
     @Test
     fun testDiff() {

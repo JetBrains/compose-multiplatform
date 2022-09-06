@@ -97,7 +97,12 @@ interface LayoutCoordinates {
      * Modifies [matrix] to be a transform to convert a coordinate in [sourceCoordinates]
      * to a coordinate in `this` [LayoutCoordinates].
      */
-    fun transformFrom(sourceCoordinates: LayoutCoordinates, matrix: Matrix) {}
+    @Suppress("DocumentExceptions")
+    fun transformFrom(sourceCoordinates: LayoutCoordinates, matrix: Matrix) {
+        throw UnsupportedOperationException(
+            "transformFrom is not implemented on this LayoutCoordinates"
+        )
+    }
 
     /**
      * Returns the position in pixels of an [alignment line][AlignmentLine],

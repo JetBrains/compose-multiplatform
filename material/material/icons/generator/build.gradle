@@ -48,9 +48,3 @@ androidx {
     description = "Generator module that parses XML drawables to generate programmatic " +
             "representations of Material Icons."
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
-    }
-}

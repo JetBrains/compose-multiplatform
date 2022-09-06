@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -39,7 +38,6 @@ import org.junit.runner.RunWith
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@OptIn(ExperimentalTestApi::class)
 class DividerScreenshotTest {
 
     @get:Rule
@@ -52,13 +50,11 @@ class DividerScreenshotTest {
 
     @Test
     fun lightTheme() {
-        composeTestRule.setContent {
-            MaterialTheme(lightColorScheme()) {
-                Column(Modifier.testTag(Tag)) {
-                    Spacer(Modifier.size(10.dp))
-                    Divider()
-                    Spacer(Modifier.size(10.dp))
-                }
+        composeTestRule.setMaterialContent(lightColorScheme()) {
+            Column(Modifier.testTag(Tag)) {
+                Spacer(Modifier.size(10.dp))
+                Divider()
+                Spacer(Modifier.size(10.dp))
             }
         }
         composeTestRule.onNodeWithTag(Tag)
@@ -68,13 +64,11 @@ class DividerScreenshotTest {
 
     @Test
     fun darkTheme() {
-        composeTestRule.setContent {
-            MaterialTheme(darkColorScheme()) {
-                Column(Modifier.testTag(Tag)) {
-                    Spacer(Modifier.size(10.dp))
-                    Divider()
-                    Spacer(Modifier.size(10.dp))
-                }
+        composeTestRule.setMaterialContent(darkColorScheme()) {
+            Column(Modifier.testTag(Tag)) {
+                Spacer(Modifier.size(10.dp))
+                Divider()
+                Spacer(Modifier.size(10.dp))
             }
         }
         composeTestRule.onNodeWithTag(Tag)

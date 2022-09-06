@@ -20,6 +20,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalProvider
@@ -36,46 +37,6 @@ import androidx.compose.ui.platform.debugInspectorInfo
  */
 internal val ModifierLocalFocusProperties =
     modifierLocalOf<FocusPropertiesModifier?> { null }
-
-internal object DefaultFocusProperties : FocusProperties {
-    override var canFocus: Boolean
-        get() = true
-        set(_) = noSet()
-
-    override var next: FocusRequester
-        get() = FocusRequester.Default
-        set(_) = noSet()
-
-    override var previous: FocusRequester
-        get() = FocusRequester.Default
-        set(_) = noSet()
-
-    override var up: FocusRequester
-        get() = FocusRequester.Default
-        set(_) = noSet()
-
-    override var down: FocusRequester
-        get() = FocusRequester.Default
-        set(_) = noSet()
-
-    override var left: FocusRequester
-        get() = FocusRequester.Default
-        set(_) = noSet()
-
-    override var right: FocusRequester
-        get() = FocusRequester.Default
-        set(_) = noSet()
-
-    override var start: FocusRequester
-        get() = FocusRequester.Default
-        set(_) = noSet()
-
-    override var end: FocusRequester
-        get() = FocusRequester.Default
-        set(_) = noSet()
-
-    private fun noSet(): Nothing = error("Attempting to change DefaultFocusProperties")
-}
 
 /**
  * Properties that are applied to [focusTarget]s that can read the [ModifierLocalFocusProperties]
@@ -164,6 +125,51 @@ interface FocusProperties {
     var end: FocusRequester
         get() = FocusRequester.Default
         set(_) {}
+
+    /**
+     * A custom item to be used when the user requests focus to move focus in
+     * ([FocusDirection.Enter]). An automatic [Enter][FocusDirection.Enter]"
+     * can be triggered when we move focus to a focus group that is not itself focusable. In this
+     * case, users can use the  the focus direction that triggered the move in to determine the
+     * next item to be focused on.
+     *
+     * When you set the [enter] property, provide a lambda that takes the FocusDirection that
+     * triggered the enter as an input, and provides a [FocusRequester] as an output. You can
+     * return a custom destination by providing a [FocusRequester] attached to that destination,
+     * a [Cancel][FocusRequester.Cancel] to cancel the focus enter or
+     * [Default][FocusRequester.Default] to use the default focus enter behavior.
+     *
+     * @sample androidx.compose.ui.samples.CustomFocusEnterSample
+     */
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalComposeUiApi
+    @set:ExperimentalComposeUiApi
+    @ExperimentalComposeUiApi
+    var enter: (FocusDirection) -> FocusRequester
+        get() = { FocusRequester.Default }
+        set(_) {}
+
+    /**
+     * A custom item to be used when the user requests focus to move out ([FocusDirection.Exit]).
+     * An automatic [Exit][FocusDirection.Exit] can be triggered when we move focus outside the edge
+     * of a parent. In this case, users can use the  the focus direction that triggered the move out
+     * to determine the next focus destination.
+     *
+     * When you set the [exit] property, provide a lambda that takes the FocusDirection that
+     * triggered the exit as an input, and provides a [FocusRequester] as an output. You can
+     * return a custom destination by providing a [FocusRequester] attached to that destination,
+     * a [Cancel][FocusRequester.Cancel] to cancel the focus exit or
+     * [Default][FocusRequester.Default] to use the default focus exit behavior.
+     *
+     * @sample androidx.compose.ui.samples.CustomFocusExitSample
+     */
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalComposeUiApi
+    @set:ExperimentalComposeUiApi
+    @ExperimentalComposeUiApi
+    var exit: (FocusDirection) -> FocusRequester
+        get() = { FocusRequester.Default }
+        set(_) {}
 }
 
 /**
@@ -229,6 +235,10 @@ internal class FocusPropertiesImpl : FocusProperties {
     override var right: FocusRequester = FocusRequester.Default
     override var start: FocusRequester = FocusRequester.Default
     override var end: FocusRequester = FocusRequester.Default
+    @OptIn(ExperimentalComposeUiApi::class)
+    override var enter: (FocusDirection) -> FocusRequester = { FocusRequester.Default }
+    @OptIn(ExperimentalComposeUiApi::class)
+    override var exit: (FocusDirection) -> FocusRequester = { FocusRequester.Default }
 }
 
 internal fun FocusProperties.clear() {
@@ -241,6 +251,10 @@ internal fun FocusProperties.clear() {
     right = FocusRequester.Default
     start = FocusRequester.Default
     end = FocusRequester.Default
+    @OptIn(ExperimentalComposeUiApi::class)
+    enter = { FocusRequester.Default }
+    @OptIn(ExperimentalComposeUiApi::class)
+    exit = { FocusRequester.Default }
 }
 
 internal fun FocusModifier.refreshFocusProperties() {

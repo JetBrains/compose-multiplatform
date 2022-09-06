@@ -48,9 +48,8 @@ import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.max
 
-// TODO: Link to M3 spec when available.
 /**
- * Determinate Material Design linear progress indicator.
+ * <a href="https://m3.material.io/components/progress-indicators/overview" class="external" target="_blank">Determinate Material Design linear progress indicator</a>.
  *
  * Progress indicators express an unspecified wait time or display the duration of a process.
  *
@@ -87,9 +86,8 @@ fun LinearProgressIndicator(
     }
 }
 
-// TODO: Link to M3 spec when available.
 /**
- * Indeterminate Material Design linear progress indicator.
+ * <a href="https://m3.material.io/components/progress-indicators/overview" class="external" target="_blank">Indeterminate Material Design linear progress indicator</a>.
  *
  * Progress indicators express an unspecified wait time or display the duration of a process.
  *
@@ -206,9 +204,8 @@ private fun DrawScope.drawLinearIndicatorTrack(
     strokeWidth: Float
 ) = drawLinearIndicator(0f, 1f, color, strokeWidth)
 
-// TODO: Link to M3 spec when available.
 /**
- * Determinate Material Design circular progress indicator.
+ * <a href="https://m3.material.io/components/progress-indicators/overview" class="external" target="_blank">Determinate Material Design circular progress indicator</a>.
  *
  * Progress indicators express an unspecified wait time or display the duration of a process.
  *
@@ -248,9 +245,8 @@ fun CircularProgressIndicator(
     }
 }
 
-// TODO: Link to M3 spec when available.
 /**
- * Indeterminate Material Design circular progress indicator.
+ * <a href="https://m3.material.io/components/progress-indicators/overview" class="external" target="_blank">Indeterminate Material Design circular progress indicator</a>.
  *
  * Progress indicators express an unspecified wait time or display the duration of a process.
  *

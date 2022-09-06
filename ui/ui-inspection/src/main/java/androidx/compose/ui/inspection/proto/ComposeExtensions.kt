@@ -87,7 +87,7 @@ private fun InspectorNode.toComposableNodeImpl(
 
         flags = flags()
         viewId = inspectorNode.viewId
-        recompositionHandler.getCounts(inspectorNode.key, inspectorNode.anchorHash)?.let {
+        recompositionHandler.getCounts(inspectorNode.key, inspectorNode.anchorId)?.let {
             recomposeCount = it.count
             recomposeSkips = it.skips
         }
@@ -96,7 +96,7 @@ private fun InspectorNode.toComposableNodeImpl(
             addChildren(child.toComposableNodeImpl(stringTable, windowPos, recompositionHandler))
         }
 
-        anchorHash = inspectorNode.anchorHash
+        anchorHash = inspectorNode.anchorId
     }
 }
 
@@ -243,7 +243,7 @@ fun NodeParameterReference.convert(): ParameterReference {
     return ParameterReference.newBuilder().apply {
         kind = reference.kind.convert()
         composableId = reference.nodeId
-        anchorHash = reference.anchorHash
+        anchorHash = reference.anchorId
         parameterIndex = reference.parameterIndex
         addAllCompositeIndex(reference.indices.asIterable())
     }.build()

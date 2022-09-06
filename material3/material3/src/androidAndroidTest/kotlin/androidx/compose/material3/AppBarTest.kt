@@ -53,6 +53,7 @@ import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -90,7 +91,7 @@ class AppBarTest {
     fun smallTopAppBar_expandsToScreen() {
         rule
             .setMaterialContentForSizeAssertions {
-                SmallTopAppBar(title = { Text("Title") })
+                TopAppBar(title = { Text("Title") })
             }
             .assertHeightIsEqualTo(TopAppBarSmallTokens.ContainerHeight)
             .assertWidthIsEqualTo(rule.rootWidth())
@@ -101,7 +102,7 @@ class AppBarTest {
         val title = "Title"
         rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(TopAppBarTestTag)) {
-                SmallTopAppBar(title = { Text(title) })
+                TopAppBar(title = { Text(title) })
             }
         }
         rule.onNodeWithText(title).assertIsDisplayed()
@@ -111,7 +112,7 @@ class AppBarTest {
     fun smallTopAppBar_default_positioning() {
         rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(TopAppBarTestTag)) {
-                SmallTopAppBar(
+                TopAppBar(
                     navigationIcon = {
                         FakeIcon(Modifier.testTag(NavigationIconTestTag))
                     },
@@ -131,7 +132,7 @@ class AppBarTest {
     fun smallTopAppBar_noNavigationIcon_positioning() {
         rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(TopAppBarTestTag)) {
-                SmallTopAppBar(
+                TopAppBar(
                     title = {
                         Text("Title", Modifier.testTag(TitleTestTag))
                     },
@@ -149,7 +150,7 @@ class AppBarTest {
         var textStyle: TextStyle? = null
         var expectedTextStyle: TextStyle? = null
         rule.setMaterialContent(lightColorScheme()) {
-            SmallTopAppBar(title = {
+            TopAppBar(title = {
                 Text("Title")
                 textStyle = LocalTextStyle.current
                 expectedTextStyle =
@@ -173,7 +174,7 @@ class AppBarTest {
         var expectedContainerColor: Color = Color.Unspecified
 
         rule.setMaterialContent(lightColorScheme()) {
-            SmallTopAppBar(
+            TopAppBar(
                 modifier = Modifier.testTag(TopAppBarTestTag),
                 navigationIcon = {
                     FakeIcon(Modifier.testTag(NavigationIconTestTag))
@@ -218,8 +219,7 @@ class AppBarTest {
         lateinit var scrollBehavior: TopAppBarScrollBehavior
         rule.setMaterialContent(lightColorScheme()) {
             scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-            SmallTopAppBar(
-                modifier = Modifier.testTag(TopAppBarTestTag),
+            TopAppBar(
                 title = {
                     Text("Title", Modifier.testTag(TitleTestTag))
                     // fraction = 1f to indicate a scroll.
@@ -227,6 +227,7 @@ class AppBarTest {
                         TopAppBarDefaults.smallTopAppBarColors()
                             .containerColor(colorTransitionFraction = 1f)
                 },
+                modifier = Modifier.testTag(TopAppBarTestTag),
                 scrollBehavior = scrollBehavior
             )
         }
@@ -250,9 +251,9 @@ class AppBarTest {
         rule.setMaterialContent(lightColorScheme()) {
             scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
             scrollHeightOffsetPx = with(LocalDensity.current) { scrollHeightOffsetDp.toPx() }
-            SmallTopAppBar(
-                modifier = Modifier.testTag(TopAppBarTestTag),
+            TopAppBar(
                 title = { Text("Title", Modifier.testTag(TitleTestTag)) },
+                modifier = Modifier.testTag(TopAppBarTestTag),
                 scrollBehavior = scrollBehavior
             )
         }
@@ -749,11 +750,11 @@ class AppBarTest {
     @Test
     fun topAppBar_smallPinnedDraggedAppBar() {
         rule.setMaterialContentForSizeAssertions {
-            SmallTopAppBar(
-                modifier = Modifier.testTag(TopAppBarTestTag),
+            TopAppBar(
                 title = {
                     Text("Title")
                 },
+                modifier = Modifier.testTag(TopAppBarTestTag),
                 scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
             )
         }
@@ -838,6 +839,39 @@ class AppBarTest {
         // TopAppBarSmallTokens.ContainerHeight).
         rule.onNodeWithTag(TopAppBarTestTag)
             .assertHeightIsEqualTo(TopAppBarSmallTokens.ContainerHeight)
+    }
+
+    @Test
+    fun topAppBar_dragWithSnapDisabled() {
+        rule.setMaterialContentForSizeAssertions {
+            LargeTopAppBar(
+                modifier = Modifier.testTag(TopAppBarTestTag),
+                title = {
+                    Text("Title")
+                },
+                scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+                    snapAnimationSpec = null
+                )
+            )
+        }
+
+        // Check that the app bar stayed at its position (i.e. its bounds are with a smaller height)
+        val boundsBefore = rule.onNodeWithTag(TopAppBarTestTag).getBoundsInRoot()
+        assertThat(TopAppBarLargeTokens.ContainerHeight).isEqualTo(boundsBefore.height)
+
+        // Slightly drag up the app bar.
+        rule.onNodeWithTag(TopAppBarTestTag).performTouchInput {
+            down(Offset(x = 100f, y = height - 20f))
+            moveTo(Offset(x = 100f, y = height - 100f))
+            up()
+        }
+        rule.waitForIdle()
+
+        // Check that the app bar did not snap back to its fully expanded height, or collapsed to
+        // its collapsed height.
+        val boundsAfter = rule.onNodeWithTag(TopAppBarTestTag).getBoundsInRoot()
+        assertThat(TopAppBarLargeTokens.ContainerHeight).isGreaterThan(boundsAfter.height)
+        assertThat(TopAppBarSmallTokens.ContainerHeight).isLessThan(boundsAfter.height)
     }
 
     @Test
@@ -997,10 +1031,10 @@ class AppBarTest {
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                SmallTopAppBar(
-                    modifier = Modifier.testTag(TopAppBarTestTag),
+                TopAppBar(
                     title = { Text(text = "Title") },
-                    scrollBehavior = scrollBehavior,
+                    modifier = Modifier.testTag(TopAppBarTestTag),
+                    scrollBehavior = scrollBehavior
                 )
             }
         ) { contentPadding ->
@@ -1027,7 +1061,7 @@ class AppBarTest {
     }
 
     /**
-     * Checks the app bar's components positioning when it's a [SmallTopAppBar], a
+     * Checks the app bar's components positioning when it's a [TopAppBar], a
      * [CenterAlignedTopAppBar], or a larger app bar that is scrolled up and collapsed into a small
      * configuration and there is no navigation icon.
      */
@@ -1055,7 +1089,7 @@ class AppBarTest {
     }
 
     /**
-     * Checks the app bar's components positioning when it's a [SmallTopAppBar] or a
+     * Checks the app bar's components positioning when it's a [TopAppBar] or a
      * [CenterAlignedTopAppBar].
      */
     private fun assertSmallDefaultPositioning(isCenteredTitle: Boolean = false) {
@@ -1218,8 +1252,6 @@ class AppBarTest {
      * Checks that changing values at a [MediumTopAppBar] or a [LargeTopAppBar] scroll behavior
      * affects the container color and the title's content color of the app bar.
      *
-     * This check partially and fully collapses the app bar to test its colors.
-     *
      * @param appBarMaxHeight the max height of the app bar [content]
      * @param appBarMinHeight the min height of the app bar [content]
      * @param content a Composable that adds a MediumTopAppBar or a LargeTopAppBar
@@ -1231,21 +1263,19 @@ class AppBarTest {
         appBarMinHeight: Dp,
         content: @Composable (TopAppBarScrollBehavior?) -> Unit
     ) {
+        // Note: This value is specifically picked to avoid precision issues when asserting the
+        // color values further down this test.
         val fullyCollapsedOffsetDp = appBarMaxHeight - appBarMinHeight
-        val oneThirdCollapsedOffsetDp = fullyCollapsedOffsetDp / 3
         var fullyCollapsedHeightOffsetPx = 0f
-        var oneThirdCollapsedHeightOffsetPx = 0f
         var fullyCollapsedContainerColor: Color = Color.Unspecified
-        var oneThirdCollapsedContainerColor: Color = Color.Unspecified
+        var expandedAppBarBackgroundColor: Color = Color.Unspecified
         var titleContentColor: Color = Color.Unspecified
         lateinit var scrollBehavior: TopAppBarScrollBehavior
         rule.setMaterialContent(lightColorScheme()) {
             scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
             // Using the mediumTopAppBarColors for both Medium and Large top app bars, as the
             // current content color settings are the same.
-            oneThirdCollapsedContainerColor =
-                TopAppBarDefaults.mediumTopAppBarColors()
-                    .containerColor(colorTransitionFraction = 1 / 3f)
+            expandedAppBarBackgroundColor = TopAppBarMediumTokens.ContainerColor.toColor()
             fullyCollapsedContainerColor =
                 TopAppBarDefaults.mediumTopAppBarColors()
                     .containerColor(colorTransitionFraction = 1f)
@@ -1256,7 +1286,6 @@ class AppBarTest {
                 TopAppBarDefaults.mediumTopAppBarColors().titleContentColor
 
             with(LocalDensity.current) {
-                oneThirdCollapsedHeightOffsetPx = oneThirdCollapsedOffsetDp.toPx()
                 fullyCollapsedHeightOffsetPx = fullyCollapsedOffsetDp.toPx()
             }
 
@@ -1270,26 +1299,18 @@ class AppBarTest {
         val topTitleNode = allTitleNodes.onFirst()
         val bottomTitleNode = allTitleNodes.onLast()
 
-        // Simulate 1/3 collapsed content.
-        rule.runOnIdle {
-            scrollBehavior.state.heightOffset = -oneThirdCollapsedHeightOffsetPx
-            scrollBehavior.state.contentOffset = -oneThirdCollapsedHeightOffsetPx
-        }
-        rule.waitForIdle()
         rule.onNodeWithTag(TopAppBarTestTag).captureToImage()
-            .assertContainsColor(oneThirdCollapsedContainerColor)
+            .assertContainsColor(expandedAppBarBackgroundColor)
 
-        // Both top and bottom titles should be visible. The top should have the title text color
-        // with ~33.333% alpha, and the bottom with ~66.666% alpha.
+        // Assert the content color at the top and bottom parts of the expanded app bar.
         topTitleNode.captureToImage()
             .assertContainsColor(
-                titleContentColor.copy(alpha = 1 / 3f)
-                    .compositeOver(oneThirdCollapsedContainerColor)
+                titleContentColor.copy(alpha = TopTitleAlphaEasing.transform(0f))
+                    .compositeOver(expandedAppBarBackgroundColor)
             )
         bottomTitleNode.captureToImage()
             .assertContainsColor(
-                titleContentColor.copy(alpha = 2 / 3f)
-                    .compositeOver(oneThirdCollapsedContainerColor)
+                titleContentColor.compositeOver(expandedAppBarBackgroundColor)
             )
 
         // Simulate fully collapsed content.
@@ -1300,8 +1321,12 @@ class AppBarTest {
         rule.waitForIdle()
         rule.onNodeWithTag(TopAppBarTestTag).captureToImage()
             .assertContainsColor(fullyCollapsedContainerColor)
+        topTitleNode.captureToImage()
+            .assertContainsColor(
+                titleContentColor.copy(alpha = TopTitleAlphaEasing.transform(1f))
+                    .compositeOver(fullyCollapsedContainerColor)
+            )
         // Only the top title should be visible in the collapsed form.
-        topTitleNode.captureToImage().assertContainsColor(titleContentColor)
         bottomTitleNode.assertIsNotDisplayed()
     }
 

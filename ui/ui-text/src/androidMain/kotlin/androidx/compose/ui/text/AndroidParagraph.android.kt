@@ -514,6 +514,7 @@ private fun shouldAttachIndentationFixSpan(textStyle: TextStyle, ellipsis: Boole
 
 @OptIn(InternalPlatformTextApi::class)
 private fun CharSequence.attachIndentationFixSpan(): CharSequence {
+    if (isEmpty()) return this
     val spannable = if (this is Spannable) this else SpannableString(this)
     spannable.setSpan(IndentationFixSpan(), spannable.length - 1, spannable.length - 1)
     return spannable

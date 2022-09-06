@@ -21,6 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.semantics.paneTitle
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -89,6 +91,7 @@ fun AlertDialog(
         onDismissRequest = onDismissRequest,
         properties = properties
     ) {
+        val dialogPaneDescription = getString(Strings.Dialog)
         AlertDialogContent(
             buttons = {
                 AlertDialogFlowRow(
@@ -99,7 +102,9 @@ fun AlertDialog(
                     confirmButton()
                 }
             },
-            modifier = modifier,
+            modifier = modifier.then(Modifier
+                .semantics { paneTitle = dialogPaneDescription }
+            ),
             icon = icon,
             title = title,
             text = text,

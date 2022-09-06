@@ -33,6 +33,7 @@ internal actual fun getString(string: Strings): String {
         Strings.ExposedDropdownMenu -> resources.getString(R.string.dropdown_menu)
         Strings.SliderRangeStart -> resources.getString(R.string.range_start)
         Strings.SliderRangeEnd -> resources.getString(R.string.range_end)
+        Strings.Dialog -> resources.getString(androidx.compose.material3.R.string.dialog)
         else -> ""
     }
 }

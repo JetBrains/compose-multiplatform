@@ -42,12 +42,6 @@ dependencies {
     androidTestImplementation(libs.truth)
 }
 
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
-    }
-}
-
 androidx {
     name = "Compose Runtime: Tracing"
     publish = Publish.SNAPSHOT_AND_RELEASE

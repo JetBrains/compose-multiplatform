@@ -1485,7 +1485,7 @@ internal class ComposerImpl(
         return if (!forceRecomposeScopes) {
             forceRecomposeScopes = true
             forciblyRecompose = true
-             true
+            true
         } else {
             false
         }

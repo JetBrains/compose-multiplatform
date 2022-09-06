@@ -500,9 +500,6 @@ package androidx.compose.foundation.lazy {
     method @Deprecated public void items(int count, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,?>? key, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? extends kotlin.Unit> itemContent);
   }
 
-  public final class LazyListScrollingKt {
-  }
-
   @androidx.compose.runtime.Stable public final class LazyListState implements androidx.compose.foundation.gestures.ScrollableState {
     ctor public LazyListState(optional int firstVisibleItemIndex, optional int firstVisibleItemScrollOffset);
     method public suspend Object? animateScrollToItem(int index, optional int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
@@ -643,9 +640,6 @@ package androidx.compose.foundation.lazy.grid {
   @kotlin.DslMarker public @interface LazyGridScopeMarker {
   }
 
-  public final class LazyGridScrollingKt {
-  }
-
   public final class LazyGridSpanKt {
     method public static long GridItemSpan(int currentLineSpan);
   }
@@ -688,6 +682,9 @@ package androidx.compose.foundation.lazy.layout {
   public final class IntervalListKt {
   }
 
+  public final class LazyAnimateScrollKt {
+  }
+
   public final class LazyLayoutItemProviderKt {
   }
 
@@ -700,6 +697,9 @@ package androidx.compose.foundation.lazy.layout {
   public final class LazyNearestItemsRangeKt {
   }
 
+  public final class LazySaveableStateHolderKt {
+  }
+
   public final class Lazy_androidKt {
   }
 
@@ -709,6 +709,9 @@ package androidx.compose.foundation.lazy.layout {
 }
 
 package androidx.compose.foundation.lazy.staggeredgrid {
+
+  public final class LazyStaggeredGridCellsKt {
+  }
 
   public final class LazyStaggeredGridDslKt {
   }
@@ -720,6 +723,15 @@ package androidx.compose.foundation.lazy.staggeredgrid {
   }
 
   public final class LazyStaggeredGridMeasureKt {
+  }
+
+  public final class LazyStaggeredGridMeasurePolicyKt {
+  }
+
+  public final class LazyStaggeredGridMeasureResultKt {
+  }
+
+  public final class LazyStaggeredGridStateKt {
   }
 
 }

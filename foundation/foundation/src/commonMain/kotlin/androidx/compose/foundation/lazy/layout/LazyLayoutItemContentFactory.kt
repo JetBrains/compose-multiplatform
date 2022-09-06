@@ -23,8 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.Density
 
 /**
  * This class:
@@ -42,24 +40,6 @@ internal class LazyLayoutItemContentFactory(
 ) {
     /** Contains the cached lambdas produced by the [itemProvider]. */
     private val lambdasCache = mutableMapOf<Any, CachedItemContent>()
-
-    /** Density used to obtain the cached lambdas. */
-    private var densityOfCachedLambdas = Density(0f, 0f)
-
-    /** Constraints used to obtain the cached lambdas. */
-    private var constraintsOfCachedLambdas = Constraints()
-
-    /**
-     * Invalidate the cached lambas if the density or constraints have changed.
-     * TODO(popam): probably LazyLayoutState should provide an invalidate() method instead.
-     */
-    fun onBeforeMeasure(density: Density, constraints: Constraints) {
-        if (density != densityOfCachedLambdas || constraints != constraintsOfCachedLambdas) {
-            densityOfCachedLambdas = density
-            constraintsOfCachedLambdas = constraints
-            lambdasCache.clear()
-        }
-    }
 
     /**
      * Returns the content type for the item with the given key. It is used to improve the item

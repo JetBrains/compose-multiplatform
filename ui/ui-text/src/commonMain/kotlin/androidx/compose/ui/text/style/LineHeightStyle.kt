@@ -192,7 +192,7 @@ class LineHeightStyle(
      * Defines how to align the line in the space provided by the line height.
      *
      * @param topRatio the ratio of ascent to ascent+descent in percentage. Valid values are
-     * integers between 0f (inclusive) to 1f (inclusive).
+     * between 0f (inclusive) and 1f (inclusive).
      */
     @kotlin.jvm.JvmInline
     value class Alignment @ExperimentalTextApi constructor(internal val topRatio: Float) {

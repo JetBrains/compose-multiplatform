@@ -60,6 +60,6 @@ internal fun interface MeasuredItemFactory {
     fun createItem(
         index: DataIndex,
         key: Any,
-        placeables: Array<Placeable>
+        placeables: List<Placeable>
     ): LazyMeasuredItem
 }

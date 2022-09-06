@@ -17,5 +17,5 @@
 package androidx.compose.ui
 
 internal actual fun areObjectsOfSameType(a: Any, b: Any): Boolean {
-    return a::class.java == b::class.java
+    return a::class.java === b::class.java
 }

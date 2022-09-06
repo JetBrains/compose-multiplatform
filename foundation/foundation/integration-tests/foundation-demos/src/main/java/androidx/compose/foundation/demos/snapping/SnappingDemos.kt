@@ -18,13 +18,10 @@ package androidx.compose.foundation.demos.snapping
 
 import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.animation.core.calculateTargetValue
-import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
-import androidx.compose.foundation.gestures.snapping.lazyListSnapLayoutInfoProvider
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -35,13 +32,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -49,90 +42,52 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.onPlaced
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 val SnappingDemos = listOf(
-    DemoCategory("Single Page Snapping", SinglePageSnappingDemos),
-    ComposableDemo("Multi Page Snapping") { MultiPageDemo() },
-    ComposableDemo("View Port Based Snapping") { ViewPortBasedDemo() },
+    DemoCategory("Lazy List Snapping", LazyListSnappingDemos),
+    DemoCategory("Scrollable Row Snapping", RowSnappingDemos),
+    DemoCategory("Lazy Grid Snapping", LazyGridSnappingDemos),
 )
 
 @OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun MultiPageDemo() {
-    val lazyListState = rememberLazyListState()
-    val animation: DecayAnimationSpec<Float> = rememberSplineBasedDecay()
-    val snappingLayout = remember(lazyListState) {
-        MultiPageSnappingLayoutInfoProvider(
-            animation,
-            lazyListSnapLayoutInfoProvider(lazyListState = lazyListState)
-        )
-    }
-
-    val flingBehavior = rememberSnapFlingBehavior(snappingLayout)
-    SnappingDemoMainLayout(lazyListState = lazyListState, flingBehavior = flingBehavior) {
-        DefaultSnapDemoItem(position = it)
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-class MultiPageSnappingLayoutInfoProvider(
-    private val decayAnimationSpec: DecayAnimationSpec<Float>,
-    private val lazySnapLayoutInfoProvider: SnapLayoutInfoProvider
-) : SnapLayoutInfoProvider by lazySnapLayoutInfoProvider {
-    override fun calculateApproachOffset(initialVelocity: Float): Float {
+internal class MultiPageSnappingLayoutInfoProvider(
+    private val baseSnapLayoutInfoProvider: SnapLayoutInfoProvider,
+    private val decayAnimationSpec: DecayAnimationSpec<Float>
+) : SnapLayoutInfoProvider by baseSnapLayoutInfoProvider {
+    override fun Density.calculateApproachOffset(initialVelocity: Float): Float {
         return decayAnimationSpec.calculateTargetValue(0f, initialVelocity) / 2f
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun ViewPortBasedDemo() {
-    val lazyListState = rememberLazyListState()
-    val snappingLayout = remember(lazyListState) {
-        ViewPortBasedSnappingLayoutInfoProvider(
-            lazyListSnapLayoutInfoProvider(lazyListState = lazyListState),
-            lazyListState
-        )
-    }
-    val flingBehavior = rememberSnapFlingBehavior(snappingLayout)
-
-    SnappingDemoMainLayout(lazyListState = lazyListState, flingBehavior = flingBehavior) {
-        DefaultSnapDemoItem(position = it)
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-class ViewPortBasedSnappingLayoutInfoProvider(
-    private val lazySnapLayoutInfoProvider: SnapLayoutInfoProvider,
-    private val lazyLayoutState: LazyListState
-) : SnapLayoutInfoProvider by lazySnapLayoutInfoProvider {
-    override fun calculateApproachOffset(initialVelocity: Float): Float {
-        return lazyLayoutState.layoutInfo.visibleItemsInfo.sumOf { it.size }.toFloat()
+internal class ViewPortBasedSnappingLayoutInfoProvider(
+    private val baseSnapLayoutInfoProvider: SnapLayoutInfoProvider,
+    private val viewPortStep: () -> Float
+) : SnapLayoutInfoProvider by baseSnapLayoutInfoProvider {
+    override fun Density.calculateApproachOffset(initialVelocity: Float): Float {
+        return viewPortStep()
     }
 }
 
 @Composable
-fun SnappingDemoMainLayout(
+internal fun SnappingDemoMainLayout(
     lazyListState: LazyListState,
     flingBehavior: FlingBehavior,
     contentPaddingValues: PaddingValues = PaddingValues(8.dp),
     content: @Composable (Int) -> Unit
 ) {
-    val layoutCoordinates = remember { mutableStateOf<LayoutCoordinates?>(null) }
     LazyRow(
         modifier = Modifier
             .fillMaxSize()
-            .onPlaced { layoutCoordinates.value = it }
             .background(Color.LightGray)
             .drawWithContent {
                 drawContent()
                 drawAnchor(
-                    layoutCoordinates.value,
                     CenterAnchor,
                     contentPaddingValues,
                     true,
@@ -152,18 +107,34 @@ fun SnappingDemoMainLayout(
 }
 
 @Composable
-fun DefaultSnapDemoItem(position: Int) {
-    val innerCoordinates = remember { mutableStateOf<LayoutCoordinates?>(null) }
+internal fun DefaultSnapDemoItem(position: Int) {
     Box(
         modifier = Modifier
             .width(200.dp)
             .height(500.dp)
             .padding(8.dp)
             .background(Color.White)
-            .onPlaced { innerCoordinates.value = it }
             .drawWithContent {
                 drawContent()
-                drawAnchor(innerCoordinates.value, CenterAnchor)
+                drawAnchor(CenterAnchor)
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = position.toString(), fontSize = 40.sp)
+    }
+}
+
+@Composable
+internal fun ResizableSnapDemoItem(width: Dp, height: Dp, position: Int) {
+    Box(
+        modifier = Modifier
+            .width(width)
+            .height(height)
+            .padding(8.dp)
+            .background(Color.White)
+            .drawWithContent {
+                drawContent()
+                drawAnchor(CenterAnchor)
             },
         contentAlignment = Alignment.Center
     ) {
@@ -172,7 +143,6 @@ fun DefaultSnapDemoItem(position: Int) {
 }
 
 internal fun ContentDrawScope.drawAnchor(
-    layoutCoordinates: LayoutCoordinates?,
     anchor: Float,
     contentPaddingValues: PaddingValues = PaddingValues(0.dp),
     shouldDrawPadding: Boolean = false,
@@ -182,31 +152,29 @@ internal fun ContentDrawScope.drawAnchor(
     val beforePadding = contentPaddingValues.calculateStartPadding(LayoutDirection.Rtl).toPx()
     val afterPadding = contentPaddingValues.calculateEndPadding(LayoutDirection.Rtl).toPx()
 
-    layoutCoordinates?.let {
-        val center = (it.size.width - beforePadding - afterPadding) * anchor + beforePadding
+    val center = (size.width - beforePadding - afterPadding) * anchor + beforePadding
 
+    drawLine(
+        Color.Red,
+        start = Offset(center, 0f),
+        end = Offset(center, size.height),
+        strokeWidth = mainLineStrokeWidth
+    )
+
+    if (shouldDrawPadding) {
         drawLine(
-            Color.Red,
-            start = Offset(center, 0f),
-            end = Offset(center, it.size.height.toFloat()),
-            strokeWidth = mainLineStrokeWidth
+            Color.Magenta,
+            start = Offset(beforePadding, 0f),
+            end = Offset(beforePadding, size.height),
+            strokeWidth = paddingLineStrokeWidth
         )
 
-        if (shouldDrawPadding) {
-            drawLine(
-                Color.Magenta,
-                start = Offset(beforePadding, 0f),
-                end = Offset(beforePadding, it.size.height.toFloat()),
-                strokeWidth = paddingLineStrokeWidth
-            )
-
-            drawLine(
-                Color.Magenta,
-                start = Offset(it.size.width - afterPadding, 0f),
-                end = Offset(it.size.width - afterPadding, it.size.height.toFloat()),
-                strokeWidth = paddingLineStrokeWidth
-            )
-        }
+        drawLine(
+            Color.Magenta,
+            start = Offset(size.width - afterPadding, 0f),
+            end = Offset(size.width - afterPadding, size.height),
+            strokeWidth = paddingLineStrokeWidth
+        )
     }
 }
 

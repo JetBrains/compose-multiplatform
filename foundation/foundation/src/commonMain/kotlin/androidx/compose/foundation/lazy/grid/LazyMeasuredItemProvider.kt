@@ -71,6 +71,6 @@ internal fun interface MeasuredItemFactory {
         key: Any,
         crossAxisSize: Int,
         mainAxisSpacing: Int,
-        placeables: Array<Placeable>
+        placeables: List<Placeable>
     ): LazyMeasuredItem
 }

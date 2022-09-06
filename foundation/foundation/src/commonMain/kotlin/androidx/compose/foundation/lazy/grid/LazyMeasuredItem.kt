@@ -22,6 +22,7 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.util.fastForEach
 
 /**
  * Represents one measured item of the lazy grid. It can in fact consist of multiple placeables
@@ -42,7 +43,7 @@ internal class LazyMeasuredItem(
     private val layoutDirection: LayoutDirection,
     private val beforeContentPadding: Int,
     private val afterContentPadding: Int,
-    val placeables: Array<Placeable>,
+    val placeables: List<Placeable>,
     private val placementAnimator: LazyGridItemPlacementAnimator,
     /**
      * The offset which shouldn't affect any calculations but needs to be applied for the final
@@ -62,7 +63,7 @@ internal class LazyMeasuredItem(
 
     init {
         var maxMainAxis = 0
-        placeables.forEach {
+        placeables.fastForEach {
             maxMainAxis = maxOf(maxMainAxis, if (isVertical) it.height else it.width)
         }
         mainAxisSize = maxMainAxis

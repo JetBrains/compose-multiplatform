@@ -119,6 +119,18 @@ class FocusRequester {
         val Default = FocusRequester()
 
         /**
+         * Cancelled [focusRequester], which when used in
+         * [Modifier.focusProperties][focusProperties] implies that we want to block focus search
+         * from proceeding in the specified [direction][FocusDirection].
+         *
+         * @sample androidx.compose.ui.samples.CancelFocusMoveSample()
+         */
+        @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+        @get:ExperimentalComposeUiApi
+        @ExperimentalComposeUiApi
+        val Cancel = FocusRequester()
+
+        /**
          * Convenient way to create multiple [FocusRequester] instances.
          *
          * @sample androidx.compose.ui.samples.CreateFocusRequesterRefsSample

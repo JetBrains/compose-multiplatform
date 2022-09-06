@@ -21,6 +21,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -201,5 +202,38 @@ fun ConvenienceLayoutModifierSample() {
             }
     ) {
         Box(Modifier.fillMaxSize().background(Color.DarkGray))
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Sampled
+@Composable
+fun LayoutWithMultipleContentsUsage(
+    content1: @Composable () -> Unit,
+    content2: @Composable () -> Unit,
+) {
+    // We can provide pass a list of two composable lambdas in order to be able to treat
+    // measureables from each lambda differently.
+    Layout(listOf(content1, content2)) { (content1Measurables, content2Measurables), constraints ->
+        val content1Placeables = content1Measurables.map { it.measure(constraints) }
+        val content2Placeables = content2Measurables.map { it.measure(constraints) }
+        layout(constraints.maxWidth, constraints.maxHeight) {
+            var currentX = 0
+            var currentY = 0
+            var currentMaxHeight = 0
+            // we place placeables from content1 as a first line
+            content1Placeables.forEach {
+                it.place(currentX, currentY)
+                currentX += it.width
+                currentMaxHeight = maxOf(currentMaxHeight, it.height)
+            }
+            currentX = 0
+            currentY = currentMaxHeight
+            // and placeables from content2 composable as a second line
+            content2Placeables.forEach {
+                it.place(currentX, currentY)
+                currentX += it.width
+            }
+        }
     }
 }

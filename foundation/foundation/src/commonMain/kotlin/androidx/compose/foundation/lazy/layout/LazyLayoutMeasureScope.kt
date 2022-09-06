@@ -51,11 +51,11 @@ sealed interface LazyLayoutMeasureScope : MeasureScope {
      * @param constraints [Constraints] to measure the children emitted into an item content
      * composable specified via [LazyLayoutItemProvider.Item].
      *
-     * @return Array of [Placeable]s. Note that if you emitted multiple children into the item
+     * @return List of [Placeable]s. Note that if you emitted multiple children into the item
      * composable you will receive multiple placeables, each of them will be measured with
      * the passed [constraints].
      */
-    fun measure(index: Int, constraints: Constraints): Array<Placeable>
+    fun measure(index: Int, constraints: Constraints): List<Placeable>
 
     // Below overrides added to work around https://youtrack.jetbrains.com/issue/KT-51672
     // Must be kept in sync until resolved.
@@ -106,9 +106,9 @@ internal class LazyLayoutMeasureScopeImpl internal constructor(
      * A cache of the previously composed items. It allows us to support [get]
      * re-executions with the same index during the same measure pass.
      */
-    private val placeablesCache = hashMapOf<Int, Array<Placeable>>()
+    private val placeablesCache = hashMapOf<Int, List<Placeable>>()
 
-    override fun measure(index: Int, constraints: Constraints): Array<Placeable> {
+    override fun measure(index: Int, constraints: Constraints): List<Placeable> {
         val cachedPlaceable = placeablesCache[index]
         return if (cachedPlaceable != null) {
             cachedPlaceable
@@ -116,7 +116,7 @@ internal class LazyLayoutMeasureScopeImpl internal constructor(
             val key = itemContentFactory.itemProvider().getKey(index)
             val itemContent = itemContentFactory.getContent(index, key)
             val measurables = subcomposeMeasureScope.subcompose(key, itemContent)
-            Array(measurables.size) { i ->
+            List(measurables.size) { i ->
                 measurables[i].measure(constraints)
             }.also {
                 placeablesCache[index] = it

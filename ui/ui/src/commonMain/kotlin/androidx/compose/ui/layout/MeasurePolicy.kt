@@ -20,6 +20,8 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.internal.JvmDefaultWithCompatibility
+import androidx.compose.ui.layout.RootMeasurePolicy.measure
+import androidx.compose.ui.layout.RootMeasurePolicy.minIntrinsicWidth
 
 /**
  * Defines the measure and layout behavior of a [Layout]. [Layout] and [MeasurePolicy] are the way
@@ -31,13 +33,13 @@ import androidx.compose.ui.internal.JvmDefaultWithCompatibility
  * Intrinsic measurement methods define the intrinsic size of the layout. These can be queried
  * by the layout's parent in order to obtain, in specific cases, more information about
  * the size of the layout in the absence of specific constraints:
- * - [minIntrinsicWidthMeasureBlock] defines the minimum width this layout can take, given
+ * - [minIntrinsicWidth] defines the minimum width this layout can take, given
  *   a specific height, such that the content of the layout will be painted correctly
- * - [minIntrinsicHeightMeasureBlock] defines the minimum height this layout can take, given
+ * - [minIntrinsicHeight] defines the minimum height this layout can take, given
  *   a specific width, such that the content of the layout will be painted correctly
- * - [maxIntrinsicWidthMeasureBlock] defines the minimum width such that increasing it further
+ * - [maxIntrinsicWidth] defines the minimum width such that increasing it further
  *   will not decrease the minimum intrinsic height
- * - [maxIntrinsicHeightMeasureBlock] defines the minimum height such that increasing it further
+ * - [maxIntrinsicHeight] defines the minimum height such that increasing it further
  *   will not decrease the minimum intrinsic width
  * Most layout scenarios do not require querying intrinsic measurements. Therefore, when writing
  * a custom layout, it is common to only define the actual measurement, as most of the times
@@ -108,8 +110,8 @@ fun interface MeasurePolicy {
 
     /**
      * The function used to calculate [IntrinsicMeasurable.minIntrinsicHeight]. It represents
-     * defines the minimum height this layout can take, given  a specific width, such
-     * that the content of the layout will be painted correctly.
+     * the minimum height this layout can take, given a specific width, such that the content
+     * of the layout will be painted correctly.
      */
     fun IntrinsicMeasureScope.minIntrinsicHeight(
         measurables: List<IntrinsicMeasurable>,

@@ -18,9 +18,11 @@ package androidx.compose.material3.catalog.library.ui.example
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumedWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.catalog.library.model.Component
 import androidx.compose.material3.catalog.library.model.Example
 import androidx.compose.material3.catalog.library.model.Theme
@@ -51,7 +53,7 @@ fun Example(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .consumedWindowInsets(paddingValues)
+                .consumedWindowInsets(WindowInsets.safeDrawing)
                 .padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
