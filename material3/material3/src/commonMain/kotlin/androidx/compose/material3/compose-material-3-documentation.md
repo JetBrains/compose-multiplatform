@@ -93,8 +93,8 @@ For more information, check out the <a href="https://developer.android.com/jetpa
 |  | [ScrollableTabRow] | M3 scrollable tab row |
 | **Text fields** | [TextField] | M3 filled text field |
 |  | [OutlinedTextField] | M3 outlined text field |
-| **Top app bar** | [CenterAlignedTopAppBar] | M3 center-aligned top app bar |
-|  | [SmallTopAppBar] | M3 small top app bar |
+| **Top app bar** | [TopAppBar] | M3 small top app bar |
+|  | [CenterAlignedTopAppBar] | M3 center-aligned top app bar |
 |  | [MediumTopAppBar] | M3 medium top app bar |
 |  | [LargeTopAppBar] | M3 large top app bar |
 
@@ -112,4 +112,4 @@ For more information, check out the <a href="https://developer.android.com/jetpa
 | **Icon** | [Icon] | M3 icon |
 | **Text** | [Text] | M3 text |
 
-Also check out the androidx.compose.material.icons ![package](https://developer.android.com/reference/kotlin/androidx/compose/material/icons/package-summary).
+Also check out the <a href="https://developer.android.com/reference/kotlin/androidx/compose/material/icons/package-summary" class="external" target="_blank">androidx.compose.material.icons package</a>.

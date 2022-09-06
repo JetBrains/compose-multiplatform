@@ -92,4 +92,4 @@ Material Design defines the qualities that can be expressed by UI regions, surfa
 | **Icon button** | [IconButton] | Icon button |
 | **Icon toggle button** | [IconToggleButton] | Icon toggle button |
 
-Also check out the androidx.compose.material.icons ![package](https://developer.android.com/reference/kotlin/androidx/compose/material/icons/package-summary).
+Also check out the <a href="https://developer.android.com/reference/kotlin/androidx/compose/material/icons/package-summary" class="external" target="_blank">androidx.compose.material.icons package</a>.
