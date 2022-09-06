@@ -189,7 +189,6 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
 
         // Broken in 7.4.0-alpha04 due to b/236262744
         disable.add("KnownPermissionError")
-        disable.add("PermissionNamingConvention")
         disable.add("ReservedSystemPermission")
         disable.add("SystemPermissionTypo")
 
