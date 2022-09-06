@@ -89,20 +89,35 @@ internal fun rememberStaggeredGridMeasurePolicy(
             IntOffset(beforeContentPadding, startContentPadding)
         }
 
+        val mainAxisSpacing = if (isVertical) {
+            verticalArrangement.spacing
+        } else {
+            horizontalArrangement.spacing
+        }.roundToPx()
+
+        val crossAxisSpacing = if (isVertical) {
+            horizontalArrangement.spacing
+        } else {
+            verticalArrangement.spacing
+        }.roundToPx()
+
         val horizontalPadding = contentPadding.run {
             calculateStartPadding(layoutDirection) + calculateEndPadding(layoutDirection)
         }.roundToPx()
         val verticalPadding = contentPadding.run {
             calculateTopPadding() + calculateBottomPadding()
         }.roundToPx()
-        measure(
-            state,
-            itemProvider,
-            resolvedSlotSums,
-            constraints.copy(
+
+        measureStaggeredGrid(
+            state = state,
+            itemProvider = itemProvider,
+            resolvedSlotSums = resolvedSlotSums,
+            constraints = constraints.copy(
                 minWidth = constraints.constrainWidth(horizontalPadding),
                 minHeight = constraints.constrainHeight(verticalPadding)
             ),
+            mainAxisSpacing = mainAxisSpacing,
+            crossAxisSpacing = crossAxisSpacing,
             contentOffset = contentOffset,
             mainAxisAvailableSize = mainAxisAvailableSize,
             isVertical = isVertical,
