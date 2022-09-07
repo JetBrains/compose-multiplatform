@@ -83,59 +83,30 @@ fun StyleScope.borderWidth(width: CSSNumeric) {
     property("border-width", width)
 }
 
-
-/**
- * https://developer.mozilla.org/en-US/docs/Web/CSS/border-width
- *
- * First argument sets the vertical borders width.
- * Second argument sets the horizontal borders width.
- *
- * NOTE: Temporary deprecation until 2.0 because of wrong parameters names.
- * In 2.0 the parameter names should be fixed. Despite the wrong parameter names, the function behaves correctly.
- */
 @Deprecated(
-    message = "This function has misleading parameter names. " +
-            "Despite that, it behaves correctly (see https://developer.mozilla.org/en-US/docs/Web/CSS/border-width)." +
-            "Therefore this function still can be used without specifying parameter names. Replacement is not necessary." +
-            " It'll remain Deprecated until 2.0, and in 2.0 parameter names should be changed to: " +
-            "`vertical: CSSNumeric` and `horizontal: CSSNumeric`",
+    message = "This function has misleading parameter names. See https://developer.mozilla.org/en-US/docs/Web/CSS/border-width",
     replaceWith = ReplaceWith(
-        expression = "borderWidth2(vertical = topLeft, horizontal = bottomRight)"
+        expression = "borderWidth(vertical = topLeft, horizontal = bottomRight)"
     )
 )
 fun StyleScope.borderWidth(topLeft: CSSNumeric, bottomRight: CSSNumeric) {
-    borderWidth2(topLeft, bottomRight)
+    borderWidth(vertical = topLeft, horizontal = bottomRight)
 }
 
 /**
- * This function is a temporary replacement for `borderWidth(topLeft: CSSNumeric, bottomRight: CSSNumeric)`.
- * After a fix for parameters names in `borderWidth`,
- * this function will be Deprecated with a replaceWith `borderWidth`. Later `borderWidth2` will be Removed.
- * @see borderWidth
+ * @param unused will be removed in 1.4. It helps to fix the borderWidth overloads with wrong parameters names.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/border-width
  */
-fun StyleScope.borderWidth2(vertical: CSSNumeric, horizontal: CSSNumeric) {
+@Suppress("UNUSED_PARAMETER")
+fun StyleScope.borderWidth(vertical: CSSNumeric, horizontal: CSSNumeric, unused: Unit? = null) {
     property("border-width", "$vertical $horizontal")
 }
 
-
-/**
- * https://developer.mozilla.org/en-US/docs/Web/CSS/border-width
- *
- * First argument sets the top border width.
- * Second argument sets the horizontal borders width.
- * Third argument sets the bottom border width.
- *
- * NOTE: Temporary deprecation until 2.0 because of wrong parameters names.
- * In 2.0 the parameter names should be fixed. Despite the wrong parameter names, the function behaves correctly.
- */
 @Deprecated(
-    message = "This function has misleading parameter names. " +
-            "Despite that, it behaves correctly (see https://developer.mozilla.org/en-US/docs/Web/CSS/border-width)." +
-            "Therefore this function still can be used without specifying parameter names. Replacement is not necessary." +
-            " It'll remain Deprecated until 2.0, and in 2.0 parameter names should be changed to: " +
-            "`top: CSSNumeric`, `horizontal: CSSNumeric`, `bottom: CSSNumeric`",
+    message = "This function has misleading parameter names. See https://developer.mozilla.org/en-US/docs/Web/CSS/border-width",
     replaceWith = ReplaceWith(
-        expression = "borderWidth3(top = topLeft, horizontal = topRightAndBottomLeft, bottom = bottomRight)"
+        expression = "borderWidth(top = topLeft, horizontal = topRightAndBottomLeft, bottom = bottomRight)"
     )
 )
 fun StyleScope.borderWidth(
@@ -143,38 +114,23 @@ fun StyleScope.borderWidth(
     topRightAndBottomLeft: CSSNumeric,
     bottomRight: CSSNumeric
 ) {
-    borderWidth3(topLeft, topRightAndBottomLeft, bottomRight)
+    borderWidth(top = topLeft, horizontal = topRightAndBottomLeft, bottom = bottomRight)
 }
 
 /**
- * This function is a temporary replacement for `borderWidth(topLeft: CSSNumeric, topRightAndBottomLeft: CSSNumeric, bottomRight: CSSNumeric)`.
- * After a fix for parameters names in `borderWidth`,
- * this function will be Deprecated with a replaceWith `borderWidth`. Later `borderWidth3` will be Removed.
- * @see borderWidth
+ * @param unused will be removed in 1.4. It helps to fix the borderWidth overloads with wrong parameters names.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/border-width
  */
-fun StyleScope.borderWidth3(top: CSSNumeric, horizontal: CSSNumeric, bottom: CSSNumeric) {
+@Suppress("UNUSED_PARAMETER")
+fun StyleScope.borderWidth(top: CSSNumeric, horizontal: CSSNumeric, bottom: CSSNumeric, unused: Unit? = null) {
     property("border-width", "$top $horizontal $bottom")
 }
 
-/**
- * https://developer.mozilla.org/en-US/docs/Web/CSS/border-width
- *
- * First argument sets the top border width.
- * Second argument sets the right border width.
- * Third argument sets the bottom border width.
- * Fourth argument sets the left border width.
- *
- * NOTE: Temporary deprecation until 2.0 because of wrong parameters names.
- * In 2.0 the parameter names should be fixed. Despite the wrong parameter names, the function behaves correctly.
- */
 @Deprecated(
-    message = "This function has misleading parameter names. " +
-            "Despite that, it behaves correctly (see https://developer.mozilla.org/en-US/docs/Web/CSS/border-width)." +
-            "Therefore this function still can be used without specifying parameter names. Replacement is not necessary." +
-            " It'll remain Deprecated until 2.0, and in 2.0 parameter names should be changed to: " +
-            "`top: CSSNumeric`, `right: CSSNumeric`, `bottom: CSSNumeric`, `left: CSSNumeric`",
+    message = "This function has misleading parameter names. See https://developer.mozilla.org/en-US/docs/Web/CSS/border-width",
     replaceWith = ReplaceWith(
-        expression = "borderWidth4(top = topLeft, right = topRight, bottom = bottomRight, left = bottomLeft)"
+        expression = "borderWidth(top = topLeft, right = topRight, bottom = bottomRight, left = bottomLeft)"
     )
 )
 fun StyleScope.borderWidth(
@@ -183,15 +139,21 @@ fun StyleScope.borderWidth(
     bottomRight: CSSNumeric,
     bottomLeft: CSSNumeric
 ) {
-    borderWidth4(topLeft, topRight, bottomRight, bottomLeft)
+    borderWidth(top = topLeft, right = topRight, bottom = bottomRight, left = bottomLeft)
 }
 
 /**
- * This function is a temporary replacement for `borderWidth(topLeft: CSSNumeric, topRight: CSSNumeric, bottomRight: CSSNumeric, bottomLeft: CSSNumeric)`.
- * After a fix for parameters names in `borderWidth`,
- * this function will be Deprecated with a replaceWith `borderWidth`. Later `borderWidth4` will be Removed.
- * @see borderWidth
+ * @param unused will be removed in 1.4. It helps to fix the borderWidth overloads with wrong parameters names.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/border-width
  */
-fun StyleScope.borderWidth4(top: CSSNumeric, right: CSSNumeric, bottom: CSSNumeric, left: CSSNumeric) {
+@Suppress("UNUSED_PARAMETER")
+fun StyleScope.borderWidth(
+    top: CSSNumeric,
+    right: CSSNumeric,
+    bottom: CSSNumeric,
+    left: CSSNumeric,
+    unused: Unit? = null
+) {
     property("border-width", "$top $right $bottom $left")
 }
