@@ -841,7 +841,7 @@ internal class AndroidComposeView(context: Context) :
                 wasMeasuredWithMultipleConstraints = true
             }
             measureAndLayoutDelegate.updateRootConstraints(constraints)
-            measureAndLayoutDelegate.measureAndLayout(resendMotionEventOnLayout)
+            measureAndLayoutDelegate.measureOnly()
             setMeasuredDimension(root.width, root.height)
             if (_androidViewsHandler != null) {
                 androidViewsHandler.measure(
@@ -864,6 +864,7 @@ internal class AndroidComposeView(context: Context) :
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        measureAndLayoutDelegate.measureAndLayout(resendMotionEventOnLayout)
         onMeasureConstraints = null
         // we postpone onPositioned callbacks until onLayout as LayoutCoordinates
         // are currently wrong if you try to get the global(activity) coordinates -
