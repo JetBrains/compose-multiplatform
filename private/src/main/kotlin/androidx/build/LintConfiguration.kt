@@ -188,7 +188,6 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
         disable.add("NotificationPermission")
 
         // Broken in 7.4.0-alpha04 due to b/236262744
-        disable.add("KnownPermissionError")
         disable.add("ReservedSystemPermission")
 
         // Disable dependency checks that suggest to change them. We want libraries to be
