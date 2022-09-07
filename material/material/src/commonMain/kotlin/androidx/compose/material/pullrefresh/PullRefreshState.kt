@@ -103,6 +103,14 @@ class PullRefreshState internal constructor(
     private val refreshingOffset: Float,
     internal val threshold: Float
 ) {
+    /**
+     * A float representing how far the user has pulled as a percentage of the refreshThreshold.
+     *
+     * If the component has not been pulled at all, progress is zero. If the pull has reached
+     * halfway to the threshold, progress is 0.5f. A value greater than 1 indicates that pull has
+     * gone beyond the refreshThreshold - e.g. a value of 2f indicates that the user has pulled to
+     * two times the refreshThreshold.
+     */
     val progress get() = adjustedDistancePulled / threshold
 
     internal val refreshing get() = _refreshing
