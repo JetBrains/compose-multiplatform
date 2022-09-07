@@ -63,6 +63,7 @@ import kotlin.math.pow
  * @param modifier Modifiers for the indicator.
  * @param backgroundColor The color of the indicator's background.
  * @param contentColor The color of the indicator's arc and arrow.
+ * @param scale A boolean controlling whether the indicator's size scales with pull progress or not.
  */
 @Composable
 @ExperimentalMaterialApi
