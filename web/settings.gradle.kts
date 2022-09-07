@@ -60,9 +60,7 @@ fun module(name: String, path: String) {
 
 module(":web-core", "core")
 module(":web-svg", "svg")
-module(":web-widgets", "widgets")
 module(":web-integration-core", "integration-core")
-module(":web-integration-widgets", "integration-widgets")
 module(":compose-compiler-integration", "compose-compiler-integration")
 module(":internal-web-core-runtime", "internal-web-core-runtime")
 module(":test-utils", "test-utils")

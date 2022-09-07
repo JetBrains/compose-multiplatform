@@ -112,9 +112,6 @@ subprojects {
         println("substituting published artifacts with projects ones in project $name")
         configurations.all {
             resolutionStrategy.dependencySubstitution {
-                substitute(module("org.jetbrains.compose.web:web-widgets")).apply {
-                    with(project(":web-widgets"))
-                }
                 substitute(module("org.jetbrains.compose.web:web-core")).apply {
                     with(project(":web-core"))
                 }
