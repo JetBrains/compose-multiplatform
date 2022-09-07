@@ -173,20 +173,20 @@ fun Slider(
         onValueChangeFinished = onValueChangeFinished,
         colors = colors,
         interactionSource = interactionSource,
-        thumb = {
+        thumb = remember(interactionSource, colors, enabled) { {
             SliderDefaults.Thumb(
                 interactionSource = interactionSource,
                 colors = colors,
                 enabled = enabled
             )
-        },
-        track = { sliderPositions ->
+        } },
+        track = remember(colors, enabled) { { sliderPositions ->
             SliderDefaults.Track(
                 colors = colors,
                 enabled = enabled,
                 sliderPositions = sliderPositions
             )
-        }
+        } }
     )
 }
 
@@ -256,13 +256,13 @@ fun Slider(
         colors = colors,
         interactionSource = interactionSource,
         thumb = thumb,
-        track = { sliderPositions ->
+        track = remember(colors, enabled) { { sliderPositions ->
             SliderDefaults.Track(
                 colors = colors,
                 enabled = enabled,
                 sliderPositions = sliderPositions
             )
-        }
+        } }
     )
 }
 
@@ -321,13 +321,14 @@ fun Slider(
     onValueChangeFinished: (() -> Unit)? = null,
     colors: SliderColors = SliderDefaults.colors(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    thumb: @Composable (SliderPositions) -> Unit = {
-        SliderDefaults.Thumb(
-            colors = colors,
-            enabled = enabled,
-            interactionSource = interactionSource
-        )
-    }
+    thumb: @Composable (SliderPositions) -> Unit =
+        remember(interactionSource, colors, enabled) { {
+            SliderDefaults.Thumb(
+                interactionSource = interactionSource,
+                colors = colors,
+                enabled = enabled
+            )
+        } }
 ) {
     require(steps >= 0) { "steps should be >= 0" }
 

@@ -149,6 +149,7 @@ fun SliderWithCustomThumbSample() {
 fun SliderWithCustomTrackAndThumb() {
     var sliderPosition by remember { mutableStateOf(0f) }
     val interactionSource = MutableInteractionSource()
+    val colors = SliderDefaults.colors(thumbColor = Color.Red, activeTrackColor = Color.Red)
     Column {
         Text(text = sliderPosition.toString())
         Slider(
@@ -164,12 +165,12 @@ fun SliderWithCustomTrackAndThumb() {
             thumb = {
                 SliderDefaults.Thumb(
                     interactionSource = interactionSource,
-                    colors = SliderDefaults.colors(thumbColor = Color.Red)
+                    colors = colors
                 )
             },
             track = { sliderPositions ->
                 SliderDefaults.Track(
-                    colors = SliderDefaults.colors(activeTrackColor = Color.Red),
+                    colors = colors,
                     sliderPositions = sliderPositions
                 )
             }
