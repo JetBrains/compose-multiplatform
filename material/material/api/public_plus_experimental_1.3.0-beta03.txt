@@ -946,3 +946,37 @@ package androidx.compose.material.internal {
 
 }
 
+package androidx.compose.material.pullrefresh {
+
+  @androidx.compose.material.ExperimentalMaterialApi public final class PullRefreshDefaults {
+    method public float getRefreshThreshold();
+    method public float getRefreshingOffset();
+    property public final float RefreshThreshold;
+    property public final float RefreshingOffset;
+    field public static final androidx.compose.material.pullrefresh.PullRefreshDefaults INSTANCE;
+  }
+
+  public final class PullRefreshIndicatorKt {
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void PullRefreshIndicator(boolean refreshing, androidx.compose.material.pullrefresh.PullRefreshState state, optional androidx.compose.ui.Modifier modifier, optional long backgroundColor, optional long contentColor, optional boolean scale);
+  }
+
+  public final class PullRefreshIndicatorTransformKt {
+    method @androidx.compose.material.ExperimentalMaterialApi public static androidx.compose.ui.Modifier pullRefreshIndicatorTransform(androidx.compose.ui.Modifier, androidx.compose.material.pullrefresh.PullRefreshState state, optional boolean scale);
+  }
+
+  public final class PullRefreshKt {
+    method @androidx.compose.material.ExperimentalMaterialApi public static androidx.compose.ui.Modifier pullRefresh(androidx.compose.ui.Modifier, androidx.compose.material.pullrefresh.PullRefreshState state, optional boolean enabled);
+    method @androidx.compose.material.ExperimentalMaterialApi public static androidx.compose.ui.Modifier pullRefresh(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> onPull, kotlin.jvm.functions.Function2<? super java.lang.Float,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> onRelease, optional boolean enabled);
+  }
+
+  @androidx.compose.material.ExperimentalMaterialApi public final class PullRefreshState {
+    method public float getProgress();
+    property public final float progress;
+  }
+
+  public final class PullRefreshStateKt {
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static androidx.compose.material.pullrefresh.PullRefreshState rememberPullRefreshState(boolean refreshing, kotlin.jvm.functions.Function0<kotlin.Unit> onRefresh, optional float refreshThreshold, optional float refreshingOffset);
+  }
+
+}
+

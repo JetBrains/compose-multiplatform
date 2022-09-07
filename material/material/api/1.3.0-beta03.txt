@@ -681,3 +681,19 @@ package androidx.compose.material.internal {
 
 }
 
+package androidx.compose.material.pullrefresh {
+
+  public final class PullRefreshIndicatorKt {
+  }
+
+  public final class PullRefreshIndicatorTransformKt {
+  }
+
+  public final class PullRefreshKt {
+  }
+
+  public final class PullRefreshStateKt {
+  }
+
+}
+
