@@ -31,8 +31,12 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
 import androidx.compose.ui.text.android.InternalPlatformTextApi
@@ -1270,6 +1274,20 @@ AndroidParagraphTest {
         assertThat(paragraph.textPaint.color).isEqualTo(color.toArgb())
     }
 
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testSpanStyle_brush_appliedOnTextPaint() {
+        val brush = Brush.horizontalGradient(listOf(Color.Red, Color.Blue)) as ShaderBrush
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(brush = brush),
+            width = 0.0f
+        )
+
+        assertThat(paragraph.textPaint.brush).isEqualTo(brush)
+        assertThat(paragraph.textPaint.brushSize).isEqualTo(Size(paragraph.width, paragraph.height))
+    }
+
     @Test
     fun testTextStyle_letterSpacingInEm_appliedOnTextPaint() {
         val letterSpacing = 2
@@ -1643,6 +1661,24 @@ AndroidParagraphTest {
         val canvas = Canvas(android.graphics.Canvas())
         paragraph.paint(canvas, color = color2)
         assertThat(paragraph.textPaint.color).isEqualTo(color2.toArgb())
+    }
+
+    @Test
+    fun testPaint_can_change_drawStyle_to_Stroke() {
+        val paragraph = simpleParagraph(
+            text = "",
+            width = 0.0f
+        )
+        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.FILL)
+
+        val stroke = Stroke(width = 4f, miter = 2f, cap = StrokeCap.Square, join = StrokeJoin.Bevel)
+        val canvas = Canvas(android.graphics.Canvas())
+        paragraph.paint(canvas, drawStyle = stroke)
+        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.STROKE)
+        assertThat(paragraph.textPaint.strokeWidth).isEqualTo(4f)
+        assertThat(paragraph.textPaint.strokeMiter).isEqualTo(2f)
+        assertThat(paragraph.textPaint.strokeCap).isEqualTo(Paint.Cap.SQUARE)
+        assertThat(paragraph.textPaint.strokeJoin).isEqualTo(Paint.Join.BEVEL)
     }
 
     @Test

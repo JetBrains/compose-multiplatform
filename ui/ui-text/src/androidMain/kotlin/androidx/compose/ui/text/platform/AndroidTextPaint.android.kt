@@ -16,7 +16,9 @@
 
 package androidx.compose.ui.text.platform
 
+import android.graphics.Paint
 import android.text.TextPaint
+import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Brush
@@ -24,6 +26,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.asAndroidPathEffect
+import androidx.compose.ui.graphics.drawscope.DrawStyle
+import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.platform.extensions.correctBlurRadius
@@ -35,10 +43,16 @@ internal class AndroidTextPaint(flags: Int, density: Float) : TextPaint(flags) {
     init {
         this.density = density
     }
+
     private var textDecoration: TextDecoration = TextDecoration.None
     private var shadow: Shadow = Shadow.None
-    private var brush: Brush? = null
-    private var brushSize: Size? = null
+
+    @VisibleForTesting
+    internal var brush: Brush? = null
+
+    @VisibleForTesting
+    internal var brushSize: Size? = null
+    private var drawStyle: DrawStyle? = null
 
     fun setTextDecoration(textDecoration: TextDecoration?) {
         if (textDecoration == null) return
@@ -99,6 +113,47 @@ internal class AndroidTextPaint(flags: Int, density: Float) : TextPaint(flags) {
                 setAlpha(alpha)
             }
         }
+    }
+
+    fun setDrawStyle(drawStyle: DrawStyle?) {
+        if (drawStyle == null) return
+        if (this.drawStyle != drawStyle) {
+            this.drawStyle = drawStyle
+            when (drawStyle) {
+                Fill -> {
+                    // Stroke properties such as strokeWidth, strokeMiter are not re-set because
+                    // Fill style should make those properties no-op. Next time the style is set
+                    // as Stroke, stroke properties get re-set as well.
+                    style = Style.FILL
+                }
+                is Stroke -> {
+                    style = Style.STROKE
+                    strokeWidth = drawStyle.width
+                    strokeMiter = drawStyle.miter
+                    strokeJoin = drawStyle.join.toAndroidJoin()
+                    strokeCap = drawStyle.cap.toAndroidCap()
+                    pathEffect = drawStyle.pathEffect?.asAndroidPathEffect()
+                }
+            }
+        }
+    }
+}
+
+private fun StrokeJoin.toAndroidJoin(): Paint.Join {
+    return when (this) {
+        StrokeJoin.Miter -> Paint.Join.MITER
+        StrokeJoin.Round -> Paint.Join.ROUND
+        StrokeJoin.Bevel -> Paint.Join.BEVEL
+        else -> Paint.Join.MITER
+    }
+}
+
+private fun StrokeCap.toAndroidCap(): Paint.Cap {
+    return when (this) {
+        StrokeCap.Butt -> Paint.Cap.BUTT
+        StrokeCap.Round -> Paint.Cap.ROUND
+        StrokeCap.Square -> Paint.Cap.SQUARE
+        else -> Paint.Cap.BUTT
     }
 }
 

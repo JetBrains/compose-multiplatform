@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextDecoration
 
@@ -59,9 +60,18 @@ actual sealed interface Paragraph {
     @ExperimentalTextApi
     actual fun paint(
         canvas: Canvas,
+        color: Color,
+        shadow: Shadow?,
+        textDecoration: TextDecoration?,
+        drawStyle: DrawStyle?
+    )
+    @ExperimentalTextApi
+    actual fun paint(
+        canvas: Canvas,
         brush: Brush,
         alpha: Float,
         shadow: Shadow?,
-        textDecoration: TextDecoration?
+        textDecoration: TextDecoration?,
+        drawStyle: DrawStyle?
     )
 }
