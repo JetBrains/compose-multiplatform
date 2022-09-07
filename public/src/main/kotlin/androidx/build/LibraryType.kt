@@ -69,6 +69,7 @@ sealed class LibraryType(
         val PUBLISHED_TEST_LIBRARY = PublishedTestLibrary()
         val PUBLISHED_NATIVE_LIBRARY = PublishedNativeLibrary()
         val INTERNAL_TEST_LIBRARY = InternalTestLibrary()
+        val INTERNAL_HOST_TEST_LIBRARY = InternalHostTestLibrary()
         val SAMPLES = Samples()
         val LINT = Lint()
         val COMPILER_DAEMON = CompilerDaemon()
@@ -82,15 +83,21 @@ sealed class LibraryType(
         val KMP_LIBRARY = KmpLibrary()
         val UNSET = Unset()
     }
-    open class PublishedLibrary : LibraryType(
+    open class PublishedLibrary() : LibraryType(
         publish = Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = true,
         checkApi = RunApiTasks.Yes()
     )
+    open class InternalLibrary(
+        compilationTarget: CompilationTarget = CompilationTarget.DEVICE
+    ) : LibraryType(
+        checkApi = RunApiTasks.No("Internal Library"),
+        compilationTarget = compilationTarget
+    )
 
     class PublishedTestLibrary() : PublishedLibrary()
-    open class InternalLibrary() : LibraryType()
     class InternalTestLibrary() : InternalLibrary()
+    class InternalHostTestLibrary() : InternalLibrary(CompilationTarget.HOST)
     class PublishedNativeLibrary : PublishedLibrary()
     class Samples : LibraryType(
         publish = Publish.SNAPSHOT_AND_RELEASE,
