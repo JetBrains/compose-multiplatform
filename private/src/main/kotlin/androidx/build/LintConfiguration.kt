@@ -187,9 +187,6 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
         // Reenable after b/238892319 is resolved
         disable.add("NotificationPermission")
 
-        // Broken in 7.4.0-alpha04 due to b/236262744
-        disable.add("ReservedSystemPermission")
-
         // Disable dependency checks that suggest to change them. We want libraries to be
         // intentional with their dependency version bumps.
         disable.add("KtxExtensionAvailable")
