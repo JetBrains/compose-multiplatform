@@ -130,6 +130,12 @@ const val KMP_GITHUB_BUILD = "androidx.github.build"
  */
 const val ALLOW_MISSING_LINT_CHECKS_PROJECT = "androidx.allow.missing.lint"
 
+/**
+ * If true, runs all KMP unit tests as part of the bOS task.
+ */
+const val RUN_KMP_UNIT_TESTS_WITH_BUILD_ON_SERVER_TASK =
+    "androidx.runKmpUnitTestsWithBuildOnServerTask"
+
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALTERNATIVE_PROJECT_URL,
     VERSION_EXTRA_CHECK_ENABLED,
@@ -155,7 +161,8 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     PROFILE_YOURKIT_AGENT_PATH,
     KMP_GITHUB_BUILD,
     ENABLED_KMP_TARGET_PLATFORMS,
-    ALLOW_MISSING_LINT_CHECKS_PROJECT
+    ALLOW_MISSING_LINT_CHECKS_PROJECT,
+    RUN_KMP_UNIT_TESTS_WITH_BUILD_ON_SERVER_TASK
 )
 
 /**
@@ -242,5 +249,11 @@ fun Project.usingMaxDepVersions(): Boolean {
  */
 fun Project.allowMissingLintProject() =
     findBooleanProperty(ALLOW_MISSING_LINT_CHECKS_PROJECT) ?: false
+
+/**
+ * Whether we should run KMP unit tests as part of bOS
+ */
+fun Project.shouldRunKmpUnitTestsWithBuildOnServerTask(): Boolean =
+    findBooleanProperty(RUN_KMP_UNIT_TESTS_WITH_BUILD_ON_SERVER_TASK) ?: false
 
 fun Project.findBooleanProperty(propName: String) = (findProperty(propName) as? String)?.toBoolean()
