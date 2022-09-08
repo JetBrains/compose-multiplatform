@@ -19,6 +19,7 @@ package androidx.build
 import androidx.build.logging.TERMINAL_RED
 import androidx.build.logging.TERMINAL_RESET
 import java.io.File
+import java.nio.file.Paths
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -88,8 +89,12 @@ private val DisabledRules = listOf(
     "wrapping",
 ).joinToString(",")
 
-private const val ExcludeTestDataFiles = "**/test-data/**/*.kt"
-private const val ExcludeExternalFiles = "**/external/**/*.kt"
+private val ExcludedDirectories = listOf(
+    "test-data",
+    "external",
+)
+
+private val ExcludedDirectoryGlobs = ExcludedDirectories.map { "**/$it/**/*.kt" }
 private const val MainClass = "com.pinterest.ktlint.Main"
 private const val InputDir = "src"
 private const val IncludedFiles = "**/*.kt"
@@ -136,7 +141,7 @@ abstract class BaseKtlintTask : DefaultTask() {
             return project.fileTree(
                 mutableMapOf(
                     "dir" to InputDir, "include" to IncludedFiles,
-                    "exclude" to listOf(ExcludeTestDataFiles, ExcludeExternalFiles)
+                    "exclude" to ExcludedDirectoryGlobs
                 )
             )
         }
@@ -177,8 +182,7 @@ abstract class BaseKtlintTask : DefaultTask() {
             subdirectories.map { arguments.add("$it/$InputDir/$IncludedFiles") }
         } ?: arguments.add("$InputDir/$IncludedFiles")
 
-        arguments.add("!$InputDir/$ExcludeTestDataFiles")
-        arguments.add("!$InputDir/$ExcludeExternalFiles")
+        ExcludedDirectoryGlobs.mapTo(arguments) { "!$InputDir/$it" }
         return arguments
     }
 }
@@ -267,7 +271,13 @@ abstract class KtlintCheckFileTask : DefaultTask() {
     fun runKtlint() {
         if (files.isEmpty()) throw StopExecutionException()
         val kotlinFiles = files.filter { file ->
-            file.endsWith(".kt") || file.endsWith(".ktx")
+            val isKotlinFile = file.endsWith(".kt") || file.endsWith(".ktx")
+            val inExcludedDir =
+                Paths.get(file).any { subPath ->
+                    ExcludedDirectories.contains(subPath.toString())
+                }
+
+            isKotlinFile && !inExcludedDir
         }
         if (kotlinFiles.isEmpty()) throw StopExecutionException()
         val result = execOperations.javaexec { javaExecSpec ->
@@ -280,10 +290,6 @@ abstract class KtlintCheckFileTask : DefaultTask() {
             )
             args.addAll(kotlinFiles)
             if (format) args.add("-F")
-
-            // Note: These exclusions must come after the inputs.
-            args.add("!$ExcludeTestDataFiles")
-            args.add("!$ExcludeExternalFiles")
 
             javaExecSpec.args = args
             javaExecSpec.isIgnoreExitValue = true
