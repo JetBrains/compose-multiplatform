@@ -41,6 +41,7 @@ fun SkikoTouchEventKind.toCompose() = when(this) {
     SkikoTouchEventKind.STARTED -> PointerEventType.Press
     SkikoTouchEventKind.ENDED -> PointerEventType.Release
     SkikoTouchEventKind.MOVED -> PointerEventType.Move
+    SkikoTouchEventKind.CANCELLED -> PointerEventType.Release
     else -> PointerEventType.Unknown
 }
 

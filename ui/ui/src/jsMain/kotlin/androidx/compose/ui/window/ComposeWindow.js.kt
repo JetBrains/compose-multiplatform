@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,29 @@
 package androidx.compose.ui.window
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionContext
 import androidx.compose.ui.createSkiaLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.native.ComposeLayer
+import androidx.compose.ui.platform.JSTextInputService
+import kotlinx.browser.document
+import org.w3c.dom.HTMLCanvasElement
 
-import platform.AppKit.*
-import platform.Cocoa.*
-import platform.Foundation.*
-import platform.CoreGraphics.*
-import kotlinx.cinterop.*
+internal actual class ComposeWindow actual constructor(){
 
-internal actual class ComposeWindow actual constructor() {
-    val layer = ComposeLayer(
+    private val textInputService = JSTextInputService(
+        showSoftwareKeyboard = {
+            println("TODO showSoftwareKeyboard in JS")
+        },
+        hideSoftwareKeyboard = {
+            println("TODO hideSoftwareKeyboard in JS")
+        },
+    )
+
+    private val layer = ComposeLayer(
         layer = createSkiaLayer(),
-        showSoftwareKeyboard = {},
-        hideSoftwareKeyboard = {},
         getTopLeftOffset = { Offset.Zero },
+        inputService = textInputService,
+        input = textInputService.input
     )
 
     val title: String
@@ -43,27 +49,19 @@ internal actual class ComposeWindow actual constructor() {
         println("TODO: set title to SkiaWindow")
     }
 
-    val windowStyle =
-        NSWindowStyleMaskTitled or
-        NSWindowStyleMaskMiniaturizable or
-        NSWindowStyleMaskClosable or
-        NSWindowStyleMaskResizable
-
-    private val contentRect = NSMakeRect(0.0, 0.0, 640.0, 480.0)
-
-    private val nsWindow = NSWindow(
-        contentRect = contentRect,
-        styleMask = windowStyle,
-        backing =  NSBackingStoreBuffered,
-        defer =  true
-    )
+    // TODO: generalize me.
+    val canvas = document.getElementById("ComposeTarget") as HTMLCanvasElement
 
     init {
-        layer.layer.attachTo(nsWindow)
-        nsWindow.orderFrontRegardless()
-        contentRect.useContents {
-            layer.setSize(size.width.toInt(), size.height.toInt())
-        }
+        layer.layer.attachTo(canvas)
+        canvas.setAttribute("tabindex", "0")
+        layer.layer.needRedraw()
+
+        val scale = layer.layer.contentScale
+        layer.setSize(
+            (canvas.width / scale).toInt(),
+            (canvas.height / scale).toInt()
+        )
     }
 
     /**

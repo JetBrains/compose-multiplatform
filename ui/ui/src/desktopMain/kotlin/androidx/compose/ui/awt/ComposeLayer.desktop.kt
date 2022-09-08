@@ -80,6 +80,7 @@ import java.awt.Cursor
 import java.awt.event.FocusListener
 import org.jetbrains.skiko.SkiaLayerAnalytics
 import org.jetbrains.skiko.hostOs
+import org.jetbrains.skiko.SkikoInput
 
 internal class ComposeLayer(
     private val skiaLayerAnalytics: SkiaLayerAnalytics
@@ -305,6 +306,11 @@ internal class ComposeLayer(
 
     init {
         _component.skikoView = object : SkikoView {
+            override val input: SkikoInput
+                get() = object: SkikoInput {
+
+                }
+
             override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                 catchExceptions {
                     scene.render(canvas, nanoTime)

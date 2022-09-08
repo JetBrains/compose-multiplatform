@@ -21,19 +21,19 @@ import androidx.compose.runtime.CompositionContext
 import androidx.compose.ui.createSkiaLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.native.ComposeLayer
-import kotlinx.browser.document
-import org.w3c.dom.HTMLCanvasElement
+import androidx.compose.ui.platform.SkikoTextInputService
 
-internal actual class ComposeWindow actual constructor(){
+import platform.AppKit.*
+import platform.Cocoa.*
+import platform.Foundation.*
+import platform.CoreGraphics.*
+import kotlinx.cinterop.*
+
+internal actual class ComposeWindow actual constructor() {
     val layer = ComposeLayer(
         layer = createSkiaLayer(),
-        showSoftwareKeyboard = {
-            println("TODO showSoftwareKeyboard in JS")
-        },
-        hideSoftwareKeyboard = {
-            println("TODO hideSoftwareKeyboard in JS")
-        },
         getTopLeftOffset = { Offset.Zero },
+        inputService = SkikoTextInputService(),
     )
 
     val title: String
@@ -43,19 +43,27 @@ internal actual class ComposeWindow actual constructor(){
         println("TODO: set title to SkiaWindow")
     }
 
-    // TODO: generalize me.
-    val canvas = document.getElementById("ComposeTarget") as HTMLCanvasElement
+    val windowStyle =
+        NSWindowStyleMaskTitled or
+        NSWindowStyleMaskMiniaturizable or
+        NSWindowStyleMaskClosable or
+        NSWindowStyleMaskResizable
+
+    private val contentRect = NSMakeRect(0.0, 0.0, 640.0, 480.0)
+
+    private val nsWindow = NSWindow(
+        contentRect = contentRect,
+        styleMask = windowStyle,
+        backing =  NSBackingStoreBuffered,
+        defer =  true
+    )
 
     init {
-        layer.layer.attachTo(canvas)
-        canvas.setAttribute("tabindex", "0")
-        layer.layer.needRedraw()
-
-        val scale = layer.layer.contentScale
-        layer.setSize(
-            (canvas.width / scale).toInt(),
-            (canvas.height / scale).toInt()
-        )
+        layer.layer.attachTo(nsWindow)
+        nsWindow.orderFrontRegardless()
+        contentRect.useContents {
+            layer.setSize(size.width.toInt(), size.height.toInt())
+        }
     }
 
     /**

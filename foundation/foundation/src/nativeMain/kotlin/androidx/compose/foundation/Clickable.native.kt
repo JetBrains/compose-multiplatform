@@ -17,7 +17,12 @@
 package androidx.compose.foundation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
+import org.jetbrains.skiko.SkikoKey
 
 @Composable
 internal actual fun isComposeRootInScrollableContainer(): () -> Boolean = { false }
@@ -30,4 +35,7 @@ internal actual val TapIndicationDelay: Long = 0L
  * (eg. When you press Enter on a focused button, it should perform a click).
  */
 internal actual val KeyEvent.isClick: Boolean
-    get() = TODO("implement native isClick")
+    get() = type == KeyEventType.KeyUp && when (nativeKeyEvent.key) {
+        SkikoKey.KEY_ENTER -> true
+        else -> false
+    }
