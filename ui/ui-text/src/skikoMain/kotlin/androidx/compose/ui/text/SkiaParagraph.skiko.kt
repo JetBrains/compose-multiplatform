@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.text.platform.SkiaParagraphIntrinsics
 import androidx.compose.ui.text.platform.cursorHorizontalPosition
+import androidx.compose.ui.text.platform.isNeutralDirectionality
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Constraints
@@ -385,14 +386,19 @@ internal class SkiaParagraph(
         val leftX = rects?.firstOrNull()?.rect?.left ?: expectedLine.left.toFloat()
         val rightX = rects?.lastOrNull()?.rect?.right ?: expectedLine.right.toFloat()
 
+        if (leftX == rightX) {
+            return glyphPosition
+        }
+
         var correctedGlyphPosition = glyphPosition
 
         if (position.x <= leftX) { // when clicked to the left of a text line
             correctedGlyphPosition = para.getGlyphPositionAtCoordinate(leftX + 1f, position.y).position
         } else if (position.x >= rightX) { // when clicked to the right of a text line
             correctedGlyphPosition = para.getGlyphPositionAtCoordinate(rightX - 1f, position.y).position
+            val isNeutralChar = text.getOrNull(correctedGlyphPosition)?.isNeutralDirectionality() ?: false
             // For RTL blocks, the position is still not correct, so we have to subtract 1 from the returned result
-            if (getBoxBackwardByOffset(correctedGlyphPosition)?.direction == Direction.RTL) {
+            if (!isNeutralChar && getBoxBackwardByOffset(correctedGlyphPosition)?.direction == Direction.RTL) {
                 correctedGlyphPosition -= 1
             }
         }
