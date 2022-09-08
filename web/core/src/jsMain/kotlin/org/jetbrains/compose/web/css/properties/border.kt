@@ -83,26 +83,82 @@ fun StyleScope.borderWidth(width: CSSNumeric) {
     property("border-width", width)
 }
 
-fun StyleScope.borderWidth(topLeft: CSSNumeric, bottomRight: CSSNumeric) {
-    property("border-width", "$topLeft $bottomRight")
+/**
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/border-width
+ */
+@Deprecated(
+    message = "This function has misleading parameter names. Please use explicit parameter names (or use `Replace with` in IDE).",
+    replaceWith = ReplaceWith(
+        expression = "borderWidth(vertical = topLeft, horizontal = bottomRight)"
+    )
+)
+@Suppress("UNUSED_PARAMETER")
+fun StyleScope.borderWidth(topLeft: CSSNumeric, bottomRight: CSSNumeric, unused: Unit? = null) {
+    borderWidth(vertical = topLeft, horizontal = bottomRight)
 }
 
+/**
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/border-width
+ */
+fun StyleScope.borderWidth(vertical: CSSNumeric, horizontal: CSSNumeric) {
+    property("border-width", "$vertical $horizontal")
+}
+
+/**
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/border-width
+ */
+@Deprecated(
+    message = "This function has misleading parameter names. Please use explicit parameter names (or use `Replace with` in IDE).",
+    replaceWith = ReplaceWith(
+        expression = "borderWidth(top = topLeft, horizontal = topRightAndBottomLeft, bottom = bottomRight)"
+    )
+)
+@Suppress("UNUSED_PARAMETER")
 fun StyleScope.borderWidth(
     topLeft: CSSNumeric,
     topRightAndBottomLeft: CSSNumeric,
-    bottomRight: CSSNumeric
+    bottomRight: CSSNumeric,
+    unused: Unit? = null
 ) {
-    property("border-width", "$topLeft $topRightAndBottomLeft $bottomRight")
+    borderWidth(top = topLeft, horizontal = topRightAndBottomLeft, bottom = bottomRight)
 }
 
+/**
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/border-width
+ */
+fun StyleScope.borderWidth(top: CSSNumeric, horizontal: CSSNumeric, bottom: CSSNumeric) {
+    property("border-width", "$top $horizontal $bottom")
+}
+
+/**
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/border-width
+ */
+@Deprecated(
+    message = "This function has misleading parameter names. Please use explicit parameter names (or use `Replace with` in IDE).",
+    replaceWith = ReplaceWith(
+        expression = "borderWidth(top = topLeft, right = topRight, bottom = bottomRight, left = bottomLeft)"
+    )
+)
+@Suppress("UNUSED_PARAMETER")
 fun StyleScope.borderWidth(
     topLeft: CSSNumeric,
     topRight: CSSNumeric,
     bottomRight: CSSNumeric,
-    bottomLeft: CSSNumeric
+    bottomLeft: CSSNumeric,
+    unused: Unit? = null
 ) {
-    property(
-        "border-width",
-        "$topLeft $topRight $bottomRight $bottomLeft"
-    )
+    borderWidth(top = topLeft, right = topRight, bottom = bottomRight, left = bottomLeft)
+}
+
+/**
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/border-width
+ */
+fun StyleScope.borderWidth(
+    top: CSSNumeric,
+    right: CSSNumeric,
+    bottom: CSSNumeric,
+    left: CSSNumeric
+) {
+    property("border-width", "$top $right $bottom $left")
 }
