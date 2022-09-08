@@ -43,7 +43,7 @@ class ViewApplier(root: View) : AbstractApplier<View>(root) {
     }
 
     override fun onClear() {
-        root.children.clear()
+        root.removeAllChildren()
     }
 
     override fun onBeginChanges() {

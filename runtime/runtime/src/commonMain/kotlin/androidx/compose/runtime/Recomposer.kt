@@ -622,13 +622,13 @@ class Recomposer(
                         }
                     }
 
-                    discardUnusedValues()
-
                     synchronized(stateLock) {
                         deriveStateLocked()
                     }
                 }
             }
+
+            discardUnusedValues()
         }
     }
 

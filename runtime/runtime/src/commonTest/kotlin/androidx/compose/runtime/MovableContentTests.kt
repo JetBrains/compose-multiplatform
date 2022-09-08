@@ -1027,8 +1027,8 @@ class MovableContentTests {
         expectUnused()
     }
 
-    @Test // Regression test for 230830644
-    fun deferredSubcompose_conditional() = compositionTest {
+    @Test // Regression test for 230830644 and 235398298
+    fun deferredSubcompose_conditional_rootLevelChildren() = compositionTest {
         var subcompose by mutableStateOf(false)
         var lastPrivateState: State<Int> = mutableStateOf(0)
 
@@ -1072,7 +1072,71 @@ class MovableContentTests {
         expectChanges()
         revalidate()
 
-        assertEquals(expectedState, lastPrivateState)
+        assertEquals(expectedState, lastPrivateState, "Movable content was unexpectedly recreated")
+
+        subcompose = false
+        expectChanges()
+        revalidate()
+
+        assertEquals(expectedState, lastPrivateState, "Movable content was unexpectedly recreated")
+    }
+
+    @Test // Regression test for 230830644 and 235398298
+    fun deferredSubcompose_conditional_nestedChildren() = compositionTest {
+        var subcompose by mutableStateOf(false)
+        var lastPrivateState: State<Int> = mutableStateOf(0)
+
+        val content = movableContentOf {
+            lastPrivateState = remember { mutableStateOf(0) }
+            Text("Movable content")
+        }
+
+        compose {
+            Text("Main content start")
+            if (!subcompose) {
+                content()
+            }
+            Text("Main content end")
+            if (subcompose) {
+                DeferredSubcompose {
+                    Column {
+                        Text("Sub-composed content start")
+                        content()
+                        Text("Sub-composed content end")
+                    }
+                }
+            }
+        }
+
+        validate {
+            Text("Main content start")
+            if (!subcompose) {
+                Text("Movable content")
+            }
+            Text("Main content end")
+            if (subcompose) {
+                DeferredSubcompose {
+                    Column {
+                        Text("Sub-composed content start")
+                        Text("Movable content")
+                        Text("Sub-composed content end")
+                    }
+                }
+            }
+        }
+
+        val expectedState = lastPrivateState
+        subcompose = true
+        expectChanges()
+        revalidate()
+
+        assertEquals(expectedState, lastPrivateState, "Movable content was unexpectedly recreated")
+
+        subcompose = false
+        expectChanges()
+        revalidate()
+
+        assertEquals(expectedState, lastPrivateState, "Movable content was unexpectedly recreated")
     }
 
     @Test // Regression test for 230830644
@@ -1525,10 +1589,11 @@ private fun DeferredSubcompose(content: @Composable () -> Unit) {
     ComposeNode<View, ViewApplier>(factory = { host }, update = { })
     val parent = rememberCompositionContext()
     val composition = remember { Composition(ViewApplier(host), parent) }
-    SideEffect {
+    LaunchedEffect(content as Any) {
         composition.setContent(content)
     }
     DisposableEffect(Unit) {
+
         onDispose { composition.dispose() }
     }
 }
