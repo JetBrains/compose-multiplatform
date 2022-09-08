@@ -19,6 +19,7 @@ package androidx.compose.ui.focus
 import android.view.View
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -26,6 +27,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -249,6 +251,155 @@ class FocusRequesterTest {
             // Assert.
             assertThat(focusState1.isFocused).isTrue()
             assertThat(focusState2.isFocused).isFalse()
+        }
+    }
+
+    @Test
+    fun requestFocus_onDeactivatedNode_focusesOnChild() {
+        // Arrange.
+        lateinit var childFocusState: FocusState
+        val focusRequester = FocusRequester()
+        rule.setFocusableContent {
+            Box(
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .focusProperties { canFocus = false }
+                    .focusTarget()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(10.dp)
+                        .onFocusChanged { childFocusState = it }
+                        .focusTarget()
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            // Act.
+            focusRequester.requestFocus()
+
+            // Assert.
+            assertThat(childFocusState.isFocused).isTrue()
+        }
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    @Test
+    fun requestFocus_onDeactivatedParent_focusesOnChild() {
+        // Arrange.
+        lateinit var childFocusState: FocusState
+        val (focusRequester, initialFocus) = FocusRequester.createRefs()
+        rule.setFocusableContent {
+            Column(
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .focusProperties { canFocus = false }
+                    .focusTarget()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(10.dp)
+                        .onFocusChanged { childFocusState = it }
+                        .focusTarget()
+                )
+                Box(
+                    modifier = Modifier
+                        .size(10.dp)
+                        .focusRequester(initialFocus)
+                        .focusTarget()
+                )
+            }
+        }
+        rule.runOnIdle { initialFocus.requestFocus() }
+
+        rule.runOnIdle {
+            // Act.
+            focusRequester.requestFocus()
+
+            // Assert.
+            assertThat(childFocusState.isFocused).isTrue()
+        }
+    }
+
+    @Test
+    fun requestFocus_intermediateDisabledParents_focusesOnDistantChild() {
+        // Arrange.
+        lateinit var childFocusState: FocusState
+        val focusRequester = FocusRequester()
+        rule.setFocusableContent {
+            Box(
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .focusProperties { canFocus = false }
+                    .focusTarget()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .focusProperties { canFocus = false }
+                        .focusTarget()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .focusProperties { canFocus = false }
+                            .focusTarget()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .onFocusChanged { childFocusState = it }
+                                .focusTarget()
+                        )
+                    }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            // Act.
+            focusRequester.requestFocus()
+
+            // Assert.
+            assertThat(childFocusState.isFocused).isTrue()
+        }
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    @Test
+    fun requestFocus_onDeactivatedNode_performsFocusEnter() {
+        // Arrange.
+        lateinit var child1FocusState: FocusState
+        lateinit var child2FocusState: FocusState
+        val focusRequester = FocusRequester()
+        val child2 = FocusRequester()
+        rule.setFocusableContent {
+            Column(
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .focusProperties { enter = { child2 } }
+                    .focusProperties { canFocus = false }
+                    .focusTarget()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .onFocusChanged { child1FocusState = it }
+                        .focusTarget()
+                )
+                Box(
+                    modifier = Modifier
+                        .focusRequester(child2)
+                        .onFocusChanged { child2FocusState = it }
+                        .focusTarget()
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            // Act.
+            focusRequester.requestFocus()
+
+            // Assert.
+            assertThat(child1FocusState.isFocused).isFalse()
+            assertThat(child2FocusState.isFocused).isTrue()
         }
     }
 

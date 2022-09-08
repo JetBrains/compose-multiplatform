@@ -244,7 +244,45 @@ class TwoDimensionalFocusTraversalExitTest {
      *     |_________________________|
      */
     @Test
-    fun moveFocusExit_deactivatedParentCanRedirectExit() {
+    fun moveFocusExit_triggersExitPropertyOnFocusedItem() {
+        // Arrange.
+        val (parent, grandparent, other) = List(3) { mutableStateOf(false) }
+        val otherItem = FocusRequester()
+        rule.setContentForTest {
+            FocusableBox(grandparent, 0, 0, 50, 50) {
+                val customExit = Modifier.focusProperties { exit = { otherItem } }
+                FocusableBox(parent, 10, 10, 30, 30, deactivated = true) {
+                    FocusableBox(focusedItem, 10, 10, 10, 10, initialFocus, modifier = customExit) }
+            }
+            FocusableBox(other, x = 0, y = 60, width = 10, height = 10, otherItem)
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Exit) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
+            assertThat(focusedItem.value).isFalse()
+            assertThat(parent.value).isFalse()
+            assertThat(grandparent.value).isFalse()
+            assertThat(other.value).isTrue()
+        }
+    }
+
+    /**
+     *      __________________________      __________
+     *     |  grandparent            |     |  other  |
+     *     |   ____________________  |     |_________|
+     *     |  |  parent           |  |
+     *     |  |   ______________  |  |
+     *     |  |  | focusedItem |  |  |
+     *     |  |  |_____________|  |  |
+     *     |  |___________________|  |
+     *     |_________________________|
+     */
+    @Test
+    fun explicitMoveFocusExit_deactivatedParentCanRedirectExit() {
         // Arrange.
         val (parent, grandparent, other) = List(3) { mutableStateOf(false) }
         val otherItem = FocusRequester()
