@@ -41,6 +41,8 @@ dependencies {
     androidTestImplementation(projectOrArtifact(":compose:runtime:runtime"))
     androidTestImplementation(projectOrArtifact(":compose:ui:ui-text"))
     androidTestImplementation(projectOrArtifact(":compose:ui:ui-util"))
+    androidTestImplementation project(":compose:test-utils")
+    androidTestImplementation project(":compose:benchmark-utils")
 
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.testExtJunit)
