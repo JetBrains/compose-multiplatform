@@ -59,9 +59,17 @@ class CSSBorderTests {
             Div({ style { borderWidth(3.px, 7.px) } })
             Div({ style { borderWidth(3.px, 5.px, 4.px) } })
             Div({ style { borderWidth(3.px, 5.px, 4.px, 2.px) } })
+
+            Div({ style { borderWidth(topLeft = 3.px, 7.px) } })
+            Div({ style { borderWidth(topLeft = 3.px, 5.px, 4.px) } })
+            Div({ style { borderWidth(topLeft = 3.px, 5.px, 4.px, 2.px) } })
         }
 
         assertEquals("2px", nextChild().style.borderWidth)
+        assertEquals("3px 7px", nextChild().style.borderWidth)
+        assertEquals("3px 5px 4px", nextChild().style.borderWidth)
+        assertEquals("3px 5px 4px 2px", nextChild().style.borderWidth)
+
         assertEquals("3px 7px", nextChild().style.borderWidth)
         assertEquals("3px 5px 4px", nextChild().style.borderWidth)
         assertEquals("3px 5px 4px 2px", nextChild().style.borderWidth)
