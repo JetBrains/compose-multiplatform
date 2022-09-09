@@ -194,8 +194,16 @@ fun AttrsScope<HTMLInputElement>.placeholder(value: String) =
 fun AttrsScope<HTMLInputElement>.readOnly() =
     attr("readonly", "")
 
+@Deprecated(
+    message = "Please use `required()` without parameters. Use if..else.. if conditional behaviour required.",
+    replaceWith = ReplaceWith("required()", "org.jetbrains.compose.web.attributes.required"),
+    level = DeprecationLevel.WARNING
+)
 fun AttrsScope<HTMLInputElement>.required(value: Boolean = true) =
     attr("required", value.toString())
+
+fun AttrsScope<HTMLInputElement>.required() =
+    attr("required", "")
 
 fun AttrsScope<HTMLInputElement>.size(value: Int) =
     attr("size", value.toString())
