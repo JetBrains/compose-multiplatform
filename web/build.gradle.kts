@@ -70,6 +70,33 @@ subprojects {
                     }
                 }
             }
+            publications.all {
+                this as MavenPublication
+                pom {
+                    name.set("JetBrains Compose Multiplatform")
+                    description.set("JetBrains Compose Multiplatform for Web")
+                    url.set("https://www.jetbrains.com/lp/compose-mpp/")
+                    licenses {
+                        license {
+                            name.set("Apache-2.0")
+                            url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                        }
+                    }
+                    developers {
+                        developer {
+                            id.set("JetBrains")
+                            name.set("JetBrains Compose Team")
+                            organization.set("JetBrains")
+                            organizationUrl.set("https://www.jetbrains.com")
+                        }
+                    }
+                    scm {
+                        connection.set("scm:git://github.com/JetBrains/compose-jb.git")
+                        developerConnection.set("scm:git://github.com/JetBrains/compose-jb.git")
+                        url.set("https://github.com/jetbrains/compose-jb")
+                    }
+                }
+            }
         }
     }
 
