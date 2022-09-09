@@ -91,9 +91,9 @@ data class Transitions(
  *  }
  *
  *  transitions {
- *    duration(.5.s)
- *    timingFunction(AnimationTimingFunction.EaseInOut)
- *    properties("width", "height")
+ *    defaultDuration(.5.s)
+ *    defaultTimingFunction(AnimationTimingFunction.EaseInOut)
+ *    defaultProperties("width", "height")
  *  }
  * ```
  *
