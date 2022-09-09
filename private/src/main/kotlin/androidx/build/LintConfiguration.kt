@@ -196,10 +196,6 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
         // concerned with drawables potentially being a little bit blurry
         disable.add("IconMissingDensityFolder")
 
-        // Disable a check that's only triggered by translation updates which are
-        // outside of library owners' control, b/174655193
-        disable.add("UnusedQuantity")
-
         // Disable until it works for our projects, b/171986505
         disable.add("JavaPluginLanguageLevel")
 
