@@ -470,7 +470,8 @@ internal fun createCompositionCoroutineScope(
  */
 @Composable
 inline fun rememberCoroutineScope(
-    getContext: @DisallowComposableCalls () -> CoroutineContext = { EmptyCoroutineContext }
+    crossinline getContext: @DisallowComposableCalls () -> CoroutineContext =
+        { EmptyCoroutineContext }
 ): CoroutineScope {
     val composer = currentComposer
     val wrapper = remember {
