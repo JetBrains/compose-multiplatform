@@ -5,6 +5,8 @@
 
 package org.jetbrains.compose.web.css
 
+import org.jetbrains.compose.web.ExperimentalComposeWebApi
+
 data class Transition(
 	var property: String? = null,
 	var duration: CSSSizeValue<out CSSUnitTime>? = null,
@@ -75,6 +77,7 @@ data class Transitions(
 	fun ease(ease: AnimationTimingFunction) = timingFunction(ease)
 }
 
+@ExperimentalComposeWebApi
 inline fun StyleScope.transitions(transitions: Transitions.() -> Unit) {
 	val transitionsValue = Transitions().apply(transitions)
 	property("transition", transitionsValue.toString())
