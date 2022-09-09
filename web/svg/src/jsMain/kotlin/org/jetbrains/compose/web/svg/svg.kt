@@ -227,6 +227,7 @@ fun ElementScope<SVGElement>.Rect(
     width: Number,
     height: Number,
     rx: Number,
+    ry: Number = rx,
     transform: String,
     attrs: AttrBuilderContext<SVGRectElement>? = null,
     content: ContentBuilder<SVGRectElement>? = null
@@ -237,6 +238,7 @@ fun ElementScope<SVGElement>.Rect(
             width(width)
             height(height)
             rx(rx)
+            ry(ry)
             transform(transform)
             attrs?.invoke(this)
         },
@@ -493,7 +495,7 @@ fun ElementScope<SVGElement>.Polygon(
     TagElement(
         elementBuilder = Polygon,
         applyAttrs = {
-            points(points.toList().chunked(2).joinToString(" ") { it.joinToString(",") })
+            points(points)
             attrs?.invoke(this)
         },
         content = content
@@ -510,7 +512,7 @@ fun ElementScope<SVGElement>.Polyline(
     TagElement(
         elementBuilder = Polyline,
         applyAttrs = {
-            points(points.toList().chunked(2).joinToString(" ") { it.joinToString(",") })
+            points(points)
             attrs?.invoke(this)
         },
         content = content

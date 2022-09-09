@@ -61,6 +61,10 @@ fun AttrsScope<SVGElement>.points(points: String) {
     attr("points", points)
 }
 
+fun AttrsScope<SVGElement>.points(vararg points: Number) {
+    attr("points", points.toList().chunked(2).joinToString(" ") { it.joinToString(",") })
+}
+
 fun AttrsScope<SVGElement>.cx(cx: Number) {
     attr("cx", cx.toString())
 }
@@ -75,6 +79,10 @@ fun AttrsScope<SVGElement>.r(r: Number) {
 
 fun AttrsScope<SVGElement>.rx(rx: Number) {
     attr("rx", rx.toString())
+}
+
+fun AttrsScope<SVGElement>.ry(ry: Number) {
+    attr("ry", ry.toString())
 }
 
 fun AttrsScope<SVGElement>.x(x: Number) {
