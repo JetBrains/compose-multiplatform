@@ -1,5 +1,0 @@
-// Baseline format: 1.0
-RemovedClass: androidx.compose.foundation.lazy.LazyListScrollingKt:
-    Removed class androidx.compose.foundation.lazy.LazyListScrollingKt
-RemovedClass: androidx.compose.foundation.lazy.grid.LazyGridScrollingKt:
-    Removed class androidx.compose.foundation.lazy.grid.LazyGridScrollingKt
