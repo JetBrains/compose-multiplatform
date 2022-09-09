@@ -251,6 +251,7 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
         view = null
         testCase = null
         simulationState = SimulationState.Initialized
+        recomposer.close()
     }
 
     override fun capturePreviewPictureToActivity() {
