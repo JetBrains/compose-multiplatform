@@ -495,7 +495,7 @@ fun ElementScope<SVGElement>.Polygon(
     TagElement(
         elementBuilder = Polygon,
         applyAttrs = {
-            points(points)
+            points(points = points)
             attrs?.invoke(this)
         },
         content = content
@@ -512,7 +512,7 @@ fun ElementScope<SVGElement>.Polyline(
     TagElement(
         elementBuilder = Polyline,
         applyAttrs = {
-            points(points)
+            points(points = points)
             attrs?.invoke(this)
         },
         content = content
