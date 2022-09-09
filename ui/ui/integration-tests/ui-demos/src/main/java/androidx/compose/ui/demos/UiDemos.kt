@@ -76,6 +76,7 @@ import androidx.compose.ui.demos.viewinterop.ComposeViewComposeNestedInterop
 import androidx.compose.ui.demos.viewinterop.EditTextInteropDemo
 import androidx.compose.ui.demos.viewinterop.FocusTransferDemo
 import androidx.compose.ui.demos.viewinterop.NestedScrollInteropComposeParentWithAndroidChild
+import androidx.compose.ui.demos.viewinterop.ResizeComposeViewDemo
 import androidx.compose.ui.demos.viewinterop.ViewComposeViewNestedScrollInteropDemo
 import androidx.compose.ui.demos.viewinterop.ViewInteropDemo
 import androidx.compose.ui.samples.NestedScrollConnectionSample
@@ -210,7 +211,8 @@ private val ViewInteropDemos = DemoCategory(
         ComplexTouchInterop,
         ComposableDemo("TextField Interop") { EditTextInteropDemo() },
         ComposableDemo("Focus Transfer") { FocusTransferDemo() },
-        NestedScrollInteropDemos
+        NestedScrollInteropDemos,
+        ComposableDemo("Resize ComposeView") { ResizeComposeViewDemo() },
     )
 )
 
