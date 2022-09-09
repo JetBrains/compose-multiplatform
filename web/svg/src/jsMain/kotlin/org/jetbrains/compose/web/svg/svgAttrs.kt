@@ -109,10 +109,6 @@ fun AttrsScope<SVGElement>.y2(y2: Number) {
     attr("y2", y2.toString())
 }
 
-fun AttrsScope<SVGElement>.ry(ry: Number) {
-    attr("ry", ry.toString())
-}
-
 fun AttrsScope<SVGElement>.cx(cx: CSSLengthOrPercentageValue) {
     attr("cx", cx.toString())
 }
