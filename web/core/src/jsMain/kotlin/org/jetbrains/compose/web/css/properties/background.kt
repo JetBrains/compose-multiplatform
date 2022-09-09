@@ -48,3 +48,8 @@ fun StyleScope.background(value: String) {
     property("background", value)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/background-blend-mode
+fun StyleScope.backgroundBlendMode(value: String) {
+    property("background-blend-mode", value)
+}
+
