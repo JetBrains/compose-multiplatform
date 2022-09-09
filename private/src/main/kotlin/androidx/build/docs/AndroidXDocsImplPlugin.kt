@@ -45,8 +45,6 @@ import org.gradle.api.Task
 import org.gradle.api.artifacts.ComponentMetadataContext
 import org.gradle.api.artifacts.ComponentMetadataRule
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.component.ComponentArtifactIdentifier
-import org.gradle.api.artifacts.result.ResolvedArtifactResult
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.DocsType
@@ -368,18 +366,12 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             @Suppress("UnstableApiUsage") // getResolvedArtifacts() is marked @Incubating
             val artifacts = docsConfiguration.incoming.artifacts.resolvedArtifacts
             task.getArtifactIds().set(
-
-                /**
-                 * Transforms the Set of [ResolvedArtifactResult] objects to a List of
-                 * [ComponentArtifactIdentifier] objects.
-                 *
-                 * This follows the guidance from
-                 * https://docs.gradle.org/7.5/userguide/more_about_tasks.html.
-                 */
                 artifacts.map { result -> result.map { it.id } }
             )
+            task.getArtifactFiles().set(
+                artifacts.map { result -> result.map { it.file } }
+            )
             task.destinationFile.set(getMetadataRegularFile(project))
-            task.prebuiltsRoot.set(File(project.getCheckoutRoot(), "prebuilts").absolutePath)
         }
 
         val dackkaTask = project.tasks.register("dackkaDocs", DackkaTask::class.java) { task ->
