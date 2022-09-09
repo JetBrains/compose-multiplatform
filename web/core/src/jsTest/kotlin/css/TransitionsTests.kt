@@ -7,7 +7,10 @@ package org.jetbrains.compose.web.core.tests.css
 
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.css.AnimationTimingFunction
+import org.jetbrains.compose.web.css.delay
+import org.jetbrains.compose.web.css.duration
 import org.jetbrains.compose.web.css.s
+import org.jetbrains.compose.web.css.timingFunction
 import org.jetbrains.compose.web.css.transitions
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.testutils.runTest
@@ -22,7 +25,7 @@ class TransitionsTests {
 			Div({ style { transitions { "width" { duration(1.s) } }}})
 		}
 		
-		assertEquals("width 1s", nextChild().style.transition)
+		assertEquals("width 1s ease 0s", nextChild().style.transition)
 	}
 	
 	@Test
@@ -31,7 +34,7 @@ class TransitionsTests {
 			Div({ style { transitions { "width" { duration(1.s) }; "height" { duration(2.s) } }}})
 		}
 		
-		assertEquals("width 1s, height 2s", nextChild().style.transition)
+		assertEquals("width 1s ease 0s, height 2s ease 0s", nextChild().style.transition)
 	}
 	
 	@Test
@@ -40,16 +43,16 @@ class TransitionsTests {
 			Div({ style { transitions { all { duration(1.s) } }}})
 		}
 		
-		assertEquals("all 1s", nextChild().style.transition)
+		assertEquals("all 1s ease 0s", nextChild().style.transition)
 	}
 	
 	@Test
-	fun ease() = runTest {
+	fun timingFunction() = runTest {
 		composition {
-			Div({ style { transitions { "width" { duration(1.s); ease(AnimationTimingFunction.EaseInOut) }}}})
+			Div({ style { transitions { "width" { duration(1.s); timingFunction(AnimationTimingFunction.EaseInOut) }}}})
 		}
 		
-		assertEquals("width 1s ease-in-out", nextChild().style.transition)
+		assertEquals("width 1s ease-in-out 0s", nextChild().style.transition)
 	}
 	
 	@Test
@@ -58,17 +61,20 @@ class TransitionsTests {
 			Div({ style { transitions { "width" { duration(1.s); delay(2.s) }}}})
 		}
 		
-		assertEquals("width 1s 2s", nextChild().style.transition)
+		assertEquals("width 1s ease 2s", nextChild().style.transition)
 	}
 	
 	@Test
 	fun properties() = runTest {
 		composition {
-			Div({ style { transitions { duration(1.s); properties("width", "height") }}})
-			Div({ style { transitions { duration(1.s); properties("width, height"); "width" { duration(2.s) }}}})
+			Div({ style { transitions { defaultDuration(1.s); properties("width", "height") }}})
+			Div({ style { transitions { defaultDuration(1.s); properties("width, height"); "width" { duration(2.s) }}}})
+			val myList = listOf("width", "height")
+			Div({ style { transitions { defaultDuration(1.s); myList { duration(2.s) }}}})
 		}
 		
-		assertEquals("width 1s, height 1s", nextChild().style.transition)
-		assertEquals("width 2s, height 1s", nextChild().style.transition)
+		assertEquals("width 1s ease 0s, height 1s ease 0s", nextChild().style.transition)
+		assertEquals("width 0s ease 0s, height 1s ease 0s, width 2s ease 0s", nextChild().style.transition)
+		assertEquals("width 2s ease 0s, height 2s ease 0s", nextChild().style.transition)
 	}
 }
