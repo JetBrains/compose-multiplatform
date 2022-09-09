@@ -368,6 +368,7 @@ package androidx.compose.runtime {
   }
 
   public final class RecomposeScopeImplKt {
+    method @kotlin.PublishedApi internal static int updateChangedFlags(int flags);
   }
 
   public final class Recomposer extends androidx.compose.runtime.CompositionContext {
