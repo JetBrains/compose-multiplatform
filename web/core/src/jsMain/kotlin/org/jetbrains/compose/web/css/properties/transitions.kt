@@ -78,6 +78,22 @@ data class Transitions(
 }
 
 @ExperimentalComposeWebApi
+/**
+ * Examples:
+ * ```
+ *  transitions {
+ *    "width" { duration(1.s) }
+ *  }
+ *
+ *  transitions {
+ *    duration(.5.s)
+ *    ease(AnimationTimingFunction.EaseInOut)
+ *    properties("width", "height")
+ *  }
+ * ```
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/transition
+ */
 inline fun StyleScope.transitions(transitions: Transitions.() -> Unit) {
 	val transitionsValue = Transitions().apply(transitions)
 	property("transition", transitionsValue.toString())
