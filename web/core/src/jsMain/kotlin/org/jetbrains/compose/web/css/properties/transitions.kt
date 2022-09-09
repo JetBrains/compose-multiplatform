@@ -7,6 +7,7 @@ package org.jetbrains.compose.web.css
 
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
 
+@ExperimentalComposeWebApi
 data class Transition(
 	var property: String? = null,
 	var duration: CSSSizeValue<out CSSUnitTime>? = null,
@@ -25,11 +26,16 @@ data class Transition(
 	}
 }
 
-fun Transition.duration(value: CSSSizeValue<out CSSUnitTime>) = apply { duration = value }
-fun Transition.timingFunction(value: AnimationTimingFunction) = apply { timingFunction = value }
-fun Transition.delay(value: CSSSizeValue<out CSSUnitTime>) = apply { delay = value }
-fun Transition.ease(ease: AnimationTimingFunction) = timingFunction(ease)
+@ExperimentalComposeWebApi
+fun Transition.duration(value: CSSSizeValue<out CSSUnitTime>): Unit = run { duration = value }
 
+@ExperimentalComposeWebApi
+fun Transition.timingFunction(value: AnimationTimingFunction): Unit = run { timingFunction = value }
+
+@ExperimentalComposeWebApi
+fun Transition.delay(value: CSSSizeValue<out CSSUnitTime>): Unit = run { delay = value }
+
+@ExperimentalComposeWebApi
 data class Transitions(
 	var transitions: List<Transition> = emptyList(),
 	private var defaultDuration: CSSSizeValue<out CSSUnitTime>? = null,
@@ -47,34 +53,33 @@ data class Transitions(
 			}.toString()
 		}
 	
-	inline operator fun String.invoke(block: Transition.() -> Unit) = Transition().apply(block).also {
+	inline operator fun String.invoke(block: Transition.() -> Unit): Unit = Transition().apply(block).let {
 		it.property = this
 		transitions += it
 	}
 	
-	inline operator fun Iterable<String>.invoke(block: Transition.() -> Unit) = Transition().apply(block).also { transition ->
+	inline operator fun Iterable<String>.invoke(block: Transition.() -> Unit): Unit = Transition().apply(block).let { transition ->
 		forEach {
 			transitions += transition.copy(property = it)
 		}
 	}
 	
-	inline operator fun Array<out String>.invoke(block: Transition.() -> Unit) = Transition().apply(block).also { transition ->
+	inline operator fun Array<out String>.invoke(block: Transition.() -> Unit): Unit = Transition().apply(block).let { transition ->
 		forEach {
 			transitions += transition.copy(property = it)
 		}
 	}
 	
-	inline fun properties(vararg properties: String, block: Transition.() -> Unit = {}) = properties.invoke(block)
+	inline fun properties(vararg properties: String, block: Transition.() -> Unit = {}): Unit = properties.invoke(block)
 	
-	inline fun all(block: Transition.() -> Unit) = Transition().apply(block).also { transition ->
+	inline fun all(block: Transition.() -> Unit): Unit = Transition().apply(block).let { transition ->
 		transition.property = "all"
 		transitions += transition
 	}
 	
-	fun duration(value: CSSSizeValue<out CSSUnitTime>) = apply { defaultDuration = value }
-	fun timingFunction(value: AnimationTimingFunction) = apply { defaultTimingFunction = value }
-	fun delay(value: CSSSizeValue<out CSSUnitTime>) = apply { defaultDelay = value }
-	fun ease(ease: AnimationTimingFunction) = timingFunction(ease)
+	fun defaultDuration(value: CSSSizeValue<out CSSUnitTime>): Unit = run { defaultDuration = value }
+	fun defaultTimingFunction(value: AnimationTimingFunction): Unit = run { defaultTimingFunction = value }
+	fun defaultDelay(value: CSSSizeValue<out CSSUnitTime>): Unit = run { defaultDelay = value }
 }
 
 @ExperimentalComposeWebApi
@@ -87,7 +92,7 @@ data class Transitions(
  *
  *  transitions {
  *    duration(.5.s)
- *    ease(AnimationTimingFunction.EaseInOut)
+ *    timingFunction(AnimationTimingFunction.EaseInOut)
  *    properties("width", "height")
  *  }
  * ```
