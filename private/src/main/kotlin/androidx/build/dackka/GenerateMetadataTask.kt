@@ -18,6 +18,7 @@ package androidx.build.dackka
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import java.io.File
 import java.io.FileWriter
 import java.util.zip.ZipFile
 import org.gradle.api.DefaultTask
@@ -25,13 +26,14 @@ import org.gradle.api.artifacts.component.ComponentArtifactIdentifier
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.component.external.model.DefaultModuleComponentIdentifier
-import org.gradle.internal.component.local.model.ComponentFileArtifactIdentifier
 
 @CacheableTask
 abstract class GenerateMetadataTask : DefaultTask() {
@@ -43,41 +45,40 @@ abstract class GenerateMetadataTask : DefaultTask() {
     abstract fun getArtifactIds(): ListProperty<ComponentArtifactIdentifier>
 
     /**
+     * List of files corresponding to artifacts in [getArtifactIds]
+     */
+    @InputFiles
+    @PathSensitive(PathSensitivity.NONE)
+    abstract fun getArtifactFiles(): ListProperty<File>
+
+    /**
      * Location of the generated JSON file
      */
     @get:OutputFile
     abstract val destinationFile: RegularFileProperty
 
-    /**
-     * Location of the prebuilts root directory
-     */
-    @get:Input
-    abstract val prebuiltsRoot: Property<String>
-
     @TaskAction
     fun generate() {
         val entries = arrayListOf<MetadataEntry>()
-        val androidXBasePath = "${prebuiltsRoot.get()}/androidx/internal"
 
-        getArtifactIds().get().forEach { id ->
+        val artifactIds = getArtifactIds().get()
+        val artifactFiles = getArtifactFiles().get()
+        for (i in 0 until artifactIds.size) {
+            val id = artifactIds[i]
+            val file = artifactFiles[i]
 
             // Only process artifact if it can be cast to ModuleComponentIdentifier.
             //
             // In practice, metadata is generated only for docs-public and not docs-tip-of-tree
             // (where id.componentIdentifier is DefaultProjectComponentIdentifier).
-            if (id.componentIdentifier !is DefaultModuleComponentIdentifier) return@forEach
+            if (id.componentIdentifier !is DefaultModuleComponentIdentifier) continue
 
             // Created https://github.com/gradle/gradle/issues/21415 to track surfacing
             // group / module / version in ComponentIdentifier
             val componentId = (id.componentIdentifier as ModuleComponentIdentifier)
 
-            // Locate the .jar file associated with this artifact and fetch the list of files
-            // contained in the .jar file
-            val jarFilename = (id as ComponentFileArtifactIdentifier).fileName
-            val componentIdPath = componentId.group.replace(".", "/")
-            val jarLocation = "$androidXBasePath/$componentIdPath/${componentId.module}/" +
-                "${componentId.version}/$jarFilename"
-            val fileList = ZipFile(jarLocation).entries().toList().map { it.name }
+            // Fetch the list of files contained in the .jar file
+            val fileList = ZipFile(file).entries().toList().map { it.name }
 
             val entry = MetadataEntry(
                 groupId = componentId.group,
