@@ -25,18 +25,13 @@ import androidx.compose.ui.text.input.TextFieldValue
 import org.jetbrains.skiko.SkikoInput
 import org.jetbrains.skiko.SkikoInputEvent
 
-internal class JSTextInputService(
-    showSoftwareKeyboard: () -> Unit,
-    hideSoftwareKeyboard: () -> Unit,
-) : PlatformTextInputService {
+internal class JSTextInputService : PlatformTextInputService {
 
     data class CurrentInput(
         var value: TextFieldValue,
         val onEditCommand: ((List<EditCommand>) -> Unit),
     )
 
-    private val _showSoftwareKeyboard: () -> Unit = showSoftwareKeyboard
-    private val _hideSoftwareKeyboard: () -> Unit = hideSoftwareKeyboard
     private var currentInput: CurrentInput? = null
 
     override fun startInput(
@@ -57,11 +52,11 @@ internal class JSTextInputService(
     }
 
     override fun showSoftwareKeyboard() {
-        _showSoftwareKeyboard()
+        println("TODO showSoftwareKeyboard in JS")
     }
 
     override fun hideSoftwareKeyboard() {
-        _hideSoftwareKeyboard()
+        println("TODO showSoftwareKeyboard in JS")
     }
 
     override fun updateState(oldValue: TextFieldValue?, newValue: TextFieldValue) {

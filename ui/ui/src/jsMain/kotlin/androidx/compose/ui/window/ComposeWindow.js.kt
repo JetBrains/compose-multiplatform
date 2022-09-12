@@ -26,14 +26,7 @@ import org.w3c.dom.HTMLCanvasElement
 
 internal actual class ComposeWindow actual constructor(){
 
-    private val textInputService = JSTextInputService(
-        showSoftwareKeyboard = {
-            println("TODO showSoftwareKeyboard in JS")
-        },
-        hideSoftwareKeyboard = {
-            println("TODO hideSoftwareKeyboard in JS")
-        },
-    )
+    private val textInputService = JSTextInputService()
 
     private val layer = ComposeLayer(
         layer = createSkiaLayer(),
