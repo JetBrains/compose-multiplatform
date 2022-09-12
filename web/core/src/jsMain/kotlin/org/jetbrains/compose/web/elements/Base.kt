@@ -106,7 +106,7 @@ private class DomElementWrapper(override val node: Element): DomNodeWrapper(node
 @Composable
 fun <TElement : Element> TagElement(
     elementBuilder: ElementBuilder<TElement>,
-    applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+    applyAttrs: (@Composable AttrsScope<TElement>.() -> Unit)?,
     content: (@Composable ElementScope<TElement>.() -> Unit)?
 ) {
     val scope = remember {  ElementScopeImpl<TElement>() }
@@ -160,7 +160,7 @@ fun <TElement : Element> TagElement(
 @Composable
 fun <TElement : Element> TagElement(
     tagName: String,
-    applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+    applyAttrs: (@Composable AttrsScope<TElement>.() -> Unit)?,
     content: (@Composable ElementScope<TElement>.() -> Unit)?
 ) {
     key(tagName) {

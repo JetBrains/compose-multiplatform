@@ -35,4 +35,31 @@ class StyleTest {
         waitForRecompositionComplete()
         assertEquals("""body { background-color: red; }""", sheet.cssRules.asList().single().cssText)
     }
+    
+    @Test
+    fun testingComposableStyleInAttrs() = runTest {
+        var colorFlip by mutableStateOf(true)
+        composition {
+            Div({
+                val color by remember {
+                    derivedStateOf {
+                        if (colorFlip) {
+                            Color.green
+                        } else Color.red
+                    }
+                }
+                style {
+                    backgroundColor(color)
+                }
+            })
+        }
+        val element = root.firstChild
+        assertTrue(element is HTMLDivElement)
+        val style = element.style
+        assertEquals("green", style.backgroundColor)
+
+        colorFlip = true
+        waitForRecompositionComplete()
+        assertEquals("red", style.backgroundColor)
+    }
 }

@@ -62,7 +62,7 @@ import org.w3c.dom.HTMLVideoElement
 import org.w3c.dom.Text
 import org.w3c.dom.css.CSSStyleSheet
 
-typealias AttrBuilderContext<T> = AttrsScope<T>.() -> Unit
+typealias AttrBuilderContext<T> = @Composable AttrsScope<T>.() -> Unit
 typealias ContentBuilder<T> = @Composable ElementScope<T>.() -> Unit
 
 private open class ElementBuilderImplementation<TElement : Element>(private val tagName: String) : ElementBuilder<TElement> {
@@ -977,7 +977,7 @@ fun Tfoot(
  */
 @Composable
 fun Style(
-    applyAttrs: (AttrsScope<HTMLStyleElement>.() -> Unit)? = null,
+    applyAttrs: AttrBuilderContext<HTMLStyleElement>? = null,
     cssRules: CSSRuleDeclarationList
 ) {
     TagElement(
@@ -1004,9 +1004,9 @@ fun Style(
  * @param rulesBuild allows to define the style rules using [StyleSheetBuilder]
  */
 @Composable
-inline fun Style(
-    noinline applyAttrs: (AttrsScope<HTMLStyleElement>.() -> Unit)? = null,
-    rulesBuild: StyleSheetBuilder.() -> Unit
+fun Style(
+    applyAttrs: AttrBuilderContext<HTMLStyleElement>? = null,
+    rulesBuild: @Composable StyleSheetBuilder.() -> Unit
 ) {
     val builder = StyleSheetBuilderImpl()
     builder.rulesBuild()
