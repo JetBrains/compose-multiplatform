@@ -15,7 +15,18 @@ enum class ComposePlatforms(vararg val alternativeNames: String) {
     MacosArm64("Macos"),
     UikitX64("UiKit"),
     UikitArm64("UiKit"),
-    UikitSimArm64("UiKit");
+    UikitSimArm64("UiKit"),
+    TvosArm64("TvOs"),
+    TvosX64("TvOs"),
+    TvosSimulatorArm64("TvOs"),
+    WatchosArm64("WatchOs"),
+    WatchosArm32("WatchOs"),
+    WatchosX86("WatchOs"),
+    WatchosX64("WatchOs"),
+    WatchosSimulatorArm64("WatchOs"),
+    LinuxX64("Linux"),
+    MingwX64("Mingw"),
+    ;
 
     fun matches(nameCandidate: String): Boolean =
         listOf(name, *alternativeNames).any { it.equals(nameCandidate, ignoreCase = true) }
@@ -32,6 +43,20 @@ enum class ComposePlatforms(vararg val alternativeNames: String) {
         val ANDROID = EnumSet.of(
             ComposePlatforms.AndroidDebug,
             ComposePlatforms.AndroidRelease
+        )
+
+        // These platforms are not supported by skiko yet
+        val NO_SKIKO = EnumSet.of(
+            ComposePlatforms.TvosArm64,
+            ComposePlatforms.TvosX64,
+            ComposePlatforms.TvosSimulatorArm64,
+            ComposePlatforms.WatchosArm64,
+            ComposePlatforms.WatchosArm32,
+            ComposePlatforms.WatchosX86,
+            ComposePlatforms.WatchosX64,
+            ComposePlatforms.WatchosSimulatorArm64,
+            ComposePlatforms.LinuxX64,
+            ComposePlatforms.MingwX64,
         )
 
         /**
