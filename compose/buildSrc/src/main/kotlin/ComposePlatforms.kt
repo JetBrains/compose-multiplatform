@@ -45,7 +45,7 @@ enum class ComposePlatforms(vararg val alternativeNames: String) {
             ComposePlatforms.AndroidRelease
         )
 
-        // Thses platforms are not supported by skiko yet
+        // These platforms are not supported by skiko yet
         val NO_SKIKO = EnumSet.of(
             ComposePlatforms.TvosArm64,
             ComposePlatforms.TvosX64,
