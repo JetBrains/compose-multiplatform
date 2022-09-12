@@ -23,6 +23,7 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
@@ -62,6 +63,7 @@ import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAll
 import kotlin.math.max
 import kotlinx.coroutines.coroutineScope
@@ -505,6 +507,15 @@ object ExposedDropdownMenuDefaults {
             placeholderColor = placeholderColor,
             disabledPlaceholderColor = disabledPlaceholderColor
         )
+
+    /**
+     * Padding for [DropdownMenuItem]s within [ExposedDropdownMenuBoxScope.ExposedDropdownMenu] to
+     * align them properly with [TextField] components.
+     */
+    val ItemContentPadding: PaddingValues = PaddingValues(
+        horizontal = ExposedDropdownMenuItemHorizontalPadding,
+        vertical = 0.dp
+    )
 }
 
 @Suppress("ComposableModifierFactory")
@@ -554,3 +565,5 @@ private fun updateHeight(
         visibleWindowBounds.bottom - visibleWindowBounds.top - coordinates.boundsInWindow().bottom
     onHeightUpdate(max(heightAbove, heightBelow).toInt() - verticalMarginInPx)
 }
+
+private val ExposedDropdownMenuItemHorizontalPadding = 16.dp

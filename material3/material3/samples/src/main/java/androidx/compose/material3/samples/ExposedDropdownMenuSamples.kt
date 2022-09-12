@@ -62,7 +62,8 @@ fun ExposedDropdownMenuSample() {
                     onClick = {
                         selectedOptionText = selectionOption
                         expanded = false
-                    }
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                 )
             }
         }
@@ -102,7 +103,8 @@ fun EditableExposedDropdownMenuSample() {
                         onClick = {
                             selectedOptionText = selectionOption
                             expanded = false
-                        }
+                        },
+                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                     )
                 }
             }
