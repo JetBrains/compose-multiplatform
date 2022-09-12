@@ -5,5 +5,5 @@
 
 data class ComposeComponent(
     val path: String,
-    val supportedPlatforms: Set<ComposePlatforms> = ComposePlatforms.ALL
+    val supportedPlatforms: Set<ComposePlatforms> = ComposePlatforms.ALL - ComposePlatforms.NO_SKIKO
 )

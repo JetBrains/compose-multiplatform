@@ -28,7 +28,7 @@ val mainComponents =
         ComposeComponent(":compose:material3:material3"),
         ComposeComponent(":compose:material:material-icons-core"),
         ComposeComponent(":compose:material:material-ripple"),
-        ComposeComponent(":compose:runtime:runtime"),
+        ComposeComponent(":compose:runtime:runtime", supportedPlatforms = ComposePlatforms.ALL),
         ComposeComponent(":compose:runtime:runtime-saveable"),
         ComposeComponent(":compose:ui:ui"),
         ComposeComponent(":compose:ui:ui-geometry"),
