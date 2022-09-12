@@ -902,6 +902,7 @@ package androidx.compose.runtime.snapshots {
 
   public final class SnapshotKt {
     method @kotlin.PublishedApi internal static <T extends androidx.compose.runtime.snapshots.StateRecord> T current(T r, androidx.compose.runtime.snapshots.Snapshot snapshot);
+    method @kotlin.PublishedApi internal static <T extends androidx.compose.runtime.snapshots.StateRecord> T current(T r);
     method @kotlin.PublishedApi internal static void notifyWrite(androidx.compose.runtime.snapshots.Snapshot snapshot, androidx.compose.runtime.snapshots.StateObject state);
     method public static <T extends androidx.compose.runtime.snapshots.StateRecord> T readable(T, androidx.compose.runtime.snapshots.StateObject state);
     method public static <T extends androidx.compose.runtime.snapshots.StateRecord> T readable(T, androidx.compose.runtime.snapshots.StateObject state, androidx.compose.runtime.snapshots.Snapshot snapshot);
