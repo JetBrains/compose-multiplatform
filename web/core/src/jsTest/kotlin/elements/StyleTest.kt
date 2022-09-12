@@ -58,7 +58,7 @@ class StyleTest {
         val style = element.style
         assertEquals("green", style.backgroundColor)
 
-        colorFlip = true
+        colorFlip = false
         waitForRecompositionComplete()
         assertEquals("red", style.backgroundColor)
     }
