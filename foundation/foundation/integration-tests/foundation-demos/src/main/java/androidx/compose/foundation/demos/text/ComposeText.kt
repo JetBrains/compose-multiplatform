@@ -21,24 +21,30 @@ import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
+import androidx.compose.material.RadioButton
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -55,17 +61,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.LocaleList
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.samples.BaselineShiftSample
 import androidx.compose.ui.text.samples.FontFamilyCursiveSample
 import androidx.compose.ui.text.samples.FontFamilyMonospaceSample
@@ -89,7 +101,11 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 
+private const val longText = "This is a very-very long string that wraps into a few lines " +
+    "given the width restrictions."
 const val displayText = "Text Demo"
 const val displayTextChinese = "文本演示"
 const val displayTextArabic = "\u0639\u0631\u0636\u0020\u0627\u0644\u0646\u0635"
@@ -100,6 +116,9 @@ val fontSize4 = 16.sp
 val fontSize6 = 20.sp
 val fontSize8 = 25.sp
 val fontSize10 = 30.sp
+
+private val overflowOptions = listOf(TextOverflow.Visible, TextOverflow.Ellipsis, TextOverflow.Clip)
+private val paragraphOptions = listOf(true, false)
 
 @Preview
 @Composable
@@ -580,8 +599,120 @@ fun TextDemoTextOverflow() {
     TextOverflowEllipsisSample()
     SecondTagLine(tag = "overflow = TextOverflow.Visible with fixed size")
     TextOverflowVisibleFixedSizeSample()
+    Spacer(modifier = Modifier.size(30.dp))
     SecondTagLine(tag = "overflow = TextOverflow.Visible with fixed width and min height")
     TextOverflowVisibleMinHeightSample()
+}
+
+@Composable
+fun TextOverflowVisibleInPopupDemo() {
+    Popup(
+        alignment = Alignment.Center,
+        properties = PopupProperties(clippingEnabled = false)
+    ) {
+        val text = "Line\n".repeat(10)
+        Box(Modifier.background(Color.Magenta).size(100.dp)) {
+            Text(text, fontSize = fontSize6, overflow = TextOverflow.Visible)
+        }
+    }
+}
+
+@OptIn(ExperimentalTextApi::class)
+@Composable
+fun TextOverflowVisibleInDrawText() {
+    val textMeasurer = rememberTextMeasurer()
+    val text = "Line\n".repeat(10)
+    Box(Modifier.fillMaxSize()) {
+        Canvas(Modifier
+            .graphicsLayer()
+            .align(Alignment.Center)
+            .background(Color.Green)
+            .size(100.dp)
+        ) {
+            drawText(
+                textMeasurer = textMeasurer,
+                text = text,
+                style = TextStyle(fontSize = fontSize6),
+                overflow = TextOverflow.Visible
+            )
+        }
+    }
+}
+
+@Composable
+fun TextOverflowDemo() {
+    Column {
+        var singleParagraph by remember { mutableStateOf(paragraphOptions[0]) }
+        var selectedOverflow by remember { mutableStateOf(overflowOptions[0]) }
+        Row(Modifier.fillMaxWidth()) {
+            Column(Modifier.selectableGroup().weight(1f)) {
+                Text("TextOverflow", fontWeight = FontWeight.Bold)
+                overflowOptions.forEach {
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = (it == selectedOverflow),
+                                onClick = { selectedOverflow = it },
+                                role = Role.RadioButton
+                            ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = (it == selectedOverflow),
+                            onClick = null // null recommended for accessibility with screenreaders
+                        )
+                        Text(text = it.toString())
+                    }
+                }
+            }
+            Column(Modifier.selectableGroup().weight(1f)) {
+                Text("Paragraph", fontWeight = FontWeight.Bold)
+                paragraphOptions.forEach {
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = (it == singleParagraph),
+                                onClick = { singleParagraph = it },
+                                role = Role.RadioButton
+                            ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = (it == singleParagraph),
+                            onClick = null // null recommended for accessibility with screenreaders
+                        )
+                        Text(text = if (it) "Single" else "Multi")
+                    }
+                }
+            }
+        }
+
+        TextOverflowDemo(singleParagraph, selectedOverflow)
+    }
+}
+
+@Composable
+private fun ColumnScope.TextOverflowDemo(singleParagraph: Boolean, textOverflow: TextOverflow) {
+    Box(Modifier.weight(1f).fillMaxWidth()) {
+        val text = if (singleParagraph) {
+            AnnotatedString(longText)
+        } else {
+            buildAnnotatedString {
+                append(longText)
+                withStyle(ParagraphStyle(textAlign = TextAlign.End)) {
+                    append("This is a second paragraph.")
+                }
+            }
+        }
+        Text(
+            text = text,
+            modifier = Modifier.align(Alignment.Center).background(Color.Magenta).size(100.dp),
+            fontSize = fontSize6,
+            overflow = textOverflow
+        )
+    }
 }
 
 @Composable
@@ -600,7 +731,9 @@ fun TextDemoInlineContent() {
             targetValue = Color.Blue,
             animationSpec = infiniteRepeatable(tween(1000), RepeatMode.Reverse)
         )
-        Box(modifier = Modifier.fillMaxSize().background(color))
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .background(color))
     }
 
     Text(

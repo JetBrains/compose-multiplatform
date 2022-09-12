@@ -338,6 +338,34 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
         return rootNodeResized
     }
 
+    /**
+     * Only does measurement from the root without doing any placement. This is intended
+     * to be called to determine only how large the root is with minimal effort.
+     */
+    fun measureOnly() {
+        performMeasureAndLayout {
+            recurseRemeasure(root)
+        }
+    }
+
+    /**
+     * Walks the hierarchy from [layoutNode] and remeasures [layoutNode] and any
+     * descendants that affect its size.
+     */
+    private fun recurseRemeasure(layoutNode: LayoutNode) {
+        remeasureOnly(layoutNode)
+
+        layoutNode._children.forEach { child ->
+            if (child.canAffectParent) {
+                if (relayoutNodes.contains(child)) {
+                    recurseRemeasure(child)
+                }
+            }
+        }
+        // The child measurement may have invalidated layoutNode's measurement
+        remeasureOnly(layoutNode)
+    }
+
     fun measureAndLayout(layoutNode: LayoutNode, constraints: Constraints) {
         require(layoutNode != root)
         performMeasureAndLayout {
@@ -439,6 +467,21 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
             }
         }
         return sizeChanged
+    }
+
+    /**
+     * Remeasures [layoutNode] if it has [LayoutNode.measurePending] or
+     * [LayoutNode.lookaheadMeasurePending].
+     */
+    private fun remeasureOnly(layoutNode: LayoutNode) {
+        if (!layoutNode.measurePending && !layoutNode.lookaheadMeasurePending) {
+            return // nothing needs to be remeasured
+        }
+        val constraints = if (layoutNode === root) rootConstraints!! else null
+        if (layoutNode.lookaheadMeasurePending) {
+            doLookaheadRemeasure(layoutNode, constraints)
+        }
+        doRemeasure(layoutNode, constraints)
     }
 
     /**

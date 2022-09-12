@@ -415,6 +415,42 @@ class WindowInsetsPaddingTest {
         }
     }
 
+    @OptIn(ExperimentalLayoutApi::class)
+    @Test
+    fun withConsumedWindowInsets() {
+        var top = 0
+        var consumingModifier: Modifier by mutableStateOf(Modifier)
+        setContent {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                Box(consumingModifier) {
+                    val density = LocalDensity.current
+                    Box(Modifier.fillMaxSize().withConsumedWindowInsets {
+                        top = it.getTop(density)
+                    })
+                }
+            }
+        }
+
+        // wait for layout
+        rule.waitForIdle()
+
+        assertThat(top).isEqualTo(0)
+
+        val insets = WindowInsetsCompat.Builder()
+            .setInsets(WindowInsetsCompat.Type.statusBars(), AndroidXInsets.of(0, 5, 0, 0))
+            .build()
+
+        dispatchApplyWindowInsets(insets)
+
+        assertThat(top).isEqualTo(0)
+
+        consumingModifier = Modifier.consumedWindowInsets(WindowInsets(0, 5, 0, 0))
+
+        rule.waitForIdle()
+
+        assertThat(top).isEqualTo(5)
+    }
+
     private fun testInsetsPadding(
         type: Int,
         modifier: Modifier,

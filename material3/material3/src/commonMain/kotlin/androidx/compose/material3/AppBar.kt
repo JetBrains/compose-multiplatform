@@ -1045,14 +1045,13 @@ private fun SingleRowTopAppBar(
     // The surface's background color is animated as specified above.
     // The height of the app bar is determined by subtracting the bar's height offset from the
     // app bar's defined constant height value (i.e. the ContainerHeight token).
-    Surface(modifier = modifier.then(appBarDragModifier)) {
+    Surface(modifier = modifier.then(appBarDragModifier), color = appBarContainerColor) {
         val height = LocalDensity.current.run {
             TopAppBarSmallTokens.ContainerHeight.toPx() + (scrollBehavior?.state?.heightOffset
                 ?: 0f)
         }
         TopAppBarLayout(
             modifier = Modifier
-                .background(color = appBarContainerColor)
                 .windowInsetsPadding(windowInsets)
                 // clip after padding so we don't show the title over the inset area
                 .clipToBounds(),

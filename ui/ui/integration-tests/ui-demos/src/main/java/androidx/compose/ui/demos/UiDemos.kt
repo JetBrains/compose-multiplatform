@@ -28,6 +28,7 @@ import androidx.compose.ui.demos.focus.CaptureFocusDemo
 import androidx.compose.ui.demos.focus.ClickableInLazyColumnDemo
 import androidx.compose.ui.demos.focus.ConditionalFocusabilityDemo
 import androidx.compose.ui.demos.focus.CustomFocusOrderDemo
+import androidx.compose.ui.demos.focus.ExplicitEnterExitWithCustomFocusEnterExitDemo
 import androidx.compose.ui.demos.focus.FocusInDialogDemo
 import androidx.compose.ui.demos.focus.FocusInPopupDemo
 import androidx.compose.ui.demos.focus.FocusManagerMoveFocusDemo
@@ -75,6 +76,7 @@ import androidx.compose.ui.demos.viewinterop.ComposeViewComposeNestedInterop
 import androidx.compose.ui.demos.viewinterop.EditTextInteropDemo
 import androidx.compose.ui.demos.viewinterop.FocusTransferDemo
 import androidx.compose.ui.demos.viewinterop.NestedScrollInteropComposeParentWithAndroidChild
+import androidx.compose.ui.demos.viewinterop.ResizeComposeViewDemo
 import androidx.compose.ui.demos.viewinterop.ViewComposeViewNestedScrollInteropDemo
 import androidx.compose.ui.demos.viewinterop.ViewInteropDemo
 import androidx.compose.ui.samples.NestedScrollConnectionSample
@@ -143,6 +145,9 @@ private val FocusDemos = DemoCategory(
         ComposableDemo("1D Focus Search") { OneDimensionalFocusSearchDemo() },
         ComposableDemo("2D Focus Search") { TwoDimensionalFocusSearchDemo() },
         ComposableDemo("Custom Focus Order") { CustomFocusOrderDemo() },
+        ComposableDemo("Explicit Enter/Exit Focus Group") {
+            ExplicitEnterExitWithCustomFocusEnterExitDemo()
+        },
         ComposableDemo("Cancel Focus Move") { CancelFocusDemo() },
         ComposableDemo("FocusManager.moveFocus()") { FocusManagerMoveFocusDemo() },
         ComposableDemo("Capture/Free Focus") { CaptureFocusDemo() },
@@ -206,7 +211,8 @@ private val ViewInteropDemos = DemoCategory(
         ComplexTouchInterop,
         ComposableDemo("TextField Interop") { EditTextInteropDemo() },
         ComposableDemo("Focus Transfer") { FocusTransferDemo() },
-        NestedScrollInteropDemos
+        NestedScrollInteropDemos,
+        ComposableDemo("Resize ComposeView") { ResizeComposeViewDemo() },
     )
 )
 

@@ -17,10 +17,13 @@
 package androidx.compose.material3
 
 import android.os.Build
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
@@ -266,6 +269,33 @@ class AppBarTest {
         rule.waitForIdle()
         rule.onNodeWithTag(TopAppBarTestTag)
             .assertHeightIsEqualTo(TopAppBarSmallTokens.ContainerHeight - scrollHeightOffsetDp)
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun smallTopAppBar_transparentContainerColor() {
+        val expectedColorBehindTopAppBar: Color = Color.Red
+        rule.setMaterialContent(lightColorScheme()) {
+            Box(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth()
+                    .background(color = expectedColorBehindTopAppBar)
+            ) {
+                TopAppBar(
+                    modifier = Modifier.testTag(TopAppBarTestTag),
+                    title = {
+                        Text("Title", Modifier.testTag(TitleTestTag))
+                    },
+                    colors =
+                    TopAppBarDefaults.smallTopAppBarColors(containerColor = Color.Transparent),
+                    scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
+                )
+            }
+        }
+        rule.onNodeWithTag(TopAppBarTestTag).captureToImage()
+            .assertContainsColor(expectedColorBehindTopAppBar)
     }
 
     @Test

@@ -31,7 +31,7 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDirection
-import androidx.compose.ui.text.style.TextDrawStyle
+import androidx.compose.ui.text.style.TextForegroundStyle
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.LayoutDirection
@@ -410,10 +410,10 @@ class TextStyle internal constructor(
     ): TextStyle {
         return TextStyle(
             spanStyle = SpanStyle(
-                textDrawStyle = if (color == this.spanStyle.color) {
-                    spanStyle.textDrawStyle
+                textForegroundStyle = if (color == this.spanStyle.color) {
+                    spanStyle.textForegroundStyle
                 } else {
-                    TextDrawStyle.from(color)
+                    TextForegroundStyle.from(color)
                 },
                 fontSize = fontSize,
                 fontWeight = fontWeight,
@@ -466,10 +466,10 @@ class TextStyle internal constructor(
     ): TextStyle {
         return TextStyle(
             spanStyle = SpanStyle(
-                textDrawStyle = if (color == this.spanStyle.color) {
-                    spanStyle.textDrawStyle
+                textForegroundStyle = if (color == this.spanStyle.color) {
+                    spanStyle.textForegroundStyle
                 } else {
-                    TextDrawStyle.from(color)
+                    TextForegroundStyle.from(color)
                 },
                 fontSize = fontSize,
                 fontWeight = fontWeight,

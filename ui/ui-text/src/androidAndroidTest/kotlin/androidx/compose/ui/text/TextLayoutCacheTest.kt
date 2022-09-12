@@ -28,7 +28,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -318,7 +317,7 @@ class TextLayoutCacheTest {
             softWrap = softWrap,
             maxLines = maxLines,
             placeholders = placeholders,
-            size = IntSize(constraints.maxWidth, constraints.maxHeight),
+            constraints = constraints
         )
     }
 }

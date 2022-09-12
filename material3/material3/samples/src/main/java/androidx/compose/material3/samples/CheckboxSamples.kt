@@ -97,6 +97,9 @@ fun TriStateCheckboxSample() {
             onStateChange2(s)
         }
 
+        // The sample below composes just basic checkboxes which are not fully accessible on their
+        // own. See the CheckboxWithTextSample as a way to ensure your checkboxes are fully
+        // accessible.
         TriStateCheckbox(
             state = parentState,
             onClick = onParentClick,

@@ -30,7 +30,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.tokens.SliderTokens
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -639,6 +642,62 @@ class SliderTest {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Test
+    fun slider_thumb_recomposition() {
+        val state = mutableStateOf(0f)
+        val recompositionCounter = SliderRecompositionCounter()
+
+        rule.setContent {
+            Slider(
+                modifier = Modifier.testTag(tag),
+                value = state.value,
+                onValueChange = { state.value = it },
+                thumb = { sliderPositions -> recompositionCounter.OuterContent(sliderPositions) }
+            )
+        }
+
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                down(center)
+                moveBy(Offset(100f, 0f))
+                moveBy(Offset(-100f, 0f))
+                moveBy(Offset(100f, 0f))
+            }
+        rule.runOnIdle {
+            Truth.assertThat(recompositionCounter.outerRecomposition).isEqualTo(1)
+            Truth.assertThat(recompositionCounter.innerRecomposition).isEqualTo(4)
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun slider_track_recomposition() {
+        val state = mutableStateOf(0f)
+        val recompositionCounter = SliderRecompositionCounter()
+
+        rule.setContent {
+            Slider(
+                modifier = Modifier.testTag(tag),
+                value = state.value,
+                onValueChange = { state.value = it },
+                track = { sliderPositions -> recompositionCounter.OuterContent(sliderPositions) }
+            )
+        }
+
+        rule.onNodeWithTag(tag)
+            .performTouchInput {
+                down(center)
+                moveBy(Offset(100f, 0f))
+                moveBy(Offset(-100f, 0f))
+                moveBy(Offset(100f, 0f))
+            }
+        rule.runOnIdle {
+            Truth.assertThat(recompositionCounter.outerRecomposition).isEqualTo(1)
+            Truth.assertThat(recompositionCounter.innerRecomposition).isEqualTo(4)
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
     fun rangeSlider_dragThumb() {
         val state = mutableStateOf(0f..1f)
         var slop = 0f
@@ -1092,5 +1151,28 @@ class SliderTest {
 
         rule.onAllNodes(isFocusable(), true)[1]
             .assertRangeInfoEquals(ProgressBarRangeInfo(15f, 10f..20f, 1))
+    }
+}
+
+@Stable
+class SliderRecompositionCounter {
+    var innerRecomposition = 0
+    var outerRecomposition = 0
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun OuterContent(sliderPositions: SliderPositions) {
+        SideEffect { ++outerRecomposition }
+        Column {
+            Text("OuterContent")
+            InnerContent(sliderPositions)
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun InnerContent(sliderPositions: SliderPositions) {
+        SideEffect { ++innerRecomposition }
+        Text("InnerContent: ${sliderPositions.positionFraction}")
     }
 }

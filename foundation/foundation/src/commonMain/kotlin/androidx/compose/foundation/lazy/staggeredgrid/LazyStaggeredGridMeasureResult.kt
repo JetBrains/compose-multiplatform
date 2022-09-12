@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.IntSize
  * @see [LazyStaggeredGridLayoutInfo]
  */
 @ExperimentalFoundationApi
-interface LazyStaggeredGridItemInfo {
+sealed interface LazyStaggeredGridItemInfo {
     /**
      * Relative offset from the start of the staggered grid.
      */
@@ -61,7 +61,7 @@ interface LazyStaggeredGridItemInfo {
  */
 // todo(b/182882362): expose more information about layout state
 @ExperimentalFoundationApi
-interface LazyStaggeredGridLayoutInfo {
+sealed interface LazyStaggeredGridLayoutInfo {
     /**
      * The list of [LazyStaggeredGridItemInfo] per each visible item ordered by index.
      */
@@ -71,6 +71,38 @@ interface LazyStaggeredGridLayoutInfo {
      * The total count of items passed to staggered grid.
      */
     val totalItemsCount: Int
+
+    /**
+     * Layout viewport (content + content padding) size in pixels.
+     */
+    val viewportSize: IntSize
+
+    /**
+     * The start offset of the layout's viewport in pixels. You can think of it as a minimum offset
+     * which would be visible. Can be negative if non-zero [beforeContentPadding]
+     * was applied as the content displayed in the content padding area is still visible.
+     *
+     * You can use it to understand what items from [visibleItemsInfo] are fully visible.
+     */
+    val viewportStartOffset: Int
+
+    /**
+     * The end offset of the layout's viewport in pixels. You can think of it as a maximum offset
+     * which would be visible. It is the size of the lazy grid layout minus [beforeContentPadding].
+     *
+     * You can use it to understand what items from [visibleItemsInfo] are fully visible.
+     */
+    val viewportEndOffset: Int
+
+    /**
+     * Content padding in pixels applied before the items in scroll direction.
+     */
+    val beforeContentPadding: Int
+
+    /**
+     * Content padding in pixels applied after the items in scroll direction.
+     */
+    val afterContentPadding: Int
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -98,11 +130,21 @@ internal class LazyStaggeredGridMeasureResult(
     val canScrollForward: Boolean,
     val canScrollBackward: Boolean,
     override val totalItemsCount: Int,
-    override val visibleItemsInfo: List<LazyStaggeredGridItemInfo>
+    override val visibleItemsInfo: List<LazyStaggeredGridItemInfo>,
+    override val viewportSize: IntSize,
+    override val viewportStartOffset: Int,
+    override val viewportEndOffset: Int,
+    override val beforeContentPadding: Int,
+    override val afterContentPadding: Int
 ) : LazyStaggeredGridLayoutInfo, MeasureResult by measureResult
 
 @OptIn(ExperimentalFoundationApi::class)
 internal object EmptyLazyStaggeredGridLayoutInfo : LazyStaggeredGridLayoutInfo {
     override val visibleItemsInfo: List<LazyStaggeredGridItemInfo> = emptyList()
     override val totalItemsCount: Int = 0
+    override val viewportSize: IntSize = IntSize.Zero
+    override val viewportStartOffset: Int = 0
+    override val viewportEndOffset: Int = 0
+    override val beforeContentPadding: Int = 0
+    override val afterContentPadding: Int = 0
 }

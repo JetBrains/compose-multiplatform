@@ -31,7 +31,7 @@ import androidx.compose.ui.text.font.lerp
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextDrawStyle
+import androidx.compose.ui.text.style.TextForegroundStyle
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.lerp
 import androidx.compose.ui.unit.TextUnit
@@ -82,7 +82,7 @@ private val DefaultColor = Color.Black
 @Immutable
 class SpanStyle internal constructor(
     // The fill to draw text, a unified representation of Color and Brush.
-    internal val textDrawStyle: TextDrawStyle,
+    internal val textForegroundStyle: TextForegroundStyle,
     val fontSize: TextUnit = TextUnit.Unspecified,
     val fontWeight: FontWeight? = null,
     val fontStyle: FontStyle? = null,
@@ -147,7 +147,7 @@ class SpanStyle internal constructor(
         textDecoration: TextDecoration? = null,
         shadow: Shadow? = null
     ) : this(
-        textDrawStyle = TextDrawStyle.from(color),
+        textForegroundStyle = TextForegroundStyle.from(color),
         fontSize = fontSize,
         fontWeight = fontWeight,
         fontStyle = fontStyle,
@@ -214,7 +214,7 @@ class SpanStyle internal constructor(
         shadow: Shadow? = null,
         platformStyle: PlatformSpanStyle? = null
     ) : this(
-        textDrawStyle = TextDrawStyle.from(color),
+        textForegroundStyle = TextForegroundStyle.from(color),
         fontSize = fontSize,
         fontWeight = fontWeight,
         fontStyle = fontStyle,
@@ -287,7 +287,7 @@ class SpanStyle internal constructor(
         shadow: Shadow? = null,
         platformStyle: PlatformSpanStyle? = null
     ) : this(
-        textDrawStyle = TextDrawStyle.from(brush, alpha),
+        textForegroundStyle = TextForegroundStyle.from(brush, alpha),
         fontSize = fontSize,
         fontWeight = fontWeight,
         fontStyle = fontStyle,
@@ -307,7 +307,7 @@ class SpanStyle internal constructor(
     /**
      * Color to draw text.
      */
-    val color: Color get() = this.textDrawStyle.color
+    val color: Color get() = this.textForegroundStyle.color
 
     /**
      * Brush to draw text. If not null, overrides [color].
@@ -315,7 +315,7 @@ class SpanStyle internal constructor(
     @ExperimentalTextApi
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalTextApi
-    val brush: Brush? get() = this.textDrawStyle.brush
+    val brush: Brush? get() = this.textForegroundStyle.brush
 
     /**
      * Opacity of text. This value is either provided along side Brush, or via alpha channel in
@@ -324,7 +324,7 @@ class SpanStyle internal constructor(
     @ExperimentalTextApi
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalTextApi
-    val alpha: Float get() = this.textDrawStyle.alpha
+    val alpha: Float get() = this.textForegroundStyle.alpha
 
     /**
      * Returns a new span style that is a combination of this style and the given [other] style.
@@ -340,7 +340,7 @@ class SpanStyle internal constructor(
         if (other == null) return this
 
         return SpanStyle(
-            textDrawStyle = textDrawStyle.merge(other.textDrawStyle),
+            textForegroundStyle = textForegroundStyle.merge(other.textForegroundStyle),
             fontFamily = other.fontFamily ?: this.fontFamily,
             fontSize = if (!other.fontSize.isUnspecified) other.fontSize else this.fontSize,
             fontWeight = other.fontWeight ?: this.fontWeight,
@@ -391,7 +391,11 @@ class SpanStyle internal constructor(
         shadow: Shadow? = this.shadow
     ): SpanStyle {
         return SpanStyle(
-            textDrawStyle = if (color == this.color) textDrawStyle else TextDrawStyle.from(color),
+            textForegroundStyle = if (color == this.color) {
+                textForegroundStyle
+            } else {
+                TextForegroundStyle.from(color)
+            },
             fontSize = fontSize,
             fontWeight = fontWeight,
             fontStyle = fontStyle,
@@ -427,7 +431,11 @@ class SpanStyle internal constructor(
         platformStyle: PlatformSpanStyle? = this.platformStyle
     ): SpanStyle {
         return SpanStyle(
-            textDrawStyle = if (color == this.color) textDrawStyle else TextDrawStyle.from(color),
+            textForegroundStyle = if (color == this.color) {
+                textForegroundStyle
+            } else {
+                TextForegroundStyle.from(color)
+            },
             fontSize = fontSize,
             fontWeight = fontWeight,
             fontStyle = fontStyle,
@@ -465,7 +473,7 @@ class SpanStyle internal constructor(
         platformStyle: PlatformSpanStyle? = this.platformStyle
     ): SpanStyle {
         return SpanStyle(
-            textDrawStyle = TextDrawStyle.from(brush, alpha),
+            textForegroundStyle = TextForegroundStyle.from(brush, alpha),
             fontSize = fontSize,
             fontWeight = fontWeight,
             fontStyle = fontStyle,
@@ -508,7 +516,7 @@ class SpanStyle internal constructor(
     }
 
     private fun hasSameNonLayoutAttributes(other: SpanStyle): Boolean {
-        if (textDrawStyle != other.textDrawStyle) return false
+        if (textForegroundStyle != other.textForegroundStyle) return false
         if (textDecoration != other.textDecoration) return false
         if (shadow != other.shadow) return false
         return true
@@ -606,7 +614,7 @@ internal fun <T> lerpDiscrete(a: T, b: T, fraction: Float): T = if (fraction < 0
  */
 fun lerp(start: SpanStyle, stop: SpanStyle, fraction: Float): SpanStyle {
     return SpanStyle(
-        textDrawStyle = lerp(start.textDrawStyle, stop.textDrawStyle, fraction),
+        textForegroundStyle = lerp(start.textForegroundStyle, stop.textForegroundStyle, fraction),
         fontFamily = lerpDiscrete(
             start.fontFamily,
             stop.fontFamily,
@@ -680,7 +688,9 @@ private fun lerpPlatformStyle(
 }
 
 internal fun resolveSpanStyleDefaults(style: SpanStyle) = SpanStyle(
-    textDrawStyle = style.textDrawStyle.takeOrElse { TextDrawStyle.from(DefaultColor) },
+    textForegroundStyle = style.textForegroundStyle.takeOrElse {
+        TextForegroundStyle.from(DefaultColor)
+    },
     fontSize = if (style.fontSize.isUnspecified) DefaultFontSize else style.fontSize,
     fontWeight = style.fontWeight ?: FontWeight.Normal,
     fontStyle = style.fontStyle ?: FontStyle.Normal,

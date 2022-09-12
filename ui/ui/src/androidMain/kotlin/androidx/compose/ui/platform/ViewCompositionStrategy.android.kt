@@ -112,9 +112,6 @@ interface ViewCompositionStrategy {
      * [AbstractComposeView.createComposition] is called while the view is detached from a window,
      * [AbstractComposeView.disposeComposition] must be called manually if the view is not later
      * attached to a window.)
-     *
-     * [DisposeOnDetachedFromWindow] is the default strategy for [AbstractComposeView] and
-     * [ComposeView].
      */
     object DisposeOnDetachedFromWindow : ViewCompositionStrategy {
         override fun installFor(view: AbstractComposeView): () -> Unit {

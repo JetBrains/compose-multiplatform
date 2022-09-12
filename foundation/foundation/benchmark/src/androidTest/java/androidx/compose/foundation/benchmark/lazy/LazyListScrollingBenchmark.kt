@@ -20,8 +20,6 @@ import android.os.Build
 import android.view.MotionEvent
 import android.view.View
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.FlingBehavior
-import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -36,10 +34,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.testutils.ComposeTestCase
-import androidx.compose.testutils.assertNoPendingChanges
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
-import androidx.compose.testutils.doFramesUntilNoChangesPending
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -200,80 +195,14 @@ private val LazyRow = LazyListScrollingTestCase(
     }
 }
 
-private object NoFlingBehavior : FlingBehavior {
-    override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
-        return 0f
-    }
-}
-
-// TODO(b/169852102 use existing public constructs instead)
-private fun ComposeBenchmarkRule.toggleStateBenchmark(
-    caseFactory: () -> ListRemeasureTestCase
-) {
-    runBenchmarkFor(caseFactory) {
-        doFramesUntilNoChangesPending()
-
-        measureRepeated {
-            runWithTimingDisabled {
-                assertNoPendingChanges()
-                getTestCase().beforeToggle()
-                if (hasPendingChanges()) {
-                    doFrame()
-                }
-                assertNoPendingChanges()
-            }
-            getTestCase().toggle()
-            if (hasPendingChanges()) {
-                doFrame()
-            }
-            runWithTimingDisabled {
-                assertNoPendingChanges()
-                getTestCase().afterToggle()
-                assertNoPendingChanges()
-            }
-        }
-    }
-}
-
-// TODO(b/169852102 use existing public constructs instead)
-private fun ComposeBenchmarkRule.toggleStateBenchmarkDraw(
-    caseFactory: () -> ListRemeasureTestCase
-) {
-    runBenchmarkFor(caseFactory) {
-        doFrame()
-
-        measureRepeated {
-            runWithTimingDisabled {
-                // reset the state and draw
-                getTestCase().beforeToggle()
-                measure()
-                layout()
-                drawPrepare()
-                draw()
-                drawFinish()
-                // toggle and prepare measuring draw
-                getTestCase().toggle()
-                measure()
-                layout()
-                drawPrepare()
-            }
-            draw()
-            runWithTimingDisabled {
-                getTestCase().afterToggle()
-                drawFinish()
-            }
-        }
-    }
-}
-
 class ListRemeasureTestCase(
     val addNewItemOnToggle: Boolean,
     val content: @Composable ListRemeasureTestCase.(LazyListState) -> Unit,
     val isVertical: Boolean,
     val usePointerInput: Boolean = false
-) : ComposeTestCase {
+) : LazyBenchmarkTestCase {
 
-    val items = List(100) { ListItem(it) }
+    val items = List(100) { LazyItem(it) }
 
     private lateinit var listState: LazyListState
     private lateinit var view: View
@@ -305,7 +234,7 @@ class ListRemeasureTestCase(
         Box(Modifier.requiredSize(20.dp).background(Color.Red, RoundedCornerShape(8.dp)))
     }
 
-    fun beforeToggle() {
+    override fun beforeToggle() {
         runBlocking {
             listState.scrollToItem(0, 0)
         }
@@ -318,7 +247,7 @@ class ListRemeasureTestCase(
         assertEquals(0, listState.firstVisibleItemScrollOffset)
     }
 
-    fun toggle() {
+    override fun toggle() {
         if (usePointerInput) {
             motionEventHelper
                 .sendEvent(MotionEvent.ACTION_MOVE, -scrollBy.toFloat().toSingleAxisOffset())
@@ -329,7 +258,7 @@ class ListRemeasureTestCase(
         }
     }
 
-    fun afterToggle() {
+    override fun afterToggle() {
         assertEquals(0, listState.firstVisibleItemIndex)
         assertEquals(scrollBy, listState.firstVisibleItemScrollOffset)
         if (usePointerInput) {
@@ -339,58 +268,4 @@ class ListRemeasureTestCase(
 
     private fun Float.toSingleAxisOffset(): Offset =
         Offset(x = if (isVertical) 0f else this, y = if (isVertical) this else 0f)
-}
-
-data class ListItem(val index: Int)
-
-/**
- * Helper for dispatching simple [MotionEvent]s to a [view] for use in scrolling benchmarks.
- */
-class MotionEventHelper(private val view: View) {
-    private var time = 0L
-    private var lastCoord: Offset? = null
-
-    fun sendEvent(
-        action: Int,
-        delta: Offset
-    ) {
-        time += 10L
-
-        val coord = delta + (lastCoord ?: Offset.Zero)
-
-        lastCoord = if (action == MotionEvent.ACTION_UP) {
-            null
-        } else {
-            coord
-        }
-
-        val locationOnScreen = IntArray(2) { 0 }
-        view.getLocationOnScreen(locationOnScreen)
-
-        val motionEvent = MotionEvent.obtain(
-            0,
-            time,
-            action,
-            1,
-            arrayOf(MotionEvent.PointerProperties()),
-            arrayOf(
-                MotionEvent.PointerCoords().apply {
-                    x = locationOnScreen[0] + coord.x.coerceAtLeast(1f)
-                    y = locationOnScreen[1] + coord.y.coerceAtLeast(1f)
-                }
-            ),
-            0,
-            0,
-            0f,
-            0f,
-            0,
-            0,
-            0,
-            0
-        ).apply {
-            offsetLocation(-locationOnScreen[0].toFloat(), -locationOnScreen[1].toFloat())
-        }
-
-        view.dispatchTouchEvent(motionEvent)
-    }
 }

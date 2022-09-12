@@ -21,10 +21,16 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.Shader
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.asAndroidPathEffect
+import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -99,6 +105,22 @@ class AndroidTextPaintTest {
     }
 
     @Test
+    fun setTextDecoration_changeDecorationToNone() {
+        val textPaint = defaultTextPaint
+        textPaint.setTextDecoration(
+            TextDecoration.combine(
+                listOf(TextDecoration.LineThrough, TextDecoration.Underline)
+            )
+        )
+        assertThat(textPaint.isUnderlineText).isTrue()
+        assertThat(textPaint.isStrikeThruText).isTrue()
+
+        textPaint.setTextDecoration(TextDecoration.None)
+        assertThat(textPaint.isUnderlineText).isFalse()
+        assertThat(textPaint.isStrikeThruText).isFalse()
+    }
+
+    @Test
     fun setTextDecoration_changeDecorationToNull() {
         val textPaint = defaultTextPaint
         textPaint.setTextDecoration(
@@ -110,8 +132,8 @@ class AndroidTextPaintTest {
         assertThat(textPaint.isStrikeThruText).isTrue()
 
         textPaint.setTextDecoration(null)
-        assertThat(textPaint.isUnderlineText).isFalse()
-        assertThat(textPaint.isStrikeThruText).isFalse()
+        assertThat(textPaint.isUnderlineText).isTrue()
+        assertThat(textPaint.isStrikeThruText).isTrue()
     }
 
     @Test
@@ -386,7 +408,7 @@ class AndroidTextPaintTest {
 
     @SdkSuppress(minSdkVersion = 29)
     @Test
-    fun resetShadow_to_null() {
+    fun resetShadow_to_null_has_no_effect() {
         val dx = 1f
         val dy = 2f
         val radius = 3f
@@ -396,10 +418,83 @@ class AndroidTextPaintTest {
         textPaint.setShadow(Shadow(color, Offset(dx, dy), radius))
         textPaint.setShadow(null)
 
-        assertThat(textPaint.shadowLayerDx).isEqualTo(0f)
-        assertThat(textPaint.shadowLayerDy).isEqualTo(0f)
-        assertThat(textPaint.shadowLayerRadius).isEqualTo(0f)
-        assertThat(textPaint.shadowLayerColor).isEqualTo(0)
+        assertThat(textPaint.shadowLayerDx).isEqualTo(dx)
+        assertThat(textPaint.shadowLayerDy).isEqualTo(dy)
+        assertThat(textPaint.shadowLayerRadius).isEqualTo(radius)
+        assertThat(textPaint.shadowLayerColor).isEqualTo(color.toArgb())
+    }
+
+    @Test
+    fun drawStyle_defaultValue() {
+        val textPaint = defaultTextPaint
+        assertThat(textPaint.style).isEqualTo(Paint.Style.FILL)
+    }
+
+    @Test
+    fun setDrawStyle_withNull() {
+        val textPaint = defaultTextPaint
+        textPaint.setDrawStyle(null)
+        assertThat(textPaint.style).isEqualTo(Paint.Style.FILL)
+    }
+
+    @Test
+    fun setDrawStyle_withFill() {
+        val textPaint = defaultTextPaint
+        textPaint.setDrawStyle(Fill)
+        assertThat(textPaint.style).isEqualTo(Paint.Style.FILL)
+    }
+
+    @Test
+    fun setDrawStyle_withStroke() {
+        val textPaint = defaultTextPaint
+        val pathEffect = PathEffect.cornerPathEffect(4f)
+        textPaint.setDrawStyle(
+            Stroke(
+                width = 4f,
+                miter = 2f,
+                join = StrokeJoin.Bevel,
+                cap = StrokeCap.Square,
+                pathEffect = pathEffect
+            )
+        )
+        assertThat(textPaint.style).isEqualTo(Paint.Style.STROKE)
+        assertThat(textPaint.strokeWidth).isEqualTo(4f)
+        assertThat(textPaint.strokeMiter).isEqualTo(2f)
+        assertThat(textPaint.strokeJoin).isEqualTo(Paint.Join.BEVEL)
+        assertThat(textPaint.strokeCap).isEqualTo(Paint.Cap.SQUARE)
+        assertThat(textPaint.pathEffect).isEqualTo(pathEffect.asAndroidPathEffect())
+    }
+
+    @Test
+    fun setDrawStyle_withStrokeThenFill() {
+        val textPaint = defaultTextPaint
+        textPaint.setDrawStyle(
+            Stroke(
+                width = 4f,
+                miter = 2f,
+                join = StrokeJoin.Bevel,
+                cap = StrokeCap.Square
+            )
+        )
+        textPaint.setDrawStyle(Fill)
+        assertThat(textPaint.style).isEqualTo(Paint.Style.FILL)
+    }
+
+    @Test
+    fun setDrawStyle_changeDrawStyleToNull() {
+        val textPaint = defaultTextPaint
+        textPaint.setDrawStyle(
+            Stroke(
+                width = 4f,
+                miter = 2f,
+                join = StrokeJoin.Bevel,
+                cap = StrokeCap.Square
+            )
+        )
+        assertThat(textPaint.style).isEqualTo(Paint.Style.STROKE)
+
+        textPaint.setDrawStyle(null)
+        assertThat(textPaint.style).isEqualTo(Paint.Style.STROKE)
     }
 
     private val defaultTextPaint get() = AndroidTextPaint(flags = 0, density = 1.0f)

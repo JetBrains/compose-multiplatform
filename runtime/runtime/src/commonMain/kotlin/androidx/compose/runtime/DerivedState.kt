@@ -100,16 +100,16 @@ private class DerivedSnapshotState<T>(
                             return@forEach
                         }
 
-                        if (stateObject is DerivedSnapshotState<*>) {
+                        // Find the first record without triggering an observer read.
+                        val record = if (stateObject is DerivedSnapshotState<*>) {
                             // eagerly access the parent derived states without recording the
                             // read
                             // that way we can be sure derived states in deps were recalculated,
                             // and are updated to the last values
-                            stateObject.refresh(stateObject.firstStateRecord, snapshot)
+                            stateObject.current(snapshot)
+                        } else {
+                            current(stateObject.firstStateRecord, snapshot)
                         }
-
-                        // Find the first record without triggering an observer read.
-                        val record = current(stateObject.firstStateRecord, snapshot)
 
                         hash = 31 * hash + identityHashCode(record)
                         hash = 31 * hash + record.snapshotId
@@ -120,10 +120,15 @@ private class DerivedSnapshotState<T>(
         }
     }
 
-    fun refresh(record: StateRecord, snapshot: Snapshot) {
+    /**
+     * Get current record in snapshot. Forces recalculation if record is invalid to refresh
+     * state value.
+     *
+     * @return latest state record for the derived state.
+     */
+    fun current(snapshot: Snapshot): StateRecord =
         @Suppress("UNCHECKED_CAST")
-        currentRecord(record as ResultRecord<T>, snapshot, false, calculation)
-    }
+        currentRecord(current(first, snapshot), snapshot, false, calculation)
 
     private fun currentRecord(
         readable: ResultRecord<T>,

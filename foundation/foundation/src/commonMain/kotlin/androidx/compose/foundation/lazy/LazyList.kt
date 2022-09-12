@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.lazy.layout.LazyLayout
 import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
+import androidx.compose.foundation.lazy.layout.lazyLayoutSemantics
 import androidx.compose.foundation.overscroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -75,6 +76,8 @@ internal fun LazyList(
 ) {
     val overscrollEffect = ScrollableDefaults.overscrollEffect()
     val itemProvider = rememberLazyListItemProvider(state, content)
+    val semanticState =
+        rememberLazyListSemanticState(state, itemProvider, reverseLayout, isVertical)
     val beyondBoundsInfo = remember { LazyListBeyondBoundsInfo() }
     val scope = rememberCoroutineScope()
     val placementAnimator = remember(state, isVertical) {
@@ -104,12 +107,10 @@ internal fun LazyList(
         modifier = modifier
             .then(state.remeasurementModifier)
             .then(state.awaitLayoutModifier)
-            .lazyListSemantics(
+            .lazyLayoutSemantics(
                 itemProvider = itemProvider,
-                state = state,
-                coroutineScope = scope,
-                isVertical = isVertical,
-                reverseScrolling = reverseLayout,
+                state = semanticState,
+                orientation = orientation,
                 userScrollEnabled = userScrollEnabled
             )
             .clipScrollableContainer(orientation)
