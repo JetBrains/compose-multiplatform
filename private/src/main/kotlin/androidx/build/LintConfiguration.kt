@@ -187,13 +187,6 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
         // Reenable after b/238892319 is resolved
         disable.add("NotificationPermission")
 
-        // Broken in 7.4.0-alpha04 due to b/236262744
-        disable.add("CustomPermissionTypo")
-        disable.add("KnownPermissionError")
-        disable.add("PermissionNamingConvention")
-        disable.add("ReservedSystemPermission")
-        disable.add("SystemPermissionTypo")
-
         // Disable dependency checks that suggest to change them. We want libraries to be
         // intentional with their dependency version bumps.
         disable.add("KtxExtensionAvailable")
@@ -202,10 +195,6 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
         // Disable a check that's only relevant for real apps. For our test apps we're not
         // concerned with drawables potentially being a little bit blurry
         disable.add("IconMissingDensityFolder")
-
-        // Disable a check that's only triggered by translation updates which are
-        // outside of library owners' control, b/174655193
-        disable.add("UnusedQuantity")
 
         // Disable until it works for our projects, b/171986505
         disable.add("JavaPluginLanguageLevel")
