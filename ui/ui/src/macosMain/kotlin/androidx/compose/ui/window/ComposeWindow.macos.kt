@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import androidx.compose.runtime.CompositionContext
 import androidx.compose.ui.createSkiaLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.native.ComposeLayer
-import androidx.compose.ui.platform.SkikoTextInputService
+import androidx.compose.ui.platform.MacosTextInputService
 
 import platform.AppKit.*
 import platform.Cocoa.*
@@ -30,10 +30,12 @@ import platform.CoreGraphics.*
 import kotlinx.cinterop.*
 
 internal actual class ComposeWindow actual constructor() {
+    val inputService = MacosTextInputService()
     val layer = ComposeLayer(
         layer = createSkiaLayer(),
         getTopLeftOffset = { Offset.Zero },
-        inputService = SkikoTextInputService(),
+        inputService = inputService,
+        input = inputService.input
     )
 
     val title: String
