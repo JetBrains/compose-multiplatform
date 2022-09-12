@@ -68,6 +68,20 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     }
 
     kotlin {
+        // Not all modules can have these targets, so declare them here instead of androidXComposeMultiplatform.
+        // We can support the kotlin-native targets supported by kotlin coroutines:
+        // https://github.com/Kotlin/kotlinx.coroutines/blob/master/gradle/compile-native-multiplatform.gradle
+        watchosArm64()
+        watchosArm32()
+        watchosX86()
+        watchosX64()
+        watchosSimulatorArm64()
+        tvosArm64()
+        tvosX64()
+        tvosSimulatorArm64()
+        mingwX64()
+        linuxX64()
+
         targets.js {
             nodejs {
                 testTask {
@@ -133,6 +147,42 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             jsNativeMain.dependsOn(commonMain)
             jsMain.dependsOn(jsNativeMain)
             nativeMain.dependsOn(jsNativeMain)
+
+            linuxX64Main.dependsOn(nativeMain)
+            linuxX64Test.dependsOn(nativeTest)
+            mingwX64Main.dependsOn(nativeMain)
+            mingwX64Test.dependsOn(nativeTest)
+
+            def darwinMain = sourceSets.getByName("darwinMain")
+            def darwinTest = sourceSets.getByName("darwinTest")
+
+            def watchOsMain = sourceSets.create("watchOsMain")
+            def watchOsTest = sourceSets.create("watchOsTest")
+            watchOsMain.dependsOn(darwinMain)
+            watchOsTest.dependsOn(darwinTest)
+
+            watchosArm64Main.dependsOn(watchOsMain)
+            watchosArm64Test.dependsOn(watchOsTest)
+            watchosArm32Main.dependsOn(watchOsMain)
+            watchosArm32Test.dependsOn(watchOsTest)
+            watchosX86Main.dependsOn(watchOsMain)
+            watchosX86Test.dependsOn(watchOsTest)
+            watchosX64Main.dependsOn(watchOsMain)
+            watchosX64Test.dependsOn(watchOsTest)
+            watchosSimulatorArm64Main.dependsOn(watchOsMain)
+            watchosSimulatorArm64Test.dependsOn(watchOsTest)
+
+            def tvOsMain = sourceSets.create("tvOsMain")
+            def tvOsTest = sourceSets.create("tvOsTest")
+            tvOsMain.dependsOn(darwinMain)
+            tvOsTest.dependsOn(darwinTest)
+
+            tvosArm64Main.dependsOn(tvOsMain)
+            tvosArm64Test.dependsOn(tvOsTest)
+            tvosX64Main.dependsOn(tvOsMain)
+            tvosX64Test.dependsOn(tvOsTest)
+            tvosSimulatorArm64Main.dependsOn(tvOsMain)
+            tvosSimulatorArm64Test.dependsOn(tvOsTest)
 
             jvmTest.dependencies {
                 implementation(libs.kotlinTestJunit)
