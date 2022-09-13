@@ -15,10 +15,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.singleWindowApplication
 
-@OptIn(ExperimentalComposeUiApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 fun main() = singleWindowApplication(title = "Context menu") {
     val text = remember { mutableStateOf("Hello!") }
     TextField(
@@ -28,6 +26,8 @@ fun main() = singleWindowApplication(title = "Context menu") {
     )
 }
 ```
+<img width="396" alt="image" src="https://user-images.githubusercontent.com/5963351/190021028-c207164d-df04-4294-ad8f-da3106c16fb6.png">
+
 
 Standard context menu for TextField contains the following items based on text selection: Copy, Cut, Paste, Select All.
 
@@ -36,17 +36,17 @@ Enabling standard context menu for a Text component is similar - you just need t
 ```kotlin
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.Text
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.singleWindowApplication
 
-@OptIn(ExperimentalComposeUiApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 fun main() = singleWindowApplication(title = "Context menu") {
     SelectionContainer {
         Text("Hello World!")
     }
 }
 ```
-Context menu for text contains just Copy action.
+Context menu for text contains just Copy action:
+
+<img width="391" alt="image" src="https://user-images.githubusercontent.com/5963351/190020951-0cc539a2-f698-4e2b-bc20-9d4aa1b11c6f.png">
 
 ## User-defined context menu
 To enable additional context menu items for TextField and Text components, ContextMenuDataProvider and ContextMenuItem elements are used:
@@ -62,12 +62,10 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
 
-@OptIn(ExperimentalComposeUiApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 fun main() = singleWindowApplication(title = "Context menu") {
     val text = remember { mutableStateOf("Hello!") }
     Column {
@@ -94,7 +92,9 @@ fun main() = singleWindowApplication(title = "Context menu") {
     }
 }
 ```
-In this example Text/TextField context menus will be extended with two additional items. 
+In this example Text/TextField context menus will be extended with two additional items:
+
+<img width="430" alt="image" src="https://user-images.githubusercontent.com/5963351/190020831-9b87b191-a351-4f70-a726-d5a53577ad53.png">
 
 ## Context menu for an arbitrary area
 There is a possibility to create a context menu for an arbitrary application window area. This is implemented using ContextMenuArea API that is 
@@ -106,13 +106,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
 
-@OptIn(ExperimentalComposeUiApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 fun main() = singleWindowApplication(title = "Context menu") {
     ContextMenuArea(items = {
         listOf(
@@ -124,4 +122,101 @@ fun main() = singleWindowApplication(title = "Context menu") {
     }
 }
 ```
-Right click on the Blue Square will show a context menu with two items
+Right click on the Blue Square will show a context menu with two items:
+
+<img width="423" alt="image" src="https://user-images.githubusercontent.com/5963351/190020592-15e851f8-e356-413c-b5c3-225393712292.png">
+
+## Swing interoperability
+If you are embedding Compose into an existing application, you may want the text context menu to look the same as in other parts of the application. To do this, there is `JPopupTextMenu`:
+```
+import androidx.compose.foundation.ContextMenuItem
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.text.JPopupTextMenu
+import androidx.compose.foundation.text.LocalTextContextMenu
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.awt.ComposePanel
+import java.awt.Color
+import java.awt.Component
+import java.awt.Dimension
+import java.awt.Graphics
+import java.awt.event.KeyEvent
+import java.awt.event.KeyEvent.CTRL_DOWN_MASK
+import java.awt.event.KeyEvent.META_DOWN_MASK
+import javax.swing.Icon
+import javax.swing.JFrame
+import javax.swing.JMenuItem
+import javax.swing.KeyStroke.getKeyStroke
+import javax.swing.SwingUtilities
+import org.jetbrains.skiko.hostOs
+
+fun main() = SwingUtilities.invokeLater {
+    val panel = ComposePanel()
+    panel.setContent {
+        JPopupTextMenuProvider(panel) {
+            Column {
+                SelectionContainer {
+                    Text("Hello, Compose!")
+                }
+
+                var text by remember { mutableStateOf("") }
+
+                TextField(text, { text = it })
+            }
+        }
+    }
+
+    val window = JFrame()
+    window.contentPane.add(panel)
+    window.size = Dimension(800, 600)
+    window.isVisible = true
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun JPopupTextMenuProvider(owner: Component, content: @Composable () -> Unit) {
+    CompositionLocalProvider(
+        LocalTextContextMenu provides JPopupTextMenu(
+            owner,
+            createCut = { swingItem(it, Color.RED, KeyEvent.VK_X) },
+            createCopy = { swingItem(it, Color.GREEN, KeyEvent.VK_C) },
+            createPaste = { swingItem(it, Color.BLUE, KeyEvent.VK_V) },
+            createSelectAll = { swingItem(it, Color.BLACK, KeyEvent.VK_A) },
+        ),
+        content = content
+    )
+}
+
+private fun swingItem(
+    item: ContextMenuItem,
+    color: Color,
+    key: Int
+) = JMenuItem(item.label).apply {
+    icon = circleIcon(color)
+    accelerator = getKeyStroke(key, if (hostOs.isMacOS) META_DOWN_MASK else CTRL_DOWN_MASK)
+    addActionListener { item.onClick() }
+}
+
+private fun circleIcon(color: Color) = object : Icon {
+    override fun paintIcon(c: Component?, g: Graphics, x: Int, y: Int) {
+        g.create().apply {
+            this.color = color
+            translate(16, 2)
+            fillOval(0, 0, 16, 16)
+        }
+    }
+
+    override fun getIconWidth() = 16
+
+    override fun getIconHeight() = 16
+}
+```
+<img width="501" alt="image" src="https://user-images.githubusercontent.com/5963351/190020459-058336e5-3b3a-4b75-87a8-0b9fd9a8c9cf.png">
