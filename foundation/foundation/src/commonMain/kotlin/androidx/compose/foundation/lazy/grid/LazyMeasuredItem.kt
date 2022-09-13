@@ -67,7 +67,7 @@ internal class LazyMeasuredItem(
             maxMainAxis = maxOf(maxMainAxis, if (isVertical) it.height else it.width)
         }
         mainAxisSize = maxMainAxis
-        mainAxisSizeWithSpacings = maxMainAxis + mainAxisSpacing
+        mainAxisSizeWithSpacings = (maxMainAxis + mainAxisSpacing).coerceAtLeast(0)
     }
 
     /**
