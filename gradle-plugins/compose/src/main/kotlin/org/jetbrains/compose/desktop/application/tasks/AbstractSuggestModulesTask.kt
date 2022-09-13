@@ -13,9 +13,12 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.jetbrains.compose.desktop.application.dsl.DEFAULT_RUNTIME_MODULES
-import org.jetbrains.compose.desktop.application.internal.*
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
-import org.jetbrains.compose.desktop.application.internal.normalizedPath
+import org.jetbrains.compose.desktop.application.internal.ioFile
+import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
+import org.jetbrains.compose.desktop.application.internal.jvmToolFile
+import org.jetbrains.compose.desktop.application.internal.files.normalizedPath
+import org.jetbrains.compose.desktop.application.internal.notNullProperty
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 
 abstract class AbstractSuggestModulesTask : AbstractComposeDesktopTask() {
@@ -59,7 +62,7 @@ abstract class AbstractSuggestModulesTask : AbstractComposeDesktopTask() {
             runExternalTool(
                 tool = jtool,
                 args = args,
-                forceLogToFile = true,
+                logToConsole = ExternalToolRunner.LogToConsole.Never,
                 processStdout = { output ->
                     val defaultModules = hashSetOf(*DEFAULT_RUNTIME_MODULES)
                     val suggestedModules = output.splitToSequence(",")

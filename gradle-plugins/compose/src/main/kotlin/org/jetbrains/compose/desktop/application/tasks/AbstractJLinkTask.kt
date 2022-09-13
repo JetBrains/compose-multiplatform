@@ -12,9 +12,9 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.jetbrains.compose.desktop.application.internal.RuntimeCompressionLevel
-import org.jetbrains.compose.desktop.application.internal.*
-import org.jetbrains.compose.desktop.application.internal.JavaRuntimeProperties
+import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.cliArg
+import org.jetbrains.compose.desktop.application.internal.ioFile
 import org.jetbrains.compose.desktop.application.internal.notNullProperty
 import org.jetbrains.compose.desktop.application.internal.nullableProperty
 import java.io.File
@@ -50,7 +50,7 @@ abstract class AbstractJLinkTask : AbstractJvmToolOperationTask("jlink") {
     override fun makeArgs(tmpDir: File): MutableList<String> = super.makeArgs(tmpDir).apply {
         val modulesToInclude =
             if (includeAllModules.get()) {
-                JavaRuntimeProperties.readFromFile(javaRuntimePropertiesFile.ioFile).availableModules
+                JvmRuntimeProperties.readFromFile(javaRuntimePropertiesFile.ioFile).availableModules
             } else modules.get()
         modulesToInclude.forEach { m ->
             cliArg("--add-modules", m)

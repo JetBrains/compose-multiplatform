@@ -62,6 +62,21 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun proguard(): Unit = with(testProject(TestProjects.proguard)) {
+        gradle(":runReleaseDistributable").build().checks { check ->
+            check.taskOutcome(":proguardReleaseJars", TaskOutcome.SUCCESS)
+
+            assertEqualTextFiles(file("main-methods.actual.txt"), file("main-methods.expected.txt"))
+
+            val actualMainImage = file("main-image.actual.png")
+            val expectedMainImage = file("main-image.expected.png")
+            assert(actualMainImage.readBytes().contentEquals(expectedMainImage.readBytes())) {
+                "The actual image '$actualMainImage' does not match the expected image '$expectedMainImage'"
+            }
+        }
+    }
+
+    @Test
     fun packageJvm() = with(testProject(TestProjects.jvm)) {
         testPackageNativeExecutables()
     }

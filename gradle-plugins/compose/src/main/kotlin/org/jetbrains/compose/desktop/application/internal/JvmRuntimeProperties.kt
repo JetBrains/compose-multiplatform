@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 JetBrains s.r.o. and respective authors and developers.
+ * Copyright 2020-2022 JetBrains s.r.o. and respective authors and developers.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -10,7 +10,7 @@ import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
 
-internal data class JavaRuntimeProperties(
+internal data class JvmRuntimeProperties(
     val majorVersion: Int,
     val availableModules: List<String>,
 ) : Serializable {
@@ -18,7 +18,7 @@ internal data class JavaRuntimeProperties(
         @Suppress("unused")
         private val serialVersionUid: Long = 0
 
-        fun writeToFile(properties: JavaRuntimeProperties, file: File) {
+        fun writeToFile(properties: JvmRuntimeProperties, file: File) {
             file.parentFile.mkdirs()
             file.delete()
             file.createNewFile()
@@ -27,9 +27,9 @@ internal data class JavaRuntimeProperties(
             }
         }
 
-        fun readFromFile(file: File): JavaRuntimeProperties =
+        fun readFromFile(file: File): JvmRuntimeProperties =
             ObjectInputStream(file.inputStream().buffered()).use { ois ->
-                ois.readObject() as JavaRuntimeProperties
+                ois.readObject() as JvmRuntimeProperties
             }
     }
 }

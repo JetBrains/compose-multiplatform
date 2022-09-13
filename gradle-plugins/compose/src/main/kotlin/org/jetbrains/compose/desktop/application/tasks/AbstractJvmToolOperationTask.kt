@@ -14,8 +14,8 @@ import org.gradle.api.tasks.*
 import org.gradle.process.ExecResult
 import org.gradle.work.InputChanges
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
-import org.jetbrains.compose.desktop.application.internal.jvmToolFile
 import org.jetbrains.compose.desktop.application.internal.ioFile
+import org.jetbrains.compose.desktop.application.internal.jvmToolFile
 import org.jetbrains.compose.desktop.application.internal.notNullProperty
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 import java.io.File

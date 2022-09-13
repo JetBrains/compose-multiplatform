@@ -9,6 +9,8 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.*
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.*
+import org.jetbrains.compose.desktop.application.internal.files.checkExistingFile
+import org.jetbrains.compose.desktop.application.internal.files.findOutputFileOrDir
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

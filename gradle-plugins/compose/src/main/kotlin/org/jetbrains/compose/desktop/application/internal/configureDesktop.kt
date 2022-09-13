@@ -11,17 +11,17 @@ import org.jetbrains.compose.desktop.tasks.AbstractUnpackDefaultComposeApplicati
 import org.jetbrains.compose.internal.registerTask
 
 internal fun configureDesktop(project: Project, desktopExtension: DesktopExtension) {
-    val unpackDefaultResources = lazy {
-        project.registerTask<AbstractUnpackDefaultComposeApplicationResourcesTask>(
-            "unpackDefaultComposeDesktopApplicationResources"
-        ) {}
-    }
-
     if (desktopExtension._isJvmApplicationInitialized) {
-        configureJvmApplication(project, desktopExtension.application, unpackDefaultResources.value)
+        val appInternal = desktopExtension.application as JvmApplicationInternal
+        val defaultBuildType = appInternal.data.buildTypes.default
+        val appData = JvmApplicationContext(project, appInternal, defaultBuildType)
+        appData.configureJvmApplication()
     }
 
     if (desktopExtension._isNativeApplicationInitialized) {
-        configureNativeApplication(project, desktopExtension.nativeApplication, unpackDefaultResources.value)
+        val unpackDefaultResources = project.registerTask<AbstractUnpackDefaultComposeApplicationResourcesTask>(
+            "unpackDefaultComposeDesktopNativeApplicationResources"
+        ) {}
+        configureNativeApplication(project, desktopExtension.nativeApplication, unpackDefaultResources)
     }
 }

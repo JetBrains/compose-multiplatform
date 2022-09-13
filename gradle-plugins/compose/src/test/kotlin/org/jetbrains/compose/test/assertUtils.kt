@@ -5,8 +5,12 @@
 
 package org.jetbrains.compose.test
 
+import org.gradle.internal.impldep.junit.framework.Assert
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
+import org.junit.jupiter.api.Assertions
+import java.io.File
+import kotlin.math.exp
 
 internal fun <T> Collection<T>.checkContains(vararg elements: T) {
     val expectedElements = elements.toMutableSet()
@@ -46,4 +50,16 @@ internal fun String.checkContains(substring: String) {
     if (!contains(substring)) {
         throw AssertionError("String '$substring' is not found in text:\n$this")
     }
+}
+
+internal fun assertEqualTextFiles(actual: File, expected: File) {
+    fun File.normalizedText() = readLines().joinToString("\n") { it.trim() }
+
+    val actualText = actual.normalizedText()
+    val expectedText = expected.normalizedText()
+    Assertions.assertEquals(
+        expectedText,
+        actualText,
+        "Expected file '$expected' differs from actual file '$actual'"
+    )
 }

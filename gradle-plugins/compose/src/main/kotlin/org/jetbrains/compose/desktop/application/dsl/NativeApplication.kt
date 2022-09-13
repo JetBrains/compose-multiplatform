@@ -7,10 +7,8 @@ package org.jetbrains.compose.desktop.application.dsl
 
 import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
-import org.jetbrains.compose.desktop.application.internal.ConfigurationSource
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import org.jetbrains.kotlin.konan.target.Family
 import javax.inject.Inject
 

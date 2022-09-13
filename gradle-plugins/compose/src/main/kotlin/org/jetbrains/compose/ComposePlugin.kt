@@ -26,9 +26,6 @@ import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
 import org.jetbrains.compose.experimental.internal.checkExperimentalTargetsWithSkikoIsEnabled
 import org.jetbrains.compose.experimental.internal.configureExperimental
-import org.jetbrains.compose.internal.COMPOSE_PLUGIN_ID
-import org.jetbrains.compose.internal.KOTLIN_JS_PLUGIN_ID
-import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -46,7 +43,7 @@ class ComposePlugin : Plugin<Project> {
             setUpGroovyDslExtensions(project)
         }
 
-        project.initializePreview()
+        project.initializePreview(desktopExtension)
         composeExtension.extensions.create("web", WebExtension::class.java)
 
         project.plugins.apply(ComposeCompilerKotlinSupportPlugin::class.java)
