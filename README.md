@@ -16,6 +16,7 @@ Preview functionality (check your application UI without building/running it) fo
 * [Mouse events and hover](tutorials/Mouse_Events)
 * [Scrolling and scrollbars](tutorials/Desktop_Components#scrollbars)
 * [Tooltips](tutorials/Desktop_Components#tooltips)
+* [Context Menu](tutorials/Context_Menu/README.md)
 * [Top level windows management](tutorials/Window_API_new)
 * [Menu, tray, notifications](tutorials/Tray_Notifications_MenuBar_new)
 * [Keyboard support](tutorials/Keyboard)
