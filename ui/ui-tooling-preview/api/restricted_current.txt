@@ -28,6 +28,8 @@ package androidx.compose.ui.tooling.preview {
     field public static final String PIXEL_C = "id:pixel_c";
     field public static final String PIXEL_XL = "id:pixel_xl";
     field public static final String TABLET = "spec:shape=Normal,width=1280,height=800,unit=dp,dpi=420";
+    field public static final String TV_1080p = "spec:shape=Normal,width=1920,height=1080,unit=dp,dpi=420";
+    field public static final String TV_720p = "spec:shape=Normal,width=1280,height=720,unit=dp,dpi=420";
     field public static final String WEAR_OS_LARGE_ROUND = "id:wearos_large_round";
     field public static final String WEAR_OS_RECT = "id:wearos_rect";
     field public static final String WEAR_OS_SMALL_ROUND = "id:wearos_small_round";
