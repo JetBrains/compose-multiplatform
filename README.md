@@ -59,7 +59,7 @@ Note that when you use Compose Multiplatform, you setup your project differently
 ## Other ##
 * [artwork](artwork) - design artifacts
 * [benchmarks](benchmarks) - collection of benchmarks
-* [compose](compose) - composite build of [Compose-jb sources](https://github.com/JetBrains/androidx)
+* [compose](compose) - composite build of [Compose Multiplatform sources](https://github.com/JetBrains/androidx)
 * [ci](ci) - Continuous Integration helpers
 * [gradle-plugins](gradle-plugins) - a plugin, simplifying usage of Compose Multiplatform with Gradle
 * [templates](templates) - new application templates
