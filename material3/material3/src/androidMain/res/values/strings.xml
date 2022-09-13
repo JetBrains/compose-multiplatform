@@ -18,4 +18,8 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- Spoken description of a dialog -->
     <string name="dialog">"Dialog"</string>
+    <!-- Spoken description of expanded state of an expandable item -->
+    <string name="expanded">Expanded</string>
+    <!-- Spoken description of collapsed state of an expandable item -->
+    <string name="collapsed">Collapsed</string>
 </resources>

@@ -28,6 +28,8 @@ internal actual fun getString(string: Strings): String {
         Strings.SliderRangeStart -> "Range Start"
         Strings.SliderRangeEnd -> "Range End"
         Strings.Dialog -> "Dialog"
+        Strings.MenuExpanded -> "Expanded"
+        Strings.MenuCollapsed -> "Collapsed"
         else -> ""
     }
 }

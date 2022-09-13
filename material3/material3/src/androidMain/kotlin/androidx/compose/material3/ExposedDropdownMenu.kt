@@ -23,6 +23,7 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
@@ -40,6 +41,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -55,11 +57,13 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAll
 import kotlin.math.max
 import kotlinx.coroutines.coroutineScope
@@ -70,10 +74,10 @@ import kotlinx.coroutines.coroutineScope
  * Menus display a list of choices on a temporary surface. They appear when users interact with a
  * button, action, or other control.
  *
- * Exposed dropdown menus display the currently selected item in a text field above the menu. In
- * some cases, it can accept and display user input (whether or not it’s listed as a menu choice).
- * If the text field input is used to filter results in the menu, the component is also known as
- * "autocomplete" or a "combobox".
+ * Exposed dropdown menus display the currently selected item in a text field to which the menu is
+ * anchored. In some cases, it can accept and display user input (whether or not it’s listed as a
+ * menu choice). If the text field input is used to filter results in the menu, the component is
+ * also known as "autocomplete" or a "combobox".
  *
  * ![Exposed dropdown menu image](https://developer.android.com/images/reference/androidx/compose/material3/exposed-dropdown-menu.png)
  *
@@ -90,8 +94,9 @@ import kotlinx.coroutines.coroutineScope
  * @param onExpandedChange called when the exposed dropdown menu is clicked and the expansion state
  * changes.
  * @param modifier the [Modifier] to be applied to this exposed dropdown menu
- * @param content the content of this exposed dropdown menu, typically a [TextField] and a
- * [ExposedDropdownMenuBoxScope.ExposedDropdownMenu]
+ * @param content the content of this exposed dropdown menu, typically a [TextField] and an
+ * [ExposedDropdownMenuBoxScope.ExposedDropdownMenu]. The [TextField] within [content] should be
+ * passed the [ExposedDropdownMenuBoxScope.menuAnchor] modifier for proper menu behavior.
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -108,37 +113,39 @@ fun ExposedDropdownMenuBox(
     val verticalMarginInPx = with(density) { MenuVerticalMargin.roundToPx() }
     val coordinates = remember { Ref<LayoutCoordinates>() }
 
-    val scope = remember(density, menuHeight, width) {
+    val focusRequester = remember { FocusRequester() }
+
+    val scope = remember(expanded, onExpandedChange, density, menuHeight, width) {
         object : ExposedDropdownMenuBoxScope {
+            override fun Modifier.menuAnchor(): Modifier {
+                return composed(inspectorInfo = debugInspectorInfo { name = "menuAnchor" }) {
+                    onGloballyPositioned {
+                        width = it.size.width
+                        coordinates.value = it
+                        updateHeight(view.rootView, coordinates.value, verticalMarginInPx) {
+                            newHeight -> menuHeight = newHeight
+                        }
+                    }.expandable(
+                        expanded = expanded,
+                        onExpandedChange = { onExpandedChange(!expanded) },
+                    ).focusRequester(focusRequester)
+                }
+            }
             override fun Modifier.exposedDropdownSize(matchTextFieldWidth: Boolean): Modifier {
                 return with(density) {
                     heightIn(max = menuHeight.toDp()).let {
                         if (matchTextFieldWidth) {
                             it.width(width.toDp())
-                        } else it
+                        } else {
+                            it
+                        }
                     }
                 }
             }
         }
     }
-    val focusRequester = remember { FocusRequester() }
 
-    Box(
-        modifier.onGloballyPositioned {
-            width = it.size.width
-            coordinates.value = it
-            updateHeight(
-                view.rootView,
-                coordinates.value,
-                verticalMarginInPx
-            ) { newHeight ->
-                menuHeight = newHeight
-            }
-        }.expandable(
-            onExpandedChange = { onExpandedChange(!expanded) },
-            menuLabel = getString(Strings.ExposedDropdownMenu)
-        ).focusRequester(focusRequester)
-    ) {
+    Box(modifier) {
         scope.content()
     }
 
@@ -149,11 +156,7 @@ fun ExposedDropdownMenuBox(
     DisposableEffect(view) {
         val listener = OnGlobalLayoutListener(view) {
             // We want to recalculate the menu height on relayout - e.g. when keyboard shows up.
-            updateHeight(
-                view.rootView,
-                coordinates.value,
-                verticalMarginInPx
-            ) { newHeight ->
+            updateHeight(view.rootView, coordinates.value, verticalMarginInPx) { newHeight ->
                 menuHeight = newHeight
             }
         }
@@ -206,6 +209,13 @@ private class OnGlobalLayoutListener(
 @ExperimentalMaterial3Api
 interface ExposedDropdownMenuBoxScope {
     /**
+     * Modifier which should be applied to a [TextField] (or [OutlinedTextField]) placed inside the
+     * scope. It's responsible for properly anchoring the [ExposedDropdownMenu], handling semantics
+     * of the component, and requesting focus.
+     */
+    fun Modifier.menuAnchor(): Modifier
+
+    /**
      * Modifier which should be applied to an [ExposedDropdownMenu] placed inside the scope. It's
      * responsible for setting the width of the [ExposedDropdownMenu], which will match the width of
      * the [TextField] (if [matchTextFieldWidth] is set to true). It will also change the height of
@@ -254,8 +264,8 @@ interface ExposedDropdownMenuBoxScope {
             val popupPositionProvider = DropdownMenuPositionProvider(
                 DpOffset.Zero,
                 density
-            ) { parentBounds, menuBounds ->
-                transformOriginState.value = calculateTransformOrigin(parentBounds, menuBounds)
+            ) { anchorBounds, menuBounds ->
+                transformOriginState.value = calculateTransformOrigin(anchorBounds, menuBounds)
             }
 
             ExposedDropdownMenuPopup(
@@ -283,30 +293,15 @@ object ExposedDropdownMenuDefaults {
      *
      * @param expanded whether [ExposedDropdownMenuBoxScope.ExposedDropdownMenu] is expanded or not.
      * Affects the appearance of the icon.
-     * @param onIconClick called when the icon is clicked
      */
     @ExperimentalMaterial3Api
     @Composable
-    fun TrailingIcon(
-        expanded: Boolean,
-        onIconClick: () -> Unit = {}
-    ) {
-        // Clear semantics here as otherwise icon will be a11y focusable but without an
-        // action. When there's an API to check if Talkback is on, developer will be able to
-        // expand the menu on icon click in a11y mode only esp. if using their own custom
-        // trailing icon.
-        IconButton(onClick = onIconClick, modifier = Modifier.clearAndSetSemantics { }) {
-            Icon(
-                Icons.Filled.ArrowDropDown,
-                "Trailing icon for exposed dropdown menu",
-                Modifier.rotate(
-                    if (expanded)
-                        180f
-                    else
-                        360f
-                )
-            )
-        }
+    fun TrailingIcon(expanded: Boolean) {
+        Icon(
+            Icons.Filled.ArrowDropDown,
+            null,
+            Modifier.rotate(if (expanded) 180f else 0f)
+        )
     }
 
     /**
@@ -512,11 +507,25 @@ object ExposedDropdownMenuDefaults {
             placeholderColor = placeholderColor,
             disabledPlaceholderColor = disabledPlaceholderColor
         )
+
+    /**
+     * Padding for [DropdownMenuItem]s within [ExposedDropdownMenuBoxScope.ExposedDropdownMenu] to
+     * align them properly with [TextField] components.
+     */
+    val ItemContentPadding: PaddingValues = PaddingValues(
+        horizontal = ExposedDropdownMenuItemHorizontalPadding,
+        vertical = 0.dp
+    )
 }
 
+@Suppress("ComposableModifierFactory")
+@Composable
 private fun Modifier.expandable(
+    expanded: Boolean,
     onExpandedChange: () -> Unit,
-    menuLabel: String
+    menuDescription: String = getString(Strings.ExposedDropdownMenu),
+    expandedDescription: String = getString(Strings.MenuExpanded),
+    collapsedDescription: String = getString(Strings.MenuCollapsed),
 ) = pointerInput(Unit) {
     forEachGesture {
         coroutineScope {
@@ -527,12 +536,13 @@ private fun Modifier.expandable(
                 } while (
                     !event.changes.fastAll { it.changedToUp() }
                 )
-                onExpandedChange.invoke()
+                onExpandedChange()
             }
         }
     }
 }.semantics {
-    contentDescription = menuLabel // this should be a localised string
+    stateDescription = if (expanded) expandedDescription else collapsedDescription
+    contentDescription = menuDescription
     onClick {
         onExpandedChange()
         true
@@ -555,3 +565,5 @@ private fun updateHeight(
         visibleWindowBounds.bottom - visibleWindowBounds.top - coordinates.boundsInWindow().bottom
     onHeightUpdate(max(heightAbove, heightBelow).toInt() - verticalMarginInPx)
 }
+
+private val ExposedDropdownMenuItemHorizontalPadding = 16.dp
