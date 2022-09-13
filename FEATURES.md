@@ -6,6 +6,28 @@
    * Linux (x86-64, arm64)
    * Web browsers
 
+### Features currently available in Compose for Desktop
+   * [Intro](tutorials/Getting_Started)
+   * [Desktop Components](tutorials/Desktop_Components/README.md)
+   * [Image loading support](tutorials/Image_And_Icons_Manipulations/README.md)
+   * [Keyboard handling](tutorials/Keyboard/README.md)
+   * [Mouse clicks and move](tutorials/Mouse_Events/README.md)
+   * [Packaging to native distributions](tutorials/Native_distributions_and_local_execution/README.md)
+   * [Signing and notarization](tutorials/Signing_and_notarization_on_macOS/README.md)
+   * [Swing interoperability](tutorials/Swing_Integration/README.md)
+   * [Keyboard navigation](tutorials/Tab_Navigation/README.md)
+   * [Tray, menu bar and notifications](tutorials/Tray_Notifications_MenuBar_new/README.md)
+   * [Window properties handling](tutorials/Window_API_new/README.md)
+   * [Context Menu](tutorials/Context_Menu/README.md)  
+
+### Features currently available in Compose for Web
+   * [Intro: HTML DOM DSL](tutorials/Web/Building_UI/README.md)
+   * [Event handling](tutorials/Web/Events_Handling/README.md)
+   * [Style DSL](tutorials/Web/Style_Dsl/README.md)
+   * [Controlled and Uncontrolled Inputs](tutorials/Web/Controlled_Uncontrolled_Inputs/README.md)
+   * [Test Utils](tutorials/Web/Using_Test_Utils/README.md)
+
+
 Follow individual tutorials to understand how to use particular feature.
 
 ### Limitations
