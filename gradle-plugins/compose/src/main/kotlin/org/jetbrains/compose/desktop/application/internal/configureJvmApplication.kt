@@ -110,6 +110,7 @@ internal fun Project.configurePackagingTasks(
             modules.set(provider { app.nativeDistributions.modules })
             includeAllModules.set(provider { app.nativeDistributions.includeAllModules })
             javaRuntimePropertiesFile.set(checkRuntime.flatMap { it.javaRuntimePropertiesFile })
+            cds.set(provider { app.nativeDistributions.cds} )
             destinationDir.set(project.layout.buildDirectory.dir("compose/tmp/${app.name}/runtime"))
         }
 
