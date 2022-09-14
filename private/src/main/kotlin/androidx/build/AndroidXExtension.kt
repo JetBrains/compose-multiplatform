@@ -17,6 +17,7 @@
 package androidx.build
 
 import androidx.build.checkapi.shouldConfigureApiTasks
+import androidx.build.jvmtest.configureAarAsJarForJvmTest
 import com.android.build.gradle.internal.crash.afterEvaluate
 import groovy.lang.Closure
 import org.gradle.api.GradleException
@@ -246,6 +247,10 @@ open class AndroidXExtension(val project: Project) {
 
     fun getLicenses(): Collection<License> {
         return licenses
+    }
+
+    fun enableAarAsJarForJvmTest() {
+        configureAarAsJarForJvmTest(project)
     }
 
     companion object {
