@@ -49,6 +49,7 @@ internal actual val GenericFontFamiliesMapping by lazy {
         Platform.MacOS ->
             mapOf(
                 FontFamily.SansSerif.name to listOf(
+                    "San Francisco",
                     "Helvetica Neue",
                     "Helvetica"
                 ),
