@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDirection
@@ -72,6 +73,7 @@ class TextStyleResolveDefaultsTest {
             assertThat(it.lineHeight).isEqualTo(DefaultLineHeight)
             assertThat(it.textIndent).isEqualTo(TextIndent.None)
             assertThat(it.platformStyle).isNull()
+            assertThat(it.lineBreak).isEqualTo(LineBreak.Simple)
         }
     }
 
@@ -269,6 +271,17 @@ class TextStyleResolveDefaultsTest {
                 direction = LayoutDirection.Ltr
             ).textIndent
         ).isEqualTo(TextIndent(12.sp, 13.sp))
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun test_use_provided_values_lineBreak() {
+        assertThat(
+            resolveDefaults(
+                TextStyle(lineBreak = LineBreak.Heading),
+                direction = LayoutDirection.Ltr
+            ).lineBreak
+        ).isEqualTo(LineBreak.Heading)
     }
 
     @Test

@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.LineHeightStyle.Trim
 import androidx.compose.ui.text.style.LineHeightStyle.Alignment
@@ -328,6 +329,21 @@ class TextStyleLayoutAttributesTest {
         ).isFalse()
     }
 
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun returns_false_for_lineBreak_change() {
+        val style = TextStyle(
+            lineBreak = LineBreak.Heading
+        )
+        assertThat(
+            style.hasSameLayoutAffectingAttributes(
+                TextStyle(
+                    lineBreak = LineBreak.Paragraph
+                )
+            )
+        ).isFalse()
+    }
+
     @Test
     fun should_be_updated_when_a_new_attribute_is_added_to_TextStyle() {
         // TextLayoutHelper TextStyle.hasSameLayoutAffectingAttributes is very easy to forget
@@ -360,7 +376,8 @@ class TextStyleLayoutAttributesTest {
             // ui-text/../androidx/compose/ui/text/TextSpanParagraphStyleTest.kt
             getProperty("paragraphStyle"),
             getProperty("spanStyle"),
-            getProperty("lineHeightStyle")
+            getProperty("lineHeightStyle"),
+            getProperty("lineBreak")
         )
 
         val textStyleProperties = TextStyle::class.memberProperties.map { Property(it) }
