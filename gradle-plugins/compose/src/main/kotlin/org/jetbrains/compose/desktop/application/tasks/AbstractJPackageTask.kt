@@ -20,12 +20,10 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.*
 import org.jetbrains.compose.desktop.application.internal.files.*
 import org.jetbrains.compose.desktop.application.internal.files.MacJarSignFileCopyingProcessor
-import org.jetbrains.compose.desktop.application.internal.files.fileHash
-import org.jetbrains.compose.desktop.application.internal.files.transformJar
+import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.validation.validate
 import java.io.*
 import java.util.*
-import java.util.zip.ZipEntry
 import javax.inject.Inject
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
@@ -37,6 +35,32 @@ abstract class AbstractJPackageTask @Inject constructor(
 ) : AbstractJvmToolOperationTask("jpackage") {
     @get:InputFiles
     val files: ConfigurableFileCollection = objects.fileCollection()
+
+    /**
+     * A hack to avoid conflicts between jar files in a flat dir.
+     * We receive input jar files as a list (FileCollection) of files.
+     * At that point we don't have access to jar files' coordinates.
+     *
+     * Some files can have the same simple names.
+     * For example, a project containing two modules:
+     *  1. :data:utils
+     *  2. :ui:utils
+     * produces:
+     *  1. <PROJECT>/data/utils/build/../utils.jar
+     *  2. <PROJECT>/ui/utils/build/../utils.jar
+     *
+     *  jpackage expects all files to be in one input directory (not sure),
+     *  so the natural workaround to avoid overwrites/conflicts is to add a content hash
+     *  to a file name. A better solution would be to preserve coordinates or relative paths,
+     *  but it is not straightforward at this point.
+     *
+     *  The flag is needed for two things:
+     *  1. Give users the ability to turn off the mangling, if they need to preserve names;
+     *  2. Proguard transformation already flattens jar files & mangles names, so we don't
+     *  need to mangle twice.
+     */
+    @get:Input
+    val mangleJarFilesNames: Property<Boolean> = objects.notNullProperty(true)
 
     @get:InputDirectory
     @get:Optional
@@ -383,7 +407,6 @@ abstract class AbstractJPackageTask @Inject constructor(
 
         fun invalidateAllLibs() {
             outdatedLibs.addAll(files.files)
-            outdatedLibs.add(launcherMainJar.ioFile)
 
             logger.debug("Clearing all files in working dir: $libsDirFile")
             fileOperations.delete(libsDirFile)
@@ -391,8 +414,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         }
 
         if (inputChanges.isIncremental) {
-            val allChanges = inputChanges.getFileChanges(files).asSequence() +
-                    inputChanges.getFileChanges(launcherMainJar)
+            val allChanges = inputChanges.getFileChanges(files).asSequence()
 
             try {
                 for (change in allChanges) {
@@ -422,18 +444,20 @@ abstract class AbstractJPackageTask @Inject constructor(
                 fileOperations.delete(tmpDirForSign)
                 tmpDirForSign.mkdirs()
 
-                val jvmRuntimeInfo = JavaRuntimeProperties.readFromFile(javaRuntimePropertiesFile.ioFile)
+                val jvmRuntimeInfo = JvmRuntimeProperties.readFromFile(javaRuntimePropertiesFile.ioFile)
                 MacJarSignFileCopyingProcessor(
                     signer,
                     tmpDirForSign,
                     jvmRuntimeVersion = jvmRuntimeInfo.majorVersion
                 )
             } ?: SimpleFileCopyingProcessor
+
+        val mangleJarFilesNames = mangleJarFilesNames.get()
         fun copyFileToLibsDir(sourceFile: File): File {
-            val targetFileName =
-                if (sourceFile.isJarFile) "${sourceFile.nameWithoutExtension}-${fileHash(sourceFile)}.jar"
+            val targetName =
+                if (mangleJarFilesNames && sourceFile.isJarFile) sourceFile.mangledName()
                 else sourceFile.name
-            val targetFile = libsDir.resolve(targetFileName)
+            val targetFile = libsDir.resolve(targetName)
             fileProcessor.copy(sourceFile, targetFile)
             return targetFile
         }
@@ -632,16 +656,14 @@ private fun unpackSkikoForCurrentOS(sourceJar: File, skikoDir: File, fileOperati
 
     fileOperations.delete(skikoDir)
     fileOperations.mkdir(skikoDir)
-    transformJar(sourceJar, targetJar) { zin, zout, entry ->
+    transformJar(sourceJar, targetJar) { entry, zin, zout ->
         // check both entry or entry.sha256
         if (entry.name.removeSuffix(".sha256") in entriesToUnpack) {
             val unpackedFile = skikoDir.resolve(entry.name.substringAfterLast("/"))
             zin.copyTo(unpackedFile)
             outputFiles.add(unpackedFile)
         } else {
-            zout.withNewEntry(ZipEntry(entry)) {
-                zin.copyTo(zout)
-            }
+            copyZipEntry(entry, zin, zout)
         }
     }
     return outputFiles

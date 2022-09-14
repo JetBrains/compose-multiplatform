@@ -5,15 +5,11 @@
 
 package org.jetbrains.compose.desktop.application.internal
 
-import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import org.jetbrains.compose.desktop.application.dsl.JvmApplication
 import org.jetbrains.compose.desktop.application.dsl.JvmApplicationDistributions
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
-internal fun packageVersionFor(
-    project: Project,
-    app: JvmApplication,
+internal fun JvmApplicationContext.packageVersionFor(
     targetFormat: TargetFormat
 ): Provider<String?> =
     project.provider {
@@ -44,9 +40,7 @@ private fun JvmApplicationDistributions.packageVersionFor(
         ?: packageVersion
 }
 
-internal fun packageBuildVersionFor(
-    project: Project,
-    app: JvmApplication,
+internal fun JvmApplicationContext.packageBuildVersionFor(
     targetFormat: TargetFormat
 ): Provider<String?> =
     project.provider {

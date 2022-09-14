@@ -33,6 +33,11 @@ private inline fun String.transformFirstCharIfNeeded(
     return this
 }
 
+internal fun joinDashLowercaseNonEmpty(vararg parts: String): String =
+    parts
+        .filter { it.isNotEmpty() }
+        .joinToString(separator = "-") { it.lowercase() }
+
 internal fun joinLowerCamelCase(vararg parts: String): String =
     parts.withIndex().joinToString(separator = "") { (i, part) ->
         if (i == 0) part.lowercaseFirstChar() else part.uppercaseFirstChar()

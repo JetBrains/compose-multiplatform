@@ -9,6 +9,7 @@ import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.jetbrains.compose.desktop.application.dsl.JvmApplication
+import org.jetbrains.compose.desktop.application.internal.JvmApplicationInternal
 import org.jetbrains.compose.desktop.application.dsl.NativeApplication
 import javax.inject.Inject
 
@@ -17,7 +18,7 @@ abstract class DesktopExtension @Inject constructor(private val objectFactory: O
         private set
     val application: JvmApplication by lazy {
         _isJvmApplicationInitialized = true
-        objectFactory.newInstance(JvmApplication::class.java, "main")
+        objectFactory.newInstance(JvmApplicationInternal::class.java, "main")
     }
     fun application(fn: Action<JvmApplication>) {
         fn.execute(application)

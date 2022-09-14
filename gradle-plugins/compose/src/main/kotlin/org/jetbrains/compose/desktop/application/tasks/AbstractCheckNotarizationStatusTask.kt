@@ -7,6 +7,7 @@ package org.jetbrains.compose.desktop.application.tasks
 
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.*
+import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
 import org.jetbrains.compose.desktop.application.internal.MacUtils
 import org.jetbrains.compose.desktop.application.internal.NOTARIZATION_REQUEST_INFO_FILE_NAME
 import org.jetbrains.compose.desktop.application.internal.NotarizationRequestInfo
@@ -49,11 +50,7 @@ abstract class AbstractCheckNotarizationStatusTask : AbstractNotarizationTask() 
                         "--username", notarization.appleID,
                         "--password", notarization.password
                     ),
-                    processStdout = { output ->
-                        if (!verbose.get()) {
-                            logger.quiet(output)
-                        }
-                    }
+                    logToConsole = ExternalToolRunner.LogToConsole.Always
                 )
             } catch (e: Exception) {
                 logger.error("Could not check notarization request '${request.uuid}'", e)

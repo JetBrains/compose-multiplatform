@@ -10,10 +10,11 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
-import org.jetbrains.compose.desktop.application.internal.JavaRuntimeProperties
+import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.executableName
 import org.jetbrains.compose.desktop.application.internal.ioFile
 import org.jetbrains.compose.desktop.application.internal.notNullProperty
+import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 import java.io.File
 
@@ -65,7 +66,7 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
         runExternalTool(
             tool = javaExec,
             args = listOf("--list-modules"),
-            forceLogToFile = true,
+            logToConsole = ExternalToolRunner.LogToConsole.Never,
             processStdout = { stdout ->
                 stdout.lineSequence().forEach { line ->
                     val moduleName = line.trim().substringBefore("@")
@@ -76,8 +77,8 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
             }
         )
 
-        val properties = JavaRuntimeProperties(javaRuntimeVersion, modules)
-        JavaRuntimeProperties.writeToFile(properties, javaRuntimePropertiesFile.ioFile)
+        val properties = JvmRuntimeProperties(javaRuntimeVersion, modules)
+        JvmRuntimeProperties.writeToFile(properties, javaRuntimePropertiesFile.ioFile)
     }
 
     private fun getJavaRuntimeVersionUnsafe(): String? {

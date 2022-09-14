@@ -8,7 +8,7 @@ package org.jetbrains.compose
 import org.gradle.internal.impldep.org.testng.Assert
 import org.jetbrains.compose.desktop.application.internal.OS
 import org.jetbrains.compose.desktop.application.internal.currentOS
-import org.jetbrains.compose.desktop.application.internal.files.fileHash
+import org.jetbrains.compose.desktop.application.internal.files.contentHash
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
@@ -38,8 +38,8 @@ class FileHashTest {
         input1.writeText("2")
         val modifiedJar = createJar("modified", input1)
 
-        val initHash = fileHash(initJar)
-        val modifiedHash = fileHash(modifiedJar)
+        val initHash = initJar.contentHash()
+        val modifiedHash = modifiedJar.contentHash()
         Assert.assertNotEquals(modifiedHash, initHash)
     }
 

@@ -1,0 +1,30 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.compose"
+}
+
+repositories {
+    jetbrainsCompose()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation compose.desktop.currentOs
+}
+
+compose.desktop {
+    application {
+        mainClass = "Main"
+        args(project.projectDir.absolutePath)
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+        }
+        args(project.projectDir.absolutePath)
+
+        buildTypes.release.proguard {
+            configurationFiles.from("rules.pro")
+        }
+    }
+}

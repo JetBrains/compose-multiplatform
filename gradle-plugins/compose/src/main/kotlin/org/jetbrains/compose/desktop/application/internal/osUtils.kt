@@ -1,13 +1,12 @@
 /*
- * Copyright 2020-2021 JetBrains s.r.o. and respective authors and developers.
+ * Copyright 2020-2022 JetBrains s.r.o. and respective authors and developers.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.compose.desktop.application.internal
 
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.Internal
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.desktop.application.internal.files.checkExistingFile
 import org.jetbrains.compose.desktop.application.tasks.MIN_JAVA_RUNTIME_VERSION
 import java.io.File
 
@@ -89,26 +88,14 @@ internal object UnixUtils {
     }
 }
 
-internal fun jvmToolFile(toolName: String, javaHome: Provider<String>): File {
-    val jtool = File(javaHome.get()).resolve("bin/${executableName(toolName)}")
+internal fun jvmToolFile(toolName: String, javaHome: Provider<String>): File =
+    jvmToolFile(toolName, File(javaHome.get()))
+
+internal fun jvmToolFile(toolName: String, javaHome: File): File {
+    val jtool = javaHome.resolve("bin/${executableName(toolName)}")
     check(jtool.isFile) {
         "Invalid JDK: $jtool is not a file! \n" +
                 "Ensure JAVA_HOME or buildSettings.javaHome is set to JDK $MIN_JAVA_RUNTIME_VERSION or newer"
     }
     return jtool
 }
-
-@Internal
-internal fun findOutputFileOrDir(dir: File, targetFormat: TargetFormat): File =
-    when (targetFormat) {
-        TargetFormat.AppImage -> dir
-        else -> dir.walk().first { it.isFile && it.name.endsWith(targetFormat.fileExt) }
-    }
-
-internal fun File.checkExistingFile(): File =
-    apply {
-        check(isFile) { "'$absolutePath' does not exist" }
-    }
-
-internal val File.isJarFile: Boolean
-    get() = name.endsWith(".jar", ignoreCase = true) && isFile

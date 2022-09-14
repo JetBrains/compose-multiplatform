@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 JetBrains s.r.o. and respective authors and developers.
+ * Copyright 2020-2022 JetBrains s.r.o. and respective authors and developers.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -7,6 +7,7 @@ package org.jetbrains.compose.desktop.application.internal
 
 import org.gradle.api.file.FileSystemLocation
 import org.gradle.api.provider.Provider
+import org.jetbrains.compose.desktop.application.internal.files.normalizedPath
 import java.io.File
 
 internal fun <T : Any?> MutableCollection<String>.cliArg(
@@ -43,6 +44,3 @@ private fun <T : Any?> defaultToString(): (T) -> String =
         }
         "\"$asString\""
     }
-
-internal fun File.normalizedPath() =
-    if (currentOS == OS.Windows) absolutePath.replace("\\", "\\\\") else absolutePath

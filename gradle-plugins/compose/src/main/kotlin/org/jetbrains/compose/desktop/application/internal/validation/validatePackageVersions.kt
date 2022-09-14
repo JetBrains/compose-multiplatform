@@ -6,14 +6,13 @@
 package org.jetbrains.compose.desktop.application.internal.validation
 
 import org.gradle.api.GradleException
-import org.gradle.api.Project
-import org.jetbrains.compose.desktop.application.dsl.JvmApplication
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.desktop.application.internal.JvmApplicationContext
 import org.jetbrains.compose.desktop.application.internal.OS
 import org.jetbrains.compose.desktop.application.internal.packageBuildVersionFor
 import org.jetbrains.compose.desktop.application.internal.packageVersionFor
 
-internal fun Project.validatePackageVersions(app: JvmApplication) {
+internal fun JvmApplicationContext.validatePackageVersions() {
     val errors = ErrorsCollector()
 
     for (targetFormat in app.nativeDistributions.targetFormats) {
@@ -25,7 +24,7 @@ internal fun Project.validatePackageVersions(app: JvmApplication) {
             TargetFormat.Dmg, TargetFormat.Pkg -> MacVersionChecker
         }
 
-        val packageVersion = packageVersionFor(project, app, targetFormat).orNull
+        val packageVersion = packageVersionFor(targetFormat).orNull
         if (packageVersion == null) {
             errors.addError(targetFormat, "no version was specified")
         } else {
@@ -41,7 +40,7 @@ internal fun Project.validatePackageVersions(app: JvmApplication) {
         }
 
         if (targetFormat.targetOS == OS.MacOS) {
-            val packageBuildVersion = packageBuildVersionFor(project, app, targetFormat).orNull
+            val packageBuildVersion = packageBuildVersionFor(targetFormat).orNull
             if (packageBuildVersion == null) {
                 errors.addError(targetFormat, "no build version was specified")
             } else {

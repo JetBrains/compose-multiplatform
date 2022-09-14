@@ -16,14 +16,14 @@ internal const val UNZIP_WIX_TOOLSET_TASK_NAME = "unzipWix"
 internal const val WIX_PATH_ENV_VAR = "WIX_PATH"
 internal const val DOWNLOAD_WIX_PROPERTY = "compose.desktop.application.downloadWix"
 
-internal fun Project.configureWix() {
-    if (currentOS != OS.Windows) return
+internal fun JvmApplicationContext.configureWix() {
+    check(currentOS == OS.Windows) { "Should not be called for non-Windows OS: $currentOS" }
 
     val wixPath = System.getenv()[WIX_PATH_ENV_VAR]
     if (wixPath != null) {
         val wixDir = File(wixPath)
         check(wixDir.isDirectory) { "$WIX_PATH_ENV_VAR value is not a valid directory: $wixDir" }
-        eachWindowsPackageTask {
+        project.eachWindowsPackageTask {
             wixToolsetDir.set(wixDir)
         }
         return
@@ -42,10 +42,10 @@ internal fun Project.configureWix() {
     }
     val unzip = root.tasks.maybeCreate(UNZIP_WIX_TOOLSET_TASK_NAME, Copy::class.java).apply {
         dependsOn(download)
-        from(zipTree(zipFile))
+        from(project.zipTree(zipFile))
         destinationDir = unzipDir
     }
-    eachWindowsPackageTask {
+    project.eachWindowsPackageTask {
         dependsOn(unzip)
         wixToolsetDir.set(unzipDir)
     }

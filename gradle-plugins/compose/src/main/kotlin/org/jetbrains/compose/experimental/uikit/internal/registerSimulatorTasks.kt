@@ -13,8 +13,6 @@ import org.jetbrains.compose.desktop.application.internal.currentArch
 import org.jetbrains.compose.experimental.dsl.DeployTarget
 import org.jetbrains.compose.experimental.dsl.UiKitConfiguration
 import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
-import java.io.File
-
 
 fun Project.registerSimulatorTasks(
     id: String,

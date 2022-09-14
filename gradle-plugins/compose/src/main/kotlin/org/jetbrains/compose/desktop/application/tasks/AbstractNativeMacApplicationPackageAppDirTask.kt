@@ -9,13 +9,12 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.Optional
-import org.jetbrains.compose.desktop.application.internal.*
 import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder
 import org.jetbrains.compose.desktop.application.internal.PlistKeys
 import org.jetbrains.compose.desktop.application.internal.ioFile
 import org.jetbrains.compose.desktop.application.internal.notNullProperty
+import org.jetbrains.compose.desktop.application.internal.nullableProperty
 import java.io.File
-import java.util.*
 
 private const val KOTLIN_NATIVE_MIN_SUPPORTED_MAC_OS = "10.13"
 
