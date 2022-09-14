@@ -297,7 +297,7 @@ internal abstract class DokkaPartialDocsTask @Inject constructor(
     }
 }
 
-private enum class DokkaAnalysisPlatform(val jsonName: String) {
+enum class DokkaAnalysisPlatform(val jsonName: String) {
     JVM("jvm"),
     ANDROID("jvm"), // intentionally same as JVM as dokka only support jvm
     JS("js"),
@@ -323,7 +323,7 @@ private fun KotlinSourceSet.displayName() = if (name.endsWith("Main")) {
     name
 }
 
-private fun KotlinTarget.docsPlatform() = when (platformType) {
+fun KotlinTarget.docsPlatform() = when (platformType) {
     KotlinPlatformType.common -> DokkaAnalysisPlatform.COMMON
     KotlinPlatformType.jvm -> DokkaAnalysisPlatform.JVM
     KotlinPlatformType.js -> DokkaAnalysisPlatform.JS

@@ -21,6 +21,7 @@ import com.android.build.gradle.LibraryPlugin
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.stream.JsonWriter
+import org.gradle.api.artifacts.Configuration
 import groovy.util.Node
 import java.io.File
 import java.io.StringReader
@@ -329,9 +330,11 @@ private fun Project.configureMultiplatformPublication(componentFactory: Software
 private fun Project.replaceBaseMultiplatformPublication(
     componentFactory: SoftwareComponentFactory
 ) {
-    withSourcesComponent(componentFactory) { sourcesComponent ->
-        val kotlinComponent = components.findByName("kotlin") as SoftwareComponentInternal
-
+    val kotlinComponent = components.findByName("kotlin") as SoftwareComponentInternal
+    withSourcesComponents(
+        componentFactory,
+        setOf("sourcesElements", "androidxSourcesElements")
+    ) { sourcesComponents ->
         configure<PublishingExtension> {
             publications { pubs ->
                 pubs.create<MavenPublication>("androidxKmp") {
@@ -348,7 +351,10 @@ private fun Project.replaceBaseMultiplatformPublication(
 
                         override fun getUsages(): MutableSet<out UsageContext> {
                             // Include sources artifact we built and root artifacts from kotlin plugin.
-                            return (sourcesComponent.usages + kotlinComponent.usages).toMutableSet()
+                            return (
+                                sourcesComponents.flatMap { it.usages } +
+                                kotlinComponent.usages
+                            ).toMutableSet()
                         }
 
                         override fun getVariants(): MutableSet<out SoftwareComponent> {
@@ -364,30 +370,37 @@ private fun Project.replaceBaseMultiplatformPublication(
                     it.isAlias = true
                 }
             }
-        }
 
-        disableBaseKmpPublications()
+            disableBaseKmpPublications()
+        }
     }
 }
 
 /**
- * If a source configuration is currently in the project, or eventually gets added, run the given
- * configuration with it.
+ * If source configurations with the given names are currently in the project, or if they
+ * eventually gets added, run the given [action] with those configurations as software components.
  */
-private fun Project.withSourcesComponent(
+private fun Project.withSourcesComponents(
     componentFactory: SoftwareComponentFactory,
-    action: (SoftwareComponentInternal) -> Unit
+    names: Set<String>,
+    action: (List<SoftwareComponentInternal>) -> Unit
 ) {
+    val targetConfigurations = mutableSetOf<Configuration>()
     configurations.configureEach {
-        if (it.attributes.getAttribute(DocsType.DOCS_TYPE_ATTRIBUTE)?.name == DocsType.SOURCES) {
-            // "adhoc" is gradle terminology; it refers to a component with arbitrary included
-            // variants, which is what we want to build.  The name need only be unique within the
-            // project
-            val androidxSourceComponentName = "androidxJvmSources"
-            val component = componentFactory.adhoc(androidxSourceComponentName).apply {
-                addVariantsFromConfiguration(it) {}
-            } as SoftwareComponentInternal
-            action(component)
+        if (
+            it.attributes.getAttribute(DocsType.DOCS_TYPE_ATTRIBUTE)?.name == DocsType.SOURCES &&
+            it.name in names
+        ) {
+            targetConfigurations.add(it)
+            if (targetConfigurations.size == names.size) {
+                action(
+                    targetConfigurations.map { configuration ->
+                        componentFactory.adhoc(configuration.name).apply {
+                            addVariantsFromConfiguration(configuration) {}
+                        } as SoftwareComponentInternal
+                    }
+                )
+            }
         }
     }
 }

@@ -332,6 +332,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                 configureAndroidLibraryWithMultiplatformPluginOptions()
             }
             project.configureKmpTests()
+            project.configureSourceJarForMultiplatform()
         }
     }
 
