@@ -89,7 +89,7 @@ internal abstract class AndroidViewHolder(
         internal set(value) {
             if (value !== field) {
                 field = value
-                removeAllViews()
+                removeAllViewsInLayout()
                 if (value != null) {
                     addView(value)
                     runUpdate()

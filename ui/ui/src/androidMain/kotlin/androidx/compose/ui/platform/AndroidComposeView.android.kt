@@ -724,14 +724,16 @@ internal class AndroidComposeView(context: Context) :
      * from the hierarchy.
      */
     fun removeAndroidView(view: AndroidViewHolder) {
-        androidViewsHandler.removeView(view)
-        androidViewsHandler.layoutNodeToHolder.remove(
-            androidViewsHandler.holderToLayoutNode.remove(view)
-        )
-        ViewCompat.setImportantForAccessibility(
-            view,
-            ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_AUTO
-        )
+        registerOnEndApplyChangesListener {
+            androidViewsHandler.removeViewInLayout(view)
+            androidViewsHandler.layoutNodeToHolder.remove(
+                androidViewsHandler.holderToLayoutNode.remove(view)
+            )
+            ViewCompat.setImportantForAccessibility(
+                view,
+                ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_AUTO
+            )
+        }
     }
 
     /**
