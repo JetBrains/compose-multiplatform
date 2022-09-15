@@ -705,5 +705,6 @@ private val hiddenPackages = listOf(
 
 // Set of packages to exclude from Java refdoc generation
 private val hiddenPackagesJava = setOf(
-    "androidx.*compose.*"
+    "androidx.*compose.*",
+    "androidx.*glance.*",
 )
