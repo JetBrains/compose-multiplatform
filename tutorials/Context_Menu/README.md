@@ -126,6 +126,51 @@ Right click on the Blue Square will show a context menu with two items:
 
 <img width="423" alt="image" src="https://user-images.githubusercontent.com/5963351/190020592-15e851f8-e356-413c-b5c3-225393712292.png">
 
+## Styling context menu
+Style of context menu doesn't comply MaterialTheme. To change its colors, you should override `LocalContextMenuRepresentation`:
+```
+import androidx.compose.foundation.DarkDefaultContextMenuRepresentation
+import androidx.compose.foundation.LightDefaultContextMenuRepresentation
+import androidx.compose.foundation.LocalContextMenuRepresentation
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.TextField
+import androidx.compose.material.darkColors
+import androidx.compose.material.lightColors
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.window.singleWindowApplication
+
+fun main() = singleWindowApplication {
+    isSystemInDarkTheme()
+    MaterialTheme(
+        colors = if (isSystemInDarkTheme()) darkColors() else lightColors()
+    ) {
+        val contextMenuRepresentation = if (isSystemInDarkTheme()) {
+            DarkDefaultContextMenuRepresentation
+        } else {
+            LightDefaultContextMenuRepresentation
+        }
+        CompositionLocalProvider(LocalContextMenuRepresentation provides contextMenuRepresentation) {
+            Surface(Modifier.fillMaxSize()) {
+                Box {
+                    var value by remember { mutableStateOf("") }
+                    TextField(value, { value = it })
+                }
+            }
+        }
+    }
+}
+```
+<img width="392" alt="image" src="https://user-images.githubusercontent.com/5963351/190514663-d345a0ba-0b4c-4920-b6cd-743a753d7d83.png">
+
 ## Custom text context menu
 You can override text menu for all texts and text fields in your application, overriding `TextContextMenu`:
 ```kotlin
