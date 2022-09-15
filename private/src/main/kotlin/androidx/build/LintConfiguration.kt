@@ -174,10 +174,7 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
         // We run lint on each library, so we don't want transitive checking of each dependency
         checkDependencies = false
 
-        if (
-            extension.type == LibraryType.PUBLISHED_TEST_LIBRARY ||
-            extension.type == LibraryType.INTERNAL_TEST_LIBRARY
-        ) {
+        if (extension.type.allowCallingVisibleForTestsApis) {
             // Test libraries are allowed to call @VisibleForTests code
             disable.add("VisibleForTests")
         } else {

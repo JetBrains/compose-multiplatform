@@ -59,7 +59,8 @@ sealed class LibraryType(
     val publish: Publish = Publish.NONE,
     val sourceJars: Boolean = false,
     val checkApi: RunApiTasks = RunApiTasks.No("Unknown Library Type"),
-    val compilationTarget: CompilationTarget = CompilationTarget.DEVICE
+    val compilationTarget: CompilationTarget = CompilationTarget.DEVICE,
+    val allowCallingVisibleForTestsApis: Boolean = false
 ) {
     val name: String
         get() = javaClass.simpleName
@@ -83,20 +84,23 @@ sealed class LibraryType(
         val KMP_LIBRARY = KmpLibrary()
         val UNSET = Unset()
     }
-    open class PublishedLibrary() : LibraryType(
+    open class PublishedLibrary(allowCallingVisibleForTestsApis: Boolean = false) : LibraryType(
         publish = Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = true,
-        checkApi = RunApiTasks.Yes()
+        checkApi = RunApiTasks.Yes(),
+        allowCallingVisibleForTestsApis = allowCallingVisibleForTestsApis
     )
     open class InternalLibrary(
-        compilationTarget: CompilationTarget = CompilationTarget.DEVICE
+        compilationTarget: CompilationTarget = CompilationTarget.DEVICE,
+        allowCallingVisibleForTestsApis: Boolean = false
     ) : LibraryType(
         checkApi = RunApiTasks.No("Internal Library"),
-        compilationTarget = compilationTarget
+        compilationTarget = compilationTarget,
+        allowCallingVisibleForTestsApis = allowCallingVisibleForTestsApis
     )
 
-    class PublishedTestLibrary() : PublishedLibrary()
-    class InternalTestLibrary() : InternalLibrary()
+    class PublishedTestLibrary() : PublishedLibrary(allowCallingVisibleForTestsApis = true)
+    class InternalTestLibrary() : InternalLibrary(allowCallingVisibleForTestsApis = true)
     class InternalHostTestLibrary() : InternalLibrary(CompilationTarget.HOST)
     class PublishedNativeLibrary : PublishedLibrary()
     class Samples : LibraryType(
