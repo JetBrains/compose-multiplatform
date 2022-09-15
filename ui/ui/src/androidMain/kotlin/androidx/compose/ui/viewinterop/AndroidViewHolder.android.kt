@@ -19,6 +19,7 @@ package androidx.compose.ui.viewinterop
 import android.content.Context
 import android.graphics.Rect
 import android.graphics.Region
+import android.os.Build
 import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
@@ -236,6 +237,15 @@ internal abstract class AndroidViewHolder(
         // We need to call super here in order to correctly update the dirty flags of the holder.
         super.onDescendantInvalidated(child, target)
         layoutNode.invalidateLayer()
+    }
+
+    override fun onWindowVisibilityChanged(visibility: Int) {
+        super.onWindowVisibilityChanged(visibility)
+        // On Lollipop, when the Window becomes visible, child Views need to be explicitly
+        // invalidated for some reason.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M && visibility == View.VISIBLE) {
+            layoutNode.invalidateLayer()
+        }
     }
 
     // Always mark the region of the View to not be transparent to disable an optimisation which
