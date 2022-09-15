@@ -437,7 +437,8 @@ class LazyGridState constructor(
 }
 
 @OptIn(ExperimentalFoundationApi::class)
-private object EmptyLazyGridLayoutInfo : LazyGridLayoutInfo {
+// TODO: it was private, but made internal because of https://youtrack.jetbrains.com/issue/KT-54028
+internal object EmptyLazyGridLayoutInfo : LazyGridLayoutInfo {
     override val visibleItemsInfo = emptyList<LazyGridItemInfo>()
     override val viewportStartOffset = 0
     override val viewportEndOffset = 0
