@@ -57,7 +57,6 @@ tasks {
 
     patchPluginXml {
         sinceBuild.set(projectProperties.pluginSinceBuild)
-        untilBuild.set(projectProperties.pluginUntilBuild)
     }
 
     runPluginVerifier {
@@ -72,7 +71,6 @@ class ProjectProperties(private val project: Project) {
     val platformDownloadSources get() = stringProperty("platform.download.sources").toBoolean()
     val pluginChannels get() = listProperty("plugin.channels")
     val pluginSinceBuild get() = stringProperty("plugin.since.build")
-    val pluginUntilBuild get() = stringProperty("plugin.until.build")
     val pluginVerifierIdeVersions get() = listProperty("plugin.verifier.ide.versions")
 
     private fun stringProperty(key: String): String =
