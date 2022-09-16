@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package androidx.build.jvmtest
+package androidx.build.transform
 
-import androidx.build.transform.ExtractClassesJarTransform
-import androidx.build.transform.IdentityTransform
 import com.android.build.api.attributes.BuildTypeAttr
 import org.gradle.api.Project
 import org.gradle.api.attributes.Attribute
@@ -27,8 +25,8 @@ import org.gradle.api.attributes.Usage
  * Creates `testAarAsJar` configuration that can be used for JVM tests that need to Android library
  * classes on the classpath.
  */
-fun configureAarAsJarForJvmTest(project: Project) {
-    val testAarsAsJars = project.configurations.create("testAarAsJar") {
+fun configureAarAsJarForConfiguration(project: Project, configurationName: String) {
+    val testAarsAsJars = project.configurations.create("${configurationName}AarAsJar") {
         it.isTransitive = false
         it.isCanBeConsumed = false
         it.isCanBeResolved = true
@@ -55,7 +53,7 @@ fun configureAarAsJarForJvmTest(project: Project) {
     val aarAsJar = testAarsAsJars.incoming.artifactView { viewConfiguration ->
         viewConfiguration.attributes.attribute(artifactType, "aarAsJar")
     }.files
-    project.configurations.getByName("testImplementation").dependencies.add(
+    project.configurations.getByName(configurationName).dependencies.add(
         project.dependencies.create(aarAsJar)
     )
 }
