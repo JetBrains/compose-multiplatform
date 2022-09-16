@@ -139,9 +139,11 @@ fun Modifier.onClick(
                 interactionSource = interactionSource, pressedInteraction = pressedInteraction
             )
 
-            Modifier.pointerInput(interactionSource, matcher, hasLongClick, hasDoubleClick) {
+            val matcherState = rememberUpdatedState(matcher)
+
+            Modifier.pointerInput(interactionSource, hasLongClick, hasDoubleClick) {
                 detectTapGestures(
-                    matcher = matcher,
+                    matcher = matcherState.value,
                     keyboardModifiers = {
                         keyboardModifiersState.value(this)
                     },
