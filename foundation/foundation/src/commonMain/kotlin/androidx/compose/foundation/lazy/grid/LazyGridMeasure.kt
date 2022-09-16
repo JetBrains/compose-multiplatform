@@ -46,6 +46,7 @@ internal fun measureLazyGrid(
     slotsPerLine: Int,
     beforeContentPadding: Int,
     afterContentPadding: Int,
+    spaceBetweenLines: Int,
     firstVisibleLineIndex: LineIndex,
     firstVisibleLineScrollOffset: Int,
     scrollToBeConsumed: Float,
@@ -96,13 +97,14 @@ internal fun measureLazyGrid(
         // this will contain all the MeasuredItems representing the visible lines
         val visibleLines = mutableListOf<LazyMeasuredLine>()
 
-        // include the start padding so we compose items in the padding area. before starting
-        // scrolling forward we would remove it back
-        currentFirstLineScrollOffset -= beforeContentPadding
-
-        // define min and max offsets (min offset currently includes beforeContentPadding)
-        val minOffset = -beforeContentPadding
+        // define min and max offsets
+        val minOffset = -beforeContentPadding + if (spaceBetweenLines < 0) spaceBetweenLines else 0
         val maxOffset = mainAxisAvailableSize
+
+        // include the start padding so we compose items in the padding area and neutralise item
+        // spacing (if the spacing is negative this will make sure the previous item is composed)
+        // before starting scrolling forward we will remove it back
+        currentFirstLineScrollOffset += minOffset
 
         // we had scrolled backward or we compose items in the start padding area, which means
         // items before current firstLineScrollOffset should be visible. compose them and update
@@ -114,15 +116,16 @@ internal fun measureLazyGrid(
             currentFirstLineScrollOffset += measuredLine.mainAxisSizeWithSpacings
             currentFirstLineIndex = previous
         }
-        // if we were scrolled backward, but there were not enough lines before. this means
+
+        // if we were scrolled backward, but there were not enough items before. this means
         // not the whole scroll was consumed
         if (currentFirstLineScrollOffset < minOffset) {
             scrollDelta += currentFirstLineScrollOffset
             currentFirstLineScrollOffset = minOffset
         }
 
-        // neutralize previously added start padding as we stopped filling the before content padding
-        currentFirstLineScrollOffset += beforeContentPadding
+        // neutralize previously added padding as we stopped filling the before content padding
+        currentFirstLineScrollOffset -= minOffset
 
         var index = currentFirstLineIndex
         val maxMainAxis = (maxOffset + afterContentPadding).coerceAtLeast(0)
@@ -192,12 +195,13 @@ internal fun measureLazyGrid(
         }
 
         // the initial offset for lines from visibleLines list
+        require(currentFirstLineScrollOffset >= 0)
         val visibleLinesScrollOffset = -currentFirstLineScrollOffset
         var firstLine = visibleLines.first()
 
         // even if we compose lines to fill before content padding we should ignore lines fully
         // located there for the state's scroll position calculation (first line + first offset)
-        if (beforeContentPadding > 0) {
+        if (beforeContentPadding > 0 || spaceBetweenLines < 0) {
             for (i in visibleLines.indices) {
                 val size = visibleLines[i].mainAxisSizeWithSpacings
                 if (currentFirstLineScrollOffset != 0 && size <= currentFirstLineScrollOffset &&

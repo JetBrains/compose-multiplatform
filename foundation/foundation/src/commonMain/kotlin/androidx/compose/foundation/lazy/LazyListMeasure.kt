@@ -42,6 +42,7 @@ internal fun measureLazyList(
     mainAxisAvailableSize: Int,
     beforeContentPadding: Int,
     afterContentPadding: Int,
+    spaceBetweenItems: Int,
     firstVisibleItemIndex: DataIndex,
     firstVisibleItemScrollOffset: Int,
     scrollToBeConsumed: Float,
@@ -100,13 +101,14 @@ internal fun measureLazyList(
         // this will contain all the MeasuredItems representing the visible items
         val visibleItems = mutableListOf<LazyMeasuredItem>()
 
-        // include the start padding so we compose items in the padding area. before starting
-        // scrolling forward we would remove it back
-        currentFirstItemScrollOffset -= beforeContentPadding
-
-        // define min and max offsets (min offset currently includes beforeContentPadding)
-        val minOffset = -beforeContentPadding
+        // define min and max offsets
+        val minOffset = -beforeContentPadding + if (spaceBetweenItems < 0) spaceBetweenItems else 0
         val maxOffset = mainAxisAvailableSize
+
+        // include the start padding so we compose items in the padding area and neutralise item
+        // spacing (if the spacing is negative this will make sure the previous item is composed)
+        // before starting scrolling forward we will remove it back
+        currentFirstItemScrollOffset += minOffset
 
         // max of cross axis sizes of all visible items
         var maxCrossAxis = 0
@@ -122,6 +124,7 @@ internal fun measureLazyList(
             currentFirstItemScrollOffset += measuredItem.sizeWithSpacings
             currentFirstItemIndex = previous
         }
+
         // if we were scrolled backward, but there were not enough items before. this means
         // not the whole scroll was consumed
         if (currentFirstItemScrollOffset < minOffset) {
@@ -129,8 +132,8 @@ internal fun measureLazyList(
             currentFirstItemScrollOffset = minOffset
         }
 
-        // neutralize previously added start padding as we stopped filling the before content padding
-        currentFirstItemScrollOffset += beforeContentPadding
+        // neutralize previously added padding as we stopped filling the before content padding
+        currentFirstItemScrollOffset -= minOffset
 
         var index = currentFirstItemIndex
         val maxMainAxis = (maxOffset + afterContentPadding).coerceAtLeast(0)
@@ -200,12 +203,13 @@ internal fun measureLazyList(
         }
 
         // the initial offset for items from visibleItems list
+        require(currentFirstItemScrollOffset >= 0)
         val visibleItemsScrollOffset = -currentFirstItemScrollOffset
         var firstItem = visibleItems.first()
 
         // even if we compose items to fill before content padding we should ignore items fully
         // located there for the state's scroll position calculation (first item + first offset)
-        if (beforeContentPadding > 0) {
+        if (beforeContentPadding > 0 || spaceBetweenItems < 0) {
             for (i in visibleItems.indices) {
                 val size = visibleItems[i].sizeWithSpacings
                 if (currentFirstItemScrollOffset != 0 && size <= currentFirstItemScrollOffset &&

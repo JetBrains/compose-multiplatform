@@ -303,6 +303,7 @@ private fun rememberLazyListMeasurePolicy(
             mainAxisAvailableSize = mainAxisAvailableSize,
             beforeContentPadding = beforeContentPadding,
             afterContentPadding = afterContentPadding,
+            spaceBetweenItems = spaceBetweenItems,
             firstVisibleItemIndex = firstVisibleItemIndex,
             firstVisibleItemScrollOffset = firstVisibleScrollOffset,
             scrollToBeConsumed = state.scrollToBeConsumed,

@@ -75,7 +75,7 @@ internal class LazyMeasuredItem @ExperimentalFoundationApi constructor(
             maxCrossAxis = maxOf(maxCrossAxis, if (!isVertical) it.height else it.width)
         }
         size = mainAxisSize
-        sizeWithSpacings = size + spacing
+        sizeWithSpacings = (size + spacing).coerceAtLeast(0)
         crossAxisSize = maxCrossAxis
     }
 
