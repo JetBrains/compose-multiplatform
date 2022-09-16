@@ -70,8 +70,9 @@ internal class LayoutTreeConsistencyChecker(
             }
             if (layoutPending) {
                 return relayoutNodes.contains(this) ||
-                    parent?.measurePending == true ||
-                    parent?.layoutPending == true ||
+                    parent == null ||
+                    parent.measurePending ||
+                    parent.layoutPending ||
                     parentLayoutState == LayoutNode.LayoutState.Measuring ||
                     parentLayoutState == LayoutNode.LayoutState.LayingOut
             }
@@ -93,11 +94,12 @@ internal class LayoutTreeConsistencyChecker(
             }
             if (lookaheadLayoutPending) {
                 return relayoutNodes.contains(this) ||
-                    parent?.lookaheadMeasurePending == true ||
-                    parent?.lookaheadLayoutPending == true ||
+                    parent == null ||
+                    parent.lookaheadMeasurePending ||
+                    parent.lookaheadLayoutPending ||
                     parentLayoutState == LayoutNode.LayoutState.LookaheadMeasuring ||
                     parentLayoutState == LayoutNode.LayoutState.LookaheadLayingOut ||
-                    (parent?.layoutPending == true && mLookaheadScope!!.root == this)
+                    (parent.layoutPending && mLookaheadScope!!.root == this)
             }
         }
         return true
