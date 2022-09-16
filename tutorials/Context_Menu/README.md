@@ -128,7 +128,7 @@ Right click on the Blue Square will show a context menu with two items:
 
 ## Styling context menu
 Style of context menu doesn't comply MaterialTheme. To change its colors, you should override `LocalContextMenuRepresentation`:
-```
+```kotlin
 import androidx.compose.foundation.DarkDefaultContextMenuRepresentation
 import androidx.compose.foundation.LightDefaultContextMenuRepresentation
 import androidx.compose.foundation.LocalContextMenuRepresentation
@@ -234,6 +234,7 @@ fun CustomTextMenuProvider(content: @Composable () -> Unit) {
                 state: ContextMenuState,
                 content: @Composable () -> Unit
             ) {
+                // Here we reuse the original TextContextMenu, but add an additional item to item on the bottom.
                 ContextMenuDataProvider({
                     val shortText = textManager.selectedText.crop()
                     if (shortText.isNotEmpty()) {
@@ -340,6 +341,8 @@ fun JPopupTextMenuProvider(owner: Component, content: @Composable () -> Unit) {
                        swingItem(localization.selectAll, Color.BLACK, KeyEvent.VK_A, it)
                     )
                 }
+                
+                // Here we add other items that can be defined additionaly in the other places of the application via ContextMenuDataProvider
                 for (item in items) {
                     add(
                         JMenuItem(item.label).apply {
