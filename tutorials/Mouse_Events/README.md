@@ -401,46 +401,44 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
 
 @OptIn(ExperimentalFoundationApi::class)
-fun main() {
-    singleWindowApplication {
-        val windowInfo = LocalWindowInfo.current
+fun main() = singleWindowApplication {
+    val windowInfo = LocalWindowInfo.current
 
-        Column {
-            var topBoxOffset by remember { mutableStateOf(Offset(0f, 0f)) }
+    Column {
+        var topBoxOffset by remember { mutableStateOf(Offset(0f, 0f)) }
 
-            Box(modifier = Modifier.offset {
-                IntOffset(topBoxOffset.x.toInt(), topBoxOffset.y.toInt())
-            }.size(100.dp)
-                .background(Color.Green)
-                .onDrag { // all default: enabled = true, matcher = PointerMatcher.Primary (left mouse button)
-                    topBoxOffset += it
+        Box(modifier = Modifier.offset {
+            IntOffset(topBoxOffset.x.toInt(), topBoxOffset.y.toInt())
+        }.size(100.dp)
+            .background(Color.Green)
+            .onDrag { // all default: enabled = true, matcher = PointerMatcher.Primary (left mouse button)
+                topBoxOffset += it
+            }
+        ) {
+            Text(text = "Drag with LMB", modifier = Modifier.align(Alignment.Center))
+        }
+
+        var bottomBoxOffset by remember { mutableStateOf(Offset(0f, 0f)) }
+
+        Box(modifier = Modifier.offset {
+            IntOffset(bottomBoxOffset.x.toInt(), bottomBoxOffset.y.toInt())
+        }.size(100.dp)
+            .background(Color.LightGray)
+            .onDrag(
+                enabled = true,
+                matcher = PointerMatcher.mouse(PointerButton.Secondary), // right mouse button
+                onDragStart = {
+                    println("Gray Box: drag start")
+                },
+                onDragEnd = {
+                    println("Gray Box: drag end")
                 }
             ) {
-                Text(text = "Drag with LMB", modifier = Modifier.align(Alignment.Center))
+                val keyboardModifiers = windowInfo.keyboardModifiers
+                bottomBoxOffset += if (keyboardModifiers.isCtrlPressed) it * 2f else it
             }
-
-            var bottomBoxOffset by remember { mutableStateOf(Offset(0f, 0f)) }
-
-            Box(modifier = Modifier.offset {
-                IntOffset(bottomBoxOffset.x.toInt(), bottomBoxOffset.y.toInt())
-            }.size(100.dp)
-                .background(Color.LightGray)
-                .onDrag(
-                    enabled = true,
-                    matcher = PointerMatcher.mouse(PointerButton.Secondary), // right mouse button
-                    onDragStart = {
-                        println("Gray Box: drag start")
-                    },
-                    onDragEnd = {
-                        println("Gray Box: drag end")
-                    }
-                ) {
-                    val keyboardModifiers = windowInfo.keyboardModifiers
-                    bottomBoxOffset += if (keyboardModifiers.isCtrlPressed) it * 2f else it
-                }
-            ){
-                Text(text = "Drag with RMB,\ntry with CTRL", modifier = Modifier.align(Alignment.Center))
-            }
+        ) {
+            Text(text = "Drag with RMB,\ntry with CTRL", modifier = Modifier.align(Alignment.Center))
         }
     }
 }
@@ -472,24 +470,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
 
 @OptIn(ExperimentalFoundationApi::class)
-fun main() {
-    singleWindowApplication {
-        var topBoxOffset by remember { mutableStateOf(Offset(0f, 0f)) }
+fun main() = singleWindowApplication {
+    var topBoxOffset by remember { mutableStateOf(Offset(0f, 0f)) }
 
-        Box(modifier = Modifier.offset {
-            IntOffset(topBoxOffset.x.toInt(), topBoxOffset.y.toInt())
-        }.size(100.dp)
-            .background(Color.Green)
-            .pointerInput(Unit) {
-                detectDragGestures(
-                    matcher = PointerMatcher.Primary
-                ) {
-                    topBoxOffset += it
-                }
+    Box(modifier = Modifier.offset {
+        IntOffset(topBoxOffset.x.toInt(), topBoxOffset.y.toInt())
+    }.size(100.dp)
+        .background(Color.Green)
+        .pointerInput(Unit) {
+            detectDragGestures(
+                matcher = PointerMatcher.Primary
+            ) {
+                topBoxOffset += it
             }
-        ) {
-            Text(text = "Drag with LMB", modifier = Modifier.align(Alignment.Center))
         }
+    ) {
+        Text(text = "Drag with LMB", modifier = Modifier.align(Alignment.Center))
     }
 }
 ```
