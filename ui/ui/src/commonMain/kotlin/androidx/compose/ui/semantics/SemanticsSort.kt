@@ -156,8 +156,13 @@ internal class NodeLocationHolder internal constructor(
             return -1
         }
 
+        val zDifference = LayoutNode.ZComparator.compare(node, other.node)
+        if (zDifference != 0) {
+            return -zDifference
+        }
+
         // Break tie somehow
-        return -1
+        return node.semanticsId - other.node.semanticsId
     }
 }
 

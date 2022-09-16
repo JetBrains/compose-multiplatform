@@ -1287,18 +1287,6 @@ internal class LayoutNode(
         }
     }
 
-    /**
-     * Comparator allowing to sort nodes by zIndex and placement order.
-     */
-    val ZComparator = Comparator<LayoutNode> { node1, node2 ->
-        if (node1.zIndex == node2.zIndex) {
-            // if zIndex is the same we use the placement order
-            node1.placeOrder.compareTo(node2.placeOrder)
-        } else {
-            node1.zIndex.compareTo(node2.zIndex)
-        }
-    }
-
     override val parentInfo: LayoutInfo?
         get() = parent
 
@@ -1338,6 +1326,18 @@ internal class LayoutNode(
                 get() = 16f
             override val minimumTouchTargetSize: DpSize
                 get() = DpSize.Zero
+        }
+
+        /**
+         * Comparator allowing to sort nodes by zIndex and placement order.
+         */
+        internal val ZComparator = Comparator<LayoutNode> { node1, node2 ->
+            if (node1.zIndex == node2.zIndex) {
+                // if zIndex is the same we use the placement order
+                node1.placeOrder.compareTo(node2.placeOrder)
+            } else {
+                node1.zIndex.compareTo(node2.zIndex)
+            }
         }
     }
 
