@@ -35,7 +35,7 @@ kotlin {
             }
         }
     } else {
-        iosX64("uikitX64") {
+        ios("uikitX64") {
             binaries {
                 framework {
                     baseName = "shared"
