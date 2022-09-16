@@ -61,7 +61,7 @@ fun main() = singleWindowApplication {
 
 <img alt="Application running" src="mouse_click.gif" height="500" />
 
-Please note, that advanced click events processing is available on Desktop via AWT interop. See **Advanced click events processing** section below.  
+`combinedClickable` supports only the Primary button (Left Mouse Button) and touch events. If there is a need to handle other buttons differently, please have a look at `Modifier.onClick` below (note: `Modifier.onClick` is currently avilable only for Desktop-JVM platform). 
 
 ### Mouse move listeners
 
@@ -185,100 +185,6 @@ fun main() = singleWindowApplication {
 ```
 *Note that onPointerEvent is experimental and can be changed in the future. For more stable API look at [Modifier.pointerInput](#listenining-raw-events-in-commonmain-via-modifierpointerinput)*.
 
-### Mouse right/middle clicks and keyboard modifiers
-
-Compose for Desktop contains desktop-only `Modifier.mouseClickable`, where data about pressed mouse buttons and keyboard modifiers is available. This is an experimental API, which means that it's likely to be changed before release.
-
-```kotlin
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.mouseClickable
-import androidx.compose.material.Text
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.isAltPressed
-import androidx.compose.ui.input.pointer.isCtrlPressed
-import androidx.compose.ui.input.pointer.isMetaPressed
-import androidx.compose.ui.input.pointer.isPrimaryPressed
-import androidx.compose.ui.input.pointer.isSecondaryPressed
-import androidx.compose.ui.input.pointer.isShiftPressed
-import androidx.compose.ui.input.pointer.isTertiaryPressed
-import androidx.compose.ui.window.singleWindowApplication
-
-@OptIn(ExperimentalFoundationApi::class)
-fun main() = singleWindowApplication {
-    var clickableText by remember { mutableStateOf("Click me!") }
-
-    Text(
-        modifier = Modifier.mouseClickable(
-            onClick = {
-                clickableText = buildString {
-                    append("Buttons pressed:\n")
-                    append("primary: ${buttons.isPrimaryPressed}\t")
-                    append("secondary: ${buttons.isSecondaryPressed}\t")
-                    append("tertiary: ${buttons.isTertiaryPressed}\t")
-
-                    append("\n\nKeyboard modifiers pressed:\n")
-
-                    append("alt: ${keyboardModifiers.isAltPressed}\t")
-                    append("ctrl: ${keyboardModifiers.isCtrlPressed}\t")
-                    append("meta: ${keyboardModifiers.isMetaPressed}\t")
-                    append("shift: ${keyboardModifiers.isShiftPressed}\t")
-                }
-            }
-        ),
-        text = clickableText
-    )
-}
-```
-<img alt="Application running" src="mouse_event.gif" height="500" />
-
-If you need to listen left/right clicks simultaneously, you should listen for raw events:
-```kotlin
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Text
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.isPrimaryPressed
-import androidx.compose.ui.input.pointer.isSecondaryPressed
-import androidx.compose.ui.input.pointer.onPointerEvent
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.singleWindowApplication
-
-@OptIn(ExperimentalComposeUiApi::class)
-fun main() = singleWindowApplication {
-    var text by remember { mutableStateOf("Press me") }
-
-    Box(
-        Modifier
-            .fillMaxSize()
-            .onPointerEvent(PointerEventType.Press) {
-                val position = it.changes.first().position
-                text = when {
-                    it.buttons.isPrimaryPressed &&
-                            it.buttons.isSecondaryPressed -> "Left+Right click $position"
-                    it.buttons.isSecondaryPressed -> "Right click $position"
-                    it.buttons.isPrimaryPressed -> "Left click $position"
-                    else -> text
-                }
-            },
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text, fontSize = 30.sp)
-    }
-}
-```
-*Note that onPointerEvent is experimental and can be changed in the future. For more stable API look at [Modifier.pointerInput](#listenining-raw-events-in-commonmain-via-modifierpointerinput)*.
-
 ### Swing interoperability
 
 Compose for Desktop uses Swing underneath and allows to access raw AWT events:
@@ -357,72 +263,13 @@ fun main() = singleWindowApplication {
 }
 ```
 
-### Advanced click events processing (only for Desktop-JVM platform)
-_NB: Please note, that approach described below is temporary and is to be replaced by Compose API in future!_
-
-It is possible to get additional information about mouse event, like number of clicks or state of other mouse buttons at the click time, via awt event. 
-
-```kotlin
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Text
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.singleWindowApplication
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.onPointerEvent
-import androidx.compose.ui.awt.awtEventOrNull
-import androidx.compose.ui.input.pointer.isPrimaryPressed
-import java.awt.event.MouseEvent
-
-@androidx.compose.ui.ExperimentalComposeUiApi
-fun main() = singleWindowApplication {
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
-        var text by remember { mutableStateOf("Click magenta box!") }
-        Column {
-            @OptIn(ExperimentalFoundationApi::class)
-            Box(
-                modifier = Modifier
-                    .background(Color.Magenta)
-                    .fillMaxWidth(0.7f)
-                    .fillMaxHeight(0.2f)
-                    .onPointerEvent(PointerEventType.Press) {
-                        when(it.awtEventOrNull?.button) {
-                            MouseEvent.BUTTON1 ->
-                                when (it.awtEventOrNull?.clickCount) {
-                                    1 -> { text = "Single click"}
-                                    2 -> { text = "Double click"}
-                                }
-                            MouseEvent.BUTTON3 -> { //BUTTON3 is right button
-                                if (it.buttons.isPrimaryPressed) { text = "Right + left click" }
-                                else { text = "Right click" }
-                            }
-                        }
-                    }
-            )
-            Text(text = text, fontSize = 40.sp)
-        }
-    }
-}
-```
-
 ### New experimental onClick handlers (only for Desktop-JVM platform)
 `Modifier.onClick` provides independent callbacks for clicks, double clicks, long clicks. It handles clicks originated only from pointer events and accessibility `click` event is not handled out of a box.
 
 Each `onClick` can be configured to target specific pointer events (using `matcher: PointerMatcher` and `keyboardModifiers: PointerKeyboardModifiers.() -> Boolean`). `matcher` can be specified to choose what mouse button should trigger a click. `keyboardModifiers` allows for filtering pointer events which have specified keyboardModifiers pressed.   
    
 Multiple `onClick` modifiers can be chained to handle different clicks with different conditions (matcher and keyboard modifiers).   
-Unlike `clickable`, `onClick` doesn't have a default `Modifier.indication` and `Modifier.semantics`, which need to be added separately if necessary.   
+Unlike `clickable`, `onClick` doesn't have a default `Modifier.indication`, `Modifier.semantics`, and it doesn't trigger a click event when `Enter` pressed. These modifiers need to be added separately if necessary.   
 The most generic (with the least number of conditions) `onClick` handlers should be declared before other to ensure correct events propagation.
 
 ```kotlin
@@ -447,74 +294,73 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.input.pointer.isAltPressed
 import androidx.compose.ui.input.pointer.isShiftPressed
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
-fun main() {
-    singleWindowApplication {
-        Column {
-            var topBoxText by remember { mutableStateOf("Click me") }
-            var topBoxCount by remember { mutableStateOf(0) }
-            // No indication on interaction
-            Box(modifier = Modifier.size(200.dp, 100.dp).background(Color.Blue)
-                // the most generic click handler (without extra conditions) should be the first one
-                .onClick {
-                    // it will receive all LMB clicks except when Shift is pressed
-                    println("Click with primary button")
-                    topBoxText = "LMB ${topBoxCount++}"
-                }.onClick(
-                    keyboardModifiers = { isShiftPressed } // accept clicks only when Shift pressed
-                ) {
-                    // it will receive all LMB clicks when Shift is pressed
-                    println("Click with primary button and shift pressed")
-                    topBoxCount++
-                    topBoxText = "LMB + Shift ${topBoxCount++}"
-                }
+fun main() = singleWindowApplication {
+    Column {
+        var topBoxText by remember { mutableStateOf("Click me\nusing LMB or LMB + Shift") }
+        var topBoxCount by remember { mutableStateOf(0) }
+        // No indication on interaction
+        Box(modifier = Modifier.size(200.dp, 100.dp).background(Color.Blue)
+            // the most generic click handler (without extra conditions) should be the first one
+            .onClick {
+                // it will receive all LMB clicks except when Shift is pressed
+                println("Click with primary button")
+                topBoxText = "LMB ${topBoxCount++}"
+            }.onClick(
+                keyboardModifiers = { isShiftPressed } // accept clicks only when Shift pressed
             ) {
-                AnimatedContent(
-                    targetState = topBoxText,
-                    modifier = Modifier.align(Alignment.Center)
-                ) {
-                    Text(text = it)
-                }
+                // it will receive all LMB clicks when Shift is pressed
+                println("Click with primary button and shift pressed")
+                topBoxCount++
+                topBoxText = "LMB + Shift ${topBoxCount++}"
             }
-
-            var bottomBoxText by remember { mutableStateOf("Click me") }
-            var bottomBoxCount by remember { mutableStateOf(0) }
-            val interactionSource = remember { MutableInteractionSource() }
-            // With indication on interaction
-            Box(modifier = Modifier.size(200.dp, 100.dp).background(Color.Yellow)
-                .onClick(
-                    enabled = true,
-                    interactionSource = interactionSource,
-                    matcher = PointerMatcher.mouse(PointerButton.Secondary), // Right Mouse Button
-                    keyboardModifiers = { isAltPressed }, // accept clicks only when Alt pressed
-                    onLongClick = { // optional
-                        bottomBoxText = "RMB Long Click + Alt ${bottomBoxCount++}"
-                        println("Long Click with secondary button and Alt pressed")
-                    },
-                    onDoubleClick = { // optional
-                        bottomBoxText = "RMB Double Click + Alt ${bottomBoxCount++}"
-                        println("Double Click with secondary button and Alt pressed")
-                    },
-                    onClick = {
-                        bottomBoxText = "RMB Click + Alt ${bottomBoxCount++}"
-                        println("Click with secondary button and Alt pressed")
-                    }
-                )
-                .onClick(interactionSource = interactionSource) { // use default parameters
-                    bottomBoxText = "LMB Click ${bottomBoxCount++}"
-                    println("Click with primary button (mouse left button)")
-                }
-                .indication(interactionSource, LocalIndication.current)
+        ) {
+            AnimatedContent(
+                targetState = topBoxText,
+                modifier = Modifier.align(Alignment.Center)
             ) {
-                AnimatedContent(
-                    targetState = bottomBoxText,
-                    modifier = Modifier.align(Alignment.Center)
-                ) {
-                    Text(text = it)
+                Text(text = it, textAlign = TextAlign.Center)
+            }
+        }
+
+        var bottomBoxText by remember { mutableStateOf("Click me\nusing LMB or\nRMB + Alt") }
+        var bottomBoxCount by remember { mutableStateOf(0) }
+        val interactionSource = remember { MutableInteractionSource() }
+        // With indication on interaction
+        Box(modifier = Modifier.size(200.dp, 100.dp).background(Color.Yellow)
+            .onClick(
+                enabled = true,
+                interactionSource = interactionSource,
+                matcher = PointerMatcher.mouse(PointerButton.Secondary), // Right Mouse Button
+                keyboardModifiers = { isAltPressed }, // accept clicks only when Alt pressed
+                onLongClick = { // optional
+                    bottomBoxText = "RMB Long Click + Alt ${bottomBoxCount++}"
+                    println("Long Click with secondary button and Alt pressed")
+                },
+                onDoubleClick = { // optional
+                    bottomBoxText = "RMB Double Click + Alt ${bottomBoxCount++}"
+                    println("Double Click with secondary button and Alt pressed")
+                },
+                onClick = {
+                    bottomBoxText = "RMB Click + Alt ${bottomBoxCount++}"
+                    println("Click with secondary button and Alt pressed")
                 }
+            )
+            .onClick(interactionSource = interactionSource) { // use default parameters
+                bottomBoxText = "LMB Click ${bottomBoxCount++}"
+                println("Click with primary button (mouse left button)")
+            }
+            .indication(interactionSource, LocalIndication.current)
+        ) {
+            AnimatedContent(
+                targetState = bottomBoxText,
+                modifier = Modifier.align(Alignment.Center)
+            ) {
+                Text(text = it, textAlign = TextAlign.Center)
             }
         }
     }
@@ -526,7 +372,7 @@ fun main() {
 `Modifier.onDrag` allows for configuration of the pointer that should trigger the drag (see `matcher: PointerMatcher`).   
 Many `onDrag` modifiers can be chained together.  
 
-The example below also shows how to access the state of keyboard modifiers (via `LocalWindowInfo.current.keyboardModifier`) for cases when keyboard modifiers can alter the behaviour of the drag (for example: move an item if simple drag; or copy/paste an item if dragged with Ctrl pressed)
+The example below also shows how to access the state of keyboard modifiers (via `LocalWindowInfo.current.keyboardModifier`) for cases when keyboard modifiers can alter the behaviour of the drag (for example: move an item if we perform a simple drag; or copy/paste an item if dragged with Ctrl pressed)
 
 ```kotlin
 import androidx.compose.foundation.ExperimentalFoundationApi
