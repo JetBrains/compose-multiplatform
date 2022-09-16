@@ -54,12 +54,10 @@ fun ContextMenuArea(
 ) {
     val data = ContextMenuData(items, LocalContextMenuData.current)
 
-    ContextMenuDataProvider(data) {
-        Box(Modifier.contextMenuDetector(state, enabled), propagateMinConstraints = true) {
-            content()
-        }
-        LocalContextMenuRepresentation.current.Representation(state, data.allItems)
+    Box(Modifier.contextMenuDetector(state, enabled), propagateMinConstraints = true) {
+        content()
     }
+    LocalContextMenuRepresentation.current.Representation(state) { data.allItems }
 }
 
 /**
@@ -139,7 +137,7 @@ private suspend fun AwaitPointerEventScope.awaitEventFirstDown(): PointerEvent {
  * @param label The text to be displayed as a context menu item.
  * @param onClick The action to be executed after click on the item.
  */
-class ContextMenuItem(
+open class ContextMenuItem(
     val label: String,
     val onClick: () -> Unit
 ) {
@@ -249,7 +247,14 @@ class ContextMenuState {
  */
 interface ContextMenuRepresentation {
     @Composable
-    fun Representation(state: ContextMenuState, items: List<ContextMenuItem>)
+    @Deprecated(
+        "Use another overload that loads items only when they are needed",
+        replaceWith = ReplaceWith("Representation(state, { items }")
+    )
+    fun Representation(state: ContextMenuState, items: List<ContextMenuItem>) = Representation(state) { items }
+
+    @Composable
+    fun Representation(state: ContextMenuState, items: () -> List<ContextMenuItem>)
 }
 
 /**

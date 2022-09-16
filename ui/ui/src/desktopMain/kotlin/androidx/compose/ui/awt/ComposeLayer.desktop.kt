@@ -338,17 +338,19 @@ internal class ComposeLayer(
 
         _component.addFocusListener(object : FocusListener {
             override fun focusGained(e: FocusEvent) {
-                // We don't reset focus for Compose when the window loses focus
-                // Partially because we don't support restoring focus after clearing it
-                if (e.cause != FocusEvent.Cause.ACTIVATION) {
+                // We don't reset focus for Compose when the component loses focus temporary.
+                // Partially because we don't support restoring focus after clearing it.
+                // Focus can be lost temporary when another window or popup takes focus.
+                if (!e.isTemporary) {
                     scene.requestFocus()
                 }
             }
 
             override fun focusLost(e: FocusEvent) {
-                // We don't reset focus for Compose when the window loses focus
-                // Partially because we don't support restoring focus after clearing it
-                if (e.cause != FocusEvent.Cause.ACTIVATION) {
+                // We don't reset focus for Compose when the component loses focus temporary.
+                // Partially because we don't support restoring focus after clearing it.
+                // Focus can be lost temporary when another window or popup takes focus.
+                if (!e.isTemporary) {
                     scene.releaseFocus()
                 }
             }

@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.platform
 
+import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
 
 interface PlatformLocalization {
@@ -32,6 +33,6 @@ internal val defaultPlatformLocalization = object : PlatformLocalization {
     override val selectAll = "Select All"
 }
 
-val LocalLocalization = staticCompositionLocalOf {
+val LocalLocalization: ProvidableCompositionLocal<PlatformLocalization> = staticCompositionLocalOf {
     defaultPlatformLocalization
 }

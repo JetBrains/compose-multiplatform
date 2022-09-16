@@ -81,7 +81,7 @@ task run3(type: JavaExec) {
         compilation.runtimeDependencyFiles
 }
 
-task run4(type: JavaExec) {
+task runSwing(type: JavaExec) {
     dependsOn(":compose:desktop:desktop:jar")
     main = "androidx.compose.desktop.examples.swingexample.Main_jvmKt"
     def compilation = kotlin.jvm().compilations["main"]
