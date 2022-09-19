@@ -289,8 +289,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             // If no one else is going to register a source jar, then we should.
             // This cross-plugin hands-off logic shouldn't be necessary once we clean up sourceSet
             // logic (b/235828421)
-            // If this is done outside of afterEvaluate, then we don't always get the right answer,
-            // but due to b/233089408 we don't currently have a way to test that.
             if (!project.plugins.hasPlugin(LibraryPlugin::class.java) &&
                 !project.plugins.hasPlugin(JavaPlugin::class.java)) {
                 project.configureSourceJarForJava()
