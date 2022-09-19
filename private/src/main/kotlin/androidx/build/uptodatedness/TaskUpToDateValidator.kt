@@ -131,7 +131,6 @@ val ALLOW_RERUNNING_TASKS = setOf(
 val DONT_TRY_RERUNNING_TASKS = setOf(
     ":buildSrc-tests:project-subsets:test",
     "listTaskOutputs",
-    "validateProperties",
     "tasks",
 
     // More information about the fact that these dokka tasks rerun can be found at b/167569304
