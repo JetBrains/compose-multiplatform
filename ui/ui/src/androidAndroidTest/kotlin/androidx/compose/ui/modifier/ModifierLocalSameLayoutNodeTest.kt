@@ -236,6 +236,87 @@ class ModifierLocalSameLayoutNodeTest {
     }
 
     @Test
+    fun modifierLocalProviderChanged_returnsDefaultValueBeforeNewValue() {
+        // Arrange.
+        val localString = modifierLocalOf { defaultValue }
+        val provider1value = "Provider1"
+        val provider2value = "Provider2"
+        var useFirstProvider by mutableStateOf(true)
+        val receivedValues = mutableListOf<String>()
+        rule.setContent {
+            Box(
+                Modifier
+                    .then(
+                        if (useFirstProvider) {
+                            Modifier.modifierLocalProvider(localString) { provider1value }
+                        } else {
+                            Modifier.modifierLocalProvider(localString) { provider2value }
+                        }
+                    )
+                    .modifierLocalConsumer { receivedValues.add(localString.current) }
+            )
+        }
+
+        // Act.
+        rule.runOnIdle { useFirstProvider = false }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(receivedValues)
+                .containsExactly(provider1value, defaultValue, provider2value, provider2value)
+                .inOrder()
+        }
+    }
+
+    @Test
+    fun modifierLocalConsumer_returnsDefaultValueWhenModifierIsDisposed() {
+        // Arrange.
+        val modifierLocal = modifierLocalOf { defaultValue }
+        var hasProvider by mutableStateOf(true)
+        lateinit var receivedValue: String
+        rule.setContent {
+            Box(
+                Modifier
+                    .then(
+                        if (hasProvider) {
+                            Modifier.modifierLocalProvider(modifierLocal) { "ProvidedValue" }
+                        } else Modifier
+                    )
+                    .modifierLocalConsumer { receivedValue = modifierLocal.current }
+            )
+        }
+
+        // Act.
+        rule.runOnIdle { hasProvider = false }
+
+        // Assert.
+        rule.runOnIdle { assertThat(receivedValue).isEqualTo(defaultValue) }
+    }
+
+    @Test
+    fun modifierLocalConsumer_returnsDefaultValueWhenComposableIsDisposed() {
+        // Arrange.
+        val modifierLocal = modifierLocalOf { defaultValue }
+        var includeComposable by mutableStateOf(true)
+        lateinit var receivedValue: String
+        rule.setContent {
+            if (includeComposable) {
+                Box(
+                    Modifier
+                        .modifierLocalProvider(modifierLocal) { "ProvidedValue" }
+                        .modifierLocalConsumer { receivedValue = modifierLocal.current }
+                )
+            }
+        }
+
+        // Act.
+        rule.runOnIdle { includeComposable = false }
+
+        // Assert.
+        rule.runOnIdle { assertThat(receivedValue).isEqualTo(defaultValue) }
+    }
+
+    @Test
     fun modifierLocalProviderValueChanged() {
         // Arrange.
         val localString = modifierLocalOf { defaultValue }
