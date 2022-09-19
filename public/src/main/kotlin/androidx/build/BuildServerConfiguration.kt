@@ -81,14 +81,14 @@ fun Project.getBuildInfoDirectory(): File =
  * configs cause all the tests to be run, except in cases where buildSrc changes.
  */
 fun Project.getTestConfigDirectory(): File =
-    File(project.buildDir, "test-xml-configs")
+    File(getDistributionDirectory(), "test-xml-configs")
 
 /**
  * Directory for android test configuration files that get consumed by Tradefed in CI. These
  * "constrained" configs cause only small and medium tests to be run for dependent projects.
  */
 fun Project.getConstrainedTestConfigDirectory(): File =
-    File(project.buildDir, "constrained-test-xml-configs")
+    File(getDistributionDirectory(), "constrained-test-xml-configs")
 
 /**
  * Directory to put release note files for generate release note tasks.
