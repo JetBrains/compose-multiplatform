@@ -202,9 +202,6 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
         // Broken in 7.0.0-alpha15 due to b/180408990
         disable.add("RestrictedApi")
 
-        // Reenable after upgradingto 7.1.0-beta01
-        disable.add("SupportAnnotationUsage")
-
         // Provide stricter enforcement for project types intended to run on a device.
         if (extension.type.compilationTarget == CompilationTarget.DEVICE) {
             fatal.add("Assert")
