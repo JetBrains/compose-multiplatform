@@ -789,8 +789,7 @@ class OutlinedTextFieldTest {
         rule.runOnIdleWithDensity {
             val iconSize = 24.dp // default icon size
             assertThat(labelPosition.value?.x).isEqualTo(
-                (ExpectedPadding.roundToPx() + IconPadding.roundToPx() + iconSize.roundToPx())
-                    .toFloat()
+                (ExpectedPadding + IconPadding + iconSize).roundToPx().toFloat()
             )
         }
     }
@@ -856,6 +855,112 @@ class OutlinedTextFieldTest {
                 },
                 trailingIcon = {
                     assertThat(LocalContentColor.current).isEqualTo(MaterialTheme.colorScheme.error)
+                }
+            )
+        }
+    }
+
+    @Test
+    fun testOutlinedTextField_supportingText_position() {
+        val tfSize = Ref<IntSize>()
+        val supportingSize = Ref<IntSize>()
+        val supportingPosition = Ref<Offset>()
+        rule.setMaterialContent(lightColorScheme()) {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                modifier = Modifier.onGloballyPositioned {
+                    tfSize.value = it.size
+                },
+                supportingText = {
+                    Text(
+                        text = "Supporting",
+                        modifier = Modifier.onGloballyPositioned {
+                            supportingSize.value = it.size
+                            supportingPosition.value = it.positionInRoot()
+                        }
+                    )
+                }
+            )
+        }
+
+        rule.runOnIdleWithDensity {
+            assertThat(supportingPosition.value?.x).isEqualTo(
+                ExpectedPadding.roundToPx().toFloat()
+            )
+            assertThat(supportingPosition.value?.y).isEqualTo(
+                tfSize.value!!.height - supportingSize.value!!.height
+            )
+        }
+    }
+
+    @Test
+    fun testOutlinedTextField_supportingText_contributesToTextFieldMeasurements() {
+        val tfSize = Ref<IntSize>()
+        rule.setMaterialContent(lightColorScheme()) {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                modifier = Modifier.onGloballyPositioned {
+                    tfSize.value = it.size
+                },
+                supportingText = { Text("Supporting") }
+            )
+        }
+
+        rule.runOnIdleWithDensity {
+            assertThat(tfSize.value!!.height).isGreaterThan(
+                ExpectedMinimumTextFieldHeight.roundToPx()
+            )
+        }
+    }
+
+    @Test
+    fun testOutlinedTextField_supportingText_clickFocusesTextField() {
+        var focused = false
+        rule.setMaterialContent(lightColorScheme()) {
+            OutlinedTextField(
+                modifier = Modifier.onFocusChanged { focused = it.isFocused },
+                value = "input",
+                onValueChange = {},
+                supportingText = { Text("Supporting") }
+            )
+        }
+
+        rule.onNodeWithText("Supporting").performClick()
+        rule.runOnIdle {
+            assertThat(focused).isTrue()
+        }
+    }
+
+    @Test
+    fun testOutlinedTextField_supportingText_colorAndStyle() {
+        rule.setMaterialContent(lightColorScheme()) {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                supportingText = {
+                    assertThat(LocalTextStyle.current)
+                        .isEqualTo(MaterialTheme.typography.bodySmall)
+                    assertThat(LocalContentColor.current)
+                        .isEqualTo(MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            )
+        }
+    }
+
+    @Test
+    fun testOutlinedTextField_supportingText_error_colorAndStyle() {
+        rule.setMaterialContent(lightColorScheme()) {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                isError = true,
+                supportingText = {
+                    assertThat(LocalTextStyle.current)
+                        .isEqualTo(MaterialTheme.typography.bodySmall)
+                    assertThat(LocalContentColor.current)
+                        .isEqualTo(MaterialTheme.colorScheme.error)
                 }
             )
         }

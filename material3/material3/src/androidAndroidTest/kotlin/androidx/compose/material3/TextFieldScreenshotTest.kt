@@ -525,6 +525,37 @@ class TextFieldScreenshotTest {
     }
 
     @Test
+    fun textField_supportingText() {
+        rule.setMaterialContent(lightColorScheme()) {
+            TextField(
+                value = "",
+                onValueChange = {},
+                modifier = Modifier.testTag(TextFieldTag).fillMaxWidth(),
+                singleLine = true,
+                supportingText = { Text("Supporting text") }
+            )
+        }
+
+        assertAgainstGolden("textField_supportingText")
+    }
+
+    @Test
+    fun textField_errorSupportingText() {
+        rule.setMaterialContent(lightColorScheme()) {
+            TextField(
+                value = "",
+                onValueChange = {},
+                isError = true,
+                modifier = Modifier.testTag(TextFieldTag).fillMaxWidth(),
+                singleLine = true,
+                supportingText = { Text("Error supporting text") }
+            )
+        }
+
+        assertAgainstGolden("textField_errorSupportingText")
+    }
+
+    @Test
     fun textField_leadingTrailingIcons() {
         rule.setMaterialContent(lightColorScheme()) {
             TextField(
